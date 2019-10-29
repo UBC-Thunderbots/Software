@@ -330,17 +330,16 @@ class Field
      */
     bool operator!=(const Field &other) const;
 
-
-   private:
-    // Private variables have underscores at the end of their names
-    // to avoid conflicts with function names
-
     /**
      * Updates the timestamp history for the Field object
      *
      * @param time_stamp : The timestamp at which the Field object was updated
      */
     void updateTimestamp(Timestamp time_stamp);
+
+   private:
+    // Private variables have underscores at the end of their names
+    // to avoid conflicts with function names
 
     // The length of the playable field (between the goal lines) in metres
     double field_x_length_;

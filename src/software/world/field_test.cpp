@@ -311,3 +311,27 @@ TEST_F(FieldTest, point_not_in_entire_field)
     Point p(-4.91, -0.88);
     EXPECT_FALSE(field.pointInEntireField(p));
 }
+
+TEST_F(FieldTest, update_timestamp_with_timestamp_in_future) {
+    try {
+        field.updateTimestamp(Timestamp::fromSeconds(1.0));
+        EXPECT_EQ(Timestamp::fromSeconds(1.0), field.getMostRecentTimestamp());
+    } catch (std::invalid_argument&) {
+        ADD_FAILURE() << "Invalid Timestamp used to update field timestamp";
+    }
+}
+
+TEST_F(FieldTest, update_timestamp_with_same_timestamp) {
+    try {
+        field.updateTimestamp(Timestamp::fromSeconds(0.0));
+        EXPECT_EQ(Timestamp::fromSeconds(0.0), field.getMostRecentTimestamp());
+    } catch (std::invalid_argument&) {
+        ADD_FAILURE() << "Invalid Timestamp used to update field timestamp";
+    }
+}
+
+TEST_F(FieldTest, update_timestamp_with_timestamp_in_past) {
+    // First make sure we have a timestamp > 0
+    field.updateTimestamp(Timestamp::fromSeconds(1.0));
+    EXPECT_THROW(field.updateTimestamp(Timestamp::fromSeconds(0.9)), std::invalid_argument);
+}
