@@ -45,3 +45,28 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "field",
+    srcs = ["physics_field.cpp"],
+    hdrs = ["physics_field.h"],
+    deps = [
+        ":box2d_util",
+        "//software/util/time:timestamp",
+        "//software/world:field",
+        "@box2d",
+    ],
+)
+
+cc_test(
+    name = "field_test",
+    srcs = ["physics_field_test.cpp"],
+    deps = [
+        ":ball",
+        ":field",
+        "//software/test_util",
+        "//software/world:field",
+        "@box2d",
+        "@gtest//:gtest_main",
+    ],
+)
