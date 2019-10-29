@@ -100,6 +100,13 @@ class Field
     double goalYLength() const;
 
     /**
+     * Gets the "depth" of the goal along the x-axis, in metres.
+     *
+     * @return the "depth" of the goal along the x-axis, in metres.
+     */
+    double goalXLength() const;
+
+    /**
      * Gets the radius of the centre circle in metres.
      *
      * @return the radius of the centre circle in metres.
@@ -351,6 +358,8 @@ class Field
     double defense_y_length_;
     // The width of the goal (between the goalposts) in metres
     double goal_y_length_;
+    // How "deep" the goal is along the x-axis in metres
+    double goal_x_length_;
 
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres

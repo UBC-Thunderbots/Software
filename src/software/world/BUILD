@@ -25,6 +25,7 @@ cc_library(
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
     deps = [
+        "//shared:constants",
         "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
@@ -36,6 +37,7 @@ cc_test(
     srcs = ["field_test.cpp"],
     deps = [
         ":field",
+        "//shared:constants",
         "@gtest//:gtest_main",
     ],
 )

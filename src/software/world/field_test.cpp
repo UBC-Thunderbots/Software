@@ -1,4 +1,5 @@
 #include "software/world/field.h"
+#include "shared/constants.h"
 
 #include <gtest/gtest.h>
 
@@ -38,6 +39,7 @@ TEST_F(FieldTest, construct_with_parameters)
     EXPECT_DOUBLE_EQ(x_length, field.xLength());
     EXPECT_DOUBLE_EQ(y_length, field.yLength());
     EXPECT_DOUBLE_EQ(goal_y_length, field.goalYLength());
+    EXPECT_DOUBLE_EQ(ROBOT_MAX_RADIUS_METERS * 2, field.goalXLength());
     EXPECT_DOUBLE_EQ(center_circle_radius, field.centerCircleRadius());
     EXPECT_DOUBLE_EQ(defense_y_length, field.defenseAreaYLength());
     EXPECT_DOUBLE_EQ(defense_x_length, field.defenseAreaXLength());

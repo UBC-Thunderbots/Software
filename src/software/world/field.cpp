@@ -1,6 +1,7 @@
 #include "software/world/field.h"
 
 #include <boost/circular_buffer.hpp>
+#include "shared/constants.h"
 
 #include "software/geom/rectangle.h"
 #include "software/util/time/timestamp.h"
@@ -14,6 +15,9 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       defense_x_length_(defense_x_length),
       defense_y_length_(defense_y_length),
       goal_y_length_(goal_y_length),
+      // While not explicitly given by SSL-Vision, the goals are typically
+      // deep enough to fit a single robot
+      goal_x_length_(ROBOT_MAX_RADIUS_METERS * 2),
       boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius)
 {
@@ -73,6 +77,10 @@ double Field::totalYLength() const
 double Field::goalYLength() const
 {
     return goal_y_length_;
+}
+
+double Field::goalXLength() const {
+    return goal_x_length_;
 }
 
 double Field::defenseAreaYLength() const
