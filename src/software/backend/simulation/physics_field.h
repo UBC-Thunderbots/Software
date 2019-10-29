@@ -1,21 +1,23 @@
 #pragma once
 
-#include "software/world/field.h"
 #include "Box2D/Box2D.h"
+#include "software/world/field.h"
 
 /**
  * This class represents a Field in a Box2D physics simulation. It provides a convenient
- * way for us to abstract the field and convert to our own Field class when data is needed.
+ * way for us to abstract the field and convert to our own Field class when data is
+ * needed.
  *
- * In a PhysicsField, objects are able to collide with the field border, and the nets at each
- * end of the field
+ * In a PhysicsField, objects are able to collide with the field border, and the nets at
+ * each end of the field
  */
-class PhysicsField {
-public:
+class PhysicsField
+{
+   public:
     /**
-     * Creates a new PhysicsField given a Box2D world and a Field object. Several Box2D bodies
-     * representing the field will be automatically added to the Box2D world and updated
-     * during world update steps.
+     * Creates a new PhysicsField given a Box2D world and a Field object. Several Box2D
+     * bodies representing the field will be automatically added to the Box2D world and
+     * updated during world update steps.
      *
      * @param world A shared_ptr to a Box2D World
      * @param field The Field to be created in the Box2D world
@@ -42,11 +44,12 @@ public:
      * @param timestamp The timestamp for the returned Field to have
      *
      * @return A Field object representing the current state of the field object in the
-     * simulated Box2D world the field was originally created in. The returned Field object
-     * will have the same timestamp as the one provided in the parameter
+     * simulated Box2D world the field was originally created in. The returned Field
+     * object will have the same timestamp as the one provided in the parameter
      */
     Field getFieldWithTimestamp(const Timestamp& timestamp) const;
-private:
+
+   private:
     void setupFieldBoundary(std::shared_ptr<b2World> world, const Field& field);
     void setupEnemyGoal(std::shared_ptr<b2World> world, const Field& field);
     void setupFriendlyGoal(std::shared_ptr<b2World> world, const Field& field);

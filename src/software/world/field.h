@@ -182,8 +182,8 @@ class Field
 
     /**
      * Gets the area within the field boundary (the physical walls surrounding the Field).
-     * This is the entire area where the robots and ball can move, and is a superset of the
-     * area inside the field lines.
+     * This is the entire area where the robots and ball can move, and is a superset of
+     * the area inside the field lines.
      *
      * @return The area within the field boundary as a rectangle
      */

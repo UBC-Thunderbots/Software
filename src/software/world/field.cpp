@@ -1,8 +1,8 @@
 #include "software/world/field.h"
 
 #include <boost/circular_buffer.hpp>
-#include "shared/constants.h"
 
+#include "shared/constants.h"
 #include "software/geom/rectangle.h"
 #include "software/util/time/timestamp.h"
 
@@ -79,7 +79,8 @@ double Field::goalYLength() const
     return goal_y_length_;
 }
 
-double Field::goalXLength() const {
+double Field::goalXLength() const
+{
     return goal_x_length_;
 }
 
@@ -107,11 +108,13 @@ Rectangle Field::enemyDefenseArea() const
         Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
 }
 
-Rectangle Field::friendlyHalf() const {
-    return Rectangle(friendlyCornerNeg(),Point(0, friendlyCornerPos().y()));
+Rectangle Field::friendlyHalf() const
+{
+    return Rectangle(friendlyCornerNeg(), Point(0, friendlyCornerPos().y()));
 }
 
-Rectangle Field::enemyHalf() const {
+Rectangle Field::enemyHalf() const
+{
     return Rectangle(Point(0, enemyCornerNeg().y()), enemyCornerPos());
 }
 
@@ -120,7 +123,8 @@ Rectangle Field::fieldLines() const
     return Rectangle(friendlyCornerNeg(), enemyCornerPos());
 }
 
-Rectangle Field::fieldBoundary() const {
+Rectangle Field::fieldBoundary() const
+{
     Point neg_x_neg_y_corner(-totalXLength() / 2, -totalYLength() / 2);
     Point pos_x_pos_y_corner(totalXLength() / 2, totalYLength() / 2);
     return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
