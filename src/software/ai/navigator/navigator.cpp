@@ -60,8 +60,10 @@ void Navigator::visit(const MoveIntent &intent)
 
     if (robot)
     {
-        path_objectives.insert(PathObjective(start, end, robot->velocity().len(),
-                                             avoid_area_obstacles, intent.getRobotId()));
+        path_objective_to_move_intent.insert(
+            {PathObjective(start, end, robot->velocity().len(), avoid_area_obstacles,
+                           intent.getRobotId()),
+             intent});
     }
     else
     {
@@ -70,8 +72,6 @@ void Navigator::visit(const MoveIntent &intent)
            << ", but failed";
         LOG(WARNING) << ss.str();
     }
-
-    robot_id_to_move_intent.insert({intent.getRobotId(), intent});
     current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
@@ -102,8 +102,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     this->world              = world;
     planned_paths.clear();
     non_path_planning_robots.clear();
-    path_objectives.clear();
-    robot_id_to_move_intent.clear();
+    path_objective_to_move_intent.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
@@ -119,6 +118,12 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
+    // get keyset from path_objective_to_move_intent
+    std::set<PathObjective> path_objectives;
+    for (const auto &p : path_objective_to_move_intent)
+    {
+        path_objectives.insert(p.first);
+    }
     auto paths = path_manager->getManagedPaths(path_objectives, navigable_area,
                                                getNonPathPlanningObstacles());
     addPathsToAssignedPrimitives(paths, assigned_primitives);
@@ -132,19 +137,25 @@ void Navigator::addPathsToAssignedPrimitives(
 {
     for (const auto &path_objective_and_path : path_objective_to_path)
     {
-        auto robot_id = path_objective_and_path.first.robot_id;
-        auto path     = path_objective_and_path.second;
+        auto path_objective = path_objective_and_path.first;
+        auto path           = path_objective_and_path.second;
 
         // look for move intent
-        auto robot_id_to_intent_it = robot_id_to_move_intent.find(robot_id);
-        if (robot_id_to_intent_it == robot_id_to_move_intent.end())
+        auto path_objective_and_intent_it =
+            path_objective_to_move_intent.find(path_objective);
+        if (path_objective_and_intent_it == path_objective_to_move_intent.end())
         {
             std::stringstream ss;
-            ss << "Tried to find intent associated with robot id = " << robot_id
-               << ", but failed";
+            ss << "Tried to find intent associated with path objective that has robot id = "
+               << path_objective.robot_id << ", but failed";
             LOG(WARNING) << ss.str();
+
+            // assume no path
+            continue;
         }
-        MoveIntent intent = robot_id_to_intent_it->second;
+
+        MoveIntent intent = path_objective_and_intent_it->second;
+
         if (path)
         {
             std::vector<Point> path_points = path->getKnots();

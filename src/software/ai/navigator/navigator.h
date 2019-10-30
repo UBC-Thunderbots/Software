@@ -132,11 +132,8 @@ class Navigator : public IntentVisitor
     // This is used by the visualizer to see the planned paths
     std::vector<std::vector<Point>> planned_paths;
 
-    // path objectives are used to plan paths
-    std::set<PathObjective> path_objectives;
-
-    // intents that need path planning
-    std::map<RobotId, MoveIntent> robot_id_to_move_intent;
+    // path objectives and intents that need path planning
+    std::map<PathObjective, MoveIntent> path_objective_to_move_intent;
 
     /**
      * Create obstacles for the given avoid areas, with a buffer such that the edge

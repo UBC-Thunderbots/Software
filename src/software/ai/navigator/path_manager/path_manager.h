@@ -43,7 +43,7 @@ class PathObjective
     const Point start;
     const Point end;
     const double current_velocity;
-    const std::vector<Obstacle> obstacles;  // obstacles specific to this objective
+    const std::vector<Obstacle> obstacles;
 
     bool operator==(const PathObjective &other) const
     {
