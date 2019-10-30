@@ -21,7 +21,7 @@ class PathManager
 {
    public:
     /**
-     * Returns map of robot ids to paths guided by path objectives,
+     * Returns map of path objectives to paths guided by path objectives,
      * given navigable_area and static_obstacles
      *
      * @param objectives vector of path objectives
