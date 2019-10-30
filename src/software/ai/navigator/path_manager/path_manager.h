@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
@@ -20,12 +21,12 @@ class PathObjective
 {
    public:
     PathObjective(const Point start, const Point end, const double current_velocity,
-                  const std::vector<Obstacle> &obstacles)
+                  const std::vector<Obstacle> &obstacles, RobotId robot_id)
         : start(start),
           end(end),
           current_velocity(current_velocity),
           obstacles(obstacles),
-          robot_id(0)
+          robot_id(robot_id)
     {
     }
 
@@ -34,7 +35,7 @@ class PathObjective
           end(other.end),
           current_velocity(other.current_velocity),
           obstacles(other.obstacles),
-          robot_id(0)
+          robot_id(other.robot_id)
     {
     }
 
@@ -47,6 +48,11 @@ class PathObjective
     bool operator==(const PathObjective &other) const
     {
         return robot_id == other.robot_id;
+    }
+
+    bool operator!=(const PathObjective &other) const
+    {
+        return robot_id != other.robot_id;
     }
 
     bool operator>(const PathObjective &other) const
@@ -75,8 +81,7 @@ class PathManager
      * @return map of robot ids to paths
      */
     virtual const std::map<PathObjective, Path> getManagedPaths(
-        const std::map<RobotId, PathObjective> &objectives,
-        const Rectangle &navigable_area,
+        const std::set<PathObjective> &objectives, const Rectangle &navigable_area,
         const std::vector<Obstacle> &static_obstacles) = 0;
 
     virtual ~PathManager() = default;

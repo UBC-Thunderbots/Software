@@ -60,9 +60,8 @@ void Navigator::visit(const MoveIntent &intent)
 
     if (robot)
     {
-        robot_id_to_path_objective.insert(
-            {intent.getRobotId(),
-             PathObjective(start, end, robot->velocity().len(), avoid_area_obstacles)});
+        path_objectives.insert(PathObjective(start, end, robot->velocity().len(),
+                                             avoid_area_obstacles, intent.getRobotId()));
     }
     else
     {
@@ -103,7 +102,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     this->world              = world;
     planned_paths.clear();
     non_path_planning_robots.clear();
-    robot_id_to_path_objective.clear();
+    path_objectives.clear();
     robot_id_to_move_intent.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
@@ -120,7 +119,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
-    auto paths = path_manager->getManagedPaths(robot_id_to_path_objective, navigable_area,
+    auto paths = path_manager->getManagedPaths(path_objectives, navigable_area,
                                                getNonPathPlanningObstacles());
     addPathsToAssignedPrimitives(paths, assigned_primitives);
 

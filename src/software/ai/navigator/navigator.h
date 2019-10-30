@@ -133,7 +133,7 @@ class Navigator : public IntentVisitor
     std::vector<std::vector<Point>> planned_paths;
 
     // path objectives are used to plan paths
-    std::map<RobotId, PathObjective> robot_id_to_path_objective;
+    std::set<PathObjective> path_objectives;
 
     // intents that need path planning
     std::map<RobotId, MoveIntent> robot_id_to_move_intent;

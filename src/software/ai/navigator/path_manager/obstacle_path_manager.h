@@ -11,8 +11,7 @@ class ObstaclePathManager : public PathManager
 {
    public:
     const std::map<PathObjective, Path> getManagedPaths(
-        const std::map<RobotId, PathObjective> &objectives,
-        const Rectangle &navigable_area,
+        const std::set<PathObjective> &objectives, const Rectangle &navigable_area,
         const std::vector<Obstacle> &static_obstacles) override;
 
     explicit ObstaclePathManager(std::unique_ptr<PathPlanner> path_planner);
@@ -29,7 +28,7 @@ class ObstaclePathManager : public PathManager
      * @return list of obstacles that around other objectives' starts
      */
     const std::vector<Obstacle> getObstaclesAroundStartOfOtherObjectives(
-        const std::map<RobotId, PathObjective> &objectives, size_t current_index,
+        const std::set<PathObjective> &objectives, const PathObjective &current_objective,
         double inflation_factor);
 
     // Path planner used to get paths
