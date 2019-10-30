@@ -20,8 +20,8 @@ void PhysicsField::setupFieldBoundary(std::shared_ptr<b2World> world, const Fiel
     field_boundary_body_def.position.Set(0, 0);
     field_boundary_body = world->CreateBody(&field_boundary_body_def);
 
-    const unsigned int num_field_boundary_vertices = 4;
-    b2Vec2 field_boundary_vertices[num_field_boundary_vertices]         = {
+    const unsigned int num_field_boundary_vertices              = 4;
+    b2Vec2 field_boundary_vertices[num_field_boundary_vertices] = {
         createVec2(field.fieldBoundary().posXPosYCorner()),
         createVec2(field.fieldBoundary().posXNegYCorner()),
         createVec2(field.fieldBoundary().negXNegYCorner()),
