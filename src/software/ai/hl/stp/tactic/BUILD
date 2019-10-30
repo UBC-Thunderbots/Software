@@ -64,6 +64,50 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "chip_tactic_test",
+    srcs = ["chip_tactic_test.cpp"],
+    deps = [
+        ":chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "kickoff_chip_tactic_test",
+    srcs = ["kickoff_chip_tactic_test.cpp"],
+    deps = [
+        ":kickoff_chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "penalty_setup_tactic_test",
+    srcs = ["penalty_setup_tactic_test.cpp"],
+    deps = [
+        ":penalty_setup_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "kickoff_chip_tactic",
+    srcs = ["kickoff_chip_tactic.cpp"],
+    hdrs = ["kickoff_chip_tactic.h"],
+    deps = [
+        ":chip_tactic",
+        ":tactic_visitor",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:chip_action",
+        "//software/geom",
+        "@g3log",
+    ],
+)
+
 cc_library(
     name = "crease_defender_tactic",
     srcs = ["crease_defender_tactic.cpp"],
@@ -260,6 +304,23 @@ cc_library(
 )
 
 cc_library(
+    name = "penalty_setup_tactic",
+    srcs = ["penalty_setup_tactic.cpp"],
+    hdrs = ["penalty_setup_tactic.h"],
+    deps = [
+        ":move_tactic",
+        ":tactic_visitor",
+        "//shared:constants",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/hl/stp/action:dribble_action",
+        "//software/ai/hl/stp/action:kick_action",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/geom",
+        "@g3log",
+    ],
+)
+
+cc_library(
     name = "receiver_tactic",
     srcs = ["receiver_tactic.cpp"],
     hdrs = ["receiver_tactic.h"],
@@ -404,10 +465,12 @@ cc_library(
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
         ":grab_ball_tactic",
+        ":kickoff_chip_tactic",
         ":move_tactic",
         ":passer_tactic",
         ":patrol_tactic",
         ":penalty_kick_tactic",
+        ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_enemy_tactic",
         ":shadow_freekicker_tactic",
