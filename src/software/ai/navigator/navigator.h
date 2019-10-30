@@ -184,4 +184,11 @@ class Navigator : public IntentVisitor
     void addPathsToAssignedPrimitives(
         const std::map<PathObjective, Path> &paths,
         std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
+
+    /**
+     * Get Obstacles from a Team
+     *
+     * @return vector of obstacles
+     */
+    std::vector<Obstacle> getObstaclesFromTeam(const Team &team);
 };

@@ -235,19 +235,13 @@ std::vector<Obstacle> Navigator::getObstaclesFromAvoidAreas(
         switch (avoid_area)
         {
             case AvoidArea::ENEMY_ROBOTS:
-                for (auto &robot : world.enemyTeam().getAllRobots())
-                {
-                    Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
-                        robot,
-                        Util::DynamicParameters->getNavigatorConfig()
-                            ->RobotObstacleInflationFactor()
-                            ->value(),
-                        Util::DynamicParameters->getNavigatorConfig()
-                            ->VelocityObstacleInflationFactor()
-                            ->value());
-                    obstacles.push_back(o);
-                }
-                break;
+            {
+                std::vector<Obstacle> enemy_robot_obstacles =
+                    getObstaclesFromTeam(world.enemyTeam());
+                obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
+                                 enemy_robot_obstacles.end());
+            }
+            break;
             case AvoidArea::FRIENDLY_DEFENSE_AREA:
                 // We extend the friendly defense area back by several meters to prevent
                 // robots going around the back of the goal
@@ -356,4 +350,22 @@ double Navigator::getCloseToEnemyObstacleFactor(const Point &p)
 std::vector<std::vector<Point>> Navigator::getPlannedPaths()
 {
     return planned_paths;
+}
+
+std::vector<Obstacle> Navigator::getObstaclesFromTeam(const Team &team)
+{
+    double robot_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
+                                        ->RobotObstacleInflationFactor()
+                                        ->value();
+    double velocity_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
+                                           ->VelocityObstacleInflationFactor()
+                                           ->value();
+    std::vector<Obstacle> obstacles;
+    for (auto &robot : team.getAllRobots())
+    {
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
+            robot, robot_inflation_factor, velocity_inflation_factor);
+        obstacles.push_back(o);
+    }
+    return obstacles;
 }
