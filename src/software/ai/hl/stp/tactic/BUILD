@@ -64,12 +64,42 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "chip_tactic_test",
+    srcs = ["chip_tactic_test.cpp"],
+    deps = [
+        ":chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "kickoff_chip_tactic_test",
+    srcs = ["kickoff_chip_tactic_test.cpp"],
+    deps = [
+        ":kickoff_chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "penalty_setup_tactic_test",
+    srcs = ["penalty_setup_tactic_test.cpp"],
+    deps = [
+        ":penalty_setup_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "kickoff_chip_tactic",
     srcs = ["kickoff_chip_tactic.cpp"],
     hdrs = ["kickoff_chip_tactic.h"],
     deps = [
-        ":tactic",
+        ":chip_tactic",
         ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
@@ -278,7 +308,7 @@ cc_library(
     srcs = ["penalty_setup_tactic.cpp"],
     hdrs = ["penalty_setup_tactic.h"],
     deps = [
-        ":tactic",
+        ":move_tactic",
         ":tactic_visitor",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
