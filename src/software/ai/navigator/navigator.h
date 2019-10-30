@@ -133,10 +133,10 @@ class Navigator : public IntentVisitor
     std::vector<std::vector<Point>> planned_paths;
 
     // path objectives are used to plan paths
-    std::map<RobotId, PathObjective> robot_id_to_path_objectives;
+    std::map<RobotId, PathObjective> robot_id_to_path_objective;
 
     // intents that need path planning
-    std::map<RobotId, MoveIntent> robot_id_to_move_intents;
+    std::map<RobotId, MoveIntent> robot_id_to_move_intent;
 
     /**
      * Create obstacles for the given avoid areas, with a buffer such that the edge
@@ -184,7 +184,7 @@ class Navigator : public IntentVisitor
      * @param paths paths to convert
      * @param assigned_primitives list of primitives to add to
      */
-    void addPathsToPrimitives(
-        const std::map<RobotId, Path> &paths,
+    void addPathsToAssignedPrimitives(
+        const std::map<PathObjective, Path> &paths,
         std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
 };

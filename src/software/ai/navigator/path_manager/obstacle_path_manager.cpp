@@ -5,11 +5,11 @@ ObstaclePathManager::ObstaclePathManager(std::unique_ptr<PathPlanner> path_plann
 {
 }
 
-const std::map<RobotId, Path> ObstaclePathManager::getManagedPaths(
+const std::map<PathObjective, Path> ObstaclePathManager::getManagedPaths(
     const std::map<RobotId, PathObjective> &objectives, const Rectangle &navigable_area,
     const std::vector<Obstacle> &static_obstacles)
 {
-    std::map<RobotId, Path> managed_paths;
+    std::map<PathObjective, Path> managed_paths;
 
     // Velocity obstacles used to avoid collisions.
     // As we plan a path for each robot, a corresponding obstacle will be added
@@ -40,7 +40,7 @@ const std::map<RobotId, Path> ObstaclePathManager::getManagedPaths(
                                            path_obstacles);
 
         // store path in managed_paths
-        managed_paths.insert({current_objective.first, path});
+        managed_paths.insert({current_objective.second, path});
 
         // store velocity obstacle for current path
         if (path && path->size() >= 2)

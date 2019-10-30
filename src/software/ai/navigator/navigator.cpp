@@ -60,7 +60,7 @@ void Navigator::visit(const MoveIntent &intent)
 
     if (robot)
     {
-        robot_id_to_path_objectives.insert(
+        robot_id_to_path_objective.insert(
             {intent.getRobotId(),
              PathObjective(start, end, robot->velocity().len(), avoid_area_obstacles)});
     }
@@ -72,7 +72,7 @@ void Navigator::visit(const MoveIntent &intent)
         LOG(WARNING) << ss.str();
     }
 
-    robot_id_to_move_intents.insert({intent.getRobotId(), intent});
+    robot_id_to_move_intent.insert({intent.getRobotId(), intent});
     current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
@@ -103,8 +103,8 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     this->world              = world;
     planned_paths.clear();
     non_path_planning_robots.clear();
-    robot_id_to_path_objectives.clear();
-    robot_id_to_move_intents.clear();
+    robot_id_to_path_objective.clear();
+    robot_id_to_move_intent.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
@@ -120,25 +120,25 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
-    auto paths = path_manager->getManagedPaths(
-        robot_id_to_path_objectives, navigable_area, getNonPathPlanningObstacles());
-    addPathsToPrimitives(paths, assigned_primitives);
+    auto paths = path_manager->getManagedPaths(robot_id_to_path_objective, navigable_area,
+                                               getNonPathPlanningObstacles());
+    addPathsToAssignedPrimitives(paths, assigned_primitives);
 
     return assigned_primitives;
 }
 
-void Navigator::addPathsToPrimitives(
-    const std::map<RobotId, Path> &robot_id_to_paths,
+void Navigator::addPathsToAssignedPrimitives(
+    const std::map<PathObjective, Path> &path_objective_to_path,
     std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
 {
-    for (const auto &robot_id_to_path : robot_id_to_paths)
+    for (const auto &path_objective_and_path : path_objective_to_path)
     {
-        auto robot_id = robot_id_to_path.first;
-        auto path     = robot_id_to_path.second;
+        auto robot_id = path_objective_and_path.first.robot_id;
+        auto path     = path_objective_and_path.second;
 
         // look for move intent
-        auto robot_id_to_intent_it = robot_id_to_move_intents.find(robot_id);
-        if (robot_id_to_intent_it == robot_id_to_move_intents.end())
+        auto robot_id_to_intent_it = robot_id_to_move_intent.find(robot_id);
+        if (robot_id_to_intent_it == robot_id_to_move_intent.end())
         {
             std::stringstream ss;
             ss << "Tried to find intent associated with robot id = " << robot_id
