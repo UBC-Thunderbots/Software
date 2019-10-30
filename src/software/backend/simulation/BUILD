@@ -22,7 +22,7 @@ cc_test(
 )
 
 cc_library(
-    name = "ball",
+    name = "physics_ball",
     srcs = ["physics_ball.cpp"],
     hdrs = ["physics_ball.h"],
     deps = [
@@ -36,10 +36,10 @@ cc_library(
 )
 
 cc_test(
-    name = "ball_test",
+    name = "physics_ball_test",
     srcs = ["physics_ball_test.cpp"],
     deps = [
-        ":ball",
+        ":physics_ball",
         "//software/world:ball",
         "@box2d",
         "@gtest//:gtest_main",
@@ -47,7 +47,7 @@ cc_test(
 )
 
 cc_library(
-    name = "field",
+    name = "physics_field",
     srcs = ["physics_field.cpp"],
     hdrs = ["physics_field.h"],
     deps = [
@@ -59,11 +59,11 @@ cc_library(
 )
 
 cc_test(
-    name = "field_test",
+    name = "physics_field_test",
     srcs = ["physics_field_test.cpp"],
     deps = [
-        ":ball",
-        ":field",
+        ":physics_ball",
+        ":physics_field",
         "//software/test_util",
         "//software/world:field",
         "@box2d",
