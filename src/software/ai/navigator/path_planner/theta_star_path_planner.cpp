@@ -7,23 +7,21 @@
 
 #include <g3log/g3log.hpp>
 
-bool ThetaStarPathPlanner::isValid(int row, int col)
+bool ThetaStarPathPlanner::isValid(GridPoint test_grid_point)
 {
     // Returns true if row number and column number
     // is in range
-    return (row >= 0) && (row < numGridRows) && (col >= 0) && (col < numGridCols);
+    return (test_grid_point.first >= 0) && (test_grid_point.first < numGridRows) && (test_grid_point.second >= 0) && (test_grid_point.second < numGridCols);
 }
 
-bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
+bool ThetaStarPathPlanner::isUnBlocked(GridPoint test_grid_point)
 {
-    auto cell = std::pair<int, int>(row, col);
-
-    // If we haven't checked this cell before, check it now
-    if (unblocked_grid.find(cell) == unblocked_grid.end())
+    // If we haven't checked this GridPoint before, check it now
+    if (unblocked_grid.find(test_grid_point) == unblocked_grid.end())
     {
         bool blocked = false;
 
-        Point p = convertCellToPoint(row, col);
+        Point p = convertGridPointToNavPoint(test_grid_point);
         for (auto &obstacle : obstacles)
         {
             if (obstacle.containsPoint(p))
@@ -34,29 +32,29 @@ bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
         }
 
         // We use the opposite convention to indicate blocked or not
-        unblocked_grid[cell] = !blocked;
+        unblocked_grid[test_grid_point] = !blocked;
     }
 
-    return unblocked_grid[cell];
+    return unblocked_grid[test_grid_point];
 }
 
-bool ThetaStarPathPlanner::isDestination(int row, int col, GridPoint dest)
+bool ThetaStarPathPlanner::isDestination(GridPoint test_grid_point, GridPoint dest)
 {
-    return (row == dest.first && col == dest.second);
+    return (test_grid_point.first == dest.first && test_grid_point.second == dest.second);
 }
 
-double ThetaStarPathPlanner::calculateHValue(int row, int col, GridPoint dest)
+double ThetaStarPathPlanner::calculateHValue(GridPoint test_grid_point, GridPoint dest)
 {
     // Return using the distance formula
-    return ((double)sqrt((row - dest.first) * (row - dest.first) +
-                         (col - dest.second) * (col - dest.second)));
+    return ((double)sqrt((test_grid_point.first - dest.first) * (test_grid_point.first - dest.first) +
+                         (test_grid_point.second - dest.second) * (test_grid_point.second - dest.second)));
 }
 
-bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
+bool ThetaStarPathPlanner::lineOfSight(GridPoint current_parent,
                                        GridPoint new_pair)
 {
     Point nextPoint    = Point(new_pair.first, new_pair.second);
-    Point parentPoint  = Point(curr_parent_i, curr_parent_j);
+    Point parentPoint  = Point(current_parent.first, current_parent.second);
     Point pointToCheck = parentPoint;
 
     Vector diff      = nextPoint - parentPoint;
@@ -65,8 +63,8 @@ bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
     for (int i = 0; i < dist; i++)
     {
         pointToCheck = pointToCheck + direction;
-        if (!isUnBlocked((int)std::round(pointToCheck.x()),
-                         (int)std::round(pointToCheck.y())))
+        if (!isUnBlocked(GridPoint((int)std::round(pointToCheck.x()),
+                         (int)std::round(pointToCheck.y()))))
         {
             return false;
         }
@@ -98,7 +96,7 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(GridPoint dest)
     {
         GridPoint p = Path.top();
         Path.pop();
-        path_points.push_back(convertCellToPoint(p.first, p.second));
+        path_points.push_back(convertGridPointToNavPoint(p));
     }
 
     return path_points;
@@ -108,22 +106,22 @@ bool ThetaStarPathPlanner::updateVertex(GridPoint pCurr, GridPoint pNew, GridPoi
                                         double currToNextNodeDist)
 {
     // Only process this GridCell if this is a valid one
-    if (isValid(pNew.first, pNew.second) == true)
+    if (isValid(pNew) == true)
     {
         // If the successor is already on the closed
         // list or if it is blocked, then ignore it.
         // Else do the following
         if (closedList[pNew.first][pNew.second] == false &&
-            isUnBlocked(pNew.first, pNew.second) == true)
+            isUnBlocked(pNew) == true)
         {
             double gNew;
             GridPoint parent_new;
             GridPoint parent = cellDetails[pCurr.first][pCurr.second].parent;
-            if (lineOfSight(parent.first, parent.second, pNew))
+            if (lineOfSight(parent, pNew))
             {
                 parent_new = parent;
                 gNew       = cellDetails[parent.first][parent.second].g_ +
-                       calculateHValue(parent.first, parent.second, pNew);
+                       calculateHValue(parent, pNew);
             }
             else
             {
@@ -131,7 +129,7 @@ bool ThetaStarPathPlanner::updateVertex(GridPoint pCurr, GridPoint pNew, GridPoi
                 gNew = cellDetails[pCurr.first][pCurr.second].g_ + currToNextNodeDist;
             }
 
-            double hNew = calculateHValue(pNew.first, pNew.second, dest);
+            double hNew = calculateHValue(pNew, dest);
             double fNew = gNew + hNew;
 
             // If it isn’t on the open list, add it to
@@ -155,7 +153,7 @@ bool ThetaStarPathPlanner::updateVertex(GridPoint pCurr, GridPoint pNew, GridPoi
             }
             // If the destination GridCell is the same as the
             // current successor
-            if (isDestination(pNew.first, pNew.second, dest) == true)
+            if (isDestination(pNew, dest) == true)
             {
                 return true;
             }
@@ -184,19 +182,19 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
 
     // Initialize local variables
     Point closest_destination = findClosestFreePoint(destination);
-    GridPoint src_coord       = convertPointToCell(start);
-    GridPoint dest_coord      = convertPointToCell(closest_destination);
+    GridPoint src_coord       = convertNavPointToGridPoint(start);
+    GridPoint dest_coord      = convertNavPointToGridPoint(closest_destination);
     Path empty_ret_val(std::nullopt);
 
     // If the source is out of range
-    if (isValid(src_coord.first, src_coord.second) == false)
+    if (isValid(src_coord) == false)
     {
         LOG(WARNING) << "Source is not valid; no path found" << std::endl;
         return empty_ret_val;
     }
 
     // If the destination is out of range
-    if (isValid(dest_coord.first, dest_coord.second) == false)
+    if (isValid(dest_coord) == false)
     {
         LOG(WARNING) << "Destination is not valid; no path found" << std::endl;
         return empty_ret_val;
@@ -218,7 +216,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     }
 
     // The source is blocked
-    if (isUnBlocked(src_coord.first, src_coord.second) == false)
+    if (isUnBlocked(src_coord) == false)
     {
         auto tmp_src_coord = findClosestUnblockedCell(src_coord);
         if (tmp_src_coord)
@@ -232,7 +230,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     }
 
     // The destination is blocked
-    if (isUnBlocked(dest_coord.first, dest_coord.second) == false)
+    if (isUnBlocked(dest_coord) == false)
     {
         auto tmp_dest_coord = findClosestUnblockedCell(dest_coord);
         if (tmp_dest_coord)
@@ -339,11 +337,12 @@ loop_end:
 }
 
 std::optional<ThetaStarPathPlanner::GridPoint>
-ThetaStarPathPlanner::findClosestUnblockedCell(GridPoint currCell)
+ThetaStarPathPlanner::findClosestUnblockedCell(GridPoint current_cell)
 {
-    // spiral out from currCell looking for unblocked cells
-    int i = currCell.first;
-    int j = currCell.second;
+    // spiral out from current_cell looking for unblocked cells
+    int i = current_cell.first;
+    int j = current_cell.second;
+    GridPoint test_grid_point;
     unsigned nextIndex, currIndex = 3;
     int nextIncrement[4] = {1, 0, -1, 0};
     for (int depth = 1; depth < numGridRows; depth++)
@@ -351,18 +350,20 @@ ThetaStarPathPlanner::findClosestUnblockedCell(GridPoint currCell)
         nextIndex = (currIndex + 1) % 4;
         i += nextIncrement[nextIndex] * depth;
         j += nextIncrement[currIndex] * depth;
-        if (isValid(i, j) && isUnBlocked(i, j))
+        test_grid_point = GridPoint(i,j);
+        if (isValid(test_grid_point) && isUnBlocked(test_grid_point))
         {
-            return GridPoint(i, j);
+            return test_grid_point;
         }
         currIndex = nextIndex;
 
         nextIndex = (currIndex + 1) % 4;
         i += nextIncrement[nextIndex] * depth;
         j += nextIncrement[currIndex] * depth;
-        if (isValid(i, j) && isUnBlocked(i, j))
+        test_grid_point = GridPoint(i,j);
+        if (isValid(test_grid_point) && isUnBlocked(test_grid_point))
         {
-            return GridPoint(i, j);
+            return test_grid_point;
         }
         currIndex = nextIndex;
     }
@@ -465,17 +466,18 @@ bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
         }
         return true;
     }
+
     return false;
 }
 
-Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)
+Point ThetaStarPathPlanner::convertGridPointToNavPoint(GridPoint gp)
 {
     // account for robot radius
-    return Point((row * SIZE_OF_GRID_CELL_IN_METERS) - maxNavXCoord,
-                 (col * SIZE_OF_GRID_CELL_IN_METERS) - maxNavYCoord);
+    return Point((gp.first * SIZE_OF_GRID_CELL_IN_METERS) - maxNavXCoord,
+                 (gp.second * SIZE_OF_GRID_CELL_IN_METERS) - maxNavYCoord);
 }
 
-ThetaStarPathPlanner::GridPoint ThetaStarPathPlanner::convertPointToCell(Point p)
+ThetaStarPathPlanner::GridPoint ThetaStarPathPlanner::convertNavPointToGridPoint(Point p)
 {
     // account for robot radius
     return GridPoint((int)((p.x() + maxNavXCoord) / SIZE_OF_GRID_CELL_IN_METERS),

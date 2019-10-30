@@ -46,46 +46,47 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Returns if a cell is within bounds of grid
-     * @param row y position of cell
-     * @param col x position of cell
+     *
+     * @param test_grid_point GridPoint to consider
      *
      * @return true if cell is valid
      */
-    bool isValid(int row, int col);
+    bool isValid(GridPoint test_grid_point);
 
     /**
      * Returns if a cell is unblocked
-     * @param row y position of cell
-     * @param col x position of cell
+     *
+     * @param test_grid_point GridPoint to consider
      *
      * @return true if cell is unblocked
      */
-    bool isUnBlocked(int row, int col);
+    bool isUnBlocked(GridPoint test_grid_point);
 
     /**
      * Returns if a cell is the destination
-     * @param row y position of cell
-     * @param col x position of cell
+     *
+     * @param test_grid_point GridPoint to consider
      * @param dest destination cell
      *
      * @return true if cell is the destination
      */
-    bool isDestination(int row, int col, GridPoint dest);
+    bool isDestination(GridPoint test_grid_point, GridPoint dest);
 
     /**
-     * Returns heuristic value of a cell
-     * This is currently the Euclidean distance to the destination
-     * @param row y position of cell
-     * @param col x position of cell
-     * @param dest destination cell
+     * Returns heuristic value of a cell,
+     * currently the Euclidean distance to the destination
+     *
+     * @param test_grid_point GridPoint to consider
+     * @param dest destination GridPoint
      *
      * @return Euclidean distance to dest
      */
-    double calculateHValue(int row, int col, GridPoint dest);
+    double calculateHValue(GridPoint test_grid_point, GridPoint dest);
 
     /**
      * Traces a path from the destination back to the start
      * and populates a vector of points with that path
+     *
      * @param dest destination cell
      *
      * @return vector of points with the path from start to dest
@@ -96,6 +97,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * Updates the new node's fields based on the current node, destination
      * and the distance to the next node
      * and checks if destination is reached
+     *
      * @param pCurr                 current cell
      * @param pNext                 next cell to be updated
      * @param dest                  destination cell
@@ -108,22 +110,21 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Checks for line of sight between parent cell and new cell
-     * @param curr_parent_i         parent cell's x coordinate
-     * @param curr_parent_j         parent cell's y coordinate
+     * @param current_parent        parent cell
      * @param new_pair              cell to check line of sight to
      *
      * @return                      true if line of sight from parent to new cell
      */
-    bool lineOfSight(int curr_parent_i, int curr_parent_j, GridPoint new_pair);
+    bool lineOfSight(GridPoint current_parent, GridPoint new_pair);
 
     /**
-     * Finds closest unblocked cell to currCell
-     * @param currCell  current cell
+     * Finds closest unblocked cell to current_cell
+     * @param current_cell  current cell
      *
-     * @return          closest unblocked cell to currCell
+     * @return          closest unblocked cell to current_cell
      *                  if none found, return nullopt
      */
-    std::optional<GridPoint> findClosestUnblockedCell(GridPoint currCell);
+    std::optional<GridPoint> findClosestUnblockedCell(GridPoint current_cell);
 
     /**
      * Finds closest valid point that's not in an obstacle to p
@@ -145,12 +146,11 @@ class ThetaStarPathPlanner : public PathPlanner
     /**
      * Converts a cell in grid to a point on navigable area
      *
-     * @param row row of cell
-     * @param col col of cell
+     * @param gp GridPoint to convert
      *
      * @return Point on navigable area
      */
-    Point convertCellToPoint(int row, int col);
+    Point convertGridPointToNavPoint(GridPoint gp);
 
     /**
      * Converts a point on navigable area to a cell in grid
@@ -159,7 +159,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return cell in grid
      */
-    GridPoint convertPointToCell(Point p);
+    GridPoint convertNavPointToGridPoint(Point p);
 
     // if close to destination then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
