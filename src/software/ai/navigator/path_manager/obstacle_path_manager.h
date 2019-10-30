@@ -22,7 +22,7 @@ class ObstaclePathManager : public PathManager
      * except for current_index
      *
      * @param objectives objectives to make obstacles
-     * @param current_index map key skip objective
+     * @param current_objective objective to skip
      * @param inflation_factor how much to inflate obstacle
      *
      * @return list of obstacles that around other objectives' starts

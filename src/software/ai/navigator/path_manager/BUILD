@@ -2,7 +2,9 @@ package(default_visibility = ["//software/ai:__subpackages__"])
 
 cc_library(
     name = "path_manager",
-    hdrs = ["path_manager.h"],
+    hdrs = ["path_manager.h",
+            "path_objective.h",
+    ],
     deps = [
         "//software/ai/navigator/obstacle",
         "//software/geom",
