@@ -108,7 +108,7 @@ cc_test(
     name = "robot_capabilities_test",
     srcs = ["robot_capabilities_test.cpp"],
     deps = [
-        ":robot_capabilities",
+        "robot_capabilities",
         "@gtest//:gtest_main",
     ],
 )
