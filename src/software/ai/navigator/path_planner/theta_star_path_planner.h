@@ -51,12 +51,12 @@ class ThetaStarPathPlanner : public PathPlanner
     {
        public:
         GridCell(Coordinate parent, double f, double g, double h)
-            : parent(parent), f_(f), g_(g), h_(h)
+            : parent(parent), f(f), g(g), h(h)
         {
         }
 
         Coordinate parent;
-        double f_, g_, h_;
+        double f, g, h;
     };
 
     using OpenListCell = std::pair<double, Coordinate>;
@@ -64,41 +64,41 @@ class ThetaStarPathPlanner : public PathPlanner
     /**
      * Returns if a cell is within bounds of grid
      *
-     * @param test_grid_point Coordinate to consider
+     * @param test_coord Coordinate to consider
      *
      * @return true if cell is valid
      */
-    bool isValid(Coordinate test_grid_point);
+    bool isValid(Coordinate test_coord);
 
     /**
      * Returns if a cell is unblocked
      *
-     * @param test_grid_point Coordinate to consider
+     * @param test_coord Coordinate to consider
      *
      * @return true if cell is unblocked
      */
-    bool isUnBlocked(Coordinate test_grid_point);
+    bool isUnBlocked(Coordinate test_coord);
 
     /**
      * Returns if a cell is the destination
      *
-     * @param test_grid_point Coordinate to consider
+     * @param test_coord Coordinate to consider
      * @param dest destination cell
      *
      * @return true if cell is the destination
      */
-    bool isDestination(Coordinate test_grid_point, Coordinate dest);
+    bool isDestination(Coordinate test_coord, Coordinate dest);
 
     /**
      * Returns heuristic value of a cell,
      * currently the Euclidean distance to the destination
      *
-     * @param test_grid_point Coordinate to consider
+     * @param test_coord Coordinate to consider
      * @param dest destination Coordinate
      *
      * @return Euclidean distance to dest
      */
-    double calculateHValue(Coordinate test_grid_point, Coordinate dest);
+    double calculateHValue(Coordinate test_coord, Coordinate dest);
 
     /**
      * Traces a path from the destination back to the start
@@ -115,15 +115,15 @@ class ThetaStarPathPlanner : public PathPlanner
      * and the distance to the next node
      * and checks if destination is reached
      *
-     * @param pCurr                 current cell
-     * @param pNext                 next cell to be updated
+     * @param current_coord         current cell
+     * @param new_coord                 next cell to be updated
      * @param dest                  destination cell
-     * @param currToNextNodeDist    Euclidean distance between pCurr and pNext
+     * @param curr_to_new_dist    Euclidean distance between current_coord and new_coord
      *
-     * @return                      true if pNew is destination
+     * @return                      true if new_coord is destination
      */
-    bool updateVertex(Coordinate pCurr, Coordinate pNew, Coordinate dest,
-                      double currToNextNodeDist);
+    bool updateVertex(Coordinate current_coord, Coordinate new_coord, Coordinate dest,
+                      double curr_to_new_dist);
 
     /**
      * Checks for line of sight between parent cell and new cell
@@ -196,10 +196,10 @@ class ThetaStarPathPlanner : public PathPlanner
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
     std::vector<Obstacle> obstacles;
-    int numGridRows;
-    int numGridCols;
-    double maxNavXCoord;
-    double maxNavYCoord;
+    int num_grid_rows;
+    int num_grid_cols;
+    double max_navigable_x_coord;
+    double max_navigable_y_coord;
 
     /*
     Create an open list having information as-
@@ -208,16 +208,16 @@ class ThetaStarPathPlanner : public PathPlanner
     and i, j are the row and column index of that GridCell
     Note that 0 <= i <= ROW-1 & 0 <= j <= COL-1
     This open list is implenented as a set of pair of pair.*/
-    std::set<OpenListCell> openList;
+    std::set<OpenListCell> open_list;
 
     // Create a closed list and initialise it to false which means
     // that no GridCell has been included yet
     // This closed list is implemented as a boolean 2D array
-    std::vector<std::vector<bool>> closedList;
+    std::vector<std::vector<bool>> closed_list;
 
     // Declare a 2D array of structure to hold the details
     // of that GridCell
-    std::vector<std::vector<GridCell>> cellDetails;
+    std::vector<std::vector<GridCell>> cell_details;
 
 
     // Description of the Grid-
