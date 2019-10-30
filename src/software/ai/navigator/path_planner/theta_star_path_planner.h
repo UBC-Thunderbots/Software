@@ -29,59 +29,76 @@ class ThetaStarPathPlanner : public PathPlanner
                   const std::vector<Obstacle> &obstacles) override;
 
    private:
-    using GridPoint    = std::pair<int, int>;
-    using OpenListCell = std::pair<double, GridPoint>;
+    class Coordinate : public std::pair<int, int>
+    {
+       public:
+        Coordinate(int row, int col) : std::pair<int, int>(row, col) {}
+
+        Coordinate() : std::pair<int, int>() {}
+
+        int row(void)
+        {
+            return this->first;
+        }
+
+        int col(void)
+        {
+            return this->second;
+        }
+    };
 
     class GridCell
     {
        public:
-        GridCell(GridPoint parent, double f, double g, double h)
+        GridCell(Coordinate parent, double f, double g, double h)
             : parent(parent), f_(f), g_(g), h_(h)
         {
         }
 
-        GridPoint parent;
+        Coordinate parent;
         double f_, g_, h_;
     };
+
+    using OpenListCell = std::pair<double, Coordinate>;
 
     /**
      * Returns if a cell is within bounds of grid
      *
-     * @param test_grid_point GridPoint to consider
+     * @param test_grid_point Coordinate to consider
      *
      * @return true if cell is valid
      */
-    bool isValid(GridPoint test_grid_point);
+    bool isValid(Coordinate test_grid_point);
 
     /**
      * Returns if a cell is unblocked
      *
-     * @param test_grid_point GridPoint to consider
+     * @param test_grid_point Coordinate to consider
      *
      * @return true if cell is unblocked
      */
-    bool isUnBlocked(GridPoint test_grid_point);
+    bool isUnBlocked(Coordinate test_grid_point);
 
     /**
      * Returns if a cell is the destination
      *
-     * @param test_grid_point GridPoint to consider
+     * @param test_grid_point Coordinate to consider
      * @param dest destination cell
      *
      * @return true if cell is the destination
      */
-    bool isDestination(GridPoint test_grid_point, GridPoint dest);
+    bool isDestination(Coordinate test_grid_point, Coordinate dest);
 
     /**
      * Returns heuristic value of a cell,
      * currently the Euclidean distance to the destination
      *
-     * @param test_grid_point GridPoint to consider
-     * @param dest destination GridPoint
+     * @param test_grid_point Coordinate to consider
+     * @param dest destination Coordinate
      *
      * @return Euclidean distance to dest
      */
-    double calculateHValue(GridPoint test_grid_point, GridPoint dest);
+    double calculateHValue(Coordinate test_grid_point, Coordinate dest);
 
     /**
      * Traces a path from the destination back to the start
@@ -91,7 +108,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return vector of points with the path from start to dest
      */
-    std::vector<Point> tracePath(GridPoint dest);
+    std::vector<Point> tracePath(Coordinate dest);
 
     /**
      * Updates the new node's fields based on the current node, destination
@@ -105,7 +122,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return                      true if pNew is destination
      */
-    bool updateVertex(GridPoint pCurr, GridPoint pNew, GridPoint dest,
+    bool updateVertex(Coordinate pCurr, Coordinate pNew, Coordinate dest,
                       double currToNextNodeDist);
 
     /**
@@ -115,7 +132,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return                      true if line of sight from parent to new cell
      */
-    bool lineOfSight(GridPoint current_parent, GridPoint new_pair);
+    bool lineOfSight(Coordinate current_parent, Coordinate new_pair);
 
     /**
      * Finds closest unblocked cell to current_cell
@@ -124,7 +141,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return          closest unblocked cell to current_cell
      *                  if none found, return nullopt
      */
-    std::optional<GridPoint> findClosestUnblockedCell(GridPoint current_cell);
+    std::optional<Coordinate> findClosestUnblockedCell(Coordinate current_cell);
 
     /**
      * Finds closest valid point that's not in an obstacle to p
@@ -146,11 +163,11 @@ class ThetaStarPathPlanner : public PathPlanner
     /**
      * Converts a cell in grid to a point on navigable area
      *
-     * @param gp GridPoint to convert
+     * @param coord Coordinate to convert
      *
      * @return Point on navigable area
      */
-    Point convertGridPointToNavPoint(GridPoint gp);
+    Point convertCoordinateToPoint(Coordinate coord);
 
     /**
      * Converts a point on navigable area to a cell in grid
@@ -159,7 +176,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return cell in grid
      */
-    GridPoint convertNavPointToGridPoint(Point p);
+    Coordinate convertPointToCoordinate(Point p);
 
     // if close to destination then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
@@ -207,5 +224,5 @@ class ThetaStarPathPlanner : public PathPlanner
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<GridPoint, bool> unblocked_grid;
+    std::map<Coordinate, bool> unblocked_grid;
 };
