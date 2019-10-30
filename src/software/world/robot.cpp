@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 
-Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
+Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_duration,
              const RobotCapabilityFlags &capabilities)
@@ -78,7 +78,7 @@ Timestamp Robot::lastUpdateTimestamp() const
     return last_update_timestamps.front();
 }
 
-unsigned int Robot::id() const
+RobotId Robot::id() const
 {
     return id_;
 }
@@ -228,7 +228,7 @@ void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity
 std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (unsigned i = 0; i < timestamp_history.size(); i++)
+    for (size_t i = 0; i < timestamp_history.size(); i++)
     {
         double timestamp_diff =
             fabs((timestamp - timestamp_history[i]).getMilliseconds());

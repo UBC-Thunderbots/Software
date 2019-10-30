@@ -29,7 +29,7 @@ class Robot
      * state
      * @param history_duration The number of previous robot states that should be stored.
      */
-    explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
+    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp, unsigned int history_duration = 20,
                    const RobotCapabilityFlags &capabilities =
@@ -92,7 +92,7 @@ class Robot
      *
      * @return the id of the robot
      */
-    unsigned int id() const;
+    RobotId id() const;
 
     /**
      * Returns the current position of the robot
@@ -314,7 +314,7 @@ class Robot
                                 const Timestamp &timestamp);
 
     // The id of this robot
-    unsigned int id_;
+    RobotId id_;
     // All previous positions of the robot, with the most recent position at the front of
     // the queue, coordinates in meters
     boost::circular_buffer<Point> positions_;
