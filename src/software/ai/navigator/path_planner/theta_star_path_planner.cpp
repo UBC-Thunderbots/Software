@@ -281,8 +281,8 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
         open_list.erase(open_list.begin());
 
         // Add this vertex to the closed list
-        i                 = p.second.row();
-        j                 = p.second.col();
+        i                 = p.coord().row();
+        j                 = p.coord().col();
         closed_list[i][j] = true;
 
         /*

@@ -59,7 +59,23 @@ class ThetaStarPathPlanner : public PathPlanner
         double f, g, h;
     };
 
-    using OpenListCell = std::pair<double, Coordinate>;
+    class OpenListCell : public std::pair<double, Coordinate>
+    {
+       public:
+        OpenListCell(double f, Coordinate coord) : std::pair<double, Coordinate>(f, coord)
+        {
+        }
+
+        double f(void)
+        {
+            return this->first;
+        }
+
+        Coordinate coord(void)
+        {
+            return this->second;
+        }
+    };
 
     /**
      * Returns if a cell is within bounds of grid
