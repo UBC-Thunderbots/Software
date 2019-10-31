@@ -18,3 +18,10 @@ bool bodyExistsInWorld(b2Body* body, std::shared_ptr<b2World> world)
     }
     return false;
 }
+
+b2Vec2 createVec2(const Point& point)
+{
+    b2Vec2 ret;
+    ret.Set(point.x(), point.y());
+    return ret;
+}

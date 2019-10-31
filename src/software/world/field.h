@@ -100,6 +100,13 @@ class Field
     double goalYLength() const;
 
     /**
+     * Gets the "depth" of the goal along the x-axis, in metres.
+     *
+     * @return the "depth" of the goal along the x-axis, in metres.
+     */
+    double goalXLength() const;
+
+    /**
      * Gets the radius of the centre circle in metres.
      *
      * @return the radius of the centre circle in metres.
@@ -172,6 +179,15 @@ class Field
      * @return The area within the field lines as a rectangle
      */
     Rectangle fieldLines() const;
+
+    /**
+     * Gets the area within the field boundary (the physical walls surrounding the Field).
+     * This is the entire area where the robots and ball can move, and is a superset of
+     * the area inside the field lines.
+     *
+     * @return The area within the field boundary as a rectangle
+     */
+    Rectangle fieldBoundary() const;
 
     /**
      * Gets the position of the centre of the friendly goal.
@@ -330,17 +346,16 @@ class Field
      */
     bool operator!=(const Field &other) const;
 
-
-   private:
-    // Private variables have underscores at the end of their names
-    // to avoid conflicts with function names
-
     /**
      * Updates the timestamp history for the Field object
      *
      * @param time_stamp : The timestamp at which the Field object was updated
      */
     void updateTimestamp(Timestamp time_stamp);
+
+   private:
+    // Private variables have underscores at the end of their names
+    // to avoid conflicts with function names
 
     // The length of the playable field (between the goal lines) in metres
     double field_x_length_;
@@ -352,6 +367,8 @@ class Field
     double defense_y_length_;
     // The width of the goal (between the goalposts) in metres
     double goal_y_length_;
+    // How "deep" the goal is along the x-axis in metres
+    double goal_x_length_;
 
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres
