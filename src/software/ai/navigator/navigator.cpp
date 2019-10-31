@@ -68,8 +68,7 @@ void Navigator::visit(const MoveIntent &intent)
     else
     {
         std::stringstream ss;
-        ss << "Tried to find robot associated with robot id = " << intent.getRobotId()
-           << ", but failed";
+        ss << "Failed to find robot associated with robot id = " << intent.getRobotId();
         LOG(WARNING) << ss.str();
     }
     current_primitive = std::unique_ptr<Primitive>(nullptr);
@@ -146,8 +145,8 @@ void Navigator::addPathsToAssignedPrimitives(
         if (path_objective_and_intent_it == path_objective_to_move_intent.end())
         {
             std::stringstream ss;
-            ss << "Tried to find intent associated with path objective that has robot id = "
-               << path_objective.robot_id << ", but failed";
+            ss << "Failed to find intent associated with path objective that has robot id = "
+               << path_objective.robot_id;
             LOG(WARNING) << ss.str();
 
             // assume no path
