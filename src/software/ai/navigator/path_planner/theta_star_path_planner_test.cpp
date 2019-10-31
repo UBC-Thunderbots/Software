@@ -62,7 +62,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
                              field.totalXLength(), field.totalYLength());
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -98,7 +98,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
                              field.totalXLength(), field.totalYLength());
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -130,7 +130,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
                              field.totalXLength(), field.totalYLength());
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -163,7 +163,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
                              field.totalXLength(), field.totalYLength());
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -198,7 +198,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
                              field.totalXLength(), field.totalYLength());
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -221,7 +221,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
     Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
                              field.totalXLength(), field.totalYLength());
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 

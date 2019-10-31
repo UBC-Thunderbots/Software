@@ -10,7 +10,7 @@
 class ObstaclePathManager : public PathManager
 {
    public:
-    const std::map<PathObjective, Path> getManagedPaths(
+    const std::map<PathObjective, std::optional<Path>> getManagedPaths(
         const std::set<PathObjective> &objectives, const Rectangle &navigable_area,
         const std::vector<Obstacle> &static_obstacles) override;
 

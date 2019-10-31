@@ -13,7 +13,7 @@
  * from start to the destination
  */
 
-using Path = std::optional<Spline>;
+using Path = Spline;
 
 class PathPlanner
 {
@@ -28,11 +28,11 @@ class PathPlanner
      * @param obstacles obstacles to avoid
      *
      * @return a path between start and destination
-     *     * no path is represented by a path of size 0
+     *     * no path is represented by std::nullopt
      */
-    virtual Path findPath(const Point &start, const Point &destination,
-                          const Rectangle &navigable_area,
-                          const std::vector<Obstacle> &obstacles) = 0;
+    virtual std::optional<Path> findPath(const Point &start, const Point &destination,
+                                         const Rectangle &navigable_area,
+                                         const std::vector<Obstacle> &obstacles) = 0;
 
     virtual ~PathPlanner() = default;
 };

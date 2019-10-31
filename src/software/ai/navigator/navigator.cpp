@@ -132,7 +132,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
 }
 
 void Navigator::addPathsToAssignedPrimitives(
-    const std::map<PathObjective, Path> &path_objective_to_path,
+    const std::map<PathObjective, std::optional<Path>> &path_objective_to_path,
     std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
 {
     for (const auto &path_objective_and_path : path_objective_to_path)
@@ -347,7 +347,7 @@ double Navigator::getCloseToEnemyObstacleFactor(const Point &p)
     return std::clamp(closest_dist / ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, 1.0);
 }
 
-std::vector<std::vector<Point>> Navigator::getPlannedPaths()
+std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
 {
     return planned_paths;
 }

@@ -38,7 +38,7 @@ class Navigator : public IntentVisitor
      *
      * @return planned paths
      */
-    std::vector<std::vector<Point>> getPlannedPaths();
+    std::vector<std::vector<Point>> getPlannedPathPoints();
 
     /**
      * Visits a CatchIntent to perform an operation.
@@ -166,7 +166,7 @@ class Navigator : public IntentVisitor
      *
      * @modifies current_primitive
      */
-    void moveNavigation(const MoveIntent &move_intent, const Path &path);
+    void moveNavigation(const MoveIntent &move_intent, const std::optional<Path> &path);
 
     /**
      * Gets obstacles to represent all the non path planning robots
@@ -182,7 +182,7 @@ class Navigator : public IntentVisitor
      * @param assigned_primitives list of primitives to add to
      */
     void addPathsToAssignedPrimitives(
-        const std::map<PathObjective, Path> &paths,
+        const std::map<PathObjective, std::optional<Path>> &paths,
         std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
 
     /**
