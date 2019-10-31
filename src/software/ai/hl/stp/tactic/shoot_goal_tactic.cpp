@@ -11,7 +11,7 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
                                  Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilityFlags::Kick}),
+    : Tactic(loop_forever, {RobotCapabilities::Capability::Kick}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -20,6 +20,8 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       chip_target(chip_target),
       has_shot_available(false)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string ShootGoalTactic::getName() const
@@ -79,11 +81,12 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = Util::DynamicParameters::ShootGoalTactic::
-                                     enemy_about_to_steal_ball_rectangle_width.value();
-    auto steal_ball_rect_length =
-        Util::DynamicParameters::ShootGoalTactic::
-            enemy_about_to_steal_ball_rectangle_extension_length.value();
+    auto steal_ball_rect_width = Util::DynamicParameters->getShootGoalTacticConfig()
+                                     ->EnemyAboutToStealBallRectangleWidth()
+                                     ->value();
+    auto steal_ball_rect_length = Util::DynamicParameters->getShootGoalTacticConfig()
+                                      ->EnemyAboutToStealBallRectangleExtensionLength()
+                                      ->value();
     Rectangle baller_frontal_area = Rectangle(
         (robot->position() + front_of_robot_dir.perp().norm(steal_ball_rect_width / 2.0)),
         robot->position() + front_of_robot_dir.norm(steal_ball_rect_length) -

@@ -25,11 +25,11 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
-    override_play          = Util::DynamicParameters::AI::override_ai_play.value();
+    override_play = Util::DynamicParameters->getAIConfig()->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name          = Util::DynamicParameters::AI::current_ai_play.value();
+    override_play_name = Util::DynamicParameters->getAIConfig()->CurrentAIPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
@@ -152,8 +152,8 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (unsigned col = 0; col < num_cols; col++)
         {
-            if (!friendly_team_robots.at(row).getRobotCapabilities().hasAllCapabilities(
-                    tactics.at(col)->robotCapabilityRequirements()))
+            if (!(tactics.at(col)->robotCapabilityRequirements() <=
+                  friendly_team_robots.at(row).getRobotCapabilities()))
             {
                 // hardware requirements of tactic are not satisfied by the current robot
                 // set cost to 10.0f

@@ -97,8 +97,9 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
         // received the pass
         if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
             ball.velocity().len() <
-                Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed
-                    .value())
+                Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                    ->BallStealSpeed()
+                    ->value())
         {
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
