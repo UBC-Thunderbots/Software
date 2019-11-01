@@ -5,8 +5,7 @@
 * [ ] Constants vs. Dynamic parameters (why we have both, where each should be used, etc.)
 * [ ] Difference between HL components and Navigator components. Be clear about where the separation is, and why. Actions and Intents are not combined because Actions are part of HL, while Intents are part of Navigator. Combining them would break the abstraction and couple STP to the navigator, removing our flexibility to implement different HL systems in the future
 * [ ] contribution / editing guide.  Diagrams in GitHub: https://github.com/jgraph/drawio-github
-* [ ] coroutines
-* [ ] field coordinate convention
+* [ ] coroutinesG
 
 # Table of Contents
 * [Tools](#tools)
@@ -31,6 +30,8 @@
   * [Visitor Design Pattern](#visitor-design-pattern)
   * [Observer Design Pattern](#observer-design-pattern)
   * [C++ Templating](#c++-templating)
+* [Conventions](#conventions)
+  * [Coordinates](#coordinates)
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
 * [Backend](#backend)
@@ -176,6 +177,28 @@ We use the Observer Design Pattern to connect all our top-level modules in the s
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
 
 We use templtaing in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-design-pattern), and our `Gradient Descent` optimizer.
+
+
+# Conventions
+Various conventions we use and follow that you need to know.
+
+
+## Coordinates
+We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularily important for any code handling gameplay logic and positions on the field.
+
+The coordinate system is a simple 2D x-y plane. The x-dimension runs between the friendly and enemy goals, along the longer dimension of the field. The y-dimension runs perpendicular to the x-dimension, along the short dimension of the field.
+
+Because we have to be able to play on either side of a field during a game, this means the "friendly half of the field" will not always be in the positive or negative x part of the coordinate plane. This inconsistency is a problem when we want to specify points like "the friendly net", or "the enemy corner". We can't simple say the friendly net is `(-4.5, 0)` all the time, because this would not be the case if we were defending the other side of the field where the friendly net would be `(4.5, 0)`.
+
+In order to overcome this, our conention is that:
+* The friendly half of the field is **always negative x**, and the enemy half of the field is **always positive x**
+* `y` is positive to the "left" of someone looking at the enemy goal from the friendly goal
+* The center of the field (inside the center-circle) is the origin / `(0, 0)`
+
+This is easiest to understand in the diagram below:
+![Coordinate Convention Diagram](images/coordinate_convention_diagram.svg)
+
+Based on what side we are defending, the [Backend](#backend) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
 
 
 # Architecture Overview
