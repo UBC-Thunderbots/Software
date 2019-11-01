@@ -11,9 +11,9 @@
 * [ ] Difference between HL components and Navigator components. Be clear about where the separation is, and why. Actions and Intents are not combined because Actions are part of HL, while Intents are part of Navigator. Combining them would break the abstraction and couple STP to the navigator, removing our flexibility to implement different HL systems in the future
 #Misc
 Diagrams in GitHub: https://github.com/jgraph/drawio-github
-
-design patterns
+G
 coroutines
+
 
 # Real stuff goes here
 
@@ -23,11 +23,18 @@ coroutines
   * [SSL-Gamecontroller](#ssl-gamecontroller)
   * [grSim](#grsim)
 * [Important Classes](#important-classes)
-  * [The World](#the-world)
+  * [World](#world)
   * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
   * [Robot Status](#robot-status)
+* [Design Patterns](#design-patterns)
+  * [Abstract Classes and Inheritance](#abstract-classes-and-inheritance)
+  * [Singleton Design Pattern](#singleton-design-pattern)
+  * [Factory Design Pattern](#factory-design-pattern)
+  * [Visitor Design Pattern](#visitor-design-pattern)
+  * [Observer Design Pattern](#observer-design-pattern)
+  * [C++ Templating](#c++-templating)
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
 * [Backend](#backend)
@@ -102,6 +109,70 @@ The `Robot Status` class contains information about the status of a single robot
 * The temperature of the dribbler motor
 
 Information received from the robots is stored in `Robot Status` objects so that the rest of the system can easily access and make sense of the information if necessary. For example, we monitor incoming `Robot Status` and display warnings in the [Visualizer](#visualizer) if anything looks wrong so we can be alerted. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
+
+
+# Design Patterns
+Below are the main design patterns we make use of in our code, and what they are used for.
+
+## Abstract Classes and Inheritance
+Abstract classes let us define interfaces for various components of our code. Then we can implement different objects that obey the interface, and use them interchangeably, with the guarantee that as long as they follow the same interface we can use them in the same way.
+
+Read [https://www.geeksforgeeks.org/inheritance-in-c/] for more information.
+
+Examples of this can be found in many places, including:
+* [Plays](#plays)
+* [Tactics](#tactics)
+* [Actions](#skills-/-actions)
+* [Intents](#intents)
+* [Primitives](#primitives)
+* Different implementations of the [Backend](#backend)
+
+
+## Singleton Design Pattern
+The Singleton pattern is useful for having a single, global instance of an object that can be accessed from anywhere. Though it's generally considered an anti-pattern (aka _bad_), it is useful in specific scenarios.
+
+Read [https://www.tutorialspoint.com/Explain-Cplusplus-Singleton-design-pattern] for more information.
+
+We use the Singleton pattern for our logger. This allows us to create a single logger for the entire system, and code can make calls to the logger from anywhere, rather than us having to pass a `logger` object literally everywhere.
+
+
+## Factory Design Pattern
+The Factory Design Pattern is useful for hiding or abstracting how certain objects are created.
+
+Read [https://www.geeksforgeeks.org/design-patterns-set-2-factory-method/] for more information.
+
+Because the Factory needs to know about what objects are available to be created, it can be taken one step further to auto-register these object types. Rather than a developer having to remember to add code to the Factory every time they create a new class, this can be done "automatically" with some clever code. This helps reduce mistakes and saves developers work.
+
+Read [http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/] for more information.
+
+The auto-registering factory is particularily useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
+
+The Factory pattern is also used to create different [Backends](#backend)
+
+
+## Visitor Design Pattern
+The `Visitor Design Pattern` is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class (eg. [Primitives](#primitives) or [Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
+
+Read [https://www.geeksforgeeks.org/visitor-design-pattern/] for more information.
+
+Examples of the Visitor Pattern can be found with the following classes:
+* [Intents](#intents)
+* [Primitives](#primitives)
+* [Tactics](#tactics)
+
+
+## Observer Design Pattern
+The Observer Design Pattern is useful for letting components of a system "notify" each other when something happens. This saves us having to waste CPU time polling components for updates.
+
+Read [https://www.geeksforgeeks.org/observer-pattern-set-1-introduction/] for more information.
+
+We use the Observer Design Pattern to connect all our top-level modules in the system as shown in the [Architecture Overview](#architecture-overview). The components can notify each other and provide data whenever it is available. For example, the [AI](#ai) will "observer" the [Backend](#backend) so that when the backend gets new information, it can notify the [AI](#ai) and the [AI](#ai) can choose to take action with the new data.
+
+
+## C++ Templating
+While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
+
+We use templtaing in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-design-pattern), and our `Gradient Descent` optimizer.
 
 
 # Architecture Overview
