@@ -12,6 +12,10 @@
 #Misc
 Diagrams in GitHub: https://github.com/jgraph/drawio-github
 
+robot status
+design patterns
+coroutines
+
 # Real stuff goes here
 
 # Table of Contents
@@ -25,8 +29,11 @@ Diagrams in GitHub: https://github.com/jgraph/drawio-github
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
 * [Architecture Overview](#architecture-overview)
+  * [Diagram](#architecture-overview-diagram)
 * [Backend](#backend)
+  * [Diagram](#backend-diagram)
 * [AI](#ai)
+  * [Diagram](#ai-diagram)
 * [Visualizer](#visualizer)
 
 
@@ -88,7 +95,11 @@ Intents are very similar to Primitives, but include slightly more logic. `Intent
 
 
 # Architecture Overview
-At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](TODO use actual link). Each component is described in more detail in their own sections.
+At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](TODO use actual link). Together, they are what make up our AI.
+
+The Backend is responsible for communicating with the outside world (network and radio), the AI is what makes the actual gameplay decisions, and the Visualizer shows us what's happening and lets us control the AI.
+
+Each component is described in more detail in their own sections.
 
 
 #### Architecture Overview Diagram
@@ -96,77 +107,83 @@ At a high-level our system is made of 3 main components: The [Backend](#backend)
 
 
 # Backend
-The `Backend` is responsible for all communication with the "outside world". It receives data over the network and also handles communication with the robots using our radio. The responsabilities of the `Backend` can be broken down into Input and Output.
+The `Backend` is responsible for all communication with the "outside world". The responsabilities of the `Backend` can be broken down into Input and Output.
 
 ### Input Responsabilities
-1. Receiving robot status messages over the radio, and publishing this data to the rest of the system
-2. Receiving camera data from SSL-Vision
-2. Receiving referee commands from the Gamecontroller
-3. Filtering the received vision and gamecontroller data
-    * SSL-Vision only does vision processing, not filtering. This means that if there are several orange blobs on the field, SSL-Vision will send multiple locations for the ball. It is up to us to filter this data to determine the "correct" state of everything.
-4. Storing the filtered data into the `World` datastructures understood by our system
+1. Receiving robot status messages
+2. Receiving vision data about where the robots and ball are (typically provided by [SSL-Vision](#ssl-vision) or [grSim](#grsim))
+2. Receiving referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
+3. Filtering the received data
+    * **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
+4. Storing the filtered data into the [World](#world) datastructures understood by our system
 5. Sending the filtered data to the rest of the system
 
 ### Output Responsabilities
 1. Sending robot primitives to the robots
 
-In practice, the `Backend` is just a simple interface that specifies `World` objects must be produced, and `Primitves` may be consumed. We have several implementations of the `Backend` to suite our needs. One imeplementation is used when we are controlling the physical robots, and need to use the radio. We have another implementation used to control the robots in grSim that uses the network rather than the radio to control the robots. The specifics of how this communication happens is hidden from the rest of the system making it very easy to switch backends depending on our needs.
+In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitves](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in [grSim](#grsim).
+
 
 #### Backend Diagram
-TODO
+![Backend Diagram](images/backend_diagram.svg)
 
 
 # AI
-The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received by the [Backend](#backend) to make decisions, and sends `Primitives` back to the [Backend](#backend) for the robots to execute. Alltogether this feedback loop is what allows us to react to what's happening on the field and play soccer.
+The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from the [Backend](#backend) to make decisions, and sends [Primitives](#primitives) back to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
 
-The `AI` is what implements things like strategy and navigation.
+The 2 main components of the AI are stratgy and navigation.
 
-### High-Level / STP (Skills, Tactics, Plays)
-`STP` is a framework for gameplay strategy originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
+
+## Strategy
+We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratgy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
 
 `STP` is a way of breaking down roles and responsabilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces. This is the core of where our strategy is implemented.
 
-`STP` takes a `World` and returns `Intents`.
+When the [AI](#ai) is given new information and asked to make a decision, our `STP` strategy is what is executed first. It takes in a [World](#world) and returns [Intents](#intents).
+
 
 #### Skills / Actions
 The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. Actions represent simple tasks an individual robot can do. Examples include:
 1. Moving to a position (without colliding with anything)
-2. Shooting at a target
-3. Intercepting the ball
+2. Shooting the ball at a target
+3. Intercepting a moving ball
 
-Actions use evaluation functions in combination with `Intents` to implement their behavior. Actions are responsible for obeying any preconditions `Intents` have.
+Actions use [ntents](#intents) to implement their behavior. Actions are responsible for obeying any preconditions `Intents` have.
+
 
 #### Tactics
-A `Tactic` represents a "single robot role" on a team. Examples include:
+The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robot role" on a team. Examples include:
 1. Being a goalie
-2. Being a passer or pasee
+2. Being a passer or pass receiver
 3. Being a defender that shadows enemy robots
 4. Being a defender that tries to steal the ball from enemies
 
-Tactics use evaluation functions and `Actions` to implement their behavior. Using the `Action` abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behavior.
+Tactics use [Actions](#skills-/-actions) to implement their behavior. Using the [Action](#skills-/-actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behavior. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behavior.
 
 #### Plays
-A `Play` represents a "team-wide goal" for the robots, usually focused on a certain goal. They can be thought of much like Plays in real-life soccer. Examples include:
+The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
 1. A Play for taking friendly corner kicks
 2. A Play for defending enemy kickoffs
 3. A general defense play
 4. A passing-based offense play
 5. A dribbling-based offense play
 
-Plays are made up of `Tactics` and sometimes some evaluation functions. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behavior.
+Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behavior. TODO coroutines
 
 Furthermore, every play specifies an `Applicable` and `Invariant` condition. These are used to determine what plays should be run at what time, and when a Play should terminate.
 
-`Applicable` indicates when a `Play` can be started. For example, we would not want to choose the `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new once will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the ball, so that would be our `Invariant` condition.
+`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new once will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the ball.
 
 
-### Navigator
-The Navigator is responsible for path planning and navigation. It takes in `Intents`, and outputs `Primitives`. Essentially it takes in the higher-level commands specified by `Intents` and breaks them down into simpler `Primitive` commands that can be executed by the robots.
+## Navigation
+The `Navigator` is responsible for path planning and navigation. Once our strategy has decided what it wants to do, it passes the resulting [Intents](#intents) to the `Navigator`. The `Navigator` is then responsible for breaking down the [Intents](#intents) and turning them into [Primitives](#primitives).
 
-`MoveIntents` are the most complicated example of this because path planning is invovled. In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+Most [Intents](#intents) are easy to break down into primitives, and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behavior like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
 
-#### AI Diagram
-TODO
+In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+
+## AI Diagram
+![Backend Diagram](images/ai_diagram.svg)
 
 
 # Visualizer
