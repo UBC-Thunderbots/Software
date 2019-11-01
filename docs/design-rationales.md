@@ -3,7 +3,6 @@
 ### TODO: Document These Things
 * [ ] Namespaces
 * [ ] Constants vs. Dynamic parameters (why we have both, where each should be used, etc.)
-* [ ] Difference between HL components and Navigator components. Be clear about where the separation is, and why. Actions and Intents are not combined because Actions are part of HL, while Intents are part of Navigator. Combining them would break the abstraction and couple STP to the navigator, removing our flexibility to implement different HL systems in the future
 * [ ] contribution / editing guide.  Diagrams in GitHub: https://github.com/jgraph/drawio-github
 * [ ] coroutinesG
 
@@ -249,16 +248,20 @@ We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratg
 When the [AI](#ai) is given new information and asked to make a decision, our `STP` strategy is what is executed first. It takes in a [World](#world) and returns [Intents](#intents).
 
 
-#### Skills / Actions
+### Skills / Actions
 The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. Actions represent simple tasks an individual robot can do. Examples include:
 1. Moving to a position (without colliding with anything)
 2. Shooting the ball at a target
 3. Intercepting a moving ball
 
-Actions use [ntents](#intents) to implement their behavior. Actions are responsible for obeying any preconditions `Intents` have.
+Actions use [Intents](#intents) to implement their behavior. Actions are responsible for obeying any preconditions `Intents` have.
+
+**It seems like Actions and Intents are basically the same thing. Why aren't they combined into a single class?**
+
+[Actions](#actions) and [Intents](#intents) are not combined because [Actions](#actions) are part of [STP](#strategy) and our strategy logic, while [Intents](#intents) are more part of the [Navigator](#navigation). Combining them would break the abstraction and couple our strategy implementation to the [Navigator](#navigation), removing our flexibility to implement different strategy systems in the future.
 
 
-#### Tactics
+### Tactics
 The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robot role" on a team. Examples include:
 1. Being a goalie
 2. Being a passer or pass receiver
@@ -267,7 +270,7 @@ The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robot rol
 
 Tactics use [Actions](#skills-/-actions) to implement their behavior. Using the [Action](#skills-/-actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behavior. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behavior.
 
-#### Plays
+### Plays
 The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
 1. A Play for taking friendly corner kicks
 2. A Play for defending enemy kickoffs
