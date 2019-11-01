@@ -33,4 +33,3 @@ enum class RefboxGameState
  * @return The name of the given refbox gamestate
  */
 std::string name(const RefboxGameState& state);
-std::ostream& operator<<(std::ostream& os, const RefboxGameState& state);

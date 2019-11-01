@@ -65,7 +65,7 @@ cc_library(
     name = "refbox_constants",
     srcs = ["refbox_constants.cpp"],
     hdrs = ["refbox_constants.h"],
-    deps = [],
+    deps = ["@magic_enum"],
 )
 
 cc_test(
