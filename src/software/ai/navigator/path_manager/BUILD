@@ -22,3 +22,13 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "obstacle_path_manager_test",
+    srcs = ["obstacle_path_manager_test.cpp"],
+    deps = [
+        ":obstacle_path_manager",
+        "//software/test_util",
+        "//software/ai/navigator/path_planner:straight_line_path_planner",
+        "@gtest//:gtest_main",
+    ],
+)
