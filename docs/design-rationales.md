@@ -2,7 +2,6 @@
 
 ### TODO: Document These Things
 * [ ] Namespaces
-* [ ] Constants vs. Dynamic parameters (why we have both, where each should be used, etc.)
 * [ ] contribution / editing guide.  Diagrams in GitHub: https://github.com/jgraph/drawio-github
 * [ ] coroutinesG
 
@@ -101,7 +100,11 @@ Intents are very similar to Primitives, but include slightly more logic. `Intent
 
 
 ## Dynamic Parameters
-`Dynamic Parameter` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly, and want to avoid having to stop the `AI`, make a change, recompile the code, and re-launch the `AI`. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! It's also very useful for testing things manually, and we also use it to communicate between the `Visualizer` and the rest of the system, so that the `Visualizer` can control the system.
+`Dynamic Parameters` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! Using `Dynamic Parameters` saves us from having to stop the [AI](#ai), change a constant, recompile the code, and restart the [AI](#ai).
+
+Additionally, we can use `Dynamic Parameters` to communicate between the [Visualizer](#visualizer) and the rest of our system. The [Visualizer](#visualizer) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start AI` button is clicked in the [Visualizer](#visualizer), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic. Alltogether this is an example of how we use `Dynamic Parameters` to control our [AI](#ai) and other parts of the code.
+
+It is worth noting that constants are still useful, and should still be used whenever possible. If a value realistically doesn't need to be changed, it should be a constant (with a nice descriptive name) rather than a `Dynamic Parameter`. Having too many `Dynamic Parameters` is overwhelming because there are too many values to understand and change, and this can make it hard to tune values to get the desired behavior while under pressure during a game.
 
 
 ## Robot Status
