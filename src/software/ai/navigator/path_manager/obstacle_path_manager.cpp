@@ -6,8 +6,7 @@ ObstaclePathManager::ObstaclePathManager(std::unique_ptr<PathPlanner> path_plann
 }
 
 const std::map<PathObjective, std::optional<Path>> ObstaclePathManager::getManagedPaths(
-    const std::set<PathObjective> &objectives, const Rectangle &navigable_area,
-    const std::vector<Obstacle> &static_obstacles)
+    const std::set<PathObjective> &objectives, const Rectangle &navigable_area)
 {
     std::map<PathObjective, std::optional<Path>> managed_paths;
 

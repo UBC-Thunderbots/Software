@@ -11,66 +11,47 @@ void Navigator::visit(const CatchIntent &intent)
 {
     auto p            = std::make_unique<CatchPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const ChipIntent &intent)
 {
     auto p            = std::make_unique<ChipPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const DirectVelocityIntent &intent)
 {
     auto p            = std::make_unique<DirectVelocityPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const DirectWheelsIntent &intent)
 {
     auto p            = std::make_unique<DirectWheelsPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const DribbleIntent &intent)
 {
     auto p            = std::make_unique<DribblePrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const KickIntent &intent)
 {
     auto p            = std::make_unique<KickPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const MoveIntent &intent)
 {
-    Point start =
-        this->world.friendlyTeam().getRobotById(intent.getRobotId())->position();
-    Point end                 = intent.getDestination();
-    auto avoid_area_obstacles = getObstaclesFromAvoidAreas(intent.getAreasToAvoid());
-
-    auto robot = world.friendlyTeam().getRobotById(intent.getRobotId());
-
-    if (robot)
-    {
-        path_objective_to_move_intent.insert(
-            {PathObjective(start, end, robot->velocity().len(), avoid_area_obstacles,
-                           intent.getRobotId()),
-             intent});
-    }
-    else
-    {
-        std::stringstream ss;
-        ss << "Failed to find robot associated with robot id = " << intent.getRobotId();
-        LOG(WARNING) << ss.str();
-    }
+    move_intents.push_back(intent);
     current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
@@ -78,30 +59,30 @@ void Navigator::visit(const MoveSpinIntent &intent)
 {
     auto p            = std::make_unique<MoveSpinPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const PivotIntent &intent)
 {
     auto p            = std::make_unique<PivotPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 void Navigator::visit(const StopIntent &intent)
 {
     auto p            = std::make_unique<StopPrimitive>(intent);
     current_primitive = std::move(p);
-    non_path_planning_robots.insert(intent.getRobotId());
+    registerNonMoveIntentRobotId(intent.getRobotId());
 }
 
 std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
-    this->world              = world;
+    this->world = world;
     planned_paths.clear();
-    non_path_planning_robots.clear();
-    path_objective_to_move_intent.clear();
+    move_intents.clear();
+    friendly_non_moving_robot_obstacles.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
@@ -113,27 +94,63 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         }
     }
 
+    addMoveIntentsToAssignedPrimitives(assigned_primitives);
+
+    return assigned_primitives;
+}
+
+std::map<PathObjective, MoveIntent> Navigator::generatePathObjectiveToMoveIntentMap(void)
+{
+    std::map<PathObjective, MoveIntent> path_objective_to_move_intent;
+    for (const auto &intent : move_intents)
+    {
+        // start with non-MoveIntent robots and then add avoid areas
+        auto obstacles            = friendly_non_moving_robot_obstacles;
+        auto avoid_area_obstacles = getObstaclesFromAvoidAreas(intent.getAreasToAvoid());
+        obstacles.insert(obstacles.end(), avoid_area_obstacles.begin(),
+                         avoid_area_obstacles.end());
+
+        auto robot = world.friendlyTeam().getRobotById(intent.getRobotId());
+
+        if (robot)
+        {
+            Point start = robot->position();
+            Point end   = intent.getDestination();
+
+            path_objective_to_move_intent.insert(
+                {PathObjective(start, end, robot->velocity().len(), obstacles,
+                               intent.getRobotId()),
+                 intent});
+        }
+        else
+        {
+            std::stringstream ss;
+            ss << "Failed to find robot associated with robot id = "
+               << intent.getRobotId();
+            LOG(WARNING) << ss.str();
+        }
+    }
+    return path_objective_to_move_intent;
+}
+
+void Navigator::addMoveIntentsToAssignedPrimitives(
+    std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
+{
     Rectangle navigable_area(
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
-    // get keyset from path_objective_to_move_intent
+    auto path_objective_to_move_intent = generatePathObjectiveToMoveIntentMap();
+
+    // get keyset from path_objective_to_move_intent and then plan paths
     std::set<PathObjective> path_objectives;
     for (const auto &p : path_objective_to_move_intent)
     {
         path_objectives.insert(p.first);
     }
-    auto paths = path_manager->getManagedPaths(path_objectives, navigable_area,
-                                               getNonPathPlanningObstacles());
-    addPathsToAssignedPrimitives(paths, assigned_primitives);
+    auto path_objective_to_path =
+        path_manager->getManagedPaths(path_objectives, navigable_area);
 
-    return assigned_primitives;
-}
-
-void Navigator::addPathsToAssignedPrimitives(
-    const std::map<PathObjective, std::optional<Path>> &path_objective_to_path,
-    std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
-{
     for (const auto &path_objective_and_path : path_objective_to_path)
     {
         auto path_objective = path_objective_and_path.first;
@@ -153,75 +170,24 @@ void Navigator::addPathsToAssignedPrimitives(
             continue;
         }
 
+        // Convert into primitive and add to assigned_primitives
         MoveIntent intent = path_objective_and_intent_it->second;
-
-        if (path)
-        {
-            std::vector<Point> path_points = path->getKnots();
-            planned_paths.emplace_back(path_points);
-
-            if (path_points.size() == 1)
-            {
-                throw std::runtime_error(
-                    "Path only contains one point, which is invalid, since it's ambiguous if it's the start or end or some other point");
-            }
-            else
-            {
-                double desired_final_speed;
-
-                if (path_points.size() == 2)
-                {
-                    // we are going to destination
-                    desired_final_speed = intent.getFinalSpeed();
-                }
-                else
-                {
-                    // we are going to some intermediate point so we transition smoothly
-                    double transition_final_speed =
-                        ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                        Util::DynamicParameters->getNavigatorConfig()
-                            ->TransitionSpeedFactor()
-                            ->value();
-
-                    desired_final_speed = calculateTransitionSpeedBetweenSegments(
-                        path_points[0], path_points[1], path_points[2],
-                        transition_final_speed);
-                }
-
-                auto move = std::make_unique<MovePrimitive>(
-                    intent.getRobotId(), path_points[1], intent.getFinalAngle(),
-                    // slow down around enemy robots
-                    desired_final_speed * getCloseToEnemyObstacleFactor(path_points[1]),
-                    intent.getDribblerEnable(), intent.getMoveType(),
-                    intent.getAutoKickType());
-                current_primitive = std::move(move);
-            }
-        }
-        else
-        {
-            LOG(WARNING) << "Path manager could not find a path";
-            auto stop = std::make_unique<StopPrimitive>(intent.getRobotId(), false);
-            current_primitive = std::move(stop);
-        }
+        processPathIntoCurrentPrimitive(path, intent);
         assigned_primitives.emplace_back(std::move(current_primitive));
     }
 }
 
-std::vector<Obstacle> Navigator::getNonPathPlanningObstacles()
+void Navigator::registerNonMoveIntentRobotId(RobotId id)
 {
-    std::vector<Obstacle> obstacles;
     double inflation_factor = Util::DynamicParameters->getNavigatorConfig()
                                   ->RobotObstacleInflationFactor()
                                   ->value();
-    for (auto &robot : world.friendlyTeam().getAllRobots())
+    auto robot = (world.friendlyTeam().getRobotById(id));
+    if (robot)
     {
-        if (non_path_planning_robots.find(robot.id()) != non_path_planning_robots.end())
-        {
-            obstacles.push_back(
-                Obstacle::createCircularRobotObstacle(robot, inflation_factor));
-        }
+        friendly_non_moving_robot_obstacles.push_back(
+            Obstacle::createCircularRobotObstacle(*robot, inflation_factor));
     }
-    return obstacles;
 }
 
 std::vector<Obstacle> Navigator::getObstaclesFromAvoidAreas(
@@ -321,6 +287,24 @@ std::vector<Obstacle> Navigator::getObstaclesFromAvoidAreas(
     return obstacles;
 }
 
+std::vector<Obstacle> Navigator::getObstaclesFromTeam(const Team &team)
+{
+    double robot_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
+                                        ->RobotObstacleInflationFactor()
+                                        ->value();
+    double velocity_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
+                                           ->VelocityObstacleInflationFactor()
+                                           ->value();
+    std::vector<Obstacle> obstacles;
+    for (auto &robot : team.getAllRobots())
+    {
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
+            robot, robot_inflation_factor, velocity_inflation_factor);
+        obstacles.push_back(o);
+    }
+    return obstacles;
+}
+
 double Navigator::getCloseToEnemyObstacleFactor(const Point &p)
 {
     // find min dist between p and any robot
@@ -346,25 +330,60 @@ double Navigator::getCloseToEnemyObstacleFactor(const Point &p)
     return std::clamp(closest_dist / ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, 1.0);
 }
 
+void Navigator::processPathIntoCurrentPrimitive(std::optional<Path> path,
+                                                MoveIntent intent)
+{
+    if (path)
+    {
+        std::vector<Point> path_points = path->getKnots();
+        planned_paths.emplace_back(path_points);
+
+        if (path_points.size() == 1)
+        {
+            throw std::runtime_error(
+                "Path only contains one point, which is invalid, since it's ambiguous if it's the start or end or some other point");
+        }
+        else
+        {
+            double desired_final_speed;
+
+            if (path_points.size() == 2)
+            {
+                // we are going to destination
+                desired_final_speed = intent.getFinalSpeed();
+            }
+            else
+            {
+                // we are going to some intermediate point so we transition smoothly
+                double transition_final_speed =
+                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                    Util::DynamicParameters->getNavigatorConfig()
+                        ->TransitionSpeedFactor()
+                        ->value();
+
+                desired_final_speed = calculateTransitionSpeedBetweenSegments(
+                    path_points[0], path_points[1], path_points[2],
+                    transition_final_speed);
+            }
+
+            auto move = std::make_unique<MovePrimitive>(
+                intent.getRobotId(), path_points[1], intent.getFinalAngle(),
+                // slow down around enemy robots
+                desired_final_speed * getCloseToEnemyObstacleFactor(path_points[1]),
+                intent.getDribblerEnable(), intent.getMoveType(),
+                intent.getAutoKickType());
+            current_primitive = std::move(move);
+        }
+    }
+    else
+    {
+        LOG(WARNING) << "Path manager could not find a path";
+        auto stop         = std::make_unique<StopPrimitive>(intent.getRobotId(), false);
+        current_primitive = std::move(stop);
+    }
+}
+
 std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
 {
     return planned_paths;
-}
-
-std::vector<Obstacle> Navigator::getObstaclesFromTeam(const Team &team)
-{
-    double robot_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
-                                        ->RobotObstacleInflationFactor()
-                                        ->value();
-    double velocity_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
-                                           ->VelocityObstacleInflationFactor()
-                                           ->value();
-    std::vector<Obstacle> obstacles;
-    for (auto &robot : team.getAllRobots())
-    {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
-            robot, robot_inflation_factor, velocity_inflation_factor);
-        obstacles.push_back(o);
-    }
-    return obstacles;
 }

@@ -26,15 +26,12 @@ class PathManager
      *
      * @param objectives vector of path objectives
      * @param navigable_area Rectangle representing the navigable area
-     * @param static_obstacles static obstacles to avoid, excluding the robots
-     *  whose paths are being planned
      *
      * @return a map of PathObjective to optional Path
      *  *no path is represented by std::nullopt
      */
     virtual const std::map<PathObjective, std::optional<Path>> getManagedPaths(
-        const std::set<PathObjective> &objectives, const Rectangle &navigable_area,
-        const std::vector<Obstacle> &static_obstacles) = 0;
+        const std::set<PathObjective> &objectives, const Rectangle &navigable_area) = 0;
 
     virtual ~PathManager() = default;
 };

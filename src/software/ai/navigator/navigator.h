@@ -121,19 +121,17 @@ class Navigator : public IntentVisitor
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
 
-    /**
-     * These are obstacles that represent robots that aren't
-     * assigned move intents
-     * When move intents are processed to path plan,
-     * we can avoid these non-"moving" robots
-     */
-    std::set<RobotId> non_path_planning_robots;
-
     // This is used by the visualizer to see the planned paths
     std::vector<std::vector<Point>> planned_paths;
 
-    // path objectives and intents that need path planning
-    std::map<PathObjective, MoveIntent> path_objective_to_move_intent;
+    // These are obstacles that represent robots that aren't
+    // assigned move intents
+    // When move intents are processed to path plan,
+    // we can avoid these non-"moving" robots
+    std::vector<Obstacle> friendly_non_moving_robot_obstacles;
+
+    // intents that need path planning
+    std::vector<MoveIntent> move_intents;
 
     /**
      * Create obstacles for the given avoid areas, with a buffer such that the edge
@@ -159,23 +157,6 @@ class Navigator : public IntentVisitor
     double getCloseToEnemyObstacleFactor(const Point &p);
 
     /**
-     * Set the current_primitive based on the intent and path
-     *
-     * @param move_intent MoveIntent to navigate with
-     * @param path path to navigate
-     *
-     * @modifies current_primitive
-     */
-    void moveNavigation(const MoveIntent &move_intent, const std::optional<Path> &path);
-
-    /**
-     * Gets obstacles to represent all the non path planning robots
-     *
-     * @return list of obstacles
-     */
-    std::vector<Obstacle> getNonPathPlanningObstacles();
-
-    /**
      * Convert paths into primitives and add them to assigned_primitives
      *
      * @param paths paths to convert
@@ -191,4 +172,35 @@ class Navigator : public IntentVisitor
      * @return vector of obstacles
      */
     std::vector<Obstacle> getObstaclesFromTeam(const Team &team);
+
+    /**
+     * Registers this robot id as a robot that is not assigned a MoveIntent
+     *
+     * @param RobotId
+     *
+     */
+    void registerNonMoveIntentRobotId(RobotId id);
+
+    /**
+     * Generates a map from path objectives to move intents
+     *
+     * @return map from path objectives to move intents
+     */
+    std::map<PathObjective, MoveIntent> generatePathObjectiveToMoveIntentMap(void);
+
+    /**
+     * Adds primitives associated with all MoveIntents into assigned_primitives
+     *
+     * @param assigned_primitives primitives to add MoveIntent primitives to
+     */
+    void addMoveIntentsToAssignedPrimitives(
+        std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
+
+    /**
+     * Set current_primitive for a given path and intent
+     *
+     * @param path path to make primitive for
+     * @param intent intent to make primitive
+     */
+    void processPathIntoCurrentPrimitive(std::optional<Path> path, MoveIntent intent);
 };
