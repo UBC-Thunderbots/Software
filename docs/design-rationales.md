@@ -6,14 +6,20 @@
 * [ ] Difference between HL components and Navigator components. Be clear about where the separation is, and why. Actions and Intents are not combined because Actions are part of HL, while Intents are part of Navigator. Combining them would break the abstraction and couple STP to the navigator, removing our flexibility to implement different HL systems in the future
 * [ ] contribution / editing guide.  Diagrams in GitHub: https://github.com/jgraph/drawio-github
 * [ ] coroutines
+* [ ] field coordinate convention
 
 # Table of Contents
-* [Tools](#Tools)
+* [Tools](#tools)
   * [SSL-Vision](#ssl-vision)
   * [SSL-Gamecontroller](#ssl-gamecontroller)
   * [grSim](#grsim)
 * [Important Classes](#important-classes)
   * [World](#world)
+    * [Team](#team)
+    * [Robot](#robot)
+    * [Ball](#ball)
+    * [Field](#field)
+    * [Refbox and Gamestate](#refbox-/-gamestate)
   * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
@@ -28,8 +34,15 @@
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
 * [Backend](#backend)
+  * [Input](#input-responsabilities)
+  * [Output](#output-responsabilities)
   * [Diagram](#backend-diagram)
 * [AI](#ai)
+  * [Strategy](#strategy)
+    * [Skills / Actions](#skills-/-actions)
+    * [Tactics](#tactics)
+    * [Plays](#plays)
+  * [Navigation](#navigation)
   * [Diagram](#ai-diagram)
 * [Visualizer](#visualizer)
 
@@ -37,20 +50,20 @@
 # Tools
 A few commonly-used terms and tools to be familiar with:
 #### SSL-Vision
-    * This is the shared vision system used by the Small Size League. It is what connects to the cameras above the field, does the vision processing, and transmits the positional data of everything on the field to our AI computers.
-    * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-vision)
+  * This is the shared vision system used by the Small Size League. It is what connects to the cameras above the field, does the vision processing, and transmits the positional data of everything on the field to our AI computers.
+  * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-vision)
 #### SSL-Gamecontroller
-    * Sometimes referred to as the "Refbox", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For examples, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
-    * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-game-controller)
+  * Sometimes referred to as the "Refbox", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For examples, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
+  * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-game-controller)
 #### grSim
-    * The general robot simulator used by the Small-Size-League. We use this to manually test strategy since it is easy to place the robots and ball in desired locations, run a strategy, and see what the robots do. It is not perfectly accurate, but is useful for testing high-level logic.
-    * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/grSim)
+  * The general robot simulator used by the Small-Size-League. We use this to manually test strategy since it is easy to place the robots and ball in desired locations, run a strategy, and see what the robots do. It is not perfectly accurate, but is useful for testing high-level logic.
+  * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/grSim)
 
 
 # Important Classes
 These are classes that are either heavily used in our code, or are very important for understanding how the AI works.
 
-## The World Class
+## World
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current refbox commands. Alltogether, it's all the information we have at any given time that we can use to make decisions.
 
 ### Team
