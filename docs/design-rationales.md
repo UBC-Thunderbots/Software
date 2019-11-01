@@ -12,7 +12,6 @@
 #Misc
 Diagrams in GitHub: https://github.com/jgraph/drawio-github
 
-robot status
 design patterns
 coroutines
 
@@ -28,6 +27,7 @@ coroutines
   * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
+  * [Robot Status](#robot-status)
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
 * [Backend](#backend)
@@ -92,6 +92,16 @@ Intents are very similar to Primitives, but include slightly more logic. `Intent
 
 ## Dynamic Parameters
 `Dynamic Parameter` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly, and want to avoid having to stop the `AI`, make a change, recompile the code, and re-launch the `AI`. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! It's also very useful for testing things manually, and we also use it to communicate between the `Visualizer` and the rest of the system, so that the `Visualizer` can control the system.
+
+
+## Robot Status
+The `Robot Status` class contains information about the status of a single robot. Examples of the information they include are:
+* Robot battery voltage
+* Whether or not the robot senses the ball in the breakbeam
+* The capacitor charge on the robot
+* The temperature of the dribbler motor
+
+Information received from the robots is stored in `Robot Status` objects so that the rest of the system can easily access and make sense of the information if necessary. For example, we monitor incoming `Robot Status` and display warnings in the [Visualizer](#visualizer) if anything looks wrong so we can be alerted. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
 
 
 # Architecture Overview
