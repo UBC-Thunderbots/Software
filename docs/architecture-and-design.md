@@ -1,4 +1,4 @@
-# Design Rationale
+# Architecture and Design Rationales
 
 ### TODO: Document These Things
 * [ ] Namespaces
