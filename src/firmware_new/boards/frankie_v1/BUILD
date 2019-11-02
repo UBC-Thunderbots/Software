@@ -4,11 +4,12 @@ load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 
 cc_binary(
     name = "frankie_v1_main",
-    srcs = ["main.c"],
+    srcs = ["Src/main.c"],
     copts = [
         "-DUSE_HAL_DRIVER",
         "-DSTM32H743xx",
     ],
+    includes = ["./Inc"],
     linkopts = [
         "-T$(location //firmware_new/boards/frankie_v1:STM32H743ZITx_FLASH.ld)",
         "-specs=nano.specs",
@@ -27,15 +28,16 @@ cc_library(
     name = "frankie_v1_main_lib",
     srcs = glob(
         [
-            "*.c",
-            "*.s",
+            "**/*.c",
+            "*/*.s",
         ],
-        exclude = ["main.c"],
+        exclude = ["Src/main.c"],
     ),
-    hdrs = glob(["*.h"]),
+    hdrs = glob(["**/*.h"]),
     copts = [
         "-DSTM32H743xx",
     ],
+    includes = ["./Inc"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":hal_library"],
     # This is _very_ important. If we don't do this, bazel will not compile in the
@@ -115,13 +117,13 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h",
-        "stm32h7xx_hal_conf.h",
+        "Inc/stm32h7xx_hal_conf.h",
     ],
     copts = [
         "-DSTM32H743xx",
     ],
     includes = [
-        "./",
+        "./Inc",
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
         "Drivers/CMSIS/Include/",
         "Drivers/CMSIS/RTOS2/Include/",
