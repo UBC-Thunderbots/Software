@@ -39,7 +39,7 @@ class Ray final
      */
     inline Point getStart() const
     {
-        return Point(start_);
+        return start_;
     }
 
     /**
