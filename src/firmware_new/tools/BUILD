@@ -8,3 +8,23 @@ sh_binary(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )
+
+# run bazel pin mapper
+filegroup(
+    name = "firmware_c_files",
+    srcs = glob(["firmware_new/boards/frankie_v1/*c",]),
+)
+
+filegroup(
+    name = "firmware_h_files",
+    srcs = glob(["firmware_new/boards/frankie_v1/*h",]),
+)
+
+sh_binary(
+    name = "regen",
+    srcs = ["regen.sh"],
+    data = ["//firmware_new/boards/frankie_v1:frankie.ioc"],
+    args = [":c_files", ":h_files"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)

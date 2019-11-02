@@ -2,6 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 
+exports_files(["frankie.ioc"])
+
 cc_binary(
     name = "frankie_v1_main",
     srcs = ["main.c"],
