@@ -1,9 +1,5 @@
 /**
- * \defgroup DRIBBLER Dribbler Functions
- *
- * \brief These functions handle overall operation of the dribbler, including PWM selection, torque limiting, and thermal modelling.
- *
- * @{
+ * These functions handle overall operation of the dribbler, including PWM selection, torque limiting, and thermal modelling.
  */
 #include "dribbler.h"
 #include "adc.h"
@@ -14,19 +10,25 @@
 #include "physics.h"
 #include <stdio.h>
 
-#define SPEED_CONSTANT 3760.0f // rpm per volt—EC16 datasheet
+/**
+ * The following constants use values from this datasheet:
+ * https://www.maxongroup.com/medias/sys_master/root/8833419509790/19-EN-177.pdf
+ */
+#define NOMINAL_SPEED_RPM 50800
+#define NOMINAL_VOLTAGE 18.0f
+#define SPEED_CONSTANT (NOMINAL_SPEED_RPM / NOMINAL_VOLTAGE) // rpm per volt
 #define VOLTS_PER_RPM (1.0f / SPEED_CONSTANT) // volts per rpm
 #define VOLTS_PER_RPT (VOLTS_PER_RPM * 60.0f * DRIBBLER_TICK_HZ) // volts per rpt, rpt=revolutions per tick
 #define VOLTS_PER_SPEED_UNIT (VOLTS_PER_RPT / 6.0f) // volts per Hall edge
-#define PHASE_RESISTANCE 0.403f // ohms—EC16 datasheet
+#define PHASE_RESISTANCE 0.512f // ohms—EC16 datasheet
 #define SWITCH_RESISTANCE (0.019f*2.0f) // ohms—AO4882 datasheet
 
-#define THERMAL_TIME_CONSTANT_WINDING 1.97f // seconds—EC16 datasheet
-#define THERMAL_RESISTANCE_WINDING 1.68f // kelvins per Watt—EC16 datasheet (winding to housing)
+#define THERMAL_TIME_CONSTANT_WINDING 2.17f // seconds—EC16 datasheet
+#define THERMAL_RESISTANCE_WINDING 1.8f // kelvins per Watt—EC16 datasheet (winding to housing)
 #define THERMAL_CAPACITANCE_WINDING (THERMAL_TIME_CONSTANT_WINDING / THERMAL_RESISTANCE_WINDING) // joules per kelvin
 
-#define THERMAL_TIME_CONSTANT_HOUSING 240.0f // seconds—EC16 datasheet
-#define THERMAL_RESISTANCE_HOUSING 16.3f // kelvins per Watt—EC16 datasheet (housing to ambient)
+#define THERMAL_TIME_CONSTANT_HOUSING 508.0f // seconds—EC16 datasheet
+#define THERMAL_RESISTANCE_HOUSING 20.3f // kelvins per Watt—EC16 datasheet (housing to ambient)
 #define THERMAL_CAPACITANCE_HOUSING (THERMAL_TIME_CONSTANT_HOUSING / THERMAL_RESISTANCE_HOUSING) // joules per kelvin
 
 #define THERMAL_AMBIENT 40.0f // °C—empirically estimated based on motor casing heatsinking to chassis
@@ -37,9 +39,9 @@
 #define THERMAL_WARNING_STOP_TEMPERATURE_WINDING (THERMAL_WARNING_START_TEMPERATURE_WINDING - 15.0f) // °C—chead
 #define THERMAL_WARNING_STOP_ENERGY_WINDING ((THERMAL_WARNING_STOP_TEMPERATURE_WINDING - THERMAL_AMBIENT) * THERMAL_CAPACITANCE_WINDING) // joules
 
-#define DRIBBLER_SPEED_BUFFER_ZONE 200 // RPM
+#define DRIBBLER_SPEED_BUFFER_ZONE 250 // RPM
 
-#define MAX_DRIBBLER_CURRENT 5 // Limit the max current the dribbler can draw when stalled
+#define MAX_DRIBBLER_CURRENT 4.0f // Limit the max current the dribbler can draw when stalled
 #define MAX_DELTA_VOLTAGE (MAX_DRIBBLER_CURRENT * (PHASE_RESISTANCE + SWITCH_RESISTANCE + MIN_RESISTANCE_UNDER_PWM70)) // Limit the current by limiting the max delta voltage we can apply
 #define MIN_RESISTANCE_UNDER_PWM70 1.5f
 

@@ -25,11 +25,11 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
-    override_play          = Util::DynamicParameters::AI::override_ai_play.value();
+    override_play = Util::DynamicParameters->getAIConfig()->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name          = Util::DynamicParameters::AI::current_ai_play.value();
+    override_play_name = Util::DynamicParameters->getAIConfig()->CurrentAIPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
@@ -131,7 +131,6 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
 
     auto friendly_team        = world.friendlyTeam();
     auto friendly_team_robots = friendly_team.getAllRobots();
-    auto friendly_team_size   = friendly_team.numRobots();
 
     size_t num_rows = world.friendlyTeam().numRobots();
     size_t num_cols = tactics.size();
@@ -149,12 +148,12 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     Matrix<double> matrix(num_rows, num_cols);
 
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
-    for (int row = 0; row < num_rows; row++)
+    for (unsigned row = 0; row < num_rows; row++)
     {
-        for (int col = 0; col < num_cols; col++)
+        for (unsigned col = 0; col < num_cols; col++)
         {
-            if (!friendly_team_robots.at(row).getRobotCapabilities().hasAllCapabilities(
-                    tactics.at(col)->robotCapabilityRequirements()))
+            if (!(tactics.at(col)->robotCapabilityRequirements() <=
+                  friendly_team_robots.at(row).getRobotCapabilities()))
             {
                 // hardware requirements of tactic are not satisfied by the current robot
                 // set cost to 10.0f
@@ -182,9 +181,9 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     //        -1, 0,-1,         and            0,-1,
     //         0,-1,-1,                       -1, 0,
     //        -1,-1, 0,
-    for (int row = 0; row < num_rows; row++)
+    for (unsigned row = 0; row < num_rows; row++)
     {
-        for (int col = 0; col < num_cols; col++)
+        for (unsigned col = 0; col < num_cols; col++)
         {
             auto val = matrix(row, col);
             if (val == 0)

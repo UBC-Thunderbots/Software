@@ -4,7 +4,7 @@
 #include <boost/coroutine2/all.hpp>
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/world/robot.h"
+#include "software/world/robot.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with

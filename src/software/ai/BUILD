@@ -14,10 +14,10 @@ cc_library(
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/navigator",
-        "//software/ai/navigator/path_planning_navigator",
+        "//software/ai/navigator/path_planner:theta_star_path_planner",
         "//software/ai/primitive",
-        "//software/ai/world",
         "//software/util/time:timestamp",
+        "//software/world",
     ],
 )
 
@@ -28,12 +28,12 @@ cc_library(
     deps = [
         "//software:typedefs",
         "//software/ai",
-        "//software/ai/world",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:navigator",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/util/parameter:dynamic_parameters",
+        "//software/world",
         "@boost//:bind",
     ],
 )
@@ -43,9 +43,9 @@ cc_test(
     srcs = ["game_state_play_selection_test.cpp"],
     deps = [
         "//software/ai",
-        "//software/ai/world",
         "//software/gui/drawing:draw_functions",
         "//software/test_util",
+        "//software/world",
         "@gtest//:gtest_main",
     ],
 )

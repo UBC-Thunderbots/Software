@@ -4,11 +4,13 @@
 #include <random>
 #include <thread>
 
+#include "software/ai/passing/evaluation.h"
 #include "software/ai/passing/pass.h"
-#include "software/ai/world/world.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/util/optimization/gradient_descent_optimizer.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/util/time/timestamp.h"
+#include "software/world/world.h"
 
 namespace Passing
 {
@@ -53,7 +55,7 @@ namespace Passing
 
         // Delete the copy and assignment operators because this class really shouldn't
         // need them and we don't want to risk doing anything nasty with the internal
-        // multithreading this class uses
+        // threading this class uses
         PassGenerator& operator=(const PassGenerator&) = delete;
         PassGenerator(const PassGenerator&)            = delete;
 
@@ -62,8 +64,13 @@ namespace Passing
          *
          * @param world The world we're passing int
          * @param passer_point The point we're passing from
+         * @param pass_type The type of pass we would like to perform.
+         *                  NOTE: this will _try_ to generate a pass of the type given,
+         *                  but it is not guaranteed, and can change during pass
+         *                  execution because of Passer/Receiver decisions
          */
-        explicit PassGenerator(const World& world, const Point& passer_point);
+        explicit PassGenerator(const World& world, const Point& passer_point,
+                               const PassType& pass_type);
 
         /**
          * Updates the world
@@ -108,7 +115,7 @@ namespace Passing
          *
          * @return The best currently known pass and the rating of that pass (in [0-1])
          */
-        std::pair<Pass, double> getBestPassSoFar();
+        PassWithRating getBestPassSoFar();
 
         /**
          * Destructs this PassGenerator
@@ -157,6 +164,12 @@ namespace Passing
         void saveBestPass();
 
         /**
+         * Draws all the passes we are currently optimizing and the gradient of pass
+         * receive position quality over the field
+         */
+        void visualizePassesAndPassQualityGradient();
+
+        /**
          * Get the number of passes to keep after pruning
          *
          * @return the number of passes to keep after pruning
@@ -179,7 +192,7 @@ namespace Passing
          *         form: {receiver_point.x, receiver_point.y, pass_speed_m_per_s
          *                pass_start_time}
          */
-        std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(Pass pass);
+        std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(const Pass& pass);
 
         /**
          * Convert a given array to a Pass
@@ -191,7 +204,7 @@ namespace Passing
          * @return The pass represented by the given array, with the passer point being
          *         the current `passer_point` we're optimizing for
          */
-        Pass convertArrayToPass(std::array<double, NUM_PARAMS_TO_OPTIMIZE> array);
+        Pass convertArrayToPass(const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& array);
 
         /**
          * Calculate the quality of a given pass
@@ -199,7 +212,7 @@ namespace Passing
          * @return A value in [0,1] representing the quality of the pass with 1 being the
          *         best pass and 0 being the worst pass
          */
-        double ratePass(Pass pass);
+        double ratePass(const Pass& pass);
 
         /**
          * Updates the passer point of all passes that we're currently optimizing
@@ -247,20 +260,6 @@ namespace Passing
         // background. This thread will run for the entire lifetime of the class
         std::thread pass_generation_thread;
 
-        // The mutex for the in_destructor flag
-        std::mutex in_destructor_mutex;
-
-        // This flag is used to indicate that we are in the destructor. We use this to
-        // communicate with pass_generation_thread that it is
-        // time to stop
-        bool in_destructor;
-
-        // The mutex for the world
-        std::mutex world_mutex;
-
-        // This world is what is used in the optimization loop
-        World world;
-
         // The mutex for the updated world
         std::mutex updated_world_mutex;
 
@@ -269,11 +268,11 @@ namespace Passing
         // entirety of each optimization loop, which makes things easier to reason about
         World updated_world;
 
-        // The mutex for the passer_point
-        std::mutex passer_point_mutex;
+        // The mutex for the world
+        std::mutex world_mutex;
 
-        // The point we are passing from
-        Point passer_point;
+        // This world is what is used in the optimization loop
+        World world;
 
         // The mutex for the passer robot ID
         std::mutex passer_robot_id_mutex;
@@ -281,11 +280,17 @@ namespace Passing
         // The id of the robot that is performing the pass. We want to ignore this robot
         std::optional<unsigned int> passer_robot_id;
 
-        // The mutex for the target region
-        std::mutex target_region_mutex;
+        // All the passes that we are currently trying to optimize in gradient descent
+        std::vector<Pass> passes_to_optimize;
 
-        // The area that we want to pass to
-        std::optional<Rectangle> target_region;
+        // The optimizer we're using to find passes
+        Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+
+        // The mutex for the passer_point
+        std::mutex passer_point_mutex;
+
+        // The point we are passing from
+        Point passer_point;
 
         // The mutex for the passer_point
         std::mutex best_known_pass_mutex;
@@ -293,15 +298,25 @@ namespace Passing
         // The best pass we currently know about
         Pass best_known_pass;
 
-        // All the passes that we are currently trying to optimize in gradient descent
-        std::vector<Pass> passes_to_optimize;
+        // The mutex for the target region
+        std::mutex target_region_mutex;
 
-        // The optimizer we're using to find passes
-        Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+        // The area that we want to pass to
+        std::optional<Rectangle> target_region;
 
         // A random number generator for use across the class
         std::random_device random_device;
         std::mt19937 random_num_gen;
+
+        // What type of pass we're trying to generate
+        PassType pass_type;
+        // The mutex for the in_destructor flag
+        std::mutex in_destructor_mutex;
+
+        // This flag is used to indicate that we are in the destructor. We use this to
+        // communicate with pass_generation_thread that it is
+        // time to stop
+        bool in_destructor;
     };
 
 

@@ -54,23 +54,34 @@ while test $# -gt 0; do
             exit 0
             ;;
         -a|--all)
-            echo "Formatting all files..."
+            echo "WARNING: "-a" will format all the files and can be very slow! Please consider using "-b" instead!"
+            echo "Are you sure you want to format all files (y/n)?"
+            read continueFormat
 
-            # Generate extension string
-            # Formatted as -iname *.EXTENSION -o
-            EXTENSION_STRING=""
-            for value in "${EXTENSIONS[@]}"
-            do
-                EXTENSION_STRING="$EXTENSION_STRING -iname *.$value -o"
-            done
-            
-            # Find all the files that we want to format, and pass them to
-            # clang-format as arguments
-            # We remove the last -o flag from the extension string
-            find $CURR_DIR/../src/ ${EXTENSION_STRING::-2} \
-                | xargs $CURR_DIR/clang-format-$CLANG_VERSION -i -style=file
+            if [ "$continueFormat" == "n" ]; then
+                exit 0
 
-            shift
+            elif [ "$continueFormat" == "y" ]; then
+                echo "Formatting all files..."
+
+                # Generate extension string
+                # Formatted as -iname *.EXTENSION -o
+                EXTENSION_STRING=""
+                for value in "${EXTENSIONS[@]}"
+                do
+                    EXTENSION_STRING="$EXTENSION_STRING -iname *.$value -o"
+                done
+    
+                # Find all the files that we want to format, and pass them to
+                # clang-format as arguments
+                # We remove the last -o flag from the extension string
+                find $CURR_DIR/../src/ ${EXTENSION_STRING::-2} \
+                    | xargs $CURR_DIR/clang-format-$CLANG_VERSION -i -style=file
+                shift
+            else 
+                echo "Error: input not recognized"
+                exit 1
+            fi
             ;;
         -b|--branch)
             # Shift the arguents to check for the argument to this flag

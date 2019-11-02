@@ -3,7 +3,7 @@
 #include <QtGui/QColor>
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/ai/world/robot.h"
+#include "software/world/robot.h"
 
 /**
  * This file contains all the functions that allow us to draw a Robot in a

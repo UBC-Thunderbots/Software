@@ -12,7 +12,9 @@ std::string ExamplePlay::getName() const
 
 bool ExamplePlay::isApplicable(const World &world) const
 {
-    return true;
+    // This play is never applicable so it will never be chosen during gameplay
+    // This play can be run for testing by using the Play override
+    return false;
 }
 
 bool ExamplePlay::invariantHolds(const World &world) const
@@ -30,32 +32,35 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
     auto move_tactic_6 = std::make_shared<MoveTactic>(true);
 
+    // Continue to loop to demonstrate the example play indefinitely
     do
     {
         // The angle between each robot spaced out in a circle around the ball
         Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
 
         // Move the robots in a circle around the ball, facing the ball
-        move_tactic_1->updateParams(
+        move_tactic_1->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 1),
             (angle_between_robots * 1) + Angle::half(), 0);
-        move_tactic_2->updateParams(
+        move_tactic_2->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 2),
             (angle_between_robots * 2) + Angle::half(), 0);
-        move_tactic_3->updateParams(
+        move_tactic_3->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 3),
             (angle_between_robots * 3) + Angle::half(), 0);
-        move_tactic_4->updateParams(
+        move_tactic_4->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 4),
             (angle_between_robots * 4) + Angle::half(), 0);
-        move_tactic_5->updateParams(
+        move_tactic_5->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 5),
             (angle_between_robots * 5) + Angle::half(), 0);
-        move_tactic_6->updateParams(
+        move_tactic_6->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 6),
             (angle_between_robots * 6) + Angle::half(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
+        // If there are fewer robots in play, robots at the end of the list will not be
+        // assigned
         yield({move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
                move_tactic_6});
     } while (true);

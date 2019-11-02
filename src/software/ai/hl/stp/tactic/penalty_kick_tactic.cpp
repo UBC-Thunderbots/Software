@@ -6,18 +6,23 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      const std::optional<Robot>& enemy_goalie,
                                      bool loop_forever)
-    : ball(ball), field(field), enemy_goalie(enemy_goalie), Tactic(loop_forever)
+    : Tactic(loop_forever), ball(ball), field(field), enemy_goalie(enemy_goalie)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    addWhitelistedAvoidArea(AvoidArea::ENEMY_DEFENSE_AREA);
+    addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 }
 
 std::string PenaltyKickTactic::getName() const
@@ -25,9 +30,9 @@ std::string PenaltyKickTactic::getName() const
     return "Penalty Kick Tactic";
 }
 
-void PenaltyKickTactic::updateParams(const Ball& updated_ball,
-                                     const std::optional<Robot>& updated_enemy_goalie,
-                                     const Field& updated_field)
+void PenaltyKickTactic::updateWorldParams(
+    const Ball& updated_ball, const std::optional<Robot>& updated_enemy_goalie,
+    const Field& updated_field)
 {
     this->enemy_goalie = updated_enemy_goalie;
     this->ball         = updated_ball;
@@ -39,7 +44,7 @@ double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& wo
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -61,7 +66,7 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
     Ray shot_ray = Ray(ball.position(), Point(robot.value().orientation().cos(),
                                               robot.value().orientation().sin()));
 
-    auto [intersect_1, intersect_2] = raySegmentIntersection(shot_ray, goal_line);
+    std::optional<Point> intersect_1 = raySegmentIntersection(shot_ray, goal_line).first;
 
     if (intersect_1.has_value())
     {
@@ -132,10 +137,6 @@ Point PenaltyKickTactic::evaluate_next_position()
 
 void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
-    // Keep track if a shot has been taken
-    bool shot_taken             = false;
-    bool is_facing_pos_goalpost = false;
-
     // We will need to keep track of time so we don't break the rules by taking too long
     Timestamp penalty_kick_start = robot->getMostRecentTimestamp();
 
@@ -174,17 +175,24 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         else if (!approach_ball_move_act.done())
         {
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0, true));
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
         }
         else
         {
             const Point next_shot_position = evaluate_next_position();
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(
-                *robot, robot.value().position(), next_angle, 0, true));
+                *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
+                MoveType::NORMAL, AutokickType::NONE));
         }
 
     } while (
         !(kick_action.done() ||
           (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
+}
+
+void PenaltyKickTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }

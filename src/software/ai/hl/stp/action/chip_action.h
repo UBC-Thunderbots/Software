@@ -1,9 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/world/ball.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
+#include "software/world/ball.h"
 
 /**
  * The ChipAction makes the robot chip from the given location in the given

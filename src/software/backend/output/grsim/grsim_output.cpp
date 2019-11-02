@@ -6,12 +6,12 @@
 
 #include "shared/constants.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/ai/world/team.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/team.h"
 
 
 using namespace boost::asio;
@@ -104,7 +104,10 @@ void GrSimOutput::sendPrimitives(
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
                 prim->getRobotId(),
-                Util::DynamicParameters::AI::refbox::friendly_color_yellow.value(),
+                Util::DynamicParameters->getAIConfig()
+                    ->getRefboxConfig()
+                    ->FriendlyColorYellow()
+                    ->value(),
                 robot_velocities.linear_velocity, robot_velocities.angular_velocity,
                 kick_speed_meters_per_second, chip_instead_of_kick, dribbler_on);
 

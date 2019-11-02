@@ -3,9 +3,9 @@
 #include "shared/constants.h"
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/ai/world/ball.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
+#include "software/world/ball.h"
 
 KickAction::KickAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 
@@ -94,8 +94,9 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
         // If we're not in position to kick, move into position
         if (!robot_behind_ball)
         {
-            yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball,
-                                               kick_direction, 0.0, 0));
+            yield(std::make_unique<MoveIntent>(
+                robot->id(), point_behind_ball, kick_direction, 0.0, 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
         }
         else
         {

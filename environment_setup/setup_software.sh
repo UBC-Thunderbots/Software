@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-# UBC Thunderbots Linux Software Setup
+# UBC Thunderbots Ubuntu Software Setup
 #
 # This script must be run with sudo! root permissions are required to install
 # packages and copy files to the /etc/udev/rules.d directory. The reason that the script
@@ -45,6 +45,7 @@ host_software_packages=(
     qt5-default # The GUI library for our visualizer
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
+    python3-yaml # yaml for cfg generation (Dynamic Parameters)
 )
 sudo apt-get install ${host_software_packages[@]} -y
 
@@ -74,8 +75,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# yaml for cfg generation (Dynamic Parameters)
-sudo apt-get install python3-yaml -y
+# Symlink qt include directory
+# As the Qt Bazel rules depend on an include directory which varies between Linux
+# platforms, we symlink this directory to one place in our source tree
+# and platform-dependent properties stay in the setup script
+ln -snf /usr/include/x86_64-linux-gnu/qt5 $GIT_ROOT/src/external/qt
 
 # Done
 echo "================================================================"

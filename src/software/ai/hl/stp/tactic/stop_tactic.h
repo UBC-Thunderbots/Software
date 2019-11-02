@@ -21,11 +21,6 @@ class StopTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this StopTactic.
-     */
-    void updateParams();
-
-    /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally
      *
@@ -35,6 +30,13 @@ class StopTactic : public Tactic
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
+
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
