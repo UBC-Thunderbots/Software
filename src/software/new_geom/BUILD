@@ -2,9 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "new_geom",
-    srcs = [],
-    hdrs = [
-        "ray.h",
     srcs = [
         "point.cpp",
         "vector.cpp",
@@ -14,8 +11,8 @@ cc_library(
         "angular_velocity.h",
         "geom_constants.h",
         "point.h",
-        "vector.h",
         "ray.h",
+        "vector.h",
     ],
     copts = [
         "-std=c++17",
@@ -24,17 +21,6 @@ cc_library(
         "//software/geom",
         "@boost//:geometry",
         "@boost//:polygon",
-    ],
-)
-
-cc_test(
-    name = "ray_test",
-    srcs = [
-        "ray_test.cpp",
-    ],
-    deps = [
-        ":new_geom",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -53,6 +39,17 @@ cc_test(
     name = "point_test",
     srcs = [
         "point_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "ray_test",
+    srcs = [
+        "ray_test.cpp",
     ],
     deps = [
         ":new_geom",
