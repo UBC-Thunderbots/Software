@@ -4,10 +4,8 @@
 #include "software/world/ball_state.h"
 
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
-           unsigned int history_size) : Ball(BallState(position, velocity, timestamp), history_size)
+           unsigned int history_size) : states_(history_size)
 {
-
-
     if (history_size <= 0)
     {
         throw std::invalid_argument("Error: history_size must be greater than 0");
