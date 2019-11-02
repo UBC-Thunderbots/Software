@@ -54,7 +54,7 @@ class Circle final : public IConvexShape
      *
      * @return the area of this Circle.
      */
-    double area() const;
+    double area() const override;
 };
 
 /**
