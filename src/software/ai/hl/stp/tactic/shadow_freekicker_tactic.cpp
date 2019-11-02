@@ -45,8 +45,9 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
         std::optional<Robot> enemy_with_ball =
             Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
         double robot_separation_scaling_factor =
-            Util::DynamicParameters::ShadowFreekickerTactic::
-                robot_separation_scaling_factor.value();
+            Util::DynamicParameters->getShadowFreekickerTacticConfig()
+                ->RobotSeparationScalingFactor()
+                ->value();
 
         if (enemy_with_ball.has_value())
         {

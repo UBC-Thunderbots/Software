@@ -72,15 +72,21 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             double ball_dist = (ball.position() - *defender_reference_position).len();
 
             double min_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::min_defender_seperation_deg
-                    .value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MinDefenderSeperationDeg()
+                    ->value();
             double max_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::max_defender_seperation_deg
-                    .value();
-            double min_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_min_defender_seperation.value();
-            double max_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_max_defender_seperation.value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MaxDefenderSeperationDeg()
+                    ->value();
+            double min_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMinDefenderSeperation()
+                    ->value();
+            double max_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMaxDefenderSeperation()
+                    ->value();
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {

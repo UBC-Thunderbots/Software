@@ -7,7 +7,6 @@
 #include "software/ai/passing/pass_generator.h"
 
 using namespace Passing;
-using namespace Util::DynamicParameters::Passing;
 
 PassGenerator::PassGenerator(const World& world, const Point& passer_point,
                              const PassType& pass_type)
@@ -152,9 +151,10 @@ void PassGenerator::optimizePasses()
     std::vector<Pass> updated_passes;
     for (Pass& pass : passes_to_optimize)
     {
-        auto pass_array =
-            optimizer.maximize(objective_function, convertPassToArray(pass),
-                               number_of_gradient_descent_steps_per_iter.value());
+        auto pass_array = optimizer.maximize(objective_function, convertPassToArray(pass),
+                                             Util::DynamicParameters->getPassingConfig()
+                                                 ->NumberOfGradientDescentStepsPerIter()
+                                                 ->value());
         try
         {
             updated_passes.emplace_back(convertArrayToPass(pass_array));
@@ -228,7 +228,9 @@ unsigned int PassGenerator::getNumPassesToKeepAfterPruning()
 {
     // We want to use the parameter value for this, but clamp it so that it is
     // <= the number of passes we're optimizing
-    return std::min(static_cast<unsigned int>(num_passes_to_keep_after_pruning.value()),
+    return std::min(static_cast<unsigned int>(Util::DynamicParameters->getPassingConfig()
+                                                  ->NumPassesToKeepAfterPruning()
+                                                  ->value()),
                     getNumPassesToOptimize());
 }
 
@@ -236,8 +238,10 @@ unsigned int PassGenerator::getNumPassesToOptimize()
 {
     // We want to use the parameter value for this, but clamp it so that it is
     // >= 1 so we are always optimizing at least one pass
-    return std::max(static_cast<unsigned int>(num_passes_to_optimize.value()),
-                    static_cast<unsigned int>(1));
+    return std::max(
+        static_cast<unsigned int>(
+            Util::DynamicParameters->getPassingConfig()->NumPassesToOptimize()->value()),
+        static_cast<unsigned int>(1));
 }
 
 void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
@@ -281,16 +285,18 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time = world.getMostRecentTimestamp().getSeconds();
-    double min_start_time_offset =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
-    double max_start_time_offset =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+    double curr_time             = world.getMostRecentTimestamp().getSeconds();
+    double min_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MinTimeOffsetForPassSeconds()
+                                       ->value();
+    double max_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MaxTimeOffsetForPassSeconds()
+                                       ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value(),
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value(),
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
     for (unsigned i = 0; i < num_passes_to_gen; i++)
@@ -316,14 +322,15 @@ bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
 bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
 {
     double max_position_difference_meters =
-        Util::DynamicParameters::Passing::pass_equality_max_position_difference_meters
-            .value();
-    double max_time_difference_seconds =
-        Util::DynamicParameters::Passing::pass_equality_max_start_time_difference_seconds
-            .value();
-    double max_speed_difference =
-        Util::DynamicParameters::Passing::
-            pass_equality_max_speed_difference_meters_per_second.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->PassEqualityMaxPositionDifferenceMeters()
+            ->value();
+    double max_time_difference_seconds = Util::DynamicParameters->getPassingConfig()
+                                             ->PassEqualityMaxStartTimeDifferenceSeconds()
+                                             ->value();
+    double max_speed_difference = Util::DynamicParameters->getPassingConfig()
+                                      ->PassEqualityMaxSpeedDifferenceMetersPerSecond()
+                                      ->value();
 
     double receiver_position_difference =
         (pass1.receiverPoint() - pass2.receiverPoint()).len();

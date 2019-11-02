@@ -532,11 +532,6 @@ def _clang_impl(ctx):
         flag_sets = [
             flag_set(
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(
-                        flags = ["-Wno-invalid-constexpr"],
-                    ),
-                ],
             ),
         ],
         implies = ["common"],

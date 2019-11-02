@@ -48,7 +48,8 @@ class Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes and will never report done
      */
-    explicit Tactic(bool loop_forever, RobotCapabilityFlags capability_reqs_ = {});
+    explicit Tactic(bool loop_forever,
+                    const std::set<RobotCapabilities::Capability> &capability_reqs_ = {});
 
     /**
      * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
@@ -77,12 +78,12 @@ class Tactic
     /**
      * robot hardware capability requirements of the tactic.
      */
-    const RobotCapabilityFlags &robotCapabilityRequirements() const;
+    const std::set<RobotCapabilities::Capability> &robotCapabilityRequirements() const;
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
      */
-    RobotCapabilityFlags &mutableRobotCapabilityRequirements();
+    std::set<RobotCapabilities::Capability> &mutableRobotCapabilityRequirements();
 
 
     /**
@@ -240,5 +241,5 @@ class Tactic
     std::vector<AvoidArea> blacklisted_avoid_areas;
 
     // robot capability requirements
-    RobotCapabilityFlags capability_reqs;
+    std::set<RobotCapabilities::Capability> capability_reqs;
 };

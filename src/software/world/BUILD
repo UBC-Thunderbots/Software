@@ -37,6 +37,7 @@ cc_library(
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
     deps = [
+        "//shared:constants",
         "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
@@ -48,6 +49,7 @@ cc_test(
     srcs = ["field_test.cpp"],
     deps = [
         ":field",
+        "//shared:constants",
         "@gtest//:gtest_main",
     ],
 )
@@ -120,7 +122,7 @@ cc_test(
     name = "robot_capabilities_test",
     srcs = ["robot_capabilities_test.cpp"],
     deps = [
-        ":robot_capabilities",
+        "robot_capabilities",
         "@gtest//:gtest_main",
     ],
 )
