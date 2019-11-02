@@ -3,9 +3,9 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
@@ -72,15 +72,21 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             double ball_dist = (ball.position() - *defender_reference_position).len();
 
             double min_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::min_defender_seperation_deg
-                    .value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MinDefenderSeperationDeg()
+                    ->value();
             double max_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::max_defender_seperation_deg
-                    .value();
-            double min_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_min_defender_seperation.value();
-            double max_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_max_defender_seperation.value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MaxDefenderSeperationDeg()
+                    ->value();
+            double min_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMinDefenderSeperation()
+                    ->value();
+            double max_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMaxDefenderSeperation()
+                    ->value();
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {

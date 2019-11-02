@@ -3,8 +3,8 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/ball.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/ball.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -17,9 +17,10 @@ using namespace Passing;
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
 CornerKickPlay::CornerKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
-          Util::DynamicParameters::CornerKickPlay::max_time_commit_to_pass_seconds
-              .value()))
+    : MAX_TIME_TO_COMMIT_TO_PASS(
+          Duration::fromSeconds(Util::DynamicParameters->getCornerKickPlayConfig()
+                                    ->MaxTimeCommitToPassSeconds()
+                                    ->value()))
 {
 }
 
@@ -224,7 +225,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
                                     world.ball());
         receiver->updateControlParams(pass);
-        receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
                                          world.friendlyTeam(), world.enemyTeam());
 

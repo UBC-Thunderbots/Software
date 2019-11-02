@@ -34,8 +34,10 @@ namespace
     BlockShotPathTactic(),std::set<MotionConstraint>({})),
     std::pair<Tactic*, std::set<MotionConstraint>>(new
     ChipTactic(),std::set<MotionConstraint>({})),
+    KickoffChipTactic(),std::set<MotionConstraint>({})),
     std::pair<Tactic*, std::set<MotionConstraint>>(new
     PenaltyKickTactic(),std::set<MotionConstraint>({})),
+    PenaltySetupTactic(),std::set<MotionConstraint>({})),
     std::pair<Tactic*, std::set<MotionConstraint>>(new
     PatrolTactic(),std::set<MotionConstraint>({})),
     std::pair<Tactic*, std::set<MotionConstraint>>(new

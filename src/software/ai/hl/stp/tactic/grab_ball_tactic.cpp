@@ -2,10 +2,10 @@
 
 #include <limits>
 
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/movespin_action.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
@@ -16,6 +16,8 @@ GrabBallTactic::GrabBallTactic(const Field &field, const Ball &ball,
                                const Team &enemy_team, bool loop_forever)
     : Tactic(loop_forever), field(field), ball(ball), enemy_team(enemy_team)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string GrabBallTactic::getName() const

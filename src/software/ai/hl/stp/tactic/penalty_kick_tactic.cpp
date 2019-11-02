@@ -6,10 +6,10 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
@@ -19,6 +19,10 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      bool loop_forever)
     : Tactic(loop_forever), ball(ball), field(field), enemy_goalie(enemy_goalie)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    addWhitelistedAvoidArea(AvoidArea::ENEMY_DEFENSE_AREA);
+    addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 }
 
 std::string PenaltyKickTactic::getName() const

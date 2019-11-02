@@ -1,10 +1,10 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
@@ -23,6 +23,8 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
 {
     addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
     addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string GoalieTactic::getName() const
@@ -181,17 +183,18 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
         auto ball_speed_panic =
-            Util::DynamicParameters::GoalieTactic::ball_speed_panic.value();
+            Util::DynamicParameters->getGoalieTacticConfig()->BallSpeedPanic()->value();
         // what should the final goalie speed be, so that the goalie accelerates faster
         auto goalie_final_speed =
-            Util::DynamicParameters::GoalieTactic::goalie_final_speed.value();
+            Util::DynamicParameters->getGoalieTacticConfig()->GoalieFinalSpeed()->value();
         // how far in should the goalie wedge itself into the block cone, to block balls
         auto block_cone_radius =
-            Util::DynamicParameters::GoalieTactic::block_cone_radius.value();
+            Util::DynamicParameters->getGoalieTacticConfig()->BlockConeRadius()->value();
         // by how much should the defense are be decreased so the goalie stays close
         // towards the net
-        auto defense_area_deflation =
-            Util::DynamicParameters::GoalieTactic::defense_area_deflation.value();
+        auto defense_area_deflation = Util::DynamicParameters->getGoalieTacticConfig()
+                                          ->DefenseAreaDeflation()
+                                          ->value();
 
         // if the ball is in the don't chip rectangle we do not chip the ball
         // as we risk bumping the ball into our own net trying to move behind
@@ -242,9 +245,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         else
         {
             // block the cone by default
-            float radius =
-                Util::DynamicParameters::GoalieTactic::block_cone_buffer.value() +
-                ROBOT_MAX_RADIUS_METERS;
+            float radius = Util::DynamicParameters->getGoalieTacticConfig()
+                               ->BlockConeBuffer()
+                               ->value() +
+                           ROBOT_MAX_RADIUS_METERS;
 
             Point goalie_pos =
                 calcBlockCone(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(),

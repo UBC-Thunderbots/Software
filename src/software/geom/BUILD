@@ -7,6 +7,8 @@ cc_library(
         "rectangle.cpp",
         "shot.cpp",
         "util.cpp",
+        "polynomial.cpp",
+        "spline.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -20,6 +22,8 @@ cc_library(
         "segment.h",
         "shot.h",
         "util.h",
+        "polynomial.h",
+        "spline.h",
         "voronoi_diagram.h",
     ],
     copts = [
@@ -29,6 +33,28 @@ cc_library(
         "@boost//:geometry",
         "@boost//:polygon",
         "@g3log",
+    ],
+)
+
+cc_test(
+    name = "spline_test",
+    srcs = [
+        "spline_test.cpp",
+    ],
+    deps = [
+        ":geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "polynomial_test",
+    srcs = [
+        "polynomial_test.cpp",
+    ],
+    deps = [
+        ":geom",
+        "@gtest//:gtest_main",
     ],
 )
 
