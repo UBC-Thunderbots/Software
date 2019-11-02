@@ -9,7 +9,6 @@ sh_binary(
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )
 
-# bazel pin mapper
 filegroup(
     name = "firmware_c_files",
     srcs = glob(["firmware_new/boards/frankie_v1/*c",]),

@@ -68,8 +68,10 @@ cd $TEMP_DIR
 
 # create the code generation cube script
 printf "$CUBE_SCRIPT" $PATH_TO_IOC $TEMP_DIR > regen.stm32cube.script
+
+# generate code
 /opt/STM32CubeMX/STM32CubeMX -s $TEMP_DIR/regen.stm32cube.script
 
-# copy the generated files to the our src repo
+# move the generated files to the right path
 mv $TEMP_DIR/Src/*.c $WORKSPACE_DIR/firmware_new/boards/frankie_v1/
 mv $TEMP_DIR/Inc/*.h $WORKSPACE_DIR/firmware_new/boards/frankie_v1/
