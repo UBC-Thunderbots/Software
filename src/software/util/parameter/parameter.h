@@ -3,17 +3,16 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
 /**
  * This class defines a dynamic parameter, meaning the parameter
- * value can be changed during runtime. Although the class is templated, it is only meant
- * to support the types also supported by the ROS Parameter Server.
+ * value can be changed during runtime.
  *
- * See http://wiki.ros.org/Parameter%20Server for the list of types
+ * In our codebase, we currently support bool, int, double, and strings
  *
- * In our codebase, we support bool, int32_t, double, and strings
  * */
 
 template <class T>
@@ -24,28 +23,22 @@ class Parameter
      * Constructs a new Parameter
      *
      * @param parameter_name The name of the parameter used by dynamic_reconfigure
-     * @param parameter_namespace The namespace of the parameter used by
      * dynamic_reconfigure
      * @param default_value The default value for this parameter
      */
-    explicit Parameter<T>(const std::string& parameter_name,
-                          const std::string& parameter_namespace, T default_value)
+    explicit Parameter<T>(const std::string& parameter_name, T default_value,
+                          std::vector<T> parameter_options,
+                          std::optional<T> parameter_min, std::optional<T> parameter_max)
     {
-        this->name_      = parameter_name;
-        this->namespace_ = parameter_namespace;
-        this->value_     = default_value;
+        this->name_    = parameter_name;
+        this->value_   = default_value;
+        this->min_     = parameter_min;
+        this->max_     = parameter_max;
+        this->options_ = parameter_options;
 
+        // TODO remove registry once Visuzlier uses new structure
+        // https://github.com/UBC-Thunderbots/Software/issues/960
         Parameter<T>::registerParameter(this);
-    }
-
-    /**
-     * Returns the global path in the ROS parameter server where this parameter is stored
-     *
-     * @return the global path in the ROS parameter sever where this parameter is stored
-     */
-    const std::string getROSParameterPath() const
-    {
-        return "/" + this->namespace_ + "/" + name();
     }
 
     /**
@@ -53,11 +46,52 @@ class Parameter
      *
      * @return the value of this parameter
      */
-    T value()
+    const T value() const
     {
         std::scoped_lock lock(this->value_mutex_);
         return this->value_;
     }
+
+    /**
+     * Returns the options for this parameter
+     *
+     * @return the options of this parameter
+     */
+    const std::vector<T> getOptions() const
+    {
+        return this->options_;
+    }
+
+    /**
+     * Returns the min for this parameter
+     *
+     * @return the min of this parameter
+     */
+    const std::optional<T> getMin() const
+    {
+        return this->min_;
+    }
+
+    /**
+     * Returns the max for this parameter
+     *
+     * @return the max of this parameter
+     */
+    const std::optional<T> getMax() const
+    {
+        return this->max_;
+    }
+
+    /**
+     * Returns the name of this parameter
+     *
+     * @return the name of this parameter
+     */
+    const std::string name() const
+    {
+        return name_;
+    }
+
 
     /**
      * Given the value, sets the value of this parameter and calls all registered
@@ -74,16 +108,6 @@ class Parameter
         {
             callback_func(new_value);
         }
-    }
-
-    /**
-     * Returns the name of this parameter
-     *
-     * @return the name of this parameter
-     */
-    const std::string name() const
-    {
-        return name_;
     }
 
     /**
@@ -125,19 +149,6 @@ class Parameter
         Parameter<T>::getMutableRegistry().emplace_back(parameter);
     }
 
-    /**
-     * Updates all the Parameters of type T with the latest values from the ROS
-     * Parameter Server
-     */
-    static void updateAllParametersFromROSParameterServer()
-    {
-        for (const auto& param : Parameter<T>::getRegistry())
-        {
-            std::scoped_lock lock(param->value_mutex_);
-            param->updateValueFromROSParameterServer();
-        }
-    }
-
    private:
     /**
      * Returns a mutable reference to the Parameter registry. This is the same as the
@@ -155,11 +166,22 @@ class Parameter
         return instance;
     }
 
-    std::mutex value_mutex_;
+    // the value mutex is marked mutable so it can be used when accessing the value
+    // of this parameter in a const function.
+    mutable std::mutex value_mutex_;
     std::mutex callback_mutex_;
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
+
+    // Store the min/max
+    // Its up to the user how they want to interpret min/max for types other than
+    // int/double
+    std::optional<T> min_;
+    std::optional<T> max_;
+
+    // Store the options of this parameter
+    std::vector<T> options_;
 
     // Store the name of the parameter
     std::string name_;

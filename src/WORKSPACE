@@ -61,6 +61,14 @@ new_git_repository(
     remote = "https://github.com/saebyn/munkres-cpp.git",
 )
 
+# yaml cpp parser for dynamic parameters test
+git_repository(
+    name = "yaml-cpp",
+    commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
+    remote = "https://github.com/jbeder/yaml-cpp.git",
+    shallow_since = "1571237073 -0500",
+)
+
 # Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
 git_repository(
     name = "bazel_rules_qt",
@@ -86,13 +94,14 @@ http_archive(
     ],
 )
 
+# TODO we are using last year's GCC version due to issues with download links on ARM's site
 http_archive(
     name = "arm_developer_gcc",
     build_file = "@//external:arm_gcc.BUILD",
-    sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
-    strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
+    sha256 = "fb31fbdfe08406ece43eef5df623c0b2deb8b53e405e2c878300f7a1f303ee52",
+    strip_prefix = "gcc-arm-none-eabi-8-2018-q4-major",
     urls = [
-        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
+	"https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2",
     ],
 )
 

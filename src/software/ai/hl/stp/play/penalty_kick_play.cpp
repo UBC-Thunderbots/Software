@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 
 const std::string PenaltyKickPlay::name = "Penalty Kick Play";
 
@@ -29,17 +30,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>(
         world.ball(), world.field(), world.enemyTeam().goalie(), true);
 
-    penalty_shot_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
-    penalty_shot_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-    penalty_shot_tactic->addWhitelistedAvoidArea(AvoidArea::ENEMY_DEFENSE_AREA);
-    penalty_shot_tactic->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
-
-    auto shooter_setup_move = std::make_shared<MoveTactic>(true);
-
-    shooter_setup_move->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
-    shooter_setup_move->addWhitelistedAvoidArea(AvoidArea::ENEMY_DEFENSE_AREA);
-    shooter_setup_move->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
-    shooter_setup_move->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
     move_tactic_2->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);

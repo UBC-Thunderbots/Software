@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_factory.h"
-#include "software/ai/hl/stp/tactic/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 
 const std::string KickoffFriendlyPlay::name = "KickoffFriendly Play";
@@ -89,11 +89,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // specific tactics
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-    auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), true);
-
-    // the chipper is allowed to go into the centre circle and touch the ball
-    chip_tactic->addWhitelistedAvoidArea(AvoidArea::CENTER_CIRCLE);
-    chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(world.ball(), true);
 
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
@@ -107,7 +103,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // set the requirement that Robot 1 must be able to kick and chip
         move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
-            RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip};
+            RobotCapabilities::Capability::Kick, RobotCapabilities::Capability::Chip};
 
         // setup 5 kickoff positions in order of priority
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
@@ -133,12 +129,12 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
-        chip_tactic->updateWorldParams(world.ball());
-        chip_tactic->updateControlParams(
+        kickoff_chip_tactic->updateWorldParams(world.ball());
+        kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
             world.field().centerPoint() + Point(world.field().xLength() / 6, 0),
             world.field().xLength() / 2);
-        result.emplace_back(chip_tactic);
+        result.emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
         // 1 will be assigned to the rest of the robots

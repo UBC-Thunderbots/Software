@@ -35,9 +35,13 @@ void MotionConstraintManager::visit(const MoveTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ChipTactic &tactic) {}
 
+void MotionConstraintManager::visit(const KickoffChipTactic &tactic) {}
+
 void MotionConstraintManager::visit(const StopTactic &tactic) {}
 
 void MotionConstraintManager::visit(const PenaltyKickTactic &tactic) {}
+
+void MotionConstraintManager::visit(const PenaltySetupTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ReceiverTactic &tactic) {}
 
