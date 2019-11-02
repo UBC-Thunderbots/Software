@@ -4,7 +4,8 @@
 #include "software/world/ball_state.h"
 
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
-           unsigned int history_size) : states_(history_size)
+           unsigned int history_size)
+    : states_(history_size)
 {
     if (history_size <= 0)
     {
