@@ -94,6 +94,7 @@ http_archive(
     ],
 )
 
+# TODO we are using last year's GCC version due to issues with download links on ARM's site
 http_archive(
     name = "arm_developer_gcc",
     build_file = "@//external:arm_gcc.BUILD",
