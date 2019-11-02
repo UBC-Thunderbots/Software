@@ -15,9 +15,6 @@ cc_library(
         "polynomial.h",
         "vector.h",
     ],
-    copts = [
-        "-std=c++17",
-    ],
     deps = [
         "@boost//:geometry",
         "@boost//:polygon",
