@@ -1,7 +1,6 @@
 #include "software/new_geom/polynomial.h"
-#include "software/new_geom/geom_constants.h"
 
-#include <stdexcept>
+#include "software/new_geom/geom_constants.h"
 
 Polynomial::Polynomial() {}
 
@@ -9,22 +8,16 @@ Polynomial::Polynomial(const std::vector<double> &coeffs) : coeffs(coeffs) {}
 
 Polynomial::Polynomial(const std::initializer_list<double> &coeffs) : coeffs(coeffs) {}
 
-Polynomial::Polynomial(const std::pair<double, double> &constraint1,
-                       const std::pair<double, double> &constraint2)
-{
-    if (constraint1.first == constraint2.first)
-    {
-        throw std::invalid_argument("Both inputs are equal - does not define a function");
-    }
-    double slope = (constraint2.second - constraint1.second) /
-                   (constraint2.first - constraint1.first);
-    coeffs.push_back(constraint1.second - (constraint1.first * slope));
-    coeffs.push_back(slope);
-}
-
 double Polynomial::getCoeff(unsigned int order) const
 {
-    return order >= coeffs.size() ? 0 : coeffs[order];
+    if (order >= coeffs.size())
+    {
+        return 0;
+    }
+    else
+    {
+        return coeffs[order];
+    }
 }
 
 void Polynomial::setCoeff(unsigned int order, double coeff)

@@ -32,17 +32,6 @@ class Polynomial
     explicit Polynomial(const std::initializer_list<double> &coeffs);
 
     /**
-     * Construct a linear polynomial from two pairs of input/output
-     *
-     * @param constraint1 first pair of values: first is the input, second is the output
-     * @param constraint2 second pair of values: first is the input, second is the output
-     *
-     * @throws std::invalid_argument if constraint1.first == constraint2.first
-     */
-    explicit Polynomial(const std::pair<double, double> &constraint1,
-                        const std::pair<double, double> &constraint2);
-
-    /**
      * Returns the coefficient of the term of given order
      *
      * @param order the order of the term
@@ -70,7 +59,7 @@ class Polynomial
      *
      * @param val value to evaluate polynomial
      *
-     * @return value of polynomial evaluated at value val
+     * @return the index of the highest order non-zero coefficient
      */
     double valueAt(double val) const;
 

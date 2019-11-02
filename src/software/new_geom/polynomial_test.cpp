@@ -51,36 +51,6 @@ TEST(PolynomialTest, test_polynomial_coeffs_list_constructor)
     EXPECT_DOUBLE_EQ(p.valueAt(3), 34);
 }
 
-TEST(PolynomialTest, test_polynomial_value_pair_constructor)
-{
-    std::pair<double, double> constraint1, constraint2;
-    constraint1 = std::make_pair(2.0, 3.0);
-    constraint2 = std::make_pair(6.0, 4.0);
-    Polynomial p(constraint1, constraint2);
-    EXPECT_DOUBLE_EQ(p.getCoeff(0), 2.5);
-    EXPECT_DOUBLE_EQ(p.getCoeff(1), .25);
-
-    EXPECT_DOUBLE_EQ(p.valueAt(constraint1.first), constraint1.second);
-    EXPECT_DOUBLE_EQ(p.valueAt(constraint2.first), constraint2.second);
-}
-
-TEST(PolynomialTest, test_polynomial_invalid_value_pair_constructor)
-{
-    std::pair<double, double> constraint1, constraint2;
-    constraint1 = std::make_pair(2.0, -3.0);
-    constraint2 = std::make_pair(2.0, -4.0);
-    try
-    {
-        Polynomial p(constraint1, constraint2);
-    }
-    catch (std::invalid_argument &e)
-    {
-        SUCCEED();
-        return;
-    }
-    ADD_FAILURE() << "Successfully able to build a polynomial that isn't a function";
-}
-
 TEST(PolynomialTest, test_set_coeff)
 {
     std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
