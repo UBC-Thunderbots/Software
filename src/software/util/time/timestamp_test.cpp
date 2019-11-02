@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <stdexcept>
 
 TEST(TimestampTest, default_constructor)
 {
@@ -128,15 +127,12 @@ TEST(TimestampTest, test_subtraction_operator_with_timestamp_with_negative_resul
     EXPECT_EQ(result, expected_result);
 }
 
-//MARIAAAAAA
-/*
-TEST(PassTest, stream_operator)
+TEST(TimestampTest, stream_operator)
 {
-    Pass p(Point(1, 2), Point(3, 4), 99.97, Timestamp::fromSeconds(10));
+    Timestamp t = Timestamp::fromSeconds(2.00);
 
     std::stringstream out;
-    out << p;
-    EXPECT_EQ("Receiver: (3, 4), Passer: (1, 2) Speed (m/s): 99.97 Start Time (s): 10",
-              out.str());
+    out << t;
+
+    EXPECT_EQ("2.00s", out.str());
 }
- */

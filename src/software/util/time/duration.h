@@ -1,5 +1,8 @@
 #pragma once
 
+
+#include <iostream>
+
 #include "software/util/time/time.h"
 
 /**
@@ -104,6 +107,16 @@ class Duration : public Time
      * Duration
      */
     Duration operator-(const Duration& duration) const;
+
+    /**
+     * Implements the << operator for printing
+     *
+     * @param ostream The stream to print to
+     * @param time The time to print
+     *
+     * @return The output stream with the string representation of the class appended
+     */
+    friend std::ostream& operator<<(std::ostream& output_stream, const Duration& duration);
 
    private:
     /**

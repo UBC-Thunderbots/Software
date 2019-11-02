@@ -2,8 +2,6 @@
 
 #include <time.h>
 
-#include <iostream>
-
 #include <cstdlib>
 
 /**
@@ -42,16 +40,6 @@ class Time
      * @return the value of the Time in milliseconds
      */
     double getMilliseconds() const;
-
-    /**
-     * Implements the << operator for printing
-     *
-     * @param ostream The stream to print to
-     * @param time The time to print
-     *
-     * @return The output stream with the string representation of the class appended
-     */
-    friend std::ostream& operator<<(std::ostream& ostream, Time& time);
 
     /**
      * Destructor
