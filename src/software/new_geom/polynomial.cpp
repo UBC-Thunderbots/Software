@@ -1,4 +1,5 @@
 #include "software/new_geom/polynomial.h"
+#include "software/new_geom/geom_constants.h"
 
 #include <stdexcept>
 
@@ -41,7 +42,7 @@ unsigned int Polynomial::getOrder() const
     {
         for (size_t i = coeffs.size() - 1; i >= 0; i++)
         {
-            if (std::abs(coeffs[i]) >= EPSILON)
+            if (std::abs(coeffs[i]) >= GeomConstants::EPSILON)
             {
                 return i;
             }
@@ -127,7 +128,7 @@ bool operator==(const Polynomial &p1, const Polynomial &p2)
     }
     for (unsigned int i = 0; i < p1_order; i++)
     {
-        if (std::abs(p1.getCoeff(i) - p2.getCoeff(i)) >= Polynomial::EPSILON)
+        if (std::abs(p1.getCoeff(i) - p2.getCoeff(i)) >= GeomConstants::EPSILON)
         {
             return false;
         }

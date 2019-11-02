@@ -10,10 +10,6 @@
 class Polynomial
 {
    public:
-    // Threshold for coefficient comparison.
-    // http://www.cplusplus.com/forum/beginner/95128/
-    static constexpr double EPSILON = 1e-15;
-
     /**
      * Construct a zero polynomial
      */
