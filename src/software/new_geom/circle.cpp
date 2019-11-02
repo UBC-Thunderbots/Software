@@ -1,0 +1,45 @@
+#include "software/new_geom/circle.h"
+
+Circle::Circle() : origin_(Point()), radius_(0) {}
+
+Circle::Circle(const Point& origin, double radius) : origin_(origin), radius_(radius) {}
+
+void Circle::setOrigin(const Point& o)
+{
+    origin_ = o;
+}
+
+Point Circle::getOrigin() const
+{
+    return Point(origin_);
+}
+
+void Circle::setRadius(double radius)
+{
+    if (radius < 0)
+    {
+        throw std::invalid_argument("Circle radius cannot be negative");
+    }
+
+    radius_ = radius;
+}
+
+double Circle::getRadius() const
+{
+    return radius_;
+}
+
+double Circle::area() const
+{
+    return M_PI * radius_ * radius_;
+}
+
+bool operator==(const Circle &c, const Circle &d)
+{
+    return c.getOrigin() == d.getOrigin() && c.getRadius() == d.getRadius();
+}
+
+bool operator!=(const Circle &c, const Circle &d)
+{
+    return !(c == d);
+}
