@@ -350,3 +350,8 @@ TEST_F(BallTest, get_timestamp_index_no_matching_timestamp)
 
     EXPECT_EQ(std::nullopt, ball.getHistoryIndexFromTimestamp(no_matching_time));
 }
+
+TEST_F(BallTest, initialize_ball_with_history_size_0)
+{
+    EXPECT_THROW(Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time, 0), std::invalid_argument);
+}
