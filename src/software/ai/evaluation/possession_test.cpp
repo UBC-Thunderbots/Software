@@ -193,8 +193,7 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
         Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
-                                       ->value()));
-    world.updateBallState(ball);
+                                       ->value())));
 
     robot0.updateState(
         Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
