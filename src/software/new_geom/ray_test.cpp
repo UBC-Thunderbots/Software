@@ -37,14 +37,14 @@ TEST(RayTest, angle_direction_setter)
     Ray r = Ray(Point(3, 2), Angle::quarter());
     EXPECT_EQ(Angle::quarter(), r.getDirection());
 
-    r.setDirection(Angle::ofDegrees(60));
-    EXPECT_EQ(Angle::ofDegrees(60), r.getDirection());
+    r.setDirection(Angle::fromDegrees(60));
+    EXPECT_EQ(Angle::fromDegrees(60), r.getDirection());
 }
 
 TEST(RayTest, vector_direction_setter)
 {
-    Ray r = Ray(Point(3, 2), Angle::ofRadians(0.5));
-    EXPECT_EQ(Angle::ofRadians(0.5), r.getDirection());
+    Ray r = Ray(Point(3, 2), Angle::fromRadians(0.5));
+    EXPECT_EQ(Angle::fromRadians(0.5), r.getDirection());
 
     r.setDirection(Vector(4.2, -1.2));
     EXPECT_EQ(Vector(4.2, -1.2).orientation(), r.getDirection());

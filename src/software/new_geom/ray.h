@@ -1,7 +1,6 @@
 #pragma once
 
-#include "software/geom/line.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 class Ray final
 {
@@ -9,7 +8,7 @@ class Ray final
     /**
      * Creates a degenerate Ray at (0, 0)
      */
-    inline explicit constexpr Ray() {}
+    inline explicit Ray() {}
 
     /**
      * Creates a Ray with a start point and a direction angle
@@ -40,7 +39,7 @@ class Ray final
      */
     inline Point getStart() const
     {
-        return start_;
+        return Point(start_);
     }
 
     /**
