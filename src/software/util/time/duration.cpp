@@ -4,9 +4,9 @@
 
 #include "software/util/time/duration.h"
 
-#include "shared/constants.h"
-
 #include <iomanip>
+
+#include "shared/constants.h"
 
 Duration::Duration() : Duration(0) {}
 
@@ -62,9 +62,9 @@ Duration Duration::operator-(const Duration &duration) const
     return Duration::fromSeconds(getSeconds() - duration.getSeconds());
 }
 
-std::ostream& operator<<(std::ostream& output_stream, const Duration& duration)
+std::ostream &operator<<(std::ostream &output_stream, const Duration &duration)
 {
-        output_stream << std::setprecision(2) << std::fixed << duration.getSeconds() << "s";
+    output_stream << std::setprecision(2) << std::fixed << duration.getSeconds() << "s";
 
-        return output_stream;
+    return output_stream;
 }

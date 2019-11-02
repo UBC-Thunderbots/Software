@@ -116,7 +116,8 @@ class Duration : public Time
      *
      * @return The output stream with the string representation of the class appended
      */
-    friend std::ostream& operator<<(std::ostream& output_stream, const Duration& duration);
+    friend std::ostream& operator<<(std::ostream& output_stream,
+                                    const Duration& duration);
 
    private:
     /**
