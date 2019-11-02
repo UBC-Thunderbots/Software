@@ -346,11 +346,13 @@ void Navigator::processPathIntoCurrentPrimitive(std::optional<Path> path,
         else
         {
             double desired_final_speed;
+            Point final_dest;
 
-            if (path_points.size() == 2)
+            if (path_points.size() <= 2)
             {
                 // we are going to destination
                 desired_final_speed = intent.getFinalSpeed();
+                final_dest          = path->endPoint();
             }
             else
             {
@@ -364,10 +366,12 @@ void Navigator::processPathIntoCurrentPrimitive(std::optional<Path> path,
                 desired_final_speed = calculateTransitionSpeedBetweenSegments(
                     path_points[0], path_points[1], path_points[2],
                     transition_final_speed);
+
+                final_dest = path_points[1];
             }
 
             auto move = std::make_unique<MovePrimitive>(
-                intent.getRobotId(), path_points[1], intent.getFinalAngle(),
+                intent.getRobotId(), final_dest, intent.getFinalAngle(),
                 // slow down around enemy robots
                 desired_final_speed * getCloseToEnemyObstacleFactor(path_points[1]),
                 intent.getDribblerEnable(), intent.getMoveType(),
