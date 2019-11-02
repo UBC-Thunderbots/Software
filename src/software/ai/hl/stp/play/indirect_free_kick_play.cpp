@@ -266,7 +266,6 @@ void IndirectFreeKickPlay::performPassStage(
         receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
                                     world.ball());
         receiver->updateControlParams(pass);
-        receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
                                          world.friendlyTeam(), world.enemyTeam());
 
