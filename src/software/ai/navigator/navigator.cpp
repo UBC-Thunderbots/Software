@@ -82,7 +82,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     this->world = world;
     planned_paths.clear();
     move_intents.clear();
-    friendly_non_moving_robot_obstacles.clear();
+    friendly_non_move_intent_robot_obstacles.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
@@ -105,7 +105,7 @@ std::map<PathObjective, MoveIntent> Navigator::generatePathObjectiveToMoveIntent
     for (const auto &intent : move_intents)
     {
         // start with non-MoveIntent robots and then add avoid areas
-        auto obstacles            = friendly_non_moving_robot_obstacles;
+        auto obstacles            = friendly_non_move_intent_robot_obstacles;
         auto avoid_area_obstacles = getObstaclesFromAvoidAreas(intent.getAreasToAvoid());
         obstacles.insert(obstacles.end(), avoid_area_obstacles.begin(),
                          avoid_area_obstacles.end());
@@ -185,7 +185,7 @@ void Navigator::registerNonMoveIntentRobotId(RobotId id)
     auto robot = (world.friendlyTeam().getRobotById(id));
     if (robot)
     {
-        friendly_non_moving_robot_obstacles.push_back(
+        friendly_non_move_intent_robot_obstacles.push_back(
             Obstacle::createCircularRobotObstacle(*robot, inflation_factor));
     }
 }
