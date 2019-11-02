@@ -2,7 +2,9 @@ package(default_visibility = ["//visibility:public"])
 
 load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 
-exports_files(["frankie.ioc"])
+# export the ioc file so the regen binary
+# can see it to generate code
+exports_files(["frankie_v1.ioc"])
 
 cc_binary(
     name = "frankie_v1_main",

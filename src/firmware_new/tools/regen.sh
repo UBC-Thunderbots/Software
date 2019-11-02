@@ -45,7 +45,11 @@ mkdir -p $TEMP_DIR/Inc
 rm -rf $TEMP_DIR/Src/*
 rm -rf $TEMP_DIR/Inc/*
 
-PATH_TO_IOC="__main__/firmware_new/boards/frankie_v1/frankie.ioc"
+# copy our current files here
+cp $WORKSPACE_DIR/firmware_new/boards/frankie_v1/*.c $TEMP_DIR/Src/
+cp $WORKSPACE_DIR/firmware_new/boards/frankie_v1/*.h $TEMP_DIR/Inc/
+
+PATH_TO_IOC=$(rlocation "__main__/firmware_new/boards/frankie_v1/frankie_v1.ioc")
 
 CUBE_SCRIPT='''
 # Load the project-specific config file (.ioc)
@@ -61,7 +65,11 @@ generate code %s
 exit
 '''
 cd $TEMP_DIR
-echo $PATH_TO_IOC
-echo $TEMP_DIR
-printf "$CUBE_SCRIPT" $(rlocation $PATH_TO_IOC) $TEMP_DIR > regen.stm32cube.script
+
+# create the code generation cube script
+printf "$CUBE_SCRIPT" $PATH_TO_IOC $TEMP_DIR > regen.stm32cube.script
 /opt/STM32CubeMX/STM32CubeMX -s $TEMP_DIR/regen.stm32cube.script
+
+# copy the generated files to the our src repo
+mv $TEMP_DIR/Src/*.c $WORKSPACE_DIR/firmware_new/boards/frankie_v1/
+mv $TEMP_DIR/Inc/*.h $WORKSPACE_DIR/firmware_new/boards/frankie_v1/
