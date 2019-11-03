@@ -203,6 +203,12 @@ This is easiest to understand in the diagram below:
 Based on what side we are defending, the [Backend](#backend) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
 
 
+## Angles
+Going along with our coordinate convention, we have a convention for angles as well. An Angle of `0` is along the positive x-axis (facing the enemy goal), and positive rotation is counter-clockwise (from a perspective above the field, looking at it like a regular x-y plane where +y is "up"). See the diagram below:
+![Coordinate Convention Diagram](images/angle_convention_diagram.svg)
+
+Because of our [Coordinate Conventions](#coordinates), this means that an angle of `0` will always face the enemy net not matter which side of the field we are defending in reality.
+
 # Architecture Overview
 At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](TODO use actual link). Together, they are what make up our AI.
 
