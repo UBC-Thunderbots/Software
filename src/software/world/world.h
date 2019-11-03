@@ -4,6 +4,7 @@
 #include <boost/circular_buffer.hpp>
 
 #include "software/world/ball.h"
+#include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/world/game_state.h"
 #include "software/world/refbox_constants.h"
@@ -49,9 +50,9 @@ class World final
     /**
      * Updates the state of the ball in the world with the new ball data
      *
-     * @param new_ball_data A Ball containing new ball information
+     * @param new_ball_data A BallState containing new ball information
      */
-    void updateBallState(const Ball& new_ball_data);
+    void updateBallState(const BallState& new_ball_state);
 
     /**
      * Updates the state of the friendly team in the world with the new team data
