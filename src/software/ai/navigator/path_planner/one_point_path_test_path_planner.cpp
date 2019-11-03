@@ -2,7 +2,7 @@
 
 /**
  * This file contains the implementation of a one point path test path planner
- * which returns a path consisting of one point
+ * which returns a path consisting of one point if start == destination
  * Note that this is an invalid path, so the navigator won't like it
  */
 
@@ -10,5 +10,12 @@ std::optional<Path> OnePointPathTestPathPlanner::findPath(
     const Point &start, const Point &destination, const Rectangle &navigable_area,
     const std::vector<Obstacle> &obstacles)
 {
-    return Path(std::vector<Point>({Point(1.0, 1.0)}));
+    if (start == destination)
+    {
+        return Path(std::vector<Point>({start}));
+    }
+    else
+    {
+        return std::nullopt;
+    }
 }

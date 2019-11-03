@@ -220,6 +220,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     // TODO: refactor this into the setup and constructor and add more of these types of
     // tests
 
+    Point poi = Point(2, -3);
     Timestamp current_time(Timestamp::fromSeconds(123));
     Field field(0, 0, 0, 0, 0, 0, 0, current_time);
     Ball ball(Point(1, 2), Vector(-0.3, 0), current_time);
@@ -230,7 +231,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     // We use this fixed point in time to make the tests deterministic.
     field = ::Test::TestUtil::createSSLDivBField();
 
-    Robot friendly_robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+    Robot friendly_robot_0 = Robot(0, poi, Vector(-1, -2), Angle::half(),
                                    AngularVelocity::threeQuarter(), current_time);
 
     Robot friendly_robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
@@ -256,20 +257,17 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
-        std::make_unique<MoveIntent>(0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF,
+        std::make_unique<MoveIntent>(0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF,
                                      MoveType::NORMAL, AutokickType::NONE));
 
-    try
-    {
-        auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
-    }
-    catch (const std::runtime_error &)
-    {
-        SUCCEED();
-        return;
-    }
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
-    FAIL();
+    // Make sure we got exactly 1 primitive back
+    EXPECT_EQ(primitive_ptrs.size(), 1);
+
+
+    auto primitive = dynamic_cast<MovePrimitive &>(*(primitive_ptrs.at(0)));
+    EXPECT_EQ(primitive.getDestination(), poi);
 }
 
 TEST(NavigatorTest, move_intent_with_no_path_test_path_planner)

@@ -144,9 +144,9 @@ void Navigator::addMoveIntentsToAssignedPrimitives(
     // Turn each intent and associated path into primitives
     for (const auto &intent : move_intents)
     {
-        auto path = robot_id_to_path[intent.getRobotId()];
-        processPathIntoCurrentPrimitive(path, intent);
-        assigned_primitives.emplace_back(std::move(current_primitive));
+        auto path      = robot_id_to_path[intent.getRobotId()];
+        auto primitive = getPrimitiveFromPathAndMoveIntent(path, intent);
+        assigned_primitives.emplace_back(std::move(primitive));
     }
 }
 
@@ -303,60 +303,46 @@ double Navigator::getCloseToEnemyObstacleFactor(const Point &p)
     return std::clamp(closest_dist / ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, 1.0);
 }
 
-void Navigator::processPathIntoCurrentPrimitive(std::optional<Path> path,
-                                                MoveIntent intent)
+std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
+    std::optional<Path> path, MoveIntent intent)
 {
     if (path)
     {
+        double desired_final_speed;
+        Point final_dest;
         std::vector<Point> path_points = path->getKnots();
         planned_paths.emplace_back(path_points);
 
-        if (path_points.size() == 1)
+        if (path_points.size() <= 2)
         {
-            throw std::runtime_error(
-                "Path only contains one point, which is invalid, since it's ambiguous if it's the start or end or some other point");
+            // we are going to destination
+            desired_final_speed = intent.getFinalSpeed();
+            final_dest          = path->endPoint();
         }
         else
         {
-            double desired_final_speed;
-            Point final_dest;
+            // we are going to some intermediate point so we transition smoothly
+            double transition_final_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                                            Util::DynamicParameters->getNavigatorConfig()
+                                                ->TransitionSpeedFactor()
+                                                ->value();
 
-            if (path_points.size() <= 2)
-            {
-                // we are going to destination
-                desired_final_speed = intent.getFinalSpeed();
-                final_dest          = path->endPoint();
-            }
-            else
-            {
-                // we are going to some intermediate point so we transition smoothly
-                double transition_final_speed =
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                    Util::DynamicParameters->getNavigatorConfig()
-                        ->TransitionSpeedFactor()
-                        ->value();
+            desired_final_speed = calculateTransitionSpeedBetweenSegments(
+                path_points[0], path_points[1], path_points[2], transition_final_speed);
 
-                desired_final_speed = calculateTransitionSpeedBetweenSegments(
-                    path_points[0], path_points[1], path_points[2],
-                    transition_final_speed);
-
-                final_dest = path_points[1];
-            }
-
-            auto move = std::make_unique<MovePrimitive>(
-                intent.getRobotId(), final_dest, intent.getFinalAngle(),
-                // slow down around enemy robots
-                desired_final_speed * getCloseToEnemyObstacleFactor(path_points[1]),
-                intent.getDribblerEnable(), intent.getMoveType(),
-                intent.getAutoKickType());
-            current_primitive = std::move(move);
+            final_dest = path_points[1];
         }
+
+        return std::make_unique<MovePrimitive>(
+            intent.getRobotId(), final_dest, intent.getFinalAngle(),
+            // slow down around enemy robots
+            desired_final_speed * getCloseToEnemyObstacleFactor(path_points[1]),
+            intent.getDribblerEnable(), intent.getMoveType(), intent.getAutoKickType());
     }
     else
     {
         LOG(WARNING) << "Path manager could not find a path";
-        auto stop         = std::make_unique<StopPrimitive>(intent.getRobotId(), false);
-        current_primitive = std::move(stop);
+        return std::make_unique<StopPrimitive>(intent.getRobotId(), false);
     }
 }
 

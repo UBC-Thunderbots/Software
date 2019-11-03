@@ -197,10 +197,13 @@ class Navigator : public IntentVisitor
         std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
 
     /**
-     * Set current_primitive for a given path and intent
+     * Creates a primitive for a given path and move intent
      *
      * @param path path to make primitive for
      * @param intent intent to make primitive
+     *
+     * @return unique pointer to the primitive
      */
-    void processPathIntoCurrentPrimitive(std::optional<Path> path, MoveIntent intent);
+    std::unique_ptr<Primitive> getPrimitiveFromPathAndMoveIntent(std::optional<Path> path,
+                                                                 MoveIntent intent);
 };
