@@ -186,7 +186,7 @@ class Navigator : public IntentVisitor
      *
      * @return map from path objectives to move intents
      */
-    std::map<PathObjective, MoveIntent> generatePathObjectiveToMoveIntentMap(void);
+    std::set<PathObjective> generatePathObjectives(void);
 
     /**
      * Adds primitives associated with all MoveIntents into assigned_primitives

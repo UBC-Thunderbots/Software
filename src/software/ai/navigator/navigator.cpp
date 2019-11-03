@@ -99,9 +99,9 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     return assigned_primitives;
 }
 
-std::map<PathObjective, MoveIntent> Navigator::generatePathObjectiveToMoveIntentMap(void)
+std::set<PathObjective> Navigator::generatePathObjectives(void)
 {
-    std::map<PathObjective, MoveIntent> path_objective_to_move_intent;
+    std::set<PathObjective> path_objectives;
     for (const auto &intent : move_intents)
     {
         // start with non-MoveIntent robots and then add avoid areas
@@ -117,10 +117,8 @@ std::map<PathObjective, MoveIntent> Navigator::generatePathObjectiveToMoveIntent
             Point start = robot->position();
             Point end   = intent.getDestination();
 
-            path_objective_to_move_intent.insert(
-                {PathObjective(start, end, robot->velocity().len(), obstacles,
-                               intent.getRobotId()),
-                 intent});
+            path_objectives.insert(PathObjective(start, end, robot->velocity().len(),
+                                                 obstacles, intent.getRobotId()));
         }
         else
         {
@@ -130,48 +128,23 @@ std::map<PathObjective, MoveIntent> Navigator::generatePathObjectiveToMoveIntent
             LOG(WARNING) << ss.str();
         }
     }
-    return path_objective_to_move_intent;
+    return path_objectives;
 }
 
 void Navigator::addMoveIntentsToAssignedPrimitives(
     std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
 {
-    Rectangle navigable_area(
-        Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
-        this->world.field().totalXLength(), this->world.field().totalYLength());
+    Rectangle navigable_area = this->world.field().fieldBoundary();
 
-    auto path_objective_to_move_intent = generatePathObjectiveToMoveIntentMap();
+    auto path_objectives = generatePathObjectives();
 
-    // get keyset from path_objective_to_move_intent and then plan paths
-    std::set<PathObjective> path_objectives;
-    for (const auto &p : path_objective_to_move_intent)
-    {
-        path_objectives.insert(p.first);
-    }
-    auto path_objective_to_path =
+    auto robot_id_to_path =
         path_manager->getManagedPaths(path_objectives, navigable_area);
 
-    for (const auto &path_objective_and_path : path_objective_to_path)
+    // Turn each intent and associated path into primitives
+    for (const auto &intent : move_intents)
     {
-        auto path_objective = path_objective_and_path.first;
-        auto path           = path_objective_and_path.second;
-
-        // look for move intent
-        auto path_objective_and_intent_it =
-            path_objective_to_move_intent.find(path_objective);
-        if (path_objective_and_intent_it == path_objective_to_move_intent.end())
-        {
-            std::stringstream ss;
-            ss << "Failed to find intent associated with path objective that has robot id = "
-               << path_objective.robot_id;
-            LOG(WARNING) << ss.str();
-
-            // assume no path
-            continue;
-        }
-
-        // Convert into primitive and add to assigned_primitives
-        MoveIntent intent = path_objective_and_intent_it->second;
+        auto path = robot_id_to_path[intent.getRobotId()];
         processPathIntoCurrentPrimitive(path, intent);
         assigned_primitives.emplace_back(std::move(current_primitive));
     }

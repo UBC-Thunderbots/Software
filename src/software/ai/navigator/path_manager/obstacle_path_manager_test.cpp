@@ -21,8 +21,8 @@ TEST(TestObstaclePathManager, test_no_obostacles)
 
     auto paths = path_manager->getManagedPaths(path_objectives, navigable_area);
 
-    auto path1 = paths[po1];
-    auto path2 = paths[po2];
+    auto path1 = paths[1];
+    auto path2 = paths[2];
 
     EXPECT_TRUE(path1 != std::nullopt);
     EXPECT_TRUE(path2 != std::nullopt);
