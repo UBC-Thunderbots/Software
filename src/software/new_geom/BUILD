@@ -13,9 +13,11 @@ cc_library(
         "geom_constants.h",
         "point.h",
         "polynomial.h",
+        "ray.h",
         "vector.h",
     ],
     deps = [
+        "//software/geom",
         "@boost//:geometry",
         "@boost//:polygon",
     ],
@@ -47,6 +49,17 @@ cc_test(
     name = "polynomial_test",
     srcs = [
         "polynomial_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "ray_test",
+    srcs = [
+        "ray_test.cpp",
     ],
     deps = [
         ":new_geom",

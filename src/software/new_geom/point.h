@@ -33,7 +33,7 @@ class Point final
      *
      * @param the Point to duplicate
      */
-    explicit Point(const Point &p);
+    Point(const Point &p);
 
     /**
      * Creates a new Point from a Vector
