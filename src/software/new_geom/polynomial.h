@@ -50,7 +50,7 @@ class Polynomial
     /**
      * Returns the order of the Polynomial
      *
-     * @return the order of the Polynomial
+     * @return the index of the highest order non-zero coefficient
      */
     unsigned int getOrder() const;
 
@@ -59,7 +59,7 @@ class Polynomial
      *
      * @param val value to evaluate polynomial
      *
-     * @return the index of the highest order non-zero coefficient
+     * @return value of polynomial evaluated at value val
      */
     double valueAt(double val) const;
 
