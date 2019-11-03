@@ -10,8 +10,8 @@ sh_binary(
 )
 
 sh_binary(
-    name = "regen",
-    srcs = ["regen.sh"],
+    name = "cubemx_regen",
+    srcs = ["cubemx_regen.sh"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )

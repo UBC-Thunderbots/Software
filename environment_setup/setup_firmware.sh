@@ -68,6 +68,7 @@ sudo mv ./* $TBOTS_TOOLCHAIN
 sudo rm -r $TEMP_FOLDER
 
 # install cubemx
+cd $CURR_DIR
 ./install_cubemx.sh
 
 # Install dfu-util, the tool used to load the firmware onto devices

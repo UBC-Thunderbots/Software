@@ -46,8 +46,8 @@ elif [ ${#IOC_FILES[@]} -lt 1 ]; then
     echo "Error: No ioc file found in provided directory"
     exit 1
 else 
-    echo "Using .ioc file found here: $IOC_FILE" 
     IOC_FILE=${IOC_FILES[0]}
+    echo "Using .ioc file found here: $IOC_FILE" 
 fi
 
 # copy our current files here
@@ -61,7 +61,7 @@ config load %s
 # Generate the peripheral initializations in main.c
 project couplefilesbyip 0
 
-# Generate code in the project direcotry
+# Generate code in the project directory
 generate code %s
 
 # Exit the program
