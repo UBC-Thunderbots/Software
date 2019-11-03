@@ -1,5 +1,5 @@
-Passing:
-  static_field_position_quality_x_offset:
+PassingConfig:
+  StaticFieldPositionQualityXOffset:
     min: 0
     max: 1
     default: 0.3
@@ -7,7 +7,7 @@ Passing:
     description: >-
                The offset from the sides of the field to place the rectangular
                sigmoid we use to determine what areas to pass to
-  static_field_position_quality_y_offset:
+  StaticFieldPositionQualityYOffset:
     min: 0
     max: 1
     default: 0.3
@@ -15,7 +15,7 @@ Passing:
     description: >-
                The offset from the sides of the field to place the rectangular
                sigmoid we use to determine what areas to pass to
-  static_field_position_quality_friendly_goal_distance_weight:
+  StaticFieldPositionQualityFriendlyGoalDistanceWeight:
     min: 0
     max: 1
     default: 0.3
@@ -24,7 +24,7 @@ Passing:
         The weight that being close to the goal will have on the static
         position quality. Lower, more negative weights result in the distance
         to the goal having less of an effect.
-  enemy_proximity_importance:
+  EnemyProximityImportance:
     min: 0
     max: 10
     default: 0.5
@@ -32,7 +32,7 @@ Passing:
     description: >-
                This controls how heavily we weight a robot being near the pass
                receiver when calculating enemy risk to a pass
-  ideal_min_shoot_angle_degrees:
+  IdealMinShootAngleDegrees:
     min: -360
     max: 360
     default: 40
@@ -42,7 +42,7 @@ Passing:
         pass reception position that we think will likely result in a good
         shooting opportunity. Note that we may take shots below this in some
         cases, it's more of a weight then a cutoff.
-  ideal_max_rotation_to_shoot_degrees:
+  IdealMaxRotationToShootDegrees:
     min: 0
     max: 180
     default: 60
@@ -52,19 +52,19 @@ Passing:
                shoot that we think would likely result in a goal. Note that we may
                try to take shots that require us to rotate more then this, it's more
                of a soft limit.
-  min_pass_speed_m_per_s:
+  MinPassSpeedMPerS:
     min: 0
     max: 5
     default: 3.5
     type: "double"
     description: "The minimum pass speed (in m/s)"
-  max_pass_speed_m_per_s:
+  MaxPassSpeedMPerS:
     min: 0
     max: 10
     default: 5.5
     type: "double"
     description: "The maximum pass speed (in m/s)"
-  min_time_offset_for_pass_seconds:
+  MinTimeOffsetForPassSeconds:
     min: 0
     max: 5
     default: 0.7
@@ -73,7 +73,7 @@ Passing:
       Minimum time into the future at which the pass should occur. This is
       to ensure we have enough time to setup a robot to actually perform
       the pass. This is in seconds.
-  max_time_offset_for_pass_seconds:
+  MaxTimeOffsetForPassSeconds:
     min: 0
     max: 5
     default: 4.0
@@ -82,7 +82,7 @@ Passing:
       Maximum time into the future at which the pass should occur. This gives the
       upper bound on the pass start time, relative to the current time. This is in
       seconds.
-  enemy_reaction_time:
+  EnemyReactionTime:
     min: 0
     max: 3.0
     default: 0.4
@@ -90,25 +90,25 @@ Passing:
     description: >-
       How long we think the enemy will take to recognize we're passing and start
       moving to intercept
-  num_passes_to_optimize:
+  NumPassesToOptimize:
     min: 1
     max: 1000
     default: 15
     type: "int"
     description: "The number of passes to try to optimize at any given time"
-  num_passes_to_keep_after_pruning:
+  NumPassesToKeepAfterPruning:
     min: 0
     max: 1000
     default: 3
     type: "int"
     description: "The number of passes to keep after pruning"
-  number_of_gradient_descent_steps_per_iter:
+  NumberOfGradientDescentStepsPerIter:
     min: 0
     max: 1000
     default: 10
     type: "int"
     description: "The number of steps of gradient descent to perform in each iteration"
-  pass_equality_max_position_difference_meters:
+  PassEqualityMaxPositionDifferenceMeters:
     min: 0
     max: 4
     default: 0.05
@@ -116,157 +116,157 @@ Passing:
     description: >-
       The maximum allowed difference between the reciever and passer
       point of two passes for which they are considered equal
-  pass_equality_max_start_time_difference_seconds:
+  PassEqualityMaxStartTimeDifferenceSeconds:
     min: 0
     max: 3
     default: 0.1
     type: "double"
     description: "TODO: Add description as part of #149"
-  pass_equality_max_speed_difference_meters_per_second:
+  PassEqualityMaxSpeedDifferenceMetersPerSecond:
     min: 0
     max: 4
     default: 0.3
     type: "double"
     description: "TODO: Add description as part of #149"
-Navigator:
-  default_avoid_dist:
+NavigatorConfig:
+  DefaultAvoidDist:
     min: 0
     max: 100
     default: 50
     type: "double"
     description: "TODO: Add description as part of #149"
-  collision_avoid_velocity_scale:
+  CollisionAvoidVelocityScale:
     min: 0
     max: 1
     default: 0.5
     type: "double"
     description: "TODO: Add description as part of #149"
-  transition_speed_factor:
+  TransitionSpeedFactor:
     min: 0
     max: 1
     default: 0.6
     type: "double"
     description: "Factor of max speed to use for transition speed calculations"
-  velocity_obstacle_inflation_factor:
+  VelocityObstacleInflationFactor:
     min: 0
     max: 1
     default: 0.2
     type: "double"
     description: "Factor for velocity obstacle length scaling"
-  robot_obstacle_inflation_factor:
+  RobotObstacleInflationFactor:
     min: 0
     max: 10
     default: 1.3
     type: "double"
     description: "Factor for robot obstacle size"
-  ball_obstacle_inflation_factor:
+  BallObstacleInflationFactor:
     min: 0
     max: 10
     default: 1.3
     type: "double"
     description: "Factor for ball obstacle size"
-robot_expiry_buffer_milliseconds:
+RobotExpiryBufferMilliseconds:
   min: 0
   max: 100
   default: 50
   type: "int"
   description: "TODO: Add description as part of #149"
-Evaluation:
-    Possession:
-      possession_dist:
+EvaluationConfig:
+    PossessionConfig:
+      PossessionDist:
         min: 0.0
         max: 1.0
         default: 0.2
         type: "double"
         description: How close the ball has to be to the robot for the robot to have the ball
-      passed_to_angle_tolerance:
+      PassedToAngleTolerance:
         min: 0.0
         max: 90.0
         default: 15.0
         type: "double"
         description: "angle in degrees that the ball velocity can deviate from the axis between
                       the ball and the robot before it doesn't count as a pass"
-      min_pass_speed:
+      MinPassSpeed:
         min: 0.0
         max: 10.0
         default: 1.0
         type: "double"
         description: minimum speed along the pass axis for it to count as a pass
-      possession_buffer_time_seconds:
+      PossessionBufferTimeSeconds:
         min: 0.0
         max: 5.0
         default: 1.5
         type: "double"
         description: how far back in time to check if a robot has possession
-      pass_buffer_time_seconds:
+      PassBufferTimeSeconds:
         min: 0.0
         max: 5.0
         default: 1.0
         type: "double"
         description: how far back in time to check if a robot is receiving a pass
-    Indirect_Chip:
-      chip_target_fraction:
+    IndirectChipConfig:
+      ChipTargetFraction:
         min: 0.0
         max: 100.0
-        default: 5.0/10.0
+        default: 0.5
         type: "double"
         description: Adjusts how far between ball and target the robot will chip
-      chip_power_bounce_threshold:
+      ChipPowerBounceThreshold:
         min: 0.0
         max: 5.0
-        default: 7.5/10.0
+        default: 0.75
         type: "double"
         description: Maximum fraction of distance between chipper and target the first bounce should be, so ball is rolling when it reaches the target
-      max_chip_power:
+      MaxChipPower:
         min: 0.0
         max: 100.0
         default: 8.0
         type: "double"
         description: Maximum power the robot can chip the ball at without malfunctions
-      chip_target_area_inset:
+      ChipTargetAreaInset:
         min: 0.0
         max: 100.0
         default: 0.3
         type: "double"
         description: Closest distance to edge of field that the robot could chip and chase to
-      min_chip_tri_area:
+      MinChipTriArea:
         min: 0.0
         max: 100.0
         default: 0.5
         type: "double"
         description: Minimum area of chip target triangle
-      min_chip_tri_edge_len:
+      MinChipTriEdgeLen:
         min: 0.0
         max: 100.0
         default: 0.8
         type: "double"
         description: Minimum edge length of chip target triangle
-      min_chip_tri_edge_angle:
+      MinChipTriEdgeAngle:
         min: 0.0
         max: 180.0
         default: 20
         type: "double"
         description: Minimum angle in degrees between chip triangle edges
-      chip_cherry_power_downscale:
+      ChipCherryPowerDownscale:
         min: 0.0
         max: 100.0
         default: 0.85
         type: "double"
         description: Percentage of distance to center of triangle to return as target
-DefenderCreaseTactic:
-  max_defender_seperation_deg:
+DefenderCreaseTacticConfig:
+  MaxDefenderSeperationDeg:
     min: 0.0
     max: 50
     default: 13.0
     type: "double"
     description: The maximum angle the crease defenders will seperate by, in degrees.
-  min_defender_seperation_deg:
+  MinDefenderSeperationDeg:
     min: 0.0
     max: 50
     default: 3.0
     type: "double"
     description: The minimum angle the crease defenders will seperate by, in degrees.
-  ball_dist_for_max_defender_seperation:
+  BallDistForMaxDefenderSeperation:
     min: 0.0
     max: 5
     default: 3
@@ -274,7 +274,7 @@ DefenderCreaseTactic:
     description: >-
       The distance between the ball and the defenders at which they will have their
       maximum seperation.
-  ball_dist_for_min_defender_seperation:
+  BallDistForMinDefenderSeperation:
     min: 0.0
     max: 5
     default: 1
@@ -282,18 +282,18 @@ DefenderCreaseTactic:
     description: >-
       The distance between the ball and the defenders at which they will have their
       minimum seperation.
-PivotAction:
-  experimental:
+PivotActionConfig:
+  Experimental:
       type: "bool"
       default: false
       description: If toggled, then loose ball will attempt to pivot with bottom parameters
-  arb_scaling:
+  ArbScaling:
       min: 0.0
       max: 10.0
       type: "double"
       default: 1.0
       description: How quickly to pivot
-  finish_angle_threshold:
+  FinishAngleThreshold:
       min: 0.0
       max: 360.0
       type: "double"
@@ -301,8 +301,8 @@ PivotAction:
       description: >-
           How much tolerance in degrees we allow for the final angle before annoucing
           pivot has finished
-GoalieTactic:
-  block_cone_buffer:
+GoalieTacticConfig:
+  BlockConeBuffer:
       min: 0.0
       max: 2.0
       default: 0.0
@@ -310,28 +310,28 @@ GoalieTactic:
       description: >-
         The block cone buffer is the extra distance to add on either side of the robot
         to allow to it be further back in the block cone
-  goalie_final_speed:
+  GoalieFinalSpeed:
       min: 0.0
       max: 3.0
       default: 0.0
       type: "double"
       description: >- 
         Control the final speed of the goalie to be able to intercept shots better
-  ball_speed_panic:
+  BallSpeedPanic:
       min: 0.0
       max: 6.0
       default: 0.2
       type: "double"
       description: >- 
         At what speed of the ball should the goalie panic and stop the ball
-  block_cone_radius:
+  BlockConeRadius:
       min: 0.0
       max: 1.0
       default: 0.3
       type: "double"
       description: >- 
-          The radius to wedge the robot into the cone, defaults to MAX_ROBOT_RADIUS
-  defense_area_deflation:
+          The radius to wedge the robot into the cone, defaults to MAXROBOTRADIUS
+  DefenseAreaDeflation:
       min: 0.1
       max: 0.5
       default: 0.2
@@ -339,8 +339,8 @@ GoalieTactic:
       description: >- 
         How much to deflate the defense area by, larger value means closer to the
         net
-ShootGoalTactic:
-  enemy_about_to_steal_ball_rectangle_width:
+ShootGoalTacticConfig:
+  EnemyAboutToStealBallRectangleWidth:
       min: 0.0
       max: 2.0
       type: "double"
@@ -348,7 +348,7 @@ ShootGoalTactic:
       description: >-
           The total width ("sideways" of the robot) of the rectangle starting
           from the friendly robot inside which we think an enemy is about to
-  enemy_about_to_steal_ball_rectangle_extension_length:
+  EnemyAboutToStealBallRectangleExtensionLength:
       min: 0.0
       max: 2.0
       type: "double"
@@ -357,35 +357,35 @@ ShootGoalTactic:
           The total length (in the direction the robot is facing) of the rectangle
           starting from the friendly robot inside which we think an enemy is about to
           steal the ball
-RobotCapabilities:
-  broken_dribblers:
+RobotCapabilitiesConfig:
+  BrokenDribblers:
     default: ""
-    type: "string"
+    type: "std::string"
     description: Comma-separated list of numbers of robots with broken dribblers
-  broken_chippers:
+  BrokenChippers:
     default: ""
-    type: "string"
+    type: "std::string"
     description: Comma-separated list of numbers of robots with broken chippers
-  broken_kickers:
+  BrokenKickers:
     default: ""
-    type: "string"
+    type: "std::string"
     description: Comma-separated list of numbers of robots with broken kickers
-DefenseShadowEnemyTactic:
-  ball_steal_speed:
+DefenseShadowEnemyTacticConfig:
+  BallStealSpeed:
     default: 0.3
     max: 1.0
     min: 0.0
     type: "double"
     description: Try to steal the passee's ball below this ball speed
-CornerKickPlay:
-  max_time_commit_to_pass_seconds:
+CornerKickPlayConfig:
+  MaxTimeCommitToPassSeconds:
     min: 0.0
     max: 5.0
     default: 3.0
     type: "double"
     description: The maximum time that we will wait before committing to a pass
-ShootOrChipPlay:
-  fallback_chip_target_enemy_goal_offset:
+ShootOrChipPlayConfig:
+  FallbackChipTargetEnemyGoalOffset:
     min: 0.0
     max: 4.0
     default: 1.5
@@ -393,14 +393,14 @@ ShootOrChipPlay:
     description: >-
       The x offset from the enemy goal for the fallback chip target, ie. where we will
       chip if any enemy approches us before we have a good shot or a robot to chip to
-ShootOrPassPlay:
-  abs_min_pass_score:
+ShootOrPassPlayConfig:
+  AbsMinPassScore:
     min: 0.0
     max: 1.0
     default: 0.05
     type: double
     description: The absolute minimum pass quality we're willing to attempt
-  pass_score_ramp_down_duration:
+  PassScoreRampDownDuration:
     min: 0.0
     max: 5.0
     default: 2.0
@@ -408,15 +408,15 @@ ShootOrPassPlay:
     description: >-
       When we're choosing a pass, we start by looking for a pass with a perfect score
       of 1, and then over time lower the score we're will to accept. This parameter
-      how fast we ramp down to abs_min_pass_score. This is in seconds.
-  min_open_angle_for_shot_deg:
+      how fast we ramp down to absMinPassScore. This is in seconds.
+  MinOpenAngleForShotDeg:
     min: 0.0
     max: 90.0
     default: 6
     type: double
     description: The minimum open angle to the goal that we require before taking a shot
-ShadowFreekickerTactic:
-  robot_separation_scaling_factor:
+ShadowFreekickerTacticConfig:
+  RobotSeparationScalingFactor:
     min: 1.0
     max: 5.0
     default: 1.1
@@ -424,8 +424,8 @@ ShadowFreekickerTactic:
     description: >-
       How much to scale the separation distance between the two robots shadowing
       an enemy freekicker
-HighLevelStrategy:
-  use_shoot_or_pass_instead_of_shoot_or_chip:
+HighLevelStrategyConfig:
+  UseShootOrPassInsteadOfShootOrChip:
     default: true
     type: bool
     description: Use the ShootOrPassPlay instead of the ShootOrChipPlay

@@ -17,9 +17,10 @@ using namespace Passing;
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
 CornerKickPlay::CornerKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
-          Util::DynamicParameters::CornerKickPlay::max_time_commit_to_pass_seconds
-              .value()))
+    : MAX_TIME_TO_COMMIT_TO_PASS(
+          Duration::fromSeconds(Util::DynamicParameters->getCornerKickPlayConfig()
+                                    ->MaxTimeCommitToPassSeconds()
+                                    ->value()))
 {
 }
 
@@ -224,7 +225,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
                                     world.ball());
         receiver->updateControlParams(pass);
-        receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
                                          world.friendlyTeam(), world.enemyTeam());
 

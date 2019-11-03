@@ -129,6 +129,33 @@ cc_test(
 )
 
 cc_library(
+    name = "indirect_free_kick_play",
+    srcs = ["indirect_free_kick_play.cpp"],
+    hdrs = ["indirect_free_kick_play.h"],
+    deps = [
+        ":corner_kick_play",
+        ":play",
+        ":play_factory",
+        "//shared:constants",
+        "//software/ai/evaluation:ball",
+        "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:possession",
+        "//software/ai/hl/stp/tactic:cherry_pick_tactic",
+        "//software/ai/hl/stp/tactic:chip_tactic",
+        "//software/ai/hl/stp/tactic:crease_defender_tactic",
+        "//software/ai/hl/stp/tactic:goalie_tactic",
+        "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/ai/hl/stp/tactic:passer_tactic",
+        "//software/ai/hl/stp/tactic:receiver_tactic",
+        "//software/ai/hl/stp/tactic:shoot_goal_tactic",
+        "//software/ai/passing:pass_generator",
+        "//software/util/logger",
+        "@g3log",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "kickoff_enemy_play",
     srcs = ["kickoff_enemy_play.cpp"],
     hdrs = ["kickoff_enemy_play.h"],
@@ -155,7 +182,7 @@ cc_library(
         ":play",
         ":play_factory",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic:chip_tactic",
+        "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
         "@g3log",
@@ -187,6 +214,7 @@ cc_library(
         ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
         "@g3log",
     ],

@@ -30,8 +30,9 @@ std::string ShootOrPassPlay::getName() const
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
     bool use_shoot_or_pass_instead_of_shoot_or_chip =
-        Util::DynamicParameters::HighLevelStrategy::
-            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+        Util::DynamicParameters->getHighLevelStrategyConfig()
+            ->UseShootOrPassInsteadOfShootOrChip()
+            ->value();
 
     return use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
@@ -96,8 +97,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
 
     // Have a robot keep trying to take a shot
-    Angle min_open_angle_for_shot = Angle::ofDegrees(
-        Util::DynamicParameters::ShootOrPassPlay::min_open_angle_for_shot_deg.value());
+    Angle min_open_angle_for_shot =
+        Angle::ofDegrees(Util::DynamicParameters->getShootOrPassPlayConfig()
+                             ->MinOpenAngleForShotDeg()
+                             ->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
@@ -122,9 +125,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     bool set_passer_robot_in_passgenerator = false;
 
     double abs_min_pass_score =
-        Util::DynamicParameters::ShootOrPassPlay::abs_min_pass_score.value();
+        Util::DynamicParameters->getShootOrPassPlayConfig()->AbsMinPassScore()->value();
     double pass_score_ramp_down_duration =
-        Util::DynamicParameters::ShootOrPassPlay::pass_score_ramp_down_duration.value();
+        Util::DynamicParameters->getShootOrPassPlayConfig()
+            ->PassScoreRampDownDuration()
+            ->value();
     do
     {
         updateCreaseDefenderTactics(crease_defender_tactics);

@@ -7,7 +7,7 @@
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_duration,
-             const RobotCapabilityFlags &capabilities)
+             const std::set<RobotCapabilities::Capability> &capabilities)
     : id_(id),
       positions_(history_duration),
       velocities_(history_duration),
@@ -253,12 +253,12 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const RobotCapabilityFlags &Robot::getRobotCapabilities() const
+const std::set<RobotCapabilities::Capability> &Robot::getRobotCapabilities() const
 {
     return capabilities_;
 }
 
-RobotCapabilityFlags &Robot::getMutableRobotCapabilities()
+std::set<RobotCapabilities::Capability> &Robot::getMutableRobotCapabilities()
 {
     return capabilities_;
 }

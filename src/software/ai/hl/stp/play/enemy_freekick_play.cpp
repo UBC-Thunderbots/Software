@@ -53,12 +53,18 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-        Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value(), true);
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+            ->BallStealSpeed()
+            ->value(),
+        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
+        true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-        Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value(), true);
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+            ->BallStealSpeed()
+            ->value(),
+        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
+        true);
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)
