@@ -7,7 +7,7 @@
 
 #include <g3log/g3log.hpp>
 
-bool ThetaStarPathPlanner::isValid(Coordinate test_coord)
+bool ThetaStarPathPlanner::isCoordValid(Coordinate test_coord)
 {
     // Returns true if row number and column number
     // is in range
@@ -22,7 +22,7 @@ bool ThetaStarPathPlanner::isUnBlocked(Coordinate test_coord)
     {
         bool blocked = false;
 
-        Point p = convertCoordinateToPoint(test_coord);
+        Point p = coordinateToPoint(test_coord);
         for (auto &obstacle : obstacles)
         {
             if (obstacle.containsPoint(p))
@@ -52,7 +52,7 @@ double ThetaStarPathPlanner::calculateHValue(Coordinate test_coord, Coordinate d
                      (test_coord.col() - dest.col()) * (test_coord.col() - dest.col())));
 }
 
-bool ThetaStarPathPlanner::lineOfSight(Coordinate current_parent, Coordinate new_coord)
+bool ThetaStarPathPlanner::hasLineOfSight(Coordinate current_parent, Coordinate new_coord)
 {
     Point next_point     = Point(new_coord.row(), new_coord.col());
     Point parent_point   = Point(current_parent.row(), current_parent.col());
@@ -97,7 +97,7 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(Coordinate dest)
     {
         Coordinate p = coord_path.top();
         coord_path.pop();
-        path_points.push_back(convertCoordinateToPoint(p));
+        path_points.push_back(coordinateToPoint(p));
     }
 
     return path_points;
@@ -107,7 +107,7 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
                                         Coordinate dest, double curr_to_new_dist)
 {
     // Only process this GridCell if this is a valid one
-    if (isValid(new_coord) == true)
+    if (isCoordValid(new_coord) == true)
     {
         // If the successor is already on the closed
         // list or if it is blocked, then ignore it.
@@ -119,7 +119,7 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
             Coordinate parent_new;
             Coordinate parent =
                 cell_details[current_coord.row()][current_coord.col()].parent;
-            if (lineOfSight(parent, new_coord))
+            if (hasLineOfSight(parent, new_coord))
             {
                 parent_new = parent;
                 g_new      = cell_details[parent.row()][parent.col()].g +
@@ -186,8 +186,8 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
 
     // Initialize local variables
     Point closest_destination = findClosestFreePoint(destination);
-    Coordinate src_coord      = convertPointToCoordinate(start);
-    Coordinate dest_coord     = convertPointToCoordinate(closest_destination);
+    Coordinate src_coord      = pointToCoordinate(start);
+    Coordinate dest_coord     = pointToCoordinate(closest_destination);
 
     bool isInvalidOrBlocked = checkForInvalidOrBlockedCases(src_coord, dest_coord);
     if (isInvalidOrBlocked)
@@ -233,14 +233,14 @@ bool ThetaStarPathPlanner::checkForInvalidOrBlockedCases(Coordinate &src_coord,
     bool ret_no_path = false;
 
     // If the source is out of range
-    if (isValid(src_coord) == false)
+    if (isCoordValid(src_coord) == false)
     {
         LOG(WARNING) << "Source is not valid; no path found" << std::endl;
         ret_no_path = true;
     }
 
     // If the destination is out of range
-    if (isValid(dest_coord) == false)
+    if (isCoordValid(dest_coord) == false)
     {
         LOG(WARNING) << "Destination is not valid; no path found" << std::endl;
         ret_no_path = true;
@@ -358,7 +358,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(Coordinate current_cell)
         i += next_increment[next_index] * depth;
         j += next_increment[curr_index] * depth;
         test_coord = Coordinate(i, j);
-        if (isValid(test_coord) && isUnBlocked(test_coord))
+        if (isCoordValid(test_coord) && isUnBlocked(test_coord))
         {
             return test_coord;
         }
@@ -368,7 +368,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(Coordinate current_cell)
         i += next_increment[next_index] * depth;
         j += next_increment[curr_index] * depth;
         test_coord = Coordinate(i, j);
-        if (isValid(test_coord) && isUnBlocked(test_coord))
+        if (isCoordValid(test_coord) && isUnBlocked(test_coord))
         {
             return test_coord;
         }
@@ -380,7 +380,8 @@ ThetaStarPathPlanner::findClosestUnblockedCell(Coordinate current_cell)
 
 Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 {
-    if (!isValidAndFreeOfObstacles(p))
+    // expanding a circle to search for free points
+    if (!isPointValidAndFreeOfObstacles(p))
     {
         int xc = (int)(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
         int yc = (int)(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
@@ -401,11 +402,11 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
                     Point p2 = Point(
                         (double)(xc + outer * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
                         (double)(yc + inner * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-                    if (isValidAndFreeOfObstacles(p1))
+                    if (isPointValidAndFreeOfObstacles(p1))
                     {
                         return p1;
                     }
-                    if (isValidAndFreeOfObstacles(p2))
+                    if (isPointValidAndFreeOfObstacles(p2))
                     {
                         return p2;
                     }
@@ -414,9 +415,6 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 
             while (y >= x)
             {
-                // for each pixel we will
-                // draw all eight pixels
-
                 x++;
 
                 // check for decision parameter
@@ -442,11 +440,11 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
                         Point p2 = Point(
                             (xc + outer * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
                             (yc + inner * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-                        if (isValidAndFreeOfObstacles(p1))
+                        if (isPointValidAndFreeOfObstacles(p1))
                         {
                             return p1;
                         }
-                        if (isValidAndFreeOfObstacles(p2))
+                        if (isPointValidAndFreeOfObstacles(p2))
                         {
                             return p2;
                         }
@@ -458,9 +456,9 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
     return p;
 }
 
-bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
+bool ThetaStarPathPlanner::isPointValidAndFreeOfObstacles(Point p)
 {
-    if (!isValid(p))
+    if (!isPointValid(p))
     {
         return false;
     }
@@ -476,21 +474,21 @@ bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
     return true;
 }
 
-bool ThetaStarPathPlanner::isValid(Point p)
+bool ThetaStarPathPlanner::isPointValid(Point p)
 {
     return ((p.x() > -max_navigable_x_coord) && (p.x() < max_navigable_x_coord) &&
             (p.y() > -max_navigable_y_coord) && (p.y() < max_navigable_y_coord));
 }
 
 
-Point ThetaStarPathPlanner::convertCoordinateToPoint(Coordinate coord)
+Point ThetaStarPathPlanner::coordinateToPoint(Coordinate coord)
 {
     // account for robot radius
     return Point((coord.row() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_x_coord,
                  (coord.col() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_y_coord);
 }
 
-ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::convertPointToCoordinate(Point p)
+ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::pointToCoordinate(Point p)
 {
     // account for robot radius
     return Coordinate(

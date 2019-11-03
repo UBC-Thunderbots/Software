@@ -84,7 +84,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if cell is valid
      */
-    bool isValid(Coordinate test_coord);
+    bool isCoordValid(Coordinate test_coord);
 
     /**
      * Returns if a cell is unblocked
@@ -143,15 +143,17 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Checks for line of sight between parent cell and new cell
+     *
      * @param current_parent        parent cell
      * @param new_pair              cell to check line of sight to
      *
      * @return                      true if line of sight from parent to new cell
      */
-    bool lineOfSight(Coordinate current_parent, Coordinate new_pair);
+    bool hasLineOfSight(Coordinate current_parent, Coordinate new_pair);
 
     /**
      * Finds closest unblocked cell to current_cell
+     *
      * @param current_cell  current cell
      *
      * @return          closest unblocked cell to current_cell
@@ -161,6 +163,7 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Finds closest valid point that's not in an obstacle to p
+     *
      * @param p     a given point
      *
      * @return          closest free point to currCell
@@ -170,19 +173,21 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Checks if a point is valid and doesn't exist in any obstacles
+     *
      * @param p     a given point
      *
      * @return      if p is valid and isn't in an obstacle
      * */
-    bool isValidAndFreeOfObstacles(Point p);
+    bool isPointValidAndFreeOfObstacles(Point p);
 
     /**
      * Checks if a point is valid
+     *
      * @param p     a given point
      *
      * @return      if p is valid
      * */
-    bool isValid(Point p);
+    bool isPointValid(Point p);
 
     /**
      * Converts a cell in grid to a point on navigable area
@@ -191,7 +196,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return Point on navigable area
      */
-    Point convertCoordinateToPoint(Coordinate coord);
+    Point coordinateToPoint(Coordinate coord);
 
     /**
      * Converts a point on navigable area to a cell in grid
@@ -200,7 +205,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return cell in grid
      */
-    Coordinate convertPointToCoordinate(Point p);
+    Coordinate pointToCoordinate(Point p);
 
     /**
      * Try to find a path to destination and leave
