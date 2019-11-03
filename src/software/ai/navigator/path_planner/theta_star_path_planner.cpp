@@ -82,12 +82,12 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(Coordinate dest)
     std::stack<Coordinate> coord_path;
 
     // loop until parent is self
-    while (!(cell_details[row][col].parent.row() == row &&
-             cell_details[row][col].parent.col() == col))
+    while (!(cell_heuristics[row][col].parent.row() == row &&
+             cell_heuristics[row][col].parent.col() == col))
     {
         coord_path.push(Coordinate(row, col));
-        int temp_row = cell_details[row][col].parent.row();
-        int temp_col = cell_details[row][col].parent.col();
+        int temp_row = cell_heuristics[row][col].parent.row();
+        int temp_col = cell_heuristics[row][col].parent.col();
         row          = temp_row;
         col          = temp_col;
     }
@@ -106,29 +106,30 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(Coordinate dest)
 bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new_coord,
                                         Coordinate dest, double curr_to_new_dist)
 {
-    // Only process this GridCell if this is a valid one
+    // Only process this CellHeuristic if this is a valid one
     if (isCoordValid(new_coord) == true)
     {
         // If the successor is already on the closed
         // list or if it is blocked, then ignore it.
         // Else do the following
-        if (closed_list[new_coord.row()][new_coord.col()] == false &&
+        //
+        if (closed_list.find(new_coord) == closed_list.end() &&
             isUnBlocked(new_coord) == true)
         {
             double g_new;
             Coordinate parent_new;
             Coordinate parent =
-                cell_details[current_coord.row()][current_coord.col()].parent;
+                cell_heuristics[current_coord.row()][current_coord.col()].parent;
             if (hasLineOfSight(parent, new_coord))
             {
                 parent_new = parent;
-                g_new      = cell_details[parent.row()][parent.col()].g +
+                g_new      = cell_heuristics[parent.row()][parent.col()].g +
                         calculateHValue(parent, new_coord);
             }
             else
             {
                 parent_new = current_coord;
-                g_new      = cell_details[current_coord.row()][current_coord.col()].g +
+                g_new      = cell_heuristics[current_coord.row()][current_coord.col()].g +
                         curr_to_new_dist;
             }
 
@@ -138,24 +139,23 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
             // If it isn’t on the open list, add it to
             // the open list. Make the current square
             // the parent of this square. Record the
-            // f, g, and h costs of the square GridCell
+            // f, g, and h costs of the square CellHeuristic
             //			 OR
             // If it is on the open list already, check
             // to see if this path to that square is better,
             // using 'f' cost as the measure.
-            if (cell_details[new_coord.row()][new_coord.col()].f == DBL_MAX ||
-                cell_details[new_coord.row()][new_coord.col()].f > f_new)
+            if (cell_heuristics[new_coord.row()][new_coord.col()].f == DBL_MAX ||
+                cell_heuristics[new_coord.row()][new_coord.col()].f > f_new)
             {
-                open_list.insert(
-                    OpenListCell(f_new, Coordinate(new_coord.row(), new_coord.col())));
+                open_list.insert(new_coord);
 
-                // Update the details of this GridCell
-                cell_details[new_coord.row()][new_coord.col()].f      = f_new;
-                cell_details[new_coord.row()][new_coord.col()].g      = g_new;
-                cell_details[new_coord.row()][new_coord.col()].h      = h_new;
-                cell_details[new_coord.row()][new_coord.col()].parent = parent_new;
+                // Update the details of this CellHeuristic
+                cell_heuristics[new_coord.row()][new_coord.col()].f      = f_new;
+                cell_heuristics[new_coord.row()][new_coord.col()].g      = g_new;
+                cell_heuristics[new_coord.row()][new_coord.col()].h      = h_new;
+                cell_heuristics[new_coord.row()][new_coord.col()].parent = parent_new;
             }
-            // If the destination GridCell is the same as the
+            // If the destination CellHeuristic is the same as the
             // current successor
             if (isDestination(new_coord, dest) == true)
             {
@@ -182,6 +182,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
 
     // Reset data structures to path plan again
     open_list.clear();
+    closed_list.clear();
     unblocked_grid.clear();
 
     // Initialize local variables
@@ -280,7 +281,7 @@ bool ThetaStarPathPlanner::checkForInvalidOrBlockedCases(Coordinate &src_coord,
 bool ThetaStarPathPlanner::isStartToDestinationWithinThreshold(const Point &start,
                                                                const Point &destination)
 {
-    // If the destination GridCell is within one grid size of start
+    // If the destination CellHeuristic is within one grid size of start
     return ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
             ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS));
 }
@@ -297,18 +298,18 @@ bool ThetaStarPathPlanner::findPathToDestination(Coordinate dest_coord)
     while (!open_list.empty())
     {
         Coordinate new_coord;
-        Coordinate current_coord(OpenListCell(*open_list.begin()).coord());
+        Coordinate current_coord(*open_list.begin());
 
         // Remove this vertex from the open list
         open_list.erase(open_list.begin());
 
         // Add this vertex to the closed list
-        int i             = current_coord.row();
-        int j             = current_coord.col();
-        closed_list[i][j] = true;
+        int i = current_coord.row();
+        int j = current_coord.col();
+        closed_list.insert(current_coord);
 
         /*
-            Generating all the 8 successor of this GridCell
+            Generating all the 8 successor of this CellHeuristic
 
             Popped Cell --> (i, j)
             <0,+y>      --> (i-1, j)
@@ -335,10 +336,10 @@ bool ThetaStarPathPlanner::findPathToDestination(Coordinate dest_coord)
         }
     }
 
-    // When the destination GridCell is not found and the open
+    // When the destination CellHeuristic is not found and the open
     // list is empty, then we conclude that we failed to
-    // reach the destination GridCell. This may happen when the
-    // there is no way to destination GridCell (due to blockages)
+    // reach the destination CellHeuristic. This may happen when the
+    // there is no way to destination CellHeuristic (due to blockages)
     return false;
 }
 
@@ -498,23 +499,20 @@ ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::pointToCoordinate(Point p
 
 void ThetaStarPathPlanner::initListsAndCellDetails(Coordinate src_coord)
 {
-    closed_list = std::vector<std::vector<bool>>(num_grid_rows,
-                                                 std::vector<bool>(num_grid_cols, false));
-
-    cell_details = std::vector<std::vector<GridCell>>(
+    cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,
-        std::vector<GridCell>(num_grid_cols,
-                              ThetaStarPathPlanner::GridCell(Coordinate(-1, -1), DBL_MAX,
-                                                             DBL_MAX, DBL_MAX)));
+        std::vector<CellHeuristic>(num_grid_cols,
+                                   ThetaStarPathPlanner::CellHeuristic(
+                                       Coordinate(-1, -1), DBL_MAX, DBL_MAX, DBL_MAX)));
 
     // Initialising the parameters of the starting node
     int i = src_coord.row(), j = src_coord.col();
-    cell_details[i][j].f      = 0.0;
-    cell_details[i][j].g      = 0.0;
-    cell_details[i][j].h      = 0.0;
-    cell_details[i][j].parent = src_coord;
+    cell_heuristics[i][j].f      = 0.0;
+    cell_heuristics[i][j].g      = 0.0;
+    cell_heuristics[i][j].h      = 0.0;
+    cell_heuristics[i][j].parent = src_coord;
 
-    // Put the starting GridCell on the open list and set its
+    // Put the starting CellHeuristic on the open list and set its
     // 'f' as 0
-    open_list.insert(OpenListCell(0.0, src_coord));
+    open_list.insert(src_coord);
 }

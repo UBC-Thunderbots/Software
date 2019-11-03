@@ -47,34 +47,16 @@ class ThetaStarPathPlanner : public PathPlanner
         }
     };
 
-    class GridCell
+    class CellHeuristic
     {
        public:
-        GridCell(Coordinate parent, double f, double g, double h)
+        CellHeuristic(Coordinate parent, double f, double g, double h)
             : parent(parent), f(f), g(g), h(h)
         {
         }
 
         Coordinate parent;
         double f, g, h;
-    };
-
-    class OpenListCell : public std::pair<double, Coordinate>
-    {
-       public:
-        OpenListCell(double f, Coordinate coord) : std::pair<double, Coordinate>(f, coord)
-        {
-        }
-
-        double f(void)
-        {
-            return this->first;
-        }
-
-        Coordinate coord(void)
-        {
-            return this->second;
-        }
     };
 
     /**
@@ -280,23 +262,16 @@ class ThetaStarPathPlanner : public PathPlanner
     double max_navigable_x_coord;
     double max_navigable_y_coord;
 
-    /*
-    Create an open list having information as-
-    <f, <i, j>>
-    where f = g + h,
-    and i, j are the row and column index of that GridCell
-    Note that 0 <= i <= ROW-1 & 0 <= j <= COL-1
-    This open list is implenented as a set of pair of pair.*/
-    std::set<OpenListCell> open_list;
+    // open_list represents Coordinates that we'd like to visit
+    std::set<Coordinate> open_list;
 
-    // Create a closed list and initialise it to false which means
-    // that no GridCell has been included yet
-    // This closed list is implemented as a boolean 2D array
-    std::vector<std::vector<bool>> closed_list;
+    // closed_list represent coords we've already visited so
+    // it contains coords for which we calculated the CellHeuristic
+    std::set<Coordinate> closed_list;
 
     // Declare a 2D array of structure to hold the details
-    // of that GridCell
-    std::vector<std::vector<GridCell>> cell_details;
+    // of that CellHeuristic
+    std::vector<std::vector<CellHeuristic>> cell_heuristics;
 
 
     // Description of the Grid-
