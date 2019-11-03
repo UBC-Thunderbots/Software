@@ -11,12 +11,14 @@ cc_library(
         "angular_velocity.h",
         "geom_constants.h",
         "point.h",
+        "ray.h",
         "vector.h",
     ],
     copts = [
         "-std=c++17",
     ],
     deps = [
+        "//software/geom",
         "@boost//:geometry",
         "@boost//:polygon",
     ],
@@ -37,6 +39,17 @@ cc_test(
     name = "point_test",
     srcs = [
         "point_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "ray_test",
+    srcs = [
+        "ray_test.cpp",
     ],
     deps = [
         ":new_geom",
