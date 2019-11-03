@@ -18,7 +18,7 @@ mkdir -p $CUBEMX_TMP_DIR
 cd $CUBEMX_TMP_DIR
 
 # create auto install xml
-AUTO_INSTAL_XML="\
+AUTO_INSTALL_XML="\
     <?xml version='1.0' encoding='UTF-8' standalone='no'?>
     <AutomatedInstallation langpack='eng'>
         <com.st.microxplorer.install.MXHTMLHelloPanel id='readme'/>
@@ -31,7 +31,7 @@ AUTO_INSTAL_XML="\
         <com.st.microxplorer.install.MXFinishPanel id='finish.panel'/>
     </AutomatedInstallation>"
 
-echo -n $AUTO_INSTAL_XML > auto-install.xml
+echo -n $AUTO_INSTALL_XML > auto-install.xml
 
 wget $CUBE_LINK
 unzip en.stm32cubemx_v5.4.0.zip

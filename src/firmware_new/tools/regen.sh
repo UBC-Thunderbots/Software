@@ -12,6 +12,7 @@ WORKSPACE_DIR="$CURR_DIR/../../"
 THIS_SCRIPT_FILENAME=$(basename "$0")
 
 TEMP_DIR="/tmp/tbots_autogen"
+CUBE_EXECUTABLE="/opt/STM32CubeMX/STM32CubeMX"
 
 # cleanup temp dir and create Src/Inc folder, the way Cube expects this output
 mkdir -p $TEMP_DIR/Src
@@ -72,9 +73,8 @@ cd $TEMP_DIR
 printf "$CUBE_SCRIPT" $IOC_FILE $TEMP_DIR > regen.stm32cube.script
 
 # generate code
-/opt/STM32CubeMX/STM32CubeMX -s $TEMP_DIR/regen.stm32cube.script
+$CUBE_EXECUTABLE -s $TEMP_DIR/regen.stm32cube.script
 
 # move the generated files to the right path
 mv $TEMP_DIR/Src/*.c $FIRMWARE_DIR/
 mv $TEMP_DIR/Inc/*.h $FIRMWARE_DIR/
-
