@@ -1,14 +1,14 @@
-#include "software/ai/navigator/path_manager/obstacle_path_manager.h"
+#include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 
 #include <gtest/gtest.h>
 
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 #include "software/geom/point.h"
 
-TEST(TestObstaclePathManager, test_no_obostacles)
+TEST(TestVelocityObstaclePathManager, test_no_obostacles)
 {
     Point start{0, 0}, dest{1, 1};
-    auto path_manager = std::make_unique<ObstaclePathManager>(
+    auto path_manager = std::make_unique<VelocityObstaclePathManager>(
         std::make_unique<StraightLinePathPlanner>());
     std::vector<Obstacle> avoid_area_obstacles;
 

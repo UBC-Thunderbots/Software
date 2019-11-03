@@ -3,18 +3,18 @@
 #include "software/util/parameter/dynamic_parameters.h"
 
 /**
- * ObstaclePathManager uses static_obstacles to arbitrate between paths to
+ * VelocityObstaclePathManager uses static_obstacles to arbitrate between paths to
  * implement the PathManager interface.
  */
 
-class ObstaclePathManager : public PathManager
+class VelocityObstaclePathManager : public PathManager
 {
    public:
     const std::map<RobotId, std::optional<Path>> getManagedPaths(
         const std::set<PathObjective> &objectives,
         const Rectangle &navigable_area) override;
 
-    explicit ObstaclePathManager(std::unique_ptr<PathPlanner> path_planner);
+    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner);
 
    private:
     /**

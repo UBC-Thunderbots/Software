@@ -13,9 +13,9 @@ cc_library(
 )
 
 cc_library(
-    name = "obstacle_path_manager",
-    srcs = ["obstacle_path_manager.cpp"],
-    hdrs = ["obstacle_path_manager.h"],
+    name = "velocity_obstacle_path_manager",
+    srcs = ["velocity_obstacle_path_manager.cpp"],
+    hdrs = ["velocity_obstacle_path_manager.h"],
     deps = [
         ":path_manager",
         "//software/util/parameter:dynamic_parameters",
@@ -23,10 +23,10 @@ cc_library(
 )
 
 cc_test(
-    name = "obstacle_path_manager_test",
-    srcs = ["obstacle_path_manager_test.cpp"],
+    name = "velocity_obstacle_path_manager_test",
+    srcs = ["velocity_obstacle_path_manager_test.cpp"],
     deps = [
-        ":obstacle_path_manager",
+        ":velocity_obstacle_path_manager",
         "//software/test_util",
         "//software/ai/navigator/path_planner:straight_line_path_planner",
         "@gtest//:gtest_main",

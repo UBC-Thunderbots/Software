@@ -1,11 +1,12 @@
-#include "software/ai/navigator/path_manager/obstacle_path_manager.h"
+#include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 
-ObstaclePathManager::ObstaclePathManager(std::unique_ptr<PathPlanner> path_planner)
+VelocityObstaclePathManager::VelocityObstaclePathManager(
+    std::unique_ptr<PathPlanner> path_planner)
     : path_planner(std::move(path_planner))
 {
 }
 
-const std::map<RobotId, std::optional<Path>> ObstaclePathManager::getManagedPaths(
+const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getManagedPaths(
     const std::set<PathObjective> &objectives, const Rectangle &navigable_area)
 {
     std::map<RobotId, std::optional<Path>> managed_paths;
@@ -54,7 +55,8 @@ const std::map<RobotId, std::optional<Path>> ObstaclePathManager::getManagedPath
     return managed_paths;
 }
 
-const std::vector<Obstacle> ObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
+const std::vector<Obstacle>
+VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
     const std::set<PathObjective> &objectives, const PathObjective &current_objective,
     double inflation_factor)
 {

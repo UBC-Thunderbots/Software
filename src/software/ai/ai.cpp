@@ -4,11 +4,11 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
-#include "software/ai/navigator/path_manager/obstacle_path_manager.h"
+#include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
 AI::AI()
-    : navigator(std::make_shared<Navigator>(std::make_unique<ObstaclePathManager>(
+    : navigator(std::make_shared<Navigator>(std::make_unique<VelocityObstaclePathManager>(
           std::make_unique<ThetaStarPathPlanner>()))),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
