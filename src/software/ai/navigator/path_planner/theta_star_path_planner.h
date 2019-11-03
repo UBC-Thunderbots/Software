@@ -177,6 +177,14 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isValidAndFreeOfObstacles(Point p);
 
     /**
+     * Checks if a point is valid
+     * @param p     a given point
+     *
+     * @return      if p is valid
+     * */
+    bool isValid(Point p);
+
+    /**
      * Converts a cell in grid to a point on navigable area
      *
      * @param coord Coordinate to convert
@@ -193,6 +201,56 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return cell in grid
      */
     Coordinate convertPointToCoordinate(Point p);
+
+    /**
+     * Try to find a path to destination and leave
+     * trail markers along the way
+     *
+     * @param dest_coord destination coordinates
+     *
+     * @return if path to destination was found
+     */
+    bool findPathToDestination(Coordinate dest_coord);
+
+    /**
+     * Check for invalid or blocked src_coord and dest_coord and
+     * adjust parameters accordingly
+     *
+     * @param src_coord source coordinate
+     * @param dest_coord destination coordinate
+     *
+     * @return true if there is no path to destination
+     */
+    bool checkForInvalidOrBlockedCases(Coordinate &src_coord, Coordinate &dest_coord);
+
+    /**
+     * Check if start to destination is at least a grid cell away
+     *
+     * @param start start point
+     * @param destination destination point
+     *
+     * @return true start to destination is within threshold
+     */
+    bool isStartToDestinationWithinThreshold(const Point &start,
+                                             const Point &destination);
+
+    /**
+     * Check if start to closest destination is at least a grid cell away
+     *
+     * @param start start point
+     * @param closest_destination closest destination point
+     *
+     * @return true start to closest destination is within threshold
+     */
+    bool isStartToClosestDestinationWithinThreshold(const Point &start,
+                                                    const Point &closest_destination);
+
+    /**
+     * Inits Lists and cell details
+     *
+     * @param src_coord source coordinate
+     */
+    void initListsAndCellDetails(Coordinate src_coord);
 
     // if close to destination then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
