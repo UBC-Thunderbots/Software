@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_set>
+
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
@@ -10,7 +12,6 @@
 #include "software/ai/primitive/primitive.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
-
 
 /**
  * This Navigator converts the given Intents into their respective Primitives
@@ -25,7 +26,7 @@ class Navigator : public IntentVisitor
      * Get assigned primitives for given assigned intents
      *
      * @param world World to navigate around
-     * @assignedIntents intents to navigate into primitives
+     * @assignedIntents intents to process into primitives
      *
      * @return vector of primitives for the given intents
      */
@@ -130,8 +131,7 @@ class Navigator : public IntentVisitor
     std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
 
     // intents that need path planning
-    std::vector<MoveIntent> move_intents;
-
+    std::vector<MoveIntent> move_intents_for_path_planning;
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
@@ -146,16 +146,6 @@ class Navigator : public IntentVisitor
     double getEnemyObstacleProximityFactor(const Point &p);
 
     /**
-     * Convert paths into primitives and add them to assigned_primitives
-     *
-     * @param paths paths to convert
-     * @param assigned_primitives list of primitives to add to
-     */
-    void addPathsToAssignedPrimitives(
-        const std::map<PathObjective, std::optional<Path>> &paths,
-        std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
-
-    /**
      * Registers this robot id as a robot that is not assigned a MoveIntent
      *
      * @param RobotId
@@ -164,19 +154,24 @@ class Navigator : public IntentVisitor
     void registerNonMoveIntentRobotId(RobotId id);
 
     /**
-     * Generates a map from path objectives to move intents
+     * Generates path objectives from move intents
      *
-     * @return map from path objectives to move intents
+     * @param move_intents intents to make into path objectives
+     *
+     * @return set of PathObjectives
      */
-    std::set<PathObjective> generatePathObjectives(void);
+    std::unordered_set<PathObjective> getPathObjectivesFromMoveIntents(
+        const std::vector<MoveIntent> &move_intents);
 
     /**
-     * Adds primitives associated with all MoveIntents into assigned_primitives
+     * Creates a list primitives for the list of MoveIntents
      *
-     * @param assigned_primitives primitives to add MoveIntent primitives to
+     * @param move_intents intents to make into primitives
+     *
+     * @return list of primitives
      */
-    void addMoveIntentsToAssignedPrimitives(
-        std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
+    std::vector<std::unique_ptr<Primitive>> getPrimitivesFromMoveIntents(
+        const std::vector<MoveIntent> &move_intents);
 
     /**
      * Creates a primitive for a given path and move intent

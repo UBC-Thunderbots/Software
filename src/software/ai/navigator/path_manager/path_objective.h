@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
@@ -44,14 +45,14 @@ class PathObjective
     {
         return robot_id != other.robot_id;
     }
+};
 
-    bool operator>(const PathObjective &other) const
+template <>
+struct std::hash<PathObjective> final
+{
+    std::size_t operator()(const PathObjective &path_objective) const
     {
-        return robot_id > other.robot_id;
-    }
-
-    bool operator<(const PathObjective &other) const
-    {
-        return robot_id < other.robot_id;
+        std::hash<RobotId> h;
+        return h(path_objective.robot_id);
     }
 };

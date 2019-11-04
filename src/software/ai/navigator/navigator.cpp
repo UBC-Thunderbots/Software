@@ -51,7 +51,7 @@ void Navigator::visit(const KickIntent &intent)
 
 void Navigator::visit(const MoveIntent &intent)
 {
-    move_intents.push_back(intent);
+    move_intents_for_path_planning.push_back(intent);
     current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
@@ -81,7 +81,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
 {
     this->world = world;
     planned_paths.clear();
-    move_intents.clear();
+    move_intents_for_path_planning.clear();
     friendly_non_move_intent_robot_obstacles.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
@@ -94,14 +94,19 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         }
     }
 
-    addMoveIntentsToAssignedPrimitives(assigned_primitives);
+    for (auto &mi_primitive :
+         getPrimitivesFromMoveIntents(move_intents_for_path_planning))
+    {
+        assigned_primitives.emplace_back(std::move(mi_primitive));
+    }
 
     return assigned_primitives;
 }
 
-std::set<PathObjective> Navigator::generatePathObjectives(void)
+std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
+    const std::vector<MoveIntent> &move_intents)
 {
-    std::set<PathObjective> path_objectives;
+    std::unordered_set<PathObjective> path_objectives;
     for (const auto &intent : move_intents)
     {
         // start with non-MoveIntent robots and then add avoid areas
@@ -132,12 +137,14 @@ std::set<PathObjective> Navigator::generatePathObjectives(void)
     return path_objectives;
 }
 
-void Navigator::addMoveIntentsToAssignedPrimitives(
-    std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
+std::vector<std::unique_ptr<Primitive>> Navigator::getPrimitivesFromMoveIntents(
+    const std::vector<MoveIntent> &move_intents)
 {
+    std::vector<std::unique_ptr<Primitive>> primitives;
+
     Rectangle navigable_area = this->world.field().fieldBoundary();
 
-    auto path_objectives = generatePathObjectives();
+    auto path_objectives = getPathObjectivesFromMoveIntents(move_intents);
 
     auto robot_id_to_path =
         path_manager->getManagedPaths(path_objectives, navigable_area);
@@ -147,8 +154,9 @@ void Navigator::addMoveIntentsToAssignedPrimitives(
     {
         auto path      = robot_id_to_path[intent.getRobotId()];
         auto primitive = getPrimitiveFromPathAndMoveIntent(path, intent);
-        assigned_primitives.emplace_back(std::move(primitive));
+        primitives.emplace_back(std::move(primitive));
     }
+    return primitives;
 }
 
 void Navigator::registerNonMoveIntentRobotId(RobotId id)

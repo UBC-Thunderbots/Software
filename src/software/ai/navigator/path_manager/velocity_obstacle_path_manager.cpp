@@ -7,7 +7,7 @@ VelocityObstaclePathManager::VelocityObstaclePathManager(
 }
 
 const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getManagedPaths(
-    const std::set<PathObjective> &objectives, const Rectangle &navigable_area)
+    const std::unordered_set<PathObjective> &objectives, const Rectangle &navigable_area)
 {
     std::map<RobotId, std::optional<Path>> managed_paths;
 
@@ -57,8 +57,8 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
 
 const std::vector<Obstacle>
 VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
-    const std::set<PathObjective> &objectives, const PathObjective &current_objective,
-    double inflation_factor)
+    const std::unordered_set<PathObjective> &objectives,
+    const PathObjective &current_objective, double inflation_factor)
 {
     std::vector<Obstacle> obstacles;
     for (auto const &obj : objectives)

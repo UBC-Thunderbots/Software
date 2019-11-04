@@ -13,7 +13,7 @@ TEST(TestVelocityObstaclePathManager, test_no_obostacles)
     std::vector<Obstacle> avoid_area_obstacles;
 
     Rectangle navigable_area = Rectangle(Point(0, 0), 0, 0);
-    std::set<PathObjective> path_objectives;
+    std::unordered_set<PathObjective> path_objectives;
     PathObjective po1(Point(1, 3), Point(2, 3), 2.0, avoid_area_obstacles, 1);
     PathObjective po2(Point(2, 4), Point(2, 5), 1.0, avoid_area_obstacles, 2);
     path_objectives.insert(po1);
