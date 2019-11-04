@@ -3,7 +3,6 @@
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
-#include "software/ai/navigator/navigator.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/ai/navigator/util.h"
@@ -133,16 +132,6 @@ class Navigator : public IntentVisitor
     // intents that need path planning
     std::vector<MoveIntent> move_intents;
 
-    /**
-     * Create obstacles for the given avoid areas, with a buffer such that the edge
-     * of the robot does not protrude into the area
-     *
-     * @param avoid_areas The areas to convert into obstacles
-     *
-     * @return Obstacles representing the given avoid areas
-     */
-    std::vector<Obstacle> getObstaclesFromAvoidAreas(
-        const std::vector<AvoidArea> &avoid_areas);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
@@ -154,7 +143,7 @@ class Navigator : public IntentVisitor
      *
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
-    double getCloseToEnemyObstacleFactor(const Point &p);
+    double getEnemyObstacleProximityFactor(const Point &p);
 
     /**
      * Convert paths into primitives and add them to assigned_primitives
@@ -165,13 +154,6 @@ class Navigator : public IntentVisitor
     void addPathsToAssignedPrimitives(
         const std::map<PathObjective, std::optional<Path>> &paths,
         std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
-
-    /**
-     * Get Obstacles from a Team
-     *
-     * @return vector of obstacles
-     */
-    std::vector<Obstacle> getObstaclesFromTeam(const Team &team);
 
     /**
      * Registers this robot id as a robot that is not assigned a MoveIntent

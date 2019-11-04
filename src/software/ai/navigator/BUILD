@@ -7,6 +7,11 @@ cc_library(
     deps = [
         "//software/ai/primitive:move_primitive",
         "//software/geom",
+        "//software/ai/navigator/obstacle",
+        "//software/util/parameter:dynamic_parameters",
+        "//software/ai/intent:avoid_area",
+        "//software/world",
+        "@g3log",
     ],
 )
 
