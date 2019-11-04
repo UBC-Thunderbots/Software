@@ -47,9 +47,10 @@ bool ThetaStarPathPlanner::isDestination(Coordinate test_coord, Coordinate dest)
 double ThetaStarPathPlanner::calculateHValue(Coordinate test_coord, Coordinate dest)
 {
     // Return using the distance formula
-    return (
-        (double)sqrt((test_coord.row() - dest.row()) * (test_coord.row() - dest.row()) +
-                     (test_coord.col() - dest.col()) * (test_coord.col() - dest.col())));
+    // Leverage point class
+    Point p1(test_coord.row(), test_coord.col());
+    Point p2(dest.row(), dest.col());
+    return dist(p1, p2);
 }
 
 bool ThetaStarPathPlanner::hasLineOfSight(Coordinate current_parent, Coordinate new_coord)
