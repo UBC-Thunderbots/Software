@@ -148,7 +148,7 @@ class Navigator : public IntentVisitor
     /**
      * Registers this robot id as a robot that is not assigned a MoveIntent
      *
-     * @param RobotId
+     * @param id RobotId to register
      *
      */
     void registerNonMoveIntentRobotId(RobotId id);
