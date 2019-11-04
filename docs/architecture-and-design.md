@@ -76,7 +76,7 @@ The Ball class represents the state of the ball. This includes its position and 
 ### Field
 The Field class represents the state of the physical field being played on, which is primarily its physical dimensions. The Field class provides many functions that make it easy to get points of interest on the field, such as the enemy net, friendly corner, or center circle.
 
-### Refbox / GameState
+### Refbox and GameState
 These represent the current state of the game as dictated by the Gamecontroller. These provide functions like `isPlaying()`, `isHalted()` that allow the rest of the system to tell what state of the game we are in, and make decisions accordingly. We need to obey the rules!
 
 
