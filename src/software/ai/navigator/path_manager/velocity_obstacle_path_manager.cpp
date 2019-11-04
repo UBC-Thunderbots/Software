@@ -47,7 +47,7 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
             current_velocity_obstacles.emplace_back(
                 Obstacle::createVelocityObstacleWithScalingParams(
                     current_objective.start, path_points[1],
-                    current_objective.current_velocity, robot_obstacle_inflation,
+                    current_objective.current_speed, robot_obstacle_inflation,
                     velocity_obstacle_inflation));
         }
     }

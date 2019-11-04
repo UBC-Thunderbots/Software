@@ -11,11 +11,11 @@
 class PathObjective
 {
    public:
-    PathObjective(const Point start, const Point end, const double current_velocity,
+    PathObjective(const Point start, const Point end, const double current_speed,
                   const std::vector<Obstacle> &obstacles, RobotId robot_id)
         : start(start),
           end(end),
-          current_velocity(current_velocity),
+          current_speed(current_speed),
           obstacles(obstacles),
           robot_id(robot_id)
     {
@@ -24,7 +24,7 @@ class PathObjective
     PathObjective(const PathObjective &other)
         : start(other.start),
           end(other.end),
-          current_velocity(other.current_velocity),
+          current_speed(other.current_speed),
           obstacles(other.obstacles),
           robot_id(other.robot_id)
     {
@@ -33,7 +33,7 @@ class PathObjective
     const RobotId robot_id;
     const Point start;
     const Point end;
-    const double current_velocity;
+    const double current_speed;
     const std::vector<Obstacle> obstacles;
 
     bool operator==(const PathObjective &other) const
