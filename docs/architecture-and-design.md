@@ -364,7 +364,7 @@ The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for 
 4. A passing-based offense play
 5. A dribbling-based offense play
 
-Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behavior. TODO coroutines
+Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behavior. Read the section on [Coroutines](#coroutines) to learn more about how we write strategy with "stages".
 
 Furthermore, every play specifies an `Applicable` and `Invariant` condition. These are used to determine what plays should be run at what time, and when a Play should terminate.
 
@@ -385,4 +385,4 @@ In order for a robot to move to the desired destination of a `MoveIntent`, the N
 # Visualizer
 The `Visualizer` is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the `World` as the [Backend](#backend) sees it, and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings and status messages from the robots, such as if a robot is low on battery.
 
-The `Visualizer` also lets us control the [AI](#ai) by setting `Parameters` (TODO: link here). Through the `Visualizer`, we can manually choose what strategy the [AI](#ai) should use, what team we think we are playing as, and tune more granular behavior such as how close an enemy must be to the ball before we consider them a threat.
+The `Visualizer` also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the `Visualizer`, we can manually choose what strategy the [AI](#ai) should use, what team we think we are playing as, and tune more granular behavior such as how close an enemy must be to the ball before we consider them a threat.
