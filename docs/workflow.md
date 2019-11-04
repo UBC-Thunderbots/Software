@@ -13,9 +13,6 @@
     * [Reviewing Pull Requests](#reviewing-pull-requests)
 * [Example Workflow](#example-workflow)
 * [Testing](#testing)
-    * [Unit Testing](#unit-testing)
-        * [For C   Code](#for-c-code)
-        * [For C Code](#for-c-code-1)
 
 
 ## Issue and Project Tracking
