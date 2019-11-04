@@ -1,8 +1,5 @@
 # Architecture and Design Rationales
 
-### TODO: Document These Things
-* [ ] Namespaces
-
 # Table of Contents
 * [Tools](#tools)
   * [SSL-Vision](#ssl-vision)
