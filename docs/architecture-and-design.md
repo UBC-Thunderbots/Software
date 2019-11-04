@@ -24,25 +24,26 @@
   * [Observer Design Pattern](#observer-design-pattern)
   * [C++ Templating](#c-templating)
 * [Coroutines](#coroutines)
-  * [What Are Coroutines?](#what-are-coroutines?)
-  * [What Coroutines Do We Use?](#what-coroutines-do-we-use?)
-  * [How Do We Use Coroutines](#how-do-we-use-coroutines)
+  * [What Are Coroutines?](#what-are-coroutines)
+  * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
+  * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
+  * [Angles](#angles)
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
-* [Backend](#backend)
-  * [Input](#input-responsabilities)
-  * [Output](#output-responsabilities)
-  * [Diagram](#backend-diagram)
-* [AI](#ai)
-  * [Strategy](#strategy)
-    * [Skills / Actions](#skills-/-actions)
-    * [Tactics](#tactics)
-    * [Plays](#plays)
-  * [Navigation](#navigation)
-  * [Diagram](#ai-diagram)
-* [Visualizer](#visualizer)
+  * [Backend](#backend)
+    * [Input](#input-responsabilities)
+    * [Output](#output-responsabilities)
+    * [Diagram](#backend-diagram)
+  * [AI](#ai)
+    * [Strategy](#strategy)
+      * [Skills / Actions](#skills--actions)
+      * [Tactics](#tactics)
+      * [Plays](#plays)
+    * [Navigation](#navigation)
+    * [Diagram](#ai-diagram)
+  * [Visualizer](#visualizer)
 
 
 # Tools
@@ -286,7 +287,7 @@ Going along with our coordinate convention, we have a convention for angles as w
 Because of our [Coordinate Conventions](#coordinates), this means that an angle of `0` will always face the enemy net not matter which side of the field we are defending in reality.
 
 # Architecture Overview
-At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](TODO use actual link). Together, they are what make up our AI.
+At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
 
 The Backend is responsible for communicating with the outside world (network and radio), the AI is what makes the actual gameplay decisions, and the Visualizer shows us what's happening and lets us control the AI.
 
