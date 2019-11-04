@@ -128,7 +128,7 @@ Read [https://www.geeksforgeeks.org/inheritance-in-c/] for more information.
 Examples of this can be found in many places, including:
 * [Plays](#plays)
 * [Tactics](#tactics)
-* [Actions](#skills-/-actions)
+* [Actions](#skills--actions)
 * [Intents](#intents)
 * [Primitives](#primitives)
 * Different implementations of the [Backend](#backend)
@@ -231,7 +231,7 @@ We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs
 
 
 ## How Do We Use Coroutines?
-We use Coroutines to write our [strategy logic](#strategy). The "pause and resume" functionality of Coroutines makes it much easier to write [Plays](#plays), [Tactics](#tactics), and [Actions](#actions).
+We use Coroutines to write our [strategy logic](#strategy). The "pause and resume" functionality of Coroutines makes it much easier to write [Plays](#plays), [Tactics](#tactics), and [Actions](#skills--actions).
 
 Specifically, we use Coroutines as a way to break down our strategy into "stages". Once a "stage" completes we generally don't want to re-evaluate it, and would rather commit to a decion and move on. Coroutines makes it much easier to write "stages" of strategy without requiring complex state machine logic to check what stage we are in, and it's easier for developers to see what the inteded order of operations is (eg. "Line up to take the shot" -> "shoot").
 
@@ -344,7 +344,7 @@ Actions use [Intents](#intents) to implement their behavior. Actions are respons
 
 **It seems like Actions and Intents are basically the same thing. Why aren't they combined into a single class?**
 
-[Actions](#actions) and [Intents](#intents) are not combined because [Actions](#actions) are part of [STP](#strategy) and our strategy logic, while [Intents](#intents) are more part of the [Navigator](#navigation). Combining them would break the abstraction and couple our strategy implementation to the [Navigator](#navigation), removing our flexibility to implement different strategy systems in the future.
+[Actions](#skills--actions) and [Intents](#intents) are not combined because [Actions](#skills--actions) are part of [STP](#strategy) and our strategy logic, while [Intents](#intents) are more part of the [Navigator](#navigation). Combining them would break the abstraction and couple our strategy implementation to the [Navigator](#navigation), removing our flexibility to implement different strategy systems in the future.
 
 
 ### Tactics
@@ -354,7 +354,7 @@ The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robot rol
 3. Being a defender that shadows enemy robots
 4. Being a defender that tries to steal the ball from enemies
 
-Tactics use [Actions](#skills-/-actions) to implement their behavior. Using the [Action](#skills-/-actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behavior. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behavior.
+Tactics use [Actions](#skills--actions) to implement their behavior. Using the [Action](#skills--actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behavior. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behavior.
 
 ### Plays
 The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
