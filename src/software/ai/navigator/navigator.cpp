@@ -152,8 +152,19 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getPrimitivesFromMoveIntents(
     // Turn each intent and associated path into primitives
     for (const auto &intent : move_intents)
     {
-        auto path      = robot_id_to_path.at(intent.getRobotId());
-        auto primitive = getPrimitiveFromPathAndMoveIntent(path, intent);
+        std::unique_ptr<Primitive> primitive;
+        if (robot_id_to_path.find(intent.getRobotId()) == robot_id_to_path.end())
+        {
+            LOG(WARNING) << "Path manager did not map RobotId = " << intent.getRobotId()
+                         << " to a path";
+            // generate primitive from no path
+            primitive = getPrimitiveFromPathAndMoveIntent(std::nullopt, intent);
+        }
+        else
+        {
+            auto path = robot_id_to_path.at(intent.getRobotId());
+            primitive = getPrimitiveFromPathAndMoveIntent(path, intent);
+        }
         primitives.emplace_back(std::move(primitive));
     }
     return primitives;
@@ -232,7 +243,8 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
     }
     else
     {
-        LOG(WARNING) << "Path manager could not find a path";
+        LOG(WARNING) << "Path manager could not find a path for RobotId = "
+                     << intent.getRobotId();
         return std::make_unique<StopPrimitive>(intent.getRobotId(), false);
     }
 }
