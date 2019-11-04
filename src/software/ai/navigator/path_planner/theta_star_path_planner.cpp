@@ -39,11 +39,6 @@ bool ThetaStarPathPlanner::isUnBlocked(Coordinate test_coord)
     return unblocked_grid[test_coord];
 }
 
-bool ThetaStarPathPlanner::isDestination(Coordinate test_coord, Coordinate dest)
-{
-    return (test_coord.row() == dest.row() && test_coord.col() == dest.col());
-}
-
 double ThetaStarPathPlanner::calculateHValue(Coordinate test_coord, Coordinate dest)
 {
     // Return using the distance formula
@@ -156,9 +151,8 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
                 cell_heuristics[new_coord.row()][new_coord.col()].h      = h_new;
                 cell_heuristics[new_coord.row()][new_coord.col()].parent = parent_new;
             }
-            // If the destination CellHeuristic is the same as the
-            // current successor
-            if (isDestination(new_coord, dest) == true)
+            // If the destination is the same as the current successor
+            if (new_coord == dest)
             {
                 return true;
             }

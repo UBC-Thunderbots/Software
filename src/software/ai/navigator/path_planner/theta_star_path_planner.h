@@ -78,16 +78,6 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isUnBlocked(Coordinate test_coord);
 
     /**
-     * Returns if a cell is the destination
-     *
-     * @param test_coord Coordinate to consider
-     * @param dest destination cell
-     *
-     * @return true if cell is the destination
-     */
-    bool isDestination(Coordinate test_coord, Coordinate dest);
-
-    /**
      * Returns heuristic value of a cell,
      * currently the Euclidean distance to the destination
      *
