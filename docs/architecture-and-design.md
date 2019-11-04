@@ -11,7 +11,7 @@
     * [Robot](#robot)
     * [Ball](#ball)
     * [Field](#field)
-    * [Refbox and Gamestate](#refbox-/-gamestate)
+    * [Refbox and Gamestate](#refbox--gamestate)
   * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
