@@ -1,11 +1,13 @@
 # Code Style Guide
 
 ## Table of Contents
+<<<<<<< HEAD
 * [Names and Variables](#names-and-variables)
 * [Comments](#comments)
 * [Headers](#headers)
 * [Includes](#includes)
 * [Namespaces](#namespaces)
+* [Exceptions](#exceptions)
 * [Tests](#tests)
 * [Spelling](#spelling)
 * [Miscellaneous](#miscellaneous)
@@ -143,6 +145,12 @@ If you think some ASCII art will help explain something better, go for it! [asci
     * The main purpose of namespaces is to compartmentalize code and help avoid conflicts. This way if 2 libraries define functions called `add()`, as long as they are in different namespaces they can be specified and used independently without issue. Because we aren't publishing our code as a library, and most libraries we use already do their own namespacing, we don't _really_ need the protection namespaces provide in this case.
 * Do not use `using namespace ...` in header files.
     * This is because any file that inludes this header will also implicitly be using the namespace, which can cause subtle issues and naming conflicts.
+
+
+### Exceptions
+
+* Throwing an exception indicates that the AI has entered an unrecoverable state.
+* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occured.
 
 
 ### Tests

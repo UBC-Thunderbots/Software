@@ -19,7 +19,8 @@ bool PenaltyKickEnemyPlay::isApplicable(const World &world) const
 
 bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isTheirPenalty();
+    return world.gameState().isTheirPenalty() && !world.gameState().isStopped() &&
+           !world.gameState().isHalted();
 }
 
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -28,10 +29,25 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
+    move_tactic_2->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    // TODO: Remove the ENEMY_HALF whitelist once ticket #980 is complete
+    move_tactic_2->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
+    move_tactic_3->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    // TODO: Remove the ENEMY_HALF whitelist once ticket #980 is complete
+    move_tactic_3->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
+    move_tactic_4->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    // TODO: Remove the ENEMY_HALF whitelist once ticket #980 is complete
+    move_tactic_4->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
+    move_tactic_5->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    // TODO: Remove the ENEMY_HALF whitelist once ticket #980 is complete
+    move_tactic_5->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    move_tactic_6->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    // TODO: Remove the ENEMY_HALF whitelist once ticket #980 is complete
+    move_tactic_6->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 
     do
     {

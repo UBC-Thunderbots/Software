@@ -3,9 +3,9 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
@@ -23,6 +23,7 @@ CreaseDefenderTactic::CreaseDefenderTactic(
       enemy_team(enemy_team),
       left_or_right(left_or_right)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string CreaseDefenderTactic::getName() const
@@ -71,15 +72,21 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             double ball_dist = (ball.position() - *defender_reference_position).len();
 
             double min_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::min_defender_seperation_deg
-                    .value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MinDefenderSeperationDeg()
+                    ->value();
             double max_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::max_defender_seperation_deg
-                    .value();
-            double min_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_min_defender_seperation.value();
-            double max_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_max_defender_seperation.value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MaxDefenderSeperationDeg()
+                    ->value();
+            double min_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMinDefenderSeperation()
+                    ->value();
+            double max_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMaxDefenderSeperation()
+                    ->value();
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
@@ -182,8 +189,8 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, defender_position, defender_orientation, 0.0, false, false,
-                AutokickType::AUTOCHIP));
+                *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::AUTOCHIP));
         }
         else
         {

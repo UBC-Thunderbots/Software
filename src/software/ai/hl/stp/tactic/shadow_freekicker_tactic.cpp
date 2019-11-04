@@ -3,9 +3,9 @@
 #include <algorithm>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-
+#include "software/util/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
                                                Team enemy_team, Ball ball, Field field,
@@ -44,6 +44,10 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
     {
         std::optional<Robot> enemy_with_ball =
             Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+        double robot_separation_scaling_factor =
+            Util::DynamicParameters->getShadowFreekickerTacticConfig()
+                ->RobotSeparationScalingFactor()
+                ->value();
 
         if (enemy_with_ball.has_value())
         {
@@ -52,9 +56,10 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
                     .norm(FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
             Vector perpendicular_to_enemy_direction =
-                enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS * 1.2);
+                enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS *
+                                                     robot_separation_scaling_factor);
 
-            defend_position = free_kick_shadower == FreekickShadower::First
+            defend_position = free_kick_shadower == FreekickShadower::RIGHT
                                   ? ball.position() + enemy_pointing_direction +
                                         perpendicular_to_enemy_direction
                                   : ball.position() + enemy_pointing_direction -
@@ -66,10 +71,10 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
                 (field.friendlyGoal() - ball.position())
                     .norm(FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
-            Vector perpendicular_to_ball_direction =
-                ball_to_net_direction.perp().norm(ROBOT_MAX_RADIUS_METERS * 1.1);
+            Vector perpendicular_to_ball_direction = ball_to_net_direction.perp().norm(
+                ROBOT_MAX_RADIUS_METERS * robot_separation_scaling_factor);
 
-            defend_position = free_kick_shadower == FreekickShadower::First
+            defend_position = free_kick_shadower == FreekickShadower::RIGHT
                                   ? ball.position() + ball_to_net_direction +
                                         perpendicular_to_ball_direction
                                   : ball.position() + ball_to_net_direction -
@@ -78,7 +83,7 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
 
         yield(move_action.updateStateAndGetNextIntent(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, false));
+            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
     } while (true);
 }
 

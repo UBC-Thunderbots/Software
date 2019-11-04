@@ -5,8 +5,9 @@
 #include "software/ai/intent/move_intent.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,
-                            RobotCapabilityFlags::Chip})
+    : Tactic(loop_forever,
+             {RobotCapabilities::Capability::Dribble, RobotCapabilities::Capability::Kick,
+              RobotCapabilities::Capability::Chip})
 {
 }
 
@@ -35,7 +36,8 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     do
     {
         yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
-                                           Angle::zero(), 0.0, 0));
+                                           Angle::zero(), 0.0, 0, DribblerEnable::OFF,
+                                           MoveType::NORMAL, AutokickType::NONE));
     } while ((this->robot->position() - this->destination).len() > 0.01);
 }
 

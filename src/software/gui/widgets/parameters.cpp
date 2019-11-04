@@ -71,7 +71,12 @@ QWidget* createBooleanParameter(Parameter<bool>* parameter)
     QWidget::connect(checkbox, &QCheckBox::stateChanged, on_checkbox_value_changed);
 
     auto on_parameter_value_changed = [checkbox](bool new_value) {
+        // We block signals while setting the state of the checkbox so that we don't
+        // trigger the `on_checkbox_value_changed` function, which would set the
+        // parameter value again and deadlock on the parameter's internal mutex
+        checkbox->blockSignals(true);
         checkbox->setChecked(new_value);
+        checkbox->blockSignals(false);
     };
     parameter->registerCallbackFunction(on_parameter_value_changed);
 
@@ -107,7 +112,12 @@ QWidget* createIntegerParameter(Parameter<int>* parameter)
                      on_spinbox_value_changed);
 
     auto on_parameter_value_changed = [spinbox](int new_value) {
+        // We block signals while setting the value of the spinbox so that we don't
+        // trigger the `on_spinbox_value_changed` function, which would set the
+        // parameter value again and deadlock on the parameter's internal mutex
+        spinbox->blockSignals(true);
         spinbox->setValue(new_value);
+        spinbox->blockSignals(false);
     };
     parameter->registerCallbackFunction(on_parameter_value_changed);
 
@@ -145,7 +155,12 @@ QWidget* createDoubleParameter(Parameter<double>* parameter)
         on_spinbox_value_changed);
 
     auto on_parameter_value_changed = [spinbox](int new_value) {
+        // We block signals while setting the value of the spinbox so that we don't
+        // trigger the `on_spinbox_value_changed` function, which would set the
+        // parameter value again and deadlock on the parameter's internal mutex
+        spinbox->blockSignals(true);
         spinbox->setValue(new_value);
+        spinbox->blockSignals(false);
     };
     parameter->registerCallbackFunction(on_parameter_value_changed);
 
@@ -178,7 +193,12 @@ QWidget* createStringParameter(Parameter<std::string>* parameter)
     QWidget::connect(line_edit, &QLineEdit::editingFinished, on_line_edit_text_changed);
 
     auto on_parameter_value_changed = [line_edit](std::string new_value) {
+        // We block signals while setting the text of the LineEdit so that we don't
+        // trigger the `on_line_edit_text_changed` function, which would set the
+        // parameter value again and deadlock on the parameter's internal mutex
+        line_edit->blockSignals(true);
         line_edit->setText(QString::fromStdString(new_value));
+        line_edit->blockSignals(false);
     };
     parameter->registerCallbackFunction(on_parameter_value_changed);
 

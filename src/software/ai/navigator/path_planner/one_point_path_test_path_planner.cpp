@@ -6,10 +6,9 @@
  * Note that this is an invalid path, so the navigator won't like it
  */
 
-PathType OnePointPathTestPathPlanner::findPath(const Point &start,
-                                               const Point &destination,
-                                               const Field &field,
-                                               const std::vector<Obstacle> &obstacles)
+Path OnePointPathTestPathPlanner::findPath(const Point &start, const Point &destination,
+                                           const Rectangle &navigable_area,
+                                           const std::vector<Obstacle> &obstacles)
 {
-    return PathType(std::vector<Point>({Point(1.0, 1.0)}));
+    return Path(std::vector<Point>({Point(1.0, 1.0)}));
 }

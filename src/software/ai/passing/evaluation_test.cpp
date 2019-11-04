@@ -39,15 +39,19 @@ class PassingEvaluationTest : public testing::Test
 
     // We get these values here so we can make these tests robust to change
     double min_pass_speed_param =
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value();
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value();
     double max_pass_speed_param =
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value();
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value();
     double avg_desired_pass_speed;
 
     double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->MinTimeOffsetForPassSeconds()
+            ->value();
     double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->MaxTimeOffsetForPassSeconds()
+            ->value();
     double avg_time_offset_for_pass_seconds;
 };
 
@@ -103,16 +107,18 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time = world.getMostRecentTimestamp().getSeconds();
-    double min_start_time_offset =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
-    double max_start_time_offset =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+    double curr_time             = world.getMostRecentTimestamp().getSeconds();
+    double min_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MinTimeOffsetForPassSeconds()
+                                       ->value();
+    double max_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MaxTimeOffsetForPassSeconds()
+                                       ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value(),
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value(),
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
 
@@ -437,7 +443,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
     // We update the the ball state because that's what is used as a reference for the
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
-    world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
+    world.updateBallState(BallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
@@ -463,8 +469,8 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
     world.updateBallState(
-        Ball({0, 0}, {0, 0},
-             Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
+        BallState({0, 0}, {0, 0},
+                  Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 

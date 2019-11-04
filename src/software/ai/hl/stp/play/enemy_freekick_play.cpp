@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/enemy_freekick_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/block_shot_path_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
@@ -44,21 +44,27 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
     // a free kick (at most we will have 2
     auto shadow_freekicker_1 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::First, world.enemyTeam(), world.ball(), world.field(),
+        ShadowFreekickerTactic::LEFT, world.enemyTeam(), world.ball(), world.field(),
         true);
     auto shadow_freekicker_2 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::Second, world.enemyTeam(), world.ball(), world.field(),
+        ShadowFreekickerTactic::RIGHT, world.enemyTeam(), world.ball(), world.field(),
         true);
 
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-        Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value(), true);
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+            ->BallStealSpeed()
+            ->value(),
+        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
+        true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-        Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value(), true);
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+            ->BallStealSpeed()
+            ->value(),
+        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
+        true);
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)
