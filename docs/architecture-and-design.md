@@ -2,8 +2,6 @@
 
 ### TODO: Document These Things
 * [ ] Namespaces
-* [ ] contribution / editing guide.  Diagrams in GitHub: https://github.com/jgraph/drawio-github
-* [ ] coroutinesG
 
 # Table of Contents
 * [Tools](#tools)
@@ -28,6 +26,10 @@
   * [Visitor Design Pattern](#visitor-design-pattern)
   * [Observer Design Pattern](#observer-design-pattern)
   * [C++ Templating](#c++-templating)
+* [Coroutines](#coroutines)
+  * [What Are Coroutines?](#what-are-coroutines?)
+  * [What Coroutines Do We Use?](#what-coroutines-do-we-use?)
+  * [How Do We Use Coroutines](#how-do-we-use-coroutines)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
 * [Architecture Overview](#architecture-overview)
@@ -179,6 +181,83 @@ We use the Observer Design Pattern to connect all our top-level modules in the s
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
 
 We use templtaing in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-design-pattern), and our `Gradient Descent` optimizer.
+
+
+# Coroutines
+## What Are Coroutines?
+Coroutines are a general control structure where the flow control is cooperatively passed between two different routines without returning, by allowing execution to be suspended and resumed. This is very similar to the `yield` statement and generators in `Python`.
+
+Rather than using the `return` keyword to return data, coroutines use the `yield` keyword. The main difference is that when `return` is encountered, the data is returned and the function terminates. If the function is called again, it starts back from the beginning. On the other hand, when `yield` is encountered some data is returned, but the state of the function / coroutine is saved and the function does not terminate. This means that when the function is called again, execution resumes immediately after the `yield` statement that previously returned the data, with all the previous context (variables, etc) as if the function never stopped running. This is the "suspend and resume" functionality of coroutines.
+
+See the following C++ pseudocode for an example. This coroutine function computes and returns the fibonacci sequence.
+```
+int fib(Coroutine::push_type& yield) {
+    int f1 = 1;
+    int f2 = 0;
+    while(true) {
+        int fn = f1 + f2; // Compute the next value in the sequence
+        f2 = f1; // Save the previous 2 values
+        f1 = fn;
+        yield(fn);
+    }
+}
+
+int main() {
+    // Coroutine setup stuff
+    // Lets pretend that we have created the Coroutine and called it `yield`
+    std::cout << fib(yield) << std::endl; // Prints 1
+    std::cout << fib(yield) << std::endl; // Prints 2
+    std::cout << fib(yield) << std::endl; // Prints 3
+    std::cout << fib(yield) << std::endl; // Prints 5
+    std::cout << fib(yield) << std::endl; // Prints 8
+    // and so on...
+}
+```
+Lets walk through what's happening here:
+1. The first time the `fib` function is called, the variables `f1` and `f2` are initialized, and we go through the first iteration of the loop until `yield` is encountered
+2. The `yield` statement is going to return the currently computed value of the fibonacci sequence (the variable `fn`) and save the state of the `fib` function
+    * "yielding" the data here is effectively returning it so that the code in the `main` function can print the result
+3. The second time `main()` calls the `fib()` function, the function will resume immediately after the `yield()` statement. This means that execution will go back to the top of the loop, *and still remember the values of `f1` and `f2` from the last time the function was called*. Since the coroutine saved the function state, it still has the previous values of `f1` and `f2` which it uses to compute the next value in the sequence.
+4. Once again when the `yield()` statement is reached, the newly computed value is returned and the function state is saved. You can think of this as "pausing" the function.
+5. As `main()` keeps calling the `fib()` function, it is computing and returning the values of the fibonacci sequence, and this only works because the coroutine "remembers" the values from each previous fibonacci computation which is uses to compute the next value the next time the function is called.
+    * If the `yield` was replaced with a regular `return` statement, the function would only ever return the value `1`. This is because using `return` would not save the function state, so the next time it's called the function would start at the beginning again, and only ever compute the first value of the sequence.
+
+
+This example / pseudocode does hide away some details about how coroutines are set up and how we extract values from them, but it's most important to understand how coroutines change the flow of control in the program.
+
+
+## What Coroutines Do We Use?
+We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Assymetric Coroutines.
+
+[This stackoverfow answer](https://stackoverflow.com/a/42042904) gives a decent explanation of the difference between Symmetric and Asymmetric Coroutines, but understanding the difference is not critical for our purposes. We use Asymmetric Coroutines because boost does not provide Symmetric Coroutines, and the hierarchical structure of Asymmetric Coroutines is more useful to us.
+
+
+## How Do We Use Coroutines?
+We use Coroutines to write our [strategy logic](#strategy). The "pause and resume" functionality of Coroutines makes it much easier to write [Plays](#plays), [Tactics](#tactics), and [Actions](#actions).
+
+Specifically, we use Coroutines as a way to break down our strategy into "stages". Once a "stage" completes we generally don't want to re-evaluate it, and would rather commit to a decion and move on. Coroutines makes it much easier to write "stages" of strategy without requiring complex state machine logic to check what stage we are in, and it's easier for developers to see what the inteded order of operations is (eg. "Line up to take the shot" -> "shoot").
+
+In the past, we had issues with our gameplay logic "committing" to decisions if we were near certain edge cases. This caused robots to behave oddly, and sometimes get significantly slowed down in "analysis paralysis". Coroutines solve this problem by allowing us to write "stages" that execute top-to-bottom in a function, and once we make a decision we commit to it and move on to the next stage.
+
+Here's a more specific example. In this example we are going to pretend to write a [Tactic](#tactic) that will pass the ball.
+```
+def executeStrategy(IntentCoroutine::push_type& yield, Pass pass) {
+    do {
+        yield(/* align the robot to make the pass */)
+    }while(current_time < pass.start_time);
+    
+    do {
+        yield(/* kick the ball at the pass location */)
+    }while(/* robot has not kicked the ball */)
+}
+```
+We will pretend that this function is getting called 30 times per second to get the most up-to-date gameplay decision.
+
+In this example, each `do while()` loop is a "stage". When the function is first called, we enter the first stage. In this stage, we will keep telling the robot to line up behind the ball to be ready to make the pass. The robot will continue to do this until it is time to start the pass.
+
+Once it is time to start the pass, the condition for the loop will become false and we will exit the loop. Then we enter the second loop / stage. The second stage tells the robot to kick the ball, and this continues until the ball has been kicked. Once the ball has been kicked, the loop will terminate and the function will end because the execution reaches the end of the function.
+
+Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
 
 
 # Conventions
