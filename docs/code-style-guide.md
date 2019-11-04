@@ -5,6 +5,8 @@
 * [Comments](#comments)
 * [Headers](#headers)
 * [Includes](#includes)
+* [Namespaces](#namespaces)
+* [Tests](#tests)
 * [Spelling](#spelling)
 * [Miscellaneous](#miscellaneous)
 
