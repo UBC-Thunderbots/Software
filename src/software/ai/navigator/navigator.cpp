@@ -174,19 +174,16 @@ void Navigator::registerNonMoveIntentRobotId(RobotId id)
 
 double Navigator::getEnemyObstacleProximityFactor(const Point &p)
 {
+    double robot_proximity_limit = Util::DynamicParameters->getNavigatorConfig()
+                                       ->EnemyRobotProximityLimit()
+                                       ->value();
+
     // find min dist between p and any robot
     double closest_dist = DBL_MAX;
-    for (auto &robot : world.enemyTeam().getAllRobots())
+    auto obstacles      = getObstaclesFromTeam(world.enemyTeam());
+    for (const auto &obstacle : obstacles)
     {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
-            robot,
-            Util::DynamicParameters->getNavigatorConfig()
-                ->RobotObstacleInflationFactor()
-                ->value(),
-            Util::DynamicParameters->getNavigatorConfig()
-                ->VelocityObstacleInflationFactor()
-                ->value());
-        double current_dist = dist(p, (*o.getBoundaryPolygon()));
+        double current_dist = dist(p, (*obstacle.getBoundaryPolygon()));
         if (current_dist < closest_dist)
         {
             closest_dist = current_dist;
@@ -194,7 +191,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p)
     }
 
     // clamp ratio between 0 and 1
-    return std::clamp(closest_dist / ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, 1.0);
+    return std::clamp(closest_dist / robot_proximity_limit, 0.0, 1.0);
 }
 
 std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
