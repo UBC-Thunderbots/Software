@@ -152,7 +152,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getPrimitivesFromMoveIntents(
     // Turn each intent and associated path into primitives
     for (const auto &intent : move_intents)
     {
-        auto path      = robot_id_to_path[intent.getRobotId()];
+        auto path      = robot_id_to_path.at(intent.getRobotId());
         auto primitive = getPrimitiveFromPathAndMoveIntent(path, intent);
         primitives.emplace_back(std::move(primitive));
     }
