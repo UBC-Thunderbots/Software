@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/geom/polynomial.h"
 
 /**

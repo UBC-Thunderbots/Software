@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 {

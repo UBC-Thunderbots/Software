@@ -4,7 +4,7 @@
 
 #include <unordered_set>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 TEST(PolygonTest, test_construct_from_vector)
 {

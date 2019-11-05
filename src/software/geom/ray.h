@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "software/geom/line.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/geom/segment.h"
 
 class Ray final
@@ -36,7 +36,7 @@ class Ray final
     /**
      * Creates a degenerate Ray at (0, 0)
      */
-    inline explicit constexpr Ray() {}
+    inline explicit Ray() {}
 
     /**
      * Creates a Ray that starts and contains a point along the given
@@ -49,16 +49,16 @@ class Ray final
 
     inline Segment toSegment() const
     {
-        return Segment(start, direction);
+        return Segment(start, Point(direction));
     }
 
     inline Vector toVector() const
     {
-        return direction - start;
+        return Point(direction) - start;
     }
 
     inline Line toLine() const
     {
-        return Line(start, direction);
+        return Line(start, Point(direction));
     }
 };

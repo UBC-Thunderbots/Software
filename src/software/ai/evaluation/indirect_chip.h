@@ -1,5 +1,5 @@
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"

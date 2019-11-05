@@ -1,12 +1,12 @@
 #include "software/ai/navigator/util.h"
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/geom/util.h"
 
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
                                                const Point &p3, double final_speed)
 {
-    return final_speed * (p2 - p1).norm().project((p3 - p2).norm()).len();
+    return final_speed * (p2 - p1).normalize().project((p3 - p2).normalize()).length();
 }
 
 std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
@@ -32,7 +32,7 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
         }
 
         MovePrimitive movePrimitive =
-            MovePrimitive(robot_id, point, point.orientation(), final_speed,
+            MovePrimitive(robot_id, point, point.toVector().orientation(), final_speed,
                           enable_dribbler, MoveType::NORMAL, autokick);
         movePrimitives.emplace_back(movePrimitive);
     }
@@ -42,7 +42,7 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
 
 double getPointTrespass(const Point &p1, const Point &p2, double trespass_threshold)
 {
-    double dist_trespass = trespass_threshold - (p1 - p2).len();
+    double dist_trespass = trespass_threshold - (p1 - p2).length();
 
     if (dist_trespass < 0)
     {

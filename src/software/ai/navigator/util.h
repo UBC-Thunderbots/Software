@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/geom/util.h"
 
 /**

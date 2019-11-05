@@ -5,7 +5,7 @@
 #include "shared/constants.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/intent/pivot_intent.h"
-#include "software/geom/angle.h"
+#include "software/new_geom/angle.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
@@ -42,7 +42,7 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             // if the robot is close enough to the final position, call it a day
             Angle threshold_angle =
-                Angle::ofDegrees(Util::DynamicParameters->getPivotActionConfig()
+                Angle::fromDegrees(Util::DynamicParameters->getPivotActionConfig()
                                      ->FinishAngleThreshold()
                                      ->value() /
                                  2);

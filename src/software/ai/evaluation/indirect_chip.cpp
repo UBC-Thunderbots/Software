@@ -1,8 +1,8 @@
 #include "software/ai/evaluation/indirect_chip.h"
 
 #include "shared/constants.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
 #include "software/world/world.h"
@@ -67,14 +67,14 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
         Point target = getTriangleCenter(t);
         // Adjust the target point to have a length of distance between itself and the
         // ball's position, then scaling it by a certain percentage
-        target = target.norm((target - ball_position).len() *
+        target = Point(target.toVector().normalize((target - ball_position).length() *
                              Util::DynamicParameters->getEvaluationConfig()
                                  ->getIndirectChipConfig()
                                  ->ChipCherryPowerDownscale()
-                                 ->value());
+                                 ->value()));
 
         // Target should never be further away than maximum chip power
-        if ((target - ball_position).len() >
+        if ((target - ball_position).length() >
             Util::DynamicParameters->getEvaluationConfig()
                 ->getIndirectChipConfig()
                 ->MaxChipPower()
@@ -82,7 +82,7 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
         {
             target =
                 ball_position + (target - ball_position)
-                                    .norm(Util::DynamicParameters->getEvaluationConfig()
+                                    .normalize(Util::DynamicParameters->getEvaluationConfig()
                                               ->getIndirectChipConfig()
                                               ->MaxChipPower()
                                               ->value());
@@ -143,11 +143,11 @@ std::vector<LegacyTriangle> Evaluation::findOpenTriangles(
     {
         // Takes vector of triangles from input and adjust every single triangle within it
         Point p1 =
-            t[0] + ((getTriangleCenter(t)) - t[0]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+            t[0] + ((getTriangleCenter(t)) - t[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
         Point p2 =
-            t[1] + ((getTriangleCenter(t)) - t[1]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+            t[1] + ((getTriangleCenter(t)) - t[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
         Point p3 =
-            t[2] + ((getTriangleCenter(t)) - t[2]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+            t[2] + ((getTriangleCenter(t)) - t[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
 
         LegacyTriangle adjusted_triangle = triangle(p1, p2, p3);
         bool containsEnemy               = false;
@@ -262,9 +262,9 @@ std::optional<LegacyTriangle> Evaluation::getLargestValidTriangle(
         {
             LegacyTriangle t = allTriangles[i];
             double area      = getTriangleArea(t);
-            double l1        = (t[1] - t[0]).len();
-            double l2        = (t[2] - t[0]).len();
-            double l3        = (t[2] - t[1]).len();
+            double l1        = (t[1] - t[0]).length();
+            double l2        = (t[2] - t[0]).length();
+            double l3        = (t[2] - t[1]).length();
 
             Angle a1 = acuteVertexAngle(t[1], t[0], t[2]).angleMod().abs();
             Angle a2 = acuteVertexAngle(t[0], t[1], t[2]).angleMod().abs();

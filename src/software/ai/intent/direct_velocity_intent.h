@@ -2,8 +2,8 @@
 
 #include "software/ai/intent/intent.h"
 #include "software/ai/primitive/direct_velocity_primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 class DirectVelocityIntent : public DirectVelocityPrimitive, public Intent
 {

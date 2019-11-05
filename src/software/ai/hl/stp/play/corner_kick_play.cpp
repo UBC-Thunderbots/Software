@@ -32,8 +32,8 @@ std::string CornerKickPlay::getName() const
 bool CornerKickPlay::isApplicable(const World &world) const
 {
     double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).len());
+        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
+                 (world.field().enemyCornerNeg() - world.ball().position()).length());
 
     return world.gameState().isOurFreeKick() &&
            min_dist_to_corner <= BALL_IN_CORNER_RADIUS;
@@ -93,10 +93,10 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Vector center_line_x_offset(1, 0);
     Rectangle pos_y_cherry_pick_rectangle(
         world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerPos() - pos_y_goalline_x_offset);
+        world.field().enemyCornerPos() -(pos_y_goalline_x_offset));
     Rectangle neg_y_cherry_pick_rectangle(
         world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerNeg() - neg_y_goalline_x_offset);
+        world.field().enemyCornerNeg() -(neg_y_goalline_x_offset));
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -114,11 +114,11 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Point opposite_corner_to_kick = kick_from_pos_corner ? world.field().enemyCornerNeg()
                                                          : world.field().enemyCornerPos();
     Point bait_move_tactic_1_pos =
-        opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().yLength() * 0.5,
-                                         copysign(0.5, opposite_corner_to_kick.y()));
+        opposite_corner_to_kick -(Vector(world.field().enemyDefenseArea().yLength() * 0.5,
+                                         copysign(0.5, opposite_corner_to_kick.y())));
     Point bait_move_tactic_2_pos =
-        opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().yLength() * 1.5,
-                                         copysign(0.5, opposite_corner_to_kick.y()));
+        opposite_corner_to_kick -(Vector(world.field().enemyDefenseArea().yLength() * 1.5,
+                                         copysign(0.5, opposite_corner_to_kick.y())));
     auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
     bait_move_tactic_1->updateControlParams(
@@ -246,11 +246,11 @@ void CornerKickPlay::updateCherryPickTactics(
 void CornerKickPlay::updateAlignToBallTactic(
     std::shared_ptr<MoveTactic> align_to_ball_tactic)
 {
-    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
+    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
+        world.ball().position() -(ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
         ball_to_center_vec.orientation(), 0);
 }
 

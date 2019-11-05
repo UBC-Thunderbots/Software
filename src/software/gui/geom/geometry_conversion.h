@@ -4,7 +4,7 @@
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 

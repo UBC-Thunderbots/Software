@@ -101,7 +101,7 @@ TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp)
     double EPSILON = 1e-4;
 
     EXPECT_EQ(Point(-1.5, 6.88), ball.position());
-    EXPECT_TRUE(Vector(-4.0717, -0.1086).isClose(ball.velocity(), EPSILON));
+    EXPECT_TRUE(Point(-4.0717, -0.1086).isClose(Point(ball.velocity()), EPSILON));
     EXPECT_EQ(one_second_future, ball.lastUpdateTimestamp());
 }
 
@@ -170,16 +170,16 @@ TEST_F(BallTest, get_velocity_at_future_time_with_positive_ball_velocity)
     double EPSILON = 1e-4;
 
     EXPECT_TRUE(
-        Vector(0.9851, 1.9702)
-            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(150)),
+        Point(0.9851, 1.9702)
+            .isClose(Point(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(150))),
                      EPSILON));
     EXPECT_TRUE(
-        Vector(0.9048, 1.8097)
-            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000)),
+        Point(0.9048, 1.8097)
+            .isClose(Point(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000))),
                      EPSILON));
     EXPECT_TRUE(
-        Vector(0.8187, 1.6375)
-            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(2000)),
+        Point(0.8187, 1.6375)
+            .isClose(Point(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(2000))),
                      EPSILON));
 }
 
@@ -191,16 +191,16 @@ TEST_F(BallTest, get_velocity_at_future_time_with_negative_ball_velocity)
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
 
     EXPECT_TRUE(
-        Vector(-4.4330, -0.1182)
-            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(150)),
+        Point(-4.4330, -0.1182)
+            .isClose(Point(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(150))),
                      EPSILON));
     EXPECT_TRUE(
-        Vector(-4.0717, -0.1086)
-            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000)),
+        Point(-4.0717, -0.1086)
+            .isClose(Point(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000))),
                      EPSILON));
     EXPECT_TRUE(
-        Vector(-3.6843, -0.0982)
-            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(2000)),
+        Point(-3.6843, -0.0982)
+            .isClose(Point(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(2000))),
                      EPSILON));
 }
 

@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "software/geom/line.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"

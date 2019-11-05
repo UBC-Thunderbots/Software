@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 

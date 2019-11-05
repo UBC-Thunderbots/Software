@@ -77,11 +77,10 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
         // inside it when taking the kick.
         Point behind_ball_vertex_A = kick_origin;
         Point behind_ball_vertex_B =
-            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
-            behind_ball.perp().norm(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
         Point behind_ball_vertex_C =
-            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
-            behind_ball.perp().norm(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -(behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2));
 
         Polygon behind_ball_region =
             Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
@@ -89,7 +88,7 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
         bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-            kick_origin + behind_ball.norm(size_of_region_behind_ball * 3 / 4);
+            kick_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
         // If we're not in position to kick, move into position
         if (!robot_behind_ball)

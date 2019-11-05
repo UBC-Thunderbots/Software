@@ -111,12 +111,12 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
         {
             current_destination      = path_points[1];
             double segment_final_vel = getCloseToEnemyObstacleFactor(
-                path_points[1] * calculateTransitionSpeedBetweenSegments(
+                Point(path_points[1].toVector() * calculateTransitionSpeedBetweenSegments(
                                      path_points[0], path_points[1], path_points[2],
                                      ROBOT_MAX_SPEED_METERS_PER_SECOND *
                                          Util::DynamicParameters->getNavigatorConfig()
                                              ->TransitionSpeedFactor()
-                                             ->value()));
+                                             ->value())));
 
             auto move = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
@@ -186,7 +186,7 @@ std::optional<Obstacle> Navigator::obstacleFromAvoidArea(AvoidArea avoid_area)
         case AvoidArea::ENEMY_HALF:
             rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                   world.field().enemyCornerNeg() -
-                                      Point(0, world.field().boundaryYLength()));
+                                      Vector(0, world.field().boundaryYLength()));
             rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                  ->RobotObstacleInflationFactor()
                                  ->value() *
@@ -195,7 +195,7 @@ std::optional<Obstacle> Navigator::obstacleFromAvoidArea(AvoidArea avoid_area)
         case AvoidArea::FRIENDLY_HALF:
             rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                   world.field().friendlyCornerNeg() -
-                                      Point(0, world.field().boundaryYLength()));
+                                      Vector(0, world.field().boundaryYLength()));
             rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                  ->RobotObstacleInflationFactor()
                                  ->value() *
@@ -223,12 +223,12 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         intent->accept(*this);
         if (this->current_robot)
         {
-            if (this->current_robot->velocity().len() > 0.3)
+            if (this->current_robot->velocity().length() > 0.3)
             {
                 this->velocity_obstacles.emplace_back(
                     Obstacle::createVelocityObstacleWithScalingParams(
                         this->current_robot->position(), this->current_destination,
-                        this->current_robot->velocity().len(),
+                        this->current_robot->velocity().length(),
                         Util::DynamicParameters->getNavigatorConfig()
                             ->RobotObstacleInflationFactor()
                             ->value(),

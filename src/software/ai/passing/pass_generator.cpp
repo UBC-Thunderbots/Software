@@ -333,8 +333,8 @@ bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
                                       ->value();
 
     double receiver_position_difference =
-        (pass1.receiverPoint() - pass2.receiverPoint()).len();
-    double passer_position_difference = (pass1.passerPoint() - pass2.passerPoint()).len();
+        (pass1.receiverPoint() - pass2.receiverPoint()).length();
+    double passer_position_difference = (pass1.passerPoint() - pass2.passerPoint()).length();
     double time_difference  = (pass1.startTime() - pass2.startTime()).getSeconds();
     double speed_difference = pass1.speed() - pass2.speed();
 

@@ -98,7 +98,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Have a robot keep trying to take a shot
     Angle min_open_angle_for_shot =
-        Angle::ofDegrees(Util::DynamicParameters->getShootOrPassPlayConfig()
+        Angle::fromDegrees(Util::DynamicParameters->getShootOrPassPlayConfig()
                              ->MinOpenAngleForShotDeg()
                              ->value());
 

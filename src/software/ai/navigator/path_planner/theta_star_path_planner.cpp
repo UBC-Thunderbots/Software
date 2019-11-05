@@ -60,8 +60,8 @@ bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
     Point pointToCheck = parentPoint;
 
     Vector diff      = nextPoint - parentPoint;
-    Vector direction = diff.norm();
-    int dist         = (int)diff.len();
+    Vector direction = diff.normalize();
+    int dist         = (int)diff.length();
     for (int i = 0; i < dist; i++)
     {
         pointToCheck = pointToCheck + direction;
@@ -209,8 +209,8 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
         return empty_ret_val;
     }
 
-    if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
-        ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS))
+    if ((start - destination).length() < CLOSE_TO_DEST_THRESHOLD ||
+        ((start - destination).length() < SIZE_OF_GRID_CELL_IN_METERS))
     {
         // If the destination GridCell is within one grid size of start or
         // start and destination, or start and closest_destination, within threshold
@@ -218,7 +218,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     }
 
 
-    if ((start - closest_destination).len() <
+    if ((start - closest_destination).length() <
         (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
     {
         return Path(std::vector<Point>({start, closest_destination}));

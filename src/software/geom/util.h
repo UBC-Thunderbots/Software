@@ -5,7 +5,7 @@
 
 #include "software/geom/circle.h"
 #include "software/geom/line.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
@@ -13,7 +13,7 @@
 #include "software/geom/shot.h"
 
 template <size_t N>
-using LegacyPolygon       = std::array<Vector, N>;
+using LegacyPolygon       = std::array<Point, N>;
 using LegacyTriangle      = LegacyPolygon<3>;
 using LegacyQuadrilateral = LegacyPolygon<4>;
 
@@ -39,12 +39,12 @@ inline LegacyQuadrilateral quad(const Point &a, const Point &b, const Point &c,
 /**
  * Signed magnitude of the projection of `second` on `first`
  */
-double proj_len(const Vector &first, const Vector &second);
+double proj_length(const Vector &first, const Vector &second);
 
 /**
  * Signed magnitude of the projection of `first.start -> second` on `first`
  */
-double proj_len(const Segment &first, const Vector &second);
+double proj_length(const Segment &first, const Vector &second);
 
 /*
  * The family of `contains` functions determines whether
@@ -102,13 +102,13 @@ bool isDegenerate(const Segment &segment);
 bool isDegenerate(const Ray &segment);
 bool isDegenerate(const Line &line);
 
-double len(const Segment &segment);
+double length(const Segment &segment);
 
-double lensq(const Segment &segment);
-double lensq(const Line &line);
+double lengthSquared(const Segment &segment);
+double lengthSquared(const Line &line);
 
 template <size_t N>
-Vector getVertex(const LegacyPolygon<N> &poly, unsigned int i);
+Point getVertex(const LegacyPolygon<N> &poly, unsigned int i);
 template <size_t N>
 void setVertex(LegacyPolygon<N> &poly, unsigned int i, Vector &v);
 
@@ -211,7 +211,7 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
  *
  * @return the Point on line segment closest to centre point.
  */
-Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
+Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
 Point closestPointOnSeg(const Point &p, const Segment &segment);
 
 /**
@@ -359,7 +359,7 @@ std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
  *
  * @return the reflected ray.
  */
-Point reflect(const Point &v, const Point &n);
+Vector reflect(const Vector &v, const Vector &n);
 
 /**
  * Calculates the intersection of a Ray and Segment
@@ -426,7 +426,7 @@ Point reflect(const Point &a, const Point &b, const Point &p);
  *
  * @return the blocking position.
  */
-Point calcBlockCone(const Point &a, const Point &b, const double &radius);
+Point calcBlockCone(const Vector &a, const Vector &b, const double &radius);
 
 /**
  * Given a cone shooting from a point P, determines the furthest location from
@@ -446,7 +446,7 @@ Point calcBlockCone(const Point &a, const Point &b, const double &radius);
  *
  * @return the blocking position.
  */
-Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double &radius);
+Point calcBlockCone(const Vector &a, const Vector &b, const Point &p, const double &radius);
 
 /**
  * Used for defender_blocks_goal
@@ -457,7 +457,7 @@ Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double
  * I.e. if p is return value,
  * then points to the other side of line p-c is not covered by goalie.
  */
-Point calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
+Vector calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
 
 /*
  * Ported code from CM geom util
@@ -522,7 +522,7 @@ double closestPointTime(Point x1, Vector v1, Point x2, Vector v2);
  *
  * @param p is the point is question
  */
-bool pointInFrontVector(Point offset, Point dir, Point p);
+bool pointInFrontVector(Point offset, Vector dir, Point p);
 
 /**
  * Returns the circle's tangent points.

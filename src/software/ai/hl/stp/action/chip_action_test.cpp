@@ -9,7 +9,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {
     Robot robot(0, Point(-0.3, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
@@ -37,11 +37,11 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 {
     Robot robot(0, Point(-2.4, 2.3), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-2.5, 2.5}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({-2.5, 2.5}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(105), 5.0);
+                                                         Angle::fromDegrees(105), 5.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -52,7 +52,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
         ChipIntent kick_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
         EXPECT_EQ(0, kick_intent.getRobotId());
         EXPECT_EQ(Point(-2.5, 2.5), kick_intent.getChipOrigin());
-        EXPECT_EQ(Angle::ofDegrees(105), kick_intent.getChipDirection());
+        EXPECT_EQ(Angle::fromDegrees(105), kick_intent.getChipDirection());
         EXPECT_EQ(5.0, kick_intent.getChipDistance());
     }
     catch (...)
@@ -65,11 +65,11 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 {
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-0.05, -0.2}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({-0.05, -0.2}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(255), 3.0);
+                                                         Angle::fromDegrees(255), 3.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -80,7 +80,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
         ChipIntent kick_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
         EXPECT_EQ(0, kick_intent.getRobotId());
         EXPECT_EQ(Point(-0.05, -0.2), kick_intent.getChipOrigin());
-        EXPECT_EQ(Angle::ofDegrees(255), kick_intent.getChipDirection());
+        EXPECT_EQ(Angle::fromDegrees(255), kick_intent.getChipDirection());
         EXPECT_EQ(3.0, kick_intent.getChipDistance());
     }
     catch (...)
@@ -93,11 +93,11 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 {
     Robot robot(0, Point(-0.125, 0.25), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(306), 5.0);
+                                                         Angle::fromDegrees(306), 5.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -108,7 +108,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
         ChipIntent kick_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
         EXPECT_EQ(0, kick_intent.getRobotId());
         EXPECT_EQ(Point(0, 0), kick_intent.getChipOrigin());
-        EXPECT_EQ(Angle::ofDegrees(306), kick_intent.getChipDirection());
+        EXPECT_EQ(Angle::fromDegrees(306), kick_intent.getChipDirection());
         EXPECT_EQ(5.0, kick_intent.getChipDistance());
     }
     catch (...)
@@ -121,7 +121,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
 {
     Robot robot(0, Point(-1, 0.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
@@ -136,6 +136,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
+        EXPECT_EQ(move_intent.getDestination(), Point(-0.18, 0));
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.18, 0), 0.1));
         EXPECT_EQ(Angle::zero(), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
@@ -150,11 +151,11 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
 {
     Robot robot(0, Point(-2, 5), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-2.5, 2.5}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({-2.5, 2.5}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(105), 5.0);
+                                                         Angle::fromDegrees(105), 5.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -166,7 +167,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-2.45, 2.25), 0.1));
-        EXPECT_EQ(Angle::ofDegrees(105), move_intent.getFinalAngle());
+        EXPECT_EQ(Angle::fromDegrees(105), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
     }
     catch (...)
@@ -179,11 +180,11 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
 {
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-1, -4}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({-1, -4}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(255), 3.0);
+                                                         Angle::fromDegrees(255), 3.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -195,7 +196,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.85, -3.75), 0.1));
-        EXPECT_EQ(Angle::ofDegrees(255), move_intent.getFinalAngle());
+        EXPECT_EQ(Angle::fromDegrees(255), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
     }
     catch (...)
@@ -208,11 +209,11 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
 {
     Robot robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
+    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(306), 5.0);
+                                                         Angle::fromDegrees(306), 5.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -224,7 +225,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.15, 0.25), 0.1));
-        EXPECT_EQ(Angle::ofDegrees(306), move_intent.getFinalAngle());
+        EXPECT_EQ(Angle::fromDegrees(306), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
     }
     catch (...)

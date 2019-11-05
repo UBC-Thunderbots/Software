@@ -39,7 +39,7 @@ void Ball::updateStateToPredictedState(const Timestamp &timestamp)
 
     auto duration_in_future = timestamp - lastUpdateTimestamp();
     Point new_position      = estimatePositionAtFutureTime(duration_in_future);
-    Point new_velocity      = estimateVelocityAtFutureTime(duration_in_future);
+    Vector new_velocity      = estimateVelocityAtFutureTime(duration_in_future);
 
     updateState(new_position, new_velocity, timestamp);
 }
@@ -66,7 +66,7 @@ Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) con
     // real-world behavior. Position prediction should be improved as outlined in
     // https://github.com/UBC-Thunderbots/Software/issues/47
     double seconds_in_future = duration_in_future.getSeconds();
-    return position() + (velocity().norm(seconds_in_future * velocity().len()));
+    return position() + (velocity().normalize(seconds_in_future * velocity().length()));
 }
 
 Vector Ball::velocity() const
