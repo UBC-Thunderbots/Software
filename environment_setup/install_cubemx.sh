@@ -4,7 +4,7 @@
 set -e
 
 # download version 5.4.0 (change the following two variables to change versions)
-CUBE_VERSION="5.4.1"
+CUBE_VERSION="5.4.0"
 CUBE_LINK="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/5f/d0/cf/79/10/fb/4e/7e/STM32CubeMX_v5-4-0/files/stm32cubemx_v5.4.0.zip/jcr:content/translations/en.stm32cubemx_v5.4.0.zip"
 
 CUBEMX_TMP_DIR="/tmp/cubemx"
@@ -44,11 +44,9 @@ else
     unzip en.stm32cubemx_v5.4.0.zip
     
     sudo java -jar ./SetupSTM32CubeMX-5.4.0.exe auto-install.xml
-    sudo ln -s /opt/STM32CubeMX_$CUBE_VERSION/STM32CubeMX /usr/local/bin/STM32CubeMX 
+    sudo ln -sfn /opt/STM32CubeMX_$CUBE_VERSION/STM32CubeMX /usr/local/bin/STM32CubeMX 
 
     echo "================================================================"
     echo "Done Installing CubeMX"
     echo "================================================================"
 fi
-
-
