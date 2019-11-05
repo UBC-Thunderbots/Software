@@ -80,7 +80,7 @@ std::vector<Obstacle> getObstaclesFromAvoidAreas(
             case AvoidArea::ENEMY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().enemyCornerNeg() -
-                                          Point(0, world.field().boundaryYLength()));
+                                          Vector(0, world.field().boundaryYLength()));
                 rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                      ->RobotObstacleInflationFactor()
                                      ->value() *
@@ -90,7 +90,7 @@ std::vector<Obstacle> getObstaclesFromAvoidAreas(
             case AvoidArea::FRIENDLY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().friendlyCornerNeg() -
-                                          Point(0, world.field().boundaryYLength()));
+                                          Vector(0, world.field().boundaryYLength()));
                 rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                      ->RobotObstacleInflationFactor()
                                      ->value() *

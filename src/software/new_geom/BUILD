@@ -17,7 +17,6 @@ cc_library(
         "vector.h",
     ],
     deps = [
-        "//software/geom",
         "@boost//:geometry",
         "@boost//:polygon",
     ],
