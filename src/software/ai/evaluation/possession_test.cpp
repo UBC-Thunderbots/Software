@@ -188,13 +188,12 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
     Robot robot2 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
-    ball.updateState(
+    world.updateBallState(BallState(
         {0.1, 2.5}, {0, 10},
         Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
-                                       ->value()));
-    world.updateBallState(ball);
+                                       ->value())));
 
     robot0.updateState(
         Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -235,8 +234,7 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
     Robot robot2 = Robot(2, Point(1.5, 2.3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    ball.updateState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4));
-    world.updateBallState(ball);
+    world.updateBallState(BallState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4)));
 
     robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
                        Timestamp::fromSeconds(4));

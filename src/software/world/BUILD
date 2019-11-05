@@ -7,6 +7,7 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/util/time:timestamp",
+        "//software/world:ball_state",
         "@boost//:circular_buffer",
     ],
 )
@@ -16,7 +17,18 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
+        ":ball_state",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "ball_state",
+    srcs = ["ball_state.cpp"],
+    hdrs = ["ball_state.h"],
+    deps = [
+        "//software/geom",
+        "//software/util/time:timestamp",
     ],
 )
 

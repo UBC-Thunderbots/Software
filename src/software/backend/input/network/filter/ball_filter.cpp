@@ -260,7 +260,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     return results;
 }
 
-std::optional<Ball> BallFilter::estimateBallState(
+std::optional<BallState> BallFilter::estimateBallState(
     boost::circular_buffer<SSLBallDetection> ball_detections)
 {
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
@@ -327,8 +327,8 @@ std::optional<Ball> BallFilter::estimateBallState(
         Vector filtered_velocity = velocity_direction_along_regression_line.norm(
             velocity_estimate->average_velocity_magnitude);
 
-        return Ball(filtered_ball_position, filtered_velocity,
-                    latest_ball_detection.timestamp);
+        return BallState(filtered_ball_position, filtered_velocity,
+                         latest_ball_detection.timestamp);
     }
 }
 
@@ -339,10 +339,10 @@ std::optional<Ball> BallFilter::getFilteredData(
 
     if (ball_detection_buffer.size() >= 2)
     {
-        std::optional<Ball> filtered_ball = estimateBallState(ball_detection_buffer);
+        std::optional<BallState> filtered_ball = estimateBallState(ball_detection_buffer);
         if (filtered_ball)
         {
-            return *filtered_ball;
+            return Ball(*filtered_ball);
         }
         else
         {

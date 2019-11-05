@@ -162,9 +162,10 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
 }
 
 // top level function
-Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination,
-                                    const Rectangle &navigable_area,
-                                    const std::vector<Obstacle> &obstacles)
+std::optional<Path> ThetaStarPathPlanner::findPath(const Point &start,
+                                                   const Point &destination,
+                                                   const Rectangle &navigable_area,
+                                                   const std::vector<Obstacle> &obstacles)
 {
     // Initialize member variables
     this->obstacles       = obstacles;
