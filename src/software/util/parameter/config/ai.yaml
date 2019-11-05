@@ -147,6 +147,12 @@ NavigatorConfig:
     default: 0.6
     type: "double"
     description: "Factor of max speed to use for transition speed calculations"
+  EnemyRobotProximityLimit:
+    min: 0
+    max: 10.0
+    default: 2.0
+    type: "double"
+    description: "Distance to nearest robot when we stop slowing down to avoid collisions"
   VelocityObstacleInflationFactor:
     min: 0
     max: 1
