@@ -56,12 +56,12 @@ bool ThetaStarPathPlanner::hasLineOfSight(Coordinate current_parent, Coordinate 
 
     Vector diff      = next_point - parent_point;
     Vector direction = diff.norm();
-    int dist         = (int)diff.len();
+    int dist         = static_cast<int>(diff.len());
     for (int i = 0; i < dist; i++)
     {
         point_to_check = point_to_check + direction;
-        if (!isUnBlocked(Coordinate((int)std::round(point_to_check.x()),
-                                    (int)std::round(point_to_check.y()))))
+        if (!isUnBlocked(Coordinate(static_cast<int>(std::round(point_to_check.x())),
+                                    static_cast<int>(std::round(point_to_check.y())))))
         {
             return false;
         }
@@ -171,10 +171,12 @@ std::optional<Path> ThetaStarPathPlanner::findPath(const Point &start,
     this->obstacles       = obstacles;
     max_navigable_x_coord = navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
     max_navigable_y_coord = navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    num_grid_rows = (int)((max_navigable_x_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
-                          SIZE_OF_GRID_CELL_IN_METERS);
-    num_grid_cols = (int)((max_navigable_y_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
-                          SIZE_OF_GRID_CELL_IN_METERS);
+    num_grid_rows =
+        static_cast<int>((max_navigable_x_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
+                         SIZE_OF_GRID_CELL_IN_METERS);
+    num_grid_cols =
+        static_cast<int>((max_navigable_y_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
+                         SIZE_OF_GRID_CELL_IN_METERS);
 
     // Reset data structures to path plan again
     open_list.clear();
@@ -380,8 +382,8 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
     // expanding a circle to search for free points
     if (!isPointValidAndFreeOfObstacles(p))
     {
-        int xc = (int)(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-        int yc = (int)(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+        int xc = static_cast<int>(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+        int yc = static_cast<int>(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
 
         for (int r = 1;
              r < max_navigable_x_coord * 2.0 * BLOCKED_DESTINATION_SEARCH_RESOLUTION; r++)
@@ -393,12 +395,14 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
             {
                 for (int inner : {-1, 1})
                 {
-                    Point p1 = Point(
-                        (double)(xc + outer * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
-                        (double)(yc + inner * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-                    Point p2 = Point(
-                        (double)(xc + outer * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
-                        (double)(yc + inner * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+                    Point p1 = Point(static_cast<double>(xc + outer * x) /
+                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                                     static_cast<double>(yc + inner * y) /
+                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+                    Point p2 = Point(static_cast<double>(xc + outer * y) /
+                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                                     static_cast<double>(yc + inner * x) /
+                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION);
                     if (isPointValidAndFreeOfObstacles(p1))
                     {
                         return p1;
@@ -489,8 +493,8 @@ ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::pointToCoordinate(Point p
 {
     // account for robot radius
     return Coordinate(
-        (int)((p.x() + max_navigable_x_coord) / SIZE_OF_GRID_CELL_IN_METERS),
-        (int)((p.y() + max_navigable_y_coord) / SIZE_OF_GRID_CELL_IN_METERS));
+        static_cast<int>((p.x() + max_navigable_x_coord) / SIZE_OF_GRID_CELL_IN_METERS),
+        static_cast<int>((p.y() + max_navigable_y_coord) / SIZE_OF_GRID_CELL_IN_METERS));
 }
 
 void ThetaStarPathPlanner::initListsAndCellDetails(Coordinate src_coord)
