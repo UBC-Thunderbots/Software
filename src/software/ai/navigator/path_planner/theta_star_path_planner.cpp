@@ -170,12 +170,12 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
 }
 
 // top level function
-Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination,
-                                    const Rectangle &navigable_area,
-                                    const std::vector<Obstacle> &obstacles)
+std::optional<Path> ThetaStarPathPlanner::findPath(const Point &start,
+                                                   const Point &destination,
+                                                   const Rectangle &navigable_area,
+                                                   const std::vector<Obstacle> &obstacles)
 {
     obstacles_ = obstacles;
-    Path empty_ret_val(std::nullopt);
     CellCoordinate src_coord, dest_coord;
 
     openList.clear();
@@ -199,14 +199,14 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     if (isValid(src_coord.first, src_coord.second) == false)
     {
         LOG(WARNING) << "Source is not valid; no path found" << std::endl;
-        return empty_ret_val;
+        return std::nullopt;
     }
 
     // If the destination is out of range
     if (isValid(dest_coord.first, dest_coord.second) == false)
     {
         LOG(WARNING) << "Destination is not valid; no path found" << std::endl;
-        return empty_ret_val;
+        return std::nullopt;
     }
 
     if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
@@ -234,7 +234,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
         }
         else
         {
-            return empty_ret_val;
+            return std::nullopt;
         }
     }
 
@@ -248,7 +248,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
         }
         else
         {
-            return empty_ret_val;
+            return std::nullopt;
         }
     }
 
@@ -329,7 +329,7 @@ loop_end:
     // there is no way to destination GridCell (due to blockages)
     if (foundDest == false)
     {
-        return empty_ret_val;
+        return std::nullopt;
     }
 
     auto path_points = tracePath(dest_coord);
