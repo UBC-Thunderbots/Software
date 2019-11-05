@@ -1,5 +1,7 @@
 #include "software/ai/navigator/util.h"
+
 #include <g3log/g3log.hpp>
+
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 
