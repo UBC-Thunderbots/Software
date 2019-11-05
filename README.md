@@ -7,4 +7,6 @@ For an explanation of our software layout and architecture, check out [architect
 
 Got a question? Look at the [FAQ](docs/faq.md) to see if it's already been answered!
 
+Want to learn more about the SSL League? (Teams, rules, etc.) Check out the [Official SSL RoboCup Website](https://ssl.robocup.org/).
+
 Want to edit these docs? If you're planning on editing diagrams, read the guide on [editing the docs](docs/editing-the-docs.md)
