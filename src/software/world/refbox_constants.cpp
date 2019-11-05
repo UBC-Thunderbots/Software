@@ -1,7 +1,7 @@
 #include "software/world/refbox_constants.h"
 
-#include <map>
 #include <magic_enum/magic_enum.hpp>
+#include <map>
 
 std::string name(const RefboxGameState& state)
 {
