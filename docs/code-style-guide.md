@@ -5,7 +5,6 @@
 * [Coding Style and Conventions](#coding-style-and-conventions)
     * [Names and Variables](#names-and-variables)
     * [Comments](#comments)
-    * [Curly Braces](#curly-braces)
     * [Headers](#headers)
     * [Includes](#includes)
     * [Spelling](#spelling)
@@ -114,51 +113,6 @@ If you think some ASCII art will help explain something better, go for it! [asci
   float power(float a, float b);
   ```
 
-### Curly Braces
-
-* Opening and closing braces \(`{}`\) must be on the same indentation level.
-  ```cpp
-  // Incorrect
-  int foo() {
-      return 0;
-  }
-
-  // Correct
-  int foo()
-  {
-      return 0;
-  }
-  ```
-* Avoid ternary operators. Clarity is more important than line count.
-  ```cpp
-  // Incorrect
-  c = ((a == 0) || ((a + b) < 10)) ? a : a + b;
-
-  // Correct
-  if ((a == 0) || ((a + b) < 10))
-  {
-    c = a;
-  }
-  else
-  {
-    c = a + b;
-  }
-  ```
-* Always use curly braces around code blocks, even if the braces surround a single statement.
-  ```cpp
-  // Incorrect
-  while (i < 10)
-    i++;
-    c[i] = i + 1;
-
-  // Correct
-  while (i < 10)
-  {
-    i++;
-  }
-  c[i] = i + 1;
-  ```
-
 ### Headers
 
 * Use _header guards_ to prevent issues of duplicate or circular includes which cause the source code to be compiled multiple times and cause build errors. 
@@ -254,3 +208,46 @@ If you think some ASCII art will help explain something better, go for it! [asci
   explicit AI(const World& world);
   int* num;
   ```
+* Opening and closing braces \(`{}`\) must be on the same indentation level.
+  ```cpp
+  // Incorrect
+  int foo() {
+      return 0;
+  }
+
+  // Correct
+  int foo()
+  {
+      return 0;
+  }
+  ```
+* Avoid ternary operators. Clarity is more important than line count.
+  ```cpp
+  // Incorrect
+  c = ((a == 0) || ((a + b) < 10)) ? a : a + b;
+
+  // Correct
+  if ((a == 0) || ((a + b) < 10))
+  {
+    c = a;
+  }
+  else
+  {
+    c = a + b;
+  }
+  ```
+* Always use curly braces around code blocks, even if the braces surround a single statement.
+  ```cpp
+  // Incorrect
+  while (i < 10)
+    i++;
+    c[i] = i + 1;
+
+  // Correct
+  while (i < 10)
+  {
+    i++;
+  }
+  c[i] = i + 1;
+  ```
+
