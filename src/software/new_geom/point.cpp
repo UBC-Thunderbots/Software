@@ -56,7 +56,7 @@ Point Point::rotate(const Angle &rot) const
 
 bool Point::isClose(const Point &other, double dist) const
 {
-    return distanceFromPoint(other) < dist * dist;
+    return distanceFromPoint(other) < dist;
 }
 
 Point &Point::operator=(const Point &q)

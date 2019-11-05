@@ -25,7 +25,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)
     std::optional<Point> intersection =
         Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
 
-    EXPECT_TRUE(intersection.value().isClose(Point(-4.5, -0.145), 0.1));
+    EXPECT_EQ(Point(-4.5, -0.145), intersection.value());
 }
 
 // Test where the ball will not intersect the friendly net
@@ -60,8 +60,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_enemy_net)
     std::optional<Point> intersection =
         Evaluation::calcBallVelIntersectEnemyNet(ball, field);
 
-
-    EXPECT_TRUE(intersection.value().isClose(Point(4.5, -0.165), 0.1));
+    EXPECT_EQ(Point(4.5, -0.165), intersection.value());
 }
 
 // Test where the ball will not intersect the enemy net
