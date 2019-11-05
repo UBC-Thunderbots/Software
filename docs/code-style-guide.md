@@ -5,6 +5,7 @@
 * [Coding Style and Conventions](#coding-style-and-conventions)
     * [Names and Variables](#names-and-variables)
     * [Comments](#comments)
+    * [Curly Braces](#curly-braces)
     * [Headers](#headers)
     * [Includes](#includes)
     * [Spelling](#spelling)
@@ -75,6 +76,16 @@ If you want to know more about our coding style you can take a look at our [clan
   const float SCALE_FACTOR = 2.15;
   float distance = catch_distance * SCALE_FACTOR;
   ```
+* Avoid initializing multiple variables on the same line.
+  ```cpp
+  // Incorrect
+  int x, y, z = 0;
+
+  // Correct
+  int x;
+  int y;
+  int z = 0;
+  ```
 
 ### Comments
 
@@ -101,6 +112,51 @@ If you think some ASCII art will help explain something better, go for it! [asci
    * @return a^b
    */
   float power(float a, float b);
+  ```
+
+### Curly Braces
+
+* Opening and closing braces \(`{}`\) must be on the same indentation level.
+  ```cpp
+  // Incorrect
+  int foo() {
+      return 0;
+  }
+
+  // Correct
+  int foo()
+  {
+      return 0;
+  }
+  ```
+* Avoid tertiary operators. Clarity is more important than line count.
+  ```cpp
+  // Incorrect
+  c = ((a == 0) || ((a + b) < 10)) ? a : a + b;
+
+  // Correct
+  if ((a == 0) || ((a + b) < 10))
+  {
+    c = a;
+  }
+  else
+  {
+    c = a + b;
+  }
+  ```
+* Always use curly braces around code blocks, even if the braces surround a single statement.
+  ```cpp
+  // Incorrect
+  while (i < 10)
+    i++;
+    c[i] = i + 1;
+
+  // Correct
+  while (i < 10)
+  {
+    i++;
+  }
+  c[i] = i + 1;
   ```
 
 ### Headers
@@ -135,7 +191,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 ### Spelling
 
 * Code, comment, and documentations should not contain spelling errors.
-* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour").
+* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour", "metre").
     * Exceptions:
       * Use "defense" in lieu of "defence" as it is more similar to the word "defensive".
       * Use "offense" in lieu of "offence".
@@ -188,16 +244,6 @@ If you think some ASCII art will help explain something better, go for it! [asci
   // Correct
   using PointsArray = std::vector<std::pair<int, int>>;
   ```
-* Avoid initializing multiple variables on the same line.
-  ```cpp
-  // Incorrect
-  int x, y, z = 0;
-
-  // Correct
-  int x;
-  int y;
-  int z = 0;
-  ```
 * Reference \(`&`\) and pointer \(`*`\) symbols should be attached to the type and not the variable name.
   ```cpp
   // Incorrect
@@ -207,17 +253,4 @@ If you think some ASCII art will help explain something better, go for it! [asci
   // Correct
   explicit AI(const World& world);
   int* num;
-  ```
-* Opening and closing braces \(`{}`\) must be on the same indentation level.
-  ```cpp
-  // Incorrect
-  int foo() {
-      return 0;
-  }
-
-  // Correct
-  int foo()
-  {
-      return 0;
-  }
   ```
