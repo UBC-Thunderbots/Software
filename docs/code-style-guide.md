@@ -129,7 +129,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
       return 0;
   }
   ```
-* Avoid tertiary operators. Clarity is more important than line count.
+* Avoid ternary operators. Clarity is more important than line count.
   ```cpp
   // Incorrect
   c = ((a == 0) || ((a + b) < 10)) ? a : a + b;
