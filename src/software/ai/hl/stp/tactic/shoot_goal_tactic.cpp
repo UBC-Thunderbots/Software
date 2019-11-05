@@ -88,7 +88,8 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
                                       ->EnemyAboutToStealBallRectangleExtensionLength()
                                       ->value();
     Rectangle baller_frontal_area = Rectangle(
-        (robot->position() + front_of_robot_dir.perpendicular().normalize(steal_ball_rect_width / 2.0)),
+        (robot->position() +
+         front_of_robot_dir.perpendicular().normalize(steal_ball_rect_width / 2.0)),
         robot->position() + front_of_robot_dir.normalize(steal_ball_rect_length) -
             front_of_robot_dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS));
 
@@ -167,9 +168,9 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // A point behind the ball that leaves 5cm between the ball and kicker of the
             // robot
             Point behind_ball =
-                ball.position() +
-                behind_ball_vector.normalize(BALL_MAX_RADIUS_METERS +
-                                        DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
+                ball.position() + behind_ball_vector.normalize(
+                                      BALL_MAX_RADIUS_METERS +
+                                      DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
 
             // The default behaviour is to move behind the ball and face the net
             yield(move_action.updateStateAndGetNextIntent(

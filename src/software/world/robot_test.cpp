@@ -282,10 +282,12 @@ TEST_F(RobotTest,
 
     EXPECT_EQ(AngularVelocity::fromRadians(0.7),
               robot.estimateAngularVelocityAtFutureTime(Duration::fromMilliseconds(400)));
-    EXPECT_EQ(AngularVelocity::fromRadians(0.7), robot.estimateAngularVelocityAtFutureTime(
-                                                   Duration::fromMilliseconds(1000)));
-    EXPECT_EQ(AngularVelocity::fromRadians(0.7), robot.estimateAngularVelocityAtFutureTime(
-                                                   Duration::fromMilliseconds(3000)));
+    EXPECT_EQ(
+        AngularVelocity::fromRadians(0.7),
+        robot.estimateAngularVelocityAtFutureTime(Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(
+        AngularVelocity::fromRadians(0.7),
+        robot.estimateAngularVelocityAtFutureTime(Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest,

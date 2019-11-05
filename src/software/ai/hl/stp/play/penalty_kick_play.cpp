@@ -62,21 +62,25 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         Angle shoot_angle =
             (world.field().enemyGoalpostPos() - world.ball().position()).orientation();
 
-        Point behind_ball = world.ball().position() +
-                            behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                                       BALL_MAX_RADIUS_METERS + 0.1);
+        Point behind_ball = world.ball().position() + behind_ball_direction.normalize(
+                                                          DIST_TO_FRONT_OF_ROBOT_METERS +
+                                                          BALL_MAX_RADIUS_METERS + 0.1);
 
         // Move all non-shooter robots to the center of the field
-        move_tactic_2->updateControlParams(Point(0, 0),
-                                           world.field().enemyGoal().toVector().orientation(), 0);
-        move_tactic_3->updateControlParams(Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().toVector().orientation(), 0);
-        move_tactic_4->updateControlParams(Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().toVector().orientation(), 0);
-        move_tactic_5->updateControlParams(Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().toVector().orientation(), 0);
-        move_tactic_6->updateControlParams(Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().toVector().orientation(), 0);
+        move_tactic_2->updateControlParams(
+            Point(0, 0), world.field().enemyGoal().toVector().orientation(), 0);
+        move_tactic_3->updateControlParams(
+            Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoal().toVector().orientation(), 0);
+        move_tactic_4->updateControlParams(
+            Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoal().toVector().orientation(), 0);
+        move_tactic_5->updateControlParams(
+            Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoal().toVector().orientation(), 0);
+        move_tactic_6->updateControlParams(
+            Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoal().toVector().orientation(), 0);
 
         penalty_shot_tactic->updateWorldParams(world.ball(), world.enemyTeam().goalie(),
                                                world.field());

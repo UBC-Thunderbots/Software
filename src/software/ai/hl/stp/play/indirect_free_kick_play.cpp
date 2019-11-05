@@ -187,7 +187,8 @@ void IndirectFreeKickPlay::updateAlignToBallTactic(
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() - ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+        world.ball().position() -
+            ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_center_vec.orientation(), 0);
 }
 

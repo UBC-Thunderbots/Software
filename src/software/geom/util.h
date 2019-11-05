@@ -5,12 +5,12 @@
 
 #include "software/geom/circle.h"
 #include "software/geom/line.h"
-#include "software/new_geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/shot.h"
+#include "software/new_geom/point.h"
 
 template <size_t N>
 using LegacyPolygon       = std::array<Point, N>;
@@ -446,7 +446,8 @@ Point calcBlockCone(const Vector &a, const Vector &b, const double &radius);
  *
  * @return the blocking position.
  */
-Point calcBlockCone(const Vector &a, const Vector &b, const Point &p, const double &radius);
+Point calcBlockCone(const Vector &a, const Vector &b, const Point &p,
+                    const double &radius);
 
 /**
  * Used for defender_blocks_goal

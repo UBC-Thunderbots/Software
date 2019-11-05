@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/primitive/move_primitive.h"
-#include "software/new_geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 
 /**
  * Calculates the transition speed for the robot between two line segments

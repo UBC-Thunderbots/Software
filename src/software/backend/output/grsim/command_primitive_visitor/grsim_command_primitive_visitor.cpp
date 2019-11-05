@@ -13,9 +13,9 @@
 #include "software/ai/primitive/movespin_primitive.h"
 #include "software/ai/primitive/pivot_primitive.h"
 #include "software/ai/primitive/stop_primitive.h"
+#include "software/geom/util.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
-#include "software/geom/util.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)
@@ -83,8 +83,9 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    Point point_behind = chip_origin + Vector(Vector::createFromAngle(chip_direction).x(),
-                                              Vector::createFromAngle(chip_direction).y());
+    Point point_behind =
+        chip_origin + Vector(Vector::createFromAngle(chip_direction).x(),
+                             Vector::createFromAngle(chip_direction).y());
 
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), chip_origin, point_behind);
@@ -140,8 +141,9 @@ void GrsimCommandPrimitiveVisitor::visit(
             .mod(Angle::half());
 
     motion_controller_command = MotionController::PositionCommand(
-        final_destination, final_orientation, linear_velocity_in_robot_coordinates.length(),
-        0.0, false, direct_velocity_primitive.getDribblerRpm() > 0);
+        final_destination, final_orientation,
+        linear_velocity_in_robot_coordinates.length(), 0.0, false,
+        direct_velocity_primitive.getDribblerRpm() > 0);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(
@@ -157,8 +159,9 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    Point point_behind = kick_origin + Vector(Vector::createFromAngle(kick_direction).x(),
-                                              Vector::createFromAngle(kick_direction).y());
+    Point point_behind =
+        kick_origin + Vector(Vector::createFromAngle(kick_direction).x(),
+                             Vector::createFromAngle(kick_direction).y());
 
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), kick_origin, point_behind);
@@ -266,7 +269,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // aggressively
     motion_controller_command = MotionController::PositionCommand(
         collinear_point_on_orbit +
-            tangential_vector * 0.5 * linear_displacement_to_final_robot_position.length(),
+            tangential_vector * 0.5 *
+                linear_displacement_to_final_robot_position.length(),
         unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 

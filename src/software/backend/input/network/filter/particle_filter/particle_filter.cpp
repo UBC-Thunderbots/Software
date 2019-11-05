@@ -352,8 +352,9 @@ double ParticleFilter::evaluateParticle(const Point &particle)
         double detectionDist = (particle - detections[i]).length();
         if (ballPosition != TMP_POINT)
         {
-            detectionScore += getDetectionWeight((detections[i] - ballPosition).length()) *
-                              exp(-detectionDist);
+            detectionScore +=
+                getDetectionWeight((detections[i] - ballPosition).length()) *
+                exp(-detectionDist);
         }
         else
         {

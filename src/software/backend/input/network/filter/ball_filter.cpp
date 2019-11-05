@@ -54,7 +54,8 @@ void BallFilter::addNewDetectionsToBuffer(
             // good chance the detection is just noise and not the real ball. In this
             // case, we ignore the new "noise" data
             double detection_distance =
-                (detection.position - detection_with_smallest_timestamp.position).length();
+                (detection.position - detection_with_smallest_timestamp.position)
+                    .length();
             double estimated_detection_velocity_magnitude =
                 detection_distance / time_diff.getSeconds();
 
@@ -244,8 +245,8 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
         A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
     // How to calculate the error is from
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-    double regression_error =
-        (A * regression_vector - b).norm() / (b.norm() + 1.0e-9);  // normalize() is L2 norm
+    double regression_error = (A * regression_vector - b).norm() /
+                              (b.norm() + 1.0e-9);  // normalize() is L2 norm
 
     // Find 2 points on the regression line that we solved for, and use this to construct
     // our own Line class

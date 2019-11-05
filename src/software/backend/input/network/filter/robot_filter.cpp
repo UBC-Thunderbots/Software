@@ -35,7 +35,8 @@ std::optional<Robot> RobotFilter::getFilteredData(
         if (robot_data.id == this->getRobotId() &&
             robot_data.timestamp > this->current_robot_state.lastUpdateTimestamp())
         {
-            filtered_data.position = filtered_data.position + robot_data.position.toVector();
+            filtered_data.position =
+                filtered_data.position + robot_data.position.toVector();
             filtered_data.orientation =
                 filtered_data.orientation + robot_data.orientation;
 

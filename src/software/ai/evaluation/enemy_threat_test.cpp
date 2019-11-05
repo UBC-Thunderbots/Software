@@ -300,8 +300,8 @@ TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,       true, Angle::fromDegrees(50), Angle::fromDegrees(20),
-        Point(-4, 0), 0,    std::nullopt};
+        robot1, true,        Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
+        0,      std::nullopt};
 
     auto threat2 = Evaluation::EnemyThreat{
         robot2, false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
@@ -326,8 +326,8 @@ TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,       true, Angle::fromDegrees(50), Angle::fromDegrees(20),
-        Point(-4, 0), 0,    std::nullopt};
+        robot1, true,        Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
+        0,      std::nullopt};
 
     auto threat2 = Evaluation::EnemyThreat{
         robot2, true,  Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
@@ -353,8 +353,8 @@ TEST(SortEnemyThreatsTest,
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,       false, Angle::fromDegrees(50), Angle::fromDegrees(20),
-        Point(-4, 0), 1,     std::nullopt};
+        robot1, false,       Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
+        1,      std::nullopt};
 
     auto threat2 = Evaluation::EnemyThreat{
         robot2, false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
@@ -379,14 +379,16 @@ TEST(SortEnemyThreatsTest,
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,      false, Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0), 2,
+        robot1,       false, Angle::fromDegrees(50), Angle::fromDegrees(20),
+        Point(-4, 0), 2,
         std::nullopt  // The passer doesn't matter since it doesn't affect the threat
                       // It's only for the use of whatever code uses these threat
                       // evaluations
     };
 
     auto threat2 = Evaluation::EnemyThreat{
-        robot2,      false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0), 2,
+        robot2,       false, Angle::fromDegrees(60), Angle::fromDegrees(30),
+        Point(-4, 0), 2,
         std::nullopt  // The passer doesn't matter since it doesn't affect the threat
                       // It's only for the use of whatever code uses these threat
                       // evaluations
@@ -486,8 +488,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
         Robot(1, world.field().friendlyGoal() + Vector(1.25, 1.5), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot enemy_robot_2 =
-        Robot(2, world.field().friendlyGoal() + Vector(2, -1), Vector(0, 0), Angle::half(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+        Robot(2, world.field().friendlyGoal() + Vector(2, -1), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot enemy_robot_3 =
         Robot(3, world.field().friendlyGoal() + Vector(0.4, -2), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));

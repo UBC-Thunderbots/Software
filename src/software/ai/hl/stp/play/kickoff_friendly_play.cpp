@@ -65,11 +65,11 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Robot 3
         Point(world.field().centerPoint() +
               Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                    -1.0 / 3.0 * world.field().yLength())),
+                     -1.0 / 3.0 * world.field().yLength())),
         // Robot 4
         Point(world.field().centerPoint() +
               Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                    1.0 / 3.0 * world.field().yLength())),
+                     1.0 / 3.0 * world.field().yLength())),
         // Robot 5
         Point(world.field().friendlyGoalpostPos().x() +
                   world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,

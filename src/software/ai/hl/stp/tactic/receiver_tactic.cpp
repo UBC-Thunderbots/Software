@@ -63,7 +63,8 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     // ourselves in the best position possible to take the pass
     // We wait for the ball to start moving at least a bit to make sure the passer
     // has actually started the pass
-    while (ball.lastUpdateTimestamp() < pass.startTime() || ball.velocity().length() < 0.5)
+    while (ball.lastUpdateTimestamp() < pass.startTime() ||
+           ball.velocity().length() < 0.5)
     {
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle
@@ -105,7 +106,8 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         // Keep trying to shoot the ball while it's traveling roughly towards the robot
         // (or moving slowly because we can't be certain of the velocity vector if it is)
-        while (ball_robot_angle.abs() < Angle::fromDegrees(90) || ball_velocity.length() < 0.5)
+        while (ball_robot_angle.abs() < Angle::fromDegrees(90) ||
+               ball_velocity.length() < 0.5)
         {
             Shot shot =
                 getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);

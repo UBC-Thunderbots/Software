@@ -80,7 +80,8 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
             behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
             behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
         Point behind_ball_vertex_C =
-            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -(behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2));
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+            (behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2));
 
         Polygon behind_ball_region =
             Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});

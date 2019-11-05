@@ -99,8 +99,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Have a robot keep trying to take a shot
     Angle min_open_angle_for_shot =
         Angle::fromDegrees(Util::DynamicParameters->getShootOrPassPlayConfig()
-                             ->MinOpenAngleForShotDeg()
-                             ->value());
+                               ->MinOpenAngleForShotDeg()
+                               ->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),

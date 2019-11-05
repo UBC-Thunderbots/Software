@@ -8,8 +8,8 @@
 #include <ctime>
 #include <sstream>
 
-#include "software/new_geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 
 TEST(NavUtilTest, calculateTransitionSpeedBetweenSegments_tests_parallel_segments)
 {

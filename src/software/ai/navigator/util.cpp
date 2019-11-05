@@ -1,7 +1,7 @@
 #include "software/ai/navigator/util.h"
 
-#include "software/new_geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
                                                const Point &p3, double final_speed)

@@ -139,7 +139,8 @@ Vector MotionController::determineLinearVelocityFromPosition(
     // Calculate the vector of our velocity perpendicular to the vector toward the
     // destination
     Vector robot_velocity_perpendicular_to_dest =
-        robot.velocity().dot(unit_vector_to_dest.perpendicular()) * unit_vector_to_dest.perpendicular();
+        robot.velocity().dot(unit_vector_to_dest.perpendicular()) *
+        unit_vector_to_dest.perpendicular();
 
     // Use the "remaining" velocity (based on physical limits) to move us along the vector
     // towards the destination
@@ -180,8 +181,8 @@ Vector MotionController::determineLinearVelocityFromPosition(
         std::clamp<double>(new_robot_velocity_magnitude, -max_speed_meters_per_second,
                            max_speed_meters_per_second);
 
-    Vector new_robot_velocity =
-        new_robot_velocity_magnitude * (robot.velocity() + additional_velocity).normalize();
+    Vector new_robot_velocity = new_robot_velocity_magnitude *
+                                (robot.velocity() + additional_velocity).normalize();
 
     // Translate velocities into robot coordinates
     Vector new_robot_velocity_in_robot_coordinates =

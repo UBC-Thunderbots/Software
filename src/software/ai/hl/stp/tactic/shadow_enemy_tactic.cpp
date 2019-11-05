@@ -105,7 +105,8 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             }
 
             Point position_to_block_shot =
-                enemy_robot.position() + enemy_shot_vector.normalize(this->shadow_distance);
+                enemy_robot.position() +
+                enemy_shot_vector.normalize(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
             if (*Evaluation::robotHasPossession(ball, enemy_robot) &&

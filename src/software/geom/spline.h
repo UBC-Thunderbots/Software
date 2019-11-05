@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "software/new_geom/point.h"
 #include "software/geom/polynomial.h"
+#include "software/new_geom/point.h"
 
 /**
  * A Spline maps a double to a Point with a parameterized piecewise function

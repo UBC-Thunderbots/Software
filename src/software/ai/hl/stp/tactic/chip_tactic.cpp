@@ -33,8 +33,8 @@ void ChipTactic::updateControlParams(Point chip_origin, Point chip_target,
 double ChipTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // the closer the robot is to a ball, the cheaper it is to perform the chip
-    double cost =
-        (robot.position() - world.ball().position()).length() / world.field().totalXLength();
+    double cost = (robot.position() - world.ball().position()).length() /
+                  world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 

@@ -100,8 +100,9 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
     // asked to pivot to 3/4 pi above x axis, with radius of 10, from point (-10, 10)
     // (chosen far so all values pivot ccw) which should result in a cw rotation on all
     // parameterized pivot points
-    PivotPrimitive primitive = PivotPrimitive(
-        1, Point(-10, 10), Angle::fromRadians(3 / 4 * M_PI), Angle::fromRadians(1.24), false);
+    PivotPrimitive primitive =
+        PivotPrimitive(1, Point(-10, 10), Angle::fromRadians(3 / 4 * M_PI),
+                       Angle::fromRadians(1.24), false);
 
     // place the robot in the first quadrant, should rotate CW
     Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::fromRadians(0.0),

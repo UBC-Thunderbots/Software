@@ -11,10 +11,10 @@
 #include <limits>
 #include <tuple>
 
-#include "software/new_geom/angle.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/voronoi_diagram.h"
+#include "software/new_geom/angle.h"
 
 double proj_length(const Segment &first, const Vector &second)
 {
@@ -223,7 +223,8 @@ bool contains(const Ray &out, const Point &in)
 {
     Point point_in_ray_direction = out.getRayStart() + out.getDirection();
     if (collinear(in, out.getRayStart(), point_in_ray_direction) &&
-        (((in - out.getRayStart()).normalize() - out.getDirection().normalize()).length() < EPS))
+        (((in - out.getRayStart()).normalize() - out.getDirection().normalize())
+             .length() < EPS))
     {
         return true;
     }
@@ -320,8 +321,7 @@ Segment getSide(const LegacyPolygon<N> &poly, unsigned int i)
     return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
 
-std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1,
-                                       const Point &p2,
+std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1, const Point &p2,
                                        const std::vector<Point> &obstacles,
                                        const double &radius)
 {
@@ -402,7 +402,8 @@ std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1,
     {
         // No obstacles in the way, so just return a range hitting the entire target
         // line segment
-        return {Shot(Point((p1.toVector() + p2.toVector()) / 2), end_angle - start_angle)};
+        return {
+            Shot(Point((p1.toVector() + p2.toVector()) / 2), end_angle - start_angle)};
     }
 
     // Sort the events by angle
@@ -438,7 +439,7 @@ std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1,
         Angle range_end   = events_collapsed[i].first + start_angle;
         Angle mid         = (range_end - range_start) / 2 + range_start;
         Vector ray        = Vector::createFromAngle(mid) * 10.0;
-        Point inter      = lineIntersection(src, src + ray, p1, p2).value();
+        Point inter       = lineIntersection(src, src + ray, p1, p2).value();
 
         // Offset the final values by the start angle
         result.emplace_back(Shot(inter, range_end - range_start));
@@ -447,8 +448,7 @@ std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1,
     return result;
 }
 
-std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1,
-                                      const Point &p2,
+std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const Point &p2,
                                       const std::vector<Point> &obstacles,
                                       const double &radius)
 {
@@ -484,7 +484,8 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
 
 bool collinear(const Point &a, const Point &b, const Point &c)
 {
-    if ((a - b).lengthSquared() < EPS2 || (b - c).lengthSquared() < EPS2 || (a - c).lengthSquared() < EPS2)
+    if ((a - b).lengthSquared() < EPS2 || (b - c).lengthSquared() < EPS2 ||
+        (a - c).lengthSquared() < EPS2)
     {
         return true;
     }
@@ -497,7 +498,7 @@ Point clipPoint(const Point &p, const Point &bound1, const Point &bound2)
     const double miny = std::min(bound1.y(), bound2.y());
     const double maxx = std::max(bound1.x(), bound2.x());
     const double maxy = std::max(bound1.y(), bound2.y());
-    Point ret        = p;
+    Point ret         = p;
     if (p.x() < minx)
     {
         ret.set(minx, ret.y());
@@ -523,7 +524,7 @@ Point clipPoint(const Point &p, const Rectangle &r)
     const double miny = r.negXNegYCorner().y();
     const double maxx = r.posXPosYCorner().x();
     const double maxy = r.posXPosYCorner().y();
-    Point ret        = p;
+    Point ret         = p;
     if (p.x() < minx)
     {
         ret.set(minx, ret.y());
@@ -544,7 +545,7 @@ Point clipPoint(const Point &p, const Rectangle &r)
 }
 
 std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
-                                        const Point &segA, const Point &segB)
+                                       const Point &segA, const Point &segB)
 {
     std::vector<Point> ans;
 
@@ -555,7 +556,7 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     }
 
     double lenseg = (segB - segA).dot(centre - segA) / (segB - segA).length();
-    Point C      = segA + lenseg * (segB - segA).normalize();
+    Point C       = segA + lenseg * (segB - segA).normalize();
 
     // if C outside circle no intersections
     if ((C - centre).lengthSquared() > radius * radius + EPS)
@@ -573,14 +574,14 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     // first possible intersection
     double lensegb = radius * radius - (C - centre).lengthSquared();
 
-    ans.push_back(C -(lensegb * (segB - segA).normalize()));
+    ans.push_back(C - (lensegb * (segB - segA).normalize()));
     ans.push_back(C + lensegb * (segB - segA).normalize());
 
     return ans;
 }
 
 std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
-                                      const Point &segB)
+                                     const Point &segB)
 {
     std::vector<Point> ans;
     for (unsigned int i = 0; i < 4; i++)
@@ -599,7 +600,8 @@ std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
 
 Point vectorRectIntersect(const Rectangle &r, const Point &pointA, const Point &pointB)
 {
-    std::vector<Point> points = lineRectIntersect(r, pointA, pointA + ((pointB - pointA) * 100));
+    std::vector<Point> points =
+        lineRectIntersect(r, pointA, pointA + ((pointB - pointA) * 100));
     for (Point i : points)
     {
         if (contains(Ray(pointA, (pointB - pointA)), i))
@@ -638,7 +640,7 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
     // find point C
     // which is the projection onto the line
     double lenseg = (segB - segA).dot(centre - segA) / (segB - segA).length();
-    Point C      = segA + lenseg * (segB - segA).normalize();
+    Point C       = segA + lenseg * (segB - segA).normalize();
 
     // check if C is in the line seg range
     double AC     = (segA - C).lengthSquared();
@@ -670,7 +672,7 @@ Point closestPointOnLine(const Point &centre, const Point &lineA, const Point &l
 {
     // find point C, the projection onto the line
     double len_line = (lineB - lineA).dot(centre - lineA) / (lineB - lineA).length();
-    Point C        = lineA + len_line * (lineB - lineA).normalize();
+    Point C         = lineA + len_line * (lineB - lineA).normalize();
     return C;
 
     // check if C is in the line range
@@ -695,8 +697,7 @@ Point closestPointOnLine(const Point &centre, const Point &lineA, const Point &l
     return lineB;
 }
 
-bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c,
-                          const Point &d)
+bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d)
 {
     return std::abs((d - c).cross(b - a)) > EPS;
 }
@@ -826,7 +827,8 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
         // Check if ray passes through both segment start and end
         if (ray.getDirection().normalize() ==
                 (segment.getSegStart() - ray.getRayStart()).normalize() &&
-            ray.getDirection().normalize() == (segment.getEnd() - ray.getRayStart()).normalize())
+            ray.getDirection().normalize() ==
+                (segment.getEnd() - ray.getRayStart()).normalize())
         {
             return std::make_pair(segment.getSegStart(), segment.getEnd());
         }
@@ -834,7 +836,8 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
         // Since we know the ray and segment are overlapping (with ray origin within the
         // segment), return the ray start position, and the end of the segment that is in
         // the direction of the ray
-        ray.getDirection().normalize() == (segment.getEnd() - segment.getSegStart()).normalize()
+        ray.getDirection().normalize() ==
+                (segment.getEnd() - segment.getSegStart()).normalize()
             ? intersection = std::make_optional(segment.getEnd())
             : intersection = std::make_optional(segment.getSegStart());
         return std::make_pair(ray.getRayStart(), intersection.value());
@@ -887,7 +890,8 @@ std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
     // Check of the intersection exits along the direction of both rays
     if (((intersection.value() - ray1.getRayStart()).normalize() ==
          ray1.getDirection().normalize()) &&
-        (intersection.value() - ray2.getRayStart()).normalize() == ray2.getDirection().normalize())
+        (intersection.value() - ray2.getRayStart()).normalize() ==
+            ray2.getDirection().normalize())
     {
         return intersection.value();
     }
@@ -928,7 +932,7 @@ Point calcBlockCone(const Vector &a, const Vector &b, const double &radius)
 }
 
 Point calcBlockCone(const Vector &a, const Vector &b, const Point &p,
-                     const double &radius)
+                    const double &radius)
 {
     return p + (calcBlockCone(a - p.toVector(), b - p.toVector(), radius)).toVector();
 }
@@ -1002,7 +1006,8 @@ Point intersection(Point a1, Point a2, Point b1, Point b2)
     Vector b2r = (b2 - a1).rotate(-a.orientation());
     Vector br  = (b1r - b2r);
 
-    return a1 + Vector(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation());
+    return a1 +
+           Vector(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation());
 }
 
 Angle acuteVertexAngle(Vector v1, Vector v2)
@@ -1052,8 +1057,12 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     {
         double perpDist = std::sqrt(circle.getRadius() * circle.getRadius() -
                                     (circle.getOrigin() - start).lengthSquared());
-        Point p1 = start + (circle.getOrigin() - start).perpendicular().normalize(perpDist + buffer);
-        Point p2 = start -((circle.getOrigin() - start).perpendicular().normalize(perpDist + buffer));
+        Point p1 =
+            start +
+            (circle.getOrigin() - start).perpendicular().normalize(perpDist + buffer);
+        Point p2 =
+            start -
+            ((circle.getOrigin() - start).perpendicular().normalize(perpDist + buffer));
         return std::make_pair(p1, p2);
     }
     else
@@ -1376,9 +1385,9 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         // vector connecting the two points. Return 2 circles that are centered at the
         // points where the splitting vector intercepts the bounding_box. We should also
         // include circles centered at each of the corners.
-        Vector connectedVec            = points[1] - points[0];
+        Vector connectedVec           = points[1] - points[0];
         Point halfPoint               = points[0] + (connectedVec * 0.5);
-        Vector perpVec                 = connectedVec.perpendicular();
+        Vector perpVec                = connectedVec.perpendicular();
         std::vector<Point> intersects = lineRectIntersect(
             bounding_box,
             halfPoint +
@@ -1437,9 +1446,9 @@ Polygon circleToPolygon(const Circle &circle, size_t num_points)
     std::vector<Point> points;
     for (unsigned i = 0; i < num_points; i++)
     {
-        Point p =
-            circle.getOrigin() + Vector(circle.getRadius(), 0)
-                                     .rotate(Angle::fromDegrees((360.0 / num_points) * i));
+        Point p = circle.getOrigin() +
+                  Vector(circle.getRadius(), 0)
+                      .rotate(Angle::fromDegrees((360.0 / num_points) * i));
         points.emplace_back(p);
     }
     return Polygon(points);

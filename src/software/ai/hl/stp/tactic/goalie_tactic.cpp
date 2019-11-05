@@ -6,10 +6,10 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/new_geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 
@@ -250,9 +250,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                ->value() +
                            ROBOT_MAX_RADIUS_METERS;
 
-            Point goalie_pos =
-                calcBlockCone(field.friendlyGoalpostNeg().toVector(), field.friendlyGoalpostPos().toVector(),
-                              ball.position(), radius);
+            Point goalie_pos = calcBlockCone(field.friendlyGoalpostNeg().toVector(),
+                                             field.friendlyGoalpostPos().toVector(),
+                                             ball.position(), radius);
 
             // restrict the goalie to a semicircle inscribed inside the defense area
             Point goalie_restricted_pos =
@@ -275,9 +275,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
         // either side
-        Point goalie_pos = calcBlockCone(
-            field.friendlyGoalpostNeg().toVector(), field.friendlyGoalpostPos().toVector(), ball.position(),
-            block_cone_radius * block_cone_angle.toRadians());
+        Point goalie_pos =
+            calcBlockCone(field.friendlyGoalpostNeg().toVector(),
+                          field.friendlyGoalpostPos().toVector(), ball.position(),
+                          block_cone_radius * block_cone_angle.toRadians());
 
         // we want to restrict the block cone to the friendly crease, also potentially
         // scaled by a defense_area_deflation_parameter

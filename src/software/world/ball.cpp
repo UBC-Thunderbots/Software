@@ -39,7 +39,7 @@ void Ball::updateStateToPredictedState(const Timestamp &timestamp)
 
     auto duration_in_future = timestamp - lastUpdateTimestamp();
     Point new_position      = estimatePositionAtFutureTime(duration_in_future);
-    Vector new_velocity      = estimateVelocityAtFutureTime(duration_in_future);
+    Vector new_velocity     = estimateVelocityAtFutureTime(duration_in_future);
 
     updateState(new_position, new_velocity, timestamp);
 }

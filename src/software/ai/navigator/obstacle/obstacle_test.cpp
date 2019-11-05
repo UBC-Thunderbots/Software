@@ -96,7 +96,7 @@ TEST(NavigatorObstacleTest, shifted_scaled_up_velocity_obstacle_polygon)
 {
     double TEST_EPSILON    = 1e-3;
     Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot            = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::fromRadians(2.2),
+    Robot robot    = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::fromRadians(2.2),
                         AngularVelocity::fromRadians(-0.6), current_time);
     auto p_pointer = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 1.4)
                          .getBoundaryPolygon();
@@ -174,7 +174,7 @@ TEST(NavigatorObstacleTest, shifted_with_buffer_velocity_obstacle_polygon)
 {
     double TEST_EPSILON    = 1e-3;
     Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot            = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::fromRadians(2.2),
+    Robot robot    = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::fromRadians(2.2),
                         AngularVelocity::fromRadians(-0.6), current_time);
     auto p_pointer = Obstacle::createRobotObstacleWithBufferParams(robot, true, 0.4, 1.8)
                          .getBoundaryPolygon();

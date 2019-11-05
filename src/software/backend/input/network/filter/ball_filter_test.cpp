@@ -62,7 +62,8 @@ class BallFilterTest : public ::testing::Test
         unsigned int num_steps_to_ignore)
     {
         Point ball_starting_position = ball_trajectory.getRayStart();
-        Vector ball_velocity = ball_trajectory.toVector().normalize(ball_velocity_magnitude);
+        Vector ball_velocity =
+            ball_trajectory.toVector().normalize(ball_velocity_magnitude);
         Duration max_ball_travel_duration =
             Duration::fromSeconds(std::numeric_limits<double>::max());
 
@@ -104,7 +105,7 @@ class BallFilterTest : public ::testing::Test
                                     unsigned int num_steps_to_ignore)
     {
         Point ball_starting_position = ball_path.getSegStart();
-        Vector ball_velocity         = ball_path.toVector().normalize(ball_velocity_magnitude);
+        Vector ball_velocity = ball_path.toVector().normalize(ball_velocity_magnitude);
         // Check for division by 0
         if (ball_velocity_magnitude == 0)
         {
@@ -170,7 +171,7 @@ class BallFilterTest : public ::testing::Test
             // Generate the noise that will be added to the position and time step to
             // simulate imperfect data
             Vector position_noise(position_noise_distribution(random_generator),
-                                 position_noise_distribution(random_generator));
+                                  position_noise_distribution(random_generator));
             Duration time_step_noise =
                 Duration::fromSeconds(time_step_noise_distribution(random_generator));
 
@@ -224,8 +225,8 @@ class BallFilterTest : public ::testing::Test
                 EXPECT_LE(velocity_orientation_difference,
                           expected_velocity_angle_tolerance.toDegrees());
                 // Check the magnitude of the velocity
-                double velocity_magnitude_difference =
-                    std::fabs(filtered_ball->velocity().length() - ball_velocity.length());
+                double velocity_magnitude_difference = std::fabs(
+                    filtered_ball->velocity().length() - ball_velocity.length());
                 EXPECT_LE(velocity_magnitude_difference,
                           expected_velocity_magnitude_tolerance);
             }

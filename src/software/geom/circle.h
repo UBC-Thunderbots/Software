@@ -37,10 +37,7 @@ class Circle final
      */
     inline explicit Circle() : radius(0) {}
 
-    inline explicit Circle(const Point& origin, double r)
-        : origin(origin), radius(r)
-    {
-    }
+    inline explicit Circle(const Point& origin, double r) : origin(origin), radius(r) {}
 
     inline bool operator==(const Circle& p)
     {

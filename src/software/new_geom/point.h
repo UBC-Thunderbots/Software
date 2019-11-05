@@ -162,7 +162,7 @@ Point operator+(const Point &p, const Vector &v) __attribute__((warn_unused_resu
  *
  * @return the Point sum of the given Point and the negated Vector
  */
-Point operator-(const Point&p, const Vector &v) __attribute__((warn_unused_result));
+Point operator-(const Point &p, const Vector &v) __attribute__((warn_unused_result));
 
 /**
  * Adds a vector to a point and sets that point to the resulting sum

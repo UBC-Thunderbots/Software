@@ -254,7 +254,9 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
 
     Shot testshot = *testshot_opt;
 
-    EXPECT_TRUE((testshot.getPointToShootAt().toVector().normalize() - Vector(0, 1)).length() < 0.0001);
+    EXPECT_TRUE(
+        (testshot.getPointToShootAt().toVector().normalize() - Vector(0, 1)).length() <
+        0.0001);
     EXPECT_NEAR(75.449, testshot.getOpenAngle().toDegrees(), 1e-4);
 
     obs.clear();
@@ -270,9 +272,9 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
 
     testshot = *testshot_opt;
 
-    EXPECT_TRUE(
-        (testshot.getPointToShootAt().toVector().normalize() - Vector(-0.0805897, 0.996747)).length() <
-        0.0001);
+    EXPECT_TRUE((testshot.getPointToShootAt().toVector().normalize() -
+                 Vector(-0.0805897, 0.996747))
+                    .length() < 0.0001);
     EXPECT_NEAR(42.1928, testshot.getOpenAngle().toDegrees(), 1e-4);
 }
 
@@ -464,7 +466,8 @@ TEST(GeomUtilTest, test_closest_lineseg_point)
     Point l1(-1, 1);
     Point l2(1, 1);
 
-    EXPECT_TRUE((closestPointOnSeg(Point(0, 2), l1, l2) - Point(0, 1)).length() < 0.00001);
+    EXPECT_TRUE((closestPointOnSeg(Point(0, 2), l1, l2) - Point(0, 1)).length() <
+                0.00001);
     EXPECT_TRUE((closestPointOnSeg(Point(-2, 1.5), l1, l2) - Point(-1, 1)).length() <
                 0.00001);
 
@@ -473,8 +476,9 @@ TEST(GeomUtilTest, test_closest_lineseg_point)
 
     EXPECT_TRUE((closestPointOnSeg(Point(1, 0), l1, l2) - Point(0.4, 1.8)).length() <
                 0.00001);
-    EXPECT_TRUE((closestPointOnSeg(Point(-1.4, 1.2), l1, l2) - Point(-1.4, 1.2)).length() <
-                0.00001);
+    EXPECT_TRUE(
+        (closestPointOnSeg(Point(-1.4, 1.2), l1, l2) - Point(-1.4, 1.2)).length() <
+        0.00001);
 }
 
 TEST(GeomUtilTest, test_line_circle_intersect)
@@ -490,12 +494,14 @@ TEST(GeomUtilTest, test_line_circle_intersect)
     // i don't know which intersections will come in which order
     intersections = lineCircleIntersect(Point(0, 0), 1.0, Point(-1, -1), Point(1, 1));
     EXPECT_TRUE(intersections.size() == 2);
-    EXPECT_TRUE(
-        (intersections[0] - Point(1.0 / sqrt(2.0), 1.0 / sqrt(2.0))).length() < 0.00001 ||
-        (intersections[0] - Point(-1.0 / sqrt(2.0), -1.0 / sqrt(2.0))).length() < 0.00001);
-    EXPECT_TRUE(
-        (intersections[1] - Point(1.0 / sqrt(2.0), 1.0 / sqrt(2.0))).length() < 0.00001 ||
-        (intersections[1] - Point(-1.0 / sqrt(2.0), -1.0 / sqrt(2.0))).length() < 0.00001);
+    EXPECT_TRUE((intersections[0] - Point(1.0 / sqrt(2.0), 1.0 / sqrt(2.0))).length() <
+                    0.00001 ||
+                (intersections[0] - Point(-1.0 / sqrt(2.0), -1.0 / sqrt(2.0))).length() <
+                    0.00001);
+    EXPECT_TRUE((intersections[1] - Point(1.0 / sqrt(2.0), 1.0 / sqrt(2.0))).length() <
+                    0.00001 ||
+                (intersections[1] - Point(-1.0 / sqrt(2.0), -1.0 / sqrt(2.0))).length() <
+                    0.00001);
 }
 
 TEST(GeomUtilTest, test_line_rect_intersect)
@@ -689,7 +695,7 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
 
         bool expected = false;
 
-        Point a2 = a1 -((i0 - a1).normalize());
+        Point a2 = a1 - ((i0 - a1).normalize());
         Point b2 = b1 + (i0 - b1) * (1 + std::rand() % 100 / 100.0);  // as a scaling
         // factor for b2,
         // make sure it
@@ -753,13 +759,16 @@ TEST(GeomUtilTest, test_calc_block_cone2)
     b = Vector(-4, 11);
     o = Point(1, 1);
 
-    EXPECT_TRUE((Point(calcBlockCone(a, b, o, 1) - Point(0, sqrt(5))) - o).length() < 0.00001);
+    EXPECT_TRUE((Point(calcBlockCone(a, b, o, 1) - Point(0, sqrt(5))) - o).length() <
+                0.00001);
 
     a = Vector(-2, 6);
     b = Vector(2, 2);
     o = Point(-2, -2);
 
-    EXPECT_TRUE((Point(calcBlockCone(a, b, o, 1) - Point(1, 1.0 + sqrt(2))) - o).length() < 0.0001);
+    EXPECT_TRUE(
+        (Point(calcBlockCone(a, b, o, 1) - Point(1, 1.0 + sqrt(2))) - o).length() <
+        0.0001);
 }
 
 TEST(GeomUtilTest, test_calc_block_other_ray)
@@ -820,7 +829,8 @@ TEST(GeomUtilTest, test_segment_near_line)
     seg0 = Point(0, 3);
     seg1 = Point(0, 4);
 
-    EXPECT_TRUE((segmentNearLine(seg0, seg1, line0, line1) - Point(0, 3)).length() < 0.001);
+    EXPECT_TRUE((segmentNearLine(seg0, seg1, line0, line1) - Point(0, 3)).length() <
+                0.001);
 }
 
 TEST(GeomUtilTest, test_intersection)
@@ -834,7 +844,8 @@ TEST(GeomUtilTest, test_intersection)
 
     a2 = Point(4, 2);
 
-    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).length() < 0.0001);
+    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).length() <
+                0.0001);
 }
 
 // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point

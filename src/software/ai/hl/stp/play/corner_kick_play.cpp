@@ -93,10 +93,10 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Vector center_line_x_offset(1, 0);
     Rectangle pos_y_cherry_pick_rectangle(
         world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerPos() -(pos_y_goalline_x_offset));
+        world.field().enemyCornerPos() - (pos_y_goalline_x_offset));
     Rectangle neg_y_cherry_pick_rectangle(
         world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerNeg() -(neg_y_goalline_x_offset));
+        world.field().enemyCornerNeg() - (neg_y_goalline_x_offset));
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -114,11 +114,13 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Point opposite_corner_to_kick = kick_from_pos_corner ? world.field().enemyCornerNeg()
                                                          : world.field().enemyCornerPos();
     Point bait_move_tactic_1_pos =
-        opposite_corner_to_kick -(Vector(world.field().enemyDefenseArea().yLength() * 0.5,
-                                         copysign(0.5, opposite_corner_to_kick.y())));
+        opposite_corner_to_kick -
+        (Vector(world.field().enemyDefenseArea().yLength() * 0.5,
+                copysign(0.5, opposite_corner_to_kick.y())));
     Point bait_move_tactic_2_pos =
-        opposite_corner_to_kick -(Vector(world.field().enemyDefenseArea().yLength() * 1.5,
-                                         copysign(0.5, opposite_corner_to_kick.y())));
+        opposite_corner_to_kick -
+        (Vector(world.field().enemyDefenseArea().yLength() * 1.5,
+                copysign(0.5, opposite_corner_to_kick.y())));
     auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
     bait_move_tactic_1->updateControlParams(
@@ -250,7 +252,8 @@ void CornerKickPlay::updateAlignToBallTactic(
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() -(ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
+        world.ball().position() -
+            (ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
         ball_to_center_vec.orientation(), 0);
 }
 

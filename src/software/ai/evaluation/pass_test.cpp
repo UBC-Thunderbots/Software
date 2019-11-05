@@ -51,8 +51,8 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desir
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)
 {
     Point dest(1, 1);
-    Robot robot(0, dest, Vector(0, 0), Angle::fromDegrees(0), AngularVelocity::fromDegrees(0),
-                Timestamp::fromSeconds(0));
+    Robot robot(0, dest, Vector(0, 0), Angle::fromDegrees(0),
+                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
 
     EXPECT_EQ(Duration::fromSeconds(0), getTimeToPositionForRobot(robot, dest, 2.0, 3.0));
 }

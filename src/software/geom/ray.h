@@ -3,8 +3,8 @@
 #include <functional>
 
 #include "software/geom/line.h"
-#include "software/new_geom/point.h"
 #include "software/geom/segment.h"
+#include "software/new_geom/point.h"
 
 class Ray final
 {

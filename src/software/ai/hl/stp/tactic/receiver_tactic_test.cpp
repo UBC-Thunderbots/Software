@@ -229,9 +229,10 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     EXPECT_TRUE(tactic.getNextIntent());
 
     // Position the ball just in front of the robot dribbler
-    Point ball_pos = receiver.position() +
-                     Vector(receiver.orientation().cos(), receiver.orientation().sin())
-                         .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+    Point ball_pos =
+        receiver.position() +
+        Vector(receiver.orientation().cos(), receiver.orientation().sin())
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
     ball = Ball(ball_pos, {-1, 1}, Timestamp::fromSeconds(5));
     tactic.updateWorldParams(friendly_team, enemy_team, ball);
     tactic.updateControlParams(pass);
