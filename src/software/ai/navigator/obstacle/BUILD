@@ -20,3 +20,17 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "obstacle_generation",
+    srcs = ["obstacle_generation.cpp"],
+    hdrs = ["obstacle_generation.h"],
+    deps = [
+        "//software/geom",
+        ":obstacle",
+        "//software/util/parameter:dynamic_parameters",
+        "//software/ai/intent:avoid_area",
+        "//software/world",
+        "@g3log",
+    ],
+)

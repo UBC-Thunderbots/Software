@@ -205,6 +205,14 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p)
     return std::clamp(closest_dist / robot_proximity_limit, 0.0, 1.0);
 }
 
+double Navigator::calculateTransitionSpeedBetweenSegments(const Point &p1,
+                                                          const Point &p2,
+                                                          const Point &p3,
+                                                          double final_speed)
+{
+    return final_speed * (p2 - p1).norm().project((p3 - p2).norm()).len();
+}
+
 std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
     std::optional<Path> path, MoveIntent intent)
 {
