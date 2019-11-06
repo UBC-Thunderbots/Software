@@ -114,3 +114,11 @@ new_git_repository(
     remote = "https://github.com/UBC-Thunderbots/Box2D",
     shallow_since = "1571445859 -0700",
 )
+
+# Magic enum library from https://github.com/Neargye/magic_enum
+new_git_repository(
+    name = "magic_enum",
+    build_file = "@//external:magic_enum.BUILD",
+    commit = "49d2429cf110f804048bc459b1d2c126d43b0a9a",
+    remote = "https://github.com/Neargye/magic_enum.git",
+)

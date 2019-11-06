@@ -4,7 +4,7 @@ cc_library(
     name = "avoid_area",
     srcs = ["avoid_area.cpp"],
     hdrs = ["avoid_area.h"],
-    deps = [],
+    deps = ["@magic_enum"],
 )
 
 cc_library(
