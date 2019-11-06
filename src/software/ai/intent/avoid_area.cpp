@@ -10,6 +10,4 @@ std::ostream& operator<<(std::ostream& os, const AvoidArea& area)
     os << find_avoid_area_name_result;
 
     return os;
-
-    return os;
 }
