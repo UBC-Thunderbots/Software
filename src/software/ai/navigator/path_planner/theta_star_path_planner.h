@@ -22,7 +22,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param obstacles obstacles to avoid
      *
      * @return a vector of points that is the optimal path avoiding obstacles
-     * 		if no valid path then return empty vector
+     *         if no valid path then return empty vector
      */
     std::optional<Path> findPath(const Point &start, const Point &destination,
                                  const Rectangle &navigable_area,

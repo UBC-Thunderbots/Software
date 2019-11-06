@@ -136,7 +136,7 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
             // the open list. Make the current square
             // the parent of this square. Record the
             // f, g, and h costs of the square CellHeuristic
-            //			 OR
+            //             OR
             // If it is on the open list already, check
             // to see if this path to that square is better,
             // using 'f' cost as the measure.
