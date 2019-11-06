@@ -1,7 +1,6 @@
 #include "software/ai/motion_constraint/motion_constraint.h"
 
 #include <magic_enum/magic_enum.hpp>
-#include <map>
 #include <string>
 
 std::ostream& operator<<(std::ostream& os, const MotionConstraint& constraint)
