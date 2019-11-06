@@ -6,29 +6,29 @@
  * @{
  */
 
-#include "adc.h"
-#include "breakbeam.h"
-#include "charger.h"
-#include "chicker.h"
-#include "constants.h"
-#include "dma.h"
-#include "dr.h"
-#include "encoder.h"
-#include "feedback.h"
-#include "icb.h"
-#include "leds.h"
-#include "log.h"
-#include "lps.h"
+#include "io/adc.h"
+#include "io/breakbeam.h"
+#include "io/charger.h"
+#include "io/chicker.h"
+#include "util/constants.h"
+#include "io/dma.h"
+#include "io/dr.h"
+#include "io/encoder.h"
+#include "io/feedback.h"
+#include "io/leds.h"
+#include "io/icb.h"
+#include "io/leds.h"
+#include "util/log.h"
 #include "main.h"
-#include "motor.h"
-#include "mrf.h"
-#include "pins.h"
+#include "io/motor.h"
+#include "io/mrf.h"
+#include "io/pins.h"
 #include "priority.h"
-#include "receive.h"
-#include "sdcard.h"
+#include "io/receive.h"
+#include "io/sdcard.h"
 #include "tick.h"
-#include "usb_config.h"
-#include "wheels.h"
+#include "io/usb_config.h"
+#include "io/wheels.h"
 #include "primitives/primitive.h"
 #include "upgrade/dfu.h"
 #include "upgrade/fpga.h"
@@ -296,8 +296,6 @@ void vApplicationIdleHook(void) {
 }
 
 static void main_task(void *param) __attribute__((noreturn));
-
-#include "leds.h"
 
 static void stm32_main(void) {
 	// Initialize the basic chip hardware.

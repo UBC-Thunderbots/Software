@@ -1,14 +1,14 @@
 #include "pivot.h"
-#include "bangbang.h"
-#include "control.h"
-#include "dr.h"
-#include "physics.h"
+#include "control/bangbang.h"
+#include "control/control.h"
+#include "io/dr.h"
+#include "physics/physics.h"
 
 #ifndef FWSIM
-#include "dr.h"
-#include "chicker.h"
-#include "dribbler.h"
-#include "leds.h"
+#include "io/dr.h"
+#include "io/chicker.h"
+#include "io/dribbler.h"
+#include "io/leds.h"
 #else
 #include "simulate.h"
 #endif

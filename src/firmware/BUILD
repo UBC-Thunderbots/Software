@@ -42,33 +42,6 @@ cc_binary(
     ],
 )
 
-genrule(
-    name = "firmware_old_main_bin",
-    srcs = [
-        ":firmware_old_main",
-        "@arm_developer_gcc//:objcopy",
-    ],
-    outs = ["firmware_old_main.bin"],
-    cmd = "\n".join([
-        "$(location @arm_developer_gcc//:objcopy) -Obinary $(location :firmware_old_main) $@",
-    ]),
-    restricted_to = ["//cc_toolchain:stm32f4"],
-)
-
-genrule(
-    name = "flash_board",
-    srcs = [":firmware_old_main_bin"],
-    outs = [],
-    cmd = "\n".join([
-        "dfu-util \
-            -d 0483 \
-            -a \"@Internal Flash  /0x08000000/04*016Kg,01*064Kg,07*128Kg\" \
-            -D $(location :firmware_old_main_bin) \
-            -s 0x08000000:leave",
-    ]),
-    restricted_to = ["//cc_toolchain:stm32f4"],
-)
-
 cc_library(
     name = "firmware_old_main_lib",
     srcs = glob(
@@ -112,4 +85,31 @@ cc_library(
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
+)
+
+genrule(
+    name = "firmware_old_main_bin",
+    srcs = [
+        ":firmware_old_main",
+        "@arm_developer_gcc//:objcopy",
+    ],
+    outs = ["firmware_old_main.bin"],
+    cmd = "\n".join([
+        "$(location @arm_developer_gcc//:objcopy) -Obinary $(location :firmware_old_main) $@",
+    ]),
+    restricted_to = ["//cc_toolchain:stm32f4"],
+)
+
+genrule(
+    name = "flash_board",
+    srcs = [":firmware_old_main_bin"],
+    outs = [],
+    cmd = "\n".join([
+        "dfu-util \
+            -d 0483 \
+            -a \"@Internal Flash  /0x08000000/04*016Kg,01*064Kg,07*128Kg\" \
+            -D $(location :firmware_old_main_bin) \
+            -s 0x08000000:leave",
+    ]),
+    restricted_to = ["//cc_toolchain:stm32f4"],
 )

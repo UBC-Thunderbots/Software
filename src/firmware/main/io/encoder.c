@@ -5,10 +5,10 @@
  *
  * @{
  */
-#include "encoder.h"
-#include "error.h"
-#include "hall.h"
-#include "wheels.h"
+#include "io/encoder.h"
+#include "util/error.h"
+#include "io/hall.h"
+#include "io/wheels.h"
 #include <assert.h>
 #include <math.h>
 #include <rcc.h>

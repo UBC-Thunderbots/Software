@@ -44,9 +44,11 @@
  * @{
  */
 
-#include "mrf.h"
-#include "error.h"
-#include "icb.h"
+#include "io/icb.h"
+#include "io/leds.h"
+#include "io/mrf.h"
+#include "io/pins.h"
+#include "util/error.h"
 #include <FreeRTOS.h>
 #include <assert.h>
 #include <event_groups.h>
@@ -54,8 +56,6 @@
 #include <semphr.h>
 #include <stdio.h>
 #include <task.h>
-#include "leds.h"
-#include "pins.h"
 
 /**
  * \brief How long to wait for a received packet before resetting the radio.

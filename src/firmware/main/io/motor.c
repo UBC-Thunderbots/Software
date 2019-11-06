@@ -1,7 +1,7 @@
-#include "motor.h"
-#include "error.h"
-#include "icb.h"
-#include "pins.h"
+#include "io/motor.h"
+#include "util/error.h"
+#include "io/icb.h"
+#include "io/pins.h"
 #include <rcc.h>
 #include <string.h>
 #include <registers/timer.h>

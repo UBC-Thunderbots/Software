@@ -1,12 +1,12 @@
-#include "lps.h"
-#include "adc.h"
-#include "pins.h"
+#include "io/lps.h"
+#include "io/adc.h"
+#include "io/pins.h"
 #include <gpio.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <limits.h>
 #include <math.h>
-#include "tbuf.h"
+#include "util/tbuf.h"
 //LPS0 = PC0
 //LPS1 = PC1
 //LPS2 = PB4

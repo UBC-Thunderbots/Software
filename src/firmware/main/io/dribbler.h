@@ -1,7 +1,7 @@
 #ifndef DRIBBLER_H
 #define DRIBBLER_H
 
-#include "log.h"
+#include "util/log.h"
 #include <stdbool.h>
 
 /**

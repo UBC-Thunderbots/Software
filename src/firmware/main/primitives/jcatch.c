@@ -7,12 +7,12 @@
  */
 
 #include "catch.h"
-#include "../bangbang.h"
-#include "../control.h"
-#include "../dr.h"
-#include "../physics.h"
-#include "../primitives/move.h"
-#include "../breakbeam.h"
+#include "control/bangbang.h"
+#include "control/control.h"
+#include "io/dr.h"
+#include "physics/physics.h"
+#include "primitives/move.h"
+#include "io/breakbeam.h"
 #include <math.h>
 #include <unused.h>
 #include <stdio.h>

@@ -1,7 +1,7 @@
 #ifndef ADC_H
 #define ADC_H
 
-#include "log.h"
+#include "util/log.h"
 
 void adc_init(void);
 void adc_tick(log_record_t *record);

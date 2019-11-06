@@ -1,7 +1,7 @@
 #ifndef PHYSBOT_H
 #define PHYSBOT_H
 
-#include "../dr.h"
+#include "io/dr.h"
 
 // Used for computing accelerations
 #define TIME_HORIZON 0.05f //s

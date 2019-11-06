@@ -1,9 +1,9 @@
 #include "fpga.h"
 #include "common.h"
 #include "internal.h"
-#include "../dma.h"
-#include "../icb.h"
-#include "../sdcard.h"
+#include "io/dma.h"
+#include "io/icb.h"
+#include "io/sdcard.h"
 #include <minmax.h>
 
 /**

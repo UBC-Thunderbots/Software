@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "log.h"
+#include "util/log.h"
 
 void receive_init(unsigned int index);
 void receive_shutdown(void);

@@ -1,11 +1,11 @@
 #include "accurate_shoot.h"
-#include "../chicker.h"
-#include "../control.h"
-#include "../dr.h"
-#include "../dribbler.h"
-#include "../leds.h"
-#include "../physics.h"
-#include "../bangbang.h"
+#include "io/chicker.h"
+#include "control/control.h"
+#include "io/dr.h"
+#include "io/dribbler.h"
+#include "io/leds.h"
+#include "physics/physics.h"
+#include "control/bangbang.h"
 #include <math.h>
 #include <stdio.h>
 

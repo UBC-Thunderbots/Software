@@ -1,5 +1,6 @@
-#include "internal.h"
-#include "../dma.h"
+#include "upgrade/internal.h"
+#include "io/dma.h"
+#include "upgrade/constants.h"
 #include <crc32.h>
 #include <minmax.h>
 #include <stdlib.h>

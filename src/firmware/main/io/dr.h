@@ -1,7 +1,7 @@
 #ifndef DR_H
 #define DR_H
 
-#include "log.h"
+#include "util/log.h"
 
 // In ticks
 #define BASE_CAMERA_DELAY 3

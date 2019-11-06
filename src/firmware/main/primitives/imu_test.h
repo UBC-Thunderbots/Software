@@ -2,10 +2,10 @@
 #define PRIMITIVES_IMU_TEST_H
 
 #include "primitive.h"
-#include "physics.h"
-#include "control.h"
-#include "wheels.h"
-#include "dr.h"
+#include "physics/physics.h"
+#include "control/control.h"
+#include "io/wheels.h"
+#include "io/dr.h"
 #include "math.h"
 #include <unused.h>
 

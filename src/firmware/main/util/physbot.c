@@ -1,7 +1,7 @@
 #include "physbot.h"
-#include "../dr.h"
-#include "../bangbang.h"
-#include "../physics.h"
+#include "io/dr.h"
+#include "control/bangbang.h"
+#include "physics/physics.h"
 
 PhysBot setup_bot(dr_data_t states, float destination[3], float major_vec[2], 
     float minor_vec[2]) {

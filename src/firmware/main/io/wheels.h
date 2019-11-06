@@ -2,11 +2,11 @@
 #define WHEELS_H
 
 
-#include "physics.h"
+#include "physics/physics.h"
 
 #include <math.h>
 
-#include "log.h"
+#include "util/log.h"
 
 /**
  * \ingroup WHEELS

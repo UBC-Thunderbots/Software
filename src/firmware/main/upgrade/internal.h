@@ -1,8 +1,8 @@
 #ifndef UPGRADE_INTERNAL_H
 #define UPGRADE_INTERNAL_H
 
-#include "constants.h"
-#include "../sdcard.h"
+#include "upgrade/constants.h"
+#include "io/sdcard.h"
 #include <stddef.h>
 #include <stdint.h>
 

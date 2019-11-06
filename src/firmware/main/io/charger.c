@@ -3,9 +3,9 @@
   * registers are written to. Otherwise it sets the duty cycle to 0.
  **/
 
-#include "adc.h"
-#include "error.h"
-#include "receive.h"
+#include "io/adc.h"
+#include "util/error.h"
+#include "io/receive.h"
 #include <FreeRTOS.h>
 #include <gpio.h>
 #include <rcc.h>

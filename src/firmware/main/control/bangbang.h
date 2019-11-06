@@ -28,32 +28,32 @@
 
 //a full trajector plan for a vehicle undergoing maximum acceleration control
 typedef struct {
-	//inputs
-	//The distance to travel 
-	float Distance;
-	//The starting velocity of the vehicle
-	float Vinitial;
-	//the terminal velocity upon reaching the destination (currently not read)
-	float Vfinal;
+    //inputs
+    //The distance to travel 
+    float Distance;
+    //The starting velocity of the vehicle
+    float Vinitial;
+    //the terminal velocity upon reaching the destination (currently not read)
+    float Vfinal;
 
-	//the following two maxes must be positive
-	//maximum allowable acceleration
-	float MaxA;
-	//maximum allowable velocity (can be infinity)
-	float MaxV;
+    //the following two maxes must be positive
+    //maximum allowable acceleration
+    float MaxA;
+    //maximum allowable velocity (can be infinity)
+    float MaxV;
 
-	//computed info
-	//The time spent accelerating with acceleration a1
-	float t1;
-	//the time spent coasting with velocity Vmid
-	float t2;
-	//the time spent accelerating with acceleration a3
-	float t3;
+    //computed info
+    //The time spent accelerating with acceleration a1
+    float t1;
+    //the time spent coasting with velocity Vmid
+    float t2;
+    //the time spent accelerating with acceleration a3
+    float t3;
 
-	//see above
-	float a1;
-	float a3;
-	float Vmid;
+    //see above
+    float a1;
+    float a3;
+    float Vmid;
 } BBProfile;
 
 

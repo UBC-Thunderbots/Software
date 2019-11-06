@@ -7,9 +7,9 @@
  */
 #include "direct_wheels.h"
 #include "primitive.h"
-#include "../dribbler.h"
-#include "../log.h"
-#include "../wheels.h"
+#include "io/dribbler.h"
+#include "util/log.h"
+#include "io/wheels.h"
 #include <unused.h>
 
 

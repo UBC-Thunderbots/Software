@@ -6,9 +6,9 @@
  * @{
  */
 #include "stop.h"
-#include "dr.h"
-#include "dribbler.h"
-#include "wheels.h"
+#include "io/dr.h"
+#include "io/dribbler.h"
+#include "io/wheels.h"
 #ifndef FWSIM
 #include <unused.h>
 #endif // FWSIM

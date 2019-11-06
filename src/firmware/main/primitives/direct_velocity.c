@@ -1,6 +1,6 @@
 #include "direct_velocity.h"
-#include "../control.h"
-#include "../dribbler.h"
+#include "control/control.h"
+#include "io/dribbler.h"
 
 #include <unused.h>
 

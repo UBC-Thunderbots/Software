@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 //#ifndef FWSIM
-#include "../log.h"
+#include "util/log.h"
 //#else
 //#include <stdbool.h>
 //#endif

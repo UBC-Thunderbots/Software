@@ -1,8 +1,8 @@
 #include "imu_test.h"
-#include "../bangbang.h"
-#include "../control.h"
-#include "../dr.h"
-#include "../physics.h"
+#include "control/bangbang.h"
+#include "control/control.h"
+#include "io/dr.h"
+#include "physics/physics.h"
 #include <math.h>
 #include <stdio.h>
 

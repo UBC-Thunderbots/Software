@@ -2,7 +2,7 @@
 #define PRIMITIVES_MOVE_H
 
 #include "primitive.h"
-#include "physics.h"
+#include "physics/physics.h"
 #include "util/physbot.h"
 
 

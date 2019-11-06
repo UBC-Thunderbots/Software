@@ -1,9 +1,9 @@
 #include "dribble.h"
-#include "../control.h"
-#include "../dr.h"
-#include "../dribbler.h"
-#include "../physics.h"
-#include "../bangbang.h"
+#include "control/control.h"
+#include "io/dr.h"
+#include "io/dribbler.h"
+#include "physics/physics.h"
+#include "control/bangbang.h"
 #include <stdio.h>
 
 #define DRIBBLE_TIME_HORIZON 0.05f //s

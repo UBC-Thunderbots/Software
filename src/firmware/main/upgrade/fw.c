@@ -6,11 +6,12 @@
 #include "fw.h"
 #include "common.h"
 #include "internal.h"
-#include "../constants.h"
-#include "../dma.h"
-#include "../main.h"
-#include "../pins.h"
-#include "../sdcard.h"
+#include "util/constants.h"
+#include "io/dma.h"
+#include "upgrade/constants.h"
+#include "main.h"
+#include "io/pins.h"
+#include "io/sdcard.h"
 #include <FreeRTOS.h>
 #include <assert.h>
 #include <build_id.h>

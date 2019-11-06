@@ -6,14 +6,14 @@
  *
  * @{
  */
-#include "wheels.h"
-#include "adc.h"
-#include "control.h"
-#include "encoder.h"
-#include "error.h"
-#include "hall.h"
-#include "motor.h"
-#include "receive.h"
+#include "io/wheels.h"
+#include "io/adc.h"
+#include "control/control.h"
+#include "io/encoder.h"
+#include "util/error.h"
+#include "io/hall.h"
+#include "io/motor.h"
+#include "io/receive.h"
 #ifndef FWSIM
 #include <rcc.h>
 #include <registers/timer.h>

@@ -1,9 +1,9 @@
-#include "dr.h"
-#include "dsp.h"
-#include "encoder.h"
-#include "physics.h"
-#include "sensors.h"
-#include "circbuff.h"
+#include "io/dr.h"
+#include "io/dsp.h"
+#include "io/encoder.h"
+#include "physics/physics.h"
+#include "io/sensors.h"
+#include "util/circbuff.h"
 #include "primitives/primitive.h"
 
 #include <stdio.h>

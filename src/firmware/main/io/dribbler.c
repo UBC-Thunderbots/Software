@@ -1,13 +1,13 @@
 /**
  * These functions handle overall operation of the dribbler, including PWM selection, torque limiting, and thermal modelling.
  */
-#include "dribbler.h"
-#include "adc.h"
-#include "control.h"
-#include "hall.h"
-#include "motor.h"
-#include "receive.h"
-#include "physics.h"
+#include "io/dribbler.h"
+#include "io/adc.h"
+#include "control/control.h"
+#include "io/hall.h"
+#include "io/motor.h"
+#include "io/receive.h"
+#include "physics/physics.h"
 #include <stdio.h>
 
 /**

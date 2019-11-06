@@ -1,7 +1,7 @@
 #ifndef BREAKBEAM_H
 #define BREAKBEAM_H
 
-#include "log.h"
+#include "util/log.h"
 #include <stdbool.h>
 
 float breakbeam_difference(void);

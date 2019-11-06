@@ -1,7 +1,7 @@
 #include "shoot.h"
-#include "control.h"
-#include "physics.h"
-#include "bangbang.h"
+#include "control/control.h"
+#include "physics/physics.h"
+#include "control/bangbang.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,10 +10,10 @@
 #include "util/log.h"
 
 #ifndef FWSIM
-#include "chicker.h"
-#include "dr.h"
-#include "dribbler.h"
-#include "leds.h"
+#include "io/chicker.h"
+#include "io/dr.h"
+#include "io/dribbler.h"
+#include "io/leds.h"
 #else
 #include "simulate.h"
 #endif

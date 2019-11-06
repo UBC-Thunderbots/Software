@@ -14,10 +14,10 @@
 #include "shoot.h"
 #include "spin.h"
 #include "stop.h"
-#include "chicker.h"
-#include "dr.h"
-#include "dribbler.h"
-#include "receive.h"
+#include "io/chicker.h"
+#include "io/dr.h"
+#include "io/dribbler.h"
+#include "io/receive.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -37,20 +37,16 @@
  * Make sure stop is always the first primitive.
  */
 static const primitive_t * const PRIMITIVES[] = {
-	&STOP_PRIMITIVE, // index 0, do not change the order of stuff in this one
-	&MOVE_PRIMITIVE, // 1
-	&DRIBBLE_PRIMITIVE, // 2 this should be unessisary for FWSIM, but keep it here to make the order still correct
-	&SHOOT_PRIMITIVE, // 3
-	&CATCH_PRIMITIVE, // 4
-	&PIVOT_PRIMITIVE, // 5
-	&SPIN_PRIMITIVE, // 6
-#ifndef FWSIM // Should be useless for simualtion?
-	&DIRECT_WHEELS_PRIMITIVE, // 7
-	&DIRECT_VELOCITY_PRIMITIVE, // 8
-#endif
-#ifndef FWSIM // not useful for simlation at all, so get rid of it
-  &IMU_TEST_PRIMITIVE,
-#endif // FWSIM
+    &STOP_PRIMITIVE, // index 0, do not change the order of stuff in this one
+    &MOVE_PRIMITIVE, // 1
+    &DRIBBLE_PRIMITIVE, // 2 this should be unessisary for FWSIM, but keep it here to make the order still correct
+    &SHOOT_PRIMITIVE, // 3
+    &CATCH_PRIMITIVE, // 4
+    &PIVOT_PRIMITIVE, // 5
+    &SPIN_PRIMITIVE, // 6
+    &DIRECT_WHEELS_PRIMITIVE, // 7
+    &DIRECT_VELOCITY_PRIMITIVE, // 8
+    &IMU_TEST_PRIMITIVE, // 9
 };
 
 /**
@@ -81,12 +77,12 @@ static unsigned int primitive_current_index;
  */
 void primitive_init(void) {
 #ifndef FWSIM
-	static StaticSemaphore_t primitive_mutex_storage;
-	primitive_mutex = xSemaphoreCreateMutexStatic(&primitive_mutex_storage);
+    static StaticSemaphore_t primitive_mutex_storage;
+    primitive_mutex = xSemaphoreCreateMutexStatic(&primitive_mutex_storage);
 #endif // FWSIM
-	for (size_t i = 0; i != PRIMITIVE_COUNT; ++i) {
-		PRIMITIVES[i]->init();
-	}
+    for (size_t i = 0; i != PRIMITIVE_COUNT; ++i) {
+        PRIMITIVES[i]->init();
+    }
 }
 
 /**
@@ -96,21 +92,17 @@ void primitive_init(void) {
  * \param[in] params the parameters to the primitive
  */
 void primitive_start(unsigned int primitive, const primitive_params_t *params) {
-	assert(primitive < PRIMITIVE_COUNT);
-#ifndef FWSIM
-	xSemaphoreTake(primitive_mutex, portMAX_DELAY);
-	if (primitive_current) {
-		primitive_current->end();
-	}
-	chicker_auto_disarm();
-	dribbler_set_speed(0);
-#endif // FWSIM
-	primitive_current = PRIMITIVES[primitive];
-	primitive_current_index = primitive;
-	primitive_current->start(params);
-#ifndef FWSIM
-	xSemaphoreGive(primitive_mutex);
-#endif
+    assert(primitive < PRIMITIVE_COUNT);
+    xSemaphoreTake(primitive_mutex, portMAX_DELAY);
+    if (primitive_current) {
+        primitive_current->end();
+    }
+    chicker_auto_disarm();
+    dribbler_set_speed(0);
+    primitive_current = PRIMITIVES[primitive];
+    primitive_current_index = primitive;
+    primitive_current->start(params);
+    xSemaphoreGive(primitive_mutex);
 }
 
 /**
@@ -120,20 +112,16 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params) {
  * \c NULL if no record is to be filled
  */
 void primitive_tick(log_record_t *log) {
-#ifndef FWSIM
-	xSemaphoreTake(primitive_mutex, portMAX_DELAY);
-	if (log) {
-		log->tick.drive_serial = receive_last_serial();
-		log->tick.primitive = (uint8_t)primitive_current_index;
-	}
-#endif // FWSIM
-	if (primitive_current) {
-		primitive_current->tick(log);
-	}
-#ifndef FWSIM
-	dr_tick(log);
-	xSemaphoreGive(primitive_mutex);
-#endif // FWSIM
+    xSemaphoreTake(primitive_mutex, portMAX_DELAY);
+    if (log) {
+        log->tick.drive_serial = receive_last_serial();
+        log->tick.primitive = (uint8_t)primitive_current_index;
+    }
+    if (primitive_current) {
+        primitive_current->tick(log);
+    }
+    dr_tick(log);
+    xSemaphoreGive(primitive_mutex);
 }
 
 /**
@@ -144,34 +132,34 @@ void primitive_tick(log_record_t *log) {
  * \retval false the primitive is a movement primitive
  */
 bool primitive_is_direct(unsigned int primitive) {
-	return PRIMITIVES[primitive]->direct;
+    return PRIMITIVES[primitive]->direct;
 }
 
 unsigned int get_primitive_index(){
-	return primitive_current_index;
+    return primitive_current_index;
 }
 
 bool primitive_params_are_equal(primitive_params_t* params1,primitive_params_t* params2) {
 
-	bool equal = true;
+    bool equal = true;
 
-	if(params1->slow != params2->slow){
-		equal = false;
-	}
+    if(params1->slow != params2->slow){
+        equal = false;
+    }
 
-	if(equal && params1->extra != params2->extra){
-		equal = false;
-	}
+    if(equal && params1->extra != params2->extra){
+        equal = false;
+    }
 
-	if(equal){
-		for(int i=0;i<4;i++){
-			if(params1->params[i] != params2->params[i]){
-				equal = false;
-			}
-		}
-	}
+    if(equal){
+        for(int i=0;i<4;i++){
+            if(params1->params[i] != params2->params[i]){
+                equal = false;
+            }
+        }
+    }
 
-	return equal;
+    return equal;
 }
-	
+    
 #endif

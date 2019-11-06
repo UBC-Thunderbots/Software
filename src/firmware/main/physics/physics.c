@@ -1,10 +1,10 @@
-#include "physics.h"
-#include "encoder.h"
+#include "physics/physics.h"
+#include "io/encoder.h"
 #include <math.h>
 #include <stdint.h>
 
 #ifndef FWSIM
-#include "adc.h"
+#include "io/adc.h"
 #else
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,5 +1,5 @@
 #include "util.h"
-#include "physics.h"
+#include "physics/physics.h"
 
 float fmax_of_array(float array[], unsigned size) {
     unsigned i;

@@ -15,10 +15,10 @@
  *
  * \{
  */
-#include "icb.h"
-#include "dma.h"
-#include "error.h"
-#include "pins.h"
+#include "io/icb.h"
+#include "io/dma.h"
+#include "util/error.h"
+#include "io/pins.h"
 #include "priority.h"
 #include <FreeRTOS.h>
 #include <assert.h>

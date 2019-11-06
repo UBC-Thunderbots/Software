@@ -1,12 +1,12 @@
 #include "spin.h"
-#include "bangbang.h"
-#include "control.h"
-#include "physics.h"
+#include "control/bangbang.h"
+#include "control/control.h"
+#include "physics/physics.h"
 #include <math.h>
 #include <stdio.h>
 
 #ifndef FWSIM
-#include "dr.h"
+#include "io/dr.h"
 #else
 #include "simulate.h"
 #endif

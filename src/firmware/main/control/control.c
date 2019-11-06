@@ -1,6 +1,6 @@
 #include "control.h"
 
-#include "physics.h"
+#include "physics/physics.h"
 
 
 #include "wheels.h"
