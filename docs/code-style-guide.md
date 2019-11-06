@@ -80,9 +80,15 @@ If you want to know more about our coding style you can take a look at our [clan
   // Incorrect
   int x, y, z = 0;
 
-  // Correct
+  // Correct and equivalent to the above
   int x;
   int y;
+  int z = 0;
+
+  // However, the author may have intended the following
+  // or a code reader may have assumed the following
+  int x = 0;
+  int y = 0;
   int z = 0;
   ```
 
