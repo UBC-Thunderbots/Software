@@ -4,7 +4,7 @@ echo "================================================================"
 echo "Installing CLion"
 echo "================================================================"
 
-clion_version="2019.2.2"
+clion_version="2019.2.1"
 clion_executable_path="/usr/local/bin/clion"
 
 
@@ -20,8 +20,8 @@ else
 
 	# Unzip and symlink to usr location
         sudo tar xfz /tmp/CLion-${clion_version}.tar.gz -C /opt
-        sudo ln -s /opt/clion-${clion_version}/bin/clion.sh ${clion_executable_path}-${clion_version}
-        sudo ln -s ${clion_executable_path}-${clion_version} $clion_executable_path
+        sudo ln -s -f /opt/clion-${clion_version}/bin/clion.sh ${clion_executable_path}-${clion_version}
+        sudo ln -s -f ${clion_executable_path}-${clion_version} $clion_executable_path
 	
 	# Install clion desktop entry
 	wget -O ~/.local/share/applications/jetbrains-clion.desktop "https://raw.githubusercontent.com/pld-linux/clion/master/clion.desktop"
