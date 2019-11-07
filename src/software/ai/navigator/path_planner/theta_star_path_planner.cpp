@@ -163,23 +163,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(const Point &start,
                                                    const Rectangle &navigable_area,
                                                    const std::vector<Obstacle> &obstacles)
 {
-    // Initialize member variables
-    this->obstacles       = obstacles;
-    max_navigable_x_coord = navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    max_navigable_y_coord = navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    num_grid_rows =
-        static_cast<int>((max_navigable_x_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
-                         SIZE_OF_GRID_CELL_IN_METERS);
-    num_grid_cols =
-        static_cast<int>((max_navigable_y_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
-                         SIZE_OF_GRID_CELL_IN_METERS);
+    resetAndInitializeMemberVariables(navigable_area, obstacles);
 
-    // Reset data structures to path plan again
-    open_list.clear();
-    closed_list.clear();
-    unblocked_grid.clear();
-
-    // Initialize local variables
     Point closest_destination = findClosestFreePoint(destination);
     Coordinate src_coord      = pointToCoordinate(start);
     Coordinate dest_coord     = pointToCoordinate(closest_destination);
@@ -200,7 +185,10 @@ std::optional<Path> ThetaStarPathPlanner::findPath(const Point &start,
         return Path(std::vector<Point>({start, closest_destination}));
     }
 
-    initListsAndCellDetails(src_coord);
+    // Initialising the parameters of the starting node
+    cell_heuristics[src_coord.row()][src_coord.col()].updateAndInitialize(src_coord, 0.0,
+                                                                          0.0);
+    open_list.insert(src_coord);
 
     bool found_dest = findPathToDestination(dest_coord);
 
@@ -493,15 +481,25 @@ ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::pointToCoordinate(Point p
         static_cast<int>((p.y() + max_navigable_y_coord) / SIZE_OF_GRID_CELL_IN_METERS));
 }
 
-void ThetaStarPathPlanner::initListsAndCellDetails(Coordinate src_coord)
+void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
+    const Rectangle &navigable_area, const std::vector<Obstacle> &obstacles)
 {
+    // Initialize member variables
+    this->obstacles       = obstacles;
+    max_navigable_x_coord = navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    max_navigable_y_coord = navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    num_grid_rows =
+        static_cast<int>((max_navigable_x_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
+                         SIZE_OF_GRID_CELL_IN_METERS);
+    num_grid_cols =
+        static_cast<int>((max_navigable_y_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
+                         SIZE_OF_GRID_CELL_IN_METERS);
+
+    // Reset data structures to path plan again
+    open_list.clear();
+    closed_list.clear();
+    unblocked_grid.clear();
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,
         std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
-
-    // Initialising the parameters of the starting node
-    cell_heuristics[src_coord.row()][src_coord.col()].updateAndInitialize(src_coord, 0.0,
-                                                                          0.0);
-
-    open_list.insert(src_coord);
 }

@@ -277,11 +277,13 @@ class ThetaStarPathPlanner : public PathPlanner
                                                     const Point &closest_destination);
 
     /**
-     * Inits Lists and cell details
+     * Resets and initializes member variables to prepare for planning a new path
      *
-     * @param src_coord source coordinate
+     * @param navigable_area Rectangle representing the navigable area
+     * @param obstacles obstacles to avoid
      */
-    void initListsAndCellDetails(Coordinate src_coord);
+    void resetAndInitializeMemberVariables(const Rectangle &navigable_area,
+                                           const std::vector<Obstacle> &obstacles);
 
     // if close to destination then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
