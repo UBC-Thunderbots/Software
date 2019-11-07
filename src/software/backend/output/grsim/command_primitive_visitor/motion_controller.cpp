@@ -55,7 +55,7 @@ MotionController::Velocity MotionController::bangBangVelocityController(
                  this](MotionController::PositionCommand& command) {
                     robot_velocities.linear_velocity =
                         MotionController::determineLinearVelocityFromPosition(
-                            robot, Point(command.global_destination),
+                            robot, command.global_destination,
                             command.final_speed_at_destination, delta_time,
                             this->max_speed_meters_per_second,
                             this->max_angular_speed_radians_per_second);

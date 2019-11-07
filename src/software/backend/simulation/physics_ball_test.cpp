@@ -15,7 +15,7 @@ TEST(PhysicsBallTest, test_get_ball_with_timestamp)
     auto physics_ball = PhysicsBall(world, ball_parameter);
     auto ball         = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(ball_parameter.position().isClose(ball.position(), 1e-4));
+    EXPECT_TRUE(ball_parameter.position().isClose(ball.position(), 1e-7));
     EXPECT_TRUE(Point(ball_parameter.velocity()).isClose(Point(ball.velocity()), 1e-7));
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
