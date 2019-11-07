@@ -144,8 +144,8 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
                 open_list.insert(new_coord);
 
                 // Update the details of this CellHeuristic
-                cell_heuristics[new_coord.row()][new_coord.col()].updateAndInitialize(
-                    parent_new, f_new, g_new);
+                cell_heuristics[new_coord.row()][new_coord.col()].update(parent_new,
+                                                                         f_new, g_new);
             }
             // If the destination is the same as the current successor
             if (new_coord == dest)
@@ -186,8 +186,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(const Point &start,
     }
 
     // Initialising the parameters of the starting node
-    cell_heuristics[src_coord.row()][src_coord.col()].updateAndInitialize(src_coord, 0.0,
-                                                                          0.0);
+    cell_heuristics[src_coord.row()][src_coord.col()].update(src_coord, 0.0, 0.0);
     open_list.insert(src_coord);
 
     bool found_dest = findPathToDestination(dest_coord);

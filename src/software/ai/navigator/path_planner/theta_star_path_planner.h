@@ -53,13 +53,14 @@ class ThetaStarPathPlanner : public PathPlanner
         CellHeuristic() {}
 
         /**
-         * Updates and initializes CellHeuristics internal variables
+         * Updates CellHeuristics internal variables
+         * Once updated, a CellHeuristic is considered intialized
          *
          * @param parent parent
          * @param f f value
          * @param g g value
          */
-        void updateAndInitialize(Coordinate parent, double f, double g)
+        void update(Coordinate parent, double f, double g)
         {
             parent_      = parent;
             f_           = f;
