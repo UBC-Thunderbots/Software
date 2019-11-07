@@ -73,22 +73,20 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(Coordinate dest)
 {
     int row                        = dest.row();
     int col                        = dest.col();
+    Coordinate current_coord       = dest;
     std::vector<Point> path_points = std::vector<Point>();
 
     std::stack<Coordinate> coord_path;
 
     // loop until parent is self
-    while (!(cell_heuristics[row][col].parent.row() == row &&
-             cell_heuristics[row][col].parent.col() == col))
+    while (!(cell_heuristics[row][col].parent() == current_coord))
     {
-        coord_path.push(Coordinate(row, col));
-        int temp_row = cell_heuristics[row][col].parent.row();
-        int temp_col = cell_heuristics[row][col].parent.col();
-        row          = temp_row;
-        col          = temp_col;
+        coord_path.push(current_coord);
+        current_coord =
+            cell_heuristics[current_coord.row()][current_coord.col()].parent();
     }
 
-    coord_path.push(Coordinate(row, col));
+    coord_path.push(current_coord);
     while (!coord_path.empty())
     {
         Coordinate p = coord_path.top();
@@ -115,17 +113,17 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
             double g_new;
             Coordinate parent_new;
             Coordinate parent =
-                cell_heuristics[current_coord.row()][current_coord.col()].parent;
+                cell_heuristics[current_coord.row()][current_coord.col()].parent();
             if (hasLineOfSight(parent, new_coord))
             {
                 parent_new = parent;
-                g_new      = cell_heuristics[parent.row()][parent.col()].g +
+                g_new      = cell_heuristics[parent.row()][parent.col()].g() +
                         calculateHValue(parent, new_coord);
             }
             else
             {
                 parent_new = current_coord;
-                g_new      = cell_heuristics[current_coord.row()][current_coord.col()].g +
+                g_new = cell_heuristics[current_coord.row()][current_coord.col()].g() +
                         curr_to_new_dist;
             }
 
@@ -135,21 +133,19 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
             // If it isn’t on the open list, add it to
             // the open list. Make the current square
             // the parent of this square. Record the
-            // f, g, and h costs of the square CellHeuristic
+            // f, and g costs of the square CellHeuristic
             //             OR
             // If it is on the open list already, check
             // to see if this path to that square is better,
             // using 'f' cost as the measure.
-            if (cell_heuristics[new_coord.row()][new_coord.col()].f == DBL_MAX ||
-                cell_heuristics[new_coord.row()][new_coord.col()].f > f_new)
+            if (!cell_heuristics[new_coord.row()][new_coord.col()].isInitialized() ||
+                cell_heuristics[new_coord.row()][new_coord.col()].f() > f_new)
             {
                 open_list.insert(new_coord);
 
                 // Update the details of this CellHeuristic
-                cell_heuristics[new_coord.row()][new_coord.col()].f      = f_new;
-                cell_heuristics[new_coord.row()][new_coord.col()].g      = g_new;
-                cell_heuristics[new_coord.row()][new_coord.col()].h      = h_new;
-                cell_heuristics[new_coord.row()][new_coord.col()].parent = parent_new;
+                cell_heuristics[new_coord.row()][new_coord.col()].updateAndInitialize(
+                    parent_new, f_new, g_new);
             }
             // If the destination is the same as the current successor
             if (new_coord == dest)
@@ -501,18 +497,11 @@ void ThetaStarPathPlanner::initListsAndCellDetails(Coordinate src_coord)
 {
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,
-        std::vector<CellHeuristic>(num_grid_cols,
-                                   ThetaStarPathPlanner::CellHeuristic(
-                                       Coordinate(-1, -1), DBL_MAX, DBL_MAX, DBL_MAX)));
+        std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
 
     // Initialising the parameters of the starting node
-    int i = src_coord.row(), j = src_coord.col();
-    cell_heuristics[i][j].f      = 0.0;
-    cell_heuristics[i][j].g      = 0.0;
-    cell_heuristics[i][j].h      = 0.0;
-    cell_heuristics[i][j].parent = src_coord;
+    cell_heuristics[src_coord.row()][src_coord.col()].updateAndInitialize(src_coord, 0.0,
+                                                                          0.0);
 
-    // Put the starting CellHeuristic on the open list and set its
-    // 'f' as 0
     open_list.insert(src_coord);
 }

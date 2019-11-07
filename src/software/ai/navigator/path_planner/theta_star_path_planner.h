@@ -50,13 +50,67 @@ class ThetaStarPathPlanner : public PathPlanner
     class CellHeuristic
     {
        public:
-        CellHeuristic(Coordinate parent, double f, double g, double h)
-            : parent(parent), f(f), g(g), h(h)
+        CellHeuristic() {}
+
+        /**
+         * Updates and initializes CellHeuristics internal variables
+         *
+         * @param parent parent
+         * @param f f value
+         * @param g g value
+         */
+        void updateAndInitialize(Coordinate parent, double f, double g)
         {
+            parent_      = parent;
+            f_           = f;
+            g_           = g;
+            initialized_ = true;
         }
 
-        Coordinate parent;
-        double f, g, h;
+        /**
+         * Checks if this is initialized
+         *
+         * @return if CellHeuristic is initialized
+         */
+        bool isInitialized(void) const
+        {
+            return initialized_;
+        }
+
+        /**
+         * Gets f value
+         *
+         * @return f value
+         */
+        double f() const
+        {
+            return f_;
+        }
+
+        /**
+         * Gets g value
+         *
+         * @return g value
+         */
+        double g() const
+        {
+            return g_;
+        }
+
+        /**
+         * Gets parent Coordinate
+         *
+         * @return parent
+         */
+        Coordinate parent() const
+        {
+            return parent_;
+        }
+
+       private:
+        Coordinate parent_;
+        double f_, g_;
+        bool initialized_;
     };
 
     /**
