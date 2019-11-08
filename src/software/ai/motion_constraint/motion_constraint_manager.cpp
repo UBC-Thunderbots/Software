@@ -7,7 +7,6 @@ std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(
 {
     std::set<MotionConstraint> current_motion_constraints =
         getMotionConstraintsFromGameState(game_state);
-    current_whitelisted_constraints.clear();
     tactic.accept(*this);  // updates current_whitelisted_constraints
     for (const auto &constraint : current_whitelisted_constraints)
     {
@@ -22,17 +21,12 @@ void MotionConstraintManager::visit(const ShadowFreekickerTactic &tactic) {}
 
 void MotionConstraintManager::visit(const GoalieTactic &tactic)
 {
-    current_whitelisted_constraints.insert(MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    current_whitelisted_constraints.insert(MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    current_whitelisted_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
-    current_whitelisted_constraints.insert(MotionConstraint::FRIENDLY_HALF);
-    // current_whitelisted_constraints.insert(MotionConstraint::BALL);
+    current_whitelisted_constraints = std::set<MotionConstraint>(
+        {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::FRIENDLY_DEFENSE_AREA,
+         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::FRIENDLY_HALF});
 }
 
-void MotionConstraintManager::visit(const CreaseDefenderTactic &tactic)
-{
-    // current_whitelisted_constraints.insert(MotionConstraint::BALL);
-}
+void MotionConstraintManager::visit(const CreaseDefenderTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ShadowEnemyTactic &tactic) {}
 
@@ -44,52 +38,44 @@ void MotionConstraintManager::visit(const ChipTactic &tactic) {}
 
 void MotionConstraintManager::visit(const KickoffChipTactic &tactic)
 {
-    current_whitelisted_constraints.insert(MotionConstraint::CENTER_CIRCLE);
-    current_whitelisted_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
+    current_whitelisted_constraints = std::set<MotionConstraint>(
+        {MotionConstraint::CENTER_CIRCLE, MotionConstraint::HALF_METER_AROUND_BALL});
 }
 
 void MotionConstraintManager::visit(const StopTactic &tactic) {}
 
 void MotionConstraintManager::visit(const PenaltyKickTactic &tactic)
 {
-    // current_whitelisted_constraints.insert(MotionConstraint::BALL);
-    current_whitelisted_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
-    current_whitelisted_constraints.insert(MotionConstraint::ENEMY_DEFENSE_AREA);
-    current_whitelisted_constraints.insert(MotionConstraint::ENEMY_HALF);
+    current_whitelisted_constraints = std::set<MotionConstraint>(
+        {MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::ENEMY_DEFENSE_AREA,
+         MotionConstraint::ENEMY_HALF});
 }
 
 void MotionConstraintManager::visit(const PenaltySetupTactic &tactic)
 {
-    current_whitelisted_constraints.insert(MotionConstraint::ENEMY_HALF);
-    current_whitelisted_constraints.insert(MotionConstraint::ENEMY_DEFENSE_AREA);
-    current_whitelisted_constraints.insert(MotionConstraint::FRIENDLY_HALF);
-    current_whitelisted_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
+    current_whitelisted_constraints = std::set<MotionConstraint>(
+        {MotionConstraint::ENEMY_HALF, MotionConstraint::ENEMY_DEFENSE_AREA,
+         MotionConstraint::FRIENDLY_HALF, MotionConstraint::HALF_METER_AROUND_BALL});
 }
 
-void MotionConstraintManager::visit(const ReceiverTactic &tactic)
-{
-    // current_whitelisted_constraints.insert(MotionConstraint::BALL);
-}
+void MotionConstraintManager::visit(const ReceiverTactic &tactic) {}
 
 void MotionConstraintManager::visit(const PatrolTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ShootGoalTactic &tactic)
 {
-    // current_whitelisted_constraints.insert(MotionConstraint::BALL);
-    current_whitelisted_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
+    current_whitelisted_constraints =
+        std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL});
 }
 
-void MotionConstraintManager::visit(const PasserTactic &tactic)
-{
-    // current_whitelisted_constraints.insert(MotionConstraint::BALL);
-}
+void MotionConstraintManager::visit(const PasserTactic &tactic) {}
 
 void MotionConstraintManager::visit(const DefenseShadowEnemyTactic &tactic) {}
 
 void MotionConstraintManager::visit(const GrabBallTactic &tactic)
 {
-    // current_whitelisted_constraints.insert(MotionConstraint::BALL);
-    current_whitelisted_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
+    current_whitelisted_constraints =
+        std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL});
 }
 
 void MotionConstraintManager::visit(const MoveTestTactic &tactic) {}
