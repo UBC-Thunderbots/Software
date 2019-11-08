@@ -340,7 +340,7 @@ The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. Ac
 2. Shooting the ball at a target
 3. Intercepting a moving ball
 
-Actions use [Intents](#intents) to implement their behavior. Actions are responsible for obeying any preconditions `Intents` have.
+Actions use [Intents](#intents) to implement their behaviour. Actions are responsible for obeying any preconditions `Intents` have.
 
 **It seems like Actions and Intents are basically the same thing. Why aren't they combined into a single class?**
 
