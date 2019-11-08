@@ -98,7 +98,7 @@ The code-review process gives us a chance ask questions or suggest improvements 
 The Pull Request process usually looks like the following:
  
 1. Make sure all the changes you want to make are pushed to a branch on your fork of the repository
-2. Make sure you have [updated your branch](#updating-yourbranch-and-resolving-conflicts) and [formatted your code](#formatting-your-code). This is to help make sure CI will pass.
+2. Make sure you have [updated your branch](#updating-your-branch-and-resolving-conflicts) and [formatted your code](#formatting-your-code). This is to help make sure CI will pass.
 3. From the main page of your fork of the Software repository, click on the "code" tab and then on the "branches" tab below.
 4. Find the branch you want to open a Pull Request with and click "New pull request"
 5. Make sure the target (base-fork) is the `UBC-Thunderbots/Software` repository with branch `master`
