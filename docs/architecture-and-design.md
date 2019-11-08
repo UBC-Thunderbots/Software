@@ -374,7 +374,7 @@ Furthermore, every play specifies an `Applicable` and `Invariant` condition. The
 ## Navigation
 The `Navigator` is responsible for path planning and navigation. Once our strategy has decided what it wants to do, it passes the resulting [Intents](#intents) to the `Navigator`. The `Navigator` is then responsible for breaking down the [Intents](#intents) and turning them into [Primitives](#primitives).
 
-Most [Intents](#intents) are easy to break down into primitives, and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behavior like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
+Most [Intents](#intents) are easy to break down into  [Primitives](#primitives), and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behavior like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
 
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
 
