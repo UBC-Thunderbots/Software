@@ -41,7 +41,6 @@ class MoveIntent : public MovePrimitive, public Intent
 
     std::string getIntentName(void) const override;
 
-
     /**
      * Gets type of navigation around the ball
      *

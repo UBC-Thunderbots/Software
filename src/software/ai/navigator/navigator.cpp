@@ -115,6 +115,10 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
             getObstaclesFromAvoidAreas(intent.getAreasToAvoid(), world);
         obstacles.insert(obstacles.end(), avoid_area_obstacles.begin(),
                          avoid_area_obstacles.end());
+        if (intent.getBallNavigationType() == BallNavigationType::AVOID_COLLISION)
+        {
+            obstacles.push_back(Obstacle::createCircularBallObstacle(world.ball(), 0.06));
+        }
 
         auto robot = world.friendlyTeam().getRobotById(intent.getRobotId());
 
