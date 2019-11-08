@@ -256,9 +256,9 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
         std::make_unique<OnePointPathTestPathPlanner>()));
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<MoveIntent>(0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF,
-                                     MoveType::NORMAL, AutokickType::NONE));
+    intents.emplace_back(std::make_unique<MoveIntent>(
+        0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutokickType::NONE, BallNavigationType::AVOID_COLLISION));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
@@ -310,9 +310,9 @@ TEST(NavigatorTest, move_intent_with_no_path_test_path_planner)
         std::make_unique<NoPathTestPathPlanner>()));
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<MoveIntent>(0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF,
-                                     MoveType::NORMAL, AutokickType::NONE));
+    intents.emplace_back(std::make_unique<MoveIntent>(
+        0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutokickType::NONE, BallNavigationType::AVOID_COLLISION));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 

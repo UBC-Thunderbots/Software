@@ -83,7 +83,8 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0.0,
-                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                    BallNavigationType::ALLOW_COLLISION));
             }
         }
         else

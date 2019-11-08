@@ -5,10 +5,17 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
+enum BallNavigationType
+{
+    ALLOW_COLLISION,
+    AVOID_COLLISION
+};
+
 class MoveIntent : public MovePrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;
+
     /**
      * Creates a new Move Intent
      *
@@ -24,13 +31,23 @@ class MoveIntent : public MovePrimitive, public Intent
      * @param autokick This will enable the "break-beam" on the robot, that will
      *                        trigger the kicker to fire as soon as the ball is in front
      *                        of it
+     * @param ball_navigation how to navigate around the ball
      */
     explicit MoveIntent(unsigned int robot_id, const Point& dest,
                         const Angle& final_angle, double final_speed,
                         unsigned int priority, DribblerEnable enable_dribbler,
-                        MoveType move_type, AutokickType autokick);
+                        MoveType move_type, AutokickType autokick,
+                        BallNavigationType ball_navigation);
 
     std::string getIntentName(void) const override;
+
+
+    /**
+     * Gets type of navigation around the ball
+     *
+     * @return type of navigation around the ball
+     */
+    BallNavigationType getBallNavigationType() const;
 
     void accept(IntentVisitor& visitor) const override;
 
@@ -50,4 +67,7 @@ class MoveIntent : public MovePrimitive, public Intent
      * @return true if the MoveIntents are not equal and false otherwise
      */
     bool operator!=(const MoveIntent& other) const;
+
+   private:
+    BallNavigationType ball_navigation;
 };

@@ -144,7 +144,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
                     Point::createFromAngle(nearest_enemy_robot->orientation()) *
                         ROBOT_MAX_RADIUS_METERS * 3;
                 move_tactics[1]->updateControlParams(
-                    block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
+                    block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0,
+                    BallNavigationType::AVOID_COLLISION);
                 result.emplace_back(move_tactics[1]);
             }
             else
@@ -170,9 +171,11 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
                             Point::createFromAngle(nearest_enemy_robot->orientation()) *
                                 ROBOT_MAX_RADIUS_METERS * 3;
         move_tactics[0]->updateControlParams(
-            block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
+            block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0,
+            BallNavigationType::AVOID_COLLISION);
         move_tactics[1]->updateControlParams(
-            block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
+            block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0,
+            BallNavigationType::AVOID_COLLISION);
         return move_tactics;
     }
     else

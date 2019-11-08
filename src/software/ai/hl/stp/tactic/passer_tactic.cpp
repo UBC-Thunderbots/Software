@@ -63,7 +63,7 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         yield(move_action.updateStateAndGetNextIntent(
             *robot, wait_position, pass.passerOrientation(), 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE));
+            MoveType::NORMAL, AutokickType::NONE, BallNavigationType::ALLOW_COLLISION));
     }
 
     // The angle between the ball velocity vector and a vector from the passer

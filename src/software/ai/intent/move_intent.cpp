@@ -7,16 +7,22 @@ const std::string MoveIntent::INTENT_NAME = "Move Intent";
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
                        double final_speed, unsigned int priority,
                        DribblerEnable enable_dribbler, MoveType move_type,
-                       AutokickType autokick)
+                       AutokickType autokick, BallNavigationType ball_navigation)
     : MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler, move_type,
                     autokick),
-      Intent(priority)
+      Intent(priority),
+      ball_navigation(ball_navigation)
 {
 }
 
 std::string MoveIntent::getIntentName(void) const
 {
     return INTENT_NAME;
+}
+
+BallNavigationType MoveIntent::getBallNavigationType() const
+{
+    return ball_navigation;
 }
 
 void MoveIntent::accept(IntentVisitor &visitor) const

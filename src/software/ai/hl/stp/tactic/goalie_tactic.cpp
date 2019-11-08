@@ -217,7 +217,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             next_intent = move_action.updateStateAndGetNextIntent(
                 *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP);
+                MoveType::NORMAL, AutokickType::AUTOCHIP,
+                BallNavigationType::ALLOW_COLLISION);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
@@ -263,7 +264,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
             next_intent             = move_action.updateStateAndGetNextIntent(
                 *robot, goalie_restricted_pos, goalie_orientation, 0.0,
-                DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                BallNavigationType::ALLOW_COLLISION);
         }
 
         // compute angle between two vectors, negative goal post to ball and positive
@@ -315,7 +317,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         next_intent = move_action.updateStateAndGetNextIntent(
             *robot, goalie_pos, goalie_orientation, goalie_final_speed,
-            DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
+            DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP,
+            BallNavigationType::ALLOW_COLLISION);
 
         yield(std::move(next_intent));
     } while (!move_action.done());

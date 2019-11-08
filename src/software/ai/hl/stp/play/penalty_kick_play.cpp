@@ -68,19 +68,25 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(Point(0, 0),
-                                           world.field().enemyGoal().orientation(), 0);
+                                           world.field().enemyGoal().orientation(), 0,
+                                           BallNavigationType::AVOID_COLLISION);
         move_tactic_3->updateControlParams(Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().orientation(), 0);
+                                           world.field().enemyGoal().orientation(), 0,
+                                           BallNavigationType::AVOID_COLLISION);
         move_tactic_4->updateControlParams(Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().orientation(), 0);
+                                           world.field().enemyGoal().orientation(), 0,
+                                           BallNavigationType::AVOID_COLLISION);
         move_tactic_5->updateControlParams(Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().orientation(), 0);
+                                           world.field().enemyGoal().orientation(), 0,
+                                           BallNavigationType::AVOID_COLLISION);
         move_tactic_6->updateControlParams(Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-                                           world.field().enemyGoal().orientation(), 0);
+                                           world.field().enemyGoal().orientation(), 0,
+                                           BallNavigationType::AVOID_COLLISION);
 
         penalty_shot_tactic->updateWorldParams(world.ball(), world.enemyTeam().goalie(),
                                                world.field());
-        shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
+        shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0,
+                                                BallNavigationType::AVOID_COLLISION);
 
         // If we are setting up for penalty kick, move our robots to position
         if (world.gameState().isSetupState())

@@ -176,7 +176,8 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
+                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                BallNavigationType::ALLOW_COLLISION));
         }
         else
         {
@@ -184,7 +185,8 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(
                 *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE));
+                MoveType::NORMAL, AutokickType::NONE,
+                BallNavigationType::ALLOW_COLLISION));
         }
 
     } while (

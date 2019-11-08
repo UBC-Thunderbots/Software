@@ -99,7 +99,6 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
-    align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
@@ -110,8 +109,8 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic,
+                                BallNavigationType::AVOID_COLLISION);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -133,8 +132,8 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Aligning to ball";
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic,
+                                BallNavigationType::AVOID_COLLISION);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -181,14 +180,14 @@ void IndirectFreeKickPlay::updateCherryPickTactics(
 }
 
 void IndirectFreeKickPlay::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic, BallNavigationType ball_navigation)
 {
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
         world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
-        ball_to_center_vec.orientation(), 0);
+        ball_to_center_vec.orientation(), 0, ball_navigation);
 }
 
 void IndirectFreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
@@ -289,8 +288,8 @@ void IndirectFreeKickPlay::findPassStage(
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic,
+                                BallNavigationType::AVOID_COLLISION);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);

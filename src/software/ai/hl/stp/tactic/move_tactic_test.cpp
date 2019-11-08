@@ -12,7 +12,8 @@ TEST(MoveTacticTest, robot_far_from_destination)
 
     MoveTactic tactic = MoveTactic();
     tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(1, 0), Angle::quarter(), 1.0);
+    tactic.updateControlParams(Point(1, 0), Angle::quarter(), 1.0,
+                               BallNavigationType::AVOID_COLLISION);
     auto intent_ptr = tactic.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -32,7 +33,8 @@ TEST(MoveTacticTest, robot_at_destination)
 
     MoveTactic tactic = MoveTactic();
     tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Angle::zero(), 0.0);
+    tactic.updateControlParams(Point(0, 0), Angle::zero(), 0.0,
+                               BallNavigationType::AVOID_COLLISION);
 
     // We call the Tactic twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
@@ -52,7 +54,8 @@ TEST(MoveTacticTest, test_calculate_robot_cost)
                         Timestamp::fromSeconds(0));
 
     MoveTactic tactic = MoveTactic();
-    tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0);
+    tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0,
+                               BallNavigationType::AVOID_COLLISION);
 
     EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));
 }
