@@ -1,7 +1,6 @@
 # Code Style Guide
 
 ## Table of Contents
-<<<<<<< HEAD
 * [Names and Variables](#names-and-variables)
 * [Comments](#comments)
 * [Headers](#headers)
