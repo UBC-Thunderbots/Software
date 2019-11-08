@@ -301,7 +301,7 @@ Each component is described in more detail in their own sections.
 # Backend
 The `Backend` is responsible for all communication with the "outside world". The responsabilities of the `Backend` can be broken down into Input and Output.
 
-### Input Responsabilities
+### Input Responsibilities
 1. Receiving robot status messages
 2. Receiving vision data about where the robots and ball are (typically provided by [SSL-Vision](#ssl-vision) or [grSim](#grsim))
 2. Receiving referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
