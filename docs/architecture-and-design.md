@@ -118,7 +118,7 @@ Information received from the robots is stored in `Robot Status` objects so that
 
 
 # Design Patterns
-Below are the main design patterns we make use of in our code, and what they are used for.
+Below are the main design patterns we use in our code, and what they are used for.
 
 ## Abstract Classes and Inheritance
 Abstract classes let us define interfaces for various components of our code. Then we can implement different objects that obey the interface, and use them interchangeably, with the guarantee that as long as they follow the same interface we can use them in the same way.
