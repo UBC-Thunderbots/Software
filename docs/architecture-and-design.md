@@ -269,7 +269,7 @@ The coordinate system is a simple 2D x-y plane. The x-dimension runs between the
 
 Because we have to be able to play on either side of a field during a game, this means the "friendly half of the field" will not always be in the positive or negative x part of the coordinate plane. This inconsistency is a problem when we want to specify points like "the friendly net", or "the enemy corner". We can't simple say the friendly net is `(-4.5, 0)` all the time, because this would not be the case if we were defending the other side of the field where the friendly net would be `(4.5, 0)`.
 
-In order to overcome this, our conention is that:
+In order to overcome this, our convention is that:
 * The friendly half of the field is **always negative x**, and the enemy half of the field is **always positive x**
 * `y` is positive to the "left" of someone looking at the enemy goal from the friendly goal
 * The center of the field (inside the center-circle) is the origin / `(0, 0)`
