@@ -181,12 +181,13 @@ Some general guidelines when writing tests are:
   ```
 * Non-simple data types are generally passed by _const_ references whenever possible. Try avoid setting values by reference, since this makes it harder to follow the flow of control and data in the program.
   ```cpp
-  // Pass by const reference
-  Point predictBallPosition(const Ball& ball);
-
   // Not ideal
   // Pass by reference to set data
   void getVisionPacket(Packet& packet);
+
+  // Preferred
+  // Pass by const reference
+  Point predictBallPosition(const Ball& ball);
   ```
 * All constructors should be marked with the `explicit` keyword. In the case of a one-argument constructor, this prevents it from being used as an implicit type conversion; in the case of other constructors, it acts as a safeguard in case arguments are later added or removed.
   ```cpp
