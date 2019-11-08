@@ -299,7 +299,7 @@ Each component is described in more detail in their own sections.
 
 
 # Backend
-The `Backend` is responsible for all communication with the "outside world". The responsabilities of the `Backend` can be broken down into Input and Output.
+The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into Input and Output.
 
 ### Input Responsibilities
 1. Receiving robot status messages
