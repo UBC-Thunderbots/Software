@@ -9,6 +9,8 @@
     * [Creating a new Branch](#creating-a-new-branch)
         * [Why should you only create branches from "upstream/master"?](#why-should-you-only-create-branches-from-upstreammaster)
     * [Making Commits](#making-commits)
+    * [Updating Your Branch and Resolving Conflicts](#updating-your-branch-and-resolving-conflicts)
+    * [Formatting Your Code](#formatting-your-code)
     * [Pull Requests](#pull-requests)
     * [Reviewing Pull Requests](#reviewing-pull-requests)
 * [Example Workflow](#example-workflow)
@@ -69,6 +71,24 @@ We don't impose any rules for how you should be committing code, just keep the f
 2. Commit messages should give a good idea of the changes made. You don't have to go in-depth with technical details, but no one will know what you've done if your commit message is "fixed broken stuff"
 3. Do not commit any non-code files such as images, videos, or generated files.
 
+### Updating Your Branch and Resolving Conflicts
+As you are working on your code on your branch and making commits, you'll want to update your branch with the latest code on `upstream/master` to make sure you're working with the latest code. This is important in case someone else merged new code that affects the code you're working on.
+
+To do this, you have 2 options: rebase or merge. [What's the difference?](https://www.atlassian.com/git/tutorials/merging-vs-rebasing). 
+
+Rebasing is generally recommended but requires slightly more knowledge of git. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`. If you do find you run into crazy conflicts, it might be worth aborting and attempting a merge.
+
+To merge, simply run `git pull upstream master`. This _usually_ produces fewer conflicts than rebasing and is a safer option if you just want to get stuff working.
+
+If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorials on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
+
+### Formatting Your Code
+We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
+
+To format the code, from the `Software` directory run `./clang_format/fix_formatting.sh -b master`. This will take the difference between your current branch and your local `master` branch, and run `clang-format` on those changes. The only reason we use the `-b master` option is because it's faster and only formats code you have modified. There is also a `-a` option that will try format the entire codebase, but it is slow and not recommended.
+
+We recommend committing all your changes and then running the formatting script. This keeps the formatting changes separate from your actual changes. For the formatting changes, a simple commit message like "fixed formatting" is fine.
+
 ### Pull Requests
 
 Pull Requests give us a chance to run our automated tests and review the code before it gets merged. This helps us make sure our code on `upstream/master` always compiles and is as bug-free as possible.
@@ -76,14 +96,15 @@ Pull Requests give us a chance to run our automated tests and review the code be
 The code-review process gives us a chance ask questions or suggest improvements regarding a proposed change, so that the code is of the highest possible quality before being merged. It is also a good opportunity for others on the team to see what changes are being made, even if they are not involved in the project.
 
 The Pull Request process usually looks like the following:
-
+ 
 1. Make sure all the changes you want to make are pushed to a branch on your fork of the repository
-2. From the main page of your fork of the Software repository, click on the "code" tab and then on the "branches" tab below.
-3. Find the branch you want to open a Pull Request with and click "New pull request"
-4. Make sure the target (base-fork) is the `UBC-Thunderbots/Software` repository with branch `master`
-5. Give your Pull Request a short but descriptive title (the title should reflect the changes)
-6. Fill out the pull request template. This includes things like a description of the changes, indicating which issues the Pull Request resolves, and indicating what testing has been done.
-7. Add reviewers. This should be anyone that worked with you on the changes or is working on something that will be affected by the changes. Add your team lead and a few other members. Around 3-4 reviewers is a good number, but use your best judgement. Remember, these reviews also help give other team members an idea of the changes that are being made even if they aren't working on them.
+2. Make sure you have [updated your branch](#updating-yourbranch-and-resolving-conflicts) and [formatted your code](#formatting-your-code). This is to help make sure CI will pass.
+3. From the main page of your fork of the Software repository, click on the "code" tab and then on the "branches" tab below.
+4. Find the branch you want to open a Pull Request with and click "New pull request"
+5. Make sure the target (base-fork) is the `UBC-Thunderbots/Software` repository with branch `master`
+6. Give your Pull Request a short but descriptive title (the title should reflect the changes)
+7. Fill out the pull request template. This includes things like a description of the changes, indicating which issues the Pull Request resolves, and indicating what testing has been done.
+8. Add reviewers. This should be anyone that worked with you on the changes or is working on something that will be affected by the changes. Add your team lead and a few other members. Around 3-4 reviewers is a good number, but use your best judgement. Remember, these reviews also help give other team members an idea of the changes that are being made even if they aren't working on them.
 9. Click "Create pull request"
 10. Now the code can be reviewed. Respond to feedback given by your team members and make changes as necessary by pushing additional commits to your branch.
     1. **If you are a reviewer:**
