@@ -75,6 +75,22 @@ If you want to know more about our coding style you can take a look at our [clan
   const float SCALE_FACTOR = 2.15;
   float distance = catch_distance * SCALE_FACTOR;
   ```
+* Avoid initializing multiple variables on the same line.
+  ```cpp
+  // Incorrect
+  int x, y, z = 0;
+
+  // Correct and equivalent to the above
+  int x;
+  int y;
+  int z = 0;
+
+  // However, the author may have intended the following
+  // or a code reader may have assumed the following
+  int x = 0;
+  int y = 0;
+  int z = 0;
+  ```
 
 ### Comments
 
@@ -135,7 +151,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 ### Spelling
 
 * Code, comment, and documentations should not contain spelling errors.
-* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour").
+* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour", "metre").
     * Exceptions:
       * Use "defense" in lieu of "defence" as it is more similar to the word "defensive".
       * Use "offense" in lieu of "offence".
@@ -188,16 +204,6 @@ If you think some ASCII art will help explain something better, go for it! [asci
   // Correct
   using PointsArray = std::vector<std::pair<int, int>>;
   ```
-* Avoid initializing multiple variables on the same line.
-  ```cpp
-  // Incorrect
-  int x, y, z = 0;
-
-  // Correct
-  int x;
-  int y;
-  int z = 0;
-  ```
 * Reference \(`&`\) and pointer \(`*`\) symbols should be attached to the type and not the variable name.
   ```cpp
   // Incorrect
@@ -221,3 +227,33 @@ If you think some ASCII art will help explain something better, go for it! [asci
       return 0;
   }
   ```
+* Avoid ternary operators. Clarity is more important than line count.
+  ```cpp
+  // Incorrect
+  c = ((a == 0) || ((a + b) < 10)) ? a : a + b;
+
+  // Correct
+  if ((a == 0) || ((a + b) < 10))
+  {
+    c = a;
+  }
+  else
+  {
+    c = a + b;
+  }
+  ```
+* Always use curly braces around code blocks, even if the braces surround a single statement.
+  ```cpp
+  // Incorrect
+  while (i < 10)
+    i++;
+    c[i] = i + 1;
+
+  // Correct
+  while (i < 10)
+  {
+    i++;
+  }
+  c[i] = i + 1;
+  ```
+
