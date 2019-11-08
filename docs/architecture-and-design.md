@@ -323,7 +323,7 @@ In practice, the `Backend` is just a simple interface that specifies [World](#wo
 # AI
 The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from the [Backend](#backend) to make decisions, and sends [Primitives](#primitives) back to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
 
-The 2 main components of the AI are stratgy and navigation.
+The 2 main components of the AI are strategy and navigation.
 
 
 ## Strategy
