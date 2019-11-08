@@ -284,7 +284,7 @@ Based on what side we are defending, the [Backend](#backend) will transform all 
 Going along with our coordinate convention, we have a convention for angles as well. An Angle of `0` is along the positive x-axis (facing the enemy goal), and positive rotation is counter-clockwise (from a perspective above the field, looking at it like a regular x-y plane where +y is "up"). See the diagram below:
 ![Coordinate Convention Diagram](images/angle_convention_diagram.svg)
 
-Because of our [Coordinate Conventions](#coordinates), this means that an angle of `0` will always face the enemy net not matter which side of the field we are defending in reality.
+Because of our [Coordinate Conventions](#coordinates), this means that an angle of `0` will always face the enemy net regardless of which side of the field we are actually defending.
 
 # Architecture Overview
 At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
