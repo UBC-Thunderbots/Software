@@ -436,9 +436,10 @@ Point calcBlockCone(const Vector &a, const Vector &b, const double &radius);
  *
  * @pre \p b must be counterclockwise of \p a.
  *
- * @param a the starting angle of the cone.
+ * @param a the point such that a vector from p to a represents the right side of the
+ * cone.
  *
- * @param b the ending angle of the cone.
+ * @param b the point such that a vector from p to b represents the left side of the cone.
  *
  * @param radius the radius of the circle with which to block the cone.
  *
@@ -446,8 +447,7 @@ Point calcBlockCone(const Vector &a, const Vector &b, const double &radius);
  *
  * @return the blocking position.
  */
-Point calcBlockCone(const Vector &a, const Vector &b, const Point &p,
-                    const double &radius);
+Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double &radius);
 
 /**
  * Used for defender_blocks_goal

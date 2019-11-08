@@ -82,6 +82,12 @@ Point &operator+=(Point &p, const Vector &v)
     return p;
 }
 
+Point &operator-=(Point &p, const Vector &v)
+{
+    p.set(p.x() - v.x(), p.y() - v.y());
+    return p;
+}
+
 Point operator-(const Point &p)
 {
     return Point(-p.x(), -p.y());

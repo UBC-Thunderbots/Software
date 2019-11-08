@@ -100,6 +100,9 @@ TEST(PointOperatorTests, point_vector_sum_set_test)
     p += v;
     EXPECT_EQ(-3, p.x());
     EXPECT_EQ(-1, p.y());
+    p -= v;
+    EXPECT_EQ(-1, p.x());
+    EXPECT_EQ(1, p.y());
 }
 
 TEST(PointOperatorTests, negate_point_test)

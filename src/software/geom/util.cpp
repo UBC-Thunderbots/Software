@@ -931,10 +931,9 @@ Point calcBlockCone(const Vector &a, const Vector &b, const double &radius)
     return Point(c * (radius / std::fabs(au.cross(c))));
 }
 
-Point calcBlockCone(const Vector &a, const Vector &b, const Point &p,
-                    const double &radius)
+Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double &radius)
 {
-    return p + (calcBlockCone(a - p.toVector(), b - p.toVector(), radius)).toVector();
+    return p + (calcBlockCone(a - p, b - p, radius)).toVector();
 }
 
 Vector calcBlockOtherRay(const Point &a, const Point &c, const Point &g)
@@ -1392,8 +1391,8 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
             bounding_box,
             halfPoint +
                 (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)),
-            halfPoint +
-                -((perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint))));
+            halfPoint -
+                (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)));
         std::vector<Point> corners = bounding_box.corners();
         intersects.insert(intersects.end(), corners.begin(), corners.end());
         for (const Point &intersect : intersects)

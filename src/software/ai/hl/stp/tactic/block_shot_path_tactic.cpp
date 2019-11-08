@@ -41,8 +41,8 @@ double BlockShotPathTactic::calculateRobotCost(const Robot& robot, const World& 
 
 Point BlockShotPathTactic::getBlockPosition()
 {
-    Point block_position = calcBlockCone(this->field.friendlyGoalpostPos().toVector(),
-                                         this->field.friendlyGoalpostNeg().toVector(),
+    Point block_position = calcBlockCone(this->field.friendlyGoalpostPos(),
+                                         this->field.friendlyGoalpostNeg(),
                                          this->shot_origin, ROBOT_MAX_RADIUS_METERS);
     return block_position;
 }
