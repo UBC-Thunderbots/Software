@@ -73,7 +73,7 @@ If you want to know more about our coding style you can take a look at our [clan
 
   // Correct
   const float CATCH_DISTANCE_SCALE_FACTOR = 2.15;
-  float distance = catch_distance * CATCH_DIstANCE_SCALE_FACTOR;
+  float distance = catch_distance * CATCH_DISTANCE_SCALE_FACTOR;
   ```
 
 
