@@ -33,8 +33,8 @@
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
   * [Backend](#backend)
-    * [Input](#input-responsabilities)
-    * [Output](#output-responsabilities)
+    * [Input](#input-responsibilities)
+    * [Output](#output-responsibilities)
     * [Diagram](#backend-diagram)
   * [AI](#ai)
     * [Strategy](#strategy)
@@ -178,7 +178,7 @@ We use the Observer Design Pattern to connect all our top-level modules in the s
 ## C++ Templating
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
 
-We use templtaing in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-design-pattern), and our `Gradient Descent` optimizer.
+We use templating in a few places around the codebase, with the most notable examples being our [Factory Design Patterns](#factory-design-pattern), and our `Gradient Descent` optimizer.
 
 
 # Coroutines
@@ -225,7 +225,7 @@ This example / pseudocode does hide away some details about how coroutines are s
 
 
 ## What Coroutines Do We Use?
-We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Assymetric Coroutines.
+We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Asymetric Coroutines.
 
 [This stackoverfow answer](https://stackoverflow.com/a/42042904) gives a decent explanation of the difference between Symmetric and Asymmetric Coroutines, but understanding the difference is not critical for our purposes. We use Asymmetric Coroutines because boost does not provide Symmetric Coroutines, and the hierarchical structure of Asymmetric Coroutines is more useful to us.
 
@@ -310,7 +310,7 @@ The `Backend` is responsible for all communication with the "outside world". The
 4. Storing the filtered data into the [World](#world) datastructures understood by our system
 5. Sending the filtered data to the rest of the system
 
-### Output Responsabilities
+### Output Responsibilities
 1. Sending robot primitives to the robots
 
 In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitves](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in [grSim](#grsim).
@@ -329,7 +329,7 @@ The 2 main components of the AI are strategy and navigation.
 ## Strategy
 We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratgy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
 
-`STP` is a way of breaking down roles and responsabilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces. This is the core of where our strategy is implemented.
+`STP` is a way of breaking down roles and responsibilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces. This is the core of where our strategy is implemented.
 
 When the [AI](#ai) is given new information and asked to make a decision, our `STP` strategy is what is executed first. It takes in a [World](#world) and returns [Intents](#intents).
 
@@ -368,7 +368,7 @@ Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics
 
 Furthermore, every play specifies an `Applicable` and `Invariant` condition. These are used to determine what plays should be run at what time, and when a Play should terminate.
 
-`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new one will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the ball.
+`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new one will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the bali.
 
 
 ## Navigation
