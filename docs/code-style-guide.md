@@ -109,7 +109,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 
 * Use _header guards_ to prevent issues of duplicate or circular includes which cause the source code to be compiled multiple times and cause build errors. 
     * If you're writing C++ (ie. not C), use `#pragma once` at the very top of the file. 
-    ```cpp
+      ```cpp
       #pragma once
       ```
     * If you're writing C, header guards should be used. They should be fully capitalized and include `_H_` at the end.
