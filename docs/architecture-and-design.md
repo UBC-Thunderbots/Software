@@ -348,7 +348,7 @@ Actions use [Intents](#intents) to implement their behaviour. Actions are respon
 
 
 ### Tactics
-The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robot role" on a team. Examples include:
+The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robots' role" on a team. Examples include:
 1. Being a goalie
 2. Being a passer or pass receiver
 3. Being a defender that shadows enemy robots
