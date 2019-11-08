@@ -12,7 +12,7 @@ You can read a bit about how the GitHub mode of [draw.io](https://github.com/jgr
 
 The gist of it is that these image files are stored in our github repository with extra information embedded that allows [draw.io](https://www.draw.io/?mode=github) to edit them. It's the same data that would be saved as an `XML` file if you simply saved a [draw.io](https://www.draw.io/?mode=github) diagram instead of exporting it as an image.
 
-The GitHub mode of  lets you connect your GitHub account, and then you can edit or create documents in any GitHub repository you have access to.
+The GitHub mode lets you connect your GitHub account, and then you can edit or create documents in any GitHub repository you have access to.
 
 ##### Creating a new Diagram
 1. Open [draw.io](https://www.draw.io/?mode=github) and connect your GitHub account if necessary
