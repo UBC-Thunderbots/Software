@@ -66,7 +66,7 @@ These are classes that are either heavily used in our code, or are very importan
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current refbox commands. Altogether, it's the information we have at any given time that we can use to make decisions.
 
 ### Team
-A team is a collection of robots
+A team is a collection of [Robots](#robot)
 
 ### Robot
 A Robot class represents the state of a single robot on the field. This includes its position, orientation, velocity, angular velocity, and any other information about its current state.
