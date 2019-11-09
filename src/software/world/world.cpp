@@ -37,9 +37,9 @@ void World::updateFieldGeometry(const Field &new_field_data)
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateBallState(const Ball &new_ball_data)
+void World::updateBallState(const BallState &new_ball_state)
 {
-    ball_.updateState(new_ball_data);
+    ball_.updateCurrentState(new_ball_state);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -143,7 +143,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
     // Add all member timestamps to a list
     std::initializer_list<Timestamp> member_timestamps = {
         friendly_team_.getMostRecentTimestamp(), enemy_team_.getMostRecentTimestamp(),
-        ball_.getPreviousTimestamps().front(), field_.getMostRecentTimestamp()};
+        ball_.getPreviousStates().front().timestamp(), field_.getMostRecentTimestamp()};
     // Return the max
 
     return std::max(member_timestamps);

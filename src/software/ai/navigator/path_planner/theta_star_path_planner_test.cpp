@@ -59,10 +59,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
-    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
-                             field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area = field.fieldBoundary();
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -95,10 +94,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
-    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
-                             field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area = field.fieldBoundary();
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -127,10 +125,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
-    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
-                             field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area = field.fieldBoundary();
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -160,10 +157,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
-    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
-                             field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area = field.fieldBoundary();
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -195,10 +191,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
-    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
-                             field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area = field.fieldBoundary();
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -218,10 +213,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
-    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
-                             field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area = field.fieldBoundary();
 
-    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -271,8 +265,7 @@ TEST(TestThetaStarPathPlanner, performance)
             std::unique_ptr<PathPlanner> planner =
                 std::make_unique<ThetaStarPathPlanner>();
 
-            Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
-                                     field.totalXLength(), field.totalYLength());
+            Rectangle navigable_area = field.fieldBoundary();
 
             planner->findPath(start, dest, navigable_area, obstacles);
         }
