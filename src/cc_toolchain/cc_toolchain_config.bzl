@@ -533,7 +533,7 @@ def _clang_impl(ctx):
     # https://github.com/bazelbuild/intellij/blob/e76fdadb0bdabbe2be913cba03d9014eb2366374/cpp/src/com/google/idea/blaze/cpp/SysrootFlagsProcessor.java#L70
     # An issue has been filed (https://github.com/bazelbuild/intellij/issues/1368) to
     # hopefully correct this so we don't need this feature in the future, or confirm
-    # if this is expected behavior
+    # if this is expected behavior.
     builtin_include_directories_feature = feature(
         name = "builtin_include_directories",
         flag_sets = [
