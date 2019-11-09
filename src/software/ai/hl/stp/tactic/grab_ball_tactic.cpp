@@ -88,7 +88,9 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
         else
         {
-            yield(intercept_action.updateStateAndGetNextIntent(*robot, field, ball));
+            intercept_action.updateControlParams(field, ball);
+            intercept_action.updateWorldParams(*robot);
+            yield(intercept_action.getNextIntent());
         }
     } while (true);
 }
