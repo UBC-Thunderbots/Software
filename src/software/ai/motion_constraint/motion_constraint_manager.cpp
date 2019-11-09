@@ -7,11 +7,22 @@ std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(
 {
     std::set<MotionConstraint> current_motion_constraints =
         getMotionConstraintsFromGameState(game_state);
-    tactic.accept(*this);  // updates current_whitelisted_constraints
+
+    try
+    {
+        // updates current_whitelisted_constraints
+        tactic.accept(*this);
+    }
+    catch (std::invalid_argument)
+    {
+        // Tactic didn't implement accept so don't add any more motion constraints
+    }
+
     for (const auto &constraint : current_whitelisted_constraints)
     {
         current_motion_constraints.erase(constraint);
     }
+
     return current_motion_constraints;
 }
 

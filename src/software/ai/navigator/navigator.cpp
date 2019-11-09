@@ -115,6 +115,12 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
             getObstaclesFromAvoidAreas(intent.getAreasToAvoid(), world);
         obstacles.insert(obstacles.end(), avoid_area_obstacles.begin(),
                          avoid_area_obstacles.end());
+
+        auto motion_constraint_obstacles =
+            getObstaclesFromMotionConstraints(intent.getMotionConstraints(), world);
+        obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
+                         motion_constraint_obstacles.end());
+
         if (intent.getBallNavigationType() == BallNavigationType::AVOID_COLLISION)
         {
             obstacles.push_back(Obstacle::createCircularBallObstacle(world.ball(), 0.06));

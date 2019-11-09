@@ -45,3 +45,13 @@ void Intent::setAreasToAvoid(const std::vector<AvoidArea> &areas_to_avoid)
 {
     this->areas_to_avoid = areas_to_avoid;
 }
+
+void Intent::setMotionConstraints(const std::set<MotionConstraint> &motion_constraints)
+{
+    this->motion_constraints = motion_constraints;
+}
+
+std::set<MotionConstraint> Intent::getMotionConstraints(void) const
+{
+    return motion_constraints;
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/intent/avoid_area.h"
+#include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/primitive/move_primitive.h"
 #include "software/geom/point.h"
@@ -35,6 +36,17 @@ double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
  */
 std::vector<Obstacle> getObstaclesFromAvoidAreas(
     const std::vector<AvoidArea> &avoid_areas, World world);
+
+/**
+ * Create obstacles for the given motion constraints
+ *
+ * @param motion_constraints
+ * @param world world to create obstacles for
+ *
+ * @return obstacles
+ */
+std::vector<Obstacle> getObstaclesFromMotionConstraints(
+    const std::set<MotionConstraint> &motion_constraints, const World &world);
 
 /**
  * Get Obstacles from a Team
