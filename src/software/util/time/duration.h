@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <iostream>
 
 #include "software/util/time/time.h"
