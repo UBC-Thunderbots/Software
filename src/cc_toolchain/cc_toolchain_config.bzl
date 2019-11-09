@@ -527,16 +527,24 @@ def _clang_impl(ctx):
         provides = ["profile"],
     )
 
-    # TODO: comment here about why this exists
+    # This feature is not required for the code to build, but it is required
+    # in order for the bazel plugin we use for CLion to function correctly. This was
+    # prompted by the following comment in the plugin itself:
+    # https://github.com/bazelbuild/intellij/blob/e76fdadb0bdabbe2be913cba03d9014eb2366374/cpp/src/com/google/idea/blaze/cpp/SysrootFlagsProcessor.java#L70
+    # An issue has been filed (https://github.com/bazelbuild/intellij/issues/1368) to
+    # hopefully correct this so we don't need this feature in the future, or confirm
+    # if this is expected behavior
     builtin_include_directories_feature = feature(
-        name = "builtin_include_directories_feature",
+        name = "builtin_include_directories",
         flag_sets = [
             flag_set(
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [flag_group(flags = [
-                    "-I{}".format(dir)
-                    for dir in ctx.attr.builtin_include_directories
-                ])],
+                flag_groups = [flag_group(
+                    flags = [
+                        "-isystem{}".format(dir)
+                        for dir in ctx.attr.builtin_include_directories
+                    ],
+                )],
             ),
         ],
     )
@@ -544,6 +552,7 @@ def _clang_impl(ctx):
     common_feature = feature(
         name = "common",
         implies = [
+            "builtin_include_directories",
             "stdlib",
             "c++17",
             "determinism",
