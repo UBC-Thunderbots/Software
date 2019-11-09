@@ -137,5 +137,5 @@ TEST(TimestampTest, stream_operator)
     out << t;
 
     EXPECT_EQ("2.00s", out.str());
-    
+
 }
