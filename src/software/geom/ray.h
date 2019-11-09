@@ -59,6 +59,6 @@ class Ray final
 
     inline Line toLine() const
     {
-        return Line(start, Point(direction));
+        return Line(start, Point(start + direction));
     }
 };

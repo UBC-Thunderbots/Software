@@ -189,7 +189,7 @@ inline constexpr double Rectangle::area() const
 
 inline Point Rectangle::centre() const
 {
-    return Point(min_corner.toVector() + diagonal.toVector() / 2);
+    return Point(min_corner + (diagonal.toVector() / 2));
 }
 
 inline Point Rectangle::posXPosYCorner() const
