@@ -6,6 +6,8 @@
 
 #include <iomanip>
 
+#include <cmath>
+
 #include "shared/constants.h"
 
 Duration::Duration() : Duration(0) {}
