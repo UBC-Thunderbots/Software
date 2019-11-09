@@ -194,7 +194,7 @@ inline Point Rectangle::centre() const
 
 inline Point Rectangle::posXPosYCorner() const
 {
-    return Point(min_corner.toVector() + diagonal.toVector());
+    return min_corner + diagonal.toVector();
 }
 
 inline Point Rectangle::negXPosYCorner() const

@@ -49,12 +49,12 @@ class Ray final
 
     inline Segment toSegment() const
     {
-        return Segment(start, Point(direction));
+        return Segment(start, Point(start + direction));
     }
 
     inline Vector toVector() const
     {
-        return Point(direction) - start;
+        return direction;
     }
 
     inline Line toLine() const

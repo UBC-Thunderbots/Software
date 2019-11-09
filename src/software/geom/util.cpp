@@ -1005,8 +1005,8 @@ Point intersection(Point a1, Point a2, Point b1, Point b2)
     Vector b2r = (b2 - a1).rotate(-a.orientation());
     Vector br  = (b1r - b2r);
 
-    return a1 +
-           Vector(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation());
+    return Vector(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation()) +
+           a1;
 }
 
 Angle acuteVertexAngle(Vector v1, Vector v2)
