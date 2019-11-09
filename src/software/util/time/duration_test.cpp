@@ -142,4 +142,5 @@ TEST(DurationTest, stream_operator)
     out << d;
 
     EXPECT_EQ("3.00s", out.str());
+
 }

@@ -67,4 +67,5 @@ std::ostream &operator<<(std::ostream &output_stream, const Duration &duration)
     output_stream << std::setprecision(2) << std::fixed << duration.getSeconds() << "s";
 
     return output_stream;
+
 }
