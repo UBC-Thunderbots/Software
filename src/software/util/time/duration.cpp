@@ -4,15 +4,15 @@
 
 #include "software/util/time/duration.h"
 
-#include <iomanip>
-
 #include <cmath>
+#include <iomanip>
 
 #include "shared/constants.h"
 
 Duration::Duration() : Duration(0) {}
 
 Duration::Duration(double duration_seconds) : Time(duration_seconds) {}
+
 
 const Duration Duration::fromSeconds(double seconds)
 {
@@ -69,5 +69,4 @@ std::ostream &operator<<(std::ostream &output_stream, const Duration &duration)
     output_stream << std::setprecision(2) << std::fixed << duration.getSeconds() << "s";
 
     return output_stream;
-
 }
