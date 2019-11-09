@@ -21,7 +21,6 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
       friendly_team(friendly_team),
       enemy_team(enemy_team)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string ReceiverTactic::getName() const

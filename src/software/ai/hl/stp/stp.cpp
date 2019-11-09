@@ -88,7 +88,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
         for (const auto& tactic : assigned_tactics)
         {
             // Get the Intent the tactic wants to run
-            auto intent = tactic->getNextIntent(world.gameState());
+            auto intent = tactic->getNextIntent();
             // Set Motion Constraints
             auto motion_constraints = motion_constraint_manager.getMotionConstraints(
                 world.gameState(), *tactic);

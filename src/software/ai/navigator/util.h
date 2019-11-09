@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/intent/avoid_area.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/primitive/move_primitive.h"
@@ -24,18 +23,6 @@
  */
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
                                                const Point &p3, double final_speed);
-
-/**
- * Create obstacles for the given avoid areas, with a buffer such that the edge
- * of the robot does not protrude into the area
- *
- * @param avoid_areas The areas to convert into obstacles
- * @param world the world that's full of obstacles
- *
- * @return Obstacles representing the given avoid areas
- */
-std::vector<Obstacle> getObstaclesFromAvoidAreas(
-    const std::vector<AvoidArea> &avoid_areas, World world);
 
 /**
  * Create obstacles for the given motion constraints

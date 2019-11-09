@@ -26,15 +26,21 @@ std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(
     return current_motion_constraints;
 }
 
+// We disable clang-format here because it makes these lists borderline unreadable,
+// and certainly way more difficult to edit
+// clang-format off
 void MotionConstraintManager::visit(const CherryPickTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ShadowFreekickerTactic &tactic) {}
 
 void MotionConstraintManager::visit(const GoalieTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::FRIENDLY_DEFENSE_AREA,
-         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::FRIENDLY_HALF});
+    current_whitelisted_constraints = std::set<MotionConstraint>({
+       MotionConstraint::FRIENDLY_DEFENSE_AREA,
+       MotionConstraint::FRIENDLY_DEFENSE_AREA,
+       MotionConstraint::HALF_METER_AROUND_BALL,
+       MotionConstraint::FRIENDLY_HALF
+       });
 }
 
 void MotionConstraintManager::visit(const CreaseDefenderTactic &tactic) {}
@@ -49,24 +55,31 @@ void MotionConstraintManager::visit(const ChipTactic &tactic) {}
 
 void MotionConstraintManager::visit(const KickoffChipTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::CENTER_CIRCLE, MotionConstraint::HALF_METER_AROUND_BALL});
+    current_whitelisted_constraints = std::set<MotionConstraint>({
+       MotionConstraint::CENTER_CIRCLE,
+       MotionConstraint::HALF_METER_AROUND_BALL
+       });
 }
 
 void MotionConstraintManager::visit(const StopTactic &tactic) {}
 
 void MotionConstraintManager::visit(const PenaltyKickTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::ENEMY_DEFENSE_AREA,
-         MotionConstraint::ENEMY_HALF});
+    current_whitelisted_constraints = std::set<MotionConstraint>({
+        MotionConstraint::HALF_METER_AROUND_BALL,
+        MotionConstraint::ENEMY_DEFENSE_AREA,
+        MotionConstraint::ENEMY_HALF
+        });
 }
 
 void MotionConstraintManager::visit(const PenaltySetupTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::ENEMY_HALF, MotionConstraint::ENEMY_DEFENSE_AREA,
-         MotionConstraint::FRIENDLY_HALF, MotionConstraint::HALF_METER_AROUND_BALL});
+    current_whitelisted_constraints = std::set<MotionConstraint>({
+        MotionConstraint::ENEMY_HALF,
+        MotionConstraint::ENEMY_DEFENSE_AREA,
+        MotionConstraint::FRIENDLY_HALF,
+        MotionConstraint::HALF_METER_AROUND_BALL
+        });
 }
 
 void MotionConstraintManager::visit(const ReceiverTactic &tactic) {}
@@ -75,8 +88,9 @@ void MotionConstraintManager::visit(const PatrolTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ShootGoalTactic &tactic)
 {
-    current_whitelisted_constraints =
-        std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL});
+    current_whitelisted_constraints = std::set<MotionConstraint>({
+        MotionConstraint::HALF_METER_AROUND_BALL
+        });
 }
 
 void MotionConstraintManager::visit(const PasserTactic &tactic) {}
@@ -85,13 +99,15 @@ void MotionConstraintManager::visit(const DefenseShadowEnemyTactic &tactic) {}
 
 void MotionConstraintManager::visit(const GrabBallTactic &tactic)
 {
-    current_whitelisted_constraints =
-        std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL});
+    current_whitelisted_constraints = std::set<MotionConstraint>({
+        MotionConstraint::HALF_METER_AROUND_BALL
+        });
 }
 
 void MotionConstraintManager::visit(const MoveTestTactic &tactic) {}
 
 void MotionConstraintManager::visit(const StopTestTactic &tactic) {}
+// clang-format on
 
 std::set<MotionConstraint> MotionConstraintManager::getMotionConstraintsFromGameState(
     const GameState &game_state)
@@ -119,9 +135,9 @@ std::set<MotionConstraint> MotionConstraintManager::getMotionConstraintsFromGame
     }
     else if (game_state.isKickoff())
     {
-        motion_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
-        motion_constraints.insert(MotionConstraint::CENTER_CIRCLE);
-        motion_constraints.insert(MotionConstraint::ENEMY_HALF);
+        motion_constraints.insert({MotionConstraint::HALF_METER_AROUND_BALL,
+                                   MotionConstraint::CENTER_CIRCLE,
+                                   MotionConstraint::ENEMY_HALF});
     }
     else
     {

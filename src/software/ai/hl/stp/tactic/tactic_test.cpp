@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
+#include "software/ai/motion_constraint/motion_constraint_manager.h"
 
 /**
  * This file contains the unit tests for the Tactic class (NOTE: `Tactic` is virtual, so
@@ -134,28 +135,30 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
 
 
 
-typedef std::tuple<std::vector<std::pair<RefboxGameState, Point>>, std::vector<AvoidArea>>
-    AvoidAreasTestParams;
+typedef std::tuple<std::vector<std::pair<RefboxGameState, Point>>,
+                   std::set<MotionConstraint>>
+    MotionConstraintsTestParams;
 
 
-AvoidAreasTestParams makeParams(
+MotionConstraintsTestParams makeParams(
     std::vector<std::pair<RefboxGameState, Point>> refbox_and_ball_states,
-    std::vector<AvoidArea> avoid_areas)
+    std::set<MotionConstraint> motion_constraints)
 {
     return std::make_tuple<std::vector<std::pair<RefboxGameState, Point>>,
-                           std::vector<AvoidArea>>(std::move(refbox_and_ball_states),
-                                                   std::move(avoid_areas));
+                           std::set<MotionConstraint>>(std::move(refbox_and_ball_states),
+                                                       std::move(motion_constraints));
 }
 
-class TacticAvoidAreasTest : public ::testing::TestWithParam<AvoidAreasTestParams>
+class TacticMotionConstraintsTest
+    : public ::testing::TestWithParam<MotionConstraintsTestParams>
 {
 };
 
-TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
+TEST_P(TacticMotionConstraintsTest, test_default_motion_constraints)
 {
     std::vector<std::pair<RefboxGameState, Point>> refbox_and_ball_states =
         std::get<0>(GetParam());
-    std::vector<AvoidArea> expected_avoid_areas = std::get<1>(GetParam());
+    std::set<MotionConstraint> expected_motion_constraints = std::get<1>(GetParam());
 
     Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
@@ -170,8 +173,13 @@ TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
         game_state.updateBall(ball);
     }
 
-    auto next_intent = tactic.getNextIntent(game_state);
+    auto next_intent = tactic.getNextIntent();
     ASSERT_TRUE(next_intent);
+
+    MotionConstraintManager motion_constraint_manager;
+    auto motion_constraints =
+        motion_constraint_manager.getMotionConstraints(game_state, tactic);
+    next_intent->setMotionConstraints(motion_constraints);
 
     std::string refbox_states_str;
     for (auto state : refbox_and_ball_states)
@@ -181,48 +189,52 @@ TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
         refbox_states_str += ss.str();
     }
 
-    EXPECT_EQ(expected_avoid_areas, next_intent->getAreasToAvoid())
+    for (auto constraint : next_intent->getMotionConstraints())
+    {
+        std::cout << constraint << std::endl;
+    }
+    EXPECT_EQ(expected_motion_constraints, next_intent->getMotionConstraints())
         << "Failed with refbox states: " << refbox_states_str;
 }
 
-// Parameterized test to check that we return the correct areas to avoid for a
+// Parameterized test to check that we return the correct motion constraints for a
 // given refbox state
 // We disable clang-format here because it makes these lists borderline unreadable,
 // and certainly way more difficult to edit
 // clang-format off
 INSTANTIATE_TEST_CASE_P(
-    All, TacticAvoidAreasTest,
+    All, TacticMotionConstraintsTest,
     ::testing::Values(
         // Halt
         makeParams({
                 {RefboxGameState::HALT, {0, 0}}
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Stop
         makeParams({
                 {RefboxGameState::STOP, {0, 0}}
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our kickoff setup
         makeParams({
                 {RefboxGameState::PREPARE_KICKOFF_US, {0, 0}}
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::CENTER_CIRCLE,
-                AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::CENTER_CIRCLE,
+                MotionConstraint::ENEMY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our kickoff before we've moved the ball
         makeParams({
@@ -230,11 +242,11 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}}
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::CENTER_CIRCLE,
-                AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::CENTER_CIRCLE,
+                MotionConstraint::ENEMY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our kickoff after we've moved the ball
         makeParams({
@@ -243,20 +255,20 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0.5}}
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their kickoff setup
         makeParams({
                 {RefboxGameState::PREPARE_KICKOFF_THEM, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::CENTER_CIRCLE,
-                AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::CENTER_CIRCLE,
+                MotionConstraint::ENEMY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their kickoff before they've moved the ball
         makeParams({
@@ -264,11 +276,11 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::CENTER_CIRCLE,
-                AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::CENTER_CIRCLE,
+                MotionConstraint::ENEMY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their kickoff after they've moved the ball
         makeParams({
@@ -277,9 +289,9 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0.5}}
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }
         ),
         // Our indirect free kick setup
@@ -287,9 +299,9 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::INDIRECT_FREE_US, {0, 0}},
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, 
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our indirect free kick after we've moved the ball
         makeParams({
@@ -297,19 +309,19 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::INDIRECT_FREE_US, {0, 0.5}},
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their indirect free kick setup
         makeParams({
                 {RefboxGameState::INDIRECT_FREE_THEM, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL, 
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their indirect free kick after they've moved the ball
         makeParams({
@@ -317,18 +329,18 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::INDIRECT_FREE_THEM, {0, 0.5}},
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our direct free kick setup
         makeParams({
                 {RefboxGameState::DIRECT_FREE_US, {0, 0}},
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, 
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our direct free kick after we've moved the ball
         makeParams({
@@ -336,19 +348,19 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::DIRECT_FREE_US, {0, 0.5}},
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their direct free kick setup
         makeParams({
                 {RefboxGameState::DIRECT_FREE_THEM, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL, 
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their direct free kick after they've moved the ball
         makeParams({
@@ -356,18 +368,18 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::DIRECT_FREE_THEM, {0, 0.5}},
             },
             {
-                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our penalty kick setup
         makeParams({
                 {RefboxGameState::PREPARE_PENALTY_US, {0, 0}},
             },
             {
-                AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::ENEMY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Our penalty kick
         makeParams({
@@ -375,19 +387,19 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}},
             },
             {
-                AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::ENEMY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their penalty kick setup
         makeParams({
                 {RefboxGameState::PREPARE_PENALTY_THEM, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::FRIENDLY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::FRIENDLY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their penalty kick before they move the ball
         makeParams({
@@ -395,10 +407,10 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::FRIENDLY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::FRIENDLY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             }),
         // Their penalty kick after they move the ball
         makeParams({
@@ -407,78 +419,10 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0.5}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::FRIENDLY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA,
-                AvoidArea::BALL
+                MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                MotionConstraint::HALF_METER_AROUND_BALL,
+                MotionConstraint::FRIENDLY_HALF,
+                MotionConstraint::FRIENDLY_DEFENSE_AREA,
             })
         ));
 // clang-format on
-
-TEST(TacticTest, test_and_remove_extra_avoid_areas)
-{
-    // Test adding and removing extra avoid areas is correctly reflected in the
-    // avoid areas produced by the tactic
-    Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-    MoveTestTactic tactic = MoveTestTactic(true);
-    tactic.updateRobot(robot);
-
-    tactic.addBlacklistedAvoidArea(AvoidArea::FRIENDLY_HALF);
-    tactic.addBlacklistedAvoidArea(AvoidArea::CENTER_CIRCLE);
-
-    auto intent_ptr = tactic.getNextIntent();
-    ASSERT_TRUE(intent_ptr);
-    EXPECT_EQ(
-        std::vector<AvoidArea>({AvoidArea::FRIENDLY_HALF, AvoidArea::CENTER_CIRCLE}),
-        intent_ptr->getAreasToAvoid());
-
-    tactic.removeBlacklistedAvoidArea(AvoidArea::FRIENDLY_HALF);
-
-    intent_ptr = tactic.getNextIntent();
-    ASSERT_TRUE(intent_ptr);
-    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::CENTER_CIRCLE}),
-              intent_ptr->getAreasToAvoid());
-}
-
-TEST(TacticTest, extra_avoid_areas_overrides_whitelist)
-{
-    // Test adding and removing extra avoid areas is correctly reflected in the
-    // avoid areas produced by the tactic
-    Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-    MoveTestTactic tactic = MoveTestTactic(true);
-    tactic.updateRobot(robot);
-
-    tactic.addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
-
-    tactic.addBlacklistedAvoidArea(AvoidArea::FRIENDLY_HALF);
-    tactic.addBlacklistedAvoidArea(AvoidArea::CENTER_CIRCLE);
-
-    auto intent_ptr = tactic.getNextIntent();
-    ASSERT_TRUE(intent_ptr);
-    EXPECT_EQ(
-        std::vector<AvoidArea>({AvoidArea::FRIENDLY_HALF, AvoidArea::CENTER_CIRCLE}),
-        intent_ptr->getAreasToAvoid());
-}
-
-TEST(TacticTest, test_whitelisted_areas_are_ignored)
-{
-    Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-    MoveTestTactic tactic = MoveTestTactic(true);
-    tactic.updateRobot(robot);
-
-    GameState game_state;
-    game_state.updateRefboxGameState(RefboxGameState::DIRECT_FREE_THEM);
-    game_state.updateBall(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
-
-    tactic.addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-
-    auto next_intent = tactic.getNextIntent(game_state);
-    ASSERT_TRUE(next_intent);
-
-    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                                      AvoidArea::FRIENDLY_DEFENSE_AREA, AvoidArea::BALL}),
-              next_intent->getAreasToAvoid());
-}

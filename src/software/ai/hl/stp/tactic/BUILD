@@ -496,6 +496,7 @@ cc_test(
     deps = [
         ":tactic",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
+        "//software/ai/motion_constraint:motion_constraint_manager",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

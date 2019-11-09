@@ -18,7 +18,6 @@ PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forev
       pass(std::move(pass)),
       ball(ball)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string PasserTactic::getName() const

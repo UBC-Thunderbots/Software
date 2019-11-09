@@ -9,7 +9,6 @@ cc_library(
         "//software/geom",
         "//software/ai/navigator/obstacle",
         "//software/util/parameter:dynamic_parameters",
-        "//software/ai/intent:avoid_area",
         "//software/ai/motion_constraint:motion_constraint",
         "//software/world",
         "@g3log",

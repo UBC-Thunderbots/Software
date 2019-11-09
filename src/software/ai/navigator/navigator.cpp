@@ -109,12 +109,8 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
     std::unordered_set<PathObjective> path_objectives;
     for (const auto &intent : move_intents)
     {
-        // start with non-MoveIntent robots and then add avoid areas
+        // start with non-MoveIntent robots and then add motion constraints
         auto obstacles = friendly_non_move_intent_robot_obstacles;
-        auto avoid_area_obstacles =
-            getObstaclesFromAvoidAreas(intent.getAreasToAvoid(), world);
-        obstacles.insert(obstacles.end(), avoid_area_obstacles.begin(),
-                         avoid_area_obstacles.end());
 
         auto motion_constraint_obstacles =
             getObstaclesFromMotionConstraints(intent.getMotionConstraints(), world);
