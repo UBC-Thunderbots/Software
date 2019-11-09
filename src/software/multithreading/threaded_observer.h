@@ -46,13 +46,13 @@ class ThreadedObserver : public Observer<T>
      */
     void continuouslyPullValuesFromBuffer();
 
-    // The period for checking whether or not the destructor for this class has
-    // been called
-    const Duration IN_DESTRUCTOR_CHECK_PERIOD;
-
     // This indicates if the destructor of this class has been called
     std::mutex in_destructor_mutex;
     bool in_destructor;
+
+    // The period for checking whether or not the destructor for this class has
+    // been called
+    const Duration IN_DESTRUCTOR_CHECK_PERIOD;
 
     // This is the thread that will continuously pull values from the buffer
     // and pass them into the `onValueReceived`

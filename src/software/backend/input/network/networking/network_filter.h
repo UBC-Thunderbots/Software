@@ -3,16 +3,17 @@
 #include <optional>
 #include <queue>
 
-#include "software/ai/world/ball.h"
-#include "software/ai/world/field.h"
-#include "software/ai/world/refbox_constants.h"
-#include "software/ai/world/team.h"
 #include "software/backend/input/network/filter/ball_filter.h"
 #include "software/backend/input/network/filter/robot_filter.h"
 #include "software/backend/input/network/filter/robot_team_filter.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/util/time/timestamp.h"
+#include "software/world/ball.h"
+#include "software/world/ball_state.h"
+#include "software/world/field.h"
+#include "software/world/refbox_constants.h"
+#include "software/world/team.h"
 
 class NetworkFilter
 {
@@ -31,7 +32,7 @@ class NetworkFilter
      * @return The most up to date state of the ball given the new DetectionFrame
      * information
      */
-    Ball getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections);
+    BallState getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections);
 
     /**
      * Returns a new Field object containing the most up to date state of the field given
@@ -81,17 +82,17 @@ class NetworkFilter
     Field createFieldFromPacketGeometry(
         const SSL_GeometryFieldSize &packet_geometry) const;
 
-    BallFilter ball_filter;
-    RobotTeamFilter friendly_team_filter;
-    RobotTeamFilter enemy_team_filter;
-
     // Objects used to aggregate and store state. We use these to aggregate the state
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
     Field field_state;
+    BallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;
-    Ball ball_state;
+
+    BallFilter ball_filter;
+    RobotTeamFilter friendly_team_filter;
+    RobotTeamFilter enemy_team_filter;
 
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.

@@ -8,6 +8,7 @@ cc_library(
     deps = [
         "//software/proto:ssl_cc_proto",
         "@g3log",
+        "@boost//:asio",
     ],
 )
 
@@ -19,6 +20,7 @@ cc_library(
     deps = [
         "//software/proto:ssl_cc_proto",
         "@g3log",
+        "@boost//:asio",
     ],
 )
 
@@ -27,10 +29,11 @@ cc_library(
     srcs = ["network_filter.cpp"],
     hdrs = ["network_filter.h"],
     deps = [
-        "//software/ai/world:ball",
-        "//software/ai/world:field",
-        "//software/ai/world:refbox_constants",
-        "//software/ai/world:team",
+        "//software/world:ball",
+        "//software/world:ball_state",
+        "//software/world:field",
+        "//software/world:refbox_constants",
+        "//software/world:team",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
@@ -53,7 +56,7 @@ cc_library(
         ":network_filter",
         ":ssl_gamecontroller_client",
         ":ssl_vision_client",
-        "//software/ai/world",
+        "//software/world",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",

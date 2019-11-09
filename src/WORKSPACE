@@ -32,7 +32,7 @@ rules_proto_toolchains()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    commit = "a1dd05e7e9178f8aad86e39f3a5b377902eae5b2",
+    commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
     remote = "https://github.com/nelhage/rules_boost",
 )
 
@@ -48,17 +48,9 @@ http_archive(
     url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
 )
 
-http_archive(
+new_local_repository(
     name = "libusb",
     build_file = "@//external:libusb.BUILD",
-    sha256 = "a5fc7c3c8ecfaca3e149ffb5a422f358fc5276fe56d851f46a4023d1e061bc00",
-    strip_prefix = "libusb-1.0.23",
-    url = "https://github.com/libusb/libusb/archive/v1.0.23.zip",
-)
-
-new_local_repository(
-    name = "libudev",
-    build_file = "@//external:libudev.BUILD",
     path = "/",
 )
 
@@ -67,6 +59,14 @@ new_git_repository(
     build_file = "@//external:munkres_cpp.BUILD",
     commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
     remote = "https://github.com/saebyn/munkres-cpp.git",
+)
+
+# yaml cpp parser for dynamic parameters test
+git_repository(
+    name = "yaml-cpp",
+    commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
+    remote = "https://github.com/jbeder/yaml-cpp.git",
+    shallow_since = "1571237073 -0500",
 )
 
 # Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
@@ -81,5 +81,43 @@ git_repository(
 new_local_repository(
     name = "qt",
     build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "/usr/include/x86_64-linux-gnu/qt5/",
+    path = "external/qt",  # This directory is symlinked in the setup script
+)
+
+http_archive(
+    name = "llvm_clang",
+    build_file = "@//external:clang.BUILD",
+    sha256 = "a23b082b30c128c9831dbdd96edad26b43f56624d0ad0ea9edec506f5385038d",
+    strip_prefix = "clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04",
+    urls = [
+        "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
+    ],
+)
+
+http_archive(
+    name = "arm_developer_gcc",
+    build_file = "@//external:arm_gcc.BUILD",
+    sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
+    strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
+    ],
+)
+
+# We use our own fork of Box2D as we have made a few small modifications
+# See the repository readme for details
+new_git_repository(
+    name = "box2d",
+    build_file = "@//external:box2d.BUILD",
+    commit = "bddb4ec7efc8a6630fcbe7ef913017d88fb9b4b1",
+    remote = "https://github.com/UBC-Thunderbots/Box2D",
+    shallow_since = "1571445859 -0700",
+)
+
+# Magic enum library from https://github.com/Neargye/magic_enum
+new_git_repository(
+    name = "magic_enum",
+    build_file = "@//external:magic_enum.BUILD",
+    commit = "49d2429cf110f804048bc459b1d2c126d43b0a9a",
+    remote = "https://github.com/Neargye/magic_enum.git",
 )

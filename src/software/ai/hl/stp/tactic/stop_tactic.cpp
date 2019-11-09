@@ -3,19 +3,15 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
-StopTactic::StopTactic(bool coast, bool loop_forever) : coast(coast), Tactic(loop_forever)
+StopTactic::StopTactic(bool coast, bool loop_forever) : Tactic(loop_forever), coast(coast)
 {
 }
 
 std::string StopTactic::getName() const
 {
     return "Stop Tactic";
-}
-
-void StopTactic::updateParams()
-{
-    // The Stop Tactic has no parameters to update
 }
 
 double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -32,4 +28,9 @@ void StopTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         yield(stop_action.updateStateAndGetNextIntent(*robot, this->coast));
     } while (!stop_action.done());
+}
+
+void StopTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

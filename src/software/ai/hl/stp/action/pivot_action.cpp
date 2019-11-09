@@ -11,11 +11,9 @@
 
 PivotAction::PivotAction() : Action() {}
 
-std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(const Robot& robot,
-                                                                 Point pivot_point,
-                                                                 Angle final_angle,
-                                                                 Angle pivot_speed,
-                                                                 bool enable_dribbler)
+std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(
+    const Robot& robot, Point pivot_point, Angle final_angle, Angle pivot_speed,
+    DribblerEnable enable_dribbler)
 {
     // update the parameters stored by this action
     this->robot           = robot;
@@ -29,9 +27,6 @@ std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(const Robot& ro
 
 void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
-    // Compute final position, to know when the robot is done
-    const double pivot_radius = BALL_MAX_RADIUS_METERS;
-
     do
     {
         // If we're not in position to pivot, move to grab the ball
@@ -39,14 +34,18 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             yield(std::make_unique<MoveIntent>(
                 robot->id(), pivot_point, (pivot_point - robot->position()).orientation(),
-                0.0, 0, enable_dribbler));
+                0.0, 0, enable_dribbler ? DribblerEnable::ON : DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::NONE));
             LOG(DEBUG) << "obtaining ball, moving!";
         }
         else
         {
             // if the robot is close enough to the final position, call it a day
-            Angle threshold_angle = Angle::ofDegrees(
-                Util::DynamicParameters::PivotAction::finish_angle_threshold.value() / 2);
+            Angle threshold_angle =
+                Angle::ofDegrees(Util::DynamicParameters->getPivotActionConfig()
+                                     ->FinishAngleThreshold()
+                                     ->value() /
+                                 2);
 
             if (robot->orientation() >= (final_angle - threshold_angle) &&
                 robot->orientation() < (final_angle + threshold_angle))

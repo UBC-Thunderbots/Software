@@ -5,7 +5,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-class DirectVelocityIntent : public Intent, public DirectVelocityPrimitive
+class DirectVelocityIntent : public DirectVelocityPrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

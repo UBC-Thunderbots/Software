@@ -10,6 +10,7 @@
 #include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
+#include "software/geom/shot.h"
 
 template <size_t N>
 using LegacyPolygon       = std::array<Vector, N>;
@@ -160,13 +161,11 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  *
  * @param radius the radii of the obstacles.
  *
- * @return The best point to aim for in the target area and the size of the open interval
- *         through which a shot from the current point to the best point would go. If no
- *         shot could be found, returns std::nullopt
+ * @return A feasible shot or std::nullopt if there is no feasible shot
  */
-std::optional<std::pair<Vector, Angle>> angleSweepCircles(
-    const Point &src, const Point &p1, const Point &p2,
-    const std::vector<Point> &obstacles, const double &radius);
+std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const Point &p2,
+                                      const std::vector<Point> &obstacles,
+                                      const double &radius);
 
 /**
  * Performs an angle sweep.
@@ -186,19 +185,15 @@ std::optional<std::pair<Vector, Angle>> angleSweepCircles(
  *
  * @param radius the radii of the obstacles.
  *
- * @return A vector of possible (ie. not blocked) pairs of points to shoot to in the
- *         target area,  and the size of the open interval for that point.
- *         ie. for a return point `p` and angle `a`, if `v` is a vector from `src` to `p`,
- *         then the open interval through which we are shooting is from `angle(v) - a/2`
- *         to `angle(v) + a/2`
- *         If lines src -> p1 and src -> p2 are collinear and src -> p1 is not blocked by
- *         an obstacle, the result will contain a single pair of the direction of
- *         src -> p1 and zero angle if the line is not blocked by an obstacle.
- *         An empty vector is returned if the preconditions aren't satisfied.
+ * @return A vector of possible (ie. not blocked) Shots. If lines src
+ * -> p1 and src -> p2 are collinear and src -> p1 is not blocked by an obstacle, the
+ * result will contain a single Shot of the direction of src -> p1 and zero angle if the
+ * line is not blocked by an obstacle. An empty vector is returned if the preconditions
+ * aren't satisfied.
  */
-std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
-    const Point &src, const Point &p1, const Point &p2,
-    const std::vector<Point> &obstacles, const double &radius);
+std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1, const Point &p2,
+                                       const std::vector<Point> &obstacles,
+                                       const double &radius);
 
 /**
  * returns a list of points that lie on the border of the circle
@@ -251,7 +246,7 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
                                        const Point &segA, const Point &segB);
 
 /**
- * Finds the points of intersection between a circle and a line.
+ * Finds the points of intersection between a rectangle and a line.
  * There may be zero, one, or two such points.
  *
  * @param r the rectangle.
@@ -378,6 +373,19 @@ Point reflect(const Point &v, const Point &n);
  */
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     const Ray &ray, const Segment &segment);
+
+/**
+ * Calculates the intersection of a Ray and Rectangle
+ *
+ * @param ray The ray
+ * @param rectangle The rectangle
+ * @return Returns {std::nullopt, std::nullopt} if no intersections exist.
+ * Returns {Point, std::nullopt} if a single intersection exists.
+ * Returns {Point, Point} if the ray overlaps a segment of the rectangle,
+ * where the points define the line segment of overlap.
+ */
+std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
+    const Ray &ray, const Rectangle &rectangle);
 
 /**
  * Calculates the intersection of two Rays
@@ -623,16 +631,28 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
 
 /**
- * Finds all circles which do not contain a point in them within the given rectangle
+ * Finds all circles which do not contain a point in them within the given rectangle.
  *
  * NOTE: this only guarantees that the center of each circle is within the
  *       rectangle, some portion of the circle may extend outside the rectangle
  *
- * @param rectangle The rectangle in which to look for open circles
+ * @param bounding_box The rectangle in which to look for open circles
  * @param points The points that must not lie within the circles
  *
- * @return A list of circles, sorted in descending order of radius
+ * @return A list of circles, sorted in descending order of radius. If no points were
+ * provided, returns an empty list. Any points outside the bounding_box are ommitted.
  */
-std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> points);
+std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
 
 Polygon circleToPolygon(const Circle &circle, size_t num_points);
+
+/**
+ *
+ * Finds the point in the testPoints vector that is closest to the originPoint.
+ *
+ * @param originPoint
+ * @param testPoints
+ * @return The point in testPoints closest to testPoints.
+ */
+std::optional<Point> findClosestPoint(const Point &origin_point,
+                                      std::vector<Point> test_points);

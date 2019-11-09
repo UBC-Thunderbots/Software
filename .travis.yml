@@ -1,60 +1,34 @@
-#########################################################################
-# Note: The main reason for the complexity of this file is that because #
-#       Travis does not yet support ubuntu 16, we must create a docker  #
-#       container within Travis to build and test the repo. When Travis #
-#       does eventually add support, this should be changed, as it will #
-#       significantly speed up CI times.                                #
-#########################################################################
-# Note: Setting `sudo` to `required` will add 20-50s to CI image boot time
-sudo: false
-dist: trusty
-services:
-  - docker
+sudo: true
+dist: bionic
 language: generic
-notifications:
-  email:
-    recipients:
 
 install:
-    # Pull in MoveIt's ROS Docker CI image (piping to `/dev/null` to hide output)
-    - DOCKER_IMAGE=moveit/moveit:melodic-ci
-    - echo "Pulling in Docker Image \"$DOCKER_IMAGE\""
-    - docker pull $DOCKER_IMAGE > /dev/null
-    # Tests default to false if not set
-    - RUN_BUILD=${RUN_BUILD:-"false"}
-    - RUN_TESTS=${RUN_TESTS:-"false"}
-    - RUN_COVERAGE=${RUN_COVERAGE:-"false"}
-    - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
-    # Grab environment variables Codecov needs to run in the docker
-    - CODECOV_ENV=`bash <(curl -s https://codecov.io/env)`
-    # Run the CI script inside the docker container
-    # (set tests/checks to false by default)
-    - docker run $CODECOV_ENV
-      --env RUN_BUILD
-      --env RUN_TESTS
-      --env RUN_COVERAGE
-      --env RUN_FORMATTING_CHECKS
-      --env REPOSITORY_NAME
-      --env TRAVIS_PULL_REQUEST
-      --env TRAVIS_BRANCH
-      --volume $(pwd):/root/$REPOSITORY_NAME
-      $DOCKER_IMAGE
-      /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
+    - ./environment_setup/setup_software.sh
 
-env:
-  # Global Variables that are set at the start of every CI run
-  global:
-    # Get the name of this repository from the `TRAVIS_REPO_SLUG`
-    # ex. "UBC-Thunderbots/Software" would give "Software"
-    - REPOSITORY_NAME=$(basename $TRAVIS_REPO_SLUG)
-
-# Each entry here represents a different CI run
-# The variables here are uniquely set at the start of each different test
-matrix:
+jobs:
   include:
-  - name: "ROS Melodic / Ubuntu 18.04 - Build and Test"
-    env: RUN_BUILD="true"
-         RUN_TESTS="true"
-         RUN_COVERAGE="true"
-  - name: "ROS Melodic / Ubuntu 18.04 - Check Formatting"
-    env: RUN_FORMATTING_CHECKS="true"
+    - name: "Build, Test, and Run Coverage"
+      script:
+        - cd src
+        # Build, test, run coverage
+        - >
+          bazel coverage //... 
+          --compilation_mode=fastbuild 
+          --verbose_test_summary 
+          --instrumentation_filter=//... 
+          --test_output=errors
+          --experimental_use_llvm_covmap
+          --collect_code_coverage
+        # Convert profdata results to lcov. We have to do this because of the
+        # current state of support for clang compiler coverage results in
+        # bazel. Once https://github.com/bazelbuild/bazel/issues/9406 is 
+        # addressed, we can probably change the `coverage_feature` flags in
+        # `cc_toolchain_config.bzl` to just `--coverage` and remove this script
+        - ./convert_profdata_to_lcov.sh
+        # Upload coverage results
+        - bash <(curl -s https://codecov.io/bash)
+        # Build our CPU-specific targets
+        - bazel build //firmware_new/... --cpu=stm32h7
+    - name: "Check Formatting"
+      script:
+        - ./clang_format/check_formatting_ci.sh

@@ -14,9 +14,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
-
-using boost::polygon::voronoi_builder;
-using boost::polygon::voronoi_diagram;
+#include "software/geom/voronoi_diagram.h"
 
 double proj_len(const Segment &first, const Vector &second)
 {
@@ -99,10 +97,10 @@ double dist(const Point &first, const Rectangle &second)
 
     // Calculate the distance from the point to each edge of the rectangle
     std::array<double, 4> distances = {
-        dist(first, Segment(second.neCorner(), second.seCorner())),
-        dist(first, Segment(second.seCorner(), second.swCorner())),
-        dist(first, Segment(second.swCorner(), second.nwCorner())),
-        dist(first, Segment(second.nwCorner(), second.neCorner()))};
+        dist(first, Segment(second.posXPosYCorner(), second.posXNegYCorner())),
+        dist(first, Segment(second.posXNegYCorner(), second.negXNegYCorner())),
+        dist(first, Segment(second.negXNegYCorner(), second.negXPosYCorner())),
+        dist(first, Segment(second.negXPosYCorner(), second.posXPosYCorner()))};
     return *std::min_element(distances.begin(), distances.end());
 }
 
@@ -322,9 +320,10 @@ Segment getSide(const LegacyPolygon<N> &poly, unsigned int i)
     return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
 
-std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
-    const Vector &src, const Vector &p1, const Vector &p2,
-    const std::vector<Point> &obstacles, const double &radius)
+std::vector<Shot> angleSweepCirclesAll(const Vector &src, const Vector &p1,
+                                       const Vector &p2,
+                                       const std::vector<Point> &obstacles,
+                                       const double &radius)
 {
     Angle p1_angle = (p1 - src).orientation();
     Angle p2_angle = (p2 - src).orientation();
@@ -355,7 +354,8 @@ std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
                 return {};
             }
         }
-        return {std::make_pair(collinear_seg.toVector(), Angle::zero())};
+
+        return {Shot(collinear_seg.toVector(), Angle::zero())};
     }
 
     // "Sweep" a line from the `src` to the target line segment, and create an "event"
@@ -402,7 +402,7 @@ std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
     {
         // No obstacles in the way, so just return a range hitting the entire target
         // line segment
-        return {std::make_pair((p1 + p2) / 2, end_angle - start_angle)};
+        return {Shot((p1 + p2) / 2, end_angle - start_angle)};
     }
 
     // Sort the events by angle
@@ -429,34 +429,36 @@ std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
     {
         events_collapsed.emplace_back(std::make_pair(end_angle - start_angle, -1));
     }
-    std::vector<std::pair<Point, Angle>> result;
-    for (int i = 0; i < events_collapsed.size() - 1; i += 2)
+
+    std::vector<Shot> result;
+    for (unsigned i = 1; i < events_collapsed.size(); i += 2)
     {
         // Calculate the center of this range on the target line segement
-        Angle range_start = events_collapsed[i].first + start_angle;
-        Angle range_end   = events_collapsed[i + 1].first + start_angle;
+        Angle range_start = events_collapsed[i - 1].first + start_angle;
+        Angle range_end   = events_collapsed[i].first + start_angle;
         Angle mid         = (range_end - range_start) / 2 + range_start;
         Vector ray        = Vector::createFromAngle(mid) * 10.0;
         Vector inter      = lineIntersection(src, src + ray, p1, p2).value();
 
         // Offset the final values by the start angle
-        result.emplace_back(std::make_pair(inter, range_end - range_start));
+        result.emplace_back(Shot(inter, range_end - range_start));
     }
 
     return result;
 }
 
-std::optional<std::pair<Point, Angle>> angleSweepCircles(
-    const Vector &src, const Vector &p1, const Vector &p2,
-    const std::vector<Vector> &obstacles, const double &radius)
+std::optional<Shot> angleSweepCircles(const Vector &src, const Vector &p1,
+                                      const Vector &p2,
+                                      const std::vector<Vector> &obstacles,
+                                      const double &radius)
 {
     // Get all possible shots we could take
-    std::vector<std::pair<Point, Angle>> possible_shots =
+    std::vector<Shot> possible_shots =
         angleSweepCirclesAll(src, p1, p2, obstacles, radius);
 
     // Sort by the interval angle (ie. the open angle the shot is going through)
     std::sort(possible_shots.begin(), possible_shots.end(),
-              [](auto p1, auto p2) { return p1.second > p2.second; });
+              [](auto s1, auto s2) { return s1.getOpenAngle() > s2.getOpenAngle(); });
 
     // Return the shot through the largest open interval if there are any
     if (possible_shots.empty())
@@ -517,10 +519,10 @@ Vector clipPoint(const Vector &p, const Vector &bound1, const Vector &bound2)
 
 Vector clipPoint(const Vector &p, const Rectangle &r)
 {
-    const double minx = r.swCorner().x();
-    const double miny = r.swCorner().y();
-    const double maxx = r.neCorner().x();
-    const double maxy = r.neCorner().y();
+    const double minx = r.negXNegYCorner().x();
+    const double miny = r.negXNegYCorner().y();
+    const double maxx = r.posXPosYCorner().x();
+    const double maxy = r.posXPosYCorner().y();
     Vector ret        = p;
     if (p.x() < minx)
     {
@@ -693,29 +695,6 @@ Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vecto
     return lineB;
 }
 
-namespace
-{
-    std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
-                                                 const Vector &segA, const Vector &segB)
-    {
-        std::vector<Vector> ans;
-        std::vector<Vector> poss = lineCircleIntersect(centre, radius, segA, segB);
-
-        for (Vector i : poss)
-        {
-            bool x_ok = i.x() <= std::max(segA.x(), segB.x()) + EPS &&
-                        i.x() >= std::min(segA.x(), segB.x()) - EPS;
-            bool y_ok = i.y() <= std::max(segA.y(), segB.y()) + EPS &&
-                        i.y() >= std::min(segA.y(), segB.y()) - EPS;
-            if (x_ok && y_ok)
-            {
-                ans.push_back(i);
-            }
-        }
-        return ans;
-    }
-}  // namespace
-
 bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
                           const Vector &d)
 {
@@ -865,6 +844,31 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     {
         return std::make_pair(std::nullopt, std::nullopt);
     }
+}
+
+std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
+    const Ray &ray, const Rectangle &rectangle)
+{
+    std::vector<Segment> rectangle_segments = {
+        Segment(rectangle.posXPosYCorner(), rectangle.negXPosYCorner()),
+        Segment(rectangle.negXPosYCorner(), rectangle.negXNegYCorner()),
+        Segment(rectangle.negXNegYCorner(), rectangle.posXNegYCorner()),
+        Segment(rectangle.posXNegYCorner(), rectangle.posXPosYCorner()),
+    };
+    std::pair<std::optional<Point>, std::optional<Point>> result =
+        std::make_pair(std::nullopt, std::nullopt);
+    for (const auto &seg : rectangle_segments)
+    {
+        auto intersection = raySegmentIntersection(ray, seg);
+        // Always take the result with more non-nullopt values
+        if ((intersection.first && !result.first) ||
+            (intersection.second && !result.second))
+        {
+            result = intersection;
+        }
+    }
+
+    return result;
 }
 
 std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
@@ -1327,14 +1331,14 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
 }
 
 
-std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> points)
+std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points)
 {
     // We use a Voronoi Diagram and it's Delaunay triangulation to find the largest
     // open circles in the field
     // Reference: https://www.cs.swarthmore.edu/~adanner/cs97/s08/papers/schuster.pdf
     //
     // You can think of the Delauney triangulation as a way to connect all the points
-    // (and the rectangle corners) such that every point has three edges, and the
+    // (and the bounding_box corners) such that every point has three edges, and the
     // triangles formed are setup to be as regular as possible (ie. we avoid things
     // like super narrow triangles). The Voronoi diagram is the *dual* of this (scary
     // math words, I know), which just means you can construct it by taking the center
@@ -1344,74 +1348,87 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
     // on the field, and the size of the circle is the distance to the closest vertex
     // on the triangle that this vertex was created from
 
-    // TODO: instead of just adding the 4 corners of the rectangle here, the proper
-    //       thing to do is to generate the voronoi with just the points given, then
-    //       also treat all intersections of the voronoi diagram with the edge of the
-    //       rectangle as vertices
-    //       https://stackoverflow.com/questions/34093602/efficient-algorithm-to-determine-largest-open-space
+    // Filters out points that are outside of the bounding box
+    points.erase(std::remove_if(points.begin(), points.end(),
+                                [&bounding_box](const Point &p) {
+                                    return !bounding_box.containsPoint(p);
+                                }),
+                 points.end());
 
-    // Add the 4 corners of the rectangle to the list of points
-    points.emplace_back(rectangle.neCorner());
-    points.emplace_back(rectangle.nwCorner());
-    points.emplace_back(rectangle.seCorner());
-    points.emplace_back(rectangle.swCorner());
+    std::vector<Circle> empty_circles;
+
+    // Creating the Voronoi diagram with 2 or less points will produce no edges so we need
+    // to handle these cases manually
+    if (points.empty())
+    {
+        // If there are no points, return an empty vector since there are no constraints
+        // to the size of the circle.
+        return empty_circles;
+    }
+    if (points.size() == 1)
+    {
+        // If there is only 1 point, return circles centered at all four corners of the
+        // bounding bounding_box.
+        for (Point &corner : bounding_box.corners())
+        {
+            empty_circles.emplace_back(Circle(corner, dist(points.front(), corner)));
+        }
+        return empty_circles;
+    }
+    if (points.size() == 2)
+    {
+        // If there are 2 point, split the points with a vector perpendicular to the
+        // vector connecting the two points. Return 2 circles that are centered at the
+        // points where the splitting vector intercepts the bounding_box. We should also
+        // include circles centered at each of the corners.
+        Point connectedVec            = points[1] - points[0];
+        Point halfPoint               = points[0] + (connectedVec * 0.5);
+        Point perpVec                 = Point(connectedVec.y(), -connectedVec.x()).norm();
+        std::vector<Point> intersects = lineRectIntersect(
+            bounding_box,
+            halfPoint +
+                (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)),
+            halfPoint -
+                (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)));
+        std::vector<Point> corners = bounding_box.corners();
+        intersects.insert(intersects.end(), corners.begin(), corners.end());
+        for (const Point &intersect : intersects)
+        {
+            double radius = dist(findClosestPoint(intersect, points).value(), intersect);
+            empty_circles.emplace_back(intersect, radius);
+        }
+        return empty_circles;
+    }
 
     // Construct the voronoi diagram
-    voronoi_diagram<double> vd;
-    construct_voronoi(points.begin(), points.end(), &vd);
+    VoronoiDiagram vd(points);
 
-    // For each vertex, construct it's delauney triangle and then compute the largest
-    // empty circle around it
-    // NOTE: Generally there is a 1:1 mapping from vertex in voronoi diagram to delauney
-    // triangle, but in the case of a degenerate vertex there may be more then one
-    // triangle for a given vertex. We just ignore this case because it normally only
-    // occurs if we created the voronoi diagram from line segments with shared endpoints
-    // (and we don't even give it segments!) see "is_degenerate" here:
-    // https://www.boost.org/doc/libs/1_60_0/libs/polygon/doc/voronoi_diagram.htm
-    // Code is a derivative of the answer to this:
-    // https://stackoverflow.com/questions/34342038/how-to-triangulate-polygons-in-boost
-    std::vector<Circle> empty_circles;
-    for (auto vertex : vd.vertices())
+    // The corners of the rectangles are locations for the centre of circles with their
+    // radius being the distance to the corner's closest point.
+    for (const Point &corner : bounding_box.corners())
     {
-        // We only want to consider vertices within our rectangle
-        if (rectangle.containsPoint(Point(vertex.x(), vertex.y())))
-        {
-            std::vector<Point> triangle;
-            auto edge = vertex.incident_edge();
-            do
-            {
-                auto cell = edge->cell();
-                if (!cell->contains_point())
-                {
-                    LOG(WARNING)
-                        << "Found cell without point inside, something is likely seriously wrong";
-                    continue;
-                }
-
-                triangle.push_back(points[cell->source_index()]);
-                if (triangle.size() == 3)
-                {
-                    // Find the smallest distance from the vertex to a vertex on it's
-                    // corresponding delauney triangle
-                    std::vector<double> radii;
-                    for (auto const &triangle_vertex : triangle)
-                    {
-                        radii.emplace_back(
-                            (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
-                    }
-                    double smallest_radius =
-                        *std::min_element(radii.begin(), radii.end());
-
-                    empty_circles.emplace_back(
-                        Circle(Point(vertex.x(), vertex.y()), smallest_radius));
-
-                    continue;
-                }
-
-                edge = edge->rot_next();
-            } while (edge != vertex.incident_edge());
-        }
+        Point closest = findClosestPoint(corner, points).value();
+        empty_circles.emplace_back(Circle(corner, dist(corner, closest)));
     }
+
+    std::vector<Point> intersects = vd.findVoronoiEdgeRecIntersects(bounding_box);
+
+    // Radius of the circle will be the distance from the interception point
+    // to the nearest input point.
+    for (const Point &p : intersects)
+    {
+        double radius = (points[0] - p).len();
+        for (const Point &inputP : points)
+        {
+            radius = std::min(radius, (inputP - p).len());
+        }
+        empty_circles.emplace_back(Circle(p, radius));
+    }
+
+    std::vector<Circle> calculatedEmptyCircles =
+        vd.voronoiVerticesToOpenCircles(bounding_box);
+    empty_circles.insert(empty_circles.end(), calculatedEmptyCircles.begin(),
+                         calculatedEmptyCircles.end());
 
     // Sort the circles in descending order of radius
     std::sort(empty_circles.begin(), empty_circles.end(),
@@ -1423,7 +1440,7 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
 Polygon circleToPolygon(const Circle &circle, size_t num_points)
 {
     std::vector<Point> points;
-    for (auto i = 0; i < num_points; i++)
+    for (unsigned i = 0; i < num_points; i++)
     {
         Point p =
             circle.getOrigin() + Point(circle.getRadius(), 0)
@@ -1431,4 +1448,21 @@ Polygon circleToPolygon(const Circle &circle, size_t num_points)
         points.emplace_back(p);
     }
     return Polygon(points);
+}
+
+std::optional<Point> findClosestPoint(const Point &origin_point,
+                                      std::vector<Point> test_points)
+{
+    std::optional<Point> closest_point = std::nullopt;
+
+    if (!test_points.empty())
+    {
+        closest_point = *std::min_element(
+            test_points.begin(), test_points.end(),
+            [&](const Point &test_point1, const Point &test_point2) {
+                return dist(origin_point, test_point1) < dist(origin_point, test_point2);
+            });
+    }
+
+    return closest_point;
 }

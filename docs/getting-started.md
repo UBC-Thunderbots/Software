@@ -23,11 +23,12 @@
    * [With CLion](#with-clion)
    * [From the command-line](#from-the-command-line)
 * [Debugging](#debugging)
+* [Flashing and Debugging A STM32 MCU](#flashing-and-debugging-a-stm32-mcu)
 
 ## Introduction
 These instructions assume that you have the following accounts setup:
-- Github
-- Slack
+- [Github](https://github.com/login)
+- [Slack](https://thunderbots.slack.com/)
 
 These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
 
@@ -42,7 +43,7 @@ We currently only support Linux, specifically Ubuntu 18.04 LTS. You are welcome 
 1. Open a new terminal
 2. Install git by running `sudo apt-get install git`
 3. Go to the [software repository](https://github.com/UBC-Thunderbots/Software)
-4. Click the `Fork` button in the top-right to fork the repository
+4. Click the `Fork` button in the top-right to fork the repository ([click here to learn about Forks](https://help.github.com/en/articles/fork-a-repo))
    1. Click on your user when prompted
    2. You should be automatically redirected to your new fork
 5. Clone your fork of the repository (you can put it wherever you want)
@@ -57,6 +58,8 @@ We currently only support Linux, specifically Ubuntu 18.04 LTS. You are welcome 
       3. From your terminal, add the new remote by running `git remote add upstream <the url>` (without the angle brackets)
          1. Eg. `git remote add upstream https://github.com/UBC-Thunderbots/Software.git`
       4. That's it. If you want to double check your remotes are set up correctly, run `git remote -v` from your terminal (at the base of the repository folder again). You should see two entries: `origin` with the url for your fork of the repository, and `upstream` with the url for the main repository
+
+*See our [workflow document](workflow.md) for how to use git to make branches, submit Pull Requests, and track issues*
 
 ## Running the setup scripts
 
@@ -92,7 +95,7 @@ We have several setup scripts to help you easily install the necessary dependenc
 
 ### Installing CLion
 
-CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `cmake`, and has all the great features of an IDE such as code completion, syntax highlighting etc. We **strongly** recommend installing CLion and using it for development.
+CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `bazel`, and has all the great features of an IDE such as code completion, syntax highlighting etc. We **strongly** recommend installing CLion and using it for development.
 
 #### Getting your Student License
 
@@ -113,7 +116,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 ### From the command-line
 
 1) Navigate to the root of this repository (wherever you have it cloned on your computer)
-2) Navigate to `src/thunderbots`.
+2) Navigate to `src`.
 3) Build a specific target for running (for example): `bazel build //software/geom:angle_test`
 4) Run a specific target by running (for example): `bazel run //software/geom:angle_test`
 4) Run a specific *test* by running (for example): `bazel test //software/geom:angle_test`
@@ -126,20 +129,27 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 First we need to setup CLion
 1. Open CLion
 2. Select `Import Bazel Project`
-3. Set `Workspace` to wherever you cloned the repository + `/src/thunderbots`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src/thunderbots`.
-4. Select `Create from scratch` 
-5. For "Project View", leave everything as default.
-6. You're good to go! Give CLion some time to find everything in your repo.
+3. Set `Workspace` to wherever you cloned the repository + `/src`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src`.
+4. Select `Import project view file`, and select the file `.bazelproject` (which will be under the `src` folder)
+5. Click `Next`
+6. Change the Project Name to whatever you want. Leave everything else as it is ("Use shared project view file" should be selected).
+6. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
 
 Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
-1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/thunderbots/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
+1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
     1. Select `Add Configuration` from the drop-down in the top-right of CLion
-    2. Under `Templates`, choose `Bazel Command`.
+    2. Click on `+`, choose `Bazel Command`.
     3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
 
 ## Debugging
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow! Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). If you insist on using the command line for everything, or if you have CLion issues, see [here](https://stackoverflow.com/questions/45812725/c-debugging-with-gdb-bazel-emacs).
+
+## Flashing And Debugging A STM32 MCU
+1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
+2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
+3. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. This will load the `.elf` file associated with (0) to the the nucleo and put you into a gdb prompt.
+4. At this point you should be in a gdb window. Take a look at [this tutorial](https://www.cprogramming.com/gdb.html) for some basics.

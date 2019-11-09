@@ -40,7 +40,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
     EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
     EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2, move_intent.getFinalAngle());
-    EXPECT_FALSE(move_intent.isDribblerEnabled());
+    EXPECT_FALSE(move_intent.getDribblerEnable());
     EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
@@ -69,8 +69,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     // we're at the target position
     for (int i = 0; i < 5; i++)
     {
-        tactic.updateParams(friendly_team, enemy_team, pass, ball);
-
+        tactic.updateWorldParams(friendly_team, enemy_team, ball);
+        tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
@@ -79,7 +79,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
                   move_intent.getFinalAngle());
-        EXPECT_FALSE(move_intent.isDribblerEnabled());
+        EXPECT_FALSE(move_intent.getDribblerEnable());
         EXPECT_EQ(move_intent.getAutoKickType(), NONE);
     }
 }
@@ -119,7 +119,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
     EXPECT_LT(move_intent.getFinalAngle().toDegrees(), -1);
     EXPECT_GT(move_intent.getFinalAngle().toDegrees(), -90);
 
-    EXPECT_FALSE(move_intent.isDribblerEnabled());
+    EXPECT_FALSE(move_intent.getDribblerEnable());
     EXPECT_EQ(move_intent.getAutoKickType(), AUTOKICK);
 }
 
@@ -155,7 +155,7 @@ TEST(ReceiverTacticTest,
     EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
 
-    EXPECT_TRUE(move_intent.isDribblerEnabled());
+    EXPECT_TRUE(move_intent.getDribblerEnable());
     EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
@@ -198,7 +198,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
 
-    EXPECT_TRUE(move_intent.isDribblerEnabled());
+    EXPECT_TRUE(move_intent.getDribblerEnable());
     EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
@@ -233,7 +233,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
                      Vector(receiver.orientation().cos(), receiver.orientation().sin())
                          .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
     ball = Ball(ball_pos, {-1, 1}, Timestamp::fromSeconds(5));
-    tactic.updateParams(friendly_team, enemy_team, pass, ball);
+    tactic.updateWorldParams(friendly_team, enemy_team, ball);
+    tactic.updateControlParams(pass);
 
     // Since we've received the ball, we shouldn't yield anything
     EXPECT_FALSE(tactic.getNextIntent());
@@ -348,9 +349,10 @@ TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_pos
     // Create a best shot towards the center of the enemy goal
     Point best_shot_target = Point(4.5, 0);
 
-    auto [ideal_position, ideal_orientation] =
-        ReceiverTactic::getOneTimeShotPositionAndOrientation(robot, ball,
-                                                             best_shot_target);
+    Shot shot = ReceiverTactic::getOneTimeShotPositionAndOrientation(robot, ball,
+                                                                     best_shot_target);
+    Point ideal_position    = shot.getPointToShootAt();
+    Angle ideal_orientation = shot.getOpenAngle();
 
     // The position where the ball should make contact with the receiver robot
     Point ball_contact_position =

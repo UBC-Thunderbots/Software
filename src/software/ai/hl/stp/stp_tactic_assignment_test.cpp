@@ -48,8 +48,8 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -70,8 +70,8 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -93,7 +93,7 @@ TEST_F(STPTacticAssignmentTest,
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
@@ -110,7 +110,7 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
@@ -149,8 +149,7 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto stop_tactic_1 = std::make_shared<StopTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    stop_tactic_1->updateParams();
+    move_tactic_1->updateControlParams(Point(-1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, stop_tactic_1};
 
@@ -178,7 +177,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(2, -3.2));
+    move_tactic_1->updateControlParams(Point(2, -3.2));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
@@ -205,8 +204,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -243,8 +242,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -275,8 +274,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -306,10 +305,6 @@ TEST_F(STPTacticAssignmentTest,
     auto stop_tactic_1 = std::make_shared<StopTestTactic>();
     auto stop_tactic_2 = std::make_shared<StopTestTactic>();
     auto stop_tactic_3 = std::make_shared<StopTestTactic>();
-
-    stop_tactic_1->updateParams();
-    stop_tactic_2->updateParams();
-    stop_tactic_3->updateParams();
 
     std::vector<std::shared_ptr<Tactic>> tactics = {stop_tactic_1, stop_tactic_2,
                                                     stop_tactic_3};
@@ -343,9 +338,7 @@ TEST_F(STPTacticAssignmentTest,
     // The destination of the move_tactic is relatively close to the robot positions, so
     // the cost of assigning any robot to the move_tactic should be less than the
     // stop_tactics
-    stop_tactic_1->updateParams();
-    move_tactic_1->updateParams(Point(0, 0));
-    stop_tactic_2->updateParams();
+    move_tactic_1->updateControlParams(Point(0, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {stop_tactic_1, move_tactic_1,
                                                     stop_tactic_2};
@@ -366,7 +359,8 @@ TEST_F(STPTacticAssignmentTest,
     Team friendly_team(Duration::fromSeconds(0));
     // this robot has no capabilities
     Robot robot_0(0, Point(0.1, 0.1), Point(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0), 10, RobotCapabilityFlags{});
+                  Timestamp::fromSeconds(0), 10,
+                  std::set<RobotCapabilities::Capability>{});
     // default is all capabilities, if not specified otherwise
     Robot robot_1(1, Point(-10, -10), Point(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
@@ -375,7 +369,7 @@ TEST_F(STPTacticAssignmentTest,
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(0, 0));
+    move_tactic_1->updateControlParams(Point(0, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
@@ -383,5 +377,5 @@ TEST_F(STPTacticAssignmentTest,
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_EQ(assigned_tactics.size(), 1);
-    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_1);
+    EXPECT_TRUE(*assigned_tactics.at(0)->getAssignedRobot() == robot_1);
 }

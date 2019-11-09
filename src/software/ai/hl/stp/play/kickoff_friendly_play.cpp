@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_factory.h"
-#include "software/ai/hl/stp/tactic/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 
 const std::string KickoffFriendlyPlay::name = "KickoffFriendly Play";
@@ -15,13 +15,15 @@ std::string KickoffFriendlyPlay::getName() const
 
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-           world.gameState().isOurKickoff();
+    return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
+            world.gameState().isOurKickoff()) &&
+           !world.gameState().isHalted() && !world.gameState().isStopped();
 }
 
 bool KickoffFriendlyPlay::invariantHolds(const World &world) const
 {
-    return !world.gameState().isPlaying();
+    return (!world.gameState().isPlaying() || world.gameState().isHalted() ||
+            world.gameState().isStopped());
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -63,18 +65,18 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Robot 3
         Point(world.field().centerPoint() +
               Point(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                    -1.0 / 3.0 * world.field().width())),
+                    -1.0 / 3.0 * world.field().yLength())),
         // Robot 4
         Point(world.field().centerPoint() +
               Point(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                    1.0 / 3.0 * world.field().width())),
+                    1.0 / 3.0 * world.field().yLength())),
         // Robot 5
         Point(world.field().friendlyGoalpostPos().x() +
-                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoalpostPos().y()),
         // Robot 6
         Point(world.field().friendlyGoalpostNeg().x() +
-                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoalpostNeg().y()),
     };
 
@@ -87,7 +89,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // specific tactics
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-    auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), true);
+    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(world.ball(), true);
 
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
@@ -95,19 +97,19 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // set the requirement that Robot 1 must be able to kick and chip
         move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
-            RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip};
+            RobotCapabilities::Capability::Kick, RobotCapabilities::Capability::Chip};
 
         // setup 5 kickoff positions in order of priority
-        for (int i = 0; i < kickoff_setup_positions.size(); i++)
+        for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
-                                             0);
+            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
+                                                    Angle::zero(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 
@@ -121,24 +123,25 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
-        chip_tactic->updateParams(
-            world.ball(), world.field().centerPoint(),
-            world.field().centerPoint() + Point(world.field().length() / 4, 0),
-            world.field().length() / 2);
-        result.emplace_back(chip_tactic);
+        kickoff_chip_tactic->updateWorldParams(world.ball());
+        kickoff_chip_tactic->updateControlParams(
+            world.ball().position(),
+            world.field().centerPoint() + Point(world.field().xLength() / 6, 0),
+            world.field().xLength() / 2);
+        result.emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
         // 1 will be assigned to the rest of the robots
-        for (int i = 1; i < kickoff_setup_positions.size(); i++)
+        for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
-                                             0);
+            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
+                                                    Angle::zero(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 

@@ -8,15 +8,17 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
 using namespace Passing;
 
 PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever)
-    : pass(std::move(pass)),
-      ball(ball),
-      Tactic(loop_forever, {RobotCapabilityFlags::Kick})
+    : Tactic(loop_forever, {RobotCapabilities::Capability::Kick}),
+      pass(std::move(pass)),
+      ball(ball)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string PasserTactic::getName() const
@@ -24,10 +26,14 @@ std::string PasserTactic::getName() const
     return "Passer Tactic";
 }
 
-void PasserTactic::updateParams(const Pass& updated_pass, const Ball& updated_ball)
+void PasserTactic::updateWorldParams(const Ball& updated_ball)
+{
+    this->ball = updated_ball;
+}
+
+void PasserTactic::updateControlParams(const Pass& updated_pass)
 {
     this->pass = updated_pass;
-    this->ball = updated_ball;
 }
 
 double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
@@ -36,7 +42,7 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-        (robot.position() - pass.passerPoint()).len() / world.field().totalLength();
+        (robot.position() - pass.passerPoint()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -55,8 +61,9 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
         Point wait_position = pass.passerPoint() - ball_offset;
 
-        yield(move_action.updateStateAndGetNextIntent(*robot, wait_position,
-                                                      pass.passerOrientation(), 0));
+        yield(move_action.updateStateAndGetNextIntent(
+            *robot, wait_position, pass.passerOrientation(), 0, DribblerEnable::OFF,
+            MoveType::NORMAL, AutokickType::NONE));
     }
 
     // The angle between the ball velocity vector and a vector from the passer
@@ -79,4 +86,9 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             ball.velocity().orientation().minDiff(passer_to_receiver_angle);
     } while (ball_velocity_to_pass_orientation.abs() > Angle::ofDegrees(20) ||
              ball.velocity().len() < 0.5);
+}
+
+void PasserTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }

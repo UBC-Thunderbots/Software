@@ -1,11 +1,57 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "navigator",
-    hdrs = ["navigator.h"],
+    name = "util",
+    srcs = ["util.cpp"],
+    hdrs = ["util.h"],
     deps = [
+        "//software/ai/primitive:move_primitive",
+        "//software/geom",
+        "//software/ai/navigator/obstacle",
+        "//software/util/parameter:dynamic_parameters",
+        "//software/ai/intent:avoid_area",
+        "//software/world",
+        "@g3log",
+    ],
+)
+
+cc_test(
+    name = "util_test",
+    srcs = ["util_test.cpp"],
+    deps = [
+        ":util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "navigator",
+    srcs = ["navigator.cpp"],
+    hdrs = ["navigator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":util",
         "//software/ai/intent",
-        "//software/ai/primitive",
-        "//software/ai/world",
+        "//software/ai/intent:all_intents",
+        "//software/ai/intent:intent_visitor",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/path_manager:path_manager",
+        "//software/ai/primitive:all_primitives",
+        "//software/util/parameter:dynamic_parameters",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "navigator_test",
+    srcs = ["navigator_test.cpp"],
+    deps = [
+        ":navigator",
+        "//software/test_util",
+        "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/ai/navigator/path_planner:one_point_path_test_path_planner",
+        "//software/ai/navigator/path_planner:no_path_test_path_planner",
+        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
+        "@gtest//:gtest_main",
     ],
 )
