@@ -7,14 +7,10 @@ MoveTestAction::MoveTestAction(double close_to_dest_threshold)
 {
 }
 
-std::unique_ptr<Intent> MoveTestAction::updateStateAndGetNextIntent(const Robot& robot,
-                                                                    Point destination)
-{
-    // Update the parameters stored by this Action
+void MoveTestAction::updateControlParams(const Robot& robot, Point destination) {
+
     this->robot       = robot;
     this->destination = destination;
-
-    return getNextIntent();
 }
 
 void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)

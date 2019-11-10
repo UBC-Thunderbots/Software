@@ -43,8 +43,10 @@ void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     ChipAction chip_action = ChipAction();
     do
     {
-        yield(chip_action.updateStateAndGetNextIntent(*robot, ball, chip_origin,
-                                                      chip_target, chip_distance_meters));
+        chip_action.updateWorldParams(ball);
+        chip_action.updateControlParams(*robot, chip_origin,
+                                                      chip_target, chip_distance_meters);
+        yield(chip_action.getNextIntent());
     } while (!chip_action.done());
 }
 

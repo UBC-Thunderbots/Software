@@ -215,9 +215,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-            next_intent = move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
                 MoveType::NORMAL, AutokickType::AUTOCHIP);
+            next_intent = move_action.getNextIntent();
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
@@ -229,15 +230,18 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
             if (dont_chip_rectangle.containsPoint(ball.position()) == true)
             {
-                next_intent = stop_action.updateStateAndGetNextIntent(*robot, false);
+                stop_action.updateControlParams(*robot, false);
+                next_intent = stop_action.getNextIntent();
             }
             // if the ball is slow or stationary inside our defense area, and is safe
             // to do so, chip it out
             else
             {
-                next_intent = chip_action.updateStateAndGetNextIntent(
-                    *robot, ball, ball.position(),
+                chip_action.updateWorldParams(ball);
+                chip_action.updateControlParams(
+                    *robot, ball.position(),
                     (ball.position() - field.friendlyGoal()).orientation(), 2);
+                next_intent = chip_action.getNextIntent();
             }
         }
         // case 3: ball does not have a clear velocity vector towards the goal, so
@@ -261,9 +265,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
-            next_intent             = move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, goalie_restricted_pos, goalie_orientation, 0.0,
                 DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
+            next_intent             = move_action.getNextIntent();
         }
 
         // compute angle between two vectors, negative goal post to ball and positive
@@ -313,11 +318,12 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
         Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-        next_intent = move_action.updateStateAndGetNextIntent(
+        move_action.updateControlParams(
             *robot, goalie_pos, goalie_orientation, goalie_final_speed,
             DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
+        next_intent = move_action.getNextIntent();
 
-        yield(std::move(next_intent));
+            yield(std::move(next_intent));
     } while (!move_action.done());
 }
 

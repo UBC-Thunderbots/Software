@@ -12,8 +12,9 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
     Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::zero(), 5.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::zero(), 5.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -40,8 +41,9 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
     Ball ball({-2.5, 2.5}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(105), 5.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::ofDegrees(105), 5.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -68,8 +70,9 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_negative_y)
     Ball ball({-0.05, -0.2}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(255), 3.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::ofDegrees(255), 3.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -96,8 +99,9 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_negative_y)
     Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(306), 5.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::ofDegrees(306), 5.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -124,8 +128,9 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_positive_y
     Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::zero(), 5.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::zero(), 5.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -153,8 +158,9 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_positive_y
     Ball ball({-2.5, 2.5}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(105), 5.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::ofDegrees(105), 5.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -182,8 +188,9 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_negative_y
     Ball ball({-1, -4}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(255), 3.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::ofDegrees(255), 3.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -211,8 +218,9 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_negative_y
     Ball ball({0, 0}, robot.position(), Timestamp::fromSeconds(0));
     KickAction action = KickAction();
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, ball.position(),
-                                                         Angle::ofDegrees(306), 5.0);
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::ofDegrees(306), 5.0);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

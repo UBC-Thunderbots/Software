@@ -27,8 +27,7 @@ class MoveAction : public Action
         bool loop_forever                    = false);
 
     /**
-     * Returns the next Intent this MoveAction wants to run, given the parameters.
-     * Moves the robot in a straight line to the given destination.
+     * Updates the params that cannot be derived from the world for this action
      *
      * @param robot The robot to move
      * @param destination The destination to move to (in global coordinates)
@@ -39,14 +38,12 @@ class MoveAction : public Action
      * @param slow Whether or not to move slow
      * @param autokick This will enable the "break-beam" on the robot, that will
      * trigger the kicker or chippper to fire as soon as the ball is in front of it
-     *
-     * @return A unique pointer to the Intent the MoveAction wants to run. If the
-     * MoveAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(
+    void updateControlParams(
         const Robot& robot, Point destination, Angle final_orientation,
         double final_speed, DribblerEnable enable_dribbler, MoveType move_type,
-        AutokickType autokick);
+        AutokickType autokick
+    );
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -9,27 +9,27 @@
 
 KickAction::KickAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 
-std::unique_ptr<Intent> KickAction::updateStateAndGetNextIntent(
-    const Robot &robot, const Ball &ball, Point kick_origin, Point kick_target,
-    double kick_speed_meters_per_second)
-{
-    return updateStateAndGetNextIntent(robot, ball, kick_origin,
-                                       (kick_target - kick_origin).orientation(),
-                                       kick_speed_meters_per_second);
+void KickAction::updateWorldParams(const Ball &ball) {
+    this->ball = ball;
 }
 
-std::unique_ptr<Intent> KickAction::updateStateAndGetNextIntent(
-    const Robot &robot, const Ball &ball, Point kick_origin, Angle kick_direction,
-    double kick_speed_meters_per_second)
+void KickAction::updateControlParams(const Robot &robot, Point kick_origin,
+                                     Point kick_target,
+                                     double kick_speed_meters_per_second)
 {
-    // Update the parameters stored by this Action
+    updateControlParams(robot, kick_origin,
+                        (kick_target - kick_origin).orientation(),
+                        kick_speed_meters_per_second);
+}
+
+void KickAction::updateControlParams(const Robot &robot, Point kick_origin,
+                                     Angle kick_direction,
+                                     double kick_speed_meters_per_second)
+{
     this->robot                        = robot;
-    this->ball                         = ball;
     this->kick_origin                  = kick_origin;
     this->kick_direction               = kick_direction;
     this->kick_speed_meters_per_second = kick_speed_meters_per_second;
-
-    return getNextIntent();
 }
 
 void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)

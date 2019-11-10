@@ -188,14 +188,16 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            yield(move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP));
+                MoveType::NORMAL, AutokickType::AUTOCHIP);
+            yield(move_action.getNextIntent());
         }
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
-            yield(std::move(stop_action.updateStateAndGetNextIntent(*robot, false)));
+            stop_action.updateControlParams(*robot, false);
+            yield(std::move(stop_action.getNextIntent()));
         }
     } while (!move_action.done());
 }

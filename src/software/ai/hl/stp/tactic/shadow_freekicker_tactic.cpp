@@ -81,9 +81,10 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
                                         perpendicular_to_ball_direction;
         }
 
-        yield(move_action.updateStateAndGetNextIntent(
+        move_action.updateControlParams(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
+        yield(move_action.getNextIntent());
     } while (true);
 }
 

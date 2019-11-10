@@ -8,27 +8,23 @@
 
 ChipAction::ChipAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 
-std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
-    const Robot& robot, const Ball& ball, Point chip_origin, Point chip_target,
-    double chip_distance_meters)
-{
-    return updateStateAndGetNextIntent(robot, ball, chip_origin,
-                                       (chip_target - chip_origin).orientation(),
-                                       chip_distance_meters);
+void ChipAction::updateWorldParams(const Ball& ball) {
+    this->ball                 = ball;
 }
 
-std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
-    const Robot& robot, const Ball& ball, Point chip_origin, Angle chip_direction,
-    double chip_distance_meters)
+void ChipAction::updateControlParams(const Robot& robot, Point chip_origin, Angle chip_direction,
+                                     double chip_distance_meters)
 {
-    // Update the parameters stored by this Action
     this->robot                = robot;
-    this->ball                 = ball;
     this->chip_origin          = chip_origin;
     this->chip_direction       = chip_direction;
     this->chip_distance_meters = chip_distance_meters;
+}
 
-    return getNextIntent();
+void ChipAction::updateControlParams(const Robot& robot, Point chip_origin, Point chip_target,
+                                     double chip_distance_meters)
+{
+    updateControlParams(robot, chip_origin, (chip_target - chip_origin).orientation(), chip_distance_meters);
 }
 
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)

@@ -28,16 +28,16 @@ class StopAction : public Action
         bool loop_forever              = false);
 
     /**
-     * Returns the next Intent this StopAction wants to run, given the parameters.
+     * Updates the params that cannot be derived from the world for this action
      *
      * @param robot the robot that should stop
      * @param coast Whether or not to coast to a stop. If this is false, the robot will
      * try actively brake to come to a stop
-     *
-     * @return A unique pointer to the Intent the StopAction wants to run.
-     *
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot, bool coast);
+    void updateControlParams(
+        const Robot& robot, bool coast
+    );
+
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

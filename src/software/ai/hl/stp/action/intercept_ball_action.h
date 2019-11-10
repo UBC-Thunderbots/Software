@@ -25,17 +25,15 @@ class InterceptBallAction : public Action
      * @param field The field
      * @param ball The ball
      */
-    void updateWorldParams(
-                                                        const Field& field,
-                                                        const Ball& ball);
+    void updateWorldParams(const Field& field, const Ball& ball);
 
     /**
      * Updates this action with all the parameters it needs that don't come from the world
      *
      * @param robot The robot to move
      */
-    void updateControlParams(const Robot& robot
-                                                        );
+    void updateControlParams(const Robot& robot);
+
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 

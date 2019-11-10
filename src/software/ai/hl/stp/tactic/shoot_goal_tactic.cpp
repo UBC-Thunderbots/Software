@@ -113,9 +113,11 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
     {
         if (!isEnemyAboutToStealBall())
         {
-            yield(kick_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
-                BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
+            kick_action.updateWorldParams(ball);
+            kick_action.updateControlParams(
+                *robot, ball.position(), shot_target->getPointToShootAt(),
+                BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+            yield(kick_action.getNextIntent());
         }
         else
         {
@@ -123,9 +125,11 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            yield(chip_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
-                CHIP_DIST));
+            chip_action.updateWorldParams(ball);
+            chip_action.updateControlParams(
+                *robot, ball.position(), shot_target->getPointToShootAt(),
+                CHIP_DIST);
+            yield(chip_action.getNextIntent());
         }
 
         shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
@@ -158,8 +162,10 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
             Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
-            yield(chip_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), fallback_chip_target, CHIP_DIST));
+            chip_action.updateWorldParams(ball);
+            chip_action.updateControlParams(
+                *robot, ball.position(), fallback_chip_target, CHIP_DIST);
+            yield(chip_action.getNextIntent());
         }
         else
         {
@@ -172,9 +178,10 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                         DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
 
             // The default behaviour is to move behind the ball and face the net
-            yield(move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
+            yield(move_action.getNextIntent());
         }
     } while (!(kick_action.done() || chip_action.done()));
 }

@@ -26,7 +26,7 @@ class MoveSpinAction : public Action
         double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
     /**
-     * Returns the next Intent this MoveSpinAction wants to run, given the parameters.
+     * Updates the params that cannot be derived from the world for this action
      *
      * @param robot The robot to move
      * @param destination The destination to move to (in global coordinates)
@@ -34,14 +34,13 @@ class MoveSpinAction : public Action
      * A positive value spins counterclockwise, and a negative value spins clockwise
      * @param final_linear_speed The final speed that robot should have at the final
      * destination
-     *
-     * @return A unique pointer to the Intent the MoveSpinAction wants to run. If the
-     * MoveSpinAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        Point destination,
-                                                        AngularVelocity angular_velocity,
-                                                        double final_linear_speed);
+    void updateControlParams(
+        const Robot& robot,
+        Point destination,
+        AngularVelocity angular_velocity,
+        double final_linear_speed
+    );
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
