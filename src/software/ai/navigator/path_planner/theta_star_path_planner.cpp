@@ -55,8 +55,9 @@ bool ThetaStarPathPlanner::hasLineOfSight(Coordinate current_parent, Coordinate 
     Point point_to_check = parent_point;
 
     Vector diff      = next_point - parent_point;
-    Vector direction = diff.norm();
-    int dist         = static_cast<int>(diff.len());
+    Vector direction = diff.normalize();
+    int dist         = static_cast<int>(diff.length());
+
     for (int i = 0; i < dist; i++)
     {
         point_to_check = point_to_check + direction;
@@ -263,14 +264,14 @@ bool ThetaStarPathPlanner::isStartToDestinationWithinThreshold(const Point &star
                                                                const Point &destination)
 {
     // If the destination CellHeuristic is within one grid size of start
-    return ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
-            ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS));
+    return ((start - destination).length() < CLOSE_TO_DEST_THRESHOLD ||
+            ((start - destination).length() < SIZE_OF_GRID_CELL_IN_METERS));
 }
 
 bool ThetaStarPathPlanner::isStartToClosestDestinationWithinThreshold(
     const Point &start, const Point &closest_destination)
 {
-    return ((start - closest_destination).len() <
+    return ((start - closest_destination).length() <
             (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION));
 }
 

@@ -207,7 +207,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::ofDegrees(90)};
+    Shot shot         = {world.field().enemyGoal(), Angle::fromDegrees(90)};
 
     auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -220,7 +220,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::ofDegrees(45)};
+    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -246,7 +246,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().friendlyGoal() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::ofDegrees(90)};
+    Shot shot         = {world.field().enemyGoal(), Angle::fromDegrees(90)};
 
     auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -259,7 +259,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().friendlyGoal() + Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::ofDegrees(45)};
+    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 

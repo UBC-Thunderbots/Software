@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/world/ball.h"
 #include "software/world/refbox_constants.h"
 

@@ -13,7 +13,7 @@ using namespace AI::Evaluation;
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
 {
     Angle target_angle = Angle::half();
-    Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::ofDegrees(0),
+    Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::fromDegrees(0),
                 Timestamp::fromSeconds(0));
 
     EXPECT_EQ(Duration::fromSeconds(0),
@@ -29,7 +29,7 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desir
     // basically re-write the function, which would be a bit pointless
 
     Angle target_angle = Angle::zero();
-    Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::ofDegrees(0),
+    Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::fromDegrees(0),
                 Timestamp::fromSeconds(0));
 
     // Figure out a lower bound on the time required, based on us being able to constantly
@@ -51,8 +51,8 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desir
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)
 {
     Point dest(1, 1);
-    Robot robot(0, dest, Vector(0, 0), Angle::ofDegrees(0), AngularVelocity::ofDegrees(0),
-                Timestamp::fromSeconds(0));
+    Robot robot(0, dest, Vector(0, 0), Angle::fromDegrees(0),
+                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
 
     EXPECT_EQ(Duration::fromSeconds(0), getTimeToPositionForRobot(robot, dest, 2.0, 3.0));
 }
@@ -66,10 +66,10 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
 
     Point dest(1, 1);
     Point robot_location(40, 40);
-    Robot robot(0, robot_location, Vector(0, 0), Angle::ofDegrees(0),
-                AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+    Robot robot(0, robot_location, Vector(0, 0), Angle::fromDegrees(0),
+                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
 
-    double distance_to_dest = (robot_location - dest).len();
+    double distance_to_dest = (robot_location - dest).length();
 
     double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND /
                                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
@@ -101,10 +101,10 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity_with_
 
     Point robot_location(0, 40);
 
-    Robot robot(0, robot_location, Vector(0, 0), Angle::ofDegrees(0),
-                AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+    Robot robot(0, robot_location, Vector(0, 0), Angle::fromDegrees(0),
+                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
 
-    double distance_to_dest = (robot_location - first_point_in_tolerance).len();
+    double distance_to_dest = (robot_location - first_point_in_tolerance).length();
 
     double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND /
                                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;

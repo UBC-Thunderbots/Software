@@ -5,7 +5,7 @@
 #include "shared/constants.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
-#include "software/geom/angle.h"
+#include "software/new_geom/angle.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 
@@ -67,12 +67,12 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest, visit_pivot_primtive_clock
     // (chosen far so all values pivot cw) which should result in a cw rotation on all
     // parameterized pivot points
     PivotPrimitive primitive =
-        PivotPrimitive(1, Point(10, -10), Angle::ofRadians(-1 / 4 * M_PI),
-                       Angle::ofRadians(1.24), false);
+        PivotPrimitive(1, Point(10, -10), Angle::fromRadians(-1 / 4 * M_PI),
+                       Angle::fromRadians(1.24), false);
 
     // place the robot in the first quadrant, should rotate CW
-    Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::fromRadians(0.0),
+                        AngularVelocity::fromRadians(0.0), Timestamp::fromSeconds(0));
 
     auto motion_command = get_motion_command(robot, primitive);
 
@@ -100,12 +100,13 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
     // asked to pivot to 3/4 pi above x axis, with radius of 10, from point (-10, 10)
     // (chosen far so all values pivot ccw) which should result in a cw rotation on all
     // parameterized pivot points
-    PivotPrimitive primitive = PivotPrimitive(
-        1, Point(-10, 10), Angle::ofRadians(3 / 4 * M_PI), Angle::ofRadians(1.24), false);
+    PivotPrimitive primitive =
+        PivotPrimitive(1, Point(-10, 10), Angle::fromRadians(3 / 4 * M_PI),
+                       Angle::fromRadians(1.24), false);
 
     // place the robot in the first quadrant, should rotate CW
-    Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::fromRadians(0.0),
+                        AngularVelocity::fromRadians(0.0), Timestamp::fromSeconds(0));
 
     auto motion_command = get_motion_command(robot, primitive);
 

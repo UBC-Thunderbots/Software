@@ -4,8 +4,9 @@
 #include <vector>
 
 #include "boost/circular_buffer.hpp"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/angular_velocity.h"
+#include "software/new_geom/point.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 

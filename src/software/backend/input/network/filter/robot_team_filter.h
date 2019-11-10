@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/backend/input/network/filter/robot_filter.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/world/team.h"
 
 class RobotTeamFilter

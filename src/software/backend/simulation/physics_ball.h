@@ -2,7 +2,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/ball.h"
 

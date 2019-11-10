@@ -3,8 +3,8 @@
 #include "software/ai/intent/avoid_area.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 

@@ -26,7 +26,7 @@ TEST(DribblePrimTest, get_robot_id_test)
 
 TEST(DribblePrimTest, get_final_orientation_test)
 {
-    const Angle final_angle = Angle::ofRadians(3.15);
+    const Angle final_angle = Angle::fromRadians(3.15);
 
     DribblePrimitive dribble_prim = DribblePrimitive(0, Point(), final_angle, 0.0, false);
 

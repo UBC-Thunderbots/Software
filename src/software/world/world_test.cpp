@@ -33,8 +33,8 @@ class WorldTest : public ::testing::Test
         friendly_team.updateRobots({friendly_robot_0, friendly_robot_1});
         friendly_team.assignGoalie(1);
 
-        Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::ofRadians(1),
-                                    AngularVelocity::ofRadians(2), current_time);
+        Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::fromRadians(1),
+                                    AngularVelocity::fromRadians(2), current_time);
 
         Robot enemy_robot_1 = Robot(1, Point(), Vector(-0.5, 4), Angle::quarter(),
                                     AngularVelocity::half(), current_time);
