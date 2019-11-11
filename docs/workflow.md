@@ -104,6 +104,7 @@ The Pull Request process usually looks like the following:
 6. Give your Pull Request a short but descriptive title (the title should reflect the changes)
 7. Fill out the pull request template. This includes things like a description of the changes, indicating which issues the Pull Request resolves, and indicating what testing has been done.
 8. Add reviewers. This should be anyone that worked with you on the changes or is working on something that will be affected by the changes. Add your team lead and a few other members. Around 3-4 reviewers is a good number, but use your best judgement. Remember, these reviews also help give other team members an idea of the changes that are being made even if they aren't working on them.
+    1. At least one "Code Owner" will need to review the change in order for it to be merged
 9. Click "Create pull request"
 10. Now the code can be reviewed. Respond to feedback given by your team members and make changes as necessary by pushing additional commits to your branch.
     1. **If you are a reviewer:**
