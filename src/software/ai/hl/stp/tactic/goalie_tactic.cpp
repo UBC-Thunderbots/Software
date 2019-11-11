@@ -215,9 +215,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-            move_action.updateControlParams(
-                *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP);
+            move_action.updateControlParams(*robot, goalie_pos, goalie_orientation, 0.0,
+                                            DribblerEnable::OFF, MoveType::NORMAL,
+                                            AutokickType::AUTOCHIP);
             next_intent = move_action.getNextIntent();
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
@@ -265,10 +265,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
-            move_action.updateControlParams(
-                *robot, goalie_restricted_pos, goalie_orientation, 0.0,
-                DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
-            next_intent             = move_action.getNextIntent();
+            move_action.updateControlParams(*robot, goalie_restricted_pos,
+                                            goalie_orientation, 0.0, DribblerEnable::OFF,
+                                            MoveType::NORMAL, AUTOCHIP);
+            next_intent = move_action.getNextIntent();
         }
 
         // compute angle between two vectors, negative goal post to ball and positive
@@ -318,12 +318,12 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
         Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-        move_action.updateControlParams(
-            *robot, goalie_pos, goalie_orientation, goalie_final_speed,
-            DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
+        move_action.updateControlParams(*robot, goalie_pos, goalie_orientation,
+                                        goalie_final_speed, DribblerEnable::OFF,
+                                        MoveType::NORMAL, AUTOCHIP);
         next_intent = move_action.getNextIntent();
 
-            yield(std::move(next_intent));
+        yield(std::move(next_intent));
     } while (!move_action.done());
 }
 

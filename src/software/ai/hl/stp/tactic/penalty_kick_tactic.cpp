@@ -168,9 +168,9 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             if (evaluate_penalty_shot())
             {
                 kick_action.updateWorldParams(ball);
-                kick_action.updateControlParams(
-                    *robot, ball.position(), robot.value().orientation(),
-                    PENALTY_KICK_SHOT_SPEED);
+                kick_action.updateControlParams(*robot, ball.position(),
+                                                robot.value().orientation(),
+                                                PENALTY_KICK_SHOT_SPEED);
                 yield(kick_action.getNextIntent());
             }
         }

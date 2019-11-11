@@ -35,12 +35,8 @@ class MoveSpinAction : public Action
      * @param final_linear_speed The final speed that robot should have at the final
      * destination
      */
-    void updateControlParams(
-        const Robot& robot,
-        Point destination,
-        AngularVelocity angular_velocity,
-        double final_linear_speed
-    );
+    void updateControlParams(const Robot& robot, Point destination,
+                             AngularVelocity angular_velocity, double final_linear_speed);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

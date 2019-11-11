@@ -34,9 +34,7 @@ class StopAction : public Action
      * @param coast Whether or not to coast to a stop. If this is false, the robot will
      * try actively brake to come to a stop
      */
-    void updateControlParams(
-        const Robot& robot, bool coast
-    );
+    void updateControlParams(const Robot& robot, bool coast);
 
 
    private:

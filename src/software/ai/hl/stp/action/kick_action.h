@@ -22,9 +22,7 @@ class KickAction : public Action
      *
      * @param ball The ball being kicked
      */
-    void updateWorldParams(
-        const Ball &ball
-    );
+    void updateWorldParams(const Ball &ball);
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -35,11 +33,8 @@ class KickAction : public Action
      * @param kick_speed_meters_per_second The speed of how fast the Robot
      * will kick the ball in meters per second
      */
-    void updateControlParams(
-        const Robot &robot,
-        Point kick_origin, Point kick_target,
-        double kick_speed_meters_per_second
-    );
+    void updateControlParams(const Robot &robot, Point kick_origin, Point kick_target,
+                             double kick_speed_meters_per_second);
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -50,11 +45,8 @@ class KickAction : public Action
      * @param kick_speed_meters_per_second The speed of how fast the Robot
      * will kick the ball in meters per second
      */
-    void updateControlParams(
-        const Robot &robot,
-         Point kick_origin, Angle kick_direction,
-        double kick_speed_meters_per_second
-    );
+    void updateControlParams(const Robot &robot, Point kick_origin, Angle kick_direction,
+                             double kick_speed_meters_per_second);
 
 
    private:

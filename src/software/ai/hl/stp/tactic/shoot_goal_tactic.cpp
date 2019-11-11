@@ -115,9 +115,9 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
         if (!isEnemyAboutToStealBall())
         {
             kick_action.updateWorldParams(ball);
-            kick_action.updateControlParams(
-                *robot, ball.position(), shot_target->getPointToShootAt(),
-                BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+            kick_action.updateControlParams(*robot, ball.position(),
+                                            shot_target->getPointToShootAt(),
+                                            BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
             yield(kick_action.getNextIntent());
         }
         else
@@ -127,9 +127,8 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
             chip_action.updateWorldParams(ball);
-            chip_action.updateControlParams(
-                *robot, ball.position(), shot_target->getPointToShootAt(),
-                CHIP_DIST);
+            chip_action.updateControlParams(*robot, ball.position(),
+                                            shot_target->getPointToShootAt(), CHIP_DIST);
             yield(chip_action.getNextIntent());
         }
 
@@ -164,8 +163,8 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // and directly losing possession that way
             Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
             chip_action.updateWorldParams(ball);
-            chip_action.updateControlParams(
-                *robot, ball.position(), fallback_chip_target, CHIP_DIST);
+            chip_action.updateControlParams(*robot, ball.position(), fallback_chip_target,
+                                            CHIP_DIST);
             yield(chip_action.getNextIntent());
         }
         else

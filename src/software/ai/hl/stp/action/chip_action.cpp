@@ -8,12 +8,13 @@
 
 ChipAction::ChipAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 
-void ChipAction::updateWorldParams(const Ball& ball) {
-    this->ball                 = ball;
+void ChipAction::updateWorldParams(const Ball& ball)
+{
+    this->ball = ball;
 }
 
-void ChipAction::updateControlParams(const Robot& robot, Point chip_origin, Angle chip_direction,
-                                     double chip_distance_meters)
+void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
+                                     Angle chip_direction, double chip_distance_meters)
 {
     this->robot                = robot;
     this->chip_origin          = chip_origin;
@@ -21,10 +22,11 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin, Angl
     this->chip_distance_meters = chip_distance_meters;
 }
 
-void ChipAction::updateControlParams(const Robot& robot, Point chip_origin, Point chip_target,
-                                     double chip_distance_meters)
+void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
+                                     Point chip_target, double chip_distance_meters)
 {
-    updateControlParams(robot, chip_origin, (chip_target - chip_origin).orientation(), chip_distance_meters);
+    updateControlParams(robot, chip_origin, (chip_target - chip_origin).orientation(),
+                        chip_distance_meters);
 }
 
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)

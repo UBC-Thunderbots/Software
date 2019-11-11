@@ -61,9 +61,9 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
         Point wait_position = pass.passerPoint() - ball_offset;
 
-        move_action.updateControlParams(
-            *robot, wait_position, pass.passerOrientation(), 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE);
+        move_action.updateControlParams(*robot, wait_position, pass.passerOrientation(),
+                                        0, DribblerEnable::OFF, MoveType::NORMAL,
+                                        AutokickType::NONE);
         yield(move_action.getNextIntent());
     }
 
@@ -77,8 +77,8 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         kick_action.updateWorldParams(ball);
-        kick_action.updateControlParams(
-            *robot, ball.position(), pass.receiverPoint(), pass.speed());
+        kick_action.updateControlParams(*robot, ball.position(), pass.receiverPoint(),
+                                        pass.speed());
         yield(kick_action.getNextIntent());
 
         // We want to keep trying to kick until the ball is moving along the pass

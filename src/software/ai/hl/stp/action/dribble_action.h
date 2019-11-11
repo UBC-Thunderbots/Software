@@ -34,13 +34,9 @@ class DribbleAction : public Action
      * @param small_kick_allowed If true, the robot can kick the ball forward a small
      * distance while dribbling
      */
-    void updateControlParams(
-        const Robot& robot,
-        const Point& dest,
-        const Angle& final_angle,
-        double rpm,
-        bool small_kick_allowed
-    );
+    void updateControlParams(const Robot& robot, const Point& dest,
+                             const Angle& final_angle, double rpm,
+                             bool small_kick_allowed);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

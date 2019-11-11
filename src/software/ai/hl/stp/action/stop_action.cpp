@@ -9,8 +9,8 @@ StopAction::StopAction(double stopped_speed_threshold, bool loop_forever)
 {
 }
 
-void StopAction::updateControlParams(const Robot& robot, bool coast) {
-
+void StopAction::updateControlParams(const Robot& robot, bool coast)
+{
     this->robot = robot;
     this->coast = coast;
 }

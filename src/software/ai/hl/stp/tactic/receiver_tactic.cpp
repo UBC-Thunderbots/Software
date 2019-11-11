@@ -85,9 +85,9 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
-        move_action.updateControlParams(
-            *robot, pass.receiverPoint(), desired_angle, 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE);
+        move_action.updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
+                                        DribblerEnable::OFF, MoveType::NORMAL,
+                                        AutokickType::NONE);
         yield(move_action.getNextIntent());
     }
 
@@ -115,9 +115,9 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
-            move_action.updateControlParams(
-                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
-                MoveType::NORMAL, AUTOKICK);
+            move_action.updateControlParams(*robot, ideal_position, ideal_orientation, 0,
+                                            DribblerEnable::OFF, MoveType::NORMAL,
+                                            AUTOKICK);
             yield(move_action.getNextIntent());
 
             // Calculations to check for termination conditions

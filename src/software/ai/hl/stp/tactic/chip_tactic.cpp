@@ -44,8 +44,8 @@ void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     do
     {
         chip_action.updateWorldParams(ball);
-        chip_action.updateControlParams(*robot, chip_origin,
-                                                      chip_target, chip_distance_meters);
+        chip_action.updateControlParams(*robot, chip_origin, chip_target,
+                                        chip_distance_meters);
         yield(chip_action.getNextIntent());
     } while (!chip_action.done());
 }

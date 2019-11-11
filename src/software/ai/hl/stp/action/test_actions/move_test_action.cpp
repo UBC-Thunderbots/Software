@@ -7,8 +7,8 @@ MoveTestAction::MoveTestAction(double close_to_dest_threshold)
 {
 }
 
-void MoveTestAction::updateControlParams(const Robot& robot, Point destination) {
-
+void MoveTestAction::updateControlParams(const Robot& robot, Point destination)
+{
     this->robot       = robot;
     this->destination = destination;
 }

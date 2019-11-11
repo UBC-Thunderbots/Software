@@ -10,8 +10,7 @@ TEST(DribbleActionTest, robot_far_from_destination)
                         Timestamp::fromSeconds(0));
     DribbleAction action = DribbleAction(0.05);
 
-    action.updateControlParams(robot, Point(1, 0),
-                               Angle::quarter(), 10000, false);
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 10000, false);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -35,8 +34,7 @@ TEST(DribbleActionTest, robot_at_destination)
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
     // done and so will return a null pointer
-    action.updateControlParams(robot, Point(0, 0),
-                               Angle::zero(), 10000, false);
+    action.updateControlParams(robot, Point(0, 0), Angle::zero(), 10000, false);
     action.getNextIntent();
     auto intent_ptr = action.getNextIntent();
 
@@ -52,8 +50,7 @@ TEST(DribbleActionTest, test_action_does_not_prematurely_report_done)
     // Run the Action several times
     for (int i = 0; i < 9; i++)
     {
-        action.updateControlParams(robot, Point(1, 0),
-                                                        Angle::quarter(), 6000, true);
+        action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 6000, true);
     }
 
     auto intent_ptr = action.getNextIntent();
@@ -69,8 +66,7 @@ TEST(DribbleActionTest, robot_far_from_destination_small_kick_allowed)
                         Timestamp::fromSeconds(0));
     DribbleAction action = DribbleAction(0.05);
 
-    action.updateControlParams(robot, Point(1, 0),
-                                                         Angle::quarter(), 20000, true);
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 20000, true);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)

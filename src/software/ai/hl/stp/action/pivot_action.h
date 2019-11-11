@@ -25,13 +25,8 @@ class PivotAction : public Action
      * @param final_angle the absolute, not relative, final angle
      * @param pivot_speed angular speed to
      */
-    void updateControlParams(
-        const Robot& robot,
-        Point pivot_point,
-        Angle final_angle,
-        Angle pivot_speed,
-        DribblerEnable enable_dribbler
-    );
+    void updateControlParams(const Robot& robot, Point pivot_point, Angle final_angle,
+                             Angle pivot_speed, DribblerEnable enable_dribbler);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

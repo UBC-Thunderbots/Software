@@ -39,11 +39,10 @@ class MoveAction : public Action
      * @param autokick This will enable the "break-beam" on the robot, that will
      * trigger the kicker or chippper to fire as soon as the ball is in front of it
      */
-    void updateControlParams(
-        const Robot& robot, Point destination, Angle final_orientation,
-        double final_speed, DribblerEnable enable_dribbler, MoveType move_type,
-        AutokickType autokick
-    );
+    void updateControlParams(const Robot& robot, Point destination,
+                             Angle final_orientation, double final_speed,
+                             DribblerEnable enable_dribbler, MoveType move_type,
+                             AutokickType autokick);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

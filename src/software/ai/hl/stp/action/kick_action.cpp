@@ -9,7 +9,8 @@
 
 KickAction::KickAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 
-void KickAction::updateWorldParams(const Ball &ball) {
+void KickAction::updateWorldParams(const Ball &ball)
+{
     this->ball = ball;
 }
 
@@ -17,8 +18,7 @@ void KickAction::updateControlParams(const Robot &robot, Point kick_origin,
                                      Point kick_target,
                                      double kick_speed_meters_per_second)
 {
-    updateControlParams(robot, kick_origin,
-                        (kick_target - kick_origin).orientation(),
+    updateControlParams(robot, kick_origin, (kick_target - kick_origin).orientation(),
                         kick_speed_meters_per_second);
 }
 

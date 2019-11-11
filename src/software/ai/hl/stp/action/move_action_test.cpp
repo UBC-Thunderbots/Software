@@ -10,9 +10,8 @@ TEST(MoveActionTest, robot_far_from_destination)
                         Timestamp::fromSeconds(0));
     MoveAction action = MoveAction(0.05, Angle(), false);
 
-    action.updateControlParams(
-        robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
+                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -37,9 +36,8 @@ TEST(MoveActionTest, robot_at_destination)
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
     // done and so will return a null pointer
-    action.updateControlParams(
-        robot, Point(0, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+    action.updateControlParams(robot, Point(0, 0), Angle::zero(), 0.0,
+                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
     action.getNextIntent();
     auto intent_ptr = action.getNextIntent();
 
@@ -53,9 +51,8 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
     MoveAction action = MoveAction(0.05, Angle(), false);
 
     // Run the Action several times
-    action.updateControlParams(
-        robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::OFF,
-        MoveType::NORMAL, AutokickType::NONE);
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
+                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
     for (int i = 0; i < 10; i++)
     {
         action.getNextIntent();
@@ -74,9 +71,8 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
     MoveAction action = MoveAction(0.05, Angle::fromDegrees(0.01), false);
 
     // Run the Action several times
-    action.updateControlParams(
-        robot, Point(0, 0), Angle::quarter(), 1.0, DribblerEnable::OFF,
-        MoveType::NORMAL, AutokickType::NONE);
+    action.updateControlParams(robot, Point(0, 0), Angle::quarter(), 1.0,
+                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
     for (int i = 0; i < 10; i++)
     {
         action.getNextIntent();
@@ -94,9 +90,8 @@ TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
     MoveAction action = MoveAction(0.05, Angle::fromDegrees(359), false);
 
     // Run the Action several times
-    action.updateControlParams(
-        robot, Point(0, 0), Angle::quarter(), 1.0, DribblerEnable::OFF,
-        MoveType::NORMAL, AutokickType::NONE);
+    action.updateControlParams(robot, Point(0, 0), Angle::quarter(), 1.0,
+                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
     for (int i = 0; i < 10; i++)
     {
         action.getNextIntent();
@@ -114,9 +109,9 @@ TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
                         Timestamp::fromSeconds(0));
     MoveAction action = MoveAction(0.05, Angle(), false);
 
-    action.updateControlParams(
-        robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::AUTOKICK);
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
+                               DribblerEnable::OFF, MoveType::NORMAL,
+                               AutokickType::AUTOKICK);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -138,9 +133,8 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
                         Timestamp::fromSeconds(0));
     MoveAction action = MoveAction(0.05, Angle(), false);
 
-    action.updateControlParams(
-        robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::ON, MoveType::NORMAL,
-        AutokickType::NONE);
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
+                               DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)

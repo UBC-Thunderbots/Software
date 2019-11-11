@@ -35,9 +35,9 @@ void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     MoveAction move_action = MoveAction(0, Angle(), false);
     do
     {
-        move_action.updateControlParams(
-            *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE);
+        move_action.updateControlParams(*robot, destination, final_orientation,
+                                        final_speed, DribblerEnable::OFF,
+                                        MoveType::NORMAL, AutokickType::NONE);
         yield(move_action.getNextIntent());
     } while (!move_action.done());
 }
