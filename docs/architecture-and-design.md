@@ -356,7 +356,7 @@ The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robots' r
 3. Being a defender that shadows enemy robots
 4. Being a defender that tries to steal the ball from enemies
 
-Tactics use [Actions](#skills--actions) to implement their behavior. Using the [Action](#skills--actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behavior. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behavior.
+Tactics use [Actions](#skills--actions) to implement their behaviour. Using the [Action](#skills--actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behaviour. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behaviour.
 
 ### Plays
 The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
