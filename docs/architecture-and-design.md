@@ -30,6 +30,7 @@
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
+  * [Diagram](#convention-diagram)
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
   * [Backend](#backend)
@@ -276,17 +277,18 @@ In order to overcome this, our convention is that:
 * `y` is positive to the "left" of someone looking at the enemy goal from the friendly goal
 * The center of the field (inside the center-circle) is the origin / `(0, 0)`
 
-This is easiest to understand in the diagram below:
-![Coordinate Convention Diagram](images/coordinate_convention_diagram.svg)
+This is easiest to understand in the [diagram](#convention-diagram) below.
 
 Based on what side we are defending, the [Backend](#backend) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
 
-
 ## Angles
-Going along with our coordinate convention, we have a convention for angles as well. An Angle of `0` is along the positive x-axis (facing the enemy goal), and positive rotation is counter-clockwise (from a perspective above the field, looking at it like a regular x-y plane where +y is "up"). See the diagram below:
-![Coordinate Convention Diagram](images/angle_convention_diagram.svg)
+Going along with our coordinate convention, we have a convention for angles as well. An Angle of `0` is along the positive x-axis (facing the enemy goal), and positive rotation is counter-clockwise (from a perspective above the field, looking at it like a regular x-y plane where +y is "up"). See the [diagram](#convention-diagram) below.
 
 Because of our [Coordinate Conventions](#coordinates), this means that an angle of `0` will always face the enemy net regardless of which side of the field we are actually defending.
+
+## Convention Diagram
+![Coordinate Convention Diagram](images/coordinate_and_angle_convention_diagram.svg)
+
 
 # Architecture Overview
 At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
@@ -294,7 +296,6 @@ At a high-level our system is made of 3 main components: The [Backend](#backend)
 The Backend is responsible for communicating with the outside world (network and radio), the AI is what makes the actual gameplay decisions, and the Visualizer shows us what's happening and lets us control the AI.
 
 Each component is described in more detail in their own sections.
-
 
 #### Architecture Overview Diagram
 ![High Level Architecture Diagram](images/high_level_architecture_diagram.svg)
