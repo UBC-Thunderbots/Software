@@ -7,6 +7,14 @@
 
 #include <g3log/g3log.hpp>
 
+ThetaStarPathPlanner::ThetaStarPathPlanner()
+    : num_grid_rows(0),
+      num_grid_cols(0),
+      max_navigable_x_coord(0),
+      max_navigable_y_coord(0)
+{
+}
+
 bool ThetaStarPathPlanner::isCoordValid(Coordinate test_coord)
 {
     // Returns true if row number and column number
@@ -486,8 +494,10 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
 {
     // Initialize member variables
     this->obstacles       = obstacles;
-    max_navigable_x_coord = navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    max_navigable_y_coord = navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    max_navigable_x_coord =
+        std::max(navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS, 0.0);
+    max_navigable_y_coord =
+        std::max(navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS, 0.0);
     num_grid_rows =
         static_cast<int>((max_navigable_x_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
                          SIZE_OF_GRID_CELL_IN_METERS);
