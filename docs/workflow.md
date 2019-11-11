@@ -3,7 +3,6 @@
 ## Table of Contents
 * [Issue and Project Tracking](#issue-and-project-tracking)
     * [Issues](#issues)
-    * [Milestones](#milestones)
 * [Git Workflow](#git-workflow)
     * [Forking and Branching](#forking-and-branching)
     * [Creating a new Branch](#creating-a-new-branch)
@@ -146,8 +145,8 @@ We are also assuming all the work done here is in your fork of the repository.
 Let's pretend our goalie strategy isn't that great. You have noticed that and suggested we improve it. Here's what your workflow would likely look like, from start to finish. We will pretend your name is Bob.
 
 1. Create a new Issue for the goalie strategy if it doesn't already exist
-   2. Let's pretend this is `Issue #23`
-   4. Add relevant tags to your Issue. In this case, likely "Enhancement"
+   1. Let's pretend this is `Issue #23`
+   2. Add relevant tags to your Issue. In this case, likely "Enhancement"
 2. Create a new branch from `upstream/master`, called `bob/create_new_goalie_strategy`
    1. `git fetch upstream`
    2. `git checkout -b bob/create_new_goalie_strategy upstream/master`
