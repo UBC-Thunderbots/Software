@@ -366,7 +366,7 @@ The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for 
 4. A passing-based offense play
 5. A dribbling-based offense play
 
-Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behavior. Read the section on [Coroutines](#coroutines) to learn more about how we write strategy with "stages".
+Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics` are being used as the state of the game changes, which allows us to implement more complex behaviour. Read the section on [Coroutines](#coroutines) to learn more about how we write strategy with "stages".
 
 Furthermore, every play specifies an `Applicable` and `Invariant` condition. These are used to determine what plays should be run at what time, and when a Play should terminate.
 
