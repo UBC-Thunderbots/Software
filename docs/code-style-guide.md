@@ -162,7 +162,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
     * We have found it's generally more work than it's worth to have everyone remember to put things in the right namespaces when writing code, and remember to manage the namespaces when code is being used
     * The main purpose of namespaces is to compartmentalize code and help avoid conflicts. This way if 2 libraries define functions called `add()`, as long as they are in different namespaces they can be specified and used independently without issue. Because we aren't publishing our code as a library, and most libraries we use already do their own namespacing, we don't _really_ need the protection namespaces provide in this case.
 * Do not use `using namespace ...` in header files.
-    * This is because any file that inludes this header will also implicitly be using the namespace, which can cause subtle issues and naming conflicts.
+   * This is because any file that includes this header will also implicitly be using the namespace, which can cause subtle issues and naming conflicts.
 
 
 ### Exceptions
