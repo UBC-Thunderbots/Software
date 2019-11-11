@@ -174,7 +174,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 ### Tests
 Some general guidelines when writing tests are:
 
-* **Tests should test a single, distinct behavior, isolated to a single class (or group of functions in C).** For example, if you have a test called `assign_and_clear_goalie`, it should probably be broken up into `assign_goalie` and `clear_goalie`. While `clear_goalie` might depend on `assign_goalie`, structuring things like this allows us to quickly narrow down where the problem might be by just looking at what tests failed, without having to go tear apart large unit tests.
+* **Tests should test a single, distinct behaviour, isolated to a single class (or group of functions in C).** For example, if you have a test called `assign_and_clear_goalie`, it should probably be broken up into `assign_goalie` and `clear_goalie`. While `clear_goalie` might depend on `assign_goalie`, structuring things like this allows us to quickly narrow down where the problem might be by just looking at what tests failed, without having to go tear apart large unit tests.
 * **Don't be afraid to use long test names.**: When naming things, as programmers we keep names short so that they can be used elsewhere without taking up an entire line. But no one is going to be using your test name elsewhere, so feel free to be verbose. Instead of `equality_operator_3`, call your test `equality_operator_two_teams_different_number_of_robots`
 
 
