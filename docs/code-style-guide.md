@@ -150,8 +150,8 @@ If you think some ASCII art will help explain something better, go for it! [asci
   // Incorrect
   #include "../../tactic/tactic.h"
  
-    // Incorrect
-    #include "tactic.h"
+  // Incorrect
+  #include "tactic.h"
 
   // Correct
   #include "software/ai/hl/stp/tactic/tactic.h"
