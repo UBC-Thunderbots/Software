@@ -21,8 +21,8 @@
 #include "software/backend/output/radio/mrf/usb/libusb.h"
 #include "software/backend/output/radio/mrf/util/async_operation.h"
 #include "software/backend/output/radio/mrf/util/noncopyable.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 /**
  * An operation to send a reliable message.

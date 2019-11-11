@@ -44,7 +44,8 @@ Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_
 
     // vector in the direction of the velocity and with the scaled size of the
     // velocity
-    Vector velocity_cushion_vector = robot.velocity().norm(robot.velocity().len());
+    Vector velocity_cushion_vector =
+        robot.velocity().normalize(robot.velocity().length());
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
@@ -64,11 +65,12 @@ Obstacle Obstacle::createVelocityObstacleWithScalingParams(Point start, Point en
     // ROBOT_MAX_SPEED_METERS_PER_SECOND times the length_scaling
     Vector velocity_cushion_vector =
         (end - start)
-            .norm((initial_speed + ROBOT_MAX_SPEED_METERS_PER_SECOND) / 4 *
-                      length_scaling +
-                  2 * ROBOT_MAX_RADIUS_METERS * width_scaling);
+            .normalize((initial_speed + ROBOT_MAX_SPEED_METERS_PER_SECOND) / 4 *
+                           length_scaling +
+                       2 * ROBOT_MAX_RADIUS_METERS * width_scaling);
 
-    Vector velocity_direction_norm_radius = velocity_cushion_vector.norm(radius_cushion);
+    Vector velocity_direction_norm_radius =
+        velocity_cushion_vector.normalize(radius_cushion);
 
     return Obstacle(
         Polygon({// left side of robot
@@ -93,12 +95,12 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
     // vector in the direction of the velocity and with the scaled size of the
     // velocity
     Vector velocity_cushion_vector =
-        robot.velocity().norm(robot.velocity().len() * velocity_cushion_scaling +
-                              2 * ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
+        robot.velocity().normalize(robot.velocity().length() * velocity_cushion_scaling +
+                                   2 * ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
-        velocity_cushion_vector.len() > radius_cushion);
+        velocity_cushion_vector.length() > radius_cushion);
 }
 
 Obstacle Obstacle::createRobotObstacleWithBufferParams(
@@ -110,12 +112,12 @@ Obstacle Obstacle::createRobotObstacleWithBufferParams(
 
     // vector in the direction of the velocity and with the scaled size of the
     // velocity
-    Vector velocity_cushion_vector = robot.velocity().norm(
-        robot.velocity().len() + additional_velocity_cushion_buffer);
+    Vector velocity_cushion_vector = robot.velocity().normalize(
+        robot.velocity().length() + additional_velocity_cushion_buffer);
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
-        enable_velocity_cushion && velocity_cushion_vector.len() > radius_cushion);
+        enable_velocity_cushion && velocity_cushion_vector.length() > radius_cushion);
 }
 
 // TODO: using this for more then robots now, should probably rename
@@ -127,14 +129,14 @@ Obstacle Obstacle::createRobotObstacleFromPositionAndRadiusAndVelocity(
     if (enable_velocity_cushion)
     {
         Vector velocity_direction_norm_radius =
-            velocity_cushion_vector.norm(radius_cushion);
+            velocity_cushion_vector.normalize(radius_cushion);
         return Obstacle(Polygon(
             {// left side of robot
              position + velocity_direction_norm_radius.rotate(Angle::quarter()),
              // back left of robot
-             position + velocity_direction_norm_radius.rotate(Angle::ofDegrees(150)),
+             position + velocity_direction_norm_radius.rotate(Angle::fromDegrees(150)),
              // back right of robot
-             position + velocity_direction_norm_radius.rotate(Angle::ofDegrees(210)),
+             position + velocity_direction_norm_radius.rotate(Angle::fromDegrees(210)),
              // right side of robot
              position + velocity_direction_norm_radius.rotate(Angle::threeQuarter()),
              // right side velocity cushions
@@ -147,20 +149,20 @@ Obstacle Obstacle::createRobotObstacleFromPositionAndRadiusAndVelocity(
     else
     {
         // force the robot to face in +x direction
-        Vector facing_direction_norm_radius = Point(1, 0).norm(radius_cushion);
+        Vector facing_direction_norm_radius = Vector(1, 0).normalize(radius_cushion);
         return Obstacle(Polygon(
             {// left side of robot
              position + facing_direction_norm_radius.rotate(Angle::quarter()),
              // back left of robot
-             position + facing_direction_norm_radius.rotate(Angle::ofDegrees(150)),
+             position + facing_direction_norm_radius.rotate(Angle::fromDegrees(150)),
              // back right of robot
-             position + facing_direction_norm_radius.rotate(Angle::ofDegrees(210)),
+             position + facing_direction_norm_radius.rotate(Angle::fromDegrees(210)),
              // right side of robot
              position + facing_direction_norm_radius.rotate(Angle::threeQuarter()),
              // front right velocity cushions
-             position + facing_direction_norm_radius.rotate(Angle::ofDegrees(330)),
+             position + facing_direction_norm_radius.rotate(Angle::fromDegrees(330)),
              // front left velocity cushions
-             position + facing_direction_norm_radius.rotate(Angle::ofDegrees(30))}));
+             position + facing_direction_norm_radius.rotate(Angle::fromDegrees(30))}));
     }
 }
 
@@ -201,7 +203,7 @@ bool Obstacle::containsPoint(const Point& point) const
     }
     else
     {
-        return ((point - (*_circle).getOrigin()).len() < (*_circle).getRadius());
+        return ((point - (*_circle).getOrigin()).length() < (*_circle).getRadius());
     }
 }
 

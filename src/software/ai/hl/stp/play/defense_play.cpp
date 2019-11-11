@@ -47,7 +47,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                              world.enemyTeam(), true);
     auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::ofDegrees(5), std::nullopt, true);
+        Angle::fromDegrees(5), std::nullopt, true);
 
     auto defense_shadow_enemy_tactic = std::make_shared<DefenseShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), true,
@@ -141,7 +141,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
             {
                 Point block_point =
                     nearest_enemy_robot->position() +
-                    Point::createFromAngle(nearest_enemy_robot->orientation()) *
+                    Vector::createFromAngle(nearest_enemy_robot->orientation()) *
                         ROBOT_MAX_RADIUS_METERS * 3;
                 move_tactics[1]->updateControlParams(
                     block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
@@ -167,7 +167,7 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
     if (nearest_enemy_robot)
     {
         Point block_point = nearest_enemy_robot->position() +
-                            Point::createFromAngle(nearest_enemy_robot->orientation()) *
+                            Vector::createFromAngle(nearest_enemy_robot->orientation()) *
                                 ROBOT_MAX_RADIUS_METERS * 3;
         move_tactics[0]->updateControlParams(
             block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);

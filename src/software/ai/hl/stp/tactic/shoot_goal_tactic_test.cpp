@@ -56,7 +56,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(6), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(6), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
@@ -143,7 +143,7 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
@@ -180,7 +180,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
@@ -215,7 +215,7 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.0520833333;
@@ -234,7 +234,7 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.40678383728;

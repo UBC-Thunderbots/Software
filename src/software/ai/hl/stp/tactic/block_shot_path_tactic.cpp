@@ -35,7 +35,7 @@ double BlockShotPathTactic::calculateRobotCost(const Robot& robot, const World& 
     // have a cost less than 1
     Point block_position = getBlockPosition();
     double cost =
-        (robot.position() - block_position).len() / world.field().totalXLength();
+        (robot.position() - block_position).length() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 

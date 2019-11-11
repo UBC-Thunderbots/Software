@@ -8,8 +8,8 @@
 #include <ctime>
 #include <sstream>
 
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 
 TEST(NavUtilTest, calculateTransitionSpeedBetweenSegments_tests_parallel_segments)
 {
@@ -93,21 +93,21 @@ TEST(NavUtilTest, convertPointsToMovePrimitives_test)
     EXPECT_EQ(movePrimitive1.getRobotId(), robot_id);
     EXPECT_EQ(movePrimitive1.getDestination(), point1);
     EXPECT_EQ(movePrimitive1.getFinalSpeed(), 0);
-    EXPECT_EQ(movePrimitive1.getFinalAngle(), point1.orientation());
+    EXPECT_EQ(movePrimitive1.getFinalAngle(), point1.toVector().orientation());
 
     // testing point 2
     MovePrimitive movePrimitive2 = movePrimitives.at(1);
     EXPECT_EQ(movePrimitive2.getRobotId(), robot_id);
     EXPECT_EQ(movePrimitive2.getDestination(), point2);
     EXPECT_EQ(movePrimitive2.getFinalSpeed(), 0);
-    EXPECT_EQ(movePrimitive2.getFinalAngle(), point2.orientation());
+    EXPECT_EQ(movePrimitive2.getFinalAngle(), point2.toVector().orientation());
 
     // testing point 3
     MovePrimitive movePrimitive3 = movePrimitives.at(2);
     EXPECT_EQ(movePrimitive3.getRobotId(), 1);
     EXPECT_EQ(movePrimitive3.getDestination(), point3);
     EXPECT_EQ(movePrimitive3.getFinalSpeed(), 0);
-    EXPECT_EQ(movePrimitive3.getFinalAngle(), point3.orientation());
+    EXPECT_EQ(movePrimitive3.getFinalAngle(), point3.toVector().orientation());
 }
 
 TEST(NavUtilTest, convertNoPointsToMovePrimitives_test)

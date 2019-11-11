@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 TEST(TestVelocityObstaclePathManager, test_no_obostacles)
 {

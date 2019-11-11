@@ -71,7 +71,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle::ofDegrees(0.01), false);
+    MoveAction action = MoveAction(0.05, Angle::fromDegrees(0.01), false);
 
     // Run the Action several times
     action.updateControlParams(
@@ -91,7 +91,7 @@ TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
 {
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle::ofDegrees(359), false);
+    MoveAction action = MoveAction(0.05, Angle::fromDegrees(359), false);
 
     // Run the Action several times
     action.updateControlParams(

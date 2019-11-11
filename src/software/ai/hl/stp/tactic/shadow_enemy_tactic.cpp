@@ -51,7 +51,7 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
     // Prefer robots closer to the enemy being shadowed
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - enemy_threat->robot.position()).len() /
+    double cost = (robot.position() - enemy_threat->robot.position()).length() /
                   world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
@@ -79,7 +79,7 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 enemy_threat->passer->position() - enemy_robot.position();
             Point position_to_block_pass =
                 enemy_robot.position() +
-                enemy_to_passer_vector.norm(this->shadow_distance);
+                enemy_to_passer_vector.normalize(this->shadow_distance);
             move_action.updateControlParams(
                 *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
                 DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
@@ -107,11 +107,12 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             }
 
             Point position_to_block_shot =
-                enemy_robot.position() + enemy_shot_vector.norm(this->shadow_distance);
+                enemy_robot.position() +
+                enemy_shot_vector.normalize(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
             if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-                ball.velocity().len() < ball_steal_speed)
+                ball.velocity().length() < ball_steal_speed)
             {
                 move_action.updateControlParams(
                     *robot, ball.position(),

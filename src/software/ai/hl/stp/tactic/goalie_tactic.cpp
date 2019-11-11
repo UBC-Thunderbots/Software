@@ -6,10 +6,10 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 
@@ -171,9 +171,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         Ray ball_ray = Ray(ball.position(), ball.velocity());
 
         const Point neg_goal_line_inflated =
-            field.friendlyGoalpostNeg() + Point(0, -ROBOT_MAX_RADIUS_METERS);
+            field.friendlyGoalpostNeg() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
         const Point pos_goal_line_inflated =
-            field.friendlyGoalpostPos() + Point(0, ROBOT_MAX_RADIUS_METERS);
+            field.friendlyGoalpostPos() + Vector(0, ROBOT_MAX_RADIUS_METERS);
         Segment full_goal_segment =
             Segment(neg_goal_line_inflated, pos_goal_line_inflated);
 
@@ -201,11 +201,11 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // the ball
         auto dont_chip_rectangle = Rectangle(
             field.friendlyGoalpostNeg(),
-            field.friendlyGoalpostPos() + Point(2 * ROBOT_MAX_RADIUS_METERS, 0));
+            field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
 
         // case 1: goalie should panic and stop the ball, its moving too fast towards the
         // net
-        if (intersection1.has_value() && ball.velocity().len() > ball_speed_panic)
+        if (intersection1.has_value() && ball.velocity().length() > ball_speed_panic)
         {
             // the ball is heading towards the net, move to intercept the shot
             // the final speed is a dynamic parameter so that if the goalie needs
@@ -222,7 +222,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
-        else if (ball.velocity().len() <= ball_speed_panic &&
+        else if (ball.velocity().length() <= ball_speed_panic &&
                  field.pointInFriendlyDefenseArea(ball.position()))
         {
             // if the ball is slow but its not safe to chip it out, don't.
@@ -261,7 +261,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // restrict the goalie to a semicircle inscribed inside the defense area
             Point goalie_restricted_pos =
                 field.friendlyGoal() - (field.friendlyDefenseArea().yLength() *
-                                        (field.friendlyGoal() - goalie_pos).norm());
+                                        (field.friendlyGoal() - goalie_pos).normalize());
 
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
@@ -304,12 +304,12 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             if (ball.position().y() > 0)
             {
                 goalie_pos =
-                    field.friendlyGoalpostPos() + Point(-ROBOT_MAX_RADIUS_METERS, 0);
+                    field.friendlyGoalpostPos() + Vector(-ROBOT_MAX_RADIUS_METERS, 0);
             }
             else
             {
                 goalie_pos =
-                    field.friendlyGoalpostNeg() + Point(ROBOT_MAX_RADIUS_METERS, 0);
+                    field.friendlyGoalpostNeg() + Vector(ROBOT_MAX_RADIUS_METERS, 0);
             }
         }
         else

@@ -38,7 +38,7 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                                            final_speed, 0, enable_dribbler, move_type,
                                            autokick));
     } while (loop_forever ||
-             (robot->position() - destination).len() > close_to_dest_threshold ||
+             (robot->position() - destination).length() > close_to_dest_threshold ||
              (robot->orientation().minDiff(final_orientation) >
               close_to_orientation_threshold));
 }

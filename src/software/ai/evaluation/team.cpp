@@ -17,8 +17,8 @@ std::optional<Robot> Evaluation::nearestRobot(const std::vector<Robot> &robots,
     Robot nearest_robot = robots.at(0);
     for (const Robot &curRobot : robots)
     {
-        double curDistance = (ref_point - curRobot.position()).len();
-        if (curDistance < (nearest_robot.position() - ref_point).len())
+        double curDistance = (ref_point - curRobot.position()).length();
+        if (curDistance < (nearest_robot.position() - ref_point).length())
         {
             nearest_robot = curRobot;
         }
