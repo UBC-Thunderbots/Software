@@ -46,6 +46,7 @@ bool SimulatorBackend::runSimulation(World world, const Duration &timeout)
             world = physics_simulator.stepSimulation(physics_time_step);
         }
 
+        // TODO: Re-enable with issue #1029
         //        auto status = primitive_future.wait_for(std::chrono::seconds(5));
         //        if(status != std::future_status::ready) {
         //            LOG(WARNING) << "Timed out waiting for primitives. Aborting
