@@ -1,10 +1,10 @@
 #pragma once
 
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
+#include "software/new_geom/point.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic

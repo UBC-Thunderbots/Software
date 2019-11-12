@@ -37,8 +37,8 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_left_side)
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         // The edge of the robot should be slightly more than 0.5m from the ball
-        EXPECT_NEAR((world.ball().position() - move_intent.getDestination()).len(), 0.62,
-                    0.05);
+        EXPECT_NEAR((world.ball().position() - move_intent.getDestination()).length(),
+                    0.62, 0.05);
 
         // The robot should be just to the left of the line between the friendly net and
         // the ball (from the POV of the friendly net)
@@ -86,8 +86,8 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_right_side)
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         // The edge of the robot should be slightly more than 0.5m from the ball
-        EXPECT_NEAR((world.ball().position() - move_intent.getDestination()).len(), 0.62,
-                    0.05);
+        EXPECT_NEAR((world.ball().position() - move_intent.getDestination()).length(),
+                    0.62, 0.05);
 
         // The robot should be just to the right of the line between the friendly net and
         // the ball (from the POV of the friendly net)

@@ -1,9 +1,7 @@
 #pragma once
-#include <bits/stdc++.h>
 #include <unistd.h>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
-#include "software/world/field.h"
 
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
@@ -15,119 +13,186 @@
 class ThetaStarPathPlanner : public PathPlanner
 {
    public:
+    ThetaStarPathPlanner();
+
     /**
      * Returns a path that is an optimized path between start and destination.
      *
      * @param start start point
      * @param destination destination point
-     * @param field field
+     * @param navigable_area Rectangle representing the navigable area
      * @param obstacles obstacles to avoid
      *
      * @return a vector of points that is the optimal path avoiding obstacles
-     * 		if no valid path then return empty vector
+     *         if no valid path then return empty vector
      */
-    PathType findPath(const Point &start, const Point &destination, const Field &field,
-                      const std::vector<Obstacle> &obstacles) override;
+    std::optional<Path> findPath(const Point &start, const Point &destination,
+                                 const Rectangle &navigable_area,
+                                 const std::vector<Obstacle> &obstacles) override;
 
    private:
-    typedef std::pair<int, int> CellCoordinate;
-    typedef std::pair<double, CellCoordinate> OpenListCell;
-
-    class GridCell
+    class Coordinate : public std::pair<int, int>
     {
        public:
-        GridCell(int parent_i, int parent_j, double f, double g, double h)
-            : parent_i_(parent_i), parent_j_(parent_j), f_(f), g_(g), h_(h)
+        Coordinate(int row, int col) : std::pair<int, int>(row, col) {}
+
+        Coordinate() : std::pair<int, int>() {}
+
+        int row(void)
         {
+            return this->first;
         }
 
-        int parent_i_, parent_j_;
-        double f_, g_, h_;
+        int col(void)
+        {
+            return this->second;
+        }
+    };
+
+    class CellHeuristic
+    {
+       public:
+        CellHeuristic() {}
+
+        /**
+         * Updates CellHeuristics internal variables
+         * Once updated, a CellHeuristic is considered intialized
+         *
+         * @param parent parent
+         * @param f f value
+         * @param g g value
+         */
+        void update(Coordinate parent, double f, double g)
+        {
+            parent_      = parent;
+            f_           = f;
+            g_           = g;
+            initialized_ = true;
+        }
+
+        /**
+         * Checks if this is initialized
+         *
+         * @return if CellHeuristic is initialized
+         */
+        bool isInitialized(void) const
+        {
+            return initialized_;
+        }
+
+        /**
+         * Gets f value
+         *
+         * @return f value
+         */
+        double f() const
+        {
+            return f_;
+        }
+
+        /**
+         * Gets g value
+         *
+         * @return g value
+         */
+        double g() const
+        {
+            return g_;
+        }
+
+        /**
+         * Gets parent Coordinate
+         *
+         * @return parent
+         */
+        Coordinate parent() const
+        {
+            return parent_;
+        }
+
+       private:
+        Coordinate parent_;
+        double f_, g_;
+        bool initialized_;
     };
 
     /**
      * Returns if a cell is within bounds of grid
-     * @param row y position of cell
-     * @param col x position of cell
+     *
+     * @param test_coord Coordinate to consider
      *
      * @return true if cell is valid
      */
-    bool isValid(int row, int col);
+    bool isCoordValid(Coordinate test_coord);
 
     /**
      * Returns if a cell is unblocked
-     * @param row y position of cell
-     * @param col x position of cell
+     *
+     * @param test_coord Coordinate to consider
      *
      * @return true if cell is unblocked
      */
-    bool isUnBlocked(int row, int col);
+    bool isUnBlocked(Coordinate test_coord);
 
     /**
-     * Returns if a cell is the destination
-     * @param row y position of cell
-     * @param col x position of cell
-     * @param dest destination cell
+     * Returns heuristic value of a cell,
+     * currently the Euclidean distance to the destination
      *
-     * @return true if cell is the destination
-     */
-    bool isDestination(int row, int col, CellCoordinate dest);
-
-    /**
-     * Returns heuristic value of a cell
-     * This is currently the Euclidean distance to the destination
-     * @param row y position of cell
-     * @param col x position of cell
-     * @param dest destination cell
+     * @param test_coord Coordinate to consider
+     * @param dest destination Coordinate
      *
      * @return Euclidean distance to dest
      */
-    double calculateHValue(int row, int col, CellCoordinate dest);
+    double calculateHValue(Coordinate test_coord, Coordinate dest);
 
     /**
      * Traces a path from the destination back to the start
      * and populates a vector of points with that path
+     *
      * @param dest destination cell
      *
      * @return vector of points with the path from start to dest
      */
-    std::vector<Point> tracePath(CellCoordinate dest);
+    std::vector<Point> tracePath(Coordinate dest);
 
     /**
      * Updates the new node's fields based on the current node, destination
      * and the distance to the next node
      * and checks if destination is reached
-     * @param pCurr                 current cell
-     * @param pNext                 next cell to be updated
-     * @param dest                  destination cell
-     * @param currToNextNodeDist    Euclidean distance between pCurr and pNext
      *
-     * @return                      true if pNew is destination
+     * @param current_coord         current cell
+     * @param new_coord                 next cell to be updated
+     * @param dest                  destination cell
+     * @param curr_to_new_dist    Euclidean distance between current_coord and new_coord
+     *
+     * @return                      true if new_coord is destination
      */
-    bool updateVertex(CellCoordinate pCurr, CellCoordinate pNew, CellCoordinate dest,
-                      double currToNextNodeDist);
+    bool updateVertex(Coordinate current_coord, Coordinate new_coord, Coordinate dest,
+                      double curr_to_new_dist);
 
     /**
      * Checks for line of sight between parent cell and new cell
-     * @param curr_parent_i         parent cell's x coordinate
-     * @param curr_parent_j         parent cell's y coordinate
+     *
+     * @param current_parent        parent cell
      * @param new_pair              cell to check line of sight to
      *
      * @return                      true if line of sight from parent to new cell
      */
-    bool lineOfSight(int curr_parent_i, int curr_parent_j, CellCoordinate new_pair);
+    bool hasLineOfSight(Coordinate current_parent, Coordinate new_pair);
 
     /**
-     * Finds closest unblocked cell to currCell
-     * @param currCell  current cell
+     * Finds closest unblocked cell to current_cell
      *
-     * @return          closest unblocked cell to currCell
+     * @param current_cell  current cell
+     *
+     * @return          closest unblocked cell to current_cell
      *                  if none found, return nullopt
      */
-    std::optional<CellCoordinate> findClosestUnblockedCell(CellCoordinate currCell);
+    std::optional<Coordinate> findClosestUnblockedCell(Coordinate current_cell);
 
     /**
      * Finds closest valid point that's not in an obstacle to p
+     *
      * @param p     a given point
      *
      * @return          closest free point to currCell
@@ -137,30 +202,91 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Checks if a point is valid and doesn't exist in any obstacles
+     *
      * @param p     a given point
      *
      * @return      if p is valid and isn't in an obstacle
      * */
-    bool isValidAndFreeOfObstacles(Point p);
+    bool isPointValidAndFreeOfObstacles(Point p);
 
     /**
-     * Converts a cell in grid to a point on field
+     * Checks if a point is valid
      *
-     * @param row row of cell
-     * @param col col of cell
+     * @param p     a given point
      *
-     * @return Point on field
+     * @return      if p is valid
+     * */
+    bool isPointValid(Point p);
+
+    /**
+     * Converts a cell in grid to a point on navigable area
+     *
+     * @param coord Coordinate to convert
+     *
+     * @return Point on navigable area
      */
-    Point convertCellToPoint(int row, int col);
+    Point coordinateToPoint(Coordinate coord);
 
     /**
-     * Converts a point on field to a cell in grid
+     * Converts a point on navigable area to a cell in grid
      *
-     * @param p point on field
+     * @param p point on navigable area
      *
      * @return cell in grid
      */
-    CellCoordinate convertPointToCell(Point p);
+    Coordinate pointToCoordinate(Point p);
+
+    /**
+     * Try to find a path to destination and leave
+     * trail markers along the way
+     *
+     * @param dest_coord destination coordinates
+     *
+     * @return if path to destination was found
+     */
+    bool findPathToDestination(Coordinate dest_coord);
+
+    /**
+     * Check for invalid or blocked src_coord and dest_coord and
+     * adjust parameters accordingly
+     *
+     * @param src_coord source coordinate
+     * @param dest_coord destination coordinate
+     *
+     * @return true if there is no path to destination
+     */
+    bool checkForInvalidOrBlockedCases(Coordinate &src_coord, Coordinate &dest_coord);
+
+    /**
+     * Check if start to destination is at least a grid cell away
+     *
+     * @param start start point
+     * @param destination destination point
+     *
+     * @return true start to destination is within threshold
+     */
+    bool isStartToDestinationWithinThreshold(const Point &start,
+                                             const Point &destination);
+
+    /**
+     * Check if start to closest destination is at least a grid cell away
+     *
+     * @param start start point
+     * @param closest_destination closest destination point
+     *
+     * @return true start to closest destination is within threshold
+     */
+    bool isStartToClosestDestinationWithinThreshold(const Point &start,
+                                                    const Point &closest_destination);
+
+    /**
+     * Resets and initializes member variables to prepare for planning a new path
+     *
+     * @param navigable_area Rectangle representing the navigable area
+     * @param obstacles obstacles to avoid
+     */
+    void resetAndInitializeMemberVariables(const Rectangle &navigable_area,
+                                           const std::vector<Obstacle> &obstacles);
 
     // if close to destination then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
@@ -179,36 +305,27 @@ class ThetaStarPathPlanner : public PathPlanner
     const double SIZE_OF_GRID_CELL_IN_METERS =
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
-    std::vector<Obstacle> obstacles_;
-    int numRows;
-    int numCols;
-    double fieldXLength;
-    double fieldYLength;
-    double fieldXHalfLength;
-    double fieldYHalfLength;
+    std::vector<Obstacle> obstacles;
+    int num_grid_rows;
+    int num_grid_cols;
+    double max_navigable_x_coord;
+    double max_navigable_y_coord;
 
-    /*
-    Create an open list having information as-
-    <f, <i, j>>
-    where f = g + h,
-    and i, j are the row and column index of that GridCell
-    Note that 0 <= i <= ROW-1 & 0 <= j <= COL-1
-    This open list is implenented as a set of pair of pair.*/
-    std::set<OpenListCell> openList;
+    // open_list represents Coordinates that we'd like to visit
+    std::set<Coordinate> open_list;
 
-    // Create a closed list and initialise it to false which means
-    // that no GridCell has been included yet
-    // This closed list is implemented as a boolean 2D array
-    std::vector<std::vector<bool>> closedList;
+    // closed_list represent coords we've already visited so
+    // it contains coords for which we calculated the CellHeuristic
+    std::set<Coordinate> closed_list;
 
     // Declare a 2D array of structure to hold the details
-    // of that GridCell
-    std::vector<std::vector<GridCell>> cellDetails;
+    // of that CellHeuristic
+    std::vector<std::vector<CellHeuristic>> cell_heuristics;
 
 
     // Description of the Grid-
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<std::pair<int, int>, bool> unblocked_grid;
+    std::map<Coordinate, bool> unblocked_grid;
 };

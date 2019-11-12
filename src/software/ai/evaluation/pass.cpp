@@ -60,7 +60,7 @@ Duration AI::Evaluation::getTimeToPositionForRobot(const Robot& robot, const Poi
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist = std::max(0.0, (robot.position() - dest).len() - tolerance_meters);
+    double dist = std::max(0.0, (robot.position() - dest).length() - tolerance_meters);
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)

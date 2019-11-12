@@ -59,7 +59,7 @@ Timestamp Pass::estimateReceiveTime() const
 
 Duration Pass::estimatePassDuration() const
 {
-    return Duration::fromSeconds((receiver_point - passer_point).len() /
+    return Duration::fromSeconds((receiver_point - passer_point).length() /
                                  pass_speed_m_per_s);
 }
 

@@ -16,7 +16,7 @@ TEST(PhysicsBallTest, test_get_ball_with_timestamp)
     auto ball         = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
     EXPECT_TRUE(ball_parameter.position().isClose(ball.position(), 1e-7));
-    EXPECT_TRUE(ball_parameter.velocity().isClose(ball.velocity(), 1e-7));
+    EXPECT_LT((ball_parameter.velocity() - ball.velocity()).length(), 1e-7);
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
 
@@ -95,8 +95,8 @@ TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Point(2, -3).isClose(ball.position(), 1e-5));
-    EXPECT_TRUE(Vector(1, -2).isClose(ball.velocity(), 1e-5));
+    EXPECT_TRUE(Point(2, -3).isClose(ball.position(), 0.01));
+    EXPECT_LT((Vector(1, -2) - ball.velocity()).length(), 1e-5);
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
 
@@ -120,7 +120,7 @@ TEST(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simulat
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Vector(3, -0.5).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(3, -0.5) - ball.velocity()).length(), 0.01);
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
 
@@ -160,7 +160,7 @@ TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collisio
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Vector(-0.5, 0.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(-0.5, 0.0) - ball.velocity()).length(), 1e-7);
 }
 
 TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflection)
@@ -202,5 +202,5 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Vector(0.0, -1.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(0.0, -1.0) - ball.velocity()).length(), 1e-5);
 }

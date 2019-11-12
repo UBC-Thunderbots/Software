@@ -1,8 +1,12 @@
 #pragma once
 
+#include "software/ai/intent/avoid_area.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
+#include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/world.h"
 
 /**
  * Calculates the transition speed for the robot between two line segments
@@ -19,6 +23,25 @@
  */
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
                                                const Point &p3, double final_speed);
+
+/**
+ * Create obstacles for the given avoid areas, with a buffer such that the edge
+ * of the robot does not protrude into the area
+ *
+ * @param avoid_areas The areas to convert into obstacles
+ * @param world the world that's full of obstacles
+ *
+ * @return Obstacles representing the given avoid areas
+ */
+std::vector<Obstacle> getObstaclesFromAvoidAreas(
+    const std::vector<AvoidArea> &avoid_areas, World world);
+
+/**
+ * Get Obstacles from a Team
+ *
+ * @return vector of obstacles
+ */
+std::vector<Obstacle> getObstaclesFromTeam(const Team &team);
 
 /**
  * Takes a vector of points that represents a path and converts them to a vector of move

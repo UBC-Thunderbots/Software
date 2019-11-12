@@ -5,7 +5,7 @@
 #include "shared/constants.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
-#include "software/geom/angle.h"
+#include "software/new_geom/angle.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 
@@ -21,8 +21,8 @@ double calculateVelocityTolerance(double velocity)
 TEST(GrsimCommandPrimitiveVisitorTest,
      visit_catch_primitive_robot_stationary_meets_ball_on_x_axis)
 {
-    Robot robot = Robot(1, Point(2, 2), Vector(0, 0), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(1, Point(2, 2), Vector(0, 0), Angle::fromRadians(0.0),
+                        AngularVelocity::fromRadians(0.0), Timestamp::fromSeconds(0));
 
     CatchPrimitive primitive = CatchPrimitive(1, 0, 10, 0.3);
 
@@ -43,8 +43,8 @@ TEST(GrsimCommandPrimitiveVisitorTest,
 TEST(GrsimCommandPrimitiveVisitorTest,
      visit_catch_primitive_robot_moving_away_from_final_dest)
 {
-    Robot robot = Robot(1, Point(2, 2), Vector(-1, 1), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(1, Point(2, 2), Vector(-1, 1), Angle::fromRadians(0.0),
+                        AngularVelocity::fromRadians(0.0), Timestamp::fromSeconds(0));
 
     CatchPrimitive primitive = CatchPrimitive(1, 0, 10, 0.3);
 
@@ -65,8 +65,8 @@ TEST(GrsimCommandPrimitiveVisitorTest,
 TEST(GrsimCommandPrimitiveVisitorTest,
      visit_catch_primitive_robot_moving_towards_final_dest)
 {
-    Robot robot = Robot(1, Point(2, 2), Vector(0, -1), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(1, Point(2, 2), Vector(0, -1), Angle::fromRadians(0.0),
+                        AngularVelocity::fromRadians(0.0), Timestamp::fromSeconds(0));
 
     CatchPrimitive primitive = CatchPrimitive(1, 0, 10, 0.3);
 
@@ -87,8 +87,8 @@ TEST(GrsimCommandPrimitiveVisitorTest,
 TEST(GrsimCommandPrimitiveVisitorTest,
      visit_catch_primitive_robot_already_in_final_dest_not_moving)
 {
-    Robot robot = Robot(1, Point(2.3, 0), Vector(0, 0), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(1, Point(2.3, 0), Vector(0, 0), Angle::fromRadians(0.0),
+                        AngularVelocity::fromRadians(0.0), Timestamp::fromSeconds(0));
 
     CatchPrimitive primitive = CatchPrimitive(1, 0, 10, 0.3);
 
@@ -108,8 +108,8 @@ TEST(GrsimCommandPrimitiveVisitorTest,
 
 TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_close_to_ball)
 {
-    Robot robot = Robot(1, Point(0.2, 0), Vector(1, 0), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(1, Point(0.2, 0), Vector(1, 0), Angle::fromRadians(0.0),
+                        AngularVelocity::fromRadians(0.0), Timestamp::fromSeconds(0));
 
     CatchPrimitive primitive = CatchPrimitive(1, 0.2, 10, 0.3);
 

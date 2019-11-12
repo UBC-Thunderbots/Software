@@ -39,15 +39,19 @@ class PassingEvaluationTest : public testing::Test
 
     // We get these values here so we can make these tests robust to change
     double min_pass_speed_param =
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value();
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value();
     double max_pass_speed_param =
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value();
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value();
     double avg_desired_pass_speed;
 
     double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->MinTimeOffsetForPassSeconds()
+            ->value();
     double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->MaxTimeOffsetForPassSeconds()
+            ->value();
     double avg_time_offset_for_pass_seconds;
 };
 
@@ -103,16 +107,18 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time = world.getMostRecentTimestamp().getSeconds();
-    double min_start_time_offset =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
-    double max_start_time_offset =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+    double curr_time             = world.getMostRecentTimestamp().getSeconds();
+    double min_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MinTimeOffsetForPassSeconds()
+                                       ->value();
+    double max_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MaxTimeOffsetForPassSeconds()
+                                       ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value(),
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value(),
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
 
@@ -437,7 +443,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
     // We update the the ball state because that's what is used as a reference for the
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
-    world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
+    world.updateBallState(BallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
@@ -463,8 +469,8 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
     world.updateBallState(
-        Ball({0, 0}, {0, 0},
-             Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
+        BallState({0, 0}, {0, 0},
+                  Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 
@@ -884,10 +890,11 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team)
 TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
 {
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {15.5, -10}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {1, 1}, 0, Timestamp::fromSeconds(10));
 
     // If there are no robots on the team, then there is no way we can receive a pass
@@ -899,10 +906,11 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one
     // Test getting friendly capability for a team with two robots, one near the pass
     // reception point and the other far away
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {15.5, -10}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {15, -10.1}, 10, Timestamp::fromSeconds(10));
 
     // There should be a very high probability that we can receive this pass
@@ -920,11 +928,11 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
     // The net result should be a poor friendly capability, as we can only pass to the
     // one robot that can't get to the pass reception point in time
 
-    Robot passer                 = Robot(13, {2, 2}, {0, 0}, Angle::ofDegrees(270),
-                         AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+    Robot passer                 = Robot(13, {2, 2}, {0, 0}, Angle::fromDegrees(270),
+                         AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
     unsigned int passer_robot_id = passer.id();
     Robot potential_receiver =
-        Robot(1, {-3, 3}, {0, 0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0),
+        Robot(1, {-3, 3}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::fromDegrees(0),
               Timestamp::fromSeconds(0));
 
     Team team(Duration::fromSeconds(10), {passer, potential_receiver});
@@ -941,10 +949,11 @@ TEST_F(PassingEvaluationTest,
     // Test case where there are lots of robots far away from the reception point and
     // there *is not* enough time for them to get to the reception point
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {15.5, -10}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {1, 1}, 10, Timestamp::fromSeconds(1));
 
     EXPECT_GE(0.1, ratePassFriendlyCapability(team, pass, std::nullopt));
@@ -957,10 +966,11 @@ TEST_F(PassingEvaluationTest,
     // Test case where there are lots of robots far away from the reception point, but
     // when *there is* enough time for them to reach the receive point
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {110, 110}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(5)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(5))});
+    team.updateRobots(
+        {Robot(0, {110, 110}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(5)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(5))});
     Pass pass({100, 100}, {120, 105}, 1, Timestamp::fromSeconds(10));
 
     EXPECT_LE(0.9, ratePassFriendlyCapability(team, pass, std::nullopt));
@@ -972,8 +982,9 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_
     // Test case where this is one robot, but it is turned in the wrong direction and
     // will not be able to turn in time to receive the pass
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {1, 0}, {0, 0}, Angle::quarter(),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {1, 0}, {0, 0}, Angle::quarter(), AngularVelocity::fromDegrees(0),
+               Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {1, 0}, 6, Timestamp::fromSeconds(0.1));
 
     EXPECT_GE(ratePassFriendlyCapability(team, pass, std::nullopt), 0.0);
@@ -986,8 +997,9 @@ TEST_F(PassingEvaluationTest,
     // Test case where the receiver is already lined up to receive the pass
     Team team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {1, 0}, 3, Timestamp::fromSeconds(0.1));
-    team.updateRobots({Robot(0, {1, 0}, {0, 0}, pass.receiverOrientation(),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {1, 0}, {0, 0}, pass.receiverOrientation(),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
 
     EXPECT_GE(ratePassFriendlyCapability(team, pass, std::nullopt), 0.90);
     EXPECT_LE(ratePassFriendlyCapability(team, pass, std::nullopt), 1.0);

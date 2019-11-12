@@ -11,7 +11,7 @@ bool Rectangle::expand(double amount)
     {
         return false;
     }
-    Point add(amount, amount);
+    Vector add(amount, amount);
     min_corner -= add;
     diagonal += 2 * add;
     return true;

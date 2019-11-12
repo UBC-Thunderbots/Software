@@ -5,8 +5,6 @@ cc_library(
     hdrs = ["path_planner.h"],
     deps = [
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/curve",
-        "//software/world:field",
         "//software/geom",
     ],
 )
@@ -33,7 +31,6 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/world:field",
     ],
 )
 
@@ -43,7 +40,6 @@ cc_library(
     hdrs = ["no_path_test_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/world:field",
     ],
 )
 
@@ -53,7 +49,6 @@ cc_library(
     hdrs = ["one_point_path_test_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/world:field",
     ],
 )
 
@@ -62,6 +57,7 @@ cc_test(
     srcs = ["theta_star_path_planner_test.cpp"],
     deps = [
         ":theta_star_path_planner",
+        "//software/world:field",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

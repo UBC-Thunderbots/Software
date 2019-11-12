@@ -2,12 +2,15 @@
 
 #include <g3log/g3log.hpp>
 
-Tactic::Tactic(bool loop_forever, RobotCapabilityFlags capability_reqs_)
+Tactic::Tactic(bool loop_forever,
+               const std::set<RobotCapabilities::Capability> &capability_reqs_)
     : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
       done_(false),
       loop_forever(loop_forever),
       capability_reqs(capability_reqs_)
 {
+    // require movement capability by default
+    capability_reqs.emplace(RobotCapabilities::Capability::Move);
 }
 
 bool Tactic::done() const
@@ -109,12 +112,12 @@ std::unique_ptr<Intent> Tactic::getNextIntentHelper()
     return next_intent;
 }
 
-const RobotCapabilityFlags &Tactic::robotCapabilityRequirements() const
+const std::set<RobotCapabilities::Capability> &Tactic::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }
 
-RobotCapabilityFlags &Tactic::mutableRobotCapabilityRequirements()
+std::set<RobotCapabilities::Capability> &Tactic::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }

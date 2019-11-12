@@ -15,6 +15,7 @@ cc_library(
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/navigator",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
         "//software/ai/primitive",
         "//software/util/time:timestamp",
         "//software/world",

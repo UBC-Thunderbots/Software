@@ -3,8 +3,8 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/ball.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/ball.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -17,9 +17,10 @@ using namespace Passing;
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
 CornerKickPlay::CornerKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
-          Util::DynamicParameters::CornerKickPlay::max_time_commit_to_pass_seconds
-              .value()))
+    : MAX_TIME_TO_COMMIT_TO_PASS(
+          Duration::fromSeconds(Util::DynamicParameters->getCornerKickPlayConfig()
+                                    ->MaxTimeCommitToPassSeconds()
+                                    ->value()))
 {
 }
 
@@ -31,8 +32,8 @@ std::string CornerKickPlay::getName() const
 bool CornerKickPlay::isApplicable(const World &world) const
 {
     double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).len());
+        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
+                 (world.field().enemyCornerNeg() - world.ball().position()).length());
 
     return world.gameState().isOurFreeKick() &&
            min_dist_to_corner <= BALL_IN_CORNER_RADIUS;
@@ -224,7 +225,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
                                     world.ball());
         receiver->updateControlParams(pass);
-        receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
                                          world.friendlyTeam(), world.enemyTeam());
 
@@ -246,11 +246,12 @@ void CornerKickPlay::updateCherryPickTactics(
 void CornerKickPlay::updateAlignToBallTactic(
     std::shared_ptr<MoveTactic> align_to_ball_tactic)
 {
-    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
+    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
+        world.ball().position() -
+            (ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
         ball_to_center_vec.orientation(), 0);
 }
 

@@ -34,7 +34,7 @@ TEST(PivotPrimTest, get_pivot_point_test)
 
 TEST(PivotPrimTest, get_final_angle_test)
 {
-    Angle final_angle = Angle::ofRadians(1.51);
+    Angle final_angle = Angle::fromRadians(1.51);
 
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), final_angle, Angle(), false);
 
@@ -43,7 +43,7 @@ TEST(PivotPrimTest, get_final_angle_test)
 
 TEST(PivotPrimTest, get_pivot_speed_test)
 {
-    Angle pivot_speed = Angle::ofRadians(1.2);
+    Angle pivot_speed = Angle::fromRadians(1.2);
 
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), pivot_speed, true);
 

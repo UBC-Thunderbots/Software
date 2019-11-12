@@ -1,28 +1,44 @@
 #pragma once
 
+#include <unordered_set>
+
+#include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
-#include "software/ai/navigator/navigator.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/path_planner/path_planner.h"
+#include "software/ai/navigator/path_manager/path_manager.h"
+#include "software/ai/navigator/util.h"
+#include "software/ai/primitive/all_primitives.h"
 #include "software/ai/primitive/primitive.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
 /**
  * This Navigator converts the given Intents into their respective Primitives
- *
- * It will construct a path planner to navigate around AvoidAreas
+ * and navigate around obstacles
  */
 class Navigator : public IntentVisitor
 {
    public:
-    explicit Navigator(std::unique_ptr<PathPlanner> path_planner);
+    explicit Navigator(std::unique_ptr<PathManager> path_manager);
 
+    /**
+     * Get assigned primitives for given assigned intents
+     *
+     * @param world World to navigate around
+     * @assignedIntents intents to process into primitives
+     *
+     * @return vector of primitives for the given intents
+     */
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents);
 
-    std::vector<std::vector<Point>> getPlannedPaths();
+    /**
+     * Get the planned paths for navigation
+     *
+     * @return planned paths
+     */
+    std::vector<std::vector<Point>> getPlannedPathPoints();
 
     /**
      * Visits a CatchIntent to perform an operation.
@@ -95,15 +111,8 @@ class Navigator : public IntentVisitor
     void visit(const StopIntent &stop_intent) override;
 
    private:
-    /**
-     * Create an obstacle for the given avoid area, with a buffer such that the edge
-     * of the robot does not protrude into the area
-     *
-     * @param avoid_area The area to convert into an obstacle
-     *
-     * @return A obstacle representing the given area
-     */
-    std::optional<Obstacle> obstacleFromAvoidArea(AvoidArea avoid_area);
+    // Path manager used to navigate around obstacles
+    std::unique_ptr<PathManager> path_manager;
 
     // This navigators knowledge / state of the world
     World world;
@@ -112,29 +121,17 @@ class Navigator : public IntentVisitor
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
 
-    // The current Robot the navigator has navigated for from an Intent.
-    // This variable is set by each `visit` function
-    std::optional<Robot> current_robot;
-
-    // The current destination the navigator has navigated to from an Intent.
-    // This variable is set by each `visit` function
-    Point current_destination;
-
-    std::vector<Obstacle> velocity_obstacles;
-
+    // This is used by the visualizer to see the planned paths
     std::vector<std::vector<Point>> planned_paths;
 
-    /**
-     * Creates a list of obstacles to avoid based on avoid areas,
-     * enemy team, and friendly team, while excluding the robot attached to robot_id
-     *
-     * @param avoid_areas specifies areas to create obstacles for
-     * @param robot_id current robot that is not an obstacle
-     *
-     * @returns list of obstacles
-     */
-    std::vector<Obstacle> createCurrentObstacles(
-        const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id);
+    // These are obstacles that represent robots that aren't
+    // assigned move intents
+    // When move intents are processed to path plan,
+    // we can avoid these non-"moving" robots
+    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
+
+    // intents that need path planning
+    std::vector<MoveIntent> move_intents_for_path_planning;
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
@@ -146,29 +143,44 @@ class Navigator : public IntentVisitor
      *
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
-    double getCloseToEnemyObstacleFactor(Point &p);
+    double getEnemyObstacleProximityFactor(const Point &p);
 
     /**
-     * Set the current_primitive based on the intent and path_points
+     * Registers this robot id as a robot that is not assigned a MoveIntent
      *
-     * @param move_intent MoveIntent to navigate with
-     * @param path_points path of points to navigate
+     * @param id RobotId to register
      *
-     * @modifies current_primitive
      */
-    void movePointNavigation(const MoveIntent &move_intent,
-                             std::vector<Point> &path_points);
+    void registerNonMoveIntentRobotId(RobotId id);
 
     /**
-     * Set the current_primitive based on the intent and path_curves
+     * Generates path objectives from move intents
      *
-     * @param move_intent MoveIntent to navigate with
-     * @param path_curves path of curves to navigate
+     * @param move_intents intents to make into path objectives
      *
-     * @modifies current_primitive, planned_paths
+     * @return set of PathObjectives
      */
-    void moveCurveNavigation(const MoveIntent &move_intent,
-                             std::vector<Curve> &path_curves);
+    std::unordered_set<PathObjective> getPathObjectivesFromMoveIntents(
+        const std::vector<MoveIntent> &move_intents);
 
-    std::unique_ptr<PathPlanner> path_planner_;
+    /**
+     * Creates a list primitives for the list of MoveIntents
+     *
+     * @param move_intents intents to make into primitives
+     *
+     * @return list of primitives
+     */
+    std::vector<std::unique_ptr<Primitive>> getPrimitivesFromMoveIntents(
+        const std::vector<MoveIntent> &move_intents);
+
+    /**
+     * Creates a primitive for a given path and move intent
+     *
+     * @param path path to make primitive for
+     * @param intent intent to make primitive
+     *
+     * @return unique pointer to the primitive
+     */
+    std::unique_ptr<Primitive> getPrimitiveFromPathAndMoveIntent(std::optional<Path> path,
+                                                                 MoveIntent intent);
 };
