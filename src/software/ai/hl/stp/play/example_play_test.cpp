@@ -5,12 +5,12 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/test_util/test_util.h"
 
-TEST(ExamplePlayTest, test_example_play_always_applicable)
+TEST(ExamplePlayTest, test_example_play_never_applicable)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     ExamplePlay example_play;
-    EXPECT_TRUE(example_play.isApplicable(world));
+    EXPECT_FALSE(example_play.isApplicable(world));
 }
 
 TEST(ExamplePlayTest, test_example_play_invariant_always_holds)

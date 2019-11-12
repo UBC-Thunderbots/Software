@@ -10,11 +10,15 @@ class StraightLinePathPlanner : public PathPlanner
 {
    public:
     /**
-     * Returns a path that is a straight line between start and dest.
+     * Returns a path that is a straight line between start and destination.
+     *
      * @param start start point
-     * @param dest destination point
-     * @return a vector that is {start, dest}
+     * @param destination destination point
+     * @param field  WARNING: StraightLinePathPlanner does not respect the field
+     * @param obstacles WARNING: StraightLinePathPlanner does not avoid obstacles
+     *
+     * @return a vector that is {start, destination}
      */
-    std::optional<std::vector<Point>> findPath(const Point &start,
-                                               const Point &dest) override;
+    PathType findPath(const Point &start, const Point &destination, const Field &field,
+                      const std::vector<Obstacle> &obstacles) override;
 };

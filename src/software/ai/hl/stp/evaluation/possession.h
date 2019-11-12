@@ -1,6 +1,4 @@
-#include "software/world/ball.h"
-#include "software/world/field.h"
-#include "software/world/team.h"
+#include "software/world/world.h"
 
 namespace Evaluation
 {
@@ -27,5 +25,14 @@ namespace Evaluation
      * @param ball The ball
      * @return True if the team has possession, false otherwise
      */
-    bool teamHasPossession(const Team &team, const Ball &ball);
+    bool teamHasPossession(const World &world, const Team &team);
+    /**
+     * Returns true if the provided team has a robot that is being passed to or has been
+     * passed to within the past `possession_buffer_time` seconds.
+     * @param world The world
+     * @param team The team
+     * @return True if the provided team has a robot that is being passed to, otherwise
+     * false.
+     */
+    bool teamPassInProgress(const World &world, const Team &team);
 }  // namespace Evaluation

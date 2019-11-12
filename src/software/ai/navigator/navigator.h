@@ -4,8 +4,7 @@
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/path_planner/straight_line_path_planner.h"
-#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
+#include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/ai/primitive/primitive.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
@@ -18,9 +17,7 @@
 class Navigator : public IntentVisitor
 {
    public:
-    explicit Navigator(){
-
-    };
+    explicit Navigator(std::unique_ptr<PathPlanner> path_planner);
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents);
@@ -150,4 +147,28 @@ class Navigator : public IntentVisitor
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
     double getCloseToEnemyObstacleFactor(Point &p);
+
+    /**
+     * Set the current_primitive based on the intent and path_points
+     *
+     * @param move_intent MoveIntent to navigate with
+     * @param path_points path of points to navigate
+     *
+     * @modifies current_primitive
+     */
+    void movePointNavigation(const MoveIntent &move_intent,
+                             std::vector<Point> &path_points);
+
+    /**
+     * Set the current_primitive based on the intent and path_curves
+     *
+     * @param move_intent MoveIntent to navigate with
+     * @param path_curves path of curves to navigate
+     *
+     * @modifies current_primitive, planned_paths
+     */
+    void moveCurveNavigation(const MoveIntent &move_intent,
+                             std::vector<Curve> &path_curves);
+
+    std::unique_ptr<PathPlanner> path_planner_;
 };

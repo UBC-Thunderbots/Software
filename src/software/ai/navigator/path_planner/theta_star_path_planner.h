@@ -16,22 +16,18 @@ class ThetaStarPathPlanner : public PathPlanner
 {
    public:
     /**
-     * Constructs a theta star path planner
-     * @param field field
-     * @param ball ball
-     * @param obstacles obstacles to avoid
-     */
-    explicit ThetaStarPathPlanner(Field field, const std::vector<Obstacle> &obstacles);
-
-    /**
-     * Returns a path that is an optimized path between start and dest.
+     * Returns a path that is an optimized path between start and destination.
+     *
      * @param start start point
-     * @param dest destination point
-     * @return a vector that is the optimal path avoiding obstacles
-     * 		if no valid path then return std::nullopt
+     * @param destination destination point
+     * @param field field
+     * @param obstacles obstacles to avoid
+     *
+     * @return a vector of points that is the optimal path avoiding obstacles
+     * 		if no valid path then return empty vector
      */
-    std::optional<std::vector<Point>> findPath(const Point &start,
-                                               const Point &dest) override;
+    PathType findPath(const Point &start, const Point &destination, const Field &field,
+                      const std::vector<Obstacle> &obstacles) override;
 
    private:
     typedef std::pair<int, int> CellCoordinate;
@@ -48,32 +44,6 @@ class ThetaStarPathPlanner : public PathPlanner
         int parent_i_, parent_j_;
         double f_, g_, h_;
     };
-
-    /*
-    Create an open list having information as-
-    <f, <i, j>>
-    where f = g + h,
-    and i, j are the row and column index of that GridCell
-    Note that 0 <= i <= ROW-1 & 0 <= j <= COL-1
-    This open list is implenented as a set of pair of pair.*/
-    std::set<OpenListCell> openList;
-
-    // Create a closed list and initialise it to false which means
-    // that no GridCell has been included yet
-    // This closed list is implemented as a boolean 2D array
-    std::vector<std::vector<bool>> closedList;
-
-    // Declare a 2D array of structure to hold the details
-    // of that GridCell
-    std::vector<std::vector<GridCell>> cellDetails;
-
-
-    // Description of the Grid-
-    // true --> The cell is not blocked
-    // false --> The cell is blocked
-    // We update this as we go to avoid updating cells we don't use
-    std::map<std::pair<int, int>, bool> unblocked_grid;
-
 
     /**
      * Returns if a cell is within bounds of grid
@@ -209,8 +179,36 @@ class ThetaStarPathPlanner : public PathPlanner
     const double SIZE_OF_GRID_CELL_IN_METERS =
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
-    Field field_;
     std::vector<Obstacle> obstacles_;
     int numRows;
     int numCols;
+    double fieldXLength;
+    double fieldYLength;
+    double fieldXHalfLength;
+    double fieldYHalfLength;
+
+    /*
+    Create an open list having information as-
+    <f, <i, j>>
+    where f = g + h,
+    and i, j are the row and column index of that GridCell
+    Note that 0 <= i <= ROW-1 & 0 <= j <= COL-1
+    This open list is implenented as a set of pair of pair.*/
+    std::set<OpenListCell> openList;
+
+    // Create a closed list and initialise it to false which means
+    // that no GridCell has been included yet
+    // This closed list is implemented as a boolean 2D array
+    std::vector<std::vector<bool>> closedList;
+
+    // Declare a 2D array of structure to hold the details
+    // of that GridCell
+    std::vector<std::vector<GridCell>> cellDetails;
+
+
+    // Description of the Grid-
+    // true --> The cell is not blocked
+    // false --> The cell is blocked
+    // We update this as we go to avoid updating cells we don't use
+    std::map<std::pair<int, int>, bool> unblocked_grid;
 };
