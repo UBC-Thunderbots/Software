@@ -109,8 +109,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic,
-                                BallNavigationType::AVOID_COLLISION);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -132,8 +131,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Aligning to ball";
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic,
-                                BallNavigationType::AVOID_COLLISION);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -180,14 +178,15 @@ void IndirectFreeKickPlay::updateCherryPickTactics(
 }
 
 void IndirectFreeKickPlay::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic, BallNavigationType ball_navigation)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic,
+    BallCollisionType ball_collision_type)
 {
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
         world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
-        ball_to_center_vec.orientation(), 0, ball_navigation);
+        ball_to_center_vec.orientation(), 0, ball_collision_type);
 }
 
 void IndirectFreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
@@ -288,8 +287,7 @@ void IndirectFreeKickPlay::findPassStage(
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic,
-                                BallNavigationType::AVOID_COLLISION);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);

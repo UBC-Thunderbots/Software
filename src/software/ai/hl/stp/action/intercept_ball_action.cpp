@@ -95,7 +95,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                 robot->id(), point_ball_leaves_field.value(),
                 (ball.position() - robot->position()).orientation(), 0, 0,
                 DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
-                BallNavigationType::ALLOW_COLLISION));
+                BallCollisionType::ALLOW));
         }
         else
         {
@@ -107,7 +107,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                 robot->id(), ball.position(),
                 (ball.position() - robot->position()).orientation(), 0, 0,
                 DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
-                BallNavigationType::ALLOW_COLLISION));
+                BallCollisionType::ALLOW));
         }
     } while (!Evaluation::robotHasPossession(ball, *robot) || loop_forever);
 }
@@ -128,7 +128,7 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
             robot->id(), ball.position(),
             (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL,
             0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
-            BallNavigationType::ALLOW_COLLISION));
+            BallCollisionType::ALLOW));
     }
     else if (robot_on_ball_line)
     {
@@ -141,13 +141,13 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
         yield(std::make_unique<MoveIntent>(
             robot->id(), point_to_meet_ball,
             (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON,
-            MoveType::NORMAL, AutokickType::NONE, BallNavigationType::ALLOW_COLLISION));
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), closest_point_on_ball_trajectory,
             (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON,
-            MoveType::NORMAL, AutokickType::NONE, BallNavigationType::ALLOW_COLLISION));
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
     }
 }

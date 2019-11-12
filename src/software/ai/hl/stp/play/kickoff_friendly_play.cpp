@@ -110,7 +110,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
                                                     Angle::zero(), 0,
-                                                    BallNavigationType::AVOID_COLLISION);
+                                                    BallCollisionType::AVOID);
             result.emplace_back(move_tactics.at(i));
         }
 
@@ -143,7 +143,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
                                                     Angle::zero(), 0,
-                                                    BallNavigationType::AVOID_COLLISION);
+                                                    BallCollisionType::AVOID);
             result.emplace_back(move_tactics.at(i));
         }
 

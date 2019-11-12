@@ -104,7 +104,7 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
                 0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
-                BallNavigationType::AVOID_COLLISION));
+                BallCollisionType::AVOID));
         }
         else
         {
@@ -113,7 +113,7 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, position_to_block_shot, facing_enemy_robot, 0,
                 DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP,
-                BallNavigationType::AVOID_COLLISION));
+                BallCollisionType::AVOID));
         }
 
     } while (!move_action.done());

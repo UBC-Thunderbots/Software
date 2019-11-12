@@ -173,7 +173,7 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
                 DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-                BallNavigationType::ALLOW_COLLISION));
+                BallCollisionType::ALLOW));
         }
     } while (!(kick_action.done() || chip_action.done()));
 }

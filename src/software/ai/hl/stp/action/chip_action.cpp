@@ -96,7 +96,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), point_behind_ball, chip_direction, 0.0, 0,
                 DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-                BallNavigationType::ALLOW_COLLISION));
+                BallCollisionType::ALLOW));
         }
         else
         {

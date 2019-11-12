@@ -47,7 +47,7 @@ void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(move_action.updateStateAndGetNextIntent(
             *robot, pass.receiverPoint(), pass.receiverOrientation(), 0,
             DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-            BallNavigationType::AVOID_COLLISION));
+            BallCollisionType::AVOID));
     } while (true);
 }
 

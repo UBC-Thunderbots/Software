@@ -189,10 +189,6 @@ TEST_P(TacticMotionConstraintsTest, test_default_motion_constraints)
         refbox_states_str += ss.str();
     }
 
-    for (auto constraint : next_intent->getMotionConstraints())
-    {
-        std::cout << constraint << std::endl;
-    }
     EXPECT_EQ(expected_motion_constraints, next_intent->getMotionConstraints())
         << "Failed with refbox states: " << refbox_states_str;
 }

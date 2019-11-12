@@ -82,7 +82,7 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0.0,
                     DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-                    BallNavigationType::ALLOW_COLLISION));
+                    BallCollisionType::ALLOW));
             }
         }
         else
