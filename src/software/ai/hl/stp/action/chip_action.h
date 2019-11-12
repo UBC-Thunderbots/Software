@@ -48,7 +48,6 @@ class ChipAction : public Action
      *
      * @param robot The robot that should perform the chip
      * @param chip_origin The location where the chip will be taken
-     * @param chip_origin The location where the chip will be taken
      * @param chip_target The target to chip at
      * @param chip_distance_meters The distance between the starting location
      * of the chip and the location of the first bounce

@@ -29,7 +29,7 @@ class KickAction : public Action
      *
      * @param robot The robot that should perform the kick
      * @param kick_origin The location where the kick will be taken
-     * @param kick_direction The direction the Robot will kick in
+     * @param kick_target The target to kick at
      * @param kick_speed_meters_per_second The speed of how fast the Robot
      * will kick the ball in meters per second
      */
