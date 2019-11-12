@@ -3,7 +3,7 @@
  */
 
 
-#include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/cost_function.h"
 
 #include <g3log/g3log.hpp>
 #include <numeric>

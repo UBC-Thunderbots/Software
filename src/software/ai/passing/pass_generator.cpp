@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <numeric>
 
-#include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_generator.h"
 
 using namespace Passing;
