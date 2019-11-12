@@ -1,6 +1,7 @@
 #include "software/util/time/timestamp.h"
 
 #include <cmath>
+#include <iomanip>
 #include <stdexcept>
 
 #include "shared/constants.h"
@@ -69,4 +70,11 @@ Timestamp Timestamp::operator-(const Duration &duration) const
 Duration Timestamp::operator-(const Timestamp &timestamp) const
 {
     return Duration::fromSeconds(getSeconds() - timestamp.getSeconds());
+}
+
+std::ostream &operator<<(std::ostream &output_stream, const Timestamp &time)
+{
+    output_stream << std::setprecision(2) << std::fixed << time.getSeconds() << "s";
+
+    return output_stream;
 }
