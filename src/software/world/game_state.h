@@ -51,7 +51,13 @@ class GameState
     // Robocup SSL Rules 9.2.
     Point ball_placement_point;
 
-    GameState() : state(HALT), restart_reason(NONE), our_restart(false) {}
+    GameState()
+        : state(HALT),
+          restart_reason(NONE),
+          game_state(RefboxGameState::HALT),
+          our_restart(false)
+    {
+    }
 
     /**
      * Updates the game state with a value from backend_input
@@ -216,7 +222,7 @@ class GameState
      *
      * @return true if we are doing ball placement.
      */
-    bool isOurPlacement() const;
+    bool isOurBallPlacement() const;
 
     /**
      * Returns true if opposing side is doing kickoff.
@@ -246,7 +252,7 @@ class GameState
      *
      * @return true if opposing side is taking an indirect free kick.
      */
-    bool isTheirIndirect() const;
+    bool isTheirIndirectFree() const;
 
     /**
      * Returns true if opposing side is taking any type of free kick.
@@ -326,9 +332,10 @@ class GameState
     void setBallPlacementPoint(Point placementPoint);
 
     /**
-     * Returns the point where the ball should be placed.
+     * Returns the point where the ball should be placed
      *
-     * @return the point where the ball should be placed.
+     * @return the point where the ball should be placed, or std::nullopt if we are not
+     *         in a state of play where the ball needs to be placed
      */
-    Point getBallPlacementPoint() const;
+    std::optional<Point> getBallPlacementPoint() const;
 };

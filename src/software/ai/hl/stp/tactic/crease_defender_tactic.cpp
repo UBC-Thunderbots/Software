@@ -23,6 +23,7 @@ CreaseDefenderTactic::CreaseDefenderTactic(
       enemy_team(enemy_team),
       left_or_right(left_or_right)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string CreaseDefenderTactic::getName() const
@@ -182,8 +183,8 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, defender_position, defender_orientation, 0.0, false, false,
-                AutokickType::AUTOCHIP));
+                *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::AUTOCHIP));
         }
         else
         {

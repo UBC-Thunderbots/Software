@@ -187,8 +187,8 @@ cc_library(
         ":intercept",
         ":robot",
         ":team",
-        "//shared:constants",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",
@@ -213,8 +213,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
-        "//software/world:ball",
-        "//software/world:robot",
+        "//software/util/parameter:dynamic_parameters",
+        "//software/world",
     ],
 )
 
@@ -223,6 +223,7 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

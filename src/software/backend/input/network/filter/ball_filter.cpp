@@ -104,11 +104,11 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
 
     std::vector<Vector> ball_velocities;
     std::vector<double> ball_velocity_magnitudes;
-    for (unsigned i = 0; i < ball_detections.size() - 1; i++)
+    for (unsigned i = 1; i < ball_detections.size(); i++)
     {
-        for (unsigned j = i + 1; j < ball_detections.size(); j++)
+        for (unsigned j = i; j < ball_detections.size(); j++)
         {
-            SSLBallDetection previous_detection = ball_detections.at(i);
+            SSLBallDetection previous_detection = ball_detections.at(i - 1);
             SSLBallDetection current_detection  = ball_detections.at(j);
 
             Duration time_diff =

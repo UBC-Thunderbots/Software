@@ -73,7 +73,7 @@ bool GameState::isOurFreeKick() const
     return isOurDirectFree() || isOurIndirectFree();
 }
 
-bool GameState::isOurPlacement() const
+bool GameState::isOurBallPlacement() const
 {
     return isBallPlacement() && our_restart;
 }
@@ -93,14 +93,14 @@ bool GameState::isTheirDirectFree() const
     return isDirectFree() && !our_restart;
 }
 
-bool GameState::isTheirIndirect() const
+bool GameState::isTheirIndirectFree() const
 {
     return isIndirectFree() && !our_restart;
 }
 
 bool GameState::isTheirFreeKick() const
 {
-    return isTheirDirectFree() || isTheirIndirect();
+    return isTheirDirectFree() || isTheirIndirectFree();
 }
 
 bool GameState::isTheirBallPlacement() const
@@ -152,9 +152,14 @@ void GameState::setBallPlacementPoint(Point placementPoint)
     ball_placement_point = placementPoint;
 }
 
-Point GameState::getBallPlacementPoint() const
+std::optional<Point> GameState::getBallPlacementPoint() const
 {
-    return ball_placement_point;
+    std::optional<Point> opt_ball_placement_point = std::nullopt;
+    if (isSetupRestart())
+    {
+        opt_ball_placement_point = ball_placement_point;
+    }
+    return opt_ball_placement_point;
 }
 
 // apologies for this monster switch statement
