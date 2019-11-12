@@ -8,7 +8,7 @@ cc_library(
     deps = [
         "//software/proto:ssl_cc_proto",
         "@g3log",
-        "@boost//:asio",  
+        "@boost//:asio",
     ],
 )
 
@@ -20,7 +20,7 @@ cc_library(
     deps = [
         "//software/proto:ssl_cc_proto",
         "@g3log",
-        "@boost//:asio",  
+        "@boost//:asio",
     ],
 )
 
@@ -30,6 +30,7 @@ cc_library(
     hdrs = ["network_filter.h"],
     deps = [
         "//software/world:ball",
+        "//software/world:ball_state",
         "//software/world:field",
         "//software/world:refbox_constants",
         "//software/world:team",

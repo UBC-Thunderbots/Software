@@ -31,5 +31,5 @@ void MoveSpinAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveSpinIntent>(robot->id(), destination, angular_velocity,
                                                final_linear_speed, 0));
-    } while ((robot->position() - destination).len() > close_to_dest_threshold);
+    } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }

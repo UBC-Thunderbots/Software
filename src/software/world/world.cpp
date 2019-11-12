@@ -7,9 +7,9 @@ World::World()
     : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
             Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
             Team(Duration::fromMilliseconds(
-                Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
             Team(Duration::fromMilliseconds(
-                Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())))
+                Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())))
 {
     // Set the default Timestamp as this parameter is not caught when using the World
     // contructor
@@ -37,9 +37,9 @@ void World::updateFieldGeometry(const Field &new_field_data)
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateBallState(const Ball &new_ball_data)
+void World::updateBallState(const BallState &new_ball_state)
 {
-    ball_.updateState(new_ball_data);
+    ball_.updateCurrentState(new_ball_state);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -143,7 +143,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
     // Add all member timestamps to a list
     std::initializer_list<Timestamp> member_timestamps = {
         friendly_team_.getMostRecentTimestamp(), enemy_team_.getMostRecentTimestamp(),
-        ball_.getPreviousTimestamps().front(), field_.getMostRecentTimestamp()};
+        ball_.getPreviousStates().front().timestamp(), field_.getMostRecentTimestamp()};
     // Return the max
 
     return std::max(member_timestamps);

@@ -61,6 +61,14 @@ new_git_repository(
     remote = "https://github.com/saebyn/munkres-cpp.git",
 )
 
+# yaml cpp parser for dynamic parameters test
+git_repository(
+    name = "yaml-cpp",
+    commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
+    remote = "https://github.com/jbeder/yaml-cpp.git",
+    shallow_since = "1571237073 -0500",
+)
+
 # Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
 git_repository(
     name = "bazel_rules_qt",
@@ -76,6 +84,26 @@ new_local_repository(
     path = "external/qt",  # This directory is symlinked in the setup script
 )
 
+http_archive(
+    name = "llvm_clang",
+    build_file = "@//external:clang.BUILD",
+    sha256 = "a23b082b30c128c9831dbdd96edad26b43f56624d0ad0ea9edec506f5385038d",
+    strip_prefix = "clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04",
+    urls = [
+        "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
+    ],
+)
+
+http_archive(
+    name = "arm_developer_gcc",
+    build_file = "@//external:arm_gcc.BUILD",
+    sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
+    strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
+    ],
+)
+
 # We use our own fork of Box2D as we have made a few small modifications
 # See the repository readme for details
 new_git_repository(
@@ -84,4 +112,12 @@ new_git_repository(
     commit = "bddb4ec7efc8a6630fcbe7ef913017d88fb9b4b1",
     remote = "https://github.com/UBC-Thunderbots/Box2D",
     shallow_since = "1571445859 -0700",
+)
+
+# Magic enum library from https://github.com/Neargye/magic_enum
+new_git_repository(
+    name = "magic_enum",
+    build_file = "@//external:magic_enum.BUILD",
+    commit = "49d2429cf110f804048bc459b1d2c126d43b0a9a",
+    remote = "https://github.com/Neargye/magic_enum.git",
 )

@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 /**
  * A rectangle.
@@ -17,7 +17,7 @@ class Rectangle final
      *
      * @param point2 The corner diagonally-opposite to point1
      */
-    explicit constexpr Rectangle(const Point &point1, const Point &point2);
+    explicit Rectangle(const Point &point1, const Point &point2);
 
     /**
      * Creates a new Rectangle from a corner and a size
@@ -28,8 +28,7 @@ class Rectangle final
      *
      * @param yLength The yLength of the rectangle
      */
-    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double x_length,
-                                 double y_length);
+    explicit Rectangle(const Point &neg_x_neg_y_corner, double x_length, double y_length);
 
     /**
      * Returns the length along the x-axis of the rectangle
@@ -57,35 +56,35 @@ class Rectangle final
      *
      * @return The centre of the rectangle
      */
-    constexpr Point centre() const;
+    Point centre() const;
 
     /**
      * Returns the <+x,+y> corner of the rectangle
      *
      * @return The <+x,+y> corner of the rectangle
      */
-    constexpr Point posXPosYCorner() const;
+    Point posXPosYCorner() const;
 
     /**
      * Returns the <-x,+y> corner of the rectangle
      *
      * @return The <-x,+y> corner of the rectangle
      */
-    constexpr Point negXPosYCorner() const;
+    Point negXPosYCorner() const;
 
     /**
      * Returns the <-x,-y> corner of the rectangle
      *
      * @return The <-x,-y> corner of the rectangle
      */
-    constexpr Point negXNegYCorner() const;
+    Point negXNegYCorner() const;
 
     /**
      * Returns the <+x,-y> corner of the rectangle
      *
      * @return The <+x,-y> corner of the rectangle
      */
-    constexpr Point posXNegYCorner() const;
+    Point posXNegYCorner() const;
 
     /**
      * Returns a digit corresponding to a specific corner for pos%4. (0 for <-x,-y>, 1
@@ -95,14 +94,14 @@ class Rectangle final
      *
      * @return Point A digit corresponding to position
      */
-    constexpr Point operator[](unsigned int pos) const;
+    Point operator[](unsigned int pos) const;
 
     /**
      * Translates the rectangle
      *
      * @param offset The distance to move the rectangle
      */
-    void translate(const Point &offset);
+    void translate(const Vector &offset);
 
     /**
      * Checks whether a point is within the boundries of the rectangle
@@ -147,7 +146,7 @@ class Rectangle final
 
     std::vector<Point> corners();
 
-    constexpr bool operator==(const Rectangle &p) const
+    bool operator==(const Rectangle &p) const
     {
         return this->min_corner == p.min_corner && this->diagonal == p.diagonal;
     }
@@ -157,7 +156,7 @@ class Rectangle final
     Point diagonal;
 };
 
-inline constexpr Rectangle::Rectangle(const Point &point1, const Point &point2)
+inline Rectangle::Rectangle(const Point &point1, const Point &point2)
     : min_corner(point1.x() < point2.x() ? point1.x() : point2.x(),
                  point1.y() < point2.y() ? point1.y() : point2.y()),
       diagonal(
@@ -166,8 +165,8 @@ inline constexpr Rectangle::Rectangle(const Point &point1, const Point &point2)
 {
 }
 
-inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double x_length,
-                                      double y_length)
+inline Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double x_length,
+                            double y_length)
     : min_corner(neg_x_neg_y_corner), diagonal(x_length, y_length)
 
 {
@@ -188,32 +187,32 @@ inline constexpr double Rectangle::area() const
     return diagonal.x() * diagonal.y();
 }
 
-inline constexpr Point Rectangle::centre() const
+inline Point Rectangle::centre() const
 {
-    return min_corner + diagonal / 2;
+    return Point(min_corner + (diagonal.toVector() / 2));
 }
 
-inline constexpr Point Rectangle::posXPosYCorner() const
+inline Point Rectangle::posXPosYCorner() const
 {
-    return min_corner + diagonal;
+    return min_corner + diagonal.toVector();
 }
 
-inline constexpr Point Rectangle::negXPosYCorner() const
+inline Point Rectangle::negXPosYCorner() const
 {
-    return min_corner + Point(0, diagonal.y());
+    return min_corner + Vector(0, diagonal.y());
 }
 
-inline constexpr Point Rectangle::negXNegYCorner() const
+inline Point Rectangle::negXNegYCorner() const
 {
     return min_corner;
 }
 
-inline constexpr Point Rectangle::posXNegYCorner() const
+inline Point Rectangle::posXNegYCorner() const
 {
-    return min_corner + Point(diagonal.x(), 0);
+    return min_corner + Vector(diagonal.x(), 0);
 }
 
-inline constexpr Point Rectangle::operator[](unsigned int pos) const
+inline Point Rectangle::operator[](unsigned int pos) const
 {
     switch (pos)
     {
@@ -230,7 +229,7 @@ inline constexpr Point Rectangle::operator[](unsigned int pos) const
     }
 }
 
-inline void Rectangle::translate(const Point &offset)
+inline void Rectangle::translate(const Vector &offset)
 {
     min_corner += offset;
 }

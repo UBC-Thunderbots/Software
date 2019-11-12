@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/util/parameter/dynamic_parameters.h"
@@ -11,7 +11,7 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
                                  Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilityFlags::Kick}),
+    : Tactic(loop_forever, {RobotCapabilities::Capability::Kick}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -20,6 +20,8 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       chip_target(chip_target),
       has_shot_available(false)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string ShootGoalTactic::getName() const
@@ -51,7 +53,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // If we can intercept the ball, use the distance to the intercept point.
         // We normalize with the total field length so that robots that are within the
         // field have a cost less than 1
-        cost = (ball_intercept_opt->first - robot.position()).len() /
+        cost = (ball_intercept_opt->first - robot.position()).length() /
                world.field().totalXLength();
     }
     else
@@ -59,7 +61,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // If we can't intercept the ball, just use the distance to the ball's current
         // position. We normalize with the total field length so that robots that are
         // within the field have a cost less than 1
-        cost = (world.ball().position() - robot.position()).len() /
+        cost = (world.ball().position() - robot.position()).length() /
                world.field().totalXLength();
     }
 
@@ -79,15 +81,17 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = Util::DynamicParameters::ShootGoalTactic::
-                                     enemy_about_to_steal_ball_rectangle_width.value();
-    auto steal_ball_rect_length =
-        Util::DynamicParameters::ShootGoalTactic::
-            enemy_about_to_steal_ball_rectangle_extension_length.value();
+    auto steal_ball_rect_width = Util::DynamicParameters->getShootGoalTacticConfig()
+                                     ->EnemyAboutToStealBallRectangleWidth()
+                                     ->value();
+    auto steal_ball_rect_length = Util::DynamicParameters->getShootGoalTacticConfig()
+                                      ->EnemyAboutToStealBallRectangleExtensionLength()
+                                      ->value();
     Rectangle baller_frontal_area = Rectangle(
-        (robot->position() + front_of_robot_dir.perp().norm(steal_ball_rect_width / 2.0)),
-        robot->position() + front_of_robot_dir.norm(steal_ball_rect_length) -
-            front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS));
+        (robot->position() +
+         front_of_robot_dir.perpendicular().normalize(steal_ball_rect_width / 2.0)),
+        robot->position() + front_of_robot_dir.normalize(steal_ball_rect_length) -
+            front_of_robot_dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS));
 
     for (const auto &enemy : enemy_team.getAllRobots())
     {
@@ -164,9 +168,9 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // A point behind the ball that leaves 5cm between the ball and kicker of the
             // robot
             Point behind_ball =
-                ball.position() +
-                behind_ball_vector.norm(BALL_MAX_RADIUS_METERS +
-                                        DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
+                ball.position() + behind_ball_vector.normalize(
+                                      BALL_MAX_RADIUS_METERS +
+                                      DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
 
             // The default behaviour is to move behind the ball and face the net
             yield(move_action.updateStateAndGetNextIntent(

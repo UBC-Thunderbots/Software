@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
 
@@ -36,7 +36,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
         EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::zero()),
-                  Angle::ofDegrees(1));
+                  Angle::fromDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == NONE);
     }
     catch (...)
@@ -81,7 +81,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(0, 0.2), 0.01));
         EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::quarter()),
-                  Angle::ofDegrees(1));
+                  Angle::fromDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == NONE);
     }
     catch (...)
@@ -123,7 +123,7 @@ TEST(ShadowEnemyTacticTest,
         EXPECT_TRUE(move_intent.getDestination().isClose(ball.position(), 0.01));
         EXPECT_LT(move_intent.getFinalAngle().minDiff(
                       (ball.position() - friendly_robot.position()).orientation()),
-                  Angle::ofDegrees(1));
+                  Angle::fromDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
     }
     catch (...)
@@ -164,7 +164,7 @@ TEST(
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
         EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::zero()),
-                  Angle::ofDegrees(1));
+                  Angle::fromDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == NONE);
     }
     catch (...)
