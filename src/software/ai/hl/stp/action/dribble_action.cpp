@@ -36,5 +36,5 @@ void DribbleAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(std::make_unique<DribbleIntent>(robot->id(), destination, final_orientation,
                                               dribbler_rpm, small_kick_allowed, 0));
     } while (loop_forever ||
-             (robot->position() - destination).len() > close_to_dest_threshold);
+             (robot->position() - destination).length() > close_to_dest_threshold);
 }

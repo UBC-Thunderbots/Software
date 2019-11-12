@@ -5,9 +5,9 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/path_manager/path_objective.h"
 #include "software/ai/navigator/path_planner/path_planner.h"
-#include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/spline.h"
+#include "software/new_geom/point.h"
 
 /**
  * PathManager is an interface for a path manager that,

@@ -7,6 +7,14 @@
 
 #include <g3log/g3log.hpp>
 
+ThetaStarPathPlanner::ThetaStarPathPlanner()
+    : num_grid_rows(0),
+      num_grid_cols(0),
+      max_navigable_x_coord(0),
+      max_navigable_y_coord(0)
+{
+}
+
 bool ThetaStarPathPlanner::isCoordValid(Coordinate test_coord)
 {
     // Returns true if row number and column number
@@ -55,8 +63,9 @@ bool ThetaStarPathPlanner::hasLineOfSight(Coordinate current_parent, Coordinate 
     Point point_to_check = parent_point;
 
     Vector diff      = next_point - parent_point;
-    Vector direction = diff.norm();
-    int dist         = static_cast<int>(diff.len());
+    Vector direction = diff.normalize();
+    int dist         = static_cast<int>(diff.length());
+
     for (int i = 0; i < dist; i++)
     {
         point_to_check = point_to_check + direction;
@@ -263,14 +272,14 @@ bool ThetaStarPathPlanner::isStartToDestinationWithinThreshold(const Point &star
                                                                const Point &destination)
 {
     // If the destination CellHeuristic is within one grid size of start
-    return ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
-            ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS));
+    return ((start - destination).length() < CLOSE_TO_DEST_THRESHOLD ||
+            ((start - destination).length() < SIZE_OF_GRID_CELL_IN_METERS));
 }
 
 bool ThetaStarPathPlanner::isStartToClosestDestinationWithinThreshold(
     const Point &start, const Point &closest_destination)
 {
-    return ((start - closest_destination).len() <
+    return ((start - closest_destination).length() <
             (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION));
 }
 
@@ -485,8 +494,10 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
 {
     // Initialize member variables
     this->obstacles       = obstacles;
-    max_navigable_x_coord = navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    max_navigable_y_coord = navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    max_navigable_x_coord =
+        std::max(navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS, 0.0);
+    max_navigable_y_coord =
+        std::max(navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS, 0.0);
     num_grid_rows =
         static_cast<int>((max_navigable_x_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
                          SIZE_OF_GRID_CELL_IN_METERS);

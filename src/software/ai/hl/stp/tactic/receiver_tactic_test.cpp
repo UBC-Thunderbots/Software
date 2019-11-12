@@ -229,9 +229,10 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     EXPECT_TRUE(tactic.getNextIntent());
 
     // Position the ball just in front of the robot dribbler
-    Point ball_pos = receiver.position() +
-                     Vector(receiver.orientation().cos(), receiver.orientation().sin())
-                         .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+    Point ball_pos =
+        receiver.position() +
+        Vector(receiver.orientation().cos(), receiver.orientation().sin())
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
     ball = Ball(ball_pos, {-1, 1}, Timestamp::fromSeconds(5));
     tactic.updateWorldParams(friendly_team, enemy_team, ball);
     tactic.updateControlParams(pass);
@@ -282,7 +283,7 @@ TEST_P(OneTimeShotDirectionTest, test_shot_towards_enemy_net)
     Ball ball(ball_location, robot_location - ball_location, Timestamp::fromSeconds(0));
 
     // Create a shot towards the enemy net
-    Ray shot(robot_location, Vector(4.5, 0) - robot_location);
+    Ray shot(robot_location, Vector(4.5, 0) - robot_location.toVector());
 
     Angle robot_angle = ReceiverTactic::getOneTimeShotDirection(shot, ball);
 
@@ -332,13 +333,13 @@ TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_pos
     // We just choose a moderate speed for these tests. Varying the speed won't change
     // the results since it's treated as an "ideal ball trajectory" anyway
     double ball_speed                 = 4;
-    Angle ball_velocity_vector_offset = Angle::ofDegrees(std::get<4>(GetParam()));
+    Angle ball_velocity_vector_offset = Angle::fromDegrees(std::get<4>(GetParam()));
     // We apply angular "noise" to the ball velocity vector to simulate imperfect passes
     Vector ball_velocity_vector = Vector::createFromAngle(
         (robot_position - ball_position).orientation() + ball_velocity_vector_offset);
 
     // Create a ball traveling from the specified position towards the robot
-    Ball ball(ball_position, ball_velocity_vector.norm(ball_speed),
+    Ball ball(ball_position, ball_velocity_vector.normalize(ball_speed),
               Timestamp::fromSeconds(0));
 
     // Create a robot at the robot location with no velocity. The initial orientation
@@ -357,8 +358,8 @@ TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_pos
     // The position where the ball should make contact with the receiver robot
     Point ball_contact_position =
         ideal_position +
-        Point::createFromAngle(ideal_orientation)
-            .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+        Vector::createFromAngle(ideal_orientation)
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
 
     // We check that the position the receiver tries to move to will cause the
     // ball contact point to intersect with the ball's trajectory, meaning that we are

@@ -7,10 +7,10 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
@@ -50,7 +50,7 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World 
     double cost                                          = 0;
     if (desired_state)
     {
-        cost = (robot.position() - calculateDesiredState(robot)->first).len() /
+        cost = (robot.position() - calculateDesiredState(robot)->first).length() /
                world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
@@ -68,7 +68,7 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
         if (defender_reference_position)
         {
             // Figure out how far away the ball is
-            double ball_dist = (ball.position() - *defender_reference_position).len();
+            double ball_dist = (ball.position() - *defender_reference_position).length();
 
             double min_defender_seperation_deg =
                 Util::DynamicParameters->getDefenderCreaseTacticConfig()
@@ -100,7 +100,7 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
                 return std::nullopt;
             }
 
-            Angle defender_seperation = Angle::ofDegrees(
+            Angle defender_seperation = Angle::fromDegrees(
                 (max_defender_seperation_deg - min_defender_seperation_deg) /
                     (max_ball_dist - min_ball_dist) *
                     std::clamp(ball_dist, min_ball_dist, max_ball_dist) +

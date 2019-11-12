@@ -72,7 +72,6 @@ cc_toolchain_config(
     name = "clang-k8",
     builtin_include_directories = [
         "external/llvm_clang/include/c++/v1/",
-        "llvm_clang/lib/clang/9.0.0/include/",
         "/usr/include/",
         "/usr/local/include/",
     ],

@@ -129,7 +129,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
             Point start = robot->position();
             Point end   = intent.getDestination();
 
-            path_objectives.insert(PathObjective(start, end, robot->velocity().len(),
+            path_objectives.insert(PathObjective(start, end, robot->velocity().length(),
                                                  obstacles, intent.getRobotId()));
         }
         else

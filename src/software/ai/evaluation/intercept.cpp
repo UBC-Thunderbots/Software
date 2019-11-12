@@ -57,7 +57,7 @@ namespace Evaluation
         // the ball position as a function of it's travel time
         // We make the weight here an inverse of the ball speed, so that the gradient
         // descent takes smaller steps when the ball is moving faster
-        double descent_weight = 1 / (std::exp(ball.velocity().len() * 0.5));
+        double descent_weight = 1 / (std::exp(ball.velocity().length() * 0.5));
         Util::GradientDescentOptimizer<1> optimizer({descent_weight},
                                                     gradient_approx_step_size);
         Duration best_ball_travel_duration = Duration::fromSeconds(
@@ -83,7 +83,7 @@ namespace Evaluation
         Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
         // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
         // check isn't relevent in that case
-        if (ball.velocity().len() != 0 &&
+        if (ball.velocity().length() != 0 &&
             std::abs(ball_robot_time_diff.getSeconds()) > descent_weight)
         {
             return std::nullopt;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 class Line final
 {
@@ -32,7 +32,7 @@ class Line final
     /**
      * Creates a degenerate Line at (0, 0)
      */
-    inline explicit constexpr Line() {}
+    inline explicit Line() {}
 
     /**
      * Creates a Line that starts and ends at the given points

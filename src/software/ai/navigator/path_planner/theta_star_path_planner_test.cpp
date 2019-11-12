@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
@@ -224,6 +224,18 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
     EXPECT_EQ(2, path->size());
     EXPECT_EQ(start, path->startPoint());
     EXPECT_EQ(dest, path->endPoint());
+}
+
+TEST(TestThetaStarPathPlanner, no_navigable_area)
+{
+    // Test running theta star with no area to navigate in
+    Point start{-1.0, -1.0}, dest{1.0, 1.0};
+
+    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+    Rectangle navigable_area({0, 0}, {0, 0});
+    auto path = ThetaStarPathPlanner().findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_EQ(std::nullopt, path);
 }
 
 TEST(TestThetaStarPathPlanner, performance)

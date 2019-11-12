@@ -3,8 +3,8 @@
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 class MoveAction : public Action
 {
@@ -13,7 +13,7 @@ class MoveAction : public Action
     // The robot should be able to reach within 1cm of the destination even with
     // camera and positioning noise
     static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD       = 0.02;
-    static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD = Angle::ofDegrees(2);
+    static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD = Angle::fromDegrees(2);
     /**
      * Creates a new MoveAction
      *

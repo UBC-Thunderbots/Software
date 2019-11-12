@@ -52,7 +52,7 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
     // Prefer robots closer to the enemy being shadowed
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - enemy_threat->robot.position()).len() /
+    double cost = (robot.position() - enemy_threat->robot.position()).length() /
                   world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
@@ -84,19 +84,19 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
 
         Vector enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
         Point position_to_block_shot =
-            enemy_robot.position() + enemy_shot_vector.norm(shadow_distance);
+            enemy_robot.position() + enemy_shot_vector.normalize(shadow_distance);
         if (best_enemy_shot_opt)
         {
             enemy_shot_vector =
                 best_enemy_shot_opt->getPointToShootAt() - enemy_robot.position();
             position_to_block_shot =
-                enemy_robot.position() + enemy_shot_vector.norm(shadow_distance);
+                enemy_robot.position() + enemy_shot_vector.normalize(shadow_distance);
         }
 
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
         if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-            ball.velocity().len() <
+            ball.velocity().length() <
                 Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
                     ->BallStealSpeed()
                     ->value())

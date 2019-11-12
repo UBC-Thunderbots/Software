@@ -125,7 +125,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
     }
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
-    EXPECT_TRUE(Vector(0, -2).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(0, -2) - ball.velocity()).length(), 1e-5);
 }
 
 TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
@@ -151,7 +151,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
     }
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
-    EXPECT_TRUE(Vector(-3.0, 0.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(-3.0, 0.0) - ball.velocity()).length(), 1e-3);
 }
 
 TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
@@ -177,5 +177,5 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
     }
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
-    EXPECT_TRUE(Vector(3.0, 0.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(3.0, 0.0) - ball.velocity()).length(), 1e-3);
 }

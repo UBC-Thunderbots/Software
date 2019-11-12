@@ -2,13 +2,13 @@
 
 #include <g3log/g3log.hpp>
 
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
                                                const Point &p3, double final_speed)
 {
-    return final_speed * (p2 - p1).norm().project((p3 - p2).norm()).len();
+    return final_speed * (p2 - p1).normalize().project((p3 - p2).normalize()).length();
 }
 
 std::vector<Obstacle> getObstaclesFromMotionConstraints(
@@ -78,7 +78,7 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
             case MotionConstraint::ENEMY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().enemyCornerNeg() -
-                                          Point(0, world.field().boundaryYLength()));
+                                          Vector(0, world.field().boundaryYLength()));
                 rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                      ->RobotObstacleInflationFactor()
                                      ->value() *
@@ -88,7 +88,7 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
             case MotionConstraint::FRIENDLY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().friendlyCornerNeg() -
-                                          Point(0, world.field().boundaryYLength()));
+                                          Vector(0, world.field().boundaryYLength()));
                 rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                      ->RobotObstacleInflationFactor()
                                      ->value() *
@@ -142,7 +142,7 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
         }
 
         MovePrimitive movePrimitive =
-            MovePrimitive(robot_id, point, point.orientation(), final_speed,
+            MovePrimitive(robot_id, point, point.toVector().orientation(), final_speed,
                           enable_dribbler, MoveType::NORMAL, autokick);
         movePrimitives.emplace_back(movePrimitive);
     }
@@ -152,7 +152,7 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
 
 double getPointTrespass(const Point &p1, const Point &p2, double trespass_threshold)
 {
-    double dist_trespass = trespass_threshold - (p1 - p2).len();
+    double dist_trespass = trespass_threshold - (p1 - p2).length();
 
     if (dist_trespass < 0)
     {
