@@ -493,7 +493,7 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
     const Rectangle &navigable_area, const std::vector<Obstacle> &obstacles)
 {
     // Initialize member variables
-    this->obstacles       = obstacles;
+    this->obstacles = obstacles;
     max_navigable_x_coord =
         std::max(navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS, 0.0);
     max_navigable_y_coord =
