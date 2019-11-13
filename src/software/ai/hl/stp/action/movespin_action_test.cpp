@@ -35,7 +35,7 @@ TEST(MoveSpinActionTest, robot_at_destination)
     // done and so will return a null pointer
     action.updateControlParams(robot, Point(0, 0), AngularVelocity::full(), 0);
     action.getNextIntent();
-    auto intent_ptr = action.getNextIntent();
+    action.getNextIntent();
 
     EXPECT_TRUE(action.done());
 }
