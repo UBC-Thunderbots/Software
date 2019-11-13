@@ -13,6 +13,7 @@ Duration::Duration() : Duration(0) {}
 
 Duration::Duration(double duration_seconds) : Time(duration_seconds) {}
 
+
 const Duration Duration::fromSeconds(double seconds)
 {
     return Duration(seconds);
@@ -63,8 +64,7 @@ Duration Duration::operator-(const Duration &duration) const
     return Duration::fromSeconds(getSeconds() - duration.getSeconds());
 }
 
-std::ostream &operator<<(std::ostream &output_stream, const Duration &duration)
-{
+std::ostream &operator<<(std::ostream &output_stream, const Duration &duration) {
     output_stream << std::setprecision(2) << std::fixed << duration.getSeconds() << "s";
 
     return output_stream;
