@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["chip_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//shared:constants",
         "//software/ai/intent:chip_intent",
         "//software/ai/intent:move_intent",
@@ -27,6 +28,7 @@ cc_library(
     hdrs = ["dribble_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//software/ai/intent:dribble_intent",
     ],
 )
@@ -46,6 +48,7 @@ cc_library(
     hdrs = ["intercept_ball_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//shared:constants",
         "//software/ai/evaluation:intercept",
         "//software/ai/evaluation:robot",
@@ -75,6 +78,7 @@ cc_library(
     hdrs = ["kick_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//shared:constants",
         "//software/ai/intent:kick_intent",
         "//software/ai/intent:move_intent",
@@ -97,6 +101,7 @@ cc_library(
     hdrs = ["move_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//software/ai/intent:move_intent",
     ],
 )
@@ -116,6 +121,7 @@ cc_library(
     hdrs = ["movespin_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//software/ai/intent:movespin_intent",
     ],
 )
@@ -135,6 +141,7 @@ cc_library(
     hdrs = ["pivot_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//shared:constants",
         "//software/ai/intent:move_intent",
         "//software/ai/intent:pivot_intent",
@@ -158,6 +165,7 @@ cc_library(
     hdrs = ["stop_action.h"],
     deps = [
         ":action",
+        ":action_visitor",
         "//software/ai/intent:stop_intent",
     ],
 )
@@ -168,6 +176,21 @@ cc_test(
     deps = [
         ":stop_action",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "all_actions",
+    srcs = ["all_actions.h"],
+    deps = [
+        ":chip_action",
+        ":dribble_action",
+        ":intercept_ball_action",
+        ":kick_action",
+        ":move_action",
+        ":movespin_action",
+        ":pivot_action",
+        ":stop_action",
     ],
 )
 
@@ -192,4 +215,10 @@ cc_test(
         "//software/ai/intent:move_intent",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "action_visitor",
+    hdrs = ["action_visitor.h"],
+    deps = [":action"],
 )

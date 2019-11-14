@@ -26,6 +26,10 @@ void InterceptBallAction::updateControlParams(const Robot& robot)
     this->robot = robot;
 }
 
+void InterceptBallAction::accept(ActionVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
 std::optional<Point> InterceptBallAction::getPointBallLeavesField(const Field& field,
                                                                   const Ball& ball)
 {
