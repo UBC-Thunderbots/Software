@@ -176,9 +176,10 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                       DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
 
             // The default behaviour is to move behind the ball and face the net
-            move_action.updateControlParams(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+            move_action.updateControlParams(*robot, behind_ball,
+                                            (-behind_ball_vector).orientation(), 0,
+                                            DribblerEnable::OFF, MoveType::NORMAL,
+                                            AutokickType::NONE, BallCollisionType::ALLOW);
             yield(move_action.getNextIntent());
         }
     } while (!(kick_action.done() || chip_action.done()));

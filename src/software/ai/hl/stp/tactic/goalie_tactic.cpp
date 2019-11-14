@@ -211,9 +211,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-            move_action.updateControlParams(*robot, goalie_pos, goalie_orientation, 0.0,
-                                            DribblerEnable::OFF, MoveType::NORMAL,
-                                            AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+            move_action.updateControlParams(
+                *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
             next_intent = move_action.getNextIntent();
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
@@ -263,7 +263,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
             move_action.updateControlParams(*robot, goalie_restricted_pos,
                                             goalie_orientation, 0.0, DribblerEnable::OFF,
-                                            MoveType::NORMAL, AUTOCHIP, BallCollisionType::ALLOW);
+                                            MoveType::NORMAL, AUTOCHIP,
+                                            BallCollisionType::ALLOW);
             next_intent = move_action.getNextIntent();
         }
 
@@ -314,9 +315,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
         Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-        move_action.updateControlParams(*robot, goalie_pos, goalie_orientation,
-                                        goalie_final_speed, DribblerEnable::OFF,
-                                        MoveType::NORMAL, AUTOCHIP, BallCollisionType::ALLOW);
+        move_action.updateControlParams(
+            *robot, goalie_pos, goalie_orientation, goalie_final_speed,
+            DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP, BallCollisionType::ALLOW);
         next_intent = move_action.getNextIntent();
 
         yield(std::move(next_intent));

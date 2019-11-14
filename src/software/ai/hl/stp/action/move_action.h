@@ -44,7 +44,8 @@ class MoveAction : public Action
     void updateControlParams(const Robot& robot, Point destination,
                              Angle final_orientation, double final_speed,
                              DribblerEnable enable_dribbler, MoveType move_type,
-                             AutokickType autokick, BallCollisionType ball_collision_type);
+                             AutokickType autokick,
+                             BallCollisionType ball_collision_type);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

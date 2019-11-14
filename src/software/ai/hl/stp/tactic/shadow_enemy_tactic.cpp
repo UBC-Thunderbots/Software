@@ -80,9 +80,10 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Point position_to_block_pass =
                 enemy_robot.position() +
                 enemy_to_passer_vector.normalize(this->shadow_distance);
-            move_action.updateControlParams(
-                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
+            move_action.updateControlParams(*robot, position_to_block_pass,
+                                            enemy_to_passer_vector.orientation(), 0,
+                                            DribblerEnable::OFF, MoveType::NORMAL,
+                                            AutokickType::NONE, BallCollisionType::AVOID);
             yield(move_action.getNextIntent());
         }
         else
@@ -117,7 +118,8 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 move_action.updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0,
-                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::AVOID);
+                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                    BallCollisionType::AVOID);
                 yield(move_action.getNextIntent());
             }
             else
@@ -125,7 +127,8 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 move_action.updateControlParams(
                     *robot, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0,
-                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                    BallCollisionType::AVOID);
                 yield(move_action.getNextIntent());
             }
         }

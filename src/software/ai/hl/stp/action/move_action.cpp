@@ -12,7 +12,8 @@ MoveAction::MoveAction(double close_to_dest_threshold,
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
                                      DribblerEnable enable_dribbler, MoveType move_type,
-                                     AutokickType autokick, BallCollisionType ball_collision_type)
+                                     AutokickType autokick,
+                                     BallCollisionType ball_collision_type)
 {
     this->robot             = robot;
     this->destination       = destination;

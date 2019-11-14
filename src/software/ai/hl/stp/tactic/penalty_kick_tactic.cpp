@@ -174,7 +174,8 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             approach_ball_move_act.updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::ALLOW);
             yield(approach_ball_move_act.getNextIntent());
         }
         else
