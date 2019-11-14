@@ -16,8 +16,6 @@ GrabBallTactic::GrabBallTactic(const Field &field, const Ball &ball,
                                const Team &enemy_team, bool loop_forever)
     : Tactic(loop_forever), field(field), ball(ball), enemy_team(enemy_team)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
-    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string GrabBallTactic::getName() const
@@ -84,7 +82,7 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 move_action.updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0.0,
-                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
                 yield(move_action.getNextIntent());
             }
         }

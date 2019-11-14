@@ -21,7 +21,6 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
       friendly_team(friendly_team),
       enemy_team(enemy_team)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string ReceiverTactic::getName() const
@@ -87,7 +86,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // rotate to the correct orientation
         move_action.updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
                                         DribblerEnable::OFF, MoveType::NORMAL,
-                                        AutokickType::NONE);
+                                        AutokickType::NONE, BallCollisionType::ALLOW);
         yield(move_action.getNextIntent());
     }
 
@@ -117,7 +116,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
             move_action.updateControlParams(*robot, ideal_position, ideal_orientation, 0,
                                             DribblerEnable::OFF, MoveType::NORMAL,
-                                            AUTOKICK);
+                                            AUTOKICK, BallCollisionType::ALLOW);
             yield(move_action.getNextIntent());
 
             // Calculations to check for termination conditions
@@ -142,7 +141,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             // Move into position with the dribbler on
             move_action.updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE);
+                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
             yield(move_action.getNextIntent());
         }
     }

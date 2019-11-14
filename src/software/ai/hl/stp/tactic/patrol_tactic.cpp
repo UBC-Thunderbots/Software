@@ -71,7 +71,7 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         move_action.updateControlParams(
             *robot, patrol_points.at(patrol_point_index), orientation_at_patrol_points,
             linear_speed_at_patrol_points, DribblerEnable::OFF, MoveType::NORMAL,
-            AutokickType::NONE);
+            AutokickType::NONE, BallCollisionType::AVOID);
         auto next_intent = move_action.getNextIntent();
         if (!next_intent || move_action.done())
         {
@@ -79,7 +79,7 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             move_action.updateControlParams(
                 *robot, patrol_points.at(patrol_point_index),
                 orientation_at_patrol_points, linear_speed_at_patrol_points,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
             next_intent = move_action.getNextIntent();
         }
 

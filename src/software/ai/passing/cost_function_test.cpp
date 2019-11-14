@@ -11,7 +11,7 @@
  * now broken?).
  */
 
-#include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/cost_function.h"
 
 #include <gtest/gtest.h>
 

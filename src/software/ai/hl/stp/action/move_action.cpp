@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/action/move_action.h"
 
-#include "software/ai/intent/move_intent.h"
-
 MoveAction::MoveAction(double close_to_dest_threshold,
                        Angle close_to_orientation_threshold, bool loop_forever)
     : Action(),
@@ -14,7 +12,7 @@ MoveAction::MoveAction(double close_to_dest_threshold,
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
                                      DribblerEnable enable_dribbler, MoveType move_type,
-                                     AutokickType autokick)
+                                     AutokickType autokick, BallCollisionType ball_collision_type)
 {
     this->robot             = robot;
     this->destination       = destination;
@@ -23,6 +21,7 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
     this->enable_dribbler   = enable_dribbler;
     this->move_type         = move_type;
     this->autokick          = autokick;
+    this->ball_collision_type = ball_collision_type;
 }
 
 void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -36,7 +35,7 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
                                            final_speed, 0, enable_dribbler, move_type,
-                                           autokick));
+                                           autokick, ball_collision_type));
     } while (loop_forever ||
              (robot->position() - destination).length() > close_to_dest_threshold ||
              (robot->orientation().minDiff(final_orientation) >

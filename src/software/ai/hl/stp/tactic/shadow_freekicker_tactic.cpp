@@ -84,7 +84,7 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
 
         move_action.updateControlParams(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
+            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
         yield(move_action.getNextIntent());
     } while (true);
 }
