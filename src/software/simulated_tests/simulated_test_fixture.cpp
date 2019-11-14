@@ -63,8 +63,6 @@ class SimulatedTest : public ::testing::Test
 
 TEST_F(SimulatedTest, example_simulated_test)
 {
-    enableVisualizer();
-
     World world         = ::Test::TestUtil::createBlankTestingWorld();
     world.mutableBall() = Ball(Point(0, 0), Vector(4, 1.5), Timestamp::fromSeconds(0));
 
