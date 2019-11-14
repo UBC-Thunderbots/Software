@@ -15,7 +15,8 @@ void StopAction::updateControlParams(const Robot& robot, bool coast)
     this->coast = coast;
 }
 
-void StopAction::accept(ActionVisitor& visitor) const {
+void StopAction::accept(ActionVisitor& visitor) const
+{
     visitor.visit(*this);
 }
 

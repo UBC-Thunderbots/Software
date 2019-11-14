@@ -20,7 +20,8 @@ void DribbleAction::updateControlParams(const Robot& robot, const Point& dest,
     this->small_kick_allowed = small_kick_allowed;
 }
 
-void DribbleAction::accept(ActionVisitor& visitor) const {
+void DribbleAction::accept(ActionVisitor& visitor) const
+{
     visitor.visit(*this);
 }
 

@@ -25,7 +25,8 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
     this->ball_collision_type = ball_collision_type;
 }
 
-void MoveAction::accept(ActionVisitor& visitor) const {
+void MoveAction::accept(ActionVisitor& visitor) const
+{
     visitor.visit(*this);
 }
 

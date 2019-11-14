@@ -32,7 +32,8 @@ void KickAction::updateControlParams(const Robot &robot, Point kick_origin,
     this->kick_speed_meters_per_second = kick_speed_meters_per_second;
 }
 
-void KickAction::accept(ActionVisitor& visitor) const {
+void KickAction::accept(ActionVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 

@@ -32,7 +32,7 @@ class PrimitiveVisitor
      * @param primitive The primitive to visit
      */
 
-    virtual void visit(const CatchPrimitive &catch_primitive) = 0;
+    virtual void visit(const CatchPrimitive &catch_primitive)                    = 0;
     virtual void visit(const ChipPrimitive &chip_primitive) = 0;
     virtual void visit(const DirectVelocityPrimitive &direct_velocity_primitive) = 0;
     virtual void visit(const DirectWheelsPrimitive &direct_wheels_primitive) = 0;

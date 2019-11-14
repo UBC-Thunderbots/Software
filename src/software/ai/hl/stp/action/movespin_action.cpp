@@ -17,7 +17,8 @@ void MoveSpinAction::updateControlParams(const Robot& robot, Point destination,
     this->final_linear_speed = final_linear_speed;
 }
 
-void MoveSpinAction::accept(ActionVisitor& visitor) const {
+void MoveSpinAction::accept(ActionVisitor& visitor) const
+{
     visitor.visit(*this);
 }
 

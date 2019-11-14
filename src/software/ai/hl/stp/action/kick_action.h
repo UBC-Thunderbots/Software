@@ -49,7 +49,7 @@ class KickAction : public Action
     void updateControlParams(const Robot &robot, Point kick_origin, Angle kick_direction,
                              double kick_speed_meters_per_second);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(ActionVisitor &visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
