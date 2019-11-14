@@ -19,8 +19,10 @@ class SimulatorBackend : public Backend
     /**
      * Supported modes for simulation speed.
      *
-     * FAST_SIMULATION will run the simulation as fast a possible, while
-     * REALTIME_SIMULATION will run the simulation in real-time. This is useful
+     * - FAST_SIMULATION will run the simulation as fast a possible
+     * - REALTIME_SIMULATION will run the simulation in real-time, meaning
+     * if timestamps in published data are 'n' seconds apart, they will be published
+     * 'n' seconds apart in real "wall-clock" time. This is useful
      * if you want to visualize the simulation.
      */
     enum SimulationSpeed
