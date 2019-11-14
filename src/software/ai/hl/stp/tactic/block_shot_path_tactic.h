@@ -45,11 +45,6 @@ class BlockShotPathTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    /**
-     * Accepts a Tactic Visitor and calls the visit function on itself
-     *
-     * @param visitor A Tactic Visitor
-     */
     void accept(TacticVisitor& visitor) const override;
 
    private:
