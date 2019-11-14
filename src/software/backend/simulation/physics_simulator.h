@@ -57,8 +57,12 @@ class PhysicsSimulator
     // The timestamp of the simulated physics world
     Timestamp physics_world_timestamp;
     std::shared_ptr<b2World> physics_world;
-    int velocity_iterations;
-    int position_iterations;
+
+    // 3 and 8 here are somewhat arbitrary values for the velocity and position
+    // iterations but are the recommended defaults from
+    // https://www.iforce2d.net/b2dtut/worlds
+    const unsigned int velocity_iterations = 8;
+    const unsigned int position_iterations = 3;
 
     // Our abstractions of objects in the physics world
     std::unique_ptr<PhysicsBall> physics_ball;

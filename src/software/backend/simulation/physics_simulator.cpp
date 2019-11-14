@@ -8,12 +8,6 @@ PhysicsSimulator::PhysicsSimulator(const World& world)
     physics_world           = std::make_shared<b2World>(gravity);
     physics_world_timestamp = Timestamp::fromSeconds(0);
 
-    // 5 and 8 here are somewhat arbitrary values for the velocity and position
-    // iterations but are the recommended defaults from
-    // https://www.iforce2d.net/b2dtut/worlds
-    velocity_iterations = 8;
-    position_iterations = 3;
-
     setWorld(world);
 }
 
