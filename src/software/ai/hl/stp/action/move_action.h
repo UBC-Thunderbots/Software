@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
+#include "software/ai/intent/move_intent.h"
 #include "software/ai/primitive/move_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
@@ -39,6 +40,7 @@ class MoveAction : public Action
      * @param slow Whether or not to move slow
      * @param autokick This will enable the "break-beam" on the robot, that will
      * trigger the kicker or chippper to fire as soon as the ball is in front of it
+     * @param ball_collision_type how to navigate around the ball
      *
      * @return A unique pointer to the Intent the MoveAction wants to run. If the
      * MoveAction is done, returns an empty/null pointer
@@ -46,7 +48,7 @@ class MoveAction : public Action
     std::unique_ptr<Intent> updateStateAndGetNextIntent(
         const Robot& robot, Point destination, Angle final_orientation,
         double final_speed, DribblerEnable enable_dribbler, MoveType move_type,
-        AutokickType autokick);
+        AutokickType autokick, BallCollisionType ball_collision_type);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
@@ -58,6 +60,7 @@ class MoveAction : public Action
     DribblerEnable enable_dribbler;
     MoveType move_type;
     AutokickType autokick;
+    BallCollisionType ball_collision_type;
 
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;

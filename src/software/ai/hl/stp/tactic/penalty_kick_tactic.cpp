@@ -19,10 +19,6 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      bool loop_forever)
     : Tactic(loop_forever), ball(ball), field(field), enemy_goalie(enemy_goalie)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
-    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-    addWhitelistedAvoidArea(AvoidArea::ENEMY_DEFENSE_AREA);
-    addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 }
 
 std::string PenaltyKickTactic::getName() const
@@ -176,7 +172,8 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
+                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::ALLOW));
         }
         else
         {
@@ -184,7 +181,7 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(
                 *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE));
+                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
         }
 
     } while (

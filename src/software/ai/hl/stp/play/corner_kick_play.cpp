@@ -100,7 +100,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
-    align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -123,10 +122,12 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
     bait_move_tactic_1->updateControlParams(
         bait_move_tactic_1_pos,
-        (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
+        (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0,
+        BallCollisionType::AVOID);
     bait_move_tactic_2->updateControlParams(
         bait_move_tactic_2_pos,
-        (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0);
+        (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0,
+        BallCollisionType::AVOID);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::ONE_TOUCH_SHOT);
@@ -142,8 +143,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
@@ -163,8 +163,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Aligning to ball";
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
@@ -183,8 +182,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
@@ -244,7 +242,8 @@ void CornerKickPlay::updateCherryPickTactics(
 }
 
 void CornerKickPlay::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic,
+    BallCollisionType ball_collision_type)
 {
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
@@ -252,7 +251,7 @@ void CornerKickPlay::updateAlignToBallTactic(
     align_to_ball_tactic->updateControlParams(
         world.ball().position() -
             (ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
-        ball_to_center_vec.orientation(), 0);
+        ball_to_center_vec.orientation(), 0, ball_collision_type);
 }
 
 void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator)

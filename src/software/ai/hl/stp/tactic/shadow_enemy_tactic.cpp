@@ -81,7 +81,8 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 enemy_to_passer_vector.normalize(this->shadow_distance);
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::AVOID));
         }
         else
         {
@@ -115,14 +116,16 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0,
-                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP));
+                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                    BallCollisionType::AVOID));
             }
             else
             {
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0,
-                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                    BallCollisionType::AVOID));
             }
         }
     } while (!move_action.done());

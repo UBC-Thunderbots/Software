@@ -21,10 +21,6 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
       friendly_team(friendly_team),
       enemy_team(enemy_team)
 {
-    addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
-    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-    addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
-    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string GoalieTactic::getName() const
@@ -217,7 +213,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             next_intent = move_action.updateStateAndGetNextIntent(
                 *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP);
+                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
@@ -263,7 +259,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
             next_intent             = move_action.updateStateAndGetNextIntent(
                 *robot, goalie_restricted_pos, goalie_orientation, 0.0,
-                DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                BallCollisionType::ALLOW);
         }
 
         // compute angle between two vectors, negative goal post to ball and positive
@@ -315,7 +312,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         next_intent = move_action.updateStateAndGetNextIntent(
             *robot, goalie_pos, goalie_orientation, goalie_final_speed,
-            DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
+            DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP,
+            BallCollisionType::ALLOW);
 
         yield(std::move(next_intent));
     } while (!move_action.done());
