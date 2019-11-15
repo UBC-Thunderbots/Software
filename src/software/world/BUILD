@@ -97,9 +97,21 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
+        ":robot_state",
         "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
+    ],
+)
+
+cc_library(
+    name = "robot_state",
+    srcs = ["robot_state.cpp"],
+    hdrs = ["robot_state.h"],
+    deps = [
+        ":robot_capabilities",
+        "//software/geom",
+        "//software/util/time:timestamp",
     ],
 )
 

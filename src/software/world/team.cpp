@@ -43,7 +43,7 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
         if (it != team_robots.end())
         {
             // The robot already exists on the team. Find and update the robot
-            it->updateState(robot);
+            it->updateCurrentState(RobotState(robot.position(), robot.velocity(), robot.orientation(), robot.angularVelocity(), robot.lastUpdateTimestamp()));
         }
         else
         {
@@ -214,9 +214,9 @@ Timestamp Team::getMostRecentTimestampFromRobots()
 
     for (Robot robot : robots)
     {
-        if (robot.getMostRecentTimestamp() > most_recent_timestamp)
+        if (robot.lastUpdateTimestamp() > most_recent_timestamp)
         {
-            most_recent_timestamp = robot.getMostRecentTimestamp();
+            most_recent_timestamp = robot.lastUpdateTimestamp();
         }
     }
 

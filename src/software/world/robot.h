@@ -62,6 +62,8 @@ class Robot
      */
     void updateCurrentState(const RobotState &new_robot_state);
 
+    RobotState currentState() const;
+
     /**
      * Updates the robot's state to be its predicted state at the given timestamp.
      * The timestamp must be >= the robot's last update timestamp

@@ -134,7 +134,7 @@ Point PenaltyKickTactic::evaluate_next_position()
 void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We will need to keep track of time so we don't break the rules by taking too long
-    Timestamp penalty_kick_start = robot->getMostRecentTimestamp();
+    Timestamp penalty_kick_start = robot->lastUpdateTimestamp();
 
 
     MoveAction approach_ball_move_act =
@@ -186,7 +186,7 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
     } while (
         !(kick_action.done() ||
-          (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
+          (penalty_kick_start - robot->lastUpdateTimestamp()) < penalty_shot_timeout));
 }
 
 void PenaltyKickTactic::accept(TacticVisitor& visitor) const

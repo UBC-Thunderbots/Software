@@ -39,7 +39,7 @@ namespace Evaluation
             {
                 if (fabs(i.position().y() - closestEdgeY) < shortestLenToEdge)
                 {
-                    enemyClosestToEdge.updateState(i);
+                    enemyClosestToEdge.updateCurrentState(RobotState(i.position(), i.velocity(), i.orientation(), i.angularVelocity(), i.lastUpdateTimestamp()));;
                     shortestLenToEdge = fabs(i.position().y() - closestEdgeY);
                 }
             }

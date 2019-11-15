@@ -38,6 +38,11 @@ void Robot::updateCurrentState(const Point &new_position, const Vector &new_velo
     updateCurrentState(RobotState(new_position, new_velocity, new_orientation, new_angular_velocity, timestamp));
 }
 
+RobotState Robot::currentState() const
+{
+    return states_.front();
+}
+
 void Robot::updateStateToPredictedState(const Timestamp &timestamp)
 {
     updateStateToPredictedState(timestamp - lastUpdateTimestamp());

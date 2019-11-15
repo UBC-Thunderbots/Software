@@ -195,19 +195,19 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
                                        ->PossessionBufferTimeSeconds()
                                        ->value())));
 
-    robot0.updateState(
+    robot0.updateCurrentState(
         Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
         Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
                                        ->value()));
-    robot1.updateState(
+    robot1.updateCurrentState(
         Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
         Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
                                        ->value()));
-    robot2.updateState(
+    robot2.updateCurrentState(
         Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
         Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
                                        ->getPossessionConfig()
@@ -236,11 +236,11 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 
     world.updateBallState(BallState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4)));
 
-    robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
+    robot0.updateCurrentState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
                        Timestamp::fromSeconds(4));
-    robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
+    robot1.updateCurrentState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                        Timestamp::fromSeconds(4));
-    robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
+    robot2.updateCurrentState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
                        Timestamp::fromSeconds(4));
 
 
