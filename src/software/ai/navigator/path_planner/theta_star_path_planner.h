@@ -13,6 +13,8 @@
 class ThetaStarPathPlanner : public PathPlanner
 {
    public:
+    ThetaStarPathPlanner();
+
     /**
      * Returns a path that is an optimized path between start and destination.
      *

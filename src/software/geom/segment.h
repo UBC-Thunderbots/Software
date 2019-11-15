@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/geom/line.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 class Segment final
 {
@@ -33,7 +33,7 @@ class Segment final
     /**
      * Creates a degenerate Segment at (0, 0)
      */
-    inline explicit constexpr Segment() {}
+    inline explicit Segment() {}
 
     /**
      * Creates a Segment that starts and ends at the given points
@@ -51,7 +51,7 @@ class Segment final
     }
 
     /**
-     * Makes a Point out of this Segment.
+     * Makes a Vector out of this Segment.
      */
     inline Vector toVector() const
     {
@@ -60,7 +60,7 @@ class Segment final
 
     inline double length() const
     {
-        return (end - start).len();
+        return (end - start).length();
     }
 
     /**

@@ -3,7 +3,7 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 TEST(Box2DUtilTest, test_existence_of_null_body_in_null_world)
 {

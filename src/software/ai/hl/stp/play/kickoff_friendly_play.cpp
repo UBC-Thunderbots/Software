@@ -59,17 +59,17 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::vector<Point> kickoff_setup_positions = {
         // Robot 1
         Point(world.field().centerPoint() +
-              Point(-world.field().centerCircleRadius(), 0)),
+              Vector(-world.field().centerCircleRadius(), 0)),
         // Robot 2
         // Goalie positions will be handled by the goalie tactic
         // Robot 3
         Point(world.field().centerPoint() +
-              Point(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                    -1.0 / 3.0 * world.field().yLength())),
+              Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+                     -1.0 / 3.0 * world.field().yLength())),
         // Robot 4
         Point(world.field().centerPoint() +
-              Point(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
-                    1.0 / 3.0 * world.field().yLength())),
+              Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+                     1.0 / 3.0 * world.field().yLength())),
         // Robot 5
         Point(world.field().friendlyGoalpostPos().x() +
                   world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
@@ -109,7 +109,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::zero(), 0);
+                                                    Angle::zero(), 0,
+                                                    BallCollisionType::AVOID);
             result.emplace_back(move_tactics.at(i));
         }
 
@@ -132,7 +133,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         kickoff_chip_tactic->updateWorldParams(world.ball());
         kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
-            world.field().centerPoint() + Point(world.field().xLength() / 6, 0),
+            world.field().centerPoint() + Vector(world.field().xLength() / 6, 0),
             world.field().xLength() / 2);
         result.emplace_back(kickoff_chip_tactic);
 
@@ -141,7 +142,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::zero(), 0);
+                                                    Angle::zero(), 0,
+                                                    BallCollisionType::AVOID);
             result.emplace_back(move_tactics.at(i));
         }
 

@@ -269,7 +269,7 @@ void GameState::updateBall(const Ball &ball)
             // Save the ball state so we can tell once it moves
             ball_state = ball;
         }
-        else if ((ball.position() - ball_state->position()).len() > 0.03)
+        else if ((ball.position() - ball_state->position()).length() > 0.03)
         {
             // Once the ball has moved enough, the restart is finished
             setRestartCompleted();

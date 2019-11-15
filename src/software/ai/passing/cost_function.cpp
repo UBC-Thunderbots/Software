@@ -3,7 +3,7 @@
  */
 
 
-#include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/cost_function.h"
 
 #include <g3log/g3log.hpp>
 #include <numeric>
@@ -146,7 +146,7 @@ double Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
     double enemy_receiver_proximity_risk = 1;
     for (const Robot& enemy : enemy_team.getAllRobots())
     {
-        double dist = (pass.receiverPoint() - enemy.position()).len();
+        double dist = (pass.receiverPoint() - enemy.position()).length();
         enemy_receiver_proximity_risk *=
             enemy_proximity_importance * std::exp(-dist * dist);
     }
@@ -195,7 +195,7 @@ double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pas
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
-        (closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
+        (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
 
     // Check for division by 0
     if (pass.speed() == 0)
@@ -261,9 +261,9 @@ double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     Robot best_receiver = friendly_team.getAllRobots()[0];
     for (const Robot& robot : friendly_team.getAllRobots())
     {
-        double distance = (robot.position() - pass.receiverPoint()).len();
+        double distance = (robot.position() - pass.receiverPoint()).length();
         double curr_best_distance =
-            (best_receiver.position() - pass.receiverPoint()).len();
+            (best_receiver.position() - pass.receiverPoint()).length();
         if (distance < curr_best_distance)
         {
             best_receiver = robot;
@@ -272,7 +272,7 @@ double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Figure out what time the robot would have to receive the ball at
     Duration ball_travel_time = Duration::fromSeconds(
-        (pass.receiverPoint() - pass.passerPoint()).len() / pass.speed());
+        (pass.receiverPoint() - pass.passerPoint()).length() / pass.speed());
     Timestamp receive_time = pass.startTime() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
@@ -328,7 +328,7 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
     // Add a negative weight for positions closer to our goal
     Vector vec_to_friendly_goal      = Vector(field.friendlyGoal().x() - position.x(),
                                          field.friendlyGoal().y() - position.y());
-    double distance_to_friendly_goal = vec_to_friendly_goal.len();
+    double distance_to_friendly_goal = vec_to_friendly_goal.length();
     double near_friendly_goal_quality =
         (1 -
          std::exp(-friendly_goal_weight * (std::pow(5, -2 + distance_to_friendly_goal))));

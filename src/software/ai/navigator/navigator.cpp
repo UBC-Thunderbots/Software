@@ -109,12 +109,18 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
     std::unordered_set<PathObjective> path_objectives;
     for (const auto &intent : move_intents)
     {
-        // start with non-MoveIntent robots and then add avoid areas
+        // start with non-MoveIntent robots and then add motion constraints
         auto obstacles = friendly_non_move_intent_robot_obstacles;
-        auto avoid_area_obstacles =
-            getObstaclesFromAvoidAreas(intent.getAreasToAvoid(), world);
-        obstacles.insert(obstacles.end(), avoid_area_obstacles.begin(),
-                         avoid_area_obstacles.end());
+
+        auto motion_constraint_obstacles =
+            getObstaclesFromMotionConstraints(intent.getMotionConstraints(), world);
+        obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
+                         motion_constraint_obstacles.end());
+
+        if (intent.getBallCollisionType() == BallCollisionType::AVOID)
+        {
+            obstacles.push_back(Obstacle::createCircularBallObstacle(world.ball(), 0.06));
+        }
 
         auto robot = world.friendlyTeam().getRobotById(intent.getRobotId());
 
@@ -123,7 +129,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
             Point start = robot->position();
             Point end   = intent.getDestination();
 
-            path_objectives.insert(PathObjective(start, end, robot->velocity().len(),
+            path_objectives.insert(PathObjective(start, end, robot->velocity().length(),
                                                  obstacles, intent.getRobotId()));
         }
         else

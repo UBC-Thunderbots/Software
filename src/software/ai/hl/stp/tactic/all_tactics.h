@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/tactic/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/grab_ball_tactic.h"
 #include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"

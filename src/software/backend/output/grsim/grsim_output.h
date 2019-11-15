@@ -4,8 +4,8 @@
 #include <string>
 
 #include "software/ai/primitive/primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/proto/grSim_Packet.pb.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"

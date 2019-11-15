@@ -2,25 +2,25 @@
 
 #include <g3log/g3log.hpp>
 
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
                                                const Point &p3, double final_speed)
 {
-    return final_speed * (p2 - p1).norm().project((p3 - p2).norm()).len();
+    return final_speed * (p2 - p1).normalize().project((p3 - p2).normalize()).length();
 }
 
-std::vector<Obstacle> getObstaclesFromAvoidAreas(
-    const std::vector<AvoidArea> &avoid_areas, World world)
+std::vector<Obstacle> getObstaclesFromMotionConstraints(
+    const std::set<MotionConstraint> &motion_constraints, const World &world)
 {
     std::vector<Obstacle> obstacles;
     Rectangle rectangle({0, 0}, {0, 0});
-    for (auto avoid_area : avoid_areas)
+    for (auto motion_constraint : motion_constraints)
     {
-        switch (avoid_area)
+        switch (motion_constraint)
         {
-            case AvoidArea::ENEMY_ROBOTS:
+            case MotionConstraint::ENEMY_ROBOTS_COLLISION:
             {
                 std::vector<Obstacle> enemy_robot_obstacles =
                     getObstaclesFromTeam(world.enemyTeam());
@@ -28,7 +28,7 @@ std::vector<Obstacle> getObstaclesFromAvoidAreas(
                                  enemy_robot_obstacles.end());
             }
             break;
-            case AvoidArea::FRIENDLY_DEFENSE_AREA:
+            case MotionConstraint::FRIENDLY_DEFENSE_AREA:
                 // We extend the friendly defense area back by several meters to prevent
                 // robots going around the back of the goal
                 rectangle = Rectangle(
@@ -40,7 +40,7 @@ std::vector<Obstacle> getObstaclesFromAvoidAreas(
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
-            case AvoidArea::ENEMY_DEFENSE_AREA:
+            case MotionConstraint::ENEMY_DEFENSE_AREA:
                 // We extend the enemy defense area back by several meters to prevent
                 // robots going around the back of the goal
                 rectangle = Rectangle(
@@ -52,7 +52,7 @@ std::vector<Obstacle> getObstaclesFromAvoidAreas(
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
-            case AvoidArea::INFLATED_ENEMY_DEFENSE_AREA:
+            case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
                 rectangle = world.field().enemyDefenseArea();
                 rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                          ->RobotObstacleInflationFactor()
@@ -61,47 +61,40 @@ std::vector<Obstacle> getObstaclesFromAvoidAreas(
                                  0.3);  // 0.3 is by definition what inflated means
                 obstacles.push_back(Obstacle(rectangle));
                 break;
-            case AvoidArea::CENTER_CIRCLE:
+            case MotionConstraint::CENTER_CIRCLE:
                 obstacles.push_back(Obstacle::createCircleObstacle(
                     world.field().centerPoint(), world.field().centerCircleRadius(),
                     Util::DynamicParameters->getNavigatorConfig()
                         ->RobotObstacleInflationFactor()
                         ->value()));
                 break;
-            case AvoidArea::HALF_METER_AROUND_BALL:
+            case MotionConstraint::HALF_METER_AROUND_BALL:
                 obstacles.push_back(Obstacle::createCircleObstacle(
                     world.ball().position(), 0.5,  // 0.5 represents half a metre radius
                     Util::DynamicParameters->getNavigatorConfig()
                         ->RobotObstacleInflationFactor()
                         ->value()));
                 break;
-            case AvoidArea::BALL:
-                obstacles.push_back(
-                    Obstacle::createCircularBallObstacle(world.ball(), 0.06));
-                break;
-            case AvoidArea::ENEMY_HALF:
+            case MotionConstraint::ENEMY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().enemyCornerNeg() -
-                                          Point(0, world.field().boundaryYLength()));
+                                          Vector(0, world.field().boundaryYLength()));
                 rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                      ->RobotObstacleInflationFactor()
                                      ->value() *
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
-            case AvoidArea::FRIENDLY_HALF:
+            case MotionConstraint::FRIENDLY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().friendlyCornerNeg() -
-                                          Point(0, world.field().boundaryYLength()));
+                                          Vector(0, world.field().boundaryYLength()));
                 rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
                                      ->RobotObstacleInflationFactor()
                                      ->value() *
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
-            default:
-                LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area
-                             << " to obstacle";
         }
     }
 
@@ -149,7 +142,7 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
         }
 
         MovePrimitive movePrimitive =
-            MovePrimitive(robot_id, point, point.orientation(), final_speed,
+            MovePrimitive(robot_id, point, point.toVector().orientation(), final_speed,
                           enable_dribbler, MoveType::NORMAL, autokick);
         movePrimitives.emplace_back(movePrimitive);
     }
@@ -159,7 +152,7 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
 
 double getPointTrespass(const Point &p1, const Point &p2, double trespass_threshold)
 {
-    double dist_trespass = trespass_threshold - (p1 - p2).len();
+    double dist_trespass = trespass_threshold - (p1 - p2).length();
 
     if (dist_trespass < 0)
     {

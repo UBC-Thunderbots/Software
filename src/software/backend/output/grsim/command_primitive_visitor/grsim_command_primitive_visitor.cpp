@@ -13,9 +13,9 @@
 #include "software/ai/primitive/movespin_primitive.h"
 #include "software/ai/primitive/pivot_primitive.h"
 #include "software/ai/primitive/stop_primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)
@@ -27,12 +27,12 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
     // Calculate the theoretical catch point based on the robots's distance to the ball
     // and how fast the robot is moving.
-    double distanceToBall = (ball.position() - robot.position()).len();
+    double distanceToBall = (ball.position() - robot.position()).length();
     Point finalDest;
-    if (robot.velocity().len() != 0)
+    if (robot.velocity().length() != 0)
     {
         finalDest = ball.estimatePositionAtFutureTime(
-            Duration::fromSeconds((int)fabs(distanceToBall / robot.velocity().len())));
+            Duration::fromSeconds((int)fabs(distanceToBall / robot.velocity().length())));
         finalDest = Point(finalDest.x(), finalDest.y());
     }
     else
@@ -58,7 +58,7 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
     // Robot should be facing in the opposite direction the ball in moving to have ball
     // hit its dribbler.
     Angle robotDirection =
-        Angle::ofRadians(std::atan2(ball.velocity().y(), ball.velocity().x())) +
+        Angle::fromRadians(std::atan2(ball.velocity().y(), ball.velocity().x())) +
         Angle::half();
 
     // If ball is far enough way from robot, add extra margin of error to ensure robot
@@ -83,8 +83,9 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    Point point_behind = chip_origin + Vector(Point::createFromAngle(chip_direction).x(),
-                                              Point::createFromAngle(chip_direction).y());
+    Point point_behind =
+        chip_origin + Vector(Vector::createFromAngle(chip_direction).x(),
+                             Vector::createFromAngle(chip_direction).y());
 
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), chip_origin, point_behind);
@@ -129,19 +130,20 @@ void GrsimCommandPrimitiveVisitor::visit(
 
     // final destination is the parameter that can control the robot to
     // move in the direction of velocity vector from current robot position
-    Vector final_destination = linear_velocity_in_global_coordinates + robot_position;
+    Point final_destination = robot_position + linear_velocity_in_global_coordinates;
 
     // final orientation is the parameter that can control the robot to rotate in the
     // direction of angular velocity from current robot orientation, clamp the angular
     // velocity between [-pi/2,pi/2]
     Angle final_orientation =
         robot_orientation +
-        Angle::ofRadians(direct_velocity_primitive.getAngularVelocity())
+        Angle::fromRadians(direct_velocity_primitive.getAngularVelocity())
             .mod(Angle::half());
 
     motion_controller_command = MotionController::PositionCommand(
-        final_destination, final_orientation, linear_velocity_in_robot_coordinates.len(),
-        0.0, false, direct_velocity_primitive.getDribblerRpm() > 0);
+        final_destination, final_orientation,
+        linear_velocity_in_robot_coordinates.length(), 0.0, false,
+        direct_velocity_primitive.getDribblerRpm() > 0);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(
@@ -157,8 +159,9 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    Point point_behind = kick_origin + Vector(Point::createFromAngle(kick_direction).x(),
-                                              Point::createFromAngle(kick_direction).y());
+    Point point_behind =
+        kick_origin + Vector(Vector::createFromAngle(kick_direction).x(),
+                             Vector::createFromAngle(kick_direction).y());
 
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), kick_origin, point_behind);
@@ -206,8 +209,8 @@ void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_prim
     Angle targetAngle = robot.orientation();
 
     (move_spin_primitive.getAngularVelocity() > AngularVelocity::zero()
-         ? targetAngle += Angle::ofDegrees(45)
-         : targetAngle -= Angle::ofDegrees(45));
+         ? targetAngle += Angle::fromDegrees(45)
+         : targetAngle -= Angle::fromDegrees(45));
 
     motion_controller_command = MotionController::PositionCommand(
         move_spin_primitive.getDestination(), targetAngle,
@@ -225,7 +228,7 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
     // get current vector from pivot point to robot position
     Vector unit_pivot_point_to_robot_pos =
-        (pivot_primitive.getPivotPoint() - robot.position()).norm();
+        (pivot_primitive.getPivotPoint() - robot.position()).normalize();
 
     // get a vector in the tangential direction
     Vector tangential_dir_1(unit_pivot_point_to_robot_pos.y(),
@@ -249,8 +252,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // shorter path on orbit. since this is resolved every time this function is called,
     // if pivot overshoots, it will rotate the other way
     Vector tangential_vector =
-        (robot_next_position_1 - final_robot_position).len() <
-                (robot_next_position_2 - final_robot_position).len()
+        (robot_next_position_1 - final_robot_position).length() <
+                (robot_next_position_2 - final_robot_position).length()
             ? tangential_dir_1
             : tangential_dir_2;
 
@@ -266,7 +269,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // aggressively
     motion_controller_command = MotionController::PositionCommand(
         collinear_point_on_orbit +
-            tangential_vector * 0.5 * linear_displacement_to_final_robot_position.len(),
+            tangential_vector * 0.5 *
+                linear_displacement_to_final_robot_position.length(),
         unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 

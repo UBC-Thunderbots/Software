@@ -81,8 +81,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // for positioning all the robots (excluding the goalie). The positioning vector
         // will be used to position robots tangent to the goal_to_ball_unit_vector
         Vector goal_to_ball_unit_vector =
-            (world.field().friendlyGoal() - world.ball().position()).norm();
-        Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perp();
+            (world.field().friendlyGoal() - world.ball().position()).normalize();
+        Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perpendicular();
 
         // goal_defense_point_center is a point on the semicircle around the friendly
         // defense area, that can block the direct path from the ball to the net.
@@ -99,10 +99,12 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         move_tactics.at(0)->updateControlParams(
             goal_defense_point_left,
-            (world.ball().position() - goal_defense_point_left).orientation(), 0);
+            (world.ball().position() - goal_defense_point_left).orientation(), 0,
+            BallCollisionType::AVOID);
         move_tactics.at(1)->updateControlParams(
             goal_defense_point_right,
-            (world.ball().position() - goal_defense_point_right).orientation(), 0);
+            (world.ball().position() - goal_defense_point_right).orientation(), 0,
+            BallCollisionType::AVOID);
 
         // ball_defense_point_center is a point on the circle around the ball that the
         // line from the center of the goal to the ball intersects. A robot will be placed
@@ -121,13 +123,16 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         move_tactics.at(2)->updateControlParams(
             ball_defense_point_center,
-            (world.ball().position() - ball_defense_point_center).orientation(), 0);
+            (world.ball().position() - ball_defense_point_center).orientation(), 0,
+            BallCollisionType::AVOID);
         move_tactics.at(3)->updateControlParams(
             ball_defense_point_left,
-            (world.ball().position() - ball_defense_point_left).orientation(), 0);
+            (world.ball().position() - ball_defense_point_left).orientation(), 0,
+            BallCollisionType::AVOID);
         move_tactics.at(4)->updateControlParams(
             ball_defense_point_right,
-            (world.ball().position() - ball_defense_point_right).orientation(), 0);
+            (world.ball().position() - ball_defense_point_right).orientation(), 0,
+            BallCollisionType::AVOID);
 
         // insert all the move tactics to the result
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());

@@ -104,6 +104,16 @@ class Angle final
     constexpr double toDegrees() const;
 
     /**
+     * Computes the modulus of a division between this angle and another
+     * angle.
+     *
+     * @param divisor the divisor.
+     *
+     * @return the modulus of this Angle ÷ divisor.
+     */
+    constexpr Angle mod(Angle divisor) const;
+
+    /**
      * Computes the remainder of a division between this angle and
      * another angle.
      *
@@ -435,6 +445,13 @@ inline constexpr double Angle::toRadians() const
 inline constexpr double Angle::toDegrees() const
 {
     return rads / M_PI * 180.0;
+}
+
+inline constexpr Angle Angle::mod(Angle divisor) const
+{
+    return Angle::fromRadians(toRadians() - static_cast<double>(static_cast<long>(
+                                                toRadians() / divisor.toRadians())) *
+                                                divisor.toRadians());
 }
 
 inline constexpr Angle Angle::remainder(const Angle &divisor) const

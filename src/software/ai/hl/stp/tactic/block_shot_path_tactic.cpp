@@ -35,7 +35,7 @@ double BlockShotPathTactic::calculateRobotCost(const Robot& robot, const World& 
     // have a cost less than 1
     Point block_position = getBlockPosition();
     double cost =
-        (robot.position() - block_position).len() / world.field().totalXLength();
+        (robot.position() - block_position).length() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -57,7 +57,7 @@ void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         Angle block_orientation = (this->shot_origin - block_position).orientation();
         yield(move_action.updateStateAndGetNextIntent(
             *robot, block_position, block_orientation, 0.0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE));
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
     } while (!move_action.done());
 }
 

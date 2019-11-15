@@ -56,7 +56,7 @@ Point Point::rotate(const Angle &rot) const
 
 bool Point::isClose(const Point &other, double dist) const
 {
-    return distanceFromPoint(other) < dist * dist;
+    return distanceFromPoint(other) < dist;
 }
 
 Point &Point::operator=(const Point &q)
@@ -71,9 +71,25 @@ Point operator+(const Point &p, const Vector &v)
     return Point(p.x() + v.x(), p.y() + v.y());
 }
 
+Point operator+(const Vector &v, const Point &p)
+{
+    return Point(p.x() + v.x(), p.y() + v.y());
+}
+
+Point operator-(const Point &p, const Vector &v)
+{
+    return Point(p.x() - v.x(), p.y() - v.y());
+}
+
 Point &operator+=(Point &p, const Vector &v)
 {
     p.set(p.x() + v.x(), p.y() + v.y());
+    return p;
+}
+
+Point &operator-=(Point &p, const Vector &v)
+{
+    p.set(p.x() - v.x(), p.y() - v.y());
     return p;
 }
 

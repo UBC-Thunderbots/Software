@@ -156,7 +156,7 @@ TEST(NavigatorTest, convert_pivot_intent_to_pivot_primitive)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
-                                                       Angle::ofRadians(3.2), true, 1));
+                                                       Angle::fromRadians(3.2), true, 1));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
@@ -164,7 +164,7 @@ TEST(NavigatorTest, convert_pivot_intent_to_pivot_primitive)
     EXPECT_EQ(primitive_ptrs.size(), 1);
 
     auto expected_primitive =
-        PivotPrimitive(0, Point(1, 0.4), Angle::half(), Angle::ofRadians(3.2), true);
+        PivotPrimitive(0, Point(1, 0.4), Angle::half(), Angle::fromRadians(3.2), true);
     auto primitive = dynamic_cast<PivotPrimitive &>(*(primitive_ptrs.at(0)));
     EXPECT_EQ(expected_primitive, primitive);
 }
@@ -197,7 +197,7 @@ TEST(NavigatorTest, convert_multiple_intents_to_primitives)
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
-                                                       Angle::ofRadians(2.2), true, 1));
+                                                       Angle::fromRadians(2.2), true, 1));
     //    intents.emplace_back(
     //        std::make_unique<MoveIntent>(0, Point(), Angle::quarter(), 0, 1));
 
@@ -210,7 +210,7 @@ TEST(NavigatorTest, convert_multiple_intents_to_primitives)
     auto stop_primitive          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
     EXPECT_EQ(expected_stop_primitive, stop_primitive);
     auto expected_pivot_primitive =
-        PivotPrimitive(0, Point(1, 0.4), Angle::half(), Angle::ofRadians(2.2), true);
+        PivotPrimitive(0, Point(1, 0.4), Angle::half(), Angle::fromRadians(2.2), true);
     auto pivot_primitive = dynamic_cast<PivotPrimitive &>(*(primitive_ptrs.at(1)));
     EXPECT_EQ(expected_pivot_primitive, pivot_primitive);
 }
@@ -240,8 +240,8 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     friendly_team.updateRobots({friendly_robot_0, friendly_robot_1});
     friendly_team.assignGoalie(1);
 
-    Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::ofRadians(1),
-                                AngularVelocity::ofRadians(2), current_time);
+    Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::fromRadians(1),
+                                AngularVelocity::fromRadians(2), current_time);
 
     Robot enemy_robot_1 = Robot(1, Point(), Vector(-0.5, 4), Angle::quarter(),
                                 AngularVelocity::half(), current_time);
@@ -256,9 +256,9 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
         std::make_unique<OnePointPathTestPathPlanner>()));
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<MoveIntent>(0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF,
-                                     MoveType::NORMAL, AutokickType::NONE));
+    intents.emplace_back(std::make_unique<MoveIntent>(
+        0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutokickType::NONE, BallCollisionType::AVOID));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
@@ -294,8 +294,8 @@ TEST(NavigatorTest, move_intent_with_no_path_test_path_planner)
     friendly_team.updateRobots({friendly_robot_0, friendly_robot_1});
     friendly_team.assignGoalie(1);
 
-    Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::ofRadians(1),
-                                AngularVelocity::ofRadians(2), current_time);
+    Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::fromRadians(1),
+                                AngularVelocity::fromRadians(2), current_time);
 
     Robot enemy_robot_1 = Robot(1, Point(), Vector(-0.5, 4), Angle::quarter(),
                                 AngularVelocity::half(), current_time);
@@ -310,9 +310,9 @@ TEST(NavigatorTest, move_intent_with_no_path_test_path_planner)
         std::make_unique<NoPathTestPathPlanner>()));
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<MoveIntent>(0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF,
-                                     MoveType::NORMAL, AutokickType::NONE));
+    intents.emplace_back(std::make_unique<MoveIntent>(
+        0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutokickType::NONE, BallCollisionType::AVOID));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 

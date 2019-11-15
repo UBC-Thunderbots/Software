@@ -101,7 +101,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
         Point(ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().x(),
               ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().y());
     double defense_length =
-        (defense_length_p2 - defense_length_p1).len() * METERS_PER_MILLIMETER;
+        (defense_length_p2 - defense_length_p1).length() * METERS_PER_MILLIMETER;
 
     // We arbitraily use the left side here since the left and right sides are identical
     Point defense_width_p1 = Point(ssl_field_lines["LeftPenaltyStretch"].p1().x(),
@@ -109,7 +109,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     Point defense_width_p2 = Point(ssl_field_lines["LeftPenaltyStretch"].p2().x(),
                                    ssl_field_lines["LeftPenaltyStretch"].p2().y());
     double defense_width =
-        (defense_width_p1 - defense_width_p2).len() * METERS_PER_MILLIMETER;
+        (defense_width_p1 - defense_width_p2).length() * METERS_PER_MILLIMETER;
 
     Field field =
         Field(field_length, field_width, defense_length, defense_width, goal_width,
@@ -193,7 +193,7 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
                 Point(friendly_robot_detection.x() * METERS_PER_MILLIMETER,
                       friendly_robot_detection.y() * METERS_PER_MILLIMETER);
             robot_detection.orientation =
-                Angle::ofRadians(friendly_robot_detection.orientation());
+                Angle::fromRadians(friendly_robot_detection.orientation());
             robot_detection.confidence = friendly_robot_detection.confidence();
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
@@ -252,7 +252,7 @@ Team NetworkFilter::getFilteredEnemyTeamData(
                 Point(enemy_robot_detection.x() * METERS_PER_MILLIMETER,
                       enemy_robot_detection.y() * METERS_PER_MILLIMETER);
             robot_detection.orientation =
-                Angle::ofRadians(enemy_robot_detection.orientation());
+                Angle::fromRadians(enemy_robot_detection.orientation());
             robot_detection.confidence = enemy_robot_detection.confidence();
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
