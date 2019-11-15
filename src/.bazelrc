@@ -1,5 +1,5 @@
 # Use Our Remote Cache To Avoid Rebuilding Files Already Built By CI
-build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache_us_multi_region
+# build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache_us_multi_region
 
 # Disable sandboxing, since using the remote cache with it enabled is still 
 # considered "experimental"
