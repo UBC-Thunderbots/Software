@@ -4,7 +4,7 @@
 #include <random>
 #include <thread>
 
-#include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/util/optimization/gradient_descent_optimizer.h"
@@ -37,10 +37,10 @@ namespace Passing
      * == Performance Considerations ==
      * It is important that the pass generator is able to "keep up" with the current
      * time. This is because a pass is defined in part by it's start time. If the
-     * pass generator only completes an interation of pass updates once every 5 seconds,
+     * pass generator only completes an iteration of pass updates once every 5 seconds,
      * then the start times for the passes will be in the past (if we choose to pass
      * very soon when optimizing the pass), and so the passes will likely be invalid by
-     * the time another iteration starts. Because of this, it isextremely important that
+     * the time another iteration starts. Because of this, it is extremely important that
      * the pass generator runs fast enough. Debug builds running on slightly slower
      * computers could be unable to converge. It is recommended that all testing of things
      * involving the PassGenerator be done with executables built in "Release" in order to

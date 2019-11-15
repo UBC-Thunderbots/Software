@@ -12,7 +12,7 @@ TEST(MoveActionTest, robot_far_from_destination)
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
         robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutokickType::NONE, BallCollisionType::AVOID);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -38,10 +38,10 @@ TEST(MoveActionTest, robot_at_destination)
     // done and so will return a null pointer
     auto intent_ptr = action.updateStateAndGetNextIntent(
         robot, Point(0, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
-    intent_ptr = action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(),
-                                                    0.0, DribblerEnable::OFF,
-                                                    MoveType::NORMAL, AutokickType::NONE);
+        AutokickType::NONE, BallCollisionType::AVOID);
+    intent_ptr = action.updateStateAndGetNextIntent(
+        robot, Point(0, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutokickType::NONE, BallCollisionType::AVOID);
 
     EXPECT_TRUE(action.done());
 }
@@ -58,7 +58,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
     {
         intent_ptr = action.updateStateAndGetNextIntent(
             robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE);
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
     }
 
     // Check an intent was returned (the pointer is not null)
@@ -70,7 +70,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle::ofDegrees(0.01), false);
+    MoveAction action = MoveAction(0.05, Angle::fromDegrees(0.01), false);
 
     // Run the Action several times
     auto intent_ptr = std::unique_ptr<Intent>{};
@@ -78,7 +78,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
     {
         intent_ptr = action.updateStateAndGetNextIntent(
             robot, Point(0, 0), Angle::quarter(), 1.0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE);
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
     }
 
     // Check an intent was returned (the pointer is not null)
@@ -89,7 +89,7 @@ TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
 {
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle::ofDegrees(359), false);
+    MoveAction action = MoveAction(0.05, Angle::fromDegrees(359), false);
 
     // Run the Action several times
     auto intent_ptr = std::unique_ptr<Intent>{};
@@ -97,7 +97,7 @@ TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
     {
         intent_ptr = action.updateStateAndGetNextIntent(
             robot, Point(0, 0), Angle::quarter(), 1.0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE);
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
     }
 
     // Check an intent was returned (the pointer is not null)
@@ -113,7 +113,7 @@ TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
         robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::AUTOKICK);
+        AutokickType::AUTOKICK, BallCollisionType::AVOID);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -136,7 +136,7 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
         robot, Point(1, 0), Angle::quarter(), 1.0, DribblerEnable::ON, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutokickType::NONE, BallCollisionType::AVOID);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

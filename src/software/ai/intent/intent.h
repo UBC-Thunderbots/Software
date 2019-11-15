@@ -1,9 +1,9 @@
 #pragma once
 
+#include <set>
 #include <string>
-#include <vector>
 
-#include "software/ai/intent/avoid_area.h"
+#include "software/ai/motion_constraint/motion_constraint.h"
 
 // We forward-declare the IntentVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
@@ -84,18 +84,18 @@ class Intent
     virtual void accept(IntentVisitor& visitor) const = 0;
 
     /**
-     * Get the areas this intent should avoid moving into
+     * Set the constraints on this intent's motion
      *
-     * @return The areas this intent should avoid moving into
+     * @param motion_constraints
      */
-    std::vector<AvoidArea> getAreasToAvoid() const;
+    void setMotionConstraints(const std::set<MotionConstraint>& motion_constraints);
 
     /**
-     * Set the areas this intent should avoid moving into
+     * Get the constraints on this intent's motion
      *
-     * @param areas_to_avoid The areas this intent should avoid moving into
+     * @return motion constraints
      */
-    void setAreasToAvoid(const std::vector<AvoidArea>& areas_to_avoid);
+    std::set<MotionConstraint> getMotionConstraints(void) const;
 
     virtual ~Intent() = default;
 
@@ -107,8 +107,7 @@ class Intent
     unsigned int priority;
 
     /**
-     * The areas this intent should avoid moving into. These are enforced by
-     * the navigator
+     * The constraints on this intent's motion. These are enforced by the navigator
      */
-    std::vector<AvoidArea> areas_to_avoid;
+    std::set<MotionConstraint> motion_constraints;
 };

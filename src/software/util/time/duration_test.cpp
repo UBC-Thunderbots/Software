@@ -133,3 +133,13 @@ TEST(DurationTest, test_subtraction_operator_with_negative_result)
     Duration expected_result = Duration::fromMilliseconds(-1);
     EXPECT_EQ(result, expected_result);
 }
+
+TEST(DurationTest, stream_operator)
+{
+    Duration d = Duration::fromSeconds(3.0);
+
+    std::stringstream out;
+    out << d;
+
+    EXPECT_EQ("3.00s", out.str());
+}

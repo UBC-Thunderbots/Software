@@ -4,12 +4,14 @@
 #include <vector>
 
 #include "boost/circular_buffer.hpp"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/angular_velocity.h"
+#include "software/new_geom/point.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 #include "software/world/robot_state.h"
 
+using RobotId = unsigned int;
 /**
  * Defines an SSL robot
  */
@@ -29,7 +31,7 @@ class Robot
      * state
      * @param history_size The number of previous robot states that should be stored. Must be > 0
      */
-    explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
+    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp, unsigned int history_size = 20,
                    const std::set<RobotCapabilities::Capability> &capabilities =
@@ -92,7 +94,7 @@ class Robot
      *
      * @return the id of the robot
      */
-    unsigned int id() const;
+    RobotId id() const;
 
     /**
      * Returns the current position of the robot
@@ -291,7 +293,7 @@ class Robot
 
    private:
     // The id of this robot
-    unsigned int id_;
+    RobotId id_;
     // All previous states of the robot, with the most recent state at the front of the
     // queue, This buffer will never be empty as it's initialized with a RobotState on
     // creation

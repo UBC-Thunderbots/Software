@@ -4,6 +4,7 @@ cc_library(
     name = "new_geom",
     srcs = [
         "point.cpp",
+        "polynomial.cpp",
         "vector.cpp",
     ],
     hdrs = [
@@ -11,10 +12,9 @@ cc_library(
         "angular_velocity.h",
         "geom_constants.h",
         "point.h",
+        "polynomial.h",
+        "ray.h",
         "vector.h",
-    ],
-    copts = [
-        "-std=c++17",
     ],
     deps = [
         "@boost//:geometry",
@@ -37,6 +37,28 @@ cc_test(
     name = "point_test",
     srcs = [
         "point_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "polynomial_test",
+    srcs = [
+        "polynomial_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "ray_test",
+    srcs = [
+        "ray_test.cpp",
     ],
     deps = [
         ":new_geom",

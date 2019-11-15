@@ -7,7 +7,7 @@
 
 AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {
-    auto planned_paths = navigator->getPlannedPaths();
+    auto planned_paths = navigator->getPlannedPathPoints();
     auto draw_function = [planned_paths](QGraphicsScene* scene) {
         QPen pen(Qt::darkBlue);
         // The cap style must be NOT be set to SquareCap. It can be set to anything else.

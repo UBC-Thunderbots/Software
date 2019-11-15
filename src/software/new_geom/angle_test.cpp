@@ -41,6 +41,14 @@ TEST(AngleTest, Angle_clamp)
     EXPECT_DOUBLE_EQ(-27, Angle::fromDegrees(360 - 27).clamp().toDegrees());
 }
 
+TEST(AngleTest, Angle_mod)
+{
+    EXPECT_DOUBLE_EQ(30, Angle::quarter().mod(Angle::fromDegrees(60)).toDegrees());
+    EXPECT_DOUBLE_EQ(0, Angle::zero().mod(Angle::half()).toDegrees());
+    EXPECT_DOUBLE_EQ(270, Angle::threeQuarter().mod(Angle::full()).toDegrees());
+    EXPECT_DOUBLE_EQ(180, Angle::half().mod(Angle::zero()).toDegrees());
+}
+
 TEST(AngleTest, Angle_remainder)
 {
     EXPECT_DOUBLE_EQ(0, Angle::full().remainder(Angle::half()).toRadians());

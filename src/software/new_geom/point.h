@@ -33,7 +33,7 @@ class Point final
      *
      * @param the Point to duplicate
      */
-    explicit Point(const Point &p);
+    Point(const Point &p);
 
     /**
      * Creates a new Point from a Vector
@@ -153,6 +153,36 @@ class Point final
  * @return the Point sum of the given Point and Vector
  */
 Point operator+(const Point &p, const Vector &v) __attribute__((warn_unused_result));
+
+/**
+ * Adds a vector to a point
+ *
+ * @param v the Vector
+ * @param p the Point
+ *
+ * @return the Point sum of the given Point and Vector
+ */
+Point operator+(const Vector &v, const Point &p) __attribute__((warn_unused_result));
+
+/**
+ * Adds the negation of a vector to a point
+ *
+ * @param p the Point
+ * @param v the Vector
+ *
+ * @return the Point sum of the given Point and the negated Vector
+ */
+Point operator-(const Point &p, const Vector &v) __attribute__((warn_unused_result));
+
+/**
+ * Adds a negated vector to a point and sets that point to the resulting sum
+ *
+ * @param p the Point to add the Vector to
+ * @param v the Vector to negate then add
+ *
+ * @return the new value of Point p
+ */
+Point &operator-=(Point &p, const Vector &v);
 
 /**
  * Adds a vector to a point and sets that point to the resulting sum

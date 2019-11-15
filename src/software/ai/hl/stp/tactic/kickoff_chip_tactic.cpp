@@ -8,11 +8,6 @@
 KickoffChipTactic::KickoffChipTactic(const Ball &ball, bool loop_forever)
     : ChipTactic(ball, loop_forever)
 {
-    // the chipper is allowed to go into the centre circle and touch the ball
-    addWhitelistedAvoidArea(AvoidArea::CENTER_CIRCLE);
-    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-
-    std::cout << this->getName() << std::endl;
 }
 
 std::string KickoffChipTactic::getName() const

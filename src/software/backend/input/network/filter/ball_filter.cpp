@@ -54,7 +54,8 @@ void BallFilter::addNewDetectionsToBuffer(
             // good chance the detection is just noise and not the real ball. In this
             // case, we ignore the new "noise" data
             double detection_distance =
-                (detection.position - detection_with_smallest_timestamp.position).len();
+                (detection.position - detection_with_smallest_timestamp.position)
+                    .length();
             double estimated_detection_velocity_magnitude =
                 detection_distance / time_diff.getSeconds();
 
@@ -130,8 +131,8 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
                                                           *ball_regression_line)
                                      : previous_detection.position;
             Vector velocity_vector    = current_position - previous_position;
-            double velocity_magnitude = velocity_vector.len() / time_diff.getSeconds();
-            Vector velocity           = velocity_vector.norm(velocity_magnitude);
+            double velocity_magnitude = velocity_vector.length() / time_diff.getSeconds();
+            Vector velocity           = velocity_vector.normalize(velocity_magnitude);
 
             ball_velocity_magnitudes.emplace_back(velocity_magnitude);
             ball_velocities.emplace_back(velocity);
@@ -161,7 +162,7 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
     {
         velocity_vector_sum += velocity;
     }
-    Vector average_velocity = velocity_vector_sum.norm(average_velocity_magnitude);
+    Vector average_velocity = velocity_vector_sum.normalize(average_velocity_magnitude);
 
     BallVelocityEstimate velocity_data(
         {average_velocity, average_velocity_magnitude, min_max_average});
@@ -324,7 +325,7 @@ std::optional<BallState> BallFilter::estimateBallState(
         auto velocity_direction_along_regression_line =
             velocity_estimate->average_velocity.project(regression_line.getSecond() -
                                                         regression_line.getFirst());
-        Vector filtered_velocity = velocity_direction_along_regression_line.norm(
+        Vector filtered_velocity = velocity_direction_along_regression_line.normalize(
             velocity_estimate->average_velocity_magnitude);
 
         return BallState(filtered_ball_position, filtered_velocity,

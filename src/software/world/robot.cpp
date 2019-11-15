@@ -5,7 +5,7 @@
 #include "shared/constants.h"
 #include "software/world/robot_state.h"
 
-Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
+Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_size,
              const std::set<RobotCapabilities::Capability> &capabilities)
@@ -65,7 +65,7 @@ Timestamp Robot::lastUpdateTimestamp() const
     return states_.front().timestamp();
 }
 
-unsigned int Robot::id() const
+RobotId Robot::id() const
 {
     return id_;
 }
@@ -87,7 +87,7 @@ Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) co
     // real-world behavior. Position prediction should be improved as outlined in
     // https://github.com/UBC-Thunderbots/Software/issues/50
     double seconds_in_future = duration_in_future.getSeconds();
-    return position() + velocity().norm(velocity().len() * seconds_in_future);
+    return position() + velocity().normalize(velocity().length() * seconds_in_future);
 }
 
 Vector Robot::velocity() const
@@ -208,7 +208,7 @@ std::vector<Timestamp> Robot::getPreviousTimestamps() const
 std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (unsigned i = 0; i < timestamp_history.size(); i++)
+    for (size_t i = 0; i < timestamp_history.size(); i++)
     {
         double timestamp_diff =
             fabs((timestamp - timestamp_history[i]).getMilliseconds());

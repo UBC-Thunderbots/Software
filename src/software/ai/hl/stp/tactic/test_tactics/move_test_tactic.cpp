@@ -27,7 +27,7 @@ double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world
     // Prefer robots closer to the destination
     // We normalize with a constant factor so test results to not change based on any
     // changes to World
-    double cost = (robot.position() - destination).len() / 10.0;
+    double cost = (robot.position() - destination).length() / 10.0;
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -37,8 +37,9 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
                                            Angle::zero(), 0.0, 0, DribblerEnable::OFF,
-                                           MoveType::NORMAL, AutokickType::NONE));
-    } while ((this->robot->position() - this->destination).len() > 0.01);
+                                           MoveType::NORMAL, AutokickType::NONE,
+                                           BallCollisionType::AVOID));
+    } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 
 void MoveTestTactic::accept(TacticVisitor &visitor) const
