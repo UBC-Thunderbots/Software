@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "new_geom",
     srcs = [
+        "line.cpp",
         "point.cpp",
         "polynomial.cpp",
         "vector.cpp",
