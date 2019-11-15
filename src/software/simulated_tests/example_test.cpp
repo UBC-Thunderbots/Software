@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
+#include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/test_util/test_util.h"
 #include "software/util/time/duration.h"
 #include "software/world/world.h"
-#include "software/simulated_tests/simulated_test_fixture.h"
 
 TEST_F(SimulatedTest, example_simulated_test)
 {

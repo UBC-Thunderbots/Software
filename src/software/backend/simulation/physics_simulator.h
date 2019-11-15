@@ -22,9 +22,9 @@
  *
  * Why do the PhysicsObject classes use raw pointers?
  *
- * Basically, b2Body objects should only be destroyed by the b2World. The b2Body destructor
- * is marked private to force this to happen.
- * See https://github.com/erincatto/Box2D/blob/master/Box2D/Dynamics/b2Body.h and
+ * Basically, b2Body objects should only be destroyed by the b2World. The b2Body
+ * destructor is marked private to force this to happen. See
+ * https://github.com/erincatto/Box2D/blob/master/Box2D/Dynamics/b2Body.h and
  * https://github.com/erincatto/Box2D/blob/master/Box2D/Dynamics/b2Body.cpp
  *
  * This means we can't create smart pointers from the b2Body* returned when we create a
