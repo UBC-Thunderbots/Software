@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gtest/gtest.h>
 
 #include "software/backend/simulator_backend.h"
@@ -60,14 +62,3 @@ class SimulatedTest : public ::testing::Test
     std::shared_ptr<SimulatorBackend> backend;
     std::shared_ptr<VisualizerWrapper> visualizer;
 };
-
-TEST_F(SimulatedTest, example_simulated_test)
-{
-    World world         = ::Test::TestUtil::createBlankTestingWorld();
-    world.mutableBall() = Ball(Point(0, 0), Vector(4, 1.5), Timestamp::fromSeconds(0));
-
-    bool test_succeeded = backend->runSimulation(world, Duration::fromSeconds(10));
-
-    // Currently the simulation always times out because validation is not implemented yet
-    ASSERT_FALSE(test_succeeded);
-}
