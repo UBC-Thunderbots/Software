@@ -41,6 +41,5 @@ void SimulatedTest::enableVisualizer()
 
     // Simulate in realtime if we are using the Visualizer so we can actually see
     // things at a reasonably realistic speed
-    backend->setSimulationSpeed(
-        SimulatorBackend::SimulationSpeed::REALTIME_SIMULATION);
+    backend->setSimulationSpeed(SimulatorBackend::SimulationSpeed::REALTIME_SIMULATION);
 }
