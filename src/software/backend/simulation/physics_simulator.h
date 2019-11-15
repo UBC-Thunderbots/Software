@@ -19,6 +19,18 @@
  * - https://box2d.org/documentation/
  * - https://github.com/libgdx/libgdx/wiki/Box2d
  * - https://www.iforce2d.net/b2dtut/
+ *
+ * Why do the PhysicsObject classes use raw pointers?
+ *
+ * Basically, b2Body objects should only be destroyed by the b2World. The b2Body destructor
+ * is marked private to force this to happen.
+ * See https://github.com/erincatto/Box2D/blob/master/Box2D/Dynamics/b2Body.h and
+ * https://github.com/erincatto/Box2D/blob/master/Box2D/Dynamics/b2Body.cpp
+ *
+ * This means we can't create smart pointers from the b2Body* returned when we create a
+ * body like std::shared_ptr<b2Body>(world->CreateBody(&body_def)). This fails because
+ * the smart pointer template will try make a call to the private destructor. Ultimately
+ * this is why we have to use raw pointers in these cases.
  */
 class PhysicsSimulator
 {
