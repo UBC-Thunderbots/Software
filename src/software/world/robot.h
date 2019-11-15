@@ -29,7 +29,8 @@ class Robot
      * per second
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state
-     * @param history_size The number of previous robot states that should be stored. Must be > 0
+     * @param history_size The number of previous robot states that should be stored. Must
+     * be > 0
      */
     explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
@@ -50,9 +51,9 @@ class Robot
      * state. The timestamp must be >= the robot's latest update timestamp
      */
     void updateCurrentState(const Point &new_position, const Vector &new_velocity,
-                     const Angle &new_orientation,
-                     const AngularVelocity &new_angular_velocity,
-                     const Timestamp &timestamp);
+                            const Angle &new_orientation,
+                            const AngularVelocity &new_angular_velocity,
+                            const Timestamp &timestamp);
 
     /**
      * Updates the robot with new data, updating the current state as well as the

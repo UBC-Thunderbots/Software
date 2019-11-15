@@ -236,12 +236,12 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 
     world.updateBallState(BallState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4)));
 
-    robot0.updateCurrentState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(4));
-    robot1.updateCurrentState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(4));
-    robot2.updateCurrentState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(4));
+    robot0.updateCurrentState(Point(-2, 3), Vector(), Angle::zero(),
+                              AngularVelocity::zero(), Timestamp::fromSeconds(4));
+    robot1.updateCurrentState(Point(-2, 0), Vector(), Angle::quarter(),
+                              AngularVelocity::zero(), Timestamp::fromSeconds(4));
+    robot2.updateCurrentState(Point(1.5, 2.3), Vector(), Angle::zero(),
+                              AngularVelocity::zero(), Timestamp::fromSeconds(4));
 
 
     team.updateRobots({robot0, robot1, robot2});

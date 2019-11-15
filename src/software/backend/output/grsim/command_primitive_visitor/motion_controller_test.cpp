@@ -152,11 +152,11 @@ TEST_F(MotionControllerTest, no_overspeed_acceleration_test)
 
 TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
 {
-    Robot robot = Robot(4, Point(-1, -1), Vector(0, 0), Angle::fromRadians(0),
+    Robot robot             = Robot(4, Point(-1, -1), Vector(0, 0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(-3.9), current_time);
-    double delta_time        = 1;
-    Point destination        = Point(-1, -1);
-    Angle destination_angle  = Angle::fromDegrees(210);
+    double delta_time       = 1;
+    Point destination       = Point(-1, -1);
+    Angle destination_angle = Angle::fromDegrees(210);
     double destination_speed = 0;
 
     // We use a custom MAX_ANGULAR_SPEED value because if this value is too high, the
@@ -181,10 +181,10 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
 
 TEST_F(MotionControllerTest, negative_time_test)
 {
-    Robot robot = Robot(4, Point(-0, -1), Vector(-1, 2), Angle::fromRadians(1),
+    Robot robot       = Robot(4, Point(-0, -1), Vector(-1, 2), Angle::fromRadians(1),
                         AngularVelocity::fromRadians(3.9), current_time);
-    double delta_time        = -1.5;
-    Point destination        = Point(-1, -1);
+    double delta_time = -1.5;
+    Point destination = Point(-1, -1);
     Angle destination_angle  = Angle::fromDegrees(210);
     double destination_speed = 0;
 
@@ -450,9 +450,9 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_tes
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
-        RobotState tempRobo = RobotState(Point(new_x_position, new_y_position),
-                               robot_velocities.linear_velocity, robot.orientation(),
-                               robot_velocities.angular_velocity, current_time);
+        RobotState tempRobo = RobotState(
+            Point(new_x_position, new_y_position), robot_velocities.linear_velocity,
+            robot.orientation(), robot_velocities.angular_velocity, current_time);
         robot.updateCurrentState(tempRobo);
     }
 
@@ -472,8 +472,8 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_negative_y_position_tes
 {
     Robot robot = Robot(4, Point(3.0, 0.05), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    double delta_time = TIME_STEP;
-    Point destination = Point(3.05, -0.02);
+    double delta_time        = TIME_STEP;
+    Point destination        = Point(3.05, -0.02);
     Angle destination_angle  = Angle::fromDegrees(0);
     double destination_speed = 0;
     int iteration_count;
@@ -496,9 +496,9 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_negative_y_position_tes
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
-        RobotState tempRobo = RobotState(Point(new_x_position, new_y_position),
-                               robot_velocities.linear_velocity, robot.orientation(),
-                               robot_velocities.angular_velocity, current_time);
+        RobotState tempRobo = RobotState(
+            Point(new_x_position, new_y_position), robot_velocities.linear_velocity,
+            robot.orientation(), robot_velocities.angular_velocity, current_time);
         robot.updateCurrentState(tempRobo);
     }
 
@@ -514,8 +514,8 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_positive_y_position_tes
 {
     Robot robot = Robot(4, Point(0.05, 3.0), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    double delta_time = TIME_STEP;
-    Point destination = Point(-0.025, 3.05);
+    double delta_time        = TIME_STEP;
+    Point destination        = Point(-0.025, 3.05);
     Angle destination_angle  = Angle::fromDegrees(0);
     double destination_speed = 0;
     int iteration_count;
@@ -538,8 +538,8 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_positive_y_position_tes
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
         robot.updateCurrentState(Point(new_x_position, new_y_position),
-                          robot_velocities.linear_velocity, robot.orientation(),
-                          robot_velocities.angular_velocity, current_time);
+                                 robot_velocities.linear_velocity, robot.orientation(),
+                                 robot_velocities.angular_velocity, current_time);
     }
 
 
@@ -558,8 +558,8 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_negative_y_position_tes
 {
     Robot robot = Robot(4, Point(0.05, 0.05), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    double delta_time = TIME_STEP;
-    Point destination = Point(-0.025, -0.025);
+    double delta_time        = TIME_STEP;
+    Point destination        = Point(-0.025, -0.025);
     Angle destination_angle  = Angle::fromDegrees(0);
     double destination_speed = 0;
     int iteration_count;
@@ -583,8 +583,8 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_negative_y_position_tes
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
         robot.updateCurrentState(Point(new_x_position, new_y_position),
-                          robot_velocities.linear_velocity, robot.orientation(),
-                          robot_velocities.angular_velocity, current_time);
+                                 robot_velocities.linear_velocity, robot.orientation(),
+                                 robot_velocities.angular_velocity, current_time);
     }
 
 
@@ -603,8 +603,8 @@ TEST_F(MotionControllerTest, asymetric_reach_des_test)
 {
     Robot robot = Robot(4, Point(0.08, 0.05), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    double delta_time = TIME_STEP;
-    Point destination = Point(-1.25, -0.78);
+    double delta_time        = TIME_STEP;
+    Point destination        = Point(-1.25, -0.78);
     Angle destination_angle  = Angle::fromDegrees(0);
     double destination_speed = 0;
     int iteration_count;
@@ -627,8 +627,8 @@ TEST_F(MotionControllerTest, asymetric_reach_des_test)
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
         robot.updateCurrentState(Point(new_x_position, new_y_position),
-                          robot_velocities.linear_velocity, robot.orientation(),
-                          robot_velocities.angular_velocity, current_time);
+                                 robot_velocities.linear_velocity, robot.orientation(),
+                                 robot_velocities.angular_velocity, current_time);
     }
 
 
@@ -645,10 +645,10 @@ TEST_F(MotionControllerTest, asymetric_reach_des_test)
 
 TEST_F(MotionControllerTest, positive_final_speed_position_test)
 {
-    Robot robot = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::fromRadians(0),
+    Robot robot       = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    double delta_time       = TIME_STEP;
-    Point destination       = Point(1., 1);
+    double delta_time = TIME_STEP;
+    Point destination = Point(1., 1);
     Angle destination_angle  = Angle::fromDegrees(0);
     double destination_speed = 1;
     int iteration_count;
@@ -672,8 +672,8 @@ TEST_F(MotionControllerTest, positive_final_speed_position_test)
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
         robot.updateCurrentState(Point(new_x_position, new_y_position),
-                          robot_velocities.linear_velocity, robot.orientation(),
-                          robot_velocities.angular_velocity, current_time);
+                                 robot_velocities.linear_velocity, robot.orientation(),
+                                 robot_velocities.angular_velocity, current_time);
 
         if ((destination - robot.position()).length() < position_epsilon)
         {
@@ -691,10 +691,10 @@ TEST_F(MotionControllerTest, positive_final_speed_position_test)
 
 TEST_F(MotionControllerTest, negative_final_speed_position_test)
 {
-    Robot robot = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::fromRadians(0),
+    Robot robot       = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    double delta_time       = TIME_STEP;
-    Point destination       = Point(-1., -1);
+    double delta_time = TIME_STEP;
+    Point destination = Point(-1., -1);
     Angle destination_angle  = Angle::fromDegrees(0);
     double destination_speed = 1;
     int iteration_count;
@@ -719,8 +719,8 @@ TEST_F(MotionControllerTest, negative_final_speed_position_test)
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
         robot.updateCurrentState(Point(new_x_position, new_y_position),
-                          robot_velocities.linear_velocity, robot.orientation(),
-                          robot_velocities.angular_velocity, current_time);
+                                 robot_velocities.linear_velocity, robot.orientation(),
+                                 robot_velocities.angular_velocity, current_time);
 
         if ((destination - robot.position()).length() < position_epsilon)
         {
@@ -740,8 +740,8 @@ TEST_F(MotionControllerTest, positive_rotation_position_test)
 {
     Robot robot = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    const double delta_time = TIME_STEP;
-    Point destination       = Point(0., 0);
+    const double delta_time  = TIME_STEP;
+    Point destination        = Point(0., 0);
     Angle destination_angle  = Angle::fromDegrees(90);
     double destination_speed = 0;
     int iteration_count;
@@ -770,8 +770,8 @@ TEST_F(MotionControllerTest, positive_rotation_position_test)
             Robot(4, robot.position(), robot_velocities.linear_velocity, new_orientation,
                   robot_velocities.angular_velocity, current_time);
         robot.updateCurrentState(robot.position(), robot_velocities.linear_velocity,
-                          new_orientation, robot_velocities.angular_velocity,
-                          current_time);
+                                 new_orientation, robot_velocities.angular_velocity,
+                                 current_time);
     }
 
     EXPECT_NEAR(robot.orientation().toRadians(), destination_angle.toRadians(),
@@ -784,8 +784,8 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
 {
     Robot robot = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::fromRadians(0),
                         AngularVelocity::fromRadians(0), current_time);
-    const double delta_time = TIME_STEP;
-    Point destination       = Point(0., 0);
+    const double delta_time  = TIME_STEP;
+    Point destination        = Point(0., 0);
     Angle destination_angle  = Angle::fromRadians(-1);
     double destination_speed = 0;
     int iteration_count;
@@ -809,8 +809,8 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
             Angle::fromRadians(robot.angularVelocity().toRadians() * delta_time);
 
         robot.updateCurrentState(robot.position(), robot_velocities.linear_velocity,
-                          new_orientation, robot_velocities.angular_velocity,
-                          current_time);
+                                 new_orientation, robot_velocities.angular_velocity,
+                                 current_time);
     }
 
     EXPECT_NEAR(robot.orientation().toRadians(), destination_angle.toRadians(),

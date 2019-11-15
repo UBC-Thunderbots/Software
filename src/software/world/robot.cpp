@@ -9,9 +9,7 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_size,
              const std::set<RobotCapabilities::Capability> &capabilities)
-    : id_(id),
-      states_(history_size),
-      capabilities_(capabilities)
+    : id_(id), states_(history_size), capabilities_(capabilities)
 {
     if (history_size <= 0)
     {
@@ -21,21 +19,24 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
     updateCurrentState(position, velocity, orientation, angular_velocity, timestamp);
 }
 
-void Robot::updateCurrentState(const RobotState &new_state) {
-    if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp()) {
+void Robot::updateCurrentState(const RobotState &new_state)
+{
+    if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
+    {
         throw std::invalid_argument(
-                "Error: Trying to update ball state using a state older then the current state");
+            "Error: Trying to update ball state using a state older then the current state");
     }
 
     states_.push_front(new_state);
 }
 
 void Robot::updateCurrentState(const Point &new_position, const Vector &new_velocity,
-                        const Angle &new_orientation,
-                        const AngularVelocity &new_angular_velocity,
-                        const Timestamp &timestamp)
+                               const Angle &new_orientation,
+                               const AngularVelocity &new_angular_velocity,
+                               const Timestamp &timestamp)
 {
-    updateCurrentState(RobotState(new_position, new_velocity, new_orientation, new_angular_velocity, timestamp));
+    updateCurrentState(RobotState(new_position, new_velocity, new_orientation,
+                                  new_angular_velocity, timestamp));
 }
 
 RobotState Robot::currentState() const
@@ -62,7 +63,7 @@ void Robot::updateStateToPredictedState(const Duration &duration_in_future)
         estimateAngularVelocityAtFutureTime(duration_in_future);
 
     updateCurrentState(new_position, new_velocity, new_orientation, new_angular_velocity,
-                lastUpdateTimestamp() + duration_in_future);
+                       lastUpdateTimestamp() + duration_in_future);
 }
 
 Timestamp Robot::lastUpdateTimestamp() const

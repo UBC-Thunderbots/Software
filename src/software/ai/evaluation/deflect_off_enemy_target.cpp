@@ -39,7 +39,10 @@ namespace Evaluation
             {
                 if (fabs(i.position().y() - closestEdgeY) < shortestLenToEdge)
                 {
-                    enemyClosestToEdge.updateCurrentState(RobotState(i.position(), i.velocity(), i.orientation(), i.angularVelocity(), i.lastUpdateTimestamp()));;
+                    enemyClosestToEdge.updateCurrentState(
+                        RobotState(i.position(), i.velocity(), i.orientation(),
+                                   i.angularVelocity(), i.lastUpdateTimestamp()));
+                    ;
                     shortestLenToEdge = fabs(i.position().y() - closestEdgeY);
                 }
             }
@@ -49,7 +52,7 @@ namespace Evaluation
         // edge of the field
         Vector dir     = enemyClosestToEdge.position() - world.ball().position();
         Vector dirPerp = dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS * 0.75);
-        Point target  = Point(0, 0);
+        Point target   = Point(0, 0);
 
         // choose point closest to edge of field
         if (fabs((world.ball().position() + dir + dirPerp).y() - closestEdgeY) >

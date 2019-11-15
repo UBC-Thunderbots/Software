@@ -184,9 +184,8 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
         }
 
-    } while (
-        !(kick_action.done() ||
-          (penalty_kick_start - robot->lastUpdateTimestamp()) < penalty_shot_timeout));
+    } while (!(kick_action.done() || (penalty_kick_start - robot->lastUpdateTimestamp()) <
+                                         penalty_shot_timeout));
 }
 
 void PenaltyKickTactic::accept(TacticVisitor& visitor) const

@@ -16,9 +16,9 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
                                      BallCollisionType ball_collision_type)
 {
     // Update the control parameters stored by this Tactic
-    this->destination       = destination;
-    this->final_orientation = final_orientation;
-    this->final_speed       = final_speed;
+    this->destination         = destination;
+    this->final_orientation   = final_orientation;
+    this->final_speed         = final_speed;
     this->ball_collision_type = ball_collision_type;
 }
 

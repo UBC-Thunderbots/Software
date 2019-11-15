@@ -1,18 +1,16 @@
 #pragma once
 
 #include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
 #include "software/new_geom/angular_velocity.h"
+#include "software/new_geom/point.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 
 class RobotState final
 {
-public:
-
+   public:
     explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation,
-                        const AngularVelocity &angular_velocity,
+                        const Angle &orientation, const AngularVelocity &angular_velocity,
                         const Timestamp &timestamp);
 
     Point position() const;
@@ -29,8 +27,7 @@ public:
 
     bool operator!=(const RobotState &other) const;
 
-private:
-
+   private:
     Point position_;
 
     Vector velocity_;
