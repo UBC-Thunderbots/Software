@@ -3,52 +3,39 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/world/robot_state.h"
 
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
-             const Timestamp &timestamp, unsigned int history_duration,
+             const Timestamp &timestamp, unsigned int history_size,
              const std::set<RobotCapabilities::Capability> &capabilities)
     : id_(id),
-      positions_(history_duration),
-      velocities_(history_duration),
-      orientations_(history_duration),
-      angularVelocities_(history_duration),
-      last_update_timestamps(history_duration),
+      states_(history_size),
       capabilities_(capabilities)
 {
-    addStateToRobotHistory(position, velocity, orientation, angular_velocity, timestamp);
+    if (history_size <= 0)
+    {
+        throw std::invalid_argument("Error: history_size must be greater than 0");
+    }
+
+    updateCurrentState(position, velocity, orientation, angular_velocity, timestamp);
 }
 
-void Robot::updateState(const Point &new_position, const Vector &new_velocity,
+void Robot::updateCurrentState(const RobotState &new_state) {
+    if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp()) {
+        throw std::invalid_argument(
+                "Error: Trying to update ball state using a state older then the current state");
+    }
+
+    states_.push_front(new_state);
+}
+
+void Robot::updateCurrentState(const Point &new_position, const Vector &new_velocity,
                         const Angle &new_orientation,
                         const AngularVelocity &new_angular_velocity,
                         const Timestamp &timestamp)
 {
-    if (timestamp < lastUpdateTimestamp())
-    {
-        throw std::invalid_argument(
-            "Error: State of robot is updating times from the past");
-    }
-
-    addStateToRobotHistory(new_position, new_velocity, new_orientation,
-                           new_angular_velocity, timestamp);
-}
-
-void Robot::updateState(const Robot &new_robot_data)
-{
-    if (new_robot_data.id() != id())
-    {
-        throw std::invalid_argument(
-            "Error: Robot updated using a robot with a mismatched id");
-    }
-
-    for (int i = new_robot_data.positions_.size() - 1; i >= 0; i--)
-    {
-        updateState(new_robot_data.positions_.at(i), new_robot_data.velocities_.at(i),
-                    new_robot_data.orientations_.at(i),
-                    new_robot_data.angularVelocities_.at(i),
-                    new_robot_data.last_update_timestamps.at(i));
-    }
+    updateCurrentState(RobotState(new_position, new_velocity, new_orientation, new_angular_velocity, timestamp));
 }
 
 void Robot::updateStateToPredictedState(const Timestamp &timestamp)
@@ -69,13 +56,13 @@ void Robot::updateStateToPredictedState(const Duration &duration_in_future)
     AngularVelocity new_angular_velocity =
         estimateAngularVelocityAtFutureTime(duration_in_future);
 
-    updateState(new_position, new_velocity, new_orientation, new_angular_velocity,
+    updateCurrentState(new_position, new_velocity, new_orientation, new_angular_velocity,
                 lastUpdateTimestamp() + duration_in_future);
 }
 
 Timestamp Robot::lastUpdateTimestamp() const
 {
-    return last_update_timestamps.front();
+    return states_.front().timestamp();
 }
 
 unsigned int Robot::id() const
@@ -85,7 +72,7 @@ unsigned int Robot::id() const
 
 Point Robot::position() const
 {
-    return positions_.front();
+    return states_.front().position();
 }
 
 Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) const
@@ -105,7 +92,7 @@ Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) co
 
 Vector Robot::velocity() const
 {
-    return velocities_.front();
+    return states_.front().velocity();
 }
 
 Vector Robot::estimateVelocityAtFutureTime(const Duration &duration_in_future) const
@@ -124,7 +111,7 @@ Vector Robot::estimateVelocityAtFutureTime(const Duration &duration_in_future) c
 
 Angle Robot::orientation() const
 {
-    return orientations_.front();
+    return states_.front().orientation();
 }
 
 Angle Robot::estimateOrientationAtFutureTime(const Duration &duration_in_future) const
@@ -144,7 +131,7 @@ Angle Robot::estimateOrientationAtFutureTime(const Duration &duration_in_future)
 
 AngularVelocity Robot::angularVelocity() const
 {
-    return angularVelocities_.front();
+    return states_.front().angularVelocity();
 }
 
 AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
@@ -165,64 +152,57 @@ AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
 
 std::vector<Point> Robot::getPreviousPositions() const
 {
-    std::vector<Point> retval{};
-    for (Point p : positions_)
-        retval.push_back(p);
+    std::vector<Point> previousPositions{};
+    for (const RobotState &state : states_)
+    {
+        previousPositions.push_back(state.position());
+    }
 
-    return retval;
+    return previousPositions;
 }
 
 std::vector<Vector> Robot::getPreviousVelocities() const
 {
-    std::vector<Vector> retval{};
-    for (Vector v : velocities_)
-        retval.push_back(v);
+    std::vector<Vector> previousVelocities{};
+    for (const RobotState &state : states_)
+    {
+        previousVelocities.push_back(state.velocity());
+    }
 
-    return retval;
+    return previousVelocities;
 }
 
 std::vector<Angle> Robot::getPreviousOrientations() const
 {
-    std::vector<Angle> retval{};
-    for (Angle a : orientations_)
-        retval.push_back(a);
+    std::vector<Angle> previousOrientations{};
+    for (const RobotState &state : states_)
+    {
+        previousOrientations.push_back(state.orientation());
+    }
 
-    return retval;
+    return previousOrientations;
 }
 
 std::vector<AngularVelocity> Robot::getPreviousAngularVelocities() const
 {
-    std::vector<AngularVelocity> retval{};
-    for (AngularVelocity av : angularVelocities_)
-        retval.push_back(av);
+    std::vector<AngularVelocity> previousAngularVelocities{};
+    for (const RobotState &state : states_)
+    {
+        previousAngularVelocities.push_back(state.angularVelocity());
+    }
 
-    return retval;
+    return previousAngularVelocities;
 }
 
 std::vector<Timestamp> Robot::getPreviousTimestamps() const
 {
-    std::vector<Timestamp> retval{};
-    for (Timestamp t : last_update_timestamps)
-        retval.push_back(t);
+    std::vector<Timestamp> previousTimestamps{};
+    for (const RobotState &state : states_)
+    {
+        previousTimestamps.push_back(state.timestamp());
+    }
 
-    return retval;
-}
-
-Timestamp Robot::getMostRecentTimestamp() const
-{
-    return last_update_timestamps.front();
-}
-
-void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity,
-                                   const Angle &orientation,
-                                   const AngularVelocity &angular_velocity,
-                                   const Timestamp &timestamp)
-{
-    positions_.push_front(position);
-    velocities_.push_front(velocity);
-    orientations_.push_front(orientation);
-    angularVelocities_.push_front(angular_velocity);
-    last_update_timestamps.push_front(timestamp);
+    return previousTimestamps;
 }
 
 std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const

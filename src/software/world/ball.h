@@ -182,7 +182,7 @@ class Ball final
     bool operator!=(const Ball &other) const;
 
    private:
-    // All previous states of the ball, with the most recent position at the front of the
+    // All previous states of the ball, with the most recent state at the front of the
     // queue, This buffer will never be empty as it's initialized with a BallState on
     // creation
     // The buffer size (history_size) must be > 0
