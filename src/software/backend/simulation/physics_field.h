@@ -26,13 +26,17 @@ class PhysicsField
 
     PhysicsField() = delete;
 
+    // Delete the copy and assignment operators because copying this class causes
+    // issues with the b2World and how it tracks bodies in the world, because as objects
+    // are copied and destroyed, they will destroy the bodies in the b2World as well
+    PhysicsField& operator=(const PhysicsField&) = delete;
+    PhysicsField(const PhysicsField&)            = delete;
+
     /**
-     * Removes the corresponding field bodies from the Box2D world. If this function
-     * is called on a world that does not contain the field, nothing happens.
-     *
-     * @param world The Box2D world to remove the ball from
+     * Destroys the PhysicsField object and removes any corresponding bodies from
+     * the physics world if the field is part of one
      */
-    void removeFromWorld(std::shared_ptr<b2World> world);
+    ~PhysicsField();
 
     /**
      * Returns a Field object representing the current state of the field object in the
