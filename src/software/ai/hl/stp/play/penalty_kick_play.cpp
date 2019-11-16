@@ -33,25 +33,10 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
-    move_tactic_2->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
-    // TODO: Remove the FRIENDLY_HALF whitelist once ticket #980 is complete
-    move_tactic_2->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
-    move_tactic_3->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
-    // TODO: Remove the FRIENDLY_HALF whitelist once ticket #980 is complete
-    move_tactic_3->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    move_tactic_4->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
-    // TODO: Remove the FRIENDLY_HALF whitelist once ticket #980 is complete
-    move_tactic_4->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
-    move_tactic_5->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
-    // TODO: Remove the FRIENDLY_HALF whitelist once ticket #980 is complete
-    move_tactic_5->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
     auto move_tactic_6 = std::make_shared<MoveTactic>(true);
-    move_tactic_6->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
-    // TODO: Remove the FRIENDLY_HALF whitelist once ticket #980 is complete
-    move_tactic_6->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
 
     do
     {
@@ -68,23 +53,29 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
-            Point(0, 0), world.field().enemyGoal().toVector().orientation(), 0);
+            Point(0, 0), world.field().enemyGoal().toVector().orientation(), 0,
+            BallCollisionType::AVOID);
         move_tactic_3->updateControlParams(
             Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoal().toVector().orientation(), 0,
+            BallCollisionType::AVOID);
         move_tactic_4->updateControlParams(
             Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoal().toVector().orientation(), 0,
+            BallCollisionType::AVOID);
         move_tactic_5->updateControlParams(
             Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoal().toVector().orientation(), 0,
+            BallCollisionType::AVOID);
         move_tactic_6->updateControlParams(
             Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoal().toVector().orientation(), 0,
+            BallCollisionType::AVOID);
 
         penalty_shot_tactic->updateWorldParams(world.ball(), world.enemyTeam().goalie(),
                                                world.field());
-        shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
+        shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0,
+                                                BallCollisionType::AVOID);
 
         // If we are setting up for penalty kick, move our robots to position
         if (world.gameState().isSetupState())

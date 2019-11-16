@@ -20,19 +20,19 @@ class InterceptBallAction : public Action
                                  bool loop_forever = false);
 
     /**
-     * Returns the next Intent this InterceptBallAction wants to run, given the
-     * parameters. Moves the robot to intercept and gain control of the ball
+     * Updates this action with all the parameters it needs from the world
      *
-     * @param robot The robot to move
      * @param field The field
      * @param ball The ball
-     *
-     * @return A unique pointer to the Intent the InterceptBallAction wants to run. If the
-     * InterceptBallAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        const Field& field,
-                                                        const Ball& ball);
+    void updateWorldParams(const Field& field, const Ball& ball);
+
+    /**
+     * Updates this action with all the parameters it needs that don't come from the world
+     *
+     * @param robot The robot to move
+     */
+    void updateControlParams(const Robot& robot);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

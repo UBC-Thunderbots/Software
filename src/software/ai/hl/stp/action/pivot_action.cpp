@@ -11,18 +11,15 @@
 
 PivotAction::PivotAction() : Action() {}
 
-std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(
-    const Robot& robot, Point pivot_point, Angle final_angle, Angle pivot_speed,
-    DribblerEnable enable_dribbler)
+void PivotAction::updateControlParams(const Robot& robot, Point pivot_point,
+                                      Angle final_angle, Angle pivot_speed,
+                                      DribblerEnable enable_dribbler)
 {
-    // update the parameters stored by this action
     this->robot           = robot;
     this->pivot_point     = pivot_point;
     this->final_angle     = final_angle;
     this->pivot_speed     = pivot_speed;
     this->enable_dribbler = enable_dribbler;
-
-    return getNextIntent();
 }
 
 void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -35,7 +32,7 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), pivot_point, (pivot_point - robot->position()).orientation(),
                 0.0, 0, enable_dribbler ? DribblerEnable::ON : DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::NONE));
+                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID));
             LOG(DEBUG) << "obtaining ball, moving!";
         }
         else

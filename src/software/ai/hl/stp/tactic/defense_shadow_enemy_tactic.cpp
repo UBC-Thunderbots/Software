@@ -67,7 +67,8 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
         if (!enemy_threat)
         {
             LOG(WARNING) << "Running DefenseShadowEnemyTactic without an enemy threat";
-            yield(stop_action.updateStateAndGetNextIntent(*robot, false));
+            stop_action.updateControlParams(*robot, false);
+            yield(stop_action.getNextIntent());
         }
 
         Robot enemy_robot                   = enemy_threat->robot;
@@ -101,17 +102,21 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
                     ->BallStealSpeed()
                     ->value())
         {
-            yield(move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP));
+                0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                BallCollisionType::AVOID);
+            yield(move_action.getNextIntent());
         }
         else
         {
             Angle facing_enemy_robot =
                 (enemy_robot.position() - robot->position()).orientation();
-            yield(move_action.updateStateAndGetNextIntent(
-                *robot, position_to_block_shot, facing_enemy_robot, 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP));
+            move_action.updateControlParams(*robot, position_to_block_shot,
+                                            facing_enemy_robot, 0, DribblerEnable::OFF,
+                                            MoveType::NORMAL, AutokickType::AUTOCHIP,
+                                            BallCollisionType::AVOID);
+            yield(move_action.getNextIntent());
         }
 
     } while (!move_action.done());

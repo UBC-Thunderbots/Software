@@ -12,12 +12,14 @@ std::string MoveTactic::getName() const
 }
 
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
-                                     double final_speed)
+                                     double final_speed,
+                                     BallCollisionType ball_collision_type)
 {
     // Update the control parameters stored by this Tactic
     this->destination       = destination;
     this->final_orientation = final_orientation;
     this->final_speed       = final_speed;
+    this->ball_collision_type = ball_collision_type;
 }
 
 double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -35,9 +37,10 @@ void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     MoveAction move_action = MoveAction(0, Angle(), false);
     do
     {
-        yield(move_action.updateStateAndGetNextIntent(
+        move_action.updateControlParams(
             *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE));
+            MoveType::NORMAL, AutokickType::NONE, ball_collision_type);
+        yield(move_action.getNextIntent());
     } while (!move_action.done());
 }
 

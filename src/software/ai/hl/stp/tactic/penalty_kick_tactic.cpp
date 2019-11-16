@@ -19,10 +19,6 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      bool loop_forever)
     : Tactic(loop_forever), ball(ball), field(field), enemy_goalie(enemy_goalie)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
-    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-    addWhitelistedAvoidArea(AvoidArea::ENEMY_DEFENSE_AREA);
-    addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 }
 
 std::string PenaltyKickTactic::getName() const
@@ -167,24 +163,29 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             if (evaluate_penalty_shot())
             {
-                yield(kick_action.updateStateAndGetNextIntent(
-                    *robot, ball, ball.position(), robot.value().orientation(),
-                    PENALTY_KICK_SHOT_SPEED));
+                kick_action.updateWorldParams(ball);
+                kick_action.updateControlParams(*robot, ball.position(),
+                                                robot.value().orientation(),
+                                                PENALTY_KICK_SHOT_SPEED);
+                yield(kick_action.getNextIntent());
             }
         }
         else if (!approach_ball_move_act.done())
         {
-            yield(approach_ball_move_act.updateStateAndGetNextIntent(
+            approach_ball_move_act.updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
+                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::ALLOW);
+            yield(approach_ball_move_act.getNextIntent());
         }
         else
         {
             const Point next_shot_position = evaluate_next_position();
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
-            yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(
+            rotate_with_ball_move_act.updateControlParams(
                 *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE));
+                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+            yield(rotate_with_ball_move_act.getNextIntent());
         }
 
     } while (

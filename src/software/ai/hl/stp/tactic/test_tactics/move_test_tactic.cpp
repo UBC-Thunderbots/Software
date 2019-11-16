@@ -37,7 +37,8 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
                                            Angle::zero(), 0.0, 0, DribblerEnable::OFF,
-                                           MoveType::NORMAL, AutokickType::NONE));
+                                           MoveType::NORMAL, AutokickType::NONE,
+                                           BallCollisionType::AVOID));
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 

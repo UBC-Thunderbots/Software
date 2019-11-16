@@ -1,58 +1,67 @@
 #include "software/backend/simulator_backend.h"
 
-#include "software/backend/backend_factory.h"
+#include <math.h>
+
+#include <algorithm>
+
+#include "software/util/logger/init.h"
 
 const std::string SimulatorBackend::name = "simulator";
 
-SimulatorBackend::SimulatorBackend(const Duration &simulation_time_step,
-                                   unsigned int num_steps_per_primitive_update)
-    : simulation_time_step(simulation_time_step),
-      num_steps_per_primitive_update(num_steps_per_primitive_update)
+SimulatorBackend::SimulatorBackend(
+    const Duration &physics_time_step, const Duration &world_time_increment,
+    SimulatorBackend::SimulationSpeed simulation_speed_mode)
+    : physics_time_step(physics_time_step),
+      world_time_increment(world_time_increment),
+      simulation_speed_mode(simulation_speed_mode)
 {
 }
 
 void SimulatorBackend::onValueReceived(ConstPrimitiveVectorPtr primitives)
 {
-    most_recently_received_primitives_mutex.lock();
-    most_recently_received_primitives = std::move(primitives);
-    most_recently_received_primitives_mutex.unlock();
-    updateSimulation();
+    primitive_promise.set_value(std::move(primitives));
 }
 
-void SimulatorBackend::setWorld(const World &new_world)
+void SimulatorBackend::setSimulationSpeed(
+    SimulatorBackend::SimulationSpeed simulation_speed_mode)
 {
-    // TODO: Set up simulation world (#768)
-
-    // We need to update the simulation (which sends the World to observers)
-    // when we set a new world to make sure we start the feedback loop between
-    // this simulator backend and the module that observes the World and produces
-    // primitives
-    updateSimulation();
+    this->simulation_speed_mode = simulation_speed_mode;
 }
 
-World SimulatorBackend::getWorld()
+bool SimulatorBackend::runSimulation(World world, const Duration &timeout)
 {
-    std::scoped_lock world_lock(world_mutex);
-    return world;
-}
+    PhysicsSimulator physics_simulator(world);
 
-void SimulatorBackend::updateSimulation()
-{
-    for (unsigned int i = 0; i < num_steps_per_primitive_update; i++)
+    Timestamp timeout_timestamp = world.getMostRecentTimestamp() + timeout;
+    std::future<ConstPrimitiveVectorPtr> primitive_future =
+        primitive_promise.get_future();
+    Subject<World>::sendValueToObservers(world);
+    while (world.getMostRecentTimestamp() <= timeout_timestamp)
     {
-        // TODO: update sim with time_step (#768)
+        for (unsigned int i = 0;
+             i < static_cast<unsigned int>(std::ceil(world_time_increment.getSeconds() /
+                                                     physics_time_step.getSeconds()));
+             i++)
+        {
+            world = physics_simulator.stepSimulation(physics_time_step);
+        }
+
+        // TODO: Re-enable with issue #1029
+        //        auto status = primitive_future.wait_for(std::chrono::seconds(5));
+        //        if(status != std::future_status::ready) {
+        //            LOG(WARNING) << "Timed out waiting for primitives. Aborting
+        //            simulation..."; return false;
+        //        }
+
+        if (simulation_speed_mode == SimulationSpeed::REALTIME_SIMULATION)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(
+                std::lrint(world_time_increment.getMilliseconds())));
+        }
+
+        Subject<World>::sendValueToObservers(world);
     }
 
-    // TODO: update world with simulated world (#768)
-
-    sendWorldToObservers();
+    LOG(WARNING) << "Simulation timed out";
+    return false;
 }
-
-void SimulatorBackend::sendWorldToObservers()
-{
-    std::scoped_lock world_lock(world_mutex);
-    Subject<World>::sendValueToObservers(world);
-}
-
-// Register this backend in the BackendFactory
-static TBackendFactory<SimulatorBackend> factory;
