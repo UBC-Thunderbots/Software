@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # This script allows the user to automatically flash and debug a given binary to a
 # ARM MCU over USB and debug it, all via OpenOCD
