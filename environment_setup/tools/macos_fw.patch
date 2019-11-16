@@ -1,0 +1,30 @@
+diff --git a/src/WORKSPACE b/src/WORKSPACE
+index a18004d..cfaf0d9 100644
+--- a/src/WORKSPACE
++++ b/src/WORKSPACE
+@@ -97,10 +97,10 @@ http_archive(
+ http_archive(
+     name = "arm_developer_gcc",
+     build_file = "@//external:arm_gcc.BUILD",
+-    sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
+-    strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
++    sha256 = "1249f860d4155d9c3ba8f30c19e7a88c5047923cea17e0d08e633f12408f01f0",
++    strip_prefix = "gcc-arm-none-eabi-9-2019-q4-major",
+     urls = [
+-        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
++        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2",
+     ],
+ )
+ 
+diff --git a/src/cc_toolchain/BUILD b/src/cc_toolchain/BUILD
+index fb31df5..a0f57a5 100644
+--- a/src/cc_toolchain/BUILD
++++ b/src/cc_toolchain/BUILD
+@@ -36,6 +36,7 @@ cc_toolchain_suite(
+         # stm32h7 MCU
+         "stm32h7": "cc_toolchain_stm32h7",
+         "stm32h7|compiler": "cc_toolchain_stm32h7",
++        "darwin": "cc_toolchain_linux",
+     },
+ )
+ 
