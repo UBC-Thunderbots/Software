@@ -55,9 +55,10 @@ void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         Point block_position = getBlockPosition();
         // We want to face the shot
         Angle block_orientation = (this->shot_origin - block_position).orientation();
-        yield(move_action.updateStateAndGetNextIntent(
-            *robot, block_position, block_orientation, 0.0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+        move_action.updateControlParams(*robot, block_position, block_orientation, 0.0,
+                                        DribblerEnable::OFF, MoveType::NORMAL,
+                                        AutokickType::NONE, BallCollisionType::ALLOW);
+        yield(move_action.getNextIntent());
     } while (!move_action.done());
 }
 

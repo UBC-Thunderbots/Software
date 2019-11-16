@@ -65,7 +65,8 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         if (!enemy_threat)
         {
-            yield(stop_action.updateStateAndGetNextIntent(*robot, false));
+            stop_action.updateControlParams(*robot, false);
+            yield(stop_action.getNextIntent());
         }
 
         Robot enemy_robot = enemy_threat->robot;
@@ -79,10 +80,11 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Point position_to_block_pass =
                 enemy_robot.position() +
                 enemy_to_passer_vector.normalize(this->shadow_distance);
-            yield(move_action.updateStateAndGetNextIntent(
-                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-                BallCollisionType::AVOID));
+            move_action.updateControlParams(*robot, position_to_block_pass,
+                                            enemy_to_passer_vector.orientation(), 0,
+                                            DribblerEnable::OFF, MoveType::NORMAL,
+                                            AutokickType::NONE, BallCollisionType::AVOID);
+            yield(move_action.getNextIntent());
         }
         else
         {
@@ -113,19 +115,21 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
                 ball.velocity().length() < ball_steal_speed)
             {
-                yield(move_action.updateStateAndGetNextIntent(
+                move_action.updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0,
                     DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
-                    BallCollisionType::AVOID));
+                    BallCollisionType::AVOID);
+                yield(move_action.getNextIntent());
             }
             else
             {
-                yield(move_action.updateStateAndGetNextIntent(
+                move_action.updateControlParams(
                     *robot, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0,
                     DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-                    BallCollisionType::AVOID));
+                    BallCollisionType::AVOID);
+                yield(move_action.getNextIntent());
             }
         }
     } while (!move_action.done());
