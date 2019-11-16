@@ -46,7 +46,7 @@
 #include <task.h>
 #include <unused.h>
 
-#include "app/world.h"
+#include "world/world.h"
 #include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
@@ -76,8 +76,12 @@ static void normal_task(void *UNUSED(param))
 
     Ball ball       = {};
     Chicker chicker = {};
+    Dribbler dribbler = {
+        .set_speed = dribbler_set_speed,
+    };
     Robot robot     = {
         .chicker = chicker,
+        .dribbler = dribbler,
     };
     World world = {
         .ball  = ball,

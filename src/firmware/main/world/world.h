@@ -1,7 +1,7 @@
 #pragma once
 
-#include "app/ball.h"
-#include "app/robot.h"
+#include "world/ball.h"
+#include "world/robot.h"
 
 // TODO: comment here
 typedef struct

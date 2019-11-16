@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "app/world.h"
+#include "world/world.h"
 #include "util/log.h"
 
 /**
