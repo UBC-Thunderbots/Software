@@ -43,7 +43,6 @@ class TacticVisitor
      *
      * @param tactic The tactic to visit
      */
-
     virtual void visit(const CherryPickTactic &tactic)         = 0;
     virtual void visit(const ShadowFreekickerTactic &tactic) = 0;
     virtual void visit(const GoalieTactic &tactic) = 0;
