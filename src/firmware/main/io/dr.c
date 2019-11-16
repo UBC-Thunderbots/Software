@@ -116,16 +116,6 @@ void dr_get_ball(dr_ball_data_t *ret) {
 }
 
 /**
- * \brief sets the applied accels
- */
-void dr_setaccel(float linear_accel[2], float angular_accel) {
-  float dr_linear_accel[2];
-  dr_linear_accel[0] = linear_accel[0];
-  dr_linear_accel[1] = linear_accel[1];
-}
-
-
-/**
  * \brief Sets the robot's camera frame.
  */
 void dr_set_robot_frame(int16_t x, int16_t y, int16_t angle) {

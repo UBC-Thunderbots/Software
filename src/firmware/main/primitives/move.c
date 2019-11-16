@@ -10,15 +10,10 @@
 #include <math.h>
 #include <stdio.h>
 
-#ifndef FWSIM
 #include "io/chicker.h"
 #include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/leds.h"
-
-#else
-#include "simulate.h"
-#endif
 
 
 // these are set to decouple the 3 axis from each other

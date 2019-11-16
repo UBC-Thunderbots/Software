@@ -134,7 +134,6 @@ bool dr_calibrated(void);
 void dr_reset(void);
 void dr_tick(log_record_t *log);
 void dr_get(dr_data_t *ret);
-void dr_setaccel(float linear_accel[2], float angular_accel);
 void dr_set_robot_frame(int16_t x, int16_t y, int16_t angle);
 void dr_apply_cam();
 void dr_set_ball_frame(int16_t x, int16_t y);
