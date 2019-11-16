@@ -12,10 +12,11 @@
  *
  * \brief The sources that are checked for liveness by the supervisor task.
  */
-typedef enum {
-	MAIN_WDT_SOURCE_TICK, ///< The normal ticks.
-	MAIN_WDT_SOURCE_HSTICK, ///< The fast ticks.
-	MAIN_WDT_SOURCE_COUNT, ///< The number of liveness sources.
+typedef enum
+{
+    MAIN_WDT_SOURCE_TICK,    ///< The normal ticks.
+    MAIN_WDT_SOURCE_HSTICK,  ///< The fast ticks.
+    MAIN_WDT_SOURCE_COUNT,   ///< The number of liveness sources.
 } main_wdt_source_t;
 
 /**
@@ -23,10 +24,11 @@ typedef enum {
  *
  * \brief The modes in which a system shutdown can occur.
  */
-typedef enum {
-	MAIN_SHUT_MODE_POWER, ///< Power off after shutdown
-	MAIN_SHUT_MODE_REBOOT, ///< Reboot after shutdown
-	MAIN_SHUT_MODE_DFU, ///< Go into DFU after shutdown
+typedef enum
+{
+    MAIN_SHUT_MODE_POWER,   ///< Power off after shutdown
+    MAIN_SHUT_MODE_REBOOT,  ///< Reboot after shutdown
+    MAIN_SHUT_MODE_DFU,     ///< Go into DFU after shutdown
 } main_shut_mode_t;
 
 extern const udev_language_info_t MAIN_LANGUAGE_TABLE[];

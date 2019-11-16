@@ -25,14 +25,15 @@
  * are not included here.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <check.h>
-#include "config.h"
-#include "check_check.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int main ()
+#include "check_check.h"
+#include "config.h"
+
+int main()
 {
     int n;
     SRunner *sr;
@@ -50,9 +51,9 @@ int main ()
      * Enable all logging types, just in case one of them
      * leaks memory.
      */
-    srunner_set_log (sr, "test_mem_leak.log");
-    srunner_set_xml (sr, "test_mem_leak.xml");
-    srunner_set_tap (sr, "test_mem_leak.tap");
+    srunner_set_log(sr, "test_mem_leak.log");
+    srunner_set_xml(sr, "test_mem_leak.xml");
+    srunner_set_tap(sr, "test_mem_leak.tap");
     srunner_run_all(sr, CK_NORMAL);
     srunner_free(sr);
 
@@ -61,10 +62,10 @@ int main ()
     /* The following setup is necessary for the fork suite */
     fork_setup();
 
-    sr = srunner_create (make_log_suite());
+    sr = srunner_create(make_log_suite());
     srunner_add_suite(sr, make_fork_suite());
 
-#if defined(HAVE_FORK) && HAVE_FORK==1
+#if defined(HAVE_FORK) && HAVE_FORK == 1
     srunner_add_suite(sr, make_exit_suite());
 #endif
     srunner_add_suite(sr, make_tag_suite());
@@ -74,9 +75,9 @@ int main ()
      * Enable all logging types, just in case one of them
      * leaks memory.
      */
-    srunner_set_log (sr, "test_mem_leak.log");
-    srunner_set_xml (sr, "test_mem_leak.xml");
-    srunner_set_tap (sr, "test_mem_leak.tap");
+    srunner_set_log(sr, "test_mem_leak.log");
+    srunner_set_xml(sr, "test_mem_leak.xml");
+    srunner_set_tap(sr, "test_mem_leak.tap");
 
     srunner_run_all(sr, CK_NORMAL);
 
@@ -87,4 +88,3 @@ int main ()
     srunner_free(sr);
     return (n == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-

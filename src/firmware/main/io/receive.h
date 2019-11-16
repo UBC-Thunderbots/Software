@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "util/log.h"
 
 void receive_init(unsigned int index);
@@ -13,4 +14,3 @@ void handle_camera_packet(uint8_t *, uint8_t);
 void handle_drive_packet(uint8_t *);
 void handle_other_packet(uint8_t *, size_t);
 #endif
-

@@ -50,4 +50,3 @@ extern const gpio_init_pin_t PINS_INIT_100[5U][16U];
 #define PIN_ENCODER3B GPIOA, 1U,
 
 #endif
-

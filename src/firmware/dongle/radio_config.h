@@ -12,27 +12,27 @@
 /**
  * \brief The configuration parameters.
  */
-extern struct radio_config {
-	/**
-	 * \brief The radio channel.
-	 */
-	uint8_t channel;
+extern struct radio_config
+{
+    /**
+     * \brief The radio channel.
+     */
+    uint8_t channel;
 
-	/**
-	 * \brief The symbol rate.
-	 */
-	uint8_t symbol_rate;
+    /**
+     * \brief The symbol rate.
+     */
+    uint8_t symbol_rate;
 
-	/**
-	 * \brief The PAN ID.
-	 */
-	uint16_t pan_id;
+    /**
+     * \brief The PAN ID.
+     */
+    uint16_t pan_id;
 
-	/**
-	 * \brief The station’s MAC address.
-	 */
-	uint64_t mac_address;
+    /**
+     * \brief The station’s MAC address.
+     */
+    uint64_t mac_address;
 } radio_config;
 
 #endif
-

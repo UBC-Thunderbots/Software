@@ -1,5 +1,6 @@
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+
 #include "i2c.h"
 
 #define CAM_IP 0x21
@@ -8,10 +9,10 @@
 
 typedef struct
 {
-	uint8_t reg;
-	bool    val;
-	uint8_t position;
-	uint8_t final_reg_val;
+    uint8_t reg;
+    bool val;
+    uint8_t position;
+    uint8_t final_reg_val;
 } cam_setting_t;
 
 

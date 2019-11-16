@@ -4,7 +4,7 @@
  * \brief These functions handle some tasks related to the DMA controllers.
  *
  * DMA streams are allocated as follows:
- * 
+ *
  * <table>
  * <tr><th>Controller</th><th>Stream</th><th>Channel</th><th>Function</th></tr>
  * <tr><td>1</td><td>0</td><td>&nbsp;</td><td>&nbsp;</td></tr>
@@ -29,6 +29,7 @@
  */
 
 #include "dma.h"
+
 #include <rcc.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -42,8 +43,9 @@
 /**
  * \brief Initializes the DMA engine(s).
  */
-void dma_init(void) {
-	rcc_enable_reset(AHB1, DMA2);
+void dma_init(void)
+{
+    rcc_enable_reset(AHB1, DMA2);
 }
 
 /**
@@ -54,17 +56,25 @@ void dma_init(void) {
  * \retval true if the entire memory block is DMA-capable
  * \retval false if any byte of the block is not DMA-capable
  */
-bool dma_check(const void *pointer, size_t length) {
-	uintptr_t pointeri = (uintptr_t) pointer;
-	uintptr_t lasti = pointeri + length - 1U;
+bool dma_check(const void *pointer, size_t length)
+{
+    uintptr_t pointeri = (uintptr_t)pointer;
+    uintptr_t lasti    = pointeri + length - 1U;
 
-	if (SRAM_BASE <= pointeri && pointeri < (SRAM_BASE + SRAM_SIZE) && SRAM_BASE <= lasti && lasti < (SRAM_BASE + SRAM_SIZE)) {
-		return true;
-	} else if (FLASH_BASE <= pointeri && pointeri < (FLASH_BASE + FLASH_SIZE) && FLASH_BASE <= lasti && lasti < (FLASH_BASE + FLASH_SIZE)) {
-		return true;
-	} else {
-		return false;
-	}
+    if (SRAM_BASE <= pointeri && pointeri < (SRAM_BASE + SRAM_SIZE) &&
+        SRAM_BASE <= lasti && lasti < (SRAM_BASE + SRAM_SIZE))
+    {
+        return true;
+    }
+    else if (FLASH_BASE <= pointeri && pointeri < (FLASH_BASE + FLASH_SIZE) &&
+             FLASH_BASE <= lasti && lasti < (FLASH_BASE + FLASH_SIZE))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 /**
@@ -73,8 +83,9 @@ bool dma_check(const void *pointer, size_t length) {
  * \param[in] length the number of bytes of memory needed
  * \return a handle to the new block, or null on failure
  */
-dma_memory_handle_t dma_alloc(size_t length) {
-	return malloc(length + DMA_ALIGN_BITS);
+dma_memory_handle_t dma_alloc(size_t length)
+{
+    return malloc(length + DMA_ALIGN_BITS);
 }
 
 /**
@@ -82,8 +93,9 @@ dma_memory_handle_t dma_alloc(size_t length) {
  *
  * \param[in] handle the handle of the block to free
  */
-void dma_free(dma_memory_handle_t handle) {
-	free(handle);
+void dma_free(dma_memory_handle_t handle)
+{
+    free(handle);
 }
 
 /**
@@ -93,11 +105,11 @@ void dma_free(dma_memory_handle_t handle) {
  *
  * \return the data area of the block
  */
-void *dma_get_buffer(dma_memory_handle_t handle) {
-	return (void *) (((uintptr_t) handle + DMA_ALIGN_BITS) & ~DMA_ALIGN_BITS);
+void *dma_get_buffer(dma_memory_handle_t handle)
+{
+    return (void *)(((uintptr_t)handle + DMA_ALIGN_BITS) & ~DMA_ALIGN_BITS);
 }
 
 /**
  * @}
  */
-

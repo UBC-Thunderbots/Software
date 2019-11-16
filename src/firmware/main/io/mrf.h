@@ -5,38 +5,40 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef enum {
-	MRF_TX_OK,
-	MRF_TX_NO_ACK,
-	MRF_TX_CCA_FAIL,
-	MRF_TX_CANCELLED,
+typedef enum
+{
+    MRF_TX_OK,
+    MRF_TX_NO_ACK,
+    MRF_TX_CCA_FAIL,
+    MRF_TX_CANCELLED,
 } mrf_tx_result_t;
 
-typedef struct {
-	/**
-	 * \brief the channel to operate on, from 11 to 26 inclusive
-	 */
-	uint8_t channel;
+typedef struct
+{
+    /**
+     * \brief the channel to operate on, from 11 to 26 inclusive
+     */
+    uint8_t channel;
 
-	/**
-	 * \brief \c true to run at 625 kb/s, or \c false to run at 250 kb/s
-	 */
-	bool symbol_rate;
+    /**
+     * \brief \c true to run at 625 kb/s, or \c false to run at 250 kb/s
+     */
+    bool symbol_rate;
 
-	/**
-	 * \brief the 16-bit address to use
-	 */
-	uint16_t pan_id;
+    /**
+     * \brief the 16-bit address to use
+     */
+    uint16_t pan_id;
 
-	/**
-	 * \brief the PAN ID to communicate on, from 0 to 0xFFFE
-	 */
-	uint16_t short_address;
+    /**
+     * \brief the PAN ID to communicate on, from 0 to 0xFFFE
+     */
+    uint16_t short_address;
 
-	/**
-	 * \brief the node’s MAC address
-	 */
-	uint64_t mac_address;
+    /**
+     * \brief the node’s MAC address
+     */
+    uint64_t mac_address;
 } mrf_settings_t;
 
 void mrf_init(const mrf_settings_t *settings);

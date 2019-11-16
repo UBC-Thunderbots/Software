@@ -26,4 +26,3 @@ extern const gpio_init_pin_t PINS_INIT[4U][16U];
 #define PIN_LCD_E GPIOC, 15U
 
 #endif
-

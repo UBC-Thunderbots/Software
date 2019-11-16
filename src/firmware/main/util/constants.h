@@ -19,32 +19,34 @@
 /**
  * \brief The interface numbers.
  */
-enum {
-	INTERFACE_CDC_ACM,
-	INTERFACE_COUNT,
+enum
+{
+    INTERFACE_CDC_ACM,
+    INTERFACE_COUNT,
 };
 
 /**
  * \brief The string indices understood by a GET DESCRIPTOR(String) request.
  */
-enum {
-	STRING_INDEX_ZERO = 0U,
-	STRING_INDEX_MANUFACTURER,
-	STRING_INDEX_PRODUCT,
-	STRING_INDEX_PRODUCT_DFU,
-	STRING_INDEX_SERIAL,
-	STRING_INDEX_DFU_FW,
-	STRING_INDEX_DFU_FPGA,
-	STRING_INDEX_COUNT,
+enum
+{
+    STRING_INDEX_ZERO = 0U,
+    STRING_INDEX_MANUFACTURER,
+    STRING_INDEX_PRODUCT,
+    STRING_INDEX_PRODUCT_DFU,
+    STRING_INDEX_SERIAL,
+    STRING_INDEX_DFU_FW,
+    STRING_INDEX_DFU_FPGA,
+    STRING_INDEX_COUNT,
 };
 
 /**
  * \brief The vendor-specific control requests understood by the robot.
  */
-enum {
-	CONTROL_REQUEST_READ_CORE = 0x0DU,
-	CONTROL_REQUEST_READ_BUILD_ID = 0x0EU,
+enum
+{
+    CONTROL_REQUEST_READ_CORE     = 0x0DU,
+    CONTROL_REQUEST_READ_BUILD_ID = 0x0EU,
 };
 
 #endif
-

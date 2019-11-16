@@ -3,15 +3,17 @@
 
 #include <stdbool.h>
 
-typedef struct 
+typedef struct
 {
-	float speed_x;
-	float speed_y;
-	float speed_angle;
+    float speed_x;
+    float speed_y;
+    float speed_angle;
 } wheel_speeds_t;
 
 void circbuff_init(wheel_speeds_t queue[], unsigned int queueSize);
-void add_to_circ_buff(wheel_speeds_t queue[], unsigned int queueSize, wheel_speeds_t value);
-wheel_speeds_t get_from_circ_buff(wheel_speeds_t queue[], unsigned int queueSize, unsigned int index);
+void add_to_circ_buff(wheel_speeds_t queue[], unsigned int queueSize,
+                      wheel_speeds_t value);
+wheel_speeds_t get_from_circ_buff(wheel_speeds_t queue[], unsigned int queueSize,
+                                  unsigned int index);
 
-#endif // CIRCBUFF_H
+#endif  // CIRCBUFF_H

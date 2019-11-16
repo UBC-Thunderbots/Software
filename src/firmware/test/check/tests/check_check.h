@@ -36,12 +36,12 @@
 
 extern int sub_ntests;
 
-void fork_setup (void);
-void fork_teardown (void);
+void fork_setup(void);
+void fork_teardown(void);
 void setup_fixture(void);
-void teardown_fixture (void);
-void setup (void);
-void cleanup (void);
+void teardown_fixture(void);
+void setup(void);
+void cleanup(void);
 Suite *make_sub_suite(void);
 Suite *make_sub2_suite(void);
 Suite *make_master_suite(void);
@@ -69,13 +69,13 @@ void init_master_tests_lineno(int num_master_tests);
  * it verified at test time. With this data, one can easily
  * determine the name of a failed test.
  */
-void record_test_name(const char* test_name);
+void record_test_name(const char *test_name);
 
 /**
  * Retrieve the next recorded test which was run, or
  * NULL if no further tests are recorded.
  */
-char* get_next_test_name(FILE * file);
+char *get_next_test_name(FILE *file);
 
 /**
  * Record a line number for a test which is to fail.
@@ -96,6 +96,6 @@ void record_failure_line_num(const int line);
  *
  * If there are no more lines to read, -1 is returned.
  */
-int get_next_failure_line_num(FILE * file);
+int get_next_failure_line_num(FILE *file);
 
 #endif /* CHECK_CHECK_H */

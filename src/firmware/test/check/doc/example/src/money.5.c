@@ -19,6 +19,7 @@
  */
 
 #include <stdlib.h>
+
 #include "money.h"
 
 struct Money
@@ -36,22 +37,22 @@ Money *money_create(int amount, char *currency)
         return NULL;
     }
 
-    m->amount = amount;
+    m->amount   = amount;
     m->currency = currency;
     return m;
 }
 
-int money_amount(Money * m)
+int money_amount(Money *m)
 {
     return m->amount;
 }
 
-char *money_currency(Money * m)
+char *money_currency(Money *m)
 {
     return m->currency;
 }
 
-void money_free(Money * m)
+void money_free(Money *m)
 {
     free(m);
     return;

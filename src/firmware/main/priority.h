@@ -10,9 +10,11 @@
 /**
  * \name Task Priorities
  *
- * These are the priorities of FreeRTOS tasks, which should range from 0 to one less than \c configMAX_PRIORITIES.
+ * These are the priorities of FreeRTOS tasks, which should range from 0 to one less than
+ * \c configMAX_PRIORITIES.
  *
- * FreeRTOS defines priorities “forwards”; that is, priority 0 is the least important and will yield to all others.
+ * FreeRTOS defines priorities “forwards”; that is, priority 0 is the least important and
+ * will yield to all others.
  *
  * @{
  */
@@ -23,11 +25,12 @@
 #define PRIO_TASK_MAX 7U
 
 /**
- * \brief The priority of the supervisor task, which is also the first task at startup that initializes the system.
+ * \brief The priority of the supervisor task, which is also the first task at startup
+ * that initializes the system.
  *
  * The supervisor needs to run from time to time, but is not very time-critical.
- * If it is starved of CPU time due to a firmware bug, eventually the hardware watchdog will kill the system safely.
- * Therefore, a low priority is suitable.
+ * If it is starved of CPU time due to a firmware bug, eventually the hardware watchdog
+ * will kill the system safely. Therefore, a low priority is suitable.
  */
 #define PRIO_TASK_SUPERVISOR 2U
 

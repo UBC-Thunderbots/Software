@@ -6,4 +6,3 @@
 extern const udev_config_info_t USB_CONFIGURATION;
 
 #endif
-

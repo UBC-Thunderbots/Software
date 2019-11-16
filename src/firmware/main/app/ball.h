@@ -1,5 +1,6 @@
 #pragma once
 
 // TODO: comment here
-typedef struct {
+typedef struct
+{
 } Ball;

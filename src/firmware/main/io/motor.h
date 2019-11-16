@@ -7,11 +7,12 @@
 /**
  * \brief The possible modes of driving a motor.
  */
-typedef enum {
-	MOTOR_MODE_COAST = 0U,
-	MOTOR_MODE_BRAKE = 1U,
-	MOTOR_MODE_FORWARD = 2U,
-	MOTOR_MODE_BACKWARD = 3U,
+typedef enum
+{
+    MOTOR_MODE_COAST    = 0U,
+    MOTOR_MODE_BRAKE    = 1U,
+    MOTOR_MODE_FORWARD  = 2U,
+    MOTOR_MODE_BACKWARD = 3U,
 } motor_mode_t;
 
 void motor_init(void);

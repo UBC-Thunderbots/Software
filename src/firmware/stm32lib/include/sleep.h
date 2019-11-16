@@ -23,7 +23,7 @@ void sleep_systick_overflows(unsigned long ticks);
  *
  * \param x the number of milliseconds to sleep
  */
-#define sleep_ms(x) sleep_us((x) * 1000UL)
+#define sleep_ms(x) sleep_us((x)*1000UL)
 
 /**
  * \brief Sleeps for some number of microseconds.
@@ -37,4 +37,3 @@ void sleep_systick_overflows(unsigned long ticks);
 /**
  * @}
  */
-

@@ -18,8 +18,9 @@ void buzzer_init(void);
  * \brief Starts the buzzer sounding.
  *
  * The buzzer starts sounding when this function is called.
- * The buzzer stops when \ref buzzer_stop is called or when all requested time periods have expired.
- * Calling this function while the buzzer is already sounding extends the remaining time the buzzer sounds, if necessary, to satisfy the request.
+ * The buzzer stops when \ref buzzer_stop is called or when all requested time periods
+ * have expired. Calling this function while the buzzer is already sounding extends the
+ * remaining time the buzzer sounds, if necessary, to satisfy the request.
  *
  * \param millis the number of milliseconds to buzz for, starting from the current time
  */

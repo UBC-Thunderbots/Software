@@ -9,4 +9,3 @@ void formathex16(char *dest, uint16_t val);
 void formathex32(char *dest, uint32_t val);
 
 #endif
-

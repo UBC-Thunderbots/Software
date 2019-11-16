@@ -21,4 +21,3 @@ unsigned int tbuf_read_get(tbuf_t *tbuf);
 void tbuf_read_put(tbuf_t *tbuf, unsigned int released);
 
 #endif
-

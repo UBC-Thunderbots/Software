@@ -13,10 +13,11 @@ static uint32_t value;
  *
  * \pre The CRC32 module must be initialized before invoking this function.
  */
-void build_id_init(void) {
-	const char *start = (const char *) 0x08000000U;
-	size_t length = (&linker_ramtext_lma - start) + ((size_t) &linker_ramtext_size);
-	value = crc32_be(start, length, CRC32_EMPTY);
+void build_id_init(void)
+{
+    const char *start = (const char *)0x08000000U;
+    size_t length     = (&linker_ramtext_lma - start) + ((size_t)&linker_ramtext_size);
+    value             = crc32_be(start, length, CRC32_EMPTY);
 }
 
 /**
@@ -24,6 +25,7 @@ void build_id_init(void) {
  *
  * \return the build ID
  */
-uint32_t build_id_get(void) {
-	return value;
+uint32_t build_id_get(void)
+{
+    return value;
 }

@@ -14,4 +14,3 @@ float adc_breakbeam(void);
 float adc_lps(void);
 
 #endif
-

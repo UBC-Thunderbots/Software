@@ -11,4 +11,3 @@ extern SemaphoreHandle_t enabled_mode_change_sem;
 extern const udev_config_info_t ENABLED_CONFIGURATION;
 
 #endif
-

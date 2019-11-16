@@ -10,4 +10,3 @@ void normal_on_exit(void);
 void timer6_isr(void);
 
 #endif
-

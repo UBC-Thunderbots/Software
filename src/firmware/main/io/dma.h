@@ -10,10 +10,11 @@
  * \param[in] name The name of the variable that will be the DMA buffer.
  * \param[in] size The size of the DMA buffer, in bytes.
  */
-#define DMA_ALLOCATE(name, size) \
-	_Static_assert(!((size) % 16), "DMA buffer size must be a multiple of 16."); \
-	static unsigned long name[(size) / sizeof(unsigned long)] __attribute__((aligned(16), section("dma")));
- 
+#define DMA_ALLOCATE(name, size)                                                         \
+    _Static_assert(!((size) % 16), "DMA buffer size must be a multiple of 16.");         \
+    static unsigned long name[(size) / sizeof(unsigned long)]                            \
+        __attribute__((aligned(16), section("dma")));
+
 /**
  * \brief A handle to a DMA-capable, suitably aligned memory block.
  */
@@ -26,4 +27,3 @@ void dma_free(dma_memory_handle_t handle);
 void *dma_get_buffer(dma_memory_handle_t handle);
 
 #endif
-

@@ -1,15 +1,16 @@
-#include "test.h"
-#include "check.h"
-#include "main/util/physbot.h"
 #include "main/primitives/move.h"
-#include "shared/robot_constants.h"
+
+#include "check.h"
 #include "main/physics.h"
+#include "main/util/physbot.h"
+#include "shared/robot_constants.h"
+#include "test.h"
 #include "util/util.h"
 
 // Common PhysBot to use throughout tests
 static PhysBot pb;
 
-START_TEST(test_plan_move_rotation_large) 
+START_TEST(test_plan_move_rotation_large)
 {
     // expected values were determined from manually
     // doing the math that plan_move_rotation does
@@ -21,7 +22,7 @@ START_TEST(test_plan_move_rotation_large)
 }
 END_TEST
 
-START_TEST(test_plan_move_rotation_small) 
+START_TEST(test_plan_move_rotation_small)
 {
     // expected values were determined from manually
     // doing the math that plan_move_rotation does
@@ -135,10 +136,11 @@ END_TEST
  * Setup function for the move tests. Initializes some parameters
  * for the PhysBot we are going to use.
  */
-void move_test_init(void) {
+void move_test_init(void)
+{
     pb.maj.disp = APPROACH_LIMIT + 1;
-    pb.dr[0] = 0;
-    pb.dr[1] = 0;
+    pb.dr[0]    = 0;
+    pb.dr[1]    = 0;
     pb.rot.disp = 0;
     pb.maj.time = 0.0f;
 }
@@ -150,8 +152,9 @@ void move_test_init(void) {
  * is rigged to choose a specific wheel axis. This was determined
  * via analyzing the layout of the robot and the possible choices
  * it could have for a wheel axis when moving in a certin direction.
- */ 
-void run_move_test() {
+ */
+void run_move_test()
+{
     // Put the name of the suite of tests in here
     Suite *s = suite_create("Move Test");
     // Creates a test case that you can add all of the tests to

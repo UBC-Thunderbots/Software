@@ -26,21 +26,20 @@
 #endif
 
 #if defined(__GNUC__) && defined(__GNUC_MINOR__)
-#define GCC_VERSION_AT_LEAST(major, minor) \
-((__GNUC__ > (major)) || \
- (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#define GCC_VERSION_AT_LEAST(major, minor)                                               \
+    ((__GNUC__ > (major)) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #define GCC_VERSION_AT_LEAST(major, minor) 0
 #endif
 
-#if GCC_VERSION_AT_LEAST(2,95)
-#define CK_ATTRIBUTE_UNUSED __attribute__ ((unused))
+#if GCC_VERSION_AT_LEAST(2, 95)
+#define CK_ATTRIBUTE_UNUSED __attribute__((unused))
 #else
 #define CK_ATTRIBUTE_UNUSED
 #endif /* GCC 2.95 */
 
-#if GCC_VERSION_AT_LEAST(2,5)
-#define CK_ATTRIBUTE_NORETURN __attribute__ ((noreturn))
+#if GCC_VERSION_AT_LEAST(2, 5)
+#define CK_ATTRIBUTE_NORETURN __attribute__((noreturn))
 #else
 #define CK_ATTRIBUTE_NORETURN
 #endif /* GCC 2.5 */
@@ -55,10 +54,10 @@
 #endif
 
 #if defined(_MSC_VER)
-#include <WinSock2.h>           /* struct timeval, API used in gettimeofday implementation */
-#include <io.h>                 /* read, write */
-#include <process.h>            /* getpid */
-#endif /* _MSC_VER */
+#include <WinSock2.h> /* struct timeval, API used in gettimeofday implementation */
+#include <io.h>       /* read, write */
+#include <process.h>  /* getpid */
+#endif                /* _MSC_VER */
 
 /* defines size_t */
 #include <sys/types.h>
@@ -78,8 +77,8 @@
 /* However, some older Visual Studio Versions do not */
 #if !defined(INFINITY) || !defined(NAN)
 extern double DOUBLE_ZERO;
-#define INFINITY (1.0/DOUBLE_ZERO)
-#define NAN (DOUBLE_ZERO/DOUBLE_ZERO)
+#define INFINITY (1.0 / DOUBLE_ZERO)
+#define NAN (DOUBLE_ZERO / DOUBLE_ZERO)
 #endif
 #if !defined(isnan) || !defined(isinf) || !defined(isfinite)
 #define NEED_fpclassify
@@ -91,7 +90,7 @@ extern int fpclassify(double d);
 #define FP_SUBNORMAL (16)
 #define isnan(x) ((fpclassify((double)(x)) & FP_NAN) == FP_NAN)
 #define isinf(x) ((fpclassify((double)(x)) & FP_INFINITE) == FP_INFINITE)
-#define isfinite(x) ((fpclassify((double)(x)) & (FP_NAN|FP_INFINITE)) == 0)
+#define isfinite(x) ((fpclassify((double)(x)) & (FP_NAN | FP_INFINITE)) == 0)
 #endif
 
 
@@ -145,7 +144,7 @@ CK_DLL_EXP int gettimeofday(struct timeval *tv, void *tz);
 
 #if !HAVE_DECL_LOCALTIME_R
 #if !defined(localtime_r)
-CK_DLL_EXP struct tm *localtime_r(const time_t * clock, struct tm *result);
+CK_DLL_EXP struct tm *localtime_r(const time_t *clock, struct tm *result);
 #endif
 #endif /* !HAVE_DECL_LOCALTIME_R */
 
@@ -195,7 +194,7 @@ struct timespec
 #endif /* STRUCT_TIMESPEC_DEFINITION_MISSING */
 
 #ifdef STRUCT_ITIMERSPEC_DEFINITION_MISSING
-/* 
+/*
  * The following structure is defined in POSIX.1b for timer start values and intervals.
  * If it is not defined in time.h, then we need to define it here.
  */
@@ -206,7 +205,7 @@ struct itimerspec
 };
 #endif /* STRUCT_ITIMERSPEC_DEFINITION_MISSING */
 
-/* 
+/*
  * Do a simple forward declaration in case the struct is not defined.
  * In the versions of timer_create in libcompat, sigevent is never
  * used.
@@ -214,8 +213,7 @@ struct itimerspec
 struct sigevent;
 
 CK_DLL_EXP int clock_gettime(clockid_t clk_id, struct timespec *ts);
-CK_DLL_EXP int timer_create(clockid_t clockid, struct sigevent *sevp,
-                            timer_t * timerid);
+CK_DLL_EXP int timer_create(clockid_t clockid, struct sigevent *sevp, timer_t *timerid);
 CK_DLL_EXP int timer_settime(timer_t timerid, int flags,
                              const struct itimerspec *new_value,
                              struct itimerspec *old_value);

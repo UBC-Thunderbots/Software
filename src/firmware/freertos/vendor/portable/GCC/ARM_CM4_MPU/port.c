@@ -78,11 +78,10 @@ task.h is included from an application file. */
 
 /* Scheduler includes. */
 #include "FreeRTOS.h"
-#include "queue.h"
 #include "event_groups.h"
 #include "mpu_prototypes.h"
-
 #include "portmacro.h"
+#include "queue.h"
 
 #ifndef __VFP_FP__
 	#error This port can only be used when the project options are configured to enable hardware floating point support.

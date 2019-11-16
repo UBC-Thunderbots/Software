@@ -25,106 +25,110 @@
  * The origin is the position and orientation of the robot at the last call to
  * \ref dr_reset.
  */
-typedef struct {
-	/**
-	 * \brief The X component of the robot’s accumulated motion.
-	 */
-	float x;
+typedef struct
+{
+    /**
+     * \brief The X component of the robot’s accumulated motion.
+     */
+    float x;
 
-	/**
-	 * \brief The Y component of the robot’s accumulated motion.
-	 */
-	float y;
+    /**
+     * \brief The Y component of the robot’s accumulated motion.
+     */
+    float y;
 
-	/**
-	 * \brief The angular component of the robot’s accumulated motion.
-	 */
-	float angle;
+    /**
+     * \brief The angular component of the robot’s accumulated motion.
+     */
+    float angle;
 
-	/**
-	 * \brief The X component of the robot’s velocity.
-	 */
-	float vx;
+    /**
+     * \brief The X component of the robot’s velocity.
+     */
+    float vx;
 
-	/**
-	 * \brief The Y component of the robot’s velocity.
-	 */
-	float vy;
+    /**
+     * \brief The Y component of the robot’s velocity.
+     */
+    float vy;
 
-	/**
-	 * \brief The robot’s angular velocity.
-	 */
-	float avel;
+    /**
+     * \brief The robot’s angular velocity.
+     */
+    float avel;
 } dr_data_t;
 
-typedef struct {
-	/**
-	 * \brief The X component of the ball’s accumulated motion.
-	 */
-	float x;
+typedef struct
+{
+    /**
+     * \brief The X component of the ball’s accumulated motion.
+     */
+    float x;
 
-	/**
-	 * \brief The Y component of the ball’s accumulated motion.
-	 */
-	float y;
+    /**
+     * \brief The Y component of the ball’s accumulated motion.
+     */
+    float y;
 
-	/**
-	 * \brief The X component of the ball’s velocity.
-	 */
-	float vx;
+    /**
+     * \brief The X component of the ball’s velocity.
+     */
+    float vx;
 
-	/**
-	 * \brief The Y component of the ball’s velocity.
-	 */
-	float vy;
+    /**
+     * \brief The Y component of the ball’s velocity.
+     */
+    float vy;
 
 } dr_ball_data_t;
 
 
-typedef struct {
-  /**
-  * \brief The x component of the robot's global position in metres.
-  */
-  float x;
+typedef struct
+{
+    /**
+     * \brief The x component of the robot's global position in metres.
+     */
+    float x;
 
-  /**
-  * \brief The y component of the robot's global position in metres.
-  */
-  float y;
+    /**
+     * \brief The y component of the robot's global position in metres.
+     */
+    float y;
 
-  /**
-  * \brief The theta component of the robot's position in the global frame in rad.
-  */
-  float angle;
-  
-  /**
-  * \brief The timestamp associated with this camera frame.
-  */
-  uint64_t timestamp;
+    /**
+     * \brief The theta component of the robot's position in the global frame in rad.
+     */
+    float angle;
 
-  /**
-  * \brief Whether the camera data has been updated since last tick
-  */
-  bool new_data;
+    /**
+     * \brief The timestamp associated with this camera frame.
+     */
+    uint64_t timestamp;
+
+    /**
+     * \brief Whether the camera data has been updated since last tick
+     */
+    bool new_data;
 
 } robot_camera_data_t;
 
 
-typedef struct {
-  /**
-  * \brief The x component of the ball's global position in metres.
-  */
-  float x;
+typedef struct
+{
+    /**
+     * \brief The x component of the ball's global position in metres.
+     */
+    float x;
 
-  /**
-  * \brief The y component of the ball's global position in metres.
-  */
-  float y;
+    /**
+     * \brief The y component of the ball's global position in metres.
+     */
+    float y;
 
-  /**
-  * \brief The timestamp associated with this camera frame.
-  */
-  uint64_t timestamp;
+    /**
+     * \brief The timestamp associated with this camera frame.
+     */
+    uint64_t timestamp;
 
 } ball_camera_data_t;
 

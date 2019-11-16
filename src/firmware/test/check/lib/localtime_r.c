@@ -22,11 +22,11 @@
 
 #if !defined(localtime_r)
 
-struct tm *localtime_r(const time_t * clock, struct tm *result)
+struct tm *localtime_r(const time_t *clock, struct tm *result)
 {
     struct tm *now = localtime(clock);
 
-    if(now == NULL)
+    if (now == NULL)
     {
         return NULL;
     }

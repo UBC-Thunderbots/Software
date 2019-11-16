@@ -8,9 +8,10 @@
  *
  * \brief The available devices.
  */
-typedef enum {
-    CHICKER_KICK, ///< Performs a straight, flat kick.
-    CHICKER_CHIP, ///< Performs a chip kick up into the air.
+typedef enum
+{
+    CHICKER_KICK,  ///< Performs a straight, flat kick.
+    CHICKER_CHIP,  ///< Performs a chip kick up into the air.
 } chicker_device_t;
 
 /**
@@ -19,7 +20,8 @@ typedef enum {
 #define CHICKER_CHARGED_THRESHOLD 35.0f
 
 /**
- * \brief The voltage above which the safe discharge pulse generator generates discharge pulses.
+ * \brief The voltage above which the safe discharge pulse generator generates discharge
+ * pulses.
  */
 #define CHICKER_DISCHARGE_THRESHOLD 25.0f
 

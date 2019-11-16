@@ -19,6 +19,7 @@
  */
 
 #include <check.h>
+
 #include "../src/money.h"
 
 START_TEST(test_money_create)

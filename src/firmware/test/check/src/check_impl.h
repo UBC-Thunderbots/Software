@@ -30,9 +30,9 @@
 #define NANOS_PER_SECONDS 1000000000
 
 /** calculate the difference in useconds out of two "struct timespec"s */
-#define DIFF_IN_USEC(begin, end) \
-  ( (((end).tv_sec - (begin).tv_sec) * US_PER_SEC) + \
-    ((end).tv_nsec/1000) - ((begin).tv_nsec/1000) )
+#define DIFF_IN_USEC(begin, end)                                                         \
+    ((((end).tv_sec - (begin).tv_sec) * US_PER_SEC) + ((end).tv_nsec / 1000) -           \
+     ((begin).tv_nsec / 1000))
 
 typedef struct TF
 {
@@ -47,7 +47,7 @@ typedef struct TF
 struct Suite
 {
     const char *name;
-    List *tclst;                /* List of test cases */
+    List *tclst; /* List of test cases */
 };
 
 typedef struct Fixture
@@ -60,7 +60,7 @@ struct TCase
 {
     const char *name;
     struct timespec timeout;
-    List *tflst;                /* list of test functions */
+    List *tflst; /* list of test functions */
     List *unch_sflst;
     List *unch_tflst;
     List *ch_sflst;
@@ -77,35 +77,34 @@ typedef struct TestStats
 
 struct TestResult
 {
-    enum test_result rtype;     /* Type of result */
-    enum ck_result_ctx ctx;     /* When the result occurred */
-    char *file;                 /* File where the test occured */
-    int line;                   /* Line number where the test occurred */
-    int iter;                   /* The iteration value for looping tests */
-    int duration;               /* duration of this test in microseconds */
-    const char *tcname;         /* Test case that generated the result */
-    const char *tname;          /* Test that generated the result */
-    char *msg;                  /* Failure message */
+    enum test_result rtype; /* Type of result */
+    enum ck_result_ctx ctx; /* When the result occurred */
+    char *file;             /* File where the test occured */
+    int line;               /* Line number where the test occurred */
+    int iter;               /* The iteration value for looping tests */
+    int duration;           /* duration of this test in microseconds */
+    const char *tcname;     /* Test case that generated the result */
+    const char *tname;      /* Test that generated the result */
+    char *msg;              /* Failure message */
 };
 
 TestResult *tr_create(void);
-void tr_reset(TestResult * tr);
-void tr_free(TestResult * tr);
+void tr_reset(TestResult *tr);
+void tr_free(TestResult *tr);
 
 enum cl_event
 {
-    CLINITLOG_SR,               /* Initialize log file */
-    CLENDLOG_SR,                /* Tests are complete */
-    CLSTART_SR,                 /* Suite runner start */
-    CLSTART_S,                  /* Suite start */
-    CLEND_SR,                   /* Suite runner end */
-    CLEND_S,                    /* Suite end */
-    CLSTART_T,                  /* A test case is about to run */
-    CLEND_T                     /* Test case end */
+    CLINITLOG_SR, /* Initialize log file */
+    CLENDLOG_SR,  /* Tests are complete */
+    CLSTART_SR,   /* Suite runner start */
+    CLSTART_S,    /* Suite start */
+    CLEND_SR,     /* Suite runner end */
+    CLEND_S,      /* Suite end */
+    CLSTART_T,    /* A test case is about to run */
+    CLEND_T       /* Test case end */
 };
 
-typedef void (*LFun) (SRunner *, FILE *, enum print_output,
-                      void *, enum cl_event);
+typedef void (*LFun)(SRunner *, FILE *, enum print_output, void *, enum cl_event);
 
 typedef struct Log
 {
@@ -117,16 +116,16 @@ typedef struct Log
 
 struct SRunner
 {
-    List *slst;                 /* List of Suite objects */
-    TestStats *stats;           /* Run statistics */
-    List *resultlst;            /* List of unit test results */
-    const char *log_fname;      /* name of log file */
-    const char *xml_fname;      /* name of xml output file */
-    const char *tap_fname;      /* name of tap output file */
-    List *loglst;               /* list of Log objects */
-    enum fork_status fstat;     /* controls if suites are forked or not
-                                   NOTE: Don't use this value directly,
-                                   instead use srunner_fork_status */
+    List *slst;             /* List of Suite objects */
+    TestStats *stats;       /* Run statistics */
+    List *resultlst;        /* List of unit test results */
+    const char *log_fname;  /* name of log file */
+    const char *xml_fname;  /* name of xml output file */
+    const char *tap_fname;  /* name of tap output file */
+    List *loglst;           /* list of Log objects */
+    enum fork_status fstat; /* controls if suites are forked or not
+                               NOTE: Don't use this value directly,
+                               instead use srunner_fork_status */
 };
 
 

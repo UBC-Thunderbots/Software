@@ -4,7 +4,8 @@
 #include "app/robot.h"
 
 // TODO: comment here
-typedef struct {
-  Ball ball;
-  Robot robot;
+typedef struct
+{
+    Ball ball;
+    Robot robot;
 } World;

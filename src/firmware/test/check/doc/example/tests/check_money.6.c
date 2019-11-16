@@ -18,8 +18,9 @@
  * MA 02110-1301, USA.
  */
 
-#include <stdlib.h>
 #include <check.h>
+#include <stdlib.h>
+
 #include "../src/money.h"
 
 START_TEST(test_money_create)
@@ -54,7 +55,7 @@ START_TEST(test_money_create_zero)
 }
 END_TEST
 
-Suite * money_suite(void)
+Suite *money_suite(void)
 {
     Suite *s;
     TCase *tc_core;
@@ -84,7 +85,7 @@ int main(void)
     Suite *s;
     SRunner *sr;
 
-    s = money_suite();
+    s  = money_suite();
     sr = srunner_create(s);
 
     srunner_run_all(sr, CK_NORMAL);

@@ -23,39 +23,41 @@
  * in order to trigger the "Message string too long" error.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <check.h>
-#include "config.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "check_check.h"
+#include "config.h"
 
 START_TEST(test_set_max_msg_size)
 {
-  ck_abort_msg("40 characters of an assertion message...");
+    ck_abort_msg("40 characters of an assertion message...");
 }
 END_TEST
 
 
 static Suite *make_set_max_msg_size_suite(void)
 {
-  Suite *s = suite_create("Check Set Max Msg Size");
+    Suite *s = suite_create("Check Set Max Msg Size");
 
-  TCase *tc_set_max_msg_size = tcase_create("Test Set Max Msg Size");
+    TCase *tc_set_max_msg_size = tcase_create("Test Set Max Msg Size");
 
-  suite_add_tcase (s, tc_set_max_msg_size);
+    suite_add_tcase(s, tc_set_max_msg_size);
 
-  tcase_add_test (tc_set_max_msg_size, test_set_max_msg_size);
+    tcase_add_test(tc_set_max_msg_size, test_set_max_msg_size);
 
-  return s;
+    return s;
 }
 
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     int n;
     SRunner *sr;
 
-    if (argc != 2) {
+    if (argc != 2)
+    {
         fprintf(stderr, "usage: %s max-msg-size\n", argv[0]);
         return EXIT_FAILURE;
     }
@@ -64,11 +66,10 @@ int main (int argc, char *argv[])
      * Run the test suite. This is intended to trigger the "Message is too long" error.
      * Actual success/failure is determined by examining the output.
      */
-    check_set_max_msg_size(32);            // 1st call has no effect since
-    check_set_max_msg_size(atoi(argv[1])); // the 2nd call will override it.
+    check_set_max_msg_size(32);             // 1st call has no effect since
+    check_set_max_msg_size(atoi(argv[1]));  // the 2nd call will override it.
     sr = srunner_create(make_set_max_msg_size_suite());
     srunner_run_all(sr, CK_NORMAL);
     srunner_free(sr);
     return EXIT_SUCCESS;
 }
-
