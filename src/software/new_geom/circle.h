@@ -11,10 +11,10 @@ class Circle final : public IConvexShape
 
     /**
      * Creates a Circle with arbitrary origin and radius.
-     * Throws an error if passed a negative radius.
      *
      * @param the origin of the Circle
      * @param the radius of the Circle
+     * @throws std::invalid_argument if passed a negative radius.
      */
     explicit Circle(const Point &origin, double radius);
 
@@ -33,9 +33,10 @@ class Circle final : public IConvexShape
     Point getOrigin() const;
 
     /**
-     * Sets the radius of this Circle. Throws an error if passed a negative radius.
+     * Sets the radius of this Circle.
      *
      * @param the new radius of this Circle
+     * @throws std::invalid_argument if passed a negative radius.
      */
     void setRadius(double radius);
 

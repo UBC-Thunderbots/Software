@@ -14,14 +14,14 @@ void Circle::setOrigin(const Point &o)
 
 Point Circle::getOrigin() const
 {
-    return Point(origin_);
+    return origin_;
 }
 
 void Circle::setRadius(double radius)
 {
     if (radius < 0)
     {
-        throw std::invalid_argument("Circle radius cannot be negative");
+        throw std::invalid_argument("Circle radius cannot be negative, given: " + std::to_string(radius));
     }
 
     radius_ = radius;
@@ -44,7 +44,8 @@ double Circle::area() const
 
 bool operator==(const Circle &c, const Circle &d)
 {
-    return c.getOrigin() == d.getOrigin() && c.getRadius() == d.getRadius();
+    return (c.getOrigin() == d.getOrigin()) &&
+           (std::abs(c.getRadius() - d.getRadius()) < GeomConstants::EPSILON);
 }
 
 bool operator!=(const Circle &c, const Circle &d)
