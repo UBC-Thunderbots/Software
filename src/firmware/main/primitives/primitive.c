@@ -110,15 +110,16 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params) {
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world An object representing the world
  */
-void primitive_tick(log_record_t *log) {
+void primitive_tick(log_record_t *log, World world) {
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
     if (log) {
         log->tick.drive_serial = receive_last_serial();
         log->tick.primitive = (uint8_t)primitive_current_index;
     }
     if (primitive_current) {
-        primitive_current->tick(log);
+        primitive_current->tick(log, world);
     }
     dr_tick(log);
     xSemaphoreGive(primitive_mutex);

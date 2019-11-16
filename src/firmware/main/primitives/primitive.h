@@ -3,11 +3,8 @@
 
 #include <stdint.h>
 
-//#ifndef FWSIM
 #include "util/log.h"
-//#else
-//#include <stdbool.h>
-//#endif
+#include "app/world.h"
 
 /**
  * \brief The information about a movement sent from the host computer.
@@ -80,13 +77,14 @@ typedef struct {
 	 *
 	 * \param[out] log the log record to fill with information about the tick,
 	 * or \c NULL if no record is to be filled
+	 * \param[in] world an object representing the world
 	 */
-	void (*tick)(log_record_t *log);
+	void (*tick)(log_record_t *log, World world);
 } primitive_t;
 
 void primitive_init(void);
 void primitive_start(unsigned int primitive, const primitive_params_t *params);
-void primitive_tick(log_record_t *log);
+void primitive_tick(log_record_t *log, World world);
 bool primitive_is_direct(unsigned int primitive);
 unsigned int get_primitive_index();
 bool primitive_params_are_equal(primitive_params_t* params1,primitive_params_t* params);

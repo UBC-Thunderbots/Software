@@ -69,6 +69,7 @@ cc_library(
         "STM32LIB_USE_FREERTOS",
     ],
     includes = [
+        ".",
         "cdcacm/include",
         "freertos/include",
         "freertos/vendor/portable/GCC/ARM_CM4F",

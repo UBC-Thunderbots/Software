@@ -44,6 +44,7 @@
 #include "priority.h"
 #include "io/receive.h"
 #include "io/wheels.h"
+#include "app/world.h"
 #include "primitives/primitive.h"
 #include <FreeRTOS.h>
 #include <assert.h>
@@ -65,6 +66,18 @@ static bool shutdown = false;
 
 static void normal_task(void *UNUSED(param)) {
 	TickType_t last_wake = xTaskGetTickCount();
+
+	Ball ball = {
+	};
+	Chicker chicker = {
+	};
+	Robot robot = {
+	    .chicker = chicker,
+	};
+        World world = {
+            .ball = ball,
+            .robot = robot,
+        };
 
 	while (!__atomic_load_n(&shutdown, __ATOMIC_RELAXED)) {
 		// Wait one system tick.
@@ -95,7 +108,7 @@ static void normal_task(void *UNUSED(param)) {
 		hall_tick();
 		encoder_tick();
 
-		primitive_tick(record);
+		primitive_tick(record, world);
 		wheels_tick(record);
 		dribbler_tick(record);
 		charger_tick();
