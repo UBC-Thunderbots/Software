@@ -1,5 +1,8 @@
 #include "software/new_geom/point.h"
 
+/**
+ * A geometric figure that encloses an area in 2D space.
+ */
 class IShape
 {
    public:

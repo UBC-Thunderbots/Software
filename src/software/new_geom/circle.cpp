@@ -21,7 +21,8 @@ void Circle::setRadius(double radius)
 {
     if (radius < 0)
     {
-        throw std::invalid_argument("Circle radius cannot be negative, given: " + std::to_string(radius));
+        throw std::invalid_argument("Circle radius cannot be negative, given: " +
+                                    std::to_string(radius));
     }
 
     radius_ = radius;

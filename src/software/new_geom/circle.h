@@ -1,6 +1,9 @@
 #include "software/new_geom/convex_shape.h"
 #include "software/new_geom/point.h"
 
+/**
+ * A circle with a radius and point representing the origin of the circle.
+ */
 class Circle final : public IConvexShape
 {
    public:
