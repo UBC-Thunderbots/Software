@@ -11,7 +11,8 @@ TEST(StopActionTest, robot_stopping_without_coasting_while_already_moving)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     StopAction action = StopAction(0.05, false);
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, false);
+    action.updateControlParams(robot, false);
+    auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -37,8 +38,9 @@ TEST(StopAction, robot_stopping_while_already_stopped)
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
     // done and so will return a null pointer
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, false);
-    intent_ptr      = action.updateStateAndGetNextIntent(robot, false);
+    action.updateControlParams(robot, false);
+    action.getNextIntent();
+    auto intent_ptr = action.getNextIntent();
 
     EXPECT_TRUE(action.done());
 }
