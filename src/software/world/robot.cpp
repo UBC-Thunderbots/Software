@@ -24,7 +24,7 @@ void Robot::updateCurrentState(const RobotState &new_state)
     if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
     {
         throw std::invalid_argument(
-            "Error: Trying to update ball state using a state older then the current state");
+            "Error: Trying to update robot state using a state older then the current state");
     }
 
     states_.push_front(new_state);

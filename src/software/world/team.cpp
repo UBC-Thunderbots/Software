@@ -43,9 +43,7 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
         if (it != team_robots.end())
         {
             // The robot already exists on the team. Find and update the robot
-            it->updateCurrentState(
-                RobotState(robot.position(), robot.velocity(), robot.orientation(),
-                           robot.angularVelocity(), robot.lastUpdateTimestamp()));
+            it->updateCurrentState(robot.currentState());
         }
         else
         {

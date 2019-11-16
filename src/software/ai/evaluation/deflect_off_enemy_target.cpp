@@ -16,7 +16,7 @@ namespace Evaluation
         LegacyTriangle chip_target_area =
             triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
 
-        Robot enemyClosestToEdge = world.enemyTeam().getRobotById(0).value();
+        Robot enemy_closest_to_edge = world.enemyTeam().getRobotById(0).value();
         double shortestLenToEdge = 100.0;
         double closestEdgeY;
         // Finds the y value of the closest edge of the field (likely where the ball
@@ -28,29 +28,27 @@ namespace Evaluation
 
         // Find the enemy that's blocking a shot that's closest to the edge of the
         // field
-        for (Robot i : world.enemyTeam().getAllRobots())
+        for (Robot enemy_robot : world.enemyTeam().getAllRobots())
         {
-            if ((contains(chip_target_area, i.position()) ||
+            if ((contains(chip_target_area, enemy_robot.position()) ||
                  offsetToLine(enemy_goal_negative, world.ball().position(),
-                              i.position()) <= ROBOT_MAX_RADIUS_METERS ||
+                              enemy_robot.position()) <= ROBOT_MAX_RADIUS_METERS ||
                  offsetToLine(enemy_goal_positive, world.ball().position(),
-                              i.position()) <= ROBOT_MAX_RADIUS_METERS) &&
-                (i.position().x() > world.ball().position().x()))
+                              enemy_robot.position()) <= ROBOT_MAX_RADIUS_METERS) &&
+                (enemy_robot.position().x() > world.ball().position().x()))
             {
-                if (fabs(i.position().y() - closestEdgeY) < shortestLenToEdge)
+                if (fabs(enemy_robot.position().y() - closestEdgeY) < shortestLenToEdge)
                 {
-                    enemyClosestToEdge.updateCurrentState(
-                        RobotState(i.position(), i.velocity(), i.orientation(),
-                                   i.angularVelocity(), i.lastUpdateTimestamp()));
-                    ;
-                    shortestLenToEdge = fabs(i.position().y() - closestEdgeY);
+                    enemy_closest_to_edge = enemy_robot;
+                    enemy_closest_to_edge.updateCurrentState(enemy_robot.currentState());
+                    shortestLenToEdge = fabs(enemy_robot.position().y() - closestEdgeY);
                 }
             }
         }
 
         // want to shoot at the edge of a robot so the ball deflects towards the
         // edge of the field
-        Vector dir     = enemyClosestToEdge.position() - world.ball().position();
+        Vector dir     = enemy_closest_to_edge.position() - world.ball().position();
         Vector dirPerp = dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS * 0.75);
         Point target   = Point(0, 0);
 
