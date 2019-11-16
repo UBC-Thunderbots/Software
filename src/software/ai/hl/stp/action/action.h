@@ -32,9 +32,6 @@ class Action
      */
     bool done() const;
 
-    virtual ~Action() = default;
-
-   protected:
     /**
      * Runs the coroutine and get the next Intent to run from the calculateNextIntent
      * function. If the Action is not done, the next Intent is returned. If the Action
@@ -45,6 +42,9 @@ class Action
      */
     std::unique_ptr<Intent> getNextIntent();
 
+    virtual ~Action() = default;
+
+   protected:
     // The coroutine that sequentially returns the Intents the Action wants to run
     IntentCoroutine::pull_type intent_sequence;
     // The robot performing this Action

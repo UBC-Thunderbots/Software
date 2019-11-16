@@ -84,9 +84,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
-        yield(move_action.updateStateAndGetNextIntent(
-            *robot, pass.receiverPoint(), desired_angle, 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+        move_action.updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
+                                        DribblerEnable::OFF, MoveType::NORMAL,
+                                        AutokickType::NONE, BallCollisionType::ALLOW);
+        yield(move_action.getNextIntent());
     }
 
     // Vector from the ball to the robot
@@ -113,9 +114,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
-            yield(move_action.updateStateAndGetNextIntent(
-                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOKICK, BallCollisionType::ALLOW));
+            move_action.updateControlParams(*robot, ideal_position, ideal_orientation, 0,
+                                            DribblerEnable::OFF, MoveType::NORMAL,
+                                            AUTOKICK, BallCollisionType::ALLOW);
+            yield(move_action.getNextIntent());
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
@@ -137,9 +139,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 (ball.position() - robot->position()).orientation();
 
             // Move into position with the dribbler on
-            yield(move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+            yield(move_action.getNextIntent());
         }
     }
     LOG(DEBUG) << "Finished";
