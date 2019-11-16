@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 /**
  * Polynomial is a representation of a polynomial

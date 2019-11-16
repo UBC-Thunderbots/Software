@@ -100,7 +100,7 @@ Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) co
     // real-world behavior. Position prediction should be improved as outlined in
     // https://github.com/UBC-Thunderbots/Software/issues/50
     double seconds_in_future = duration_in_future.getSeconds();
-    return position() + velocity().norm(velocity().len() * seconds_in_future);
+    return position() + velocity().normalize(velocity().length() * seconds_in_future);
 }
 
 Vector Robot::velocity() const

@@ -26,7 +26,8 @@ void StopTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, false);
     do
     {
-        yield(stop_action.updateStateAndGetNextIntent(*robot, this->coast));
+        stop_action.updateControlParams(*robot, this->coast);
+        yield(stop_action.getNextIntent());
     } while (!stop_action.done());
 }
 

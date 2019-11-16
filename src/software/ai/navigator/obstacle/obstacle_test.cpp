@@ -10,7 +10,7 @@
 #include <sstream>
 
 #include "shared/constants.h"
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 // obstacle with robot radius factor = 1, velocity projection factor = 1
 // centred at (0,0) and with (0,0) velocity
@@ -18,8 +18,8 @@ TEST(NavigatorObstacleTest, default_velocity_obstacle_polygon)
 {
     double TEST_EPSILON    = 1e-3;
     Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot    = Robot(3, Point(0.0, 0.0), Vector(0.0, 0.0), Angle::ofRadians(2.2),
-                        AngularVelocity::ofRadians(-0.6), current_time);
+    Robot robot    = Robot(3, Point(0.0, 0.0), Vector(0.0, 0.0), Angle::fromRadians(2.2),
+                        AngularVelocity::fromRadians(-0.6), current_time);
     auto p_pointer = Obstacle::createRobotObstacleWithScalingParams(robot, 1.0, 1.0)
                          .getBoundaryPolygon();
 
@@ -57,8 +57,8 @@ TEST(NavigatorObstacleTest, shifted_scaling_velocity_obstacle_polygon)
 {
     double TEST_EPSILON    = 1e-3;
     Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot            = Robot(3, Point(1, 2), Vector(3, 2), Angle::ofRadians(2.2),
-                        AngularVelocity::ofRadians(-0.6), current_time);
+    Robot robot            = Robot(3, Point(1, 2), Vector(3, 2), Angle::fromRadians(2.2),
+                        AngularVelocity::fromRadians(-0.6), current_time);
     auto p_pointer = Obstacle::createRobotObstacleWithScalingParams(robot, 1.0, 1.0)
                          .getBoundaryPolygon();
 
@@ -96,8 +96,8 @@ TEST(NavigatorObstacleTest, shifted_scaled_up_velocity_obstacle_polygon)
 {
     double TEST_EPSILON    = 1e-3;
     Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot            = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::ofRadians(2.2),
-                        AngularVelocity::ofRadians(-0.6), current_time);
+    Robot robot    = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::fromRadians(2.2),
+                        AngularVelocity::fromRadians(-0.6), current_time);
     auto p_pointer = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 1.4)
                          .getBoundaryPolygon();
 
@@ -135,8 +135,8 @@ TEST(NavigatorObstacleTest, shifted_no_buffer_velocity_obstacle_polygon)
 {
     double TEST_EPSILON    = 1e-3;
     Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot            = Robot(3, Point(1, 2), Vector(3, 2), Angle::ofRadians(2.2),
-                        AngularVelocity::ofRadians(-0.6), current_time);
+    Robot robot            = Robot(3, Point(1, 2), Vector(3, 2), Angle::fromRadians(2.2),
+                        AngularVelocity::fromRadians(-0.6), current_time);
     auto p_pointer = Obstacle::createRobotObstacleWithBufferParams(robot, true, 0.0, 0.0)
                          .getBoundaryPolygon();
 
@@ -174,8 +174,8 @@ TEST(NavigatorObstacleTest, shifted_with_buffer_velocity_obstacle_polygon)
 {
     double TEST_EPSILON    = 1e-3;
     Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot            = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::ofRadians(2.2),
-                        AngularVelocity::ofRadians(-0.6), current_time);
+    Robot robot    = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::fromRadians(2.2),
+                        AngularVelocity::fromRadians(-0.6), current_time);
     auto p_pointer = Obstacle::createRobotObstacleWithBufferParams(robot, true, 0.4, 1.8)
                          .getBoundaryPolygon();
 
@@ -229,5 +229,5 @@ TEST(NavigatorObstacleTest, create_from_circle)
     EXPECT_TRUE(obstacle.getBoundaryCircle());
 
     EXPECT_EQ((*obstacle.getBoundaryCircle()).getRadius(), (1 + ROBOT_MAX_RADIUS_METERS));
-    EXPECT_EQ((*obstacle.getBoundaryCircle()).getOrigin(), Point({2, 2}));
+    EXPECT_EQ((*obstacle.getBoundaryCircle()).getOrigin(), Point(2, 2));
 }

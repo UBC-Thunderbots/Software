@@ -104,13 +104,13 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         if (enemy_threats.size() == 0)
         {
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoal()).orientation(),
-                0);
+                world.field().friendlyGoal() + Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
+                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0,
+                BallCollisionType::AVOID);
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoal() + Point(0, -2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoal()).orientation(),
-                0);
+                world.field().friendlyGoal() + Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
+                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0,
+                BallCollisionType::AVOID);
 
             tactics_to_run.emplace_back(move_tactic_main);
             tactics_to_run.emplace_back(move_tactic_secondary);
@@ -122,9 +122,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             shadow_tactic_main->updateControlParams(enemy_threats.at(1),
                                                     ROBOT_MAX_RADIUS_METERS * 3);
             move_tactic_main->updateControlParams(
-                world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoal()).orientation(),
-                0);
+                world.field().friendlyGoal() + Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
+                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0,
+                BallCollisionType::AVOID);
 
             tactics_to_run.emplace_back(shadow_tactic_main);
             tactics_to_run.emplace_back(move_tactic_main);

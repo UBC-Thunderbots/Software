@@ -31,8 +31,8 @@ std::string IndirectFreeKickPlay::getName() const
 bool IndirectFreeKickPlay::isApplicable(const World &world) const
 {
     double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).len());
+        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
+                 (world.field().enemyCornerNeg() - world.ball().position()).length());
 
     // Make sure we don't interfere with the cornerkick play
     return world.gameState().isOurFreeKick() &&
@@ -99,7 +99,6 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
-    align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
@@ -110,8 +109,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -133,8 +131,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Aligning to ball";
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -181,14 +178,16 @@ void IndirectFreeKickPlay::updateCherryPickTactics(
 }
 
 void IndirectFreeKickPlay::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic,
+    BallCollisionType ball_collision_type)
 {
-    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
+    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
-        ball_to_center_vec.orientation(), 0);
+        world.ball().position() -
+            ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+        ball_to_center_vec.orientation(), 0, ball_collision_type);
 }
 
 void IndirectFreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
@@ -224,7 +223,7 @@ void IndirectFreeKickPlay::chipAtGoalStage(
 
     do
     {
-        double chip_dist = (chip_target - world.ball().position()).len();
+        double chip_dist = (chip_target - world.ball().position()).length();
 
         updateCreaseDefenderTactics(crease_defender_tactics);
         chip_tactic->updateWorldParams(world.ball());
@@ -289,8 +288,7 @@ void IndirectFreeKickPlay::findPassStage(
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateAlignToBallTactic(align_to_ball_tactic, BallCollisionType::AVOID);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);

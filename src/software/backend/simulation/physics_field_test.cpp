@@ -36,47 +36,23 @@ TEST(PhysicsFieldTest, test_field_added_to_physics_world_on_creation)
     EXPECT_EQ(3, world->GetBodyCount());
 }
 
-TEST(PhysicsFieldTest, test_remove_physics_field_from_world)
+TEST(PhysicsFieldTest, test_physics_field_is_removed_from_world_when_destroyed)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
+    {
+        Field field_parameter(::Test::TestUtil::createSSLDivBField());
 
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
+        EXPECT_EQ(0, world->GetBodyCount());
 
-    EXPECT_EQ(0, world->GetBodyCount());
+        auto physics_field = PhysicsField(world, field_parameter);
 
-    auto physics_field = PhysicsField(world, field_parameter);
+        EXPECT_EQ(3, world->GetBodyCount());
+    }
 
-    EXPECT_EQ(3, world->GetBodyCount());
-
-    physics_field.removeFromWorld(world);
-
-    EXPECT_EQ(0, world->GetBodyCount());
-}
-
-TEST(PhysicsFieldTest, test_remove_physics_field_from_world_multiple_times)
-{
-    b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
-
-    Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
-
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
-
-    EXPECT_EQ(0, world->GetBodyCount());
-
-    auto physics_field = PhysicsField(world, field_parameter);
-
-    EXPECT_EQ(3, world->GetBodyCount());
-
-    physics_field.removeFromWorld(world);
-
-    EXPECT_EQ(0, world->GetBodyCount());
-
-    physics_field.removeFromWorld(world);
-
+    // Once we leave the above scope the field is destroyed, so it should have been
+    // removed from the world
     EXPECT_EQ(0, world->GetBodyCount());
 }
 
@@ -125,7 +101,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
     }
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
-    EXPECT_TRUE(Vector(0, -2).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(0, -2) - ball.velocity()).length(), 1e-5);
 }
 
 TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
@@ -151,7 +127,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
     }
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
-    EXPECT_TRUE(Vector(-3.0, 0.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(-3.0, 0.0) - ball.velocity()).length(), 1e-3);
 }
 
 TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
@@ -177,5 +153,5 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
     }
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
-    EXPECT_TRUE(Vector(3.0, 0.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(3.0, 0.0) - ball.velocity()).length(), 1e-3);
 }

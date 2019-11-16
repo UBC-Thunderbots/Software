@@ -8,27 +8,25 @@
 
 ChipAction::ChipAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 
-std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
-    const Robot& robot, const Ball& ball, Point chip_origin, Point chip_target,
-    double chip_distance_meters)
+void ChipAction::updateWorldParams(const Ball& ball)
 {
-    return updateStateAndGetNextIntent(robot, ball, chip_origin,
-                                       (chip_target - chip_origin).orientation(),
-                                       chip_distance_meters);
+    this->ball = ball;
 }
 
-std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
-    const Robot& robot, const Ball& ball, Point chip_origin, Angle chip_direction,
-    double chip_distance_meters)
+void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
+                                     Angle chip_direction, double chip_distance_meters)
 {
-    // Update the parameters stored by this Action
     this->robot                = robot;
-    this->ball                 = ball;
     this->chip_origin          = chip_origin;
     this->chip_direction       = chip_direction;
     this->chip_distance_meters = chip_distance_meters;
+}
 
-    return getNextIntent();
+void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
+                                     Point chip_target, double chip_distance_meters)
+{
+    updateControlParams(robot, chip_origin, (chip_target - chip_origin).orientation(),
+                        chip_distance_meters);
 }
 
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -76,11 +74,11 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // inside it when taking the chip.
         Point behind_ball_vertex_A = chip_origin;
         Point behind_ball_vertex_B =
-            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
-            behind_ball.perp().norm(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
         Point behind_ball_vertex_C =
-            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
-            behind_ball.perp().norm(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
         Polygon behind_ball_region =
             Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
@@ -88,14 +86,15 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-            chip_origin + behind_ball.norm(size_of_region_behind_ball * 3 / 4);
+            chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
         // If we're not in position to chip, move into position
         if (!robot_behind_ball)
         {
             yield(std::make_unique<MoveIntent>(
                 robot->id(), point_behind_ball, chip_direction, 0.0, 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::ALLOW));
         }
         else
         {

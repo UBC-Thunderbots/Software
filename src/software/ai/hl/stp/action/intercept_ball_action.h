@@ -2,8 +2,8 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 
@@ -20,19 +20,19 @@ class InterceptBallAction : public Action
                                  bool loop_forever = false);
 
     /**
-     * Returns the next Intent this InterceptBallAction wants to run, given the
-     * parameters. Moves the robot to intercept and gain control of the ball
+     * Updates this action with all the parameters it needs from the world
      *
-     * @param robot The robot to move
      * @param field The field
      * @param ball The ball
-     *
-     * @return A unique pointer to the Intent the InterceptBallAction wants to run. If the
-     * InterceptBallAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        const Field& field,
-                                                        const Ball& ball);
+    void updateWorldParams(const Field& field, const Ball& ball);
+
+    /**
+     * Updates this action with all the parameters it needs that don't come from the world
+     *
+     * @param robot The robot to move
+     */
+    void updateControlParams(const Robot& robot);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

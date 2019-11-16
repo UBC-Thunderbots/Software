@@ -9,19 +9,15 @@ DribbleAction::DribbleAction(double close_to_dest_threshold, bool loop_forever)
 {
 }
 
-std::unique_ptr<Intent> DribbleAction::updateStateAndGetNextIntent(
-    const Robot& robot, const Point& dest, const Angle& final_angle, double rpm,
-    bool small_kick_allowed)
-
+void DribbleAction::updateControlParams(const Robot& robot, const Point& dest,
+                                        const Angle& final_angle, double rpm,
+                                        bool small_kick_allowed)
 {
-    // Update the parameters stored by this Action
     this->robot              = robot;
     this->destination        = dest;
     this->final_orientation  = final_angle;
     this->dribbler_rpm       = rpm;
     this->small_kick_allowed = small_kick_allowed;
-
-    return getNextIntent();
 }
 
 void DribbleAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -36,5 +32,5 @@ void DribbleAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(std::make_unique<DribbleIntent>(robot->id(), destination, final_orientation,
                                               dribbler_rpm, small_kick_allowed, 0));
     } while (loop_forever ||
-             (robot->position() - destination).len() > close_to_dest_threshold);
+             (robot->position() - destination).length() > close_to_dest_threshold);
 }

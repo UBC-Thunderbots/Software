@@ -33,8 +33,8 @@ void ChipTactic::updateControlParams(Point chip_origin, Point chip_target,
 double ChipTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // the closer the robot is to a ball, the cheaper it is to perform the chip
-    double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
+    double cost = (robot.position() - world.ball().position()).length() /
+                  world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -43,8 +43,10 @@ void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     ChipAction chip_action = ChipAction();
     do
     {
-        yield(chip_action.updateStateAndGetNextIntent(*robot, ball, chip_origin,
-                                                      chip_target, chip_distance_meters));
+        chip_action.updateWorldParams(ball);
+        chip_action.updateControlParams(*robot, chip_origin, chip_target,
+                                        chip_distance_meters);
+        yield(chip_action.getNextIntent());
     } while (!chip_action.done());
 }
 

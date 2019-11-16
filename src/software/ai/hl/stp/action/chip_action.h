@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/world/ball.h"
 
 /**
@@ -18,49 +18,42 @@ class ChipAction : public Action
     explicit ChipAction();
 
     /**
-     * Returns the next Intent this ChipAction wants to run, given the parameters.
+     * Updates the params that can be derived from the world for this action
+     *
+     * @param ball The ball being kicked
+     */
+    void updateWorldParams(const Ball& ball);
+
+    /**
+     * Updates the params for this action that cannot be derived from the world
      *
      * @param robot The robot that should perform the chip
-     * @param ball The ball being kicked
      * @param chip_origin The location where the chip will be taken
      * @param chip_direction The direction the Robot will chip in
      * @param chip_distance_meters The distance between the starting location
      * of the chip and the location of the first bounce
-     *
-     * @return A unique pointer to the Intent the ChipAction wants to run. If the
-     * ChipAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        const Ball& ball,
-                                                        Point chip_origin,
-                                                        Angle chip_direction,
-                                                        double chip_distance_meters);
+    void updateControlParams(const Robot& robot, Point chip_origin, Angle chip_direction,
+                             double chip_distance_meters);
 
     /**
-     * Returns the next Intent this ChipAction wants to run, given the parameters.
+     * Updates the params for this action that cannot be derived from the world
      *
-     * The ball and chip origin are given separately so that we can line up chips where
-     * the ball isn't present yet. For example, specifying where a chip will take place
-     * where the robot will meet the ball as it's moving. We need to be able to specify
-     * where the chip will take place even if the ball isn't there yet, which is why the
-     * chip_origin is separate. The ball is used for other calculations, such as when
-     * the ball has been chipped and the action is done.
+     * The chip origin is given (instead of just using the ball position), so that we
+     * can line up chips where the ball isn't present yet. For example, specifying where
+     * a chip will take place where the robot will meet the ball as it's moving. We need
+     * to be able to specify where the chip will take place even if the ball isn't there
+     * yet, which is why the chip_origin is separate. The ball is used for other
+     * calculations, such as when the ball has been chipped and the action is done.
      *
      * @param robot The robot that should perform the chip
-     * @param ball The ball being kicked
      * @param chip_origin The location where the chip will be taken
      * @param chip_target The target to chip at
      * @param chip_distance_meters The distance between the starting location
      * of the chip and the location of the first bounce
-     *
-     * @return A unique pointer to the Intent the ChipAction wants to run. If the
-     * ChipAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        const Ball& ball,
-                                                        Point chip_origin,
-                                                        Point chip_target,
-                                                        double chip_distance_meters);
+    void updateControlParams(const Robot& robot, Point chip_origin, Point chip_target,
+                             double chip_distance_meters);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

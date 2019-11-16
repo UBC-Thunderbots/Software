@@ -70,3 +70,28 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "physics_simulator",
+    srcs = ["physics_simulator.cpp"],
+    hdrs = ["physics_simulator.h"],
+    deps = [
+        ":physics_ball",
+        ":physics_field",
+        "//software/util/time:duration",
+        "//software/util/time:timestamp",
+        "//software/world",
+        "@box2d",
+    ],
+)
+
+cc_test(
+    name = "physics_simulator_test",
+    srcs = ["physics_simulator_test.cpp"],
+    deps = [
+        ":physics_simulator",
+        "//software/test_util",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)

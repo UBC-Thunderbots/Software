@@ -20,8 +20,6 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       chip_target(chip_target),
       has_shot_available(false)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
-    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string ShootGoalTactic::getName() const
@@ -53,7 +51,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // If we can intercept the ball, use the distance to the intercept point.
         // We normalize with the total field length so that robots that are within the
         // field have a cost less than 1
-        cost = (ball_intercept_opt->first - robot.position()).len() /
+        cost = (ball_intercept_opt->first - robot.position()).length() /
                world.field().totalXLength();
     }
     else
@@ -61,7 +59,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // If we can't intercept the ball, just use the distance to the ball's current
         // position. We normalize with the total field length so that robots that are
         // within the field have a cost less than 1
-        cost = (world.ball().position() - robot.position()).len() /
+        cost = (world.ball().position() - robot.position()).length() /
                world.field().totalXLength();
     }
 
@@ -88,9 +86,10 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
                                       ->EnemyAboutToStealBallRectangleExtensionLength()
                                       ->value();
     Rectangle baller_frontal_area = Rectangle(
-        (robot->position() + front_of_robot_dir.perp().norm(steal_ball_rect_width / 2.0)),
-        robot->position() + front_of_robot_dir.norm(steal_ball_rect_length) -
-            front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS));
+        (robot->position() +
+         front_of_robot_dir.perpendicular().normalize(steal_ball_rect_width / 2.0)),
+        robot->position() + front_of_robot_dir.normalize(steal_ball_rect_length) -
+            front_of_robot_dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS));
 
     for (const auto &enemy : enemy_team.getAllRobots())
     {
@@ -113,9 +112,11 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
     {
         if (!isEnemyAboutToStealBall())
         {
-            yield(kick_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
-                BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
+            kick_action.updateWorldParams(ball);
+            kick_action.updateControlParams(*robot, ball.position(),
+                                            shot_target->getPointToShootAt(),
+                                            BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+            yield(kick_action.getNextIntent());
         }
         else
         {
@@ -123,9 +124,10 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            yield(chip_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
-                CHIP_DIST));
+            chip_action.updateWorldParams(ball);
+            chip_action.updateControlParams(*robot, ball.position(),
+                                            shot_target->getPointToShootAt(), CHIP_DIST);
+            yield(chip_action.getNextIntent());
         }
 
         shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
@@ -158,8 +160,10 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
             Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
-            yield(chip_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), fallback_chip_target, CHIP_DIST));
+            chip_action.updateWorldParams(ball);
+            chip_action.updateControlParams(*robot, ball.position(), fallback_chip_target,
+                                            CHIP_DIST);
+            yield(chip_action.getNextIntent());
         }
         else
         {
@@ -167,14 +171,16 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // A point behind the ball that leaves 5cm between the ball and kicker of the
             // robot
             Point behind_ball =
-                ball.position() +
-                behind_ball_vector.norm(BALL_MAX_RADIUS_METERS +
-                                        DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
+                ball.position() + behind_ball_vector.normalize(
+                                      BALL_MAX_RADIUS_METERS +
+                                      DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
 
             // The default behaviour is to move behind the ball and face the net
-            yield(move_action.updateStateAndGetNextIntent(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+            move_action.updateControlParams(*robot, behind_ball,
+                                            (-behind_ball_vector).orientation(), 0,
+                                            DribblerEnable::OFF, MoveType::NORMAL,
+                                            AutokickType::NONE, BallCollisionType::ALLOW);
+            yield(move_action.getNextIntent());
         }
     } while (!(kick_action.done() || chip_action.done()));
 }

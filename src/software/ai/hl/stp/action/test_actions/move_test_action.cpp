@@ -7,14 +7,10 @@ MoveTestAction::MoveTestAction(double close_to_dest_threshold)
 {
 }
 
-std::unique_ptr<Intent> MoveTestAction::updateStateAndGetNextIntent(const Robot& robot,
-                                                                    Point destination)
+void MoveTestAction::updateControlParams(const Robot& robot, Point destination)
 {
-    // Update the parameters stored by this Action
     this->robot       = robot;
     this->destination = destination;
-
-    return getNextIntent();
 }
 
 void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -28,6 +24,6 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, Angle::zero(), 0.0,
                                            0, DribblerEnable::OFF, MoveType::NORMAL,
-                                           AutokickType::NONE));
-    } while ((robot->position() - destination).len() > close_to_dest_threshold);
+                                           AutokickType::NONE, BallCollisionType::AVOID));
+    } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }

@@ -20,7 +20,7 @@ void StopTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     do
     {
         yield(std::make_unique<StopIntent>(this->robot->id(), false, 0));
-    } while (this->robot->velocity().len() > 0.05);
+    } while (this->robot->velocity().length() > 0.05);
 }
 
 void StopTestTactic::accept(TacticVisitor &visitor) const

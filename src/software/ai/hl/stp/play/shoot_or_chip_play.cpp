@@ -21,7 +21,7 @@ using namespace Evaluation;
 
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
-ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4)) {}
+ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4)) {}
 
 std::string ShootOrChipPlay::getName() const
 {
@@ -122,9 +122,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             // Move a bit backwards to make it more likely we'll receive the chip
             Point position =
                 chip_targets[i].getOrigin() -
-                Vector::createFromAngle(orientation).norm(ROBOT_MAX_RADIUS_METERS);
+                Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
-            move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
+            move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0,
+                                                              BallCollisionType::AVOID);
             result.emplace_back(move_to_open_area_tactics[i]);
         }
 

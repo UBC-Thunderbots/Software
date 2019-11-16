@@ -25,5 +25,6 @@ cc_test(
     deps = [
         ":motion_constraint_manager",
         "@gtest//:gtest_main",
+        "//software/test_util",
     ],
 )

@@ -39,7 +39,8 @@ std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle boundi
                 double endY = (p1.x() - p2.x()) * -1;
                 // Extend the edge out to beyond the rectangle to ensure interception
                 // functions work.
-                Point end = Point(endX, endY) * dist(bounding_box.furthestCorner(p2), p2);
+                Point end =
+                    Point(Vector(endX, endY) * dist(bounding_box.furthestCorner(p2), p2));
 
                 std::vector<Point> edgeIntersects =
                     lineRectIntersect(bounding_box, Point(start->x(), start->y()), end);
@@ -93,7 +94,7 @@ std::vector<Circle> VoronoiDiagram::voronoiVerticesToOpenCircles(
                     for (auto const &triangle_vertex : triangle)
                     {
                         radii.emplace_back(
-                            (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
+                            (Point(vertex.x(), vertex.y()) - triangle_vertex).length());
                     }
                     double smallest_radius =
                         *std::min_element(radii.begin(), radii.end());

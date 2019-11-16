@@ -1,8 +1,8 @@
 #include "software/backend/simulation/box2d_util.h"
 
-bool bodyExistsInWorld(b2Body* body, std::shared_ptr<b2World> world)
+bool bodyExistsInWorld(b2Body* body, b2World* world)
 {
-    if (body == nullptr || !world)
+    if (body == nullptr || world == nullptr)
     {
         return false;
     }

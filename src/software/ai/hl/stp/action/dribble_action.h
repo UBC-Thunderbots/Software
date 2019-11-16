@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 class DribbleAction : public Action
 {
@@ -24,8 +24,7 @@ class DribbleAction : public Action
                            bool loop_forever              = false);
 
     /**
-     * Returns the next Intent this DribbleAction wants to run, given the parameters.
-     * Moves the robot in a straight line to the given destination.
+     * Updates the params that cannot be derived from the world for this action
      *
      * @param robot The robot to move
      * @param destination The destination to move to (in global coordinates)
@@ -34,15 +33,10 @@ class DribbleAction : public Action
      * @param rpm RPM of the dribbler
      * @param small_kick_allowed If true, the robot can kick the ball forward a small
      * distance while dribbling
-     *
-     * @return A unique pointer to the Intent the DribbleAction wants to run. If the
-     * DribbleAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        const Point& dest,
-                                                        const Angle& final_angle,
-                                                        double rpm,
-                                                        bool small_kick_allowed);
+    void updateControlParams(const Robot& robot, const Point& dest,
+                             const Angle& final_angle, double rpm,
+                             bool small_kick_allowed);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -16,7 +16,7 @@ TEST(PhysicsBallTest, test_get_ball_with_timestamp)
     auto ball         = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
     EXPECT_TRUE(ball_parameter.position().isClose(ball.position(), 1e-7));
-    EXPECT_TRUE(ball_parameter.velocity().isClose(ball.velocity(), 1e-7));
+    EXPECT_LT((ball_parameter.velocity() - ball.velocity()).length(), 1e-7);
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
 
@@ -34,46 +34,25 @@ TEST(PhysicsBallTest, test_ball_added_to_physics_world_on_creation)
     EXPECT_EQ(1, world->GetBodyCount());
 }
 
-TEST(PhysicsBallTest, test_remove_physics_ball_from_world)
+TEST(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
+    {
+        Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(0, world->GetBodyCount());
+        EXPECT_EQ(0, world->GetBodyCount());
 
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+        auto physics_ball = PhysicsBall(world, ball_parameter);
 
-    EXPECT_EQ(1, world->GetBodyCount());
+        EXPECT_EQ(1, world->GetBodyCount());
+    }
 
-    physics_ball.removeFromWorld(world);
-
-    EXPECT_EQ(0, world->GetBodyCount());
-}
-
-TEST(PhysicsBallTest, test_remove_physics_ball_from_world_multiple_times)
-{
-    b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
-
-    Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
-
-    EXPECT_EQ(0, world->GetBodyCount());
-
-    auto physics_ball = PhysicsBall(world, ball_parameter);
-
-    EXPECT_EQ(1, world->GetBodyCount());
-
-    physics_ball.removeFromWorld(world);
-
-    EXPECT_EQ(0, world->GetBodyCount());
-
-    physics_ball.removeFromWorld(world);
-
+    // Once we leave the above scope the ball is destroyed, so it should have been
+    // removed from the world
     EXPECT_EQ(0, world->GetBodyCount());
 }
-
 
 TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_step)
 {
@@ -95,8 +74,8 @@ TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Point(2, -3).isClose(ball.position(), 1e-5));
-    EXPECT_TRUE(Vector(1, -2).isClose(ball.velocity(), 1e-5));
+    EXPECT_TRUE(Point(2, -3).isClose(ball.position(), 0.01));
+    EXPECT_LT((Vector(1, -2) - ball.velocity()).length(), 1e-5);
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
 
@@ -120,7 +99,7 @@ TEST(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simulat
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Vector(3, -0.5).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(3, -0.5) - ball.velocity()).length(), 0.01);
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
 
@@ -160,7 +139,7 @@ TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collisio
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Vector(-0.5, 0.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(-0.5, 0.0) - ball.velocity()).length(), 1e-7);
 }
 
 TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflection)
@@ -202,5 +181,5 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-    EXPECT_TRUE(Vector(0.0, -1.0).isClose(ball.velocity(), 1e-5));
+    EXPECT_LT((Vector(0.0, -1.0) - ball.velocity()).length(), 1e-5);
 }

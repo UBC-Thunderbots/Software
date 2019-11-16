@@ -7,17 +7,14 @@ MoveSpinAction::MoveSpinAction(double close_to_dest_threshold)
 {
 }
 
-std::unique_ptr<Intent> MoveSpinAction::updateStateAndGetNextIntent(
-    const Robot& robot, Point destination, AngularVelocity angular_velocity,
-    double final_linear_speed)
+void MoveSpinAction::updateControlParams(const Robot& robot, Point destination,
+                                         AngularVelocity angular_velocity,
+                                         double final_linear_speed)
 {
-    // Update the parameters stored by this Action
     this->robot              = robot;
     this->destination        = destination;
     this->angular_velocity   = angular_velocity;
     this->final_linear_speed = final_linear_speed;
-
-    return getNextIntent();
 }
 
 void MoveSpinAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -31,5 +28,5 @@ void MoveSpinAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveSpinIntent>(robot->id(), destination, angular_velocity,
                                                final_linear_speed, 0));
-    } while ((robot->position() - destination).len() > close_to_dest_threshold);
+    } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }
