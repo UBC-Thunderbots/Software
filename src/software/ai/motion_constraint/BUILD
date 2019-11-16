@@ -4,7 +4,7 @@ cc_library(
     name = "motion_constraint",
     srcs = ["motion_constraint.cpp"],
     hdrs = ["motion_constraint.h"],
-    deps = [],
+    deps = ["@magic_enum"],
 )
 
 cc_library(
@@ -25,5 +25,6 @@ cc_test(
     deps = [
         ":motion_constraint_manager",
         "@gtest//:gtest_main",
+        "//software/test_util",
     ],
 )

@@ -2,7 +2,7 @@
 
 #include <Box2D/Box2D.h>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/ball.h"
 
@@ -25,13 +25,17 @@ class PhysicsBall
 
     PhysicsBall() = delete;
 
+    // Delete the copy and assignment operators because copying this class causes
+    // issues with the b2World and how it tracks bodies in the world, because as objects
+    // are copied and destroyed, they will destroy the bodies in the b2World as well
+    PhysicsBall& operator=(const PhysicsBall&) = delete;
+    PhysicsBall(const PhysicsBall&)            = delete;
+
     /**
-     * Removes the corresponding ball body from the Box2D world. If this function
-     * is called on a world that does not contain the ball, nothing happens.
-     *
-     * @param world The Box2D world to remove the ball from
+     * Destroys the PhysicsBall object and removes any corresponding bodies from
+     * the physics world if the ball is part of one
      */
-    void removeFromWorld(std::shared_ptr<b2World> world);
+    ~PhysicsBall();
 
     /**
      * Returns a Ball object representing the current state of the ball object in the

@@ -14,11 +14,10 @@
 using namespace Passing;
 
 PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilityFlags::Kick}),
+    : Tactic(loop_forever, {RobotCapabilities::Capability::Kick}),
       pass(std::move(pass)),
       ball(ball)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string PasserTactic::getName() const
@@ -42,7 +41,7 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-        (robot.position() - pass.passerPoint()).len() / world.field().totalXLength();
+        (robot.position() - pass.passerPoint()).length() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -58,12 +57,13 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // ball is *almost* touching the kicker
         Vector ball_offset =
             Vector::createFromAngle(pass.passerOrientation())
-                .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
+                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
         Point wait_position = pass.passerPoint() - ball_offset;
 
-        yield(move_action.updateStateAndGetNextIntent(
-            *robot, wait_position, pass.passerOrientation(), 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE));
+        move_action.updateControlParams(*robot, wait_position, pass.passerOrientation(),
+                                        0, DribblerEnable::OFF, MoveType::NORMAL,
+                                        AutokickType::NONE, BallCollisionType::ALLOW);
+        yield(move_action.getNextIntent());
     }
 
     // The angle between the ball velocity vector and a vector from the passer
@@ -75,8 +75,10 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
-        yield(kick_action.updateStateAndGetNextIntent(
-            *robot, ball, ball.position(), pass.receiverPoint(), pass.speed()));
+        kick_action.updateWorldParams(ball);
+        kick_action.updateControlParams(*robot, ball.position(), pass.receiverPoint(),
+                                        pass.speed());
+        yield(kick_action.getNextIntent());
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
@@ -84,8 +86,8 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             (pass.receiverPoint() - pass.passerPoint()).orientation();
         ball_velocity_to_pass_orientation =
             ball.velocity().orientation().minDiff(passer_to_receiver_angle);
-    } while (ball_velocity_to_pass_orientation.abs() > Angle::ofDegrees(20) ||
-             ball.velocity().len() < 0.5);
+    } while (ball_velocity_to_pass_orientation.abs() > Angle::fromDegrees(20) ||
+             ball.velocity().length() < 0.5);
 }
 
 void PasserTactic::accept(TacticVisitor& visitor) const

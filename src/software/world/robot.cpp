@@ -4,10 +4,10 @@
 
 #include "shared/constants.h"
 
-Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
+Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_duration,
-             const RobotCapabilityFlags &capabilities)
+             const std::set<RobotCapabilities::Capability> &capabilities)
     : id_(id),
       positions_(history_duration),
       velocities_(history_duration),
@@ -78,7 +78,7 @@ Timestamp Robot::lastUpdateTimestamp() const
     return last_update_timestamps.front();
 }
 
-unsigned int Robot::id() const
+RobotId Robot::id() const
 {
     return id_;
 }
@@ -100,7 +100,7 @@ Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) co
     // real-world behavior. Position prediction should be improved as outlined in
     // https://github.com/UBC-Thunderbots/Software/issues/50
     double seconds_in_future = duration_in_future.getSeconds();
-    return position() + velocity().norm(velocity().len() * seconds_in_future);
+    return position() + velocity().normalize(velocity().length() * seconds_in_future);
 }
 
 Vector Robot::velocity() const
@@ -228,7 +228,7 @@ void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity
 std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (unsigned i = 0; i < timestamp_history.size(); i++)
+    for (size_t i = 0; i < timestamp_history.size(); i++)
     {
         double timestamp_diff =
             fabs((timestamp - timestamp_history[i]).getMilliseconds());
@@ -253,12 +253,12 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const RobotCapabilityFlags &Robot::getRobotCapabilities() const
+const std::set<RobotCapabilities::Capability> &Robot::getRobotCapabilities() const
 {
     return capabilities_;
 }
 
-RobotCapabilityFlags &Robot::getMutableRobotCapabilities()
+std::set<RobotCapabilities::Capability> &Robot::getMutableRobotCapabilities()
 {
     return capabilities_;
 }

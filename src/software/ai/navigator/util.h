@@ -1,8 +1,12 @@
 #pragma once
 
+#include "software/ai/motion_constraint/motion_constraint.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
+#include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/world.h"
 
 /**
  * Calculates the transition speed for the robot between two line segments
@@ -19,6 +23,24 @@
  */
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
                                                const Point &p3, double final_speed);
+
+/**
+ * Create obstacles for the given motion constraints
+ *
+ * @param motion_constraints
+ * @param world world to create obstacles for
+ *
+ * @return obstacles
+ */
+std::vector<Obstacle> getObstaclesFromMotionConstraints(
+    const std::set<MotionConstraint> &motion_constraints, const World &world);
+
+/**
+ * Get Obstacles from a Team
+ *
+ * @return vector of obstacles
+ */
+std::vector<Obstacle> getObstaclesFromTeam(const Team &team);
 
 /**
  * Takes a vector of points that represents a path and converts them to a vector of move

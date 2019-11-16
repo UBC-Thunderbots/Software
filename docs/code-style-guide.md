@@ -1,24 +1,21 @@
 # Code Style Guide
 
 ## Table of Contents
-* [Table of Contents](#table-of-contents)
-* [Coding Style and Conventions](#coding-style-and-conventions)
-    * [Names and Variables](#names-and-variables)
-    * [Comments](#comments)
-    * [Headers](#headers)
-    * [Includes](#includes)
-    * [Spelling](#spelling)
-    * [Miscellaneous](#miscellaneous)
+* [Names and Variables](#names-and-variables)
+* [Comments](#comments)
+* [Headers](#headers)
+* [Includes](#includes)
+* [Namespaces](#namespaces)
+* [Exceptions](#exceptions)
+* [Tests](#tests)
+* [Spelling](#spelling)
+* [Miscellaneous](#miscellaneous)
 
-## Coding Style and Conventions
 
 Our C++ coding style is based off of [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html). We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce most of the nit-picky parts of the style, such as brackets and alignment, so this document highlights the important rules to follow that clang-format cannot enforce.
 
 If you want to know more about our coding style you can take a look at our [clang-format configuration file](https://github.com/UBC-Thunderbots/Software/blob/master/.clang-format).
 
-{% hint style="info" %}
-Each coding style has a tag \(i.e. _N1_\), use this tag to comment on code reviews.
-{% endhint %}
 
 ### Names and Variables
 
@@ -75,9 +72,26 @@ Each coding style has a tag \(i.e. _N1_\), use this tag to comment on code revie
   float distance = catch_distance * 2.15;
 
   // Correct
-  const float SCALE_FACTOR = 2.15;
-  float distance = catch_distance * SCALE_FACTOR;
+  const float CATCH_DISTANCE_SCALE_FACTOR = 2.15;
+  float distance = catch_distance * CATCH_DISTANCE_SCALE_FACTOR;
   ```
+* Avoid initializing multiple variables on the same line.
+  ```cpp
+  // Incorrect
+  int x, y, z = 0;
+
+  // Correct and equivalent to the above
+  int x;
+  int y;
+  int z = 0;
+
+  // However, the author may have intended the following
+  // or a code reader may have assumed the following
+  int x = 0;
+  int y = 0;
+  int z = 0;
+  ```
+
 
 ### Comments
 
@@ -106,12 +120,16 @@ If you think some ASCII art will help explain something better, go for it! [asci
   float power(float a, float b);
   ```
 
+
 ### Headers
 
 * Use _header guards_ to prevent issues of duplicate or circular includes which cause the source code to be compiled multiple times and cause build errors. 
     * If you're writing C++ (ie. not C), use `#pragma once` at the very top of the file. 
-    * If header guards are used, they should be fully capitalized and include `_H_` at the end.
       ```cpp
+      #pragma once
+      ```
+    * If you're writing C, header guards should be used. They should be fully capitalized and include `_H_` at the end.
+      ```c
       #ifndef AI_WORLD_FIELD_H_
       #define AI_WORLD_FIELD_H_
       ```
@@ -121,27 +139,53 @@ If you think some ASCII art will help explain something better, go for it! [asci
       ```
 *In general the reason a header guard's name is so complicated is to make sure that it is unique. There cannot be any other header guards or constants defined with #define anywhere else in the code, or weird build issues may occur.*
 
+
 ### Includes
 
 * Use `#include` sparingly and only include the necessary sources to build the file. Do not include headers whos class or implementation is not used.
-* Often `.cpp` files include its corresponding header `.h` file, it means the `.cpp` file include everything included in the header. Do not have duplicate `#include` in both `.h` and `.cpp` files.
+* Often `.cpp` files include its corresponding header `.h` file, it means the `.cpp` file include everything included in the header. Do not have duplicate `#include`'s in both `.h` and `.cpp` files.
 * `#include`s are generally preferred written on the `.cpp` side; use minimum `#include` in the header file. Use _forward declarations_ in headers if necessary.
-* Specify full path of the include file on the file system, relative to the top-level project directory or _CMakeList.txt_ file. Do not use relative paths.
+* Specify full path of the include file on the file system, relative to the top-level project directory or _WORKSPACE_ file. Do not use relative paths.
   ```cpp
   // Incorrect
   #include "../../tactic/tactic.h"
+ 
+  // Incorrect
+  #include "tactic.h"
 
   // Correct
-  #include "ai/hl/stp/tactic/tactic.h"
+  #include "software/ai/hl/stp/tactic/tactic.h"
   ```
+
+### Namespaces
+* We generally don't use namespaces because they add extra complexity, and we do not really need the protection they provide
+    * We have found it's generally more work than it's worth to have everyone remember to put things in the right namespaces when writing code, and remember to manage the namespaces when code is being used
+    * The main purpose of namespaces is to compartmentalize code and help avoid conflicts. This way if 2 libraries define functions called `add()`, as long as they are in different namespaces they can be specified and used independently without issue. Because we aren't publishing our code as a library, and most libraries we use already do their own namespacing, we don't _really_ need the protection namespaces provide in this case.
+* Do not use `using namespace ...` in header files.
+    * This is because any file that includes this header will also implicitly be using the namespace, which can cause subtle issues and naming conflicts.
+
+
+### Exceptions
+
+* Throwing an exception indicates that the AI has entered an unrecoverable state.
+* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occured.
+
+
+### Tests
+Some general guidelines when writing tests are:
+
+* **Tests should test a single, distinct behaviour, isolated to a single class (or group of functions in C).** For example, if you have a test called `assign_and_clear_goalie`, it should probably be broken up into `assign_goalie` and `clear_goalie`. While `clear_goalie` might depend on `assign_goalie`, structuring things like this allows us to quickly narrow down where the problem might be by just looking at what tests failed, without having to go tear apart large unit tests.
+* **Don't be afraid to use long test names.**: When naming things, as programmers we keep names short so that they can be used elsewhere without taking up an entire line. But no one is going to be using your test name elsewhere, so feel free to be verbose. Instead of `equality_operator_3`, call your test `equality_operator_two_teams_different_number_of_robots`
+
 
 ### Spelling
 
 * Code, comment, and documentations should not contain spelling errors.
-* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour").
+* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour", "metre").
     * Exceptions:
       * Use "defense" in lieu of "defence" as it is more similar to the word "defensive".
       * Use "offense" in lieu of "offence".
+
 
 ### Miscellaneous
 
@@ -154,30 +198,21 @@ If you think some ASCII art will help explain something better, go for it! [asci
   ```cpp
   void foo(double x);
   ```
-* Non-simple data types are generally passed by _const_ references. Use non-const references if the parameter is used to return data.
+* Non-simple data types are generally passed by _const_ references whenever possible. Try avoid setting values by reference, since this makes it harder to follow the flow of control and data in the program.
   ```cpp
+  // Not ideal
+  // Pass by reference to set data
+  void getVisionPacket(Packet& packet);
+
+  // Preferred
   // Pass by const reference
   Point predictBallPosition(const Ball& ball);
-
-  // Pass by reference to return data
-  void getVisionPacket(Packet& packet);
   ```
 * All constructors should be marked with the `explicit` keyword. In the case of a one-argument constructor, this prevents it from being used as an implicit type conversion; in the case of other constructors, it acts as a safeguard in case arguments are later added or removed.
   ```cpp
   explicit AI(const World& world);
   ```
 * Use C++ smart pointers and avoid raw pointers. (See also: [what are smart pointers and why they are good](https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one))
-* Explicitly use the namespace when using invoking classes or functions with namespaces. Do not use `using namespace` in the source. If the namespace hierarchy is long, shorten it.
-  ```cpp
-  // Incorrect
-  using namespace AI::HL::STP::Action;
-  int id = getId();
-
-  // Correct
-  namespace Action = AI::HL::STP::Action;
-  int id = Action::getId();
-  ```
-* Do not use `using namespace ...` in header files.
 * Use C++11 keyword `using` to make _type alias_ instead of `typedef` as they're equivalent except the former is compatible with templates.
   ```cpp
   // Incorrect
@@ -195,27 +230,40 @@ If you think some ASCII art will help explain something better, go for it! [asci
   int x;
   int y;
   int z = 0;
-  ```
-* Reference \(`&`\) and pointer \(`*`\) symbols should be attached to the type and not the variable name.
+
+  // However, the author may have intended the following
+  // or a code reader may have assumed the following
+  int x = 0;
+  int y = 0;
+  int z = 0;
+  ```  
+* Avoid ternary operators. Clarity is more important than line count.
   ```cpp
   // Incorrect
-  explicit AI(const World &world);
-  int *num;
+  c = ((a == 0) || ((a + b) < 10)) ? a : a + b;
 
   // Correct
-  explicit AI(const World& world);
-  int* num;
-  ```
-* Opening and closing braces \(`{}`\) must be on the same indentation level.
-  ```cpp
-  // Incorrect
-  int foo() {
-      return 0;
-  }
-
-  // Correct
-  int foo()
+  if ((a == 0) || ((a + b) < 10))
   {
-      return 0;
+    c = a;
+  }
+  else
+  {
+    c = a + b;
   }
   ```
+* Always use curly braces around code blocks, even if the braces surround a single statement.
+  ```cpp
+  // Incorrect
+  while (i < 10)
+    i++;
+    c[i] = i + 1;
+
+  // Correct
+  while (i < 10)
+  {
+    i++;
+  }
+  c[i] = i + 1;
+  ```
+

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 /**
  * A test Action used for unit tests
@@ -21,17 +21,9 @@ class MoveTestAction : public Action
     explicit MoveTestAction(double close_to_dest_threshold);
 
     /**
-     * Returns the next Intent this MoveTestAction wants to run, given the parameters.
-     * Moves the robot in a straight line to the given destination.
-     *
-     * @param robot The robot to move
-     * @param destination The destination to move to (in global coordinates)
-     *
-     * @return A unique pointer to the Intent the MoveTestAction wants to run. If the
-     * MoveTestAction is done, returns an empty/null pointer
+     * Updates the params for this action that cannot be derived from the world
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        Point destination);
+    void updateControlParams(const Robot& robot, Point destination);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

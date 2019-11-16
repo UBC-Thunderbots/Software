@@ -3,8 +3,8 @@
 #include <boost/polygon/voronoi.hpp>
 
 #include "software/geom/circle.h"
-#include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/new_geom/point.h"
 
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;

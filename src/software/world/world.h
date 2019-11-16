@@ -4,6 +4,7 @@
 #include <boost/circular_buffer.hpp>
 
 #include "software/world/ball.h"
+#include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/world/game_state.h"
 #include "software/world/refbox_constants.h"
@@ -49,9 +50,9 @@ class World final
     /**
      * Updates the state of the ball in the world with the new ball data
      *
-     * @param new_ball_data A Ball containing new ball information
+     * @param new_ball_data A BallState containing new ball information
      */
-    void updateBallState(const Ball& new_ball_data);
+    void updateBallState(const BallState& new_ball_state);
 
     /**
      * Updates the state of the friendly team in the world with the new team data
@@ -183,7 +184,7 @@ class World final
     Team friendly_team_;
     Team enemy_team_;
     GameState game_state_;
-    // All previous timestamps of when the field was updated, with the most recent
+    // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
     // A small buffer that stores previous refbox game state

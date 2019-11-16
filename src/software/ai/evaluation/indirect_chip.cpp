@@ -1,10 +1,10 @@
 #include "software/ai/evaluation/indirect_chip.h"
 
 #include "shared/constants.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/world/world.h"
 
 std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
@@ -30,9 +30,11 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
     std::vector<LegacyTriangle> target_triangles =
         findOpenTriangles(allTriangles, all_enemy_positions);
 
-    Rectangle target_area_rectangle = findBestChipTargetArea(
-        world, Util::DynamicParameters::Evaluation::Indirect_Chip::chip_target_area_inset
-                   .value());
+    Rectangle target_area_rectangle =
+        findBestChipTargetArea(world, Util::DynamicParameters->getEvaluationConfig()
+                                          ->getIndirectChipConfig()
+                                          ->ChipTargetAreaInset()
+                                          ->value());
 
     target_triangles =
         removeTrianglesOutsideRectangle(target_area_rectangle, target_triangles);
@@ -50,30 +52,41 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
         // Get the largest triangle within the vector of triangles that has area greater
         // than minimum area of chip target triangle, and all edge lengths greater than
         // minimum edge length of chip target triangle
-        std::optional<LegacyTriangle> largest_triangle = getLargestValidTriangle(
-            triangles,
-            Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_area.value(),
-            Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_edge_len
-                .value());
+        std::optional<LegacyTriangle> largest_triangle =
+            getLargestValidTriangle(triangles,
+                                    Util::DynamicParameters->getEvaluationConfig()
+                                        ->getIndirectChipConfig()
+                                        ->MinChipTriArea()
+                                        ->value(),
+                                    Util::DynamicParameters->getEvaluationConfig()
+                                        ->getIndirectChipConfig()
+                                        ->MinChipTriEdgeLen()
+                                        ->value());
         LegacyTriangle t = largest_triangle.value();
 
         Point target = getTriangleCenter(t);
         // Adjust the target point to have a length of distance between itself and the
         // ball's position, then scaling it by a certain percentage
-        target = target.norm((target - ball_position).len() *
-                             Util::DynamicParameters::Evaluation::Indirect_Chip::
-                                 chip_cherry_power_downscale.value());
+        target = Point(
+            target.toVector().normalize((target - ball_position).length() *
+                                        Util::DynamicParameters->getEvaluationConfig()
+                                            ->getIndirectChipConfig()
+                                            ->ChipCherryPowerDownscale()
+                                            ->value()));
 
         // Target should never be further away than maximum chip power
-        if ((target - ball_position).len() >
-            Util::DynamicParameters::Evaluation::Indirect_Chip::max_chip_power.value())
+        if ((target - ball_position).length() >
+            Util::DynamicParameters->getEvaluationConfig()
+                ->getIndirectChipConfig()
+                ->MaxChipPower()
+                ->value())
         {
-            target =
-                ball_position +
-                (target - ball_position)
-                    .norm(
-                        Util::DynamicParameters::Evaluation::Indirect_Chip::max_chip_power
-                            .value());
+            target = ball_position +
+                     (target - ball_position)
+                         .normalize(Util::DynamicParameters->getEvaluationConfig()
+                                        ->getIndirectChipConfig()
+                                        ->MaxChipPower()
+                                        ->value());
         }
 
         return std::optional(target);
@@ -131,11 +144,14 @@ std::vector<LegacyTriangle> Evaluation::findOpenTriangles(
     {
         // Takes vector of triangles from input and adjust every single triangle within it
         Point p1 =
-            t[0] + ((getTriangleCenter(t)) - t[0]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+            t[0] +
+            ((getTriangleCenter(t)) - t[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
         Point p2 =
-            t[1] + ((getTriangleCenter(t)) - t[1]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+            t[1] +
+            ((getTriangleCenter(t)) - t[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
         Point p3 =
-            t[2] + ((getTriangleCenter(t)) - t[2]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+            t[2] +
+            ((getTriangleCenter(t)) - t[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
 
         LegacyTriangle adjusted_triangle = triangle(p1, p2, p3);
         bool containsEnemy               = false;
@@ -250,9 +266,9 @@ std::optional<LegacyTriangle> Evaluation::getLargestValidTriangle(
         {
             LegacyTriangle t = allTriangles[i];
             double area      = getTriangleArea(t);
-            double l1        = (t[1] - t[0]).len();
-            double l2        = (t[2] - t[0]).len();
-            double l3        = (t[2] - t[1]).len();
+            double l1        = (t[1] - t[0]).length();
+            double l2        = (t[2] - t[0]).length();
+            double l3        = (t[2] - t[1]).length();
 
             Angle a1 = acuteVertexAngle(t[1], t[0], t[2]).angleMod().abs();
             Angle a2 = acuteVertexAngle(t[0], t[1], t[2]).angleMod().abs();

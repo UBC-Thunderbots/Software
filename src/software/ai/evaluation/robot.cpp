@@ -62,9 +62,11 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
 
     // check if the ball is within a certain distance of the robot
     auto max_dist_to_robot =
-        ROBOT_MAX_RADIUS_METERS +
-        Util::DynamicParameters::Evaluation::Possession::possession_dist.value();
-    if ((ball_pos_at_time - robot_pos_at_time).len() > max_dist_to_robot)
+        ROBOT_MAX_RADIUS_METERS + Util::DynamicParameters->getEvaluationConfig()
+                                      ->getPossessionConfig()
+                                      ->PossessionDist()
+                                      ->value();
+    if ((ball_pos_at_time - robot_pos_at_time).length() > max_dist_to_robot)
     {
         return false;
     }
@@ -73,14 +75,15 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
         // check that ball is in a 90-degree cone in front of the robot
         auto ball_to_robot_angle = robot_ori_at_time.minDiff(
             (ball_pos_at_time - robot_pos_at_time).orientation());
-        return std::make_optional<bool>(ball_to_robot_angle < Angle::ofDegrees(45.0));
+        return std::make_optional<bool>(ball_to_robot_angle < Angle::fromDegrees(45.0));
     }
 }
 
 std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Robot& robot,
                                                    std::optional<Timestamp> timestamp)
 {
-    Point robot_pos, ball_pos, ball_velocity;
+    Point robot_pos, ball_pos;
+    Vector ball_velocity;
     if (!timestamp.has_value())
     {
         robot_pos     = robot.position();
@@ -109,12 +112,16 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
     auto ball_angle_deviation =
         ball_to_robot_vector.orientation().minDiff(ball_velocity.orientation());
     // pass axis velocity
-    double pass_axis_speed = ball_velocity.project(ball_to_robot_vector.norm()).len();
+    double pass_axis_speed =
+        ball_velocity.project(ball_to_robot_vector.normalize()).length();
     return std::make_optional<bool>(
         (ball_angle_deviation <
-         Angle::ofDegrees(
-             Util::DynamicParameters::Evaluation::Possession::passed_to_angle_tolerance
-                 .value())) &&
-        pass_axis_speed >
-            Util::DynamicParameters::Evaluation::Possession::min_pass_speed.value());
+         Angle::fromDegrees(Util::DynamicParameters->getEvaluationConfig()
+                                ->getPossessionConfig()
+                                ->PassedToAngleTolerance()
+                                ->value())) &&
+        pass_axis_speed > Util::DynamicParameters->getEvaluationConfig()
+                              ->getPossessionConfig()
+                              ->MinPassSpeed()
+                              ->value());
 };

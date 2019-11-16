@@ -21,7 +21,7 @@ using namespace Evaluation;
 
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
-ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4)) {}
+ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4)) {}
 
 std::string ShootOrChipPlay::getName() const
 {
@@ -69,8 +69,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset =
-        Util::DynamicParameters::ShootOrChipPlay::fallback_chip_target_enemy_goal_offset
-            .value();
+        Util::DynamicParameters->getShootOrChipPlayConfig()
+            ->FallbackChipTargetEnemyGoalOffset()
+            ->value();
 
     Point fallback_chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
@@ -121,9 +122,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             // Move a bit backwards to make it more likely we'll receive the chip
             Point position =
                 chip_targets[i].getOrigin() -
-                Vector::createFromAngle(orientation).norm(ROBOT_MAX_RADIUS_METERS);
+                Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
-            move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
+            move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0,
+                                                              BallCollisionType::AVOID);
             result.emplace_back(move_to_open_area_tactics[i]);
         }
 
@@ -136,9 +138,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         shoot_or_chip_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball());
         shoot_or_chip_tactic->updateControlParams(chip_target);
-
-        shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
-        shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);

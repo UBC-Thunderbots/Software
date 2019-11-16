@@ -37,15 +37,21 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
             false, true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
             false, true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
             false, true)};
 
     // these positions are picked according to the following slide
@@ -136,7 +142,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // listed above
                 move_tactics.at(defense_position_index)
                     ->updateControlParams(defense_positions.at(defense_position_index),
-                                          Angle::zero(), 0);
+                                          Angle::zero(), 0, BallCollisionType::AVOID);
                 result.emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }

@@ -9,14 +9,10 @@ StopAction::StopAction(double stopped_speed_threshold, bool loop_forever)
 {
 }
 
-std::unique_ptr<Intent> StopAction::updateStateAndGetNextIntent(const Robot& robot,
-                                                                bool coast)
+void StopAction::updateControlParams(const Robot& robot, bool coast)
 {
-    // Update the parameters stored by this action
     this->robot = robot;
     this->coast = coast;
-
-    return getNextIntent();
 }
 
 void StopAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -24,5 +20,5 @@ void StopAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     do
     {
         yield(std::make_unique<StopIntent>(robot->id(), coast, 0));
-    } while (loop_forever || robot->velocity().len() > stopped_speed_threshold);
+    } while (loop_forever || robot->velocity().length() > stopped_speed_threshold);
 }

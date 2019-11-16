@@ -40,8 +40,10 @@ class CornerKickPlay : public Play
      * Update the tactic that aligns the robot to the ball in preperation to pass
      *
      * @param align_to_ball_tactic
+     * @param ball_collision_type controls how robot navigates around abll
      */
-    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic);
+    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                 BallCollisionType ball_collision_type);
 
     /**
      * Updates the pass generator

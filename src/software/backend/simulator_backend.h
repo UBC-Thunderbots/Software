@@ -1,20 +1,15 @@
 #pragma once
 
+#include <future>
 #include <mutex>
 
 #include "software/backend/backend.h"
+#include "software/backend/simulation/physics_simulator.h"
 #include "software/world/world.h"
 
 /**
  * This class implements the Backend interface using a physics simulation to
  * execute received commands and provide new data to the system.
- *
- * The simulation uses Box2D as the physics engine, and the abstractions can be found
- * in the `simulation` folder. For more information and examples of how to use Box2D
- * see the following:
- * - https://box2d.org/documentation/
- * - https://github.com/libgdx/libgdx/wiki/Box2d
- * - https://www.iforce2d.net/b2dtut/
  */
 class SimulatorBackend : public Backend
 {
@@ -22,14 +17,28 @@ class SimulatorBackend : public Backend
     static const std::string name;
 
     /**
+     * Supported modes for simulation speed.
+     *
+     * - FAST_SIMULATION will run the simulation as fast a possible
+     * - REALTIME_SIMULATION will run the simulation in real-time, meaning
+     * if timestamps in published data are 'n' seconds apart, they will be published
+     * 'n' seconds apart in real "wall-clock" time. This is useful
+     * if you want to visualize the simulation.
+     */
+    enum SimulationSpeed
+    {
+        FAST_SIMULATION,
+        REALTIME_SIMULATION
+    };
+
+    /**
      * Creates a new SimulatorBackend
      *
      * The SimulatorBackend will run a physics simulation to simulate and publish the
-     * World, and simulate the primitives given to it. The SimulatorBackend will only
-     * advance the simulation by a fixed amount each time primitives are received, rather
-     * than running at full-speed or in real-time. This is because we want the simulator
-     * to be deterministic and always provide the World at a "fixed" rate from the
-     * perspective of any consumers.
+     * World, and simulate the primitives given to it. The SimulatorBackend is
+     * deterministic and so will advance the simulation by a fixed amount each time
+     * primitives are received, rather than running completely independently at full-speed
+     * or in real-time.
      *
      * The reason we don't want to run in real-time is because the simulation can likely
      * run much faster than real life. This is a problem because if the simulation can run
@@ -41,57 +50,41 @@ class SimulatorBackend : public Backend
      * This means that in real life each time the AI is ready for more data, about 2 *
      * 1/60 seconds have passed in real-time (and therefore World time). But if the
      * simulation is running way faster then 10 * 1/60 seconds will have passed each time
-     * the AI is ready for more data. This is the scenario we are trying to avoid.
+     * the AI is ready for more data. This is the scenario we are trying to avoid by
+     * waiting for Primitives before continuing the simulation.
      *
-     * @param simulation_time_step How far to step the simulation in time each time the
-     * simulation is advanced
-     * @param num_steps_per_primitive_update How many times to advance the simulation each
-     * time new primitives are received
+     * @param physics_time_step Time time step used by the physics simulation
+     * @param world_time_increment The increment in the timestamp of the published World
+     * object each time it is published. ie. from the perspective of consumers, the World
+     * is being published every 'world_time_increment' seconds.
+     * @param simulation_speed_mode What speed mode to run the simulator with
      */
-    explicit SimulatorBackend(
-        const Duration& simulation_time_step        = Duration::fromSeconds(1.0 / 60.0),
-        unsigned int num_steps_per_primitive_update = 2);
+    explicit SimulatorBackend(const Duration& physics_time_step,
+                              const Duration& world_time_increment,
+                              SimulationSpeed simulation_speed_mode);
 
     /**
-     * Returns the current state of the World in the simulated backend
+     * Sets the SimulationSpeed for the simulation
      *
-     * @return the current state of the World in the simulated backend
+     * @param simulation_speed_mode the new SimulationSpeed to set
      */
-    World getWorld();
+    void setSimulationSpeed(SimulationSpeed simulation_speed_mode);
 
     /**
-     * Sets the state of the World in the simulated backend. All following simulation will
-     * follow from this newly provided world.
+     * Simulates the world given the initial state until the simulation times out
      *
-     * @param new_world A new state of the World to set in the simulated backend
+     * @param world The initial state of the world in the simulation
+     * @param timeout How long to run the simulation for before failing
+     * @return true if the simulation succeeds, and false if it times out and fails
      */
-    void setWorld(const World& new_world);
+    bool runSimulation(World world, const Duration& timeout);
 
    private:
-    /**
-     * Updates the simulation.
-     *
-     * This will advance the simulation by "simulation_time_step",
-     * "num_steps_per_primitive_update" times. We take several smaller steps if necessary
-     * to maintain the accuracy of the simulation. This will update the state of the World
-     * in the backend and send the updated values to all observers.
-     */
-    void updateSimulation();
-
-    /**
-     * Sends the current state of the world in the simulation to all Observers
-     */
-    void sendWorldToObservers();
-
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
-    Duration simulation_time_step;
-    unsigned int num_steps_per_primitive_update;
+    const Duration physics_time_step;
+    const Duration world_time_increment;
+    SimulationSpeed simulation_speed_mode;
 
-    ConstPrimitiveVectorPtr most_recently_received_primitives;
-    std::mutex most_recently_received_primitives_mutex;
-
-    // The current state of the world in the simulation
-    World world;
-    std::mutex world_mutex;
+    std::promise<ConstPrimitiveVectorPtr> primitive_promise;
 };

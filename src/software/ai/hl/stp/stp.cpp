@@ -25,11 +25,11 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
-    override_play          = Util::DynamicParameters::AI::override_ai_play.value();
+    override_play = Util::DynamicParameters->getAIConfig()->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name          = Util::DynamicParameters::AI::current_ai_play.value();
+    override_play_name = Util::DynamicParameters->getAIConfig()->CurrentAIPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
@@ -88,7 +88,11 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
         for (const auto& tactic : assigned_tactics)
         {
             // Get the Intent the tactic wants to run
-            auto intent = tactic->getNextIntent(world.gameState());
+            auto intent = tactic->getNextIntent();
+            // Set Motion Constraints
+            auto motion_constraints = motion_constraint_manager.getMotionConstraints(
+                world.gameState(), *tactic);
+            intent->setMotionConstraints(motion_constraints);
 
             // If the tactic is not done and a valid intent was returned, the intent will
             // be run by the robot. Otherwise, the robot will default to running a
@@ -152,8 +156,8 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (unsigned col = 0; col < num_cols; col++)
         {
-            if (!friendly_team_robots.at(row).getRobotCapabilities().hasAllCapabilities(
-                    tactics.at(col)->robotCapabilityRequirements()))
+            if (!(tactics.at(col)->robotCapabilityRequirements() <=
+                  friendly_team_robots.at(row).getRobotCapabilities()))
             {
                 // hardware requirements of tactic are not satisfied by the current robot
                 // set cost to 10.0f

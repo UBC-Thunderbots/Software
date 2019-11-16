@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 {
@@ -11,7 +11,7 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 
     Rectangle navigable_area = Rectangle(Point(0, 0), 0, 0);
 
-    Path path = planner->findPath(start, dest, navigable_area, std::vector<Obstacle>());
+    auto path = planner->findPath(start, dest, navigable_area, std::vector<Obstacle>());
 
     EXPECT_TRUE(path != std::nullopt);
 

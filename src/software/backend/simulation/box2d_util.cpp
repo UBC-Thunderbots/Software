@@ -1,8 +1,8 @@
 #include "software/backend/simulation/box2d_util.h"
 
-bool bodyExistsInWorld(b2Body* body, std::shared_ptr<b2World> world)
+bool bodyExistsInWorld(b2Body* body, b2World* world)
 {
-    if (body == nullptr || !world)
+    if (body == nullptr || world == nullptr)
     {
         return false;
     }
@@ -17,4 +17,11 @@ bool bodyExistsInWorld(b2Body* body, std::shared_ptr<b2World> world)
         current_body = current_body->GetNext();
     }
     return false;
+}
+
+b2Vec2 createVec2(const Point& point)
+{
+    b2Vec2 ret;
+    ret.Set(point.x(), point.y());
+    return ret;
 }

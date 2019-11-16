@@ -18,9 +18,13 @@ mkdir -p $OPENOCD_TMP_DIR
 
 # Download openocd
 git clone https://github.com/ntfreak/openocd.git $OPENOCD_TMP_DIR
+cd $OPENOCD_TMP_DIR
+
+# Set permissions to allow this user to access USB devices
+sudo cp contrib/60-openocd.rules /etc/udev/rules.d/
+sudo adduser $USER plugdev
 
 # Build and Install Openocd
-cd $OPENOCD_TMP_DIR
 ./bootstrap
 ./configure
 make

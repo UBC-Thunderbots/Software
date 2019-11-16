@@ -2,8 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "evaluation",
-    srcs = ["evaluation.cpp"],
-    hdrs = ["evaluation.h"],
+    srcs = ["cost_function.cpp"],
+    hdrs = ["cost_function.h"],
     deps = [
         ":pass",
         "//software/ai/evaluation:pass",
@@ -16,7 +16,7 @@ cc_library(
 
 cc_test(
     name = "evaluation_test",
-    srcs = ["evaluation_test.cpp"],
+    srcs = ["cost_function_test.cpp"],
     deps = [
         ":evaluation",
         "//software/test_util",

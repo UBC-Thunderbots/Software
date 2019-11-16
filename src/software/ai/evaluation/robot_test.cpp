@@ -13,9 +13,9 @@
 TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_45_threshold_60)
 {
     Point position    = Point(0, 0);
-    Angle orientation = Angle::ofDegrees(0);
+    Angle orientation = Angle::fromDegrees(0);
     Point target      = Point(1, 1);
-    Angle threshold   = Angle::ofDegrees(60);
+    Angle threshold   = Angle::fromDegrees(60);
 
     EXPECT_TRUE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
@@ -25,9 +25,9 @@ TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_45_threshold_
 TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_threshold_30)
 {
     Point position    = Point(0, 0);
-    Angle orientation = Angle::ofDegrees(0);
+    Angle orientation = Angle::fromDegrees(0);
     Point target      = Point(1, 1);
-    Angle threshold   = Angle::ofDegrees(30);
+    Angle threshold   = Angle::fromDegrees(30);
 
     EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
@@ -36,9 +36,9 @@ TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_thresh
 TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_threshold_45)
 {
     Point position    = Point(0, 0);
-    Angle orientation = Angle::ofDegrees(0);
+    Angle orientation = Angle::fromDegrees(0);
     Point target      = Point(1, 1);
-    Angle threshold   = Angle::ofDegrees(45);
+    Angle threshold   = Angle::fromDegrees(45);
 
     EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
@@ -47,9 +47,9 @@ TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_thresh
 TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_135_threshold_150)
 {
     Point position    = Point(0, 0);
-    Angle orientation = Angle::ofDegrees(0);
+    Angle orientation = Angle::fromDegrees(0);
     Point target      = Point(-1, 1);
-    Angle threshold   = Angle::ofDegrees(150);
+    Angle threshold   = Angle::fromDegrees(150);
 
     EXPECT_TRUE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
@@ -58,9 +58,9 @@ TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_135_threshold
 TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_135_threshold_90)
 {
     Point position    = Point(0, 0);
-    Angle orientation = Angle::ofDegrees(0);
+    Angle orientation = Angle::fromDegrees(0);
     Point target      = Point(-1, 1);
-    Angle threshold   = Angle::ofDegrees(90);
+    Angle threshold   = Angle::fromDegrees(90);
 
     EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
@@ -70,9 +70,9 @@ TEST(RobotEvaluationTest,
      orientation_in_threshold_facing_150_target_minus_150_threshold_90)
 {
     Point position    = Point(0, 0);
-    Angle orientation = Angle::ofDegrees(150);
+    Angle orientation = Angle::fromDegrees(150);
     Point target      = Point(-2, -1);
-    Angle threshold   = Angle::ofDegrees(90);
+    Angle threshold   = Angle::fromDegrees(90);
 
     EXPECT_TRUE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
@@ -82,9 +82,9 @@ TEST(RobotEvaluationTest,
      orientation_not_in_threshold_facing_150_target_minus_150_threshold_30)
 {
     Point position    = Point(0, 0);
-    Angle orientation = Angle::ofDegrees(150);
+    Angle orientation = Angle::fromDegrees(150);
     Point target      = Point(-2, -1);
-    Angle threshold   = Angle::ofDegrees(30);
+    Angle threshold   = Angle::fromDegrees(30);
 
     EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
@@ -186,7 +186,7 @@ TEST(RobotEvaluationTest, has_possession_robot_on_angle_with_ball_in_dribbler)
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
 
-    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
 
     auto result = Evaluation::robotHasPossession(ball, robot);
@@ -233,7 +233,7 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
-    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
 
@@ -252,7 +252,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
-    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
 
@@ -271,7 +271,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast_at_future_timestamp)
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
-    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
 
@@ -290,7 +290,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_slow)
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
-    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
 
@@ -309,7 +309,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_wrong_way)
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
-    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
 
@@ -328,7 +328,7 @@ TEST(RobotEvaluationTest, pass_with_ball_slightly_off)
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
-    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
 
@@ -347,7 +347,7 @@ TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
-    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
 
