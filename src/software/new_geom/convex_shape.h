@@ -1,3 +1,5 @@
 #include "software/new_geom/shape.h"
 
-class IConvexShape : public IShape {};
+class IConvexShape : public IShape
+{
+};

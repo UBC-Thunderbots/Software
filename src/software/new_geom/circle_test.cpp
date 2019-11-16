@@ -19,7 +19,7 @@ TEST(CreateCircleTests, circle_custom_constructor)
 TEST(CircleLogicTests, circle_logic_tests)
 {
     Circle c = Circle();
-    c.setOrigin(Point(2,- 3));
+    c.setOrigin(Point(2, -3));
     c.setRadius(10);
     EXPECT_EQ(Point(2, -3), c.getOrigin());
     EXPECT_EQ(10, c.getRadius());

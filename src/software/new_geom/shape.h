@@ -2,7 +2,7 @@
 
 class IShape
 {
-public:
+   public:
     virtual ~IShape() = default;
 
     /**

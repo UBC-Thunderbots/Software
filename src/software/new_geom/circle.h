@@ -15,14 +15,14 @@ class Circle final : public IConvexShape
      * @param the origin of the Circle
      * @param the radius of the Circle
      */
-    explicit Circle(const Point& origin, double radius);
+    explicit Circle(const Point &origin, double radius);
 
     /**
      * Sets the origin of this Circle.
      *
      * @param the new origin of this Circle
      */
-    void setOrigin(const Point& o);
+    void setOrigin(const Point &o);
 
     /**
      * Returns the origin of this Circle.
@@ -59,9 +59,9 @@ class Circle final : public IConvexShape
      */
     double area() const override;
 
-    private:
-      Point origin_;
-      double radius_;
+   private:
+    Point origin_;
+    double radius_;
 };
 
 /**
@@ -87,7 +87,7 @@ bool operator!=(const Circle &c, const Circle &d);
 template <>
 struct std::hash<Circle>
 {
-    size_t operator()(const Circle& circle) const
+    size_t operator()(const Circle &circle) const
     {
         return std::hash<Point>()(circle.getOrigin()) ^
                std::hash<double>()(circle.getRadius());
