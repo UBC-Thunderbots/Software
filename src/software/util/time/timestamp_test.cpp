@@ -127,3 +127,13 @@ TEST(TimestampTest, test_subtraction_operator_with_timestamp_with_negative_resul
     Duration expected_result = Duration::fromMilliseconds(634);
     EXPECT_EQ(result, expected_result);
 }
+
+TEST(TimestampTest, stream_operator)
+{
+    Timestamp t = Timestamp::fromSeconds(2.00);
+
+    std::stringstream out;
+    out << t;
+
+    EXPECT_EQ("2.00s", out.str());
+}

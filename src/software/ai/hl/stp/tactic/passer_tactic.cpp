@@ -18,7 +18,6 @@ PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forev
       pass(std::move(pass)),
       ball(ball)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string PasserTactic::getName() const
@@ -63,7 +62,7 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         yield(move_action.updateStateAndGetNextIntent(
             *robot, wait_position, pass.passerOrientation(), 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE));
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
     }
 
     // The angle between the ball velocity vector and a vector from the passer

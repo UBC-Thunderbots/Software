@@ -1,55 +1,35 @@
 # Workflow
 
 ## Table of Contents
-* [Table of Contents](#table-of-contents)
 * [Issue and Project Tracking](#issue-and-project-tracking)
     * [Issues](#issues)
-    * [Milestones](#milestones)
 * [Git Workflow](#git-workflow)
     * [Forking and Branching](#forking-and-branching)
     * [Creating a new Branch](#creating-a-new-branch)
         * [Why should you only create branches from "upstream/master"?](#why-should-you-only-create-branches-from-upstreammaster)
     * [Making Commits](#making-commits)
+    * [Updating Your Branch and Resolving Conflicts](#updating-your-branch-and-resolving-conflicts)
+    * [Formatting Your Code](#formatting-your-code)
     * [Pull Requests](#pull-requests)
     * [Reviewing Pull Requests](#reviewing-pull-requests)
 * [Example Workflow](#example-workflow)
 * [Testing](#testing)
-    * [Unit Testing](#unit-testing)
-        * [For C   Code](#for-c-code)
-        * [For C Code](#for-c-code-1)
+
 
 ## Issue and Project Tracking
 
-We try keep our issue and project tracking fairly simple, to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview. Similarly, you can read about GitHub's milestones [here](https://help.github.com/articles/about-milestones/).
+We try keep our issue and project tracking fairly simple, to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview.
 
 ### Issues
 
-We use issues to keep track of bugs in our system, and new features or enhancements we want to add. When creating a new issue, we have 2 simple templates that can be used: 'Bug" and "Feature Request"
+We use issues to keep track of bugs in our system, and new features or enhancements we want to add. When creating a new issue, we have a simple "Task" template that can be filled out. We *strongly* recommend using the template since it provides guiding questions/headings to make sure we have all the necessary information in each issue.
 
-We highly recommend using one of these two templates, as they provide guiding questions to make sure we have all the necessary information in each issue.
-
-*It is very important to give lots of detail and context when creating an issue. It is best to pretend you are writing the issue for someone who has not worked on the relevant part of the system before, and to leave a good enough explanation that someone with very little prior knowledge could get started.*
+*It is very important to give lots of detail and context when creating an issue. It is best to pretend you are writing the issue for someone who has not worked on the relevant part of the system before, and to leave a good enough explanation that someone with very little prior knowledge could get started. Sometimes issues get worked on many months after they were created, and we don't want to forget exactly what we wanted to do and why.*
 
 In general if you find an issue with the system, first check with others on your team to make sure that this is indeed unintended behavior (you never know), and make sure that an issue has not already been created before you create a new one.  
   
 The same goes for feature requests. Just make sure that whatever you want to say doesn't already exist in an issue.
 
-### Milestones
-
-We use Milestones as a way of grouping tickets that all work towards a larger goal. GitHub's Milestones can be found under the "Issues" tab.
-
-When creating or editing and issue, the issue can be added to a Milestone by selecting one from the column on the right, beneath the "New Issue" button. Issues should be added to a MIlestone if they are relevant to the project and contribute towards the final goal or deliverable. Using Milestones to keep related issues together helps us track how much work is left in a project, if we are going to meet our deadlines, and makes it easy to view all the tickets related to a project at once.
-
-*General Issues such as bugs, or random small fixes/features that are only a single Issue and don't belong to a larger goal do not need to be added to a Milestone. We only use Milestones for larger projects that can be broken down into several issues.*
-
-If you're starting a new project, creating a Milestone is easy. Just follow these steps:
-
-1. Navigate to the "Milestones" page by clicking on "Issues" -> "Milestones"
-2. Click "New Milestone"
-3. Give the Milestone and short but descriptive title
-4. Fill out the description, giving a high-level overview of the project and its goals
-5. Decide on a due date and fill it in. Planning timelines for projects can be tricky, so talk to your team lead and anyone else that may be working on the project to help come to a decision.
-6. That's it! Easy. Now you can create and add Issues to the Milestone (see above)
 
 ## Git Workflow
 
@@ -65,12 +45,14 @@ In general, we follow the Forking Workflow
 
 For each Issue of project you are working on, you should have a separate branch. This helps keep work organized and separate.
 
-**Branches should always be created from the latest code on the `master` branch of our main Software repository**. Once this branch is created, you can push it to your fork and update it with commits until it is ready to merge. 
+**Branches should always be created from the latest code on the `master` branch of our main Software repository**. If you followed the steps in [Getting Started](software-setup.md), this will be `upstream/master`. Once this branch is created, you can push it to your fork and update it with commits until it is ready to merge. 
 
 1. Navigate to the base folder of your Software repository: `cd path/to/the/repository/Software`
 2. Make git aware of any new changes to `upstream` by running `git fetch upstream`
-3. Create a new branch from `upstream/master` by running `git checkout -b your-branch-name -t upstream/master`
-   1. Our branch naming convention is: `your_name/branch_name` (all lowercase, words separated by underscores). The branch name should be short and descriptive of the work being done on the branch.  **Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
+3. Create a new branch from `upstream/master` by running `git checkout -b your-branch-name upstream/master`
+   1. Our branch naming convention is: `your_name/branch_name` (all lowercase, words separated by underscores). The branch name should be short and descriptive of the work being done on the branch.
+   
+**Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
 4. You can now commit changes to this branch, and push them to your fork with `git push origin your_branch_name`
 
 #### Why should you only create branches from "upstream/master"? 
@@ -88,6 +70,24 @@ We don't impose any rules for how you should be committing code, just keep the f
 2. Commit messages should give a good idea of the changes made. You don't have to go in-depth with technical details, but no one will know what you've done if your commit message is "fixed broken stuff"
 3. Do not commit any non-code files such as images, videos, or generated files.
 
+### Updating Your Branch and Resolving Conflicts
+As you are working on your code on your branch and making commits, you'll want to update your branch with the latest code on `upstream/master` to make sure you're working with the latest code. This is important in case someone else merged new code that affects the code you're working on.
+
+To do this, you have 2 options: rebase or merge. [What's the difference?](https://www.atlassian.com/git/tutorials/merging-vs-rebasing). 
+
+Rebasing is generally recommended but requires slightly more knowledge of git. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`. If you do find you run into crazy conflicts, it might be worth aborting and attempting a merge.
+
+To merge, simply run `git pull upstream master`. This _usually_ produces fewer conflicts than rebasing and is a safer option if you just want to get stuff working.
+
+If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorials on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
+
+### Formatting Your Code
+We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
+
+To format the code, from the `Software` directory run `./clang_format/fix_formatting.sh -b master`. This will take the difference between your current branch and your local `master` branch, and run `clang-format` on those changes. The only reason we use the `-b master` option is because it's faster and only formats code you have modified. There is also a `-a` option that will try format the entire codebase, but it is slow and not recommended.
+
+We recommend committing all your changes and then running the formatting script. This keeps the formatting changes separate from your actual changes. For the formatting changes, a simple commit message like "fixed formatting" is fine.
+
 ### Pull Requests
 
 Pull Requests give us a chance to run our automated tests and review the code before it gets merged. This helps us make sure our code on `upstream/master` always compiles and is as bug-free as possible.
@@ -95,15 +95,16 @@ Pull Requests give us a chance to run our automated tests and review the code be
 The code-review process gives us a chance ask questions or suggest improvements regarding a proposed change, so that the code is of the highest possible quality before being merged. It is also a good opportunity for others on the team to see what changes are being made, even if they are not involved in the project.
 
 The Pull Request process usually looks like the following:
-
+ 
 1. Make sure all the changes you want to make are pushed to a branch on your fork of the repository
-2. From the main page of your fork of the Software repository, click on the "code" tab and then on the "branches" tab below.
-3. Find the branch you want to open a Pull Request with and click "New pull request"
-4. Make sure the target (base-fork) is the `UBC-Thunderbots/Software` repository with branch `master`
-5. Give your Pull Request a short but descriptive title (the title should reflect the changes)
-6. Fill out the pull request template. This includes things like a description of the changes, indicating which issues the Pull Request resolves, and indicating what testing has been done.
-7. Add reviewers. This should be anyone that worked with you on the changes or is working on something that will be affected by the changes. Add your team lead and a few other members. Around 5 reviewers is a good number, but use your best judgement. Remember, these reviews also help give other team members an idea of the changes that are being made even if they aren't working on them.
-8. Tag the Pull Request with any relevant tags
+2. Make sure you have [updated your branch](#updating-your-branch-and-resolving-conflicts) and [formatted your code](#formatting-your-code). This is to help make sure CI will pass.
+3. From the main page of your fork of the Software repository, click on the "code" tab and then on the "branches" tab below.
+4. Find the branch you want to open a Pull Request with and click "New pull request"
+5. Make sure the target (base-fork) is the `UBC-Thunderbots/Software` repository with branch `master`
+6. Give your Pull Request a short but descriptive title (the title should reflect the changes)
+7. Fill out the pull request template. This includes things like a description of the changes, indicating which issues the Pull Request resolves, and indicating what testing has been done.
+8. Add reviewers. This should be anyone that worked with you on the changes or is working on something that will be affected by the changes. Add your team lead and a few other members. Around 3-4 reviewers is a good number, but use your best judgement. Remember, these reviews also help give other team members an idea of the changes that are being made even if they aren't working on them.
+    1. At least one "Code Owner" will need to review the change in order for it to be merged
 9. Click "Create pull request"
 10. Now the code can be reviewed. Respond to feedback given by your team members and make changes as necessary by pushing additional commits to your branch.
     1. **If you are a reviewer:**
@@ -133,24 +134,23 @@ When reviewing pull requests, it can be really difficult to phrase comments in a
 
 [https://mtlynch.io/human-code-reviews-2/](https://mtlynch.io/human-code-reviews-2/)
 
+
 ## Example Workflow
 
 We find our workflow is best explained by walking through an example. We're assuming you have already cloned the repository and set up your git remotes. If not, check out our [Getting the Code](software-setup.md#getting-the-code) instructions first and then come back.
 
-This example incorporates information from the previous sections on [Issue and Project Tracking](workflow-and-conventions.md#issue-and-project-tracking), and [the Git Workflow](workflow-and-conventions.md#git-workflow). Make sure you have read those sections first. This example skips over some of the smaller details.
+This example incorporates information from the previous sections on [Issue and Project Tracking](#issue-and-project-tracking), and [the Git Workflow](#git-workflow). Make sure you have read those sections first. This example skips over some of the smaller details.
   
 We are also assuming all the work done here is in your fork of the repository.
 
 Let's pretend our goalie strategy isn't that great. You have noticed that and suggested we improve it. Here's what your workflow would likely look like, from start to finish. We will pretend your name is Bob.
 
 1. Create a new Issue for the goalie strategy if it doesn't already exist
-   1. Since this is more of a new feature than a bug, you would use the "Feature Request" Issue template
-   2. Let's pretend this is `Issue #23`
-   3. Add the Issue to the appropriate Milestone, if applicable
-   4. Add relevant tags to your Issue. In this case, likely "Software" and "Enhancement"
+   1. Let's pretend this is `Issue #23`
+   2. Add relevant tags to your Issue. In this case, likely "Enhancement"
 2. Create a new branch from `upstream/master`, called `bob/create_new_goalie_strategy`
    1. `git fetch upstream`
-   2. `git checkout -b bob/create_new_goalie_strategy -t upstream/master`
+   2. `git checkout -b bob/create_new_goalie_strategy upstream/master`
 3. Make your changes
    1. As you make changes and come across new information / challenges, it is good to update the Issue you are working on to document these new changes or requirements. Updating our progress on the ticket also helps other know how your work is going.
       1. `git commit -m "Improved the goalie's positioning during corner kicks, to block shots near the edge of the net"`
@@ -159,37 +159,11 @@ Let's pretend our goalie strategy isn't that great. You have noticed that and su
    1. The description should include `resolves #23`, so we know this Pull Request resolved your ticket
 5. Discuss the changes with your reviewers and update the Pull Request by pushing additional commits to your branch
 6. Once the Pull Request is approved and all CI checks pass, Squash and merge the changes
-7. Optional: Delete your remote branch
+7. **Optional:** Delete your remote branch
 8. Make sure your issue is marked as resolved. If you remembered to include `resolves #23` in your Pull Request description, this should have been done automatically for you, but it's good to double check.
 9. Congratulations, you've now made changes to our main codebase!
 
+
 ## Testing
 
-Testing is an integral part of our development process. If you are writing basically **any** code, it should be tested. If you feel like you can't test your piece of code, it's likely because it was written in a way that makes it difficult to test (which is a strong indicator for other problems, such as too much [coupling](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29)). _(An exception to this rule is any code that talks **directly** with hardware)_. For some examples of what happens when people don't test their code enough, see [here](http://outfresh.com/knowledge-base/6-famous-software-disasters-due-lack-testing/). To run all the tests in the repository, you just need to run `catkin_make run_tests` in the top level directory (go try it now!). 
-
-### Unit Testing
-
-Some general guidelines when writing tests are:
-
-* **Tests should test a single, distinct behavior, isolated to a single class (or group of functions in C).** For example, if you have a test called `assign_and_clear_goalie`, it should probably be broken up into `assign_goalie` and `clear_goalie`. While `clear_goalie` might depend on `assign_goalie`, structuring things like this allows us to quickly narrow down where the problem might be by just looking at what tests failed, without having to go tear apart large unit tests.
-* **Don't be afraid to use long test names.** _****_When naming things, as programmers we keep names short so that they can be used elsewhere without taking up an entire line. But no one is going to be using your test name elsewhere, so feel free to be verbose. Instead of `equality_operator_3`, call your test `equality_operator_two_teams_different_number_of_robots`
-
-#### For C++ Code
-
-* We use [gtest](https://github.com/google/googletest/blob/master/googletest/docs/primer.md) for our C++ unit testing. 
-* For examples, please look in the `test` folder (currently under `src/software`, though this path may change.
-* To add a test to the build system you'll need to add something like following to the bottom of the `src/software/CMakeLists.txt` file , under the block marked `if (CATKIN_ENABLE_TESTING)`
-
-```text
-catkin_add_gtest(geom_angle_test
-        test/geom/angle.cpp
-        )
-target_link_libraries(geom_angle_test ${catkin_LIBRARIES})
-```
-
-* Specific tests may be run directly in CLion. See [here](https://www.jetbrains.com/clion/features/unit-testing.html) for more info.
-
-#### For C Code
-
-**TODO**
-
+Testing is an integral part of our development process. If you are writing basically **any** code, it should be tested. If you feel like you can't test your piece of code, it's likely because it was written in a way that makes it difficult to test (which is a strong indicator for other problems, such as too much [coupling](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29)). _(An exception to this rule is any code that talks **directly** with hardware)_. For some examples of what happens when people don't test their code enough, see [here](http://outfresh.com/knowledge-base/6-famous-software-disasters-due-lack-testing/). How to run tests is explained in the [Getting Started Guide](getting-started.md/#building-and-running-the-code). 

@@ -34,46 +34,25 @@ TEST(PhysicsBallTest, test_ball_added_to_physics_world_on_creation)
     EXPECT_EQ(1, world->GetBodyCount());
 }
 
-TEST(PhysicsBallTest, test_remove_physics_ball_from_world)
+TEST(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
+    {
+        Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(0, world->GetBodyCount());
+        EXPECT_EQ(0, world->GetBodyCount());
 
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+        auto physics_ball = PhysicsBall(world, ball_parameter);
 
-    EXPECT_EQ(1, world->GetBodyCount());
+        EXPECT_EQ(1, world->GetBodyCount());
+    }
 
-    physics_ball.removeFromWorld(world);
-
-    EXPECT_EQ(0, world->GetBodyCount());
-}
-
-TEST(PhysicsBallTest, test_remove_physics_ball_from_world_multiple_times)
-{
-    b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
-
-    Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
-
-    EXPECT_EQ(0, world->GetBodyCount());
-
-    auto physics_ball = PhysicsBall(world, ball_parameter);
-
-    EXPECT_EQ(1, world->GetBodyCount());
-
-    physics_ball.removeFromWorld(world);
-
-    EXPECT_EQ(0, world->GetBodyCount());
-
-    physics_ball.removeFromWorld(world);
-
+    // Once we leave the above scope the ball is destroyed, so it should have been
+    // removed from the world
     EXPECT_EQ(0, world->GetBodyCount());
 }
-
 
 TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_step)
 {

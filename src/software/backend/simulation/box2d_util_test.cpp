@@ -7,7 +7,7 @@
 
 TEST(Box2DUtilTest, test_existence_of_null_body_in_null_world)
 {
-    std::shared_ptr<b2World> world;
+    b2World* world = nullptr;
 
     b2Body* body = nullptr;
 
@@ -18,7 +18,7 @@ TEST(Box2DUtilTest, test_existence_of_null_body_in_null_world)
 TEST(Box2DUtilTest, test_existence_of_null_body)
 {
     b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
+    auto world = new b2World(gravity);
 
     b2Body* body = nullptr;
 
@@ -29,8 +29,8 @@ TEST(Box2DUtilTest, test_existence_of_null_body)
 TEST(Box2DUtilTest, test_existence_of_random_body_in_empty_world)
 {
     b2Vec2 gravity(0, 0);
-    auto world       = std::make_shared<b2World>(gravity);
-    auto other_world = std::make_shared<b2World>(gravity);
+    auto world       = new b2World(gravity);
+    auto other_world = new b2World(gravity);
 
     b2BodyDef body_def;
     body_def.type = b2_dynamicBody;
@@ -46,7 +46,7 @@ TEST(Box2DUtilTest, test_existence_of_random_body_in_empty_world)
 TEST(Box2DUtilTest, test_existence_of_body_in_world_with_one_body)
 {
     b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
+    auto world = new b2World(gravity);
 
     b2BodyDef body_def;
     body_def.type = b2_dynamicBody;
@@ -61,8 +61,8 @@ TEST(Box2DUtilTest, test_existence_of_body_in_world_with_one_body)
 TEST(Box2DUtilTest, test_existence_of_body_in_world_with_multiple_bodies)
 {
     b2Vec2 gravity(0, 0);
-    auto world       = std::make_shared<b2World>(gravity);
-    auto other_world = std::make_shared<b2World>(gravity);
+    auto world       = new b2World(gravity);
+    auto other_world = new b2World(gravity);
 
     b2BodyDef body_def_1;
     body_def_1.type = b2_dynamicBody;
