@@ -3,14 +3,14 @@
 #include "physics/physics.h"
 
 
-#include "wheels.h"
+#include "io/wheels.h"
 #include <math.h>
 
 #ifndef FWSIM
-#include "adc.h"
-#include "dsp.h"
-#include "dr.h"
-#include "encoder.h"
+#include "io/adc.h"
+#include "io/dsp.h"
+#include "io/dr.h"
+#include "io/encoder.h"
 #else
 #include "simulate.h"
 #include <stdio.h>
