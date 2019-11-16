@@ -111,7 +111,7 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // If the enemy robot already had the ball, try steal it and chip it away
             if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-                ball.velocity().length() < ball_steal_speed)
+                ball.velocity().length() <= ball_steal_speed)
             {
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, ball.position(),
