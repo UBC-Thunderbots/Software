@@ -15,15 +15,15 @@ InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
 {
 }
 
-std::unique_ptr<Intent> InterceptBallAction::updateStateAndGetNextIntent(
-    const Robot& robot, const Field& field, const Ball& ball)
+void InterceptBallAction::updateWorldParams(const Field& field, const Ball& ball)
 {
-    // Update the parameters stored by this Action
-    this->field = field;
     this->ball  = ball;
-    this->robot = robot;
+    this->field = field;
+}
 
-    return getNextIntent();
+void InterceptBallAction::updateControlParams(const Robot& robot)
+{
+    this->robot = robot;
 }
 
 std::optional<Point> InterceptBallAction::getPointBallLeavesField(const Field& field,
