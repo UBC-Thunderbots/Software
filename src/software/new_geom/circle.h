@@ -11,6 +11,7 @@ class Circle final : public IConvexShape
 
     /**
      * Creates a Circle with arbitrary origin and radius.
+     * Throws an error if passed a negative radius.
      *
      * @param the origin of the Circle
      * @param the radius of the Circle
