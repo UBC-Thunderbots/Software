@@ -2,14 +2,13 @@
 
 # Define TBOTS_DIR to be the root of the Software repo in your .bashrc/.bash_profile
 ProgName=tb
-TBOTS_DIR="$HOME/robocup/thunderbots/Software/src"
   
 sub_help(){
     echo "Usage: $ProgName <subcommand> [options]\n"
     echo "Subcommands:"
-    echo "    build {software, fw} [opts]"
+    echo "    build {ai, fw} [opts]"
     echo "    run  {ai, fw} [opts] "
-    echo "    macos  {ai, firmware} [opts] ### EXPERIMENTAL ###"
+    echo "    macos {pfw, ufw, ai} [opts] ### EXPERIMENTAL ###"
     echo ""
     echo "For help with each subcommand run:"
     echo "$ProgName <subcommand> -h|--help"
@@ -25,7 +24,7 @@ sub_build(){
         "fw")
             bazel build //firmware_new/... --cpu=stm32h7;
             ;;
-        "software")
+        "ai")
             bazel build //software/...;
             ;;
         *)
@@ -80,7 +79,7 @@ function tb() {
             ;;
         *)
             shift
-            cd $TBOTS_DIR;
+            cd $TBOTS_DIR/src;
             sub_${subcommand} $@
             if [ $? = 127 ]; then
                 echo "Error: '$subcommand' is not a known subcommand." >&2
