@@ -27,6 +27,8 @@ jobs:
         - ./convert_profdata_to_lcov.sh
         # Upload coverage results
         - bash <(curl -s https://codecov.io/bash)
+    - name: "Build Firmware"
+        - cd src
         # Build our CPU-specific targets
         - bazel build //firmware_new/... --cpu=stm32h7
     - name: "Check Formatting"
