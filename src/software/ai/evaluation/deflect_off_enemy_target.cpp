@@ -17,7 +17,7 @@ namespace Evaluation
             triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
 
         Robot enemy_closest_to_edge = world.enemyTeam().getRobotById(0).value();
-        double shortestLenToEdge = 100.0;
+        double shortestLenToEdge    = 100.0;
         double closestEdgeY;
         // Finds the y value of the closest edge of the field (likely where the ball
         // is)

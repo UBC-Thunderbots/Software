@@ -15,13 +15,13 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      AutokickType autokick,
                                      BallCollisionType ball_collision_type)
 {
-    this->robot             = robot;
-    this->destination       = destination;
-    this->final_orientation = final_orientation;
-    this->final_speed       = final_speed;
-    this->enable_dribbler   = enable_dribbler;
-    this->move_type         = move_type;
-    this->autokick          = autokick;
+    this->robot               = robot;
+    this->destination         = destination;
+    this->final_orientation   = final_orientation;
+    this->final_speed         = final_speed;
+    this->enable_dribbler     = enable_dribbler;
+    this->move_type           = move_type;
+    this->autokick            = autokick;
     this->ball_collision_type = ball_collision_type;
 }
 
