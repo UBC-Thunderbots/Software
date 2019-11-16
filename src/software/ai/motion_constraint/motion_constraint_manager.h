@@ -96,6 +96,15 @@ class MotionConstraintManager : public TacticVisitor
     void visit(const ChipTactic &tactic) override;
 
     /**
+     * Visits a KickoffChipTactic to perform an operation.
+     *
+     * @param tactic The KickoffChipTactic to visit
+     *
+     * @modifies current_whitelisted_constraints
+     */
+    void visit(const KickoffChipTactic &tactic) override;
+
+    /**
      * Visits a StopTactic to perform an operation.
      *
      * @param tactic The StopTactic to visit
@@ -112,6 +121,15 @@ class MotionConstraintManager : public TacticVisitor
      * @modifies current_whitelisted_constraints
      */
     void visit(const PenaltyKickTactic &tactic) override;
+
+    /**
+     * Visits a PenaltySetupTactic to perform an operation.
+     *
+     * @param tactic The PenaltySetupTactic to visit
+     *
+     * @modifies current_whitelisted_constraints
+     */
+    void visit(const PenaltySetupTactic &tactic) override;
 
     /**
      * Visits a ReceiverTactic to perform an operation.
@@ -148,6 +166,24 @@ class MotionConstraintManager : public TacticVisitor
      * @modifies current_whitelisted_constraints
      */
     void visit(const PasserTactic &tactic) override;
+
+    /**
+     * Visits a DefenseShadowEnemyTactic to perform an operation.
+     *
+     * @param tactic The DefenseShadowEnemyTactic to visit
+     *
+     * @modifies current_whitelisted_constraints
+     */
+    void visit(const DefenseShadowEnemyTactic &tactic) override;
+
+    /**
+     * Visits a GrabBallTactic to perform an operation.
+     *
+     * @param tactic The GrabBallTactic to visit
+     *
+     * @modifies current_whitelisted_constraints
+     */
+    void visit(const GrabBallTactic &tactic) override;
 
     /**
      * Visits a MoveTestTactic to perform an operation.

@@ -1,4 +1,4 @@
-package(default_visibility = ["//software/ai/navigator:__subpackages__"])
+package(default_visibility = ["//software/ai:__subpackages__"])
 
 cc_library(
     name = "path_planner",
@@ -31,7 +31,24 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/world:field",
+    ],
+)
+
+cc_library(
+    name = "no_path_test_path_planner",
+    srcs = ["no_path_test_path_planner.cpp"],
+    hdrs = ["no_path_test_path_planner.h"],
+    deps = [
+        ":path_planner",
+    ],
+)
+
+cc_library(
+    name = "one_point_path_test_path_planner",
+    srcs = ["one_point_path_test_path_planner.cpp"],
+    hdrs = ["one_point_path_test_path_planner.h"],
+    deps = [
+        ":path_planner",
     ],
 )
 
@@ -40,6 +57,7 @@ cc_test(
     srcs = ["theta_star_path_planner_test.cpp"],
     deps = [
         ":theta_star_path_planner",
+        "//software/world:field",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

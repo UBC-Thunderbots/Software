@@ -5,15 +5,15 @@
 
 #include "software/geom/circle.h"
 #include "software/geom/line.h"
-#include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/shot.h"
+#include "software/new_geom/point.h"
 
 template <size_t N>
-using LegacyPolygon       = std::array<Vector, N>;
+using LegacyPolygon       = std::array<Point, N>;
 using LegacyTriangle      = LegacyPolygon<3>;
 using LegacyQuadrilateral = LegacyPolygon<4>;
 
@@ -39,12 +39,12 @@ inline LegacyQuadrilateral quad(const Point &a, const Point &b, const Point &c,
 /**
  * Signed magnitude of the projection of `second` on `first`
  */
-double proj_len(const Vector &first, const Vector &second);
+double proj_length(const Vector &first, const Vector &second);
 
 /**
  * Signed magnitude of the projection of `first.start -> second` on `first`
  */
-double proj_len(const Segment &first, const Vector &second);
+double proj_length(const Segment &first, const Vector &second);
 
 /*
  * The family of `contains` functions determines whether
@@ -102,13 +102,13 @@ bool isDegenerate(const Segment &segment);
 bool isDegenerate(const Ray &segment);
 bool isDegenerate(const Line &line);
 
-double len(const Segment &segment);
+double length(const Segment &segment);
 
-double lensq(const Segment &segment);
-double lensq(const Line &line);
+double lengthSquared(const Segment &segment);
+double lengthSquared(const Line &line);
 
 template <size_t N>
-Vector getVertex(const LegacyPolygon<N> &poly, unsigned int i);
+Point getVertex(const LegacyPolygon<N> &poly, unsigned int i);
 template <size_t N>
 void setVertex(LegacyPolygon<N> &poly, unsigned int i, Vector &v);
 
@@ -211,7 +211,7 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
  *
  * @return the Point on line segment closest to centre point.
  */
-Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
+Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
 Point closestPointOnSeg(const Point &p, const Segment &segment);
 
 /**
@@ -246,7 +246,7 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
                                        const Point &segA, const Point &segB);
 
 /**
- * Finds the points of intersection between a circle and a line.
+ * Finds the points of intersection between a rectangle and a line.
  * There may be zero, one, or two such points.
  *
  * @param r the rectangle.
@@ -359,7 +359,7 @@ std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
  *
  * @return the reflected ray.
  */
-Point reflect(const Point &v, const Point &n);
+Vector reflect(const Vector &v, const Vector &n);
 
 /**
  * Calculates the intersection of a Ray and Segment
@@ -373,6 +373,19 @@ Point reflect(const Point &v, const Point &n);
  */
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     const Ray &ray, const Segment &segment);
+
+/**
+ * Calculates the intersection of a Ray and Rectangle
+ *
+ * @param ray The ray
+ * @param rectangle The rectangle
+ * @return Returns {std::nullopt, std::nullopt} if no intersections exist.
+ * Returns {Point, std::nullopt} if a single intersection exists.
+ * Returns {Point, Point} if the ray overlaps a segment of the rectangle,
+ * where the points define the line segment of overlap.
+ */
+std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
+    const Ray &ray, const Rectangle &rectangle);
 
 /**
  * Calculates the intersection of two Rays
@@ -413,7 +426,7 @@ Point reflect(const Point &a, const Point &b, const Point &p);
  *
  * @return the blocking position.
  */
-Point calcBlockCone(const Point &a, const Point &b, const double &radius);
+Point calcBlockCone(const Vector &a, const Vector &b, const double &radius);
 
 /**
  * Given a cone shooting from a point P, determines the furthest location from
@@ -423,9 +436,10 @@ Point calcBlockCone(const Point &a, const Point &b, const double &radius);
  *
  * @pre \p b must be counterclockwise of \p a.
  *
- * @param a the starting angle of the cone.
+ * @param a the point such that a vector from p to a represents the right side of the
+ * cone.
  *
- * @param b the ending angle of the cone.
+ * @param b the point such that a vector from p to b represents the left side of the cone.
  *
  * @param radius the radius of the circle with which to block the cone.
  *
@@ -444,7 +458,7 @@ Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double
  * I.e. if p is return value,
  * then points to the other side of line p-c is not covered by goalie.
  */
-Point calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
+Vector calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
 
 /*
  * Ported code from CM geom util
@@ -509,7 +523,7 @@ double closestPointTime(Point x1, Vector v1, Point x2, Vector v2);
  *
  * @param p is the point is question
  */
-bool pointInFrontVector(Point offset, Point dir, Point p);
+bool pointInFrontVector(Point offset, Vector dir, Point p);
 
 /**
  * Returns the circle's tangent points.
@@ -618,16 +632,28 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
 
 /**
- * Finds all circles which do not contain a point in them within the given rectangle
+ * Finds all circles which do not contain a point in them within the given rectangle.
  *
  * NOTE: this only guarantees that the center of each circle is within the
  *       rectangle, some portion of the circle may extend outside the rectangle
  *
- * @param rectangle The rectangle in which to look for open circles
+ * @param bounding_box The rectangle in which to look for open circles
  * @param points The points that must not lie within the circles
  *
- * @return A list of circles, sorted in descending order of radius
+ * @return A list of circles, sorted in descending order of radius. If no points were
+ * provided, returns an empty list. Any points outside the bounding_box are ommitted.
  */
-std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> points);
+std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
 
 Polygon circleToPolygon(const Circle &circle, size_t num_points);
+
+/**
+ *
+ * Finds the point in the testPoints vector that is closest to the originPoint.
+ *
+ * @param originPoint
+ * @param testPoints
+ * @return The point in testPoints closest to testPoints.
+ */
+std::optional<Point> findClosestPoint(const Point &origin_point,
+                                      std::vector<Point> test_points);

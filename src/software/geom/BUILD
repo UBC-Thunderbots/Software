@@ -4,36 +4,41 @@ cc_library(
     name = "geom",
     srcs = [
         "polygon.cpp",
+        "polynomial.cpp",
         "rectangle.cpp",
         "shot.cpp",
+        "spline.cpp",
         "util.cpp",
+        "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "angle.h",
         "circle.h",
         "line.h",
-        "point.h",
         "polygon.h",
+        "polynomial.h",
         "ray.h",
         "rectangle.h",
         "segment.h",
         "shot.h",
+        "spline.h",
         "util.h",
+        "voronoi_diagram.h",
     ],
     copts = [
         "-std=c++17",
     ],
     deps = [
+        "//software/new_geom",
         "@boost//:geometry",
-        "@g3log",
         "@boost//:polygon",
+        "@g3log",
     ],
 )
 
 cc_test(
-    name = "angle_test",
+    name = "spline_test",
     srcs = [
-        "angle_test.cpp",
+        "spline_test.cpp",
     ],
     deps = [
         ":geom",
@@ -42,9 +47,9 @@ cc_test(
 )
 
 cc_test(
-    name = "point_test",
+    name = "polynomial_test",
     srcs = [
-        "point_test.cpp",
+        "polynomial_test.cpp",
     ],
     deps = [
         ":geom",
@@ -70,6 +75,19 @@ cc_test(
     ],
     deps = [
         ":geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "voronoi_util_test",
+    srcs = [
+        "voronoi_diagram_test.cpp",
+    ],
+    deps = [
+        ":geom",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

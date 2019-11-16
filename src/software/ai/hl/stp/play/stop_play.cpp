@@ -81,8 +81,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // for positioning all the robots (excluding the goalie). The positioning vector
         // will be used to position robots tangent to the goal_to_ball_unit_vector
         Vector goal_to_ball_unit_vector =
-            (world.field().friendlyGoal() - world.ball().position()).norm();
-        Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perp();
+            (world.field().friendlyGoal() - world.ball().position()).normalize();
+        Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perpendicular();
 
         // goal_defense_point_center is a point on the semicircle around the friendly
         // defense area, that can block the direct path from the ball to the net.

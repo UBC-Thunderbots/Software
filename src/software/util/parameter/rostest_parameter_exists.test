@@ -1,4 +1,0 @@
-<launch>
-    <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>
-    <test test-name="check_parameter_existance_test" pkg="thunderbots" type="check_parameter_existance_test" />
-</launch>

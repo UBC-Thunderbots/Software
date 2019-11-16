@@ -6,8 +6,9 @@
  * points.
  */
 
-std::optional<std::vector<Point>> StraightLinePathPlanner::findPath(const Point &start,
-                                                                    const Point &dest)
+std::optional<Path> StraightLinePathPlanner::findPath(
+    const Point &start, const Point &destination, const Rectangle &navigable_area,
+    const std::vector<Obstacle> &obstacles)
 {
-    return std::make_optional<std::vector<Point>>({start, dest});
+    return Path(std::vector<Point>({start, destination}));
 }

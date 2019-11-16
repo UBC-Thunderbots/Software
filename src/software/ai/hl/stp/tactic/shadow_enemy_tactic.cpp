@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
@@ -52,7 +52,7 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
     // Prefer robots closer to the enemy being shadowed
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - enemy_threat->robot.position()).len() /
+    double cost = (robot.position() - enemy_threat->robot.position()).length() /
                   world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
@@ -79,9 +79,10 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 enemy_threat->passer->position() - enemy_robot.position();
             Point position_to_block_pass =
                 enemy_robot.position() +
-                enemy_to_passer_vector.norm(this->shadow_distance);
+                enemy_to_passer_vector.normalize(this->shadow_distance);
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0));
+                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
         }
         else
         {
@@ -105,22 +106,24 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             }
 
             Point position_to_block_shot =
-                enemy_robot.position() + enemy_shot_vector.norm(this->shadow_distance);
+                enemy_robot.position() +
+                enemy_shot_vector.normalize(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
-            if (Evaluation::robotHasPossession(ball, enemy_robot) &&
-                ball.velocity().len() < ball_steal_speed)
+            if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
+                ball.velocity().length() < ball_steal_speed)
             {
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, ball.position(),
-                    (ball.position() - robot->position()).orientation(), 0, true, false,
-                    AutokickType::AUTOCHIP));
+                    (ball.position() - robot->position()).orientation(), 0,
+                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP));
             }
             else
             {
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, position_to_block_shot,
-                    enemy_shot_vector.orientation() + Angle::half(), 0));
+                    enemy_shot_vector.orientation() + Angle::half(), 0,
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
             }
         }
     } while (!move_action.done());

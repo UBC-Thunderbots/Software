@@ -73,7 +73,7 @@ bool GameState::isOurFreeKick() const
     return isOurDirectFree() || isOurIndirectFree();
 }
 
-bool GameState::isOurPlacement() const
+bool GameState::isOurBallPlacement() const
 {
     return isBallPlacement() && our_restart;
 }
@@ -93,14 +93,14 @@ bool GameState::isTheirDirectFree() const
     return isDirectFree() && !our_restart;
 }
 
-bool GameState::isTheirIndirect() const
+bool GameState::isTheirIndirectFree() const
 {
     return isIndirectFree() && !our_restart;
 }
 
 bool GameState::isTheirFreeKick() const
 {
-    return isTheirDirectFree() || isTheirIndirect();
+    return isTheirDirectFree() || isTheirIndirectFree();
 }
 
 bool GameState::isTheirBallPlacement() const
@@ -152,9 +152,14 @@ void GameState::setBallPlacementPoint(Point placementPoint)
     ball_placement_point = placementPoint;
 }
 
-Point GameState::getBallPlacementPoint() const
+std::optional<Point> GameState::getBallPlacementPoint() const
 {
-    return ball_placement_point;
+    std::optional<Point> opt_ball_placement_point = std::nullopt;
+    if (isSetupRestart())
+    {
+        opt_ball_placement_point = ball_placement_point;
+    }
+    return opt_ball_placement_point;
 }
 
 // apologies for this monster switch statement
@@ -264,7 +269,7 @@ void GameState::updateBall(const Ball &ball)
             // Save the ball state so we can tell once it moves
             ball_state = ball;
         }
-        else if ((ball.position() - ball_state->position()).len() > 0.03)
+        else if ((ball.position() - ball_state->position()).length() > 0.03)
         {
             // Once the ball has moved enough, the restart is finished
             setRestartCompleted();

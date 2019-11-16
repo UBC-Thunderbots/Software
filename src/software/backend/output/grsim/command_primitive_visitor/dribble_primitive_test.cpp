@@ -18,7 +18,7 @@ using MotionControllerCommand =
 TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_allowed)
 {
     DribblePrimitive dribble_primitive =
-        DribblePrimitive(0, Point(-0.2, 1), AngularVelocity::ofDegrees(75), 50.0, true);
+        DribblePrimitive(0, Point(-0.2, 1), AngularVelocity::fromDegrees(75), 50.0, true);
 
     Robot test_robot = Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -32,7 +32,7 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_allowed)
         grsimCommandPrimitiveVisitor.getMotionControllerCommand());
 
     EXPECT_EQ(motion_controller_command.global_destination, Point(-0.2, 1));
-    EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(75));
+    EXPECT_EQ(motion_controller_command.final_orientation, Angle::fromDegrees(75));
     EXPECT_EQ(motion_controller_command.kick_speed_meters_per_second, 0);
     EXPECT_TRUE(motion_controller_command.dribbler_on);
     EXPECT_FALSE(motion_controller_command.chip_instead_of_kick);
@@ -40,8 +40,8 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_allowed)
 
 TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_not_allowed)
 {
-    DribblePrimitive dribble_primitive =
-        DribblePrimitive(0, Point(-0.2, 1), AngularVelocity::ofDegrees(75), 50.0, false);
+    DribblePrimitive dribble_primitive = DribblePrimitive(
+        0, Point(-0.2, 1), AngularVelocity::fromDegrees(75), 50.0, false);
 
     Robot test_robot = Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -55,7 +55,7 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_not_allowed)
         grsimCommandPrimitiveVisitor.getMotionControllerCommand());
 
     EXPECT_EQ(motion_controller_command.global_destination, Point(-0.2, 1));
-    EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(75));
+    EXPECT_EQ(motion_controller_command.final_orientation, Angle::fromDegrees(75));
     EXPECT_EQ(motion_controller_command.kick_speed_meters_per_second, 0.0);
     EXPECT_TRUE(motion_controller_command.dribbler_on);
     EXPECT_FALSE(motion_controller_command.chip_instead_of_kick);

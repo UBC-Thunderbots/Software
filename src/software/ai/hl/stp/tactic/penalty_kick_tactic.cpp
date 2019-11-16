@@ -6,10 +6,10 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
@@ -19,6 +19,10 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      bool loop_forever)
     : Tactic(loop_forever), ball(ball), field(field), enemy_goalie(enemy_goalie)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    addWhitelistedAvoidArea(AvoidArea::ENEMY_DEFENSE_AREA);
+    addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 }
 
 std::string PenaltyKickTactic::getName() const
@@ -39,8 +43,8 @@ double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& wo
 {
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
+    double cost = (robot.position() - world.ball().position()).length() /
+                  world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -59,8 +63,8 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
     // it
     Segment goal_line = Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg());
 
-    Ray shot_ray = Ray(ball.position(), Point(robot.value().orientation().cos(),
-                                              robot.value().orientation().sin()));
+    Ray shot_ray = Ray(ball.position(), Vector(robot.value().orientation().cos(),
+                                               robot.value().orientation().sin()));
 
     std::optional<Point> intersect_1 = raySegmentIntersection(shot_ray, goal_line).first;
 
@@ -69,7 +73,7 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
         // If we have an intersection, calculate if we have a viable shot
 
         const double shooter_to_goal_distance =
-            (robot.value().position() - intersect_1.value()).len();
+            (robot.value().position() - intersect_1.value()).length();
         const double time_to_score =
             fabs(shooter_to_goal_distance / PENALTY_KICK_SHOT_SPEED) -
             SSL_VISION_DELAY;  // Include the vision delay in our penalty shot
@@ -116,9 +120,9 @@ Point PenaltyKickTactic::evaluate_next_position()
     if (enemy_goalie.has_value())
     {
         double goalie_dist_to_neg_goalpost =
-            (field.enemyGoalpostNeg() - enemy_goalie.value().position()).lensq();
+            (field.enemyGoalpostNeg() - enemy_goalie.value().position()).lengthSquared();
         double goalie_dist_to_pos_goalpost =
-            (field.enemyGoalpostPos() - enemy_goalie.value().position()).lensq();
+            (field.enemyGoalpostPos() - enemy_goalie.value().position()).lengthSquared();
 
         return goalie_dist_to_neg_goalpost > goalie_dist_to_pos_goalpost
                    ? field.enemyGoalpostNeg()
@@ -148,13 +152,13 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         Vector behind_ball_vector = (ball.position() - field.enemyGoal());
         // A point behind the ball that leaves 5cm between the ball and kicker of the
         // robot
-        Point behind_ball = ball.position() +
-                            behind_ball_vector.norm(BALL_MAX_RADIUS_METERS +
-                                                    DIST_TO_FRONT_OF_ROBOT_METERS + 0.04);
+        Point behind_ball = ball.position() + behind_ball_vector.normalize(
+                                                  BALL_MAX_RADIUS_METERS +
+                                                  DIST_TO_FRONT_OF_ROBOT_METERS + 0.04);
 
         // If we haven't approached the ball yet, get close
 
-        if ((robot.value().position() - behind_ball).len() <=
+        if ((robot.value().position() - behind_ball).length() <=
                 MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD &&
             (robot.value()
                  .orientation()
@@ -171,14 +175,16 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         else if (!approach_ball_move_act.done())
         {
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0, true));
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
         }
         else
         {
             const Point next_shot_position = evaluate_next_position();
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(
-                *robot, robot.value().position(), next_angle, 0, true));
+                *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
+                MoveType::NORMAL, AutokickType::NONE));
         }
 
     } while (

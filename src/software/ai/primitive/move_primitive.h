@@ -6,14 +6,26 @@
 #pragma once
 
 #include "software/ai/primitive/primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 enum AutokickType
 {
     NONE,
     AUTOKICK,
     AUTOCHIP
+};
+
+enum MoveType
+{
+    NORMAL,
+    SLOW,
+};
+
+enum DribblerEnable
+{
+    OFF = false,
+    ON  = true,
 };
 
 class MovePrimitive : public Primitive
@@ -39,8 +51,8 @@ class MovePrimitive : public Primitive
      */
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
-                           bool enable_dribbler = false, bool slow = false,
-                           AutokickType autokick = NONE);
+                           DribblerEnable enable_dribbler, MoveType move_type,
+                           AutokickType autokick);
 
     /**
      * Gets the primitive name
@@ -88,14 +100,14 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not the dribbler should be enabled while moving
      */
-    bool isDribblerEnabled() const;
+    DribblerEnable getDribblerEnable() const;
 
     /**
      * Gets whether or not the robot should be moving slow
      *
      * @return whether or not the robot should be moving slow
      */
-    bool isSlowEnabled() const;
+    MoveType getMoveType() const;
 
     void accept(PrimitiveVisitor &visitor) const override;
 
@@ -121,7 +133,7 @@ class MovePrimitive : public Primitive
     Point dest;
     Angle final_angle;
     double final_speed;
-    bool enable_dribbler;
-    bool slow;
+    DribblerEnable enable_dribbler;
+    MoveType move_type;
     AutokickType autokick;
 };

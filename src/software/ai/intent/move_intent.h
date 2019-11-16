@@ -2,8 +2,8 @@
 
 #include "software/ai/intent/intent.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 class MoveIntent : public MovePrimitive, public Intent
 {
@@ -27,8 +27,8 @@ class MoveIntent : public MovePrimitive, public Intent
      */
     explicit MoveIntent(unsigned int robot_id, const Point& dest,
                         const Angle& final_angle, double final_speed,
-                        unsigned int priority, bool enable_dribbler = false,
-                        bool slow = false, AutokickType autokick = NONE);
+                        unsigned int priority, DribblerEnable enable_dribbler,
+                        MoveType move_type, AutokickType autokick);
 
     std::string getIntentName(void) const override;
 

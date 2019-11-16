@@ -2,8 +2,8 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 class MoveAction : public Action
 {
@@ -12,7 +12,7 @@ class MoveAction : public Action
     // The robot should be able to reach within 1cm of the destination even with
     // camera and positioning noise
     static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD       = 0.02;
-    static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD = Angle::ofDegrees(2);
+    static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD = Angle::fromDegrees(2);
     /**
      * Creates a new MoveAction
      *
@@ -45,8 +45,8 @@ class MoveAction : public Action
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(
         const Robot& robot, Point destination, Angle final_orientation,
-        double final_speed, bool enable_dribbler = false, bool slow = false,
-        AutokickType autokick = NONE);
+        double final_speed, DribblerEnable enable_dribbler, MoveType move_type,
+        AutokickType autokick);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
@@ -55,8 +55,8 @@ class MoveAction : public Action
     Point destination;
     Angle final_orientation;
     double final_speed;
-    bool enable_dribbler;
-    bool slow;
+    DribblerEnable enable_dribbler;
+    MoveType move_type;
     AutokickType autokick;
 
     double close_to_dest_threshold;

@@ -13,19 +13,19 @@ class GameStatePlaySelectionTest : public ::testing::Test,
     {
         world.mutableField() = ::Test::TestUtil::createSSLDivBField();
 
-        Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+        Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
-        Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(),
+        Robot robot_1(1, Point(2, 0.81), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
-        Robot robot_2(2, Point(0, 5.0), Point(), Angle::zero(), AngularVelocity::zero(),
+        Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
         world.mutableFriendlyTeam().updateRobots({robot_0, robot_1, robot_2});
 
-        Robot enemy_robot_0(0, Point(1.1, 1), Point(), Angle::zero(),
+        Robot enemy_robot_0(0, Point(1.1, 1), Vector(), Angle::zero(),
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        Robot enemy_robot_1(1, Point(-2, 0.81), Point(), Angle::zero(),
+        Robot enemy_robot_1(1, Point(-2, 0.81), Vector(), Angle::zero(),
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        Robot enemy_robot_2(2, Point(0, -5.0), Point(), Angle::zero(),
+        Robot enemy_robot_2(2, Point(0, -5.0), Vector(), Angle::zero(),
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
         world.mutableEnemyTeam().updateRobots(
             {enemy_robot_0, enemy_robot_1, enemy_robot_2});

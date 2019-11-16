@@ -44,7 +44,7 @@ TEST(PasserTacticTest,
      passer_oriented_correctly_but_not_at_pass_start_position_pass_not_yet_started)
 {
     // Robot is sitting at {1,2} facing towards -y
-    Robot robot = Robot(13, Point(1, 2), Vector(), Angle::ofDegrees(-90),
+    Robot robot = Robot(13, Point(1, 2), Vector(), Angle::fromDegrees(-90),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
 
@@ -73,7 +73,7 @@ TEST(
     passer_oriented_incorrectly_and_close_to_start_position_but_in_front_of_pass_pass_not_yet_started)
 {
     // Robot is sitting at {-0.3,0.2} facing towards -y
-    Robot robot = Robot(13, Point(-0.3, 0.2), Vector(), Angle::ofDegrees(-90),
+    Robot robot = Robot(13, Point(-0.3, 0.2), Vector(), Angle::fromDegrees(-90),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
 
@@ -102,7 +102,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started)
 {
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to just move forward a bit and take the kick
-    Robot robot = Robot(13, Point(0, 0.3), Vector(), Angle::ofDegrees(-90),
+    Robot robot = Robot(13, Point(0, 0.3), Vector(), Angle::fromDegrees(-90),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
 
@@ -130,7 +130,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
 {
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to just move forward a bit and take the kick
-    Robot robot = Robot(13, Point(0, 0.3), Vector(), Angle::ofDegrees(-90),
+    Robot robot = Robot(13, Point(0, 0.3), Vector(), Angle::fromDegrees(-90),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     // Ball not moving initially

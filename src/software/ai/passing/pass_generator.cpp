@@ -7,9 +7,9 @@
 #include "software/ai/passing/pass_generator.h"
 
 using namespace Passing;
-using namespace Util::DynamicParameters::Passing;
 
-PassGenerator::PassGenerator(const World& world, const Point& passer_point)
+PassGenerator::PassGenerator(const World& world, const Point& passer_point,
+                             const PassType& pass_type)
     : updated_world(world),
       world(world),
       passer_robot_id(std::nullopt),
@@ -18,6 +18,7 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point)
       best_known_pass({0, 0}, {0, 0}, 0, Timestamp::fromSeconds(0)),
       target_region(std::nullopt),
       random_num_gen(random_device()),
+      pass_type(pass_type),
       in_destructor(false)
 {
     // Generate the initial set of passes
@@ -62,7 +63,6 @@ PassWithRating PassGenerator::getBestPassSoFar()
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
     Pass best_known_pass_copy = best_known_pass;
-
     return PassWithRating{std::move(best_known_pass_copy), ratePass(best_known_pass)};
 }
 
@@ -132,7 +132,7 @@ void PassGenerator::optimizePasses()
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
     const auto objective_function =
-        [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array) {
+        [this](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
             try
             {
                 Pass pass = convertArrayToPass(pass_array);
@@ -151,9 +151,10 @@ void PassGenerator::optimizePasses()
     std::vector<Pass> updated_passes;
     for (Pass& pass : passes_to_optimize)
     {
-        auto pass_array =
-            optimizer.maximize(objective_function, convertPassToArray(pass),
-                               number_of_gradient_descent_steps_per_iter.value());
+        auto pass_array = optimizer.maximize(objective_function, convertPassToArray(pass),
+                                             Util::DynamicParameters->getPassingConfig()
+                                                 ->NumberOfGradientDescentStepsPerIter()
+                                                 ->value());
         try
         {
             updated_passes.emplace_back(convertArrayToPass(pass_array));
@@ -227,7 +228,9 @@ unsigned int PassGenerator::getNumPassesToKeepAfterPruning()
 {
     // We want to use the parameter value for this, but clamp it so that it is
     // <= the number of passes we're optimizing
-    return std::min(static_cast<unsigned int>(num_passes_to_keep_after_pruning.value()),
+    return std::min(static_cast<unsigned int>(Util::DynamicParameters->getPassingConfig()
+                                                  ->NumPassesToKeepAfterPruning()
+                                                  ->value()),
                     getNumPassesToOptimize());
 }
 
@@ -235,8 +238,10 @@ unsigned int PassGenerator::getNumPassesToOptimize()
 {
     // We want to use the parameter value for this, but clamp it so that it is
     // >= 1 so we are always optimizing at least one pass
-    return std::max(static_cast<unsigned int>(num_passes_to_optimize.value()),
-                    static_cast<unsigned int>(1));
+    return std::max(
+        static_cast<unsigned int>(
+            Util::DynamicParameters->getPassingConfig()->NumPassesToOptimize()->value()),
+        static_cast<unsigned int>(1));
 }
 
 void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
@@ -248,7 +253,7 @@ void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
     }
 }
 
-double PassGenerator::ratePass(Pass pass)
+double PassGenerator::ratePass(const Pass& pass)
 {
     // Take ownership of world, target_region, passer_robot_id for the duration of this
     // function
@@ -259,7 +264,7 @@ double PassGenerator::ratePass(Pass pass)
     double rating = 0;
     try
     {
-        rating = ::ratePass(world, pass, target_region, passer_robot_id);
+        rating = ::ratePass(world, pass, target_region, passer_robot_id, pass_type);
     }
     catch (std::invalid_argument& e)
     {
@@ -280,16 +285,18 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time = world.getMostRecentTimestamp().getSeconds();
-    double min_start_time_offset =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
-    double max_start_time_offset =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+    double curr_time             = world.getMostRecentTimestamp().getSeconds();
+    double min_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MinTimeOffsetForPassSeconds()
+                                       ->value();
+    double max_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MaxTimeOffsetForPassSeconds()
+                                       ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value(),
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value(),
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
     for (unsigned i = 0; i < num_passes_to_gen; i++)
@@ -315,18 +322,20 @@ bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
 bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
 {
     double max_position_difference_meters =
-        Util::DynamicParameters::Passing::pass_equality_max_position_difference_meters
-            .value();
-    double max_time_difference_seconds =
-        Util::DynamicParameters::Passing::pass_equality_max_start_time_difference_seconds
-            .value();
-    double max_speed_difference =
-        Util::DynamicParameters::Passing::
-            pass_equality_max_speed_difference_meters_per_second.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->PassEqualityMaxPositionDifferenceMeters()
+            ->value();
+    double max_time_difference_seconds = Util::DynamicParameters->getPassingConfig()
+                                             ->PassEqualityMaxStartTimeDifferenceSeconds()
+                                             ->value();
+    double max_speed_difference = Util::DynamicParameters->getPassingConfig()
+                                      ->PassEqualityMaxSpeedDifferenceMetersPerSecond()
+                                      ->value();
 
     double receiver_position_difference =
-        (pass1.receiverPoint() - pass2.receiverPoint()).len();
-    double passer_position_difference = (pass1.passerPoint() - pass2.passerPoint()).len();
+        (pass1.receiverPoint() - pass2.receiverPoint()).length();
+    double passer_position_difference =
+        (pass1.passerPoint() - pass2.passerPoint()).length();
     double time_difference  = (pass1.startTime() - pass2.startTime()).getSeconds();
     double speed_difference = pass1.speed() - pass2.speed();
 
@@ -337,7 +346,7 @@ bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
 }
 
 std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>
-PassGenerator::convertPassToArray(Pass pass)
+PassGenerator::convertPassToArray(const Pass& pass)
 {
     // Take ownership of the world for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
@@ -347,7 +356,7 @@ PassGenerator::convertPassToArray(Pass pass)
 }
 
 Pass PassGenerator::convertArrayToPass(
-    std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE> array)
+    const std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>& array)
 {
     // Take ownership of the passer_point and world for the duration of this function
     std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);

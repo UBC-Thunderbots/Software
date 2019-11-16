@@ -7,6 +7,11 @@ cc_library(
     deps = [
         "//software/ai/primitive:move_primitive",
         "//software/geom",
+        "//software/ai/navigator/obstacle",
+        "//software/util/parameter:dynamic_parameters",
+        "//software/ai/intent:avoid_area",
+        "//software/world",
+        "@g3log",
     ],
 )
 
@@ -30,8 +35,7 @@ cc_library(
         "//software/ai/intent:all_intents",
         "//software/ai/intent:intent_visitor",
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/path_planner:straight_line_path_planner",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/ai/navigator/path_manager:path_manager",
         "//software/ai/primitive:all_primitives",
         "//software/util/parameter:dynamic_parameters",
         "//software/world",
@@ -44,6 +48,10 @@ cc_test(
     deps = [
         ":navigator",
         "//software/test_util",
+        "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/ai/navigator/path_planner:one_point_path_test_path_planner",
+        "//software/ai/navigator/path_planner:no_path_test_path_planner",
+        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
         "@gtest//:gtest_main",
     ],
 )

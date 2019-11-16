@@ -12,14 +12,18 @@ class ShadowEnemyTactic;
 class BlockShotPathTactic;
 class MoveTactic;
 class ChipTactic;
+class KickoffChipTactic;
 class StopTactic;
 class PenaltyKickTactic;
+class PenaltySetupTactic;
 class ReceiverTactic;
 class PatrolTactic;
 class ShootGoalTactic;
 class PasserTactic;
+class GrabBallTactic;
 class MoveTestTactic;
 class StopTestTactic;
+class DefenseShadowEnemyTactic;
 
 /**
  * This class provides an interface for all Tactic Visitors. The Visitor design pattern
@@ -91,6 +95,13 @@ class TacticVisitor
     virtual void visit(const ChipTactic &tactic) = 0;
 
     /**
+     * Visits a KickoffChipTactic to perform an operation.
+     *
+     * @param tactic The KickoffChipTactic to visit
+     */
+    virtual void visit(const KickoffChipTactic &tactic) = 0;
+
+    /**
      * Visits a StopTactic to perform an operation.
      *
      * @param tactic The StopTactic to visit
@@ -103,6 +114,13 @@ class TacticVisitor
      * @param tactic The PenaltyKickTactic to visit
      */
     virtual void visit(const PenaltyKickTactic &tactic) = 0;
+
+    /**
+     * Visits a PenaltySetupTactic to perform an operation.
+     *
+     * @param tactic The PenaltySetupTactic to visit
+     */
+    virtual void visit(const PenaltySetupTactic &tactic) = 0;
 
     /**
      * Visits a ReceiverTactic to perform an operation.
@@ -133,6 +151,13 @@ class TacticVisitor
     virtual void visit(const PasserTactic &tactic) = 0;
 
     /**
+     * Visits a GrabBallTactic to perform an operation.
+     *
+     * @param tactic The GrabBallTactic to visit
+     */
+    virtual void visit(const GrabBallTactic &tactic) = 0;
+
+    /**
      * Visits a MoveTestTactic to perform an operation.
      *
      * @param tactic The MoveTestTactic to visit
@@ -145,4 +170,11 @@ class TacticVisitor
      * @param tactic The StopTestTactic to visit
      */
     virtual void visit(const StopTestTactic &tactic) = 0;
+
+    /**
+     * Visits a DefenseShadowEnemyTactic to perform an operation.
+     *
+     * @param tactic The DefenseShadowEnemyTactic to visit
+     */
+    virtual void visit(const DefenseShadowEnemyTactic &tactic) = 0;
 };

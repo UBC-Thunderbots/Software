@@ -8,6 +8,7 @@
     * [Headers](#headers)
     * [Includes](#includes)
     * [Spelling](#spelling)
+    * [Exceptions](#exceptions)
     * [Miscellaneous](#miscellaneous)
 
 ## Coding Style and Conventions
@@ -15,10 +16,6 @@
 Our C++ coding style is based off of [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html). We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce most of the nit-picky parts of the style, such as brackets and alignment, so this document highlights the important rules to follow that clang-format cannot enforce.
 
 If you want to know more about our coding style you can take a look at our [clang-format configuration file](https://github.com/UBC-Thunderbots/Software/blob/master/.clang-format).
-
-{% hint style="info" %}
-Each coding style has a tag \(i.e. _N1_\), use this tag to comment on code reviews.
-{% endhint %}
 
 ### Names and Variables
 
@@ -77,6 +74,22 @@ Each coding style has a tag \(i.e. _N1_\), use this tag to comment on code revie
   // Correct
   const float SCALE_FACTOR = 2.15;
   float distance = catch_distance * SCALE_FACTOR;
+  ```
+* Avoid initializing multiple variables on the same line.
+  ```cpp
+  // Incorrect
+  int x, y, z = 0;
+
+  // Correct and equivalent to the above
+  int x;
+  int y;
+  int z = 0;
+
+  // However, the author may have intended the following
+  // or a code reader may have assumed the following
+  int x = 0;
+  int y = 0;
+  int z = 0;
   ```
 
 ### Comments
@@ -138,10 +151,15 @@ If you think some ASCII art will help explain something better, go for it! [asci
 ### Spelling
 
 * Code, comment, and documentations should not contain spelling errors.
-* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour").
+* Locale-specific English words follow Canadian/British spelling ("colour", "neighbour", "honour", "metre").
     * Exceptions:
       * Use "defense" in lieu of "defence" as it is more similar to the word "defensive".
       * Use "offense" in lieu of "offence".
+
+### Exceptions
+
+* Throwing an exception indicates that the AI has entered an unrecoverable state.
+* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occured.
 
 ### Miscellaneous
 
@@ -166,7 +184,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
   ```cpp
   explicit AI(const World& world);
   ```
-* Use C++ smart pointers and avoid raw pointers. (See also: [what are smart pointers and why they are good](https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one))
+* Use C++ smart pointers. Do not use raw pointers unless _absolutely_ necessary (and even then, probably not) (See also: [what are smart pointers and why they are good](https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one))
 * Explicitly use the namespace when using invoking classes or functions with namespaces. Do not use `using namespace` in the source. If the namespace hierarchy is long, shorten it.
   ```cpp
   // Incorrect
@@ -185,16 +203,6 @@ If you think some ASCII art will help explain something better, go for it! [asci
 
   // Correct
   using PointsArray = std::vector<std::pair<int, int>>;
-  ```
-* Avoid initializing multiple variables on the same line.
-  ```cpp
-  // Incorrect
-  int x, y, z = 0;
-
-  // Correct
-  int x;
-  int y;
-  int z = 0;
   ```
 * Reference \(`&`\) and pointer \(`*`\) symbols should be attached to the type and not the variable name.
   ```cpp
@@ -219,3 +227,33 @@ If you think some ASCII art will help explain something better, go for it! [asci
       return 0;
   }
   ```
+* Avoid ternary operators. Clarity is more important than line count.
+  ```cpp
+  // Incorrect
+  c = ((a == 0) || ((a + b) < 10)) ? a : a + b;
+
+  // Correct
+  if ((a == 0) || ((a + b) < 10))
+  {
+    c = a;
+  }
+  else
+  {
+    c = a + b;
+  }
+  ```
+* Always use curly braces around code blocks, even if the braces surround a single statement.
+  ```cpp
+  // Incorrect
+  while (i < 10)
+    i++;
+    c[i] = i + 1;
+
+  // Correct
+  while (i < 10)
+  {
+    i++;
+  }
+  c[i] = i + 1;
+  ```
+

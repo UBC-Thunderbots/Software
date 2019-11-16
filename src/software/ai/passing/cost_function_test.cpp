@@ -18,7 +18,7 @@
 #include <chrono>
 #include <random>
 
-#include "software/../shared/constants.h"
+#include "shared/constants.h"
 #include "software/test_util/test_util.h"
 #include "software/util/math/math_functions.h"
 #include "software/util/parameter/dynamic_parameters.h"
@@ -39,15 +39,19 @@ class PassingEvaluationTest : public testing::Test
 
     // We get these values here so we can make these tests robust to change
     double min_pass_speed_param =
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value();
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value();
     double max_pass_speed_param =
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value();
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value();
     double avg_desired_pass_speed;
 
     double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->MinTimeOffsetForPassSeconds()
+            ->value();
     double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters->getPassingConfig()
+            ->MaxTimeOffsetForPassSeconds()
+            ->value();
     double avg_time_offset_for_pass_seconds;
 };
 
@@ -98,21 +102,23 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
                        Timestamp::fromSeconds(0)),
              }));
 
-    std::uniform_real_distribution x_distribution(-world.field().length() / 2,
-                                                  world.field().length() / 2);
-    std::uniform_real_distribution y_distribution(-world.field().width() / 2,
-                                                  world.field().width() / 2);
+    std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
+                                                  world.field().xLength() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
+                                                  world.field().yLength() / 2);
 
-    double curr_time = world.getMostRecentTimestamp().getSeconds();
-    double min_start_time_offset =
-        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
-    double max_start_time_offset =
-        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+    double curr_time             = world.getMostRecentTimestamp().getSeconds();
+    double min_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MinTimeOffsetForPassSeconds()
+                                       ->value();
+    double max_start_time_offset = Util::DynamicParameters->getPassingConfig()
+                                       ->MaxTimeOffsetForPassSeconds()
+                                       ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value(),
-        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
+        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value(),
+        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
 
@@ -134,7 +140,7 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
     auto start_time = std::chrono::system_clock::now();
     for (auto pass : passes)
     {
-        ratePass(world, pass, std::nullopt, std::nullopt);
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     }
 
     auto end_time = std::chrono::system_clock::now();
@@ -178,7 +184,8 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
     });
     world.updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_GE(pass_rating, 0.0);
     EXPECT_LE(pass_rating, 0.02);
 }
@@ -207,7 +214,8 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     });
     world.updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_GE(pass_rating, 0.65);
     EXPECT_LE(pass_rating, 0.9);
 }
@@ -234,7 +242,8 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     });
     world.updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_GE(pass_rating, 0.0);
     EXPECT_LE(pass_rating, 0.02);
 }
@@ -261,7 +270,8 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     });
     world.updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_GE(pass_rating, 0.5);
     EXPECT_LE(pass_rating, 1.0);
 }
@@ -288,7 +298,8 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     });
     world.updateEnemyTeamState(enemy_team);
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_GE(pass_rating, 0.7);
     EXPECT_LE(pass_rating, 0.9);
 }
@@ -308,7 +319,8 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net)
     Pass pass({3, 2}, {2, -2}, avg_desired_pass_speed,
               Timestamp::fromSeconds(avg_time_offset_for_pass_seconds));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.95, pass_rating);
     EXPECT_GE(1.0, pass_rating);
 }
@@ -328,7 +340,8 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
     Pass pass(world.field().enemyCornerPos(), {0, 0}, avg_desired_pass_speed,
               Timestamp::fromSeconds(avg_time_offset_for_pass_seconds));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.95, pass_rating);
     EXPECT_GE(1.0, pass_rating);
 }
@@ -362,7 +375,8 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
     Pass pass(world.field().enemyCornerPos(), {1.8, 0.8}, 4.8,
               Timestamp::fromSeconds(0.8));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_GE(pass_rating, 0.1);
     EXPECT_LE(pass_rating, 0.7);
 }
@@ -383,7 +397,8 @@ TEST_F(PassingEvaluationTest, ratePass_no_target_region)
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.95, pass_rating);
     EXPECT_GE(1.0, pass_rating);
 }
@@ -406,7 +421,8 @@ TEST_F(PassingEvaluationTest, ratePass_with_target_region)
               Timestamp::fromSeconds(avg_time_offset_for_pass_seconds));
 
     Rectangle target_region({1, 1}, {2, 2});
-    double pass_rating = ratePass(world, pass, target_region, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, target_region, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -426,13 +442,13 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
 
     // We update the the ball state because that's what is used as a reference for the
     // current time by the evaluation function
-    // Here we are updating the Ball Timestamp to indirectly update the World Timestamp
-    // (as World cannot have it's Timestamp updated independently of its members)
-    world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
+    // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
+    world.updateBallState(BallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.01, pass_rating);
 }
@@ -451,22 +467,21 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
 
     // We update the the ball state because that's what is used as a reference for the
     // current time by the evaluation function
-    // Here we are updating the Ball Timestamp to indirectly update the World Timestamp
-    // (as World cannot have it's Timestamp updated independently of its members)git sfsd
+    // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
     world.updateBallState(
-        Ball({0, 0}, {0, 0},
-             Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
+        BallState({0, 0}, {0, 0},
+                  Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.01, pass_rating);
 }
 
 TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
 {
-    // We should very poorly rate a pass that has occurred in the past
     World world = ::Test::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
@@ -479,14 +494,14 @@ TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
 
     Pass pass({3, 0}, {2, 0}, min_pass_speed_param - 0.1, Timestamp::fromSeconds(1));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.05, pass_rating);
 }
 
 TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
 {
-    // We should very poorly rate a pass that has occurred in the past
     World world = ::Test::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
@@ -499,7 +514,8 @@ TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
 
     Pass pass({3, 0}, {2, 0}, max_pass_speed_param + 0.1, Timestamp::fromSeconds(1));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.05, pass_rating);
 }
@@ -517,8 +533,39 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
 
     Pass pass({0, 0}, {0.1, 0.1}, avg_desired_pass_speed, Timestamp::fromSeconds(10));
 
-    double pass_rating = ratePass(world, pass, std::nullopt, passer_robot_id);
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, passer_robot_id, PassType::ONE_TOUCH_SHOT);
     EXPECT_DOUBLE_EQ(0, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_attempting_to_pass_and_receive_no_shot)
+{
+    // Test that a pass which does NOT result in a good shot on goal is rated
+    // highly if we are rating it as a pass which is intended to be received
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    world.mutableFriendlyTeam().updateRobots({
+        Robot(0, {1, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.mutableEnemyTeam().updateRobots({
+        Robot(0, world.field().enemyGoal(), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(1, world.field().enemyGoal() - Vector(0, 0.2), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(2, world.field().enemyGoal() + Vector(0, 0.2), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+    });
+
+    // Since we're passing from the origin to a point directly in front of the goal,
+    // the receiving robot would have to turn 180 degrees to take a shot after
+    // receiving the ball
+    Pass pass({0, 0}, {1, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(1.0));
+
+    double pass_rating =
+        ratePass(world, pass, std::nullopt, std::nullopt, PassType::RECEIVE_AND_DRIBBLE);
+    EXPECT_GE(pass_rating, 0.9);
+    EXPECT_LE(pass_rating, 1.0);
 }
 
 TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goal)
@@ -843,10 +890,11 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team)
 TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
 {
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {15.5, -10}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {1, 1}, 0, Timestamp::fromSeconds(10));
 
     // If there are no robots on the team, then there is no way we can receive a pass
@@ -858,10 +906,11 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one
     // Test getting friendly capability for a team with two robots, one near the pass
     // reception point and the other far away
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {15.5, -10}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {15, -10.1}, 10, Timestamp::fromSeconds(10));
 
     // There should be a very high probability that we can receive this pass
@@ -879,11 +928,11 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
     // The net result should be a poor friendly capability, as we can only pass to the
     // one robot that can't get to the pass reception point in time
 
-    Robot passer                 = Robot(13, {2, 2}, {0, 0}, Angle::ofDegrees(270),
-                         AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+    Robot passer                 = Robot(13, {2, 2}, {0, 0}, Angle::fromDegrees(270),
+                         AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
     unsigned int passer_robot_id = passer.id();
     Robot potential_receiver =
-        Robot(1, {-3, 3}, {0, 0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0),
+        Robot(1, {-3, 3}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::fromDegrees(0),
               Timestamp::fromSeconds(0));
 
     Team team(Duration::fromSeconds(10), {passer, potential_receiver});
@@ -900,10 +949,11 @@ TEST_F(PassingEvaluationTest,
     // Test case where there are lots of robots far away from the reception point and
     // there *is not* enough time for them to get to the reception point
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {15.5, -10}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {1, 1}, 10, Timestamp::fromSeconds(1));
 
     EXPECT_GE(0.1, ratePassFriendlyCapability(team, pass, std::nullopt));
@@ -916,10 +966,11 @@ TEST_F(PassingEvaluationTest,
     // Test case where there are lots of robots far away from the reception point, but
     // when *there is* enough time for them to reach the receive point
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {110, 110}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(5)),
-                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(5))});
+    team.updateRobots(
+        {Robot(0, {110, 110}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(5)),
+         Robot(1, {100, -100}, {0, 0}, Angle::fromDegrees(0),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(5))});
     Pass pass({100, 100}, {120, 105}, 1, Timestamp::fromSeconds(10));
 
     EXPECT_LE(0.9, ratePassFriendlyCapability(team, pass, std::nullopt));
@@ -931,8 +982,9 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_
     // Test case where this is one robot, but it is turned in the wrong direction and
     // will not be able to turn in time to receive the pass
     Team team(Duration::fromSeconds(10));
-    team.updateRobots({Robot(0, {1, 0}, {0, 0}, Angle::quarter(),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {1, 0}, {0, 0}, Angle::quarter(), AngularVelocity::fromDegrees(0),
+               Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {1, 0}, 6, Timestamp::fromSeconds(0.1));
 
     EXPECT_GE(ratePassFriendlyCapability(team, pass, std::nullopt), 0.0);
@@ -945,8 +997,9 @@ TEST_F(PassingEvaluationTest,
     // Test case where the receiver is already lined up to receive the pass
     Team team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {1, 0}, 3, Timestamp::fromSeconds(0.1));
-    team.updateRobots({Robot(0, {1, 0}, {0, 0}, pass.receiverOrientation(),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    team.updateRobots(
+        {Robot(0, {1, 0}, {0, 0}, pass.receiverOrientation(),
+               AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
 
     EXPECT_GE(ratePassFriendlyCapability(team, pass, std::nullopt), 0.90);
     EXPECT_LE(ratePassFriendlyCapability(team, pass, std::nullopt), 1.0);

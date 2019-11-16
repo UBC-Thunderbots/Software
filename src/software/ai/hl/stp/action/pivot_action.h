@@ -1,8 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 /**
  * The PivotAction makes the robot pivot from the given pivot point to the given
@@ -31,7 +32,7 @@ class PivotAction : public Action
                                                         Point pivot_point,
                                                         Angle final_angle,
                                                         Angle pivot_speed,
-                                                        bool enable_dribbler);
+                                                        DribblerEnable enable_dribbler);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
@@ -40,5 +41,5 @@ class PivotAction : public Action
     Point pivot_point;
     Angle final_angle;
     Angle pivot_speed;
-    bool enable_dribbler;
+    DribblerEnable enable_dribbler;
 };

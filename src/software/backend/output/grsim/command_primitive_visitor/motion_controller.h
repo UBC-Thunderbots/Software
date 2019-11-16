@@ -6,8 +6,8 @@
 
 #include <variant>
 
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/world/robot.h"
 
 class MotionController
@@ -40,7 +40,7 @@ class MotionController
     struct PositionCommand
     {
         PositionCommand()
-            : global_destination(Vector(0, 0)),
+            : global_destination(Point(0, 0)),
               final_orientation(Angle::zero()),
               final_speed_at_destination(0.0),
               kick_speed_meters_per_second(0.0),
@@ -49,7 +49,7 @@ class MotionController
         {
         }
 
-        PositionCommand(Vector global_destination, Angle final_orientation,
+        PositionCommand(Point global_destination, Angle final_orientation,
                         double final_speed_at_destination, double kick_or_chip_power,
                         bool chip_instead_of_kick, bool dribbler_on)
             : global_destination(global_destination),
@@ -76,7 +76,7 @@ class MotionController
 
         // The point (in global coordinates) the robot should move towards in a
         // straight line
-        Vector global_destination;
+        Point global_destination;
         // The global orientation the robot should have when it arrives at the destination
         Angle final_orientation;
         // The speed the robot should have when it arrives at the destination
@@ -133,7 +133,7 @@ class MotionController
     // tolerance distance measurement in meters
     const double VELOCITY_STOP_TOLERANCE       = 0.02;
     const double POSITION_STOP_TOLERANCE       = 0.01;
-    const Angle DESTINATION_VELOCITY_TOLERENCE = Angle::ofDegrees(1);
+    const Angle DESTINATION_VELOCITY_TOLERENCE = Angle::fromDegrees(1);
 
     // Constants used to determine output velocity of the controller
     const double max_speed_meters_per_second;

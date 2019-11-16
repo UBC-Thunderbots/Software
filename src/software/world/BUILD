@@ -7,6 +7,7 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/util/time:timestamp",
+        "//software/world:ball_state",
         "@boost//:circular_buffer",
     ],
 )
@@ -16,7 +17,18 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
+        ":ball_state",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "ball_state",
+    srcs = ["ball_state.cpp"],
+    hdrs = ["ball_state.h"],
+    deps = [
+        "//software/geom",
+        "//software/util/time:timestamp",
     ],
 )
 
@@ -25,6 +37,7 @@ cc_library(
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
     deps = [
+        "//shared:constants",
         "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
@@ -36,6 +49,7 @@ cc_test(
     srcs = ["field_test.cpp"],
     deps = [
         ":field",
+        "//shared:constants",
         "@gtest//:gtest_main",
     ],
 )
@@ -65,7 +79,7 @@ cc_library(
     name = "refbox_constants",
     srcs = ["refbox_constants.cpp"],
     hdrs = ["refbox_constants.h"],
-    deps = [],
+    deps = ["@magic_enum"],
 )
 
 cc_test(
@@ -108,7 +122,7 @@ cc_test(
     name = "robot_capabilities_test",
     srcs = ["robot_capabilities_test.cpp"],
     deps = [
-        ":robot_capabilities",
+        "robot_capabilities",
         "@gtest//:gtest_main",
     ],
 )

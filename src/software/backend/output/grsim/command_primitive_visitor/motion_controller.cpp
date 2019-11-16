@@ -103,7 +103,7 @@ AngularVelocity MotionController::determineAngularVelocityFromPosition(
     // target angle
     double new_robot_angular_velocity_magnitude =
         std::sqrt(std::max<double>(
-            (angle_difference.abs() - Angle::ofDegrees(0.2)).toRadians(), 0)) *
+            (angle_difference.abs() - Angle::fromDegrees(0.2)).toRadians(), 0)) *
         3;
     // Cap our angular velocity at the robot's physical limit
     new_robot_angular_velocity_magnitude = std::min<double>(
@@ -121,7 +121,7 @@ AngularVelocity MotionController::determineAngularVelocityFromPosition(
         std::clamp<double>(new_angular_velocity, -new_robot_angular_velocity_magnitude,
                            new_robot_angular_velocity_magnitude);
 
-    return AngularVelocity::ofRadians(new_angular_velocity);
+    return AngularVelocity::fromRadians(new_angular_velocity);
 }
 
 Vector MotionController::determineLinearVelocityFromPosition(
@@ -134,18 +134,19 @@ Vector MotionController::determineLinearVelocityFromPosition(
         max_acceleration_meters_per_second_squared * delta_time;
 
     // Calculate a unit vector from the robot to the destination
-    Vector unit_vector_to_dest = (dest - robot.position()).norm();
+    Vector unit_vector_to_dest = (dest - robot.position()).normalize();
 
     // Calculate the vector of our velocity perpendicular to the vector toward the
     // destination
     Vector robot_velocity_perpendicular_to_dest =
-        robot.velocity().dot(unit_vector_to_dest.perp()) * unit_vector_to_dest.perp();
+        robot.velocity().dot(unit_vector_to_dest.perpendicular()) *
+        unit_vector_to_dest.perpendicular();
 
     // Use the "remaining" velocity (based on physical limits) to move us along the vector
     // towards the destination
     double magnitude_additional_velocity_towards_dest =
         std::max<double>(0, max_magnitude_of_velocity_to_apply -
-                                robot_velocity_perpendicular_to_dest.len());
+                                robot_velocity_perpendicular_to_dest.length());
     Vector additional_velocity_towards_dest =
         magnitude_additional_velocity_towards_dest * unit_vector_to_dest;
 
@@ -159,7 +160,7 @@ Vector MotionController::determineLinearVelocityFromPosition(
     // a square root-esque function of the distance to the destination. This allows us to
     // bring the robot velocity to zero as we approach the destination
     double new_robot_velocity_magnitude =
-        std::sqrt(std::max<double>((dest - robot.position()).len() - 0.01, 0)) * 2 +
+        std::sqrt(std::max<double>((dest - robot.position()).length() - 0.01, 0)) * 2 +
         desired_final_speed;
 
     // https://github.com/UBC-Thunderbots/Software/issues/270
@@ -172,7 +173,7 @@ Vector MotionController::determineLinearVelocityFromPosition(
             .angleMod()
             .abs() > Angle::quarter();
 
-    if (moving_away_from_dest && additional_velocity.len() < robot.velocity().len())
+    if (moving_away_from_dest && additional_velocity.length() < robot.velocity().length())
     {
         new_robot_velocity_magnitude *= -1;
     }
@@ -180,8 +181,8 @@ Vector MotionController::determineLinearVelocityFromPosition(
         std::clamp<double>(new_robot_velocity_magnitude, -max_speed_meters_per_second,
                            max_speed_meters_per_second);
 
-    Vector new_robot_velocity =
-        new_robot_velocity_magnitude * (robot.velocity() + additional_velocity).norm();
+    Vector new_robot_velocity = new_robot_velocity_magnitude *
+                                (robot.velocity() + additional_velocity).normalize();
 
     // Translate velocities into robot coordinates
     Vector new_robot_velocity_in_robot_coordinates =
@@ -216,11 +217,11 @@ Vector MotionController::determineLinearVelocityFromVelocity(
         new_velocity_y = robot.velocity().y() - velocity_to_add;
     }
 
-    Vector new_velocity_norm      = Vector(new_velocity_x, new_velocity_y).norm();
-    double new_velocity_magnitude = Vector(new_velocity_x, new_velocity_y).len();
+    Vector new_velocity_norm      = Vector(new_velocity_x, new_velocity_y).normalize();
+    double new_velocity_magnitude = Vector(new_velocity_x, new_velocity_y).length();
 
     new_velocity_magnitude = std::clamp<double>(
-        new_velocity_magnitude, -linear_velocity.len(), linear_velocity.len());
+        new_velocity_magnitude, -linear_velocity.length(), linear_velocity.length());
     new_velocity_magnitude =
         std::clamp<double>(new_velocity_magnitude, -max_speed_meters_per_second,
                            max_speed_meters_per_second);
@@ -251,5 +252,5 @@ AngularVelocity MotionController::determineAngularVelocityFromVelocity(
     new_angular_velocity = std::clamp(new_angular_velocity,
                                       -max_angular_acceleration_meters_per_second_squared,
                                       max_angular_acceleration_meters_per_second_squared);
-    return AngularVelocity::ofRadians(new_angular_velocity);
+    return AngularVelocity::fromRadians(new_angular_velocity);
 }

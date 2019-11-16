@@ -5,8 +5,8 @@
 #pragma once
 
 #include "software/geom/circle.h"
-#include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/new_geom/point.h"
 
 namespace Util
 {

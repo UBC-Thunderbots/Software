@@ -11,7 +11,7 @@ bool Rectangle::expand(double amount)
     {
         return false;
     }
-    Point add(amount, amount);
+    Vector add(amount, amount);
     min_corner -= add;
     diagonal += 2 * add;
     return true;
@@ -27,4 +27,19 @@ double Rectangle::distToBoundary(Point p)
         inf     = std::min(inf, dist(p, Segment(a, b)));
     }
     return inf;
+}
+
+Point Rectangle::furthestCorner(Point p)
+{
+    std::vector<Point> corners = this->corners();
+
+    return *std::max_element(corners.begin(), corners.end(),
+                             [&](const Point& corner1, const Point& corner2) {
+                                 return dist(corner1, p) < dist(corner2, p);
+                             });
+}
+
+std::vector<Point> Rectangle::corners()
+{
+    return std::vector<Point>{operator[](0), operator[](1), operator[](2), operator[](3)};
 }
