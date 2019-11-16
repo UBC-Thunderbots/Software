@@ -3,10 +3,6 @@
 
 class Circle final : public IConvexShape
 {
-   private:
-    Point origin_;
-    double radius_;
-
    public:
     /**
      * Creates a Circle at origin (0,0) and radius 0.
@@ -50,11 +46,22 @@ class Circle final : public IConvexShape
     double getRadius() const;
 
     /**
+     * Determines whether the given Point is contained within this Circle.
+     *
+     * @return whether the Point p is contained within this Circle.
+     */
+    bool contains(const Point &p) const override;
+
+    /**
      * Returns the area of this Circle.
      *
      * @return the area of this Circle.
      */
     double area() const override;
+
+    private:
+      Point origin_;
+      double radius_;
 };
 
 /**

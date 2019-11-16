@@ -80,3 +80,14 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "circle_test",
+    srcs = [
+        "circle_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)

@@ -16,7 +16,7 @@ TEST(CreateCircleTests, circle_custom_constructor)
     EXPECT_EQ(Point(1, 2), c.getOrigin());
 }
 
-TEST(CircleSetterTests, circle_logic_tests)
+TEST(CircleLogicTests, circle_logic_tests)
 {
     Circle c = Circle();
     c.setOrigin(Point(2,- 3));
@@ -27,7 +27,7 @@ TEST(CircleSetterTests, circle_logic_tests)
     EXPECT_EQ(Point(-6, 7), c.getOrigin());
     c.setRadius(8);
     EXPECT_EQ(8, c.getRadius());
-    EXPECT_EQ(201.062, c.area());
+    EXPECT_LT(201.062 - c.area(), 1e-4);
 
     EXPECT_THROW(c.setRadius(-1), std::invalid_argument);
 }
