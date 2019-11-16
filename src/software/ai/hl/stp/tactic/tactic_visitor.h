@@ -41,124 +41,124 @@ class TacticVisitor
      *
      * @param tactic The CherryPickTactic to visit
      */
-    virtual void visit(const CherryPickTactic &tactic) = 0;
+    virtual void visit(CherryPickTactic &tactic) = 0;
 
     /**
      * Visits a ShadowFreekickerTactic to perform an operation.
      *
      * @param tactic The ShadowFreekickerTactic to visit
      */
-    virtual void visit(const ShadowFreekickerTactic &tactic) = 0;
+    virtual void visit(ShadowFreekickerTactic &tactic) = 0;
 
     /**
      * Visits a GoalieTactic to perform an operation.
      *
      * @param tactic The GoalieTactic to visit
      */
-    virtual void visit(const GoalieTactic &tactic) = 0;
+    virtual void visit(GoalieTactic &tactic) = 0;
 
     /**
      * Visits a CreaseDefenderTactic to perform an operation.
      *
      * @param tactic The CreaseDefenderTactic to visit
      */
-    virtual void visit(const CreaseDefenderTactic &tactic) = 0;
+    virtual void visit(CreaseDefenderTactic &tactic) = 0;
 
     /**
      * Visits a ShadowEnemyTactic to perform an operation.
      *
      * @param tactic The ShadowEnemyTactic to visit
      */
-    virtual void visit(const ShadowEnemyTactic &tactic) = 0;
+    virtual void visit(ShadowEnemyTactic &tactic) = 0;
 
     /**
      * Visits a BlockShotPathTactic to perform an operation.
      *
      * @param tactic The BlockShotPathTactic to visit
      */
-    virtual void visit(const BlockShotPathTactic &tactic) = 0;
+    virtual void visit(BlockShotPathTactic &tactic) = 0;
 
     /**
      * Visits a MoveTactic to perform an operation.
      *
      * @param tactic The MoveTactic to visit
      */
-    virtual void visit(const MoveTactic &tactic) = 0;
+    virtual void visit(MoveTactic &tactic) = 0;
 
     /**
      * Visits a ChipTactic to perform an operation.
      *
      * @param tactic The ChipTactic to visit
      */
-    virtual void visit(const ChipTactic &tactic) = 0;
+    virtual void visit(ChipTactic &tactic) = 0;
 
     /**
      * Visits a StopTactic to perform an operation.
      *
      * @param tactic The StopTactic to visit
      */
-    virtual void visit(const StopTactic &tactic) = 0;
+    virtual void visit(StopTactic &tactic) = 0;
 
     /**
      * Visits a PenaltyKickTactic to perform an operation.
      *
      * @param tactic The PenaltyKickTactic to visit
      */
-    virtual void visit(const PenaltyKickTactic &tactic) = 0;
+    virtual void visit(PenaltyKickTactic &tactic) = 0;
 
     /**
      * Visits a ReceiverTactic to perform an operation.
      *
      * @param tactic The ReceiverTactic to visit
      */
-    virtual void visit(const ReceiverTactic &tactic) = 0;
+    virtual void visit(ReceiverTactic &tactic) = 0;
 
     /**
      * Visits a PatrolTactic to perform an operation.
      *
      * @param tactic The PatrolTactic to visit
      */
-    virtual void visit(const PatrolTactic &tactic) = 0;
+    virtual void visit(PatrolTactic &tactic) = 0;
 
     /**
      * Visits a ShootGoalTactic to perform an operation.
      *
      * @param tactic The ShootGoalTactic to visit
      */
-    virtual void visit(const ShootGoalTactic &tactic) = 0;
+    virtual void visit(ShootGoalTactic &tactic) = 0;
 
     /**
      * Visits a PasserTactic to perform an operation.
      *
      * @param tactic The PasserTactic to visit
      */
-    virtual void visit(const PasserTactic &tactic) = 0;
+    virtual void visit(PasserTactic &tactic) = 0;
 
     /**
      * Visits a GrabBallTactic to perform an operation.
      *
      * @param tactic The GrabBallTactic to visit
      */
-    virtual void visit(const GrabBallTactic &tactic) = 0;
+    virtual void visit(GrabBallTactic &tactic) = 0;
 
     /**
      * Visits a MoveTestTactic to perform an operation.
      *
      * @param tactic The MoveTestTactic to visit
      */
-    virtual void visit(const MoveTestTactic &tactic) = 0;
+    virtual void visit(MoveTestTactic &tactic) = 0;
 
     /**
      * Visits a StopTestTactic to perform an operation.
      *
      * @param tactic The StopTestTactic to visit
      */
-    virtual void visit(const StopTestTactic &tactic) = 0;
+    virtual void visit(StopTestTactic &tactic) = 0;
 
     /**
      * Visits a DefenseShadowEnemyTactic to perform an operation.
      *
      * @param tactic The DefenseShadowEnemyTactic to visit
      */
-    virtual void visit(const DefenseShadowEnemyTactic &tactic) = 0;
+    virtual void visit(DefenseShadowEnemyTactic &tactic) = 0;
 };

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/world/world.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
@@ -8,17 +6,17 @@
 class TacticUpdateVisitor : public TacticVisitor
 {
 public:
-    explicit TacticUpdateVisitor(const World &world)
+    explicit TacticUpdateVisitor(const World& world)
     {
         this->world = world;
     }
 
-    void visit(CherryPickTactic& tactic)
+    void visit(const CherryPickTactic& tactic) override
     {
         tactic.updateWorldParams(world);
     }
 
-    void visit(ChipTactic& tactic)
+    void visit(const ChipTactic& tactic) override
     {
         tactic.updateWorldParams(world.ball());
     }
