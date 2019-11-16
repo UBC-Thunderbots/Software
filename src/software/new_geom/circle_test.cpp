@@ -59,7 +59,7 @@ TEST(CircleAreaTest, circle_area_tests)
 TEST(CircleContainsPointTest, circle_contains_point_tests)
 {
     Circle zero = Circle();
-    Point p = Point(1, 1);
+    Point p     = Point(1, 1);
     EXPECT_FALSE(zero.contains(p));
     EXPECT_TRUE(zero.contains(Point()));
 
