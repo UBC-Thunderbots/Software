@@ -40,7 +40,7 @@ TEST(PlayInfoTest, set_and_get_play_robot_tactic_assignment_works)
     s2 = "string two";
     std::vector<std::string> v;
     v = {s1, s2};
-    test_play_info.setRobotTacticAssignment(v);
+    test_play_info.setRobotsTacticAssignment(v);
     test_play_rta = test_play_info.getRobotTacticAssignment();
     EXPECT_EQ(test_play_rta, v);
 }
