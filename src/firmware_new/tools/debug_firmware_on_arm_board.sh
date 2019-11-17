@@ -31,7 +31,8 @@ set +e
 # --- end runfiles.bash initialization ---
 
 # The directory this script is in
-CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
+CURR_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
+echo $CURR_DIR
 
 # The name of this script
 THIS_SCRIPT_FILENAME=$(basename "$0")

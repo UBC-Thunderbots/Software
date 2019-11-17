@@ -38,7 +38,7 @@ sub_run(){
     echo $@
     case $sub in
         "fw")
-            bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board;
+            bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board $@;
             ;;
         "ai")
             bazel run //software/full_system $@;
