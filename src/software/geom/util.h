@@ -138,6 +138,19 @@ Segment getSide(const LegacyPolygon<N> &poly, unsigned int i);
 bool collinear(const Point &a, const Point &b, const Point &c);
 
 /**
+ * Checks if 3 points are collinear.
+ *
+ * @param segment1 : The first Segment
+ *
+ * @param segment1 : The second Segment
+ *
+ * @return true : If the Segment1 and Segment2 are collinear within EPS disance
+ *
+ * @return false : If Segment1 and Segment2 are NOT collinear within EPS distance
+ */
+bool collinear(const Segment &segment1, const Segment &segment2);
+
+/**
  * Performs an angle sweep.
  * Suppose in this world, all objects are circles of fixed radius.
  * You are at point \p src, and you want to shoot a ray between \p p1 and \p p2.
@@ -620,6 +633,9 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
  */
 std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
 
+std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> segments);
+
+std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles);
 /**
  * Returns the binary trespass score of a point and rectangle
  *

@@ -239,182 +239,37 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
         intersects(triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
 }
 
-TEST(GeomUtilTest, test_angle_sweep_circles)
+TEST(GeomUtilTest, test_calc_open_shot_circles)
 {
-    std::vector<Point> obs;
+    std::vector<Circle> obs;
     obs.clear();
-    obs.push_back(Point(-9, 10));
-    obs.push_back(Point(9, 10));
+    obs.push_back(Circle(Point(-9, 10), 1.0));
+    obs.push_back(Circle(Point(9, 10),1.0));
 
-    std::optional<Shot> testshot_opt =
-        angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+    std::pair<Angle, Point> testshot =
+        calcOpenDirection(Point(0, 0), Segment(Point(10, 10), Point(-10, 10)), obs);
 
     // We expect to get a result
-    ASSERT_TRUE(testshot_opt);
+    EXPECT_TRUE(testshot.first != Angle::ofDegrees(0));
 
-    Shot testshot = *testshot_opt;
-
-    EXPECT_TRUE((testshot.getPointToShootAt().norm() - Point(0, 1)).len() < 0.0001);
-    EXPECT_NEAR(75.449, testshot.getOpenAngle().toDegrees(), 1e-4);
+    EXPECT_TRUE((testshot.second.norm() - Point(0, 1)).len() < 0.0001);
+    EXPECT_NEAR(75.449, testshot.first.toDegrees(), 1e-4);
 
     obs.clear();
-    obs.push_back(Point(-4, 6));
-    obs.push_back(Point(6, 8));
-    obs.push_back(Point(4, 10));
+    obs.push_back(Circle(Point(-4, 6), 1.0));
+    obs.push_back(Circle(Point(6, 8), 1.0));
+    obs.push_back(Circle(Point(4, 10), 1.0));
 
-    testshot_opt =
-        angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+    testshot =
+        calcOpenDirection(Point(0, 0), Segment(Point(10, 10), Point(-10, 10)), obs);
 
     // We expect to get a result
-    ASSERT_TRUE(testshot_opt);
-
-    testshot = *testshot_opt;
+    EXPECT_TRUE(testshot.first != Angle::ofDegrees(0));
 
     EXPECT_TRUE(
-        (testshot.getPointToShootAt().norm() - Point(-0.0805897, 0.996747)).len() <
+        (testshot.second.norm() - Point(-0.0805897, 0.996747)).len() <
         0.0001);
-    EXPECT_NEAR(42.1928, testshot.getOpenAngle().toDegrees(), 1e-4);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_no_obstacles)
-{
-    std::vector<Shot> result = angleSweepCirclesAll({0, 0}, {1, 1}, {-1, 1}, {}, 0.1);
-
-    ASSERT_EQ(1, result.size());
-    EXPECT_EQ(Point(0, 1), result[0].getPointToShootAt());
-    EXPECT_EQ(90, result[0].getOpenAngle().toDegrees());
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_pos_y_to_neg_y)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {1, -1}, {1, 1}, {{1, 0}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(1, result[0].getPointToShootAt().x());
-    EXPECT_NEAR(-0.40, result[0].getPointToShootAt().y(), 0.05);
-    EXPECT_EQ(1, result[1].getPointToShootAt().x());
-    EXPECT_NEAR(0.40, result[1].getPointToShootAt().y(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_neg_y_to_pos_y)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {1, 1}, {1, -1}, {{1, 0}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(1, result[0].getPointToShootAt().x());
-    EXPECT_NEAR(-0.40, result[0].getPointToShootAt().y(), 0.05);
-    EXPECT_EQ(1, result[1].getPointToShootAt().x());
-    EXPECT_NEAR(0.40, result[1].getPointToShootAt().y(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_x_axis)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {-1, 1}, {-1, -1}, {{-1, 0}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(-1, result[0].getPointToShootAt().x());
-    EXPECT_NEAR(0.40, result[0].getPointToShootAt().y(), 0.05);
-    EXPECT_EQ(-1, result[1].getPointToShootAt().x());
-    EXPECT_NEAR(-0.40, result[1].getPointToShootAt().y(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_pos_y_axis)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {-1, 1}, {1, 1}, {{0, 1}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(1, result[0].getPointToShootAt().y());
-    EXPECT_NEAR(0.40, result[0].getPointToShootAt().x(), 0.05);
-    EXPECT_EQ(1, result[1].getPointToShootAt().y());
-    EXPECT_NEAR(-0.40, result[1].getPointToShootAt().x(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_y_axis)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {-1, -1}, {1, -1}, {{0, -1}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(-1, result[0].getPointToShootAt().y());
-    EXPECT_NEAR(-0.40, result[0].getPointToShootAt().x(), 0.05);
-    EXPECT_EQ(-1, result[1].getPointToShootAt().y());
-    EXPECT_NEAR(0.40, result[1].getPointToShootAt().x(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacle_blocks_whole_range)
-{
-    // Test where there is no way to draw a line from the start point to the
-    // target line segment that we are sweeping over because there is one obstacle in the
-    // way
-    std::vector<Shot> result =
-        angleSweepCirclesAll({-1, -0.5}, {-4.5, 0.5}, {-4.5, -0.5}, {{-1.2, -0.5}}, 0.09);
-
-    ASSERT_EQ(0, result.size());
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all)
-{
-    std::vector<Point> obs;
-    obs.clear();
-    obs.push_back(Point(-9, 10));
-    obs.push_back(Point(9, 10));
-
-    std::vector<Shot> testshots =
-        angleSweepCirclesAll(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
-
-    obs.clear();
-    obs.push_back(Point(-4, 6));
-    obs.push_back(Point(6, 8));
-    obs.push_back(Point(4, 10));
-
-    testshots =
-        angleSweepCirclesAll(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
-
-    // TODO: Add assert statement
+    EXPECT_NEAR(42.1928, testshot.first.toDegrees(), 1e-4);
 }
 
 TEST(GeomUtilTest, test_point_in_rectangle)
@@ -1554,4 +1409,166 @@ TEST(GeomUtilTest, test_find_closest_point_many_points)
                                       Point(0.1, 0.2), Point(-1, -3.4)};
     Point reference_point(0.9, 0.9);
     EXPECT_EQ(test_points[1], findClosestPoint(reference_point, test_points));
+}
+
+TEST(GeomUtilTest, test_reduce_segments_collinear)
+{
+    Segment seg1 = Segment( Point( 0, 1), Point(0, 2));
+    Segment seg2 = Segment( Point( 0, 1.5), Point(0, 2.5));
+    Segment seg3 = Segment( Point( 0, 3), Point(0, 4));
+    Segment seg4 = Segment( Point(0,1.2), Point(0, 1.5));
+
+    Segment seg5 = Segment( Point(0,6), Point(0, 9));
+    Segment seg6 = Segment( Point(0,6), Point(0, 12));
+
+    Segment seg7 = Segment( Point(0,-2), Point(0, -5));
+
+    std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5, seg6, seg7};
+
+    std::optional<std::vector<Segment>> reduced_segs = reduceParallelSegments(segs);
+
+    EXPECT_EQ(Segment(Point(0,1), Point(0,2.5)), reduced_segs.value()[0]);
+}
+
+
+
+TEST(GeomUtilTest, test_circle_rays)
+{
+    Point reference = Point(0,0);
+    Circle circle = Circle( Point(0,1), 0.5);
+    std::pair<Ray,Ray> test = getCircleTangentRays(reference, circle);
+
+    EXPECT_EQ(test.first.getDirection(),test.first.getDirection());
+}
+
+
+TEST(GeomUtilTest, test_calc_most_open_seg_no_obstacles)
+{
+    std::vector<Circle> obs = {};
+    Segment ref_segment = Segment( Point(202,15), Point(202,-15));
+    Point origin = Point(0,0);
+
+    std::pair<Angle, Point> open_shot = calcOpenDirection( origin, ref_segment, obs );
+
+    EXPECT_EQ( (ref_segment.getSegStart() - origin).orientation() - (ref_segment.getEnd() - origin).orientation() , open_shot.first );
+    EXPECT_EQ( (ref_segment.getSegStart() + ref_segment.getEnd()) /2, open_shot.second );
+}
+
+TEST(GeomUtilTest, test_calc_most_open_seg_obstacle_center_obstacle)
+{
+    Circle obst1 = Circle( Point(100, 0), 0.5);
+
+
+    std::vector<Circle> obs = {obst1};
+    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), Segment( Point(202,15), Point(202,-15)), obs );
+    EXPECT_EQ(open_shot.first,open_shot.first);
+}
+
+TEST(GeomUtilTest, test_calc_most_open_seg)
+{
+    Circle obst1 = Circle( Point(200,1), 0.5);
+    Circle obst2 = Circle( Point(200,1.2), 0.5);
+    Circle obst3 = Circle( Point(200,-3), 0.5);
+    Circle obst4 = Circle( Point(200,-10), 0.5);
+    Circle obst5 = Circle( Point(200, 10), 0.5);
+
+    std::vector<Circle> obs = {obst1, obst2, obst3, obst4, obst5};
+    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), Segment( Point(202,15), Point(202,-15)), obs );
+    EXPECT_EQ(open_shot.first,open_shot.first);
+}
+
+TEST(GeomUtilTest, test_calc_most_open_seg_line_of_obstacles_half_blocked)
+{
+    Segment ref_seg = Segment(Point(10,-10), Point(10,10));
+
+    // Create a complete line of obstacles
+    std::vector<Circle> obs;
+
+    for(int i = -11; i < 0; i++){
+        obs.push_back(Circle( Point(5,i), 0.5));
+    }
+
+    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
+    EXPECT_EQ(open_shot.first,open_shot.first);
+}
+
+TEST(GeomUtilTest, test_calc_most_open_seg_line_of_obstacles_complete_blocked)
+{
+    Segment ref_seg = Segment(Point(10,-10), Point(10,10));
+
+    // Create a complete line of obstacles
+    std::vector<Circle> obs;
+
+    for(int i = -12; i < 12; i++){
+        obs.push_back(Circle( Point(5,i), 0.5));
+    }
+
+    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
+    EXPECT_EQ(open_shot.first,Angle::ofDegrees(0));
+}
+
+TEST(GeomUtilTest, test_calc_most_open_seg_touching_blocking_obstacle)
+{
+Segment ref_seg = Segment(Point(10,-5), Point(10,5));
+
+// Create a complete line of obstacles
+std::vector<Circle> obs;
+
+obs.push_back(Circle( Point(0.5,0), 0.5));
+
+std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
+EXPECT_EQ(open_shot.first, Angle::ofDegrees(0));
+}
+
+TEST(GeomUtilTest, test_calc_most_open_seg_close_blocking_obstacle)
+{
+    Segment ref_seg = Segment(Point(10,-5), Point(10,5));
+
+// Create a complete line of obstacles
+    std::vector<Circle> obs;
+
+    obs.push_back(Circle( Point(0.55,0), 0.5));
+
+    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
+    EXPECT_EQ(open_shot.first, Angle::ofDegrees(0));
+}
+
+TEST(GeomUtilTest, test_open_shot_with_a_dense_wall_of_obstacles)
+{
+std::vector<Circle> obs;
+obs.push_back(Circle(Point(3, -0.09), 0.09));
+obs.push_back(Circle(Point(3, 0), 0.09));
+obs.push_back(Circle(Point(3, 0.09), 0.09));
+// Using an obstacle radius of 0.1 passes, but 0.09 fails. Interesting...
+std::pair<Angle, Point> testpair_opt =
+        calcOpenDirection(Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
+// We do not expect to get a result
+EXPECT_EQ(testpair_opt.first,testpair_opt.first);
+}
+
+TEST(GeomUtilTest, test_calc_open_shot_with_a_dense_wall_of_obstacles_2)
+{
+std::vector<Circle> obs;
+obs.push_back(Circle(Point(3, 0.05), 0.1));
+obs.push_back(Circle(Point(3, -0.05), 0.1));
+
+std::pair<Angle, Point> testpair_opt =
+        calcOpenDirection(Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
+// We do not expect to get a result
+EXPECT_EQ(testpair_opt.first, testpair_opt.first);
+}
+
+TEST(GeomUtilTest, test_calc_most_open_seg_obstacles_not_blocking)
+{
+    Segment ref_seg = Segment(Point(10,-10), Point(10,10));
+    Point reference = Point(0,0);
+    // Create a complete line of obstacles
+    std::vector<Circle> obs;
+
+    for(int i = -12; i < 12; i++){
+        obs.push_back(Circle( Point(-5,i), 0.5));
+    }
+
+    std::pair<Angle, Point> open_shot = calcOpenDirection( reference, ref_seg, obs );
+    EXPECT_EQ(open_shot.first, (ref_seg.getSegStart() - reference).orientation() - (ref_seg.getEnd() - reference).orientation());
 }

@@ -491,6 +491,18 @@ bool collinear(const Vector &a, const Vector &b, const Vector &c)
     return std::fabs((b - a).cross(c - a)) < EPS;
 }
 
+bool collinear(const Segment &segment1, const Segment &segment2){
+    
+    // Two segments are collinear if all Points are collinear
+    if (collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) &&
+            collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()))
+        {
+            return true;
+        }
+    return false;
+}
+
+
 Vector clipPoint(const Vector &p, const Vector &bound1, const Vector &bound2)
 {
     const double minx = std::min(bound1.x(), bound2.x());
@@ -873,7 +885,7 @@ std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
 
 std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
 {
-    // Calculate if the intersecion exists along segments of infinite length
+    // Calculate if the intersection exists along segments of infinite length
     std::optional<Point> intersection =
         lineIntersection(ray1.getRayStart(), ray1.getRayStart() + ray1.getDirection(),
                          ray2.getRayStart(), ray2.getRayStart() + ray2.getDirection());
@@ -885,9 +897,10 @@ std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
     }
 
     // Check of the intersection exits along the direction of both rays
-    if (((intersection.value() - ray1.getRayStart()).norm() ==
-         ray1.getDirection().norm()) &&
-        (intersection.value() - ray2.getRayStart()).norm() == ray2.getDirection().norm())
+    const Vector intersection_ray1_direction = (intersection.value() - ray1.getRayStart());
+    const Vector intersection_ray2_direction = (intersection.value() - ray2.getRayStart());
+
+    if( sign(intersection_ray1_direction.x()) == sign(ray1.getDirection().x()) && sign(intersection_ray1_direction.y()) == sign(ray1.getDirection().y()) && sign(intersection_ray2_direction.x()) == sign(ray2.getDirection().x()) && sign(intersection_ray2_direction.y()) == sign(ray2.getDirection().y())  )
     {
         return intersection.value();
     }
@@ -1077,14 +1090,13 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     }
 }
 
-std::pair<Ray, Ray> getCircleTangentRays(const Point reference, const Circle circle,
-                                         double buffer)
+std::pair<Ray, Ray> getCircleTangentRays(const Point reference, const Circle circle)
 {
     auto [tangent_point1, tangent_point2] =
-        getCircleTangentPoints(reference, circle, buffer);
+        getCircleTangentPoints(reference, circle, 0);
 
-    return std::make_pair(Ray(tangent_point1, (tangent_point1 - reference).norm()),
-                          Ray(tangent_point2, (tangent_point2 - reference).norm()));
+    return std::make_pair(Ray(reference, (tangent_point1 - reference).norm()),
+                          Ray(reference, (tangent_point2 - reference).norm()));
 }
 
 bool pointIsRightOfLine(const Segment &line, const Point &point)
@@ -1137,8 +1149,8 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
     const std::optional<Point> extreme_intersect22 = getRayIntersection(extremes2, ray2);
 
     // Check for the cases that the rays intersect the same segment projection
-    if ((extreme_intersect11.has_value() == extreme_intersect21.has_value()) ||
-        (extreme_intersect21.has_value() == extreme_intersect22.has_value()))
+    if ((extreme_intersect11.has_value() && extreme_intersect21.has_value()) ||
+        (extreme_intersect12.has_value() && extreme_intersect22.has_value()))
     {
         return std::nullopt;
     }
@@ -1159,7 +1171,6 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
         }
     }
 }
-
 std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segment)
 {
     // Check if the segment is enclosed between the rays
@@ -1216,7 +1227,7 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
     }
     // If only one ray intersects the segment return the segment between the intersection
     // and the segment extreme (intersection11 is real, intersection22 is not)
-    else if (intersect11.has_value() && !intersect21.has_value())
+    else if (intersect21.has_value() && !intersect11.has_value())
     {
         const Ray extremes1 =
             Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
@@ -1249,8 +1260,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
 
     // If the segments are not parallel, then return std::nullopt. (The segments are
     // parallel of all points are collinear)
-    if (!collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) &&
-        !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()))
+    if (!collinear(segment1, segment2))
     {
         return std::nullopt;
     }
@@ -1286,8 +1296,7 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 {
     // If the segments are not parallel, then return std::nullopt. (The segments are
     // parallel if all points are collinear)
-    if (!collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) &&
-        !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()))
+    if (!collinear(segment1, segment2))
     {
         return std::nullopt;
     }
@@ -1316,6 +1325,119 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
     {
         return std::nullopt;
     }
+}
+
+std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> segments){
+
+    // If there are no segments, return nullopt
+    if(segments.size() == 0){
+        return std::nullopt;
+    } 
+    else if(segments.size() == 1) {
+        // If there is only 1 segments, it is unique and should be returned
+        return std::make_optional(segments);
+    }
+
+    // Check that all segments are collinear
+    for(unsigned int i = 0; i < segments.size()-1; i++){
+        if( !collinear(segments[i], segments[i+1])) {
+            return std::nullopt;
+        }
+    }
+    std::vector<Segment> unique_segments;
+
+    unsigned int j = 0;
+    // Loop through all segments
+    while(segments.size() > 0){
+        std::optional<Segment> temp_segment = segments[0];
+        unique_segments.push_back(temp_segment.value());
+        segments.erase(segments.begin());
+
+        for( unsigned int i = 0; i < segments.size(); i++){
+            temp_segment = mergeOverlappingParallelSegments(unique_segments[j], segments[i]);
+
+            if(temp_segment.has_value()){
+                unique_segments[j] = temp_segment.value();
+                // Remove segments[i] from the list as it is not unique
+                segments.erase(segments.begin()+i);
+                i--;
+            }
+        }
+        j++;
+    }
+
+    return unique_segments;
+}
+
+std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles) {
+
+    std::vector<Segment> obstacle_segment_projections;
+    if(obstacles.size() == 0){
+        return std::make_pair((segment.getSegStart() - origin).orientation() - (segment.getEnd() - origin).orientation().abs(), (segment.getSegStart() + segment.getEnd())/2);
+    }
+
+    for(Circle circle : obstacles){
+
+        // If the reference is inside an obstacle there is no way we have a shot.
+        if(contains(circle, origin)){
+            return std::make_pair(Angle::ofDegrees(0), Point( segment.getSegStart() + segment.getEnd())/2);
+        }
+
+        auto [ray1, ray2] = getCircleTangentRays(origin, circle);
+        std::optional<Segment> intersect_segment = getIntersectingSegment(ray1, ray2, segment);
+
+        if(intersect_segment.has_value()){
+            obstacle_segment_projections.push_back(intersect_segment.value());
+        }
+    }
+
+    // If we have more than 1 Segment from the obstacle projection then we must combine overlapping ones
+    // to simplify analysis
+    if(obstacle_segment_projections.size() >= 2){
+        obstacle_segment_projections = reduceParallelSegments(obstacle_segment_projections).value();
+    }
+    // Next we must sort the Segments based on their closest point to the start of the reference Segment
+    for(auto &unordered_seg : obstacle_segment_projections) {
+        if( (segment.getSegStart() - unordered_seg.getSegStart()).len() > (segment.getSegStart() - unordered_seg.getEnd()).len() ){
+            Segment temp = unordered_seg;
+            unordered_seg.setSegStart(temp.getEnd());
+            unordered_seg.setEnd(temp.getSegStart());
+        }
+    }
+
+    // Now we must sort the segments so that we can iterate through them in order to generate open angles
+    // sort using a lambda expression
+    std::sort(obstacle_segment_projections.begin(), obstacle_segment_projections.end(), [segment](Segment& a, Segment& b) {
+        // We need to flip the start/end of the segment
+        return (segment.getSegStart() - a.getSegStart()).len() < (segment.getSegStart() - b.getSegStart()).len();
+    });
+
+    // Now we need to find the largest open segment/angle
+    std::vector<Segment> open_segs;
+
+    // The first Angle is between the reference Segment and the first obstacle Segment
+    // After this one, ever open angle is between segment(i).end and segment(i+1).start
+    if(obstacle_segment_projections.size() == 0){
+        return std::make_pair((segment.getSegStart() - origin).orientation() - (segment.getEnd() - origin).orientation().abs(), Point( segment.getSegStart() + segment.getEnd())/2);
+    }
+    open_segs.push_back( Segment(segment.getSegStart(), obstacle_segment_projections.front().getSegStart()));
+
+    for(std::vector<Segment>::const_iterator it = obstacle_segment_projections.begin(); it != obstacle_segment_projections.end() -1; it++){
+        open_segs.push_back( Segment(it->getEnd(), (it+1)->getSegStart()));
+    }
+
+    // Lastly, the final open angle is between obstacles.end().getEnd() and reference_segment.getEnd()
+    open_segs.push_back( Segment( obstacle_segment_projections.back().getEnd() , segment.getEnd()) );
+
+
+    Segment largest_segment = *std::max_element( open_segs.begin(), open_segs.end(),
+                                        [](const Segment& s1, const Segment& s2) {
+                                            return s1.length() < s2.length();
+                                        });
+
+    const Point most_open_point = Point( (largest_segment.getSegStart().x() + largest_segment.getEnd().x())/2, (largest_segment.getSegStart().y() + largest_segment.getEnd().y())/2);
+
+    return std::make_pair( (largest_segment.getSegStart() - origin).orientation() - (largest_segment.getEnd() - origin).orientation().abs() ,  most_open_point);
 }
 
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
