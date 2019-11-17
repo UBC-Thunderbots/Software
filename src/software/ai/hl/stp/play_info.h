@@ -5,13 +5,12 @@
 
 class PlayInfo
 {
-    public:
+   public:
     explicit PlayInfo();
     bool operator==(const PlayInfo& other) const;
 
-    private:
+   private:
     std::string play_type;
     std::string play_name;
     std::vector<std::string> robot_tactic_assignment;
 };
-
