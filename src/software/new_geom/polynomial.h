@@ -45,7 +45,7 @@ class Polynomial
      * @param order the order of the term to set the coefficient
      * @param coeff the coefficient
      */
-    virtual void setCoeff(unsigned int order, double coeff);
+    void setCoeff(unsigned int order, double coeff);
 
     /**
      * Returns the order of the Polynomial
