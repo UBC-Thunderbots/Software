@@ -153,3 +153,9 @@ Debugging in CLion is as simple as running the above instructions for building C
 2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
 3. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. This will load the `.elf` file associated with (0) to the the nucleo and put you into a gdb prompt.
 4. At this point you should be in a gdb window. Take a look at [this tutorial](https://www.cprogramming.com/gdb.html) for some basics.
+
+## Working with CubeMX to regenerate code
+1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies)
+2. To regenerate code from the `.ioc` file, run `bazel run //firmware_new/tools:cubemx_regen firmware_new/boards/frankie_v1`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
+
+To make sure we are all using the same cube version, run `STM32CubeMX` when editing the `.ioc` file.

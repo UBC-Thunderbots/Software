@@ -39,12 +39,22 @@ else
         </AutomatedInstallation>"
     
     echo -n $AUTO_INSTALL_XML > auto-install.xml
+
+    # create script to cd and run STM32CubeMX
+    STM32_SCRIPT="cd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && cd -"
+
+    echo -n $STM32_SCRIPT > cuberunner.sh
     
     curl -O $CUBE_LINK
     unzip en.stm32cubemx_v5.4.0.zip
     
     sudo java -jar ./SetupSTM32CubeMX-5.4.0.exe auto-install.xml
-    sudo ln -sfn /opt/STM32CubeMX_$CUBE_VERSION/STM32CubeMX /usr/local/bin/STM32CubeMX 
+    sudo cp ./cuberunner.sh /opt/STM32CubeMX_$CUBE_VERSION/cuberunner.sh
+
+    cd $CUBEMX_INSTALL_DIR
+
+    sudo chmod +x cuberunner.sh
+    sudo ln -sfn /opt/STM32CubeMX_$CUBE_VERSION/cuberunner.sh /usr/local/bin/STM32CubeMX 
 
     echo "================================================================"
     echo "Done Installing CubeMX"
