@@ -2,14 +2,29 @@
 
 Line::Line() {}
 
-Line::Line(double y_intercept, double slope) : Polynomial({y_intercept, slope}) {}
+Line::Line(double y_intercept, double slope) : line(Polynomial({y_intercept, slope})) {}
 
-void Line::setCoeff(unsigned int order, double coeff)
+double Line::getYIntercept()
 {
-    if (order > 1)
-    {
-        throw std::invalid_argument(
-            "Tried to set the coefficient of a term with order greater than 1 for a line");
-    }
-    Polynomial::setCoeff(order, coeff);
-};
+    return line.getCoeff(0);
+}
+
+double Line::getSlope()
+{
+    return line.getCoeff(1);
+}
+
+void Line::setYIntercept(double y_intercept)
+{
+    line.setCoeff(0, y_intercept);
+}
+
+void Line::setSlope(double slope)
+{
+    line.setCoeff(1, slope);
+}
+
+double Line::valueAt(double val)
+{
+    return line.valueAt(val);
+}

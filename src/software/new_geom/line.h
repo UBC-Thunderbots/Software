@@ -4,7 +4,10 @@
 
 #include "software/new_geom/polynomial.h"
 
-class Line final : public Polynomial
+/**
+ * A 2D line.
+ */
+class Line final
 {
    public:
     /**
@@ -15,18 +18,51 @@ class Line final : public Polynomial
     /**
      * Creates a line from a y-intercept and a slope
      *
-     * @param y_intercept the y_intercept of the line
-     * @param slope the slope of the line
+     * @param y_intercept the y-intercept
+     * @param slope the slope
      */
     explicit Line(double y_intercept, double slope);
 
     /**
-     * Sets the coefficient of the term of the given order
+     * Returns the y-intercept
      *
-     * @param order the order of the term to set the coefficient
-     * @param coeff the coefficient
-     *
-     * @throws std::invalid_argument if order > 1
+     * @return the y-intercept
      */
-    void setCoeff(unsigned int order, double coeff) override;
+    double getYIntercept();
+
+    /**
+     * Returns the slope
+     *
+     * @return the slope
+     */
+    double getSlope();
+
+    /**
+     * Sets the y-intercept
+     *
+     * @param y_intercept the new y-intercept
+     */
+    void setYIntercept(double y_intercept);
+
+    /**
+     * Sets the slope
+     *
+     * @param slope the new slope
+     */
+    void setSlope(double slope);
+
+    /**
+     * Calculates the value of line evaluated at value val
+     *
+     * @param val value to evaluate line
+     *
+     * @return value of line evaluated at value val
+     */
+    double valueAt(double val);
+
+   private:
+    /**
+     * Polynomial object that represents the line
+     */
+    Polynomial line;
 };
