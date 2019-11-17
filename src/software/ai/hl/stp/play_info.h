@@ -3,6 +3,11 @@
 #include <string>
 #include <vector>
 
+/**
+ * A description of the play.  Contains the type of play being
+ * run, its name, and the tactic assignments for all the robots
+ * on the field.
+ */
 class PlayInfo
 {
    public:
@@ -12,16 +17,22 @@ class PlayInfo
     explicit PlayInfo();
 
     /**
+     * Get play type
+     *
      * @return play_type field
      */
     std::string getPlayType() const;
 
     /**
+     * Get play name
+     *
      * @return play_name field
      */
     std::string getPlayName() const;
 
     /**
+     * Get vector containing tactic assignments for robots
+     *
      * @return robot_tactic_assignment field
      */
     std::vector<std::string> getRobotTacticAssignment() const;
