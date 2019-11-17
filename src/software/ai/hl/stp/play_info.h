@@ -53,7 +53,7 @@ class PlayInfo
      * Sets the robot_tactic_assignment field to rta
      * @param rta, the new vector containing robot assignments
      */
-    void setRobotTacticAssignment(std::vector<std::string> rta);
+    void setRobotsTacticAssignment(std::vector<std::string> rta);
 
     /**
      * Adds new_assignment to robot_tactic_assignment

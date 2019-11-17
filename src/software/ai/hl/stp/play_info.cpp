@@ -27,7 +27,7 @@ void PlayInfo::setPlayName(std::string new_play_name)
     this->play_name = new_play_name;
 }
 
-void PlayInfo::setRobotTacticAssignment(std::vector<std::string> rta)
+void PlayInfo::setRobotsTacticAssignment(std::vector<std::string> rta)
 {
     this->robot_tactic_assignment = rta;
 }
