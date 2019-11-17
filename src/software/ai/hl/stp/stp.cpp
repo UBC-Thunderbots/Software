@@ -241,8 +241,8 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    info.play_type = name(current_game_state);
-    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
+    info.setPlayType(name(current_game_state));
+    info.setPlayName(getCurrentPlayName() ? *getCurrentPlayName() : "No Play");
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report the
     // tactics in order or robot id. This makes it much easier to read if tactics or
@@ -279,7 +279,7 @@ PlayInfo STP::getPlayInfo()
             }
             std::string s = "Robot " + std::to_string(tactic->getAssignedRobot()->id()) +
                             "  -  " + tactic->getName();
-            info.robot_tactic_assignment.emplace_back(s);
+            info.addAssignment(s);
         }
     }
 

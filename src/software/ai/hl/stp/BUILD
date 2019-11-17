@@ -10,14 +10,15 @@ cc_library(
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:stop_intent",
-        "//software/util/parameter:dynamic_parameters",
         "//software/ai/motion_constraint:motion_constraint_manager",
+        "//software/util/parameter:dynamic_parameters",
         "@munkres_cpp",
     ],
 )
 
 cc_library(
     name = "play_info",
+    srcs = ["play_info.cpp"],
     hdrs = ["play_info.h"],
     deps = [],
 )

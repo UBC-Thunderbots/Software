@@ -63,11 +63,11 @@ void MainWidget::draw(WorldDrawFunction world_draw_function,
 void MainWidget::updatePlayInfo(const PlayInfo& play_info)
 {
     QString play_type_string =
-        QString("Play Type: %1\n").arg(QString::fromStdString(play_info.play_type));
+        QString("Play Type: %1\n").arg(QString::fromStdString(play_info.getPlayType()));
     QString play_name_string =
-        QString("Play Name: %1\n").arg(QString::fromStdString(play_info.play_name));
+        QString("Play Name: %1\n").arg(QString::fromStdString(play_info.getPlayName()));
     QString tactics_string = QString("Tactics:\n");
-    for (const auto& tactic_string : play_info.robot_tactic_assignment)
+    for (const auto& tactic_string : play_info.getRobotTacticAssignment())
     {
         tactics_string.append(QString::fromStdString(tactic_string)).append("\n");
     }
