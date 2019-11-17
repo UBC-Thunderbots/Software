@@ -62,7 +62,7 @@ dribble_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void dribble_tick(log_record_t *logajectory, World world)
+static void dribble_tick(log_record_t *logajectory, World* world)
 {
     // TODO: what would you like to log?
 

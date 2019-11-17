@@ -4,8 +4,9 @@
 #include "world/dribbler.h"
 
 // TODO: jdoc for struct and each function
-typedef struct
-{
-    Dribbler dribbler;
-    Chicker chicker;
-} Robot;
+struct Robot;
+typedef struct Robot Robot;
+
+Robot* Robot__construct(Chicker* chicker, Dribbler* dribbler);
+Chicker* Robot__getChicker(Robot* this);
+Dribbler* Robot__getDribbler(Robot* this);

@@ -96,7 +96,7 @@ static void spin_end(void) {}
  * \param[in] world an object representing the world
  */
 
-static void spin_tick(log_record_t *log, World world)
+static void spin_tick(log_record_t *log, World* world)
 {
     dr_data_t now;
     dr_get(&now);

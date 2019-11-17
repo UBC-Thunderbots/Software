@@ -71,7 +71,7 @@ static void stop_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void stop_tick(log_record_t *log, World world){}
+static void stop_tick(log_record_t *log, World* world){}
 
 /**
  * \brief The stop movement primitive.

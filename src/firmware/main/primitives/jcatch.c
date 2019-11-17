@@ -100,7 +100,7 @@ static void catch_end(void) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void catch_tick(log_record_t *log, World world)
+static void catch_tick(log_record_t *log, World* world)
 {
     // Grab Camera Data
     dr_data_t current_states;

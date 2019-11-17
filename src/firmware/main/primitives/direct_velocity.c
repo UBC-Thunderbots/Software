@@ -48,7 +48,7 @@ static void direct_velocity_end(void) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void direct_velocity_tick(log_record_t *UNUSED(log), World world)
+static void direct_velocity_tick(log_record_t *UNUSED(log), World* world)
 {
     track_vel_target(direct_target_velocity, direct_target_velocity[2]);
 }

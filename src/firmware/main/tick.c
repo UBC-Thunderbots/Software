@@ -74,19 +74,17 @@ static void normal_task(void *UNUSED(param))
 {
     TickType_t last_wake = xTaskGetTickCount();
 
-    Ball ball       = {};
-    Chicker chicker = {};
-    Dribbler dribbler = {
-        .set_speed = dribbler_set_speed,
-    };
-    Robot robot     = {
-        .chicker = chicker,
-        .dribbler = dribbler,
-    };
-    World world = {
-        .ball  = ball,
-        .robot = robot,
-    };
+    World* world = World__construct(
+        Robot__construct(
+            Chicker__construct(
+                NULL, NULL, NULL, NULL, NULL, NULL
+                ),
+                Dribbler__construct(
+                    dribbler_set_speed,
+                    dribbler_temperature
+                    )
+            )
+        );
 
     while (!__atomic_load_n(&shutdown, __ATOMIC_RELAXED))
     {

@@ -62,7 +62,7 @@ static void imu_test_end(void) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void imu_test_tick(log_record_t *log, World world)
+static void imu_test_tick(log_record_t *log, World* world)
 {
     dr_data_t data;
 

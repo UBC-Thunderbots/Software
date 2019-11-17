@@ -221,7 +221,7 @@ static void move_end(void)
  * \param[in] world an object representing the world
  * @return void
  */
-static void move_tick(log_record_t *log, World world)
+static void move_tick(log_record_t *log, World* world)
 {
     printf("Move tick called.\n");
     // get the state of the bot

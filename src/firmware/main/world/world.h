@@ -1,11 +1,9 @@
 #pragma once
 
-#include "world/ball.h"
 #include "world/robot.h"
 
-// TODO: comment here
-typedef struct
-{
-    Ball ball;
-    Robot robot;
-} World;
+struct World;
+typedef struct World World;
+
+World* World__construct(Robot* robot);
+Robot* World__getRobot(World* this);
