@@ -26,8 +26,9 @@ cc_library(
 cc_test(
     name = "play_info_test",
     srcs = ["play_info_test.cpp"],
-    deps = [":play_info",
-            "@gtest//:gtest_main"
+    deps = [
+        ":play_info",
+        "@gtest//:gtest_main",
     ],
 )
 
