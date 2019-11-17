@@ -5,9 +5,10 @@
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
+#include "software/ai/navigator/navigator_private.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle_generation.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
-#include "software/ai/navigator/util.h"
 #include "software/ai/primitive/all_primitives.h"
 #include "software/ai/primitive/primitive.h"
 #include "software/util/parameter/dynamic_parameters.h"
@@ -134,18 +135,6 @@ class Navigator : public IntentVisitor
     std::vector<MoveIntent> move_intents_for_path_planning;
 
     /**
-     * Calculates a factor for how close p is to an enemy obstacle.
-     * 0 = touching or inside
-     * 1 = greater than/equal to 2m away
-     * scaled linearly between these values
-     *
-     * @param p point to evaluate
-     *
-     * @return A factor from 0 to 1 for how close p is to an enemy obstacle
-     */
-    double getEnemyObstacleProximityFactor(const Point &p);
-
-    /**
      * Registers this robot id as a robot that is not assigned a MoveIntent
      *
      * @param id RobotId to register
@@ -183,4 +172,17 @@ class Navigator : public IntentVisitor
      */
     std::unique_ptr<Primitive> getPrimitiveFromPathAndMoveIntent(std::optional<Path> path,
                                                                  MoveIntent intent);
+
+    /**
+     * Calculates a factor for how close p is to an enemy obstacle.
+     * 0 = touching or inside
+     * 1 = greater than/equal to EnemyRobotProximityLimit (dynamic parameter) away
+     * scaled linearly between these values
+     *
+     * @param p point to evaluate
+     * @param enemy_team enemy team
+     *
+     * @return A factor from 0 to 1 for how close p is to an enemy obstacle
+     */
+    double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
 };
