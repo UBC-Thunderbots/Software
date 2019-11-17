@@ -1373,12 +1373,11 @@ std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment, std::ve
 
     std::vector<Segment> obstacle_segment_projections;
     if(obstacles.size() == 0){
-        return std::make_pair((segment.getSegStart() - origin).orientation() - (segment.getEnd() - origin).orientation().abs(), (segment.getSegStart() + segment.getEnd())/2);
+        return std::make_pair(((segment.getSegStart() - origin).orientation() - (segment.getEnd() - origin).orientation()).abs(), (segment.getSegStart() + segment.getEnd())/2);
     }
 
     for(Circle circle : obstacles){
-
-        // If the reference is inside an obstacle there is no way we have a shot.
+        // If the reference is inside an obstacle there is no open direction
         if(contains(circle, origin)){
             return std::make_pair(Angle::ofDegrees(0), Point( segment.getSegStart() + segment.getEnd())/2);
         }
@@ -1437,7 +1436,7 @@ std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment, std::ve
 
     const Point most_open_point = Point( (largest_segment.getSegStart().x() + largest_segment.getEnd().x())/2, (largest_segment.getSegStart().y() + largest_segment.getEnd().y())/2);
 
-    return std::make_pair( (largest_segment.getSegStart() - origin).orientation() - (largest_segment.getEnd() - origin).orientation().abs() ,  most_open_point);
+    return std::make_pair( ((largest_segment.getSegStart() - origin).orientation() - (largest_segment.getEnd() - origin).orientation()).abs() ,  most_open_point);
 }
 
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)

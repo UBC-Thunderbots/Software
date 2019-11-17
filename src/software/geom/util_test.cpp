@@ -267,7 +267,7 @@ TEST(GeomUtilTest, test_calc_open_shot_circles)
     EXPECT_TRUE(testshot.first != Angle::ofDegrees(0));
 
     EXPECT_TRUE(
-        (testshot.second.norm() - Point(-0.0805897, 0.996747)).len() <
+        (testshot.second.norm() - Point(-0.092577, 0.995702)).len() <
         0.0001);
     EXPECT_NEAR(42.1928, testshot.first.toDegrees(), 1e-4);
 }
@@ -1432,13 +1432,19 @@ TEST(GeomUtilTest, test_reduce_segments_collinear)
 
 
 
-TEST(GeomUtilTest, test_circle_rays)
+TEST(GeomUtilTest, test_circle_tangent_rays)
 {
     Point reference = Point(0,0);
     Circle circle = Circle( Point(0,1), 0.5);
     std::pair<Ray,Ray> test = getCircleTangentRays(reference, circle);
 
-    EXPECT_EQ(test.first.getDirection(),test.first.getDirection());
+    EXPECT_EQ(test.second.getRayStart(),Point(0,0));
+    EXPECT_EQ(test.first.getRayStart(), Point(0,0));
+
+    EXPECT_NEAR(test.first.getDirection().x(), Vector(0.5,0.866025).x(), 0.001);
+    EXPECT_NEAR(test.second.getDirection().x(), Vector(-0.5,0.866025).x(), 0.001);
+    EXPECT_NEAR(test.first.getDirection().y(), Vector(0.5,0.866025).y(), 0.001);
+    EXPECT_NEAR(test.second.getDirection().y(), Vector(-0.5,0.866025).y(), 0.001);
 }
 
 
@@ -1461,7 +1467,9 @@ TEST(GeomUtilTest, test_calc_most_open_seg_obstacle_center_obstacle)
 
     std::vector<Circle> obs = {obst1};
     std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), Segment( Point(202,15), Point(202,-15)), obs );
-    EXPECT_EQ(open_shot.first,open_shot.first);
+    EXPECT_NEAR(open_shot.first.toRadians(),0.069121, 0.001);
+    EXPECT_NEAR(open_shot.second.x(), Point(202,8.00501).x(), 0.001);
+    EXPECT_NEAR(open_shot.second.y(), Point(202,8.00501).y(), 0.001);
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg)
@@ -1474,7 +1482,9 @@ TEST(GeomUtilTest, test_calc_most_open_seg)
 
     std::vector<Circle> obs = {obst1, obst2, obst3, obst4, obst5};
     std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), Segment( Point(202,15), Point(202,-15)), obs );
-    EXPECT_EQ(open_shot.first,open_shot.first);
+    EXPECT_NEAR(open_shot.first.toRadians(),0.038961, 0.0001);
+    EXPECT_NEAR(open_shot.second.x(), Point(202, 5.65572).x(), 0.001);
+    EXPECT_NEAR(open_shot.second.y(), Point(202, 5.65572).y(), 0.001);
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg_line_of_obstacles_half_blocked)
