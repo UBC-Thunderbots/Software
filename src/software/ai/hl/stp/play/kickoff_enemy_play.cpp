@@ -142,7 +142,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // listed above
                 move_tactics.at(defense_position_index)
                     ->updateControlParams(defense_positions.at(defense_position_index),
-                                          Angle::zero(), 0, BallCollisionType::AVOID);
+                                          Angle::zero(), 0);
                 result.emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }

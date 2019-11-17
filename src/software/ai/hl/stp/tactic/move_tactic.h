@@ -27,10 +27,9 @@ class MoveTactic : public Tactic
      * @param final_orientation The final orientation the robot should have at
      * the destination
      * @param final_speed The final speed the robot should have at the destination
-     * @param ball_collision_type how the robot should navigate around ball
      */
     void updateControlParams(Point destination, Angle final_orientation,
-                             double final_speed, BallCollisionType ball_collision_type);
+                             double final_speed);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -60,6 +59,4 @@ class MoveTactic : public Tactic
     Angle final_orientation;
     // The speed the robot should have when it arrives at its destination
     double final_speed;
-    // How the robot should navigate around the ball
-    BallCollisionType ball_collision_type;
 };
