@@ -24,6 +24,14 @@ cc_library(
 )
 
 cc_test(
+    name = "play_info_test",
+    srcs = ["play_info_test.cpp"],
+    deps = [":play_info",
+            "@gtest//:gtest_main"
+    ],
+)
+
+cc_test(
     name = "stp_refbox_game_state_play_selection_test",
     srcs = ["stp_refbox_game_state_play_selection_test.cpp"],
     deps = [
