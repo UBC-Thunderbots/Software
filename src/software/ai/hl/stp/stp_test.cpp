@@ -167,8 +167,8 @@ TEST_F(STPTest, test_get_play_info)
     PlayInfo expected_play_info;
     expected_play_info.setPlayName("Halt Test Play");
     expected_play_info.setPlayType("HALT");
-    expected_play_info.setRobotTacticAssignment({"Robot 0  -  Stop Test Tactic",
-                                                  "Robot 1  -  Stop Test Tactic"});
+    expected_play_info.setRobotTacticAssignment(
+        {"Robot 0  -  Stop Test Tactic", "Robot 1  -  Stop Test Tactic"});
 
     EXPECT_EQ(play_info, expected_play_info);
 }

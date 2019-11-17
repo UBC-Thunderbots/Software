@@ -1,10 +1,12 @@
 #include "software/ai/hl/stp/play_info.h"
+
 #include <gtest/gtest.h>
+
 #include <string>
 
 TEST(PlayInfoTest, set_and_get_play_type_works)
 {
-    PlayInfo test_play_info = PlayInfo();
+    PlayInfo test_play_info    = PlayInfo();
     std::string test_play_type = test_play_info.getPlayType();
     EXPECT_EQ(test_play_type, "");
     std::string s;
@@ -16,7 +18,7 @@ TEST(PlayInfoTest, set_and_get_play_type_works)
 
 TEST(PlayInfoTest, set_and_get_play_name_works)
 {
-    PlayInfo test_play_info = PlayInfo();
+    PlayInfo test_play_info    = PlayInfo();
     std::string test_play_name = test_play_info.getPlayName();
     EXPECT_EQ(test_play_name, "");
     std::string s;
@@ -28,7 +30,7 @@ TEST(PlayInfoTest, set_and_get_play_name_works)
 
 TEST(PlayInfoTest, set_and_get_play_robot_tactic_assignment_works)
 {
-    PlayInfo test_play_info = PlayInfo();
+    PlayInfo test_play_info                = PlayInfo();
     std::vector<std::string> test_play_rta = test_play_info.getRobotTacticAssignment();
     std::vector<std::string> emptyVec;
     emptyVec = {};
@@ -51,7 +53,7 @@ TEST(PlayInfoTest, add_assignment_test)
     s2 = "string two";
     s3 = "string three";
     std::vector<std::string> v, v1, v2, v3;
-    v = {};
+    v  = {};
     v1 = {s1};
     v2 = {s1, s2};
     v3 = {s1, s2, s3};
