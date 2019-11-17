@@ -20,6 +20,7 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":frankie_v1_main_lib",
+        "@nanopb//:nanopb"
     ],
 )
 

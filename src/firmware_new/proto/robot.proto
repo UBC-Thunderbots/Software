@@ -1,0 +1,34 @@
+syntax = "proto2";
+
+// A test robot msg which serves as an example to modify and use to
+// facilitate firmware testing.
+// 
+// robot_msg is sent by send_proto_over_serial.cpp, and is recieved by the
+// STM32 which responds w/ robot_ack.
+
+message robot_msg {
+    // The UNIX timestamp when the packet was sent, in microseconds.
+    // Divide by 1,000,000 to get a time_t.
+    required uint64 timestamp = 1;
+
+    // The 2 operands needed to perform the operation
+    required int32 operand1 = 2;
+    required int32 operand2 = 3;
+
+    // the operator to perform on the operands
+    enum Operator {
+        ADD = 0;
+        MULTIPLY = 1;
+    }
+
+    // which operator to use
+    required Operator operator = 4;
+}
+
+message robot_ack {
+    // The timestamp is copied over
+    required uint64 ack_timestamp = 1;
+
+    // the result of the computation
+    required int32 result = 2;
+}

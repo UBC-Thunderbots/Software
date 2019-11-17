@@ -23,6 +23,10 @@
 
 #include "string.h"
 
+/* Protobuf */
+#include "external/nanopb/pb_encode.h"
+#include "external/nanopb/pb_decode.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -132,7 +136,9 @@ int main(void)
     MX_ETH_Init();
     MX_USART3_UART_Init();
     MX_USB_OTG_FS_PCD_Init();
+
     /* USER CODE BEGIN 2 */
+    /*SimpleMessage message = SimpleMessage_init_zero;*/
 
     /* USER CODE END 2 */
 
