@@ -5,7 +5,6 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/typedefs.h"
 #include "software/world/world.h"
 
 /**

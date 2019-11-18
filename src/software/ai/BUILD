@@ -27,7 +27,6 @@ cc_library(
     srcs = ["ai_wrapper.cpp"],
     hdrs = ["ai_wrapper.h"],
     deps = [
-        "//software:typedefs",
         "//software/ai",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:navigator",
