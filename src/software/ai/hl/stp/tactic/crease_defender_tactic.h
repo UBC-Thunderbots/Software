@@ -106,5 +106,4 @@ class CreaseDefenderTactic : public Tactic
     Team friendly_team;
     Team enemy_team;
     LeftOrRight left_or_right;
-
 };

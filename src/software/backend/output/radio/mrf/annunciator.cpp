@@ -11,7 +11,6 @@
 
 namespace
 {
-
     /**
      * Amount of time to keep an edge-triggered message sending, in seconds.
      */

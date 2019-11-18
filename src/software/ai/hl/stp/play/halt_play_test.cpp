@@ -27,7 +27,7 @@ TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
     EXPECT_EQ((*tactics).size(), 6);
 
     // Make sure each tactic is an ExampleTactic
-    for (const auto& t : *tactics)
+    for (const auto &t : *tactics)
     {
         try
         {
