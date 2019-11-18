@@ -189,28 +189,6 @@ void Navigator::registerNonMoveIntentRobotId(RobotId id)
     }
 }
 
-double Navigator::getEnemyObstacleProximityFactor(const Point &p)
-{
-    double robot_proximity_limit = Util::DynamicParameters->getNavigatorConfig()
-                                       ->EnemyRobotProximityLimit()
-                                       ->value();
-
-    // find min dist between p and any robot
-    double closest_dist = DBL_MAX;
-    auto obstacles      = getObstaclesFromTeam(world.enemyTeam());
-    for (const auto &obstacle : obstacles)
-    {
-        double current_dist = dist(p, (*obstacle.getBoundaryPolygon()));
-        if (current_dist < closest_dist)
-        {
-            closest_dist = current_dist;
-        }
-    }
-
-    // clamp ratio between 0 and 1
-    return std::clamp(closest_dist / robot_proximity_limit, 0.0, 1.0);
-}
-
 std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
     std::optional<Path> path, MoveIntent intent)
 {
@@ -244,7 +222,8 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
         return std::make_unique<MovePrimitive>(
             intent.getRobotId(), final_dest, intent.getFinalAngle(),
             // slow down around enemy robots
-            desired_final_speed * getEnemyObstacleProximityFactor(path_points[1]),
+            desired_final_speed *
+                getEnemyObstacleProximityFactor(path_points[1], world.enemyTeam()),
             intent.getDribblerEnable(), intent.getMoveType(), intent.getAutoKickType());
     }
     else
@@ -253,6 +232,36 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
                      << intent.getRobotId();
         return std::make_unique<StopPrimitive>(intent.getRobotId(), false);
     }
+}
+
+double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team)
+{
+    double robot_proximity_limit = Util::DynamicParameters->getNavigatorConfig()
+                                       ->EnemyRobotProximityLimit()
+                                       ->value();
+
+    // find min dist between p and any robot
+    double closest_dist = DBL_MAX;
+    auto obstacles      = getObstaclesFromTeam(enemy_team);
+    for (const auto &obstacle : obstacles)
+    {
+        double current_dist = dist(p, (*obstacle.getBoundaryPolygon()));
+        if (current_dist < closest_dist)
+        {
+            closest_dist = current_dist;
+        }
+    }
+
+    // clamp ratio between 0 and 1
+    return std::clamp(closest_dist / robot_proximity_limit, 0.0, 1.0);
+}
+
+double Navigator::calculateTransitionSpeedBetweenSegments(const Point &p1,
+                                                          const Point &p2,
+                                                          const Point &p3,
+                                                          double final_speed)
+{
+    return final_speed * (p2 - p1).normalize().project((p3 - p2).normalize()).length();
 }
 
 std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
