@@ -28,8 +28,6 @@ cc_binary(
     ],
     linkopts = [
         "-T$(location //firmware:stm32f405.ld)",
-        # TODO: is this OK?
-        #"-Map=./firmware_old_main.map",
         "-Wl,--build-id=none",
         "-Wl,--gc-sections",
         "-nostdlib",
@@ -51,20 +49,6 @@ genrule(
     outs = ["firmware_old_main.bin"],
     cmd = "\n".join([
         "$(location @arm_developer_gcc//:objcopy) -Obinary $(location :firmware_old_main) $@",
-    ]),
-    restricted_to = ["//cc_toolchain:stm32f4"],
-)
-
-genrule(
-    name = "flash_board",
-    srcs = [":firmware_old_main_bin"],
-    outs = [],
-    cmd = "\n".join([
-        "dfu-util \
-            -d 0483 \
-            -a \"@Internal Flash  /0x08000000/04*016Kg,01*064Kg,07*128Kg\" \
-            -D $(location :firmware_old_main_bin) \
-            -s 0x08000000:leave",
     ]),
     restricted_to = ["//cc_toolchain:stm32f4"],
 )
