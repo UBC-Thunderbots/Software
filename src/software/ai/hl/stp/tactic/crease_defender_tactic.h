@@ -107,6 +107,4 @@ class CreaseDefenderTactic : public Tactic
     Team enemy_team;
     LeftOrRight left_or_right;
 
-    // How slow the ball must be moving for us to clear it from the defense area
-    double BALL_SLOW_SPEED_THRESHOLD = 0.2;
 };

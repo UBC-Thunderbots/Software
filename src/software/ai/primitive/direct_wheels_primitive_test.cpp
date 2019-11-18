@@ -129,10 +129,11 @@ TEST(DirectWheelsPrimTest,
 TEST(DirectWheelsPrimTest,
      test_inequality_operator_with_mismatched_back_right_wheel_power)
 {
+    double mismatched_val = -100.1;
     DirectWheelsPrimitive directwheels_primitive =
         DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
     DirectWheelsPrimitive directwheels_primitive_other =
-        DirectWheelsPrimitive(0, 0, 0, 0, -100.1, 0.0);
+        DirectWheelsPrimitive(0, 0, 0, 0, mismatched_val, 0.0);
 
     EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
 }

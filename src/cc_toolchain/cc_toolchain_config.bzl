@@ -192,7 +192,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion", "-Werror", "-Winvalid-constexpr"] +
+                        flags = ["-Wall", "-Werror", "-Wno-overloaded-virtual"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -557,6 +557,7 @@ def _clang_impl(ctx):
             "c++17",
             "determinism",
             "hardening",
+            "warnings",
             "build-id",
             "no-canonical-prefixes",
             "lld",

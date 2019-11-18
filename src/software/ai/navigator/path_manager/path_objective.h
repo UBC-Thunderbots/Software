@@ -13,20 +13,20 @@ class PathObjective
    public:
     PathObjective(const Point start, const Point end, const double current_speed,
                   const std::vector<Obstacle> &obstacles, RobotId robot_id)
-        : start(start),
+        : robot_id(robot_id),
+          start(start),
           end(end),
           current_speed(current_speed),
-          obstacles(obstacles),
-          robot_id(robot_id)
+          obstacles(obstacles)
     {
     }
 
     PathObjective(const PathObjective &other)
-        : start(other.start),
+        : robot_id(other.robot_id),
+          start(other.start),
           end(other.end),
           current_speed(other.current_speed),
-          obstacles(other.obstacles),
-          robot_id(other.robot_id)
+          obstacles(other.obstacles)
     {
     }
 

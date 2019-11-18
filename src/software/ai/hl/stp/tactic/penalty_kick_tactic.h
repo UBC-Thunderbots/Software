@@ -66,8 +66,6 @@ class PenaltyKickTactic : public Tactic
     Field field;
     std::optional<Robot> enemy_goalie;
 
-    const bool ENABLE_DRIBBLER = true;
-
     static constexpr double PENALTY_KICK_SHOT_SPEED     = 5.0;
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
     static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds

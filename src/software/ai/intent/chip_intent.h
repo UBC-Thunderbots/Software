@@ -26,6 +26,7 @@ class ChipIntent : public ChipPrimitive, public Intent
 
     std::string getIntentName(void) const override;
 
+    using Intent::accept;
     void accept(IntentVisitor& visitor) const override;
 
     /**

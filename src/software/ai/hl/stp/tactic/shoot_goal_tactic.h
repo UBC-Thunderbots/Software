@@ -123,7 +123,7 @@ class ShootGoalTactic : public Tactic
 
     // How far from the ball an enemy must be to be considered a danger that may steal the
     // ball
-    const double ENEMY_DANGER_DIST = 0.5 + ROBOT_MAX_RADIUS_METERS;
+    [[maybe_unused]] const double ENEMY_DANGER_DIST = 0.5 + ROBOT_MAX_RADIUS_METERS;
     // How far we try chip when chipping over an enemy. This value is relatively small so
     // that we chip over the enemy, but don't launch the ball so far we have no chance of
     // recovering possession

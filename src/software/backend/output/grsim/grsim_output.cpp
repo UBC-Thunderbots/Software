@@ -32,7 +32,7 @@ GrSimOutput::GrSimOutput(std::string network_address, unsigned short port)
     : network_address(network_address), port(port), socket(io_service)
 {
     socket.open(ip::udp::v4());
-    remote_endpoint = ip::udp::endpoint(ip::address::from_string(network_address), port);
+    remote_endpoint = ip::udp::endpoint(ip::address::from_string(network_address), this->port);
 }
 
 GrSimOutput::~GrSimOutput()

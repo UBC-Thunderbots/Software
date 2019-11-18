@@ -287,8 +287,8 @@ TEST(TestThetaStarPathPlanner, performance)
 
     std::chrono::duration<double> duration = end_time - start_time;
 
-    std::chrono::duration<double> avg =
-        duration / ((double)num_iterations * obstacle_sets.size() - 1);
+    std::chrono::duration<double> avg;
+    avg = duration / ((double)num_iterations * obstacle_sets.size() - 1);
 
     //    std::cout << "Took " <<
     //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0

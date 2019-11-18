@@ -194,7 +194,7 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
-            yield(std::move(stop_action.updateStateAndGetNextIntent(*robot, false)));
+            yield(stop_action.updateStateAndGetNextIntent(*robot, false));
         }
     } while (!move_action.done());
 }
