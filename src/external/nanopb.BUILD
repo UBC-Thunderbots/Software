@@ -20,6 +20,19 @@ cc_library(
   ],
 )
 
+# this library is linked with all c_proto_libraries
+# the generated h and c files access pb.h relatively, so
+# we strip external/nanopb to comply
+
+cc_library(
+  name = "nanopb_header",
+  hdrs = [
+	"pb.h",
+  ],
+  strip_include_prefix = "",
+  visibility = ["//visibility:public"],
+)
+
 py_binary(
     name = "nanopb_generator",
     srcs = ["generator/nanopb_generator.py"],
