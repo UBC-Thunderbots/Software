@@ -20,8 +20,8 @@ cc_library(
   ],
 )
 
-sh_binary(
-    name = "nanopb-protoc",
-    srcs = ["generator-bin/protoc.bin"],
-    data = glob(["generator-bin/**"]),
+py_binary(
+    name = "nanopb_generator",
+    srcs = ["generator/nanopb_generator.py"],
+    imports = ["proto"],
 )
