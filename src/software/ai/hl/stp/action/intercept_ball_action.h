@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
+#include "software/ai/hl/stp/action/action_visitor.h"
 #include "software/ai/primitive/move_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
@@ -33,6 +34,8 @@ class InterceptBallAction : public Action
      * @param robot The robot to move
      */
     void updateControlParams(const Robot& robot);
+
+    void accept(ActionVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

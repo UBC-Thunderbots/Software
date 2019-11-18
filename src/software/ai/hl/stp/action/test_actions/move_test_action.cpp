@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/action/test_actions/move_test_action.h"
 
+#include "software/ai/hl/stp/action/action_visitor.h"
 #include "software/ai/intent/move_intent.h"
 
 MoveTestAction::MoveTestAction(double close_to_dest_threshold)
@@ -26,4 +27,12 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                                            0, DribblerEnable::OFF, MoveType::NORMAL,
                                            AutokickType::NONE, BallCollisionType::AVOID));
     } while ((robot->position() - destination).length() > close_to_dest_threshold);
+}
+
+void MoveTestAction::accept(ActionVisitor& visitor) const
+{
+    // We don't call "visitor.visit" here because this class is just intended
+    // for testing and shouldn't be part of the visitor
+    throw std::logic_error(
+        "accept(ActionVisitor) is not implemented for MoveTestAction!");
 }

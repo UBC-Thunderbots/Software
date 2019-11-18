@@ -29,6 +29,11 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
                         chip_distance_meters);
 }
 
+void ChipAction::accept(ActionVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // How large the triangle is that defines the region where the robot is

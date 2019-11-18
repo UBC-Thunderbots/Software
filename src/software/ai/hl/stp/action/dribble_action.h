@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
+#include "software/ai/hl/stp/action/action_visitor.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 
@@ -37,6 +38,8 @@ class DribbleAction : public Action
     void updateControlParams(const Robot& robot, const Point& dest,
                              const Angle& final_angle, double rpm,
                              bool small_kick_allowed);
+
+    void accept(ActionVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
