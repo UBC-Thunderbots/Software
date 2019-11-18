@@ -19,7 +19,7 @@ proto_library(
     visibility = ["//visibility:private"],
 )
 
-proto_library(
+p:qroto_library(
     name = "grsim_proto",
     srcs = [
         "grSim_Commands.proto",
@@ -35,6 +35,10 @@ cc_proto_library(
     deps = [":ssl_proto"],
 )
 
+c_proto_library(
+    name = "ssl_cc_proto",
+    deps = [":ssl_proto"],
+)
 cc_proto_library(
     name = "grsim_cc_proto",
     deps = [":grsim_proto"],
