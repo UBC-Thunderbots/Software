@@ -1,7 +1,7 @@
 #pragma once
 
 // We forward-declare all the actions because if we include them we induce a
-// circular dependency between the Individual library for each action and this
+// circular dependency between the individual library for each action and this
 // visitor. Ex. `MoveAction` includes `ActionVisitor`, but `ActionVisitor`
 // also includes `MoveAction`
 class ChipAction;

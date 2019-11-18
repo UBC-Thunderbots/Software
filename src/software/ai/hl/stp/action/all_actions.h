@@ -6,5 +6,5 @@
 #include "software/ai/hl/stp/actions/kick_action.h"
 #include "software/ai/hl/stp/actions/move_action.h"
 #include "software/ai/hl/stp/actions/movespin_action.h"
-#include "software/ai/hl/stp/actions/picot_action.h"
+#include "software/ai/hl/stp/actions/pivot_action.h"
 #include "software/ai/hl/stp/actions/stop_action.h"
