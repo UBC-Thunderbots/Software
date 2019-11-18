@@ -1,14 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_test(
-    name = "navigator_private_test",
-    srcs = ["navigator_private_test.cpp"],
-    deps = [
-        ":navigator_private",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_library(
     name = "navigator",
     srcs = ["navigator.cpp"],
@@ -19,24 +10,9 @@ cc_library(
         "//software/ai/intent:all_intents",
         "//software/ai/intent:intent_visitor",
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator:navigator_private",
         "//software/ai/navigator/obstacle:obstacle_generation",
         "//software/ai/navigator/path_manager:path_manager",
         "//software/ai/primitive:all_primitives",
-        "//software/util/parameter:dynamic_parameters",
-        "//software/world",
-        "@g3log",
-    ],
-)
-
-cc_library(
-    name = "navigator_private",
-    srcs = ["navigator_private.cpp"],
-    hdrs = ["navigator_private.h"],
-    visibility = ["//visibility:private"],
-    deps = [
-        "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/obstacle:obstacle_generation",
         "//software/util/parameter:dynamic_parameters",
         "//software/world",
         "@g3log",

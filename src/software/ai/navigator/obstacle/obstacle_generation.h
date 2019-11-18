@@ -21,6 +21,8 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
 /**
  * Get Obstacles from a Team
  *
+ * @param team team to get obstacles from
+ *
  * @return vector of obstacles
  */
 std::vector<Obstacle> getObstaclesFromTeam(const Team &team);

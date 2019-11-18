@@ -256,6 +256,14 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
     return std::clamp(closest_dist / robot_proximity_limit, 0.0, 1.0);
 }
 
+double Navigator::calculateTransitionSpeedBetweenSegments(const Point &p1,
+                                                          const Point &p2,
+                                                          const Point &p3,
+                                                          double final_speed)
+{
+    return final_speed * (p2 - p1).normalize().project((p3 - p2).normalize()).length();
+}
+
 std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
 {
     return planned_paths;
