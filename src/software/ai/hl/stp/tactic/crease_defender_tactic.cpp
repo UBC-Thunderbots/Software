@@ -187,14 +187,17 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            yield(move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW));
+                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+            yield(move_action.getNextIntent());
         }
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
-            yield(stop_action.updateStateAndGetNextIntent(*robot, false));
+
+            stop_action.updateControlParams(*robot, false);
+            yield(stop_action.getNextIntent());
         }
     } while (!move_action.done());
 }

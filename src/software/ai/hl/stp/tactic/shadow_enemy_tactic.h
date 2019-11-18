@@ -84,10 +84,6 @@ class ShadowEnemyTactic : public Tactic
     Team friendly_team;
     // The enemy team
     Team enemy_team;
-    // How far from the enemy the robot will position itself to shadow
-    double shadow_distance;
-    // Whether or not we think the enemy team can pass the ball
-    bool enemy_team_can_pass;
     // Whether or not to ignore the friendly goalie when calculating the enemy's best shot
     // to shadow
     bool ignore_goalie;
@@ -96,4 +92,8 @@ class ShadowEnemyTactic : public Tactic
     // If the enemy robot has possession of the ball, and it is moving less than this
     // speed, the shadowing robot will try steal the ball
     double ball_steal_speed;
+    // Whether or not we think the enemy team can pass the ball
+    bool enemy_team_can_pass;
+    // How far from the enemy the robot will position itself to shadow
+    double shadow_distance;
 };

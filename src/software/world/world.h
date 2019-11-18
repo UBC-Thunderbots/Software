@@ -184,7 +184,7 @@ class World final
     Team friendly_team_;
     Team enemy_team_;
     GameState game_state_;
-    // All previous timestamps of when the field was updated, with the most recent
+    // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
     // A small buffer that stores previous refbox game state

@@ -16,7 +16,9 @@ TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
 
     InterceptBallAction action = InterceptBallAction(field, ball, true);
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, field, ball);
+    action.updateWorldParams(field, ball);
+    action.updateControlParams(robot);
+    std::unique_ptr<Intent> intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -46,7 +48,9 @@ TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_t
 
     InterceptBallAction action = InterceptBallAction(field, ball, true);
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, field, ball);
+    action.updateWorldParams(field, ball);
+    action.updateControlParams(robot);
+    std::unique_ptr<Intent> intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -76,7 +80,9 @@ TEST(InterceptBallActionTest, test_robot_moves_to_the_ball_if_the_ball_is_moving
 
     InterceptBallAction action = InterceptBallAction(field, ball, true);
 
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, field, ball);
+    action.updateWorldParams(field, ball);
+    action.updateControlParams(robot);
+    std::unique_ptr<Intent> intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

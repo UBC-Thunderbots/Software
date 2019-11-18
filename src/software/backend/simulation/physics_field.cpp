@@ -10,6 +10,29 @@ PhysicsField::PhysicsField(std::shared_ptr<b2World> world, const Field &field)
     setupFriendlyGoal(world, field);
 }
 
+PhysicsField::~PhysicsField()
+{
+    // Examples for removing bodies safely from
+    // https://www.iforce2d.net/b2dtut/removing-bodies
+    b2World *field_boundary_world = field_boundary_body->GetWorld();
+    if (bodyExistsInWorld(field_boundary_body, field_boundary_world))
+    {
+        field_boundary_world->DestroyBody(field_boundary_body);
+    }
+
+    b2World *enemy_goal_world = enemy_goal_body->GetWorld();
+    if (bodyExistsInWorld(enemy_goal_body, enemy_goal_world))
+    {
+        enemy_goal_world->DestroyBody(enemy_goal_body);
+    }
+
+    b2World *friendly_goal_world = friendly_goal_body->GetWorld();
+    if (bodyExistsInWorld(friendly_goal_body, friendly_goal_world))
+    {
+        friendly_goal_world->DestroyBody(friendly_goal_body);
+    }
+}
+
 void PhysicsField::setupFieldBoundary(std::shared_ptr<b2World> world, const Field &field)
 {
     field_boundary_body_def.type = b2_staticBody;
@@ -82,24 +105,6 @@ void PhysicsField::setupFriendlyGoal(std::shared_ptr<b2World> world, const Field
     friendly_goal_fixture_def.restitution = 1.0;
     friendly_goal_fixture_def.friction    = 1.0;
     friendly_goal_body->CreateFixture(&friendly_goal_fixture_def);
-}
-
-void PhysicsField::removeFromWorld(std::shared_ptr<b2World> world)
-{
-    if (bodyExistsInWorld(field_boundary_body, world))
-    {
-        world->DestroyBody(field_boundary_body);
-    }
-
-    if (bodyExistsInWorld(enemy_goal_body, world))
-    {
-        world->DestroyBody(enemy_goal_body);
-    }
-
-    if (bodyExistsInWorld(friendly_goal_body, world))
-    {
-        world->DestroyBody(friendly_goal_body);
-    }
 }
 
 Field PhysicsField::getFieldWithTimestamp(const Timestamp &timestamp) const
