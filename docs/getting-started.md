@@ -156,6 +156,6 @@ Debugging in CLion is as simple as running the above instructions for building C
 
 ## Working with CubeMX to regenerate code
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies)
-2. To regenerate code from the `.ioc` file, run `bazel run //firmware_new/tools:cubemx_regen firmware_new/boards/frankie_v1`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
+2. To regenerate code from the `.ioc` file, run `bazel run //firmware_new/tools:cubemx_regen path/to/directory/with/.ioc`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
 
 To make sure we are all using the same cube version, run `STM32CubeMX` when editing the `.ioc` file.
