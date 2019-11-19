@@ -1,4 +1,4 @@
-#include "software/backend/simulation/box2d_util.h"
+#include "software/backend/simulation/physics/box2d_util.h"
 
 bool bodyExistsInWorld(b2Body* body, b2World* world)
 {

@@ -1,7 +1,7 @@
-#include "software/backend/simulation/physics_ball.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 
 #include "shared/constants.h"
-#include "software/backend/simulation/box2d_util.h"
+#include "software/backend/simulation/physics/box2d_util.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
 {
