@@ -3,31 +3,37 @@
 #include "software/backend/simulation/validation/validation_function.h"
 
 /**
- * This class is a wrapper to make it easier to work with ValidationFunctions. It provides an easy
- * way to manage the coroutines required to run ValidationFunctions as well as see if the function
- * has succeeded / passed.
+ * This class is a wrapper to make it easier to work with ValidationFunctions. It provides
+ * an easy way to manage the coroutines required to run ValidationFunctions as well as see
+ * if the function has succeeded / passed.
  */
-class FunctionValidator {
-public:
+class FunctionValidator
+{
+   public:
     /**
      * Creates a new FunctionValidator.
      *
-     * @param validation_function The ValidationFunction this FunctionValidator should manage and run
-     * @param world The world that will be given to the ValidationFunction in order to run it
+     * @param validation_function The ValidationFunction this FunctionValidator should
+     * manage and run
+     * @param world The world that will be given to the ValidationFunction in order to run
+     * it
      */
-    explicit FunctionValidator(const ValidationFunction& validation_function, std::shared_ptr<World> world);
+    explicit FunctionValidator(const ValidationFunction& validation_function,
+                               std::shared_ptr<World> world);
 
     /**
-     * Runs the ValidationFunction that was given to this FunctionValidator on construction and returns
-     * true if the ValidationFunction has succeeded / passed. Returns false otherwise. Once the ValidationFunction
-     * has succeeded (returned true once), the coroutine will not be restarted and this function will always return
+     * Runs the ValidationFunction that was given to this FunctionValidator on
+     * construction and returns true if the ValidationFunction has succeeded / passed.
+     * Returns false otherwise. Once the ValidationFunction has succeeded (returned true
+     * once), the coroutine will not be restarted and this function will always return
      * true without re-running the ValidationFunction.
      *
-     * @return true if the internal ValidationFunction has succeeded / passed, and false otherwise
+     * @return true if the internal ValidationFunction has succeeded / passed, and false
+     * otherwise
      */
     bool executeAndCheckForSuccess();
 
-private:
+   private:
     /**
      * A wrapper function for the validation_function.
      *
@@ -40,7 +46,7 @@ private:
      *
      * @param yield The coroutine push_type for the validation_function
      */
-    void executeAndCheckForSuccessWrapper(ValidationCoroutine::push_type &yield);
+    void executeAndCheckForSuccessWrapper(ValidationCoroutine::push_type& yield);
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;
