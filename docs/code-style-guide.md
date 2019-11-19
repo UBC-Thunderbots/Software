@@ -8,6 +8,7 @@
 * [Namespaces](#namespaces)
 * [Exceptions](#exceptions)
 * [Tests](#tests)
+* [Getter And Setter Functions](#getter-and-setter-functions)
 * [Spelling](#spelling)
 * [Miscellaneous](#miscellaneous)
 
@@ -176,6 +177,11 @@ Some general guidelines when writing tests are:
 
 * **Tests should test a single, distinct behaviour, isolated to a single class (or group of functions in C).** For example, if you have a test called `assign_and_clear_goalie`, it should probably be broken up into `assign_goalie` and `clear_goalie`. While `clear_goalie` might depend on `assign_goalie`, structuring things like this allows us to quickly narrow down where the problem might be by just looking at what tests failed, without having to go tear apart large unit tests.
 * **Don't be afraid to use long test names.**: When naming things, as programmers we keep names short so that they can be used elsewhere without taking up an entire line. But no one is going to be using your test name elsewhere, so feel free to be verbose. Instead of `equality_operator_3`, call your test `equality_operator_two_teams_different_number_of_robots`
+
+### Getter And Setter Functions
+* in general, getter and setter methods on classes should be written like `getName()`, `setName(string name)`, with the following exceptions
+  * getters with the return type `bool` may be prefixed with `is` instead of `get`, ie. `bool isActive()`
+  * getters that are used _incredibly_ frequently and are _incredibly_ obvious may not require the `get` prefix. For example `Point::x()` and `Point::y()` 
 
 
 ### Spelling
