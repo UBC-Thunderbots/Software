@@ -31,7 +31,7 @@ double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world
     return std::clamp<double>(cost, 0, 1);
 }
 
-void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do
     {

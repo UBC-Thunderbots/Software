@@ -38,7 +38,7 @@ double ChipTactic::calculateRobotCost(const Robot &robot, const World &world)
     return std::clamp<double>(cost, 0, 1);
 }
 
-void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     ChipAction chip_action = ChipAction();
     do

@@ -41,7 +41,7 @@ TEST(TacticTest, test_nullptr_returned_when_no_robot_assigned)
     MoveTestTactic tactic = MoveTestTactic();
     tactic.updateControlParams(Point());
 
-    EXPECT_FALSE(tactic.getNextIntent());
+    EXPECT_FALSE(tactic.getNextAction());
 }
 
 TEST(TacticTest, test_tactic_not_done_after_run_with_no_robot_assigned)
@@ -52,7 +52,7 @@ TEST(TacticTest, test_tactic_not_done_after_run_with_no_robot_assigned)
     // Run the tactic several times
     for (int i = 0; i < 5; i++)
     {
-        tactic.getNextIntent();
+        tactic.getNextAction();
     }
 
     EXPECT_FALSE(tactic.done());
@@ -77,7 +77,7 @@ TEST(TacticTest, test_tactic_does_not_prematurely_report_done)
     auto intent_ptr = std::unique_ptr<Intent>{};
     for (int i = 0; i < 10; i++)
     {
-        intent_ptr = tactic.getNextIntent();
+        intent_ptr = tactic.getNextAction();
     }
 
     // Check an intent was returned (the pointer is not null)
@@ -99,13 +99,13 @@ TEST(TacticTest, test_tactic_reports_done_at_same_time_nullptr_returned)
     // The tactic should always return an Intent the first time it is run to make sure we
     // are doing the right thing (and just don't happen to be in the "done state" at the
     // time while actually doing something else)
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(tactic.done());
 
     // Subsequent calls should return a nullptr since the Tactic is done, and the
     // tactic should also report done()
-    intent_ptr = tactic.getNextIntent();
+    intent_ptr = tactic.getNextAction();
     EXPECT_FALSE(intent_ptr);
     EXPECT_TRUE(tactic.done());
 }
@@ -126,7 +126,7 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
     std::unique_ptr<Intent> intent_ptr;
     for (int i = 0; i < 5; i++)
     {
-        intent_ptr = tactic.getNextIntent();
+        intent_ptr = tactic.getNextAction();
         EXPECT_TRUE(intent_ptr);
         EXPECT_FALSE(tactic.done());
     }

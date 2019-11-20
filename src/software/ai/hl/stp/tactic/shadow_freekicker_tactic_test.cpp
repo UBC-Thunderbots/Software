@@ -29,7 +29,7 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_left_side)
                                world.ball(), world.field(), false);
     tactic.updateRobot(friendly_robot);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(intent_ptr);
 
@@ -78,7 +78,7 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_right_side)
                                world.ball(), world.field(), false);
     tactic.updateRobot(friendly_robot);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(intent_ptr);
 

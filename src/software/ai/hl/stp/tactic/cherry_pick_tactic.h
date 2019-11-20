@@ -46,7 +46,7 @@ class CherryPickTactic : public Tactic
     void accept(TacticVisitor& visitor) const override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // The pass optimizer being used to figure out the best position for the robot
     Passing::PassGenerator pass_generator;

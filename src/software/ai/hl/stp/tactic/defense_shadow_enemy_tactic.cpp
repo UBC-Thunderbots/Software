@@ -57,7 +57,7 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
     return std::clamp<double>(cost, 0, 1);
 }
 
-void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     MoveAction move_action = MoveAction();
     StopAction stop_action =

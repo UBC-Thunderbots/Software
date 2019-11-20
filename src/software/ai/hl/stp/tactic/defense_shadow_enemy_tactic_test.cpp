@@ -27,7 +27,7 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(intent_ptr);
 
@@ -67,7 +67,7 @@ TEST(DefenseShadowEnemyTacticTest,
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(intent_ptr);
 
@@ -110,7 +110,7 @@ TEST(
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(intent_ptr);
 

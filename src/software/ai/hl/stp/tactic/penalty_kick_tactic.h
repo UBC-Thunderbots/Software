@@ -48,7 +48,7 @@ class PenaltyKickTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
+    void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
     // Evaluation function designed specifically for 1-on-1 penalty shots
     bool evaluate_penalty_shot();

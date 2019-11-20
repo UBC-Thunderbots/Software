@@ -52,7 +52,7 @@ double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
     }
 }
 
-void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     if (patrol_points.empty())
     {

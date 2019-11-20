@@ -131,7 +131,7 @@ Point PenaltyKickTactic::evaluate_next_position()
     }
 }
 
-void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
+void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     // We will need to keep track of time so we don't break the rules by taking too long
     Timestamp penalty_kick_start = robot->getMostRecentTimestamp();

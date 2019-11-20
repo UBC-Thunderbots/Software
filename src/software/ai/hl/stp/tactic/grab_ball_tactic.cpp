@@ -52,7 +52,7 @@ double GrabBallTactic::calculateRobotCost(const Robot &robot, const World &world
     return std::clamp<double>(cost, 0, 1);
 }
 
-void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void GrabBallTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     InterceptBallAction intercept_action = InterceptBallAction(field, ball, true);
     MoveSpinAction movespin_action =

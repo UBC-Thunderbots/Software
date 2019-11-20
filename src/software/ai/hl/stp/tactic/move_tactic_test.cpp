@@ -13,7 +13,7 @@ TEST(MoveTacticTest, robot_far_from_destination)
     MoveTactic tactic = MoveTactic();
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(1, 0), Angle::quarter(), 1.0);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -37,8 +37,8 @@ TEST(MoveTacticTest, robot_at_destination)
     // We call the Tactic twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
     // done and so will return a null pointer
-    auto intent_ptr = tactic.getNextIntent();
-    intent_ptr      = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
+    intent_ptr      = tactic.getNextAction();
 
     EXPECT_TRUE(tactic.done());
 }

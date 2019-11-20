@@ -22,7 +22,7 @@ TEST(GrabBallTacticTest, test_robot_intercepts_ball_if_no_enemies_near_ball)
     GrabBallTactic tactic =
         GrabBallTactic(world.field(), world.ball(), world.enemyTeam(), true);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -56,7 +56,7 @@ TEST(GrabBallTacticTest,
     GrabBallTactic tactic =
         GrabBallTactic(world.field(), world.ball(), world.enemyTeam(), true);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -89,7 +89,7 @@ TEST(GrabBallTacticTest, test_robot_steals_the_ball_if_close_to_an_enemy_with_th
     GrabBallTactic tactic =
         GrabBallTactic(world.field(), world.ball(), world.enemyTeam(), true);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

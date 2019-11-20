@@ -129,7 +129,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     }
 }
 
-void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     MoveAction move_action = MoveAction();
     ChipAction chip_action = ChipAction();

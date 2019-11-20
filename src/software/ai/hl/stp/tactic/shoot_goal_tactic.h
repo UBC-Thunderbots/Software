@@ -76,7 +76,7 @@ class ShootGoalTactic : public Tactic
     void accept(TacticVisitor& visitor) const override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     /**
      * Returns true if there is an enemy close enough to steal the ball from the shooting
@@ -96,7 +96,7 @@ class ShootGoalTactic : public Tactic
      * @param yield The coroutine to yield
      */
     void shootUntilShotBlocked(KickAction& kick_action, ChipAction& chip_action,
-                               IntentCoroutine::push_type& yield) const;
+                               ActionCoroutine::push_type& yield) const;
 
     // Tactic parameters
     // The field being played on

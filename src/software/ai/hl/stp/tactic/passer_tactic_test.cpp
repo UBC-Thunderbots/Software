@@ -32,7 +32,7 @@ TEST(PasserTacticTest,
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
     EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
@@ -60,7 +60,7 @@ TEST(PasserTacticTest,
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
     EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
@@ -90,7 +90,7 @@ TEST(
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
     EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
@@ -118,7 +118,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started)
 
     // We're in the perfect position to kick, but pass hasn't started yet, so
     // we should just be moving
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
     EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
@@ -143,7 +143,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
     tactic.updateRobot(robot);
 
     // We should try to kick the ball
-    KickIntent kick_intent = dynamic_cast<KickIntent &>(*tactic.getNextIntent());
+    KickIntent kick_intent = dynamic_cast<KickIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, kick_intent.getRobotId());
     EXPECT_EQ(-90, kick_intent.getKickDirection().toDegrees());
     EXPECT_EQ(Point(0, 0), kick_intent.getKickOrigin());
@@ -155,7 +155,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
     tactic.updateControlParams(pass);
 
     // We need to try to get the next the intent to make the tactic finish
-    tactic.getNextIntent();
+    tactic.getNextAction();
 
     // The tactic should now be done
     EXPECT_TRUE(tactic.done());

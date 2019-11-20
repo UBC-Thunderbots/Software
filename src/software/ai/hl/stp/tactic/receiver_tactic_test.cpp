@@ -35,7 +35,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 
     Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
     EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
@@ -73,7 +73,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
         EXPECT_EQ(13, move_intent.getRobotId());
         EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
         EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
@@ -108,7 +108,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
 
     // We should be trying to move into a position to properly deflect the ball into
     // the net with a kick
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_LT(move_intent.getDestination().x(), -0.001);
     EXPECT_GT(move_intent.getDestination().x(), -0.2);
@@ -149,7 +149,7 @@ TEST(ReceiverTacticTest,
 
     // Since there's no reasonable way we could one-touch kick the pass into the net,
     // we should be lining up to receive it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_NEAR(0.0, move_intent.getDestination().x(), 0.0001);
     EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
@@ -192,7 +192,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
 
     // Since there's no reasonable way we could one-touch kick the pass into the net,
     // we should be lining up to receive it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_NEAR(0.0, move_intent.getDestination().x(), 0.0001);
     EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
@@ -226,7 +226,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     tactic.updateRobot(receiver);
 
     // We should yield one intent here
-    EXPECT_TRUE(tactic.getNextIntent());
+    EXPECT_TRUE(tactic.getNextAction());
 
     // Position the ball just in front of the robot dribbler
     Point ball_pos =
@@ -238,7 +238,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     tactic.updateControlParams(pass);
 
     // Since we've received the ball, we shouldn't yield anything
-    EXPECT_FALSE(tactic.getNextIntent());
+    EXPECT_FALSE(tactic.getNextAction());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
@@ -265,7 +265,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
     tactic.updateRobot(receiver);
 
     // Since we've kicked the ball, we shouldn't yield anything
-    EXPECT_EQ(std::unique_ptr<Intent>{}, tactic.getNextIntent());
+    EXPECT_EQ(std::unique_ptr<Intent>{}, tactic.getNextAction());
 }
 
 class OneTimeShotDirectionTest

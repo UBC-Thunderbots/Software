@@ -52,6 +52,6 @@ void Action::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
     // Anytime after the first function call, the calculateNextIntent function will be
     // used to perform the real logic. The calculateNextIntent function will yield its
     // values to the top of the coroutine stack, where they will be retrieved by
-    // getNextIntent, so we do not need to yield or return the result of this function
+    // getNextAction, so we do not need to yield or return the result of this function
     calculateNextIntent(yield);
 }

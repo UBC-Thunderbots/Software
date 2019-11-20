@@ -33,7 +33,7 @@ double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& wor
     return dist(robot.position(), target_region);
 }
 
-void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
+void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     MoveAction move_action =
         MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);

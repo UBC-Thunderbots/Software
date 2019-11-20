@@ -22,7 +22,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::LEFT);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -62,7 +62,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::LEFT);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -105,7 +105,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_sid
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::RIGHT);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

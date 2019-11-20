@@ -47,7 +47,7 @@ Point BlockShotPathTactic::getBlockPosition()
     return block_position;
 }
 
-void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
+void BlockShotPathTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     MoveAction move_action = MoveAction(0, Angle(), false);
     do

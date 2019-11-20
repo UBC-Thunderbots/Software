@@ -24,7 +24,7 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);
@@ -62,7 +62,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
                              world.ball());
 
     // The robot will start the shot since it can see enough of the net
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);
@@ -86,7 +86,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
-    intent_ptr = tactic.getNextIntent();
+    intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);
@@ -110,8 +110,8 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
-    intent_ptr = tactic.getNextIntent();
-    intent_ptr = tactic.getNextIntent();
+    intent_ptr = tactic.getNextAction();
+    intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);
@@ -148,7 +148,7 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);
@@ -185,7 +185,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);

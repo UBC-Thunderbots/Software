@@ -18,7 +18,7 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     // Shoot from 2m in front of the goal
     Point shot_origin = field.friendlyGoal() + Vector(2, 0);
     tactic.updateControlParams(shot_origin);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -48,7 +48,7 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
     BlockShotPathTactic tactic = BlockShotPathTactic(field);
     tactic.updateRobot(friendly_robot);
     tactic.updateControlParams(enemy_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

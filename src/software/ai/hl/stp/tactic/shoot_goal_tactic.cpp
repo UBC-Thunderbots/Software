@@ -104,7 +104,7 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
 
 void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
                                             ChipAction &chip_action,
-                                            IntentCoroutine::push_type &yield) const
+                                            ActionCoroutine::push_type &yield) const
 {
     auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
                                                            enemy_team, ball.position());
@@ -135,7 +135,7 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
     }
 }
 
-void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     KickAction kick_action = KickAction();
     ChipAction chip_action = ChipAction();

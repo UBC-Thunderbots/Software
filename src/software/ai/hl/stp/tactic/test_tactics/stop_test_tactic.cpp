@@ -15,7 +15,7 @@ double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world
     return 0.5;
 }
 
-void StopTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do
     {

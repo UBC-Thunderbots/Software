@@ -52,7 +52,7 @@ class ChipTactic : public Tactic
     void accept(TacticVisitor& visitor) const override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // Tactic parameters
     Ball ball;

@@ -46,7 +46,7 @@ class GrabBallTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
+    void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
     // Spin 2.5 rotations per second to steal the ball
     const AngularVelocity STEAL_BALL_SPIN_SPEED = AngularVelocity::fromDegrees(360 * 2.5);

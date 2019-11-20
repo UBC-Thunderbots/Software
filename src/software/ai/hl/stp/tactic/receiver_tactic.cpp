@@ -52,7 +52,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     return std::clamp<double>(cost, 0, 1);
 }
 
-void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
+void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     MoveAction move_action =
         MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,

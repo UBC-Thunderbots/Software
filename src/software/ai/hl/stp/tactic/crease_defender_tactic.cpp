@@ -176,7 +176,7 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
     }
 }
 
-void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     MoveAction move_action = MoveAction(0, Angle(), false);
     StopAction stop_action = StopAction();

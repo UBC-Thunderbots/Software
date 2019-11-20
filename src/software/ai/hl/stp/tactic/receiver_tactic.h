@@ -99,7 +99,7 @@ class ReceiverTactic : public Tactic
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     /**
      * Finds a feasible shot for the robot, if any.

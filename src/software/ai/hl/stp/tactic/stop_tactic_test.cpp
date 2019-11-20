@@ -12,7 +12,7 @@ TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving)
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);
@@ -36,7 +36,7 @@ TEST(StopTacticTest, robot_stopping_while_already_stopped)
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto intent_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
     ASSERT_TRUE(intent_ptr);
