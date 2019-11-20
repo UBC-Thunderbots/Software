@@ -48,6 +48,27 @@ class MoveAction : public Action
                              AutokickType autokick,
                              BallCollisionType ball_collision_type);
 
+    /**
+     * Get the destination this MoveAction is going to
+     *
+     * @return the destination this MoveAction is going to
+     */
+    Point getDestination();
+
+    /**
+     * Get the angle the robot should be at the destination
+     *
+     * @return the angle the robot should be at the destination
+     */
+    Angle getFinalOrientation();
+
+    /**
+     * Get the speed the robot should be moving at the destination
+     *
+     * @return the speed the robot should be moving at the destination
+     */
+    double getFinalSpeed();
+
     void accept(ActionVisitor& visitor) const override;
 
    private:

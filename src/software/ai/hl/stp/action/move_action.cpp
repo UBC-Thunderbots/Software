@@ -3,6 +3,13 @@
 MoveAction::MoveAction(double close_to_dest_threshold,
                        Angle close_to_orientation_threshold, bool loop_forever)
     : Action(),
+      destination(0, 0),
+      final_orientation(Angle::zero()),
+      final_speed(0.0),
+      enable_dribbler(DribblerEnable::OFF),
+      move_type(MoveType::NORMAL),
+      autokick(AutokickType::NONE),
+      ball_collision_type(BallCollisionType::AVOID),
       close_to_dest_threshold(close_to_dest_threshold),
       close_to_orientation_threshold(close_to_orientation_threshold),
       loop_forever(loop_forever)
@@ -15,14 +22,29 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      AutokickType autokick,
                                      BallCollisionType ball_collision_type)
 {
-    this->robot             = robot;
-    this->destination       = destination;
-    this->final_orientation = final_orientation;
-    this->final_speed       = final_speed;
-    this->enable_dribbler   = enable_dribbler;
-    this->move_type         = move_type;
-    this->autokick          = autokick;
+    this->robot               = robot;
+    this->destination         = destination;
+    this->final_orientation   = final_orientation;
+    this->final_speed         = final_speed;
+    this->enable_dribbler     = enable_dribbler;
+    this->move_type           = move_type;
+    this->autokick            = autokick;
     this->ball_collision_type = ball_collision_type;
+}
+
+Point MoveAction::getDestination()
+{
+    return destination;
+}
+
+Angle MoveAction::getFinalOrientation()
+{
+    return final_orientation;
+}
+
+double MoveAction::getFinalSpeed()
+{
+    return final_speed;
 }
 
 void MoveAction::accept(ActionVisitor& visitor) const
