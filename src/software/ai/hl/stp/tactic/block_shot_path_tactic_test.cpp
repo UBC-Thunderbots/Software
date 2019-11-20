@@ -10,7 +10,7 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(),
+    Robot friendly_robot = Robot(13, Point(1, 0.5), Vector(), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     BlockShotPathTactic tactic = BlockShotPathTactic(field);
@@ -18,20 +18,21 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     // Shoot from 2m in front of the goal
     Point shot_origin = field.friendlyGoal() + Vector(2, 0);
     tactic.updateControlParams(shot_origin);
-    auto action_ptr = tactic.getNextAction();
+    std::shared_ptr<Action> action = tactic.getNextAction();
 
     // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
+    EXPECT_TRUE(action);
 
-    auto move_action_ptr = dynamic_cast<std::shared_ptr<MoveAction>>(action_ptr);
-    EXPECT_EQ(0, move_action_ptr->getRobotId());
+    auto move_action = std::static_pointer_cast<MoveAction>(action);
+    EXPECT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
     // Check the robot is moving somewhere on the line segment between the shot origin
     // and the goal
     EXPECT_LE(
         dist(Segment(shot_origin, field.friendlyGoal()), move_action->getDestination()),
         0.1);
     // Make sure the robot is facing the shot
-    EXPECT_EQ(Angle::zero(), move_action->getFinalAngle());
+    EXPECT_EQ(Angle::zero(), move_action->getFinalOrientation());
     EXPECT_EQ(0.0, move_action->getFinalSpeed());
 }
 
@@ -39,7 +40,7 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(),
+    Robot friendly_robot = Robot(13, Point(1, 0.5), Vector(), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     Robot enemy_robot = Robot(0, field.enemyCornerNeg(), Vector(), Angle::zero(),
@@ -48,22 +49,23 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
     BlockShotPathTactic tactic = BlockShotPathTactic(field);
     tactic.updateRobot(friendly_robot);
     tactic.updateControlParams(enemy_robot);
-    auto action_ptr = tactic.getNextAction();
+    std::shared_ptr<Action> action = tactic.getNextAction();
 
     // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
+    EXPECT_TRUE(action);
 
-    MoveAction move_action = dynamic_cast<MoveAction &>(*action_ptr);
-    EXPECT_EQ(0, move_action.getRobotId());
+    auto move_action = std::static_pointer_cast<MoveAction>(action);
+    EXPECT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
     // Check the robot is moving somewhere on the line segment between the shot origin
     // and the goal
     EXPECT_LE(dist(Segment(enemy_robot.position(), field.friendlyGoal()),
-                   move_action.getDestination()),
+                   move_action->getDestination()),
               0.1);
     // Make sure the robot is facing the shot
     EXPECT_NEAR((enemy_robot.position() - field.friendlyGoal()).orientation().toRadians(),
-                move_action.getFinalAngle().toRadians(), 0.001);
-    EXPECT_EQ(0.0, move_action.getFinalSpeed());
+                move_action->getFinalOrientation().toRadians(), 0.001);
+    EXPECT_EQ(0.0, move_action->getFinalSpeed());
 }
 
 TEST(BlockShotPathTacticTest, test_calculate_robot_cost)
