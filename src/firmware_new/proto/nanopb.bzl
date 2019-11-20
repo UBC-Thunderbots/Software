@@ -39,7 +39,7 @@ def c_proto_library(name, srcs, **kwargs):
                 name = "%s_proto_ch_genrule" % (proto_name),
                 srcs = ["%s.pb" % (proto_name)],
                 tools = ["@nanopb//:nanopb_generator",],
-                cmd = "ls -R && python3 $(location @nanopb//:nanopb_generator) $(location %s.pb)" % (proto_name),
+                cmd = "python3 $(location @nanopb//:nanopb_generator) $(location %s.pb)" % (proto_name),
                 outs = [h_out, c_out],
         )
 
