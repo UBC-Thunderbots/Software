@@ -60,9 +60,4 @@ fi
 bin_file=${bin_files[$1]}
 
 # Try to flash the given binary
-dfu-util \
-    -d 0483 \
-    -a "@internal flash  /0x08000000/04*016kg,01*064kg,07*128kg" \
-    -D "$bin_file" \
-    -s 0x08000000:leave
-
+dfu-util -d 0483 -a "@Internal Flash  /0x08000000/04*016Kg,01*064Kg,07*128Kg" -D $bin_file  -s 0x08000000:leave
