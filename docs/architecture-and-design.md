@@ -173,7 +173,9 @@ Examples of the Visitor Pattern can be found with the following classes:
 ## Observer Design Pattern
 The Observer Design Pattern is useful for letting components of a system "notify" each other when something happens. Read [https://www.geeksforgeeks.org/observer-pattern-set-1-introduction/] for a general introduction to the pattern.
 
-Our implementation of this pattern consists of two classes, `Observer` and `Subject`. `Observer`'s can be registered with a `Subject`, after which new values will be sent from each `Subject` to all of it's registered `Observer`'s. Please see the headers of both classes for details. Note that a class can extend both `Observer` and `Subject`, thus receiving and sending out data. In this way we can "chain" multiple classes.
+Our implementation of this pattern consists of two classes, `Observer` and `Subject`. `Observer`s can be registered with a `Subject`, after which new values will be sent from each `Subject` to all of it's registered `Observer`s. Please see the headers of both classes for details. Note that a class can extend both `Observer` and `Subject`, thus receiving and sending out data. In this way we can "chain" multiple classes.
+
+One example of this is the `Backend`, which extends `Subject<World>` and the `AI`, which extends `ThreadedObserver<World>`. The backend runs in one thread and sends data to the AI, which receives and processes it another thread.
 
 ### Threaded Observer
 In our system, we need to be able to do multiple things (receive camera data, run the AI, send commands to the robots) at the same time. In order to facilitate this, we extend the `Observer` to the `ThreadedObserver` class. The `ThreadedObserver` starts a thread with an infinite loop that waits for new data from `Subject` and performs some operation with it.
