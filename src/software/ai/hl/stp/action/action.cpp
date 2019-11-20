@@ -43,6 +43,10 @@ std::unique_ptr<Intent> Action::getNextIntent()
     return next_intent;
 }
 
+std::optional<Robot> Action::getRobot() {
+    return robot;
+}
+
 void Action::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
@@ -55,3 +59,4 @@ void Action::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
     // getNextAction, so we do not need to yield or return the result of this function
     calculateNextIntent(yield);
 }
+
