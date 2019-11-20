@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/intent/move_intent.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
 #include "software/test_util/test_util.h"
 
@@ -18,21 +18,21 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     // Shoot from 2m in front of the goal
     Point shot_origin = field.friendlyGoal() + Vector(2, 0);
     tactic.updateControlParams(shot_origin);
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-    EXPECT_EQ(0, move_intent.getRobotId());
+    auto move_action_ptr = dynamic_cast<std::shared_ptr<MoveAction>>(action_ptr);
+    EXPECT_EQ(0, move_action_ptr->getRobotId());
     // Check the robot is moving somewhere on the line segment between the shot origin
     // and the goal
     EXPECT_LE(
-        dist(Segment(shot_origin, field.friendlyGoal()), move_intent.getDestination()),
+        dist(Segment(shot_origin, field.friendlyGoal()), move_action->getDestination()),
         0.1);
     // Make sure the robot is facing the shot
-    EXPECT_EQ(Angle::zero(), move_intent.getFinalAngle());
-    EXPECT_EQ(0.0, move_intent.getFinalSpeed());
+    EXPECT_EQ(Angle::zero(), move_action->getFinalAngle());
+    EXPECT_EQ(0.0, move_action->getFinalSpeed());
 }
 
 TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
@@ -48,22 +48,22 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
     BlockShotPathTactic tactic = BlockShotPathTactic(field);
     tactic.updateRobot(friendly_robot);
     tactic.updateControlParams(enemy_robot);
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-    EXPECT_EQ(0, move_intent.getRobotId());
+    MoveAction move_action = dynamic_cast<MoveAction &>(*action_ptr);
+    EXPECT_EQ(0, move_action.getRobotId());
     // Check the robot is moving somewhere on the line segment between the shot origin
     // and the goal
     EXPECT_LE(dist(Segment(enemy_robot.position(), field.friendlyGoal()),
-                   move_intent.getDestination()),
+                   move_action.getDestination()),
               0.1);
     // Make sure the robot is facing the shot
     EXPECT_NEAR((enemy_robot.position() - field.friendlyGoal()).orientation().toRadians(),
-                move_intent.getFinalAngle().toRadians(), 0.001);
-    EXPECT_EQ(0.0, move_intent.getFinalSpeed());
+                move_action.getFinalAngle().toRadians(), 0.001);
+    EXPECT_EQ(0.0, move_action.getFinalSpeed());
 }
 
 TEST(BlockShotPathTacticTest, test_calculate_robot_cost)

@@ -49,17 +49,17 @@ Point BlockShotPathTactic::getBlockPosition()
 
 void BlockShotPathTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    MoveAction move_action = MoveAction(0, Angle(), false);
+    auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
     do
     {
         Point block_position = getBlockPosition();
         // We want to face the shot
         Angle block_orientation = (this->shot_origin - block_position).orientation();
-        move_action.updateControlParams(*robot, block_position, block_orientation, 0.0,
+        move_action->updateControlParams(*robot, block_position, block_orientation, 0.0,
                                         DribblerEnable::OFF, MoveType::NORMAL,
                                         AutokickType::NONE, BallCollisionType::ALLOW);
-        yield(move_action.getNextIntent());
-    } while (!move_action.done());
+        yield(move_action);
+    } while (!move_action->done());
 }
 
 void BlockShotPathTactic::accept(TacticVisitor& visitor) const
