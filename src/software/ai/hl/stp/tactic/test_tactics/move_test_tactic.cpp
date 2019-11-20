@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "software/ai/intent/move_intent.h"
+#include "software/ai/hl/stp/action/move_action.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
     : Tactic(loop_forever,
@@ -35,10 +35,11 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do
     {
-        yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
-                                           Angle::zero(), 0.0, 0, DribblerEnable::OFF,
-                                           MoveType::NORMAL, AutokickType::NONE,
-                                           BallCollisionType::AVOID));
+        yield(std::make_shared<MoveAction>());
+//        yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
+//                                           Angle::zero(), 0.0, 0, DribblerEnable::OFF,
+//                                           MoveType::NORMAL, AutokickType::NONE,
+//                                           BallCollisionType::AVOID));
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 

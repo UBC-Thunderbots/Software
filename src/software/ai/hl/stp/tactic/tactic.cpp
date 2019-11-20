@@ -30,7 +30,7 @@ void Tactic::updateRobot(const Robot &robot)
 
 std::shared_ptr<Action> Tactic::getNextAction(void)
 {
-    std::unique_ptr<Action> next_action = nullptr;
+    std::shared_ptr<Action> next_action = nullptr;
     if (!robot)
     {
         LOG(WARNING) << "Requesting the next Action for a Tactic without a Robot assigned"
@@ -59,7 +59,7 @@ void Tactic::calculateNextActionWrapper(ActionCoroutine::push_type &yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
-    yield(std::unique_ptr<Action>{});
+    yield(std::shared_ptr<Action>{});
 
     // Anytime after the first function call, the calculateNextAction function will be
     // used to perform the real logic. The calculateNextAction function will yield its
@@ -70,7 +70,7 @@ void Tactic::calculateNextActionWrapper(ActionCoroutine::push_type &yield)
 
 std::shared_ptr<Action> Tactic::getNextActionHelper()
 {
-    std::unique_ptr<Action> next_action = nullptr;
+    std::shared_ptr<Action> next_action = nullptr;
     // Check the coroutine status to see if it has any more work to do.
     if (action_sequence)
     {
