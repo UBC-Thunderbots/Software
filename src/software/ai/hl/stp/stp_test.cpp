@@ -165,10 +165,11 @@ TEST_F(STPTest, test_get_play_info)
 
     auto play_info = stp.getPlayInfo();
     PlayInfo expected_play_info;
-    expected_play_info.setPlayName("Halt Test Play");
-    expected_play_info.setPlayType("HALT");
-    expected_play_info.setRobotsTacticAssignment(
-        {"Robot 0  -  Stop Test Tactic", "Robot 1  -  Stop Test Tactic"});
-
+    std::string expected_play_type, expected_play_name;
+    expected_play_type = "HALT";
+    expected_play_name = "Halt Test Play";
+    std::unordered_set<std::string> expected_robot_tactic_assignment =
+            {"Robot 0  -  Stop Test Tactic", "Robot 1  -  Stop Test Tactic"};
+    expected_play_info = PlayInfo(expected_play_type, expected_play_name, expected_robot_tactic_assignment);
     EXPECT_EQ(play_info, expected_play_info);
 }

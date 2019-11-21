@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
+
 
 /**
  * A description of the play.  Contains the type of play being
@@ -15,6 +17,11 @@ class PlayInfo
      * Constructs a PlayInfo object.
      */
     explicit PlayInfo();
+
+    /**
+     * Constructs a PlayInfo object with given arguments for fields
+     */
+    explicit PlayInfo(std::string play_type, std::string play_name, std::unordered_set<std::string> robots_tactic_assignment);
 
     /**
      * Get play type
@@ -31,29 +38,11 @@ class PlayInfo
     std::string getPlayName() const;
 
     /**
-     * Get vector containing tactic assignments for robots
+     * Get unordered set containing tactic assignments for robots
      *
      * @return robot_tactic_assignment field
      */
-    std::vector<std::string> getRobotTacticAssignment() const;
-
-    /**
-     * Sets the play_type field to new_play_type
-     * @param new_play_type, the new play type to be set to
-     */
-    void setPlayType(std::string new_play_type);
-
-    /**
-     * Sets the play_name field to new_play_name
-     * @param new_play_name, the new play name to be set to
-     */
-    void setPlayName(std::string new_play_name);
-
-    /**
-     * Sets the robot_tactic_assignment field to rta
-     * @param rta, the new vector containing robot assignments
-     */
-    void setRobotsTacticAssignment(std::vector<std::string> rta);
+    std::unordered_set<std::string> getRobotTacticAssignment() const;
 
     /**
      * Adds new_assignment to robot_tactic_assignment
@@ -61,10 +50,17 @@ class PlayInfo
      */
     void addAssignment(std::string new_assignment);
 
+    /**
+     * Equals operator for PlayInfo objects
+     *
+     * @param other, PlayInfo object to be compared to
+     * @return True if all fields are equal for both objects, false otherwise
+     */
     bool operator==(const PlayInfo& other) const;
 
    private:
     std::string play_type;
     std::string play_name;
-    std::vector<std::string> robot_tactic_assignment;
+    std::unordered_set<std::string> robot_tactic_assignment;
 };
+
