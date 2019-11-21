@@ -24,10 +24,9 @@
 #include "string.h"
 
 /* Protobuf */
-#include "external/nanopb/pb_encode.h"
 #include "external/nanopb/pb_decode.h"
+#include "external/nanopb/pb_encode.h"
 #include "firmware_new/proto/robot.pb.h"
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -138,61 +137,7 @@ int main(void)
     MX_ETH_Init();
     MX_USART3_UART_Init();
     MX_USB_OTG_FS_PCD_Init();
-
     /* USER CODE BEGIN 2 */
-
-    uint8_t buffer[robot]; // TODO figure out a better way to determine this
-    size_t message_length;
-    bool status;
-    
-	// Initialize robot msg to zero
-	RobotAck message = RobotAck_init_zero;
-	
-	/* Create a stream that will write to our buffer. */
-	pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-	
-	/* Fill in the lucky number */
-	message.lucky_number = 13;
-	
-	/* Now we are ready to encode the message! */
-	status = pb_encode(&stream, SimpleMessage_fields, &message);
-	message_length = stream.bytes_written;
-	
-	/* Then just check for any errors.. */
-	if (!status)
-	{
-	    printf("Encoding failed: %s\n", PB_GET_ERROR(&stream));
-	    return 1;
-	}
-    
-    /* 
-	 * Now we could transmit the message over network, store it in a file or
-     * wrap it to a pigeon's leg.
-	 *
-     */
-
-    /* But because we are lazy, we will just decode it immediately. */
-    
-    {
-        /* Allocate space for the decoded message. */
-        SimpleMessage message = SimpleMessage_init_zero;
-        
-        /* Create a stream that reads from the buffer. */
-        pb_istream_t stream = pb_istream_from_buffer(buffer, message_length);
-        
-        /* Now we are ready to decode the message. */
-        status = pb_decode(&stream, SimpleMessage_fields, &message);
-        
-        /* Check for errors... */
-        if (!status)
-        {
-            printf("Decoding failed: %s\n", PB_GET_ERROR(&stream));
-            return 1;
-        }
-        
-        /* Print the data contained in the message. */
-        printf("Your lucky number was %d!\n", (int)message.lucky_number);
-    }
 
     /* USER CODE END 2 */
 
@@ -201,6 +146,13 @@ int main(void)
     while (1)
     {
         /* USER CODE END WHILE */
+        char buf[64];
+        uint8_t Rx_data[10];  //  creating a buffer of 10 bytes
+        sprintf(buf, "Value of asodijasodijasodijasd: \r\n");
+
+        // change huartX to your initialized HAL UART peripheral
+        HAL_UART_Receive(&huart3, (uint8_t *)Rx_data, 4, 2000);
+        HAL_UART_Transmit(&huart3, buf, strlen(buf), HAL_MAX_DELAY);
 
         /* USER CODE BEGIN 3 */
     }
@@ -285,19 +237,16 @@ static void MX_ETH_Init(void)
 
     /* USER CODE END ETH_Init 0 */
 
-    uint8_t MACAddr[6];
-
     /* USER CODE BEGIN ETH_Init 1 */
 
     /* USER CODE END ETH_Init 1 */
     heth.Instance            = ETH;
-    MACAddr[0]               = 0x00;
-    MACAddr[1]               = 0x80;
-    MACAddr[2]               = 0xE1;
-    MACAddr[3]               = 0x00;
-    MACAddr[4]               = 0x00;
-    MACAddr[5]               = 0x00;
-    heth.Init.MACAddr        = &MACAddr[0];
+    heth.Init.MACAddr[0]     = 0x00;
+    heth.Init.MACAddr[1]     = 0x80;
+    heth.Init.MACAddr[2]     = 0xE1;
+    heth.Init.MACAddr[3]     = 0x00;
+    heth.Init.MACAddr[4]     = 0x00;
+    heth.Init.MACAddr[5]     = 0x00;
     heth.Init.MediaInterface = HAL_ETH_RMII_MODE;
     heth.Init.TxDesc         = DMATxDscrTab;
     heth.Init.RxDesc         = DMARxDscrTab;
