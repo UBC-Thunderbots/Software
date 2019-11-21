@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
+#include "software/ai/hl/stp/action/action_visitor.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/world/ball.h"
@@ -48,6 +49,7 @@ class KickAction : public Action
     void updateControlParams(const Robot &robot, Point kick_origin, Angle kick_direction,
                              double kick_speed_meters_per_second);
 
+    void accept(ActionVisitor &visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;

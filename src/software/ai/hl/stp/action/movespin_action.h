@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
+#include "software/ai/hl/stp/action/action_visitor.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 
@@ -37,6 +38,8 @@ class MoveSpinAction : public Action
      */
     void updateControlParams(const Robot& robot, Point destination,
                              AngularVelocity angular_velocity, double final_linear_speed);
+
+    void accept(ActionVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

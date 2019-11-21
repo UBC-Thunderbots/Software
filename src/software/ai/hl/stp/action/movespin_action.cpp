@@ -17,6 +17,11 @@ void MoveSpinAction::updateControlParams(const Robot& robot, Point destination,
     this->final_linear_speed = final_linear_speed;
 }
 
+void MoveSpinAction::accept(ActionVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
 void MoveSpinAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was

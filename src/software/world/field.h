@@ -14,6 +14,23 @@ typedef enum
 
 /**
  * Exposes the dimensions of various parts of the field.
+ *
+ *      +-------+-------+-------+
+ *      |       | Enemy |       |
+ *      |       +-------+       |
+ *      |                       |
+ *      |           ^ +x        |
+ *      |           |           |
+ *      |           |           |
+ *      |           |           |
+ *      |  +y       |           |
+ *      |  <--------+ (0,0)     |
+ *      |                       |
+ *      |                       |
+ *      |                       |
+ *      |      +----------+     |
+ *      |      | Friendly |     |
+ *      +------+----------+-----+
  */
 class Field
 {
