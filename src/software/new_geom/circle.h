@@ -4,7 +4,7 @@
 /**
  * A circle with a radius and point representing the origin of the circle.
  */
-class Circle final : public IConvexShape
+class Circle final : public ConvexShape
 {
    public:
     /**

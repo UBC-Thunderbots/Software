@@ -18,33 +18,47 @@ TEST(CreateCircleTests, circle_custom_constructor)
     EXPECT_THROW(Circle(Point(3, 5), -4), std::invalid_argument);
 }
 
-TEST(CircleLogicTests, circle_getter_setter_tests)
+TEST(CircleOperatorTests, circle_set_origin)
 {
     Circle c = Circle();
-    c.setOrigin(Point(2, -3));
-    c.setRadius(10);
-    EXPECT_EQ(Point(2, -3), c.getOrigin());
-    EXPECT_EQ(10, c.getRadius());
-    c.setOrigin(Point(-6, 7));
-    EXPECT_EQ(Point(-6, 7), c.getOrigin());
+    c.setOrigin(Point(1, 2));
+    EXPECT_EQ(Point(1, 2), c.getOrigin());
+}
 
+TEST(CircleOperatorTests, circle_set_valid_radius)
+{
+    Circle c = Circle();
+    c.setRadius(3);
+    EXPECT_EQ(3, c.getRadius());
+}
+
+TEST(CircleOperatorTests, circle_set_invalid_radius)
+{
+    Circle c = Circle();
     EXPECT_THROW(c.setRadius(-1), std::invalid_argument);
 }
 
-TEST(CircleOperatorTests, circle_operator_tests)
+TEST(CircleOperatorTests, circle_equals_test)
 {
-    Circle c = Circle(Point(1, 2), 3);
+    Circle c = Circle(Point(), 5);
     Circle d;
-    d.setOrigin(Point(1, 2));
-    d.setRadius(3);
+    d.setRadius(5);
     EXPECT_TRUE(c == d);
+}
 
-    d.setRadius(4);
+TEST(CircleOperatorTests, circle_not_equals_through_radius_test)
+{
+    Circle c = Circle(Point(1, 2), 5);
+    Circle d;
+    d.setRadius(5);
     EXPECT_TRUE(c != d);
+}
 
-    d.setRadius(3);
-    d.setOrigin(Point());
-    EXPECT_FALSE(c == d);
+TEST(CircleOperatorTests, circle_not_equals_through_origin_test)
+{
+    Circle c = Circle(Point(1, 2), 5);
+    Circle d = Circle(Point(1, 2), 3);
+    EXPECT_TRUE(c != d);
 }
 
 TEST(CircleAreaTest, circle_area_tests)
@@ -56,17 +70,23 @@ TEST(CircleAreaTest, circle_area_tests)
     EXPECT_EQ(0, zero.area());
 }
 
-TEST(CircleContainsPointTest, circle_contains_point_tests)
+TEST(CircleContainsPointTests, zero_circle_contans_point_test)
 {
     Circle zero = Circle();
     Point p     = Point(1, 1);
     EXPECT_FALSE(zero.contains(p));
     EXPECT_TRUE(zero.contains(Point()));
+}
 
+TEST(CircleContainsPointTests, circle_at_origin_contains_point_test)
+{
     Circle c = Circle(Point(), 5);
     EXPECT_FALSE(c.contains(Point(-6, -6)));
     EXPECT_TRUE(c.contains(Point(-2, 3)));
+}
 
+TEST(CircleContainsPointTests, circle_not_at_origin_contains_point_test)
+{
     Circle d = Circle(Point(-5, -5), 5);
     EXPECT_FALSE(d.contains(Point()));
     EXPECT_TRUE(d.contains(Point(-10, -5)));

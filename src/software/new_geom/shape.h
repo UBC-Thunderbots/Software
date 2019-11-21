@@ -3,10 +3,10 @@
 /**
  * A geometric figure that encloses an area in 2D space.
  */
-class IShape
+class Shape
 {
    public:
-    virtual ~IShape() = default;
+    virtual ~Shape() = default;
 
     /**
      * Determines whether the given Point is contained within this Shape.
