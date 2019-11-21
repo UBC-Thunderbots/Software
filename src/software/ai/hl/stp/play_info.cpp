@@ -2,11 +2,11 @@
 
 PlayInfo::PlayInfo() : play_type(""), play_name(""), robot_tactic_assignment({}) {}
 
-PlayInfo::PlayInfo(std::string play_type, std::string play_name, std::unordered_set<std::string> rta):
-    play_type(play_type),
-    play_name(play_name),
-    robot_tactic_assignment(rta)
-{}
+PlayInfo::PlayInfo(std::string play_type, std::string play_name,
+                   std::unordered_set<std::string> rta)
+    : play_type(play_type), play_name(play_name), robot_tactic_assignment(rta)
+{
+}
 
 std::string PlayInfo::getPlayType() const
 {

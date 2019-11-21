@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 
 /**
@@ -21,7 +21,8 @@ class PlayInfo
     /**
      * Constructs a PlayInfo object with given arguments for fields
      */
-    explicit PlayInfo(std::string play_type, std::string play_name, std::unordered_set<std::string> robots_tactic_assignment);
+    explicit PlayInfo(std::string play_type, std::string play_name,
+                      std::unordered_set<std::string> robots_tactic_assignment);
 
     /**
      * Get play type
@@ -63,4 +64,3 @@ class PlayInfo
     std::string play_name;
     std::unordered_set<std::string> robot_tactic_assignment;
 };
-
