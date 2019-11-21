@@ -96,7 +96,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             if (intent && !tactic->done())
             {
                 // Set Motion Constraints
-                auto motion_constraints = motion_constraint_manager.getMotionConstraints(world.gameState(), *tactic);
+                auto motion_constraints = motion_constraint_manager.getMotionConstraints(
+                    world.gameState(), *tactic);
                 intent->setMotionConstraints(motion_constraints);
 
                 intents.emplace_back(std::move(intent));
