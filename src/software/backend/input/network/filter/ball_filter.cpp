@@ -15,8 +15,8 @@ BallFilter::BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_siz
 {
 }
 
-void BallFilter::addNewDetectionsToBuffer(
-    std::vector<SSLBallDetection> new_ball_detections, const Field &field)
+void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
+                                          const Field &field)
 {
     // Sort the detections in increasing order before processing. This places the oldest
     // detections (with the smallest timestamp) at the front of the buffer, and the most
@@ -95,7 +95,7 @@ void BallFilter::addNewDetectionsToBuffer(
 }
 
 std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
-    boost::circular_buffer<SSLBallDetection> ball_detections,
+    boost::circular_buffer<BallDetection> ball_detections,
     const std::optional<Line> &ball_regression_line)
 {
     // Sort the detections in increasing order before processing. This places the oldest
@@ -109,8 +109,8 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
     {
         for (unsigned j = i; j < ball_detections.size(); j++)
         {
-            SSLBallDetection previous_detection = ball_detections.at(i - 1);
-            SSLBallDetection current_detection  = ball_detections.at(j);
+            BallDetection previous_detection = ball_detections.at(i - 1);
+            BallDetection current_detection  = ball_detections.at(j);
 
             Duration time_diff =
                 current_detection.timestamp - previous_detection.timestamp;
@@ -171,7 +171,7 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
 }
 
 std::optional<size_t> BallFilter::getAdjustedBufferSize(
-    boost::circular_buffer<SSLBallDetection> ball_detections)
+    boost::circular_buffer<BallDetection> ball_detections)
 {
     // Sort the detections in decreasing order before processing. This places the most
     // recent detections (with the largest timestamp) at the front of the buffer, and the
@@ -217,7 +217,7 @@ std::optional<size_t> BallFilter::getAdjustedBufferSize(
 }
 
 LinearRegressionResults BallFilter::getLinearRegressionLine(
-    boost::circular_buffer<SSLBallDetection> ball_detections)
+    boost::circular_buffer<BallDetection> ball_detections)
 {
     // Sort the detections in increasing order before processing. This places the oldest
     // detections (smallest timestamp) at the front of the buffer, and the most recent
@@ -262,7 +262,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
 }
 
 std::optional<BallState> BallFilter::estimateBallState(
-    boost::circular_buffer<SSLBallDetection> ball_detections)
+    boost::circular_buffer<BallDetection> ball_detections)
 {
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
     if (!adjusted_buffer_size)
@@ -281,7 +281,7 @@ std::optional<BallState> BallFilter::estimateBallState(
     // Linear regression cannot fit a vertical line. To get around this, we fit two lines,
     // one with x and y swapped, so any vertical line becomes horizontal. Then we take the
     // line of the two that fit the best.
-    boost::circular_buffer<SSLBallDetection> swapped_ball_detections = ball_detections;
+    boost::circular_buffer<BallDetection> swapped_ball_detections = ball_detections;
     for (auto &detection : swapped_ball_detections)
     {
         detection.position = Point(detection.position.y(), detection.position.x());
@@ -306,7 +306,7 @@ std::optional<BallState> BallFilter::estimateBallState(
     // velocity vector, and this allows us to return more stable position values since the
     // line of best fit is less likely to fluctuate compared to the raw position of a ball
     // detection
-    SSLBallDetection latest_ball_detection = ball_detections.front();
+    BallDetection latest_ball_detection = ball_detections.front();
     Point filtered_ball_position =
         closestPointOnLine(latest_ball_detection.position, regression_line);
 
@@ -334,7 +334,7 @@ std::optional<BallState> BallFilter::estimateBallState(
 }
 
 std::optional<Ball> BallFilter::getFilteredData(
-    const std::vector<SSLBallDetection> &new_ball_detections, const Field &field)
+    const std::vector<BallDetection> &new_ball_detections, const Field &field)
 {
     addNewDetectionsToBuffer(new_ball_detections, field);
 

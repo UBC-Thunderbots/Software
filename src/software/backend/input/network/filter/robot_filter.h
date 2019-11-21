@@ -14,7 +14,7 @@
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
-struct SSLRobotDetection
+struct RobotDetection
 {
     unsigned int id;
     Point position;
@@ -47,7 +47,7 @@ class RobotFilter
      * from the field if data about the robot is not received before that time
      */
     explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
-    explicit RobotFilter(SSLRobotDetection current_robot_state,
+    explicit RobotFilter(RobotDetection current_robot_state,
                          Duration expiry_buffer_duration);
 
     /**
@@ -61,7 +61,7 @@ class RobotFilter
      * @return The filtered data for the robot
      */
     std::optional<Robot> getFilteredData(
-        const std::vector<SSLRobotDetection>& new_robot_data);
+        const std::vector<RobotDetection>& new_robot_data);
 
     /**
      * Returns the id of the Robot that this filter is filtering for

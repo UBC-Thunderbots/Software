@@ -23,7 +23,7 @@ class RobotTeamFilter
      * @return The updated state of the team given the new data
      */
     Team getFilteredData(const Team& current_team_state,
-                         const std::vector<SSLRobotDetection>& new_robot_detections);
+                         const std::vector<RobotDetection>& new_robot_detections);
 
 
     // A map used to store a separate robot filter for each robot on this team, so
