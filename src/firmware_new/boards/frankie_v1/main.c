@@ -145,10 +145,10 @@ int main(void)
     while (1)
     {
         /* USER CODE END WHILE */
-            char buf[4];
+         char buf[robot_msg_size];
          //change huartX to your initialized HAL UART peripheral
-         HAL_UART_Receive(&huart3, (uint8_t *) buf, 4, 2000);
-         HAL_UART_Transmit(&huart3, buf, 4, HAL_MAX_DELAY);
+         HAL_UART_Receive(&huart3, (uint8_t *) buf, robot_msg_size, 2000);
+         HAL_UART_Transmit(&huart3, buf, robot_msg_size, HAL_MAX_DELAY);
 
         /* USER CODE BEGIN 3 */
     }

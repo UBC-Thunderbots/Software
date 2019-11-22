@@ -22,7 +22,7 @@ message robot_msg {
     }
 
     // which operator to use
-    required Operator operator = 4;
+    optional Operator operator = 4;
 }
 
 message robot_ack {

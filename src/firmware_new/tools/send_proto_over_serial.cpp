@@ -31,21 +31,49 @@ int main()
     port.open("/dev/ttyACM0");
     port.set_option(boost::asio::serial_port_base::baud_rate(115200));
 
-    char c[3];
-    char d[3];
-    c[0] = 'l';
-    c[1] = 'o';
-    c[2] = 'l';
+    // Verify that the version of the library that we linked against is
+    // compatible with the version of the headers we compiled against.
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-     //Read 1 character into c, this will block
-      // forever if no character arrives.
-      while(1){
-            std::cout<<"BEFORE WRITE: "<<c[0]<<c[1]<<c[2]<<std::endl;
-            boost::asio::write(port, boost::asio::buffer(c, 3)); 
-            std::cout<<"AFTER READ: "<<d[0]<<d[1]<<d[2]<<std::endl;
-            boost::asio::read(port, boost::asio::buffer(&d, 3));
-      }
-           port.close();
-               
+    robot_msg test_msg;
+    robot_msg ack_msg;
+    test_msg.set_timestamp(100);
+    test_msg.set_operand1(69);
+    test_msg.set_operand2(69);
+
+    // Read 1 character into c, this will block
+    // forever if no character arrives.
+    while(1){
+
+        boost::asio::streambuf b;
+        std::ostream os(&b);
+
+        // grab the size of the serialized msg, we will also be delimiting by this msg
+        int size = test_msg.ByteSizeLong();
+        char data[size];
+
+        test_msg.SerializeToArray(&data, size);
+
+        std::cerr<<"SENDING.........."<<std::endl;
+        boost::asio::write(port, boost::asio::buffer(&data, size));
+
+        char databack[size];
+
+        boost::asio::read(port, boost::asio::buffer(&databack, size));
+        ack_msg.ParseFromArray(&databack, size);
+        std::cerr<<"COMING BACK"<<ack_msg.operand1()<<ack_msg.operand2()<<std::endl;
+
+        for (int k = 0; k<size; k++){
+            std::cout<<databack[k];
+        }
+
+        std::cout<<std::endl;
+    }
+
+    port.close();
+
+    // Optional:  Delete all global objects allocated by libprotobuf.
+    google::protobuf::ShutdownProtobufLibrary();
+
     return 0;
 }
