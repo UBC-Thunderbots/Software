@@ -23,8 +23,8 @@
 #include "string.h"
 
 /* Protobuf */
-#include "external/nanopb/pb_decode.h"
 #include "external/nanopb/pb_encode.h"
+#include "external/nanopb/pb_decode.h"
 #include "firmware_new/proto/robot.pb.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -145,13 +145,10 @@ int main(void)
     while (1)
     {
         /* USER CODE END WHILE */
-        char buf[64];
-        uint8_t Rx_data[10];  //  creating a buffer of 10 bytes
-        sprintf(buf, "Value of asodijasodijasodijasd: \r\n");
-
-        // change huartX to your initialized HAL UART peripheral
-        HAL_UART_Receive(&huart3, (uint8_t *)Rx_data, 4, 2000);
-        HAL_UART_Transmit(&huart3, buf, strlen(buf), HAL_MAX_DELAY);
+            char buf[4];
+         //change huartX to your initialized HAL UART peripheral
+         HAL_UART_Receive(&huart3, (uint8_t *) buf, 4, 2000);
+         HAL_UART_Transmit(&huart3, buf, 4, HAL_MAX_DELAY);
 
         /* USER CODE BEGIN 3 */
     }

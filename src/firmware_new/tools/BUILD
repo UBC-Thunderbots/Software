@@ -29,6 +29,6 @@ sh_binary(
 cc_binary(
     name = "send_proto_over_serial",
     srcs = ["send_proto_over_serial.cpp"],
-    deps = ["@libusb//:libusb",
+    deps = ["@boost//:asio",
             "//firmware_new/proto:fw_cc_proto"],
 )
