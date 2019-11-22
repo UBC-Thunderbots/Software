@@ -156,45 +156,6 @@ TEST(FunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(
-    FunctionValidatorTest,
-    test_validation_function_with_two_loops_fails_if_loop_conditions_are_not_satisfied_in_order)
-{
-    // This validation function will only pass if the ball's x-coordinate becomes positive
-    // before the ball's y-coordinate becomes positive
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        while (world->ball().position().x() < 0)
-        {
-            yield();
-        }
-
-        while (world->ball().position().y() < 0)
-        {
-            yield();
-        }
-    };
-
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
-    FunctionValidator function_validator(validation_function, world);
-
-    world->mutableBall() = Ball(Point(-1, -1), Vector(0, 0), Timestamp::fromSeconds(0));
-    bool result          = function_validator.executeAndCheckForSuccess();
-    EXPECT_FALSE(result);
-
-    // Make the ball's y-coordinate positive before the x-coordinate
-    world->mutableBall() = Ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
-    result               = function_validator.executeAndCheckForSuccess();
-    EXPECT_FALSE(result);
-
-    world->mutableBall() = Ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
-    result               = function_validator.executeAndCheckForSuccess();
-    // Even though both conditions (x > 0 and y > 0) are met in this state, they were not
-    // met in the order the validation function wanted so the function has not succeeded /
-    // passed
-    EXPECT_FALSE(result);
-}
-
 TEST(FunctionValidatorTest, test_validation_function_with_gtest_statements)
 {
     // This shows an example of using GoogleTest statements within a validation function.
