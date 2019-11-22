@@ -195,14 +195,13 @@ TEST(
     EXPECT_FALSE(result);
 }
 
-TEST(
-        FunctionValidatorTest,
-        test_validation_function_with_gtest_statements)
+TEST(FunctionValidatorTest, test_validation_function_with_gtest_statements)
 {
     // This shows an example of using GoogleTest statements within a validation function.
-    // Just like regular unit tests, if the condition is not met the test will fail. Unfortunately
-    // we can't have an example of a failing tests since GoogleTest doesn't have a way of expecting
-    // a test to fail, so we just have an example of a passing test.
+    // Just like regular unit tests, if the condition is not met the test will fail.
+    // Unfortunately we can't have an example of a failing tests since GoogleTest doesn't
+    // have a way of expecting a test to fail, so we just have an example of a passing
+    // test.
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->gameState().isStopped())
@@ -218,7 +217,8 @@ TEST(
     world->mutableGameState().updateRefboxGameState(RefboxGameState::STOP);
     world->mutableBall() = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
 
-    for(unsigned int i = 0; i < 10; i++) {
+    for (unsigned int i = 0; i < 10; i++)
+    {
         bool result = function_validator.executeAndCheckForSuccess();
         EXPECT_FALSE(result);
     }
