@@ -92,7 +92,7 @@ cc_library(
         "//shared:constants",
         "//shared:robot_constants",
     ],
-    # This is _very_ important. If we don't do this, bazel will not compile in the
+    # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
