@@ -31,8 +31,8 @@ std::string IndirectFreeKickPlay::getName() const
 bool IndirectFreeKickPlay::isApplicable(const World &world) const
 {
     double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).len());
+        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
+                 (world.field().enemyCornerNeg() - world.ball().position()).length());
 
     // Make sure we don't interfere with the cornerkick play
     return world.gameState().isOurFreeKick() &&
@@ -99,7 +99,6 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
-    align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
@@ -111,7 +110,6 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -134,7 +132,6 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -183,11 +180,12 @@ void IndirectFreeKickPlay::updateCherryPickTactics(
 void IndirectFreeKickPlay::updateAlignToBallTactic(
     std::shared_ptr<MoveTactic> align_to_ball_tactic)
 {
-    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
+    Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-        world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
+        world.ball().position() -
+            ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_center_vec.orientation(), 0);
 }
 
@@ -216,15 +214,15 @@ void IndirectFreeKickPlay::chipAtGoalStage(
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset =
-        Util::DynamicParameters::ShootOrChipPlay::fallback_chip_target_enemy_goal_offset
-            .value();
-
+        Util::DynamicParameters->getShootOrChipPlayConfig()
+            ->FallbackChipTargetEnemyGoalOffset()
+            ->value();
     Point chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
 
     do
     {
-        double chip_dist = (chip_target - world.ball().position()).len();
+        double chip_dist = (chip_target - world.ball().position()).length();
 
         updateCreaseDefenderTactics(crease_defender_tactics);
         chip_tactic->updateWorldParams(world.ball());
@@ -266,7 +264,6 @@ void IndirectFreeKickPlay::performPassStage(
         receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
                                     world.ball());
         receiver->updateControlParams(pass);
-        receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
                                          world.friendlyTeam(), world.enemyTeam());
 
@@ -291,7 +288,6 @@ void IndirectFreeKickPlay::findPassStage(
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);

@@ -1,29 +1,29 @@
  XBoxControllerDemo:
-  robot_id:
+  RobotId:
     min: 0
     max: 16
     default: 0
     type: "int"
     description: "The ID of the robot being controller by the XBox Controller"
-  kick_speed_meters_per_second:
+  KickSpeedMetersPerSecond:
     min: 0.0
     max: 6.5
     default: 4.0
     type: "double"
     description: "The robot's kick speed in meters per second"
-  chip_distance_meters:
+  ChipDistanceMeters:
     min: 0.0
     max: 5.0
     default: 1.0
     type: "double"
     description: "How far in meters the robot will chip"
-  dribbler_rpm:
+  DribblerRpm:
     min: 0
     max: 10000
     default: 1000
     type: "int"
     description: "The RPM of the robot's dribbler when turned on"
-  linear_sensitivity:
+  LinearSensitivity:
     min: 0.0
     max: 1.0
     default: 1.0
@@ -32,7 +32,7 @@
         The amount to scale the x and y output values
         by to make the robot more or less sensitive
         to control linearly
-  angular_sensitivity:
+  AngularSensitivity:
     min: 0.0
     max: 1.0
     default: 1.0

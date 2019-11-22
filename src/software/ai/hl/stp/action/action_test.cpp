@@ -17,7 +17,8 @@ TEST(ActionTest, test_action_reports_done_at_same_time_nullptr_returned)
 
     // The first time the Action runs it will always return an Intent to make sure we
     // are doing the correct thing
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point());
+    action.updateControlParams(robot, Point());
+    auto intent_ptr = action.getNextIntent();
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
 
@@ -26,7 +27,7 @@ TEST(ActionTest, test_action_reports_done_at_same_time_nullptr_returned)
     // This is important since higher-level functionality relies on the Action::done()
     // function but returning nullptr values out of sync with this done() function could
     // cause problems
-    intent_ptr = action.updateStateAndGetNextIntent(robot, Point());
+    intent_ptr = action.getNextIntent();
     EXPECT_FALSE(intent_ptr);
     EXPECT_TRUE(action.done());
 }

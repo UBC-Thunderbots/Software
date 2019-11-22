@@ -20,7 +20,7 @@ class NoPathTestPathPlanner : public PathPlanner
      *
      * @return a vector that is {}
      */
-    Path findPath(const Point &start, const Point &destination,
-                  const Rectangle &navigable_area,
-                  const std::vector<Obstacle> &obstacles) override;
+    std::optional<Path> findPath(const Point &start, const Point &destination,
+                                 const Rectangle &navigable_area,
+                                 const std::vector<Obstacle> &obstacles) override;
 };

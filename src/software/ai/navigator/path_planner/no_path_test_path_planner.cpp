@@ -5,9 +5,9 @@
  * which returns a path consisting of no points.
  */
 
-Path NoPathTestPathPlanner::findPath(const Point &start, const Point &destination,
-                                     const Rectangle &navigable_area,
-                                     const std::vector<Obstacle> &obstacles)
+std::optional<Path> NoPathTestPathPlanner::findPath(
+    const Point &start, const Point &destination, const Rectangle &navigable_area,
+    const std::vector<Obstacle> &obstacles)
 {
-    return Path(std::nullopt);
+    return std::nullopt;
 }

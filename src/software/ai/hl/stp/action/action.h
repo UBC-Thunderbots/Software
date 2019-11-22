@@ -6,6 +6,13 @@
 #include "software/ai/intent/intent.h"
 #include "software/world/robot.h"
 
+// We forward-declare the ActionVisitor interface (pure virtual class) because we need
+// to know about the existence of this class in order to accept visitors with the
+// accept() function. We cannot use an #include statement because this creates a cyclic
+// dependency
+//
+class ActionVisitor;
+
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
 typedef boost::coroutines2::coroutine<std::unique_ptr<Intent>> IntentCoroutine;
@@ -32,9 +39,6 @@ class Action
      */
     bool done() const;
 
-    virtual ~Action() = default;
-
-   protected:
     /**
      * Runs the coroutine and get the next Intent to run from the calculateNextIntent
      * function. If the Action is not done, the next Intent is returned. If the Action
@@ -45,6 +49,16 @@ class Action
      */
     std::unique_ptr<Intent> getNextIntent();
 
+    /**
+     * Accepts a Action Visitor and calls the visit function on itself
+     *
+     * @param visitor A Action Visitor
+     */
+    virtual void accept(ActionVisitor &visitor) const = 0;
+
+    virtual ~Action() = default;
+
+   protected:
     // The coroutine that sequentially returns the Intents the Action wants to run
     IntentCoroutine::pull_type intent_sequence;
     // The robot performing this Action

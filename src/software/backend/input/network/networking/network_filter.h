@@ -10,6 +10,7 @@
 #include "software/proto/ssl_referee.pb.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/ball.h"
+#include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/world/refbox_constants.h"
 #include "software/world/team.h"
@@ -31,7 +32,7 @@ class NetworkFilter
      * @return The most up to date state of the ball given the new DetectionFrame
      * information
      */
-    Ball getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections);
+    BallState getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections);
 
     /**
      * Returns a new Field object containing the most up to date state of the field given
@@ -85,7 +86,7 @@ class NetworkFilter
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
     Field field_state;
-    Ball ball_state;
+    BallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;
 

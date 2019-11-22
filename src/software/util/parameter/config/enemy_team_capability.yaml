@@ -1,5 +1,5 @@
-EnemyCapability:
-  enemy_team_can_pass:
+EnemyCapabilityConfig:
+  EnemyTeamCanPass:
     type: "bool"
     default: true
     description: >-

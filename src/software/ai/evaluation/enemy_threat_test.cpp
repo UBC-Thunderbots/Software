@@ -300,11 +300,11 @@ TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,       true, Angle::ofDegrees(50), Angle::ofDegrees(20),
-        Point(-4, 0), 0,    std::nullopt};
+        robot1, true,        Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
+        0,      std::nullopt};
 
     auto threat2 = Evaluation::EnemyThreat{
-        robot2, false, Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0),
+        robot2, false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         1,      robot1};
 
     // Despite robot2 having better shooting and scoring opporunity, robot1 has the ball
@@ -326,11 +326,11 @@ TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,       true, Angle::ofDegrees(50), Angle::ofDegrees(20),
-        Point(-4, 0), 0,    std::nullopt};
+        robot1, true,        Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
+        0,      std::nullopt};
 
     auto threat2 = Evaluation::EnemyThreat{
-        robot2, true,  Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0),
+        robot2, true,  Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         1,      robot1};
 
     // Both robots have posession but robot2 has a better shot on the friendly goal, so
@@ -353,11 +353,11 @@ TEST(SortEnemyThreatsTest,
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,       false, Angle::ofDegrees(50), Angle::ofDegrees(20),
-        Point(-4, 0), 1,     std::nullopt};
+        robot1, false,       Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
+        1,      std::nullopt};
 
     auto threat2 = Evaluation::EnemyThreat{
-        robot2, false, Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0),
+        robot2, false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         2,      robot1};
 
     // robot1 can be reached in fewer passes, so it should be more threatening
@@ -379,14 +379,16 @@ TEST(SortEnemyThreatsTest,
                          Timestamp::fromSeconds(0));
 
     auto threat1 = Evaluation::EnemyThreat{
-        robot1,      false, Angle::ofDegrees(50), Angle::ofDegrees(20), Point(-4, 0), 2,
+        robot1,       false, Angle::fromDegrees(50), Angle::fromDegrees(20),
+        Point(-4, 0), 2,
         std::nullopt  // The passer doesn't matter since it doesn't affect the threat
                       // It's only for the use of whatever code uses these threat
                       // evaluations
     };
 
     auto threat2 = Evaluation::EnemyThreat{
-        robot2,      false, Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0), 2,
+        robot2,       false, Angle::fromDegrees(60), Angle::fromDegrees(30),
+        Point(-4, 0), 2,
         std::nullopt  // The passer doesn't matter since it doesn't affect the threat
                       // It's only for the use of whatever code uses these threat
                       // evaluations
@@ -406,7 +408,7 @@ TEST(EnemyThreatTest, no_enemies_on_field)
 
     world = ::Test::TestUtil::setBallPosition(
         world,
-        Point(world.field().friendlyGoal()) + Point(2 - ROBOT_MAX_RADIUS_METERS, 0),
+        Point(world.field().friendlyGoal()) + Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
         Timestamp::fromSeconds(0));
 
     auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
@@ -421,7 +423,7 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     Robot enemy_robot_0 =
-        Robot(0, Point(world.field().friendlyGoal()) + Point(2, 0), Vector(0, 0),
+        Robot(0, Point(world.field().friendlyGoal()) + Vector(2, 0), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Team enemy_team = Team(Duration::fromSeconds(1));
     enemy_team.updateRobots({enemy_robot_0});
@@ -429,7 +431,7 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
 
     world = ::Test::TestUtil::setBallPosition(
         world,
-        Point(world.field().friendlyGoal()) + Point(2 - ROBOT_MAX_RADIUS_METERS, 0),
+        Point(world.field().friendlyGoal()) + Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
         Timestamp::fromSeconds(0));
 
     auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
@@ -483,20 +485,20 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
 
     // Robots are positioned relative to the friendly goal
     Robot enemy_robot_1 =
-        Robot(1, world.field().friendlyGoal() + Point(1.25, 1.5), Vector(0, 0),
+        Robot(1, world.field().friendlyGoal() + Vector(1.25, 1.5), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot enemy_robot_2 =
-        Robot(2, world.field().friendlyGoal() + Point(2, -1), Vector(0, 0), Angle::half(),
-              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+        Robot(2, world.field().friendlyGoal() + Vector(2, -1), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot enemy_robot_3 =
-        Robot(3, world.field().friendlyGoal() + Point(0.4, -2), Vector(0, 0),
+        Robot(3, world.field().friendlyGoal() + Vector(0.4, -2), Vector(0, 0),
               Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Team enemy_team = Team(Duration::fromSeconds(1));
     enemy_team.updateRobots({enemy_robot_1, enemy_robot_2, enemy_robot_3});
     world.updateEnemyTeamState(enemy_team);
 
     Robot friendly_robot =
-        Robot(0, world.field().friendlyGoal() + Point(1, 0.5), Vector(0, 0),
+        Robot(0, world.field().friendlyGoal() + Vector(1, 0.5), Vector(0, 0),
               Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Team friendly_team = Team(Duration::fromSeconds(1));
     friendly_team.updateRobots({friendly_robot});
@@ -504,7 +506,7 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
 
     // Put the ball right in front of enemy 1
     world = ::Test::TestUtil::setBallPosition(
-        world, enemy_robot_1.position() + Point(-ROBOT_MAX_RADIUS_METERS, 0),
+        world, enemy_robot_1.position() + Vector(-ROBOT_MAX_RADIUS_METERS, 0),
         Timestamp::fromSeconds(0));
 
     auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),

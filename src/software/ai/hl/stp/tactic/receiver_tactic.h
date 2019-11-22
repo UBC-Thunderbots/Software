@@ -88,11 +88,6 @@ class ReceiverTactic : public Tactic
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target);
 
-    /**
-     * Accepts a Tactic Visitor and calls the visit function on itself
-     *
-     * @param visitor A Tactic Visitor
-     */
     void accept(TacticVisitor& visitor) const override;
 
    private:
@@ -102,7 +97,7 @@ class ReceiverTactic : public Tactic
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
-    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::ofDegrees(90);
+    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 

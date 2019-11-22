@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/cost_function.h"
 #include "software/test_util/test_util.h"
 
 using namespace Passing;
@@ -55,7 +55,7 @@ class PassGeneratorTest : public testing::Test
             seconds_so_far++;
 
             auto curr_pass_and_score = pass_generator->getBestPassSoFar();
-            curr_score               = curr_pass_and_score.second;
+            curr_score               = curr_pass_and_score.rating;
 
             // Run until the pass has converged with sufficient tolerance or the given
             // time has expired, whichever comes first. We also check that the score
@@ -135,7 +135,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         std::cout << pass;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
-        EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.3);
+        EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).length(), 0.3);
         EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
         EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).getSeconds()), 0.2);
     }
@@ -182,7 +182,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
     // We expect to have converged to a point near robot 1. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - robot_1.position()).len(), 0.5);
+    EXPECT_LE((converged_pass.receiverPoint() - robot_1.position()).length(), 0.5);
 }
 
 TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
@@ -234,7 +234,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     // We expect to have converged to a point near robot 2. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).len(), 0.6);
+    EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).length(), 0.6);
 }
 
 TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
@@ -283,12 +283,12 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     auto converged_pass_and_score = pass_generator->getBestPassSoFar();
-    auto converged_pass           = converged_pass_and_score.first;
+    auto converged_pass           = converged_pass_and_score.pass;
 
     // We expect to have converged to a point near the robot in +y. The tolerance is
     // fairly generous here because the enemies on the field can "force" the point
     // slightly away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - pos_y_friendly.position()).len(), 0.5);
+    EXPECT_LE((converged_pass.receiverPoint() - pos_y_friendly.position()).length(), 0.5);
 
     // Set the passer point so that the only reasonable pass is to the robot
     // on the -y side
@@ -299,12 +299,12 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     converged_pass_and_score = pass_generator->getBestPassSoFar();
-    converged_pass           = converged_pass_and_score.first;
+    converged_pass           = converged_pass_and_score.pass;
 
     // We expect to have converged to a point near the robot in +y. The tolerance is
     // fairly generous here because the enemies on the field can "force" the point
     // slightly away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - neg_y_friendly.position()).len(), 0.5);
+    EXPECT_LE((converged_pass.receiverPoint() - neg_y_friendly.position()).length(), 0.5);
 }
 
 TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_region)

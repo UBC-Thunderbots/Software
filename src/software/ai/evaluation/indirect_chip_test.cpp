@@ -6,9 +6,9 @@
 
 #include <gtest/gtest.h>
 
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
 #include "software/geom/util.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 
@@ -22,7 +22,7 @@ TEST(findTargetPointForIndirectChipAndChaseTest,
     Point ball_position = Point(0, 0);
 
     Point target = Point(0, (-1 + sqrt(0.75) - 1) / 3);
-    target       = target.norm((target - ball_position).len() * 0.85);
+    target = Point(target.toVector().normalize((target - ball_position).length() * 0.85));
 
     EXPECT_EQ(target, Evaluation::findTargetPointForIndirectChipAndChase(triangles,
                                                                          ball_position));
@@ -39,8 +39,8 @@ TEST(findTargetPointForIndirectChipAndChaseTest,
     Point ball_position = Point(0, 0);
 
     Point target = Point(25.4 / 3, 17.8 / 3);
-    target       = target.norm((target - ball_position).len() * 0.85);
-    target       = ball_position + (target - ball_position).norm(8.0);
+    target = Point(target.toVector().normalize((target - ball_position).length() * 0.85));
+    target = ball_position + (target - ball_position).normalize(8.0);
 
     EXPECT_EQ(std::optional(target), Evaluation::findTargetPointForIndirectChipAndChase(
                                          triangles, ball_position));
@@ -97,11 +97,12 @@ TEST(findOpenTrianglesTest, find_open_triangles_test)
 
     LegacyTriangle adjusted_triangle = {
         (Point(-1, -1) +
-         (Point(0, (-1 + sqrt(0.75) - 1) / 3) - Point(-1, -1)).norm(2.5 * 0.09)),
+         (Point(0, (-1 + sqrt(0.75) - 1) / 3) - Point(-1, -1)).normalize(2.5 * 0.09)),
         (Point(0, sqrt(0.75)) +
-         (Point(0, (-1 + sqrt(0.75) - 1) / 3) - Point(0, sqrt(0.75))).norm(2.5 * 0.09)),
+         (Point(0, (-1 + sqrt(0.75) - 1) / 3) - Point(0, sqrt(0.75)))
+             .normalize(2.5 * 0.09)),
         (Point(1, -1) +
-         (Point(0, (-1 + sqrt(0.75) - 1) / 3) - Point(1, -1)).norm(2.5 * 0.09))};
+         (Point(0, (-1 + sqrt(0.75) - 1) / 3) - Point(1, -1)).normalize(2.5 * 0.09))};
 
     std::vector<LegacyTriangle> open_triangles;
     open_triangles.emplace_back(adjusted_triangle);
