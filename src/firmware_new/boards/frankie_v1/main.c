@@ -94,7 +94,8 @@ uint8_t bytemod;
 uint8_t bytepos = 0;
 uint8_t recv_buf[robot_msg_size];
 uint8_t send_buf[robot_ack_size];
-volatile bool msg_ready;
+volatile bool msg_recieved = false;
+volatile bool msg_sent = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -158,25 +159,32 @@ int main(void)
     {
 
         // TODO change this to be interrupt based, for now we just block forever
-        robot_msg incoming_req = robot_msg_init_zero;
-        robot_ack outgoing_msg = robot_ack_init_zero;
 
-        // Create a stream that reads from the buffer. 
-        pb_istream_t in_stream = pb_istream_from_buffer(recv_buf, robot_msg_size);
+        if (msg_recieved && !msg_sent) {
+            robot_msg incoming_req = robot_msg_init_zero;
+            robot_ack outgoing_msg = robot_ack_init_zero;
 
-        // if we could decode it sucessfully, then return then return back the computation
-        if (pb_decode(&in_stream, robot_msg_fields, &incoming_req))
-        {
-            outgoing_msg.ack_timestamp = incoming_req.timestamp;
-            outgoing_msg.result = 200;
-            pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);
+            // Create a stream that reads from the buffer. 
+            pb_istream_t in_stream = pb_istream_from_buffer(recv_buf, robot_msg_size);
 
-            if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {
+            // if we could decode it sucessfully, then return then return back the computation
+            if (pb_decode(&in_stream, robot_msg_fields, &incoming_req))
+            {
+                outgoing_msg.ack_timestamp = incoming_req.timestamp;
+                outgoing_msg.result = incoming_req.operand1 + incoming_req.operand2;
+                pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);
+
+                if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {
+
+                }
+                HAL_UART_Transmit(&huart3, send_buf, robot_ack_size, HAL_MAX_DELAY);
+            /*HAL_UART_Transmit(&huart3, recv_buf, robot_msg_size, 1000);*/
+            msg_recieved = false;
+            msg_sent = true;
 
             }
-            HAL_UART_Transmit(&huart3, send_buf, robot_ack_size, HAL_MAX_DELAY);
         }
-
+    
         /* USER CODE BEGIN 3 */
     }
     /* USER CODE END 3 */
@@ -429,12 +437,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART3)
     {
-        if (bytepos != robot_msg_size) {
-            recv_buf[bytepos] = byte;
+        if (bytepos < robot_msg_size) {
+            recv_buf[bytepos++] = byte;
+            /*HAL_UART_Transmit(&huart3, &bytepos, 1, 100);*/
             HAL_UART_Receive_IT(&huart3, &byte, 1);
-            bytepos++;
         } else {
-            msg_ready = true;
+            /* transmit one byte with 100 ms timeout */
+            /*HAL_UART_Transmit(&huart3, &byte, 1, 100);*/
+            /*[>HAL_UART_Receive_IT(&huart3, &byte, 1);<]*/
+            msg_recieved = true;
             bytepos = 0;
         }
     }

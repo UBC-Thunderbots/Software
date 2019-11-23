@@ -33,9 +33,9 @@ int main()
 
     char c[3];
     char d[3];
-    c[0] = 'c';
-    c[1] = 'a';
-    c[2] = 't';
+    c[0] = 'u';
+    c[1] = 'u';
+    c[2] = 'u';
 
     // Verify that the version of the library that we linked against is
     // compatible with the version of the headers we compiled against.
@@ -44,40 +44,45 @@ int main()
     robot_msg test_msg;
     robot_ack ack_msg;
     test_msg.set_timestamp(100);
-    test_msg.set_operand1(1);
-    test_msg.set_operand2(1);
+    test_msg.set_operand1(100);
+    test_msg.set_operand2(62);
 
     // Read 1 character into c, this will block
     // forever if no character arrives.
     while (1)
     {
-         boost::asio::streambuf b;
-         std::ostream os(&b);
+		 boost::asio::streambuf b;
+		 std::ostream os(&b);
 
-        // grab the size of the serialized msg, we will also be delimiting by this msg
-         int size = test_msg.ByteSizeLong();
-         int size2 = ack_msg.ByteSizeLong();
-         char data[size];
-         char databack[size2];
+		// grab the size of the serialized msg, we will also be delimiting by this msg
+		 int outsize = 35;
+		 int insize = 22;
+		 char outdata[outsize];
+		 char indata[insize];
+         char test;
 
-         test_msg.SerializeToArray(&data, size);
+		 test_msg.SerializeToArray(&outdata, outsize);
 
-         std::cerr<<"SENDING"<<std::endl;
+		 std::cerr<<"SENDING.........."<<std::endl;
+		 boost::asio::write(port, boost::asio::buffer(&outdata, outsize));
 
-         boost::asio::write(port, boost::asio::buffer(&size, 4));
-         boost::asio::read(port, boost::asio::buffer(&databack, size2));
+         for (int i = 0; i < 22; i++){
+		    boost::asio::read(port, boost::asio::buffer(&test, 1));
+            std::cerr<<i<<":"<<test<<std::endl;
+            indata[i] = test;
+         }
 
-         boost::asio::write(port, boost::asio::buffer(&data, size));
-         boost::asio::read(port, boost::asio::buffer(&databack, size2));
+		 ack_msg.ParseFromArray(&indata, insize);
+		 std::cerr<<"COMING BACK"<<ack_msg.result()<<std::endl;
 
-         ack_msg.ParseFromArray(&databack, size2);
-         std::cerr<<"COMING BACK"<<ack_msg.result()<<std::endl;
-
-        //std::cout << "BEFORE WRITE: " << c[0] << std::endl;
-        //boost::asio::write(port, boost::asio::buffer(c, 1));
-        //boost::asio::read(port, boost::asio::buffer(&d, 1));
-        //std::cout << "AFTER READ: " << d[0]<<std::endl;
+        //std::cout << "BEFORE WRITE: " << c[0] << c[1] << c[2] << std::endl;
+        //boost::asio::write(port, boost::asio::buffer(c, 3));
+        //boost::asio::read(port, boost::asio::buffer(&d, 3));
+        //std::cout << "AFTER READ: " << d[0] << d[1] << d[2] << std::endl;
     }
+
+    port.close();
+
     // Optional:  Delete all global objects allocated by libprotobuf.
     google::protobuf::ShutdownProtobufLibrary();
 
