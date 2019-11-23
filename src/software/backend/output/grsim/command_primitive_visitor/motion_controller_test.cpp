@@ -450,10 +450,10 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_tes
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
-        RobotState tempRobo = RobotState(
+        RobotState temp_robo = RobotState(
             Point(new_x_position, new_y_position), robot_velocities.linear_velocity,
             robot.orientation(), robot_velocities.angular_velocity, current_time);
-        robot.updateCurrentState(tempRobo);
+        robot.updateCurrentState(temp_robo);
     }
 
 
@@ -496,10 +496,10 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_negative_y_position_tes
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
 
-        RobotState tempRobo = RobotState(
+        RobotState temp_robo = RobotState(
             Point(new_x_position, new_y_position), robot_velocities.linear_velocity,
             robot.orientation(), robot_velocities.angular_velocity, current_time);
-        robot.updateCurrentState(tempRobo);
+        robot.updateCurrentState(temp_robo);
     }
 
     EXPECT_NEAR(robot.position().x(), destination.x(), POSITION_TOLERANCE);
@@ -766,7 +766,7 @@ TEST_F(MotionControllerTest, positive_rotation_position_test)
             robot.orientation() +
             Angle::fromRadians(robot.angularVelocity().toRadians() * delta_time);
 
-        Robot tempRobo =
+        Robot temp_robo =
             Robot(4, robot.position(), robot_velocities.linear_velocity, new_orientation,
                   robot_velocities.angular_velocity, current_time);
         robot.updateCurrentState(robot.position(), robot_velocities.linear_velocity,

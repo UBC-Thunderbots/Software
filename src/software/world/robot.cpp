@@ -11,7 +11,7 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const std::set<RobotCapabilities::Capability> &capabilities)
     : id_(id), states_(history_size), capabilities_(capabilities)
 {
-    if (history_size <= 0)
+    if (history_size < 1)
     {
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
