@@ -22,8 +22,6 @@
  */
 static void direct_wheels_init(void) {}
 
-static float dribbler_speed;
-
 /**
  * \brief Starts a movement of this type.
  *
@@ -40,7 +38,7 @@ static void direct_wheels_start(const primitive_params_t *params)
     {
         wheels_drive(i, params->params[i]);
     }
-    dribbler_speed = (params->extra) * 300;
+    dribbler_set_speed((params->extra) * 300);
 }
 
 /**
@@ -63,9 +61,8 @@ static void direct_wheels_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void direct_wheels_tick(log_record_t *UNUSED(log), World* world)
+static void direct_wheels_tick(log_record_t *UNUSED(log), World world)
 {
-    Dribbler__setSpeed(Robot__getDribbler(World__getRobot(world)), dribbler_speed);
     // Nothing to do here; the PWM values are sent to the wheels as soon as
     // they are received from the radio.
 }
