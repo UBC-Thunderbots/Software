@@ -18,11 +18,8 @@ class DribbleAction : public Action
      *
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
-     * @param loop_forever If true, continuously new DribbleIntents even after we have
-     * reached our goal
      */
-    explicit DribbleAction(double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
-                           bool loop_forever              = false);
+    explicit DribbleAction(double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -51,5 +48,4 @@ class DribbleAction : public Action
     bool small_kick_allowed;
 
     double close_to_dest_threshold;
-    bool loop_forever;
 };

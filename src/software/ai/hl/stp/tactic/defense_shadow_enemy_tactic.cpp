@@ -61,7 +61,7 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
 {
     MoveAction move_action = MoveAction();
     StopAction stop_action =
-        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
+        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
     do
     {
         if (!enemy_threat)

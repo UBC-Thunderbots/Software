@@ -56,7 +56,7 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     if (patrol_points.empty())
     {
-        StopAction stop_action = StopAction(false, true);
+        StopAction stop_action = StopAction(false);
         do
         {
             LOG(WARNING) << "Running a Patrol Tactic with no patrol points" << std::endl;

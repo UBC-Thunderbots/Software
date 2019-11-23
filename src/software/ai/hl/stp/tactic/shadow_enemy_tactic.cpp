@@ -61,7 +61,7 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     MoveAction move_action = MoveAction(0, Angle(), false);
     StopAction stop_action =
-        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
+        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
     do
     {
         if (!enemy_threat)
