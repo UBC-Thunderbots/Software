@@ -12,7 +12,6 @@
 // accept() function. We cannot use an #include statement because this creates a cyclic
 // dependency
 //
-// This class can be found in ai/hl/stp/tactic/tactic_visitor.h
 class TacticVisitor;
 
 /**
