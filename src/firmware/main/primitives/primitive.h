@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#include "app/world.h"
 #include "util/log.h"
 
 /**
@@ -79,14 +78,13 @@ typedef struct
      *
      * \param[out] log the log record to fill with information about the tick,
      * or \c NULL if no record is to be filled
-     * \param[in] world an object representing the world
      */
-    void (*tick)(log_record_t *log, World world);
+    void (*tick)(log_record_t *log);
 } primitive_t;
 
 void primitive_init(void);
 void primitive_start(unsigned int primitive, const primitive_params_t *params);
-void primitive_tick(log_record_t *log, World world);
+void primitive_tick(log_record_t *log);
 bool primitive_is_direct(unsigned int primitive);
 unsigned int get_primitive_index();
 bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params);

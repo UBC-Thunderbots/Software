@@ -93,10 +93,9 @@ static void spin_end(void) {}
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
  */
 
-static void spin_tick(log_record_t *log, World world)
+static void spin_tick(log_record_t *log)
 {
     dr_data_t now;
     dr_get(&now);

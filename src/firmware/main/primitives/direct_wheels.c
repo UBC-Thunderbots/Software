@@ -59,9 +59,8 @@ static void direct_wheels_end(void)
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
  */
-static void direct_wheels_tick(log_record_t *UNUSED(log), World world)
+static void direct_wheels_tick(log_record_t *UNUSED(log))
 {
     // Nothing to do here; the PWM values are sent to the wheels as soon as
     // they are received from the radio.

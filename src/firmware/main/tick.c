@@ -46,7 +46,6 @@
 #include <task.h>
 #include <unused.h>
 
-#include "app/world.h"
 #include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
@@ -73,16 +72,6 @@ static bool shutdown = false;
 static void normal_task(void *UNUSED(param))
 {
     TickType_t last_wake = xTaskGetTickCount();
-
-    Ball ball       = {};
-    Chicker chicker = {};
-    Robot robot     = {
-        .chicker = chicker,
-    };
-    World world = {
-        .ball  = ball,
-        .robot = robot,
-    };
 
     while (!__atomic_load_n(&shutdown, __ATOMIC_RELAXED))
     {
@@ -117,7 +106,7 @@ static void normal_task(void *UNUSED(param))
         hall_tick();
         encoder_tick();
 
-        primitive_tick(record, world);
+        primitive_tick(record);
         wheels_tick(record);
         dribbler_tick(record);
         charger_tick();

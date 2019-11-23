@@ -182,9 +182,8 @@ static void shoot_end(void)
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
  */
-static void shoot_tick(log_record_t *log, World world)
+static void shoot_tick(log_record_t *log)
 {
     printf("Shoot tick called.\n");
     dr_data_t states;
