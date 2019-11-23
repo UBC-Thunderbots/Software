@@ -41,7 +41,7 @@ else
     echo -n $AUTO_INSTALL_XML > auto-install.xml
 
     # create script to cd and run STM32CubeMX
-    STM32_SCRIPT="pushd $CUBEMX_TMP_DIR && cd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd"
+    STM32_SCRIPT="pushd . && cd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd"
 
     echo -n $STM32_SCRIPT > cuberunner.sh
     
