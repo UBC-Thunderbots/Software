@@ -136,7 +136,7 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while (!move_action.done());
 }
 
-void ShadowEnemyTactic::accept(TacticVisitor &visitor) const
+void ShadowEnemyTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

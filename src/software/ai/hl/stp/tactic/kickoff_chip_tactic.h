@@ -21,5 +21,5 @@ class KickoffChipTactic : public ChipTactic
 
     std::string getName() const override;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(TacticVisitor& visitor) override;
 };

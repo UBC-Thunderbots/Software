@@ -50,7 +50,7 @@ void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while (!chip_action.done());
 }
 
-void ChipTactic::accept(TacticVisitor &visitor) const
+void ChipTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

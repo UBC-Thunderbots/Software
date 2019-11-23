@@ -31,7 +31,7 @@ void StopTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while (!stop_action.done());
 }
 
-void StopTactic::accept(TacticVisitor &visitor) const
+void StopTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

@@ -43,24 +43,24 @@ class TacticVisitor
      *
      * @param tactic The tactic to visit
      */
-    virtual void visit(const CherryPickTactic &tactic)         = 0;
-    virtual void visit(const ShadowFreekickerTactic &tactic) = 0;
-    virtual void visit(const GoalieTactic &tactic) = 0;
-    virtual void visit(const CreaseDefenderTactic &tactic) = 0;
-    virtual void visit(const ShadowEnemyTactic &tactic) = 0;
-    virtual void visit(const BlockShotPathTactic &tactic) = 0;
-    virtual void visit(const MoveTactic &tactic) = 0;
-    virtual void visit(const ChipTactic &tactic) = 0;
-    virtual void visit(const KickoffChipTactic &tactic)        = 0;
-    virtual void visit(const StopTactic &tactic) = 0;
-    virtual void visit(const PenaltyKickTactic &tactic) = 0;
-    virtual void visit(const PenaltySetupTactic &tactic)       = 0;
-    virtual void visit(const ReceiverTactic &tactic) = 0;
-    virtual void visit(const PatrolTactic &tactic) = 0;
-    virtual void visit(const ShootGoalTactic &tactic) = 0;
-    virtual void visit(const PasserTactic &tactic) = 0;
-    virtual void visit(const GrabBallTactic &tactic) = 0;
-    virtual void visit(const MoveTestTactic &tactic) = 0;
-    virtual void visit(const StopTestTactic &tactic) = 0;
-    virtual void visit(const DefenseShadowEnemyTactic &tactic) = 0;
+    virtual void visit(CherryPickTactic &tactic) = 0;
+    virtual void visit(ShadowFreekickerTactic &tactic) = 0;
+    virtual void visit(GoalieTactic &tactic) = 0;
+    virtual void visit(CreaseDefenderTactic &tactic) = 0;
+    virtual void visit(ShadowEnemyTactic &tactic) = 0;
+    virtual void visit(BlockShotPathTactic &tactic) = 0;
+    virtual void visit(MoveTactic &tactic) = 0;
+    virtual void visit(ChipTactic &tactic) = 0;
+    virtual void visit(KickoffChipTactic &tactic) = 0;
+    virtual void visit(StopTactic &tactic) = 0;
+    virtual void visit(PenaltyKickTactic &tactic) = 0;
+    virtual void visit(PenaltySetupTactic &tactic) = 0;
+    virtual void visit(ReceiverTactic &tactic) = 0;
+    virtual void visit(PatrolTactic &tactic) = 0;
+    virtual void visit(ShootGoalTactic &tactic) = 0;
+    virtual void visit(PasserTactic &tactic) = 0;
+    virtual void visit(GrabBallTactic &tactic) = 0;
+    virtual void visit(MoveTestTactic &tactic) = 0;
+    virtual void visit(StopTestTactic &tactic) = 0;
+    virtual void visit(DefenseShadowEnemyTactic &tactic) = 0;
 };

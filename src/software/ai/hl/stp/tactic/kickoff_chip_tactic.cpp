@@ -15,7 +15,7 @@ std::string KickoffChipTactic::getName() const
     return "Kickoff Chip Tactic";
 }
 
-void KickoffChipTactic::accept(TacticVisitor &visitor) const
+void KickoffChipTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

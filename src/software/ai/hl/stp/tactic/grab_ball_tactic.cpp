@@ -96,7 +96,7 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while (true);
 }
 
-void GrabBallTactic::accept(TacticVisitor &visitor) const
+void GrabBallTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

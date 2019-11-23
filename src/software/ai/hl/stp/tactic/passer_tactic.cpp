@@ -90,7 +90,7 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
              ball.velocity().length() < 0.5);
 }
 
-void PasserTactic::accept(TacticVisitor& visitor) const
+void PasserTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

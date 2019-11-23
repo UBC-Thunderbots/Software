@@ -61,7 +61,7 @@ class GoalieTactic : public Tactic
      */
     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
                                                    Rectangle goalie_restricted_area);
-    void accept(TacticVisitor &visitor) const override;
+    void accept(TacticVisitor &visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;

@@ -88,7 +88,7 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while (true);
 }
 
-void PatrolTactic::accept(TacticVisitor &visitor) const
+void PatrolTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

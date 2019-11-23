@@ -2,9 +2,11 @@
 
 #include <gtest/gtest.h>
 
+#include "shared/constants.h"
+#include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/intent/move_intent.h"
 #include "software/geom/util.h"
 #include "software/test_util/test_util.h"
-#include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 
 //add cherry pick tactic test
 
@@ -17,11 +19,11 @@ TEST(TacticUpdateVisitorTest, update_chip_tactic)
     world2 = ::Test::TestUtil::setBallPosition(world2, Point(1,0), Timestamp::fromSeconds(0));
     ChipTactic tactic = ChipTactic(world1.ball());
 
-    EQUAL_TRUE(tactic.calculateRobotCost(robot, world1) != 0);
+    EXPECT_NE(tactic.calculateRobotCost(robot, world1), 0.0);
 
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world2);
-    visitor.visit(tactic);
-    EQUAL_TRUE(tactic.calculateRobotCost(robot, world2) == 0);
+    tactic.accept(visitor);
+    EXPECT_EQ(tactic.calculateRobotCost(robot, world2), 0.0);
 }
 
 TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
@@ -38,7 +40,7 @@ TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
     Timestamp::fromSeconds(0));
 
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
-    visitor.visit(tactic);
+    tactic.accept(visitor);
 
 
     Robot friendly_robot = Robot(0, Point(-2, 0), Vector(0, 0), Angle::zero(),
@@ -67,7 +69,7 @@ TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
 }
 
 TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
-    {
+{
     Robot enemy_robot(1, Point(0, 0), Vector(0, 0), Angle::zero(),
                       AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -79,13 +81,14 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
     Team enemy_team    = Team(Duration::fromSeconds(1), {enemy_robot});
     Team friendly_team = Team(Duration::fromSeconds(1), {friendly_robot});
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
+
     World world = World(field, ball, friendly_team, enemy_team, 20);
 
     DefenseShadowEnemyTactic tactic =
             DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true);
     tactic.updateRobot(friendly_robot);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
-    visitor.visit(tactic);
+    tactic.accept(visitor);
     tactic.updateControlParams(enemy_threat);
 
     auto intent_ptr = tactic.getNextIntent();
@@ -97,7 +100,7 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
         EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::zero()),
-                Angle::ofDegrees(1));
+                Angle::fromDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AutokickType::AUTOCHIP);
     }
     catch (std::bad_cast &)
@@ -113,7 +116,36 @@ TEST(TacticUpdateVisitorTest, update_goalie_tactic)
 
 TEST(TacticUpdateVisitorTest, update_grab_ball_tactic)
 {
-//add grabball test
+    World blank_world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    world =
+    ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    world = ::Test::TestUtil::setBallVelocity(world, Vector(0.5, 0),
+                                              Timestamp::fromSeconds(0));
+
+    Robot friendly_robot = Robot(0, Point(2, -1), Vector(0, 0), Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    world.mutableFriendlyTeam().updateRobots({friendly_robot});
+
+    GrabBallTactic tactic =
+            GrabBallTactic(blank_world.field(), blank_world.ball(), blank_world.enemyTeam(), true);
+    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+    tactic.accept(visitor);
+    tactic.updateRobot(friendly_robot);
+    auto intent_ptr = tactic.getNextIntent();
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_TRUE(intent_ptr);
+
+    try
+    {
+        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
+        EXPECT_TRUE(move_intent.getDestination().isClose(Point(2, 0), 0.05));
+    }
+    catch (...)
+    {
+        ADD_FAILURE() << "MoveIntent was not returned by the GrabBallTactic!";
+    }
 }
 
 TEST(TacticUpdateVisitorTest, update_passer_tactic)
@@ -146,14 +178,16 @@ TEST(TacticUpdateVisitorTest, update_receiver_tactic)
 
     tactic.updateRobot(receiver);
 
+    World world = World(field, ball, friendly_team, enemy_team, 20);
+
     // Since we're already setup to receive the pass, we should just be trying to move
     // to our current position. We should continue to yield new Move Intents even though
     // we're at the target position
     for (int i = 0; i < 5; i++)
     {
         TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
-        visitor.visit(tactic);
-        tactic.updateWorldParams(friendly_team, enemy_team, ball);
+        tactic.accept(visitor);
+        //tactic.updateWorldParams(friendly_team, enemy_team, ball);
         tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
@@ -185,8 +219,9 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
     ShadowEnemyTactic tactic =
             ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
     tactic.updateRobot(friendly_robot);
+    World world = World(field, ball, friendly_team, enemy_team, 20);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
-    visitor.visit(tactic);
+    tactic.accept(visitor);
     //tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat, 0.5);
 
@@ -199,7 +234,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
         EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::zero()),
-                Angle::ofDegrees(1));
+                Angle::fromDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == NONE);
     }
     catch (...)
@@ -210,7 +245,55 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
 
 TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
 {
-//add shadow freekicker
+    World blank_world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    world       = ::Test::TestUtil::setEnemyRobotPositions(
+            world, {0, Point(world.field().friendlyCornerPos().y(), 0)},
+            Timestamp::fromSeconds(0));
+    world = ::Test::TestUtil::setBallPosition(
+            world, Point(-0.09, world.field().friendlyCornerPos().y() - 0.09),
+            Timestamp::fromSeconds(0));
+    world =
+    ::Test::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+
+    Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    world.mutableFriendlyTeam().updateRobots({friendly_robot});
+
+    ShadowFreekickerTactic tactic =
+            ShadowFreekickerTactic(ShadowFreekickerTactic::RIGHT, blank_world.enemyTeam(),
+                                   blank_world.ball(), blank_world.field(), false);
+    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+    tactic.accept(visitor);
+    tactic.updateRobot(friendly_robot);
+
+    auto intent_ptr = tactic.getNextIntent();
+
+    ASSERT_TRUE(intent_ptr);
+
+    try
+    {
+        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
+        // The edge of the robot should be slightly more than 0.5m from the ball
+        EXPECT_NEAR((world.ball().position() - move_intent.getDestination()).length(),
+        0.62, 0.05);
+
+        // The robot should be just to the right of the line between the friendly net and
+        // the ball (from the POV of the friendly net)
+        Line ball_to_net_line =
+                Line(world.ball().position(), world.field().friendlyGoal());
+        EXPECT_NEAR(dist(ball_to_net_line, move_intent.getDestination()), 0.09, 0.01);
+        Angle goal_to_ball_angle =
+                (world.ball().position() - world.field().friendlyGoal()).orientation();
+        Angle goal_to_dest_angle =
+                (move_intent.getDestination() - world.field().friendlyGoal()).orientation();
+        EXPECT_LT(goal_to_dest_angle, goal_to_ball_angle);
+    }
+    catch (std::bad_cast &)
+    {
+        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
+    }
+
 }
 
 TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
@@ -227,7 +310,7 @@ TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
                             world.ball(), Angle::zero(), std::nullopt, false);
     tactic.updateRobot(robot);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
-    visitor.visit(tactic);
+    tactic.accept(visitor);
     //tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
     //        world.ball());
 

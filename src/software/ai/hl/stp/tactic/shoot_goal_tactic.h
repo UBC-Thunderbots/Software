@@ -73,7 +73,7 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(TacticVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

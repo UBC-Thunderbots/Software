@@ -42,7 +42,7 @@ void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while (!move_action.done());
 }
 
-void MoveTactic::accept(TacticVisitor &visitor) const
+void MoveTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

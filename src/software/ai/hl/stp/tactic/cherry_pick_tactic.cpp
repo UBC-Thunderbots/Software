@@ -52,7 +52,7 @@ void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (true);
 }
 
-void CherryPickTactic::accept(TacticVisitor& visitor) const
+void CherryPickTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

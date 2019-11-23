@@ -62,7 +62,7 @@ void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (!move_action.done());
 }
 
-void BlockShotPathTactic::accept(TacticVisitor& visitor) const
+void BlockShotPathTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }
