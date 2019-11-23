@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 
 class Circle final
 {
@@ -35,19 +35,16 @@ class Circle final
     /**
      * Creates a circle with origin (0, 0) and radius 0.
      */
-    inline explicit constexpr Circle() : radius(0) {}
+    inline explicit Circle() : radius(0) {}
 
-    inline explicit constexpr Circle(const Point& origin, double r)
-        : origin(origin), radius(r)
-    {
-    }
+    inline explicit Circle(const Point& origin, double r) : origin(origin), radius(r) {}
 
-    inline constexpr bool operator==(const Circle& p)
+    inline bool operator==(const Circle& p)
     {
         return this->origin == p.origin && this->radius == p.radius;
     }
 
-    inline constexpr bool operator!=(const Circle& p)
+    inline bool operator!=(const Circle& p)
     {
         return this->origin != p.origin || this->radius != p.radius;
     }

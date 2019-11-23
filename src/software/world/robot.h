@@ -4,11 +4,13 @@
 #include <vector>
 
 #include "boost/circular_buffer.hpp"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/angular_velocity.h"
+#include "software/new_geom/point.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 
+using RobotId = unsigned int;
 /**
  * Defines an SSL robot
  */
@@ -28,11 +30,11 @@ class Robot
      * state
      * @param history_duration The number of previous robot states that should be stored.
      */
-    explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
+    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp, unsigned int history_duration = 20,
-                   const RobotCapabilityFlags &capabilities =
-                       RobotCapabilityFlags::allCapabilities());
+                   const std::set<RobotCapabilities::Capability> &capabilities =
+                       RobotCapabilities::allCapabilities());
 
     /**
      * Updates the state of the robot.
@@ -91,7 +93,7 @@ class Robot
      *
      * @return the id of the robot
      */
-    unsigned int id() const;
+    RobotId id() const;
 
     /**
      * Returns the current position of the robot
@@ -249,14 +251,14 @@ class Robot
      *
      * @return the hardware capabilities of the robot
      */
-    const RobotCapabilityFlags &getRobotCapabilities() const;
+    const std::set<RobotCapabilities::Capability> &getRobotCapabilities() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
      *
      * @return the mutable hardware capabilities of the robot
      */
-    RobotCapabilityFlags &getMutableRobotCapabilities();
+    std::set<RobotCapabilities::Capability> &getMutableRobotCapabilities();
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -313,7 +315,7 @@ class Robot
                                 const Timestamp &timestamp);
 
     // The id of this robot
-    unsigned int id_;
+    RobotId id_;
     // All previous positions of the robot, with the most recent position at the front of
     // the queue, coordinates in meters
     boost::circular_buffer<Point> positions_;
@@ -331,5 +333,5 @@ class Robot
     boost::circular_buffer<Timestamp> last_update_timestamps;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
-    RobotCapabilityFlags capabilities_;
+    std::set<RobotCapabilities::Capability> capabilities_;
 };

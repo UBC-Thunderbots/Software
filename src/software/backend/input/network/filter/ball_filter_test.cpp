@@ -62,7 +62,8 @@ class BallFilterTest : public ::testing::Test
         unsigned int num_steps_to_ignore)
     {
         Point ball_starting_position = ball_trajectory.getRayStart();
-        Vector ball_velocity = ball_trajectory.toVector().norm(ball_velocity_magnitude);
+        Vector ball_velocity =
+            ball_trajectory.toVector().normalize(ball_velocity_magnitude);
         Duration max_ball_travel_duration =
             Duration::fromSeconds(std::numeric_limits<double>::max());
 
@@ -104,7 +105,7 @@ class BallFilterTest : public ::testing::Test
                                     unsigned int num_steps_to_ignore)
     {
         Point ball_starting_position = ball_path.getSegStart();
-        Vector ball_velocity         = ball_path.toVector().norm(ball_velocity_magnitude);
+        Vector ball_velocity = ball_path.toVector().normalize(ball_velocity_magnitude);
         // Check for division by 0
         if (ball_velocity_magnitude == 0)
         {
@@ -169,8 +170,8 @@ class BallFilterTest : public ::testing::Test
         {
             // Generate the noise that will be added to the position and time step to
             // simulate imperfect data
-            Point position_noise(position_noise_distribution(random_generator),
-                                 position_noise_distribution(random_generator));
+            Vector position_noise(position_noise_distribution(random_generator),
+                                  position_noise_distribution(random_generator));
             Duration time_step_noise =
                 Duration::fromSeconds(time_step_noise_distribution(random_generator));
 
@@ -189,7 +190,7 @@ class BallFilterTest : public ::testing::Test
             Duration time_diff = current_timestamp - start_time;
             Point current_ball_position =
                 ball_starting_position +
-                ball_velocity.norm(ball_velocity.len() * time_diff.getSeconds());
+                ball_velocity.normalize(ball_velocity.length() * time_diff.getSeconds());
 
             // Apply noise to the ball's position to simulate measurement noise
             Point ball_position_with_noise = current_ball_position + position_noise;
@@ -208,7 +209,7 @@ class BallFilterTest : public ::testing::Test
 
             ASSERT_TRUE(filtered_ball);
             double ball_position_difference =
-                (filtered_ball->position() - current_ball_position).len();
+                (filtered_ball->position() - current_ball_position).length();
             EXPECT_LT(ball_position_difference, expected_position_tolerance);
             // Only check the velocity once we have more than 1 data entry in the filter
             // since the filter can't return a realistic velocity with only a single
@@ -224,8 +225,8 @@ class BallFilterTest : public ::testing::Test
                 EXPECT_LE(velocity_orientation_difference,
                           expected_velocity_angle_tolerance.toDegrees());
                 // Check the magnitude of the velocity
-                double velocity_magnitude_difference =
-                    std::fabs(filtered_ball->velocity().len() - ball_velocity.len());
+                double velocity_magnitude_difference = std::fabs(
+                    filtered_ball->velocity().length() - ball_velocity.length());
                 EXPECT_LE(velocity_magnitude_difference,
                           expected_velocity_magnitude_tolerance);
             }
@@ -295,7 +296,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
     double expected_position_tolerance           = 0.001;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(0.01);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -314,7 +315,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_d
     double ball_position_variance                = 0.001;
     double time_step_variance                    = 0.001;
     double expected_position_tolerance           = 0.004;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(5.5);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(5.5);
     double expected_velocity_magnitude_tolerance = 0.04;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -333,7 +334,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_
     double ball_position_variance                = 0.003;
     double time_step_variance                    = 0.001;
     double expected_position_tolerance           = 0.011;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(16);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(16);
     double expected_velocity_magnitude_tolerance = 0.11;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -352,7 +353,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
     double expected_position_tolerance           = 0.001;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(0.01);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -371,7 +372,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_d
     double ball_position_variance                = 0.001;
     double time_step_variance                    = 0.001;
     double expected_position_tolerance           = 0.003;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(0.9);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.9);
     double expected_velocity_magnitude_tolerance = 0.07;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -390,7 +391,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
     double ball_position_variance                = 0.003;
     double time_step_variance                    = 0.001;
     double expected_position_tolerance           = 0.008;
-    Angle expected_velocity_angle_tolerance      = Angle::ofDegrees(3.0);
+    Angle expected_velocity_angle_tolerance      = Angle::fromDegrees(3.0);
     double expected_velocity_magnitude_tolerance = 0.21;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -410,7 +411,7 @@ TEST_F(BallFilterTest,
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
     double expected_position_tolerance           = 0.0001;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(0.01);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -424,7 +425,7 @@ TEST_F(BallFilterTest,
     ball_path                   = Segment(field.enemyCornerPos(), field.enemyCornerNeg());
     ball_velocity_magnitude     = 4.8;
     expected_position_tolerance = 0.0001;
-    expected_velocity_angle_tolernace     = Angle::ofDegrees(0.01);
+    expected_velocity_angle_tolernace     = Angle::fromDegrees(0.01);
     expected_velocity_magnitude_tolerance = 0.01;
     num_steps_to_ignore                   = 5;
     start_time                            = current_timestamp;
@@ -444,7 +445,7 @@ TEST_F(BallFilterTest,
     double ball_position_variance      = 0;
     double time_step_variance          = 0;
     double expected_position_tolerance = 0.0001;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(0.1);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.1);
     double expected_velocity_magnitude_tolerance = 0.1;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -458,7 +459,7 @@ TEST_F(BallFilterTest,
     ball_path                             = Segment(Point(0, 3), field.enemyCornerNeg());
     ball_velocity_magnitude               = 4.8;
     expected_position_tolerance           = 0.0001;
-    expected_velocity_angle_tolernace     = Angle::ofDegrees(0.1);
+    expected_velocity_angle_tolernace     = Angle::fromDegrees(0.1);
     expected_velocity_magnitude_tolerance = 0.1;
     num_steps_to_ignore                   = 5;
     start_time                            = current_timestamp;
@@ -478,7 +479,7 @@ TEST_F(BallFilterTest,
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
     double expected_position_tolerance           = 0.0001;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(0.1);
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.1);
     double expected_velocity_magnitude_tolerance = 0.1;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -492,7 +493,7 @@ TEST_F(BallFilterTest,
     ball_path                             = Segment(Point(0, 0), Point(3, 0));
     ball_velocity_magnitude               = 4.8;
     expected_position_tolerance           = 0.0001;
-    expected_velocity_angle_tolernace     = Angle::ofDegrees(0.1);
+    expected_velocity_angle_tolernace     = Angle::fromDegrees(0.1);
     expected_velocity_magnitude_tolerance = 0.1;
     num_steps_to_ignore                   = 5;
     start_time                            = current_timestamp;

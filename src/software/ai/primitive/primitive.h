@@ -7,8 +7,6 @@
 // to know about the existence of this class in order to accept visitors with the
 // accept() function. We cannot use an #include statement because this creates a cyclic
 // dependency
-//
-// This class can be found in ai/primitive/primitive_visitor.h
 class PrimitiveVisitor;
 
 /**
@@ -48,3 +46,13 @@ class Primitive
 
     virtual ~Primitive() = default;
 };
+
+/**
+ * We use this typedef to pass lists of Primitives around
+ *
+ * Since `std::unique_ptr<Primitive>` does not have a copy constructor, we
+ * need to pass a `shared_ptr` to the vector. To prevent the modification of
+ * the vector we declare it `const`
+ */
+using ConstPrimitiveVectorPtr =
+    std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>;

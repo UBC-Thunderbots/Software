@@ -2,38 +2,41 @@
 
 #include <gtest/gtest.h>
 
-TEST(RobotCapabilityFlagsTest, test_has_all_capabilities_1)
+using namespace RobotCapabilities;
+
+TEST(RobotCapabilitiesTest, test_subset_superset_operators_both_empty)
 {
-    RobotCapabilityFlags cap1{RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick};
-    RobotCapabilityFlags cap2{RobotCapabilityFlags::Kick};
-    EXPECT_TRUE(cap1.hasAllCapabilities(cap2));
+    std::set<Capability> lhs{};
+    std::set<Capability> rhs{};
+    EXPECT_TRUE(lhs <= rhs);
+    EXPECT_TRUE(lhs >= rhs);
+    EXPECT_TRUE(rhs >= lhs);
+    EXPECT_TRUE(rhs <= lhs);
 }
 
-TEST(RobotCapabilityFlagsTest, test_has_all_capabilities_2)
+TEST(RobotCapabilitiesTest, test_subset_superset_operators_same)
 {
-    RobotCapabilityFlags cap1{RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick};
-    RobotCapabilityFlags cap2{RobotCapabilityFlags::Kick, RobotCapabilityFlags::Dribble};
-    EXPECT_TRUE(cap1.hasAllCapabilities(cap2));
+    std::set<Capability> lhs{Capability::Kick};
+    std::set<Capability> rhs{Capability::Kick};
+    EXPECT_TRUE(lhs <= rhs);
+    EXPECT_TRUE(rhs >= lhs);
+    EXPECT_TRUE(lhs >= rhs);
+    EXPECT_TRUE(rhs <= lhs);
 }
 
-TEST(RobotCapabilityFlagsTest, test_has_all_capabilities_3)
+TEST(RobotCapabilitiesTest, test_subset_superset_operators_subset)
 {
-    RobotCapabilityFlags cap1{RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick};
-    RobotCapabilityFlags cap2{RobotCapabilityFlags::Kick, RobotCapabilityFlags::Dribble,
-                              RobotCapabilityFlags::Chip};
-    EXPECT_FALSE(cap1.hasAllCapabilities(cap2));
+    std::set<Capability> lhs{Capability::Kick};
+    std::set<Capability> rhs{Capability::Kick, Capability::Chip};
+    EXPECT_TRUE(lhs <= rhs);
+    EXPECT_TRUE(rhs >= lhs);
+    EXPECT_FALSE(lhs >= rhs);
+    EXPECT_FALSE(rhs <= lhs);
 }
 
-TEST(RobotCapabilityFlagsTest, test_has_all_capabilities_4)
+TEST(RobotCapabilitiesTest, test_all_capabilities)
 {
-    RobotCapabilityFlags cap1{RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick};
-    RobotCapabilityFlags cap2{RobotCapabilityFlags::Chip};
-    EXPECT_FALSE(cap1.hasAllCapabilities(cap2));
-}
-
-TEST(RobotCapabilityFlagsTest, test_remove_capability)
-{
-    RobotCapabilityFlags cap1{RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick};
-    cap1.removeCapability(RobotCapabilityFlags::Kick);
-    EXPECT_EQ(cap1, RobotCapabilityFlags{RobotCapabilityFlags::Dribble});
+    std::set<Capability> all = allCapabilities();
+    EXPECT_TRUE((all == std::set<Capability>{Capability::Dribble, Capability::Move,
+                                             Capability::Chip, Capability::Kick}));
 }

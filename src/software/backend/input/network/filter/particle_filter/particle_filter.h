@@ -3,7 +3,7 @@
 
 #include <random>
 
-#include "software/geom/point.h"
+#include "software/new_geom/point.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 /**

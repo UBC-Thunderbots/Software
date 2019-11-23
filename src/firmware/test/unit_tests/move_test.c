@@ -1,6 +1,7 @@
 #include "main/primitives/move.h"
 
 #include "check.h"
+#include "shared/robot_constants.h"
 #include "main/physics.h"
 #include "main/util/physbot.h"
 #include "shared/robot_constants.h"

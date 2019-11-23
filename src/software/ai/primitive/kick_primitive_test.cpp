@@ -34,7 +34,7 @@ TEST(KickPrimTest, get_kick_origin_test)
 
 TEST(KickPrimTest, get_kick_direction_test)
 {
-    const Angle kick_direction = Angle::ofRadians(2.58);
+    const Angle kick_direction = Angle::fromRadians(2.58);
 
     KickPrimitive kick_prim = KickPrimitive(0, Point(), kick_direction, 0.0);
 

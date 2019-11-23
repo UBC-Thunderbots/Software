@@ -27,7 +27,7 @@ TEST(MoveSpinPrimTest, get_robot_id_test)
 
 TEST(MoveSpinPrimTest, get_angular_vel_test)
 {
-    const AngularVelocity angular_vel = AngularVelocity::ofRadians(2.5);
+    const AngularVelocity angular_vel = AngularVelocity::fromRadians(2.5);
 
     MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), angular_vel, 1.0);
 

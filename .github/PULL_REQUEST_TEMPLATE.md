@@ -19,9 +19,7 @@ This file outlines a list of common things that should be addressed when opening
 ### Resolved Issues
 
 <!--
-    Link any issues that this PR resolved. Eg `resolves #1, #2, and #5` (note that they MUST be specified like this so Github can automatically close them then this PR merges)
-
-    Please connect this PR to the issue in Zenhub by going to the bottom of this page and clicking "Connect With Issue" (so that this link is tracked in zenhub!)
+    Link any issues that this PR resolved. Ex. `resolves #1, #2, and #5` (note that they MUST be specified like this so Github can automatically close them then this PR merges)
 -->
 
 ### Length Justification

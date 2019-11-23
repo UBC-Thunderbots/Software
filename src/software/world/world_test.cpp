@@ -33,8 +33,8 @@ class WorldTest : public ::testing::Test
         friendly_team.updateRobots({friendly_robot_0, friendly_robot_1});
         friendly_team.assignGoalie(1);
 
-        Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::ofRadians(1),
-                                    AngularVelocity::ofRadians(2), current_time);
+        Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::fromRadians(1),
+                                    AngularVelocity::fromRadians(2), current_time);
 
         Robot enemy_robot_1 = Robot(1, Point(), Vector(-0.5, 4), Angle::quarter(),
                                     AngularVelocity::half(), current_time);
@@ -61,10 +61,10 @@ TEST_F(WorldTest, default_constructor)
     EXPECT_EQ(Field(0, 0, 0, 0, 0, 0, 0, current_time), world.field());
     EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
     EXPECT_EQ(Team(Duration::fromMilliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                  Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
               world.friendlyTeam());
     EXPECT_EQ(Team(Duration::fromMilliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                  Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
               world.enemyTeam());
 }
 

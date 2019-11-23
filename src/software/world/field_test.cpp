@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "shared/constants.h"
+
 class FieldTest : public ::testing::Test
 {
    protected:
@@ -38,6 +40,7 @@ TEST_F(FieldTest, construct_with_parameters)
     EXPECT_DOUBLE_EQ(x_length, field.xLength());
     EXPECT_DOUBLE_EQ(y_length, field.yLength());
     EXPECT_DOUBLE_EQ(goal_y_length, field.goalYLength());
+    EXPECT_DOUBLE_EQ(ROBOT_MAX_RADIUS_METERS * 2, field.goalXLength());
     EXPECT_DOUBLE_EQ(center_circle_radius, field.centerCircleRadius());
     EXPECT_DOUBLE_EQ(defense_y_length, field.defenseAreaYLength());
     EXPECT_DOUBLE_EQ(defense_x_length, field.defenseAreaXLength());
@@ -70,6 +73,11 @@ TEST_F(FieldTest, update_with_all_parameters)
               field_to_update.enemyDefenseArea());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
               field_to_update.fieldLines());
+    EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3)),
+              field_to_update.fieldBoundary());
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)),
+              field_to_update.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field_to_update.enemyHalf());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
@@ -107,6 +115,11 @@ TEST_F(FieldTest, update_with_new_field)
               field_to_update.enemyDefenseArea());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
               field_to_update.fieldLines());
+    EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3)),
+              field_to_update.fieldBoundary());
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)),
+              field_to_update.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field_to_update.enemyHalf());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
@@ -310,4 +323,38 @@ TEST_F(FieldTest, point_not_in_entire_field)
 {
     Point p(-4.91, -0.88);
     EXPECT_FALSE(field.pointInEntireField(p));
+}
+
+TEST_F(FieldTest, update_timestamp_with_timestamp_in_future)
+{
+    try
+    {
+        field.updateTimestamp(Timestamp::fromSeconds(1.0));
+        EXPECT_EQ(Timestamp::fromSeconds(1.0), field.getMostRecentTimestamp());
+    }
+    catch (std::invalid_argument&)
+    {
+        ADD_FAILURE() << "Invalid Timestamp used to update field timestamp";
+    }
+}
+
+TEST_F(FieldTest, update_timestamp_with_same_timestamp)
+{
+    try
+    {
+        field.updateTimestamp(Timestamp::fromSeconds(0.0));
+        EXPECT_EQ(Timestamp::fromSeconds(0.0), field.getMostRecentTimestamp());
+    }
+    catch (std::invalid_argument&)
+    {
+        ADD_FAILURE() << "Invalid Timestamp used to update field timestamp";
+    }
+}
+
+TEST_F(FieldTest, update_timestamp_with_timestamp_in_past)
+{
+    // First make sure we have a timestamp > 0
+    field.updateTimestamp(Timestamp::fromSeconds(1.0));
+    EXPECT_THROW(field.updateTimestamp(Timestamp::fromSeconds(0.9)),
+                 std::invalid_argument);
 }

@@ -1,13 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "avoid_area",
-    srcs = ["avoid_area.cpp"],
-    hdrs = ["avoid_area.h"],
-    deps = [],
-)
-
-cc_library(
     name = "catch_intent",
     srcs = ["catch_intent.cpp"],
     hdrs = ["catch_intent.h"],
@@ -229,7 +222,7 @@ cc_library(
     srcs = ["intent.cpp"],
     hdrs = ["intent.h"],
     deps = [
-        ":avoid_area",
+        "//software/ai/motion_constraint:motion_constraint",
         "@g3log",
     ],
 )

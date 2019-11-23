@@ -8,10 +8,10 @@ TEST(TestSpline, test_three_knot_value_at)
     Spline s(points);
     EXPECT_EQ(s.size(), points.size());
     EXPECT_EQ(s.valueAt(0.0), points[0]);
-    EXPECT_TRUE(s.valueAt(0.1).isClose(Point(3.8, 14.4)));
-    EXPECT_TRUE(s.valueAt(0.5).isClose(points[1]));
-    EXPECT_TRUE(s.valueAt(0.6).isClose(Point(1, -0.2)));
-    EXPECT_TRUE(s.valueAt(0.9).isClose(Point(-5, -0.8)));
+    EXPECT_TRUE(s.valueAt(0.1).isClose(Point(3.8, 14.4), 1e-9));
+    EXPECT_TRUE(s.valueAt(0.5).isClose(points[1], 1e-9));
+    EXPECT_TRUE(s.valueAt(0.6).isClose(Point(1, -0.2), 1e-8));
+    EXPECT_TRUE(s.valueAt(0.9).isClose(Point(-5, -0.8), 1e-9));
     EXPECT_EQ(s.valueAt(1.0), points[2]);
 }
 
@@ -47,10 +47,10 @@ TEST(TestSpline, test_two_knot_value_at)
     Spline s(points);
     EXPECT_EQ(s.size(), points.size());
     EXPECT_EQ(s.valueAt(0.0), points[0]);
-    EXPECT_TRUE(s.valueAt(0.1).isClose(Point(-2.3, -15.7)));
-    EXPECT_TRUE(s.valueAt(0.5).isClose(Point(0.5, 5.5)));
-    EXPECT_TRUE(s.valueAt(0.6).isClose(Point(1.2, 10.8)));
-    EXPECT_TRUE(s.valueAt(0.9).isClose(Point(3.3, 26.7)));
+    EXPECT_TRUE(s.valueAt(0.1).isClose(Point(-2.3, -15.7), 1e-9));
+    EXPECT_TRUE(s.valueAt(0.5).isClose(Point(0.5, 5.5), 1e-9));
+    EXPECT_TRUE(s.valueAt(0.6).isClose(Point(1.2, 10.8), 1e-7));
+    EXPECT_TRUE(s.valueAt(0.9).isClose(Point(3.3, 26.7), 1e-7));
     EXPECT_EQ(s.valueAt(1.0), points[1]);
 }
 

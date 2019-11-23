@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
-
 cc_binary(
     name = "firmware_old_main",
     srcs = ["main/main.c"],
@@ -28,8 +26,6 @@ cc_binary(
     ],
     linkopts = [
         "-T$(location //firmware:stm32f405.ld)",
-        # TODO: is this OK?
-        #"-Map=./firmware_old_main.map",
         "-Wl,--build-id=none",
         "-Wl,--gc-sections",
         "-nostdlib",
@@ -40,6 +36,19 @@ cc_binary(
         ":firmware_old_main_lib",
         ":stm32f405.ld",
     ],
+)
+
+genrule(
+    name = "firmware_old_main_bin",
+    srcs = [
+        ":firmware_old_main",
+        "@arm_developer_gcc//:objcopy",
+    ],
+    outs = ["firmware_old_main.bin"],
+    cmd = "\n".join([
+        "$(location @arm_developer_gcc//:objcopy) -Obinary $(location :firmware_old_main) $@",
+    ]),
+    restricted_to = ["//cc_toolchain:stm32f4"],
 )
 
 cc_library(
@@ -82,35 +91,8 @@ cc_library(
         "//shared:constants",
         "//shared:robot_constants",
     ],
-    # This is _very_ important. If we don't do this, bazel will not compile in the
+    # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
-)
-
-genrule(
-    name = "firmware_old_main_bin",
-    srcs = [
-        ":firmware_old_main",
-        "@arm_developer_gcc//:objcopy",
-    ],
-    outs = ["firmware_old_main.bin"],
-    cmd = "\n".join([
-        "$(location @arm_developer_gcc//:objcopy) -Obinary $(location :firmware_old_main) $@",
-    ]),
-    restricted_to = ["//cc_toolchain:stm32f4"],
-)
-
-genrule(
-    name = "flash_board",
-    srcs = [":firmware_old_main_bin"],
-    outs = [],
-    cmd = "\n".join([
-        "dfu-util \
-            -d 0483 \
-            -a \"@Internal Flash  /0x08000000/04*016Kg,01*064Kg,07*128Kg\" \
-            -D $(location :firmware_old_main_bin) \
-            -s 0x08000000:leave",
-    ]),
-    restricted_to = ["//cc_toolchain:stm32f4"],
 )
