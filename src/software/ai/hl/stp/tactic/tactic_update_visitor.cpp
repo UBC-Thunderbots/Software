@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/tactic_update_visitor.h"
 
+
 class TacticUpdateVisitor : public TacticVisitor
 {
 public:
@@ -8,11 +9,12 @@ public:
         this->world = world;
     }
 
-    void visit(CherryPickTactic &tactic) override
+    void visit(CherryPickTactic& tactic) override
     {
         tactic.updateWorldParams(world);
     }
 
+<<<<<<< HEAD
     void visit(ShadowFreekickerTactic &tactic) override
     {
         tactic.updateWorldParams(world.enemyTeam(),world.ball());
@@ -36,6 +38,7 @@ public:
     void visit(BlockShotPathTactic &tactic) override {}
     void visit(MoveTactic &tactic) override {}
     void visit(ChipTactic &tactic) override
+
     {
         tactic.updateWorldParams(world.ball());
     }
@@ -46,6 +49,7 @@ public:
     {
         tactic.updateWorldParams(world.ball(), world.enemyTeam().goalie(),world.field());
     }
+
 
     void visit(PenaltySetupTactic &tactic) override {}
     void visit(ReceiverTactic &tactic) override

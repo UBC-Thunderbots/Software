@@ -506,3 +506,26 @@ cc_library(
     hdrs = ["tactic_visitor.h"],
     deps = [":tactic"],
 )
+
+cc_library(
+    name = "tactic_update_visitor",
+    srcs = ["tactic_update_visitor.cpp"],
+    hdrs = ["tactic_update_visitor.h"],
+    deps = [
+        ":all_tactics",
+        ":tactic_visitor",
+    ],
+)
+
+cc_test(
+    name = "tactic_update_visitor_test",
+    srcs = ["tactic_update_visitor_test.cpp"],
+    deps = [
+        "tactic_update_visitor",
+        ":defense_shadow_enemy_tactic",
+        ":tactic",
+        "//software/geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

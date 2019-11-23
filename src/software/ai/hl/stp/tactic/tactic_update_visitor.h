@@ -1,7 +1,13 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+<<<<<<< HEAD
 #include "software/ai/hl/stp/tactic/all_tactics.h"
+=======
+#include "software/world/world.h"
+#include "software/ai/hl/stp/tactic/all_tactics.h"
+#include "software/ai/hl/stp/tactic/grab_ball_tactic.h"
+>>>>>>> 464ae18961cae3d2d6b65d74df2fb4d5a2878f5f
 
 class TacticUpdateVisitor : public TacticVisitor
 {
