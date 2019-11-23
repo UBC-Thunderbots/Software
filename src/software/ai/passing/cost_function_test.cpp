@@ -148,7 +148,7 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
     std::chrono::duration<double> duration = end_time - start_time;
 
     std::chrono::duration<double> avg;
-    avg = duration / (double)num_passes_to_gen;
+    avg = duration / static_cast<double>(num_passes_to_gen);
 
     // At the time of this tests creation, ratePass ran at an average 0.105ms
     // in debug on an i7

@@ -28,7 +28,6 @@ class StopPrimitive : public Primitive
      */
     bool robotShouldCoast() const;
 
-    using Primitive::accept;
     void accept(PrimitiveVisitor& visitor) const override;
 
     /**
