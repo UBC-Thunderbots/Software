@@ -190,6 +190,7 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
 /*
  * The structures and methods of manipulating the MPU are contained within the
  * port layer.
+
  *
  * Fills the xMPUSettings structure with the memory region information
  * contained in xRegions.
