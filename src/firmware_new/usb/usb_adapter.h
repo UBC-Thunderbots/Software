@@ -2,12 +2,11 @@
 
 class USBMediator
 {
-
-public:
+   public:
     /*
      * Creates a usb mediator, given the port and the baud rate.
      * Used to send and recieve msgs to serial devices using boost and protobuf
-     * 
+     *
      * TODO need a better name
      *
      * @param port The serial port to send to, usuall /dev/tty*
@@ -17,7 +16,7 @@ public:
 
     virtual ~USBMediator();
 
-    /* 
+    /*
      * Templated function to send proto over serial.
      *
      * This function returns immediately, the optional callback can run once the msg
@@ -38,7 +37,7 @@ public:
     template <class R>
     void receive_proto_over_usb();
 
-private:
+   private:
     // in_buffer;
     // out_buffer;
 };

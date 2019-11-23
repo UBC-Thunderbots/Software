@@ -56,6 +56,7 @@ NVIC.PendSV_IRQn=true\:0\:0\:false\:false\:true\:true\:false
 NVIC.PriorityGroup=NVIC_PRIORITYGROUP_4
 NVIC.SVCall_IRQn=true\:0\:0\:false\:false\:true\:true\:false
 NVIC.SysTick_IRQn=true\:0\:0\:false\:false\:true\:true\:true
+NVIC.USART3_IRQn=true\:0\:0\:false\:false\:true\:true\:true
 NVIC.UsageFault_IRQn=true\:0\:0\:false\:false\:true\:true\:false
 PA1.GPIOParameters=GPIO_Label
 PA1.GPIO_Label=RMII_REF_CLK
