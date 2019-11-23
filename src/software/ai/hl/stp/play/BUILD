@@ -129,9 +129,9 @@ cc_test(
 )
 
 cc_library(
-    name = "indirect_free_kick_play",
-    srcs = ["indirect_free_kick_play.cpp"],
-    hdrs = ["indirect_free_kick_play.h"],
+    name = "direct_free_kick_play",
+    srcs = ["direct_free_kick_play.cpp"],
+    hdrs = ["direct_free_kick_play.h"],
     deps = [
         ":corner_kick_play",
         ":play",
@@ -182,8 +182,8 @@ cc_library(
         ":play",
         ":play_factory",
         "//shared:constants",
-        "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
+        "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
         "@g3log",
     ],
@@ -214,8 +214,8 @@ cc_library(
         ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:move_tactic",
-        "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
+        "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "@g3log",
     ],
     alwayslink = True,

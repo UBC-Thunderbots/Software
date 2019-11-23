@@ -5,17 +5,18 @@
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 
 /**
- * A Play for Indirect Free kicks
+ * A Play for Direct Free kicks
  */
-class IndirectFreeKickPlay : public Play
+class DirectFreeKickPlay : public Play
 {
    public:
     static const std::string name;
 
-    IndirectFreeKickPlay();
+    DirectFreeKickPlay();
 
     std::string getName() const override;
 
@@ -72,9 +73,10 @@ class IndirectFreeKickPlay : public Play
      * @param pass_generator The pass generator that will generate passes
      * @param best_pass_and_score_so_far The best pass and score so far
      */
-    void findPassStage(
+    void shootOrfindPassStage(
         TacticCoroutine::push_type &yield,
         std::shared_ptr<MoveTactic> align_to_ball_tactic,
+        std::shared_ptr<ShootGoalTactic> shoot_tactic,
         std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
         std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
@@ -100,6 +102,13 @@ class IndirectFreeKickPlay : public Play
      * @param pass_generator
      */
     void updatePassGenerator(Passing::PassGenerator &pass_generator);
+
+    /**
+     * Update the given shoot goal tactic
+     *
+     * @param shoot_tactic
+     */
+    void updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic);
 
     /**
      * Updates the given crease defender tactics
