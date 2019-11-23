@@ -73,11 +73,6 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
-    /**
-     * Accepts a Tactic Visitor and calls the visit function on itself
-     *
-     * @param visitor A Tactic Visitor
-     */
     void accept(TacticVisitor& visitor) const override;
 
    private:

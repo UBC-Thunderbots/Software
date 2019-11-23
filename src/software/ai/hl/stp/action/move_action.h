@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
+#include "software/ai/hl/stp/action/action_visitor.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/primitive/move_primitive.h"
 #include "software/new_geom/angle.h"
@@ -46,6 +47,8 @@ class MoveAction : public Action
                              DribblerEnable enable_dribbler, MoveType move_type,
                              AutokickType autokick,
                              BallCollisionType ball_collision_type);
+
+    void accept(ActionVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

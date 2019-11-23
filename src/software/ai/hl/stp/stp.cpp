@@ -89,16 +89,17 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
         {
             // Get the Intent the tactic wants to run
             auto intent = tactic->getNextIntent();
-            // Set Motion Constraints
-            auto motion_constraints = motion_constraint_manager.getMotionConstraints(
-                world.gameState(), *tactic);
-            intent->setMotionConstraints(motion_constraints);
 
             // If the tactic is not done and a valid intent was returned, the intent will
             // be run by the robot. Otherwise, the robot will default to running a
             // StopIntent so it doesn't do anything crazy.
             if (intent && !tactic->done())
             {
+                // Set Motion Constraints
+                auto motion_constraints = motion_constraint_manager.getMotionConstraints(
+                    world.gameState(), *tactic);
+                intent->setMotionConstraints(motion_constraints);
+
                 intents.emplace_back(std::move(intent));
             }
             else if (tactic->getAssignedRobot())

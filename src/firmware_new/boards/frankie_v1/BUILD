@@ -5,9 +5,9 @@ load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 cc_binary(
     name = "frankie_v1_main",
     srcs = ["main.c"],
-    copts = [
-        "-DUSE_HAL_DRIVER",
-        "-DSTM32H743xx",
+    defines = [
+        "USE_HAL_DRIVER",
+        "STM32H743xx",
     ],
     linkopts = [
         "-T$(location //firmware_new/boards/frankie_v1:STM32H743ZITx_FLASH.ld)",
@@ -38,7 +38,7 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":hal_library"],
-    # This is _very_ important. If we don't do this, bazel will not compile in the
+    # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
@@ -117,8 +117,8 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h",
         "stm32h7xx_hal_conf.h",
     ],
-    copts = [
-        "-DSTM32H743xx",
+    defines = [
+        "STM32H743xx",
     ],
     includes = [
         "./",

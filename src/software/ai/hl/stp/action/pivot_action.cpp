@@ -22,6 +22,11 @@ void PivotAction::updateControlParams(const Robot& robot, Point pivot_point,
     this->enable_dribbler = enable_dribbler;
 }
 
+void PivotAction::accept(ActionVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
 void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     do

@@ -20,6 +20,11 @@ void DribbleAction::updateControlParams(const Robot& robot, const Point& dest,
     this->small_kick_allowed = small_kick_allowed;
 }
 
+void DribbleAction::accept(ActionVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
 void DribbleAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was
