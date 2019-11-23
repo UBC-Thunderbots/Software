@@ -131,7 +131,9 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
 
 void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction();
+    MoveAction move_action =
+        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
+                   MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, true);
     ChipAction chip_action = ChipAction();
     StopAction stop_action = StopAction();
 
