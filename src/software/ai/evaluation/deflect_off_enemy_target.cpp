@@ -17,7 +17,7 @@ namespace Evaluation
             triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
 
         Robot enemy_closest_to_edge = world.enemyTeam().getRobotById(0).value();
-        double shortestLenToEdge    = 100.0;
+        double shortest_len_to_edge = 100.0;
         double closestEdgeY;
         // Finds the y value of the closest edge of the field (likely where the ball
         // is)
@@ -37,11 +37,13 @@ namespace Evaluation
                               enemy_robot.position()) <= ROBOT_MAX_RADIUS_METERS) &&
                 (enemy_robot.position().x() > world.ball().position().x()))
             {
-                if (fabs(enemy_robot.position().y() - closestEdgeY) < shortestLenToEdge)
+                if (fabs(enemy_robot.position().y() - closestEdgeY) <
+                    shortest_len_to_edge)
                 {
                     enemy_closest_to_edge = enemy_robot;
                     enemy_closest_to_edge.updateCurrentState(enemy_robot.currentState());
-                    shortestLenToEdge = fabs(enemy_robot.position().y() - closestEdgeY);
+                    shortest_len_to_edge =
+                        fabs(enemy_robot.position().y() - closestEdgeY);
                 }
             }
         }

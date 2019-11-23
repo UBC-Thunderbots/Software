@@ -6,6 +6,7 @@
 #include "software/util/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 
+// This class represents the state of a Robot at a single point in time
 class RobotState final
 {
    public:
