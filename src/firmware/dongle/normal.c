@@ -875,11 +875,11 @@ static void mdr_task(void *UNUSED(param))
                             ;
                     }
                     else
-                    {   // ECONNRESET
-                        // Shutting down. Drop MDRs on the floor. Do not
-                        // actually exit the inner loop right now, though;
-                        // instead, wait for shutting_down to be set to true by
-                        // popping a shutdown-signal MDR.
+                    {  // ECONNRESET
+                       // Shutting down. Drop MDRs on the floor. Do not
+                       // actually exit the inner loop right now, though;
+                       // instead, wait for shutting_down to be set to true by
+                       // popping a shutdown-signal MDR.
                     }
                 }
             }
@@ -1162,9 +1162,8 @@ static void rdrx_task(void *UNUSED(param))
                             ((frame_control >> 6U) & 1U) == 1U /* Intra-PAN */ &&
                             ((frame_control >> 10U) & 3U) ==
                                 2U /* 16-bit destination address */
-                            &&
-                            ((frame_control >> 14U) & 3U) ==
-                                2U /* 16-bit source address */)
+                            && ((frame_control >> 14U) & 3U) ==
+                                   2U /* 16-bit source address */)
                         {
                             static const unsigned int HEADER_LENGTH =
                                 2U /* Frame control */ + 1U /* Seq# */ +

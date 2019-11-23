@@ -70,7 +70,7 @@ static void stop_end(void)
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
  */
-static void stop_tick(log_record_t *log){}
+static void stop_tick(log_record_t *log) {}
 
 /**
  * \brief The stop movement primitive.

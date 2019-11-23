@@ -103,7 +103,8 @@ bool dcmi_dma_init(void)
         .MSIZE = 0b10,  // 32bit
         .PSIZE = 0b10,  // 32bit
         .MINC  = 1,     // Memory increments automatically
-                        //					  .CIRC = 1, 	// Double buffer iff circular mode enabled
+                        //					  .CIRC = 1, 	// Double buffer iff circular mode
+                        // enabled
         .DIR   = 0b00,  // Peripheral to memory
         .TCIE  = 1,     // Transfer complete interrupt enabled
         .DMEIE = 1      // Direct mode error interrupt enabled

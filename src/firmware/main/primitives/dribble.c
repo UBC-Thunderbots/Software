@@ -48,10 +48,7 @@ static void dribble_start(const primitive_params_t *params)
  * \brief Ends a movement of this type.
  * * This function runs when the host computer requests a new movement while a * dribble
  * movement is already in progress. */
-static void
-dribble_end(void)
-{
-}
+static void dribble_end(void) {}
 
 /**
  * \brief Ticks a movement of this type.
