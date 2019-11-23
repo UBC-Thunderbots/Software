@@ -14,10 +14,12 @@ environment_group(
     defaults = [
         ":k8",
         ":stm32h7",
+        ":stm32f4",
     ],
     environments = [
         ":k8",
         ":stm32h7",
+        ":stm32f4",
     ],
 )
 

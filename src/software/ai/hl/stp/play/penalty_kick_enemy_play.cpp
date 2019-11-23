@@ -44,24 +44,19 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
-            Point(0, 0), world.field().enemyGoal().toVector().orientation(), 0,
-            BallCollisionType::AVOID);
+            Point(0, 0), world.field().enemyGoal().toVector().orientation(), 0);
         move_tactic_3->updateControlParams(
             Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0,
-            BallCollisionType::AVOID);
+            world.field().enemyGoal().toVector().orientation(), 0);
         move_tactic_4->updateControlParams(
             Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0,
-            BallCollisionType::AVOID);
+            world.field().enemyGoal().toVector().orientation(), 0);
         move_tactic_5->updateControlParams(
             Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0,
-            BallCollisionType::AVOID);
+            world.field().enemyGoal().toVector().orientation(), 0);
         move_tactic_6->updateControlParams(
             Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0,
-            BallCollisionType::AVOID);
+            world.field().enemyGoal().toVector().orientation(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield({goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,

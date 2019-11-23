@@ -1,17 +1,3 @@
-# Use Our Remote Cache To Avoid Rebuilding Files Already Built By CI
-build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache_us_multi_region
-
-# Disable sandboxing, since using the remote cache with it enabled is still 
-# considered "experimental"
---spawn_strategy=standalone
-
-# Don't Try to Upload Results (since CI does not currently have required credentials)
-# See https://github.com/UBC-Thunderbots/Software/issues/829 for more info
-build --remote_upload_local_results=false 
-
-# Credentials for Uploading Build Results To Our Remote Cache
-#build --google_credentials="/home/gareth/Downloads/tbots-bazel-cache-key.json"
-
 # We rely on all symbols being included when linking for our implementation of
 # the "factory" design pattern.
 build --incompatible_remove_legacy_whole_archive=False

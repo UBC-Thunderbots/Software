@@ -32,6 +32,11 @@ void KickAction::updateControlParams(const Robot &robot, Point kick_origin,
     this->kick_speed_meters_per_second = kick_speed_meters_per_second;
 }
 
+void KickAction::accept(ActionVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
 void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     // How large the triangle is that defines the region where the robot is

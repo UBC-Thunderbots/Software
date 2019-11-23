@@ -225,19 +225,16 @@ static void MX_ETH_Init(void)
 
     /* USER CODE END ETH_Init 0 */
 
-    uint8_t MACAddr[6];
-
     /* USER CODE BEGIN ETH_Init 1 */
 
     /* USER CODE END ETH_Init 1 */
     heth.Instance            = ETH;
-    MACAddr[0]               = 0x00;
-    MACAddr[1]               = 0x80;
-    MACAddr[2]               = 0xE1;
-    MACAddr[3]               = 0x00;
-    MACAddr[4]               = 0x00;
-    MACAddr[5]               = 0x00;
-    heth.Init.MACAddr        = &MACAddr[0];
+    heth.Init.MACAddr[0]     = 0x00;
+    heth.Init.MACAddr[1]     = 0x80;
+    heth.Init.MACAddr[2]     = 0xE1;
+    heth.Init.MACAddr[3]     = 0x00;
+    heth.Init.MACAddr[4]     = 0x00;
+    heth.Init.MACAddr[5]     = 0x00;
     heth.Init.MediaInterface = HAL_ETH_RMII_MODE;
     heth.Init.TxDesc         = DMATxDscrTab;
     heth.Init.RxDesc         = DMARxDscrTab;

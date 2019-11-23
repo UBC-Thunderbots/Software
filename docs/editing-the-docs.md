@@ -6,7 +6,7 @@ Most text can easily be edited with your favourite text editor, or directly in G
 #### Editing Diagrams
 Editing diagrams is the tricky part about our documentation. All our diagrams live in the [images](images/) folder. These are all diagrams created by [draw.io](https://www.draw.io/?mode=github). Specifically, this is done with the "GitHub mode" of [draw.io](https://www.draw.io/?mode=github). This allows diagrams or images to be saved directly in a git repository, but still edited with [draw.io](https://www.draw.io/?mode=github) when needed.
 
-We do this so that it's easier for everyone to udpate the diagrams and have them automatically saved back to our repository, rather than having to save the diagram file in Google Drive, give people access, and remember to export new images and replace them in the docs everytime they need to be updated.
+We do this so that it's easier for everyone to update the diagrams and have them automatically saved back to our repository, rather than having to save the diagram file in Google Drive, give people access, and remember to export new images and replace them in the docs everytime they need to be updated.
 
 You can read a bit about how the GitHub mode of [draw.io](https://github.com/jgraph/drawio-github) works at https://github.com/jgraph/drawio-github.
 
