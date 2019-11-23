@@ -65,6 +65,7 @@ int main()
 
 		 std::cerr<<"SENDING.........."<<std::endl;
 		 boost::asio::write(port, boost::asio::buffer(&outdata, outsize));
+		 boost::asio::write(port, boost::asio::buffer(&outdata, outsize));
 
          for (int i = 0; i < 22; i++){
 		    boost::asio::read(port, boost::asio::buffer(&test, 1));

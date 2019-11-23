@@ -171,16 +171,18 @@ int main(void)
             if (pb_decode(&in_stream, robot_msg_fields, &incoming_req))
             {
                 outgoing_msg.ack_timestamp = incoming_req.timestamp;
-                outgoing_msg.result = incoming_req.operand1 + incoming_req.operand2;
+                outgoing_msg.result = 2 + incoming_req.operand1 + incoming_req.operand2;
                 pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);
 
                 if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {
 
                 }
                 HAL_UART_Transmit(&huart3, send_buf, robot_ack_size, HAL_MAX_DELAY);
+
             /*HAL_UART_Transmit(&huart3, recv_buf, robot_msg_size, 1000);*/
             msg_recieved = false;
             msg_sent = true;
+            bytepos = 0;
 
             }
         }
@@ -446,7 +448,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             /*HAL_UART_Transmit(&huart3, &byte, 1, 100);*/
             /*[>HAL_UART_Receive_IT(&huart3, &byte, 1);<]*/
             msg_recieved = true;
-            bytepos = 0;
         }
     }
 }
