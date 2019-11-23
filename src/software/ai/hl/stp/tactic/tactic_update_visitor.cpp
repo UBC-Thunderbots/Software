@@ -11,62 +11,62 @@ public:
         this->world = world;
     }
 
-    void visit(const CherryPickTactic& tactic) override
+    void visit(CherryPickTactic& tactic) override
     {
         tactic.updateWorldParams(world);
     }
 
-    void visit(const ChipTactic& tactic) override
+    void visit(ChipTactic& tactic) override
     {
         tactic.updateWorldParams(world.ball());
     }
 
-    void visit(CreaseDefenderTactic& tactic)
+    void visit(CreaseDefenderTactic& tactic) override
     {
-        tactic.updateWorldParams((world.ball(),world.field(),world.friendlyTeam(),world.enemyTeam()));
+        tactic.updateWorldParams(world.ball(),world.field(),world.friendlyTeam(),world.enemyTeam());
     }
 
-    void visit(DefenseShadowEnemyTactic& tactic)
+    void visit(DefenseShadowEnemyTactic& tactic) override
     {
         tactic.updateWorldParams(world.field(),world.friendlyTeam(),world.enemyTeam(),world.ball());
     }
 
-    void visit(GoalieTactic& tactic)
+    void visit(GoalieTactic& tactic) override
     {
         tactic.updateWorldParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     }
 
-    void visit(GrabBallTactic& tactic)
+    void visit(GrabBallTactic& tactic) override
     {
         tactic.updateParams(world.field(), world.ball(), world.enemyTeam());
     }
 
-    void visit(PasserTactic& tactic)
+    void visit(PasserTactic& tactic) override
     {
         tactic.updateWorldParams(world.ball());
     }
 
-    void visit(PenaltyKickTactic& tactic)
+    void visit(PenaltyKickTactic& tactic) override
     {
         tactic.updateWorldParams(world.ball(), world.enemyTeam().goalie(),world.field());
     }
 
-    void visit(ReceiverTactic& tactic)
+    void visit(ReceiverTactic& tactic) override
     {
         tactic.updateWorldParams(world.friendlyTeam(),world.enemyTeam(),world.ball());
     }
 
-    void visit(ShadowEnemyTactic& tactic)
+    void visit(ShadowEnemyTactic& tactic) override
     {
         tactic.updateWorldParams(world.field(),world.friendlyTeam(),world.enemyTeam(),world.ball());
     }
 
-    void visit(ShadowFreekickerTactic& tactic)
+    void visit(ShadowFreekickerTactic& tactic) override
     {
         tactic.updateWorldParams(world.enemyTeam(),world.ball());
     }
 
-    void visit(ShootGoalTactic& tactic)
+    void visit(ShootGoalTactic& tactic) override
     {
         tactic.updateWorldParams(world.field(),world.friendlyTeam(),world.enemyTeam(),world.ball());
     }
