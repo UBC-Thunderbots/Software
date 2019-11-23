@@ -27,6 +27,8 @@
 #include "external/nanopb/pb_decode.h"
 #include "firmware_new/proto/robot.pb.h"
 
+/* Single byte to store input */
+uint8_t byte;
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -60,54 +62,55 @@ uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffe
 #elif defined(__CC_ARM) /* MDK ARM Compiler */
 
 __attribute__((at(0x30040000)))
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+    ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at(0x30040060)))
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+    ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 __attribute__((at(0x30040200)))
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
+    uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
 
 #elif defined(__GNUC__) /* GNU Compiler */
 
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]
+    ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]
     __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]
+    ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]
     __attribute__((section(".TxDecripSection"))); /* Ethernet Tx DMA Descriptors */
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]
+    uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]
     __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
 
 #endif
 
-ETH_TxPacketConfig TxConfig;
+    ETH_TxPacketConfig TxConfig;
 
-ETH_HandleTypeDef heth;
+    ETH_HandleTypeDef heth;
+    volatile bool char_received = false;
 
-UART_HandleTypeDef huart3;
+    UART_HandleTypeDef huart3;
 
-PCD_HandleTypeDef hpcd_USB_OTG_FS;
+    PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-/* USER CODE BEGIN PV */
+    /* USER CODE BEGIN PV */
 
-/* USER CODE END PV */
+    /* USER CODE END PV */
 
-/* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_ETH_Init(void);
-static void MX_USART3_UART_Init(void);
-static void MX_USB_OTG_FS_PCD_Init(void);
-/* USER CODE BEGIN PFP */
+    /* Private function prototypes -----------------------------------------------*/
+    void SystemClock_Config(void);
+    static void MX_GPIO_Init(void);
+    static void MX_ETH_Init(void);
+    static void MX_USART3_UART_Init(void);
+    static void MX_USB_OTG_FS_PCD_Init(void);
+    /* USER CODE BEGIN PFP */
 
-/* USER CODE END PFP */
+    /* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+    /* Private user code ---------------------------------------------------------*/
+    /* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
+    /* USER CODE END 0 */
 
-/**
- * @brief  The application entry point.
- * @retval int
- */
+    /**
+     * @brief  The application entry point.
+     * @retval int
+     */
 int main(void)
 {
     /* USER CODE BEGIN 1 */
@@ -136,25 +139,87 @@ int main(void)
     MX_ETH_Init();
     MX_USART3_UART_Init();
     MX_USB_OTG_FS_PCD_Init();
+
     /* USER CODE BEGIN 2 */
+    /*uint8_t recv_buf[robot_msg_size];*/
+    /*uint8_t send_buf[robot_ack_size];*/
 
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
+    /*uint8_t rx_char;*/
+    /*HAL_UART_Receive(&huart3, recv_buf, robot_msg_size, 2000);*/
+    HAL_UART_Receive_IT(&huart3, &byte, 1);
+
     while (1)
     {
-        /* USER CODE END WHILE */
-         char buf[robot_msg_size];
-         //change huartX to your initialized HAL UART peripheral
-         HAL_UART_Receive(&huart3, (uint8_t *) buf, robot_msg_size, 2000);
-         HAL_UART_Transmit(&huart3, buf, robot_msg_size, HAL_MAX_DELAY);
+        /*[> USER CODE END WHILE <]*/
 
-        /* USER CODE BEGIN 3 */
+        /*// Block forver until we get a request!*/
+        /*// TODO change this to be interrupt based, for now we just block forever*/
+
+        /*HAL_UART_Receive_IT(&huart3, &rx_char, 1);*/
+
+        /*while(1)*/
+        /*{*/
+            /*if (char_received == true)*/
+            /*{*/
+                /*char_received = false;*/
+
+                /*if (rx_char == 's')*/
+                /*{*/
+                    /*HAL_UART_Transmit(&huart3, &rx_char, 1, 100);*/
+                /*}*/
+
+                /*HAL_UART_Receive_IT(&huart3, &rx_char, 1);*/
+            /*}*/
+        /*}*/
+
+        /*[>[> Allocate space for the decoded message. <]<]*/
+        /*robot_msg incoming_req = robot_msg_init_zero;*/
+        /*robot_ack outgoing_msg = robot_ack_init_zero;*/
+
+        /*// Create a stream that reads from the buffer. */
+        /*pb_istream_t in_stream = pb_istream_from_buffer(recv_buf, robot_msg_size);*/
+
+        /*// if we could decode it sucessfully, then return then return back the computation*/
+        /*if (pb_decode(&in_stream, robot_msg_fields, &incoming_req))*/
+        /*{*/
+        /*}*/
+
+        /*outgoing_msg.ack_timestamp = incoming_req.timestamp;*/
+        /*outgoing_msg.result = 200;*/
+        /*pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);*/
+
+        /*if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {*/
+
+        /*}*/
+        /*HAL_UART_Transmit(&huart3, recv_buf, robot_msg_size, 2000);*/
+
+        /*[> USER CODE BEGIN 3 <]*/
     }
     /* USER CODE END 3 */
 }
 
+void USART3_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&huart3);
+}
+
+/* This callback is called by the HAL_UART_IRQHandler when the given number of bytes are received */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+        HAL_UART_Transmit(&huart3, &byte, 1, 100);
+    if (huart->Instance == USART3)
+    {
+        /* Transmit one byte with 100 ms timeout */
+        HAL_UART_Transmit(&huart3, &byte, 1, 100);
+
+        /* Receive one byte in interrupt mode */ 
+        HAL_UART_Receive_IT(&huart3, &byte, 1);
+    }
+}
 /**
  * @brief System Clock Configuration
  * @retval None
@@ -166,17 +231,17 @@ void SystemClock_Config(void)
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
     /** Supply configuration update enable
-     */
+    */
     HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY);
     /** Configure the main internal regulator output voltage
-     */
+    */
     __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
     while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY))
     {
     }
     /** Initializes the CPU, AHB and APB busses clocks
-     */
+    */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState       = RCC_HSE_BYPASS;
     RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;
@@ -194,10 +259,10 @@ void SystemClock_Config(void)
         Error_Handler();
     }
     /** Initializes the CPU, AHB and APB busses clocks
-     */
+    */
     RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
-                                  RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 |
-                                  RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
+        RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 |
+        RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
     RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.SYSCLKDivider  = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.AHBCLKDivider  = RCC_HCLK_DIV1;
@@ -218,7 +283,7 @@ void SystemClock_Config(void)
         Error_Handler();
     }
     /** Enable USB Voltage detector
-     */
+    */
     HAL_PWREx_EnableUSBVoltageDetector();
 }
 
@@ -424,7 +489,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
     /* USER CODE BEGIN 6 */
     /* User can add his own implementation to report the file name and line number,
-       tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
     /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

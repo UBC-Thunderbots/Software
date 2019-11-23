@@ -36,10 +36,10 @@ int main()
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     robot_msg test_msg;
-    robot_msg ack_msg;
+    robot_ack ack_msg;
     test_msg.set_timestamp(100);
-    test_msg.set_operand1(69);
-    test_msg.set_operand2(69);
+    test_msg.set_operand1(1);
+    test_msg.set_operand2(1);
 
     // Read 1 character into c, this will block
     // forever if no character arrives.
@@ -50,6 +50,7 @@ int main()
 
         // grab the size of the serialized msg, we will also be delimiting by this msg
         int size = test_msg.ByteSizeLong();
+        int size2 = ack_msg.ByteSizeLong();
         char data[size];
 
         test_msg.SerializeToArray(&data, size);
@@ -57,17 +58,11 @@ int main()
         std::cerr<<"SENDING.........."<<std::endl;
         boost::asio::write(port, boost::asio::buffer(&data, size));
 
-        char databack[size];
+        //char databack[size2];
 
-        boost::asio::read(port, boost::asio::buffer(&databack, size));
-        ack_msg.ParseFromArray(&databack, size);
-        std::cerr<<"COMING BACK"<<ack_msg.operand1()<<ack_msg.operand2()<<std::endl;
-
-        for (int k = 0; k<size; k++){
-            std::cout<<databack[k];
-        }
-
-        std::cout<<std::endl;
+        //boost::asio::read(port, boost::asio::buffer(&databack, size2));
+        //ack_msg.ParseFromArray(&databack, size2);
+        //std::cerr<<"COMING BACK"<<ack_msg.result()<<std::endl;
     }
 
     port.close();
