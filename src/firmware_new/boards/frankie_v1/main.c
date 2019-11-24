@@ -149,7 +149,6 @@ int main(void)
     /* USER CODE BEGIN 2 */
 
     __USART3_CLK_ENABLE();
-
     HAL_UART_Receive_IT(&huart3, &byte, 1);
 
     /* USER CODE END 2 */
@@ -159,29 +158,12 @@ int main(void)
     while (1)
     {
         if (msg_recieved) {
-            control_msg incoming_req = control_msg_init_zero;
-            robot_ack outgoing_msg = robot_ack_init_zero;
 
-            // Create a stream that reads from the buffer. 
-            pb_istream_t in_stream = pb_istream_from_buffer(recv_buf, control_msg_size);
-
-            // if we could decode it sucessfully, then return then return back the computation
-            if (pb_decode(&in_stream, control_msg_fields, &incoming_req))
-            {
-                outgoing_msg.error = false;
-                pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);
-
-                if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {
-
-                }
-                HAL_UART_Transmit(&huart3, send_buf, robot_ack_size, HAL_MAX_DELAY);
-
-            // acknowledge by setting msg_recieved back to false
+            // acknowledge and setting msg_recieved back to false
+            send_ack_for_control_msg(false);
             msg_recieved = false;
 
             }
-        }
-    
         /* USER CODE BEGIN 3 */
     }
     /* USER CODE END 3 */
@@ -434,6 +416,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART3)
     {
+
         // if we are recieving the first 4 bytes, then we are recieving
         // the size of the incoming proto msg
         if (read_byte_position < 4) {
@@ -442,6 +425,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             // the size by shifting the byte by the required amount
             // and "or"ing all those together as all 4 bytes come in
             size |= (byte & 0xFF) << (8 * read_byte_position++);
+
+            // unmask interrupts and prepare for next incoming byte
+            HAL_UART_Receive_IT(&huart3, &byte, 1);
+            return;
         } 
 
         // if we have already read the size value, we can now read the incoming msg
@@ -449,19 +436,46 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         else if (4 <= read_byte_position && read_byte_position < size + 4)  {
             recv_buf[read_byte_position - 4] = byte;
             read_byte_position++;
+
+            // unmask interrupts and prepare for next incoming byte
+            HAL_UART_Receive_IT(&huart3, &byte, 1);
+            return;
         } 
         // if we have read all bytes in the size field, we can now signal
         // the main thread that we recieved a msg
         else {
             msg_recieved = true;
             read_byte_position = 0;
+            return;
         }
-
-        // unmask interrupts and prepare for next incoming byte
-        HAL_UART_Receive_IT(&huart3, &byte, 1);
     }
 }
 
+/* 
+ * @brief Transmits an robot_ack proto msg w/ error
+ * @param error: true for error, false otherwise
+ * @retval None
+ */
+void send_ack_for_control_msg(){
+    control_msg incoming_req = control_msg_init_zero;
+    robot_ack outgoing_msg = robot_ack_init_zero;
+
+    // Create a stream that reads from the buffer. 
+    pb_istream_t in_stream = pb_istream_from_buffer(recv_buf, control_msg_size);
+
+    // if we could decode it sucessfully, then return then return back the computation
+    if (pb_decode(&in_stream, control_msg_fields, &incoming_req))
+    {
+        outgoing_msg.error = false;
+        pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);
+
+        if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {
+            HAL_UART_Transmit_IT(&huart3, send_buf, robot_ack_size);
+            // unmask interrupts and prepare for next incoming byte
+        }
+    }
+    HAL_UART_Receive_IT(&huart3, &byte, 1);
+}
 
 /* USER CODE END 4 */
 
