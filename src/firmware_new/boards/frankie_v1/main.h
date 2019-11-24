@@ -55,7 +55,6 @@ extern "C"
     void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-void send_ack_for_control_msg();
 
 /* USER CODE END EFP */
 

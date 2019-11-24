@@ -23,12 +23,6 @@
 
 #include "string.h"
 
-/* Protobuf */
-#include "external/nanopb/pb_encode.h"
-#include "external/nanopb/pb_decode.h"
-#include "firmware_new/proto/control.pb.h"
-
-/* Single byte to store input */
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -88,15 +82,7 @@ UART_HandleTypeDef huart3;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-/* Private variables ---------------------------------------------------------*/
-uint8_t byte;
-uint8_t read_byte_position = 0;
-uint8_t recv_buf[control_msg_size];
-uint8_t send_buf[robot_ack_size];
 
-// modified in interrupts
-volatile uint32_t size;
-volatile bool msg_recieved = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -148,22 +134,14 @@ int main(void)
     MX_USB_OTG_FS_PCD_Init();
     /* USER CODE BEGIN 2 */
 
-    __USART3_CLK_ENABLE();
-    HAL_UART_Receive_IT(&huart3, &byte, 1);
-
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1)
     {
-        if (msg_recieved) {
+        /* USER CODE END WHILE */
 
-            // acknowledge and setting msg_recieved back to false
-            send_ack_for_control_msg(false);
-            msg_recieved = false;
-
-            }
         /* USER CODE BEGIN 3 */
     }
     /* USER CODE END 3 */
@@ -411,71 +389,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    if (huart->Instance == USART3)
-    {
-
-        // if we are recieving the first 4 bytes, then we are recieving
-        // the size of the incoming proto msg
-        if (read_byte_position < 4) {
-
-            // the size is encoded in little endian, we reconstruct
-            // the size by shifting the byte by the required amount
-            // and "or"ing all those together as all 4 bytes come in
-            size |= (byte & 0xFF) << (8 * read_byte_position++);
-
-            // unmask interrupts and prepare for next incoming byte
-            HAL_UART_Receive_IT(&huart3, &byte, 1);
-            return;
-        } 
-
-        // if we have already read the size value, we can now read the incoming msg
-        // with the new size
-        else if (4 <= read_byte_position && read_byte_position < size + 4)  {
-            recv_buf[read_byte_position - 4] = byte;
-            read_byte_position++;
-
-            // unmask interrupts and prepare for next incoming byte
-            HAL_UART_Receive_IT(&huart3, &byte, 1);
-            return;
-        } 
-        // if we have read all bytes in the size field, we can now signal
-        // the main thread that we recieved a msg
-        else {
-            msg_recieved = true;
-            read_byte_position = 0;
-            return;
-        }
-    }
-}
-
-/* 
- * @brief Transmits an robot_ack proto msg w/ error
- * @param error: true for error, false otherwise
- * @retval None
- */
-void send_ack_for_control_msg(){
-    control_msg incoming_req = control_msg_init_zero;
-    robot_ack outgoing_msg = robot_ack_init_zero;
-
-    // Create a stream that reads from the buffer. 
-    pb_istream_t in_stream = pb_istream_from_buffer(recv_buf, control_msg_size);
-
-    // if we could decode it sucessfully, then return then return back the computation
-    if (pb_decode(&in_stream, control_msg_fields, &incoming_req))
-    {
-        outgoing_msg.error = false;
-        pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);
-
-        if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {
-            HAL_UART_Transmit_IT(&huart3, send_buf, robot_ack_size);
-            // unmask interrupts and prepare for next incoming byte
-        }
-    }
-    HAL_UART_Receive_IT(&huart3, &byte, 1);
-}
 
 /* USER CODE END 4 */
 

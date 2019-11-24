@@ -34,7 +34,7 @@ int main()
 
     // TODO update udev rules to make this constant?
     port.open("/dev/ttyACM0");
-    port.set_option(boost::asio::serial_port_base::baud_rate(115200));
+    port.set_option(boost::asio::serial_port_base::baud_rate(9600));
 
     // verify that the version of the library that we linked against is
     // compatible with the version of the headers we compiled against.
@@ -101,7 +101,7 @@ void send_proto_over_serial(boost::asio::serial_port &port, const google::protob
 
     std::cout << "Sent! waiting for ack" << std::endl;
 
-         for (int i = 0; i < 22; i++){
+         for (int i = 0; i < 2; i++){
 		    boost::asio::read(port, boost::asio::buffer(&test, 1));
             std::cerr<<i<<":"<<test<<std::endl;
             rcv_buf[i] = test;
