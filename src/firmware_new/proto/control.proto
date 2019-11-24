@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+// A test robot msg which serves as an example to modify and use to
+// facilitate firmware testing.
+
+message control_msg {
+    // the 4 wheel speeds are optional, if no speed is provided,
+    // then the previous speed is maintained
+    required wheel_speed_msg wheel_1_control = 1;
+    optional wheel_speed_msg wheel_2_control = 2;
+    optional wheel_speed_msg wheel_3_control = 3;
+    optional wheel_speed_msg wheel_4_control = 4;
+}
+
+message wheel_speed_msg {
+    // speed at which to rotate
+    required uint32 rpm = 1;
+
+    // true for forwards, false for backwards
+    required bool forwards = 2;
+}
+
+
+// TODO remove this?
+message robot_ack {
+    optional bool error = 1;
+}

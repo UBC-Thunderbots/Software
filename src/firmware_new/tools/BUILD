@@ -30,5 +30,7 @@ cc_binary(
     name = "send_proto_over_serial",
     srcs = ["send_proto_over_serial.cpp"],
     deps = ["@boost//:asio",
+            "@g3log",
+            "@com_google_protobuf//:protobuf",
             "//firmware_new/proto:fw_cc_proto"],
 )
