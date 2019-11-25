@@ -45,11 +45,11 @@ class FunctionValidator
      * all parameters through coroutines.
      *
      * @param yield The coroutine push_type for the validation_function
-     * @param world The world that will be given to the validation_function being run. Because
-     * it's a shared_ptr any external changes made to the world will be reflected inside the
-     * validation_function.
+     * @param world The world that will be given to the validation_function being run.
+     * Because it's a shared_ptr any external changes made to the world will be reflected
+     * inside the validation_function.
      */
-    void executeAndCheckForSuccessWrapper(ValidationCoroutine::push_type &yield,
+    void executeAndCheckForSuccessWrapper(ValidationCoroutine::push_type& yield,
                                           std::shared_ptr<World> world);
 
     // The coroutine that will be given to the validation function

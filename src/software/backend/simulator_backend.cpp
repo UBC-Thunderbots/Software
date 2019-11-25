@@ -28,39 +28,48 @@ void SimulatorBackend::setSimulationSpeed(
     this->simulation_speed_mode = simulation_speed_mode;
 }
 
-bool SimulatorBackend::runSimulation(const std::vector<ValidationFunction>& validation_functions, World world, const Duration &timeout)
+bool SimulatorBackend::runSimulation(
+    const std::vector<ValidationFunction> &validation_functions, World world,
+    const Duration &timeout)
 {
     PhysicsSimulator physics_simulator(world);
 
     std::shared_ptr<World> world_ptr = std::make_shared<World>(world);
 
     std::vector<FunctionValidator> function_validators;
-    for(const auto& validation_function : validation_functions) {
-        function_validators.emplace_back(FunctionValidator(validation_function, world_ptr));
+    for (const auto &validation_function : validation_functions)
+    {
+        function_validators.emplace_back(
+            FunctionValidator(validation_function, world_ptr));
     }
 
-    bool all_tests_pass = runSimulationLoop(world_ptr, function_validators, physics_simulator, timeout);
+    bool all_tests_pass =
+        runSimulationLoop(world_ptr, function_validators, physics_simulator, timeout);
 
-    if(!all_tests_pass) {
+    if (!all_tests_pass)
+    {
         LOG(WARNING) << "Simulation timed out";
     }
 
     return all_tests_pass;
 }
 
-bool SimulatorBackend::runSimulationLoop(std::shared_ptr<World> world,
-                                         std::vector<FunctionValidator> &function_validators,
-                                         PhysicsSimulator &physics_simulator, const Duration& timeout) {
+bool SimulatorBackend::runSimulationLoop(
+    std::shared_ptr<World> world, std::vector<FunctionValidator> &function_validators,
+    PhysicsSimulator &physics_simulator, const Duration &timeout)
+{
     bool all_tests_pass = false;
 
     std::future<ConstPrimitiveVectorPtr> primitive_future =
-            primitive_promise.get_future();
+        primitive_promise.get_future();
     Subject<World>::sendValueToObservers(*world);
     Timestamp timeout_timestamp = world->getMostRecentTimestamp() + timeout;
     while (world->getMostRecentTimestamp() <= timeout_timestamp)
     {
-        all_tests_pass = updateSimulationAndCheckValidation(world, function_validators, physics_simulator);
-        if(all_tests_pass) {
+        all_tests_pass = updateSimulationAndCheckValidation(world, function_validators,
+                                                            physics_simulator);
+        if (all_tests_pass)
+        {
             break;
         }
 
@@ -74,7 +83,7 @@ bool SimulatorBackend::runSimulationLoop(std::shared_ptr<World> world,
         if (simulation_speed_mode == SimulationSpeed::REALTIME_SIMULATION)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(
-                    std::lrint(world_time_increment.getMilliseconds())));
+                std::lrint(world_time_increment.getMilliseconds())));
         }
 
         Subject<World>::sendValueToObservers(*world);
@@ -83,21 +92,23 @@ bool SimulatorBackend::runSimulationLoop(std::shared_ptr<World> world,
     return all_tests_pass;
 }
 
-bool SimulatorBackend::updateSimulationAndCheckValidation(std::shared_ptr<World> world,
-                                                          std::vector<FunctionValidator> &function_validators,
-                                                          PhysicsSimulator &physics_simulator) {
-    bool all_tests_pass = false;
-    unsigned int num_physics_steps_per_world_published = static_cast<unsigned int>(std::ceil(world_time_increment.getSeconds() /
-                                                                                              physics_time_step.getSeconds()));
+bool SimulatorBackend::updateSimulationAndCheckValidation(
+    std::shared_ptr<World> world, std::vector<FunctionValidator> &function_validators,
+    PhysicsSimulator &physics_simulator)
+{
+    bool all_tests_pass                                = false;
+    unsigned int num_physics_steps_per_world_published = static_cast<unsigned int>(
+        std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
     for (unsigned int i = 0; i < num_physics_steps_per_world_published; i++)
     {
         *world = physics_simulator.stepSimulation(physics_time_step);
 
-        all_tests_pass = std::all_of(function_validators.begin(), function_validators.end(), [](FunctionValidator& fv){
-            return fv.executeAndCheckForSuccess();
-        });
+        all_tests_pass = std::all_of(
+            function_validators.begin(), function_validators.end(),
+            [](FunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
 
-        if(all_tests_pass) {
+        if (all_tests_pass)
+        {
             break;
         }
     }

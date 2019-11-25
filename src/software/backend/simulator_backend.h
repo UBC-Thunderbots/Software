@@ -5,8 +5,8 @@
 
 #include "software/backend/backend.h"
 #include "software/backend/simulation/physics/physics_simulator.h"
-#include "software/backend/simulation/validation/validation_function.h"
 #include "software/backend/simulation/validation/function_validator.h"
+#include "software/backend/simulation/validation/validation_function.h"
 #include "software/world/world.h"
 
 /**
@@ -82,7 +82,8 @@ class SimulatorBackend : public Backend
      * @param timeout How long to run the simulation for before failing
      * @return true if the simulation succeeds, and false if it times out and fails
      */
-    bool runSimulation(const std::vector<ValidationFunction>& validation_functions, World world, const Duration& timeout);
+    bool runSimulation(const std::vector<ValidationFunction>& validation_functions,
+                       World world, const Duration& timeout);
 
    private:
     /**
@@ -91,7 +92,8 @@ class SimulatorBackend : public Backend
      *
      * @param world The world to be simulated
      * @param function_validators The function validators to check during the simulation
-     * @param physics_simulator The physics simulator responsible for the physics simulation
+     * @param physics_simulator The physics simulator responsible for the physics
+     * simulation
      * @param timeout How long to run the simulation before timing out
      *
      * @return true if all function_validators report their validation function has passed
@@ -99,24 +101,24 @@ class SimulatorBackend : public Backend
      */
     bool runSimulationLoop(std::shared_ptr<World> world,
                            std::vector<FunctionValidator>& function_validators,
-                           PhysicsSimulator& physics_simulator,
-                           const Duration& timeout);
+                           PhysicsSimulator& physics_simulator, const Duration& timeout);
 
     /**
      * Updates the simulation until world_time_increment has passed. For each physics step
-     * checks the result of each function_validator. If all function_validators report their
-     * validation_functions have passed, this function returns true.
+     * checks the result of each function_validator. If all function_validators report
+     * their validation_functions have passed, this function returns true.
      *
      * @param world The world to be simulated
      * @param function_validators The function validators to check during the simulation
-     * @param physics_simulator The physics simulator responsible for the physics simulation
+     * @param physics_simulator The physics simulator responsible for the physics
+     * simulation
      *
      * @return true if all function_validators report their validation function has passed
      * before the simulation timeout is reached, and false otherwise
      */
-    bool updateSimulationAndCheckValidation(std::shared_ptr<World> world,
-            std::vector<FunctionValidator>& function_validators,
-            PhysicsSimulator& physics_simulator);
+    bool updateSimulationAndCheckValidation(
+        std::shared_ptr<World> world, std::vector<FunctionValidator>& function_validators,
+        PhysicsSimulator& physics_simulator);
 
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
