@@ -1,7 +1,7 @@
-#include "software/backend/simulation/physics_ball.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 
 #include "shared/constants.h"
-#include "software/backend/simulation/box2d_util.h"
+#include "software/backend/simulation/physics/box2d_util.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
 {
@@ -15,7 +15,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
     // See the "Breakdown of a collision" section of:
     // https://www.iforce2d.net/b2dtut/collision-anatomy
     ball_body_def.bullet = true;
-    ball_body = world->CreateBody(&ball_body_def);
+    ball_body            = world->CreateBody(&ball_body_def);
 
     ball_shape.m_radius = BALL_MAX_RADIUS_METERS;
 
