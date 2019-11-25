@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
- *
- * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
- * All rights reserved.</center></h2>
- *
- * This software component is licensed by ST under BSD 3-Clause license,
- * the "License"; You may not use this file except in compliance with the
- * License. You may obtain a copy of the License at:
- *                        opensource.org/licenses/BSD-3-Clause
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -24,12 +24,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "external/nanopb/pb_encode.h"
-#include "external/nanopb/pb_decode.h"
-#include "firmware_new/proto/control.pb.h"
-#define TX_LENGTH (16)
-#define RX_LENGTH (16)
-
 
 /* USER CODE END Includes */
 
@@ -40,12 +34,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
 
 /* USER CODE END PM */
 
@@ -79,13 +71,11 @@ ETH_HandleTypeDef heth;
 
 UART_HandleTypeDef huart3;
 DMA_HandleTypeDef hdma_usart3_rx;
+DMA_HandleTypeDef hdma_usart3_tx;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-
-uint8_t recv_buf[] = {12,12,3,4,1,2};
-uint8_t send_buf[robot_ack_size];
 
 /* USER CODE END PV */
 
@@ -102,17 +92,6 @@ static void MX_DMA_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-// TODO comment
-typedef enum
-{
-    IDLE,
-    RECIEVING_SIZE,
-    RECIEVING_PROTO,
-    IDLE_LINE_DETECTED,
-    SENDING_PROTO
-} UART_State;
-
-UART_State uart_state = IDLE;
 
 /* USER CODE END 0 */
 
@@ -126,6 +105,9 @@ int main(void)
 
   /* USER CODE END 1 */
   
+
+  /* Enable I-Cache---------------------------------------------------------*/
+  SCB_EnableICache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -151,32 +133,16 @@ int main(void)
   MX_DMA_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Invalidate D-cache before reception */
-  /* Make sure the address is 32-byte aligned and add 32-bytes to length, in case it overlaps cacheline */
-  uint8_t rx_buffer[RX_LENGTH];
-  SCB_InvalidateDCache_by_Addr((uint32_t*)(((uint32_t)rx_buffer) & ~(uint32_t)0x1F), RX_LENGTH+32);
-
-  /* Start DMA transfer */
-  if(HAL_UART_Receive_DMA(&huart3, rx_buffer, RX_LENGTH)) {
-      
-      Error_Handler();
-  }
-
-  /*if(HAL_UART_Receive_DMA(&huart3, (uint8_t*)recv_buf, 5) != HAL_OK)*/
-  /*{        */
-      /*Error_Handler();*/
-  /*}*/
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    while (1)
-    {
+  while (1)
+  {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    }
+  }
   /* USER CODE END 3 */
 }
 
@@ -273,7 +239,7 @@ static void MX_ETH_Init(void)
   heth.Init.RxBuffLen = 1524;
 
   /* USER CODE BEGIN MACADDRESS */
-
+    
   /* USER CODE END MACADDRESS */
 
   if (HAL_ETH_Init(&heth) != HAL_OK)
@@ -385,6 +351,9 @@ static void MX_DMA_Init(void)
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
+  /* DMA1_Stream6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
   /* DMA1_Stream7_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);
@@ -443,46 +412,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    if (huart->Instance == USART3)
-    {
-        uint16_t current_sounter = __HAL_DMA_GET_COUNTER(huart->hdmarx);
-    }
-}
 
-/* 
- * @brief Transmits an robot_ack proto msg w/ error
- * @param error: true for error, false otherwise
- * @retval None
- */
-void send_ack_for_control_msg(){
-    /*control_msg incoming_req = control_msg_init_zero;*/
-    /*robot_ack outgoing_msg = robot_ack_init_zero;*/
-
-    /*// Create a stream that reads from the buffer. */
-    /*pb_istream_t in_stream = pb_istream_from_buffer(recv_buf, control_msg_size);*/
-
-    /*// if we could decode it sucessfully, then return then return back the computation*/
-    /*outgoing_msg.error = false;*/
-
-    /*if (pb_decode(&in_stream, control_msg_fields, &incoming_req))*/
-    /*{*/
-        /*outgoing_msg.error = true;*/
-    /*}*/
-        /*pb_ostream_t out_stream = pb_ostream_from_buffer(send_buf, robot_ack_size);*/
-
-        /*if(pb_encode(&out_stream, robot_ack_fields, &outgoing_msg)) {*/
-            /*HAL_UART_Transmit(&huart3, send_buf, robot_ack_size, 1000);*/
-            /*// unmask interrupts and prepare for next incoming byte*/
-        /*}*/
-    /*HAL_UART_Receive_DMA(&huart3, &byte, 1);*/
-}
-
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-        Error_Handler();
-}
 /* USER CODE END 4 */
 
 /**
@@ -492,7 +422,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-    /* User can add his own implementation to report the HAL error return state */
+  /* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }
@@ -508,9 +438,8 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 { 
   /* USER CODE BEGIN 6 */
-    /* User can add his own implementation to report the file name and line number,
-u
-       tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* User can add his own implementation to report the file name and line number,
+     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
