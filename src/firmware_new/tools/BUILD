@@ -14,3 +14,11 @@ sh_binary(
     srcs = ["cubemx_regen.sh"],
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )
+cc_binary(
+    name = "send_proto_over_serial",
+    srcs = ["send_proto_over_serial.cpp"],
+    deps = ["@boost//:asio",
+            "@g3log",
+            "@com_google_protobuf//:protobuf",
+            "//firmware_new/proto:fw_cc_proto"],
+)
