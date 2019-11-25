@@ -67,6 +67,8 @@ cc_library(
     deps = [
         ":backend",
         "//software/backend/simulation/physics:physics_simulator",
+        "//software/backend/simulation/validation:function_validator",
+        "//software/backend/simulation/validation:validation_function",
         "//software/util/logger",
         "//software/world",
     ],

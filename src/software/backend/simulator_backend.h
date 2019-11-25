@@ -5,11 +5,16 @@
 
 #include "software/backend/backend.h"
 #include "software/backend/simulation/physics/physics_simulator.h"
+#include "software/backend/simulation/validation/validation_function.h"
+#include "software/backend/simulation/validation/function_validator.h"
 #include "software/world/world.h"
 
 /**
  * This class implements the Backend interface using a physics simulation to
  * execute received commands and provide new data to the system.
+ *
+ * This class is intentionally not registered in the BackendFactory since it does
+ * not have a default constructor and has a relatively specialized use case.
  */
 class SimulatorBackend : public Backend
 {
@@ -21,9 +26,9 @@ class SimulatorBackend : public Backend
      *
      * - FAST_SIMULATION will run the simulation as fast a possible
      * - REALTIME_SIMULATION will run the simulation in real-time, meaning
-     * if timestamps in published data are 'n' seconds apart, they will be published
-     * 'n' seconds apart in real "wall-clock" time. This is useful
-     * if you want to visualize the simulation.
+     *   if timestamps in published data are 'n' seconds apart, they will be published
+     *   'n' seconds apart in real "wall-clock" time. This is useful
+     *   if you want to visualize the simulation.
      */
     enum SimulationSpeed
     {
@@ -77,12 +82,47 @@ class SimulatorBackend : public Backend
      * @param timeout How long to run the simulation for before failing
      * @return true if the simulation succeeds, and false if it times out and fails
      */
-    bool runSimulation(World world, const Duration& timeout);
+    bool runSimulation(const std::vector<ValidationFunction>& validation_functions, World world, const Duration& timeout);
 
    private:
+    /**
+     * Runs the main simulation loop that updates the physics simulation, checks the
+     * function validators, and publishes the latest world data to Observers
+     *
+     * @param world The world to be simulated
+     * @param function_validators The function validators to check during the simulation
+     * @param physics_simulator The physics simulator responsible for the physics simulation
+     * @param timeout How long to run the simulation before timing out
+     *
+     * @return true if all function_validators report their validation function has passed
+     * before the simulation timeout is reached, and false otherwise
+     */
+    bool runSimulationLoop(std::shared_ptr<World> world,
+                           std::vector<FunctionValidator>& function_validators,
+                           PhysicsSimulator& physics_simulator,
+                           const Duration& timeout);
+
+    /**
+     * Updates the simulation until world_time_increment has passed. For each physics step
+     * checks the result of each function_validator. If all function_validators report their
+     * validation_functions have passed, this function returns true.
+     *
+     * @param world The world to be simulated
+     * @param function_validators The function validators to check during the simulation
+     * @param physics_simulator The physics simulator responsible for the physics simulation
+     *
+     * @return true if all function_validators report their validation function has passed
+     * before the simulation timeout is reached, and false otherwise
+     */
+    bool updateSimulationAndCheckValidation(std::shared_ptr<World> world,
+            std::vector<FunctionValidator>& function_validators,
+            PhysicsSimulator& physics_simulator);
+
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
+    // The time increment the physics simulation is updated by
     const Duration physics_time_step;
+    // The time increment between each World published by the backend
     const Duration world_time_increment;
     SimulationSpeed simulation_speed_mode;
 
