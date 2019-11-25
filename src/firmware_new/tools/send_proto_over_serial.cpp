@@ -93,23 +93,30 @@ void send_proto_over_serial(boost::asio::serial_port &port, const google::protob
     // append the rest of the message to the length prefixed buffer
     for (int k = 0; k < size_of_msg; k++)
     {
-        send_buf[4 + k] = msg_buf[k];
+        send_buf[k] = k;
     }
     uint8_t test;
+    send_buf[3] = 'a';
+    send_buf[2] = 'b';
+    send_buf[1] = 'c';
+    send_buf[0] = 'd';
 
-    boost::asio::write(port, boost::asio::buffer(&send_buf, size_of_msg + 4));
+    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
+    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
+    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
+    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
 
-    std::cout << "Sent! waiting for ack" << std::endl;
+    std::cout << "Sent!"<<std::endl;
 
-         for (int i = 0; i < 2; i++){
-		    boost::asio::read(port, boost::asio::buffer(&test, 1));
-            std::cerr<<i<<":"<<test<<std::endl;
-            rcv_buf[i] = test;
-         }
+    for (int i = 0; i < 12; i++){
+       boost::asio::read(port, boost::asio::buffer(&test, 1));
+       std::cerr<<i<<":"<<test<<std::endl;
+       rcv_buf[i] = test;
+    }
 
-    robot_ack ack_msg;
-    ack_msg.ParseFromArray(&rcv_buf, 2);
-    std::cerr<<"Error? : "<<ack_msg.error()<<std::endl;
+    //robot_ack ack_msg;
+    //ack_msg.ParseFromArray(&rcv_buf, 2);
+    //std::cerr<<"Error? : "<<ack_msg.error()<<std::endl;
 }
 
 /*

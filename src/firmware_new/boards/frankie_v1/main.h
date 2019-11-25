@@ -55,6 +55,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+void USER_UART_IdleLineCallback(UART_HandleTypeDef* huart);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

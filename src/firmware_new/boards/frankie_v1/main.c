@@ -24,6 +24,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "external/nanopb/pb_encode.h"
+#include "external/nanopb/pb_decode.h"
+#include "firmware_new/proto/control.pb.h"
+#define TX_LENGTH (16)
+#define RX_LENGTH (16)
 
 /* USER CODE END Includes */
 
@@ -77,6 +82,8 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
 
+uint8_t recv_buf[RX_LENGTH];
+uint8_t send_buf[TX_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,6 +99,17 @@ static void MX_DMA_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+typedef enum
+{
+    AWAITING_DMA_RX_COMPLETE_INTERRUPT,
+    AWAITING_TX_COMPLETE_INTERRUPT,
+    RECIEVED_TX_COMPLETE_INTERRUPT,
+    RECEIVED_DMA_RX_COMPLETE_INTERRUPT,
+    IDLE,
+    IDLE_LINE_DETECTED,
+} UART_State;
+
+volatile UART_State uart_state = IDLE;
 
 /* USER CODE END 0 */
 
@@ -133,15 +151,30 @@ int main(void)
   MX_DMA_Init();
   /* USER CODE BEGIN 2 */
 
-  /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int count = 0;
   while (1)
   {
-    /* USER CODE END WHILE */
+      /* Start DMA transfer */
+      /*__HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);*/
+      while(HAL_UART_Receive_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK) {
+          count ++;
+      }
 
-    /* USER CODE BEGIN 3 */
+      uart_state = AWAITING_DMA_RX_COMPLETE_INTERRUPT;
+      while (uart_state != RECEIVED_DMA_RX_COMPLETE_INTERRUPT);
+
+      /*// echo back the data*/
+      HAL_UART_Transmit(&huart3, recv_buf, RX_LENGTH, 1000);
+      /*uart_state = AWAITING_TX_COMPLETE_INTERRUPT;*/
+      /*[> USER CODE END WHILE <]*/
+      /*while (uart_state != RECIEVED_TX_COMPLETE_INTERRUPT);*/
+
+      /* USER CODE END 2 */
+
+      /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
@@ -352,7 +385,7 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 1);
   HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
   /* DMA1_Stream7_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
@@ -412,7 +445,37 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    uint16_t current_sounter = 0;
+    if (huart->Instance == USART3)
+    {
+        uart_state = RECEIVED_DMA_RX_COMPLETE_INTERRUPT;
+        current_sounter = __HAL_DMA_GET_COUNTER(huart->hdmarx);
+    }
+    uint16_t current_counter = current_sounter;
+}
 
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    uint16_t current_sounter = 0;
+    if (huart->Instance == USART3)
+    {
+        uart_state = RECIEVED_TX_COMPLETE_INTERRUPT;
+        current_sounter = __HAL_DMA_GET_COUNTER(huart->hdmarx);
+    }
+    uint16_t current_counter = current_sounter;
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+        Error_Handler();
+}
+
+void USER_UART_IdleLineCallback(UART_HandleTypeDef* huart)
+{
+    return; //yeehaw
+}
 /* USER CODE END 4 */
 
 /**
