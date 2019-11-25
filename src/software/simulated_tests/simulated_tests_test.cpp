@@ -6,7 +6,7 @@
 #include "software/backend/simulation/validation/validation_function.h"
 #include "software/world/world.h"
 
-TEST_F(SimulatedTest, example_simulated_test)
+TEST_F(SimulatedTest, test_single_validation_function_passes_before_timeout)
 {
     World world         = ::Test::TestUtil::createBlankTestingWorld();
     world.mutableBall() = Ball(Point(0, 0), Vector(4, 1.5), Timestamp::fromSeconds(0));
@@ -18,7 +18,7 @@ TEST_F(SimulatedTest, example_simulated_test)
             }
     };
 
-    bool test_succeeded = backend->runSimulation(validation_functions, world, Duration::fromSeconds(2));
+    bool test_passed = backend->runSimulation(validation_functions, world, Duration::fromSeconds(1));
 
-    ASSERT_TRUE(test_succeeded);
+    ASSERT_TRUE(test_passed);
 }

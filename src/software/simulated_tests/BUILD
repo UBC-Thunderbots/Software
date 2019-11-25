@@ -14,13 +14,13 @@ cc_library(
 )
 
 cc_test(
-    name = "example_test",
-    srcs = ["example_test.cpp"],
+    name = "simulated_tests_test",
+    srcs = ["simulated_tests_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        "//software/backend/simulation/validation:validation_function",
         "//software/test_util",
         "//software/util/time:duration",
-        "//software/backend/simulation/validation:validation_function",
         "//software/world",
         "@gtest//:gtest_main",
     ],
