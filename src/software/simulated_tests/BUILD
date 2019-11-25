@@ -20,6 +20,7 @@ cc_test(
         ":simulated_test_fixture",
         "//software/test_util",
         "//software/util/time:duration",
+        "//software/backend/simulation/validation:validation_function",
         "//software/world",
         "@gtest//:gtest_main",
     ],
