@@ -1,6 +1,6 @@
-#include "software/backend/simulation/physics_field.h"
+#include "software/backend/simulation/physics/physics_field.h"
 
-#include "software/backend/simulation/box2d_util.h"
+#include "software/backend/simulation/physics/box2d_util.h"
 
 PhysicsField::PhysicsField(std::shared_ptr<b2World> world, const Field &field)
     : field(field)
