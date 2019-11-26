@@ -93,24 +93,20 @@ void send_proto_over_serial(boost::asio::serial_port& port,
     proto_msg.SerializeToArray(&msg_buf, size_of_msg);
 
     // append the rest of the message to the length prefixed buffer
-    for (int k = 0; k < size_of_msg; k++)
+    for (int k = 0; k < size_of_msg + 4; k++)
     {
-        send_buf[k] = k;
+        send_buf[k] = 65 - k;
     }
-    uint8_t test;
-    send_buf[3] = 'a';
-    send_buf[2] = 'b';
-    send_buf[1] = 'c';
-    send_buf[0] = 'd';
 
-    boost::asio::write(port, boost::asio::buffer(&send_buf, 12 + 4));
+    boost::asio::write(port, boost::asio::buffer(&send_buf, size_of_msg + 4));
 
     std::cout << "Sent! Waiting for echo!" << std::endl;
 
-    for (int i = 0; i < 12; i++)
+    uint8_t test;
+    for (int i = 0; i < size_of_msg+4; i++)
     {
         boost::asio::read(port, boost::asio::buffer(&test, 1));
-        std::cerr << i << ":" << test << std::endl;
+        std::cerr << i << ":" << signed(test) << std::endl;
         rcv_buf[i] = test;
     }
 

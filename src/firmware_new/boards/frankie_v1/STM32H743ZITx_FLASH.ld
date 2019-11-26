@@ -178,6 +178,13 @@ SECTIONS
     . = ALIGN(8);
   } >RAM_D1
 
+  /* DMA1 and DMA2 are directly connected to D2 Domain so we allocate
+   * any DMA buffers there */
+  .dma_buffer :
+  {
+    *(.dma_buffer)
+  } >RAM_D2
+
   
 
   /* Remove information from the standard libraries */

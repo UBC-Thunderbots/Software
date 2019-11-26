@@ -1,6 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "proto_library", "proto_lang_toolchain", "ProtoInfo")
 load("@com_google_protobuf//:protobuf.bzl", "proto_gen")
-load("@bazel_skylib//lib:versions.bzl", "versions")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 def c_proto_library(name, srcs, **kwargs):

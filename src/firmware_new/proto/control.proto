@@ -4,8 +4,10 @@ syntax = "proto2";
 // facilitate firmware testing.
 
 message control_msg {
+
     // the 4 wheel speeds are optional, if no speed is provided,
     // then the previous speed is maintained
+
     required wheel_speed_msg wheel_1_control = 1;
     optional wheel_speed_msg wheel_2_control = 2;
     optional wheel_speed_msg wheel_3_control = 3;
@@ -13,6 +15,7 @@ message control_msg {
 }
 
 message wheel_speed_msg {
+
     // speed at which to rotate
     required uint32 rpm = 1;
 
@@ -20,8 +23,7 @@ message wheel_speed_msg {
     required bool forwards = 2;
 }
 
-
-// TODO remove this?
+// Robot response
 message robot_ack {
-    optional bool error = 1;
+    required uint32 error_code = 1;
 }

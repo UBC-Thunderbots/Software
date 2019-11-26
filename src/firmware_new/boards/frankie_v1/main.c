@@ -44,6 +44,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+#define DMA_BUFFER __attribute__((section(".dma_buffer")))
 
 /* USER CODE END PM */
 
@@ -89,8 +90,8 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
 
-uint8_t recv_buf[RX_LENGTH];
-uint8_t send_buf[TX_LENGTH];
+DMA_BUFFER uint8_t recv_buf[RX_LENGTH];
+DMA_BUFFER uint8_t send_buf[TX_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -108,12 +109,11 @@ static void MX_DMA_Init(void);
 /* USER CODE BEGIN 0 */
 typedef enum
 {
+    IDLE,
     AWAITING_DMA_RX_COMPLETE_INTERRUPT,
     AWAITING_TX_COMPLETE_INTERRUPT,
     RECIEVED_TX_COMPLETE_INTERRUPT,
     RECEIVED_DMA_RX_COMPLETE_INTERRUPT,
-    IDLE,
-    IDLE_LINE_DETECTED,
 } UART_State;
 
 volatile UART_State uart_state = IDLE;
@@ -161,31 +161,44 @@ int main(void)
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    int count = 0;
+    // some metrics
+    int rx_wait_count = 0;
+    int tx_wait_count = 0;
     while (1)
     {
         /* Start DMA transfer */
         HAL_UART_DeInit(&huart3);
         HAL_UART_Init(&huart3);
 
-        /*__HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);*/
-        while (HAL_UART_Receive_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK)
-            ;
+        /* Enable IDLE line interrupt to parse data */
+        __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
 
+        /* RX */
+        while (HAL_UART_Receive_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK) {
+            rx_wait_count++;
+        }
         uart_state = AWAITING_DMA_RX_COMPLETE_INTERRUPT;
-        while (uart_state != RECEIVED_DMA_RX_COMPLETE_INTERRUPT)
-            ;
+        while (uart_state != RECEIVED_DMA_RX_COMPLETE_INTERRUPT) {}
 
-        for (int k = 0; k<RX_LENGTH; k++) {
-            recv_buf[k]+=30;
+        /* Insertion Sort */
+        for(int i=1; i<RX_LENGTH; i++)
+        {
+            int value = recv_buf[i];
+            int hole = i;
+            while(hole>0 && recv_buf[hole-1]>value)
+            {
+                recv_buf[hole] = recv_buf[hole-1];
+                hole--;
+            }
+            recv_buf[hole] = value;
         }
 
-        while (HAL_UART_Transmit_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK)
-            ;
+        /* TX */
+        while (HAL_UART_Transmit_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK) {
+            tx_wait_count++;
+        }
         uart_state = AWAITING_TX_COMPLETE_INTERRUPT;
-
-        while (uart_state != RECIEVED_TX_COMPLETE_INTERRUPT)
-            ;
+        while (uart_state != RECIEVED_TX_COMPLETE_INTERRUPT) {}
 
         /* USER CODE END 2 */
 
