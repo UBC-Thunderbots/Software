@@ -158,19 +158,19 @@ int main(void)
   while (1)
   {
       /* Start DMA transfer */
+      HAL_UART_DeInit(&huart3);
+      HAL_UART_Init(&huart3);
+
       /*__HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);*/
-      while(HAL_UART_Receive_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK) {
-          count ++;
-      }
+      while(HAL_UART_Receive_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK);
 
       uart_state = AWAITING_DMA_RX_COMPLETE_INTERRUPT;
       while (uart_state != RECEIVED_DMA_RX_COMPLETE_INTERRUPT);
 
-      /*// echo back the data*/
-      HAL_UART_Transmit(&huart3, recv_buf, RX_LENGTH, 1000);
-      /*uart_state = AWAITING_TX_COMPLETE_INTERRUPT;*/
-      /*[> USER CODE END WHILE <]*/
-      /*while (uart_state != RECIEVED_TX_COMPLETE_INTERRUPT);*/
+      while(HAL_UART_Transmit_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK);
+      uart_state = AWAITING_TX_COMPLETE_INTERRUPT;
+
+      while (uart_state != RECIEVED_TX_COMPLETE_INTERRUPT);
 
       /* USER CODE END 2 */
 

@@ -102,9 +102,6 @@ void send_proto_over_serial(boost::asio::serial_port &port, const google::protob
     send_buf[0] = 'd';
 
     boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
-    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
-    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
-    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
 
     std::cout << "Sent!"<<std::endl;
 
