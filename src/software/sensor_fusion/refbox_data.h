@@ -110,8 +110,100 @@ struct TeamInfo
  */
 class RefboxData
 {
+   public:
+    RefboxData(Timestamp packet_timestamp, Timestamp game_state_timestamp,
+               int game_state_counter, Point designated_position,
+               bool blue_team_on_positive_half,
+               Duration current_game_state_time_remaining, TeamInfo us_team_info,
+               TeamInfo them_team_info, RefboxGameState game_state,
+               RefboxGameState next_game_state, RefboxStage stage,
+               std::vector<GameEvent> game_events,
+               std::vector<ProposedGameEvent> proposed_game_events)
+        : packet_timestamp(packet_timestamp),
+          game_state_timestamp(game_state_timestamp),
+          game_state_counter(game_state_counter),
+          designated_position(designated_position),
+          blue_team_on_positive_half(blue_team_on_positive_half),
+          current_game_state_time_remaining(current_game_state_time_remaining),
+          us_team_info(us_team_info),
+          them_team_info(them_team_info),
+          game_state(game_state),
+          next_game_state(next_game_state),
+          stage(stage),
+          game_events(game_events),
+          proposed_game_events(proposed_game_events)
+    {
+    }
+
+    Timestamp getPacketTimestamp(void)
+    {
+        return packet_timestamp;
+    }
+
+    Timestamp getGameStateTimestamp(void)
+    {
+        return game_state_timestamp;
+    }
+
+    int getGameStateCounter(void)
+    {
+        return game_state_counter;
+    }
+
+    Point getDesignatedPosition(void)
+    {
+        return designated_position;
+    }
+
+    bool getBlueTeamOnPositiveHalf(void)
+    {
+        return blue_team_on_positive_half;
+    }
+
+    Duration getCurrentGameStateTimeRemaining(void)
+    {
+        return current_game_state_time_remaining;
+    }
+
+    TeamInfo getUsTeamInfo(void)
+    {
+        return us_team_info;
+    }
+
+    TeamInfo getThemTeamInfo(void)
+    {
+        return them_team_info;
+    }
+
+    RefboxGameState getGameState(void)
+    {
+        return game_state;
+    }
+
+    RefboxGameState getNextGameState(void)
+    {
+        return next_game_state;
+    }
+
+    RefboxStage getStage(void)
+    {
+        return stage;
+    }
+
+    std::vector<GameEvent> getGameEvents(void)
+    {
+        return game_events;
+    }
+
+    std::vector<ProposedGameEvent> getProposedGameEvents(void)
+    {
+        return proposed_game_events;
+    }
+
+
+   private:
     // packet timestamp
-    Timestamp timestamp;
+    Timestamp packet_timestamp;
     // time that current game state was initiated
     Timestamp game_state_timestamp;
     // number of game states issued since startup (mod 2^32)
