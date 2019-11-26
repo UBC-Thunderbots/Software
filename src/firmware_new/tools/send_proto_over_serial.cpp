@@ -22,10 +22,11 @@
 #include "boost/asio.hpp"
 #include "boost/asio/serial_port.hpp"
 #include "firmware_new/proto/control.pb.h"
-#include "google/protobuf/util/delimited_message_util.h"
 #include "g3log/g3log.hpp"
+#include "google/protobuf/util/delimited_message_util.h"
 
-void send_proto_over_serial(boost::asio::serial_port &port, const google::protobuf::Message& proto_msg);
+void send_proto_over_serial(boost::asio::serial_port& port,
+                            const google::protobuf::Message& proto_msg);
 
 int main()
 {
@@ -63,25 +64,26 @@ int main()
 
 /*
  * Given a boost::asio::serial_port and an arbitrary protomsg, length prefixes the bytes
- * and sends them over the port. Assumes the port is open and does not close the port. 
+ * and sends them over the port. Assumes the port is open and does not close the port.
  *
  * @param port The port to send the data over
  * @param proto_msg The msg to serialize, length-prefix and send over the port.
  */
-void send_proto_over_serial(boost::asio::serial_port &port, const google::protobuf::Message& proto_msg){
-
+void send_proto_over_serial(boost::asio::serial_port& port,
+                            const google::protobuf::Message& proto_msg)
+{
     auto size_of_msg = proto_msg.ByteSizeLong();
     uint8_t msg_buf[size_of_msg];
     uint8_t rcv_buf[size_of_msg];
     std::cout << "Sending protobuf with size: " << size_of_msg << std::endl;
 
     // we need to encode the size of the msg being sent over serial into the msg due
-    // to the nature of how the micro recieves these values. Regardless of DMA or a purely Interrupt based
-    // approach on the stm32, it is difficult to know where the msg begins and ends,
-    // (even using pb_decode_delimited and writeDelimitedTo are tricky due to how this data is received
-    // on the stm32, as we can't use in/out streams the same way c++ server/clients can)
-    // So we consistently send the size of the msg in the first 4 bytes, as our
-    // custom "framing" (size is stored in little endian)
+    // to the nature of how the micro recieves these values. Regardless of DMA or a purely
+    // Interrupt based approach on the stm32, it is difficult to know where the msg begins
+    // and ends, (even using pb_decode_delimited and writeDelimitedTo are tricky due to
+    // how this data is received on the stm32, as we can't use in/out streams the same way
+    // c++ server/clients can) So we consistently send the size of the msg in the first 4
+    // bytes, as our custom "framing" (size is stored in little endian)
     uint8_t send_buf[size_of_msg + 4];
     send_buf[3] = (size_of_msg >> 24) & 0xFF;
     send_buf[2] = (size_of_msg >> 16) & 0xFF;
@@ -101,19 +103,20 @@ void send_proto_over_serial(boost::asio::serial_port &port, const google::protob
     send_buf[1] = 'c';
     send_buf[0] = 'd';
 
-    boost::asio::write(port, boost::asio::buffer(&send_buf, 12+4));
+    boost::asio::write(port, boost::asio::buffer(&send_buf, 12 + 4));
 
-    std::cout << "Sent!"<<std::endl;
+    std::cout << "Sent! Waiting for echo!" << std::endl;
 
-    for (int i = 0; i < 12; i++){
-       boost::asio::read(port, boost::asio::buffer(&test, 1));
-       std::cerr<<i<<":"<<test<<std::endl;
-       rcv_buf[i] = test;
+    for (int i = 0; i < 12; i++)
+    {
+        boost::asio::read(port, boost::asio::buffer(&test, 1));
+        std::cerr << i << ":" << test << std::endl;
+        rcv_buf[i] = test;
     }
 
-    //robot_ack ack_msg;
-    //ack_msg.ParseFromArray(&rcv_buf, 2);
-    //std::cerr<<"Error? : "<<ack_msg.error()<<std::endl;
+    // robot_ack ack_msg;
+    // ack_msg.ParseFromArray(&rcv_buf, 2);
+    // std::cerr<<"Error? : "<<ack_msg.error()<<std::endl;
 }
 
 /*
@@ -122,10 +125,11 @@ void send_proto_over_serial(boost::asio::serial_port &port, const google::protob
  * @param port The port to send the data over
  * @param proto_msg The msg to serialize, length-prefix and send over the port.
  */
-//void recv_proto_over_serial(boost::asio::serial_port &port, const google::protobuf::Message& proto_msg){
+// void recv_proto_over_serial(boost::asio::serial_port &port, const
+// google::protobuf::Message& proto_msg){
 
-    //std::cout << "Sent! waiting for ack" << std::endl;
-    //boost::asio::read(port, boost::asio::buffer(&, 1));
-    //ack_msg.ParseFromArray(&indata, insize);
-    //std::cerr<<"COMING BACK"<<ack_msg.result()<<std::endl;
+// std::cout << "Sent! waiting for ack" << std::endl;
+// boost::asio::read(port, boost::asio::buffer(&, 1));
+// ack_msg.ParseFromArray(&indata, insize);
+// std::cerr<<"COMING BACK"<<ack_msg.result()<<std::endl;
 //}

@@ -15,7 +15,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
     // See the "Breakdown of a collision" section of:
     // https://www.iforce2d.net/b2dtut/collision-anatomy
     ball_body_def.bullet = true;
-    ball_body = world->CreateBody(&ball_body_def);
+    ball_body            = world->CreateBody(&ball_body_def);
 
     ball_shape.m_radius = BALL_MAX_RADIUS_METERS;
 
