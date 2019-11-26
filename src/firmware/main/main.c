@@ -297,6 +297,8 @@ void vApplicationIdleHook(void) {
 
 static void main_task(void *param) __attribute__((noreturn));
 
+#include "leds.h"
+
 static void stm32_main(void) {
 	// Initialize the basic chip hardware.
 	init_chip(&INIT_SPECS);
@@ -310,7 +312,7 @@ static void stm32_main(void) {
 	static StaticTask_t main_task_tcb;
 	STACK_ALLOCATE(main_task_stack, 4096);
 	main_task_handle = xTaskCreateStatic(&main_task, "main", sizeof(main_task_stack) / sizeof(*main_task_stack), 0, PRIO_TASK_SUPERVISOR, main_task_stack, &main_task_tcb);
-	vTaskStartScheduler();
+        vTaskStartScheduler();
 	__builtin_unreachable();
 }
 

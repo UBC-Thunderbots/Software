@@ -4,7 +4,7 @@
 #include <mutex>
 
 #include "software/backend/backend.h"
-#include "software/backend/simulation/physics_simulator.h"
+#include "software/backend/simulation/physics/physics_simulator.h"
 #include "software/world/world.h"
 
 /**

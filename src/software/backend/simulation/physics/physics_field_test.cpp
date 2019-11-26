@@ -1,10 +1,10 @@
-#include "software/backend/simulation/physics_field.h"
+#include "software/backend/simulation/physics/physics_field.h"
 
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 #include <math.h>
 
-#include "software/backend/simulation/physics_ball.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
