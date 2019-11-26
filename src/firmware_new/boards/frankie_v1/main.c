@@ -176,6 +176,10 @@ int main(void)
         while (uart_state != RECEIVED_DMA_RX_COMPLETE_INTERRUPT)
             ;
 
+        for (int k = 0; k<RX_LENGTH; k++) {
+            recv_buf[k]+=30;
+        }
+
         while (HAL_UART_Transmit_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK)
             ;
         uart_state = AWAITING_TX_COMPLETE_INTERRUPT;
