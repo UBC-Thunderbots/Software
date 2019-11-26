@@ -5,7 +5,7 @@
 
 #include "software/geom/line.h"
 #include "software/new_geom/point.h"
-#include "software/sensor_fusion/detection.h"
+#include "software/sensor_fusion/ball_detection.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/ball.h"
 #include "software/world/ball_state.h"

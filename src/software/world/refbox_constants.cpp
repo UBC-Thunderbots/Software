@@ -1,6 +1,6 @@
-#include "software/world/refbox_constants.h"
-
 #include <magic_enum/magic_enum.hpp>
+
+#include "software/sensor_fusion/refbox_data.h"
 
 std::string name(const RefboxGameState& state)
 {

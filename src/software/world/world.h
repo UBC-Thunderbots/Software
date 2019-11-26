@@ -3,11 +3,11 @@
 
 #include <boost/circular_buffer.hpp>
 
+#include "software/sensor_fusion/refbox_data.h"
 #include "software/world/ball.h"
 #include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/world/game_state.h"
-#include "software/world/refbox_constants.h"
 #include "software/world/team.h"
 
 /**

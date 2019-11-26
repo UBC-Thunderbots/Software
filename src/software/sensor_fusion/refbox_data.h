@@ -106,7 +106,7 @@ struct TeamInfo
 /**
  * RefboxData is a container class to represent the referee proto internally
  * It renames fields for ease of use, i.e. command->game_state and blue/yellow->us/them
- * and uses our data structures, such as Timestamp, Duration, and Point
+ * and uses friendly data structures, such as Timestamp, Duration, and Point
  */
 class RefboxData
 {
@@ -114,8 +114,8 @@ class RefboxData
     RefboxData(Timestamp packet_timestamp, Timestamp game_state_timestamp,
                int game_state_counter, Point designated_position,
                bool blue_team_on_positive_half,
-               Duration current_game_state_time_remaining, TeamInfo us_team_info,
-               TeamInfo them_team_info, RefboxGameState game_state,
+               Duration current_game_state_time_remaining, TeamInfo friendly_team_info,
+               TeamInfo enemy_team_info, RefboxGameState game_state,
                RefboxGameState next_game_state, RefboxStage stage,
                std::vector<GameEvent> game_events,
                std::vector<ProposedGameEvent> proposed_game_events)
@@ -125,8 +125,8 @@ class RefboxData
           designated_position(designated_position),
           blue_team_on_positive_half(blue_team_on_positive_half),
           current_game_state_time_remaining(current_game_state_time_remaining),
-          us_team_info(us_team_info),
-          them_team_info(them_team_info),
+          friendly_team_info(friendly_team_info),
+          enemy_team_info(enemy_team_info),
           game_state(game_state),
           next_game_state(next_game_state),
           stage(stage),
@@ -135,71 +135,60 @@ class RefboxData
     {
     }
 
-    Timestamp getPacketTimestamp(void)
+    Timestamp getPacketTimestamp(void) const
     {
         return packet_timestamp;
     }
 
-    Timestamp getGameStateTimestamp(void)
+    Timestamp getGameStateTimestamp(void) const
     {
         return game_state_timestamp;
     }
 
-    int getGameStateCounter(void)
+    int getGameStateCounter(void) const
     {
         return game_state_counter;
     }
 
-    Point getDesignatedPosition(void)
+    Point getDesignatedPosition(void) const
     {
         return designated_position;
     }
 
-    bool getBlueTeamOnPositiveHalf(void)
+    bool getBlueTeamOnPositiveHalf(void) const
     {
         return blue_team_on_positive_half;
     }
 
-    Duration getCurrentGameStateTimeRemaining(void)
+    Duration getCurrentGameStateTimeRemaining(void) const
     {
         return current_game_state_time_remaining;
     }
 
-    TeamInfo getUsTeamInfo(void)
+    TeamInfo getFriendlyTeamInfo(void) const
     {
-        return us_team_info;
+        return friendly_team_info;
     }
 
-    TeamInfo getThemTeamInfo(void)
+    TeamInfo getEnemyTeamInfo(void) const
     {
-        return them_team_info;
+        return enemy_team_info;
     }
 
-    RefboxGameState getGameState(void)
+    RefboxGameState getGameState(void) const
     {
         return game_state;
     }
 
-    RefboxGameState getNextGameState(void)
+    RefboxGameState getNextGameState(void) const
     {
         return next_game_state;
     }
 
-    RefboxStage getStage(void)
+    RefboxStage getStage(void) const
     {
         return stage;
     }
-
-    std::vector<GameEvent> getGameEvents(void)
-    {
-        return game_events;
-    }
-
-    std::vector<ProposedGameEvent> getProposedGameEvents(void)
-    {
-        return proposed_game_events;
-    }
-
 
    private:
     // packet timestamp
@@ -216,10 +205,10 @@ class RefboxData
     // time remaining for current game_state
     Duration current_game_state_time_remaining;
 
-    // Referee's info on our team
-    TeamInfo us_team_info;
-    // Referee's info on their team
-    TeamInfo them_team_info;
+    // Referee's info on friendly team
+    TeamInfo friendly_team_info;
+    // Referee's info on enemy team
+    TeamInfo enemy_team_info;
     // Current game state
     RefboxGameState game_state;
     // The game state that will be issued after the current stoppage and ball placement to
