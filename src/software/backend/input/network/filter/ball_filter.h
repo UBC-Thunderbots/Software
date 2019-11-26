@@ -65,7 +65,7 @@ class BallFilter
      * Filters the new ball detection data, and returns the updated state of the ball
      * given the new data *
      * @param current_ball_state The current state of the Ball
-     * @param new_ball_detections A list of new SSL Ball detections
+     * @param new_ball_detections A list of new Ball detections
      *
      * @return The updated state of the ball given the new data
      */

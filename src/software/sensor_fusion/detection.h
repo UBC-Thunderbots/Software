@@ -41,6 +41,10 @@ struct BallDetection
     }
 };
 
+/**
+ * VisionDetection represents ball and robot detections
+ * and is used to pass data from backend to sensor fusion
+ */
 class VisionDetection
 {
    public:
