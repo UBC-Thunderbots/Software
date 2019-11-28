@@ -69,15 +69,6 @@ class MotionConstraintManager : public TacticVisitor
     void visit(const ShadowEnemyTactic &tactic) override;
 
     /**
-     * Visits a BlockShotPathTactic to perform an operation.
-     *
-     * @param tactic The BlockShotPathTactic to visit
-     *
-     * @modifies current_whitelisted_constraints
-     */
-    void visit(const BlockShotPathTactic &tactic) override;
-
-    /**
      * Visits a MoveTactic to perform an operation.
      *
      * @param tactic The MoveTactic to visit
@@ -141,15 +132,6 @@ class MotionConstraintManager : public TacticVisitor
     void visit(const ReceiverTactic &tactic) override;
 
     /**
-     * Visits a PatrolTactic to perform an operation.
-     *
-     * @param tactic The PatrolTactic to visit
-     *
-     * @modifies current_whitelisted_constraints
-     */
-    void visit(const PatrolTactic &tactic) override;
-
-    /**
      * Visits a ShootGoalTactic to perform an operation.
      *
      * @param tactic The ShootGoalTactic to visit
@@ -175,15 +157,6 @@ class MotionConstraintManager : public TacticVisitor
      * @modifies current_whitelisted_constraints
      */
     void visit(const DefenseShadowEnemyTactic &tactic) override;
-
-    /**
-     * Visits a GrabBallTactic to perform an operation.
-     *
-     * @param tactic The GrabBallTactic to visit
-     *
-     * @modifies current_whitelisted_constraints
-     */
-    void visit(const GrabBallTactic &tactic) override;
 
     /**
      * Visits a MoveTestTactic to perform an operation.
