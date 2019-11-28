@@ -3,9 +3,9 @@
 #include "shared/constants.h"
 #include "software/proto/messages_robocup_ssl_detection.pb.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
+#include "software/sensor_fusion/refbox_data.h"
 #include "software/util/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
-#include "software/world/refbox_constants.h"
 
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
@@ -120,14 +120,14 @@ Field NetworkFilter::createFieldFromPacketGeometry(
 BallState NetworkFilter::getFilteredBallData(
     const std::vector<SSL_DetectionFrame> &detections)
 {
-    auto ball_detections = std::vector<SSLBallDetection>();
+    auto ball_detections = std::vector<BallDetection>();
 
     for (const auto &detection : detections)
     {
         for (const SSL_DetectionBall &ball : detection.balls())
         {
             // Convert all data to meters and radians
-            SSLBallDetection ball_detection;
+            BallDetection ball_detection;
             ball_detection.position =
                 Point(ball.x() * METERS_PER_MILLIMETER, ball.y() * METERS_PER_MILLIMETER);
             ball_detection.timestamp = Timestamp::fromSeconds(detection.t_capture());
@@ -168,7 +168,7 @@ BallState NetworkFilter::getFilteredBallData(
 Team NetworkFilter::getFilteredFriendlyTeamData(
     const std::vector<SSL_DetectionFrame> &detections)
 {
-    auto friendly_robot_detections = std::vector<SSLRobotDetection>();
+    auto friendly_robot_detections = std::vector<RobotDetection>();
 
     // Collect all the visible robots from all camera frames
     for (const auto &detection : detections)
@@ -186,7 +186,7 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
 
         for (const auto &friendly_robot_detection : ssl_robots)
         {
-            SSLRobotDetection robot_detection;
+            RobotDetection robot_detection;
 
             robot_detection.id = friendly_robot_detection.robot_id();
             robot_detection.position =
@@ -229,7 +229,7 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
 Team NetworkFilter::getFilteredEnemyTeamData(
     const std::vector<SSL_DetectionFrame> &detections)
 {
-    auto enemy_robot_detections = std::vector<SSLRobotDetection>();
+    auto enemy_robot_detections = std::vector<RobotDetection>();
 
     // Collect all the visible robots from all camera frames
     for (const auto &detection : detections)
@@ -245,7 +245,7 @@ Team NetworkFilter::getFilteredEnemyTeamData(
 
         for (const auto &enemy_robot_detection : ssl_robots)
         {
-            SSLRobotDetection robot_detection;
+            RobotDetection robot_detection;
 
             robot_detection.id = enemy_robot_detection.robot_id();
             robot_detection.position =

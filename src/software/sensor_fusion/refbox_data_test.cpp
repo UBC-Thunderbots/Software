@@ -1,8 +1,8 @@
-#include "software/world/refbox_constants.h"
+#include "software/sensor_fusion/refbox_data.h"
 
 #include <gtest/gtest.h>
 
-TEST(RefboxConstants, test_get_name_of_refbox_constants)
+TEST(RefboxData, test_get_name_of_refbox_constants)
 {
     for (int i = 0; i < static_cast<int>(RefboxGameState::REFBOX_GAME_STATE_COUNT); i++)
     {
