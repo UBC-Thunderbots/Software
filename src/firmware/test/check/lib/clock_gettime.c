@@ -21,10 +21,10 @@
 #include "libcompat.h"
 
 #ifdef __APPLE__
+#include <CoreServices/CoreServices.h>
 #include <mach/clock.h>
 #include <mach/mach.h>
 #include <mach/mach_time.h>
-#include <CoreServices/CoreServices.h>
 #include <unistd.h>
 #endif
 
@@ -34,7 +34,6 @@
 
 int clock_gettime(clockid_t clk_id CK_ATTRIBUTE_UNUSED, struct timespec *ts)
 {
-
 #ifdef __APPLE__
     /* Some versions of macOS and iOS do not have clock_gettime, use
      * mach_absolute_time */
@@ -55,30 +54,30 @@ int clock_gettime(clockid_t clk_id CK_ATTRIBUTE_UNUSED, struct timespec *ts)
     /*
      * First grab the time base used on the system, if this is the first
      * time we are being called. We can check if the value is uninitialized,
-     * as the denominator will be zero. 
+     * as the denominator will be zero.
      */
-    if(sTimebaseInfo.denom == 0)
+    if (sTimebaseInfo.denom == 0)
     {
         (void)mach_timebase_info(&sTimebaseInfo);
     }
 
-    /* 
-     * Do the conversion. We hope that the multiplication doesn't 
+    /*
+     * Do the conversion. We hope that the multiplication doesn't
      * overflow; the price you pay for working in fixed point.
      */
     nanos = rawTime * sTimebaseInfo.numer / sTimebaseInfo.denom;
 
-    /* 
-     * Fill in the timespec container 
+    /*
+     * Fill in the timespec container
      */
-    ts->tv_sec = nanos / NANOSECONDS_PER_SECOND;
+    ts->tv_sec  = nanos / NANOSECONDS_PER_SECOND;
     ts->tv_nsec = nanos - (ts->tv_sec * NANOSECONDS_PER_SECOND);
 #else
-    /* 
+    /*
      * As there is no function to fall back onto to get the current
-     * time, zero out the time so the caller will have a sane value. 
+     * time, zero out the time so the caller will have a sane value.
      */
-    ts->tv_sec = 0;
+    ts->tv_sec  = 0;
     ts->tv_nsec = 0;
 #endif
 

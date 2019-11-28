@@ -20,10 +20,11 @@
 
 
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <check.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "config.h"
 
 START_TEST(test_pass)
@@ -42,7 +43,7 @@ END_TEST
  * This test will fail without fork, as it will result in the
  * unit test runniner exiting early.
  */
-#if defined(HAVE_FORK) && HAVE_FORK==1
+#if defined(HAVE_FORK) && HAVE_FORK == 1
 START_TEST(test_exit)
 {
     exit(1);
@@ -75,7 +76,11 @@ END_TEST
 
 START_TEST(test_xml_esc_fail_msg)
 {
-    ck_abort_msg("fail \" ' < > & \x9 \xA" "X""\x08"" message"); /* backspace char \x08 deletes the X */
+    ck_abort_msg(
+        "fail \" ' < > & \x9 \xA"
+        "X"
+        "\x08"
+        " message"); /* backspace char \x08 deletes the X */
 }
 END_TEST
 
@@ -84,12 +89,12 @@ static Suite *make_log1_suite(void)
     Suite *s;
     TCase *tc;
 
-    s = suite_create("S1");
+    s  = suite_create("S1");
     tc = tcase_create("Core");
     suite_add_tcase(s, tc);
     tcase_add_test(tc, test_pass);
     tcase_add_test(tc, test_fail);
-#if defined(HAVE_FORK) && HAVE_FORK==1
+#if defined(HAVE_FORK) && HAVE_FORK == 1
     tcase_add_test(tc, test_exit);
 #endif /* HAVE_FORK */
 
@@ -101,10 +106,10 @@ static Suite *make_log2_suite(int include_exit_test)
     Suite *s;
     TCase *tc;
 
-    s = suite_create("S2");
+    s  = suite_create("S2");
     tc = tcase_create("Core");
     suite_add_tcase(s, tc);
-    if(include_exit_test == 1)
+    if (include_exit_test == 1)
     {
         tcase_add_test(tc, test_abort);
     }
@@ -120,8 +125,16 @@ static Suite *make_xml_esc_suite(void)
     Suite *s;
     TCase *tc;
 
-    s = suite_create("XML escape \" ' < > & \x9 \xA" "X""\x08"" tests"); /* backspace char \x08 deletes the X */
-    tc = tcase_create("description \" ' < > & \x9 \xA" "X""\x08"" end"); /* backspace char \x08 deletes the X */
+    s = suite_create(
+        "XML escape \" ' < > & \x9 \xA"
+        "X"
+        "\x08"
+        " tests"); /* backspace char \x08 deletes the X */
+    tc = tcase_create(
+        "description \" ' < > & \x9 \xA"
+        "X"
+        "\x08"
+        " end"); /* backspace char \x08 deletes the X */
     suite_add_tcase(s, tc);
 
     tcase_add_test(tc, test_xml_esc_fail_msg);
@@ -136,12 +149,15 @@ static void print_usage(void)
     printf(" | CK_SUBUNIT");
 #endif
     printf(")\n");
-    printf("                 (STDOUT | STDOUT_DUMP | LOG | LOG_STDOUT | TAP | TAP_STDOUT | XML | XML_STDOUT)\n");
+    printf(
+        "                 (STDOUT | STDOUT_DUMP | LOG | LOG_STDOUT | TAP | TAP_STDOUT | XML | XML_STDOUT)\n");
     printf("                 (NORMAL | EXIT_TEST)\n");
     printf("   If CK_ENV is used, the environment variable CK_VERBOSITY can be set to\n");
-    printf("   one of these: silent, minimal, or verbose. If it is not set to these, or\n");
+    printf(
+        "   one of these: silent, minimal, or verbose. If it is not set to these, or\n");
     printf("   if CK_VERBOSITY is not set, then CK_NORMAL will be used\n");
-    printf("   If testing the CK_[LOG|TAP_LOG|XML_LOG]_FILE_NAME env var and setting it to '-',\n");
+    printf(
+        "   If testing the CK_[LOG|TAP_LOG|XML_LOG]_FILE_NAME env var and setting it to '-',\n");
     printf("   then use the following mode: CK_SILENT STDOUT [NORMAL|EXIT_TEST].\n");
 }
 
@@ -154,11 +170,11 @@ static void run_tests(enum print_output printmode, char *log_type, int include_e
     srunner_add_suite(sr, make_log2_suite(include_exit_test));
     srunner_add_suite(sr, make_xml_esc_suite());
 
-    if(strcmp(log_type, "STDOUT") == 0)
+    if (strcmp(log_type, "STDOUT") == 0)
     {
         /* Nothing else to do here */
     }
-    else if(strcmp(log_type, "STDOUT_DUMP") == 0)
+    else if (strcmp(log_type, "STDOUT_DUMP") == 0)
     {
         /*
          * Dump each type to stdout, in addition to printing out
@@ -166,27 +182,27 @@ static void run_tests(enum print_output printmode, char *log_type, int include_e
          */
         dump_everything_to_stdout = 1;
     }
-    else if(strcmp(log_type, "LOG") == 0)
+    else if (strcmp(log_type, "LOG") == 0)
     {
         srunner_set_log(sr, "test.log");
     }
-    else if(strcmp(log_type, "LOG_STDOUT") == 0)
+    else if (strcmp(log_type, "LOG_STDOUT") == 0)
     {
         srunner_set_log(sr, "-");
     }
-    else if(strcmp(log_type, "TAP") == 0)
+    else if (strcmp(log_type, "TAP") == 0)
     {
         srunner_set_tap(sr, "test.tap");
     }
-    else if(strcmp(log_type, "TAP_STDOUT") == 0)
+    else if (strcmp(log_type, "TAP_STDOUT") == 0)
     {
         srunner_set_tap(sr, "-");
     }
-    else if(strcmp(log_type, "XML") == 0)
+    else if (strcmp(log_type, "XML") == 0)
     {
         srunner_set_xml(sr, "test.xml");
     }
-    else if(strcmp(log_type, "XML_STDOUT") == 0)
+    else if (strcmp(log_type, "XML_STDOUT") == 0)
     {
         srunner_set_xml(sr, "-");
     }
@@ -198,7 +214,7 @@ static void run_tests(enum print_output printmode, char *log_type, int include_e
 
     srunner_run_all(sr, printmode);
 
-    if(dump_everything_to_stdout)
+    if (dump_everything_to_stdout)
     {
         srunner_print(sr, CK_SILENT);
         srunner_print(sr, CK_MINIMAL);
@@ -217,42 +233,42 @@ static void run_tests(enum print_output printmode, char *log_type, int include_e
     srunner_free(sr);
 }
 
-#define OUTPUT_TYPE_ARG       1
-#define LOG_TYPE_ARG          2
+#define OUTPUT_TYPE_ARG 1
+#define LOG_TYPE_ARG 2
 #define INCLUDE_EXIT_TEST_ARG 3
 int main(int argc, char **argv)
 {
     enum print_output printmode;
     int include_exit_test;
 
-    if(argc != 4)
+    if (argc != 4)
     {
         print_usage();
         return EXIT_FAILURE;
     }
 
-    if(strcmp(argv[OUTPUT_TYPE_ARG], "CK_SILENT") == 0)
+    if (strcmp(argv[OUTPUT_TYPE_ARG], "CK_SILENT") == 0)
     {
         printmode = CK_SILENT;
     }
-    else if(strcmp(argv[OUTPUT_TYPE_ARG], "CK_MINIMAL") == 0)
+    else if (strcmp(argv[OUTPUT_TYPE_ARG], "CK_MINIMAL") == 0)
     {
         printmode = CK_MINIMAL;
     }
-    else if(strcmp(argv[OUTPUT_TYPE_ARG], "CK_NORMAL") == 0)
+    else if (strcmp(argv[OUTPUT_TYPE_ARG], "CK_NORMAL") == 0)
     {
         printmode = CK_NORMAL;
     }
-    else if(strcmp(argv[OUTPUT_TYPE_ARG], "CK_VERBOSE") == 0)
+    else if (strcmp(argv[OUTPUT_TYPE_ARG], "CK_VERBOSE") == 0)
     {
         printmode = CK_VERBOSE;
     }
-    else if(strcmp(argv[OUTPUT_TYPE_ARG], "CK_ENV") == 0)
+    else if (strcmp(argv[OUTPUT_TYPE_ARG], "CK_ENV") == 0)
     {
         printmode = CK_ENV;
     }
 #if ENABLE_SUBUNIT
-    else if(strcmp(argv[OUTPUT_TYPE_ARG], "CK_SUBUNIT") == 0)
+    else if (strcmp(argv[OUTPUT_TYPE_ARG], "CK_SUBUNIT") == 0)
     {
         printmode = CK_SUBUNIT;
     }
@@ -263,11 +279,11 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if(strcmp(argv[INCLUDE_EXIT_TEST_ARG], "NORMAL") == 0)
+    if (strcmp(argv[INCLUDE_EXIT_TEST_ARG], "NORMAL") == 0)
     {
         include_exit_test = 0;
     }
-    else if(strcmp(argv[INCLUDE_EXIT_TEST_ARG], "EXIT_TEST") == 0)
+    else if (strcmp(argv[INCLUDE_EXIT_TEST_ARG], "EXIT_TEST") == 0)
     {
         include_exit_test = 1;
     }

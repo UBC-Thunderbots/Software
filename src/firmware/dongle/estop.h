@@ -13,21 +13,22 @@
 /**
  * \brief The states the switch can be in.
  */
-typedef enum {
-	/**
-	 * \brief The switch is faulty or not plugged in.
-	 */
-	ESTOP_BROKEN,
+typedef enum
+{
+    /**
+     * \brief The switch is faulty or not plugged in.
+     */
+    ESTOP_BROKEN,
 
-	/**
-	 * \brief The switch is set to the stop position.
-	 */
-	ESTOP_STOP,
+    /**
+     * \brief The switch is set to the stop position.
+     */
+    ESTOP_STOP,
 
-	/**
-	 * \brief The switch is set to the run position.
-	 */
-	ESTOP_RUN,
+    /**
+     * \brief The switch is set to the run position.
+     */
+    ESTOP_RUN,
 } estop_t;
 
 /**
@@ -60,4 +61,3 @@ void estop_set_sem(SemaphoreHandle_t sem);
 void adc_isr(void);
 
 #endif
-
