@@ -44,8 +44,8 @@
       * [Plays](#plays)
     * [Navigation](#navigation)
       * [Path Planner](#path-planner)
-        * [Theta Star Path Planner](#theta-star)
-        * [Alternative Path Planners](#alt-path-planner)
+        * [Theta Star Path Planner](#theta-star-path-planner)
+        * [Alternative Path Planners](#alternative-path-planners)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
 
@@ -398,7 +398,7 @@ A Star is a similar algorithm that does the same graph exloration as Theta Star.
 
 References:
 * [Theta Star Any Angle](https://web.archive.org/web/20190218161704/http://aigamedev.com/open/tutorial/theta-star-any-angle-paths/)
-* [Reference A Star Implementation] (https://www.geeksforgeeks.org/a-search-algorithm/)
+* [Reference A Star Implementation](https://www.geeksforgeeks.org/a-search-algorithm/)
 
 #### Alternative Path Planners
 Our team has used Rapidly-exploring Random Tree in the past, but we found that the non-determinism and precision were big problems.
