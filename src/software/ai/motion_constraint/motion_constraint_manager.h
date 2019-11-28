@@ -105,6 +105,15 @@ class MotionConstraintManager : public TacticVisitor
     void visit(const StopTactic &tactic) override;
 
     /**
+     * Visits a PatrolTactic to perform an operation.
+     *
+     * @param tactic The PatrolTactic to visit
+     *
+     * @modifies current_whitelisted_constraints
+     */
+    void visit(const PatrolTactic &tactic) override;
+
+    /**
      * Visits a PenaltyKickTactic to perform an operation.
      *
      * @param tactic The PenaltyKickTactic to visit

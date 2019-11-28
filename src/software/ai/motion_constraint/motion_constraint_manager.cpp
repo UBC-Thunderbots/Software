@@ -61,6 +61,8 @@ void MotionConstraintManager::visit(const KickoffChipTactic &tactic)
 
 void MotionConstraintManager::visit(const StopTactic &tactic) {}
 
+void MotionConstraintManager::visit(const PatrolTactic &tactic) {}
+
 void MotionConstraintManager::visit(const PenaltyKickTactic &tactic)
 {
     current_whitelisted_constraints = std::set<MotionConstraint>({

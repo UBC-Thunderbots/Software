@@ -234,6 +234,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/ai/hl/stp/tactic:patrol_tactic",
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/hl/stp/tactic:stop_tactic",
