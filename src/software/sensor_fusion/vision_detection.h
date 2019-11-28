@@ -21,13 +21,11 @@ class VisionDetection
      * @param ball_detections list of ball detections
      * @param friendly_team_detections list of robot detections for friendly team
      * @param enemy_team_detections list of robot detections for enemy team
-     * @param latest_timestamp latest timestamp from all the detections
      *
      */
     VisionDetection(const std::vector<BallDetection> &ball_detections,
                     const std::vector<RobotDetection> &friendly_team_detections,
-                    const std::vector<RobotDetection> &enemy_team_detections,
-                    const Timestamp &latest_timestamp);
+                    const std::vector<RobotDetection> &enemy_team_detections);
 
     /**
      * Gets ball detections

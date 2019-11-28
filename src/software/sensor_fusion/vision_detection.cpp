@@ -3,8 +3,7 @@
 VisionDetection::VisionDetection(
     const std::vector<BallDetection> &ball_detections,
     const std::vector<RobotDetection> &friendly_team_detections,
-    const std::vector<RobotDetection> &enemy_team_detections,
-    const Timestamp &latest_timestamp)
+    const std::vector<RobotDetection> &enemy_team_detections)
 {
 }
 
