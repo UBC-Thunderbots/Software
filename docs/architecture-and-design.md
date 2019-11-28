@@ -43,6 +43,9 @@
       * [Tactics](#tactics)
       * [Plays](#plays)
     * [Navigation](#navigation)
+      * [Path Planner](#path-planner)
+        * [Theta Star Path Planner](#theta-star)
+        * [Alternative Path Planners](#alt-path-planner)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
 
@@ -385,6 +388,22 @@ The `Navigator` is responsible for path planning and navigation. Once our strate
 Most [Intents](#intents) are easy to break down into  [Primitives](#primitives), and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behaviour like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
 
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+
+### Path Planner
+The `Path Planner` is responsible for path planning a single robot around a single set of obstacles from a given start to a given destination. Note that the interface of the path planner is intentionally decoupled from the rest of AI, so that it doesn't rely on the representation of [Intents](#intents) or [World](#world).
+
+#### Theta Star Path Planner
+The `Theta Star Path Planner` is a path planner that determines a series of points from the start and destination, such that none of the points are in an obstacle and none of the line segments between adjacent points cross an obstacle, optimizing for the shortest total path length. It uses a grid of points to represent the field and uses graph exploration to connect the start and destination. As it explores each point, it checks against each of the given obstacles to see if that point is inside. 
+A Star is a similar algorithm that does the same graph exloration as Theta Star. The key difference is that Theta Star will try to connect each newly explored point to the previous point on the path via line of sight by checking that the line of sight doesn't cross an obstacle. This means the path isn't confined to moving along right angles of the grid as in A Star and is free to move at any angle. Why not smooth the path afterwards? Looking for line of sight allows the algorithm to accurately evaluate the smoothed path length as it goes. This avoids cases with A Star where the right-angled path it generates might be the shortest when compare against other right-angled paths, but once smoothed, it isn't the shortest when compared to other smoothed paths.
+
+References:
+* [Theta Star Any Angle](https://web.archive.org/web/20190218161704/http://aigamedev.com/open/tutorial/theta-star-any-angle-paths/)
+* [Reference A Star Implementation] (https://www.geeksforgeeks.org/a-search-algorithm/)
+
+#### Alternative Path Planners
+Our team has used Rapidly-exploring Random Tree in the past, but we found that the non-determinism and precision were big problems.
+
+Our team has experimented with spline-based path planners in the past. Spline-based path planners offer the advantage of making smoother paths and possibly accounting for robot dynamics to make the path faster for the robot to follow. However, we would need to change the radio protocol to communicate the spline information and we would need to improve control to keep the robot on the path.
 
 ## AI Diagram
 ![Backend Diagram](images/ai_diagram.svg)
