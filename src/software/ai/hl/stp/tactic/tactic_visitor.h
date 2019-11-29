@@ -51,7 +51,7 @@ class TacticVisitor
     virtual void visit(const ChipTactic &tactic) = 0;
     virtual void visit(const KickoffChipTactic &tactic)        = 0;
     virtual void visit(const StopTactic &tactic) = 0;
-    virtual void visit(const PatrolTactic &tactic) = 0;
+    virtual void visit(const PatrolTactic &tactic)             = 0;
     virtual void visit(const PenaltyKickTactic &tactic) = 0;
     virtual void visit(const PenaltySetupTactic &tactic)       = 0;
     virtual void visit(const ReceiverTactic &tactic) = 0;
