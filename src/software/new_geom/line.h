@@ -10,12 +10,12 @@ class Line final
 {
    public:
     /**
-     * Creates a degenerate line with zero Points and zero Polynomials
+     * Creates a degenerate Line with zero Points and zero Polynomials
      */
     Line();
 
     /**
-     * Creates a line from two Points
+     * Creates a Line from two Points
      *
      * @param first the first Point
      * @param second the second Point
@@ -59,32 +59,32 @@ class Line final
 
     /**
      * Calculates the Point evaluated at val, starting from the first Point and moving val
-     * units along the line towards the second Point
+     * units along the Line towards the second Point
      *
-     * @param val the value to evaluate line
+     * @param val the value to evaluate Line
      *
-     * @return Point on line evaluated at val
+     * @return Point on Line evaluated at val
      */
     Point valueAt(double val) const;
 
    private:
     /**
-     * The first point that defines the starting point of the line
+     * The first point that defines the starting point of the Line
      */
     Point first;
 
     /**
-     * The second point that defines the direction of the line
+     * The second point that defines the direction of the Line
      */
     Point second;
 
     /**
-     * Parametric equation for the x component of line
+     * Parametric equation for the x component of Line
      */
     Polynomial x;
 
     /**
-     * Parametric equation for the y component of line
+     * Parametric equation for the y component of Line
      */
     Polynomial y;
 
