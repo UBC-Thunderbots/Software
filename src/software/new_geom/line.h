@@ -89,7 +89,7 @@ class Line final
     Polynomial y;
 
     /**
-     * Calculates the parametric equations based on points given and sets x and y
+     * Calculates the parametric equations based on Points given and sets x and y
      * accordingly
      *
      * @param first the first Point
