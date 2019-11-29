@@ -11,7 +11,7 @@ RobotTeamFilter::RobotTeamFilter() {}
 
 Team RobotTeamFilter::getFilteredData(
     const Team &current_team_state,
-    const std::vector<SSLRobotDetection> &new_robot_detections)
+    const std::vector<RobotDetection> &new_robot_detections)
 {
     // Add filters for any robot we haven't seen before
     for (auto detection : new_robot_detections)

@@ -60,7 +60,7 @@ cc_library(
     hdrs = ["game_state.h"],
     deps = [
         ":ball",
-        ":refbox_constants",
+        "//software/sensor_fusion:refbox_data",
         "@g3log",
     ],
 )
@@ -71,22 +71,6 @@ cc_test(
     deps = [
         ":game_state",
         "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "refbox_constants",
-    srcs = ["refbox_constants.cpp"],
-    hdrs = ["refbox_constants.h"],
-    deps = ["@magic_enum"],
-)
-
-cc_test(
-    name = "refbox_constants_test",
-    srcs = ["refbox_constants_test.cpp"],
-    deps = [
-        ":refbox_constants",
         "@gtest//:gtest_main",
     ],
 )
