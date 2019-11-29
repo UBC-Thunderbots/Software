@@ -32,6 +32,16 @@ cc_test(
 )
 
 cc_library(
+    name = "continuous_function_validator",
+    srcs = ["continuous_function_validator.cpp"],
+    hdrs = ["continuous_function_validator.h"],
+    deps = [
+        ":validation_function",
+        "@boost//:coroutine2",
+    ],
+)
+
+cc_library(
     name = "world_state_validator",
     srcs = ["world_state_validator.cpp"],
     hdrs = ["world_state_validator.h"],

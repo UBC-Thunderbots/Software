@@ -7,34 +7,29 @@
  * an easy way to manage the coroutines required to run ValidationFunctions as well as see
  * if the function has succeeded / passed.
  *
- * This class will run the provided coroutine a single time and stop once it has completed.
- * The coroutine will NOT be restarted upon completion.
+ * This class will run the provided coroutine continuously by restarting it every time the
+ * coroutine has completed.
  */
-class FunctionValidator
-{
-   public:
+class ContinuousFunctionValidator {
+public:
     /**
-     * Creates a new FunctionValidator.
+     * Creates a new ContinousFunctionValidator.
      *
      * @param validation_function The ValidationFunction this FunctionValidator should
      * manage and run
      * @param world The world that will be given to the ValidationFunction in order to run
      * it
      */
-    explicit FunctionValidator(const ValidationFunction& validation_function,
+    explicit ContinuousFunctionValidator(const ValidationFunction& validation_function,
                                std::shared_ptr<World> world);
 
     /**
      * Runs the ValidationFunction that was given to this FunctionValidator on
-     * construction and returns true if the ValidationFunction has succeeded / passed.
-     * Returns false otherwise. Once the ValidationFunction has succeeded (returned true
-     * once), the coroutine will not be restarted and this function will always return
-     * true without re-running the ValidationFunction.
-     *
-     * @return true if the internal ValidationFunction has succeeded / passed, and false
-     * otherwise
+     * construction. The ValidationFunction will be restarted if it has completed. As such,
+     * the ValidationFunction can never be "done" and will only terminate due to failures
+     * within the ValidationFunction, such as as a failed GoogleTest assert
      */
-    bool executeAndCheckForSuccess();
+    void executeAndCheckForFailures();
 
 private:
     /**
@@ -52,11 +47,12 @@ private:
      * Because it's a shared_ptr any external changes made to the world will be reflected
      * inside the validation_function.
      */
-    void executeAndCheckForSuccessWrapper(ValidationCoroutine::push_type& yield,
+    void executeAndCheckForFailuresWrapper(ValidationCoroutine::push_type& yield,
                                           std::shared_ptr<World> world);
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;
     // The validation function being executed / managed
     ValidationFunction validation_function;
+    std::shared_ptr<World> world_ptr;
 };
