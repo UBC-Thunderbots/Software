@@ -196,8 +196,8 @@ class BallFilterTest : public ::testing::Test
             Point ball_position_with_noise = current_ball_position + position_noise;
 
             // Create the detection that would have been seen by the vision system
-            std::vector<SSLBallDetection> ball_detections = {
-                SSLBallDetection{ball_position_with_noise, current_timestamp}};
+            std::vector<BallDetection> ball_detections = {
+                BallDetection{ball_position_with_noise, current_timestamp}};
 
             // Get the filtered result given the new detection information
             auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);
@@ -508,7 +508,7 @@ TEST_F(BallFilterTest,
 TEST_F(BallFilterTest,
        test_linear_regression_returns_same_results_for_inverted_coordinates)
 {
-    boost::circular_buffer<SSLBallDetection> ball_detections(2);
+    boost::circular_buffer<BallDetection> ball_detections(2);
     Point p1(0, 0);
     Point p2(1, 0.5);
     ball_detections.push_front({p1, Timestamp::fromSeconds(1)});
@@ -522,7 +522,7 @@ TEST_F(BallFilterTest,
     EXPECT_LT(d2, 0.001);
 
     // test the inverse regression
-    boost::circular_buffer<SSLBallDetection> inv_ball_detections = ball_detections;
+    boost::circular_buffer<BallDetection> inv_ball_detections = ball_detections;
     for (auto& detection : inv_ball_detections)
     {
         detection.position = Point(detection.position.y(), detection.position.x());

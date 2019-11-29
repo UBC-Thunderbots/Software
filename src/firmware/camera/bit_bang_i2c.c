@@ -1,22 +1,15 @@
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 
-//SDA
-//SCL
+// SDA
+// SCL
 
-//Hello
+// Hello
 
-void delay (void)//uint32_t time)
+void delay(void)  // uint32_t time)
 {
-	
 }
 
-void send_start (void)
-{
+void send_start(void) {}
 
-}
-
-void send_msg (uint8_t msg)
-{
-
-}
+void send_msg(uint8_t msg) {}
