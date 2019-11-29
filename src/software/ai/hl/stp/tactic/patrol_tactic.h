@@ -39,11 +39,6 @@ class PatrolTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    /**
-     * Visits itself using the visitor
-     *
-     * @param visitor to use to visit itself
-     */
     void accept(TacticVisitor& visitor) const override;
 
    private:

@@ -25,6 +25,11 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
     this->ball_collision_type = ball_collision_type;
 }
 
+void MoveAction::accept(ActionVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
 void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was

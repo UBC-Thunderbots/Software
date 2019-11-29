@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/play/play_factory.h"
-#include "software/ai/hl/stp/tactic/block_shot_path_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -105,12 +104,12 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0,
-                BallCollisionType::AVOID);
+                (world.ball().position() - world.field().friendlyGoal()).orientation(),
+                0);
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0,
-                BallCollisionType::AVOID);
+                (world.ball().position() - world.field().friendlyGoal()).orientation(),
+                0);
 
             tactics_to_run.emplace_back(move_tactic_main);
             tactics_to_run.emplace_back(move_tactic_secondary);
@@ -123,8 +122,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                     ROBOT_MAX_RADIUS_METERS * 3);
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0,
-                BallCollisionType::AVOID);
+                (world.ball().position() - world.field().friendlyGoal()).orientation(),
+                0);
 
             tactics_to_run.emplace_back(shadow_tactic_main);
             tactics_to_run.emplace_back(move_tactic_main);

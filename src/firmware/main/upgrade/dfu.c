@@ -211,7 +211,9 @@
  *
  * <table>
  * <tr><th>Bit Index</th><th>Applicable To</th><th>Description</th></tr>
- * <tr><td>0</td><td>Firmware Only</td><td>\em Ephemeral: The image on the SD card is erased at system startup if identical firmware is present in the microcontroller’s on-board Flash.</td></tr>
+ * <tr><td>0</td><td>Firmware Only</td><td>\em Ephemeral: The image on the SD card is
+ * erased at system startup if identical firmware is present in the microcontroller’s
+ * on-board Flash.</td></tr>
  * </table>
  *
  * Any bits that are not specified above are reserved and must be zero. Any
@@ -223,18 +225,13 @@
  * \{
  */
 #include "dfu.h"
-#include "common.h"
-#include "internal.h"
-#include "../constants.h"
-#include "../dma.h"
-#include "../main.h"
-#include "../pins.h"
-#include "../sdcard.h"
+
 #include <FreeRTOS.h>
 #include <assert.h>
 #include <crc32.h>
 #include <gpio.h>
 #include <minmax.h>
+#include <registers/iwdg.h>
 #include <semphr.h>
 #include <stack.h>
 #include <stdbool.h>
@@ -245,259 +242,288 @@
 #include <unused.h>
 #include <usb.h>
 #include <usb_dfu.h>
-#include <registers/iwdg.h>
+
+#include "common.h"
+#include "internal.h"
+#include "io/dma.h"
+#include "io/pins.h"
+#include "io/sdcard.h"
+#include "main.h"
+#include "util/constants.h"
 
 /**
  * \brief The possible types of jobs the writeout task performs.
  */
-typedef enum {
-	/**
-	 * \brief The writeout task prepare to write data into a storage area.
-	 *
-	 * The \ref upgrade_dfu_writeout_job_t::integer "integer" parameter is the
-	 * index (0 or 1) of the storage area to write to.
-	 *
-	 * The writeout task will initialize its pointers in preparation for
-	 * writing to the specified storage area.
-	 *
-	 * This job does not send a response.
-	 */
-	UPGRADE_WRITEOUT_JOB_TYPE_PREPARE,
+typedef enum
+{
+    /**
+     * \brief The writeout task prepare to write data into a storage area.
+     *
+     * The \ref upgrade_dfu_writeout_job_t::integer "integer" parameter is the
+     * index (0 or 1) of the storage area to write to.
+     *
+     * The writeout task will initialize its pointers in preparation for
+     * writing to the specified storage area.
+     *
+     * This job does not send a response.
+     */
+    UPGRADE_WRITEOUT_JOB_TYPE_PREPARE,
 
-	/**
-	 * \brief Provides data to the writeout task to write to the storage area.
-	 *
-	 * The \ref upgrade_dfu_writeout_job_t::pointer "pointer" parameter is a
-	 * pointer to the data to write (which will be freed when no longer
-	 * needed), while the \ref upgrade_dfu_writeout_job_t::integer "integer"
-	 * parameter is the size of the data.
-	 *
-	 * The writeout task will collect the data until it has enough to make a
-	 * full SD sector (or until it receives an UPGRADE_WRITEOUT_JOB_TYPE_COMMIT
-	 * message) and then write the data to the SD card.
-	 *
-	 * This job sends a response when as many sectors as possible have been
-	 * written and the remaining data has been collected. The response’s \ref
-	 * upgrade_dfu_writeout_job_t::integer "integer" parameter is nonzero if
-	 * all writes so far have succeeded, or zero if a write has failed. In the
-	 * latter case, the requester’s attention is directed to \ref sd_status for
-	 * more details.
-	 */
-	UPGRADE_WRITEOUT_JOB_TYPE_DATA,
+    /**
+     * \brief Provides data to the writeout task to write to the storage area.
+     *
+     * The \ref upgrade_dfu_writeout_job_t::pointer "pointer" parameter is a
+     * pointer to the data to write (which will be freed when no longer
+     * needed), while the \ref upgrade_dfu_writeout_job_t::integer "integer"
+     * parameter is the size of the data.
+     *
+     * The writeout task will collect the data until it has enough to make a
+     * full SD sector (or until it receives an UPGRADE_WRITEOUT_JOB_TYPE_COMMIT
+     * message) and then write the data to the SD card.
+     *
+     * This job sends a response when as many sectors as possible have been
+     * written and the remaining data has been collected. The response’s \ref
+     * upgrade_dfu_writeout_job_t::integer "integer" parameter is nonzero if
+     * all writes so far have succeeded, or zero if a write has failed. In the
+     * latter case, the requester’s attention is directed to \ref sd_status for
+     * more details.
+     */
+    UPGRADE_WRITEOUT_JOB_TYPE_DATA,
 
-	/**
-	 * \brief Instructs the writeout task to finish the data it has been
-	 * provided and write the header.
-	 *
-	 * The writeout task will write any data it has collected that is less than
-	 * a full SD sector, then write a header at the start of the storage area.
-	 *
-	 * This job sends a response when all data and the header have been
-	 * written. The response’s \ref upgrade_dfu_writeout_job_t::integer
-	 * "integer" parameter is nonzero if all writes have succeeded, or zero if
-	 * a write has failed. In the latter case, the requester’s attention is
-	 * directed to \ref sd_status for more details.
-	 */
-	UPGRADE_WRITEOUT_JOB_TYPE_COMMIT,
+    /**
+     * \brief Instructs the writeout task to finish the data it has been
+     * provided and write the header.
+     *
+     * The writeout task will write any data it has collected that is less than
+     * a full SD sector, then write a header at the start of the storage area.
+     *
+     * This job sends a response when all data and the header have been
+     * written. The response’s \ref upgrade_dfu_writeout_job_t::integer
+     * "integer" parameter is nonzero if all writes have succeeded, or zero if
+     * a write has failed. In the latter case, the requester’s attention is
+     * directed to \ref sd_status for more details.
+     */
+    UPGRADE_WRITEOUT_JOB_TYPE_COMMIT,
 
-	/**
-	 * \brief Instructs the writeout task to terminate.
-	 *
-	 * This job sends a response when all prior jobs are complete and the
-	 * writeout task is about to terminate.
-	 */
-	UPGRADE_WRITEOUT_JOB_TYPE_EXIT,
+    /**
+     * \brief Instructs the writeout task to terminate.
+     *
+     * This job sends a response when all prior jobs are complete and the
+     * writeout task is about to terminate.
+     */
+    UPGRADE_WRITEOUT_JOB_TYPE_EXIT,
 } upgrade_dfu_writeout_job_type_t;
 
 /**
  * \brief The type of a queue element sent to or from the writeout task.
  */
-typedef struct {
-	/**
-	 * \brief The type of job.
-	 */
-	upgrade_dfu_writeout_job_type_t type;
+typedef struct
+{
+    /**
+     * \brief The type of job.
+     */
+    upgrade_dfu_writeout_job_type_t type;
 
-	/**
-	 * \brief A pointer parameter associated with the job.
-	 */
-	void *pointer;
+    /**
+     * \brief A pointer parameter associated with the job.
+     */
+    void *pointer;
 
-	/**
-	 * \brief An integer parameter associated with the job.
-	 */
-	size_t integer;
+    /**
+     * \brief An integer parameter associated with the job.
+     */
+    size_t integer;
 } upgrade_dfu_writeout_job_t;
 
 /**
  * \brief Objects used to communicate with the writeout task.
  */
-static struct {
-	/**
-	 * \brief A queue onto which job requests are pushed to send to the
-	 * writeout queue.
-	 */
-	QueueHandle_t request_queue;
+static struct
+{
+    /**
+     * \brief A queue onto which job requests are pushed to send to the
+     * writeout queue.
+     */
+    QueueHandle_t request_queue;
 
-	/**
-	 * \brief A queue onto which job status responses are pushed as the
-	 * writeout queue finishes jobs.
-	 */
-	QueueHandle_t response_queue;
+    /**
+     * \brief A queue onto which job status responses are pushed as the
+     * writeout queue finishes jobs.
+     */
+    QueueHandle_t response_queue;
 } upgrade_dfu_writeout_iface;
 
 /**
  * \brief The writeout task.
  */
-static void upgrade_dfu_writeout_task(void *UNUSED(param)) {
-	bool prepared = false, running = true, erased = false;
-	size_t buffer_used = 0;
-	uint32_t byte_count, crc, start_sector = 0, next_sector = 0, header_magic, header_flags;
-	char *buffer = upgrade_common_get_sector_dma_buffer();
+static void upgrade_dfu_writeout_task(void *UNUSED(param))
+{
+    bool prepared = false, running = true, erased = false;
+    size_t buffer_used = 0;
+    uint32_t byte_count, crc, start_sector = 0, next_sector = 0, header_magic,
+                              header_flags;
+    char *buffer = upgrade_common_get_sector_dma_buffer();
 
-	while (running) {
-		upgrade_dfu_writeout_job_t job;
-		xQueueReceive(upgrade_dfu_writeout_iface.request_queue, &job, portMAX_DELAY);
-		bool reply;
-		switch (job.type) {
-			case UPGRADE_WRITEOUT_JOB_TYPE_PREPARE:
-				assert((job.integer == 0) || (job.integer == 1));
-				prepared = true;
-				reply = false;
-				erased = false;
-				buffer_used = 0;
-				byte_count = 0;
-				crc = CRC32_EMPTY;
-				start_sector = (job.integer == 0) ? UPGRADE_FW_FIRST_SECTOR : UPGRADE_FPGA_FIRST_SECTOR;
-				next_sector = start_sector + 1;
-				header_magic = (job.integer == 0) ? UPGRADE_FW_MAGIC : UPGRADE_FPGA_MAGIC;
-				header_flags = (job.integer == 0) ? 0x00000001 : 0x00000000;
-				break;
+    while (running)
+    {
+        upgrade_dfu_writeout_job_t job;
+        xQueueReceive(upgrade_dfu_writeout_iface.request_queue, &job, portMAX_DELAY);
+        bool reply;
+        switch (job.type)
+        {
+            case UPGRADE_WRITEOUT_JOB_TYPE_PREPARE:
+                assert((job.integer == 0) || (job.integer == 1));
+                prepared     = true;
+                reply        = false;
+                erased       = false;
+                buffer_used  = 0;
+                byte_count   = 0;
+                crc          = CRC32_EMPTY;
+                start_sector = (job.integer == 0) ? UPGRADE_FW_FIRST_SECTOR
+                                                  : UPGRADE_FPGA_FIRST_SECTOR;
+                next_sector  = start_sector + 1;
+                header_magic = (job.integer == 0) ? UPGRADE_FW_MAGIC : UPGRADE_FPGA_MAGIC;
+                header_flags = (job.integer == 0) ? 0x00000001 : 0x00000000;
+                break;
 
-			case UPGRADE_WRITEOUT_JOB_TYPE_DATA:
-				assert(job.pointer || !job.integer);
-				assert(prepared);
-				reply = true;
-				if (job.pointer) {
-					bool ok = true;
+            case UPGRADE_WRITEOUT_JOB_TYPE_DATA:
+                assert(job.pointer || !job.integer);
+                assert(prepared);
+                reply = true;
+                if (job.pointer)
+                {
+                    bool ok = true;
 
-					// Erase the storage area, if we haven’t already done so.
-					if (!erased) {
-						ok = sd_erase(start_sector, UPGRADE_SD_AREA_SECTORS) == SD_STATUS_OK;
-						erased = ok;
-					}
+                    // Erase the storage area, if we haven’t already done so.
+                    if (!erased)
+                    {
+                        ok = sd_erase(start_sector, UPGRADE_SD_AREA_SECTORS) ==
+                             SD_STATUS_OK;
+                        erased = ok;
+                    }
 
-					// Grab temporaries to walk through the received data.
-					const uint8_t *data = job.pointer;
-					size_t left = job.integer;
+                    // Grab temporaries to walk through the received data.
+                    const uint8_t *data = job.pointer;
+                    size_t left         = job.integer;
 
-					// Update the running records.
-					byte_count += left;
-					crc = crc32_be(data, left, crc);
+                    // Update the running records.
+                    byte_count += left;
+                    crc = crc32_be(data, left, crc);
 
-					// If there is data in the buffer, combine it with the
-					// beginning of the new data to fill the buffer more.
-					if (ok && buffer_used) {
-						size_t to_copy = MIN(SD_SECTOR_SIZE - buffer_used, left);
-						memcpy(buffer + buffer_used, data, to_copy);
-						buffer_used += to_copy;
-						data += to_copy;
-						left -= to_copy;
-					}
+                    // If there is data in the buffer, combine it with the
+                    // beginning of the new data to fill the buffer more.
+                    if (ok && buffer_used)
+                    {
+                        size_t to_copy = MIN(SD_SECTOR_SIZE - buffer_used, left);
+                        memcpy(buffer + buffer_used, data, to_copy);
+                        buffer_used += to_copy;
+                        data += to_copy;
+                        left -= to_copy;
+                    }
 
-					// If the previous step completely filled the buffer, flush
-					// it.
-					if (ok && (buffer_used == SD_SECTOR_SIZE)) {
-						// The buffer is full, so write it out.
-						ok = sd_write(next_sector++, buffer) == SD_STATUS_OK;
-						buffer_used = 0;
-					}
+                    // If the previous step completely filled the buffer, flush
+                    // it.
+                    if (ok && (buffer_used == SD_SECTOR_SIZE))
+                    {
+                        // The buffer is full, so write it out.
+                        ok          = sd_write(next_sector++, buffer) == SD_STATUS_OK;
+                        buffer_used = 0;
+                    }
 
-					// Write out any whole sectors in the new data.
-					while (ok && (left >= SD_SECTOR_SIZE)) {
-						// There is a whole sector ready to write, so write it.
-						// Don’t just use the data as is; it may not be
-						// properly aligned for DMA.
-						memcpy(buffer, data, SD_SECTOR_SIZE);
-						ok = sd_write(next_sector++, buffer) == SD_STATUS_OK;
-						data += SD_SECTOR_SIZE;
-						left -= SD_SECTOR_SIZE;
-					}
+                    // Write out any whole sectors in the new data.
+                    while (ok && (left >= SD_SECTOR_SIZE))
+                    {
+                        // There is a whole sector ready to write, so write it.
+                        // Don’t just use the data as is; it may not be
+                        // properly aligned for DMA.
+                        memcpy(buffer, data, SD_SECTOR_SIZE);
+                        ok = sd_write(next_sector++, buffer) == SD_STATUS_OK;
+                        data += SD_SECTOR_SIZE;
+                        left -= SD_SECTOR_SIZE;
+                    }
 
-					// If there is a partial sector left at the end of the
-					// input data, buffer it.
-					if (ok && left) {
-						// There is some data left, so buffer it.
-						assert(left < SD_SECTOR_SIZE);
-						memcpy(buffer, data, left);
-						buffer_used = left;
-						data += left;
-						left = 0;
-					}
+                    // If there is a partial sector left at the end of the
+                    // input data, buffer it.
+                    if (ok && left)
+                    {
+                        // There is some data left, so buffer it.
+                        assert(left < SD_SECTOR_SIZE);
+                        memcpy(buffer, data, left);
+                        buffer_used = left;
+                        data += left;
+                        left = 0;
+                    }
 
-					// Clean up and build a reply.
-					free(job.pointer);
-					job.pointer = 0;
-					job.integer = ok ? 1 : 0;
-				} else {
-					// A request with no data is pointless but successful.
-					job.integer = 1;
-				}
-				break;
+                    // Clean up and build a reply.
+                    free(job.pointer);
+                    job.pointer = 0;
+                    job.integer = ok ? 1 : 0;
+                }
+                else
+                {
+                    // A request with no data is pointless but successful.
+                    job.integer = 1;
+                }
+                break;
 
-			case UPGRADE_WRITEOUT_JOB_TYPE_COMMIT:
-				assert(prepared);
-				reply = true;
-				{
-					bool ok = true;
+            case UPGRADE_WRITEOUT_JOB_TYPE_COMMIT:
+                assert(prepared);
+                reply = true;
+                {
+                    bool ok = true;
 
-					// It is possible, for a sufficiently small image, that we
-					// have not yet erased the card. If so, do it now.
-					if (!erased) {
-						ok = sd_erase(start_sector, UPGRADE_SD_AREA_SECTORS) == SD_STATUS_OK;
-						erased = ok;
-					}
+                    // It is possible, for a sufficiently small image, that we
+                    // have not yet erased the card. If so, do it now.
+                    if (!erased)
+                    {
+                        ok = sd_erase(start_sector, UPGRADE_SD_AREA_SECTORS) ==
+                             SD_STATUS_OK;
+                        erased = ok;
+                    }
 
-					// There may be a residual partial sector in the buffer. If
-					// so, flush it.
-					if (ok && buffer_used) {
-						memset(buffer + buffer_used, 0, SD_SECTOR_SIZE - buffer_used);
-						ok = sd_write(next_sector++, buffer) == SD_STATUS_OK;
-					}
+                    // There may be a residual partial sector in the buffer. If
+                    // so, flush it.
+                    if (ok && buffer_used)
+                    {
+                        memset(buffer + buffer_used, 0, SD_SECTOR_SIZE - buffer_used);
+                        ok = sd_write(next_sector++, buffer) == SD_STATUS_OK;
+                    }
 
-					// Write the area header.
-					if (ok) {
-						memset(buffer, 0, SD_SECTOR_SIZE);
-						memcpy(&buffer[0], &header_magic, 4);
-						memcpy(&buffer[4], &header_flags, 4);
-						memcpy(&buffer[8], &byte_count, 4);
-						memcpy(&buffer[12], &crc, 4);
-						ok = sd_write(start_sector, buffer) == SD_STATUS_OK;
-					}
+                    // Write the area header.
+                    if (ok)
+                    {
+                        memset(buffer, 0, SD_SECTOR_SIZE);
+                        memcpy(&buffer[0], &header_magic, 4);
+                        memcpy(&buffer[4], &header_flags, 4);
+                        memcpy(&buffer[8], &byte_count, 4);
+                        memcpy(&buffer[12], &crc, 4);
+                        ok = sd_write(start_sector, buffer) == SD_STATUS_OK;
+                    }
 
-					// Clean up and build a reply.
-					prepared = false;
-					job.pointer = 0;
-					job.integer = ok ? 1 : 0;
-				}
-				break;
+                    // Clean up and build a reply.
+                    prepared    = false;
+                    job.pointer = 0;
+                    job.integer = ok ? 1 : 0;
+                }
+                break;
 
-			case UPGRADE_WRITEOUT_JOB_TYPE_EXIT:
-				reply = true;
-				running = false;
-				job.pointer = 0;
-				job.integer = 0;
-				break;
+            case UPGRADE_WRITEOUT_JOB_TYPE_EXIT:
+                reply       = true;
+                running     = false;
+                job.pointer = 0;
+                job.integer = 0;
+                break;
 
-			default:
-				abort();
-		}
-		if (reply) {
-			xQueueSend(upgrade_dfu_writeout_iface.response_queue, &job, portMAX_DELAY);
-		}
-	}
+            default:
+                abort();
+        }
+        if (reply)
+        {
+            xQueueSend(upgrade_dfu_writeout_iface.response_queue, &job, portMAX_DELAY);
+        }
+    }
 
-	vTaskSuspend(0);
+    vTaskSuspend(0);
 }
 
 /**
@@ -505,14 +531,24 @@ static void upgrade_dfu_writeout_task(void *UNUSED(param)) {
  *
  * This function is called by the supervisor as part of bringing up DFU mode.
  */
-static void upgrade_dfu_writeout_init(void) {
-	static StaticQueue_t request_queue_storage, response_queue_storage;
-	static uint8_t request_queue_buffer[4 * sizeof(upgrade_dfu_writeout_job_t)], response_queue_buffer[4 * sizeof(upgrade_dfu_writeout_job_t)];
-	upgrade_dfu_writeout_iface.request_queue = xQueueCreateStatic(4U, sizeof(upgrade_dfu_writeout_job_t), request_queue_buffer, &request_queue_storage);
-	upgrade_dfu_writeout_iface.response_queue = xQueueCreateStatic(4U, sizeof(upgrade_dfu_writeout_job_t), response_queue_buffer, &response_queue_storage);
-	static StaticTask_t upgrade_dfu_writeout_task_tcb;
-	STACK_ALLOCATE(upgrade_dfu_writeout_task_stack, 4096);
-	xTaskCreateStatic(&upgrade_dfu_writeout_task, "upg-writeout", sizeof(upgrade_dfu_writeout_task_stack) / sizeof(*upgrade_dfu_writeout_task_stack), 0, PRIO_TASK_UPGRADE_WRITEOUT, upgrade_dfu_writeout_task_stack, &upgrade_dfu_writeout_task_tcb);
+static void upgrade_dfu_writeout_init(void)
+{
+    static StaticQueue_t request_queue_storage, response_queue_storage;
+    static uint8_t request_queue_buffer[4 * sizeof(upgrade_dfu_writeout_job_t)],
+        response_queue_buffer[4 * sizeof(upgrade_dfu_writeout_job_t)];
+    upgrade_dfu_writeout_iface.request_queue =
+        xQueueCreateStatic(4U, sizeof(upgrade_dfu_writeout_job_t), request_queue_buffer,
+                           &request_queue_storage);
+    upgrade_dfu_writeout_iface.response_queue =
+        xQueueCreateStatic(4U, sizeof(upgrade_dfu_writeout_job_t), response_queue_buffer,
+                           &response_queue_storage);
+    static StaticTask_t upgrade_dfu_writeout_task_tcb;
+    STACK_ALLOCATE(upgrade_dfu_writeout_task_stack, 4096);
+    xTaskCreateStatic(&upgrade_dfu_writeout_task, "upg-writeout",
+                      sizeof(upgrade_dfu_writeout_task_stack) /
+                          sizeof(*upgrade_dfu_writeout_task_stack),
+                      0, PRIO_TASK_UPGRADE_WRITEOUT, upgrade_dfu_writeout_task_stack,
+                      &upgrade_dfu_writeout_task_tcb);
 }
 
 /**
@@ -520,12 +556,14 @@ static void upgrade_dfu_writeout_init(void) {
  *
  * This function is called by the supervisor as part of exiting DFU mode.
  */
-static void upgrade_dfu_writeout_deinit(void) {
-	upgrade_dfu_writeout_job_t job = { UPGRADE_WRITEOUT_JOB_TYPE_EXIT, 0, 0 };
-	xQueueSend(upgrade_dfu_writeout_iface.request_queue, &job, portMAX_DELAY);
-	do {
-		xQueueReceive(upgrade_dfu_writeout_iface.response_queue, &job, portMAX_DELAY);
-	} while (job.type != UPGRADE_WRITEOUT_JOB_TYPE_EXIT);
+static void upgrade_dfu_writeout_deinit(void)
+{
+    upgrade_dfu_writeout_job_t job = {UPGRADE_WRITEOUT_JOB_TYPE_EXIT, 0, 0};
+    xQueueSend(upgrade_dfu_writeout_iface.request_queue, &job, portMAX_DELAY);
+    do
+    {
+        xQueueReceive(upgrade_dfu_writeout_iface.response_queue, &job, portMAX_DELAY);
+    } while (job.type != UPGRADE_WRITEOUT_JOB_TYPE_EXIT);
 }
 
 /**
@@ -535,12 +573,14 @@ static void upgrade_dfu_writeout_deinit(void) {
  * \param[in] pointer the pointer parameter of the job
  * \param[in] integer the integer parameter of the job
  */
-static void upgrade_dfu_writeout_submit(upgrade_dfu_writeout_job_type_t type, void *pointer, size_t integer) {
-	upgrade_dfu_writeout_job_t job;
-	job.type = type;
-	job.pointer = pointer;
-	job.integer = integer;
-	xQueueSend(upgrade_dfu_writeout_iface.request_queue, &job, portMAX_DELAY);
+static void upgrade_dfu_writeout_submit(upgrade_dfu_writeout_job_type_t type,
+                                        void *pointer, size_t integer)
+{
+    upgrade_dfu_writeout_job_t job;
+    job.type    = type;
+    job.pointer = pointer;
+    job.integer = integer;
+    xQueueSend(upgrade_dfu_writeout_iface.request_queue, &job, portMAX_DELAY);
 }
 
 /**
@@ -550,8 +590,9 @@ static void upgrade_dfu_writeout_submit(upgrade_dfu_writeout_job_type_t type, vo
  * \retval true a response was popped and returned
  * \retval false no response was available
  */
-static bool upgrade_dfu_writeout_pop_status(upgrade_dfu_writeout_job_t *job) {
-	return xQueueReceive(upgrade_dfu_writeout_iface.response_queue, job, 0) == pdTRUE;
+static bool upgrade_dfu_writeout_pop_status(upgrade_dfu_writeout_job_t *job)
+{
+    return xQueueReceive(upgrade_dfu_writeout_iface.response_queue, job, 0) == pdTRUE;
 }
 
 
@@ -559,436 +600,523 @@ static bool upgrade_dfu_writeout_pop_status(upgrade_dfu_writeout_job_t *job) {
 /**
  * \brief The state data for USB DFU operations.
  */
-static struct {
-	/**
-	 * \brief A semaphore signalling that it’s time to exit DFU mode and
-	 * reboot.
-	 *
-	 * This semaphore is given by the USB stack internal task when it sees
-	 * reset signalling.
-	 *
-	 * This semaphore is taken by the supervisor task after setting up DFU
-	 * operations, allowing it to start shutting down DFU mode.
-	 */
-	SemaphoreHandle_t done_sem;
+static struct
+{
+    /**
+     * \brief A semaphore signalling that it’s time to exit DFU mode and
+     * reboot.
+     *
+     * This semaphore is given by the USB stack internal task when it sees
+     * reset signalling.
+     *
+     * This semaphore is taken by the supervisor task after setting up DFU
+     * operations, allowing it to start shutting down DFU mode.
+     */
+    SemaphoreHandle_t done_sem;
 
-	/**
-	 * \brief Which storage area is currently being accessed.
-	 */
-	unsigned int area;
+    /**
+     * \brief Which storage area is currently being accessed.
+     */
+    unsigned int area;
 
-	/**
-	 * \brief Information used by an upload operation.
-	 */
-	union {
-		/**
-		 * \brief The next byte to send, for a firmware upload.
-		 */
-		const char *fw_next_byte;
+    /**
+     * \brief Information used by an upload operation.
+     */
+    union {
+        /**
+         * \brief The next byte to send, for a firmware upload.
+         */
+        const char *fw_next_byte;
 
-		/**
-		 * \brief Information used for an FPGA upload.
-		 */
-		struct {
-			/**
-			 * \brief The number of bytes in the complete FPGA bitstream.
-			 */
-			size_t length;
+        /**
+         * \brief Information used for an FPGA upload.
+         */
+        struct
+        {
+            /**
+             * \brief The number of bytes in the complete FPGA bitstream.
+             */
+            size_t length;
 
-			/**
-			 * \brief The position of the next byte to read, measured from the
-			 * start of the FPGA bitstream.
-			 */
-			size_t pos;
+            /**
+             * \brief The position of the next byte to read, measured from the
+             * start of the FPGA bitstream.
+             */
+            size_t pos;
 
-			/**
-			 * \brief The expected CRC of the complete bitstream image.
-			 */
-			uint32_t expected_crc;
+            /**
+             * \brief The expected CRC of the complete bitstream image.
+             */
+            uint32_t expected_crc;
 
-			/**
-			 * \brief The CRC of the part of the bitstream image that has been
-			 * read so far.
-			 */
-			uint32_t current_crc;
-		} fpga;
-	} upload_info;
+            /**
+             * \brief The CRC of the part of the bitstream image that has been
+             * read so far.
+             */
+            uint32_t current_crc;
+        } fpga;
+    } upload_info;
 
-	/**
-	 * \brief The DFU status block.
-	 */
-	usb_dfu_status_block_t status_block;
+    /**
+     * \brief The DFU status block.
+     */
+    usb_dfu_status_block_t status_block;
 
-	/**
-	 * \brief Whether a data or commit job has been pushed and is pending a
-	 * response from the writeout task.
-	 */
-	bool job_response_pending;
+    /**
+     * \brief Whether a data or commit job has been pushed and is pending a
+     * response from the writeout task.
+     */
+    bool job_response_pending;
 } upgrade_dfu_state;
 
-static bool upgrade_dfu_control_handler_dnload(const usb_setup_packet_t *pkt) {
-	// Sanity check that the host has not tried to send too much data.
-	if (pkt->wLength > UPGRADE_DFU_MAX_TRANSFER_SIZE) {
-		upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-		upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-		return false;
-	}
+static bool upgrade_dfu_control_handler_dnload(const usb_setup_packet_t *pkt)
+{
+    // Sanity check that the host has not tried to send too much data.
+    if (pkt->wLength > UPGRADE_DFU_MAX_TRANSFER_SIZE)
+    {
+        upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+        upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+        return false;
+    }
 
-	// Dispatch based on state.
-	switch (upgrade_dfu_state.status_block.bState) {
-		case USB_DFU_STATE_DFU_IDLE:
-			// In this state, we do not accept zero-length blocks (USB DFU spec
-			// v1.1 section A.2.3).
-			if (!pkt->wLength) {
-				upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-				upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-				return false;
-			}
+    // Dispatch based on state.
+    switch (upgrade_dfu_state.status_block.bState)
+    {
+        case USB_DFU_STATE_DFU_IDLE:
+            // In this state, we do not accept zero-length blocks (USB DFU spec
+            // v1.1 section A.2.3).
+            if (!pkt->wLength)
+            {
+                upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+                upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+                return false;
+            }
 
-			// It is possible that a previous DFU operation left a writeout job
-			// in progress and the operation was then ripped out from under us
-			// by e.g. a SET INTERFACE request. In that case,
-			// job_response_pending will be true here. Then try to get the job
-			// status, but only if it’s already finished; if it’s still in
-			// progress, don’t block the USB, but just return an error.
-			if (upgrade_dfu_state.job_response_pending) {
-				upgrade_dfu_writeout_job_t job;
-				if (upgrade_dfu_writeout_pop_status(&job)) {
-					upgrade_dfu_state.job_response_pending = false;
-				} else {
-					upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-					upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_ERASE;
-					return false;
-				}
-			}
+            // It is possible that a previous DFU operation left a writeout job
+            // in progress and the operation was then ripped out from under us
+            // by e.g. a SET INTERFACE request. In that case,
+            // job_response_pending will be true here. Then try to get the job
+            // status, but only if it’s already finished; if it’s still in
+            // progress, don’t block the USB, but just return an error.
+            if (upgrade_dfu_state.job_response_pending)
+            {
+                upgrade_dfu_writeout_job_t job;
+                if (upgrade_dfu_writeout_pop_status(&job))
+                {
+                    upgrade_dfu_state.job_response_pending = false;
+                }
+                else
+                {
+                    upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+                    upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_ERASE;
+                    return false;
+                }
+            }
 
-			// Fall through.
+            // Fall through.
 
-		case USB_DFU_STATE_DFU_DNLOAD_IDLE:
-			if (pkt->wLength) {
-				// The host wants to send us some data to write out.
-				uint8_t *buffer = malloc(pkt->wLength);
-				if (uep0_data_read(buffer)) {
-					upgrade_dfu_writeout_submit(UPGRADE_WRITEOUT_JOB_TYPE_DATA, buffer, pkt->wLength);
-					upgrade_dfu_state.job_response_pending = true;
-					// Submitting the block transitions to DNLOAD-SYNC state.
-					// The host must poll to discover when the block is done.
-					upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_DNLOAD_SYNC;
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				// The host wants us to start manifestation. First transition
-				// to MANIFEST-SYNC, at which point a GETSTATUS request starts
-				// actual manifestation.
-				upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_MANIFEST_SYNC;
-				return true;
-			}
-			break;
+        case USB_DFU_STATE_DFU_DNLOAD_IDLE:
+            if (pkt->wLength)
+            {
+                // The host wants to send us some data to write out.
+                uint8_t *buffer = malloc(pkt->wLength);
+                if (uep0_data_read(buffer))
+                {
+                    upgrade_dfu_writeout_submit(UPGRADE_WRITEOUT_JOB_TYPE_DATA, buffer,
+                                                pkt->wLength);
+                    upgrade_dfu_state.job_response_pending = true;
+                    // Submitting the block transitions to DNLOAD-SYNC state.
+                    // The host must poll to discover when the block is done.
+                    upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_DNLOAD_SYNC;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // The host wants us to start manifestation. First transition
+                // to MANIFEST-SYNC, at which point a GETSTATUS request starts
+                // actual manifestation.
+                upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_MANIFEST_SYNC;
+                return true;
+            }
+            break;
 
-		default:
-			// This request is not acceptable in other states.
-			upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-			upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-			return false;
-	}
+        default:
+            // This request is not acceptable in other states.
+            upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+            upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+            return false;
+    }
 }
 
-static bool upgrade_dfu_control_handler_upload(const usb_setup_packet_t *pkt) {
-	// Sanity check that the host is not asking for too much data or an empty transfer.
-	if (!pkt->wLength || (pkt->wLength > UPGRADE_DFU_MAX_TRANSFER_SIZE)) {
-		upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-		upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-		return false;
-	}
+static bool upgrade_dfu_control_handler_upload(const usb_setup_packet_t *pkt)
+{
+    // Sanity check that the host is not asking for too much data or an empty transfer.
+    if (!pkt->wLength || (pkt->wLength > UPGRADE_DFU_MAX_TRANSFER_SIZE))
+    {
+        upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+        upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+        return false;
+    }
 
-	// Dispatch based on state.
-	switch (upgrade_dfu_state.status_block.bState) {
-		case USB_DFU_STATE_DFU_IDLE:
-			// Set up the upload from the beginning.
-			if (upgrade_dfu_state.area == 0) {
-				// Uploading firmware.
-				upgrade_dfu_state.upload_info.fw_next_byte = (const char *) 0x08000000U;
-			} else {
-				// Uploading FPGA bitstream; read the header to figure out
-				// what’s going on.
-				dma_memory_handle_t header_handle = dma_alloc(SD_SECTOR_SIZE);
-				uint32_t *header = dma_get_buffer(header_handle);
-				bool ok = sd_read(UPGRADE_FPGA_FIRST_SECTOR, header) == SD_STATUS_OK;
-				ok = ok && (header[0] == UPGRADE_FPGA_MAGIC);
-				upgrade_dfu_state.upload_info.fpga.length = header[2];
-				upgrade_dfu_state.upload_info.fpga.pos = 0;
-				upgrade_dfu_state.upload_info.fpga.expected_crc = header[3];
-				upgrade_dfu_state.upload_info.fpga.current_crc = CRC32_EMPTY;
-				dma_free(header_handle);
-				if (!ok) {
-					upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-					upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_VERIFY;
-					return false;
-				}
-			}
-			upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_UPLOAD_IDLE;
-			// Fall through.
+    // Dispatch based on state.
+    switch (upgrade_dfu_state.status_block.bState)
+    {
+        case USB_DFU_STATE_DFU_IDLE:
+            // Set up the upload from the beginning.
+            if (upgrade_dfu_state.area == 0)
+            {
+                // Uploading firmware.
+                upgrade_dfu_state.upload_info.fw_next_byte = (const char *)0x08000000U;
+            }
+            else
+            {
+                // Uploading FPGA bitstream; read the header to figure out
+                // what’s going on.
+                dma_memory_handle_t header_handle = dma_alloc(SD_SECTOR_SIZE);
+                uint32_t *header                  = dma_get_buffer(header_handle);
+                bool ok = sd_read(UPGRADE_FPGA_FIRST_SECTOR, header) == SD_STATUS_OK;
+                ok      = ok && (header[0] == UPGRADE_FPGA_MAGIC);
+                upgrade_dfu_state.upload_info.fpga.length       = header[2];
+                upgrade_dfu_state.upload_info.fpga.pos          = 0;
+                upgrade_dfu_state.upload_info.fpga.expected_crc = header[3];
+                upgrade_dfu_state.upload_info.fpga.current_crc  = CRC32_EMPTY;
+                dma_free(header_handle);
+                if (!ok)
+                {
+                    upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+                    upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_VERIFY;
+                    return false;
+                }
+            }
+            upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_UPLOAD_IDLE;
+            // Fall through.
 
-		case USB_DFU_STATE_DFU_UPLOAD_IDLE:
-			// Upload some data.
-			if (upgrade_dfu_state.area == 0) {
-				// Uploading firmware.
-				extern const char linker_data_lma, linker_data_size;
-				const char *start = (const char *) 0x08000000U;
-				size_t total_length = (&linker_data_lma - start) + (size_t) &linker_data_size;
-				const char *end = start + total_length;
-				size_t left = end - upgrade_dfu_state.upload_info.fw_next_byte;
-				bool ok = uep0_data_write(upgrade_dfu_state.upload_info.fw_next_byte, left);
-				upgrade_dfu_state.upload_info.fw_next_byte += left;
-				if (left < pkt->wLength) {
-					// We sent a short transfer signalling end of firmware
-					// image. Note, this is not precisely equivalent to
-					// fw_next_byte reaching end; the latter would also be
-					// satisfied by a perfectly sized transfer being completely
-					// filled.
-					upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
-				}
-				return ok;
-			} else {
-				// Uploading FPGA bitstream.
-				size_t bytes_left = upgrade_dfu_state.upload_info.fpga.length - upgrade_dfu_state.upload_info.fpga.pos;
-				size_t bytes_this = MIN(bytes_left, pkt->wLength);
-				if (bytes_this) {
-					// Read all the sectors included in the needed range of bytes.
-					uint32_t first_sector = upgrade_dfu_state.upload_info.fpga.pos / SD_SECTOR_SIZE + UPGRADE_FPGA_FIRST_SECTOR + 1;
-					uint32_t last_sector = (upgrade_dfu_state.upload_info.fpga.pos + bytes_this - 1) / SD_SECTOR_SIZE + UPGRADE_FPGA_FIRST_SECTOR + 1;
-					size_t sector_count = last_sector - first_sector + 1;
-					dma_memory_handle_t buffer_handle = dma_alloc(sector_count * SD_SECTOR_SIZE);
-					char *buffer = dma_get_buffer(buffer_handle);
-					bool ok = true;
-					for (size_t i = 0; i < sector_count; ++i) {
-						ok = ok && sd_read(first_sector + i, buffer + i * SD_SECTOR_SIZE) == SD_STATUS_OK;
-					}
-					size_t first_byte = upgrade_dfu_state.upload_info.fpga.pos % SD_SECTOR_SIZE;
-					upgrade_dfu_state.upload_info.fpga.pos += bytes_this;
-					upgrade_dfu_state.upload_info.fpga.current_crc = crc32_be(buffer + first_byte, bytes_this, upgrade_dfu_state.upload_info.fpga.current_crc);
-					if (bytes_this != pkt->wLength) {
-						// We got to the end of the bitstream and are preparing
-						// to send a short transfer. This signals the end of
-						// the image and returns to idle state.
-						upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
-					}
-					if (upgrade_dfu_state.upload_info.fpga.pos == upgrade_dfu_state.upload_info.fpga.length) {
-						// We got to the end of the bitstream (whether or not
-						// we are going to send a short transfer), so check
-						// CRC.
-						ok = ok && (upgrade_dfu_state.upload_info.fpga.current_crc == upgrade_dfu_state.upload_info.fpga.expected_crc);
-					}
-					ok = ok && uep0_data_write(buffer + first_byte, bytes_this);
-					if (!ok) {
-						upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-						upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_VERIFY;
-					}
-					dma_free(buffer_handle);
-					return ok;
-				} else {
-					// No more bytes to send; send a ZLP and exit this state.
-					upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
-					return uep0_data_write(0, 0);
-				}
-			}
+        case USB_DFU_STATE_DFU_UPLOAD_IDLE:
+            // Upload some data.
+            if (upgrade_dfu_state.area == 0)
+            {
+                // Uploading firmware.
+                extern const char linker_data_lma, linker_data_size;
+                const char *start = (const char *)0x08000000U;
+                size_t total_length =
+                    (&linker_data_lma - start) + (size_t)&linker_data_size;
+                const char *end = start + total_length;
+                size_t left     = end - upgrade_dfu_state.upload_info.fw_next_byte;
+                bool ok =
+                    uep0_data_write(upgrade_dfu_state.upload_info.fw_next_byte, left);
+                upgrade_dfu_state.upload_info.fw_next_byte += left;
+                if (left < pkt->wLength)
+                {
+                    // We sent a short transfer signalling end of firmware
+                    // image. Note, this is not precisely equivalent to
+                    // fw_next_byte reaching end; the latter would also be
+                    // satisfied by a perfectly sized transfer being completely
+                    // filled.
+                    upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
+                }
+                return ok;
+            }
+            else
+            {
+                // Uploading FPGA bitstream.
+                size_t bytes_left = upgrade_dfu_state.upload_info.fpga.length -
+                                    upgrade_dfu_state.upload_info.fpga.pos;
+                size_t bytes_this = MIN(bytes_left, pkt->wLength);
+                if (bytes_this)
+                {
+                    // Read all the sectors included in the needed range of bytes.
+                    uint32_t first_sector =
+                        upgrade_dfu_state.upload_info.fpga.pos / SD_SECTOR_SIZE +
+                        UPGRADE_FPGA_FIRST_SECTOR + 1;
+                    uint32_t last_sector =
+                        (upgrade_dfu_state.upload_info.fpga.pos + bytes_this - 1) /
+                            SD_SECTOR_SIZE +
+                        UPGRADE_FPGA_FIRST_SECTOR + 1;
+                    size_t sector_count = last_sector - first_sector + 1;
+                    dma_memory_handle_t buffer_handle =
+                        dma_alloc(sector_count * SD_SECTOR_SIZE);
+                    char *buffer = dma_get_buffer(buffer_handle);
+                    bool ok      = true;
+                    for (size_t i = 0; i < sector_count; ++i)
+                    {
+                        ok = ok && sd_read(first_sector + i,
+                                           buffer + i * SD_SECTOR_SIZE) == SD_STATUS_OK;
+                    }
+                    size_t first_byte =
+                        upgrade_dfu_state.upload_info.fpga.pos % SD_SECTOR_SIZE;
+                    upgrade_dfu_state.upload_info.fpga.pos += bytes_this;
+                    upgrade_dfu_state.upload_info.fpga.current_crc =
+                        crc32_be(buffer + first_byte, bytes_this,
+                                 upgrade_dfu_state.upload_info.fpga.current_crc);
+                    if (bytes_this != pkt->wLength)
+                    {
+                        // We got to the end of the bitstream and are preparing
+                        // to send a short transfer. This signals the end of
+                        // the image and returns to idle state.
+                        upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
+                    }
+                    if (upgrade_dfu_state.upload_info.fpga.pos ==
+                        upgrade_dfu_state.upload_info.fpga.length)
+                    {
+                        // We got to the end of the bitstream (whether or not
+                        // we are going to send a short transfer), so check
+                        // CRC.
+                        ok = ok && (upgrade_dfu_state.upload_info.fpga.current_crc ==
+                                    upgrade_dfu_state.upload_info.fpga.expected_crc);
+                    }
+                    ok = ok && uep0_data_write(buffer + first_byte, bytes_this);
+                    if (!ok)
+                    {
+                        upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
+                        upgrade_dfu_state.status_block.bStatus =
+                            USB_DFU_STATUS_ERR_VERIFY;
+                    }
+                    dma_free(buffer_handle);
+                    return ok;
+                }
+                else
+                {
+                    // No more bytes to send; send a ZLP and exit this state.
+                    upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
+                    return uep0_data_write(0, 0);
+                }
+            }
 
-		default:
-			// This request is not acceptable in other states.
-			upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-			upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-			return false;
-	}
+        default:
+            // This request is not acceptable in other states.
+            upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+            upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+            return false;
+    }
 }
 
-static void upgrade_dfu_poststatus_manifest_sync(void) {
-	// Detach from the bus, because we advertise that we will detach on exiting
-	// DFU mode.
-	udev_detach();
+static void upgrade_dfu_poststatus_manifest_sync(void)
+{
+    // Detach from the bus, because we advertise that we will detach on exiting
+    // DFU mode.
+    udev_detach();
 
-	// Inform the supervisor to exit DFU mode and reboot.
-	xSemaphoreGive(upgrade_dfu_state.done_sem);
+    // Inform the supervisor to exit DFU mode and reboot.
+    xSemaphoreGive(upgrade_dfu_state.done_sem);
 }
 
-static bool upgrade_dfu_control_handler_getstatus(const usb_setup_packet_t *pkt) {
-	// Sanity check.
-	if ((pkt->wValue != 0) || (pkt->wLength != sizeof(upgrade_dfu_state.status_block))) {
-		upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-		upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-		return false;
-	}
+static bool upgrade_dfu_control_handler_getstatus(const usb_setup_packet_t *pkt)
+{
+    // Sanity check.
+    if ((pkt->wValue != 0) || (pkt->wLength != sizeof(upgrade_dfu_state.status_block)))
+    {
+        upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+        upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+        return false;
+    }
 
-	// Dispatch based on state.
-	switch (upgrade_dfu_state.status_block.bState) {
-		case USB_DFU_STATE_DFU_DNLOAD_SYNC:
-			// GETSTATUS checks whether the job is complete and transitions to
-			// either DNBUSY or DNLOAD-IDLE.
-			assert(upgrade_dfu_state.job_response_pending);
-			{
-				upgrade_dfu_writeout_job_t job;
-				if (upgrade_dfu_writeout_pop_status(&job)) {
-					// Job is done.
-					upgrade_dfu_state.job_response_pending = false;
-					if (job.integer) {
-						// Job was successful.
-						upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_DNLOAD_IDLE;
-					} else {
-						// Job failed.
-						upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-						upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_PROG;
-					}
-					return uep0_data_write(&upgrade_dfu_state.status_block, sizeof(upgrade_dfu_state.status_block));
-				} else {
-					// Job is not done yet.
-					upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_DNBUSY;
-					bool ret = uep0_data_write(&upgrade_dfu_state.status_block, sizeof(upgrade_dfu_state.status_block));
-					// As per USB DFU spec v1.1 section A.2.5, the device
-					// transitions automatically from DNBUSY back to
-					// DNLOAD-SYNC after a poll timeout has expired, and the
-					// host is not permitted to send any traffic to the device
-					// until then. Rather than actually counting time, just
-					// change back to DNLOAD-SYNC immediately instead. The host
-					// can poll whenever it wants, and will get updated
-					// information on whether the job has finished.
-					upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_DNLOAD_SYNC;
-					return ret;
-				}
-			}
+    // Dispatch based on state.
+    switch (upgrade_dfu_state.status_block.bState)
+    {
+        case USB_DFU_STATE_DFU_DNLOAD_SYNC:
+            // GETSTATUS checks whether the job is complete and transitions to
+            // either DNBUSY or DNLOAD-IDLE.
+            assert(upgrade_dfu_state.job_response_pending);
+            {
+                upgrade_dfu_writeout_job_t job;
+                if (upgrade_dfu_writeout_pop_status(&job))
+                {
+                    // Job is done.
+                    upgrade_dfu_state.job_response_pending = false;
+                    if (job.integer)
+                    {
+                        // Job was successful.
+                        upgrade_dfu_state.status_block.bState =
+                            USB_DFU_STATE_DFU_DNLOAD_IDLE;
+                    }
+                    else
+                    {
+                        // Job failed.
+                        upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+                        upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_PROG;
+                    }
+                    return uep0_data_write(&upgrade_dfu_state.status_block,
+                                           sizeof(upgrade_dfu_state.status_block));
+                }
+                else
+                {
+                    // Job is not done yet.
+                    upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_DNBUSY;
+                    bool ret = uep0_data_write(&upgrade_dfu_state.status_block,
+                                               sizeof(upgrade_dfu_state.status_block));
+                    // As per USB DFU spec v1.1 section A.2.5, the device
+                    // transitions automatically from DNBUSY back to
+                    // DNLOAD-SYNC after a poll timeout has expired, and the
+                    // host is not permitted to send any traffic to the device
+                    // until then. Rather than actually counting time, just
+                    // change back to DNLOAD-SYNC immediately instead. The host
+                    // can poll whenever it wants, and will get updated
+                    // information on whether the job has finished.
+                    upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_DNLOAD_SYNC;
+                    return ret;
+                }
+            }
 
-		case USB_DFU_STATE_DFU_MANIFEST_SYNC:
-			// GETSTATUS starts manifestation and transitions to MANIFEST.
-			assert(!upgrade_dfu_state.job_response_pending);
-			upgrade_dfu_writeout_submit(UPGRADE_WRITEOUT_JOB_TYPE_COMMIT, 0, 0);
-			upgrade_dfu_state.job_response_pending = true;
-			upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_MANIFEST;
+        case USB_DFU_STATE_DFU_MANIFEST_SYNC:
+            // GETSTATUS starts manifestation and transitions to MANIFEST.
+            assert(!upgrade_dfu_state.job_response_pending);
+            upgrade_dfu_writeout_submit(UPGRADE_WRITEOUT_JOB_TYPE_COMMIT, 0, 0);
+            upgrade_dfu_state.job_response_pending = true;
+            upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_MANIFEST;
 
-			// We are intolerant during manifestation and advertise intent to
-			// detach, so set a post-status callback that will detach and
-			// initiate DFU exit and reboot as soon as the control transfer
-			// completes.
-			uep0_set_poststatus(&upgrade_dfu_poststatus_manifest_sync);
+            // We are intolerant during manifestation and advertise intent to
+            // detach, so set a post-status callback that will detach and
+            // initiate DFU exit and reboot as soon as the control transfer
+            // completes.
+            uep0_set_poststatus(&upgrade_dfu_poststatus_manifest_sync);
 
-			return uep0_data_write(&upgrade_dfu_state.status_block, sizeof(upgrade_dfu_state.status_block));
+            return uep0_data_write(&upgrade_dfu_state.status_block,
+                                   sizeof(upgrade_dfu_state.status_block));
 
-		case USB_DFU_STATE_DFU_IDLE:
-		case USB_DFU_STATE_DFU_DNLOAD_IDLE:
-		case USB_DFU_STATE_DFU_UPLOAD_IDLE:
-			// GETSTATUS has no side effects, but is acceptable and returns the
-			// current status.
-			return uep0_data_write(&upgrade_dfu_state.status_block, sizeof(upgrade_dfu_state.status_block));
+        case USB_DFU_STATE_DFU_IDLE:
+        case USB_DFU_STATE_DFU_DNLOAD_IDLE:
+        case USB_DFU_STATE_DFU_UPLOAD_IDLE:
+            // GETSTATUS has no side effects, but is acceptable and returns the
+            // current status.
+            return uep0_data_write(&upgrade_dfu_state.status_block,
+                                   sizeof(upgrade_dfu_state.status_block));
 
-		default:
-			// This request is not acceptable in other states.
-			upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-			upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-			return false;
-	}
+        default:
+            // This request is not acceptable in other states.
+            upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+            upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+            return false;
+    }
 }
 
-static bool upgrade_dfu_control_handler_clrstatus(const usb_setup_packet_t *pkt) {
-	// Sanity check.
-	if ((pkt->wValue != 0) || (pkt->wLength != 0) || (upgrade_dfu_state.status_block.bState != USB_DFU_STATE_DFU_ERROR)) {
-		upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-		upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-		return false;
-	}
+static bool upgrade_dfu_control_handler_clrstatus(const usb_setup_packet_t *pkt)
+{
+    // Sanity check.
+    if ((pkt->wValue != 0) || (pkt->wLength != 0) ||
+        (upgrade_dfu_state.status_block.bState != USB_DFU_STATE_DFU_ERROR))
+    {
+        upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+        upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+        return false;
+    }
 
-	// Clear the error.
-	upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
-	upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_OK;
-	return true;
+    // Clear the error.
+    upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_IDLE;
+    upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_OK;
+    return true;
 }
 
-static bool upgrade_dfu_control_handler_getstate(const usb_setup_packet_t *pkt) {
-	// Sanity check.
-	if ((pkt->wValue != 0) || (pkt->wLength != 1)) {
-		upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-		upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-		return false;
-	}
+static bool upgrade_dfu_control_handler_getstate(const usb_setup_packet_t *pkt)
+{
+    // Sanity check.
+    if ((pkt->wValue != 0) || (pkt->wLength != 1))
+    {
+        upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+        upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+        return false;
+    }
 
-	// Return the state.
-	uint8_t state = upgrade_dfu_state.status_block.bState;
-	return uep0_data_write(&state, 1);
+    // Return the state.
+    uint8_t state = upgrade_dfu_state.status_block.bState;
+    return uep0_data_write(&state, 1);
 }
 
-static bool upgrade_dfu_control_handler_abort(const usb_setup_packet_t *pkt) {
-	// Sanity check.
-	if ((pkt->wValue != 0) || (pkt->wLength != 0)) {
-		upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_ERROR;
-		upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
-		return false;
-	}
+static bool upgrade_dfu_control_handler_abort(const usb_setup_packet_t *pkt)
+{
+    // Sanity check.
+    if ((pkt->wValue != 0) || (pkt->wLength != 0))
+    {
+        upgrade_dfu_state.status_block.bState  = USB_DFU_STATE_DFU_ERROR;
+        upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_ERR_STALLEDPKT;
+        return false;
+    }
 
-	// Dispatch based on state.
-	switch (upgrade_dfu_state.status_block.bState) {
-		case USB_DFU_STATE_DFU_IDLE:
-		case USB_DFU_STATE_DFU_DNLOAD_IDLE:
-		case USB_DFU_STATE_DFU_UPLOAD_IDLE:
-			// Return to DFU-IDLE.
-			upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
-			return true;
+    // Dispatch based on state.
+    switch (upgrade_dfu_state.status_block.bState)
+    {
+        case USB_DFU_STATE_DFU_IDLE:
+        case USB_DFU_STATE_DFU_DNLOAD_IDLE:
+        case USB_DFU_STATE_DFU_UPLOAD_IDLE:
+            // Return to DFU-IDLE.
+            upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
+            return true;
 
-		default:
-			// This request is not acceptable in other states.
-			return false;
-	}
+        default:
+            // This request is not acceptable in other states.
+            return false;
+    }
 }
 
-static bool upgrade_dfu_control_handler(const usb_setup_packet_t *pkt) {
-	if (pkt->bmRequestType.type == USB_CTYPE_CLASS) {
-		switch (pkt->bRequest) {
-			case USB_DFU_CREQ_DNLOAD: return upgrade_dfu_control_handler_dnload(pkt);
-			case USB_DFU_CREQ_UPLOAD: return upgrade_dfu_control_handler_upload(pkt);
-			case USB_DFU_CREQ_GETSTATUS: return upgrade_dfu_control_handler_getstatus(pkt);
-			case USB_DFU_CREQ_CLRSTATUS: return upgrade_dfu_control_handler_clrstatus(pkt);
-			case USB_DFU_CREQ_GETSTATE: return upgrade_dfu_control_handler_getstate(pkt);
-			case USB_DFU_CREQ_ABORT: return upgrade_dfu_control_handler_abort(pkt);
-			default: return false;
-		}
-	}
-	return false;
+static bool upgrade_dfu_control_handler(const usb_setup_packet_t *pkt)
+{
+    if (pkt->bmRequestType.type == USB_CTYPE_CLASS)
+    {
+        switch (pkt->bRequest)
+        {
+            case USB_DFU_CREQ_DNLOAD:
+                return upgrade_dfu_control_handler_dnload(pkt);
+            case USB_DFU_CREQ_UPLOAD:
+                return upgrade_dfu_control_handler_upload(pkt);
+            case USB_DFU_CREQ_GETSTATUS:
+                return upgrade_dfu_control_handler_getstatus(pkt);
+            case USB_DFU_CREQ_CLRSTATUS:
+                return upgrade_dfu_control_handler_clrstatus(pkt);
+            case USB_DFU_CREQ_GETSTATE:
+                return upgrade_dfu_control_handler_getstate(pkt);
+            case USB_DFU_CREQ_ABORT:
+                return upgrade_dfu_control_handler_abort(pkt);
+            default:
+                return false;
+        }
+    }
+    return false;
 }
 
-static void upgrade_dfu_on_enter_common(unsigned int area) {
-	// On entering a configuration, signal the writeout task to prepare to
-	// operate on the specified memory area.
-	upgrade_dfu_writeout_submit(UPGRADE_WRITEOUT_JOB_TYPE_PREPARE, 0, area);
+static void upgrade_dfu_on_enter_common(unsigned int area)
+{
+    // On entering a configuration, signal the writeout task to prepare to
+    // operate on the specified memory area.
+    upgrade_dfu_writeout_submit(UPGRADE_WRITEOUT_JOB_TYPE_PREPARE, 0, area);
 
-	// Record, locally, which area we are accessing.
-	upgrade_dfu_state.area = area;
+    // Record, locally, which area we are accessing.
+    upgrade_dfu_state.area = area;
 
-	// Set up the DFU status block.
-	upgrade_dfu_state.status_block.bStatus = USB_DFU_STATUS_OK;
-	upgrade_dfu_state.status_block.bwPollTimeout = 1;
-	upgrade_dfu_state.status_block.bState = USB_DFU_STATE_DFU_IDLE;
-	upgrade_dfu_state.status_block.iString = 0;
+    // Set up the DFU status block.
+    upgrade_dfu_state.status_block.bStatus       = USB_DFU_STATUS_OK;
+    upgrade_dfu_state.status_block.bwPollTimeout = 1;
+    upgrade_dfu_state.status_block.bState        = USB_DFU_STATE_DFU_IDLE;
+    upgrade_dfu_state.status_block.iString       = 0;
 }
 
-static void upgrade_dfu_on_enter_fw(void) {
-	upgrade_dfu_on_enter_common(0);
+static void upgrade_dfu_on_enter_fw(void)
+{
+    upgrade_dfu_on_enter_common(0);
 }
 
-static void upgrade_dfu_on_enter_fpga(void) {
-	upgrade_dfu_on_enter_common(1);
+static void upgrade_dfu_on_enter_fpga(void)
+{
+    upgrade_dfu_on_enter_common(1);
 }
 
 /**
  * \brief Initializes the DFU layer.
  */
-static void upgrade_dfu_init(void) {
-	static StaticSemaphore_t done_sem_storage;
-	upgrade_dfu_state.done_sem = xSemaphoreCreateBinaryStatic(&done_sem_storage);
-	upgrade_dfu_state.job_response_pending = false;
+static void upgrade_dfu_init(void)
+{
+    static StaticSemaphore_t done_sem_storage;
+    upgrade_dfu_state.done_sem = xSemaphoreCreateBinaryStatic(&done_sem_storage);
+    upgrade_dfu_state.job_response_pending = false;
 }
 
 /**
  * \brief Shuts down the DFU layer.
  */
-static void upgrade_dfu_deinit(void) {
-}
+static void upgrade_dfu_deinit(void) {}
 
 
 
@@ -996,27 +1124,28 @@ static void upgrade_dfu_deinit(void) {
  * \brief The type of the DFU-mode configuration descriptor and associated
  * auxiliary descriptors.
  */
-typedef struct __attribute__((packed)) {
-	/**
-	 * \brief The configuration descriptor.
-	 */
-	usb_configuration_descriptor_t config;
+typedef struct __attribute__((packed))
+{
+    /**
+     * \brief The configuration descriptor.
+     */
+    usb_configuration_descriptor_t config;
 
-	/**
-	 * \brief The interface alternate setting for upgrading microcontroller
-	 * firmware.
-	 */
-	usb_interface_descriptor_t fw_dfu_interface;
+    /**
+     * \brief The interface alternate setting for upgrading microcontroller
+     * firmware.
+     */
+    usb_interface_descriptor_t fw_dfu_interface;
 
-	/**
-	 * \brief The interface alternate setting for upgrading the FPGA bitstream.
-	 */
-	usb_interface_descriptor_t fpga_dfu_interface;
+    /**
+     * \brief The interface alternate setting for upgrading the FPGA bitstream.
+     */
+    usb_interface_descriptor_t fpga_dfu_interface;
 
-	/**
-	 * \brief The DFU functional descriptor.
-	 */
-	usb_dfu_functional_descriptor_t dfu_functional;
+    /**
+     * \brief The DFU functional descriptor.
+     */
+    usb_dfu_functional_descriptor_t dfu_functional;
 } config_descriptor_t;
 
 /**
@@ -1024,149 +1153,163 @@ typedef struct __attribute__((packed)) {
  * descriptors.
  */
 static const config_descriptor_t UPGRADE_CONFIG_DESCRIPTOR = {
-	.config = {
-		.bLength = sizeof(usb_configuration_descriptor_t),
-		.bDescriptorType = USB_DTYPE_CONFIGURATION,
-		.wTotalLength = sizeof(UPGRADE_CONFIG_DESCRIPTOR),
-		.bNumInterfaces = 1U,
-		.bConfigurationValue = 1U,
-		.iConfiguration = 0U,
-		.bmAttributes = {
-			.remoteWakeup = 0U,
-			.selfPowered = 1U,
-			.one = 1U,
-		},
-		.bMaxPower = 50U,
-	},
-	.fw_dfu_interface = {
-		.bLength = sizeof(usb_interface_descriptor_t),
-		.bDescriptorType = USB_DTYPE_INTERFACE,
-		.bInterfaceNumber = 0U,
-		.bAlternateSetting = 0U,
-		.bNumEndpoints = 0U,
-		.bInterfaceClass = USB_DFU_CLASS_APPLICATION_SPECIFIC,
-		.bInterfaceSubClass = USB_DFU_SUBCLASS_DFU,
-		.bInterfaceProtocol = USB_DFU_PROTOCOL_DFU,
-		.iInterface = STRING_INDEX_DFU_FW,
-	},
-	.fpga_dfu_interface = {
-		.bLength = sizeof(usb_interface_descriptor_t),
-		.bDescriptorType = USB_DTYPE_INTERFACE,
-		.bInterfaceNumber = 0U,
-		.bAlternateSetting = 1U,
-		.bNumEndpoints = 0U,
-		.bInterfaceClass = USB_DFU_CLASS_APPLICATION_SPECIFIC,
-		.bInterfaceSubClass = USB_DFU_SUBCLASS_DFU,
-		.bInterfaceProtocol = USB_DFU_PROTOCOL_DFU,
-		.iInterface = STRING_INDEX_DFU_FPGA,
-	},
-	.dfu_functional = {
-		.bLength = sizeof(usb_dfu_functional_descriptor_t),
-		.bDescriptorType = USB_DFU_DTYPE_FUNCTIONAL,
-		.bmAttributes = {
-			.bitCanDnload = 1U,
-			.bitCanUpload = 1U,
-			.bitManifestationTolerant = 0U,
-			.bitWillDetach = 1U,
-		},
-		.wDetachTimeout = 0U,
-		.wTransferSize = UPGRADE_DFU_MAX_TRANSFER_SIZE,
-		.bcdDFUVersion = 0x0110U,
-	},
+    .config =
+        {
+            .bLength             = sizeof(usb_configuration_descriptor_t),
+            .bDescriptorType     = USB_DTYPE_CONFIGURATION,
+            .wTotalLength        = sizeof(UPGRADE_CONFIG_DESCRIPTOR),
+            .bNumInterfaces      = 1U,
+            .bConfigurationValue = 1U,
+            .iConfiguration      = 0U,
+            .bmAttributes =
+                {
+                    .remoteWakeup = 0U,
+                    .selfPowered  = 1U,
+                    .one          = 1U,
+                },
+            .bMaxPower = 50U,
+        },
+    .fw_dfu_interface =
+        {
+            .bLength            = sizeof(usb_interface_descriptor_t),
+            .bDescriptorType    = USB_DTYPE_INTERFACE,
+            .bInterfaceNumber   = 0U,
+            .bAlternateSetting  = 0U,
+            .bNumEndpoints      = 0U,
+            .bInterfaceClass    = USB_DFU_CLASS_APPLICATION_SPECIFIC,
+            .bInterfaceSubClass = USB_DFU_SUBCLASS_DFU,
+            .bInterfaceProtocol = USB_DFU_PROTOCOL_DFU,
+            .iInterface         = STRING_INDEX_DFU_FW,
+        },
+    .fpga_dfu_interface =
+        {
+            .bLength            = sizeof(usb_interface_descriptor_t),
+            .bDescriptorType    = USB_DTYPE_INTERFACE,
+            .bInterfaceNumber   = 0U,
+            .bAlternateSetting  = 1U,
+            .bNumEndpoints      = 0U,
+            .bInterfaceClass    = USB_DFU_CLASS_APPLICATION_SPECIFIC,
+            .bInterfaceSubClass = USB_DFU_SUBCLASS_DFU,
+            .bInterfaceProtocol = USB_DFU_PROTOCOL_DFU,
+            .iInterface         = STRING_INDEX_DFU_FPGA,
+        },
+    .dfu_functional =
+        {
+            .bLength         = sizeof(usb_dfu_functional_descriptor_t),
+            .bDescriptorType = USB_DFU_DTYPE_FUNCTIONAL,
+            .bmAttributes =
+                {
+                    .bitCanDnload             = 1U,
+                    .bitCanUpload             = 1U,
+                    .bitManifestationTolerant = 0U,
+                    .bitWillDetach            = 1U,
+                },
+            .wDetachTimeout = 0U,
+            .wTransferSize  = UPGRADE_DFU_MAX_TRANSFER_SIZE,
+            .bcdDFUVersion  = 0x0110U,
+        },
 };
 
 static const udev_interface_info_t UPGRADE_DFU_INTF = {
-	.control_handler = 0,
-	.endpoints = { 0, 0, 0, 0, 0, 0 },
-	.alternate_settings = {
-		{
-			.can_enter = 0,
-			.on_enter = &upgrade_dfu_on_enter_fw,
-			.on_exit = 0,
-			.control_handler = &upgrade_dfu_control_handler,
-			.endpoints = { 0, 0, 0, 0, 0, 0 },
-		},
-		{
-			.can_enter = 0,
-			.on_enter = &upgrade_dfu_on_enter_fpga,
-			.on_exit = 0,
-			.control_handler = &upgrade_dfu_control_handler,
-			.endpoints = { 0, 0, 0, 0, 0, 0 },
-		},
-	},
+    .control_handler = 0,
+    .endpoints       = {0, 0, 0, 0, 0, 0},
+    .alternate_settings =
+        {
+            {
+                .can_enter       = 0,
+                .on_enter        = &upgrade_dfu_on_enter_fw,
+                .on_exit         = 0,
+                .control_handler = &upgrade_dfu_control_handler,
+                .endpoints       = {0, 0, 0, 0, 0, 0},
+            },
+            {
+                .can_enter       = 0,
+                .on_enter        = &upgrade_dfu_on_enter_fpga,
+                .on_exit         = 0,
+                .control_handler = &upgrade_dfu_control_handler,
+                .endpoints       = {0, 0, 0, 0, 0, 0},
+            },
+        },
 };
 
 static const udev_config_info_t UPGRADE_USB_CONFIGURATION = {
-	.can_enter = 0,
-	.on_enter = 0,
-	.on_exit = 0,
-	.control_handler = 0,
-	.descriptors = &UPGRADE_CONFIG_DESCRIPTOR.config,
-	.transmit_fifo_words = { 16, 16, 16 },
-	.endpoints = { 0, 0, 0, 0, 0, 0 },
-	.interfaces = { &UPGRADE_DFU_INTF },
+    .can_enter           = 0,
+    .on_enter            = 0,
+    .on_exit             = 0,
+    .control_handler     = 0,
+    .descriptors         = &UPGRADE_CONFIG_DESCRIPTOR.config,
+    .transmit_fifo_words = {16, 16, 16},
+    .endpoints           = {0, 0, 0, 0, 0, 0},
+    .interfaces          = {&UPGRADE_DFU_INTF},
 };
 
 static const udev_info_t UPGRADE_USB_INFO = {
-	.flags = {
-		.vbus_sensing = 1,
-		.minimize_interrupts = 0,
-		.self_powered = 1,
-	},
-	.internal_task_priority = PRIO_TASK_USB,
-	.internal_task_stack_size = 1024U,
-	.receive_fifo_words = 10U /* SETUP packets */ + 1U /* Global OUT NAK status */ + ((64U / 4U) + 1U) * 2U /* Packets */ + 4U /* Transfer complete status */,
-	.device_descriptor = {
-		.bLength = sizeof(usb_device_descriptor_t),
-		.bDescriptorType = USB_DTYPE_DEVICE,
-		.bcdUSB = 0x0200U,
-		.bDeviceClass = 0x00U,
-		.bDeviceSubClass = 0x00U,
-		.bDeviceProtocol = 0x00U,
-		.bMaxPacketSize0 = 64U,
-		.idVendor = VENDOR_ID,
-		.idProduct = PRODUCT_ID_DFU,
-		.bcdDevice = 0x0101U,
-		.iManufacturer = STRING_INDEX_MANUFACTURER,
-		.iProduct = STRING_INDEX_PRODUCT_DFU,
-		.iSerialNumber = STRING_INDEX_SERIAL,
-		.bNumConfigurations = 1U,
-	},
-	.string_count = STRING_INDEX_COUNT - 1U /* exclude zero */,
-	.string_zero_descriptor = &MAIN_STRING_ZERO,
-	.language_table = MAIN_LANGUAGE_TABLE,
-	.control_handler = 0,
-	.configurations = {
-		&UPGRADE_USB_CONFIGURATION,
-	},
+    .flags =
+        {
+            .vbus_sensing        = 1,
+            .minimize_interrupts = 0,
+            .self_powered        = 1,
+        },
+    .internal_task_priority   = PRIO_TASK_USB,
+    .internal_task_stack_size = 1024U,
+    .receive_fifo_words       = 10U /* SETUP packets */ + 1U /* Global OUT NAK status */ +
+                          ((64U / 4U) + 1U) * 2U /* Packets */ +
+                          4U /* Transfer complete status */,
+    .device_descriptor =
+        {
+            .bLength            = sizeof(usb_device_descriptor_t),
+            .bDescriptorType    = USB_DTYPE_DEVICE,
+            .bcdUSB             = 0x0200U,
+            .bDeviceClass       = 0x00U,
+            .bDeviceSubClass    = 0x00U,
+            .bDeviceProtocol    = 0x00U,
+            .bMaxPacketSize0    = 64U,
+            .idVendor           = VENDOR_ID,
+            .idProduct          = PRODUCT_ID_DFU,
+            .bcdDevice          = 0x0101U,
+            .iManufacturer      = STRING_INDEX_MANUFACTURER,
+            .iProduct           = STRING_INDEX_PRODUCT_DFU,
+            .iSerialNumber      = STRING_INDEX_SERIAL,
+            .bNumConfigurations = 1U,
+        },
+    .string_count           = STRING_INDEX_COUNT - 1U /* exclude zero */,
+    .string_zero_descriptor = &MAIN_STRING_ZERO,
+    .language_table         = MAIN_LANGUAGE_TABLE,
+    .control_handler        = 0,
+    .configurations =
+        {
+            &UPGRADE_USB_CONFIGURATION,
+        },
 };
 
 /**
  * \brief Runs the DFU mode, allowing images to be uploaded and downloaded.
  */
-void upgrade_dfu_run(void) {
-	// Initialize the two layers.
-	upgrade_dfu_writeout_init();
-	upgrade_dfu_init();
+void upgrade_dfu_run(void)
+{
+    // Initialize the two layers.
+    upgrade_dfu_writeout_init();
+    upgrade_dfu_init();
 
-	// Attach to USB.
-	udev_init(&UPGRADE_USB_INFO);
-	udev_attach();
+    // Attach to USB.
+    udev_init(&UPGRADE_USB_INFO);
+    udev_attach();
 
-	// Wait until done. The task that terminates operation also detaches from
-	// USB.
-	while (!xSemaphoreTake(upgrade_dfu_state.done_sem, 100U / portTICK_PERIOD_MS)) {
-		// Kick the hardware watchdog.
-		IWDG.KR = 0xAAAAU;
-		gpio_toggle(PIN_LED_STATUS);
-	}
+    // Wait until done. The task that terminates operation also detaches from
+    // USB.
+    while (!xSemaphoreTake(upgrade_dfu_state.done_sem, 100U / portTICK_PERIOD_MS))
+    {
+        // Kick the hardware watchdog.
+        IWDG.KR = 0xAAAAU;
+        gpio_toggle(PIN_LED_STATUS);
+    }
 
-	// Shut down the two layers.
-	upgrade_dfu_deinit();
-	upgrade_dfu_writeout_deinit();
+    // Shut down the two layers.
+    upgrade_dfu_deinit();
+    upgrade_dfu_writeout_deinit();
 
-	// Wait for USB detach to be visible.
-	vTaskDelay(100U / portTICK_PERIOD_MS);
+    // Wait for USB detach to be visible.
+    vTaskDelay(100U / portTICK_PERIOD_MS);
 }
 
 /**

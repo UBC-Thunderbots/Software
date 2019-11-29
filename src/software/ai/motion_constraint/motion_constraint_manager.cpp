@@ -47,8 +47,6 @@ void MotionConstraintManager::visit(const CreaseDefenderTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ShadowEnemyTactic &tactic) {}
 
-void MotionConstraintManager::visit(const BlockShotPathTactic &tactic) {}
-
 void MotionConstraintManager::visit(const MoveTactic &tactic) {}
 
 void MotionConstraintManager::visit(const ChipTactic &tactic) {}
@@ -62,6 +60,8 @@ void MotionConstraintManager::visit(const KickoffChipTactic &tactic)
 }
 
 void MotionConstraintManager::visit(const StopTactic &tactic) {}
+
+void MotionConstraintManager::visit(const PatrolTactic &tactic) {}
 
 void MotionConstraintManager::visit(const PenaltyKickTactic &tactic)
 {
@@ -84,8 +84,6 @@ void MotionConstraintManager::visit(const PenaltySetupTactic &tactic)
 
 void MotionConstraintManager::visit(const ReceiverTactic &tactic) {}
 
-void MotionConstraintManager::visit(const PatrolTactic &tactic) {}
-
 void MotionConstraintManager::visit(const ShootGoalTactic &tactic)
 {
     current_whitelisted_constraints = std::set<MotionConstraint>({
@@ -96,13 +94,6 @@ void MotionConstraintManager::visit(const ShootGoalTactic &tactic)
 void MotionConstraintManager::visit(const PasserTactic &tactic) {}
 
 void MotionConstraintManager::visit(const DefenseShadowEnemyTactic &tactic) {}
-
-void MotionConstraintManager::visit(const GrabBallTactic &tactic)
-{
-    current_whitelisted_constraints = std::set<MotionConstraint>({
-        MotionConstraint::HALF_METER_AROUND_BALL
-        });
-}
 
 void MotionConstraintManager::visit(const MoveTestTactic &tactic) {}
 

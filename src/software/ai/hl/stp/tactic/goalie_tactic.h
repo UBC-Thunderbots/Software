@@ -61,11 +61,6 @@ class GoalieTactic : public Tactic
      */
     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
                                                    Rectangle goalie_restricted_area);
-    /**
-     * Accepts a Tactic Visitor and calls the visit function on itself
-     *
-     * @param visitor A Tactic Visitor
-     */
     void accept(TacticVisitor &visitor) const override;
 
    private:

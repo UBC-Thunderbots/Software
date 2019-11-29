@@ -10,10 +10,11 @@
 /**
  * \brief The LEDs installed on the device.
  */
-typedef enum {
-	LED_POWER,
-	LED_TX,
-	LED_RX,
+typedef enum
+{
+    LED_POWER,
+    LED_TX,
+    LED_RX,
 } led_t;
 
 void led_init(void);

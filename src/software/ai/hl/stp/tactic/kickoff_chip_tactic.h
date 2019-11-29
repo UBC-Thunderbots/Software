@@ -21,10 +21,5 @@ class KickoffChipTactic : public ChipTactic
 
     std::string getName() const override;
 
-    /**
-     * Accepts a Tactic Visitor and calls the visit function on itself
-     *
-     * @param visitor A Tactic Visitor
-     */
     void accept(TacticVisitor& visitor) const override;
 };
