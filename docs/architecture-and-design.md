@@ -45,7 +45,6 @@
     * [Navigation](#navigation)
       * [Path Planner](#path-planner)
         * [Theta Star Path Planner](#theta-star-path-planner)
-        * [Alternative Path Planners](#alternative-path-planners)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
 
@@ -399,11 +398,6 @@ A Star is a similar algorithm that does the same graph exloration as Theta Star.
 References:
 * [Theta Star Any Angle](https://web.archive.org/web/20190218161704/http://aigamedev.com/open/tutorial/theta-star-any-angle-paths/)
 * [Reference A Star Implementation](https://www.geeksforgeeks.org/a-search-algorithm/)
-
-#### Alternative Path Planners
-Our team has used Rapidly-exploring Random Tree in the past, but we found that the non-determinism and precision were big problems.
-
-Our team has experimented with spline-based path planners in the past. Spline-based path planners offer the advantage of making smoother paths and possibly accounting for robot dynamics to make the path faster for the robot to follow. However, we would need to change the radio protocol to communicate the spline information and we would need to improve control to keep the robot on the path.
 
 ## AI Diagram
 ![Backend Diagram](images/ai_diagram.svg)
