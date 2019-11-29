@@ -15,24 +15,24 @@ class Line final
     Line();
 
     /**
-     * Creates a line from two points
+     * Creates a line from two Points
      *
-     * @param first the first point
-     * @param second the second point
+     * @param first the first Point
+     * @param second the second Point
      */
     explicit Line(const Point& first, const Point& second);
 
     /**
-     * Returns the first point
+     * Returns the first Point
      *
-     * @return the first point
+     * @return the first Point
      */
     Point getFirst() const;
 
     /**
-     * Returns the second point
+     * Returns the second Point
      *
-     * @return the second point
+     * @return the second Point
      */
     Point getSecond() const;
 
@@ -44,24 +44,24 @@ class Line final
     double getSlope() const;
 
     /**
-     * Sets the first point
+     * Sets the first Point
      *
-     * @param first the new first point
+     * @param first the new first Point
      */
     void setFirst(const Point& first);
 
     /**
-     * Sets the second point
+     * Sets the second Point
      *
-     * @param second the new second point
+     * @param second the new second Point
      */
     void setSecond(const Point& second);
 
     /**
-     * Calculates the Point evaluated at val, starting from the first point and moving val
-     * units along the line towards the second point
+     * Calculates the Point evaluated at val, starting from the first Point and moving val
+     * units along the line towards the second Point
      *
-     * @param val value to evaluate line
+     * @param val the value to evaluate line
      *
      * @return Point on line evaluated at val
      */
@@ -88,5 +88,12 @@ class Line final
      */
     Polynomial y;
 
+    /**
+     * Calculates the parametric equations based on points given and sets x and y
+     * accordingly
+     *
+     * @param first the first Point
+     * @param second the second Point
+     */
     void calculateLine(const Point& first, const Point& second);
 };
