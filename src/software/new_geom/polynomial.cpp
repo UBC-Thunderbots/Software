@@ -1,7 +1,5 @@
 #include "software/new_geom/polynomial.h"
 
-#include <iostream>
-
 #include "software/new_geom/geom_constants.h"
 
 Polynomial::Polynomial() {}
