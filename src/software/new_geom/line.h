@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/new_geom/polynomial.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/polynomial.h"
 
 /**
  * A 2D line.
@@ -58,7 +58,8 @@ class Line final
     void setSecond(const Point& second);
 
     /**
-     * Calculates the Point evaluated at val, starting from the first point and moving val units along the line towards the second point
+     * Calculates the Point evaluated at val, starting from the first point and moving val
+     * units along the line towards the second point
      *
      * @param val value to evaluate line
      *

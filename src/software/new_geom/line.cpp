@@ -2,7 +2,7 @@
 
 Line::Line() {}
 
-Line::Line(const Point& first, const Point& second) : first(first), second(second)
+Line::Line(const Point &first, const Point &second) : first(first), second(second)
 {
     calculateLine(first, second);
 }
@@ -44,8 +44,8 @@ void Line::calculateLine(const Point &first, const Point &second)
     if (first != second)
     {
         double angle = std::atan2(second.y() - first.y(), second.x() - first.x());
-        x = Polynomial({first.x(), std::cos(angle)});
-        y = Polynomial({first.y(), std::sin(angle)});
+        x            = Polynomial({first.x(), std::cos(angle)});
+        y            = Polynomial({first.y(), std::sin(angle)});
     }
     else
     {

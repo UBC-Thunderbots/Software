@@ -26,11 +26,15 @@ TEST(LineTest, two_points_constructor)
     EXPECT_DOUBLE_EQ(l.getSlope(), 0.5);
 
     double angle = std::atan2(y2 - y1, x2 - x1);
-    EXPECT_EQ(l.valueAt(-20000), Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(-2.5), Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-20000),
+              Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-2.5),
+              Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
     EXPECT_EQ(l.valueAt(0.0), Point(x1, y1));
-    EXPECT_EQ(l.valueAt(2.5), Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(20000), Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(2.5),
+              Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(20000),
+              Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
 }
 
 TEST(LineTest, two_points_constructor_reverse)
@@ -45,11 +49,15 @@ TEST(LineTest, two_points_constructor_reverse)
     EXPECT_DOUBLE_EQ(l.getSlope(), 0.5);
 
     double angle = std::atan2(y2 - y1, x2 - x1);
-    EXPECT_EQ(l.valueAt(-20000), Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(-2.5), Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-20000),
+              Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-2.5),
+              Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
     EXPECT_EQ(l.valueAt(0.0), Point(x1, y1));
-    EXPECT_EQ(l.valueAt(2.5), Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(20000), Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(2.5),
+              Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(20000),
+              Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
 }
 
 TEST(LineTest, set_first)
@@ -64,11 +72,15 @@ TEST(LineTest, set_first)
     EXPECT_DOUBLE_EQ(l.getSlope(), -2.0 / 11.0);
 
     double angle = std::atan2(y2 - y1, x2 - x1);
-    EXPECT_EQ(l.valueAt(-20000), Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(-2.5), Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-20000),
+              Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-2.5),
+              Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
     EXPECT_EQ(l.valueAt(0.0), Point(x1, y1));
-    EXPECT_EQ(l.valueAt(2.5), Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(20000), Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(2.5),
+              Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(20000),
+              Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
 }
 
 TEST(LineTest, set_second)
@@ -83,9 +95,13 @@ TEST(LineTest, set_second)
     EXPECT_DOUBLE_EQ(l.getSlope(), -2.0 / 11.0);
 
     double angle = std::atan2(y2 - y1, x2 - x1);
-    EXPECT_EQ(l.valueAt(-20000), Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(-2.5), Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-20000),
+              Point(x1 + -20000 * std::cos(angle), y1 + -20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(-2.5),
+              Point(x1 + -2.5 * std::cos(angle), y1 + -2.5 * std::sin(angle)));
     EXPECT_EQ(l.valueAt(0.0), Point(x1, y1));
-    EXPECT_EQ(l.valueAt(2.5), Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
-    EXPECT_EQ(l.valueAt(20000), Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(2.5),
+              Point(x1 + 2.5 * std::cos(angle), y1 + 2.5 * std::sin(angle)));
+    EXPECT_EQ(l.valueAt(20000),
+              Point(x1 + 20000 * std::cos(angle), y1 + 20000 * std::sin(angle)));
 }
