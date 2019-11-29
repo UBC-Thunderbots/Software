@@ -79,12 +79,12 @@ class Line final
     Point second;
 
     /**
-     * Parametric equation for the x-axis
+     * Parametric equation for the x component of line
      */
     Polynomial x;
 
     /**
-     * Parametric equation for the y-axis
+     * Parametric equation for the y component of line
      */
     Polynomial y;
 
