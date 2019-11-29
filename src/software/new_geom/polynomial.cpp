@@ -1,3 +1,4 @@
+#include <iostream>
 #include "software/new_geom/polynomial.h"
 
 #include "software/new_geom/geom_constants.h"
@@ -33,7 +34,7 @@ unsigned int Polynomial::getOrder() const
 {
     if (coeffs.size() != 0)
     {
-        for (size_t i = coeffs.size() - 1; i >= 0; i++)
+        for (size_t i = coeffs.size() - 1; i >= 0; i--)
         {
             if (std::abs(coeffs[i]) >= GeomConstants::EPSILON)
             {

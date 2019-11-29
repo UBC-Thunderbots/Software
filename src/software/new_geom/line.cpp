@@ -2,29 +2,54 @@
 
 Line::Line() {}
 
-Line::Line(double y_intercept, double slope) : line(Polynomial({y_intercept, slope})) {}
-
-double Line::getYIntercept()
+Line::Line(const Point& first, const Point& second) : first(first), second(second)
 {
-    return line.getCoeff(0);
+    calculateLine(first, second);
 }
 
-double Line::getSlope()
+Point Line::getFirst() const
 {
-    return line.getCoeff(1);
+    return first;
 }
 
-void Line::setYIntercept(double y_intercept)
+Point Line::getSecond() const
 {
-    line.setCoeff(0, y_intercept);
+    return second;
 }
 
-void Line::setSlope(double slope)
+double Line::getSlope() const
 {
-    line.setCoeff(1, slope);
+    return (second.y() - first.y()) / (second.x() - first.x());
 }
 
-double Line::valueAt(double val)
+void Line::setFirst(const Point &first)
 {
-    return line.valueAt(val);
+    this->first = first;
+    calculateLine(this->first, this->second);
+}
+
+void Line::setSecond(const Point &second)
+{
+    this->second = second;
+    calculateLine(this->first, this->second);
+}
+
+Point Line::valueAt(double val) const
+{
+    return Point(x.valueAt(val), y.valueAt(val));
+}
+
+void Line::calculateLine(const Point &first, const Point &second)
+{
+    if (first != second)
+    {
+        double angle = std::atan2(second.y() - first.y(), second.x() - first.x());
+        x = Polynomial({first.x(), std::cos(angle)});
+        y = Polynomial({first.y(), std::sin(angle)});
+    }
+    else
+    {
+        x = Polynomial();
+        y = Polynomial();
+    }
 }
