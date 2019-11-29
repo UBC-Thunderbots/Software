@@ -43,6 +43,7 @@
       * [Tactics](#tactics)
       * [Plays](#plays)
     * [Navigation](#navigation)
+      * [Path Manager](#path-manager)
       * [Path Planner](#path-planner)
         * [Theta Star Path Planner](#theta-star-path-planner)
     * [Diagram](#ai-diagram)
@@ -387,6 +388,9 @@ The `Navigator` is responsible for path planning and navigation. Once our strate
 Most [Intents](#intents) are easy to break down into  [Primitives](#primitives), and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behaviour like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
 
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+
+### Path Manager
+The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of path objectives and path planner and it will generate paths using the given path planner and arbitrate between paths to prevent collisions. One approach is to add extra obstacles to cause the path planner to generate paths that avoid a potential collisions; this is what `VelocityObstaclePathManager` implements. One disadvantage of this approach is that it does not account for when robots will occupy particular positions on the path. (Trajectory planning or use of the Minkowski space are possible ideas to account for time.)
 
 ### Path Planner
 The `Path Planner` is responsible for path planning a single robot around a single set of obstacles from a given start to a given destination. Note that the interface of the path planner is intentionally decoupled from the rest of AI, so that it doesn't rely on the representation of [Intents](#intents) or [World](#world).
