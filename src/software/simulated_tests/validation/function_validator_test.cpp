@@ -1,10 +1,10 @@
-#include "software/backend/simulation/validation/function_validator.h"
+#include "software/simulated_tests/validation/function_validator.h"
 
 #include <gtest/gtest.h>
 
 #include <boost/coroutine2/all.hpp>
 
-#include "software/backend/simulation/validation/validation_function.h"
+#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
 TEST(FunctionValidatorTest, test_validation_function_that_does_nothing_reports_success)

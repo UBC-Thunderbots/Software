@@ -30,3 +30,18 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "world_state_validator",
+    srcs = ["world_state_validator.cpp"],
+    hdrs = ["world_state_validator.h"],
+    deps = [
+        ":function_validator",
+        ":validation_function",
+        "//software/multithreading:thread_safe_buffer",
+        "//software/multithreading:threaded_observer",
+        "//software/util/logger",
+        "//software/util/time:duration",
+        "//software/world",
+    ],
+)
