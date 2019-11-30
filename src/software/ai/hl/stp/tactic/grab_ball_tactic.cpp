@@ -54,11 +54,14 @@ double GrabBallTactic::calculateRobotCost(const Robot &robot, const World &world
 
 void GrabBallTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    InterceptBallAction intercept_action = InterceptBallAction(field, ball, true);
-    MoveSpinAction movespin_action =
-        MoveSpinAction(MoveSpinAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
-    MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
-    auto intercept         = Evaluation::findBestInterceptForBall(ball, field, *robot);
+    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, true);
+    auto movespin_action =
+        std::make_shared<MoveSpinAction>(MoveSpinAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    auto move_action =
+        std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
+
+    auto intercept = Evaluation::findBestInterceptForBall(ball, field, *robot);
+
     do
     {
         double smallest_enemy_dist_to_ball = std::numeric_limits<double>::max();
@@ -73,25 +76,25 @@ void GrabBallTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         {
             if (dist(robot->position(), ball.position()) < BALL_DIST_FROM_ENEMY)
             {
-                movespin_action.updateControlParams(*robot, ball.position(),
+                movespin_action->updateControlParams(*robot, ball.position(),
                                                     STEAL_BALL_SPIN_SPEED, 0);
-                yield(movespin_action.getNextIntent());
+                yield(movespin_action);
             }
             else
             {
-                move_action.updateControlParams(
+                move_action->updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0.0,
                     DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
                     BallCollisionType::ALLOW);
-                yield(move_action.getNextIntent());
+                yield(move_action);
             }
         }
         else
         {
-            intercept_action.updateWorldParams(field, ball);
-            intercept_action.updateControlParams(*robot);
-            yield(intercept_action.getNextIntent());
+            intercept_action->updateWorldParams(field, ball);
+            intercept_action->updateControlParams(*robot);
+            yield(intercept_action);
         }
     } while (true);
 }

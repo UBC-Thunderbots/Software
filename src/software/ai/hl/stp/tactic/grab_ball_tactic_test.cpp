@@ -3,8 +3,9 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/intent/move_intent.h"
-#include "software/ai/intent/movespin_intent.h"
+#include "software/ai/hl/stp/action/intercept_ball_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/movespin_action.h"
 #include "software/test_util/test_util.h"
 
 TEST(GrabBallTacticTest, test_robot_intercepts_ball_if_no_enemies_near_ball)
@@ -22,20 +23,13 @@ TEST(GrabBallTacticTest, test_robot_intercepts_ball_if_no_enemies_near_ball)
     GrabBallTactic tactic =
         GrabBallTactic(world.field(), world.ball(), world.enemyTeam(), true);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(2, 0), 0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the GrabBallTactic!";
-    }
+    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
+    ASSERT_FALSE(intercept_action == nullptr);
 }
 
 TEST(GrabBallTacticTest,
@@ -56,20 +50,13 @@ TEST(GrabBallTacticTest,
     GrabBallTactic tactic =
         GrabBallTactic(world.field(), world.ball(), world.enemyTeam(), true);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(world.ball().position(), 0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the GrabBallTactic!";
-    }
+    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
+    ASSERT_FALSE(intercept_action == nullptr);
 }
 
 TEST(GrabBallTacticTest, test_robot_steals_the_ball_if_close_to_an_enemy_with_the_ball)
@@ -89,19 +76,12 @@ TEST(GrabBallTacticTest, test_robot_steals_the_ball_if_close_to_an_enemy_with_th
     GrabBallTactic tactic =
         GrabBallTactic(world.field(), world.ball(), world.enemyTeam(), true);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    try
-    {
-        MoveSpinIntent movespin_intent = dynamic_cast<MoveSpinIntent &>(*intent_ptr);
-        EXPECT_TRUE(
-            movespin_intent.getDestination().isClose(world.ball().position(), 0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveSpinIntent was not returned by the GrabBallTactic!";
-    }
+    auto movespin_action = std::dynamic_pointer_cast<MoveSpinAction>(action_ptr);
+    ASSERT_FALSE(movespin_action == nullptr);
+    EXPECT_TRUE(movespin_action->getDestination().isClose(world.ball().position(), 0.05));
 }
