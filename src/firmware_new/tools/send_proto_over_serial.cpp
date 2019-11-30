@@ -21,12 +21,16 @@
 
 #include "boost/asio.hpp"
 #include "boost/asio/serial_port.hpp"
+#include "boost/crc.hpp"
 #include "firmware_new/proto/control.pb.h"
 #include "g3log/g3log.hpp"
 #include "google/protobuf/util/delimited_message_util.h"
 
 void send_proto_over_serial(boost::asio::serial_port& port,
                             const google::protobuf::Message& proto_msg);
+
+//void receive_proto_over_serial(boost::asio::serial_port& port,
+                            //const google::protobuf::Message& proto_msg)
 
 int main()
 {
@@ -54,10 +58,14 @@ int main()
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
 
-    for (int k = 0; k < 1000; k++)
+    for (int k =0; k<1000; k++)
         send_proto_over_serial(port, control_req);
 
+    robot_ack ack;
+    //recv_proto_over_serial<robot_ack>(port, ack);
+
     // shutdown
+    //std::promise<void>().get_future().wait();
     port.close();
     google::protobuf::ShutdownProtobufLibrary();
 
@@ -77,22 +85,37 @@ int main()
 void send_proto_over_serial(boost::asio::serial_port& port,
                             const google::protobuf::Message& proto_msg)
 {
+    // serialize msg
     auto size_of_msg = proto_msg.ByteSizeLong();
-    uint8_t send_buf[size_of_msg];
+    uint8_t msg_buf[size_of_msg];
+    proto_msg.SerializeToArray(&msg_buf, size_of_msg);
 
-    // std::cout << "Sending protobuf with size: " << size_of_msg << std::endl;
+    // compute and store crc checksum
+    boost::crc_32_type result;
+    result.process_bytes(msg_buf, size_of_msg);
+    uint32_t checksum = result.checksum();
 
-    proto_msg.SerializeToArray(&send_buf, size_of_msg);
-    boost::asio::write(port, boost::asio::buffer(&send_buf, size_of_msg));
+    // we encode the checksum in the first 4 bytes of the msg
+    // little endian
+    uint8_t send_buf[size_of_msg + 4];
+    send_buf[3] = (checksum >> 24) & 0xFF;
+    send_buf[2] = (checksum >> 16) & 0xFF;
+    send_buf[1] = (checksum >> 8) & 0xFF;
+    send_buf[0] = (checksum & 0xFF);
+
+    for (int k = 0; k < size_of_msg; k++)
+    {
+        send_buf[k+4] = msg_buf[k];
+    }
+
+    boost::asio::write(port, boost::asio::buffer(&send_buf, size_of_msg + 4));
 
     // an "Idle Line" is detected when the received detects the line idle
     // for more than 1/baud_rate. We compute that value and create a blocking
     // delay
-    //
-    // NOTE: we also add additional delay to allow for the msg to be parsed on arrival
-    // so we just multiply by 1000
     boost::asio::serial_port_base::baud_rate baud_rate;
     port.get_option(baud_rate);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)1e6 / baud_rate.value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(
+                                    (int)1e6 / baud_rate.value()));
 }
