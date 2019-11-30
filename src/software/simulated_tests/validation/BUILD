@@ -41,6 +41,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "continuous_function_validator_test",
+    srcs = ["continuous_function_validator_test.cpp"],
+    deps = [
+        ":continuous_function_validator",
+        ":validation_function",
+        "//software/test_util",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "world_state_validator",
     srcs = ["world_state_validator.cpp"],
