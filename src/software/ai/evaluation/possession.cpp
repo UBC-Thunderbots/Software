@@ -52,8 +52,12 @@ namespace Evaluation
     {
         for (const Robot &robot : team.getAllRobots())
         {
-            std::vector<Timestamp> robot_history_timestamps =
-                robot.getPreviousTimestamps();
+            boost::circular_buffer<RobotState> previous_states = robot.getPreviousStates();
+            std::vector<Timestamp> robot_history_timestamps{};
+            for (int i = 0; i < previous_states.size(); i++)
+            {
+                robot_history_timestamps.push_back(previous_states.at(i).timestamp());
+            }
 
             unsigned i = 0;
 
@@ -80,8 +84,12 @@ namespace Evaluation
     {
         for (const Robot &robot : team.getAllRobots())
         {
-            std::vector<Timestamp> robot_history_timestamps =
-                robot.getPreviousTimestamps();
+            boost::circular_buffer<RobotState> previous_states = robot.getPreviousStates();
+            std::vector<Timestamp> robot_history_timestamps{};
+            for (int i = 0; i < previous_states.size(); i++)
+            {
+                robot_history_timestamps.push_back(previous_states.at(i).timestamp());
+            }
 
             int i = 0;
 

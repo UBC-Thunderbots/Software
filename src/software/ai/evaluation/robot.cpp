@@ -31,10 +31,10 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     }
     else if (robot.getHistoryIndexFromTimestamp(*timestamp))
     {
-        robot_pos_at_time = robot.getPreviousPositions().at(
-            *robot.getHistoryIndexFromTimestamp(*timestamp));
-        robot_ori_at_time = robot.getPreviousOrientations().at(
-            *robot.getHistoryIndexFromTimestamp(*timestamp));
+        robot_pos_at_time = robot.getPreviousStates().at(
+            *robot.getHistoryIndexFromTimestamp(*timestamp)).position();
+        robot_ori_at_time = robot.getPreviousStates().at(
+            *robot.getHistoryIndexFromTimestamp(*timestamp)).orientation();
     }
     else
     {
@@ -49,8 +49,8 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     }
     else if (ball.getHistoryIndexFromTimestamp(*timestamp))
     {
-        ball_pos_at_time = ball.getPreviousPositions().at(
-            *ball.getHistoryIndexFromTimestamp(*timestamp));
+        ball_pos_at_time = ball.getPreviousStates().at(
+            *ball.getHistoryIndexFromTimestamp(*timestamp)).position();
     }
     else
     {
@@ -93,12 +93,12 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
     else if (robot.getHistoryIndexFromTimestamp(*timestamp) &&
              world.ball().getHistoryIndexFromTimestamp(*timestamp))
     {
-        robot_pos = robot.getPreviousPositions().at(
-            *robot.getHistoryIndexFromTimestamp(*timestamp));
-        ball_pos = world.ball().getPreviousPositions().at(
-            *world.ball().getHistoryIndexFromTimestamp(*timestamp));
-        ball_velocity = world.ball().getPreviousVelocities().at(
-            *world.ball().getHistoryIndexFromTimestamp(*timestamp));
+        robot_pos = robot.getPreviousStates().at(
+            *robot.getHistoryIndexFromTimestamp(*timestamp)).position();
+        ball_pos = world.ball().getPreviousStates().at(
+            *world.ball().getHistoryIndexFromTimestamp(*timestamp)).position();
+        ball_velocity = world.ball().getPreviousStates().at(
+            *world.ball().getHistoryIndexFromTimestamp(*timestamp)).velocity();
     }
     else
     {

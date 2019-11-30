@@ -147,68 +147,17 @@ AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
     return angularVelocity();
 }
 
-std::vector<Point> Robot::getPreviousPositions() const
+boost::circular_buffer<RobotState> Robot::getPreviousStates() const
 {
-    std::vector<Point> previousPositions{};
-    for (const RobotState &state : states_)
-    {
-        previousPositions.push_back(state.position());
-    }
-
-    return previousPositions;
-}
-
-std::vector<Vector> Robot::getPreviousVelocities() const
-{
-    std::vector<Vector> previousVelocities{};
-    for (const RobotState &state : states_)
-    {
-        previousVelocities.push_back(state.velocity());
-    }
-
-    return previousVelocities;
-}
-
-std::vector<Angle> Robot::getPreviousOrientations() const
-{
-    std::vector<Angle> previousOrientations{};
-    for (const RobotState &state : states_)
-    {
-        previousOrientations.push_back(state.orientation());
-    }
-
-    return previousOrientations;
-}
-
-std::vector<AngularVelocity> Robot::getPreviousAngularVelocities() const
-{
-    std::vector<AngularVelocity> previousAngularVelocities{};
-    for (const RobotState &state : states_)
-    {
-        previousAngularVelocities.push_back(state.angularVelocity());
-    }
-
-    return previousAngularVelocities;
-}
-
-std::vector<Timestamp> Robot::getPreviousTimestamps() const
-{
-    std::vector<Timestamp> previousTimestamps{};
-    for (const RobotState &state : states_)
-    {
-        previousTimestamps.push_back(state.timestamp());
-    }
-
-    return previousTimestamps;
+    return states_;
 }
 
 std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
-    std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (size_t i = 0; i < timestamp_history.size(); i++)
+    for (unsigned i = 0; i < states_.size(); i++)
     {
         double timestamp_diff =
-            fabs((timestamp - timestamp_history[i]).getMilliseconds());
+            fabs((timestamp - states_.at(i).timestamp()).getMilliseconds());
 
         // If timestamp is close to desired timestamp, return the index.
         if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)

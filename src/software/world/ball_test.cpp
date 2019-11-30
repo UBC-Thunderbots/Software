@@ -275,7 +275,13 @@ TEST_F(BallTest, get_position_history)
     ball.updateState(
         BallState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future));
 
-    EXPECT_EQ(prevPositions, ball.getPreviousPositions());
+    boost::circular_buffer<BallState> previous_states = ball.getPreviousStates();
+    std::vector<Point> previous_positions{};
+    for (int i = 0; i < previous_states.size(); i++)
+    {
+        previous_positions.push_back(previous_states.at(i).position());
+    }
+    EXPECT_EQ(prevPositions, previous_positions);
 }
 
 TEST_F(BallTest, get_velocity_history)
@@ -288,7 +294,13 @@ TEST_F(BallTest, get_velocity_history)
     ball.updateState(
         BallState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future));
 
-    EXPECT_EQ(prevVelocities, ball.getPreviousVelocities());
+    boost::circular_buffer<BallState> previous_states = ball.getPreviousStates();
+    std::vector<Vector> previous_velocities{};
+    for (int i = 0; i < previous_states.size(); i++)
+    {
+        previous_velocities.push_back(previous_states.at(i).velocity());
+    }
+    EXPECT_EQ(prevVelocities, previous_velocities);
 }
 
 TEST_F(BallTest, get_timestamp_history)
@@ -302,7 +314,13 @@ TEST_F(BallTest, get_timestamp_history)
     ball.updateState(
         BallState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future));
 
-    EXPECT_EQ(prevAngularVelocities, ball.getPreviousTimestamps());
+    boost::circular_buffer<BallState> previous_states = ball.getPreviousStates();
+    std::vector<Timestamp> previous_timestamps{};
+    for (int i = 0; i < previous_states.size(); i++)
+    {
+        previous_timestamps.push_back(previous_states.at(i).timestamp());
+    }
+    EXPECT_EQ(prevAngularVelocities, previous_timestamps);
 }
 
 TEST_F(BallTest, get_timestamp_index_fetches_first_index)

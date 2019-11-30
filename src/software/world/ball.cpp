@@ -61,31 +61,9 @@ Timestamp Ball::lastUpdateTimestamp() const
     return states_.front().timestamp();
 }
 
-std::vector<Timestamp> Ball::getPreviousTimestamps() const
-{
-    std::vector<Timestamp> timestamps{};
-    for (const BallState &state : states_)
-    {
-        timestamps.push_back(state.timestamp());
-    }
-
-    return timestamps;
-}
-
 Point Ball::position() const
 {
     return states_.front().position();
-}
-
-std::vector<Point> Ball::getPreviousPositions() const
-{
-    std::vector<Point> positions{};
-    for (const BallState &state : states_)
-    {
-        positions.push_back(state.position());
-    }
-
-    return positions;
 }
 
 Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) const
@@ -106,17 +84,6 @@ Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) con
 Vector Ball::velocity() const
 {
     return states_.front().velocity();
-}
-
-std::vector<Vector> Ball::getPreviousVelocities() const
-{
-    std::vector<Vector> velocities{};
-    for (const BallState &state : states_)
-    {
-        velocities.push_back(state.velocity());
-    }
-
-    return velocities;
 }
 
 Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) const
@@ -141,13 +108,14 @@ boost::circular_buffer<BallState> Ball::getPreviousStates() const
 
 std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
-    std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (unsigned i = 0; i < timestamp_history.size(); i++)
+    for (unsigned i = 0; i < states_.size(); i++)
     {
         double timestamp_diff =
-            fabs((timestamp - timestamp_history[i]).getMilliseconds());
+                fabs((timestamp - states_.at(i).timestamp()).getMilliseconds());
+
+        // If timestamp is close to desired timestamp, return the index.
         if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
-            return i;  // If timestamp is close to desired timestamp, return the index.
+            return i;
     }
     return std::nullopt;
 }

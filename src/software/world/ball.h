@@ -65,27 +65,11 @@ class Ball final
     Timestamp lastUpdateTimestamp() const;
 
     /**
-     * Gets the previous timestamps for each state stored in states_
-     *
-     * @return Vector containing the update timestamp history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<Timestamp> getPreviousTimestamps() const;
-
-    /**
      * Returns the current position of the ball
      *
      * @return the current position of the ball
      */
     Point position() const;
-
-    /**
-     * Gets the previous positions for each state stored in states_
-     *
-     * @return Vector containing the position history starting with the oldest available
-     * data at index 0
-     */
-    std::vector<Point> getPreviousPositions() const;
 
     /**
      * Returns the estimated position of the ball at a future time, relative to when the
@@ -109,14 +93,6 @@ class Ball final
      * @return the current velocity of the ball
      */
     Vector velocity() const;
-
-    /**
-     * Gets the previous velocities for each state stored in states_
-     *
-     * @return Vector containing the velocity history starting with the oldest available
-     * data at index 0
-     */
-    std::vector<Vector> getPreviousVelocities() const;
 
     /**
      * Returns the estimated velocity of the ball at a future time, relative to when the

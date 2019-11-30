@@ -176,44 +176,11 @@ class Robot
         const Duration &duration_in_future) const;
 
     /**
-     * Gets the buffer which holds all the previous position states of the robot
+     * Gets the buffer which holds all of the previous states
      *
-     * @return Vector containing the position history starting with the oldest available
-     * data at index 0
+     * @return circular_buffer containing all previous states up to the history_size field cap
      */
-    std::vector<Point> getPreviousPositions() const;
-
-    /**
-     * Gets the buffer which holds all the previous velocity states of the robot
-     *
-     * @return Vector containing the velocity history starting with the oldest available
-     * data at index 0
-     */
-    std::vector<Vector> getPreviousVelocities() const;
-
-    /**
-     * Gets the buffer which holds all the previous orientation states of the robot
-     *
-     * @return Vector containing the orientation history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<Angle> getPreviousOrientations() const;
-
-    /**
-     * Gets the buffer which holds all the previous angular velocity states of the robot
-     *
-     * @return Vector containing the angular velocity history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<AngularVelocity> getPreviousAngularVelocities() const;
-
-    /**
-     * Gets the buffer which holds all the timestamps of the previous states
-     *
-     * @return Vector containing the update timestamp history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<Timestamp> getPreviousTimestamps() const;
+    boost::circular_buffer<RobotState> getPreviousStates() const;
 
     /**
      * Finds an update timestamp that is close to the provided timestamp and returns the
