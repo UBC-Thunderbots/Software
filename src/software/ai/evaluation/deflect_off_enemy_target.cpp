@@ -41,7 +41,7 @@ namespace Evaluation
                     shortest_len_to_edge)
                 {
                     enemy_closest_to_edge = enemy_robot;
-                    enemy_closest_to_edge.updateCurrentState(enemy_robot.currentState());
+                    enemy_closest_to_edge.updateState(enemy_robot.currentState());
                     shortest_len_to_edge =
                         fabs(enemy_robot.position().y() - closestEdgeY);
                 }

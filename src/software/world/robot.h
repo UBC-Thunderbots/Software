@@ -39,29 +39,12 @@ class Robot
                        RobotCapabilities::allCapabilities());
 
     /**
-     * Updates the state of the robot.
-     *
-     * @throws std::invalid_argument if the robot is updated with a time from the past
-     * @param new_position the new position of the robot. Coordinates are in metres.
-     * @param new_velocity the new velocity of the robot, in metres / second.
-     * @param new_orientation the new orientation of the robot, in Radians.
-     * @param new_angular_velocity the new angular velocity of the robot, in Radians
-     * per second
-     * @param timestamp The timestamp at which the robot was observed to be in the given
-     * state. The timestamp must be >= the robot's latest update timestamp
-     */
-    void updateCurrentState(const Point &new_position, const Vector &new_velocity,
-                            const Angle &new_orientation,
-                            const AngularVelocity &new_angular_velocity,
-                            const Timestamp &timestamp);
-
-    /**
      * Updates the robot with new data, updating the current state as well as the
      * predictive model
      *
      * @param new_robot_data A robot containing new robot data
      */
-    void updateCurrentState(const RobotState &new_robot_state);
+    void updateState(const RobotState &new_robot_state);
 
     RobotState currentState() const;
 

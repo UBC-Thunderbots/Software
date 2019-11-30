@@ -45,19 +45,7 @@ class Ball final
      *
      * @param new_state the new state of the ball
      */
-    void updateCurrentState(const BallState &new_state);
-
-    /**
-     * Updates the ball with new data, updating the current data as well as the predictive
-     * model, converts the given parameters to a BallState and calls
-     * updateCurrentState(BallState &new_state)
-     *
-     * @param new_position , the new position of the ball
-     * @param new_velocity , the new velocity of the ball
-     * @param timestamp , the timestamp of the given position and velocity
-     */
-    void updateCurrentState(const Point &new_position, const Vector &new_velocity,
-                            const Timestamp &timestamp);
+    void updateState(const BallState &new_state);
 
     /**
      * Updates the ball's state to be its predicted state at the given timestamp.

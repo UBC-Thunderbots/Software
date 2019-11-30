@@ -12,7 +12,7 @@ Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateCurrentState(position, velocity, timestamp);
+    updateState(BallState(position, velocity, timestamp));
 }
 
 Ball::Ball(BallState &ball_state, unsigned int history_size) : states_(history_size)
@@ -22,7 +22,7 @@ Ball::Ball(BallState &ball_state, unsigned int history_size) : states_(history_s
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateCurrentState(ball_state);
+    updateState(ball_state);
 }
 
 BallState Ball::currentState() const
@@ -30,7 +30,7 @@ BallState Ball::currentState() const
     return states_.front();
 }
 
-void Ball::updateCurrentState(const BallState &new_state)
+void Ball::updateState(const BallState &new_state)
 {
     if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
     {
@@ -39,12 +39,6 @@ void Ball::updateCurrentState(const BallState &new_state)
     }
 
     states_.push_front(new_state);
-}
-
-void Ball::updateCurrentState(const Point &new_position, const Vector &new_velocity,
-                              const Timestamp &timestamp)
-{
-    return updateCurrentState(BallState(new_position, new_velocity, timestamp));
 }
 
 void Ball::updateStateToPredictedState(const Timestamp &timestamp)
@@ -59,7 +53,7 @@ void Ball::updateStateToPredictedState(const Timestamp &timestamp)
     Point new_position      = estimatePositionAtFutureTime(duration_in_future);
     Vector new_velocity     = estimateVelocityAtFutureTime(duration_in_future);
 
-    updateCurrentState(BallState(new_position, new_velocity, timestamp));
+    updateState(BallState(new_position, new_velocity, timestamp));
 }
 
 Timestamp Ball::lastUpdateTimestamp() const
