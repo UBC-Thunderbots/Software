@@ -101,6 +101,7 @@ volatile uint32_t dma_counter_on_idle = RX_BUFFER_LENGTH;
 
 // Stores the last parsed byte position
 volatile uint32_t last_byte_parsed = 0;
+volatile uint32_t urmum            = 0;
 
 // global proto msg that will be updated to the most recent msg sent
 control_msg control = control_msg_init_zero;
@@ -186,15 +187,6 @@ int main(void)
 
     while (1)
     {
-        // if the dma_counter is at a new position, then we parse the data
-        // NOTE that we subtract the buffer length as the dma counter is the number
-        // of bytes left to transfer, we would like the number of bytes transfered
-        if ((RX_BUFFER_LENGTH - dma_counter_on_idle) != last_byte_parsed)
-        {
-            parse_control_msg_from_dma_buffer(recv_buf, RX_BUFFER_LENGTH,
-                                              last_byte_parsed, dma_counter_on_idle);
-            last_byte_parsed = RX_BUFFER_LENGTH - dma_counter_on_idle;
-        }
         /* USER CODE END 2 */
 
         /* USER CODE BEGIN 3 */
@@ -507,7 +499,7 @@ int parse_control_msg_from_dma_buffer(uint8_t *rx_buf, uint32_t size,
             buffer_to_parse[index++] = rx_buf[k];
         }
 
-        for (uint32_t k = 0; k < buffer_position; k++)
+        for (uint32_t k = 0; k <= buffer_position; k++)
         {
             buffer_to_parse[index++] = rx_buf[k];
         }
@@ -565,6 +557,18 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 void USER_UART_IdleLineCallback(UART_HandleTypeDef *huart)
 {
     dma_counter_on_idle = __HAL_DMA_GET_COUNTER(huart->hdmarx);
+    // if the dma_counter is at a new position, then we parse the data
+    // NOTE that we subtract the buffer length as the dma counter is the number
+    // of bytes left to transfer, we would like the number of bytes that have
+    // already been transfered
+    if ((RX_BUFFER_LENGTH - dma_counter_on_idle) != last_byte_parsed)
+    {
+        // if this fails, the global control_msg will remain untouched
+        // we currently don't handle any errors
+        parse_control_msg_from_dma_buffer(recv_buf, RX_BUFFER_LENGTH, last_byte_parsed,
+                                          dma_counter_on_idle);
+        last_byte_parsed = RX_BUFFER_LENGTH - dma_counter_on_idle;
+    }
 }
 /* USER CODE END 4 */
 

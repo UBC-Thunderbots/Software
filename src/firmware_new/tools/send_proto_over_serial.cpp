@@ -80,18 +80,19 @@ void send_proto_over_serial(boost::asio::serial_port& port,
     auto size_of_msg = proto_msg.ByteSizeLong();
     uint8_t send_buf[size_of_msg];
 
-    std::cout << "Sending protobuf with size: " << size_of_msg << std::endl;
+    // std::cout << "Sending protobuf with size: " << size_of_msg << std::endl;
 
     proto_msg.SerializeToArray(&send_buf, size_of_msg);
     boost::asio::write(port, boost::asio::buffer(&send_buf, size_of_msg));
 
-    // an "Idle line" is detected when the received detects the line idle
+    // an "Idle Line" is detected when the received detects the line idle
     // for more than 1/baud_rate. We compute that value and create a blocking
-    // delay (which shouldn't be a huge problem as its about 0.0087ms at
-    // 115200 baud rate
+    // delay
+    //
+    // NOTE: we also add additional delay to allow for the msg to be parsed on arrival
+    // so we just multiply by 1000
     boost::asio::serial_port_base::baud_rate baud_rate;
     port.get_option(baud_rate);
 
-    std::chrono::nanoseconds idle_line_delay((int)(1.0 / baud_rate.value() * 1e9));
-    std::this_thread::sleep_for(idle_line_delay);
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)1e6 / baud_rate.value()));
 }
