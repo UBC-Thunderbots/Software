@@ -48,10 +48,7 @@ static void dribble_start(const primitive_params_t *params)
  * \brief Ends a movement of this type.
  * * This function runs when the host computer requests a new movement while a * dribble
  * movement is already in progress. */
-static void
-dribble_end(void)
-{
-}
+static void dribble_end(void) {}
 
 /**
  * \brief Ticks a movement of this type.
@@ -62,7 +59,7 @@ dribble_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void dribble_tick(log_record_t *logajectory, World* world)
+static void dribble_tick(log_record_t *logajectory, World *world)
 {
     // TODO: what would you like to log?
 

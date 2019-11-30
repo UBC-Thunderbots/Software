@@ -7,7 +7,8 @@ struct World
     Robot* robot;
 };
 
-World* World__construct(Robot* robot){
+World* World__construct(Robot* robot)
+{
     World* new_world = malloc(sizeof(World));
 
     new_world->robot = robot;
@@ -15,6 +16,7 @@ World* World__construct(Robot* robot){
     return new_world;
 }
 
-Robot* World__getRobot(World* this){
+Robot* World__getRobot(World* this)
+{
     return this->robot;
 }

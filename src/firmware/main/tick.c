@@ -46,7 +46,6 @@
 #include <task.h>
 #include <unused.h>
 
-#include "world/world.h"
 #include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
@@ -63,6 +62,7 @@
 #include "main.h"
 #include "primitives/primitive.h"
 #include "priority.h"
+#include "world/world.h"
 
 // Verify that all the timing requirements are set up properly.
 _Static_assert(portTICK_PERIOD_MS *CONTROL_LOOP_HZ == 1000U,
@@ -74,17 +74,9 @@ static void normal_task(void *UNUSED(param))
 {
     TickType_t last_wake = xTaskGetTickCount();
 
-    World* world = World__construct(
-        Robot__construct(
-            Chicker__construct(
-                NULL, NULL, NULL, NULL, NULL, NULL
-                ),
-                Dribbler__construct(
-                    dribbler_set_speed,
-                    dribbler_temperature
-                    )
-            )
-        );
+    World *world = World__construct(
+        Robot__construct(Chicker__construct(NULL, NULL, NULL, NULL, NULL, NULL),
+                         Dribbler__construct(dribbler_set_speed, dribbler_temperature)));
 
     while (!__atomic_load_n(&shutdown, __ATOMIC_RELAXED))
     {

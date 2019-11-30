@@ -1,9 +1,8 @@
 #include "move.h"
+
 #include <math.h>
 #include <stdio.h>
 
-#include "shared/robot_constants.h"
-#include "shared/constants.h"
 #include "control/bangbang.h"
 #include "control/control.h"
 #include "io/chicker.h"
@@ -222,7 +221,7 @@ static void move_end(void)
  * \param[in] world an object representing the world
  * @return void
  */
-static void move_tick(log_record_t *log, World* world)
+static void move_tick(log_record_t *log, World *world)
 {
     printf("Move tick called.\n");
     // get the state of the bot

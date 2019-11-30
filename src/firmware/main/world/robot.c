@@ -8,20 +8,22 @@ struct Robot
     Dribbler* dribbler;
 };
 
-Robot* Robot__construct(Chicker* chicker, Dribbler* dribbler){
+Robot* Robot__construct(Chicker* chicker, Dribbler* dribbler)
+{
     Robot* new_robot = malloc(sizeof(Robot));
 
-    new_robot->chicker = chicker;
+    new_robot->chicker  = chicker;
     new_robot->dribbler = dribbler;
 
     return new_robot;
 }
 
-Chicker* Robot__getChicker(Robot* this){
+Chicker* Robot__getChicker(Robot* this)
+{
     return this->chicker;
 }
 
-Dribbler* Robot__getDribbler(Robot* this){
+Dribbler* Robot__getDribbler(Robot* this)
+{
     return this->dribbler;
 }
-
