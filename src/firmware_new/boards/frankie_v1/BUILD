@@ -78,6 +78,8 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c",
+        "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_crc.c",
+        "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_crc_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.c",
     ],
     hdrs = [
@@ -116,6 +118,8 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_crc.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_crc_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h",
         "stm32h7xx_hal_conf.h",
     ],

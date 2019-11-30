@@ -2,6 +2,9 @@
 CORTEX_M7.CPU_DCache=Disabled
 CORTEX_M7.CPU_ICache=Enabled
 CORTEX_M7.IPParameters=CPU_DCache,CPU_ICache
+CRC.IPParameters=InputDataInversionMode,OutputDataInversionMode
+CRC.InputDataInversionMode=CRC_INPUTDATA_INVERSION_BYTE
+CRC.OutputDataInversionMode=CRC_OUTPUTDATA_INVERSION_ENABLE
 Dma.Request0=USART3_RX
 Dma.Request1=USART3_TX
 Dma.RequestsNb=2

@@ -81,6 +81,8 @@ uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]
 
 ETH_TxPacketConfig TxConfig;
 
+CRC_HandleTypeDef hcrc;
+
 ETH_HandleTypeDef heth;
 
 UART_HandleTypeDef huart3;
@@ -94,6 +96,9 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 // controller has access to write to
 DMA_BUFFER uint8_t recv_buf[RX_BUFFER_LENGTH];
 DMA_BUFFER uint8_t send_buf[TX_BUFFER_LENGTH];
+
+// this buffer is used to store the bytes in the right order
+uint8_t parse_buffer[RX_BUFFER_LENGTH];
 
 // This value is set in the idle line interrupt with the number of
 // bytes left to transfer into the DMA buffer before it wraps around
@@ -116,6 +121,7 @@ static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_DMA_Init(void);
+static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -161,6 +167,7 @@ int main(void)
     MX_USART3_UART_Init();
     MX_USB_OTG_FS_PCD_Init();
     MX_DMA_Init();
+    MX_CRC_Init();
     /* USER CODE BEGIN 2 */
 
     /* Infinite loop */
@@ -184,10 +191,36 @@ int main(void)
     while (HAL_UART_Receive_DMA(&huart3, recv_buf, RX_BUFFER_LENGTH) != HAL_OK)
     {
     }
+    /* USER CODE END 2 */
 
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+
+    /* If we don't call these two functions (DeInit then Init) in this sequence,
+     * we are only able to do one transfer and then everything grinds to a halt.
+     * This was determined experimentally
+     * */
+
+    HAL_UART_DeInit(&huart3);
+    HAL_UART_Init(&huart3);
+
+    /* We use idle line detection to know when to parse the circular buffer */
+    __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
+
+    /* Setup DMA transfer to continually receive data over UART as the DMA
+     * controller is setup in circular mode for rx/tx
+     * NOTE: Even though this is in a while loop, it only takes 1 or 2 tries
+     * for HAL to not be busy and initialize the DMA transfer  */
+    while (HAL_UART_Receive_DMA(&huart3, recv_buf, RX_BUFFER_LENGTH) != HAL_OK)
+    {
+    }
+    /* USER CODE END 2 */
+
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
     while (1)
     {
-        /* USER CODE END 2 */
+        /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
     }
@@ -259,6 +292,35 @@ void SystemClock_Config(void)
     /** Enable USB Voltage detector
      */
     HAL_PWREx_EnableUSBVoltageDetector();
+}
+
+/**
+ * @brief CRC Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_CRC_Init(void)
+{
+    /* USER CODE BEGIN CRC_Init 0 */
+
+    /* USER CODE END CRC_Init 0 */
+
+    /* USER CODE BEGIN CRC_Init 1 */
+
+    /* USER CODE END CRC_Init 1 */
+    hcrc.Instance                     = CRC;
+    hcrc.Init.DefaultPolynomialUse    = DEFAULT_POLYNOMIAL_ENABLE;
+    hcrc.Init.DefaultInitValueUse     = DEFAULT_INIT_VALUE_ENABLE;
+    hcrc.Init.InputDataInversionMode  = CRC_INPUTDATA_INVERSION_BYTE;
+    hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_ENABLE;
+    hcrc.InputDataFormat              = CRC_INPUTDATA_FORMAT_BYTES;
+    if (HAL_CRC_Init(&hcrc) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN CRC_Init 2 */
+
+    /* USER CODE END CRC_Init 2 */
 }
 
 /**
@@ -395,7 +457,7 @@ static void MX_DMA_Init(void)
 
     /* DMA interrupt init */
     /* DMA1_Stream6_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
     /* DMA1_Stream7_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
@@ -487,53 +549,58 @@ int parse_control_msg_from_dma_buffer(uint8_t *rx_buf, uint32_t size,
     // NOTE: the dma counter will be how many bytes are left in the buffer, we have to
     // subtract the size to get the position from the beginning of the buffer
     uint32_t buffer_position = size - dma_counter_on_idle;
+    uint32_t msg_size;
+    uint32_t index = 0;
 
     if (buffer_position <= last_byte_parsed)
     {
-        uint32_t msg_size = (size - last_byte_parsed) + buffer_position;
-        uint8_t buffer_to_parse[msg_size];
+        // see ascii above, the msg size includes the bytes left in the buffer to the
+        // right of the last byte parsed + the position of the wrapped around counter
+        // including the 4 bytes for crc
+        msg_size = (size - last_byte_parsed) + buffer_position;
 
-        uint32_t index = 0;
-        for (uint32_t k = last_byte_parsed; k < size; k++)
+        for (uint32_t k = last_byte_parsed + 4; k < size; k++)
         {
-            buffer_to_parse[index++] = rx_buf[k];
+            parse_buffer[index++] = rx_buf[k];
         }
 
         for (uint32_t k = 0; k <= buffer_position; k++)
         {
-            buffer_to_parse[index++] = rx_buf[k];
+            parse_buffer[index++] = rx_buf[k];
         }
-
-        // Create a stream that reads from the buffer.
-        pb_istream_t in_stream = pb_istream_from_buffer(buffer_to_parse, msg_size);
-
-        // TODO error check
-        if (pb_decode(&in_stream, control_msg_fields, &control))
-        {
-            return 0;
-        }
-
-        // the buffer has not wrapped around yet
     }
     else if (buffer_position > last_byte_parsed)
     {
-        uint32_t msg_size = buffer_position - last_byte_parsed;
-        uint8_t buffer_to_parse[msg_size];
+        // the buffer has not wrapped around, we can simply grab the bytes in sequence
+        msg_size = buffer_position - last_byte_parsed;
 
-        uint32_t index = 0;
         for (uint32_t k = last_byte_parsed; k <= buffer_position; k++)
         {
-            buffer_to_parse[index++] = rx_buf[k];
+            parse_buffer[index++] = rx_buf[k];
         }
+    }
+    // we compute the crc for the received bytes (excluding the 4 bytes at the end
+    // which contain the incoming crc
+    uint32_t computed_crc =
+        ~HAL_CRC_Calculate(&hcrc, (uint8_t *)parse_buffer, msg_size - 4);
+    uint32_t received_crc = 0;
 
-        // Create a stream that reads from the buffer.
-        pb_istream_t in_stream = pb_istream_from_buffer(buffer_to_parse, msg_size);
+    for (uint32_t k = msg_size - 4; k < msg_size; k++)
+    {
+        // the size is encoded in little endian, we reconstruct the size by shifting the
+        // byte by the required amount and "or"ing all those together We need to shift
+        // each byte by a multiple of 8 each time, which we calculate based on the index k
+        // (minus the msg_siz-4 to get to the start of the index
+        received_crc |= (parse_buffer[k] & 0xFF) << (8 * (k - (msg_size - 4)));
+    }
 
-        // TODO error check
-        if (pb_decode(&in_stream, control_msg_fields, &control))
-        {
-            return 0;
-        }
+    // Create a stream that reads from the buffer. (subtract 4 bytes to exclude CRC)
+    pb_istream_t in_stream = pb_istream_from_buffer(parse_buffer, msg_size - 4);
+
+    if (computed_crc == received_crc &&
+        pb_decode(&in_stream, control_msg_fields, &control))
+    {
+        return 0;
     }
 
     return -1;

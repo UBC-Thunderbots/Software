@@ -29,8 +29,10 @@
 void send_proto_over_serial(boost::asio::serial_port& port,
                             const google::protobuf::Message& proto_msg);
 
-//void receive_proto_over_serial(boost::asio::serial_port& port,
-                            //const google::protobuf::Message& proto_msg)
+// typedef crc_optimal<32, 0x04C11DB7, 0, 0, 0xFFFFFFFF, false,false> checksum_crc_type;
+
+// void receive_proto_over_serial(boost::asio::serial_port& port,
+// const google::protobuf::Message& proto_msg)
 
 int main()
 {
@@ -58,14 +60,14 @@ int main()
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
 
-    for (int k =0; k<1000; k++)
-        send_proto_over_serial(port, control_req);
+    // for (int k =0; k<1000; k++)
+    send_proto_over_serial(port, control_req);
 
     robot_ack ack;
-    //recv_proto_over_serial<robot_ack>(port, ack);
+    // recv_proto_over_serial<robot_ack>(port, ack);
 
     // shutdown
-    //std::promise<void>().get_future().wait();
+    // std::promise<void>().get_future().wait();
     port.close();
     google::protobuf::ShutdownProtobufLibrary();
 
@@ -95,17 +97,25 @@ void send_proto_over_serial(boost::asio::serial_port& port,
     result.process_bytes(msg_buf, size_of_msg);
     uint32_t checksum = result.checksum();
 
-    // we encode the checksum in the first 4 bytes of the msg
-    // little endian
+    // we encode the checksum in the last 4 bytes of the msg
+    // in little endian format as its easier to unpack on the
+    // receiver side
     uint8_t send_buf[size_of_msg + 4];
-    send_buf[3] = (checksum >> 24) & 0xFF;
-    send_buf[2] = (checksum >> 16) & 0xFF;
-    send_buf[1] = (checksum >> 8) & 0xFF;
-    send_buf[0] = (checksum & 0xFF);
+    send_buf[size_of_msg + 3] = (checksum >> 24) & 0xFF;
+    send_buf[size_of_msg + 2] = (checksum >> 16) & 0xFF;
+    send_buf[size_of_msg + 1] = (checksum >> 8) & 0xFF;
+    send_buf[size_of_msg]     = (checksum & 0xFF);
+
+    std::cerr << checksum << " ";
+    std::cerr << signed(send_buf[size_of_msg + 3]) << "  ";
+    std::cerr << signed(send_buf[size_of_msg + 2]) << "  ";
+    std::cerr << signed(send_buf[size_of_msg + 1]) << "  ";
+    std::cerr << signed(send_buf[size_of_msg + 0]) << "  ";
+    std::cerr << std::endl;
 
     for (int k = 0; k < size_of_msg; k++)
     {
-        send_buf[k+4] = msg_buf[k];
+        send_buf[k] = msg_buf[k];
     }
 
     boost::asio::write(port, boost::asio::buffer(&send_buf, size_of_msg + 4));
@@ -116,6 +126,5 @@ void send_proto_over_serial(boost::asio::serial_port& port,
     boost::asio::serial_port_base::baud_rate baud_rate;
     port.get_option(baud_rate);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(
-                                    (int)1e6 / baud_rate.value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)1e6 / baud_rate.value()));
 }
