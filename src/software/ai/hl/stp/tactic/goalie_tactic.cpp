@@ -131,7 +131,9 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
 
 void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>();
+    auto move_action = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
+        MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, true);
     auto chip_action = std::make_shared<ChipAction>();
     auto stop_action = std::make_shared<StopAction>();
 
@@ -262,9 +264,9 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
             move_action->updateControlParams(*robot, goalie_restricted_pos,
-                                            goalie_orientation, 0.0, DribblerEnable::OFF,
-                                            MoveType::NORMAL, AUTOCHIP,
-                                            BallCollisionType::ALLOW);
+                                             goalie_orientation, 0.0, DribblerEnable::OFF,
+                                             MoveType::NORMAL, AUTOCHIP,
+                                             BallCollisionType::ALLOW);
             next_action = move_action;
         }
 
