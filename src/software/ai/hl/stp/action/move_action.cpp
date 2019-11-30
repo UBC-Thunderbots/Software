@@ -8,7 +8,7 @@ MoveAction::MoveAction(double close_to_dest_threshold,
       final_speed(0.0),
       enable_dribbler(DribblerEnable::OFF),
       move_type(MoveType::NORMAL),
-      autokick(AutokickType::NONE),
+      autokick_type(AutokickType::NONE),
       ball_collision_type(BallCollisionType::AVOID),
       close_to_dest_threshold(close_to_dest_threshold),
       close_to_orientation_threshold(close_to_orientation_threshold),
@@ -28,7 +28,7 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
     this->final_speed         = final_speed;
     this->enable_dribbler     = enable_dribbler;
     this->move_type           = move_type;
-    this->autokick            = autokick;
+    this->autokick_type       = autokick;
     this->ball_collision_type = ball_collision_type;
 }
 
@@ -47,6 +47,10 @@ double MoveAction::getFinalSpeed()
     return final_speed;
 }
 
+AutokickType MoveAction::getAutoKickType() {
+    return autokick_type;
+}
+
 void MoveAction::accept(ActionVisitor& visitor) const
 {
     visitor.visit(*this);
@@ -63,7 +67,7 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
                                            final_speed, 0, enable_dribbler, move_type,
-                                           autokick, ball_collision_type));
+                                           autokick_type, ball_collision_type));
     } while (loop_forever ||
              (robot->position() - destination).length() > close_to_dest_threshold ||
              (robot->orientation().minDiff(final_orientation) >

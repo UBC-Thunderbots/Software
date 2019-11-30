@@ -40,6 +40,24 @@ TEST(MoveActionTest, getFinalSpeed){
     EXPECT_EQ(99, action.getFinalSpeed());
 }
 
+TEST(MoveActionTest, getAutoKickType){
+    Robot robot = Robot(13, Point(1,2), Vector(3,4), Angle::fromDegrees(5), AngularVelocity::fromDegrees(6),
+                        Timestamp::fromSeconds(7));
+    MoveAction action = MoveAction();
+
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
+                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                               BallCollisionType::AVOID);
+
+    EXPECT_EQ(AutokickType::NONE, action.getAutoKickType());
+
+    action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
+                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                               BallCollisionType::AVOID);
+
+    EXPECT_EQ(AutokickType::AUTOCHIP, action.getAutoKickType());
+}
+
 TEST(MoveActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),

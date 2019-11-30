@@ -69,6 +69,15 @@ class MoveAction : public Action
      */
     double getFinalSpeed();
 
+    /**
+     * Gets what auto-kick mode this move action should operate with
+     *
+     * (ex. "auto-kick", "auto-chip")
+     *
+     * @return The auto-kick mode this move action should operate with
+     */
+    AutokickType getAutoKickType();
+
     void accept(ActionVisitor& visitor) const override;
 
    private:
@@ -80,7 +89,7 @@ class MoveAction : public Action
     double final_speed;
     DribblerEnable enable_dribbler;
     MoveType move_type;
-    AutokickType autokick;
+    AutokickType autokick_type;
     BallCollisionType ball_collision_type;
 
     double close_to_dest_threshold;
