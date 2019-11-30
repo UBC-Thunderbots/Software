@@ -241,7 +241,6 @@ TEST(TestThetaStarPathPlanner, no_navigable_area)
 // This test is disabled, it can be enabled by removing "DISABLED_" from the test name
 TEST(TestThetaStarPathPlanner, DISABLED_performance)
 {
-    std::cout << "RUNNING THAT TEST \n";
     // This test can be used to guage performance, and profiled to find areas for
     // improvement
     std::vector<std::vector<Obstacle>> obstacle_sets = {
