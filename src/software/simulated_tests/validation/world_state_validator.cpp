@@ -1,6 +1,6 @@
 #include "software/simulated_tests/validation/world_state_validator.h"
 #include "software/simulated_tests/validation/function_validator.h"
-#include <future>
+#include "software/simulated_tests/validation/continuous_function_validator.h"
 #include "software/util/logger/init.h"
 
 WorldStateValidator::WorldStateValidator() : world_buffer(world_buffer_size) {}
@@ -10,6 +10,7 @@ void WorldStateValidator::onValueReceived(World world) {
 }
 
 bool WorldStateValidator::waitForValidationToPass(const std::vector<ValidationFunction> &validation_functions,
+                                                  const std::vector<ValidationFunction> &continuous_validation_functions,
                                                   const Duration &timeout) {
     std::optional<World> world = world_buffer.popLeastRecentlyAddedValue(world_buffer_timeout);
     if(!world) {
@@ -27,15 +28,29 @@ bool WorldStateValidator::waitForValidationToPass(const std::vector<ValidationFu
                 FunctionValidator(validation_function, world_ptr));
     }
 
+    std::vector<ContinuousFunctionValidator> continuous_function_validators;
+    for (const auto &continuous_validation_function : continuous_validation_functions)
+    {
+        continuous_function_validators.emplace_back(
+                ContinuousFunctionValidator(continuous_validation_function, world_ptr));
+    }
+
     bool validation_successful = false;
     Timestamp starting_timestamp = world_ptr->getMostRecentTimestamp();
     Timestamp timeout_timestamp = starting_timestamp + timeout;
     while(world_ptr->getMostRecentTimestamp() < timeout_timestamp) {
+        for(auto& continuous_function_validator : continuous_function_validators)  {
+            continuous_function_validator.executeAndCheckForFailures();
+        }
+
         validation_successful = std::all_of(function_validators.begin(), function_validators.end(),
                 [](FunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
         if(validation_successful) {
             break;
         }
+
+        // After we have validated the world state, send it to other Observers
+        Subject<World>::sendValueToObservers(*world_ptr);
 
         std::optional<World> world = world_buffer.popLeastRecentlyAddedValue(world_buffer_timeout);
         if(!world) {

@@ -1,12 +1,13 @@
 #pragma once
 
 #include "software/multithreading/threaded_observer.h"
+#include "software/multithreading/subject.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/world/world.h"
 #include "software/simulated_tests/validation/validation_function.h"
 
 // TODO: comment
-class WorldStateValidator : public ThreadedObserver<World> {
+class WorldStateValidator : public ThreadedObserver<World>, public Subject<World> {
 public:
     explicit WorldStateValidator();
 
@@ -18,8 +19,15 @@ public:
     WorldStateValidator& operator=(const WorldStateValidator&) = delete;
     WorldStateValidator(const WorldStateValidator&)            = delete;
 
-    // TODO: comemnt
-    bool waitForValidationToPass(const std::vector<ValidationFunction>& validation_functions, const Duration& timeout);
+    /**
+     *
+     *
+     * @param validation_functions
+     * @param continuous_validation_functions
+     * @param timeout
+     * @return
+     */
+    bool waitForValidationToPass(const std::vector<ValidationFunction>& validation_functions, const std::vector<ValidationFunction>& continuous_validation_functions, const Duration& timeout);
 
 private:
     void onValueReceived(World world) override;
