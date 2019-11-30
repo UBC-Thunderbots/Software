@@ -29,7 +29,7 @@ TEST(GrabBallTacticTest, test_robot_intercepts_ball_if_no_enemies_near_ball)
     EXPECT_TRUE(action_ptr);
 
     auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
-    ASSERT_FALSE(intercept_action == nullptr);
+    ASSERT_NE(intercept_action, nullptr);
 }
 
 TEST(GrabBallTacticTest,
@@ -56,7 +56,7 @@ TEST(GrabBallTacticTest,
     EXPECT_TRUE(action_ptr);
 
     auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
-    ASSERT_FALSE(intercept_action == nullptr);
+    ASSERT_NE(intercept_action, nullptr);
 }
 
 TEST(GrabBallTacticTest, test_robot_steals_the_ball_if_close_to_an_enemy_with_the_ball)
@@ -82,6 +82,6 @@ TEST(GrabBallTacticTest, test_robot_steals_the_ball_if_close_to_an_enemy_with_th
     EXPECT_TRUE(action_ptr);
 
     auto movespin_action = std::dynamic_pointer_cast<MoveSpinAction>(action_ptr);
-    ASSERT_FALSE(movespin_action == nullptr);
+    ASSERT_NE(movespin_action, nullptr);
     EXPECT_TRUE(movespin_action->getDestination().isClose(world.ball().position(), 0.05));
 }

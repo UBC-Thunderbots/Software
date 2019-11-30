@@ -23,7 +23,8 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     // Check an action was returned (the pointer is not null)
     EXPECT_TRUE(action);
 
-    auto move_action = std::static_pointer_cast<MoveAction>(action);
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action);
+    ASSERT_NE(move_action, nullptr);
     EXPECT_TRUE(move_action->getRobot().has_value());
     EXPECT_EQ(13, move_action->getRobot()->id());
     // Check the robot is moving somewhere on the line segment between the shot origin
@@ -54,7 +55,8 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
     // Check an action was returned (the pointer is not null)
     EXPECT_TRUE(action);
 
-    auto move_action = std::static_pointer_cast<MoveAction>(action);
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action);
+    ASSERT_NE(move_action, nullptr);
     EXPECT_TRUE(move_action->getRobot().has_value());
     EXPECT_EQ(13, move_action->getRobot()->id());
     // Check the robot is moving somewhere on the line segment between the shot origin
