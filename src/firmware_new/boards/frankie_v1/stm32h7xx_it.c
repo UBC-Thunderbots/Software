@@ -224,8 +224,8 @@ void USART3_IRQHandler(void)
     if (RESET != __HAL_UART_GET_FLAG(
                      &huart3, UART_FLAG_IDLE))  // Judging whether it is idle interruption
     {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart3);  // Clear idle interrupt sign (otherwise it
-                                             // will continue to enter interrupt)
+        __HAL_UART_CLEAR_IDLEFLAG(&huart3);   // Clear idle interrupt sign (otherwise it
+                                              // will continue to enter interrupt)
         USER_UART_IdleLineCallback(&huart3);  // Call interrupt handler
     }
 

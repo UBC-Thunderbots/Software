@@ -58,7 +58,9 @@ extern "C"
     /* USER CODE BEGIN EFP */
 
     void USER_UART_IdleLineCallback(UART_HandleTypeDef* huart);
-    int parse_control_msg_from_dma_buffer(uint8_t* rx_buf, uint32_t size, uint32_t last_parsed_byte, uint32_t dma_counter_on_idle);
+    int parse_control_msg_from_dma_buffer(uint8_t* rx_buf, uint32_t size,
+                                          uint32_t last_parsed_byte,
+                                          uint32_t dma_counter_on_idle);
 
 /* USER CODE END EFP */
 

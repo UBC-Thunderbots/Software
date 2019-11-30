@@ -54,7 +54,7 @@ int main()
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
 
-    for(int k = 0; k < 1000; k++)
+    for (int k = 0; k < 1000; k++)
         send_proto_over_serial(port, control_req);
 
     // shutdown
@@ -68,8 +68,8 @@ int main()
  * Given a boost::asio::serial_port and an arbitrary protomsg, serializes the msg
  * and sends it over the port. Assumes the port is open and does not close the port.
  *
- * NOTE: we assume that the receiver is using IDLE Line detection for delimiting. This function
- * can be repeatedly called to stream data
+ * NOTE: we assume that the receiver is using IDLE Line detection for delimiting. This
+ * function can be repeatedly called to stream data
  *
  * @param port The port to send the data over
  * @param proto_msg The msg to serialize and send
@@ -92,6 +92,6 @@ void send_proto_over_serial(boost::asio::serial_port& port,
     boost::asio::serial_port_base::baud_rate baud_rate;
     port.get_option(baud_rate);
 
-    std::chrono::nanoseconds idle_line_delay((int)(1.0/baud_rate.value()*1e9));
+    std::chrono::nanoseconds idle_line_delay((int)(1.0 / baud_rate.value() * 1e9));
     std::this_thread::sleep_for(idle_line_delay);
 }
