@@ -238,8 +238,11 @@ TEST(TestThetaStarPathPlanner, no_navigable_area)
     EXPECT_EQ(std::nullopt, path);
 }
 
-TEST(TestThetaStarPathPlanner, performance)
+//This test is disabled, it can be enabled by removing "DISABLED_" from the test name
+TEST(TestThetaStarPathPlanner, DISABLED_performance)
 {
+
+    std::cout << "RUNNING THAT TEST \n";
     // This test can be used to guage performance, and profiled to find areas for
     // improvement
     std::vector<std::vector<Obstacle>> obstacle_sets = {
@@ -287,12 +290,11 @@ TEST(TestThetaStarPathPlanner, performance)
 
     std::chrono::duration<double> duration = end_time - start_time;
 
-    std::chrono::duration<double> avg;
-    avg = duration / ((double)num_iterations * obstacle_sets.size() - 1);
+    std::chrono::duration<double> avg = duration / (static_cast<double >(num_iterations) * obstacle_sets.size() - 1);
 
-    //    std::cout << "Took " <<
-    //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
-    //    << "ms to run, average time of " <<
-    //    std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0 <<
-    //    "ms";
+        std::cout << "Took " <<
+        std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
+        << "ms to run, average time of " <<
+        std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0 <<
+        "ms";
 }

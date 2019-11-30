@@ -4,10 +4,10 @@
 
 FunctionValidator::FunctionValidator(const ValidationFunction &validation_function,
                                      std::shared_ptr<World> world)
-    : validation_function(validation_function),
+    : validation_sequence(
+          boost::bind(&FunctionValidator::executeAndCheckForSuccessWrapper, this, _1)),
       world(world),
-      validation_sequence(
-          boost::bind(&FunctionValidator::executeAndCheckForSuccessWrapper, this, _1))
+      validation_function(validation_function)
 {
 }
 
