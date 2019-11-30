@@ -28,8 +28,6 @@
 #include "external/nanopb/pb_decode.h"
 #include "external/nanopb/pb_encode.h"
 #include "firmware_new/proto/control.pb.h"
-#define TX_LENGTH (16)
-#define RX_LENGTH (16)
 
 /* USER CODE END Includes */
 
@@ -44,7 +42,10 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
+#define TX_BUFFER_LENGTH (1024)
+#define RX_BUFFER_LENGTH (1024)
 
 /* USER CODE END PM */
 
@@ -89,9 +90,22 @@ DMA_HandleTypeDef hdma_usart3_tx;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
+// These buffers are stored in the R2 domain which is what the DMA
+// controller has access to write to
+DMA_BUFFER uint8_t recv_buf[RX_BUFFER_LENGTH];
+DMA_BUFFER uint8_t send_buf[TX_BUFFER_LENGTH];
 
-DMA_BUFFER uint8_t recv_buf[RX_LENGTH];
-DMA_BUFFER uint8_t send_buf[TX_LENGTH];
+// This value is set in the idle line interrupt with the number of
+// bytes left to transfer into the DMA buffer before it wraps around
+volatile uint32_t dma_counter_on_idle = RX_BUFFER_LENGTH;
+
+// Stores the last parsed byte position
+volatile uint32_t last_byte_parsed = 0;
+
+// global proto msg that will be updated to the most recent msg sent
+control_msg control = control_msg_init_zero;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,16 +121,6 @@ static void MX_DMA_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-typedef enum
-{
-    IDLE,
-    AWAITING_DMA_RX_COMPLETE_INTERRUPT,
-    AWAITING_TX_COMPLETE_INTERRUPT,
-    RECIEVED_TX_COMPLETE_INTERRUPT,
-    RECEIVED_DMA_RX_COMPLETE_INTERRUPT,
-} UART_State;
-
-volatile UART_State uart_state = IDLE;
 
 /* USER CODE END 0 */
 
@@ -158,48 +162,35 @@ int main(void)
     MX_DMA_Init();
     /* USER CODE BEGIN 2 */
 
-
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    // some metrics
-    int rx_wait_count = 0;
-    int tx_wait_count = 0;
+
+    /* If we don't call these two functions (DeInit then Init) in this sequence,
+     * we are only able to do one transfer and then everything grinds to a halt.
+     * This was determined experimentally 
+     * */
+
+    HAL_UART_DeInit(&huart3);
+    HAL_UART_Init(&huart3);
+
+    /* We use idle line detection to know when to parse the circular buffer */
+    __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
+
+    /* Setup DMA transfer to continually receive data over UART as the DMA
+     * controller is setup in circular mode for rx/tx
+     * NOTE: Even though this is in a while loop, it only takes 1 or 2 tries
+     * for HAL to not be busy and initialize the DMA transfer  */
+    while (HAL_UART_Receive_DMA(&huart3, recv_buf, RX_BUFFER_LENGTH) != HAL_OK) {}
+
     while (1)
     {
-        /* Start DMA transfer */
-        HAL_UART_DeInit(&huart3);
-        HAL_UART_Init(&huart3);
-
-        /* Enable IDLE line interrupt to parse data */
-        __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
-
-        /* RX */
-        while (HAL_UART_Receive_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK) {
-            rx_wait_count++;
+        // if the dma_counter is at a new position, then we parse the data
+        // NOTE that we subtract the buffer length as the dma counter is the number
+        // of bytes left to transfer, we would like the number of bytes transfered
+        if ((RX_BUFFER_LENGTH - dma_counter_on_idle) != last_byte_parsed) {
+            parse_control_msg_from_dma_buffer(recv_buf, RX_BUFFER_LENGTH, last_byte_parsed, dma_counter_on_idle);
+            last_byte_parsed = RX_BUFFER_LENGTH - dma_counter_on_idle;
         }
-        uart_state = AWAITING_DMA_RX_COMPLETE_INTERRUPT;
-        while (uart_state != RECEIVED_DMA_RX_COMPLETE_INTERRUPT) {}
-
-        /* Insertion Sort */
-        for(int i=1; i<RX_LENGTH; i++)
-        {
-            int value = recv_buf[i];
-            int hole = i;
-            while(hole>0 && recv_buf[hole-1]>value)
-            {
-                recv_buf[hole] = recv_buf[hole-1];
-                hole--;
-            }
-            recv_buf[hole] = value;
-        }
-
-        /* TX */
-        while (HAL_UART_Transmit_DMA(&huart3, recv_buf, RX_LENGTH) != HAL_OK) {
-            tx_wait_count++;
-        }
-        uart_state = AWAITING_TX_COMPLETE_INTERRUPT;
-        while (uart_state != RECIEVED_TX_COMPLETE_INTERRUPT) {}
-
         /* USER CODE END 2 */
 
         /* USER CODE BEGIN 3 */
@@ -333,7 +324,7 @@ static void MX_USART3_UART_Init(void)
 
     /* USER CODE END USART3_Init 1 */
     huart3.Instance                    = USART3;
-    huart3.Init.BaudRate               = 9600;
+    huart3.Init.BaudRate               = 115200;
     huart3.Init.WordLength             = UART_WORDLENGTH_8B;
     huart3.Init.StopBits               = UART_STOPBITS_1;
     huart3.Init.Parity                 = UART_PARITY_NONE;
@@ -466,26 +457,95 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/**
+ * @brief  Updates a control msg struct with the given dma buffer, start and end positions
+ *
+ *  Example: Consider the following circular buffer, notice that byte 13, 14, 15 wrap
+ *  around back to the start of the buffer.
+ *
+ *  BUFFER = [ b13 | b14 | b15 | b4 | b5 | b6 | b7 | b8 | b9 | b10 | b11 | b12 ]
+ *                         dci                                 lbp
+ *
+ *  Here, lbp (last byte parsed) is the last position of the last msg that was received 
+ *  and decoded. dci (dma_counter_on_idle) is the new position where we detected an idle line,
+ *  indicating the end of another transfer.
+ *
+ *  NOTE: both dci and lbp must be less than buffer size
+ *  NOTE: we also make the assumption that the buffer is large enough that we
+ *  don't wrap around more than once for each msg
+ *  NOTE: this function modifies the global control_msg (control)
+ *
+ * @param  rx_buf: pointer to the base of the DMA buffer
+ * @param  size: the max size of the circular DMA buffer, used to wrap around
+ * @param  last_byte_parsed: The position of the last byte that was parsed
+ * @param  dma_counter_on_idle: The position of the last byte that was coun
+ * @retval -1 for error, 0 otherwise
+ */
+int parse_control_msg_from_dma_buffer(
+        uint8_t* rx_buf, uint32_t size, uint32_t last_byte_parsed, uint32_t dma_counter_on_idle) {
+
+    // the dma_counter when we detected an IDLE line is less than the position of
+    // the previously parsed byte, we have wrapped around the buffer
+    //
+    // NOTE: the dma counter will be how many bytes are left in the buffer, we have to subtract
+    // the size to get the position from the beginning of the buffer
+    uint32_t buffer_position = size - dma_counter_on_idle;
+
+    if (buffer_position <= last_byte_parsed) {
+
+        uint32_t msg_size = (size - last_byte_parsed) + buffer_position;
+        uint8_t buffer_to_parse[msg_size];
+
+        uint32_t index = 0;
+        for (uint32_t k = last_byte_parsed; k < size; k++) {
+            buffer_to_parse[index++] = rx_buf[k];
+        }
+
+        for (uint32_t k = 0; k < buffer_position; k++) {
+            buffer_to_parse[index++] = rx_buf[k];
+        }
+
+        // Create a stream that reads from the buffer. 
+        pb_istream_t in_stream = pb_istream_from_buffer(buffer_to_parse, msg_size);
+
+        // TODO error check
+        if (pb_decode(&in_stream, control_msg_fields, &control))
+        {
+            return 0;
+        }
+
+    // the buffer has not wrapped around yet
+    } else if (buffer_position > last_byte_parsed) {
+
+        uint32_t msg_size = buffer_position - last_byte_parsed;
+        uint8_t buffer_to_parse[msg_size];
+
+        uint32_t index = 0;
+        for (uint32_t k = last_byte_parsed; k <= buffer_position; k++) {
+            buffer_to_parse[index++] = rx_buf[k];
+        }
+
+        // Create a stream that reads from the buffer. 
+        pb_istream_t in_stream = pb_istream_from_buffer(buffer_to_parse, msg_size);
+
+        // TODO error check
+        if (pb_decode(&in_stream, control_msg_fields, &control))
+        {
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    uint32_t current_sounter = 0;
-    if (huart->Instance == USART3)
-    {
-        uart_state      = RECEIVED_DMA_RX_COMPLETE_INTERRUPT;
-        current_sounter = __HAL_DMA_GET_COUNTER(huart->hdmarx);
-    }
-    uint32_t current_counter = current_sounter;
+    return;
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    uint32_t current_sounter = 0;
-    if (huart->Instance == USART3)
-    {
-        uart_state      = RECIEVED_TX_COMPLETE_INTERRUPT;
-        current_sounter = __HAL_DMA_GET_COUNTER(huart->hdmarx);
-    }
-    uint32_t current_counter = current_sounter;
+    return;
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
@@ -495,7 +555,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 
 void USER_UART_IdleLineCallback(UART_HandleTypeDef *huart)
 {
-    return;  // yeehaw
+    dma_counter_on_idle = __HAL_DMA_GET_COUNTER(huart->hdmarx);
 }
 /* USER CODE END 4 */
 

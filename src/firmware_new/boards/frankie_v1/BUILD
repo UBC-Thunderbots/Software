@@ -39,7 +39,7 @@ cc_library(
         "-DSTM32H743xx",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = [":hal_library"],
+    deps = [":hal_library", "//firmware_new/proto:fw_c_proto"],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
