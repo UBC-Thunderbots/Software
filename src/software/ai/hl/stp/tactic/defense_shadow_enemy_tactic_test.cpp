@@ -4,8 +4,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
+#include "software/ai/hl/stp/action/move_action.h"
 
 TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
 {
@@ -27,21 +27,21 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
 
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
 
     try
     {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
-        EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::zero()),
+        auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+        EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
+        EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
                   Angle::fromDegrees(1));
-        EXPECT_TRUE(move_intent.getAutoKickType() == AutokickType::AUTOCHIP);
+        EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
     }
     catch (std::bad_cast &)
     {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
+        ADD_FAILURE() << "MoveAction was not returned by the tactic!";
     }
 }
 
@@ -67,22 +67,22 @@ TEST(DefenseShadowEnemyTacticTest,
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
 
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
 
     try
     {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(ball.position(), 0.01));
-        EXPECT_LT(move_intent.getFinalAngle().minDiff(
+        auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+        EXPECT_TRUE(move_action->getDestination().isClose(ball.position(), 0.01));
+        EXPECT_LT(move_action->getFinalOrientation().minDiff(
                       (enemy_robot.position() - field.friendlyGoal()).orientation()),
                   Angle::fromDegrees(1));
-        EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
+        EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
     }
     catch (std::bad_cast &)
     {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
+        ADD_FAILURE() << "MoveAction was not returned by the tactic!";
     }
 }
 
@@ -110,21 +110,21 @@ TEST(
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
 
-    auto intent_ptr = tactic.getNextAction();
+    auto action_ptr = tactic.getNextAction();
 
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
 
     try
     {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
-        EXPECT_LT(move_intent.getFinalAngle().minDiff(
+        auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+        EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
+        EXPECT_LT(move_action->getFinalOrientation().minDiff(
                       (enemy_robot.position() - friendly_robot.position()).orientation()),
                   Angle::fromDegrees(1));
-        EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
+        EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
     }
     catch (std::bad_cast &)
     {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
+        ADD_FAILURE() << "MoveAction was not returned by the tactic!";
     }
 }
