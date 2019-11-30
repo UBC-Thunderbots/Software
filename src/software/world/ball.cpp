@@ -111,7 +111,7 @@ std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) cons
     for (unsigned i = 0; i < states_.size(); i++)
     {
         double timestamp_diff =
-                fabs((timestamp - states_.at(i).timestamp()).getMilliseconds());
+            fabs((timestamp - states_.at(i).timestamp()).getMilliseconds());
 
         // If timestamp is close to desired timestamp, return the index.
         if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)

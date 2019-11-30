@@ -178,7 +178,8 @@ class Robot
     /**
      * Gets the buffer which holds all of the previous states
      *
-     * @return circular_buffer containing all previous states up to the history_size field cap
+     * @return circular_buffer containing all previous states up to the history_size field
+     * cap
      */
     boost::circular_buffer<RobotState> getPreviousStates() const;
 

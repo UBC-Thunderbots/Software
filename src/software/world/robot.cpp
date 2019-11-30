@@ -53,8 +53,9 @@ void Robot::updateStateToPredictedState(const Duration &duration_in_future)
     AngularVelocity new_angular_velocity =
         estimateAngularVelocityAtFutureTime(duration_in_future);
 
-    updateState(RobotState(new_position, new_velocity, new_orientation, new_angular_velocity,
-                       lastUpdateTimestamp() + duration_in_future));
+    updateState(RobotState(new_position, new_velocity, new_orientation,
+                           new_angular_velocity,
+                           lastUpdateTimestamp() + duration_in_future));
 }
 
 Timestamp Robot::lastUpdateTimestamp() const
