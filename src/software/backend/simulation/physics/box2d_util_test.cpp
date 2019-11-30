@@ -1,4 +1,4 @@
-#include "software/backend/simulation/box2d_util.h"
+#include "software/backend/simulation/physics/box2d_util.h"
 
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>

@@ -32,7 +32,7 @@ cc_library(
         "//software/world:ball",
         "//software/world:ball_state",
         "//software/world:field",
-        "//software/world:refbox_constants",
+        "//software/sensor_fusion:refbox_data",
         "//software/world:team",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",

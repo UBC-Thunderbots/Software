@@ -218,7 +218,7 @@ static void move_end(void)
  *
  * @param log the log record to fill with information about the tick, or
  * NULL if no record is to be filled
- * \param[in] world an object representing the world
+ * @param[in] world an object representing the world
  * @return void
  */
 static void move_tick(log_record_t *log, World *world)
