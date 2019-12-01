@@ -7,8 +7,8 @@
  * an easy way to manage the coroutines required to run ValidationFunctions as well as see
  * if the function has succeeded / passed.
  *
- * This class will run the provided coroutine a single time and stop once it has completed.
- * The coroutine will NOT be restarted upon completion.
+ * This class will run the provided coroutine a single time and stop once it has
+ * completed. The coroutine will NOT be restarted upon completion.
  */
 class FunctionValidator
 {
@@ -36,7 +36,7 @@ class FunctionValidator
      */
     bool executeAndCheckForSuccess();
 
-private:
+   private:
     /**
      * A wrapper function for the validation_function.
      *

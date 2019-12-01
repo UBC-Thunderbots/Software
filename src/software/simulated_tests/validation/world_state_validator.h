@@ -1,14 +1,15 @@
 #pragma once
 
-#include "software/multithreading/threaded_observer.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/world/world.h"
+#include "software/multithreading/threaded_observer.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/world/world.h"
 
 // TODO: comment
-class WorldStateValidator : public ThreadedObserver<World>, public Subject<World> {
-public:
+class WorldStateValidator : public ThreadedObserver<World>, public Subject<World>
+{
+   public:
     explicit WorldStateValidator();
 
     virtual ~WorldStateValidator() = default;
@@ -27,9 +28,12 @@ public:
      * @param timeout
      * @return
      */
-    bool waitForValidationToPass(const std::vector<ValidationFunction>& validation_functions, const std::vector<ValidationFunction>& continuous_validation_functions, const Duration& timeout);
+    bool waitForValidationToPass(
+        const std::vector<ValidationFunction>& validation_functions,
+        const std::vector<ValidationFunction>& continuous_validation_functions,
+        const Duration& timeout);
 
-private:
+   private:
     void onValueReceived(World world) override;
 
     const Duration world_buffer_timeout = Duration::fromSeconds(5);

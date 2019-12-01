@@ -10,8 +10,9 @@
  * This class will run the provided coroutine continuously by restarting it every time the
  * coroutine has completed.
  */
-class ContinuousFunctionValidator {
-public:
+class ContinuousFunctionValidator
+{
+   public:
     /**
      * Creates a new ContinousFunctionValidator.
      *
@@ -21,17 +22,17 @@ public:
      * it
      */
     explicit ContinuousFunctionValidator(const ValidationFunction& validation_function,
-                               std::shared_ptr<World> world);
+                                         std::shared_ptr<World> world);
 
     /**
      * Runs the ValidationFunction that was given to this FunctionValidator on
-     * construction. The ValidationFunction will be restarted if it has completed. As such,
-     * the ValidationFunction can never be "done" and will only terminate due to failures
-     * within the ValidationFunction, such as as a failed GoogleTest assert
+     * construction. The ValidationFunction will be restarted if it has completed. As
+     * such, the ValidationFunction can never be "done" and will only terminate due to
+     * failures within the ValidationFunction, such as as a failed GoogleTest assert
      */
     void executeAndCheckForFailures();
 
-private:
+   private:
     /**
      * A wrapper function for the validation_function.
      *
@@ -48,7 +49,7 @@ private:
      * inside the validation_function.
      */
     void executeAndCheckForFailuresWrapper(ValidationCoroutine::push_type& yield,
-                                          std::shared_ptr<World> world);
+                                           std::shared_ptr<World> world);
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;

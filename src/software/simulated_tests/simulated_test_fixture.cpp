@@ -6,16 +6,17 @@
 void SimulatedTest::SetUp()
 {
     Util::Logger::LoggerSingleton::initializeLogger();
-    backend = std::make_shared<SimulatorBackend>();
+    backend               = std::make_shared<SimulatorBackend>();
     world_state_validator = std::make_shared<WorldStateValidator>();
-    ai_wrapper = std::make_shared<MockAIWrapper>();
+    ai_wrapper            = std::make_shared<MockAIWrapper>();
 
     backend->Subject<World>::registerObserver(world_state_validator);
     world_state_validator->Subject<World>::registerObserver(ai_wrapper);
     ai_wrapper->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
 }
 
-void SimulatedTest::TearDown() {
+void SimulatedTest::TearDown()
+{
     backend->stopSimulation();
 }
 
