@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/new_geom/point.h"
-#include "software/new_geom/polynomial.h"
 #include "software/new_geom/vector.h"
 
 /**
