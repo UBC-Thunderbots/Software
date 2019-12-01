@@ -78,6 +78,13 @@ class MoveAction : public Action
      */
     AutokickType getAutoKickType();
 
+    /**
+     * Gets the dribbler mode this move action should operate with
+     *
+     * @return the dribbler mode this move action should operate with
+     */
+    DribblerEnable getDribblerEnabled();
+
     void accept(ActionVisitor& visitor) const override;
 
    private:

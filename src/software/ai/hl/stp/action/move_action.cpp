@@ -51,6 +51,10 @@ AutokickType MoveAction::getAutoKickType() {
     return autokick_type;
 }
 
+DribblerEnable MoveAction::getDribblerEnabled() {
+    return enable_dribbler;
+}
+
 void MoveAction::accept(ActionVisitor& visitor) const
 {
     visitor.visit(*this);
