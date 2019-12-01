@@ -12,7 +12,7 @@ struct Chicker
     void (*disable_autochip)(void);
 };
 
-Chicker* Chicker__construct(void (*kick)(float speed_m_per_s),
+Chicker* Chicker_create(void (*kick)(float speed_m_per_s),
                             void (*chip)(float distance_m), void (*enable_autokick)(void),
                             void (*enable_autochip)(void), void (*disable_autokick)(void),
                             void (*disable_autochip)(void))
@@ -27,32 +27,36 @@ Chicker* Chicker__construct(void (*kick)(float speed_m_per_s),
     return new_chicker;
 }
 
-void Chicker__kick(Chicker* this, float speed_m_per_s)
+void Chicker_kick(Chicker* chicker, float speed_m_per_s)
 {
-    this->kick(speed_m_per_s);
+    chicker->kick(speed_m_per_s);
 }
 
-void Chicker__chip(Chicker* this, float distance_m)
+void Chicker_chip(Chicker* chicker, float distance_m)
 {
-    this->chip(distance_m);
+    chicker->chip(distance_m);
 }
 
-void Chicker__enableAutokick(Chicker* this)
+void Chicker_enableAutokick(Chicker* chicker)
 {
-    this->enable_autokick();
+    chicker->enable_autokick();
 }
 
-void Chicker__enableAutochip(Chicker* this)
+void Chicker_enableAutochip(Chicker* chicker)
 {
-    this->enable_autochip();
+    chicker->enable_autochip();
 }
 
-void Chicker__disableAutokick(Chicker* this)
+void Chicker_disableAutokick(Chicker* chicker)
 {
-    this->disable_autokick();
+    chicker->disable_autokick();
 }
 
-void Chicker__disableAutochip(Chicker* this)
+void Chicker_disableAutochip(Chicker* chicker)
 {
-    this->disable_autochip();
+    chicker->disable_autochip();
+}
+
+void Chicker_destroy(Chicker* this){
+    free(this);
 }

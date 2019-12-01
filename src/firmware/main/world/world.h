@@ -5,5 +5,6 @@
 struct World;
 typedef struct World World;
 
-World* World__construct(Robot* robot);
-Robot* World__getRobot(World* this);
+World* World_create(Robot* robot);
+Robot* World_getRobot(World* this);
+void World_destroy(World* world);

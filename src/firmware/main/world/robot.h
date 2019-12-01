@@ -7,6 +7,7 @@
 struct Robot;
 typedef struct Robot Robot;
 
-Robot* Robot__construct(Chicker* chicker, Dribbler* dribbler);
-Chicker* Robot__getChicker(Robot* this);
-Dribbler* Robot__getDribbler(Robot* this);
+Robot* Robot_create(Chicker* chicker, Dribbler* dribbler);
+Chicker* Robot_getChicker(Robot* robot);
+Dribbler* Robot_getDribbler(Robot* robot);
+void Robot_destroy(Robot* robot);

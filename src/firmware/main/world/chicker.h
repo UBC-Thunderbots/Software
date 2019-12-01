@@ -3,13 +3,14 @@
 struct Chicker;
 typedef struct Chicker Chicker;
 
-Chicker* Chicker__construct(void (*kick)(float speed_m_per_s),
+Chicker* Chicker_create(void (*kick)(float speed_m_per_s),
                             void (*chip)(float distance_m), void (*enable_autokick)(void),
                             void (*enable_autochip)(void), void (*disable_autokick)(void),
                             void (*disable_autochip)(void));
-void Chicker__kick(Chicker* this, float speed_m_per_s);
-void Chicker__chip(Chicker* this, float distance_m);
-void Chicker__enableAutokick(Chicker* this);
-void Chicker__enableAutochip(Chicker* this);
-void Chicker__disableAutokick(Chicker* this);
-void Chicker__disableAutochip(Chicker* this);
+void Chicker_kick(Chicker* chicker, float speed_m_per_s);
+void Chicker_chip(Chicker* chicker, float distance_m);
+void Chicker_enableAutokick(Chicker* chicker);
+void Chicker_enableAutochip(Chicker* chicker);
+void Chicker_disableAutokick(Chicker* chicker);
+void Chicker_disableAutochip(Chicker* chicker);
+void Chicker_destroy(Chicker* chicker);

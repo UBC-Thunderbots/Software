@@ -8,7 +8,7 @@ struct Robot
     Dribbler* dribbler;
 };
 
-Robot* Robot__construct(Chicker* chicker, Dribbler* dribbler)
+Robot* Robot_create(Chicker* chicker, Dribbler* dribbler)
 {
     Robot* new_robot = malloc(sizeof(Robot));
 
@@ -18,12 +18,16 @@ Robot* Robot__construct(Chicker* chicker, Dribbler* dribbler)
     return new_robot;
 }
 
-Chicker* Robot__getChicker(Robot* this)
+Chicker* Robot_getChicker(Robot* robot)
 {
-    return this->chicker;
+    return robot->chicker;
 }
 
-Dribbler* Robot__getDribbler(Robot* this)
+Dribbler* Robot_getDribbler(Robot* robot)
 {
-    return this->dribbler;
+    return robot->dribbler;
+}
+
+void Robot_destroy(Robot* robot){
+    free(robot);
 }

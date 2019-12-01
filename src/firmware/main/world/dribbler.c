@@ -8,7 +8,7 @@ struct Dribbler
     unsigned int (*get_temperature)(void);
 };
 
-Dribbler* Dribbler__construct(void (*set_speed)(uint32_t rpm),
+Dribbler* Dribbler_create(void (*set_speed)(uint32_t rpm),
                               unsigned int (*get_temperature)(void))
 {
     Dribbler* new_dribbler = malloc(sizeof(Dribbler));
@@ -18,12 +18,16 @@ Dribbler* Dribbler__construct(void (*set_speed)(uint32_t rpm),
     return new_dribbler;
 }
 
-void Dribbler__setSpeed(Dribbler* this, uint32_t rpm)
+void Dribbler_setSpeed(Dribbler* dribbler, uint32_t rpm)
 {
-    this->set_speed(rpm);
+    dribbler->set_speed(rpm);
 }
 
-unsigned int Dribbler__getTemperature(Dribbler* this)
+unsigned int Dribbler_getTemperature(Dribbler* dribbler)
 {
-    return this->get_temperature();
+    return dribbler->get_temperature();
+}
+
+void Dribbler_destroy(Dribbler* dribbler){
+    free(dribbler);
 }

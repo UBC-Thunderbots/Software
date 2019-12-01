@@ -74,9 +74,10 @@ static void normal_task(void *UNUSED(param))
 {
     TickType_t last_wake = xTaskGetTickCount();
 
-    World *world = World__construct(
-        Robot__construct(Chicker__construct(NULL, NULL, NULL, NULL, NULL, NULL),
-                         Dribbler__construct(dribbler_set_speed, dribbler_temperature)));
+    Chicker *chicker   = Chicker_create(NULL, NULL, NULL, NULL, NULL, NULL);
+    Dribbler *dribbler = Dribbler_create(dribbler_set_speed, dribbler_temperature);
+    Robot *robot       = Robot_create(chicker, dribbler);
+    World *world       = World_create(robot);
 
     while (!__atomic_load_n(&shutdown, __ATOMIC_RELAXED))
     {
@@ -128,6 +129,11 @@ static void normal_task(void *UNUSED(param))
         // Report progress.
         main_kick_wdt(MAIN_WDT_SOURCE_TICK);
     }
+
+    World_destroy(world);
+    Robot_destroy(robot);
+    Dribbler_destroy(dribbler);
+    Chicker_destroy(chicker);
 
     __atomic_signal_fence(__ATOMIC_ACQUIRE);
     xSemaphoreGive(main_shutdown_sem);
