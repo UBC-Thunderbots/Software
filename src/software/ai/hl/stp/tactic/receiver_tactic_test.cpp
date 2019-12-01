@@ -6,10 +6,9 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/intent/kick_intent.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/geom/util.h"
 #include "software/test_util/test_util.h"
+#include "software/ai/hl/stp/action/move_action.h"
 
 using namespace Passing;
 
@@ -35,13 +34,15 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 
     Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
-    EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
-    EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2, move_intent.getFinalAngle());
-    EXPECT_FALSE(move_intent.getDribblerEnable());
-    EXPECT_EQ(move_intent.getAutoKickType(), NONE);
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_NE(move_action, nullptr);
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
+    EXPECT_DOUBLE_EQ(0.5, move_action->getDestination().x());
+    EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
+    EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2, move_action->getFinalOrientation());
+    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
+    EXPECT_EQ(move_action->getAutoKickType(), NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
@@ -73,14 +74,16 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
-        EXPECT_EQ(13, move_intent.getRobotId());
-        EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
-        EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
+        auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+        ASSERT_NE(move_action, nullptr);
+        ASSERT_TRUE(move_action->getRobot().has_value());
+        EXPECT_EQ(13, move_action->getRobot()->id());
+        EXPECT_DOUBLE_EQ(0.5, move_action->getDestination().x());
+        EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
-                  move_intent.getFinalAngle());
-        EXPECT_FALSE(move_intent.getDribblerEnable());
-        EXPECT_EQ(move_intent.getAutoKickType(), NONE);
+                  move_action->getFinalOrientation());
+        EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
+        EXPECT_EQ(move_action->getAutoKickType(), NONE);
     }
 }
 
@@ -108,19 +111,23 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
 
     // We should be trying to move into a position to properly deflect the ball into
     // the net with a kick
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_LT(move_intent.getDestination().x(), -0.001);
-    EXPECT_GT(move_intent.getDestination().x(), -0.2);
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_NE(move_action, nullptr);
 
-    EXPECT_GT(move_intent.getDestination().y(), 0.001);
-    EXPECT_LT(move_intent.getDestination().y(), 0.1);
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
 
-    EXPECT_LT(move_intent.getFinalAngle().toDegrees(), -1);
-    EXPECT_GT(move_intent.getFinalAngle().toDegrees(), -90);
+    EXPECT_LT(move_action->getDestination().x(), -0.001);
+    EXPECT_GT(move_action->getDestination().x(), -0.2);
 
-    EXPECT_FALSE(move_intent.getDribblerEnable());
-    EXPECT_EQ(move_intent.getAutoKickType(), AUTOKICK);
+    EXPECT_GT(move_action->getDestination().y(), 0.001);
+    EXPECT_LT(move_action->getDestination().y(), 0.1);
+
+    EXPECT_LT(move_action->getFinalOrientation().toDegrees(), -1);
+    EXPECT_GT(move_action->getFinalOrientation().toDegrees(), -90);
+
+    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
+    EXPECT_EQ(move_action->getAutoKickType(), AUTOKICK);
 }
 
 TEST(ReceiverTacticTest,
@@ -149,14 +156,16 @@ TEST(ReceiverTacticTest,
 
     // Since there's no reasonable way we could one-touch kick the pass into the net,
     // we should be lining up to receive it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_NEAR(0.0, move_intent.getDestination().x(), 0.0001);
-    EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
-    EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_NE(move_action, nullptr);
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
+    EXPECT_NEAR(0.0, move_action->getDestination().x(), 0.0001);
+    EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
+    EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_TRUE(move_intent.getDribblerEnable());
-    EXPECT_EQ(move_intent.getAutoKickType(), NONE);
+    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
+    EXPECT_EQ(move_action->getAutoKickType(), NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
@@ -192,14 +201,16 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
 
     // Since there's no reasonable way we could one-touch kick the pass into the net,
     // we should be lining up to receive it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextAction());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_NEAR(0.0, move_intent.getDestination().x(), 0.0001);
-    EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
-    EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_NE(move_action, nullptr);
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
+    EXPECT_NEAR(0.0, move_action->getDestination().x(), 0.0001);
+    EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
+    EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_TRUE(move_intent.getDribblerEnable());
-    EXPECT_EQ(move_intent.getAutoKickType(), NONE);
+    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
+    EXPECT_EQ(move_action->getAutoKickType(), NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
@@ -238,7 +249,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     tactic.updateControlParams(pass);
 
     // Since we've received the ball, we shouldn't yield anything
-    EXPECT_FALSE(tactic.getNextAction());
+    EXPECT_EQ(nullptr, tactic.getNextAction());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
@@ -265,7 +276,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
     tactic.updateRobot(receiver);
 
     // Since we've kicked the ball, we shouldn't yield anything
-    EXPECT_EQ(std::unique_ptr<Intent>{}, tactic.getNextAction());
+    EXPECT_EQ(nullptr, tactic.getNextAction());
 }
 
 class OneTimeShotDirectionTest

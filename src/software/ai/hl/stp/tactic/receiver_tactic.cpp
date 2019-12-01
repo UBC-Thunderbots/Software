@@ -54,8 +54,8 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    MoveAction move_action =
-        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
+    auto move_action =
+        std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
                    MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, true);
 
     // Setup for the pass. We want to use any free time before the pass starts putting
@@ -84,10 +84,10 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
-        move_action.updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
+        move_action->updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
                                         DribblerEnable::OFF, MoveType::NORMAL,
                                         AutokickType::NONE, BallCollisionType::ALLOW);
-        yield(move_action.getNextIntent());
+        yield(move_action);
     }
 
     // Vector from the ball to the robot
@@ -114,10 +114,10 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
-            move_action.updateControlParams(*robot, ideal_position, ideal_orientation, 0,
+            move_action->updateControlParams(*robot, ideal_position, ideal_orientation, 0,
                                             DribblerEnable::OFF, MoveType::NORMAL,
                                             AUTOKICK, BallCollisionType::ALLOW);
-            yield(move_action.getNextIntent());
+            yield(move_action);
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
@@ -139,10 +139,10 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                 (ball.position() - robot->position()).orientation();
 
             // Move into position with the dribbler on
-            move_action.updateControlParams(
+            move_action->updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
                 MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
-            yield(move_action.getNextIntent());
+            yield(move_action);
         }
     }
     LOG(DEBUG) << "Finished";
