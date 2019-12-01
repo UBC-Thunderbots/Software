@@ -5,7 +5,6 @@
 
 #include "control/bangbang.h"
 #include "control/control.h"
-#include "io/chicker.h"
 #include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/leds.h"
@@ -64,8 +63,9 @@ static void accurate_shoot_init(void) {}
  *	2. there is no need to worry about recording the start position
  *	   because the primitive start function already does it
  *
+ * \param[in] world TODO
  */
-static void accurate_shoot_start(const primitive_params_t *params)
+static void accurate_shoot_start(const primitive_params_t *params, World* world)
 {
     global_params = params;
     // Convert into m/s and rad/s because physics is in m and s

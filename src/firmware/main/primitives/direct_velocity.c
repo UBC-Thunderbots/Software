@@ -22,8 +22,9 @@ static void direct_velocity_init(void) {}
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
+ * \param[in] world TODO?
  */
-static void direct_velocity_start(const primitive_params_t *params)
+static void direct_velocity_start(const primitive_params_t *params, World* world)
 {
     direct_target_velocity[0] = params->params[0] / 1000.0f;
     direct_target_velocity[1] = params->params[1] / 1000.0f;

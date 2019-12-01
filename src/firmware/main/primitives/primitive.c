@@ -13,7 +13,6 @@
 #include "direct_velocity.h"
 #include "direct_wheels.h"
 #include "dribble.h"
-#include "io/chicker.h"
 #include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/receive.h"
@@ -95,8 +94,9 @@ void primitive_init(void)
  *
  * \param[in] primitive the index of the primitive to run
  * \param[in] params the parameters to the primitive
+ * \param[in] world TODO?
  */
-void primitive_start(unsigned int primitive, const primitive_params_t *params)
+void primitive_start(unsigned int primitive, const primitive_params_t *params, World* world)
 {
     assert(primitive < PRIMITIVE_COUNT);
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
@@ -108,7 +108,7 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params)
     dribbler_set_speed(0);
     primitive_current       = PRIMITIVES[primitive];
     primitive_current_index = primitive;
-    primitive_current->start(params);
+    primitive_current->start(params, world);
     xSemaphoreGive(primitive_mutex);
 }
 

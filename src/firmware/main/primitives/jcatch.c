@@ -43,24 +43,24 @@ static primitive_params_t catch_param;
  */
 static void catch_init(void) {}
 
-/**
- * \brief Starts a movement of this type.
- *
- * This function runs each time the host computer requests to start a catch
- * movement.
- *
- * @param primitive_params_t the catch parameters, which are only valid until this
- * primitive ends. Three parameters are the catchmargin and velocity ratios as well as
- * dribbler set speed in rpm
- * @return void - function returns and must be copied into this module if needed
- */
 
 float catchvelocity;  // 0.4
 float catchmargin;    // 8.8
 
 float dribbler_speed;
 
-static void catch_start(const primitive_params_t *params)
+/**
+ * \brief Starts a movement of this type.
+ *
+ * This function runs each time the host computer requests to start a catch
+ * movement.
+ *
+ * \param[in] primitive_params_t the catch parameters, which are only valid until this
+ * primitive ends. Three parameters are the catchmargin and velocity ratios as well as
+ * dribbler set speed in rpm
+ * \param[in] world TODO?
+ */
+static void catch_start(const primitive_params_t *params, World* world)
 {
     for (unsigned int i = 0; i < 4; i++)
     {

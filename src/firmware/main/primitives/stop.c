@@ -31,8 +31,9 @@ static void stop_init(void)
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
+ * \param[in] world
  */
-static void stop_start(const primitive_params_t *params)
+static void stop_start(const primitive_params_t *params, World* world)
 {
     for (unsigned int i = 0; i != 4; ++i)
     {

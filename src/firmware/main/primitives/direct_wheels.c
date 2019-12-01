@@ -30,8 +30,9 @@ static void direct_wheels_init(void) {}
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
+ * \param[in] world TODO?
  */
-static void direct_wheels_start(const primitive_params_t *params)
+static void direct_wheels_start(const primitive_params_t *params, World* world)
 {
     // Send the PWM values directly to the wheels and dribbler.
     for (unsigned int i = 0; i != WHEELS_NUM_WHEELS; ++i)

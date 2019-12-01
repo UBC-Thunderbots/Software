@@ -5,7 +5,6 @@
 
 #include "control/bangbang.h"
 #include "control/control.h"
-#include "io/chicker.h"
 #include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/leds.h"
@@ -148,16 +147,16 @@ static void move_init(void)
 }
 
 /**
- * Starts a movement of this type.
+ * \brief Starts a movement of this type.
  *
  * This function runs each time the host computer requests to start a move
  * movement.
  *
- * @param params the movement parameters, which are only valid until this
+ * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
- * @return void
+ * \param[in] world TODO?
  */
-static void move_start(const primitive_params_t *params)
+static void move_start(const primitive_params_t *params, World* world)
 {
     // Parameters:     destination_x [mm]
     //                destination_y [mm]
@@ -189,7 +188,8 @@ static void move_start(const primitive_params_t *params)
     wheel_index = choose_wheel_axis(dx, dy, current_states.angle, destination[2]);
 
     if (params->extra & 0x01)
-        chicker_auto_arm(CHICKER_KICK, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+        Chicker_enableAutokick(Robot_getChicker(World_getRobot(world)));
+        //chicker_auto_arm(CHICKER_KICK, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     if (params->extra & 0x02)
         dribbler_set_speed(16000);
     if (params->extra & 0x04)

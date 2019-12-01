@@ -38,13 +38,15 @@ static void spin_init(void) {}
  * This function runs each time the host computer requests to start a spin
  * movement.
  *
+ * input to 3->4 matrix is quarter-degrees per 5 ms, matrix is dimensionless
+ * linear ramp up for velocity and linear fall as robot approaches point
+ * constant angular velocity
+ *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
+ * \param[in] world TODO?
  */
-// input to 3->4 matrix is quarter-degrees per 5 ms, matrix is dimensionless
-// linear ramp up for velocity and linear fall as robot approaches point
-// constant angular velocity
-static void spin_start(const primitive_params_t *p)
+static void spin_start(const primitive_params_t *p, World* world)
 {
     // Parameters:  param[0]: g_destination_x   [mm]
     //              param[1]: g_destination_y   [mm]

@@ -5,14 +5,9 @@
 #include "io/dr.h"
 #include "physics/physics.h"
 
-#ifndef FWSIM
-#include "io/chicker.h"
 #include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/leds.h"
-#else
-#include "simulate.h"
-#endif
 
 #define TIME_HORIZON 0.05f  // s
 #define FALSE 0
@@ -55,14 +50,14 @@ float compute_magnitude(float a[2])
  *
  * This function runs each time the host computer requests to start a pivot
  * movement.
+ * This function needs to run every time the center of the pivot moves as
+ * optimal direction and final position needs to be recalculated
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
- *
- * This function needs to run every time the center of the pivot moves as
- * optimal direction and final position needs to be recalculated
+ * \param[in] world TODO?
  */
-static void pivot_start(const primitive_params_t *params)
+static void pivot_start(const primitive_params_t *params, World* world)
 {
     center[0] = params->params[0] / 1000.0;
     center[1] = params->params[1] / 1000.0;
