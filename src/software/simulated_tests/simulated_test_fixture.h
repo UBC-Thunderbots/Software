@@ -4,6 +4,8 @@
 
 #include "software/backend/simulator_backend.h"
 #include "software/gui/visualizer_wrapper.h"
+#include "software/simulated_tests/mock_ai_wrapper.h"
+#include "software/simulated_tests/validation/world_state_validator.h"
 
 
 class SimulatedTest : public ::testing::Test
@@ -15,6 +17,11 @@ class SimulatedTest : public ::testing::Test
     void SetUp() override;
 
     /**
+     * The teardown function that will run after each test case
+     */
+    void TearDown() override;
+
+    /**
      * This function enables the Visualizer while a test is running, so that the test can
      * be debugged Visually. Simply call this function at the start of the test(s) you
      * want to show in the Visualizer. Make sure to run the test targets with 'bazel run'
@@ -24,4 +31,6 @@ class SimulatedTest : public ::testing::Test
 
     std::shared_ptr<SimulatorBackend> backend;
     std::shared_ptr<VisualizerWrapper> visualizer;
+    std::shared_ptr<MockAIWrapper> ai_wrapper;
+    std::shared_ptr<WorldStateValidator> world_state_validator;
 };

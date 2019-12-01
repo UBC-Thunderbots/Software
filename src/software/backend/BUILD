@@ -66,9 +66,9 @@ cc_library(
     hdrs = ["simulator_backend.h"],
     deps = [
         ":backend",
+        ":backend_factory",
         "//software/backend/simulation/physics:physics_simulator",
-        "//software/backend/simulation/validation:function_validator",
-        "//software/backend/simulation/validation:validation_function",
+        "//software/multithreading:thread_safe_buffer",
         "//software/util/logger",
         "//software/world",
     ],

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <future>
 #include <mutex>
+#include <thread>
+#include <atomic>
 
 #include "software/backend/backend.h"
+#include "software/multithreading/thread_safe_buffer.h"
 #include "software/backend/simulation/physics/physics_simulator.h"
-#include "software/backend/simulation/validation/function_validator.h"
-#include "software/backend/simulation/validation/validation_function.h"
 #include "software/world/world.h"
 
 /**
@@ -64,9 +64,9 @@ class SimulatorBackend : public Backend
      * is being published every 'world_time_increment' seconds.
      * @param simulation_speed_mode What speed mode to run the simulator with
      */
-    explicit SimulatorBackend(const Duration& physics_time_step,
-                              const Duration& world_time_increment,
-                              SimulationSpeed simulation_speed_mode);
+    explicit SimulatorBackend(const Duration& physics_time_step = Duration::fromMilliseconds(5),
+                              const Duration& world_time_increment = Duration::fromSeconds(1.0 / 30.0),
+                              SimulationSpeed simulation_speed_mode = SimulationSpeed::FAST_SIMULATION);
 
     /**
      * Sets the SimulationSpeed for the simulation
@@ -76,16 +76,21 @@ class SimulatorBackend : public Backend
     void setSimulationSpeed(SimulationSpeed simulation_speed_mode);
 
     /**
-     * Simulates the world given the initial state until the simulation times out
-     *
-     * @param world The initial state of the world in the simulation
-     * @param timeout How long to run the simulation for before failing
-     * @return true if the simulation succeeds, and false if it times out and fails
+     * Starts the simulation. This is a non-blocking call. The simulation will continue to run
+     * until the stopSimulation() function is called
      */
-    bool runSimulation(const std::vector<ValidationFunction>& validation_functions,
-                       World world, const Duration& timeout);
+     // TODO: comment
+    void startSimulation(World world);
+
+    /**
+     * Stops the simulation if it is running
+     */
+    void stopSimulation();
 
    private:
+    void runSimulationLoop(World world);
+
+
     /**
      * Runs the main simulation loop that updates the physics simulation, checks the
      * function validators, and publishes the latest world data to Observers
@@ -99,9 +104,9 @@ class SimulatorBackend : public Backend
      * @return true if all function_validators report their validation function has passed
      * before the simulation timeout is reached, and false otherwise
      */
-    bool runSimulationLoop(std::shared_ptr<World> world,
-                           std::vector<FunctionValidator>& function_validators,
-                           PhysicsSimulator& physics_simulator, const Duration& timeout);
+//    bool runSimulationLoop(std::shared_ptr<World> world,
+//                           std::vector<FunctionValidator>& function_validators,
+//                           PhysicsSimulator& physics_simulator, const Duration& timeout);
 
     /**
      * Updates the simulation until world_time_increment has passed. For each physics step
@@ -116,17 +121,31 @@ class SimulatorBackend : public Backend
      * @return true if all function_validators report their validation function has passed
      * before the simulation timeout is reached, and false otherwise
      */
-    bool updateSimulationAndCheckValidation(
-        std::shared_ptr<World> world, std::vector<FunctionValidator>& function_validators,
-        PhysicsSimulator& physics_simulator);
-
+//    bool updateSimulationAndCheckValidation(
+//        std::shared_ptr<World> world, std::vector<FunctionValidator>& function_validators,
+//        PhysicsSimulator& physics_simulator);
+//
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
+
+    std::thread simulation_thread;
+    bool simulation_thread_started;
+
+    // This flag is used to indicate that we are in the destructor. We use this to
+    // communicate with pass_generation_thread that it is
+    // time to stop
+    bool in_destructor;
+    // The mutex for the in_destructor flag
+    std::mutex in_destructor_mutex;
 
     // The time increment the physics simulation is updated by
     const Duration physics_time_step;
     // The time increment between each World published by the backend
     const Duration world_time_increment;
-    SimulationSpeed simulation_speed_mode;
+    std::atomic<SimulationSpeed> simulation_speed_mode;
 
-    std::promise<ConstPrimitiveVectorPtr> primitive_promise;
+    const unsigned int primitive_buffer_size = 1;
+    ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
+    // We only want to simulate the most recently receive primitives so have no reason
+    // to buffer more than 1 value
+    const Duration primitive_timeout = Duration::fromSeconds(2);
 };
