@@ -95,7 +95,7 @@ class ShootGoalTactic : public Tactic
      * @param chip_action The chip action to run
      * @param yield The coroutine to yield
      */
-    void shootUntilShotBlocked(KickAction& kick_action, ChipAction& chip_action,
+    void shootUntilShotBlocked(std::shared_ptr<KickAction> kick_action, std::shared_ptr<ChipAction> chip_action,
                                ActionCoroutine::push_type& yield) const;
 
     // Tactic parameters
