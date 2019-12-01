@@ -37,12 +37,12 @@ void Chicker_chip(Chicker* chicker, float distance_m)
     chicker->chip(distance_m);
 }
 
-void Chicker_enableAutokick(Chicker* chicker)
+void Chicker_enableAutokick(Chicker* chicker, float speed_m_per_s)
 {
     chicker->enable_autokick();
 }
 
-void Chicker_enableAutochip(Chicker* chicker)
+void Chicker_enableAutochip(Chicker* chicker, float distance_m)
 {
     chicker->enable_autochip();
 }

@@ -187,13 +187,14 @@ static void move_start(const primitive_params_t *params, World* world)
     // pick the wheel axis that will be used for faster movement
     wheel_index = choose_wheel_axis(dx, dy, current_states.angle, destination[2]);
 
+    Chicker* chicker = Robot_getChicker(World_getRobot(world));
+
     if (params->extra & 0x01)
-        Chicker_enableAutokick(Robot_getChicker(World_getRobot(world)));
-        //chicker_auto_arm(CHICKER_KICK, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+        Chicker_enableAutokick(chicker, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     if (params->extra & 0x02)
         dribbler_set_speed(16000);
     if (params->extra & 0x04)
-        chicker_auto_arm(CHICKER_CHIP, 2);
+        Chicker_enableAutochip(chicker, 2);
 }
 
 /**

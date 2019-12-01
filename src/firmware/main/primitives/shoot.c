@@ -142,7 +142,13 @@ static void shoot_start(const primitive_params_t *params, World* world)
     total_rot         = min_angle_delta(destination[2], states.angle);
     float shoot_power = (float)params->params[3] / 1000.0f;
     chip              = params->extra & 1;
-    chicker_auto_arm(chip ? CHICKER_CHIP : CHICKER_KICK, shoot_power);
+
+    Chicker* chicker = Robot_getChicker(World_getRobot(world));
+    if (chip){
+        Chicker_enableAutochip(chicker, shoot_power);
+    } else {
+        Chicker_enableAutokick(chicker, shoot_power);
+    }
 }
 
 /**

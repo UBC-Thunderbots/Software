@@ -190,12 +190,20 @@ static void accurate_shoot_tick(log_record_t *log, World *world)
     else
     {
         // accelerate at ball to kick it
-        chicker_auto_arm((global_params->extra & 1) ? CHICKER_CHIP : CHICKER_KICK,
-                         global_params->params[3]);
-        if (!(global_params->extra & 1))
-        {
+        Chicker* chicker = Robot_getChicker(World_getRobot(world));
+        bool chipping = global_params->extra & 1;
+        if (chipping){
+            float chip_distance = global_params->params[3];
+            Chicker_enableAutochip(chicker, chip_distance);
+        } else {
+            float speed_m_per_s = global_params->params[3];
+            Chicker_enableAutokick(chicker, speed_m_per_s);
+        }
+
+        if (!chipping){
             dribbler_set_speed(8000);
         }
+
         PrepareBBTrajectoryMaxV(&major_profile, major_disp, major_vel, 1.0, 1.5, 1.5);
         PlanBBTrajectory(&major_profile);
         major_accel             = BBComputeAvgAccel(&major_profile, TIME_HORIZON);

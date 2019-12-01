@@ -10,7 +10,7 @@ Chicker* Chicker_create(void (*kick)(float speed_m_per_s),
 void Chicker_kick(Chicker* chicker, float speed_m_per_s);
 void Chicker_chip(Chicker* chicker, float distance_m);
 void Chicker_enableAutokick(Chicker* chicker, float speed_m_per_s);
-void Chicker_enableAutochip(Chicker* chicker, float speed_m_per_s);
+void Chicker_enableAutochip(Chicker* chicker, float distance_m);
 void Chicker_disableAutokick(Chicker* chicker);
 void Chicker_disableAutochip(Chicker* chicker);
 void Chicker_destroy(Chicker* chicker);
