@@ -8,7 +8,6 @@
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/grab_ball_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
@@ -43,8 +42,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-    auto grab_ball_tactic  = std::make_shared<GrabBallTactic>(world.field(), world.ball(),
-                                                             world.enemyTeam(), true);
     auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
         Angle::fromDegrees(5), std::nullopt, true);
@@ -94,7 +91,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
                                          friendly_team_for_goalie, world.enemyTeam());
-        grab_ball_tactic->updateParams(world.field(), world.ball(), world.enemyTeam());
         shoot_goal_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
                                              world.enemyTeam(), world.ball());
         shoot_goal_tactic->updateControlParams(std::nullopt);
