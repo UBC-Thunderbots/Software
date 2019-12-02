@@ -21,7 +21,7 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
 {
 }
 
-std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
+void STP::updateCurrentPlay(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
@@ -75,8 +75,10 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             }
         }
     }
+}
 
-    // Run the current play
+std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
+{
     current_tactics = current_play->getTactics(world);
 
     std::vector<std::unique_ptr<Intent>> intents;
@@ -113,6 +115,11 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     }
 
     return intents;
+}
+
+std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world) {
+    updateCurrentPlay(world);
+    return getIntentsFromCurrentPlay(world);
 }
 
 std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
