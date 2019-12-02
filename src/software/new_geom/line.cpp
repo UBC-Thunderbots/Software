@@ -2,9 +2,9 @@
 
 Line::Line(const Point &first, const Point &second)
 {
-    coeffs.push_back(first.y() - second.y());
-    coeffs.push_back(second.x() - first.x());
-    coeffs.push_back(first.x() * second.y() - second.x() * first.y());
+    coeffs[0] = first.y() - second.y();
+    coeffs[1] = second.x() - first.x();
+    coeffs[2] = first.x() * second.y() - second.x() * first.y();
 }
 
 Vector Line::toNormalUnitVector()

@@ -33,5 +33,5 @@ class Line final
 
    private:
     // Coefficients for a line in the form coeffs[0]*x + coeffs[1]*y + coeffs[2] = 0
-    std::vector<double> coeffs;
+    std::array<double, 3> coeffs;
 };
