@@ -58,6 +58,11 @@ bool WorldStateValidator::waitForValidationToPass(
         std::cout << "validator after emplace " << &function_validator << std::endl;
     }
 
+    for(unsigned int i = 0; i < validation_functions.size(); i++) {
+        function_validators[i].setValidationFunction(validation_functions[i]);
+    }
+
+
     std::vector<ContinuousFunctionValidator> continuous_function_validators;
     for (const auto &continuous_validation_function : continuous_validation_functions)
     {
