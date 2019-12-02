@@ -17,7 +17,7 @@ TEST(LineTest, to_normal_unit_vector)
 
 TEST(LineTest, vertical_line)
 {
-    Line l(Point(1, -1), Point(1, 1)); // x = 1
+    Line l(Point(1, -1), Point(1, 1));  // x = 1
     EXPECT_EQ(l.toNormalUnitVector(), Vector(-1, 0));
 }
 
