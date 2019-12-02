@@ -1,7 +1,7 @@
 #ifndef UPGRADE_CONSTANTS_H
 #define UPGRADE_CONSTANTS_H
 
-#include "../sdcard.h"
+#include "io/sdcard.h"
 
 /**
  * \ingroup UPGRADE

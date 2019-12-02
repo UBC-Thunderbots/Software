@@ -25,8 +25,9 @@ bool ThetaStarPathPlanner::isCoordValid(Coordinate test_coord)
 
 bool ThetaStarPathPlanner::isUnBlocked(Coordinate test_coord)
 {
-    // If we haven't checked this Coordinate before, check it now
-    if (unblocked_grid.find(test_coord) == unblocked_grid.end())
+    // If we haven't checked this Coordinate for obstacles before, check it now
+    auto unblocked_grid_it = unblocked_grid.find(test_coord);
+    if (unblocked_grid_it == unblocked_grid.end())
     {
         bool blocked = false;
 
@@ -42,9 +43,10 @@ bool ThetaStarPathPlanner::isUnBlocked(Coordinate test_coord)
 
         // We use the opposite convention to indicate blocked or not
         unblocked_grid[test_coord] = !blocked;
+        return !blocked;
     }
 
-    return unblocked_grid[test_coord];
+    return unblocked_grid_it->second;
 }
 
 double ThetaStarPathPlanner::calculateHValue(Coordinate test_coord, Coordinate dest)

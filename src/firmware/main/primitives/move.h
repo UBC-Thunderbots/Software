@@ -1,8 +1,8 @@
 #ifndef PRIMITIVES_MOVE_H
 #define PRIMITIVES_MOVE_H
 
+#include "physics/physics.h"
 #include "primitive.h"
-#include "physics.h"
 #include "util/physbot.h"
 
 
@@ -16,17 +16,17 @@ static const float CLOSEST_WHEEL_ANGLE = 30.0f * P_PI / 180.0f;
 // The minimum distance away from our destination that we must be if we
 // are going to rotate the bot onto its wheel axis
 // 2 * P_PI * ROBOT_RADIUS = robot circumference, which is approximately
-// how far the bot would have to turn for one full rotation, so we 
+// how far the bot would have to turn for one full rotation, so we
 // set it a litle larger than that.
 static const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
 
 #define VAL_EQUIVALENT_2_ZERO (5e-3f)
-#define CONTROL_TICK (1.0f/CONTROL_LOOP_HZ)
+#define CONTROL_TICK (1.0f / CONTROL_LOOP_HZ)
 
 #define LOOK_AHEAD_T 10
 
 /**
- * call from move_start to choose which wheel axis we will be 
+ * call from move_start to choose which wheel axis we will be
  * using for preliminary rotation. The idea is to pick the wheel
  * axis that will result in the minimum remaining rotation onto
  * the bot's final destination angle.
@@ -40,9 +40,9 @@ static const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
 unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_angle);
 
 /**
- * Calculates the rotation time, velocity, and acceleration to be stored 
+ * Calculates the rotation time, velocity, and acceleration to be stored
  * in a PhysBot data container.
- * 
+ *
  * @param pb The data container that has information about major axis time
  * and will store the rotational information
  * @param avel The current rotational velocity of the bot

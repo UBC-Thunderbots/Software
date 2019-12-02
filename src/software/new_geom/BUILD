@@ -4,6 +4,7 @@ cc_library(
     name = "new_geom",
     srcs = [
         "circle.cpp",
+        "line.cpp",
         "point.cpp",
         "polynomial.cpp",
         "vector.cpp",
@@ -14,6 +15,7 @@ cc_library(
         "circle.h",
         "convex_shape.h",
         "geom_constants.h",
+        "line.h",
         "point.h",
         "polynomial.h",
         "ray.h",
@@ -30,6 +32,17 @@ cc_test(
     name = "angle_test",
     srcs = [
         "angle_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "line_test",
+    srcs = [
+        "line_test.cpp",
     ],
     deps = [
         ":new_geom",

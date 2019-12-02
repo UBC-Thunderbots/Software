@@ -63,6 +63,16 @@ TEST(PolynomialTest, test_set_coeff)
     EXPECT_DOUBLE_EQ(p.getCoeff(100), 6);
 }
 
+TEST(PolynomialTest, get_order)
+{
+    std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
+    Polynomial p(coeffs);
+    EXPECT_EQ(p.getOrder(), 2);
+
+    p.setCoeff(2, 0);
+    EXPECT_EQ(p.getOrder(), 1);
+}
+
 TEST(PolynomialTest, test_get_order)
 {
     std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
