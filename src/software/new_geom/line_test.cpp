@@ -4,13 +4,26 @@
 
 TEST(LineTest, two_points_constructor)
 {
-    Line l(Point(-1.0, 2.0), Point(3.0, 4.0));
+    Line l(Point(-1.0, 2.0), Point(3.0, 4.0));  // -0.5x + y - 2.5 = 0
     EXPECT_EQ(l.toNormalUnitVector(), Vector(-1, 2).normalize());
+}
+
+TEST(LineTest, to_normal_unit_vector)
+{
+    Line l1(Point(-5, -4.5), Point(0, 3));  // -1.5x + y - 3 = 0
+    Line l2(Point(-2, -9), Point(4, 0));    // -1.5x + y + 6 = 0
+    EXPECT_EQ(l1.toNormalUnitVector(), l2.toNormalUnitVector());
+}
+
+TEST(LineTest, vertical_line)
+{
+    Line l(Point(1, -1), Point(1, 1)); // x = 1
+    EXPECT_EQ(l.toNormalUnitVector(), Vector(-1, 0));
 }
 
 TEST(LineTest, swapXY)
 {
-    Line l(Point(-1.0, 2.0), Point(3.0, 4.0));
+    Line l(Point(-1.0, 2.0), Point(3.0, 4.0));  // -0.5x + y - 2.5 = 0
     l.swapXY();
     EXPECT_EQ(l.toNormalUnitVector(), Vector(2, -1).normalize());
 }
