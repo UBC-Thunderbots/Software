@@ -22,13 +22,13 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    StopAction stop_action =
-        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, false);
+    auto stop_action =
+        std::make_shared<StopAction>(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, false);
     do
     {
-        stop_action.updateControlParams(*robot, this->coast);
-        yield(stop_action.getNextIntent());
-    } while (!stop_action.done());
+        stop_action->updateControlParams(*robot, this->coast);
+        yield(stop_action);
+    } while (!stop_action->done());
 }
 
 void StopTactic::accept(TacticVisitor &visitor) const
