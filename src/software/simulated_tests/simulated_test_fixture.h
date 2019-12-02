@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/ai_wrapper.h"
 #include "software/backend/simulator_backend.h"
 #include "software/gui/visualizer_wrapper.h"
 #include "software/simulated_tests/validation/world_state_validator.h"
-#include "software/ai/ai_wrapper.h"
 
 
 class SimulatedTest : public ::testing::Test

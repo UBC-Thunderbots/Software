@@ -4,8 +4,7 @@
 #include "software/simulated_tests/validation/function_validator.h"
 #include "software/util/logger/init.h"
 
-WorldStateValidator::WorldStateValidator() : world_buffer(world_buffer_size) {
-}
+WorldStateValidator::WorldStateValidator() : world_buffer(world_buffer_size) {}
 
 void WorldStateValidator::onValueReceived(World world)
 {
@@ -32,7 +31,8 @@ bool WorldStateValidator::waitForValidationToPass(
     std::vector<FunctionValidator> function_validators;
     for (ValidationFunction validation_function : validation_functions)
     {
-        function_validators.emplace_back(FunctionValidator(validation_function, world_ptr));
+        function_validators.emplace_back(
+            FunctionValidator(validation_function, world_ptr));
     }
 
     std::vector<ContinuousFunctionValidator> continuous_function_validators;

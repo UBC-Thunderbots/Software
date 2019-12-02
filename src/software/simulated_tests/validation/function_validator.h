@@ -54,7 +54,8 @@ class FunctionValidator
      * @param validation_function The validation_function to run in the coroutine
      */
     void executeAndCheckForSuccessWrapper(ValidationCoroutine::push_type& yield,
-                                          std::shared_ptr<World> world, ValidationFunction validation_function);
+                                          std::shared_ptr<World> world,
+                                          ValidationFunction validation_function);
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;

@@ -97,7 +97,8 @@ class SimulatorBackend : public Backend
    private:
     /**
      * The function that runs inside the simulation thread, running the physics simulation
-     * steps inside a loop. This function will continue to run until stopSimulation() is called
+     * steps inside a loop. This function will continue to run until stopSimulation() is
+     * called
      *
      * @param world The initial state of the world to start the simulation with
      */

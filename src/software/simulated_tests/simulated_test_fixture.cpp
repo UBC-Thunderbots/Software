@@ -7,8 +7,8 @@ void SimulatedTest::SetUp()
 {
     Util::Logger::LoggerSingleton::initializeLogger();
     backend = std::make_shared<SimulatorBackend>(
-            Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
-            SimulatorBackend::SimulationSpeed::FAST_SIMULATION);
+        Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
+        SimulatorBackend::SimulationSpeed::FAST_SIMULATION);
     world_state_validator = std::make_shared<WorldStateValidator>();
     ai_wrapper            = std::make_shared<AIWrapper>();
 
