@@ -105,6 +105,8 @@ int main(void)
     MX_USART3_UART_Init();
     MX_USB_OTG_FS_PCD_Init();
     MX_LWIP_Init();
+    HAL_UART_DeInit(&huart3);
+    HAL_UART_Init(&huart3);
     /* USER CODE BEGIN 2 */
 
     /* USER CODE END 2 */
@@ -113,6 +115,7 @@ int main(void)
     /* USER CODE BEGIN WHILE */
     while (1)
     {
+        MX_LWIP_Process();
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */

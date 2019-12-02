@@ -87,7 +87,7 @@ extern "C"
 /*----- Value in opt.h for CHECKSUM_GEN_IP: 1 -----*/
 #define CHECKSUM_GEN_IP 0
 /*----- Value in opt.h for CHECKSUM_GEN_UDP: 1 -----*/
-#define CHECKSUM_GEN_UDP 0
+#define CHECKSUM_GEN_UDP 1
 /*----- Value in opt.h for CHECKSUM_GEN_TCP: 1 -----*/
 #define CHECKSUM_GEN_TCP 0
 /*----- Value in opt.h for CHECKSUM_GEN_ICMP6: 1 -----*/
