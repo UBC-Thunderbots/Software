@@ -46,13 +46,17 @@ bool WorldStateValidator::waitForValidationToPass(
 //    }
 
     // THIS DOES NOT WORK
-//    std::vector<FunctionValidator> function_validators;
-//    for (auto validation_function : validation_functions)
-//    {
-//        FunctionValidator foo(validation_function, world_ptr);
-//        std::cout << "emplacing function validator: " << &foo << std::endl;
-//        function_validators.emplace_back(std::move(foo));
-//    }
+    std::vector<FunctionValidator> function_validators;
+    for (ValidationFunction validation_function : validation_functions)
+    {
+        FunctionValidator foo(validation_function, world_ptr);
+        std::cout << "emplacing function validator: " << &foo << std::endl;
+        function_validators.emplace_back(std::move(foo));
+    }
+
+    for(const auto& function_validator : function_validators) {
+        std::cout << "validator after emplace " << &function_validator << std::endl;
+    }
 
     std::vector<ContinuousFunctionValidator> continuous_function_validators;
     for (const auto &continuous_validation_function : continuous_validation_functions)

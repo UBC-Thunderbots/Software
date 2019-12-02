@@ -4,12 +4,12 @@
 
 FunctionValidator::FunctionValidator(ValidationFunction validation_function,
                                      std::shared_ptr<World> world)
-    : validation_function(validation_function),
+    : //validation_function(validation_function),
       // We need to provide the world in the coroutine function binding so that the
       // wrapper function has access to the correct variable context, otherwise the World
       // inside the coroutine will not update properly when the pointer is updated.
       validation_sequence(boost::bind(
-          &FunctionValidator::executeAndCheckForSuccessWrapper, this, _1, world))
+          &FunctionValidator::executeAndCheckForSuccessWrapper, this, _1, world, validation_function))
 //      validation_sequence(boost::bind(
 //              [this, world]() {
 //                  this->executeAndCheckForSuccessWrapper(validation_sequence, world);
@@ -21,7 +21,7 @@ FunctionValidator::FunctionValidator(ValidationFunction validation_function,
 }
 
 void FunctionValidator::executeAndCheckForSuccessWrapper(
-    ValidationCoroutine::push_type &yield, std::shared_ptr<World> world)
+    ValidationCoroutine::push_type &yield, std::shared_ptr<World> world, ValidationFunction validation_function)
 {
     // Yield the very first time the function is called, so that the validation_function
     // is not run until this coroutine / wrapper function is called again by
