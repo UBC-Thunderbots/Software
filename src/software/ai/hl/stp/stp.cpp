@@ -115,7 +115,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
             }
             else
             {
-                // TODO: log error here
+                LOG(WARN) << "Tried to run a tactic that didn't yield an Intent"
+                          << "and did not have a robot assigned!";
             }
         }
     }

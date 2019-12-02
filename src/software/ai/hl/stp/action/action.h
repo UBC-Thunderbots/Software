@@ -50,9 +50,9 @@ class Action
     std::unique_ptr<Intent> getNextIntent();
 
     /**
-     * Gets the robot assigned to this tactic, if one is assigned
+     * Gets the robot assigned to this action, if one is assigned
      *
-     * @return the robot assigned to this tactic, if one is assigned
+     * @return the robot assigned to this action, if one is assigned
      */
     std::optional<Robot> getRobot();
 
