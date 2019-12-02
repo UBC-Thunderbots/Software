@@ -15,11 +15,14 @@ SimulatorBackend::SimulatorBackend(
     : physics_time_step(physics_time_step),
       world_time_increment(world_time_increment),
       simulation_speed_mode(simulation_speed_mode),
-      primitive_buffer(primitive_buffer_size)
+      primitive_buffer(primitive_buffer_size),
+      in_destructor(false),
+      simulation_thread_started(false)
 {
 }
 
-SimulatorBackend::~SimulatorBackend() {
+SimulatorBackend::~SimulatorBackend()
+{
     stopSimulation();
 }
 
@@ -40,8 +43,7 @@ void SimulatorBackend::startSimulation(World world)
     // The lambda expression here is needed so that we can call
     // `runSimulationLoop()`, which is not a static function
     simulation_thread_started = true;
-    simulation_thread =
-        std::thread(&SimulatorBackend::runSimulationLoop, this, world);
+    simulation_thread = std::thread(&SimulatorBackend::runSimulationLoop, this, world);
 }
 
 void SimulatorBackend::stopSimulation()
@@ -95,14 +97,11 @@ void SimulatorBackend::runSimulationLoop(World world)
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
-//        std::this_thread::yield();
+        std::this_thread::yield();
 
         // TODO: Simulate the primitives
         // https://github.com/UBC-Thunderbots/Software/issues/768
-//        auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
-        LOG(INFO) << "waiting for primitives";
-        auto primitives = primitive_buffer.popMostRecentlyAddedValue(Duration::fromMilliseconds(509));
-        LOG(INFO) << "done waiting for primitives";
+        auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
         if (!primitives)
         {
             LOG(WARNING) << "Simulator Backend timed out waiting for primitives";

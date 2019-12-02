@@ -5,7 +5,6 @@
 #include "software/util/logger/init.h"
 
 WorldStateValidator::WorldStateValidator() : world_buffer(world_buffer_size) {
-    std::cout << "WorldStateValidator buffer address: " << &world_buffer;
 }
 
 void WorldStateValidator::onValueReceived(World world)

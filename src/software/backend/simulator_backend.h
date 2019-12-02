@@ -69,7 +69,10 @@ class SimulatorBackend : public Backend
         const Duration& world_time_increment  = Duration::fromSeconds(1.0 / 30.0),
         SimulationSpeed simulation_speed_mode = SimulationSpeed::FAST_SIMULATION);
 
-    ~SimulatorBackend();
+    /**
+     * Destroys the SimulatorBackend and stops any currently running simulation
+     */
+    ~SimulatorBackend() override;
 
     /**
      * Sets the SimulationSpeed for the simulation
@@ -80,9 +83,10 @@ class SimulatorBackend : public Backend
 
     /**
      * Starts the simulation. This is a non-blocking call. The simulation will continue to
-     * run until the stopSimulation() function is called
+     * run until the stopSimulation() function is called.
+     *
+     * @param world The initial state of the world to start the simulation with
      */
-    // TODO: comment
     void startSimulation(World world);
 
     /**
@@ -91,44 +95,14 @@ class SimulatorBackend : public Backend
     void stopSimulation();
 
    private:
+    /**
+     * The function that runs inside the simulation thread, running the physics simulation
+     * steps inside a loop. This function will continue to run until stopSimulation() is called
+     *
+     * @param world The initial state of the world to start the simulation with
+     */
     void runSimulationLoop(World world);
 
-
-    /**
-     * Runs the main simulation loop that updates the physics simulation, checks the
-     * function validators, and publishes the latest world data to Observers
-     *
-     * @param world The world to be simulated
-     * @param function_validators The function validators to check during the simulation
-     * @param physics_simulator The physics simulator responsible for the physics
-     * simulation
-     * @param timeout How long to run the simulation before timing out
-     *
-     * @return true if all function_validators report their validation function has passed
-     * before the simulation timeout is reached, and false otherwise
-     */
-    //    bool runSimulationLoop(std::shared_ptr<World> world,
-    //                           std::vector<FunctionValidator>& function_validators,
-    //                           PhysicsSimulator& physics_simulator, const Duration&
-    //                           timeout);
-
-    /**
-     * Updates the simulation until world_time_increment has passed. For each physics step
-     * checks the result of each function_validator. If all function_validators report
-     * their validation_functions have passed, this function returns true.
-     *
-     * @param world The world to be simulated
-     * @param function_validators The function validators to check during the simulation
-     * @param physics_simulator The physics simulator responsible for the physics
-     * simulation
-     *
-     * @return true if all function_validators report their validation function has passed
-     * before the simulation timeout is reached, and false otherwise
-     */
-    //    bool updateSimulationAndCheckValidation(
-    //        std::shared_ptr<World> world, std::vector<FunctionValidator>&
-    //        function_validators, PhysicsSimulator& physics_simulator);
-    //
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
     std::thread simulation_thread;
@@ -147,9 +121,9 @@ class SimulatorBackend : public Backend
     const Duration world_time_increment;
     std::atomic<SimulationSpeed> simulation_speed_mode;
 
-    const unsigned int primitive_buffer_size = 1;
-    ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
     // We only want to simulate the most recently receive primitives so have no reason
     // to buffer more than 1 value
+    const unsigned int primitive_buffer_size = 1;
+    ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
     const Duration primitive_timeout = Duration::fromSeconds(1);
 };
