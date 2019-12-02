@@ -28,14 +28,31 @@ bool WorldStateValidator::waitForValidationToPass(
     // The pointer to the world that will be shared with all the function validators
     std::shared_ptr<World> world_ptr = std::make_shared<World>(world.value());
 
-    std::vector<FunctionValidator> function_validators;
-    for (const auto &validation_function : validation_functions)
-    {
-        std::cout << "emplacing function: " << &validation_function << std::endl;
-        FunctionValidator foo(validation_function, world_ptr);
-        std::cout << "emplacing function validator: " << &foo << std::endl;
-        function_validators.emplace_back(std::move(foo));
-    }
+    // THIS WORKS
+//    std::vector<FunctionValidator> function_validators;
+//    FunctionValidator foo(validation_functions.at(0), world_ptr);
+//    std::cout << "emplacing function validator foo: " << &foo << std::endl;
+//    function_validators.emplace_back(std::move(foo));
+//    FunctionValidator bar(validation_functions.at(1), world_ptr);
+//    std::cout << "function validator bar: " << &bar << std::endl;
+//    function_validators.emplace_back(std::move(bar));
+
+    // THIS DOES NOT WORK
+//    std::vector<FunctionValidator> function_validators;
+//    for(unsigned int i = 0; i < validation_functions.size(); i++) {
+//        FunctionValidator foo(validation_functions.at(i), world_ptr);
+//        std::cout << "emplacing function validator: " << &foo << std::endl;
+//        function_validators.emplace_back(std::move(foo));
+//    }
+
+    // THIS DOES NOT WORK
+//    std::vector<FunctionValidator> function_validators;
+//    for (auto validation_function : validation_functions)
+//    {
+//        FunctionValidator foo(validation_function, world_ptr);
+//        std::cout << "emplacing function validator: " << &foo << std::endl;
+//        function_validators.emplace_back(std::move(foo));
+//    }
 
     std::vector<ContinuousFunctionValidator> continuous_function_validators;
     for (const auto &continuous_validation_function : continuous_validation_functions)
@@ -43,9 +60,6 @@ bool WorldStateValidator::waitForValidationToPass(
         continuous_function_validators.emplace_back(
             ContinuousFunctionValidator(continuous_validation_function, world_ptr));
     }
-
-//    continuous_function_validators[0].executeAndCheckForFailures();
-//    continuous_function_validators[1].executeAndCheckForFailures();
 
     bool validation_successful   = false;
     Timestamp starting_timestamp = world_ptr->getMostRecentTimestamp();

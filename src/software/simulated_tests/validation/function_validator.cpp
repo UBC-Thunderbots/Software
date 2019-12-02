@@ -2,7 +2,7 @@
 
 #include <boost/bind.hpp>
 
-FunctionValidator::FunctionValidator(const ValidationFunction &validation_function,
+FunctionValidator::FunctionValidator(ValidationFunction validation_function,
                                      std::shared_ptr<World> world)
     : validation_function(validation_function),
       // We need to provide the world in the coroutine function binding so that the
@@ -16,7 +16,7 @@ FunctionValidator::FunctionValidator(const ValidationFunction &validation_functi
 //              })
 //              )
 {
-    std::cout << "constructor vf " << &validation_function << std::endl;
+//    std::cout << "constructor vf " << &validation_function << std::endl;
     std::cout << "this " << this << std::endl;
 }
 
@@ -30,7 +30,6 @@ void FunctionValidator::executeAndCheckForSuccessWrapper(
 
     // Anytime after the first function call, the validation_function will be
     // used to perform the real logic.
-    std::cout << "vf " << &validation_function << std::endl;
     validation_function(world, yield);
 }
 
@@ -48,4 +47,5 @@ bool FunctionValidator::executeAndCheckForSuccess()
     // execution has "dropped out" the bottom of the function and there is no more work to
     // do. If this is the case then the validation_function has passed successfully
     return !static_cast<bool>(validation_sequence);
+//return true;
 }

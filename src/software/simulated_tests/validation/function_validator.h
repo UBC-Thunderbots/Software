@@ -21,7 +21,7 @@ class FunctionValidator
      * @param world The world that will be given to the ValidationFunction in order to run
      * it
      */
-    explicit FunctionValidator(const ValidationFunction& validation_function,
+    explicit FunctionValidator(ValidationFunction validation_function,
                                std::shared_ptr<World> world);
 
     /**
@@ -56,7 +56,7 @@ class FunctionValidator
                                           std::shared_ptr<World> world);
 
     // The coroutine that will be given to the validation function
-//    ValidationCoroutine::pull_type validation_sequence;
+    ValidationCoroutine::pull_type validation_sequence;
     // The validation function being executed / managed
     ValidationFunction validation_function;
 };
