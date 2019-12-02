@@ -14,44 +14,43 @@
   * the License. You may obtain a copy of the License at:
   *                             www.st.com/SLA0044
   *
-  *************************************************************************
+  *************************************************************************  
 
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __mx_lwip_H
 #define __mx_lwip_H
 #ifdef __cplusplus
-extern "C"
-{
+ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "ethernetif.h"
-#include "lwip/dhcp.h"
+#include "lwip/opt.h"
 #include "lwip/mem.h"
 #include "lwip/memp.h"
-#include "lwip/netif.h"
-#include "lwip/opt.h"
-#include "lwip/timeouts.h"
 #include "netif/etharp.h"
+#include "lwip/dhcp.h"
+#include "lwip/netif.h"
+#include "lwip/timeouts.h"
+#include "ethernetif.h"
 
 /* Includes for RTOS ---------------------------------------------------------*/
 #if WITH_RTOS
 #include "lwip/tcpip.h"
 #endif /* WITH_RTOS */
 
-    /* USER CODE BEGIN 0 */
+/* USER CODE BEGIN 0 */
 
-    /* USER CODE END 0 */
+/* USER CODE END 0 */
 
-    /* Global Variables ----------------------------------------------------------*/
-    extern ETH_HandleTypeDef heth;
+/* Global Variables ----------------------------------------------------------*/
+extern ETH_HandleTypeDef heth;
 
-    /* LWIP init function */
-    void MX_LWIP_Init(void);
+/* LWIP init function */	
+void MX_LWIP_Init(void);
 
 #if !WITH_RTOS
-    /* USER CODE BEGIN 1 */
+/* USER CODE BEGIN 1 */
     /* Function defined in lwip.c to:
      *   - Read a received packet from the Ethernet buffers
      *   - Send it to the lwIP stack for handling
@@ -68,11 +67,11 @@ extern "C"
 #endif /*__ mx_lwip_H */
 
 /**
- * @}
- */
+  * @}
+  */
 
 /**
- * @}
- */
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
