@@ -94,7 +94,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
             std::unique_ptr<Intent> intent;
             if (action)
             {
-                intent = action.getNextIntent();
+                intent = action->getNextIntent();
             }
 
             if (intent)
