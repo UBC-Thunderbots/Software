@@ -3,14 +3,14 @@
 #include <boost/bind.hpp>
 
 ContinuousFunctionValidator::ContinuousFunctionValidator(
-    const ValidationFunction &validation_function, std::shared_ptr<World> world)
-    : validation_function(validation_function),
-      // We need to provide the world in the coroutine function binding so that the
-      // wrapper function has access to the correct variable context, otherwise the World
-      // inside the coroutine will not update properly when the pointer is updated.
+    ValidationFunction validation_function, std::shared_ptr<World> world)
+    : // We need to provide the world and validation_function in the coroutine function
+      // binding so that the wrapper function has access to the correct variable context,
+      // otherwise the World inside the coroutine will not update properly when the pointer
+      // is updated, and the wrong validation_function may be run.
       validation_sequence(
           boost::bind(&ContinuousFunctionValidator::executeAndCheckForFailuresWrapper,
-                      this, _1, world))
+                      this, _1, world, validation_function))
 {
 }
 
@@ -28,7 +28,7 @@ void ContinuousFunctionValidator::executeAndCheckForFailures()
 }
 
 void ContinuousFunctionValidator::executeAndCheckForFailuresWrapper(
-    ValidationCoroutine::push_type &yield, std::shared_ptr<World> world)
+    ValidationCoroutine::push_type &yield, std::shared_ptr<World> world, ValidationFunction validation_function)
 {
     // Yield the very first time the function is called, so that the validation_function
     // is not run until this coroutine / wrapper function is called again by

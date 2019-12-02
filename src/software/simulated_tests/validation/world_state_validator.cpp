@@ -4,7 +4,9 @@
 #include "software/simulated_tests/validation/function_validator.h"
 #include "software/util/logger/init.h"
 
-WorldStateValidator::WorldStateValidator() : world_buffer(world_buffer_size) {}
+WorldStateValidator::WorldStateValidator() : world_buffer(world_buffer_size) {
+    std::cout << "WorldStateValidator buffer address: " << &world_buffer;
+}
 
 void WorldStateValidator::onValueReceived(World world)
 {
@@ -28,40 +30,11 @@ bool WorldStateValidator::waitForValidationToPass(
     // The pointer to the world that will be shared with all the function validators
     std::shared_ptr<World> world_ptr = std::make_shared<World>(world.value());
 
-    // THIS WORKS
-//    std::vector<FunctionValidator> function_validators;
-//    FunctionValidator foo(validation_functions.at(0), world_ptr);
-//    std::cout << "emplacing function validator foo: " << &foo << std::endl;
-//    function_validators.emplace_back(std::move(foo));
-//    FunctionValidator bar(validation_functions.at(1), world_ptr);
-//    std::cout << "function validator bar: " << &bar << std::endl;
-//    function_validators.emplace_back(std::move(bar));
-
-    // THIS DOES NOT WORK
-//    std::vector<FunctionValidator> function_validators;
-//    for(unsigned int i = 0; i < validation_functions.size(); i++) {
-//        FunctionValidator foo(validation_functions.at(i), world_ptr);
-//        std::cout << "emplacing function validator: " << &foo << std::endl;
-//        function_validators.emplace_back(std::move(foo));
-//    }
-
-    // THIS DOES NOT WORK
     std::vector<FunctionValidator> function_validators;
     for (ValidationFunction validation_function : validation_functions)
     {
-        FunctionValidator foo(validation_function, world_ptr);
-        std::cout << "emplacing function validator: " << &foo << std::endl;
-        function_validators.emplace_back(std::move(foo));
+        function_validators.emplace_back(FunctionValidator(validation_function, world_ptr));
     }
-
-    for(const auto& function_validator : function_validators) {
-        std::cout << "validator after emplace " << &function_validator << std::endl;
-    }
-
-    for(unsigned int i = 0; i < validation_functions.size(); i++) {
-        function_validators[i].setValidationFunction(validation_functions[i]);
-    }
-
 
     std::vector<ContinuousFunctionValidator> continuous_function_validators;
     for (const auto &continuous_validation_function : continuous_validation_functions)
@@ -83,13 +56,14 @@ bool WorldStateValidator::waitForValidationToPass(
         validation_successful = std::all_of(
             function_validators.begin(), function_validators.end(),
             [](FunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
-        if (validation_successful && !function_validators.empty())
-        {
-            break;
-        }
 
         // After we have validated the world state, send it to other Observers
         Subject<World>::sendValueToObservers(*world_ptr);
+
+        if (!function_validators.empty() && validation_successful)
+        {
+            break;
+        }
 
         std::optional<World> world =
             world_buffer.popLeastRecentlyAddedValue(world_buffer_timeout);
@@ -109,11 +83,11 @@ bool WorldStateValidator::waitForValidationToPass(
     {
         LOG(INFO)
             << "Validation failed. Not all validation functions passed within the timeout duration";
+        return false;
     }
     else
     {
         LOG(INFO) << "Validation passed!";
+        return true;
     }
-
-    return validation_successful;
 }

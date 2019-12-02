@@ -6,7 +6,9 @@
 #include <deque>
 #include <mutex>
 #include <optional>
+#include <thread>
 
+#include "software/ai/primitive/primitive.h"
 #include "software/util/time/duration.h"
 
 /**
@@ -109,8 +111,11 @@ std::optional<T> ThreadSafeBuffer<T>::popLeastRecentlyAddedValue(Duration max_wa
 {
     // We hold the returned lock in a variable here so that we hold the lock on the
     // buffer mutex until the lock is destructed at the end of this function
+//        std::this_thread::yield();
     auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
-
+    if (typeid(T) == typeid(ConstPrimitiveVectorPtr)) {
+//        std::cout << "LRV got returned buffer lock in " << this << std::endl;
+    }
     std::optional<T> result = std::nullopt;
     if (!buffer.empty())
     {
@@ -126,6 +131,9 @@ std::optional<T> ThreadSafeBuffer<T>::popMostRecentlyAddedValue(Duration max_wai
     // We hold the returned lock in a variable here so that we hold the lock on the
     // buffer mutex until the lock is destructed at the end of this function
     auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
+    if (typeid(T) == typeid(ConstPrimitiveVectorPtr)) {
+//        std::cout << "MRV got returned buffer lock in " << this << std::endl;
+    }
 
     std::optional<T> result = std::nullopt;
     if (!buffer.empty())
@@ -149,11 +157,20 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
     Duration max_wait_time)
 {
     std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
+    auto foo = std::chrono::duration<float>(max_wait_time.getSeconds());
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(foo);
+
+    if (typeid(T) == typeid(ConstPrimitiveVectorPtr)) {
+//        std::cout << "Waiting in buffer " << this << " for " << ms.count() << " milliseconds" << std::endl;
+    }
     received_new_value.wait_for(
         buffer_lock, std::chrono::duration<float>(max_wait_time.getSeconds()), [this] {
             std::scoped_lock destructor_called_lock(destructor_called_mutex);
             return !buffer.empty() || destructor_called;
         });
+    if (typeid(T) == typeid(ConstPrimitiveVectorPtr)) {
+//        std::cout << "done  Waiting in buffer " << this << " for " << ms.count() << " milliseconds" << std::endl;
+    }
 
     // NOTE: We need to return this in order to prevent it being destructed so
     //       the the lock is maintained until the value is read

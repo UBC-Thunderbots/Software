@@ -36,8 +36,6 @@ class FunctionValidator
      */
     bool executeAndCheckForSuccess();
 
-    void setValidationFunction(ValidationFunction validation_function);
-
    private:
     /**
      * A wrapper function for the validation_function.
@@ -53,12 +51,11 @@ class FunctionValidator
      * @param world The world that will be given to the validation_function being run.
      * Because it's a shared_ptr any external changes made to the world will be reflected
      * inside the validation_function.
+     * @param validation_function The validation_function to run in the coroutine
      */
     void executeAndCheckForSuccessWrapper(ValidationCoroutine::push_type& yield,
-                                          std::shared_ptr<World> world);
+                                          std::shared_ptr<World> world, ValidationFunction validation_function);
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;
-    // The validation function being executed / managed
-    ValidationFunction validation_function;
 };

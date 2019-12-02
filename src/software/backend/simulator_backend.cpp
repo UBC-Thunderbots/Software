@@ -19,6 +19,10 @@ SimulatorBackend::SimulatorBackend(
 {
 }
 
+SimulatorBackend::~SimulatorBackend() {
+    stopSimulation();
+}
+
 void SimulatorBackend::onValueReceived(ConstPrimitiveVectorPtr primitives)
 {
     primitive_buffer.push(primitives);
@@ -37,14 +41,15 @@ void SimulatorBackend::startSimulation(World world)
     // `runSimulationLoop()`, which is not a static function
     simulation_thread_started = true;
     simulation_thread =
-        std::thread(&SimulatorBackend::runSimulationLoop, this,
-                    world);  //[this, world]() { return runSimulationLoop(world); });
+        std::thread(&SimulatorBackend::runSimulationLoop, this, world);
 }
 
 void SimulatorBackend::stopSimulation()
 {
     if (simulation_thread_started)
     {
+        simulation_thread_started = false;
+
         // Set this flag so pass_generation_thread knows to end (also making sure to
         // properly take and give ownership of the flag)
         in_destructor_mutex.lock();
@@ -56,7 +61,6 @@ void SimulatorBackend::stopSimulation()
         // call `std::terminate` when we deallocate the thread object and kill our whole
         // program
         simulation_thread.join();
-        simulation_thread_started = false;
     }
 }
 
@@ -91,11 +95,14 @@ void SimulatorBackend::runSimulationLoop(World world)
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
-        std::this_thread::yield();
+//        std::this_thread::yield();
 
         // TODO: Simulate the primitives
         // https://github.com/UBC-Thunderbots/Software/issues/768
-        auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
+//        auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
+        LOG(INFO) << "waiting for primitives";
+        auto primitives = primitive_buffer.popMostRecentlyAddedValue(Duration::fromMilliseconds(509));
+        LOG(INFO) << "done waiting for primitives";
         if (!primitives)
         {
             LOG(WARNING) << "Simulator Backend timed out waiting for primitives";

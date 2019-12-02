@@ -21,7 +21,7 @@ class ContinuousFunctionValidator
      * @param world The world that will be given to the ValidationFunction in order to run
      * it
      */
-    explicit ContinuousFunctionValidator(const ValidationFunction& validation_function,
+    explicit ContinuousFunctionValidator(ValidationFunction validation_function,
                                          std::shared_ptr<World> world);
 
     /**
@@ -47,12 +47,10 @@ class ContinuousFunctionValidator
      * @param world The world that will be given to the validation_function being run.
      * Because it's a shared_ptr any external changes made to the world will be reflected
      * inside the validation_function.
+     * @param validation_function The validation_function to run in the coroutine
      */
-    void executeAndCheckForFailuresWrapper(ValidationCoroutine::push_type& yield, std::shared_ptr<World> world);
+    void executeAndCheckForFailuresWrapper(ValidationCoroutine::push_type& yield, std::shared_ptr<World> world, ValidationFunction validation_function);
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;
-    // The validation function being executed / managed
-    ValidationFunction validation_function;
-//    std::shared_ptr<World> world_ptr;
 };

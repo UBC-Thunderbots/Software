@@ -18,6 +18,7 @@ cc_library(
     name = "thread_safe_buffer",
     hdrs = ["thread_safe_buffer.h"],
     deps = [
+        "//software/ai/primitive",
         "//software/util/time:duration",
         "@boost//:circular_buffer",
     ],

@@ -69,6 +69,8 @@ class SimulatorBackend : public Backend
         const Duration& world_time_increment  = Duration::fromSeconds(1.0 / 30.0),
         SimulationSpeed simulation_speed_mode = SimulationSpeed::FAST_SIMULATION);
 
+    ~SimulatorBackend();
+
     /**
      * Sets the SimulationSpeed for the simulation
      *
@@ -149,5 +151,5 @@ class SimulatorBackend : public Backend
     ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
     // We only want to simulate the most recently receive primitives so have no reason
     // to buffer more than 1 value
-    const Duration primitive_timeout = Duration::fromSeconds(2);
+    const Duration primitive_timeout = Duration::fromSeconds(1);
 };
