@@ -34,17 +34,19 @@ class WorldStateValidator : public ThreadedObserver<World>, public Subject<World
      * validation functions pass or the timeout has passed (in World time, NOT wall-clock
      * time). This is a blocking function.
      *
-     * @param validation_functions The ValidationFunctions to run. These functions will be run
-     * to completion and not restarted. They will report they are "done" once they have completed.
-     * These are good for checking certain things happen in a given order, or "stages".
-     * @param continuous_validation_functions The continuous validation functions to run. These
-     * functions will be continually restarted and run if they finish. They only report failures,
-     * and do not have the sense of "completing when done". They are useful for more stateless
-     * assertions about the world that must always be true.
-     * @param timeout How long to wait (in World time) for the validation functions to pass
+     * @param validation_functions The ValidationFunctions to run. These functions will be
+     * run to completion and not restarted. They will report they are "done" once they
+     * have completed. These are good for checking certain things happen in a given order,
+     * or "stages".
+     * @param continuous_validation_functions The continuous validation functions to run.
+     * These functions will be continually restarted and run if they finish. They only
+     * report failures, and do not have the sense of "completing when done". They are
+     * useful for more stateless assertions about the world that must always be true.
+     * @param timeout How long to wait (in World time) for the validation functions to
+     * pass
      *
-     * @return true if all the validation functions have passed before the timeout has been reached,
-     * and false otherwise
+     * @return true if all the validation functions have passed before the timeout has
+     * been reached, and false otherwise
      */
     bool waitForValidationToPass(
         const std::vector<ValidationFunction>& validation_functions,
@@ -57,10 +59,10 @@ class WorldStateValidator : public ThreadedObserver<World>, public Subject<World
     // How long to wait to receive a world, in wall-clock time
     const Duration world_buffer_timeout = Duration::fromSeconds(5);
     // This class makes the assumption that it will finish processing the World before
-    // it is re-published to the rest of the system. We know that the AI will wait for a new world
-    // before running, and that the SimulatorBackend will wait for new primitives before running, so
-    // we can guarantee we will never receive worlds faster than they can be validated, so we only
-    // need to buffer a single value
+    // it is re-published to the rest of the system. We know that the AI will wait for a
+    // new world before running, and that the SimulatorBackend will wait for new
+    // primitives before running, so we can guarantee we will never receive worlds faster
+    // than they can be validated, so we only need to buffer a single value
     const std::size_t world_buffer_size = 1;
     ThreadSafeBuffer<World> world_buffer;
 };
