@@ -1,27 +1,28 @@
 /**
  ******************************************************************************
-  * File Name          : LWIP.c
-  * Description        : This file provides initialization code for LWIP
-  *                      middleWare.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
-  ******************************************************************************
-  */
-  
+ * File Name          : LWIP.c
+ * Description        : This file provides initialization code for LWIP
+ *                      middleWare.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
+ *
+ ******************************************************************************
+ */
+
 /* Includes ------------------------------------------------------------------*/
 #include "lwip.h"
+
 #include "lwip/init.h"
 #include "lwip/netif.h"
-#if defined ( __CC_ARM )  /* MDK ARM Compiler */
+#if defined(__CC_ARM) /* MDK ARM Compiler */
 #include "lwip/sio.h"
 #endif /* MDK ARM Compiler */
 
@@ -33,7 +34,7 @@
 void Error_Handler(void);
 
 /* DHCP Variables initialization ---------------------------------------------*/
-uint32_t DHCPfineTimer = 0;
+uint32_t DHCPfineTimer   = 0;
 uint32_t DHCPcoarseTimer = 0;
 /* USER CODE BEGIN 1 */
 
@@ -50,41 +51,41 @@ ip4_addr_t gw;
 /* USER CODE END 2 */
 
 /**
-  * LwIP initialization function
-  */
+ * LwIP initialization function
+ */
 void MX_LWIP_Init(void)
 {
-  /* Initilialize the LwIP stack without RTOS */
-  lwip_init();
+    /* Initilialize the LwIP stack without RTOS */
+    lwip_init();
 
-  /* IP addresses initialization with DHCP (IPv4) */
-  ipaddr.addr = 0;
-  netmask.addr = 0;
-  gw.addr = 0;
+    /* IP addresses initialization with DHCP (IPv4) */
+    ipaddr.addr  = 0;
+    netmask.addr = 0;
+    gw.addr      = 0;
 
-  /* add the network interface (IPv4/IPv6) without RTOS */
-  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
+    /* add the network interface (IPv4/IPv6) without RTOS */
+    netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
 
-  /* Registers the default network interface */
-  netif_set_default(&gnetif);
+    /* Registers the default network interface */
+    netif_set_default(&gnetif);
 
-  if (netif_is_link_up(&gnetif))
-  {
-    /* When the netif is fully configured this function must be called */
-    netif_set_up(&gnetif);
-  }
-  else
-  {
-    /* When the netif link is down this function must be called */
-    netif_set_down(&gnetif);
-  }
+    if (netif_is_link_up(&gnetif))
+    {
+        /* When the netif is fully configured this function must be called */
+        netif_set_up(&gnetif);
+    }
+    else
+    {
+        /* When the netif link is down this function must be called */
+        netif_set_down(&gnetif);
+    }
 
-  /* Start DHCP negotiation for a network interface (IPv4) */
-  dhcp_start(&gnetif);
+    /* Start DHCP negotiation for a network interface (IPv4) */
+    dhcp_start(&gnetif);
 
-/* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 
-/* USER CODE END 3 */
+    /* USER CODE END 3 */
 }
 
 #ifdef USE_OBSOLETE_USER_CODE_SECTION_4
@@ -98,29 +99,29 @@ void MX_LWIP_Init(void)
  * ----------------------------------------------------------------------
  * Function given to help user to continue LwIP Initialization
  * Up to user to complete or change this function ...
- * Up to user to call this function in main.c in while (1) of main(void) 
+ * Up to user to call this function in main.c in while (1) of main(void)
  *-----------------------------------------------------------------------
- * Read a received packet from the Ethernet buffers 
+ * Read a received packet from the Ethernet buffers
  * Send it to the lwIP stack for handling
  * Handle timeouts if LWIP_TIMERS is set and without RTOS
- * Handle the llink status if LWIP_NETIF_LINK_CALLBACK is set and without RTOS 
+ * Handle the llink status if LWIP_NETIF_LINK_CALLBACK is set and without RTOS
  */
 void MX_LWIP_Process(void)
 {
-/* USER CODE BEGIN 4_1 */
-/* USER CODE END 4_1 */
-  ethernetif_input(&gnetif);
-  
-/* USER CODE BEGIN 4_2 */
-/* USER CODE END 4_2 */  
-  /* Handle timeouts */
-  sys_check_timeouts();
+    /* USER CODE BEGIN 4_1 */
+    /* USER CODE END 4_1 */
+    ethernetif_input(&gnetif);
 
-/* USER CODE BEGIN 4_3 */
-/* USER CODE END 4_3 */
+    /* USER CODE BEGIN 4_2 */
+    /* USER CODE END 4_2 */
+    /* Handle timeouts */
+    sys_check_timeouts();
+
+    /* USER CODE BEGIN 4_3 */
+    /* USER CODE END 4_3 */
 }
 
-#if defined ( __CC_ARM )  /* MDK ARM Compiler */
+#if defined(__CC_ARM) /* MDK ARM Compiler */
 /**
  * Opens a serial device for communication.
  *
@@ -129,13 +130,13 @@ void MX_LWIP_Process(void)
  */
 sio_fd_t sio_open(u8_t devnum)
 {
-  sio_fd_t sd;
+    sio_fd_t sd;
 
-/* USER CODE BEGIN 7 */
+    /* USER CODE BEGIN 7 */
     sd = 0;  // dummy code
-/* USER CODE END 7 */
-	
-  return sd;
+             /* USER CODE END 7 */
+
+    return sd;
 }
 
 /**
@@ -148,8 +149,8 @@ sio_fd_t sio_open(u8_t devnum)
  */
 void sio_send(u8_t c, sio_fd_t fd)
 {
-/* USER CODE BEGIN 8 */
-/* USER CODE END 8 */
+    /* USER CODE BEGIN 8 */
+    /* USER CODE END 8 */
 }
 
 /**
@@ -165,12 +166,12 @@ void sio_send(u8_t c, sio_fd_t fd)
  */
 u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
 {
-  u32_t recved_bytes;
+    u32_t recved_bytes;
 
-/* USER CODE BEGIN 9 */
+    /* USER CODE BEGIN 9 */
     recved_bytes = 0;  // dummy code
-/* USER CODE END 9 */	
-  return recved_bytes;
+                       /* USER CODE END 9 */
+    return recved_bytes;
 }
 
 /**
@@ -184,12 +185,12 @@ u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
  */
 u32_t sio_tryread(sio_fd_t fd, u8_t *data, u32_t len)
 {
-  u32_t recved_bytes;
+    u32_t recved_bytes;
 
-/* USER CODE BEGIN 10 */
+    /* USER CODE BEGIN 10 */
     recved_bytes = 0;  // dummy code
-/* USER CODE END 10 */	
-  return recved_bytes;
+                       /* USER CODE END 10 */
+    return recved_bytes;
 }
 #endif /* MDK ARM Compiler */
 
