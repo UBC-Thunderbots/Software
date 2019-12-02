@@ -102,7 +102,8 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     return false;
 }
 
-void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_action, std::shared_ptr<ChipAction> chip_action,
+void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_action,
+                                            std::shared_ptr<ChipAction> chip_action,
                                             ActionCoroutine::push_type &yield) const
 {
     auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
@@ -113,8 +114,8 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
         {
             kick_action->updateWorldParams(ball);
             kick_action->updateControlParams(*robot, ball.position(),
-                                            shot_target->getPointToShootAt(),
-                                            BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+                                             shot_target->getPointToShootAt(),
+                                             BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
             yield(kick_action);
         }
         else
@@ -125,7 +126,7 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             // we need to be very quick so the enemy doesn't get the ball
             chip_action->updateWorldParams(ball);
             chip_action->updateControlParams(*robot, ball.position(),
-                                            shot_target->getPointToShootAt(), CHIP_DIST);
+                                             shot_target->getPointToShootAt(), CHIP_DIST);
             yield(chip_action);
         }
 
@@ -138,8 +139,8 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto kick_action = std::make_shared<KickAction>();
     auto chip_action = std::make_shared<ChipAction>();
-    auto move_action =
-        std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+    auto move_action = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
 
     do
     {
@@ -160,8 +161,8 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // and directly losing possession that way
             Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
             chip_action->updateWorldParams(ball);
-            chip_action->updateControlParams(*robot, ball.position(), fallback_chip_target,
-                                            CHIP_DIST);
+            chip_action->updateControlParams(*robot, ball.position(),
+                                             fallback_chip_target, CHIP_DIST);
             yield(chip_action);
         }
         else
@@ -175,10 +176,10 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                                       DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
 
             // The default behaviour is to move behind the ball and face the net
-            move_action->updateControlParams(*robot, behind_ball,
-                                            (-behind_ball_vector).orientation(), 0,
-                                            DribblerEnable::OFF, MoveType::NORMAL,
-                                            AutokickType::NONE, BallCollisionType::ALLOW);
+            move_action->updateControlParams(
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::ALLOW);
             yield(move_action);
         }
     } while (!(kick_action->done() || chip_action->done()));

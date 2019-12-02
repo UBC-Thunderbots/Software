@@ -45,7 +45,7 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     {
         chip_action->updateWorldParams(ball);
         chip_action->updateControlParams(*robot, chip_origin, chip_target,
-                                        chip_distance_meters);
+                                         chip_distance_meters);
         yield(chip_action);
     } while (!chip_action->done());
 }

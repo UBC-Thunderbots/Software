@@ -6,9 +6,9 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
 #include "software/test_util/test_util.h"
-#include "software/ai/hl/stp/action/move_action.h"
 
 using namespace Passing;
 
@@ -40,7 +40,8 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_EQ(13, move_action->getRobot()->id());
     EXPECT_DOUBLE_EQ(0.5, move_action->getDestination().x());
     EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
-    EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2, move_action->getFinalOrientation());
+    EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
+              move_action->getFinalOrientation());
     EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
     EXPECT_EQ(move_action->getAutoKickType(), NONE);
 }

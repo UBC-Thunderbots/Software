@@ -60,8 +60,8 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
 void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
-    auto stop_action =
-        std::make_shared<StopAction>(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
+    auto stop_action = std::make_shared<StopAction>(
+        StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
     do
     {
         if (!enemy_threat)
@@ -81,10 +81,10 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             Point position_to_block_pass =
                 enemy_robot.position() +
                 enemy_to_passer_vector.normalize(this->shadow_distance);
-            move_action->updateControlParams(*robot, position_to_block_pass,
-                                            enemy_to_passer_vector.orientation(), 0,
-                                            DribblerEnable::OFF, MoveType::NORMAL,
-                                            AutokickType::NONE, BallCollisionType::AVOID);
+            move_action->updateControlParams(
+                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::AVOID);
             yield(move_action);
         }
         else

@@ -37,7 +37,8 @@ double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const Worl
 }
 void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    auto move_action =
+        std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
     Point defend_position  = robot->position();
 
     do

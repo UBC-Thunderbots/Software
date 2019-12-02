@@ -47,8 +47,8 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action =
-        std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+    auto move_action = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
     while (ball.lastUpdateTimestamp() < pass.startTime())
@@ -61,8 +61,8 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         Point wait_position = pass.passerPoint() - ball_offset;
 
         move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
-                                        0, DribblerEnable::OFF, MoveType::NORMAL,
-                                        AutokickType::NONE, BallCollisionType::ALLOW);
+                                         0, DribblerEnable::OFF, MoveType::NORMAL,
+                                         AutokickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -77,7 +77,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // rotate to the correct orientation to face the shot
         kick_action->updateWorldParams(ball);
         kick_action->updateControlParams(*robot, ball.position(), pass.receiverPoint(),
-                                        pass.speed());
+                                         pass.speed());
         yield(kick_action);
 
         // We want to keep trying to kick until the ball is moving along the pass

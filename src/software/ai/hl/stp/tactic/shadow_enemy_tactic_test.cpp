@@ -34,7 +34,8 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(nullptr, move_action);
     EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
-    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()), Angle::fromDegrees(1));
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
+              Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == NONE);
 }
 
@@ -143,6 +144,7 @@ TEST(
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(nullptr, move_action);
     EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
-    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()), Angle::fromDegrees(1));
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
+              Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == NONE);
 }

@@ -85,14 +85,14 @@ class STP : public HL
      *
      * @param world
      */
-    void updateCurrentPlay(const World& world);
+    void updateCurrentPlay(const World &world);
 
     /**
      * Gets the intents the current play wants to run
      *
      * @return The vector of intents that should be run right now to execute the play
      */
-    std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World& world);
+    std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world);
 
     // A function that constructs a Play that will be used if no other Plays are
     // applicable

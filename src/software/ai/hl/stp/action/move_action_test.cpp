@@ -4,21 +4,23 @@
 
 #include "software/ai/intent/move_intent.h"
 
-TEST(MoveActionTest, getDestination){
-    Robot robot = Robot(13, Point(1,2), Vector(3,4), Angle::fromDegrees(5), AngularVelocity::fromDegrees(6),
-                        Timestamp::fromSeconds(7));
+TEST(MoveActionTest, getDestination)
+{
+    Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
+                        AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
     MoveAction action = MoveAction(0.05, Angle(), false);
 
     action.updateControlParams(robot, Point(11, 12), Angle::quarter(), 1.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
                                BallCollisionType::AVOID);
 
-    EXPECT_EQ(Point(11,12), action.getDestination());
+    EXPECT_EQ(Point(11, 12), action.getDestination());
 }
 
-TEST(MoveActionTest, getFinalOrientation){
-    Robot robot = Robot(13, Point(1,0), Vector(3,4), Angle::fromDegrees(5), AngularVelocity::fromDegrees(6),
-                        Timestamp::fromSeconds(7));
+TEST(MoveActionTest, getFinalOrientation)
+{
+    Robot robot       = Robot(13, Point(1, 0), Vector(3, 4), Angle::fromDegrees(5),
+                        AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
     MoveAction action = MoveAction(0.05, Angle(), false);
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
@@ -28,9 +30,10 @@ TEST(MoveActionTest, getFinalOrientation){
     EXPECT_EQ(Angle::quarter(), action.getFinalOrientation());
 }
 
-TEST(MoveActionTest, getFinalSpeed){
-    Robot robot = Robot(13, Point(1,2), Vector(3,4), Angle::fromDegrees(5), AngularVelocity::fromDegrees(6),
-                        Timestamp::fromSeconds(7));
+TEST(MoveActionTest, getFinalSpeed)
+{
+    Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
+                        AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
     MoveAction action = MoveAction(0.05, Angle(), false);
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
@@ -40,9 +43,10 @@ TEST(MoveActionTest, getFinalSpeed){
     EXPECT_EQ(99, action.getFinalSpeed());
 }
 
-TEST(MoveActionTest, getAutoKickType){
-    Robot robot = Robot(13, Point(1,2), Vector(3,4), Angle::fromDegrees(5), AngularVelocity::fromDegrees(6),
-                        Timestamp::fromSeconds(7));
+TEST(MoveActionTest, getAutoKickType)
+{
+    Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
+                        AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
     MoveAction action = MoveAction();
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
@@ -52,15 +56,16 @@ TEST(MoveActionTest, getAutoKickType){
     EXPECT_EQ(AutokickType::NONE, action.getAutoKickType());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP,
-                               BallCollisionType::AVOID);
+                               DribblerEnable::OFF, MoveType::NORMAL,
+                               AutokickType::AUTOCHIP, BallCollisionType::AVOID);
 
     EXPECT_EQ(AutokickType::AUTOCHIP, action.getAutoKickType());
 }
 
-TEST(MoveActionTest, getDribblerEnabled){
-    Robot robot = Robot(13, Point(1,2), Vector(3,4), Angle::fromDegrees(5), AngularVelocity::fromDegrees(6),
-                        Timestamp::fromSeconds(7));
+TEST(MoveActionTest, getDribblerEnabled)
+{
+    Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
+                        AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
     MoveAction action = MoveAction();
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
@@ -70,8 +75,8 @@ TEST(MoveActionTest, getDribblerEnabled){
     EXPECT_EQ(DribblerEnable::OFF, action.getDribblerEnabled());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
-                               BallCollisionType::AVOID);
+                               DribblerEnable::ON, MoveType::NORMAL,
+                               AutokickType::AUTOCHIP, BallCollisionType::AVOID);
 
     EXPECT_EQ(DribblerEnable::ON, action.getDribblerEnabled());
 }

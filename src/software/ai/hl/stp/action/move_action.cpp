@@ -47,11 +47,13 @@ double MoveAction::getFinalSpeed()
     return final_speed;
 }
 
-AutokickType MoveAction::getAutoKickType() {
+AutokickType MoveAction::getAutoKickType()
+{
     return autokick_type;
 }
 
-DribblerEnable MoveAction::getDribblerEnabled() {
+DribblerEnable MoveAction::getDribblerEnabled()
+{
     return enable_dribbler;
 }
 

@@ -35,8 +35,8 @@ double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& wor
 
 void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action =
-        std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+    auto move_action = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
     auto best_pass_and_score = pass_generator.getBestPassSoFar();
     do
     {
@@ -45,9 +45,9 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // find (within the target region)
         Pass pass = pass_generator.getBestPassSoFar().pass;
         move_action->updateControlParams(*robot, pass.receiverPoint(),
-                                        pass.receiverOrientation(), 0,
-                                        DribblerEnable::OFF, MoveType::NORMAL,
-                                        AutokickType::NONE, BallCollisionType::AVOID);
+                                         pass.receiverOrientation(), 0,
+                                         DribblerEnable::OFF, MoveType::NORMAL,
+                                         AutokickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
 }
