@@ -10,7 +10,14 @@ FunctionValidator::FunctionValidator(const ValidationFunction &validation_functi
       // inside the coroutine will not update properly when the pointer is updated.
       validation_sequence(boost::bind(
           &FunctionValidator::executeAndCheckForSuccessWrapper, this, _1, world))
+//      validation_sequence(boost::bind(
+//              [this, world]() {
+//                  this->executeAndCheckForSuccessWrapper(validation_sequence, world);
+//              })
+//              )
 {
+    std::cout << "constructor vf " << &validation_function << std::endl;
+    std::cout << "this " << this << std::endl;
 }
 
 void FunctionValidator::executeAndCheckForSuccessWrapper(
@@ -23,6 +30,7 @@ void FunctionValidator::executeAndCheckForSuccessWrapper(
 
     // Anytime after the first function call, the validation_function will be
     // used to perform the real logic.
+    std::cout << "vf " << &validation_function << std::endl;
     validation_function(world, yield);
 }
 

@@ -4,8 +4,8 @@
 
 #include "software/backend/simulator_backend.h"
 #include "software/gui/visualizer_wrapper.h"
-#include "software/simulated_tests/mock_ai_wrapper.h"
 #include "software/simulated_tests/validation/world_state_validator.h"
+#include "software/ai/ai_wrapper.h"
 
 
 class SimulatedTest : public ::testing::Test
@@ -31,6 +31,6 @@ class SimulatedTest : public ::testing::Test
 
     std::shared_ptr<SimulatorBackend> backend;
     std::shared_ptr<VisualizerWrapper> visualizer;
-    std::shared_ptr<MockAIWrapper> ai_wrapper;
+    std::shared_ptr<AIWrapper> ai_wrapper;
     std::shared_ptr<WorldStateValidator> world_state_validator;
 };

@@ -48,12 +48,11 @@ class ContinuousFunctionValidator
      * Because it's a shared_ptr any external changes made to the world will be reflected
      * inside the validation_function.
      */
-    void executeAndCheckForFailuresWrapper(ValidationCoroutine::push_type& yield,
-                                           std::shared_ptr<World> world);
+    void executeAndCheckForFailuresWrapper(ValidationCoroutine::push_type& yield, std::shared_ptr<World> world);
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;
     // The validation function being executed / managed
     ValidationFunction validation_function;
-    std::shared_ptr<World> world_ptr;
+//    std::shared_ptr<World> world_ptr;
 };

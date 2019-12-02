@@ -17,7 +17,7 @@ cc_library(
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
     deps = [
-        ":mock_ai",
+        "//software/ai:ai_wrapper",
         "//software/backend:simulator_backend",
         "//software/gui:visualizer_wrapper",
         "//software/simulated_tests/validation:world_state_validator",
@@ -31,10 +31,12 @@ cc_test(
     name = "simulated_tests_test",
     srcs = ["simulated_tests_test.cpp"],
     deps = [
+        ":mock_ai",
         ":simulated_test_fixture",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/util/time:duration",
+        "//software/util/time:timestamp",
         "//software/world",
         "@gtest//:gtest_main",
     ],

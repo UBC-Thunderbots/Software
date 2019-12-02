@@ -4,8 +4,7 @@
 
 ContinuousFunctionValidator::ContinuousFunctionValidator(
     const ValidationFunction &validation_function, std::shared_ptr<World> world)
-    : world_ptr(world),
-      validation_function(validation_function),
+    : validation_function(validation_function),
       // We need to provide the world in the coroutine function binding so that the
       // wrapper function has access to the correct variable context, otherwise the World
       // inside the coroutine will not update properly when the pointer is updated.
@@ -20,10 +19,7 @@ void ContinuousFunctionValidator::executeAndCheckForFailures()
     // Check the coroutine status to see if it has any more work to do.
     if (!validation_sequence)
     {
-        // Re-start the validation sequence by re-creating it
-        validation_sequence = ValidationCoroutine::pull_type(
-            boost::bind(&ContinuousFunctionValidator::executeAndCheckForFailuresWrapper,
-                        this, _1, world_ptr));
+        throw std::runtime_error("The coroutine in the ContinuousFunctionValidator finished. This should never happen");
     }
 
     // Run the coroutine. This will call the bound executeAndCheckForFailuresWrapper
@@ -41,5 +37,10 @@ void ContinuousFunctionValidator::executeAndCheckForFailuresWrapper(
 
     // Anytime after the first function call, the validation_function will be
     // used to perform the real logic.
-    validation_function(world, yield);
+    while(true) {
+        validation_function(world, yield);
+        // Yield outside the validation_function in case the validation_function does not
+        // yield, to prevent us from getting stuck in an infinite loop
+        yield();
+    }
 }

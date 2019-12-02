@@ -5,6 +5,10 @@
 #include "software/multithreading/threaded_observer.h"
 #include "software/world/world.h"
 
+/**
+ * This is a simple class that Mocks being an AIWrapper. It removes all gameplay logic
+ * and simply publishes en empty list of Primitives every time it receives a World.
+ */
 class MockAIWrapper : public ThreadedObserver<World>,
                       public Subject<ConstPrimitiveVectorPtr>
 {

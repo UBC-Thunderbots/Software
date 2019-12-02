@@ -31,8 +31,10 @@ bool WorldStateValidator::waitForValidationToPass(
     std::vector<FunctionValidator> function_validators;
     for (const auto &validation_function : validation_functions)
     {
-        function_validators.emplace_back(
-            FunctionValidator(validation_function, world_ptr));
+        std::cout << "emplacing function: " << &validation_function << std::endl;
+        FunctionValidator foo(validation_function, world_ptr);
+        std::cout << "emplacing function validator: " << &foo << std::endl;
+        function_validators.emplace_back(std::move(foo));
     }
 
     std::vector<ContinuousFunctionValidator> continuous_function_validators;
@@ -41,6 +43,9 @@ bool WorldStateValidator::waitForValidationToPass(
         continuous_function_validators.emplace_back(
             ContinuousFunctionValidator(continuous_validation_function, world_ptr));
     }
+
+//    continuous_function_validators[0].executeAndCheckForFailures();
+//    continuous_function_validators[1].executeAndCheckForFailures();
 
     bool validation_successful   = false;
     Timestamp starting_timestamp = world_ptr->getMostRecentTimestamp();
@@ -55,7 +60,7 @@ bool WorldStateValidator::waitForValidationToPass(
         validation_successful = std::all_of(
             function_validators.begin(), function_validators.end(),
             [](FunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
-        if (validation_successful)
+        if (validation_successful && !function_validators.empty())
         {
             break;
         }
@@ -77,14 +82,14 @@ bool WorldStateValidator::waitForValidationToPass(
         *world_ptr = world.value();
     }
 
-    if (validation_successful)
-    {
-        LOG(INFO) << "Validation passed!";
-    }
-    else
+    if (!validation_successful && !function_validators.empty())
     {
         LOG(INFO)
             << "Validation failed. Not all validation functions passed within the timeout duration";
+    }
+    else
+    {
+        LOG(INFO) << "Validation passed!";
     }
 
     return validation_successful;

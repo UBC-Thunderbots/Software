@@ -21,7 +21,6 @@ SimulatorBackend::SimulatorBackend(
 
 void SimulatorBackend::onValueReceived(ConstPrimitiveVectorPtr primitives)
 {
-    std::cout << "receiving primities" << std::endl;
     primitive_buffer.push(primitives);
 }
 
