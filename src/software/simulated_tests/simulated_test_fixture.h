@@ -7,7 +7,12 @@
 #include "software/gui/visualizer_wrapper.h"
 #include "software/simulated_tests/validation/world_state_validator.h"
 
-
+/**
+ * This is a test fixture designed to make it easy to write integration tests with the
+ * SimulatorBackend. It uses the SimulatorBackend to simulate and publish the World, and
+ * the WorldStateValidator to make assertions about the world. This allows us to easily
+ * write tests for the AI's behaviour.
+ */
 class SimulatedTest : public ::testing::Test
 {
    protected:

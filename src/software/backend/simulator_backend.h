@@ -126,5 +126,6 @@ class SimulatorBackend : public Backend
     // to buffer more than 1 value
     const unsigned int primitive_buffer_size = 1;
     ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
-    const Duration primitive_timeout = Duration::fromSeconds(1);
+    // How long to wait for primitives, in wall-clock time
+    const Duration primitive_timeout = Duration::fromSeconds(5);
 };
