@@ -19,6 +19,15 @@
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen);
 
 /**
+ * Draws the lines showing the physical boundary around the field
+ *
+ * @param scene The scene to draw on
+ * @param field The field to draw
+ * @param pen The pen used to draw
+ */
+void drawFieldPhysicalBoundaryLines(QGraphicsScene* scene, const Field& field, QPen pen);
+
+/**
  * Draws the field's defense areas in the scene
  *
  * @param scene The scene to draw on

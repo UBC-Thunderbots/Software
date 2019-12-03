@@ -8,6 +8,10 @@ void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
     scene->addRect(createQRectF(field.fieldLines()), pen);
 }
 
+void drawFieldPhysicalBoundaryLines(QGraphicsScene* scene, const Field& field, QPen pen) {
+    scene->addRect(createQRectF(field.fieldBoundary()), pen);
+}
+
 void drawDefenseAreas(QGraphicsScene* scene, const Field& field, QPen pen)
 {
     scene->addRect(createQRectF(field.friendlyDefenseArea()), pen);
@@ -54,6 +58,7 @@ void drawField(QGraphicsScene* scene, const Field& field)
     pen.setWidth(2);
     pen.setCosmetic(true);
 
+    drawFieldPhysicalBoundaryLines(scene, field, pen);
     drawOuterFieldLines(scene, field, pen);
     drawCenterLine(scene, field, pen);
     drawCenterCircle(scene, field, pen);
