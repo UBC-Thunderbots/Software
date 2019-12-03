@@ -1,9 +1,9 @@
-#include "software/gui/drawing/navigator.h"
+#include "software/visualizer/drawing/navigator.h"
 
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/geom/segment.h"
-#include "software/gui/geom/geometry_conversion.h"
+#include "software/visualizer/geom/geometry_conversion.h"
 
 AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {

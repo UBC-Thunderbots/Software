@@ -1,4 +1,4 @@
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//software/visualizer:__subpackages__"])
 
 cc_library(
     name = "geometry_conversion",

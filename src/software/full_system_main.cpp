@@ -6,7 +6,7 @@
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend_factory.h"
-#include "software/gui/visualizer_wrapper.h"
+#include "software/visualizer/visualizer_wrapper.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
 

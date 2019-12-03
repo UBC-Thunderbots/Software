@@ -1,4 +1,4 @@
-#include "software/gui/widgets/visualizer.h"
+#include "software/visualizer/widgets/visualizer.h"
 
 Visualizer::Visualizer() : QMainWindow(), main_widget(new MainWidget(this))
 {

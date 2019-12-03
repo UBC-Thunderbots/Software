@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
-        "//software/gui/geom:geometry_conversion",
+        "//software/visualizer/geom:geometry_conversion",
         "//software/world:ball",
         "//software/world:field",
         "@qt//:qt_widgets",
@@ -20,7 +20,7 @@ cc_library(
     hdrs = ["field.h"],
     deps = [
         "//shared:constants",
-        "//software/gui/geom:geometry_conversion",
+        "//software/visualizer/geom:geometry_conversion",
         "//software/world:field",
         "@qt//:qt_widgets",
     ],
@@ -33,7 +33,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
-        "//software/gui/geom:geometry_conversion",
+        "//software/visualizer/geom:geometry_conversion",
         "//software/world:robot",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
@@ -73,7 +73,7 @@ cc_library(
         ":draw_functions",
         "//software/ai/navigator",
         "//software/geom",
-        "//software/gui/geom:geometry_conversion",
+        "//software/visualizer/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],
 )

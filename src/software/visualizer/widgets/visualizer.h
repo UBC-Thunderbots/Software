@@ -4,8 +4,8 @@
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
-#include "software/gui/drawing/draw_functions.h"
-#include "software/gui/widgets/main_widget.h"
+#include "software/visualizer/drawing/draw_functions.h"
+#include "software/visualizer/widgets/main_widget.h"
 
 /**
  * This is the main window / application object for the visualizer.

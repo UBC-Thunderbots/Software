@@ -9,12 +9,12 @@
 // The generated version will be names 'ui_<filename>.h'
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
-#include "software/gui/drawing/draw_functions.h"
-#include "software/gui/ui/ui_main_widget.h"
-#include "software/gui/widgets/ai_control.h"
-#include "software/gui/widgets/parameters.h"
-#include "software/gui/widgets/robot_status.h"
-#include "software/gui/widgets/world_view.h"
+#include "software/visualizer/drawing/draw_functions.h"
+#include "software/visualizer/ui/ui_main_widget.h"
+#include "software/visualizer/widgets/ai_control.h"
+#include "software/visualizer/widgets/parameters.h"
+#include "software/visualizer/widgets/robot_status.h"
+#include "software/visualizer/widgets/world_view.h"
 
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui

@@ -1,4 +1,4 @@
-#include "software/gui/widgets/world_view.h"
+#include "software/visualizer/widgets/world_view.h"
 
 void setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget)
 {

@@ -1,6 +1,6 @@
-#include "software/gui/visualizer_wrapper.h"
+#include "software/visualizer/visualizer_wrapper.h"
 
-#include "software/gui/drawing/world.h"
+#include "software/visualizer/drawing/world.h"
 
 VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
     : ThreadedObserver<World>(),

@@ -1,4 +1,4 @@
-#include "software/gui/widgets/robot_status_table.h"
+#include "software/visualizer/widgets/robot_status_table.h"
 
 #include <math.h>
 

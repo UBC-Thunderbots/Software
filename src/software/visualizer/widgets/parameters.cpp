@@ -1,4 +1,4 @@
-#include "software/gui/widgets/parameters.h"
+#include "software/visualizer/widgets/parameters.h"
 
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>

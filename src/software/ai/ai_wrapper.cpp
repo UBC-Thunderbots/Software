@@ -2,7 +2,7 @@
 
 #include <boost/bind.hpp>
 
-#include "software/gui/drawing/navigator.h"
+#include "software/visualizer/drawing/navigator.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 void AIWrapper::onValueReceived(World world)

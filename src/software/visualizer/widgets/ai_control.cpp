@@ -1,4 +1,4 @@
-#include "software/gui/widgets/ai_control.h"
+#include "software/visualizer/widgets/ai_control.h"
 
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QPushButton>

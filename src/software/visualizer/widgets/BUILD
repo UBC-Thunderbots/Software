@@ -1,6 +1,6 @@
 load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//software/visualizer:__subpackages__"])
 
 qt_cc_library(
     name = "main_widget",
@@ -13,8 +13,8 @@ qt_cc_library(
         ":world_view",
         "//software/ai/hl/stp:play_info",
         "//software/backend:robot_status",
-        "//software/gui/drawing:draw_functions",
-        "//software/gui/ui:main_widget",
+        "//software/visualizer/drawing:draw_functions",
+        "//software/visualizer/ui:main_widget",
         "@g3log",
         "@qt//:qt_widgets",
     ],
@@ -27,9 +27,9 @@ qt_cc_library(
     deps = [
         ":main_widget",
         "//software/ai/hl/stp:play_info",
-        "//software/world",
         "//software/backend:robot_status",
-        "//software/gui/drawing:draw_functions",
+        "//software/visualizer/drawing:draw_functions",
+        "//software/world",
         "@qt//:qt_widgets",
     ],
 )
@@ -62,8 +62,8 @@ qt_cc_library(
     deps = [
         ":robot_status_table",
         ":zoomable_qgraphics_view",
-        "//software/gui/ui:main_widget",
         "//software/util/parameter",
+        "//software/visualizer/ui:main_widget",
         "@g3log",
         "@qt//:qt_widgets",
     ],
@@ -77,8 +77,8 @@ qt_cc_library(
         ":robot_status_table",
         ":zoomable_qgraphics_view",
         "//software/ai/hl/stp/play:play_factory",
-        "//software/gui/ui:main_widget",
         "//software/util/parameter:dynamic_parameters",
+        "//software/visualizer/ui:main_widget",
         "@qt//:qt_widgets",
     ],
 )

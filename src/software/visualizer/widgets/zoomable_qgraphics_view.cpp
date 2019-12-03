@@ -1,4 +1,4 @@
-#include "software/gui/widgets/zoomable_qgraphics_view.h"
+#include "software/visualizer/widgets/zoomable_qgraphics_view.h"
 
 ZoomableQGraphicsView::ZoomableQGraphicsView(QWidget *parent) : QGraphicsView(parent) {}
 

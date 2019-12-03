@@ -213,12 +213,12 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>RobotStatusTable</class>
    <extends>QTableWidget</extends>
-   <header>software/gui/widgets/robot_status_table.h</header>
+   <header>software/visualizer/widgets/robot_status_table.h</header>
   </customwidget>
   <customwidget>
    <class>ZoomableQGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>software/gui/widgets/zoomable_qgraphics_view.h</header>
+   <header>software/visualizer/widgets/zoomable_qgraphics_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
