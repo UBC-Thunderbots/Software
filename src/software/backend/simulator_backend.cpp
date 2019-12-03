@@ -21,7 +21,9 @@ SimulatorBackend::SimulatorBackend(
 {
 }
 
-SimulatorBackend::SimulatorBackend() : SimulatorBackend(Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0), SimulationSpeed::FAST_SIMULATION)
+SimulatorBackend::SimulatorBackend()
+    : SimulatorBackend(Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
+                       SimulationSpeed::FAST_SIMULATION)
 {
 }
 
@@ -95,15 +97,20 @@ void SimulatorBackend::runSimulationLoop(World world)
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {
-            // Calculate how much wall-clock time has passed since we last published a world,
-            // and sleep for as much time as necessary for it to have been world_time_increment
-            // seconds in wall-clock time since the last world was published.
+            // Calculate how much wall-clock time has passed since we last published a
+            // world, and sleep for as much time as necessary for it to have been
+            // world_time_increment seconds in wall-clock time since the last world was
+            // published.
             auto timestamp_now = std::chrono::steady_clock::now();
-            auto milliseconds_since_world_publish  = std::chrono::duration_cast<std::chrono::milliseconds>(
-                timestamp_now - world_publish_timestamp);
-            auto remaining_milliseconds = std::chrono::milliseconds(std::lrint(world_time_increment.getMilliseconds())) - milliseconds_since_world_publish;
+            auto milliseconds_since_world_publish =
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    timestamp_now - world_publish_timestamp);
+            auto remaining_milliseconds = std::chrono::milliseconds(std::lrint(
+                                              world_time_increment.getMilliseconds())) -
+                                          milliseconds_since_world_publish;
 
-            if(remaining_milliseconds > std::chrono::milliseconds(0)) {
+            if (remaining_milliseconds > std::chrono::milliseconds(0))
+            {
                 std::this_thread::sleep_for(remaining_milliseconds);
             }
         }

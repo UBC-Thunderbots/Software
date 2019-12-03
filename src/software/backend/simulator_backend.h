@@ -61,7 +61,9 @@ class SimulatorBackend : public Backend
      * is being published every 'world_time_increment' seconds.
      * @param simulation_speed_mode What speed mode to run the simulator with
      */
-    explicit SimulatorBackend(const Duration& physics_time_step, const Duration& world_time_increment, SimulationSpeed simulation_speed_mode);
+    explicit SimulatorBackend(const Duration& physics_time_step,
+                              const Duration& world_time_increment,
+                              SimulationSpeed simulation_speed_mode);
 
     explicit SimulatorBackend();
 
