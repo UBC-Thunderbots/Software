@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/test_util/test_util.h"
 
@@ -21,7 +22,7 @@ TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving)
     auto stop_action = std::dynamic_pointer_cast<StopAction>(action_ptr);
     ASSERT_NE(nullptr, stop_action);
     ASSERT_TRUE(stop_action->getRobot().has_value());
-    EXPECT_EQ(0, stop_action->getRobot()->id())
+    EXPECT_EQ(0, stop_action->getRobot()->id());
 }
 
 TEST(StopTacticTest, robot_stopping_while_already_stopped)
@@ -40,7 +41,7 @@ TEST(StopTacticTest, robot_stopping_while_already_stopped)
     auto stop_action = std::dynamic_pointer_cast<StopAction>(action_ptr);
     ASSERT_NE(nullptr, stop_action);
     ASSERT_TRUE(stop_action->getRobot().has_value());
-    EXPECT_EQ(0, stop_action->getRobot()->id())
+    EXPECT_EQ(0, stop_action->getRobot()->id());
 }
 
 TEST(StopTacticTest, test_calculate_robot_cost)
