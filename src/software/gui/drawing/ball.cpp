@@ -42,3 +42,20 @@ void drawBall(QGraphicsScene *scene, const Ball &ball)
     drawBallPosition(scene, ball, ball_color);
     drawBallVelocity(scene, ball, ball_color);
 }
+
+void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Ball &ball, const Field& field) {
+    // Slightly transparent
+    QColor ball_cone_color = QColor(255, 100, 0, 170);
+
+    QPen pen(ball_cone_color);
+    pen.setWidth(1);
+    // The cap style must be NOT be set to SquareCap. It can be set to anything else.
+    // Drawing a line of length 0 with the SquareCap style causes a large line to be drawn
+    pen.setCapStyle(Qt::PenCapStyle::RoundCap);
+    pen.setCosmetic(true);
+
+    Segment pos_goalpost_segment(ball.position(), field.friendlyGoalpostPos());
+    Segment neg_goalpost_segment(ball.position(), field.friendlyGoalpostNeg());
+    scene->addLine(createQLineF(pos_goalpost_segment), pen);
+    scene->addLine(createQLineF(neg_goalpost_segment), pen);
+}

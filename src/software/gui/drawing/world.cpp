@@ -10,6 +10,7 @@ void drawWorld(QGraphicsScene* scene, const World& world)
     drawEnemyTeam(scene, world.enemyTeam());
     drawFriendlyTeam(scene, world.friendlyTeam());
     drawBall(scene, world.ball());
+    drawBallConeToFriendlyNet(scene, world.ball(), world.field());
 }
 
 WorldDrawFunction getDrawWorldFunction(const World& world)
