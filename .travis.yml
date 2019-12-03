@@ -13,8 +13,6 @@ jobs:
         # Build, test, run coverage
         - >
           bazel build //...
-          --verbose_test_summary 
-          --test_output=errors
         - >
           bazel test //...
           --verbose_test_summary 
