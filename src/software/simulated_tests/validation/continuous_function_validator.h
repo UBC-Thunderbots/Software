@@ -55,4 +55,6 @@ class ContinuousFunctionValidator
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;
+    std::shared_ptr<World> world_;
+    ValidationFunction validation_function_;
 };

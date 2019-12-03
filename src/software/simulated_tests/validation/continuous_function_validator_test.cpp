@@ -42,6 +42,7 @@ TEST(ContinuousFunctionValidatorTest,
         {
             throw std::runtime_error("x < 1");
         }
+        return;
     };
 
     auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
