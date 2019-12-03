@@ -12,9 +12,6 @@
 /**
  * This class implements the Backend interface using a physics simulation to
  * execute received commands and provide new data to the system.
- *
- * This class is intentionally not registered in the BackendFactory since it does
- * not have a default constructor and has a relatively specialized use case.
  */
 class SimulatorBackend : public Backend
 {
@@ -64,10 +61,9 @@ class SimulatorBackend : public Backend
      * is being published every 'world_time_increment' seconds.
      * @param simulation_speed_mode What speed mode to run the simulator with
      */
-    explicit SimulatorBackend(
-        const Duration& physics_time_step     = Duration::fromMilliseconds(5),
-        const Duration& world_time_increment  = Duration::fromSeconds(1.0 / 30.0),
-        SimulationSpeed simulation_speed_mode = SimulationSpeed::FAST_SIMULATION);
+    explicit SimulatorBackend(const Duration& physics_time_step, const Duration& world_time_increment, SimulationSpeed simulation_speed_mode);
+
+    explicit SimulatorBackend();
 
     /**
      * Destroys the SimulatorBackend and stops any currently running simulation

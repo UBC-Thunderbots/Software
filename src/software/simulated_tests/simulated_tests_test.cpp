@@ -43,6 +43,8 @@ class MockSimulatedTest : public SimulatedTest
 
 TEST_F(MockSimulatedTest, test_single_validation_function_passes_before_timeout)
 {
+    enableVisualizer();
+
     World world         = ::Test::TestUtil::createBlankTestingWorld();
     world.mutableBall() = Ball(Point(0, 0), Vector(4, 1.5), Timestamp::fromSeconds(0));
 

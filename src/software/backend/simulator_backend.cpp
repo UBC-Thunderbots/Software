@@ -21,6 +21,10 @@ SimulatorBackend::SimulatorBackend(
 {
 }
 
+SimulatorBackend::SimulatorBackend() : SimulatorBackend(Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0), SimulationSpeed::FAST_SIMULATION)
+{
+}
+
 SimulatorBackend::~SimulatorBackend()
 {
     stopSimulation();
@@ -52,7 +56,7 @@ void SimulatorBackend::stopSimulation()
     {
         simulation_thread_started = false;
 
-        // Set this flag so pass_generation_thread knows to end (also making sure to
+        // Set this flag so the simulation_thread knows to end (also making sure to
         // properly take and give ownership of the flag)
         in_destructor_mutex.lock();
         in_destructor = true;
@@ -73,6 +77,8 @@ void SimulatorBackend::runSimulationLoop(World world)
 
     PhysicsSimulator physics_simulator(world);
 
+    auto world_publish_timestamp = std::chrono::steady_clock::now();
+
     // Take ownership of the in_destructor flag so we can use it for the conditional
     // check
     in_destructor_mutex.lock();
@@ -89,11 +95,22 @@ void SimulatorBackend::runSimulationLoop(World world)
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(
-                std::lrint(world_time_increment.getMilliseconds())));
+            // Calculate how much wall-clock time has passed since we last published a world,
+            // and sleep for as much time as necessary for it to have been world_time_increment
+            // seconds in wall-clock time since the last world was published.
+            auto timestamp_now = std::chrono::steady_clock::now();
+            auto milliseconds_since_world_publish  = std::chrono::duration_cast<std::chrono::milliseconds>(
+                timestamp_now - world_publish_timestamp);
+            auto remaining_milliseconds = std::chrono::milliseconds(std::lrint(world_time_increment.getMilliseconds())) - milliseconds_since_world_publish;
+
+            if(remaining_milliseconds > std::chrono::milliseconds(0)) {
+                std::this_thread::sleep_for(remaining_milliseconds);
+            }
         }
 
         Subject<World>::sendValueToObservers(world);
+
+        world_publish_timestamp = std::chrono::steady_clock::now();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
