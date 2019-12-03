@@ -15,6 +15,10 @@ jobs:
           bazel build //...
           --verbose_test_summary 
           --test_output=errors
+        - >
+          bazel test //...
+          --verbose_test_summary 
+          --test_output=errors
         # Build our CPU-specific targets
         - bazel build //firmware_new/... --cpu=stm32h7
     - name: "Check Formatting"
