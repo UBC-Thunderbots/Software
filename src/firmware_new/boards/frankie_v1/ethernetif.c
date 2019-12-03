@@ -48,6 +48,7 @@
 #define ETH_DMA_TRANSMIT_TIMEOUT (20U)
 
 /* USER CODE BEGIN 1 */
+#define CORE_CM7 1
 
 /* USER CODE END 1 */
 
@@ -393,6 +394,9 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 
     TxConfig.Length   = framelen;
     TxConfig.TxBuffer = Txbuffer;
+
+    // we need this line here???????????? Why cube
+    SCB_CleanInvalidateDCache();
 
     HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
 
