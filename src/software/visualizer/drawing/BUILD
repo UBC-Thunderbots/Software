@@ -1,10 +1,20 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "colors",
+    hdrs = ["colors.h"],
+    deps = [
+        "@qt//:qt_gui",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
     name = "ball",
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
+        ":colors",
         "//shared:constants",
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",
@@ -19,6 +29,7 @@ cc_library(
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
     deps = [
+        ":colors",
         "//shared:constants",
         "//software/visualizer/geom:geometry_conversion",
         "//software/world:field",
@@ -35,7 +46,6 @@ cc_library(
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",
         "//software/world:robot",
-        "@qt//:qt_gui",
         "@qt//:qt_widgets",
     ],
 )
@@ -45,6 +55,7 @@ cc_library(
     srcs = ["team.cpp"],
     hdrs = ["team.h"],
     deps = [
+        ":colors",
         ":robot",
         "//software/world:team",
         "@qt//:qt_widgets",
@@ -70,6 +81,7 @@ cc_library(
     srcs = ["navigator.cpp"],
     hdrs = ["navigator.h"],
     deps = [
+        ":colors",
         ":draw_functions",
         "//software/ai/navigator",
         "//software/geom",

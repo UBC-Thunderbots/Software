@@ -46,6 +46,16 @@ void drawDefenseAreas(QGraphicsScene* scene, const Field& field, QPen pen);
 void drawGoals(QGraphicsScene* scene, const Field& field, QPen pen);
 
 /**
+ * Highlights each team's goal on the field based on whether they are the friendly or enemy team
+ *
+ * @param scene The scene to draw on
+ * @param field The field to draw
+ * @param friendly_team_brush The brush used to highlight the friendly team's goal
+ * @param enemy_team_brush The brush used to highlight the enemy team's goal
+ */
+void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field, QBrush friendly_team_brush, QBrush enemy_team_brush);
+
+/**
  * Draws the center line of the field in the scene
  *
  * @param scene The scene to draw on

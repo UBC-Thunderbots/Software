@@ -1,5 +1,6 @@
 #include "software/visualizer/drawing/ball.h"
 
+#include "software/visualizer/drawing/colors.h"
 #include "shared/constants.h"
 #include "software/geom/segment.h"
 #include "software/visualizer/geom/geometry_conversion.h"
@@ -37,15 +38,13 @@ void drawBallPosition(QGraphicsScene *scene, const Ball &ball, const QColor &col
 
 void drawBall(QGraphicsScene *scene, const Ball &ball)
 {
-    QColor ball_color = QColor(255, 100, 0, 255);
-
     drawBallPosition(scene, ball, ball_color);
     drawBallVelocity(scene, ball, ball_color);
 }
 
 void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Ball &ball, const Field& field) {
-    // Slightly transparent
-    QColor ball_cone_color = QColor(255, 100, 0, 170);
+    QColor ball_cone_color = ball_color;
+    ball_cone_color.setAlpha(170);
 
     QPen pen(ball_cone_color);
     pen.setWidth(1);

@@ -1,4 +1,5 @@
 #include "software/visualizer/drawing/navigator.h"
+#include "software/visualizer/drawing/colors.h"
 
 #include <QtWidgets/QGraphicsScene>
 
@@ -9,7 +10,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {
     auto planned_paths = navigator->getPlannedPathPoints();
     auto draw_function = [planned_paths](QGraphicsScene* scene) {
-        QPen pen(Qt::darkBlue);
+        QPen pen(navigator_path_color);
         // The cap style must be NOT be set to SquareCap. It can be set to anything else.
         // Drawing a line of length 0 with the SquareCap style causes a large line to be
         // drawn
@@ -17,7 +18,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
         pen.setWidth(2);
         pen.setCosmetic(true);
 
-        QBrush brush(Qt::darkBlue);
+        QBrush brush(navigator_path_color);
         brush.setStyle(Qt::BrushStyle::SolidPattern);
 
         for (const auto& path : planned_paths)

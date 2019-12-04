@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtGui/QColor>
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/world/robot.h"
