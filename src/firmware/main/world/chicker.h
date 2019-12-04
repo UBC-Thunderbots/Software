@@ -52,7 +52,7 @@ void Chicker_kick(Chicker* chicker, float speed_m_per_s);
 /**
  * Chip with the given chicker at the given speed
  * @param chicker The chicker to chip with
- * @param distance_m  The distance to chip, in meters
+ * @param distance_m  The distance to chip, in meters. This distance is the distance to the first bounce.
  */
 void Chicker_chip(Chicker* chicker, float distance_m);
 
