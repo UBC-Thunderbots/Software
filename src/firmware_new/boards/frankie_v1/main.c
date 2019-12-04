@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "udp_echoserver.h"
 
 /* USER CODE END Includes */
 
@@ -114,6 +115,7 @@ int main(void)
     MX_LWIP_Init();
     /* USER CODE BEGIN 2 */
     HAL_Delay(1000);
+    udp_echoserver_init();
 
     /* USER CODE END 2 */
 
