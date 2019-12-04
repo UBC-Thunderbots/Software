@@ -13,13 +13,14 @@ FirmwareWorld* FirmwareWorld_create(FirmwareRobot* robot, FirmwareBall* ball)
     FirmwareWorld* new_world = malloc(sizeof(FirmwareWorld));
 
     new_world->robot = robot;
-    new_world->ball = robot;
+    new_world->ball  = robot;
 
     return new_world;
 }
 
 
-void FirmwareWorld_destroy(FirmwareWorld* world){
+void FirmwareWorld_destroy(FirmwareWorld* world)
+{
     free(world);
 }
 

@@ -31,4 +31,3 @@ void Wheel_destroy(Wheel* wheel);
  * @param force_in_newtons The force to apply to the wheel, in newtons
  */
 void Wheel_applyForce(Wheel* wheel, float force_in_newtons);
-

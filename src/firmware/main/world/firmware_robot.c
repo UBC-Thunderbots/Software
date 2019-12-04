@@ -12,9 +12,9 @@ struct FirmwareRobot
     Wheel* back_left_wheel;
 };
 
-FirmwareRobot* FirmwareRobot_create(Chicker* chicker, Dribbler* dribbler, Wheel* front_right_wheel,
-                    Wheel* front_left_wheel, Wheel* back_right_wheel,
-                    Wheel* back_left_wheel)
+FirmwareRobot* FirmwareRobot_create(Chicker* chicker, Dribbler* dribbler,
+                                    Wheel* front_right_wheel, Wheel* front_left_wheel,
+                                    Wheel* back_right_wheel, Wheel* back_left_wheel)
 {
     FirmwareRobot* new_robot = malloc(sizeof(FirmwareRobot));
 
