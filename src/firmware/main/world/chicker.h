@@ -13,7 +13,7 @@ typedef struct Chicker Chicker;
  * @param kick A function that we can call to kick with the chicker with a given speed,
  *             in meters per second
  * @param chip A function that we can call to chip a given distance, in meters, with the
- *             chicker
+ *             chicker. The distance parameter is the distance to the first bounce.
  * @param enable_autokick A function that we can call to enable autokick on the chicker
  *                        (ie. the chicker will kick the ball as soon as the ball is close
  *                        enough to the front of the chicker to be kicked), with a kick
