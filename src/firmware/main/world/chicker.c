@@ -27,9 +27,9 @@ Chicker* Chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float di
     return new_chicker;
 }
 
-void Chicker_destroy(Chicker* this)
+void Chicker_destroy(Chicker* chicker)
 {
-    free(this);
+    free(chicker);
 }
 
 void Chicker_kick(Chicker* chicker, float speed_m_per_s)
