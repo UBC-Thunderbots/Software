@@ -1,7 +1,7 @@
 #include "software/visualizer/drawing/field.h"
-#include "software/visualizer/drawing/colors.h"
 
 #include "shared/constants.h"
+#include "software/visualizer/drawing/colors.h"
 #include "software/visualizer/geom/geometry_conversion.h"
 
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
@@ -9,7 +9,8 @@ void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
     scene->addRect(createQRectF(field.fieldLines()), pen);
 }
 
-void drawFieldPhysicalBoundaryLines(QGraphicsScene* scene, const Field& field, QPen pen) {
+void drawFieldPhysicalBoundaryLines(QGraphicsScene* scene, const Field& field, QPen pen)
+{
     scene->addRect(createQRectF(field.fieldBoundary()), pen);
 }
 
@@ -36,7 +37,9 @@ void drawGoals(QGraphicsScene* scene, const Field& field, QPen pen)
     scene->addRect(enemy_goal_rect, pen);
 }
 
-void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field, QBrush friendly_team_brush, QBrush enemy_team_brush) {
+void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
+                          QBrush friendly_team_brush, QBrush enemy_team_brush)
+{
     QPen pen(Qt::transparent);
     pen.setWidth(0);
     pen.setCosmetic(true);
@@ -54,7 +57,6 @@ void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field, QBrush frie
                                     field.enemyGoalpostNeg().y());
     QRectF enemy_goal_rect(enemy_goal_top_left, enemy_goal_bottom_right);
     scene->addRect(enemy_goal_rect, pen, enemy_team_brush);
-
 }
 
 void drawCenterLine(QGraphicsScene* scene, const Field& field, QPen pen)

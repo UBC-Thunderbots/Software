@@ -1,6 +1,6 @@
 #include "software/visualizer/drawing/team.h"
-#include "software/visualizer/drawing/colors.h"
 
+#include "software/visualizer/drawing/colors.h"
 #include "software/visualizer/drawing/robot.h"
 
 void drawTeam(QGraphicsScene* scene, const Team& team, QColor color)

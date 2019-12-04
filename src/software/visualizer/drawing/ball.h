@@ -43,4 +43,5 @@ void drawBall(QGraphicsScene *scene, const Ball &ball);
  * @param ball The ball to draw the cone for
  * @param field The field to draw the cone on
  */
-void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Ball &ball, const Field& field);
+void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Ball &ball,
+                               const Field &field);

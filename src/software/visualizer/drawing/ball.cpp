@@ -1,8 +1,8 @@
 #include "software/visualizer/drawing/ball.h"
 
-#include "software/visualizer/drawing/colors.h"
 #include "shared/constants.h"
 #include "software/geom/segment.h"
+#include "software/visualizer/drawing/colors.h"
 #include "software/visualizer/geom/geometry_conversion.h"
 
 void drawBallVelocity(QGraphicsScene *scene, const Ball &ball, const QColor &color)
@@ -42,7 +42,9 @@ void drawBall(QGraphicsScene *scene, const Ball &ball)
     drawBallVelocity(scene, ball, ball_color);
 }
 
-void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Ball &ball, const Field& field) {
+void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Ball &ball,
+                               const Field &field)
+{
     QColor ball_cone_color = ball_color;
     ball_cone_color.setAlpha(170);
 
