@@ -65,7 +65,7 @@ static void accurate_shoot_init(void) {}
  *
  * \param[in] world TODO
  */
-static void accurate_shoot_start(const primitive_params_t *params, World* world)
+static void accurate_shoot_start(const primitive_params_t *params, FirmwareWorld* world)
 {
     global_params = params;
     // Convert into m/s and rad/s because physics is in m and s
@@ -107,7 +107,7 @@ static void accurate_shoot_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void accurate_shoot_tick(log_record_t *log, World *world)
+static void accurate_shoot_tick(log_record_t *log, FirmwareWorld *world)
 {
     // TODO: what would you like to log?
 
@@ -190,7 +190,7 @@ static void accurate_shoot_tick(log_record_t *log, World *world)
     else
     {
         // accelerate at ball to kick it
-        Chicker* chicker = Robot_getChicker(World_getRobot(world));
+        Chicker* chicker = FirmwareRobot_getChicker(FirmwareWorld_getRobot(world));
         bool chipping = global_params->extra & 1;
         if (chipping){
             float chip_distance = global_params->params[3];

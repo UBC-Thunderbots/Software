@@ -15,10 +15,8 @@
 #include "io/motor.h"
 #include "io/receive.h"
 #include "util/error.h"
-#ifndef FWSIM
 #include <rcc.h>
 #include <registers/timer.h>
-#endif
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>

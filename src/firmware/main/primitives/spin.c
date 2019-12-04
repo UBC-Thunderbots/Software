@@ -46,7 +46,7 @@ static void spin_init(void) {}
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void spin_start(const primitive_params_t *p, World* world)
+static void spin_start(const primitive_params_t *p, FirmwareWorld* world)
 {
     // Parameters:  param[0]: g_destination_x   [mm]
     //              param[1]: g_destination_y   [mm]
@@ -98,7 +98,7 @@ static void spin_end(void) {}
  * \param[in] world an object representing the world
  */
 
-static void spin_tick(log_record_t *log, World *world)
+static void spin_tick(log_record_t *log, FirmwareWorld *world)
 {
     dr_data_t now;
     dr_get(&now);

@@ -96,7 +96,7 @@ void primitive_init(void)
  * \param[in] params the parameters to the primitive
  * \param[in] world TODO?
  */
-void primitive_start(unsigned int primitive, const primitive_params_t *params, World* world)
+void primitive_start(unsigned int primitive, const primitive_params_t *params, FirmwareWorld* world)
 {
     assert(primitive < PRIMITIVE_COUNT);
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
@@ -119,7 +119,7 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params, W
  * \c NULL if no record is to be filled
  * \param[in] world An object representing the world
  */
-void primitive_tick(log_record_t *log, World *world)
+void primitive_tick(log_record_t *log, FirmwareWorld *world)
 {
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
     if (log)

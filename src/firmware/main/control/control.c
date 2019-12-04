@@ -56,19 +56,45 @@ void correct_wheel_force(const float force[4], float new_force[4])
  *
  * \param[in] per wheel force in newtons
  */
-void apply_wheel_force(const float force[4])
+void apply_wheel_force_all_wheels(const float *force)
 {
-    float battery = adc_battery();
-
     for (int i = 0; i < 4; i++)
     {
-        float torque   = force[i] * WHEEL_RADIUS * GEAR_RATIO;
-        float voltage  = torque * CURRENT_PER_TORQUE * PHASE_RESISTANCE;  // delta voltage
-        float back_emf = (float)encoder_speed(i) * QUARTERDEGREE_TO_VOLT;
-        wheels_drive(i, (voltage + back_emf) / battery * 255);
+        apply_wheel_force(i, force[i]);
     }
 }
 
+/**
+ * \ingroup Controls
+ * \brief Applies a force in newtons to the wheel with the given index
+ *
+ * \param[in] wheel force in newtons
+ */
+void apply_wheel_force(int wheel_index, float force_in_newtons){
+    float battery = adc_battery();
+
+    float torque   = WHEEL_RADIUS * GEAR_RATIO;
+    float voltage  = torque * CURRENT_PER_TORQUE * PHASE_RESISTANCE;  // delta voltage
+    float back_emf = (float)encoder_speed(wheel_index) * QUARTERDEGREE_TO_VOLT;
+    wheels_drive(wheel_index, (voltage + back_emf) / battery * 255);
+}
+
+// TODO: jdocs?
+void apply_wheel_force_front_right(float force_in_newtons){
+    apply_wheel_force(3, force_in_newtons);
+}
+
+void apply_wheel_force_front_left(float force_in_newtons){
+    apply_wheel_force(0, force_in_newtons);
+}
+
+void apply_wheel_force_back_right(float force_in_newtons){
+    apply_wheel_force(2, force_in_newtons);
+}
+
+void apply_wheel_force_back_left(float force_in_newtons){
+    apply_wheel_force(1, force_in_newtons);
+}
 
 #define JERK_LIMIT 40.0f  //(m/s^3)
 
@@ -123,7 +149,7 @@ void apply_accel(float linear_accel[2], float angular_accel)
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
     // printf("wheel 0 force: %f", wheel_force[0]);
     // printf("wheel 1 force: %f", wheel_force[1]);
-    apply_wheel_force(wheel_force);  // set force
+    apply_wheel_force_all_wheels(wheel_force);  // set force
 }
 
 /**

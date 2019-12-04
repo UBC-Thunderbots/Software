@@ -121,7 +121,7 @@ static void shoot_init(void) {}
  *	   because the primitive start function already does it
  * \param[in] world TODO?
  */
-static void shoot_start(const primitive_params_t *params, World* world)
+static void shoot_start(const primitive_params_t *params, FirmwareWorld* world)
 {
     printf("Shoot start called.\n");
     // Convert into m/s and rad/s because physics is in m and s
@@ -143,7 +143,7 @@ static void shoot_start(const primitive_params_t *params, World* world)
     float shoot_power = (float)params->params[3] / 1000.0f;
     chip              = params->extra & 1;
 
-    Chicker* chicker = Robot_getChicker(World_getRobot(world));
+    Chicker* chicker = FirmwareRobot_getChicker(FirmwareWorld_getRobot(world));
     if (chip){
         Chicker_enableAutochip(chicker, shoot_power);
     } else {
@@ -185,7 +185,7 @@ static void shoot_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void shoot_tick(log_record_t *log, World *world)
+static void shoot_tick(log_record_t *log, FirmwareWorld *world)
 {
     printf("Shoot tick called.\n");
     dr_data_t states;

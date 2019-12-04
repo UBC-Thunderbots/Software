@@ -33,7 +33,7 @@ static void stop_init(void)
  * function returns and must be copied into this module if needed
  * \param[in] world
  */
-static void stop_start(const primitive_params_t *params, World* world)
+static void stop_start(const primitive_params_t *params, FirmwareWorld* world)
 {
     for (unsigned int i = 0; i != 4; ++i)
     {
@@ -72,7 +72,7 @@ static void stop_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void stop_tick(log_record_t *log, World *world) {}
+static void stop_tick(log_record_t *log, FirmwareWorld *world) {}
 
 /**
  * \brief The stop movement primitive.

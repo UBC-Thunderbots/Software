@@ -1,6 +1,5 @@
 #pragma once
 
-#include "world/firmware_ball.h"
 #include "world/firmware_robot.h"
 
 /**
@@ -13,11 +12,10 @@ typedef struct FirmwareWorld FirmwareWorld;
  * Create a world
  *
  * @param robot The robot from the perspective of firmware
- * @param ball The ball from the perspective of firmware
  *
  * @return A pointer to the created world, ownership is given to the caller
  */
-FirmwareWorld* FirmwareWorld_create(FirmwareRobot* robot, FirmwareBall* ball);
+FirmwareWorld* FirmwareWorld_create(FirmwareRobot* robot);
 
 /**
  * Destroy the given world, freeing any memory allocated for it
@@ -34,11 +32,5 @@ void FirmwareWorld_destroy(FirmwareWorld* world);
  * @param world The world to get the robot from
  * @return The robot from the given world
  */
-FirmwareRobot* FirmwareWorld_getFirmwareRobot(FirmwareWorld* world);
+FirmwareRobot* FirmwareWorld_getRobot(FirmwareWorld* world);
 
-/**
- * Get the ball from the given world
- * @param world The world to get the ball from
- * @return The ball from the given world
- */
-FirmwareBall* FirmwareWorld_getFirmwareBall(FirmwareWorld* world);

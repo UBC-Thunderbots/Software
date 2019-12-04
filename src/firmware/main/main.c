@@ -35,10 +35,12 @@
 #include <unused.h>
 #include <usb.h>
 
+#include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
 #include "io/charger.h"
 #include "io/chicker.h"
+#include "io/dribbler.h"
 #include "io/dma.h"
 #include "io/dr.h"
 #include "io/encoder.h"
@@ -60,6 +62,7 @@
 #include "upgrade/fw.h"
 #include "util/constants.h"
 #include "util/log.h"
+#include "world/firmware_world.h"
 
 static void stm32_main(void) __attribute__((noreturn));
 
@@ -182,7 +185,7 @@ static const usb_string_descriptor_t STRING_EN_CA_DFU_FW =
     USB_STRING_DESCRIPTOR_INITIALIZER(u"Firmware");
 static const usb_string_descriptor_t STRING_EN_CA_DFU_FPGA =
     USB_STRING_DESCRIPTOR_INITIALIZER(u"FPGA Bitstream");
-static const usb_string_descriptor_t *const STRINGS_EN_CA[] = {
+static const usb_string_descriptor_t* const STRINGS_EN_CA[] = {
     [STRING_INDEX_MANUFACTURER - 1U] = &STRING_EN_CA_MANUFACTURER,
     [STRING_INDEX_PRODUCT - 1U]      = &STRING_EN_CA_PRODUCT,
     [STRING_INDEX_PRODUCT_DFU - 1U]  = &STRING_EN_CA_PRODUCT_DFU,
@@ -203,7 +206,7 @@ const usb_string_zero_descriptor_t MAIN_STRING_ZERO = {
         },
 };
 
-static bool usb_control_handler(const usb_setup_packet_t *pkt)
+static bool usb_control_handler(const usb_setup_packet_t* pkt)
 {
     if (pkt->bmRequestType.recipient == USB_RECIPIENT_DEVICE &&
         pkt->bmRequestType.type == USB_CTYPE_VENDOR &&
@@ -334,7 +337,7 @@ void vApplicationIdleHook(void)
     asm volatile("isb");
 }
 
-static void main_task(void *param) __attribute__((noreturn));
+static void main_task(void* param) __attribute__((noreturn));
 
 static void stm32_main(void)
 {
@@ -454,13 +457,28 @@ static void run_normal(void)
         exception_reboot_without_core = false;
     }
 
+    // Setup the world that acts as the interface for the higher level firmware
+    // (like primitives or the controller) to interface with the outside world
+    // TODO: put this in a function?
+    Wheel* front_right_wheel = Wheel_create(apply_wheel_force_front_right);
+    Wheel* front_left_wheel  = Wheel_create(apply_wheel_force_front_left);
+    Wheel* back_right_wheel  = Wheel_create(apply_wheel_force_back_right);
+    Wheel* back_left_wheel   = Wheel_create(apply_wheel_force_back_left);
+    Chicker* chicker         = Chicker_create(chicker_kick, chicker_chip,
+                                      chicker_enable_auto_kick, chicker_enable_auto_chip,
+                                      chicker_auto_disarm, chicker_auto_disarm);
+    Dribbler* dribbler       = Dribbler_create(dribbler_set_speed, dribbler_temperature);
+    FirmwareRobot* robot = FirmwareRobot_create(chicker, dribbler, front_right_wheel, front_left_wheel,
+                                back_right_wheel, back_left_wheel);
+    FirmwareWorld* world = FirmwareWorld_create(robot);
+
     // Receive must be the second-last module initialized, because received
     // packets can cause calls to other modules.
-    receive_init(switches[0U]);
+    receive_init(switches[0U], world);
 
     // Ticks must be the last module initialized, because ticks propagate into
     // other modules.
-    tick_init();
+    tick_init(world);
 
     // Done!
     fputs("System online.\r\n", stdout);
@@ -531,6 +549,16 @@ static void run_normal(void)
     charger_shutdown();
     motor_shutdown();
 
+    // TODO: put this in a function?
+    FirmwareWorld_destroy(world);
+    FirmwareRobot_destroy(robot);
+    Dribbler_destroy(dribbler);
+    Chicker_destroy(chicker);
+    Wheel_destroy(front_right_wheel);
+    Wheel_destroy(front_left_wheel);
+    Wheel_destroy(back_right_wheel);
+    Wheel_destroy(back_left_wheel);
+
     // Kick the hardware watchdog to avoid timeouts. Chicker shutdown sometimes
     // takes up to three seconds, particularly if the board is not plugged in,
     // so that eats most of the timeout period.
@@ -579,7 +607,7 @@ static void run_safe_mode(void)
     fputs("System shutdown.\r\n", stdout);
 }
 
-static void main_task(void *UNUSED(param))
+static void main_task(void* UNUSED(param))
 {
     // Initialize DMA engines.
     // These are needed for a lot of other things so must come first.
@@ -805,8 +833,8 @@ uint32_t main_read_clear_idle_cycles(void)
     return __atomic_exchange_n(&idle_cycles, 0, __ATOMIC_RELAXED);
 }
 
-void vApplicationGetIdleTaskMemory(StaticTask_t **tcb, StackType_t **stack,
-                                   uint32_t *stack_size)
+void vApplicationGetIdleTaskMemory(StaticTask_t** tcb, StackType_t** stack,
+                                   uint32_t* stack_size)
 {
     static StaticTask_t tcb_storage;
     *tcb = &tcb_storage;

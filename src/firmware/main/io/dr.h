@@ -144,6 +144,4 @@ void dr_set_ball_frame(int16_t x, int16_t y);
 void dr_set_ball_frame_timestamp(int16_t x, int16_t y, uint64_t timestamp);
 void dr_set_robot_timestamp(uint64_t timestamp);
 void dr_set_ball_timestamp(uint64_t timestamp);
-void dr_do_maneuver();
-void dr_follow_ball();
 #endif

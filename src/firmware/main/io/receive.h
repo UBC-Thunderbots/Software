@@ -5,8 +5,9 @@
 #include <stdint.h>
 
 #include "util/log.h"
+#include "world/firmware_world.h"
 
-void receive_init(unsigned int index);
+void receive_init(unsigned int index, FirmwareWorld* _world);
 void receive_shutdown(void);
 void receive_tick(log_record_t *record);
 uint8_t receive_last_serial(void);

@@ -62,7 +62,7 @@ static void imu_test_end(void) {}
  * \c NULL if no record is to be filled
  * \param[in] world TODO?
  */
-static void imu_test_tick(log_record_t *log, World *world)
+static void imu_test_tick(log_record_t *log, FirmwareWorld *world)
 {
     dr_data_t data;
 

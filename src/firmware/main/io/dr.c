@@ -247,46 +247,6 @@ void dr_set_ball_timestamp(uint64_t timestamp)
 }
 
 
-void dr_do_maneuver()
-{
-    int16_t dests[3][3] = {{700, -700, (int16_t)(P_PI * 100)},
-                           {2000, 1000, 30},
-                           {0, 0, (int16_t)(P_PI / 2.0)}};
-
-
-
-    if (tick_count > 800 || (get_primitive_index() != 1))
-    {
-        tick_count = 0;
-        maneuver_stage++;
-        if (maneuver_stage >= 3)
-        {
-            maneuver_stage = 0;
-        }
-
-        primitive_params_t move_params;
-        move_params.params[0] = dests[maneuver_stage][0];
-        move_params.params[1] = dests[maneuver_stage][1];
-        move_params.params[2] = dests[maneuver_stage][2];
-        move_params.params[3] = 0.0;
-        primitive_start(1, &move_params);
-    }
-}
-
-void dr_follow_ball()
-{
-    if (tick_count > 10 || (get_primitive_index() != 1))
-    {
-        tick_count = 0;
-
-        primitive_params_t move_params;
-        move_params.params[0] = ball_camera_data.x;
-        move_params.params[1] = ball_camera_data.y;
-        move_params.params[2] = 0;
-        primitive_start(1, &move_params);
-    }
-}
-
 void dr_log(log_record_t *log)
 {
     sensors_gyro_data_t gyrodata;

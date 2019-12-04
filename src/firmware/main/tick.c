@@ -62,22 +62,18 @@
 #include "main.h"
 #include "primitives/primitive.h"
 #include "priority.h"
-#include "world/world.h"
+#include "world/firmware_world.h"
 
 // Verify that all the timing requirements are set up properly.
 _Static_assert(portTICK_PERIOD_MS *CONTROL_LOOP_HZ == 1000U,
                "Tick rate is not equal to control loop period.");
 
 static bool shutdown = false;
+static FirmwareWorld* world;
 
 static void normal_task(void *UNUSED(param))
 {
     TickType_t last_wake = xTaskGetTickCount();
-
-    Chicker *chicker   = Chicker_create(NULL, NULL, NULL, NULL, NULL, NULL);
-    Dribbler *dribbler = Dribbler_create(dribbler_set_speed, dribbler_temperature);
-    Robot *robot       = Robot_create(chicker, dribbler);
-    World *world       = World_create(robot);
 
     while (!__atomic_load_n(&shutdown, __ATOMIC_RELAXED))
     {
@@ -130,11 +126,6 @@ static void normal_task(void *UNUSED(param))
         main_kick_wdt(MAIN_WDT_SOURCE_TICK);
     }
 
-    World_destroy(world);
-    Robot_destroy(robot);
-    Dribbler_destroy(dribbler);
-    Chicker_destroy(chicker);
-
     __atomic_signal_fence(__ATOMIC_ACQUIRE);
     xSemaphoreGive(main_shutdown_sem);
     vTaskSuspend(0);
@@ -142,9 +133,14 @@ static void normal_task(void *UNUSED(param))
 
 /**
  * \brief Initializes the tick generators.
+ *
+ * \param[in] _world The world the "high level" firmware can use to interact with the
+ *                   outside world
  */
-void tick_init(void)
+void tick_init(FirmwareWorld* _world)
 {
+    world = _world;
+
     // Configure timer 6 to run the fast ticks.
     rcc_enable_reset(APB1, TIM6);
     TIM6.PSC            = 84000000U / 1000000U;  // One microsecond per timer tick
