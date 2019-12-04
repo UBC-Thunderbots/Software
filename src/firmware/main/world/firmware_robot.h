@@ -13,12 +13,12 @@ typedef struct FirmwareRobot FirmwareRobot;
 /**
  * Create a robot with the given hardware
  *
- * @param chicker
- * @param dribbler
- * @param front_right_wheel
- * @param front_left_wheel
- * @param back_right_wheel
- * @param back_left_wheel
+ * @param chicker The robot chicker
+ * @param dribbler The robot dribbler
+ * @param front_right_wheel The front right wheel of the robot
+ * @param front_left_wheel The front left wheel of the robot
+ * @param back_right_wheel The back right wheel of the robot
+ * @param back_left_wheel The back left wheel of the robot
  *
  * @return A pointer to a robot with the given hardware, ownership of the robot is
  *         given to the caller
