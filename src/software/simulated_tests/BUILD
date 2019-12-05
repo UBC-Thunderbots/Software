@@ -6,9 +6,9 @@ cc_library(
     hdrs = ["simulated_test_fixture.h"],
     deps = [
         "//software/backend:simulator_backend",
-        "//software/gui:visualizer_wrapper",
         "//software/util/logger",
         "//software/util/time:duration",
+        "//software/visualizer:visualizer_wrapper",
         "@gtest",
     ],
 )

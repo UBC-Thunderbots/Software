@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/backend/simulator_backend.h"
-#include "software/gui/visualizer_wrapper.h"
+#include "software/visualizer/visualizer_wrapper.h"
 
 
 class SimulatedTest : public ::testing::Test
