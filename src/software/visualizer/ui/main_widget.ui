@@ -52,6 +52,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
         <attribute name="title">
          <string>AI</string>
         </attribute>
@@ -164,6 +167,9 @@ p, li { white-space: pre-wrap; }
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
         </property>
         <attribute name="title">
          <string>Params</string>
