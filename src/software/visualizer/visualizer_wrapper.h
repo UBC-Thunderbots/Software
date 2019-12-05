@@ -87,6 +87,13 @@ class VisualizerWrapper : public ThreadedObserver<World>,
      */
     void updatePlayInfo();
 
+    /**
+     * Sets the area of the World being drawn in the Visualizer
+     *
+     * @param view_area the area of the World to show in the Visualizer
+     */
+    void setDrawViewArea(const Rectangle& view_area);
+
     std::mutex world_lock;
     std::mutex ai_lock;
 
@@ -99,4 +106,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     std::shared_ptr<Visualizer> visualizer;
     std::shared_ptr<QApplication> application;
+
+    // Whether or not we have set the view area in the Visualizer
+    bool initial_view_area_set;
 };

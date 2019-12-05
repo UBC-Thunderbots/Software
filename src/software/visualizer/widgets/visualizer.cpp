@@ -16,6 +16,10 @@ void Visualizer::draw(WorldDrawFunction world_draw_function,
     main_widget->draw(world_draw_function, ai_draw_function);
 }
 
+void Visualizer::setDrawViewArea(const Rectangle view_area) {
+    main_widget->setDrawViewArea(view_area);
+}
+
 void Visualizer::updatePlayInfo(const PlayInfo& play_info)
 {
     main_widget->updatePlayInfo(play_info);

@@ -6,6 +6,7 @@
 #include "software/backend/robot_status.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/widgets/main_widget.h"
+#include "software/geom/rectangle.h"
 
 /**
  * This is the main window / application object for the visualizer.
@@ -32,6 +33,13 @@ class Visualizer : public QMainWindow
      * state
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
+
+    /**
+     * Sets the area of the World being drawn in the Visualizer
+     *
+     * @param view_area the area of the World to show in the Visualizer
+     */
+    void setDrawViewArea(const Rectangle view_area);
 
     /**
      * Updates and displays newly provided PlayInfo

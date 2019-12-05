@@ -7,7 +7,8 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
       ThreadedObserver<RobotStatus>(),
-      termination_promise_ptr(std::make_shared<std::promise<void>>())
+      termination_promise_ptr(std::make_shared<std::promise<void>>()),
+      initial_view_area_set(false)
 {
     auto application_promise =
         std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
@@ -63,6 +64,11 @@ void VisualizerWrapper::onValueReceived(World world)
     most_recent_world_draw_function = getDrawWorldFunction(world);
     world_lock.unlock();
     draw();
+
+    if(!initial_view_area_set && world.field().fieldBoundary().area() > 0) {
+        initial_view_area_set = true;
+        setDrawViewArea(world.field().fieldBoundary());
+    }
 }
 
 void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function)
@@ -110,6 +116,15 @@ void VisualizerWrapper::updatePlayInfo()
     QMetaObject::invokeMethod(visualizer.get(), "updatePlayInfo",
                               Qt::ConnectionType::BlockingQueuedConnection,
                               Q_ARG(PlayInfo, most_recent_play_info));
+}
+
+void VisualizerWrapper::setDrawViewArea(const Rectangle &view_area) {
+    // Call the Visualizer to update the view area in a threadsafe manner
+    // See
+    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
+    QMetaObject::invokeMethod(visualizer.get(), "setDrawViewArea",
+                              Qt::ConnectionType::BlockingQueuedConnection,
+                              Q_ARG(Rectangle, view_area));
 }
 
 std::shared_ptr<std::promise<void>> VisualizerWrapper::getTerminationPromise()
