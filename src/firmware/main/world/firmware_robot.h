@@ -15,6 +15,10 @@ typedef struct FirmwareRobot FirmwareRobot;
  *
  * @param chicker The robot chicker
  * @param dribbler The robot dribbler
+ * @param get_robot_position_x A function that can be called to get the x-position of the
+ *                             robot, in meters
+ * @param get_robot_position_y A function that can be called to get the y-position of the
+ *                             robot, in meters
  * @param front_right_wheel The front right wheel of the robot
  * @param front_left_wheel The front left wheel of the robot
  * @param back_right_wheel The back right wheel of the robot
@@ -24,6 +28,8 @@ typedef struct FirmwareRobot FirmwareRobot;
  *         given to the caller
  */
 FirmwareRobot* FirmwareRobot_create(Chicker* chicker, Dribbler* dribbler,
+                                    float (*get_robot_position_x)(),
+                                    float (*get_robot_position_y)(),
                                     Wheel* front_right_wheel, Wheel* front_left_wheel,
                                     Wheel* back_right_wheel, Wheel* back_left_wheel);
 
@@ -50,6 +56,20 @@ Chicker* FirmwareRobot_getChicker(FirmwareRobot* robot);
  * @return The dribbler from the given robot
  */
 Dribbler* FirmwareRobot_getDribbler(FirmwareRobot* robot);
+
+/**
+ * Get the x-position of the given ball
+ * @param ball The ball to get the y-position for
+ * @return The x-position of the given ball, in meters
+ */
+float FirmwareRobot_getPositionX(FirmwareRobot* robot);
+
+/**
+ * Get the y-position of the given ball
+ * @param ball The ball to get the y-position for
+ * @return The y-position of the given ball, in meters
+ */
+float FirmwareRobot_getPositionY(FirmwareRobot* robot);
 
 /**
  * Get the front right wheel from the given robot

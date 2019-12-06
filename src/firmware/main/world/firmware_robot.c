@@ -6,6 +6,8 @@ struct FirmwareRobot
 {
     Chicker* chicker;
     Dribbler* dribbler;
+    float (*get_robot_position_x)();
+    float (*get_robot_position_y)();
     Wheel* front_right_wheel;
     Wheel* front_left_wheel;
     Wheel* back_right_wheel;
@@ -13,17 +15,22 @@ struct FirmwareRobot
 };
 
 FirmwareRobot* FirmwareRobot_create(Chicker* chicker, Dribbler* dribbler,
+
+                                    float (*get_robot_position_x)(),
+                                    float (*get_robot_position_y)(),
                                     Wheel* front_right_wheel, Wheel* front_left_wheel,
                                     Wheel* back_right_wheel, Wheel* back_left_wheel)
 {
     FirmwareRobot* new_robot = malloc(sizeof(FirmwareRobot));
 
-    new_robot->chicker           = chicker;
-    new_robot->dribbler          = dribbler;
-    new_robot->front_right_wheel = front_right_wheel;
-    new_robot->front_left_wheel  = front_left_wheel;
-    new_robot->back_right_wheel  = back_right_wheel;
-    new_robot->back_left_wheel   = back_left_wheel;
+    new_robot->chicker              = chicker;
+    new_robot->dribbler             = dribbler;
+    new_robot->get_robot_position_x = get_robot_position_x;
+    new_robot->get_robot_position_y = get_robot_position_y;
+    new_robot->front_right_wheel    = front_right_wheel;
+    new_robot->front_left_wheel     = front_left_wheel;
+    new_robot->back_right_wheel     = back_right_wheel;
+    new_robot->back_left_wheel      = back_left_wheel;
 
     return new_robot;
 }
@@ -41,6 +48,16 @@ Chicker* FirmwareRobot_getChicker(FirmwareRobot* robot)
 Dribbler* FirmwareRobot_getDribbler(FirmwareRobot* robot)
 {
     return robot->dribbler;
+}
+
+float FirmwareRobot_getPositionX(FirmwareRobot* robot)
+{
+    return robot->get_robot_position_x();
+}
+
+float FirmwareRobot_getPositionY(FirmwareRobot* robot)
+{
+    return robot->get_robot_position_x();
 }
 
 Wheel* FirmwareRobot_getFrontRightWheel(FirmwareRobot* robot)
