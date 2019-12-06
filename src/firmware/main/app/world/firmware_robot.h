@@ -13,6 +13,9 @@ typedef struct FirmwareRobot FirmwareRobot;
 /**
  * Create a robot with the given hardware
  *
+ * NOTE: All positions are in global field coordinates (ie. 0,0 is the center of the
+ *       field)
+ *
  * @param chicker The robot chicker
  * @param dribbler The robot dribbler
  * @param get_robot_position_x A function that can be called to get the x-position of the
@@ -61,14 +64,14 @@ Dribbler* app_firmware_robot_getDribbler(FirmwareRobot* robot);
 /**
  * Get the x-position of the given ball
  * @param ball The ball to get the y-position for
- * @return The x-position of the given ball, in meters
+ * @return The x-position of the given ball, in meters, in global coordinates
  */
 float app_firmware_robot_getPositionX(FirmwareRobot* robot);
 
 /**
  * Get the y-position of the given ball
  * @param ball The ball to get the y-position for
- * @return The y-position of the given ball, in meters
+ * @return The y-position of the given ball, in meters, in global coordinates
  */
 float app_firmware_robot_getPositionY(FirmwareRobot* robot);
 

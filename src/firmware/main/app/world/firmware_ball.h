@@ -9,6 +9,9 @@ typedef struct FirmwareBall FirmwareBall;
 /**
  * Create a ball with methods for accessing it's state
  *
+ * NOTE: All positions are in global field coordinates (ie. 0,0 is the center of the
+ *       field)
+ *
  * @param get_ball_position_x A function that can be called to get the x-position of the
  *                            ball, in meters
  * @param get_ball_position_y A function that can be called to get the y-position of the
@@ -39,27 +42,29 @@ void app_firmware_ball_destroy(FirmwareBall* ball);
 /**
  * Get the x-position of the given ball
  * @param ball The ball to get the x-position for
- * @return The x-position of the given ball, in meters
+ * @return The x-position of the given ball, in meters, in global field coordinates
  */
 float app_firmware_ball_getPositionX(FirmwareBall* ball);
 
 /**
  * Get the y-position of the given ball
  * @param ball The ball to get the y-position for
- * @return The y-position of the given ball, in meters
+ * @return The y-position of the given ball, in meters, in global field coordinates
  */
 float app_firmware_ball_getPositionY(FirmwareBall* ball);
 
 /**
  * Get the x component of velocity of the given ball
  * @param ball The ball to get the x component of velocity for
- * @return The x component of velocity of the given ball, in meters per second
+ * @return The x component of velocity of the given ball, in meters per second,
+ *         in global field coordinates
  */
 float app_firmware_ball_getVelocityX(FirmwareBall* ball);
 
 /**
  * Get the y component of velocity of the given ball
  * @param ball The ball to get the y component of velocity for
- * @return The y component of velocity of the given ball, in meters per second
+ * @return The y component of velocity of the given ball, in meters per second,
+ *         in global field coordinates
  */
 float app_firmware_ball_getVelocityY(FirmwareBall* ball);
