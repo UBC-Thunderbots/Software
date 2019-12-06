@@ -13,11 +13,10 @@ FirmwareWorld* app_firmware_world_create(FirmwareRobot* robot, FirmwareBall* bal
     FirmwareWorld* new_world = malloc(sizeof(FirmwareWorld));
 
     new_world->robot = robot;
-    new_world->ball  = robot;
+    new_world->ball  = ball;
 
     return new_world;
 }
-
 
 void app_firmware_world_destroy(FirmwareWorld* world)
 {

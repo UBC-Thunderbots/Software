@@ -9,7 +9,7 @@ struct Dribbler
 };
 
 Dribbler* app_dribbler_create(void (*set_speed)(uint32_t rpm),
-                          unsigned int (*get_temperature_deg_c)(void))
+                              unsigned int (*get_temperature_deg_c)(void))
 {
     Dribbler* new_dribbler = malloc(sizeof(Dribbler));
 

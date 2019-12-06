@@ -27,10 +27,12 @@ typedef struct Chicker Chicker;
  *
  * @return A pointer to the created chicker, ownership is given to the caller
  */
-Chicker* app_chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float distance_m),
-                        void (*enable_autokick)(float speed_m_per_s),
-                        void (*enable_autochip)(float distance_m),
-                        void (*disable_autokick)(void), void (*disable_autochip)(void));
+Chicker* app_chicker_create(void (*kick)(float speed_m_per_s),
+                            void (*chip)(float distance_m),
+                            void (*enable_autokick)(float speed_m_per_s),
+                            void (*enable_autochip)(float distance_m),
+                            void (*disable_autokick)(void),
+                            void (*disable_autochip)(void));
 
 /**
  * Destroy the given chicker, freeing any memory allocated for it

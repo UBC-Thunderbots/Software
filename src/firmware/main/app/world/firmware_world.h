@@ -22,7 +22,7 @@ FirmwareWorld* app_firmware_world_create(FirmwareRobot* robot, FirmwareBall* bal
 /**
  * Destroy the given world, freeing any memory allocated for it
  *
- * NOTE: This will not destroy the values pointed to by any pointers passed to the 
+ * NOTE: This will not destroy the values pointed to by any pointers passed to the
  *       `create` function
  *
  * @param world The world to destroy

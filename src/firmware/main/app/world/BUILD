@@ -10,6 +10,15 @@ cc_library(
     strip_include_prefix = "/firmware/main",
 )
 
+cc_test(
+    name = "chicker_test",
+    srcs = ["chicker_test.cpp"],
+    deps = [
+        ":chicker",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "dribbler",
     srcs = ["dribbler.c"],
@@ -17,11 +26,29 @@ cc_library(
     strip_include_prefix = "/firmware/main",
 )
 
+cc_test(
+    name = "dribbler_test",
+    srcs = ["dribbler_test.cpp"],
+    deps = [
+        ":dribbler",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "firmware_ball",
     srcs = ["firmware_ball.c"],
     hdrs = ["firmware_ball.h"],
     strip_include_prefix = "/firmware/main",
+)
+
+cc_test(
+    name = "firmware_ball_test",
+    srcs = ["firmware_ball_test.cpp"],
+    deps = [
+        ":firmware_ball",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(
@@ -36,6 +63,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "firmware_robot_test",
+    srcs = ["firmware_robot_test.cpp"],
+    deps = [
+        ":firmware_robot",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "firmware_world",
     srcs = ["firmware_world.c"],
@@ -47,9 +83,27 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "firmware_world_test",
+    srcs = ["firmware_world_test.cpp"],
+    deps = [
+        ":firmware_world",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "wheel",
     srcs = ["wheel.c"],
     hdrs = ["wheel.h"],
     strip_include_prefix = "/firmware/main",
+)
+
+cc_test(
+    name = "wheel_test",
+    srcs = ["wheel_test.cpp"],
+    deps = [
+        ":wheel",
+        "@gtest//:gtest_main",
+    ],
 )

@@ -22,9 +22,9 @@ typedef struct FirmwareBall FirmwareBall;
  *         ownership of the ball is given to the caller
  */
 FirmwareBall* app_firmware_ball_create(float (*get_ball_position_x)(),
-                                  float (*get_ball_position_y)(),
-                                  float (*get_ball_velocity_x)(),
-                                  float (*get_ball_velocity_y)());
+                                       float (*get_ball_position_y)(),
+                                       float (*get_ball_velocity_x)(),
+                                       float (*get_ball_velocity_y)());
 
 /**
  * Destroy the given ball, freeing any memory allocated for it

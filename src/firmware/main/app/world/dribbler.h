@@ -18,7 +18,7 @@ typedef struct Dribbler Dribbler;
  * @return A pointer to the created dribbler, ownership is given to the caller
  */
 Dribbler* app_dribbler_create(void (*set_speed)(uint32_t rpm),
-                          unsigned int (*get_temperature_deg_c)(void));
+                              unsigned int (*get_temperature_deg_c)(void));
 
 /**
  * Destroy the given dribbler, freeing any memory allocated for it

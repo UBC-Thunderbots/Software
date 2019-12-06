@@ -13,7 +13,7 @@ typedef struct Wheel Wheel;
  *
  * @return A pointer to the created wheel, ownership is given to the caller
  */
-Wheel* Wheel_create(void (*apply_wheel_force)(float force_in_newtons));
+Wheel* app_wheel_create(void (*apply_wheel_force)(float force_in_newtons));
 
 /**
  * Destroy the given wheel, freeing any memory allocated for it
@@ -23,11 +23,11 @@ Wheel* Wheel_create(void (*apply_wheel_force)(float force_in_newtons));
  *
  * @param wheel The wheel to destroy
  */
-void Wheel_destroy(Wheel* wheel);
+void app_wheel_destroy(Wheel* wheel);
 
 /**
  * Apply the given force to the given wheel
  * @param wheel The wheel to apply force to
  * @param force_in_newtons The force to apply to the wheel, in newtons
  */
-void Wheel_applyForce(Wheel* wheel, float force_in_newtons);
+void app_wheel_applyForce(Wheel* wheel, float force_in_newtons);

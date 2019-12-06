@@ -11,9 +11,9 @@ struct FirmwareBall
 };
 
 FirmwareBall* app_firmware_ball_create(float (*get_ball_position_x)(),
-                                  float (*get_ball_position_y)(),
-                                  float (*get_ball_velocity_x)(),
-                                  float (*get_ball_velocity_y)())
+                                       float (*get_ball_position_y)(),
+                                       float (*get_ball_velocity_x)(),
+                                       float (*get_ball_velocity_y)())
 {
     FirmwareBall* new_ball = malloc(sizeof(FirmwareBall));
 
@@ -47,5 +47,5 @@ float app_firmware_ball_getVelocityX(FirmwareBall* ball)
 
 float app_firmware_ball_getVelocityY(FirmwareBall* ball)
 {
-    return ball->get_ball_position_y();
+    return ball->get_ball_velocity_y();
 }

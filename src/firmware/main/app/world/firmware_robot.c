@@ -16,10 +16,11 @@ struct FirmwareRobot
 
 FirmwareRobot* app_firmware_robot_create(Chicker* chicker, Dribbler* dribbler,
 
-                                    float (*get_robot_position_x)(),
-                                    float (*get_robot_position_y)(),
-                                    Wheel* front_right_wheel, Wheel* front_left_wheel,
-                                    Wheel* back_right_wheel, Wheel* back_left_wheel)
+                                         float (*get_robot_position_x)(),
+                                         float (*get_robot_position_y)(),
+                                         Wheel* front_right_wheel,
+                                         Wheel* front_left_wheel, Wheel* back_right_wheel,
+                                         Wheel* back_left_wheel)
 {
     FirmwareRobot* new_robot = malloc(sizeof(FirmwareRobot));
 
@@ -57,7 +58,7 @@ float app_firmware_robot_getPositionX(FirmwareRobot* robot)
 
 float app_firmware_robot_getPositionY(FirmwareRobot* robot)
 {
-    return robot->get_robot_position_x();
+    return robot->get_robot_position_y();
 }
 
 Wheel* app_firmware_robot_getFrontRightWheel(FirmwareRobot* robot)

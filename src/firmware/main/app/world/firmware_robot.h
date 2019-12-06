@@ -28,10 +28,11 @@ typedef struct FirmwareRobot FirmwareRobot;
  *         given to the caller
  */
 FirmwareRobot* app_firmware_robot_create(Chicker* chicker, Dribbler* dribbler,
-                                    float (*get_robot_position_x)(),
-                                    float (*get_robot_position_y)(),
-                                    Wheel* front_right_wheel, Wheel* front_left_wheel,
-                                    Wheel* back_right_wheel, Wheel* back_left_wheel);
+                                         float (*get_robot_position_x)(),
+                                         float (*get_robot_position_y)(),
+                                         Wheel* front_right_wheel,
+                                         Wheel* front_left_wheel, Wheel* back_right_wheel,
+                                         Wheel* back_left_wheel);
 
 /**
  * Destroy the given robot, freeing any memory allocated for it

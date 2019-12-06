@@ -12,17 +12,21 @@ struct Chicker
     void (*disable_autochip)(void);
 };
 
-Chicker* app_chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float distance_m),
-                        void (*enable_autokick)(float speed_m_per_s),
-                        void (*enable_autochip)(float distance_m),
-                        void (*disable_autokick)(void), void (*disable_autochip)(void))
+Chicker* app_chicker_create(void (*kick)(float speed_m_per_s),
+                            void (*chip)(float distance_m),
+                            void (*enable_autokick)(float speed_m_per_s),
+                            void (*enable_autochip)(float distance_m),
+                            void (*disable_autokick)(void),
+                            void (*disable_autochip)(void))
 {
     Chicker* new_chicker = malloc(sizeof(Chicker));
 
-    new_chicker->kick            = kick;
-    new_chicker->chip            = chip;
-    new_chicker->enable_autochip = enable_autochip;
-    new_chicker->enable_autokick = enable_autokick;
+    new_chicker->kick             = kick;
+    new_chicker->chip             = chip;
+    new_chicker->enable_autochip  = enable_autochip;
+    new_chicker->enable_autokick  = enable_autokick;
+    new_chicker->disable_autokick = disable_autokick;
+    new_chicker->disable_autochip = disable_autochip;
 
     return new_chicker;
 }
