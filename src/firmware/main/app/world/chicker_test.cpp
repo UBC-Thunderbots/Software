@@ -57,7 +57,7 @@ class ChickerTest : public testing::Test
         autokick_disabled = true;
     }
 
-    Chicker* chicker;
+    Chicker_t* chicker;
 
     inline static float requested_kick_speed;
     inline static float requested_chip_distance;

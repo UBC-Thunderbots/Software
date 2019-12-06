@@ -12,14 +12,14 @@ struct Chicker
     void (*disable_autochip)(void);
 };
 
-Chicker* app_chicker_create(void (*kick)(float speed_m_per_s),
-                            void (*chip)(float distance_m),
-                            void (*enable_autokick)(float speed_m_per_s),
-                            void (*enable_autochip)(float distance_m),
-                            void (*disable_autokick)(void),
-                            void (*disable_autochip)(void))
+Chicker_t* app_chicker_create(void (*kick)(float speed_m_per_s),
+                              void (*chip)(float distance_m),
+                              void (*enable_autokick)(float speed_m_per_s),
+                              void (*enable_autochip)(float distance_m),
+                              void (*disable_autokick)(void),
+                              void (*disable_autochip)(void))
 {
-    Chicker* new_chicker = malloc(sizeof(Chicker));
+    Chicker_t* new_chicker = malloc(sizeof(Chicker_t));
 
     new_chicker->kick             = kick;
     new_chicker->chip             = chip;
@@ -31,37 +31,37 @@ Chicker* app_chicker_create(void (*kick)(float speed_m_per_s),
     return new_chicker;
 }
 
-void app_chicker_destroy(Chicker* chicker)
+void app_chicker_destroy(Chicker_t* chicker)
 {
     free(chicker);
 }
 
-void app_chicker_kick(Chicker* chicker, float speed_m_per_s)
+void app_chicker_kick(Chicker_t* chicker, float speed_m_per_s)
 {
     chicker->kick(speed_m_per_s);
 }
 
-void app_chicker_chip(Chicker* chicker, float distance_m)
+void app_chicker_chip(Chicker_t* chicker, float distance_m)
 {
     chicker->chip(distance_m);
 }
 
-void app_chicker_enableAutokick(Chicker* chicker, float speed_m_per_s)
+void app_chicker_enableAutokick(Chicker_t* chicker, float speed_m_per_s)
 {
     chicker->enable_autokick(speed_m_per_s);
 }
 
-void app_chicker_enableAutoChip(Chicker* chicker, float distance_m)
+void app_chicker_enableAutoChip(Chicker_t* chicker, float distance_m)
 {
     chicker->enable_autochip(distance_m);
 }
 
-void app_chicker_disableAutokick(Chicker* chicker)
+void app_chicker_disableAutokick(Chicker_t* chicker)
 {
     chicker->disable_autokick();
 }
 
-void app_chicker_disableAutochip(Chicker* chicker)
+void app_chicker_disableAutochip(Chicker_t* chicker)
 {
     chicker->disable_autochip();
 }

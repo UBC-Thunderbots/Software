@@ -39,7 +39,7 @@ class FirmwareRobotTest : public testing::Test
     Wheel* back_left_wheel   = (Wheel*)13;
     Wheel* back_right_wheel  = (Wheel*)14;
 
-    FirmwareRobot* firmware_robot;
+    FirmwareRobot_t* firmware_robot;
 };
 
 TEST_F(FirmwareRobotTest, getChicker)

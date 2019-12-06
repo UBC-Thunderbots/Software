@@ -39,7 +39,7 @@ class FirmwareBallTest : public testing::Test
         return 10;
     }
 
-    FirmwareBall* firmware_ball;
+    FirmwareBall_t* firmware_ball;
 };
 
 TEST_F(FirmwareBallTest, getPositionX)

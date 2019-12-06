@@ -25,7 +25,7 @@ class WheelTest : public testing::Test
         requested_wheel_force = force;
     }
 
-    Wheel* wheel;
+    Wheel_t* wheel;
 
     inline static float requested_wheel_force;
 };

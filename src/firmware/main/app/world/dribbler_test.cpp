@@ -30,7 +30,7 @@ class DribblerTest : public testing::Test
         return 7;
     }
 
-    Dribbler* dribbler;
+    Dribbler_t* dribbler;
 
     inline static float requested_rpm;
 };

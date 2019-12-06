@@ -20,8 +20,8 @@ class FirmwareWorldTest : public testing::Test
 
     FirmwareWorld* firmware_world;
 
-    FirmwareRobot* robot = (FirmwareRobot*)8;
-    FirmwareBall* ball   = (FirmwareBall*)9;
+    FirmwareRobot_t* robot = (FirmwareRobot*)8;
+    FirmwareBall_t* ball   = (FirmwareBall*)9;
 };
 
 TEST_F(FirmwareWorldTest, getRobot)

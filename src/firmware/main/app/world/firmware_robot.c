@@ -4,25 +4,26 @@
 
 struct FirmwareRobot
 {
-    Chicker* chicker;
-    Dribbler* dribbler;
+    Chicker_t* chicker;
+    Dribbler_t* dribbler;
     float (*get_robot_position_x)();
     float (*get_robot_position_y)();
-    Wheel* front_right_wheel;
-    Wheel* front_left_wheel;
-    Wheel* back_right_wheel;
-    Wheel* back_left_wheel;
+    Wheel_t* front_right_wheel;
+    Wheel_t* front_left_wheel;
+    Wheel_t* back_right_wheel;
+    Wheel_t* back_left_wheel;
 };
 
-FirmwareRobot* app_firmware_robot_create(Chicker* chicker, Dribbler* dribbler,
+FirmwareRobot_t* app_firmware_robot_create(Chicker_t* chicker, Dribbler_t* dribbler,
 
-                                         float (*get_robot_position_x)(),
-                                         float (*get_robot_position_y)(),
-                                         Wheel* front_right_wheel,
-                                         Wheel* front_left_wheel, Wheel* back_right_wheel,
-                                         Wheel* back_left_wheel)
+                                           float (*get_robot_position_x)(),
+                                           float (*get_robot_position_y)(),
+                                           Wheel_t* front_right_wheel,
+                                           Wheel_t* front_left_wheel,
+                                           Wheel_t* back_right_wheel,
+                                           Wheel_t* back_left_wheel)
 {
-    FirmwareRobot* new_robot = malloc(sizeof(FirmwareRobot));
+    FirmwareRobot_t* new_robot = malloc(sizeof(FirmwareRobot_t));
 
     new_robot->chicker              = chicker;
     new_robot->dribbler             = dribbler;
@@ -36,47 +37,47 @@ FirmwareRobot* app_firmware_robot_create(Chicker* chicker, Dribbler* dribbler,
     return new_robot;
 }
 
-void app_firmware_robot_destroy(FirmwareRobot* robot)
+void app_firmware_robot_destroy(FirmwareRobot_t* robot)
 {
     free(robot);
 }
 
-Chicker* app_firmware_robot_getChicker(FirmwareRobot* robot)
+Chicker_t* app_firmware_robot_getChicker(FirmwareRobot_t* robot)
 {
     return robot->chicker;
 }
 
-Dribbler* app_firmware_robot_getDribbler(FirmwareRobot* robot)
+Dribbler_t* app_firmware_robot_getDribbler(FirmwareRobot_t* robot)
 {
     return robot->dribbler;
 }
 
-float app_firmware_robot_getPositionX(FirmwareRobot* robot)
+float app_firmware_robot_getPositionX(FirmwareRobot_t* robot)
 {
     return robot->get_robot_position_x();
 }
 
-float app_firmware_robot_getPositionY(FirmwareRobot* robot)
+float app_firmware_robot_getPositionY(FirmwareRobot_t* robot)
 {
     return robot->get_robot_position_y();
 }
 
-Wheel* app_firmware_robot_getFrontRightWheel(FirmwareRobot* robot)
+Wheel_t* app_firmware_robot_getFrontRightWheel(FirmwareRobot_t* robot)
 {
     return robot->front_right_wheel;
 }
 
-Wheel* app_firmware_robot_getFrontLeftWheel(FirmwareRobot* robot)
+Wheel_t* app_firmware_robot_getFrontLeftWheel(FirmwareRobot_t* robot)
 {
     return robot->front_left_wheel;
 }
 
-Wheel* app_firmware_robot_getBackRightWheel(FirmwareRobot* robot)
+Wheel_t* app_firmware_robot_getBackRightWheel(FirmwareRobot_t* robot)
 {
     return robot->back_right_wheel;
 }
 
-Wheel* app_firmware_robot_getBackLeftWheel(FirmwareRobot* robot)
+Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot)
 {
     return robot->back_left_wheel;
 }
