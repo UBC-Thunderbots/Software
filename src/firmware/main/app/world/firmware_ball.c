@@ -1,4 +1,4 @@
-#include "world/firmware_ball.h"
+#include "app/world/firmware_ball.h"
 
 #include <stdlib.h>
 
@@ -10,7 +10,7 @@ struct FirmwareBall
     float (*get_ball_velocity_y)();
 };
 
-FirmwareBall* FirmwareBall_create(float (*get_ball_position_x)(),
+FirmwareBall* app_firmware_ball_create(float (*get_ball_position_x)(),
                                   float (*get_ball_position_y)(),
                                   float (*get_ball_velocity_x)(),
                                   float (*get_ball_velocity_y)())
@@ -25,27 +25,27 @@ FirmwareBall* FirmwareBall_create(float (*get_ball_position_x)(),
     return new_ball;
 }
 
-void FirmwareBall_destroy(FirmwareBall* ball)
+void app_firmware_ball_destroy(FirmwareBall* ball)
 {
     free(ball);
 }
 
-float FirmwareBall_getPositionX(FirmwareBall* ball)
+float app_firmware_ball_getPositionX(FirmwareBall* ball)
 {
     return ball->get_ball_position_x();
 }
 
-float FirmwareBall_getPositionY(FirmwareBall* ball)
+float app_firmware_ball_getPositionY(FirmwareBall* ball)
 {
     return ball->get_ball_position_y();
 }
 
-float FirmwareBall_getVelocityX(FirmwareBall* ball)
+float app_firmware_ball_getVelocityX(FirmwareBall* ball)
 {
     return ball->get_ball_velocity_x();
 }
 
-float FirmwareBall_getVelocityY(FirmwareBall* ball)
+float app_firmware_ball_getVelocityY(FirmwareBall* ball)
 {
     return ball->get_ball_position_y();
 }

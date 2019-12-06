@@ -1,4 +1,4 @@
-#include "world/dribbler.h"
+#include "app/world/dribbler.h"
 
 #include <stdlib.h>
 
@@ -8,7 +8,7 @@ struct Dribbler
     unsigned int (*get_temperature_deg_c)(void);
 };
 
-Dribbler* Dribbler_create(void (*set_speed)(uint32_t rpm),
+Dribbler* app_dribbler_create(void (*set_speed)(uint32_t rpm),
                           unsigned int (*get_temperature_deg_c)(void))
 {
     Dribbler* new_dribbler = malloc(sizeof(Dribbler));
@@ -19,17 +19,17 @@ Dribbler* Dribbler_create(void (*set_speed)(uint32_t rpm),
     return new_dribbler;
 }
 
-void Dribbler_destroy(Dribbler* dribbler)
+void app_dribbler_destroy(Dribbler* dribbler)
 {
     free(dribbler);
 }
 
-void Dribbler_setSpeed(Dribbler* dribbler, uint32_t rpm)
+void app_dribbler_setSpeed(Dribbler* dribbler, uint32_t rpm)
 {
     dribbler->set_speed(rpm);
 }
 
-unsigned int Dribbler_getTemperature(Dribbler* dribbler)
+unsigned int app_dribbler_getTemperature(Dribbler* dribbler)
 {
     return dribbler->get_temperature_deg_c();
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "world/chicker.h"
-#include "world/dribbler.h"
-#include "world/wheel.h"
+#include "app/world/chicker.h"
+#include "app/world/dribbler.h"
+#include "app/world/wheel.h"
 
 /**
  * This struct represents a robot from the perspective of firmware
@@ -27,7 +27,7 @@ typedef struct FirmwareRobot FirmwareRobot;
  * @return A pointer to a robot with the given hardware, ownership of the robot is
  *         given to the caller
  */
-FirmwareRobot* FirmwareRobot_create(Chicker* chicker, Dribbler* dribbler,
+FirmwareRobot* app_firmware_robot_create(Chicker* chicker, Dribbler* dribbler,
                                     float (*get_robot_position_x)(),
                                     float (*get_robot_position_y)(),
                                     Wheel* front_right_wheel, Wheel* front_left_wheel,
@@ -36,61 +36,61 @@ FirmwareRobot* FirmwareRobot_create(Chicker* chicker, Dribbler* dribbler,
 /**
  * Destroy the given robot, freeing any memory allocated for it
  *
- * NOTE: This will not destroy the values pointed to by any pointers passed into
- *       `FirmwareRobot_create`
+ * NOTE: This will not destroy the values pointed to by any pointers passed to the
+ *       `create` function
  *
  * @param robot The robot to destroy
  */
-void FirmwareRobot_destroy(FirmwareRobot* robot);
+void app_firmware_robot_destroy(FirmwareRobot* robot);
 
 /**
  * Get the chicker from the given robot
  * @param robot The robot to get the chicker from
  * @return The chicker from the given robot
  */
-Chicker* FirmwareRobot_getChicker(FirmwareRobot* robot);
+Chicker* app_firmware_robot_getChicker(FirmwareRobot* robot);
 
 /**
  * Get the dribbler from the given robot
  * @param robot The robot to get the dribbler from
  * @return The dribbler from the given robot
  */
-Dribbler* FirmwareRobot_getDribbler(FirmwareRobot* robot);
+Dribbler* app_firmware_robot_getDribbler(FirmwareRobot* robot);
 
 /**
  * Get the x-position of the given ball
  * @param ball The ball to get the y-position for
  * @return The x-position of the given ball, in meters
  */
-float FirmwareRobot_getPositionX(FirmwareRobot* robot);
+float app_firmware_robot_getPositionX(FirmwareRobot* robot);
 
 /**
  * Get the y-position of the given ball
  * @param ball The ball to get the y-position for
  * @return The y-position of the given ball, in meters
  */
-float FirmwareRobot_getPositionY(FirmwareRobot* robot);
+float app_firmware_robot_getPositionY(FirmwareRobot* robot);
 
 /**
  * Get the front right wheel from the given robot
  * @param robot The robot to get the front right wheel from
  * @return The front right wheel from the given robot
  */
-Wheel* FirmwareRobot_getFrontRightWheel(FirmwareRobot* robot);
+Wheel* app_firmware_robot_getFrontRightWheel(FirmwareRobot* robot);
 
 /**
  * Get the front left wheel from the given robot
  * @param robot The robot to get the front left wheel from
  * @return The front left wheel from the given robot
  */
-Wheel* FirmwareRobot_getFrontLeftWheel(FirmwareRobot* robot);
+Wheel* app_firmware_robot_getFrontLeftWheel(FirmwareRobot* robot);
 
 /**
  * Get the back right wheel from the given robot
  * @param robot The robot to get the back right wheel from
  * @return The back right wheel from the given robot
  */
-Wheel* FirmwareRobot_getBackRightWheel(FirmwareRobot* robot);
+Wheel* app_firmware_robot_getBackRightWheel(FirmwareRobot* robot);
 
 
 /**
@@ -98,4 +98,4 @@ Wheel* FirmwareRobot_getBackRightWheel(FirmwareRobot* robot);
  * @param robot The robot to get the back left wheel from
  * @return The back left wheel from the given robot
  */
-Wheel* FirmwareRobot_getBackLeftWheel(FirmwareRobot* robot);
+Wheel* app_firmware_robot_getBackLeftWheel(FirmwareRobot* robot);

@@ -21,7 +21,7 @@ typedef struct FirmwareBall FirmwareBall;
  * @return A pointer to a ball that will use the given methods to get the ball state,
  *         ownership of the ball is given to the caller
  */
-FirmwareBall* FirmwareBall_create(float (*get_ball_position_x)(),
+FirmwareBall* app_firmware_ball_create(float (*get_ball_position_x)(),
                                   float (*get_ball_position_y)(),
                                   float (*get_ball_velocity_x)(),
                                   float (*get_ball_velocity_y)());
@@ -29,37 +29,37 @@ FirmwareBall* FirmwareBall_create(float (*get_ball_position_x)(),
 /**
  * Destroy the given ball, freeing any memory allocated for it
  *
- * NOTE: This will not destroy the values pointed to by any pointers passed into
- *       `FirmwareBall_create`
+ * NOTE: This will not destroy the values pointed to by any pointers passed to the
+ *       `create` function
  *
  * @param ball The ball to destroy
  */
-void FirmwareBall_destroy(FirmwareBall* ball);
+void app_firmware_ball_destroy(FirmwareBall* ball);
 
 /**
  * Get the x-position of the given ball
  * @param ball The ball to get the x-position for
  * @return The x-position of the given ball, in meters
  */
-float FirmwareBall_getPositionX(FirmwareBall* ball);
+float app_firmware_ball_getPositionX(FirmwareBall* ball);
 
 /**
  * Get the y-position of the given ball
  * @param ball The ball to get the y-position for
  * @return The y-position of the given ball, in meters
  */
-float FirmwareBall_getPositionY(FirmwareBall* ball);
+float app_firmware_ball_getPositionY(FirmwareBall* ball);
 
 /**
  * Get the x component of velocity of the given ball
  * @param ball The ball to get the x component of velocity for
  * @return The x component of velocity of the given ball, in meters per second
  */
-float FirmwareBall_getVelocityX(FirmwareBall* ball);
+float app_firmware_ball_getVelocityX(FirmwareBall* ball);
 
 /**
  * Get the y component of velocity of the given ball
  * @param ball The ball to get the y component of velocity for
  * @return The y component of velocity of the given ball, in meters per second
  */
-float FirmwareBall_getVelocityY(FirmwareBall* ball);
+float app_firmware_ball_getVelocityY(FirmwareBall* ball);

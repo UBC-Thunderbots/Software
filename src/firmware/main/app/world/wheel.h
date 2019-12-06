@@ -18,8 +18,8 @@ Wheel* Wheel_create(void (*apply_wheel_force)(float force_in_newtons));
 /**
  * Destroy the given wheel, freeing any memory allocated for it
  *
- * NOTE: This will not destroy the values pointed to by any pointers passed into
- *       `Wheel_create`
+ * NOTE: This will not destroy the values pointed to by any pointers passed to the
+ *       `create` function
  *
  * @param wheel The wheel to destroy
  */

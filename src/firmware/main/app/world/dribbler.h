@@ -17,29 +17,29 @@ typedef struct Dribbler Dribbler;
  *
  * @return A pointer to the created dribbler, ownership is given to the caller
  */
-Dribbler* Dribbler_create(void (*set_speed)(uint32_t rpm),
+Dribbler* app_dribbler_create(void (*set_speed)(uint32_t rpm),
                           unsigned int (*get_temperature_deg_c)(void));
 
 /**
  * Destroy the given dribbler, freeing any memory allocated for it
  *
- * NOTE: This will not destroy the values pointed to by any pointers passed into
- *       `Dribbler_create`
+ * NOTE: This will not destroy the values pointed to by any pointers passed to the
+ *       `create` function
  *
  * @param dribbler The dribbler to destroy
  */
-void Dribbler_destroy(Dribbler* dribbler);
+void app_dribbler_destroy(Dribbler* dribbler);
 
 /**
  * Set the speed of the given dribbler
  * @param dribbler The dribbler to set the speed of
  * @param rpm The rpm to set the dribbler to
  */
-void Dribbler_setSpeed(Dribbler* dribbler, uint32_t rpm);
+void app_dribbler_setSpeed(Dribbler* dribbler, uint32_t rpm);
 
 /**
  * Get the temperature of the given dribbler
  * @param dribbler The dribbler to get the temperature of
  * @return The temperature of the dribbler, in degrees celsius
  */
-unsigned int Dribbler_getTemperature(Dribbler* dribbler);
+unsigned int app_dribbler_getTemperature(Dribbler* dribbler);

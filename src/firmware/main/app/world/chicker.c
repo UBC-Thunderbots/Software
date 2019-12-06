@@ -1,4 +1,4 @@
-#include "world/chicker.h"
+#include "app/world/chicker.h"
 
 #include <stdlib.h>
 
@@ -12,7 +12,7 @@ struct Chicker
     void (*disable_autochip)(void);
 };
 
-Chicker* Chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float distance_m),
+Chicker* app_chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float distance_m),
                         void (*enable_autokick)(float speed_m_per_s),
                         void (*enable_autochip)(float distance_m),
                         void (*disable_autokick)(void), void (*disable_autochip)(void))
@@ -27,37 +27,37 @@ Chicker* Chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float di
     return new_chicker;
 }
 
-void Chicker_destroy(Chicker* chicker)
+void app_chicker_destroy(Chicker* chicker)
 {
     free(chicker);
 }
 
-void Chicker_kick(Chicker* chicker, float speed_m_per_s)
+void app_chicker_kick(Chicker* chicker, float speed_m_per_s)
 {
     chicker->kick(speed_m_per_s);
 }
 
-void Chicker_chip(Chicker* chicker, float distance_m)
+void app_chicker_chip(Chicker* chicker, float distance_m)
 {
     chicker->chip(distance_m);
 }
 
-void Chicker_enableAutokick(Chicker* chicker, float speed_m_per_s)
+void app_chicker_enableAutokick(Chicker* chicker, float speed_m_per_s)
 {
     chicker->enable_autokick(speed_m_per_s);
 }
 
-void Chicker_enableAutochip(Chicker* chicker, float distance_m)
+void app_chicker_enableAutoChip(Chicker* chicker, float distance_m)
 {
     chicker->enable_autochip(distance_m);
 }
 
-void Chicker_disableAutokick(Chicker* chicker)
+void app_chicker_disableAutokick(Chicker* chicker)
 {
     chicker->disable_autokick();
 }
 
-void Chicker_disableAutochip(Chicker* chicker)
+void app_chicker_disableAutochip(Chicker* chicker)
 {
     chicker->disable_autochip();
 }

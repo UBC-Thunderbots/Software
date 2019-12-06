@@ -27,7 +27,7 @@ typedef struct Chicker Chicker;
  *
  * @return A pointer to the created chicker, ownership is given to the caller
  */
-Chicker* Chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float distance_m),
+Chicker* app_chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float distance_m),
                         void (*enable_autokick)(float speed_m_per_s),
                         void (*enable_autochip)(float distance_m),
                         void (*disable_autokick)(void), void (*disable_autochip)(void));
@@ -35,19 +35,19 @@ Chicker* Chicker_create(void (*kick)(float speed_m_per_s), void (*chip)(float di
 /**
  * Destroy the given chicker, freeing any memory allocated for it
  *
- * NOTE: This will not destroy the values pointed to by any pointers passed into
- *       `Firmwarechicker_create`
+ * NOTE: This will not destroy the values pointed to by any pointers passed to the
+ *       `create` function
  *
  * @param chicker The chicker to destroy
  */
-void Chicker_destroy(Chicker* chicker);
+void app_chicker_destroy(Chicker* chicker);
 
 /**
  * Kick with the given chicker at the given speed
  * @param chicker The chicker to kick with
  * @param speed_m_per_s  The speed to kick at, in meters per second
  */
-void Chicker_kick(Chicker* chicker, float speed_m_per_s);
+void app_chicker_kick(Chicker* chicker, float speed_m_per_s);
 
 /**
  * Chip with the given chicker at the given speed
@@ -55,30 +55,30 @@ void Chicker_kick(Chicker* chicker, float speed_m_per_s);
  * @param distance_m  The distance to chip, in meters. This distance is the distance to
  * the first bounce.
  */
-void Chicker_chip(Chicker* chicker, float distance_m);
+void app_chicker_chip(Chicker* chicker, float distance_m);
 
 /**
  * Enable autokick on the given chicker
  * @param chicker The chicker to enable autokick on
  * @param speed_m_per_s The speed of the kick, in meters per second
  */
-void Chicker_enableAutokick(Chicker* chicker, float speed_m_per_s);
+void app_chicker_enableAutokick(Chicker* chicker, float speed_m_per_s);
 
 /**
  * Enable autochip on the given chicker
  * @param chicker The chicker to enable autochip on
  * @param distance_m The distance to chip, in meters
  */
-void Chicker_enableAutochip(Chicker* chicker, float distance_m);
+void app_chicker_enableAutoChip(Chicker* chicker, float distance_m);
 
 /**
  * Disable autokick on the given chicker
  * @param chicker The chicker to disable autokick on
  */
-void Chicker_disableAutokick(Chicker* chicker);
+void app_chicker_disableAutokick(Chicker* chicker);
 
 /**
  * Disable autochip on the given chicker
  * @param chicker The chicker to disable autochip on
  */
-void Chicker_disableAutochip(Chicker* chicker);
+void app_chicker_disableAutochip(Chicker* chicker);

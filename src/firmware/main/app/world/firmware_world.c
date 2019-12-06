@@ -1,4 +1,4 @@
-#include "world/firmware_world.h"
+#include "app/world/firmware_world.h"
 
 #include <stdlib.h>
 
@@ -8,7 +8,7 @@ struct FirmwareWorld
     FirmwareBall* ball;
 };
 
-FirmwareWorld* FirmwareWorld_create(FirmwareRobot* robot, FirmwareBall* ball)
+FirmwareWorld* app_firmware_world_create(FirmwareRobot* robot, FirmwareBall* ball)
 {
     FirmwareWorld* new_world = malloc(sizeof(FirmwareWorld));
 
@@ -19,17 +19,17 @@ FirmwareWorld* FirmwareWorld_create(FirmwareRobot* robot, FirmwareBall* ball)
 }
 
 
-void FirmwareWorld_destroy(FirmwareWorld* world)
+void app_firmware_world_destroy(FirmwareWorld* world)
 {
     free(world);
 }
 
-FirmwareRobot* FirmwareWorld_getFirmwareRobot(FirmwareWorld* world)
+FirmwareRobot* app_firmware_world_getRobot(FirmwareWorld* world)
 {
     return world->robot;
 }
 
-FirmwareBall* FirmwareWorld_getFirmwareBall(FirmwareWorld* world)
+FirmwareBall* app_firmware_world_getBall(FirmwareWorld* world)
 {
     return world->ball;
 }
