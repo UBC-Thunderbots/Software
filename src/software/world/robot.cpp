@@ -7,14 +7,14 @@
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_duration,
-             const std::set<RobotCapabilities::Capability> &capabilities)
+             const std::set<RobotCapabilities::Capability> &unavailable_capabilities)
     : id_(id),
       positions_(history_duration),
       velocities_(history_duration),
       orientations_(history_duration),
       angularVelocities_(history_duration),
       last_update_timestamps(history_duration),
-      capabilities_(capabilities)
+      unavailable_capabilities_(unavailable_capabilities)
 {
     addStateToRobotHistory(position, velocity, orientation, angular_velocity, timestamp);
 }
@@ -253,12 +253,12 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapabilities::Capability> &Robot::getRobotCapabilities() const
+const std::set<RobotCapabilities::Capability> &Robot::getCapabiltiesBlacklist() const
 {
-    return capabilities_;
+    return unavailable_capabilities_;
 }
 
 std::set<RobotCapabilities::Capability> &Robot::getMutableRobotCapabilities()
 {
-    return capabilities_;
+    return unavailable_capabilities_;
 }
