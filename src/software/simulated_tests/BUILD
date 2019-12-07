@@ -23,6 +23,7 @@ cc_library(
         "//software/simulated_tests/validation:world_state_validator",
         "//software/util/logger",
         "//software/util/time:duration",
+        "//software/visualizer:visualizer_wrapper",
         "@gtest",
     ],
 )
