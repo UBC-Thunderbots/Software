@@ -86,7 +86,6 @@ bool WorldStateValidator::waitForValidationToPass(
     }
     else
     {
-        LOG(INFO) << "Validation passed!";
         return true;
     }
 }
