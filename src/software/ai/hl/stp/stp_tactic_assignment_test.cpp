@@ -360,9 +360,7 @@ TEST_F(STPTacticAssignmentTest,
     // this robot has no capabilities
     using RobotCapabilities::Capability;
     Robot robot_0(0, Point(0.1, 0.1), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0), 10,
-                  std::set<RobotCapabilities::Capability>{Capability::Move, Capability::Kick,
-                                                                                Capability::Chip, Capability::Dribble});
+                  Timestamp::fromSeconds(0), 10, RobotCapabilities::allCapabilities());
     // default is all capabilities, if not specified otherwise
     Robot robot_1(1, Point(-10, -10), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));

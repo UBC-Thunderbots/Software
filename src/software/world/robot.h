@@ -30,11 +30,12 @@ class Robot
      * state
      * @param history_duration The number of previous robot states that should be stored.
      */
-    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
-                   const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp, unsigned int history_duration = 20,
-                   const std::set<RobotCapabilities::Capability> &unavailable_capabilities =
-                           std::set<RobotCapabilities::Capability>());
+    explicit Robot(
+        RobotId id, const Point &position, const Vector &velocity,
+        const Angle &orientation, const AngularVelocity &angular_velocity,
+        const Timestamp &timestamp, unsigned int history_duration = 20,
+        const std::set<RobotCapabilities::Capability> &unavailable_capabilities =
+            std::set<RobotCapabilities::Capability>());
 
     /**
      * Updates the state of the robot.
