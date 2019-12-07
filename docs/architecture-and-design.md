@@ -44,6 +44,7 @@
       * [Plays](#plays)
     * [Navigation](#navigation)
       * [Path Manager](#path-manager)
+      * [Path Objective](#path-objective)
       * [Path Planner](#path-planner)
         * [Theta Star Path Planner](#theta-star-path-planner)
     * [Diagram](#ai-diagram)
@@ -390,10 +391,13 @@ Most [Intents](#intents) are easy to break down into  [Primitives](#primitives),
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
 
 ### Path Manager
-The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of path objectives and path planner, and it will generate paths using the given path planner and arbitrate between paths to prevent collisions. One approach is to add extra obstacles to cause the path planner to generate paths that avoid potential collisions; this is what `VelocityObstaclePathManager` implements. One disadvantage of this approach is that it does not account for when robots will occupy particular positions on the path. (Trajectory planning or use of the Minkowski space are possible ideas to account for time.)
+The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions. One approach is to add extra obstacles to cause the path planner to generate paths that avoid potential collisions; this is what `VelocityObstaclePathManager` implements. The approach is somewhat like using [Minkowski space](https://en.wikipedia.org/wiki/Minkowski_space), but where we assume that a robot will occupy all the positions along the path for the next time step. However, it's a very crude implementation.
+
+### Path Objective
+A path objective is used to communicate between the navigator and the path manager. It conveys information for generating one path, such as start, destination, and obstacles.
 
 ### Path Planner
-The `Path Planner` is responsible for path planning a single robot around a single set of obstacles from a given start to a given destination. Note that the interface of the path planner is intentionally decoupled from the rest of AI, so that it doesn't rely on the representation of [Intents](#intents) or [World](#world).
+The `Path Planner` is an interface for the responsibility of path planning a single robot around a single set of obstacles from a given start to a given destination. The interface allows us to easily swap out path planners.
 
 #### Theta Star Path Planner
 The `Theta Star Path Planner` is a path planner that determines a series of points from the start and destination, such that none of the points are in an obstacle and none of the line segments between adjacent points cross an obstacle. It is a grid-based graph algorithm, but it allows any two nodes to be connected to each other, as long as there's line of sight. It will optimize for the shortest total path length.
