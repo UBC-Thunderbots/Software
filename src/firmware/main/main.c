@@ -35,14 +35,15 @@
 #include <unused.h>
 #include <usb.h>
 
+#include "app/world/firmware_world.h"
 #include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
 #include "io/charger.h"
 #include "io/chicker.h"
-#include "io/dribbler.h"
 #include "io/dma.h"
 #include "io/dr.h"
+#include "io/dribbler.h"
 #include "io/encoder.h"
 #include "io/feedback.h"
 #include "io/icb.h"
@@ -62,7 +63,6 @@
 #include "upgrade/fw.h"
 #include "util/constants.h"
 #include "util/log.h"
-#include "world/firmware_world.h"
 
 static void stm32_main(void) __attribute__((noreturn));
 
@@ -460,17 +460,22 @@ static void run_normal(void)
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
     // TODO: put this in a function?
-    Wheel* front_right_wheel = Wheel_create(apply_wheel_force_front_right);
-    Wheel* front_left_wheel  = Wheel_create(apply_wheel_force_front_left);
-    Wheel* back_right_wheel  = Wheel_create(apply_wheel_force_back_right);
-    Wheel* back_left_wheel   = Wheel_create(apply_wheel_force_back_left);
-    Chicker* chicker         = Chicker_create(chicker_kick, chicker_chip,
-                                      chicker_enable_auto_kick, chicker_enable_auto_chip,
-                                      chicker_auto_disarm, chicker_auto_disarm);
-    Dribbler* dribbler       = Dribbler_create(dribbler_set_speed, dribbler_temperature);
-    FirmwareRobot* robot = FirmwareRobot_create(chicker, dribbler, front_right_wheel, front_left_wheel,
-                                back_right_wheel, back_left_wheel);
-    FirmwareWorld* world = FirmwareWorld_create(robot);
+    Wheel_t* front_right_wheel = app_wheel_create(apply_wheel_force_front_right);
+    Wheel_t* front_left_wheel  = app_wheel_create(apply_wheel_force_front_left);
+    Wheel_t* back_right_wheel  = app_wheel_create(apply_wheel_force_back_right);
+    Wheel_t* back_left_wheel   = app_wheel_create(apply_wheel_force_back_left);
+    Chicker_t* chicker         = app_chicker_create(
+        chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
+        chicker_auto_disarm, chicker_auto_disarm);
+    Dribbler_t* dribbler = app_dribbler_create(dribbler_set_speed, dribbler_temperature);
+    FirmwareRobot_t* robot =
+        app_firmware_robot_create(chicker, dribbler, dr_get_robot_position_x,
+                                  dr_get_robot_position_y, front_right_wheel,
+                                  front_left_wheel, back_right_wheel, back_left_wheel);
+    FirmwareBall_t* ball =
+        app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
+                                 dr_get_ball_velocity_x, dr_get_ball_velocity_y);
+    FirmwareWorld_t* world = app_firmware_world_create(robot, ball);
 
     // Receive must be the second-last module initialized, because received
     // packets can cause calls to other modules.
@@ -550,14 +555,14 @@ static void run_normal(void)
     motor_shutdown();
 
     // TODO: put this in a function?
-    FirmwareWorld_destroy(world);
-    FirmwareRobot_destroy(robot);
-    Dribbler_destroy(dribbler);
-    Chicker_destroy(chicker);
-    Wheel_destroy(front_right_wheel);
-    Wheel_destroy(front_left_wheel);
-    Wheel_destroy(back_right_wheel);
-    Wheel_destroy(back_left_wheel);
+    app_firmware_world_destroy(world);
+    app_firmware_robot_destroy(robot);
+    app_dribbler_destroy(dribbler);
+    app_chicker_destroy(chicker);
+    app_wheel_destroy(front_right_wheel);
+    app_wheel_destroy(front_left_wheel);
+    app_wheel_destroy(back_right_wheel);
+    app_wheel_destroy(back_left_wheel);
 
     // Kick the hardware watchdog to avoid timeouts. Chicker shutdown sometimes
     // takes up to three seconds, particularly if the board is not plugged in,

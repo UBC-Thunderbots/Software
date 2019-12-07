@@ -71,7 +71,7 @@ void app_chicker_enableAutokick(Chicker_t* chicker, float speed_m_per_s);
  * @param chicker The chicker to enable autochip on
  * @param distance_m The distance to chip, in meters
  */
-void app_chicker_enableAutoChip(Chicker_t* chicker, float distance_m);
+void app_chicker_enableAutochip(Chicker_t* chicker, float distance_m);
 
 /**
  * Disable autokick on the given chicker

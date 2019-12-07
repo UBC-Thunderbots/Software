@@ -156,7 +156,7 @@ static void move_init(void)
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void move_start(const primitive_params_t *params, FirmwareWorld* world)
+static void move_start(const primitive_params_t *params, FirmwareWorld_t* world)
 {
     // Parameters:     destination_x [mm]
     //                destination_y [mm]
@@ -187,14 +187,14 @@ static void move_start(const primitive_params_t *params, FirmwareWorld* world)
     // pick the wheel axis that will be used for faster movement
     wheel_index = choose_wheel_axis(dx, dy, current_states.angle, destination[2]);
 
-    Chicker* chicker = FirmwareRobot_getChicker(FirmwareWorld_getRobot(world));
+    Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
 
     if (params->extra & 0x01)
-        Chicker_enableAutokick(chicker, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+        app_chicker_enableAutokick(chicker, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     if (params->extra & 0x02)
         dribbler_set_speed(16000);
     if (params->extra & 0x04)
-        Chicker_enableAutochip(chicker, 2);
+        app_chicker_enableAutochip(chicker, 2);
 }
 
 /**
@@ -222,7 +222,7 @@ static void move_end(void)
  * @param[in] world an object representing the world
  * @return void
  */
-static void move_tick(log_record_t *log, FirmwareWorld *world)
+static void move_tick(log_record_t *log, FirmwareWorld_t *world)
 {
     printf("Move tick called.\n");
     // get the state of the bot

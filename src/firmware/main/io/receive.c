@@ -60,7 +60,7 @@
         1 /*Status*/
 
 static unsigned int robot_index;
-static FirmwareWorld* world;
+static FirmwareWorld_t* world;
 static uint8_t *dma_buffer;
 static SemaphoreHandle_t drive_mtx;
 static unsigned int timeout_ticks;
@@ -137,7 +137,7 @@ static void receive_task(void *UNUSED(param))
  * \param[in] world_ The world the "high level" firmware can use to interact with the
  *                   outside world
  */
-void receive_init(unsigned int index, FirmwareWorld* _world)
+void receive_init(unsigned int index, FirmwareWorld_t* _world)
 {
     static StaticSemaphore_t drive_mtx_storage;
     drive_mtx = xSemaphoreCreateMutexStatic(&drive_mtx_storage);

@@ -62,14 +62,14 @@
 #include "main.h"
 #include "primitives/primitive.h"
 #include "priority.h"
-#include "world/firmware_world.h"
+#include "app/world/firmware_world.h"
 
 // Verify that all the timing requirements are set up properly.
 _Static_assert(portTICK_PERIOD_MS *CONTROL_LOOP_HZ == 1000U,
                "Tick rate is not equal to control loop period.");
 
 static bool shutdown = false;
-static FirmwareWorld* world;
+static FirmwareWorld_t* world;
 
 static void normal_task(void *UNUSED(param))
 {
@@ -137,7 +137,7 @@ static void normal_task(void *UNUSED(param))
  * \param[in] _world The world the "high level" firmware can use to interact with the
  *                   outside world
  */
-void tick_init(FirmwareWorld* _world)
+void tick_init(FirmwareWorld_t* _world)
 {
     world = _world;
 

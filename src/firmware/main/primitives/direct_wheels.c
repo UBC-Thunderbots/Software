@@ -32,7 +32,7 @@ static void direct_wheels_init(void) {}
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void direct_wheels_start(const primitive_params_t *params, FirmwareWorld* world)
+static void direct_wheels_start(const primitive_params_t *params, FirmwareWorld_t* world)
 {
     // Send the PWM values directly to the wheels and dribbler.
     for (unsigned int i = 0; i != WHEELS_NUM_WHEELS; ++i)
@@ -62,7 +62,7 @@ static void direct_wheels_end(void)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void direct_wheels_tick(log_record_t *UNUSED(log), FirmwareWorld *world)
+static void direct_wheels_tick(log_record_t *UNUSED(log), FirmwareWorld_t *world)
 {
     // Nothing to do here; the PWM values are sent to the wheels as soon as
     // they are received from the radio.

@@ -60,7 +60,7 @@ float dribbler_speed;
  * dribbler set speed in rpm
  * \param[in] world TODO?
  */
-static void catch_start(const primitive_params_t *params, FirmwareWorld* world)
+static void catch_start(const primitive_params_t *params, FirmwareWorld_t* world)
 {
     for (unsigned int i = 0; i < 4; i++)
     {
@@ -100,7 +100,7 @@ static void catch_end(void) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void catch_tick(log_record_t *log, FirmwareWorld *world)
+static void catch_tick(log_record_t *log, FirmwareWorld_t *world)
 {
     // Grab Camera Data
     dr_data_t current_states;

@@ -57,7 +57,7 @@ float compute_magnitude(float a[2])
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void pivot_start(const primitive_params_t *params, FirmwareWorld* world)
+static void pivot_start(const primitive_params_t *params, FirmwareWorld_t* world)
 {
     center[0] = params->params[0] / 1000.0;
     center[1] = params->params[1] / 1000.0;
@@ -112,7 +112,7 @@ static void pivot_end(void) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void pivot_tick(log_record_t *log, FirmwareWorld *world)
+static void pivot_tick(log_record_t *log, FirmwareWorld_t *world)
 {
     dr_data_t current_bot_state;
     dr_get(&current_bot_state);

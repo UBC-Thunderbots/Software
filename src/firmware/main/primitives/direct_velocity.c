@@ -24,7 +24,7 @@ static void direct_velocity_init(void) {}
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void direct_velocity_start(const primitive_params_t *params, FirmwareWorld* world)
+static void direct_velocity_start(const primitive_params_t *params, FirmwareWorld_t* world)
 {
     direct_target_velocity[0] = params->params[0] / 1000.0f;
     direct_target_velocity[1] = params->params[1] / 1000.0f;
@@ -49,7 +49,7 @@ static void direct_velocity_end(void) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void direct_velocity_tick(log_record_t *UNUSED(log), FirmwareWorld *world)
+static void direct_velocity_tick(log_record_t *UNUSED(log), FirmwareWorld_t *world)
 {
     track_vel_target(direct_target_velocity, direct_target_velocity[2]);
 }

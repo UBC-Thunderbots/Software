@@ -112,7 +112,8 @@ void dr_tick(log_record_t *log)
 }
 
 /**
- * \brief provides current state information to caller
+ * \brief provides current state information about the robot to caller
+ * \param ret The struct to populate with the robot data
  */
 void dr_get(dr_data_t *ret)
 {
@@ -120,11 +121,63 @@ void dr_get(dr_data_t *ret)
 }
 
 /**
- * \brief provides current state information to caller
+ * \brief provides current state information about the ball to caller
+ * \param ret The struct to populate with the ball data
  */
-void dr_get_ball(dr_ball_data_t *ret)
-{
+void dr_get_ball(dr_ball_data_t* ret){
     *ret = current_ball_state;
+}
+
+/**
+ * \brief Get the x-component of the robot's position
+ * \return The x-component of the robot's position
+ */
+float dr_get_robot_position_x(){
+    return current_state.x;
+}
+
+/**
+ * \brief Get the y-component of the robot's position
+ * \return The y-component of the robot's position
+ */
+float dr_get_robot_position_y(){
+    return current_state.y;
+}
+
+/**
+ * \brief Get the x-component of the ball's position
+ * \return The x-component of the ball's position
+ */
+float dr_get_ball_position_x()
+{
+    return current_ball_state.x;
+}
+
+/**
+ * \brief Get the y-component of the ball's position
+ * \return The y-component of the ball's position
+ */
+float dr_get_ball_position_y()
+{
+    return current_ball_state.y;
+}
+
+/**
+ * \brief Get the x-component of the ball's velocity
+ * \return The x-component of the ball's velocity
+ */
+float dr_get_ball_velocity_x()
+{
+    return current_ball_state.vx;
+}
+
+/**
+ * \brief Get the y-component of the ball's velocity
+ * \return The y-component of the ball's velocity
+ */
+float dr_get_ball_velocity_y()
+{
+    return current_ball_state.vy;
 }
 
 /**
