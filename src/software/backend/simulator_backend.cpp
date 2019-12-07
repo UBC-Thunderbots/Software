@@ -23,7 +23,7 @@ SimulatorBackend::SimulatorBackend(
 
 SimulatorBackend::SimulatorBackend()
     : SimulatorBackend(Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
-                       SimulationSpeed::FAST_SIMULATION)
+                       SimulationSpeed::REALTIME_SIMULATION)
 {
 }
 

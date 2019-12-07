@@ -19,7 +19,6 @@ cc_library(
     deps = [
         "//software/ai:ai_wrapper",
         "//software/backend:simulator_backend",
-        "//software/gui:visualizer_wrapper",
         "//software/simulated_tests/validation:world_state_validator",
         "//software/util/logger",
         "//software/util/time:duration",
