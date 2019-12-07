@@ -125,5 +125,5 @@ class SimulatorBackend : public Backend
     const unsigned int primitive_buffer_size = 1;
     ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
     // How long to wait for primitives, in wall-clock time
-    const Duration primitive_timeout = Duration::fromSeconds(5);
+    const Duration primitive_timeout = Duration::fromSeconds(1);
 };

@@ -80,7 +80,7 @@ bool WorldStateValidator::waitForValidationToPass(
 
     if (!validation_successful && !function_validators.empty())
     {
-        LOG(INFO)
+        LOG(WARNING)
             << "Validation failed. Not all validation functions passed within the timeout duration";
         return false;
     }
