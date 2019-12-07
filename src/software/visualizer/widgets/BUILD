@@ -30,9 +30,8 @@ qt_cc_library(
         ":main_widget",
         "//software/ai/hl/stp:play_info",
         "//software/backend:robot_status",
-        "//software/geom",
-        "//software/visualizer/drawing:draw_functions",
-        "//software/world",
+        "//software/multithreading:thread_safe_buffer",
+        "//software/util/time:duration",
         "@qt//:qt_widgets",
     ],
 )

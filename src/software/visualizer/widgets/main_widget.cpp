@@ -1,5 +1,5 @@
 #include "software/visualizer/widgets/main_widget.h"
-#include "software/gui/geom/geometry_conversion.h"
+#include "software/visualizer/geom/geometry_conversion.h"
 
 MainWidget::MainWidget(QWidget* parent)
     : QWidget(parent),
@@ -39,13 +39,6 @@ MainWidget::MainWidget(QWidget* parent)
     update();
 }
 
-MainWidget::~MainWidget()
-{
-    delete main_widget;
-    delete scene;
-    delete glWidget;
-}
-
 void MainWidget::draw(WorldDrawFunction world_draw_function,
                       AIDrawFunction ai_draw_function)
 {
@@ -54,8 +47,7 @@ void MainWidget::draw(WorldDrawFunction world_draw_function,
     ai_draw_function.execute(scene);
 }
 
-void MainWidget::setDrawViewArea(const Rectangle view_area) {
-    scene->setSceneRect(createQRectF(view_area));
+void MainWidget::setDrawViewAreaToSceneContents() {
     main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
