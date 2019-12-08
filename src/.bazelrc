@@ -16,4 +16,3 @@ build --auto_cpu_environment_group=//cc_toolchain:cpus
 # between git branches or workspaces for the same project.
 # See https://docs.bazel.build/versions/master/remote-caching.html#disk-cache
 build --disk_cache=/tmp/thunderbots_bazel_disk_cache
-
