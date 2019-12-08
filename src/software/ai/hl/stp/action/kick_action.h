@@ -50,9 +50,9 @@ class KickAction : public Action
                              double kick_speed_meters_per_second);
 
     /**
-     * Get the direction this action wants to kick in, relative to the robot kicking
+     * Get the direction this action wants to kick in
      *
-     * @return The direction this action wants to kick in, relative to the robot kicking
+     * @return The direction this action wants to kick in
      */
     Angle getKickDirection();
 
