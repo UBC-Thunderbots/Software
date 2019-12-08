@@ -3,7 +3,6 @@
 /**
  * This struct represents the ball from the perspective of firmware
  */
-struct FirmwareBall;
 typedef struct FirmwareBall FirmwareBall_t;
 
 /**

@@ -5,7 +5,6 @@
 /**
  * This struct represents a robot dribbler from the perspective of firmware
  */
-struct Dribbler;
 typedef struct Dribbler Dribbler_t;
 
 /**

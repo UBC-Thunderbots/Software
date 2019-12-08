@@ -3,7 +3,6 @@
 /**
  * This struct represents a robot wheel, from the perspective of firmware
  */
-struct Wheel;
 typedef struct Wheel Wheel_t;
 
 /**
