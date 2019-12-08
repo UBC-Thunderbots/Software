@@ -172,11 +172,12 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (unsigned col = 0; col < num_cols; col++)
         {
-            if (!(tactics.at(col)->robotCapabilityRequirements() <=
-                  friendly_team_robots.at(row).getRobotCapabilities()))
+            if (friendly_team_robots.at(row).getCapabiltiesBlacklist().size() > 0 &&
+                friendly_team_robots.at(row).getCapabiltiesBlacklist() <=
+                    tactics.at(col)->robotCapabilityRequirements())
             {
-                // hardware requirements of tactic are not satisfied by the current
-                // robot set cost to 10.0f
+                // if the blacklist contains any subset of the required capabilties,
+                // set the cost to 10.0f
                 matrix(row, col) = 10.0f;
             }
             else
