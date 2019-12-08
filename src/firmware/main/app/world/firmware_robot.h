@@ -7,7 +7,6 @@
 /**
  * This struct represents a robot from the perspective of firmware
  */
-struct FirmwareRobot;
 typedef struct FirmwareRobot FirmwareRobot_t;
 
 /**

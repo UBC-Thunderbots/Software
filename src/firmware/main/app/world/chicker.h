@@ -4,7 +4,6 @@
  * This struct represents a robot chicker (kicker and chipper) from the perspective of
  * firmware
  */
-struct Chicker;
 typedef struct Chicker Chicker_t;
 
 /**

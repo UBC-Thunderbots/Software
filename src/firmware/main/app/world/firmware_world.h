@@ -6,7 +6,6 @@
 /**
  * This struct represents the world from the perspective of the firmware
  */
-struct FirmwareWorld;
 typedef struct FirmwareWorld FirmwareWorld_t;
 
 /**
