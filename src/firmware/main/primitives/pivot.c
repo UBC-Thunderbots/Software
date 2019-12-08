@@ -6,7 +6,6 @@
 #include "physics/physics.h"
 
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/leds.h"
 
 #define TIME_HORIZON 0.05f  // s
@@ -64,8 +63,10 @@ static void pivot_start(const primitive_params_t *params, FirmwareWorld_t* world
     angle     = params->params[2] / 100.0;
     speed     = params->params[3] / 100.0;
 
-    if (params->extra & 0x01)
-        dribbler_set_speed(16000);
+    if (params->extra & 0x01) {
+        Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+        app_dribbler_setSpeed(dribbler, 16000);
+    }
 
     radius = 0.15;  // ball radius + robot radius + buffer
 

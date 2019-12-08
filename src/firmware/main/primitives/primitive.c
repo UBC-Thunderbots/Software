@@ -14,7 +14,6 @@
 #include "direct_wheels.h"
 #include "dribble.h"
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/receive.h"
 #include "move.h"
 #include "pivot.h"
@@ -104,8 +103,14 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params, F
     {
         primitive_current->end(world);
     }
-    chicker_auto_disarm();
-    dribbler_set_speed(0);
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    Chicker_t* chicker = app_firmware_robot_getChicker(robot);
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
+
+    app_chicker_disableAutochip(chicker);
+    app_chicker_disableAutokick(chicker);
+    app_dribbler_setSpeed(dribbler, 0);
     primitive_current       = PRIMITIVES[primitive];
     primitive_current_index = primitive;
     primitive_current->start(params, world);

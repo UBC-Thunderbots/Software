@@ -12,7 +12,6 @@
 #include "util/physbot.h"
 
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/leds.h"
 
 // these are set to decouple the 3 axis from each other
@@ -172,9 +171,9 @@ static void shoot_start(const primitive_params_t *params, FirmwareWorld_t* world
  */
 static void shoot_end(FirmwareWorld_t* world)
 {
-#ifndef FWSIM
-    chicker_auto_disarm();
-#endif
+    Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    app_chicker_disableAutokick(chicker);
+    app_chicker_disableAutochip(chicker);
 }
 
 /**
@@ -206,19 +205,10 @@ static void shoot_tick(log_record_t *log, FirmwareWorld_t *world)
     scale(&pb);
     to_local_coords(accel, pb, states.angle, major_vec, minor_vec);
     apply_accel(accel, accel[2]);
-#ifndef FWSIm
     if (log)
     {
         to_log(log, pb.rot.time, accel);
     }
-#endif
-    /*
-        if(fabs(pb.rot.disp) < 10.0*M_PI/180.0){
-            //TODO: add a flag for 'accurate' or not
-            chicker_auto_arm( chip ? CHICKER_CHIP : CHICKER_KICK, shoot_power);
-        }else{
-            chicker_auto_disarm();
-        }*/
 }
 
 

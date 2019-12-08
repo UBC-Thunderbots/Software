@@ -48,6 +48,7 @@ static void stop_start(const primitive_params_t *params, FirmwareWorld_t* world)
     }
     if (!params->extra)
     {
+        // TODO: what to do here. Should coasting be part of the "world" API?
         dribbler_coast();
     }
 }
