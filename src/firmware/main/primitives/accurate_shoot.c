@@ -6,7 +6,6 @@
 #include "control/bangbang.h"
 #include "control/control.h"
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/leds.h"
 #include "physics/physics.h"
 
@@ -80,11 +79,6 @@ static void accurate_shoot_start(const primitive_params_t *params, FirmwareWorld
     minor_vec[0] = major_vec[0];
     minor_vec[1] = major_vec[1];
     rotate(minor_vec, M_PI / 2);
-
-    // arm the chicker
-    //	chicker_auto_arm((params->extra & 1) ? CHICKER_CHIP : CHICKER_KICK,
-    // params->params[3]); 	if (!(params->extra & 1)) { 		dribbler_set_speed(8000);
-    //	}
 }
 
 /**
@@ -92,10 +86,13 @@ static void accurate_shoot_start(const primitive_params_t *params, FirmwareWorld
  *
  * This function runs when the host computer requests a new movement while an
  * accurate shoot movement is already in progress.
+ *
+ * \param[in] world TODO?
  */
-static void accurate_shoot_end(void)
+static void accurate_shoot_end(FirmwareWorld_t* world)
 {
-    chicker_auto_disarm();
+    Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    app_chicker_disableAutokick(chicker);
 }
 
 /**
@@ -189,8 +186,10 @@ static void accurate_shoot_tick(log_record_t *log, FirmwareWorld_t *world)
     }
     else
     {
+        FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+
         // accelerate at ball to kick it
-        Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+        Chicker_t* chicker = app_firmware_robot_getChicker(robot);
         bool chipping = global_params->extra & 1;
         if (chipping){
             float chip_distance = global_params->params[3];
@@ -201,7 +200,8 @@ static void accurate_shoot_tick(log_record_t *log, FirmwareWorld_t *world)
         }
 
         if (!chipping){
-            dribbler_set_speed(8000);
+            Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
+            app_dribbler_setSpeed(dribbler, 8000);
         }
 
         PrepareBBTrajectoryMaxV(&major_profile, major_disp, major_vel, 1.0, 1.5, 1.5);

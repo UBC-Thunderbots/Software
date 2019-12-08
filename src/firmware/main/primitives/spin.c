@@ -85,8 +85,10 @@ static void spin_start(const primitive_params_t *p, FirmwareWorld_t* world)
  *
  * This function runs when the host computer requests a new movement while a
  * spin movement is already in progress.
+ *
+ * \param[in] world TODO?
  */
-static void spin_end(void) {}
+static void spin_end(FirmwareWorld_t* world) {}
 
 /**
  * \brief Ticks a movement of this type.

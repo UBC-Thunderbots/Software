@@ -5,7 +5,6 @@
 #include "control/bangbang.h"
 #include "control/control.h"
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "physics/physics.h"
 
 #define DRIBBLE_TIME_HORIZON 0.05f  // s
@@ -42,14 +41,18 @@ static void dribble_start(const primitive_params_t *params, FirmwareWorld_t* wor
     destination[0] = ((float)(params->params[0]) / 1000.0f);
     destination[1] = ((float)(params->params[1]) / 1000.0f);
     destination[2] = ((float)(params->params[2]) / 100.0f);
-    dribbler_set_speed(((unsigned int)(params->params[3])));
+
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    app_dribbler_setSpeed(dribbler, (unsigned int)(params->params[3]));
 }
 
 /**
  * \brief Ends a movement of this type.
- * * This function runs when the host computer requests a new movement while a * dribble
- * movement is already in progress. */
-static void dribble_end(void) {}
+ * This function runs when the host computer requests a new movement while a dribble
+ * movement is already in progress.
+ * \param[in] world TODO?
+ */
+static void dribble_end(FirmwareWorld_t* world) {}
 
 /**
  * \brief Ticks a movement of this type.

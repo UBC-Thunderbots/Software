@@ -46,7 +46,6 @@ static void catch_init(void) {}
 
 float catchvelocity;  // 0.4
 float catchmargin;    // 8.8
-
 float dribbler_speed;
 
 /**
@@ -69,18 +68,13 @@ static void catch_start(const primitive_params_t *params, FirmwareWorld_t* world
     catch_param.slow  = params->slow;
     catch_param.extra = params->extra;
 
-    // TO-DO set dribbler speed in GUI
-    unsigned int rpm = 6000;
-    dribbler_set_speed(rpm);
-
-    // pass params in (to do, add dribbler speed as a parameter)
+    // pass params in
     catchvelocity  = (float)catch_param.params[0];
     catchmargin    = (float)catch_param.params[2];
     dribbler_speed = (float)catch_param.params[1];
 
-    // unsigned int rpm = 6000;
-    dribbler_set_speed(dribbler_speed);
-    // finalangle = (float)catch_param.params[1]; //currently being unused
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    app_dribbler_setSpeed(dribbler, dribbler_speed);
 }
 
 /**
@@ -88,8 +82,9 @@ static void catch_start(const primitive_params_t *params, FirmwareWorld_t* world
  *
  * This function runs when the host computer requests a new movement while a
  * catch movement is already in progress.
+ * \param[in] world TODO?
  */
-static void catch_end(void) {}
+static void catch_end(FirmwareWorld_t* world) {}
 
 /**
  * \brief Ticks a movement of this type.

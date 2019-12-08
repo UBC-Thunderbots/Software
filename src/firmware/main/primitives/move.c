@@ -6,7 +6,6 @@
 #include "control/bangbang.h"
 #include "control/control.h"
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/leds.h"
 #include "physics/physics.h"
 #include "shared/constants.h"
@@ -187,12 +186,14 @@ static void move_start(const primitive_params_t *params, FirmwareWorld_t* world)
     // pick the wheel axis that will be used for faster movement
     wheel_index = choose_wheel_axis(dx, dy, current_states.angle, destination[2]);
 
-    Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    Chicker_t* chicker = app_firmware_robot_getChicker(robot);
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
 
     if (params->extra & 0x01)
         app_chicker_enableAutokick(chicker, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     if (params->extra & 0x02)
-        dribbler_set_speed(16000);
+        app_dribbler_setSpeed(dribbler, 16000);
     if (params->extra & 0x04)
         app_chicker_enableAutochip(chicker, 2);
 }
@@ -202,13 +203,20 @@ static void move_start(const primitive_params_t *params, FirmwareWorld_t* world)
  *
  * This function runs when the host computer requests a new movement while a
  * move movement is already in progress.
+ * \param[in] world TODO?
  *
  * @return void
  */
-static void move_end(void)
+static void move_end(FirmwareWorld_t* world)
 {
-    chicker_auto_disarm();
-    dribbler_set_speed(0);
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(robot);
+    app_chicker_disableAutochip(chicker);
+    app_chicker_disableAutokick(chicker);
+
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
+    app_dribbler_setSpeed(dribbler, 0);
 }
 
 

@@ -29,7 +29,9 @@ static void direct_velocity_start(const primitive_params_t *params, FirmwareWorl
     direct_target_velocity[0] = params->params[0] / 1000.0f;
     direct_target_velocity[1] = params->params[1] / 1000.0f;
     direct_target_velocity[2] = params->params[2] / 100.0f;
-    dribbler_set_speed((params->extra) * 300);
+
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    app_dribbler_setSpeed(dribbler, (params->extra) * 300);
 }
 
 /**
@@ -37,8 +39,9 @@ static void direct_velocity_start(const primitive_params_t *params, FirmwareWorl
  *
  * This function runs when the host computer requests a new movement while a
  * direct_velocity movement is already in progress.
+ * \param[in] world TODO?
  */
-static void direct_velocity_end(void) {}
+static void direct_velocity_end(FirmwareWorld_t* world) {}
 
 /**
  * \brief Ticks a movement of this type.

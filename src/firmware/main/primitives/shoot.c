@@ -168,8 +168,9 @@ static void shoot_start(const primitive_params_t *params, FirmwareWorld_t* world
     rotate(minor_vec, P_PI / 2);
  * This function runs when the host computer requests a new movement while a
  * shoot movement is already in progress.
+ * \param[in] world TODO?
  */
-static void shoot_end(void)
+static void shoot_end(FirmwareWorld_t* world)
 {
 #ifndef FWSIM
     chicker_auto_disarm();

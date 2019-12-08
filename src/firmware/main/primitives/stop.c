@@ -57,8 +57,10 @@ static void stop_start(const primitive_params_t *params, FirmwareWorld_t* world)
  *
  * This function runs when the host computer requests a new movement while a
  * stop movement is already in progress.
+ *
+ * \param[in] world TODO?
  */
-static void stop_end(void)
+static void stop_end(FirmwareWorld_t* world)
 {
     // Nothing to do here.
 }

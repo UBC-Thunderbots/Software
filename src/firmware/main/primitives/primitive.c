@@ -102,7 +102,7 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params, F
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
     if (primitive_current)
     {
-        primitive_current->end();
+        primitive_current->end(world);
     }
     chicker_auto_disarm();
     dribbler_set_speed(0);

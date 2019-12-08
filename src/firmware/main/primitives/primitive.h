@@ -69,8 +69,9 @@ typedef struct
      * This is invoked every time a new movement begins after a primitive has
      * been in use, regardless of whether the new movement is of the same or a
      * different type.
+     * \param[in] world TODO? REALLY CONSIDER
      */
-    void (*end)(void);
+    void (*end)(FirmwareWorld_t *world);
 
     /**
      * \brief Advances time in the primitive.
@@ -80,7 +81,7 @@ typedef struct
      *
      * \param[out] log the log record to fill with information about the tick,
      * or \c NULL if no record is to be filled
-     * \param[in] world an object representing the world
+     * \param[in] world TODO?
      */
     void (*tick)(log_record_t *log, FirmwareWorld_t *world);
 } primitive_t;

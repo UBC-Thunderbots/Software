@@ -100,8 +100,9 @@ static void pivot_start(const primitive_params_t *params, FirmwareWorld_t* world
  *
  * This function runs when the host computer requests a new movement while a
  * pivot movement is already in progress.
- **/
-static void pivot_end(void) {}
+ * \param[in] world TODO?
+ */
+static void pivot_end(FirmwareWorld_t* world) {}
 
 /**
  * \brief Ticks a movement of this type.
