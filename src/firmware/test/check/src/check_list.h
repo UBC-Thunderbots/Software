@@ -27,33 +27,33 @@ typedef struct List List;
 List *check_list_create(void);
 
 /* Is list at end? */
-int check_list_at_end(List * lp);
+int check_list_at_end(List *lp);
 
 /* Position list at front */
-void check_list_front(List * lp);
+void check_list_front(List *lp);
 
 /* Add a value to the front of the list,
    positioning newly added value as current value.
    More expensive than list_add_end, as it uses memmove. */
-void check_list_add_front(List * lp, void *val);
+void check_list_add_front(List *lp, void *val);
 
 /* Add a value to the end of the list,
    positioning newly added value as current value */
-void check_list_add_end(List * lp, void *val);
+void check_list_add_end(List *lp, void *val);
 
 /* Give the value of the current node */
-void *check_list_val(List * lp);
+void *check_list_val(List *lp);
 
 /* Position the list at the next node */
-void check_list_advance(List * lp);
+void check_list_advance(List *lp);
 
 /* Free a list, but don't free values */
-void check_list_free(List * lp);
+void check_list_free(List *lp);
 
-void check_list_apply(List * lp, void (*fp) (void *));
+void check_list_apply(List *lp, void (*fp)(void *));
 
 /* Return true if the list contains the value, false otherwise */
-int check_list_contains(List * lp, void *val);
+int check_list_contains(List *lp, void *val);
 
 
 #endif /* CHECK_LIST_H */

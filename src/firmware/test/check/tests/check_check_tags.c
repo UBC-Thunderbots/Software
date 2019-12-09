@@ -17,16 +17,17 @@
  * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
-#include "../lib/libcompat.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <check.h>
 #include <assert.h>
+#include <check.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "../lib/libcompat.h"
 #include "check_check.h"
 
-enum {
+enum
+{
     RED,
     BLUE,
     PURPLE,
@@ -78,7 +79,6 @@ END_TEST
 
 static SRunner *make_tagged_testrunner(void)
 {
-
     SRunner *sr;
     Suite *s1, *s2;
 
@@ -88,28 +88,28 @@ static SRunner *make_tagged_testrunner(void)
 
     red = tcase_create("Red");
     tcase_set_tags(red, "Red");
-    suite_add_tcase (s1, red);
+    suite_add_tcase(s1, red);
     tcase_add_test(red, red_test1);
 
     blue = tcase_create("Blue");
     tcase_set_tags(blue, "Blue");
-    suite_add_tcase (s1, blue);
+    suite_add_tcase(s1, blue);
     tcase_add_test(blue, blue_test1);
 
     s2 = suite_create("PurpleYellowBlack Suite");
 
     purple = tcase_create("Purple");
     tcase_set_tags(purple, "Red Blue");
-    suite_add_tcase (s2, purple);
+    suite_add_tcase(s2, purple);
     tcase_add_test(purple, purple_test1);
 
     yellow = tcase_create("Yellow");
     tcase_set_tags(yellow, "Yellow");
-    suite_add_tcase (s2, yellow);
+    suite_add_tcase(s2, yellow);
     tcase_add_test(yellow, yellow_test1);
 
     black = tcase_create("Black");
-    suite_add_tcase (s2, black);
+    suite_add_tcase(s2, black);
     tcase_add_test(black, black_test1);
 
     sr = srunner_create(s1);
@@ -118,17 +118,17 @@ static SRunner *make_tagged_testrunner(void)
     return sr;
 }
 
-static   SRunner *sr = NULL;
+static SRunner *sr = NULL;
 
 static void tag_test_setup(void)
 {
-  sr = make_tagged_testrunner();
-  srunner_set_fork_status(sr, CK_NOFORK);
+    sr = make_tagged_testrunner();
+    srunner_set_fork_status(sr, CK_NOFORK);
 }
 
-static void tag_test_teardown (void)
+static void tag_test_teardown(void)
 {
-    srunner_free (sr);
+    srunner_free(sr);
 }
 
 /*
@@ -145,8 +145,8 @@ START_TEST(null_filter)
     ck_assert(test_executed[PURPLE]);
     ck_assert(test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_nothing)
 {
@@ -159,8 +159,8 @@ START_TEST(include_nothing)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(exclude_nothing)
 {
@@ -173,8 +173,8 @@ START_TEST(exclude_nothing)
     ck_assert(test_executed[PURPLE]);
     ck_assert(test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_nothing_exclude_nothing)
 {
@@ -187,8 +187,8 @@ START_TEST(include_nothing_exclude_nothing)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_yellow)
 {
@@ -201,8 +201,8 @@ START_TEST(include_yellow)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 
 START_TEST(include_red)
@@ -216,8 +216,8 @@ START_TEST(include_red)
     ck_assert(test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_red_blue)
 {
@@ -230,8 +230,8 @@ START_TEST(include_red_blue)
     ck_assert(test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_red_blue_yellow)
 {
@@ -244,8 +244,8 @@ START_TEST(include_red_blue_yellow)
     ck_assert(test_executed[PURPLE]);
     ck_assert(test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(exclude_yellow)
 {
@@ -258,8 +258,8 @@ START_TEST(exclude_yellow)
     ck_assert(test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(exclude_red)
 {
@@ -272,8 +272,8 @@ START_TEST(exclude_red)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(exclude_red_blue)
 {
@@ -286,8 +286,8 @@ START_TEST(exclude_red_blue)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(exclude_red_blue_yellow)
 {
@@ -300,8 +300,8 @@ START_TEST(exclude_red_blue_yellow)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 #if HAVE_DECL_SETENV
 
@@ -311,7 +311,7 @@ START_TEST(include_yellow_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Yellow", 1);
+    setenv("CK_INCLUDE_TAGS", "Yellow", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -320,16 +320,16 @@ START_TEST(include_yellow_env)
     ck_assert(test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+}
+END_TEST
 
 
 START_TEST(include_red_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Red", 1);
+    setenv("CK_INCLUDE_TAGS", "Red", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(test_executed[RED]);
@@ -338,15 +338,15 @@ START_TEST(include_red_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+}
+END_TEST
 
 START_TEST(include_red_blue_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Red  Blue", 1);
+    setenv("CK_INCLUDE_TAGS", "Red  Blue", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(test_executed[RED]);
@@ -355,15 +355,15 @@ START_TEST(include_red_blue_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+}
+END_TEST
 
 START_TEST(include_red_blue_yellow_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Red Blue Yellow", 1);
+    setenv("CK_INCLUDE_TAGS", "Red Blue Yellow", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(test_executed[RED]);
@@ -372,15 +372,15 @@ START_TEST(include_red_blue_yellow_env)
     ck_assert(test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+}
+END_TEST
 
 START_TEST(exclude_yellow_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Yellow", 1);
+    setenv("CK_EXCLUDE_TAGS", "Yellow", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(test_executed[RED]);
@@ -389,15 +389,15 @@ START_TEST(exclude_yellow_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+}
+END_TEST
 
 START_TEST(exclude_red_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Red", 1);
+    setenv("CK_EXCLUDE_TAGS", "Red", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -406,15 +406,15 @@ START_TEST(exclude_red_env)
     ck_assert(test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+}
+END_TEST
 
 START_TEST(exclude_red_blue_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Red Blue", 1);
+    setenv("CK_EXCLUDE_TAGS", "Red Blue", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -423,15 +423,15 @@ START_TEST(exclude_red_blue_env)
     ck_assert(test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+}
+END_TEST
 
 START_TEST(exclude_red_blue_yellow_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Red Blue Yellow", 1);
+    setenv("CK_EXCLUDE_TAGS", "Red Blue Yellow", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -440,16 +440,16 @@ START_TEST(exclude_red_blue_yellow_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+}
+END_TEST
 
 START_TEST(include_red_case_red_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_CASE", "Red", 1);
+    setenv("CK_INCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_CASE", "Red", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(test_executed[RED]);
@@ -458,17 +458,17 @@ START_TEST(include_red_case_red_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-    unsetenv ("CK_RUN_CASE");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+    unsetenv("CK_RUN_CASE");
+}
+END_TEST
 
 START_TEST(include_red_case_blue_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_CASE", "Blue", 1);
+    setenv("CK_INCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_CASE", "Blue", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -477,17 +477,17 @@ START_TEST(include_red_case_blue_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-    unsetenv ("CK_RUN_CASE");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+    unsetenv("CK_RUN_CASE");
+}
+END_TEST
 
 START_TEST(exclude_red_case_red_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_CASE", "Red", 1);
+    setenv("CK_EXCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_CASE", "Red", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -496,17 +496,17 @@ START_TEST(exclude_red_case_red_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-    unsetenv ("CK_RUN_CASE");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+    unsetenv("CK_RUN_CASE");
+}
+END_TEST
 
 START_TEST(exclude_red_case_blue_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_CASE", "Blue", 1);
+    setenv("CK_EXCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_CASE", "Blue", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -515,17 +515,17 @@ START_TEST(exclude_red_case_blue_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-    unsetenv ("CK_RUN_CASE");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+    unsetenv("CK_RUN_CASE");
+}
+END_TEST
 
 START_TEST(include_red_suite_redblue_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_SUITE", "RedBlue Suite", 1);
+    setenv("CK_INCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_SUITE", "RedBlue Suite", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(test_executed[RED]);
@@ -534,17 +534,17 @@ START_TEST(include_red_suite_redblue_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-    unsetenv ("CK_RUN_SUITE");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+    unsetenv("CK_RUN_SUITE");
+}
+END_TEST
 
 START_TEST(include_red_suite_purpleyellowblack_env)
 {
     reset_executed();
 
-    setenv ("CK_INCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_SUITE", "PurpleYellowBlack Suite", 1);
+    setenv("CK_INCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_SUITE", "PurpleYellowBlack Suite", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -553,17 +553,17 @@ START_TEST(include_red_suite_purpleyellowblack_env)
     ck_assert(test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_INCLUDE_TAGS");
-    unsetenv ("CK_RUN_SUITE");
-
-} END_TEST
+    unsetenv("CK_INCLUDE_TAGS");
+    unsetenv("CK_RUN_SUITE");
+}
+END_TEST
 
 START_TEST(exclude_red_suite_redblue_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_SUITE", "RedBlue Suite", 1);
+    setenv("CK_EXCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_SUITE", "RedBlue Suite", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -572,17 +572,17 @@ START_TEST(exclude_red_suite_redblue_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-    unsetenv ("CK_RUN_SUITE");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+    unsetenv("CK_RUN_SUITE");
+}
+END_TEST
 
 START_TEST(exclude_red_suite_purpleyellowblack_env)
 {
     reset_executed();
 
-    setenv ("CK_EXCLUDE_TAGS", "Red Yellow", 1);
-    setenv ("CK_RUN_SUITE", "PurpleYellowBlack Suite", 1);
+    setenv("CK_EXCLUDE_TAGS", "Red Yellow", 1);
+    setenv("CK_RUN_SUITE", "PurpleYellowBlack Suite", 1);
     srunner_run_all(sr, CK_VERBOSE);
 
     ck_assert(!test_executed[RED]);
@@ -591,10 +591,10 @@ START_TEST(exclude_red_suite_purpleyellowblack_env)
     ck_assert(!test_executed[YELLOW]);
     ck_assert(test_executed[BLACK]);
 
-    unsetenv ("CK_EXCLUDE_TAGS");
-    unsetenv ("CK_RUN_SUITE");
-
-} END_TEST
+    unsetenv("CK_EXCLUDE_TAGS");
+    unsetenv("CK_RUN_SUITE");
+}
+END_TEST
 
 
 #endif /* HAVE_DECL_SETENV */
@@ -611,8 +611,8 @@ START_TEST(include_red_exclude_red)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_red_exclude_blue)
 {
@@ -625,8 +625,8 @@ START_TEST(include_red_exclude_blue)
     ck_assert(!test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_red_include_red)
 {
@@ -639,8 +639,8 @@ START_TEST(include_red_include_red)
     ck_assert(test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 START_TEST(include_w_spaces)
 {
@@ -653,8 +653,8 @@ START_TEST(include_w_spaces)
     ck_assert(test_executed[PURPLE]);
     ck_assert(!test_executed[YELLOW]);
     ck_assert(!test_executed[BLACK]);
-
-} END_TEST
+}
+END_TEST
 
 Suite *make_tag_suite(void)
 {
@@ -670,94 +670,77 @@ Suite *make_tag_suite(void)
     s = suite_create("Check Tag Filtering");
 
     no_filters = tcase_create("no tag filters");
-    suite_add_tcase (s, no_filters);
+    suite_add_tcase(s, no_filters);
     tcase_add_test(no_filters, null_filter);
     tcase_add_test(no_filters, include_nothing);
     tcase_add_test(no_filters, exclude_nothing);
-    tcase_add_unchecked_fixture (no_filters,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(no_filters, tag_test_setup, tag_test_teardown);
 
     include_filters = tcase_create("include tags");
-    suite_add_tcase (s, include_filters);
+    suite_add_tcase(s, include_filters);
     tcase_add_test(include_filters, include_yellow);
     tcase_add_test(include_filters, include_red);
     tcase_add_test(include_filters, include_red_blue);
     tcase_add_test(include_filters, include_red_blue_yellow);
-    tcase_add_unchecked_fixture (include_filters,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(include_filters, tag_test_setup, tag_test_teardown);
 
     exclude_filters = tcase_create("exclude tags");
-    suite_add_tcase (s, exclude_filters);
+    suite_add_tcase(s, exclude_filters);
     tcase_add_test(exclude_filters, exclude_yellow);
     tcase_add_test(exclude_filters, exclude_red);
     tcase_add_test(exclude_filters, exclude_red_blue);
     tcase_add_test(exclude_filters, exclude_red_blue_yellow);
-    tcase_add_unchecked_fixture (exclude_filters,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(exclude_filters, tag_test_setup, tag_test_teardown);
 
 #if HAVE_DECL_SETENV
 
     include_filters_env = tcase_create("include tags via env");
-    suite_add_tcase (s, include_filters_env);
+    suite_add_tcase(s, include_filters_env);
     tcase_add_test(include_filters_env, include_yellow_env);
     tcase_add_test(include_filters_env, include_red_env);
     tcase_add_test(include_filters_env, include_red_blue_env);
     tcase_add_test(include_filters_env, include_red_blue_yellow_env);
-    tcase_add_unchecked_fixture (include_filters_env,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(include_filters_env, tag_test_setup, tag_test_teardown);
 
     exclude_filters_env = tcase_create("exclude tags via env");
-    suite_add_tcase (s, exclude_filters_env);
+    suite_add_tcase(s, exclude_filters_env);
     tcase_add_test(exclude_filters_env, exclude_yellow_env);
     tcase_add_test(exclude_filters_env, exclude_red_env);
     tcase_add_test(exclude_filters_env, exclude_red_blue_env);
     tcase_add_test(exclude_filters_env, exclude_red_blue_yellow_env);
-    tcase_add_unchecked_fixture (exclude_filters_env,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(exclude_filters_env, tag_test_setup, tag_test_teardown);
 
     tag_plus_suite_env = tcase_create("combining tag filters with suite selection");
-    suite_add_tcase (s, tag_plus_suite_env);
+    suite_add_tcase(s, tag_plus_suite_env);
     tcase_add_test(tag_plus_suite_env, include_red_suite_redblue_env);
     tcase_add_test(tag_plus_suite_env, include_red_suite_purpleyellowblack_env);
     tcase_add_test(tag_plus_suite_env, exclude_red_suite_redblue_env);
     tcase_add_test(tag_plus_suite_env, exclude_red_suite_purpleyellowblack_env);
-    tcase_add_unchecked_fixture (tag_plus_suite_env,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(tag_plus_suite_env, tag_test_setup, tag_test_teardown);
 
     tag_plus_case_env = tcase_create("combining tag filters with case selection");
-    suite_add_tcase (s, tag_plus_case_env);
+    suite_add_tcase(s, tag_plus_case_env);
     tcase_add_test(tag_plus_case_env, include_red_case_red_env);
     tcase_add_test(tag_plus_case_env, include_red_case_blue_env);
     tcase_add_test(tag_plus_case_env, exclude_red_case_red_env);
     tcase_add_test(tag_plus_case_env, exclude_red_case_blue_env);
-    tcase_add_unchecked_fixture (tag_plus_case_env,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(tag_plus_case_env, tag_test_setup, tag_test_teardown);
 
 #endif /* HAVE_DECL_SETENV  */
 
     include_exclude_filters = tcase_create("include and exclude tags");
-    suite_add_tcase (s, include_exclude_filters);
+    suite_add_tcase(s, include_exclude_filters);
     tcase_add_test(include_exclude_filters, include_nothing_exclude_nothing);
     tcase_add_test(include_exclude_filters, include_red_exclude_blue);
     tcase_add_test(include_exclude_filters, include_red_exclude_red);
-    tcase_add_unchecked_fixture (include_exclude_filters,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(include_exclude_filters, tag_test_setup,
+                                tag_test_teardown);
 
     strange_filters = tcase_create("strange tag filters");
-    suite_add_tcase (s, strange_filters);
+    suite_add_tcase(s, strange_filters);
     tcase_add_test(strange_filters, include_red_include_red);
     tcase_add_test(strange_filters, include_w_spaces);
-    tcase_add_unchecked_fixture (strange_filters,
-				 tag_test_setup,
-				 tag_test_teardown);
+    tcase_add_unchecked_fixture(strange_filters, tag_test_setup, tag_test_teardown);
 
     return s;
 }

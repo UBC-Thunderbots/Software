@@ -5,23 +5,9 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/sensor_fusion/robot_detection.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/robot.h"
-
-/**
- * A lightweight datatype used to input new data into the filter.
- * We do this rather than taking the SSL_Detection data directly
- * so we can make this module more generic and abstract away
- * the protobuf for testing
- */
-struct SSLRobotDetection
-{
-    unsigned int id;
-    Point position;
-    Angle orientation;
-    double confidence;
-    Timestamp timestamp;
-};
 
 /**
  * A lightweight datatype used to pass filtered robot data
@@ -47,7 +33,7 @@ class RobotFilter
      * from the field if data about the robot is not received before that time
      */
     explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
-    explicit RobotFilter(SSLRobotDetection current_robot_state,
+    explicit RobotFilter(RobotDetection current_robot_state,
                          Duration expiry_buffer_duration);
 
     /**
@@ -61,7 +47,7 @@ class RobotFilter
      * @return The filtered data for the robot
      */
     std::optional<Robot> getFilteredData(
-        const std::vector<SSLRobotDetection>& new_robot_data);
+        const std::vector<RobotDetection>& new_robot_data);
 
     /**
      * Returns the id of the Robot that this filter is filtering for
