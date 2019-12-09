@@ -4,7 +4,7 @@
 
 Tactic::Tactic(bool loop_forever,
                const std::set<RobotCapabilities::Capability> &capability_reqs_)
-    : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
+    : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
       done_(false),
       loop_forever(loop_forever),
       capability_reqs(capability_reqs_)
@@ -28,72 +28,72 @@ void Tactic::updateRobot(const Robot &robot)
     this->robot = robot;
 }
 
-std::unique_ptr<Intent> Tactic::getNextIntent(void)
+std::shared_ptr<Action> Tactic::getNextAction(void)
 {
-    std::unique_ptr<Intent> next_intent = nullptr;
+    std::shared_ptr<Action> next_action = nullptr;
     if (!robot)
     {
-        LOG(WARNING) << "Requesting the next Intent for a Tactic without a Robot assigned"
+        LOG(WARNING) << "Requesting the next Action for a Tactic without a Robot assigned"
                      << std::endl;
     }
     else
     {
-        // We call the getNextIntentHelper before checking if we should loop forever
+        // We call the getNextActionHelper before checking if we should loop forever
         // so we can catch the tactic right when it's done. Since we do not want to return
         // any nullptrs while a tactic is looping forever, we need to perform this
         // check after running the logic and immediately restarting.
-        next_intent = getNextIntentHelper();
+        next_action = getNextActionHelper();
         if (done_ && loop_forever)
         {
-            // Re-start the intent sequence by re-creating it
-            intent_sequence = IntentCoroutine::pull_type(
-                boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
-            next_intent = getNextIntentHelper();
+            // Re-start the action sequence by re-creating it
+            action_sequence = ActionCoroutine::pull_type(
+                boost::bind(&Tactic::calculateNextActionWrapper, this, _1));
+            next_action = getNextActionHelper();
         }
     }
 
-    return next_intent;
+    return next_action;
 }
 
-void Tactic::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
+void Tactic::calculateNextActionWrapper(ActionCoroutine::push_type &yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
-    yield(std::unique_ptr<Intent>{});
+    yield(std::shared_ptr<Action>{});
 
-    // Anytime after the first function call, the calculateNextIntent function will be
-    // used to perform the real logic. The calculateNextIntent function will yield its
+    // Anytime after the first function call, the calculateNextAction function will be
+    // used to perform the real logic. The calculateNextAction function will yield its
     // values to the top of the coroutine stack, where they will be retrieved by
-    // getNextIntent, so we do not need to yield or return the result of this function
-    calculateNextIntent(yield);
+    // getNextAction, so we do not need to yield or return the result of this function
+    calculateNextAction(yield);
 }
 
-std::unique_ptr<Intent> Tactic::getNextIntentHelper()
+std::shared_ptr<Action> Tactic::getNextActionHelper()
 {
-    std::unique_ptr<Intent> next_intent = nullptr;
+    std::shared_ptr<Action> next_action = nullptr;
     // Check the coroutine status to see if it has any more work to do.
-    if (intent_sequence)
+    if (action_sequence)
     {
-        // Run the coroutine. This will call the bound calculateNextIntent function
-        intent_sequence();
+        // Run the coroutine. This will call the bound calculateNextAction function
+        action_sequence();
 
         // Check if the coroutine is still valid before getting the result. This makes
         // sure we don't try get the result after "running out the bottom" of the
         // coroutine function
-        if (intent_sequence)
+        if (action_sequence)
         {
             // Extract the result from the coroutine. This will be whatever value was
-            // yielded by the calculateNextIntent function
-            next_intent = intent_sequence.get();
+            // yielded by the calculateNextAction function
+            next_action = action_sequence.get();
         }
     }
 
-    // The Tactic is considered done once the next_intent becomes a nullptr. This could
-    // either be because it was returned by the calculateNextIntent function, or because
-    // the intent_sequence coroutine is done and has no more work to do.
-    done_ = !static_cast<bool>(next_intent);
+    // The Tactic is considered done once the next_action becomes a nullptr. This could
+    // either be because it was returned by the calculateNextAction function, or because
+    // the action_sequence coroutine is done and has no more work to do.
+    done_ = !static_cast<bool>(next_action);
 
-    return next_intent;
+    return next_action;
 }
 
 const std::set<RobotCapabilities::Capability> &Tactic::robotCapabilityRequirements() const

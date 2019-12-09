@@ -39,6 +39,13 @@ class MoveSpinAction : public Action
     void updateControlParams(const Robot& robot, Point destination,
                              AngularVelocity angular_velocity, double final_linear_speed);
 
+    /**
+     * Gets the destination this MoveSpinAction is trying to move to
+     *
+     * @return The destination this MoveSpinAction is trying to move to
+     */
+    Point getDestination();
+
     void accept(ActionVisitor& visitor) const override;
 
    private:

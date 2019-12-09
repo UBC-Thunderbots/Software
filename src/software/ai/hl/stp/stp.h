@@ -80,6 +80,20 @@ class STP : public HL
     PlayInfo getPlayInfo() override;
 
    private:
+    /**
+     * Updates the current play based on the state of the world
+     *
+     * @param world
+     */
+    void updateCurrentPlay(const World &world);
+
+    /**
+     * Gets the intents the current play wants to run
+     *
+     * @return The vector of intents that should be run right now to execute the play
+     */
+    std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world);
+
     // A function that constructs a Play that will be used if no other Plays are
     // applicable
     std::function<std::unique_ptr<Play>()> default_play_constructor;
