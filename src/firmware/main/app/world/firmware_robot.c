@@ -12,16 +12,19 @@ struct FirmwareRobot
     Wheel_t* front_left_wheel;
     Wheel_t* back_right_wheel;
     Wheel_t* back_left_wheel;
+    // TODO: add this to tests
+    RobotConstants_t robot_constants;
 };
 
-FirmwareRobot_t* app_firmware_robot_create(Chicker_t* chicker, Dribbler_t* dribbler,
+FirmwareRobot_t *app_firmware_robot_create(Chicker_t*chicker, Dribbler_t*dribbler,
 
                                            float (*get_robot_position_x)(),
                                            float (*get_robot_position_y)(),
-                                           Wheel_t* front_right_wheel,
-                                           Wheel_t* front_left_wheel,
-                                           Wheel_t* back_right_wheel,
-                                           Wheel_t* back_left_wheel)
+                                           Wheel_t*front_right_wheel,
+                                           Wheel_t*front_left_wheel,
+                                           Wheel_t*back_right_wheel,
+                                           Wheel_t*back_left_wheel),
+    RobotConstants_t robot_constants)
 {
     FirmwareRobot_t* new_robot = malloc(sizeof(FirmwareRobot_t));
 
@@ -33,6 +36,7 @@ FirmwareRobot_t* app_firmware_robot_create(Chicker_t* chicker, Dribbler_t* dribb
     new_robot->front_left_wheel     = front_left_wheel;
     new_robot->back_right_wheel     = back_right_wheel;
     new_robot->back_left_wheel      = back_left_wheel;
+    new_robot->robot_contstants     = robot_constants;
 
     return new_robot;
 }
@@ -80,4 +84,9 @@ Wheel_t* app_firmware_robot_getBackRightWheel(FirmwareRobot_t* robot)
 Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot)
 {
     return robot->back_left_wheel;
+}
+
+RobotConstants_t app_firmware_robot_getPhysicalConstants(FirmwareRobot_t* robot)
+{
+    return robot->robot_constants;
 }

@@ -104,9 +104,14 @@ extern const float MAX_VEL[3];
 // robot relative coordinates
 void speed4_to_speed3(const float speed4[4], float speed3[3]);
 void speed3_to_speed4(const float speed3[3], float speed4[4]);
-#ifdef FWSIM
+
+// transformation matricies to convert forces in the
+// two different domains commonly used by the robot
+// force4 which is the listing of wheel forces
+// and force3 which is a force in x,y,rotation in
+// robot relative coordinates
 void force4_to_force3(const float force4[4], float force3[3]);
-#endif
+void force3_to_force4(float force3[3], float force4[4]);
 
 float min_angle_delta(float, float);
 

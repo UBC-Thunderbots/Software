@@ -6,13 +6,13 @@
  * Apply the given acceleration to the given robot
  *
  * @param robot The robot to apply acceleration to
- * @param linear_acceleration_x The linear acceleration, in robot coordinates, in the x
+ * @param linear_accel_x The linear acceleration, in robot coordinates, in the x
  *                       (forward/backwards) direction (m/s^2)
- * @param linear_acceleration_y The linear acceleration, in robot coordinates, in the y
+ * @param linear_accel_y The linear acceleration, in robot coordinates, in the y
  *                       (side-to-side) direction (m/s^2)
  * @param angular_accel The angular acceleration to apply to the robot (rad/s^2)
  */
-void app_control_applyAccel(FirmwareRobot_t* robot, float linear_acceleration_x, float linear_acceleration_y, float angular_accel);
+void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x, float linear_accel_y, float angular_accel);
 
 /**
  * Drive the given robot at the given velocity in the global coordinate frame
