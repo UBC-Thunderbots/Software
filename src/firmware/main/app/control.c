@@ -3,7 +3,7 @@
 #include "physics/physics.h"
 #include "util/util.h"
 
-// TODO: finish this
+// TODO: finish this jdoc
 /**
  * Compute the maximum
  * @param robot_constants
@@ -37,6 +37,7 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
 void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
                             float linear_accel_y, float angular_accel)
 {
+    // TODO: we really should not just arbitrary arrays here...
     const RobotConstants_t robot_constants =
         app_firmware_robot_getPhysicalConstants(robot);
 
@@ -78,16 +79,16 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     prev_angular_accel  = angular_accel;
 
     float robot_force[3];
-    robot_force[0] =
-        linear_accel_x * robot_constants.linear_mass;
-    robot_force[1] =
-        linear_accel_y * robot_constants.linear_mass;
+    robot_force[0] = linear_accel_x * robot_constants.linear_mass;
+    robot_force[1] = linear_accel_y * robot_constants.linear_mass;
     // input is angular acceleration so mass * Radius * radians/second^2 gives newtons
     robot_force[2] =
         angular_accel * robot_constants.robot_radius * robot_constants.rotational_mass;
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
-    // printf("wheel 0 force: %f", wheel_force[0]);
-    // printf("wheel 1 force: %f", wheel_force[1]);
-    apply_wheel_force_all_wheels(wheel_force);  // set force
+
+    app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot), wheel_force[0]);
+    app_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot), wheel_force[3]);
+    app_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot), wheel_force[1]);
+    app_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot), wheel_force[2]);
 }

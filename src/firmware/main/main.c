@@ -468,10 +468,18 @@ static void run_normal(void)
         chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
         chicker_auto_disarm, chicker_auto_disarm);
     Dribbler_t* dribbler = app_dribbler_create(dribbler_set_speed, dribbler_temperature);
-    FirmwareRobot_t* robot =
-        app_firmware_robot_create(chicker, dribbler, dr_get_robot_position_x,
-                                  dr_get_robot_position_y, front_right_wheel,
-                                  front_left_wheel, back_right_wheel, back_left_wheel);
+    const RobotConstants_t robot_constants = {
+        .linear_mass     = ROBOT_MASS[0],
+        .rotational_mass = ROBOT_MASS[2],
+        .robot_radius    = ROBOT_RADIUS,
+        .gear_ratio      = GEAR_RATIO,
+        .wheel_radius    = WHEEL_RADIUS,
+        .jerk_limit      = JERK_LIMIT,
+    };
+    FirmwareRobot_t* robot = app_firmware_robot_create(
+        chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
+        front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel,
+        robot_constants);
     FirmwareBall_t* ball =
         app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
                                  dr_get_ball_velocity_x, dr_get_ball_velocity_y);

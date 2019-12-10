@@ -12,15 +12,16 @@ typedef struct FirmwareRobot FirmwareRobot_t;
 /**
  * This struct represents robot constants
  */
-typedef struct RobotConstants {
+typedef struct RobotConstants
+{
     // TODO: jdocs for members
-    const float linear_mass;
-    const float rotational_mass;
-    const float robot_radius;
-    const float wheel_radius;
+    float linear_mass;
+    float rotational_mass;
+    float robot_radius;
+    float wheel_radius;
     // TODO: which direction is this ratio in?
-    const float gear_ratio;
-    const float jerk_limit;
+    float gear_ratio;
+    float jerk_limit;
 } RobotConstants_t;
 
 /**
@@ -46,7 +47,8 @@ typedef struct RobotConstants {
 FirmwareRobot_t* app_firmware_robot_create(
     Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(),
     float (*get_robot_position_y)(), Wheel_t* front_right_wheel,
-    Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel, RobotConstants_t robot_contstants);
+    Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
+    RobotConstants_t robot_constants);
 
 /**
  * Destroy the given robot, freeing any memory allocated for it
@@ -120,5 +122,5 @@ Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot);
  * @param robot The robot to get physical constants from
  * @return The physical constants for the given robot
  */
- // TODO: should this be "physical constants", or just "constants"
-RobotConstants_t app_firmware_robot_getPhysicalConstants(FirmwareRobot_t* robot);
+// TODO: should this be "physical constants", or just "constants"
+const RobotConstants_t app_firmware_robot_getPhysicalConstants(FirmwareRobot_t* robot);

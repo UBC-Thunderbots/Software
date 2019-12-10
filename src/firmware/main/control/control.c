@@ -5,16 +5,10 @@
 #include "io/wheels.h"
 #include "physics/physics.h"
 
-#ifndef FWSIM
 #include "io/adc.h"
 #include "io/dr.h"
 #include "io/dsp.h"
 #include "io/encoder.h"
-#else
-#include <stdio.h>
-
-#include "simulate.h"
-#endif
 
 
 // adjust the force on the wheels such that it compensates for a high center
@@ -95,8 +89,6 @@ void apply_wheel_force_back_right(float force_in_newtons){
 void apply_wheel_force_back_left(float force_in_newtons){
     apply_wheel_force(1, force_in_newtons);
 }
-
-#define JERK_LIMIT 40.0f  //(m/s^3)
 
 /**
  * \ingroup Controls

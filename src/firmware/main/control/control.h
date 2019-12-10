@@ -1,6 +1,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#define JERK_LIMIT 40.0f  //(m/s^3)
+
 #include "util/util.h"
 // input is acceleration in robot coordinates
 // a is in m/s^2
@@ -18,6 +20,7 @@ void apply_wheel_force_back_right(float force_in_newtons);
 void apply_wheel_force_back_left(float force_in_newtons);
 
 // input is force in newtons per wheel to apply the robot
+// TODO: delete this
 void apply_wheel_force_all_wheels(const float *force);
 
 // Takes velocities in global coordinates
