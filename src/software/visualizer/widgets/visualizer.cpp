@@ -1,4 +1,5 @@
 #include "software/visualizer/widgets/visualizer.h"
+
 #include "software/visualizer/geom/geometry_conversion.h"
 
 Visualizer::Visualizer(
@@ -23,45 +24,56 @@ Visualizer::Visualizer(
     update_timer->start(update_timer_interval.getMilliseconds());
 }
 
-void Visualizer::updateVisualizer() {
+void Visualizer::updateVisualizer()
+{
     draw();
     updatePlayInfo();
     updateRobotStatus();
     updateDrawViewArea();
 }
 
-void Visualizer::draw() {
+void Visualizer::draw()
+{
     auto world_draw_function = world_draw_functions_buffer->popLeastRecentlyAddedValue();
-    if(world_draw_function) {
+    if (world_draw_function)
+    {
         most_recent_world_draw_function = world_draw_function.value();
     }
 
     auto ai_draw_function = ai_draw_functions_buffer->popLeastRecentlyAddedValue();
-    if(ai_draw_function) {
+    if (ai_draw_function)
+    {
         most_recent_ai_draw_function = ai_draw_function.value();
     }
 
     main_widget->draw(most_recent_world_draw_function, most_recent_ai_draw_function);
 }
 
-void Visualizer::updatePlayInfo() {
+void Visualizer::updatePlayInfo()
+{
     auto play_info = play_info_buffer->popLeastRecentlyAddedValue();
-    if(play_info) {
+    if (play_info)
+    {
         main_widget->updatePlayInfo(play_info.value());
     }
 }
 
-void Visualizer::updateRobotStatus() {
-    std::optional<RobotStatus> robot_status = robot_status_buffer->popLeastRecentlyAddedValue();
-    while(robot_status) {
+void Visualizer::updateRobotStatus()
+{
+    std::optional<RobotStatus> robot_status =
+        robot_status_buffer->popLeastRecentlyAddedValue();
+    while (robot_status)
+    {
         main_widget->updateRobotStatus(robot_status.value());
         robot_status = robot_status_buffer->popLeastRecentlyAddedValue();
     }
 }
 
-void Visualizer::updateDrawViewArea() {
+void Visualizer::updateDrawViewArea()
+{
     std::optional<Rectangle> view_area = view_area_buffer->popLeastRecentlyAddedValue();
-    if(view_area) {
+    if (view_area)
+    {
         main_widget->setDrawViewArea(createQRectF(view_area.value()));
     }
 }

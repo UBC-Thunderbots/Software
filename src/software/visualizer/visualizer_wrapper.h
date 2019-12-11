@@ -2,18 +2,18 @@
 
 #include <QtCore/QGenericArgument>
 #include <QtWidgets/QApplication>
-#include <thread>
-#include <future>
 #include <atomic>
+#include <future>
+#include <thread>
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
-#include "software/multithreading/threaded_observer.h"
+#include "software/geom/rectangle.h"
 #include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/threaded_observer.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/widgets/visualizer.h"
 #include "software/world/world.h"
-#include "software/geom/rectangle.h"
 
 /**
  * This class wraps our Visualizer object which is responsible for

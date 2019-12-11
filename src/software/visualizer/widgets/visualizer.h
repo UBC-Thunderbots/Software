@@ -1,15 +1,15 @@
 #pragma once
 
+#include <QtCore/QRectF>
 #include <QtCore/QTimer>
 #include <QtWidgets/QMainWindow>
-#include <QtCore/QRectF>
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/multithreading/thread_safe_buffer.h"
+#include "software/util/time/duration.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/widgets/main_widget.h"
-#include "software/util/time/duration.h"
 
 /**
  * This is the main window / application object for the visualizer.
@@ -27,7 +27,8 @@ class Visualizer : public QMainWindow
     /**
      * Creates a new Visualizer MainWindow
      *
-     * @param world_draw_functions_buffer The buffer used to receive new WorldDrawFunctions
+     * @param world_draw_functions_buffer The buffer used to receive new
+     * WorldDrawFunctions
      * @param ai_draw_functions_buffer The buffer used to receive new AIDrawFunctions
      * @param play_info_buffer The buffer used to receive new PlayInfo
      * @param robot_status_buffer The buffer used to receive new RobotStatuses

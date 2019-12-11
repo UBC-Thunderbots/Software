@@ -9,13 +9,13 @@
 // The generated version will be names 'ui_<filename>.h'
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
+#include "software/geom/rectangle.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/ui/ui_main_widget.h"
 #include "software/visualizer/widgets/ai_control.h"
 #include "software/visualizer/widgets/parameters.h"
 #include "software/visualizer/widgets/robot_status.h"
 #include "software/visualizer/widgets/world_view.h"
-#include "software/geom/rectangle.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui

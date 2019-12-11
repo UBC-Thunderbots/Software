@@ -30,7 +30,8 @@ class DrawFunction
             draw_function_(scene);
         }
     }
-    inline bool hasValidFunction() {
+    inline bool hasValidFunction()
+    {
         return static_cast<bool>(draw_function_);
     }
     virtual ~DrawFunction() = 0;
