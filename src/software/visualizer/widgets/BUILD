@@ -32,6 +32,7 @@ qt_cc_library(
         "//software/backend:robot_status",
         "//software/multithreading:thread_safe_buffer",
         "//software/util/time:duration",
+        "//software/visualizer/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],
 )

@@ -13,6 +13,7 @@
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/widgets/visualizer.h"
 #include "software/world/world.h"
+#include "software/geom/rectangle.h"
 
 /**
  * This class wraps our Visualizer object which is responsible for
@@ -73,6 +74,8 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer;
+    std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
     std::atomic_bool application_shutting_down;
+    bool initial_view_area_set;
 };

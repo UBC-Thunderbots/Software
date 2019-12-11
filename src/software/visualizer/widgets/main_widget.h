@@ -49,10 +49,11 @@ class MainWidget : public QWidget
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
 
     /**
-     * Sets the area of the World being drawn in the Visualizer to the smallest rectangle
-     * that contains all drawn elements
+     * Sets the area of the World being drawn in the Visualizer to the given region
+     *
+     * @param new_view_area The new area to show in the view
      */
-    void setDrawViewAreaToSceneContents();
+    void setDrawViewArea(const QRectF& new_view_area);
 
     /**
      * Updates and displays newly provided PlayInfo

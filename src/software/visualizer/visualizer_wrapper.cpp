@@ -10,11 +10,20 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
       ThreadedObserver<PlayInfo>(),
       ThreadedObserver<RobotStatus>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
+      // We want to show the most recent world and AI data, but also want things to look
+      // smooth if the stream of data isn't perfectly consistent, so we use a very small
+      // buffer of 2 values to be responsive while also giving a small buffer for smoothness
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(2)),
       ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(2)),
+      // We only care about the most recent PlayInfo, so the buffer is of size 1
       play_info_buffer(std::make_shared<ThreadSafeBuffer<PlayInfo>>(1)),
-      robot_status_buffer(std::make_shared<ThreadSafeBuffer<RobotStatus>>(5)),
-      application_shutting_down(false)
+      // We don't want to miss any robot status updates so we make the buffer larger
+      robot_status_buffer(std::make_shared<ThreadSafeBuffer<RobotStatus>>(60)),
+      // We only care about the most recent view area that was requested, so the
+      // buffer is of size 1
+      view_area_buffer(std::make_shared<ThreadSafeBuffer<Rectangle>>(1)),
+      application_shutting_down(false),
+      initial_view_area_set(false)
 {
     run_visualizer_thread = std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv);
 }
@@ -40,7 +49,7 @@ void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv)
     QApplication::connect(application, &QApplication::aboutToQuit, [&]() {
         application_shutting_down = true;
     });
-    Visualizer* visualizer = new Visualizer(world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer, robot_status_buffer);
+    Visualizer* visualizer = new Visualizer(world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer, robot_status_buffer, view_area_buffer);
     visualizer->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -62,6 +71,11 @@ void VisualizerWrapper::onValueReceived(World world)
 {
     auto world_draw_function = getDrawWorldFunction(world);
     world_draw_functions_buffer->push(world_draw_function);
+
+    if(!initial_view_area_set && world.field().fieldBoundary().area() > 0) {
+        initial_view_area_set = true;
+        view_area_buffer->push(world.field().fieldBoundary());
+    }
 }
 
 void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function)

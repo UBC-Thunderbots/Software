@@ -47,7 +47,8 @@ void MainWidget::draw(WorldDrawFunction world_draw_function,
     ai_draw_function.execute(scene);
 }
 
-void MainWidget::setDrawViewAreaToSceneContents() {
+void MainWidget::setDrawViewArea(const QRectF &new_view_area) {
+    scene->setSceneRect(new_view_area);
     main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 

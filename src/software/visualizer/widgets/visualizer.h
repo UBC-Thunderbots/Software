@@ -2,6 +2,7 @@
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QMainWindow>
+#include <QtCore/QRectF>
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
@@ -30,12 +31,15 @@ class Visualizer : public QMainWindow
      * @param ai_draw_functions_buffer The buffer used to receive new AIDrawFunctions
      * @param play_info_buffer The buffer used to receive new PlayInfo
      * @param robot_status_buffer The buffer used to receive new RobotStatuses
+     * @param view_area_buffer The buffer used to receive Rectangles that specify the area
+     * of the world to display in the view
      */
     explicit Visualizer(
         std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
-        std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer);
+        std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
+        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer);
 
    public slots:
     /**
@@ -62,6 +66,11 @@ class Visualizer : public QMainWindow
      */
     void updateRobotStatus();
 
+    /**
+     * Updates the area of the World being drawn in the Visualizer
+     */
+    void updateDrawViewArea();
+
     // Because we set the central widget of the MainWindow to this main_widget,
     // the Qt system takes ownership of the pointer and is responsible for
     // de-allocating it so we don't have to
@@ -72,11 +81,10 @@ class Visualizer : public QMainWindow
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer;
+    std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
     WorldDrawFunction most_recent_world_draw_function;
     AIDrawFunction most_recent_ai_draw_function;
-
-    bool initial_view_area_set;
 
     const Duration update_timer_interval;
 };

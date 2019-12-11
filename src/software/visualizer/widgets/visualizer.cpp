@@ -1,10 +1,12 @@
 #include "software/visualizer/widgets/visualizer.h"
+#include "software/visualizer/geom/geometry_conversion.h"
 
 Visualizer::Visualizer(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
-    std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer)
+    std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
+    std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer)
     : QMainWindow(),
       main_widget(new MainWidget(this)),
       update_timer(new QTimer(this)),
@@ -12,7 +14,7 @@ Visualizer::Visualizer(
       ai_draw_functions_buffer(ai_draw_functions_buffer),
       play_info_buffer(play_info_buffer),
       robot_status_buffer(robot_status_buffer),
-      initial_view_area_set(false),
+      view_area_buffer(view_area_buffer),
       update_timer_interval(Duration::fromSeconds(1.0 / 60.0))
 {
     setCentralWidget(main_widget);
@@ -25,6 +27,7 @@ void Visualizer::updateVisualizer() {
     draw();
     updatePlayInfo();
     updateRobotStatus();
+    updateDrawViewArea();
 }
 
 void Visualizer::draw() {
@@ -39,11 +42,6 @@ void Visualizer::draw() {
     }
 
     main_widget->draw(most_recent_world_draw_function, most_recent_ai_draw_function);
-
-    if(!initial_view_area_set) {
-        main_widget->setDrawViewAreaToSceneContents();
-        initial_view_area_set = true;
-    }
 }
 
 void Visualizer::updatePlayInfo() {
@@ -58,5 +56,12 @@ void Visualizer::updateRobotStatus() {
     while(robot_status) {
         main_widget->updateRobotStatus(robot_status.value());
         robot_status = robot_status_buffer->popLeastRecentlyAddedValue();
+    }
+}
+
+void Visualizer::updateDrawViewArea() {
+    std::optional<Rectangle> view_area = view_area_buffer->popLeastRecentlyAddedValue();
+    if(view_area) {
+        main_widget->setDrawViewArea(createQRectF(view_area.value()));
     }
 }
