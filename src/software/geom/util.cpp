@@ -42,22 +42,6 @@ double dist(const Segment &first, const Segment &second)
         std::min(distsq(second, first.getSegStart()), distsq(second, first.getEnd()))));
 }
 
-// double dist(const Line &first, const Point &second)
-//{
-//    if (isDegenerate(first))
-//    {
-//        return dist(first.getFirst(), second);
-//    }
-//    return fabs((second - first.getFirst()).cross(first.getSecond() - first.getFirst())
-//    /
-//                (first.getSecond() - first.getFirst()).length());
-//}
-
-// double dist(const Point &first, const Line &second)
-//{
-//    return dist(second, first);
-//}
-
 double dist(const Point &first, const Segment &second)
 {
     return std::sqrt(distsq(first, second));
@@ -143,11 +127,6 @@ bool isDegenerate(const Segment &segment)
 {
     return distsq(segment.getSegStart(), segment.getEnd()) < EPS2;
 }
-
-// bool isDegenerate(const Line &line)
-//{
-//    return distsq(line.getFirst(), line.getSecond()) < EPS2;
-//}
 
 bool isDegenerate(const Ray &ray)
 {
@@ -658,39 +637,6 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
     }
     return segB;
 }
-
-// Point closestPointOnLine(const Point &p, const Line &line)
-//{
-//    return closestPointOnLine(p, line.getFirst(), line.getSecond());
-//}
-// Point closestPointOnLine(const Point &centre, const Point &lineA, const Point &lineB)
-//{
-//    // find point C, the projection onto the line
-//    double len_line = (lineB - lineA).dot(centre - lineA) / (lineB - lineA).length();
-//    Point C         = lineA + len_line * (lineB - lineA).normalize();
-//    return C;
-//
-//    // check if C is in the line range
-//    double AC     = (lineA - C).lengthSquared();
-//    double BC     = (lineB - C).lengthSquared();
-//    double AB     = (lineA - lineB).lengthSquared();
-//    bool in_range = AC <= AB && BC <= AB;
-//
-//    // if so return C
-//    if (in_range)
-//    {
-//    }
-//
-//    double lenA = (centre - lineA).length();
-//    double lenB = (centre - lineB).length();
-//
-//    // otherwise return closest end of line-seg
-//    if (lenA < lenB)
-//    {
-//        return lineA;
-//    }
-//    return lineB;
-//}
 
 bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d)
 {
