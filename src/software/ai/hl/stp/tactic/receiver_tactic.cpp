@@ -135,7 +135,8 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
             Point ball_receive_pos = closestPointOnLine(
-                robot->position(), ball.position(), ball.position() + ball.velocity());
+                robot->position(),
+                Line(ball.position(), ball.position() + ball.velocity()));
             Angle ball_receive_orientation =
                 (ball.position() - robot->position()).orientation();
 
@@ -227,8 +228,8 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
         Vector::createFromAngle(robot.orientation()).normalize(dist_to_ball_in_dribbler);
 
     // Find the closest point to the ball contact point on the ball's trajectory
-    Point closest_ball_pos = closestPointOnLine(ball_contact_point, ball.position(),
-                                                ball.position() + ball.velocity());
+    Point closest_ball_pos = closestPointOnLine(
+        ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
     Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
     Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);
