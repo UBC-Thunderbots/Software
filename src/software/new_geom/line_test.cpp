@@ -6,6 +6,25 @@ TEST(LineTest, two_points_constructor)
 {
     Line l(Point(-1.0, 2.0), Point(3.0, 4.0));  // -0.5x + y - 2.5 = 0
     EXPECT_EQ(l.toNormalUnitVector(), Vector(-1, 2).normalize());
+    std::array<double, 3> expectedCoeffs = {-2, 4, -10};
+    EXPECT_EQ(l.getCoeffs(), expectedCoeffs);
+}
+
+TEST(LineTest, two_points_constructor_invalid)
+{
+    try
+    {
+        Line l(Point(1, 1), Point(1, 1));
+        FAIL() << "A Line was created with two equal Points";
+    }
+    catch (std::runtime_error &e)
+    {
+        EXPECT_EQ(e.what(), std::string("Cannot create a Line with two equal Points"));
+    }
+    catch (...)
+    {
+        FAIL() << "Expected std::runtime_error";
+    }
 }
 
 TEST(LineTest, to_normal_unit_vector)
@@ -19,6 +38,8 @@ TEST(LineTest, vertical_line)
 {
     Line l(Point(1, -1), Point(1, 1));  // x = 1
     EXPECT_EQ(l.toNormalUnitVector(), Vector(-1, 0));
+    std::array<double, 3> expectedCoeffs = {-2, 0, 2};
+    EXPECT_EQ(l.getCoeffs(), expectedCoeffs);
 }
 
 TEST(LineTest, swapXY)
@@ -26,4 +47,6 @@ TEST(LineTest, swapXY)
     Line l(Point(-1.0, 2.0), Point(3.0, 4.0));  // -0.5x + y - 2.5 = 0
     l.swapXY();
     EXPECT_EQ(l.toNormalUnitVector(), Vector(2, -1).normalize());
+    std::array<double, 3> expectedCoeffs = {4, -2, -10};
+    EXPECT_EQ(l.getCoeffs(), expectedCoeffs);
 }

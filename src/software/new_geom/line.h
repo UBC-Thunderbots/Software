@@ -20,11 +20,18 @@ class Line final
     explicit Line(const Point& first, const Point& second);
 
     /**
+     * Returns the coefficient array
+     *
+     * @return the coeffecient array
+     */
+    std::array<double, 3> getCoeffs() const;
+
+    /**
      * Returns the normal unit vector of the Line
      *
      * @return the normal unit vector of the Line
      */
-    Vector toNormalUnitVector();
+    Vector toNormalUnitVector() const;
 
     /**
      * Reflects the Line about the line y = x

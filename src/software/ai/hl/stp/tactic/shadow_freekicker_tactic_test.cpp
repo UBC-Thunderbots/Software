@@ -4,8 +4,9 @@
 
 #include "shared/constants.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/line.h"
 #include "software/geom/util.h"
+#include "software/new_geom/line.h"
+#include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
 
 TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_left_side)
@@ -42,7 +43,7 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_left_side)
     // The robot should be just to the left of the line between the friendly net and
     // the ball (from the POV of the friendly net)
     Line ball_to_net_line = Line(world.ball().position(), world.field().friendlyGoal());
-    EXPECT_NEAR(dist(ball_to_net_line, move_action->getDestination()), 0.09, 0.01);
+    EXPECT_NEAR(distance(ball_to_net_line, move_action->getDestination()), 0.09, 0.01);
     Angle goal_to_ball_angle =
         (world.ball().position() - world.field().friendlyGoal()).orientation();
     Angle goal_to_dest_angle =
@@ -84,7 +85,7 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_right_side)
     // The robot should be just to the right of the line between the friendly net and
     // the ball (from the POV of the friendly net)
     Line ball_to_net_line = Line(world.ball().position(), world.field().friendlyGoal());
-    EXPECT_NEAR(dist(ball_to_net_line, move_action->getDestination()), 0.09, 0.01);
+    EXPECT_NEAR(distance(ball_to_net_line, move_action->getDestination()), 0.09, 0.01);
     Angle goal_to_ball_angle =
         (world.ball().position() - world.field().friendlyGoal()).orientation();
     Angle goal_to_dest_angle =

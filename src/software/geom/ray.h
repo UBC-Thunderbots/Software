@@ -2,7 +2,6 @@
 
 #include <functional>
 
-#include "software/geom/line.h"
 #include "software/geom/segment.h"
 #include "software/new_geom/point.h"
 
@@ -55,10 +54,5 @@ class Ray final
     inline Vector toVector() const
     {
         return direction;
-    }
-
-    inline Line toLine() const
-    {
-        return Line(start, Point(start + direction));
     }
 };
