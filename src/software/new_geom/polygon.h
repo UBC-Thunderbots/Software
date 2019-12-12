@@ -2,15 +2,15 @@
 
 #include <vector>
 
-#include "software/new_geom/shape.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/shape.h"
 
 /**
  * A shape composed of segments.
  */
 class Polygon : public virtual Shape
 {
-public:
+   public:
     Polygon() = delete;
     /**
      * Construct a polygon by drawing line segments between consecutive
@@ -31,7 +31,7 @@ public:
      *
      * @return whether the Point p is contained within this Polygon.
      */
-    bool contains(const Point &p) const override;
+    bool contains(const Point& p) const override;
 
     /**
      * Returns the line segments that form this polygon.
@@ -45,7 +45,7 @@ public:
      */
     const std::vector<Point>& getPoints() const;
 
-protected:
+   protected:
     std::vector<Segment> segments_;
     std::vector<Point> points_;
 };

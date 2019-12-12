@@ -1,14 +1,14 @@
 #include "software/new_geom/rectangle.h"
 
 Rectangle::Rectangle(const Point &point1, const Point &point2)
-        : Polygon({Point(point1.x() < point2.x() ? point1.x() : point2.x(),
+    : Polygon({Point(point1.x() < point2.x() ? point1.x() : point2.x(),
                      point1.y() < point2.y() ? point1.y() : point2.y()),
-                  Point(point1.x() < point2.x() ? point1.x() : point2.x(),
-                        point1.y() > point2.y() ? point1.y() : point2.y()),
-                  Point(point1.x() > point2.x() ? point1.x() : point2.x(),
-                        point1.y() > point2.y() ? point1.y() : point2.y()),
-                  Point(point1.x() > point2.x() ? point1.x() : point2.x(),
-                        point1.y() < point2.y() ? point1.y() : point2.y())})
+               Point(point1.x() < point2.x() ? point1.x() : point2.x(),
+                     point1.y() > point2.y() ? point1.y() : point2.y()),
+               Point(point1.x() > point2.x() ? point1.x() : point2.x(),
+                     point1.y() > point2.y() ? point1.y() : point2.y()),
+               Point(point1.x() > point2.x() ? point1.x() : point2.x(),
+                     point1.y() < point2.y() ? point1.y() : point2.y())})
 {
 }
 
@@ -57,7 +57,7 @@ Point Rectangle::posXNegYCorner() const
     return negXNegYCorner() + Vector(diagonal().x(), 0);
 }
 
-bool Rectangle::contains(const Point& p) const
+bool Rectangle::contains(const Point &p) const
 {
     return p.x() >= negXNegYCorner().x() && p.y() >= negXNegYCorner().y() &&
            p.x() <= negXNegYCorner().x() + diagonal().x() &&
@@ -85,10 +85,10 @@ Point Rectangle::furthestCorner(const Point &p)
 {
     std::vector<Point> corners = points_;
 
-    return *std::max_element(corners.begin(), corners.end(),
-                             [&](const Point& corner1, const Point& corner2) {
-                                 return p.distanceFromPoint(corner1) < p.distanceFromPoint(corner2);
-                             });
+    return *std::max_element(
+        corners.begin(), corners.end(), [&](const Point &corner1, const Point &corner2) {
+            return p.distanceFromPoint(corner1) < p.distanceFromPoint(corner2);
+        });
 }
 
 bool Rectangle::operator==(const Rectangle &p) const

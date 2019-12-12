@@ -5,7 +5,7 @@
  */
 class Rectangle : public ConvexPolygon
 {
-public:
+   public:
     /**
      * Creates a new Rectangle from two corners.
      *

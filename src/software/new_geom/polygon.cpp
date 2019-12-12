@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 Polygon::Polygon(const std::vector<Point>& points)
-        : segments_(points.size()), points_(points)
+    : segments_(points.size()), points_(points)
 {
     for (unsigned i = 0; i < points.size(); i++)
     {
@@ -14,14 +14,14 @@ Polygon::Polygon(const std::vector<Point>& points)
 }
 
 Polygon::Polygon(const std::initializer_list<Point>& points)
-        : segments_(points.size()), points_(points)
+    : segments_(points.size()), points_(points)
 {
     for (unsigned i = 0; i < points_.size(); i++)
     {
         // add a segment between consecutive points, but wrap index
         // to draw a segment from the last point to first point.
         segments_[i] =
-                Segment{*(points.begin() + i), *(points.begin() + ((i + 1) % points.size()))};
+            Segment{*(points.begin() + i), *(points.begin() + ((i + 1) % points.size()))};
     }
 }
 
@@ -47,9 +47,9 @@ bool Polygon::contains(const Point& p) const
     {
         if (((points_.at(i).y() > p.y()) != (points_.at(j).y() > p.y())) &&
             (p.x() < (points_.at(j).x() - points_.at(i).x()) *
-                         (p.y() - points_.at(i).y()) /
-                         (points_.at(j).y() - points_.at(i).y()) +
-                             points_.at(i).x()))
+                             (p.y() - points_.at(i).y()) /
+                             (points_.at(j).y() - points_.at(i).y()) +
+                         points_.at(i).x()))
         {
             point_is_contained = !point_is_contained;
         }

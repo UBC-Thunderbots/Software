@@ -2,15 +2,16 @@
 
 #include "software/new_geom/point.h"
 
-// This is a direct copy of geom/segment.h, this is needed to unblock work on the new_geom shape hierarchy.
+// This is a direct copy of geom/segment.h, this is needed to unblock work on the new_geom
+// shape hierarchy.
 // TODO: Refactor this to fit the new_geom hierarchy
 class Segment final
 {
-private:
+   private:
     Point start;
     Point end;
 
-public:
+   public:
     void setSegStart(Point o)
     {
         start = o;
