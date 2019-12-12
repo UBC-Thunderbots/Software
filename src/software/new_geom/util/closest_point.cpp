@@ -13,7 +13,7 @@ Point closestPointOnLine(const Point &p, const Line &l)
     return Point(x, y);
 }
 
-Point closestPointOnLine(const Point &p, const Point &p1, const Point &p2)
+Point closestPointOnLine(const Line &l, const Point &p)
 {
-    return closestPointOnLine(p, Line(p1, p2));
+    return closestPointOnLine(p, l);
 }
