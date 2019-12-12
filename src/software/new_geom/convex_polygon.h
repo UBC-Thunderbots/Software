@@ -1,8 +1,9 @@
-//
-// Created by sam on 2019-11-23.
-//
+#include "software/new_geom/convex_shape.h"
+#include "software/new_geom/polygon.h"
 
-#ifndef SRC_CONVEX_POLYGON_H
-#define SRC_CONVEX_POLYGON_H
-
-#endif //SRC_CONVEX_POLYGON_H
+/**
+ * A polygon that is convex (curved outwards).
+ */
+class ConvexPolygon : public virtual Polygon, public ConvexShape
+{
+};
