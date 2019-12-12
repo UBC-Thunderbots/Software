@@ -20,9 +20,9 @@ class Line final
     explicit Line(const Point& first, const Point& second);
 
     /**
-     * Returns the coefficient array
+     * Returns the coefficient array in the form coeffs[0]*x + coeffs[1]*y + coeffs[2] = 0
      *
-     * @return the coeffecient array
+     * @return the coefficient array
      */
     std::array<double, 3> getCoeffs() const;
 
