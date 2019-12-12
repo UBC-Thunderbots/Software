@@ -12,11 +12,6 @@ Rectangle::Rectangle(const Point &point1, const Point &point2)
 {
 }
 
-Point Rectangle::minCorner() const
-{
-    return points_[0];
-}
-
 Vector Rectangle::diagonal() const
 {
     return points_[2] - points_[0];
@@ -39,34 +34,34 @@ double Rectangle::area() const
 
 Point Rectangle::centre() const
 {
-    return Point(minCorner() + (diagonal() / 2));
+    return Point(negXNegYCorner() + (diagonal() / 2));
 }
 
 Point Rectangle::posXPosYCorner() const
 {
-    return minCorner() + diagonal();
+    return negXNegYCorner() + diagonal();
 }
 
 Point Rectangle::negXPosYCorner() const
 {
-    return minCorner() + Vector(0, diagonal().y());
+    return negXNegYCorner() + Vector(0, diagonal().y());
 }
 
 Point Rectangle::negXNegYCorner() const
 {
-    return minCorner();
+    return points_[0];
 }
 
 Point Rectangle::posXNegYCorner() const
 {
-    return minCorner() + Vector(diagonal().x(), 0);
+    return negXNegYCorner() + Vector(diagonal().x(), 0);
 }
 
 bool Rectangle::contains(const Point& p) const
 {
-    return p.x() >= minCorner().x() && p.y() >= minCorner().y() &&
-           p.x() <= minCorner().x() + diagonal().x() &&
-           p.y() <= minCorner().y() + diagonal().y();
+    return p.x() >= negXNegYCorner().x() && p.y() >= negXNegYCorner().y() &&
+           p.x() <= negXNegYCorner().x() + diagonal().x() &&
+           p.y() <= negXNegYCorner().y() + diagonal().y();
 }
 
 Point Rectangle::operator[](unsigned int pos) const
@@ -86,17 +81,17 @@ Point Rectangle::operator[](unsigned int pos) const
     }
 }
 
-Point Rectangle::furthestCorner(Point p)
+Point Rectangle::furthestCorner(const Point &p)
 {
-    std::vector<Point> corners = this->corners();
+    std::vector<Point> corners = points_;
 
     return *std::max_element(corners.begin(), corners.end(),
                              [&](const Point& corner1, const Point& corner2) {
-                                 return dist(corner1, p) < dist(corner2, p);
+                                 return p.distanceFromPoint(corner1) < p.distanceFromPoint(corner2);
                              });
 }
 
 bool Rectangle::operator==(const Rectangle &p) const
 {
-    return minCorner() == p.minCorner() && diagonal() == p.diagonal();
+    return negXNegYCorner() == p.negXNegYCorner() && diagonal() == p.diagonal();
 }

@@ -93,33 +93,13 @@ public:
     Point operator[](unsigned int pos) const;
 
     /**
-     * Attempts to move all edges of the rectangle outwards or inwards towards
-     * the centre by an "amount" while maintaining the same location for the center of the
-     * rectangle. The rectangle will not shrink to anything smaller than a point
-     *
-     * @param amount The amount to expand or shrink the rectangle by on all sides, can be
-     * positive or negative
-     *
-     * @return bool Whether it was possible to expand or shrink the rectangle by
-     * amount requested
-     */
-    bool expand(double amount);
-
-    /**
      * Returns the corner point of the rectangle that is the furthest from the input
      * point.
      *
      * @param p The point to test
      * @return The corner point that is furthest from the test point
      */
-    Point furthestCorner(Point p);
-
-    /**
-     * Returns the negXNegY point of the rectangle.
-     *
-     * @return The bottom left corner of the rectangle
-     */
-    Point minCorner() const;
+    Point furthestCorner(const Point &p);
 
     /**
      * Returns a vector from negXNegY point of the rectangle to the posXPosY point

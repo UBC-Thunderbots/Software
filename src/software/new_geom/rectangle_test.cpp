@@ -7,9 +7,6 @@ TEST(RectangleConstructorTests, test_bottom_left_top_right)
     Rectangle r = Rectangle(Point(0, 0), Point(4, 5));
     EXPECT_EQ(r.xLength(), 4);
     EXPECT_EQ(r.yLength(), 5);
-    for (const Point &p : r.getPoints()) {
-        std::cout << p.x() << " and " << p.y() << std::endl;
-    }
 }
 
 TEST(RectangleConstructorTests, test_top_left_bottom_right)
@@ -17,9 +14,6 @@ TEST(RectangleConstructorTests, test_top_left_bottom_right)
     Rectangle r = Rectangle(Point(-3, 3), Point(4, -5));
     EXPECT_EQ(r.xLength(), 7);
     EXPECT_EQ(r.yLength(), 8);
-    for (const Point &p : r.getPoints()) {
-        std::cout << p.x() << " and " << p.y() << std::endl;
-    }
 }
 
 TEST(RectangleConstructorTests, test_top_right_bottom_left)
@@ -27,9 +21,6 @@ TEST(RectangleConstructorTests, test_top_right_bottom_left)
     Rectangle r = Rectangle(Point(2, 7), Point(0, 0));
     EXPECT_EQ(r.xLength(), 2);
     EXPECT_EQ(r.yLength(), 7);
-    for (const Point &p : r.getPoints()) {
-        std::cout << p.x() << " and " << p.y() << std::endl;
-    }
 }
 
 TEST(RectangleConstructorTests, test_bottom_right_top_left)
@@ -156,4 +147,45 @@ TEST(RectangleContainsPointTests, test_point_off_above_rectangle)
 TEST(RectangleContainsPointTests, test_point_centre_of_rectangle)
 {
     EXPECT_TRUE(Rectangle(Point(1, 1), Point(-1, -1)).contains(Point(0.5, 0.5)));
+}
+
+TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_top_right)
+{
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(0.5, 0.5)), Point(8, 4));
+}
+
+TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_top_left)
+{
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(7, 0.5)), Point(0, 4));
+}
+
+TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_bottom_right)
+{
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(0.5, 3)), Point(8, 0));
+}
+
+TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_bottom_left)
+{
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(7, 3)), Point(0, 0));
+}
+
+TEST(RectangleEqualsTests, test_rectangles_equal)
+{
+    Rectangle r = Rectangle(Point(0, 0), Point(5, 5));
+    Rectangle p = Rectangle(Point(5, 5), Point(0, 0));
+    EXPECT_TRUE(r == p);
+}
+
+TEST(RectangleNotEqualsTests, test_rectangles_not_equal_different_diagonal)
+{
+    Rectangle r = Rectangle(Point(0, 0), Point(6, 5));
+    Rectangle p = Rectangle(Point(5, 5), Point(0, 0));
+    EXPECT_FALSE(r == p);
+}
+
+TEST(RectangleEqualsTests, test_rectangles_not_equal_different_bottom_left_point)
+{
+    Rectangle r = Rectangle(Point(1, 1), Point(6, 6));
+    Rectangle p = Rectangle(Point(0, 0), Point(5, 5));
+    EXPECT_FALSE(r == p);
 }
