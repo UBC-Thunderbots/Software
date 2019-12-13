@@ -46,6 +46,10 @@ cc_library(
         "util/closest_point.h",
         "vector.h",
     ],
+    deps = [
+        "@boost//:geometry",
+        "@boost//:polygon",
+    ],
 )
 
 cc_library(
@@ -63,6 +67,10 @@ cc_library(
         "point.h",
         "util/distance.h",
         "vector.h",
+    ],
+    deps = [
+        "@boost//:geometry",
+        "@boost//:polygon",
     ],
 )
 
