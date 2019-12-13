@@ -11,20 +11,12 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
       ThreadedObserver<PlayInfo>(),
       ThreadedObserver<RobotStatus>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
-      // We want to show the most recent world and AI data, but also want things to look
-      // smooth if the stream of data isn't perfectly consistent, so we use a very small
-      // buffer of 2 values to be responsive while also giving a small buffer for
-      // smoothness
       world_draw_functions_buffer(
-          std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(2)),
-      ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(2)),
-      // We only care about the most recent PlayInfo, so the buffer is of size 1
-      play_info_buffer(std::make_shared<ThreadSafeBuffer<PlayInfo>>(1)),
-      // We don't want to miss any robot status updates so we make the buffer larger
-      robot_status_buffer(std::make_shared<ThreadSafeBuffer<RobotStatus>>(60)),
-      // We only care about the most recent view area that was requested, so the
-      // buffer is of size 1
-      view_area_buffer(std::make_shared<ThreadSafeBuffer<Rectangle>>(1)),
+          std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(world_draw_functions_buffer_size)),
+      ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(ai_draw_functions_buffer_size)),
+      play_info_buffer(std::make_shared<ThreadSafeBuffer<PlayInfo>>(play_info_buffer_size)),
+      robot_status_buffer(std::make_shared<ThreadSafeBuffer<RobotStatus>>(robot_status_buffer_size)),
+      view_area_buffer(std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size)),
       application_shutting_down(false),
       initial_view_area_set(false)
 {

@@ -6,10 +6,10 @@ ZoomableQGraphicsView::ZoomableQGraphicsView(QWidget *parent) : QGraphicsView(pa
 
 void ZoomableQGraphicsView::wheelEvent(QWheelEvent *event)
 {
-    // Do a wheel-based zoom about the cursor position
+    // Do a mouse-wheel based zoom about the cursor position
     // See https://stackoverflow.com/a/44422044
     double wheel_angle_delta = event->angleDelta().y();
-    double scaling_factor    = qPow(scaling_factor_base, wheel_angle_delta);
+    double scaling_factor    = qPow(zoom_scaling_factor_exponential_base, wheel_angle_delta);
 
     auto target_viewport_pos = event->pos();
     auto target_scene_pos    = mapToScene(event->pos());

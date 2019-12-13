@@ -17,5 +17,7 @@ class ZoomableQGraphicsView : public QGraphicsView
     void wheelEvent(QWheelEvent *event);
 
    private:
-    const double scaling_factor_base = 1.0005;
+    // The base of the exponential used to calculate how much to zoom
+    // given a certain amount of mouse wheel movement
+    const double zoom_scaling_factor_exponential_base = 1.0005;
 };
