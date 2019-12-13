@@ -4,73 +4,103 @@ cc_library(
     name = "new_geom",
     srcs = [
         "circle.cpp",
-        "line.cpp",
-        "point.cpp",
         "polynomial.cpp",
-        "vector.cpp",
     ],
     hdrs = [
-        "angle.h",
         "angular_velocity.h",
         "circle.h",
         "convex_shape.h",
-        "geom_constants.h",
-        "line.h",
-        "point.h",
         "polynomial.h",
         "ray.h",
         "shape.h",
-        "vector.h",
     ],
     deps = [
+        ":angle",
         ":closest_point",
         ":distance",
-        "@boost//:geometry",
-        "@boost//:polygon",
+        ":geom_constants",
+        ":line",
+        ":point",
+        ":vector",
     ],
+)
+
+cc_library(
+    name = "angle",
+    hdrs = ["angle.h"],
 )
 
 cc_library(
     name = "closest_point",
     srcs = [
-        "line.cpp",
-        "point.cpp",
         "util/closest_point.cpp",
-        "vector.cpp",
     ],
     hdrs = [
-        "angle.h",
-        "geom_constants.h",
-        "line.h",
-        "point.h",
         "util/closest_point.h",
-        "vector.h",
     ],
     deps = [
-        "@boost//:geometry",
-        "@boost//:polygon",
+        ":angle",
+        ":geom_constants",
+        ":line",
+        ":point",
+        ":vector",
     ],
 )
 
 cc_library(
     name = "distance",
     srcs = [
-        "line.cpp",
-        "point.cpp",
         "util/distance.cpp",
-        "vector.cpp",
     ],
     hdrs = [
-        "angle.h",
-        "geom_constants.h",
-        "line.h",
-        "point.h",
         "util/distance.h",
-        "vector.h",
     ],
     deps = [
+        ":angle",
+        ":geom_constants",
+        ":line",
+        ":point",
+        ":vector",
+    ],
+)
+
+cc_library(
+    name = "geom_constants",
+    hdrs = ["geom_constants.h"],
+)
+
+cc_library(
+    name = "line",
+    srcs = ["line.cpp"],
+    hdrs = ["line.h"],
+    deps = [
+        ":angle",
+        ":point",
+        ":vector",
+    ],
+)
+
+cc_library(
+    name = "point",
+    srcs = ["point.cpp"],
+    hdrs = ["point.h"],
+    deps = [
+        ":angle",
+        ":geom_constants",
+        ":vector",
         "@boost//:geometry",
         "@boost//:polygon",
+    ],
+)
+
+cc_library(
+    name = "vector",
+    srcs = ["vector.cpp"],
+    hdrs = ["vector.h"],
+    deps = [
+        "angle",
+        "geom_constants",
+        "@boost//:geometry",
     ],
 )
 
