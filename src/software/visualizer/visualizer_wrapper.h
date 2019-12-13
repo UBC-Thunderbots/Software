@@ -81,7 +81,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     // buffer of 2 values to be responsive while also giving a small buffer for
     // smoothness
     const std::size_t world_draw_functions_buffer_size = 2;
-    const std::size_t ai_draw_functions_buffer_size = 2;
+    const std::size_t ai_draw_functions_buffer_size    = 2;
     // We only care about the most recent PlayInfo, so the buffer is of size 1
     const std::size_t play_info_buffer_size = 1;
     // We don't want to miss any robot status updates so we make the buffer larger

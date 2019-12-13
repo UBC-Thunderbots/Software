@@ -11,12 +11,16 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
       ThreadedObserver<PlayInfo>(),
       ThreadedObserver<RobotStatus>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
-      world_draw_functions_buffer(
-          std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(world_draw_functions_buffer_size)),
-      ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(ai_draw_functions_buffer_size)),
-      play_info_buffer(std::make_shared<ThreadSafeBuffer<PlayInfo>>(play_info_buffer_size)),
-      robot_status_buffer(std::make_shared<ThreadSafeBuffer<RobotStatus>>(robot_status_buffer_size)),
-      view_area_buffer(std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size)),
+      world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
+          world_draw_functions_buffer_size)),
+      ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
+          ai_draw_functions_buffer_size)),
+      play_info_buffer(
+          std::make_shared<ThreadSafeBuffer<PlayInfo>>(play_info_buffer_size)),
+      robot_status_buffer(
+          std::make_shared<ThreadSafeBuffer<RobotStatus>>(robot_status_buffer_size)),
+      view_area_buffer(
+          std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size)),
       application_shutting_down(false),
       initial_view_area_set(false)
 {
