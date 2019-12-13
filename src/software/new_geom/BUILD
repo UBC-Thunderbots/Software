@@ -7,8 +7,6 @@ cc_library(
         "line.cpp",
         "point.cpp",
         "polynomial.cpp",
-        "util/closest_point.cpp",
-        "util/distance.cpp",
         "vector.cpp",
     ],
     hdrs = [
@@ -22,13 +20,49 @@ cc_library(
         "polynomial.h",
         "ray.h",
         "shape.h",
-        "util/closest_point.h",
-        "util/distance.h",
         "vector.h",
     ],
     deps = [
+        ":closest_point",
+        ":distance",
         "@boost//:geometry",
         "@boost//:polygon",
+    ],
+)
+
+cc_library(
+    name = "closest_point",
+    srcs = [
+        "line.cpp",
+        "point.cpp",
+        "util/closest_point.cpp",
+        "vector.cpp",
+    ],
+    hdrs = [
+        "angle.h",
+        "geom_constants.h",
+        "line.h",
+        "point.h",
+        "util/closest_point.h",
+        "vector.h",
+    ],
+)
+
+cc_library(
+    name = "distance",
+    srcs = [
+        "line.cpp",
+        "point.cpp",
+        "util/distance.cpp",
+        "vector.cpp",
+    ],
+    hdrs = [
+        "angle.h",
+        "geom_constants.h",
+        "line.h",
+        "point.h",
+        "util/distance.h",
+        "vector.h",
     ],
 )
 
@@ -49,7 +83,7 @@ cc_test(
         "util/closest_point_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":closest_point",
         "@gtest//:gtest_main",
     ],
 )
@@ -60,7 +94,7 @@ cc_test(
         "util/distance_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":distance",
         "@gtest//:gtest_main",
     ],
 )
