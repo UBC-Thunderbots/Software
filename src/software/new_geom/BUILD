@@ -4,24 +4,22 @@ cc_library(
     name = "new_geom",
     srcs = [
         "circle.cpp",
-        "polynomial.cpp",
     ],
     hdrs = [
-        "angular_velocity.h",
         "circle.h",
         "convex_shape.h",
-        "polynomial.h",
-        "ray.h",
         "shape.h",
     ],
     deps = [
         ":angle",
-        ":closest_point",
-        ":distance",
+        ":angular_velocity",
         ":geom_constants",
         ":line",
         ":point",
+        ":polynomial",
+        ":ray",
         ":vector",
+        "//software/new_geom/util",
     ],
 )
 
@@ -31,37 +29,9 @@ cc_library(
 )
 
 cc_library(
-    name = "closest_point",
-    srcs = [
-        "util/closest_point.cpp",
-    ],
-    hdrs = [
-        "util/closest_point.h",
-    ],
-    deps = [
-        ":angle",
-        ":geom_constants",
-        ":line",
-        ":point",
-        ":vector",
-    ],
-)
-
-cc_library(
-    name = "distance",
-    srcs = [
-        "util/distance.cpp",
-    ],
-    hdrs = [
-        "util/distance.h",
-    ],
-    deps = [
-        ":angle",
-        ":geom_constants",
-        ":line",
-        ":point",
-        ":vector",
-    ],
+    name = "angular_velocity",
+    hdrs = ["angular_velocity.h"],
+    deps = [":angle"],
 )
 
 cc_library(
@@ -94,6 +64,19 @@ cc_library(
 )
 
 cc_library(
+    name = "polynomial",
+    srcs = ["polynomial.cpp"],
+    hdrs = ["polynomial.h"],
+    deps = [":geom_constants"],
+)
+
+cc_library(
+    name = "ray",
+    hdrs = ["ray.h"],
+    deps = [":point"],
+)
+
+cc_library(
     name = "vector",
     srcs = ["vector.cpp"],
     hdrs = ["vector.h"],
@@ -111,28 +94,6 @@ cc_test(
     ],
     deps = [
         ":new_geom",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "closest_point_test",
-    srcs = [
-        "util/closest_point_test.cpp",
-    ],
-    deps = [
-        ":closest_point",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "distance_test",
-    srcs = [
-        "util/distance_test.cpp",
-    ],
-    deps = [
-        ":distance",
         "@gtest//:gtest_main",
     ],
 )
