@@ -64,7 +64,7 @@ static void accurate_shoot_init(void) {}
  *
  * \param[in] world TODO
  */
-static void accurate_shoot_start(const primitive_params_t *params, FirmwareWorld_t* world)
+static void accurate_shoot_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     global_params = params;
     // Convert into m/s and rad/s because physics is in m and s
@@ -91,7 +91,8 @@ static void accurate_shoot_start(const primitive_params_t *params, FirmwareWorld
  */
 static void accurate_shoot_end(FirmwareWorld_t* world)
 {
-    Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    Chicker_t* chicker =
+        app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
     app_chicker_disableAutokick(chicker);
 }
 
@@ -104,7 +105,7 @@ static void accurate_shoot_end(FirmwareWorld_t* world)
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void accurate_shoot_tick(log_record_t *log, FirmwareWorld_t *world)
+static void accurate_shoot_tick(log_record_t* log, FirmwareWorld_t* world)
 {
     // TODO: what would you like to log?
 
@@ -190,16 +191,20 @@ static void accurate_shoot_tick(log_record_t *log, FirmwareWorld_t *world)
 
         // accelerate at ball to kick it
         Chicker_t* chicker = app_firmware_robot_getChicker(robot);
-        bool chipping = global_params->extra & 1;
-        if (chipping){
+        bool chipping      = global_params->extra & 1;
+        if (chipping)
+        {
             float chip_distance = global_params->params[3];
             app_chicker_enableAutokick(chicker, chip_distance);
-        } else {
+        }
+        else
+        {
             float speed_m_per_s = global_params->params[3];
             app_chicker_enableAutochip(chicker, speed_m_per_s);
         }
 
-        if (!chipping){
+        if (!chipping)
+        {
             Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
             app_dribbler_setSpeed(dribbler, 8000);
         }

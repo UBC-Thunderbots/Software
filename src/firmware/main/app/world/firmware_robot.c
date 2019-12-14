@@ -32,7 +32,7 @@ FirmwareRobot_t* app_firmware_robot_create(
     new_robot->front_left_wheel     = front_left_wheel;
     new_robot->back_right_wheel     = back_right_wheel;
     new_robot->back_left_wheel      = back_left_wheel;
-    new_robot->robot_constants     = robot_constants;
+    new_robot->robot_constants      = robot_constants;
 
     return new_robot;
 }

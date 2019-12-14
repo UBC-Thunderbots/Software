@@ -59,7 +59,7 @@ float dribbler_speed;
  * dribbler set speed in rpm
  * \param[in] world TODO?
  */
-static void catch_start(const primitive_params_t *params, FirmwareWorld_t* world)
+static void catch_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     for (unsigned int i = 0; i < 4; i++)
     {
@@ -73,7 +73,8 @@ static void catch_start(const primitive_params_t *params, FirmwareWorld_t* world
     catchmargin    = (float)catch_param.params[2];
     dribbler_speed = (float)catch_param.params[1];
 
-    Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    Dribbler_t* dribbler =
+        app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
     app_dribbler_setSpeed(dribbler, dribbler_speed);
 }
 
@@ -95,7 +96,7 @@ static void catch_end(FirmwareWorld_t* world) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void catch_tick(log_record_t *log, FirmwareWorld_t *world)
+static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
 {
     // Grab Camera Data
     dr_data_t current_states;

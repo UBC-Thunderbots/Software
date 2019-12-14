@@ -29,7 +29,7 @@ static void dribble_init(void) {}
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void dribble_start(const primitive_params_t *params, FirmwareWorld_t* world)
+static void dribble_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     for (unsigned int i = 0; i < 4; i++)
     {
@@ -42,7 +42,8 @@ static void dribble_start(const primitive_params_t *params, FirmwareWorld_t* wor
     destination[1] = ((float)(params->params[1]) / 1000.0f);
     destination[2] = ((float)(params->params[2]) / 100.0f);
 
-    Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    Dribbler_t* dribbler =
+        app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
     app_dribbler_setSpeed(dribbler, (unsigned int)(params->params[3]));
 }
 
@@ -63,7 +64,7 @@ static void dribble_end(FirmwareWorld_t* world) {}
  * \c NULL if no record is to be filled
  * \param[in] world an object representing the world
  */
-static void dribble_tick(log_record_t *logajectory, FirmwareWorld_t *world)
+static void dribble_tick(log_record_t* logajectory, FirmwareWorld_t* world)
 {
     // TODO: what would you like to log?
 

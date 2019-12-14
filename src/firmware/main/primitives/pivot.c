@@ -56,15 +56,17 @@ float compute_magnitude(float a[2])
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void pivot_start(const primitive_params_t *params, FirmwareWorld_t* world)
+static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
     center[0] = params->params[0] / 1000.0;
     center[1] = params->params[1] / 1000.0;
     angle     = params->params[2] / 100.0;
     speed     = params->params[3] / 100.0;
 
-    if (params->extra & 0x01) {
-        Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    if (params->extra & 0x01)
+    {
+        Dribbler_t *dribbler =
+            app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
         app_dribbler_setSpeed(dribbler, 16000);
     }
 
@@ -103,7 +105,7 @@ static void pivot_start(const primitive_params_t *params, FirmwareWorld_t* world
  * pivot movement is already in progress.
  * \param[in] world TODO?
  */
-static void pivot_end(FirmwareWorld_t* world) {}
+static void pivot_end(FirmwareWorld_t *world) {}
 
 /**
  * \brief Ticks a movement of this type.

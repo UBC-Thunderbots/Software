@@ -64,7 +64,8 @@ void apply_wheel_force_all_wheels(const float *force)
  *
  * \param[in] wheel force in newtons
  */
-void apply_wheel_force(int wheel_index, float force_in_newtons){
+void apply_wheel_force(int wheel_index, float force_in_newtons)
+{
     float battery = adc_battery();
 
     float torque   = WHEEL_RADIUS * GEAR_RATIO;
@@ -74,19 +75,23 @@ void apply_wheel_force(int wheel_index, float force_in_newtons){
 }
 
 // TODO: jdocs?
-void apply_wheel_force_front_right(float force_in_newtons){
+void apply_wheel_force_front_right(float force_in_newtons)
+{
     apply_wheel_force(3, force_in_newtons);
 }
 
-void apply_wheel_force_front_left(float force_in_newtons){
+void apply_wheel_force_front_left(float force_in_newtons)
+{
     apply_wheel_force(0, force_in_newtons);
 }
 
-void apply_wheel_force_back_right(float force_in_newtons){
+void apply_wheel_force_back_right(float force_in_newtons)
+{
     apply_wheel_force(2, force_in_newtons);
 }
 
-void apply_wheel_force_back_left(float force_in_newtons){
+void apply_wheel_force_back_left(float force_in_newtons)
+{
     apply_wheel_force(1, force_in_newtons);
 }
 

@@ -120,7 +120,7 @@ static void shoot_init(void) {}
  *	   because the primitive start function already does it
  * \param[in] world TODO?
  */
-static void shoot_start(const primitive_params_t *params, FirmwareWorld_t* world)
+static void shoot_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
     printf("Shoot start called.\n");
     // Convert into m/s and rad/s because physics is in m and s
@@ -142,10 +142,14 @@ static void shoot_start(const primitive_params_t *params, FirmwareWorld_t* world
     float shoot_power = (float)params->params[3] / 1000.0f;
     chip              = params->extra & 1;
 
-    Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
-    if (chip){
+    Chicker_t *chicker =
+        app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    if (chip)
+    {
         app_chicker_enableAutochip(chicker, shoot_power);
-    } else {
+    }
+    else
+    {
         app_chicker_enableAutokick(chicker, shoot_power);
     }
 }
@@ -169,9 +173,10 @@ static void shoot_start(const primitive_params_t *params, FirmwareWorld_t* world
  * shoot movement is already in progress.
  * \param[in] world TODO?
  */
-static void shoot_end(FirmwareWorld_t* world)
+static void shoot_end(FirmwareWorld_t *world)
 {
-    Chicker_t* chicker = app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    Chicker_t *chicker =
+        app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
     app_chicker_disableAutokick(chicker);
     app_chicker_disableAutochip(chicker);
 }

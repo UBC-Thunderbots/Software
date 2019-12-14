@@ -95,7 +95,8 @@ void primitive_init(void)
  * \param[in] params the parameters to the primitive
  * \param[in] world TODO?
  */
-void primitive_start(unsigned int primitive, const primitive_params_t *params, FirmwareWorld_t* world)
+void primitive_start(unsigned int primitive, const primitive_params_t *params,
+                     FirmwareWorld_t *world)
 {
     assert(primitive < PRIMITIVE_COUNT);
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
@@ -104,9 +105,9 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params, F
         primitive_current->end(world);
     }
 
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-    Chicker_t* chicker = app_firmware_robot_getChicker(robot);
-    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
+    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
 
     app_chicker_disableAutochip(chicker);
     app_chicker_disableAutokick(chicker);

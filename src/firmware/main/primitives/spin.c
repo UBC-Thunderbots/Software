@@ -46,7 +46,7 @@ static void spin_init(void) {}
  * function returns and must be copied into this module if needed
  * \param[in] world TODO?
  */
-static void spin_start(const primitive_params_t *p, FirmwareWorld_t* world)
+static void spin_start(const primitive_params_t *p, FirmwareWorld_t *world)
 {
     // Parameters:  param[0]: g_destination_x   [mm]
     //              param[1]: g_destination_y   [mm]
@@ -88,7 +88,7 @@ static void spin_start(const primitive_params_t *p, FirmwareWorld_t* world)
  *
  * \param[in] world TODO?
  */
-static void spin_end(FirmwareWorld_t* world) {}
+static void spin_end(FirmwareWorld_t *world) {}
 
 /**
  * \brief Ticks a movement of this type.

@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#include "util/log.h"
 #include "app/world/firmware_world.h"
+#include "util/log.h"
 
 /**
  * \brief The information about a movement sent from the host computer.
@@ -61,7 +61,7 @@ typedef struct
      * storage if needed subsequently
      * \param[in] world TODO? REALLY CONSIDER
      */
-    void (*start)(const primitive_params_t *params, FirmwareWorld_t* world);
+    void (*start)(const primitive_params_t *params, FirmwareWorld_t *world);
 
     /**
      * \brief Ends a movement using the primitive.
@@ -87,7 +87,8 @@ typedef struct
 } primitive_t;
 
 void primitive_init(void);
-void primitive_start(unsigned int primitive, const primitive_params_t *params, FirmwareWorld_t* world);
+void primitive_start(unsigned int primitive, const primitive_params_t *params,
+                     FirmwareWorld_t *world);
 void primitive_tick(log_record_t *log, FirmwareWorld_t *world);
 bool primitive_is_direct(unsigned int primitive);
 unsigned int get_primitive_index();

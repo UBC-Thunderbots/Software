@@ -52,7 +52,7 @@ static void imu_test_start(const primitive_params_t *params)
  * spin movement is already in progress.
  * \param[in] world TODO?
  */
-static void imu_test_end(FirmwareWorld_t* world) {}
+static void imu_test_end(FirmwareWorld_t *world) {}
 
 /**
  * \brief Ticks a movement of this type.

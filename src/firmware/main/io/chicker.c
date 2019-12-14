@@ -487,7 +487,8 @@ void chicker_fire_with_pulsewidth(chicker_device_t device, unsigned int width)
  *              second. For the chipper this is the distance to the first bounce of the
  *              ball
  */
-void chicker_fire_with_power(chicker_device_t device, float power){
+void chicker_fire_with_power(chicker_device_t device, float power)
+{
     unsigned int width = chicker_power_to_pulse_width(power, device == CHICKER_CHIP);
     chicker_fire_with_pulsewidth(device, width);
 }
@@ -554,7 +555,8 @@ bool chicker_auto_fired_test_clear(void)
  * \param speed_m_per_s The speed that the ball would be kicked at, if it were right
  *                      in front of the kicker
  */
-void chicker_kick(float speed_m_per_s){
+void chicker_kick(float speed_m_per_s)
+{
     chicker_fire_with_power(CHICKER_KICK, speed_m_per_s);
 }
 
@@ -563,7 +565,8 @@ void chicker_kick(float speed_m_per_s){
  * \param distance_m The distance to the first bounce the ball would be chipped, if it
  *                   were right in front of the chipper when the chipper fired
  */
-void chicker_chip(float distance_m){
+void chicker_chip(float distance_m)
+{
     chicker_fire_with_power(CHICKER_KICK, distance_m);
 }
 
@@ -571,7 +574,8 @@ void chicker_chip(float distance_m){
  * \brief Enables autokick, so the kicker will fire if the ball comes in front of it
  * \param speed_m_per_s The speed to kick the ball at
  */
-void chicker_enable_auto_kick(float speed_m_per_s){
+void chicker_enable_auto_kick(float speed_m_per_s)
+{
     chicker_auto_arm(CHICKER_KICK, speed_m_per_s);
 }
 
@@ -579,7 +583,8 @@ void chicker_enable_auto_kick(float speed_m_per_s){
  * \brief Enables autochip, so the chipper will fire if the ball comes in front of it
  * \param distance_m The distance to chip the ball (to the first bounce)
  */
-void chicker_enable_auto_chip(float distance_m){
+void chicker_enable_auto_chip(float distance_m)
+{
     chicker_auto_arm(CHICKER_CHIP, distance_m);
 }
 

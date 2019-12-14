@@ -33,7 +33,7 @@ static void stop_init(void)
  * function returns and must be copied into this module if needed
  * \param[in] world
  */
-static void stop_start(const primitive_params_t *params, FirmwareWorld_t* world)
+static void stop_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
     for (unsigned int i = 0; i != 4; ++i)
     {
@@ -61,7 +61,7 @@ static void stop_start(const primitive_params_t *params, FirmwareWorld_t* world)
  *
  * \param[in] world TODO?
  */
-static void stop_end(FirmwareWorld_t* world)
+static void stop_end(FirmwareWorld_t *world)
 {
     // Nothing to do here.
 }

@@ -12,7 +12,8 @@
  *                       (side-to-side) direction (m/s^2)
  * @param angular_accel The angular acceleration to apply to the robot (rad/s^2)
  */
-void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x, float linear_accel_y, float angular_accel);
+void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
+                            float linear_accel_y, float angular_accel);
 
 /**
  * Drive the given robot at the given velocity in the global coordinate frame
@@ -24,4 +25,5 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x, float 
  *                          coordinate frame (m/s)
  * @param angular_velocity The angular velocity to move at (rad/s)
  */
-void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x, float linear_velocity_y, float angular_velocity);
+void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
+                               float linear_velocity_y, float angular_velocity);

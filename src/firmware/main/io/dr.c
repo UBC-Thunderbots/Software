@@ -124,7 +124,8 @@ void dr_get(dr_data_t *ret)
  * \brief provides current state information about the ball to caller
  * \param ret The struct to populate with the ball data
  */
-void dr_get_ball(dr_ball_data_t* ret){
+void dr_get_ball(dr_ball_data_t *ret)
+{
     *ret = current_ball_state;
 }
 
@@ -132,7 +133,8 @@ void dr_get_ball(dr_ball_data_t* ret){
  * \brief Get the x-component of the robot's position
  * \return The x-component of the robot's position
  */
-float dr_get_robot_position_x(){
+float dr_get_robot_position_x()
+{
     return current_state.x;
 }
 
@@ -140,7 +142,8 @@ float dr_get_robot_position_x(){
  * \brief Get the y-component of the robot's position
  * \return The y-component of the robot's position
  */
-float dr_get_robot_position_y(){
+float dr_get_robot_position_y()
+{
     return current_state.y;
 }
 
