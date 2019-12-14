@@ -9,6 +9,16 @@
 class Line final
 {
    public:
+    /**
+     * Struct to wrap the coefficients in the form a*x + b*y + c = 0
+     */
+    struct Coeffs
+    {
+        double a;
+        double b;
+        double c;
+    };
+
     Line() = delete;
 
     /**
@@ -19,17 +29,10 @@ class Line final
      */
     explicit Line(const Point& first, const Point& second);
 
-    struct Coeffs
-    {
-        double a;
-        double b;
-        double c;
-    };
-
     /**
-     * Returns the coefficient array in the form coeffs[0]*x + coeffs[1]*y + coeffs[2] = 0
+     * Returns the coefficient struct
      *
-     * @return the coefficient array
+     * @return the coefficient struct
      */
     Coeffs getCoeffs() const;
 
