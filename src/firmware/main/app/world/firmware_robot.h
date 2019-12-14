@@ -24,6 +24,7 @@ typedef struct RobotConstants
     float jerk_limit;
 } RobotConstants_t;
 
+// TODO: this constructor needs to take functions for robot velocity
 /**
  * Create a robot with the given hardware
  *
@@ -75,18 +76,50 @@ Chicker_t* app_firmware_robot_getChicker(FirmwareRobot_t* robot);
 Dribbler_t* app_firmware_robot_getDribbler(FirmwareRobot_t* robot);
 
 /**
- * Get the x-position of the given ball
- * @param ball The ball to get the y-position for
- * @return The x-position of the given ball, in meters, in global coordinates
+ * Get the x-position of the given robot
+ * @param robot The robot to get the y-position for
+ * @return The x-position of the given robot, in meters, in global coordinates
  */
 float app_firmware_robot_getPositionX(FirmwareRobot_t* robot);
 
 /**
- * Get the y-position of the given ball
- * @param ball The ball to get the y-position for
- * @return The y-position of the given ball, in meters, in global coordinates
+ * Get the y-position of the given robot
+ * @param robot The robot to get the y-position for
+ * @return The y-position of the given robot, in meters, in global coordinates
  */
 float app_firmware_robot_getPositionY(FirmwareRobot_t* robot);
+
+// TODO: testme
+/**
+ * Get the current orientation of the given robot
+ *
+ * @param robot The robot to get the orientation of
+ * @return The orientation of the robot, in radians
+ */
+float app_firmware_robot_getOrientation(FirmwareRobot_t* robot);
+
+// TODO: test me!
+/**
+ * Get the x-velocity of the given robot
+ * @param robot The robot to get the y-velocity for
+ * @return The x-velocity of the given robot, in m/s, in global coordinates
+ */
+float app_firmware_robot_getVelocityX(FirmwareRobot_t* robot);
+
+// TODO: test me!
+/**
+ * Get the y-velocity of the given robot
+ * @param robot The robot to get the y-velocity for
+ * @return The y-velocity of the given robot, in m/s, in global coordinates
+ */
+float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot);
+
+/**
+ * Get the current angular velocity for the given robot
+ * @param robot The robot to get the angular velocity for
+ * @return The angular velocity of the given robot, in rad/s
+ */
+float app_firmware_robot_getAngularVelocity(FirmwareRobot_t* robot);
 
 /**
  * Get the front right wheel from the given robot

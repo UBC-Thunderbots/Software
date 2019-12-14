@@ -2,13 +2,12 @@
 
 #include <math.h>
 
-#include "io/wheels.h"
-#include "physics/physics.h"
-
 #include "io/adc.h"
 #include "io/dr.h"
 #include "io/dsp.h"
 #include "io/encoder.h"
+#include "io/wheels.h"
+#include "physics/physics.h"
 
 
 // adjust the force on the wheels such that it compensates for a high center
@@ -44,6 +43,7 @@ void correct_wheel_force(const float force[4], float new_force[4])
 }
 
 
+// TODO: deleteme
 /**
  * \ingroup Controls
  * \brief Applies a force in newtons to each wheel
@@ -59,8 +59,8 @@ void apply_wheel_force_all_wheels(const float *force)
 }
 
 /**
- * \ingroup Controls
- * \brief Applies a force in newtons to the wheel with the given index
+ * \ingroup controls
+ * \brief applies a force in newtons to the wheel with the given index
  *
  * \param[in] wheel force in newtons
  */
@@ -95,6 +95,7 @@ void apply_wheel_force_back_left(float force_in_newtons)
     apply_wheel_force(1, force_in_newtons);
 }
 
+// TODO: deleteme
 /**
  * \ingroup Controls
  *
@@ -149,8 +150,9 @@ void apply_accel(float linear_accel[2], float angular_accel)
     apply_wheel_force_all_wheels(wheel_force);  // set force
 }
 
-/**
- * \ingroup Controls
+
+// TODO: deleteme
+/** * \ingroup Controls
  *
  * \brief Applies acceleration to reach a desired velocity specified in dead reckoning
  * coordinates

@@ -92,3 +92,25 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     app_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot), wheel_force[1]);
     app_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot), wheel_force[2]);
 }
+
+void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
+                               float linear_velocity_y, float angular_velocity)
+{
+    float current_vx               = app_firmware_robot_getVelocityX(robot);
+    float current_vy               = app_firmware_robot_getVelocityY(robot);
+    float current_angular_velocity = app_firmware_robot_getAngularVelocity(robot);
+    float current_orientation      = app_firmware_robot_getOrientation(robot);
+
+    // get the desired acceleration by assuming we need to achieve the
+    // velocity delta in a single tick
+    float acceleration_x = (linear_velocity_x - current_vx) / TRACK_TIME;
+    float acceleration_y = (linear_velocity_y - current_vy) / TRACK_TIME;
+
+    rotate(cur_acc, -current_orientation);  // rotate into robot local coordinate from dr
+
+    float angular_acceleration =
+        (angular_velocity - current_angular_velocity) / TRACK_TIME;
+
+    // send acceleration to wheels
+    app_control_applyAccel(robot, acceleration_x, acceleration_y, angular_acceleration);
+}
