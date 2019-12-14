@@ -127,8 +127,6 @@ int main(int argc, char **argv)
 
     Util::Logger::LoggerSingleton::initializeLogger();
 
-    ai = std::make_shared<AIWrapper>();
-
     commandLineArgs args = parseCommandLineArgs(argc, argv);
 
     if (!args.help && !args.err)

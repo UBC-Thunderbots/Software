@@ -1,5 +1,8 @@
 #include "software/visualizer/visualizer_wrapper.h"
 
+#include <QtCore/QTimer>
+#include <QtWidgets/QApplication>
+
 #include "software/visualizer/drawing/world.h"
 
 VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
@@ -7,51 +10,61 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
       ThreadedObserver<RobotStatus>(),
-      termination_promise_ptr(std::make_shared<std::promise<void>>())
+      termination_promise_ptr(std::make_shared<std::promise<void>>()),
+      world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
+          world_draw_functions_buffer_size)),
+      ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
+          ai_draw_functions_buffer_size)),
+      play_info_buffer(
+          std::make_shared<ThreadSafeBuffer<PlayInfo>>(play_info_buffer_size)),
+      robot_status_buffer(
+          std::make_shared<ThreadSafeBuffer<RobotStatus>>(robot_status_buffer_size)),
+      view_area_buffer(
+          std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size)),
+      application_shutting_down(false),
+      initial_view_area_set(false)
 {
-    auto application_promise =
-        std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
-    std::future<std::shared_ptr<QApplication>> application_future =
-        application_promise->get_future();
-    auto visualizer_promise =
-        std::make_shared<std::promise<std::shared_ptr<Visualizer>>>();
-    std::future<std::shared_ptr<Visualizer>> visualizer_future =
-        visualizer_promise->get_future();
     run_visualizer_thread =
-        std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv,
-                    application_promise, visualizer_promise, termination_promise_ptr);
-
-    // We use futures and promises here to force the constructor to wait for the newly
-    // spawned thread to fully create the application and visualizer objects before we
-    // take pointers to them. If we do not make this guarantee, we could get invalid
-    // references to the application or visualizer objects which will cause the system to
-    // fail when we try interact with them
-    application = application_future.get();
-    visualizer  = visualizer_future.get();
+        std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv);
 }
 
 VisualizerWrapper::~VisualizerWrapper()
 {
-    // Call the Application in a threadsafe manner
-    // See
-    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
-    QMetaObject::invokeMethod(application.get(), "quit",
-                              Qt::ConnectionType::BlockingQueuedConnection);
+    QCoreApplication* application_ptr = QApplication::instance();
+    if (!application_shutting_down.load() && application_ptr != nullptr)
+    {
+        // Call the Application in a threadsafe manner.
+        // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
+        QMetaObject::invokeMethod(application_ptr, "quit",
+                                  Qt::ConnectionType::QueuedConnection);
+    }
+
     run_visualizer_thread.join();
 }
 
-void VisualizerWrapper::createAndRunVisualizer(
-    int argc, char** argv,
-    std::shared_ptr<std::promise<std::shared_ptr<QApplication>>> application_promise_ptr,
-    std::shared_ptr<std::promise<std::shared_ptr<Visualizer>>> visualizer_promise_ptr,
-    std::shared_ptr<std::promise<void>> termination_promise_ptr)
+void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv)
 {
-    auto app = std::make_shared<QApplication>(argc, argv);
-    application_promise_ptr->set_value(app);
-    auto viz = std::make_shared<Visualizer>();
-    viz->show();
-    visualizer_promise_ptr->set_value(viz);
-    app->exec();
+    // We use raw pointers to have explicit control over the order of destruction.
+    // For some reason, putting the QApplication and Visualizer on the stack does
+    // not work, despite theoretically having the same order of destruction
+    QApplication* application = new QApplication(argc, argv);
+    QApplication::connect(application, &QApplication::aboutToQuit,
+                          [&]() { application_shutting_down = true; });
+    Visualizer* visualizer =
+        new Visualizer(world_draw_functions_buffer, ai_draw_functions_buffer,
+                       play_info_buffer, robot_status_buffer, view_area_buffer);
+    visualizer->show();
+
+    // Run the QApplication and all windows / widgets. This function will block
+    // until "quit" is called on the QApplication, either by closing all the
+    // application windows or calling the destructor of this class
+    application->exec();
+
+    // NOTE: The visualizer MUST be deleted before the QApplication. The QApplication
+    // manages all the windows, widgets, and event loop so must be destroyed last
+    delete visualizer;
+    delete application;
+
     // Let the system know the visualizer has shut down once the application has
     // stopped running
     termination_promise_ptr->set_value();
@@ -59,57 +72,29 @@ void VisualizerWrapper::createAndRunVisualizer(
 
 void VisualizerWrapper::onValueReceived(World world)
 {
-    world_lock.lock();
-    most_recent_world_draw_function = getDrawWorldFunction(world);
-    world_lock.unlock();
-    draw();
+    auto world_draw_function = getDrawWorldFunction(world);
+    world_draw_functions_buffer->push(world_draw_function);
+
+    if (!initial_view_area_set && world.field().fieldBoundary().area() > 0)
+    {
+        initial_view_area_set = true;
+        view_area_buffer->push(world.field().fieldBoundary());
+    }
 }
 
 void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function)
 {
-    ai_lock.lock();
-    most_recent_ai_draw_function = draw_function;
-    ai_lock.unlock();
-    draw();
+    ai_draw_functions_buffer->push(draw_function);
 }
 
 void VisualizerWrapper::onValueReceived(PlayInfo play_info)
 {
-    most_recent_play_info = play_info;
-    updatePlayInfo();
+    play_info_buffer->push(play_info);
 }
 
 void VisualizerWrapper::onValueReceived(RobotStatus robot_status)
 {
-    // Call the Visualizer to update the Play Info in a threadsafe manner
-    // See
-    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
-    QMetaObject::invokeMethod(visualizer.get(), "updateRobotStatus",
-                              Qt::ConnectionType::BlockingQueuedConnection,
-                              Q_ARG(RobotStatus, robot_status));
-}
-
-void VisualizerWrapper::draw()
-{
-    std::scoped_lock ai_world_lock(ai_lock, world_lock);
-
-    // Call the Visualizer to draw the AI in a threadsafe manner
-    // See
-    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
-    QMetaObject::invokeMethod(visualizer.get(), "draw",
-                              Qt::ConnectionType::BlockingQueuedConnection,
-                              Q_ARG(WorldDrawFunction, most_recent_world_draw_function),
-                              Q_ARG(AIDrawFunction, most_recent_ai_draw_function));
-}
-
-void VisualizerWrapper::updatePlayInfo()
-{
-    // Call the Visualizer to update the Play Info in a threadsafe manner
-    // See
-    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
-    QMetaObject::invokeMethod(visualizer.get(), "updatePlayInfo",
-                              Qt::ConnectionType::BlockingQueuedConnection,
-                              Q_ARG(PlayInfo, most_recent_play_info));
+    robot_status_buffer->push(robot_status);
 }
 
 std::shared_ptr<std::promise<void>> VisualizerWrapper::getTerminationPromise()
