@@ -19,12 +19,19 @@ class Line final
      */
     explicit Line(const Point& first, const Point& second);
 
+    struct Coeffs
+    {
+        double a;
+        double b;
+        double c;
+    };
+
     /**
      * Returns the coefficient array in the form coeffs[0]*x + coeffs[1]*y + coeffs[2] = 0
      *
      * @return the coefficient array
      */
-    std::array<double, 3> getCoeffs() const;
+    Coeffs getCoeffs() const;
 
     /**
      * Returns the normal unit vector of the Line

@@ -11,9 +11,9 @@ Line::Line(const Point &first, const Point &second)
     coeffs[2] = first.x() * second.y() - second.x() * first.y();
 }
 
-std::array<double, 3> Line::getCoeffs() const
+Line::Coeffs Line::getCoeffs() const
 {
-    return coeffs;
+    return {coeffs[0], coeffs[1], coeffs[2]};
 }
 
 Vector Line::toNormalUnitVector() const

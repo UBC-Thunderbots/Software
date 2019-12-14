@@ -6,8 +6,11 @@ TEST(LineTest, two_points_constructor)
 {
     Line l(Point(-1.0, 2.0), Point(3.0, 4.0));  // -0.5x + y - 2.5 = 0
     EXPECT_EQ(l.toNormalUnitVector(), Vector(-1, 2).normalize());
-    std::array<double, 3> expectedCoeffs = {-2, 4, -10};
-    EXPECT_EQ(l.getCoeffs(), expectedCoeffs);
+    Line::Coeffs expectedCoeffs = {-2, 4, -10};
+    Line::Coeffs coeffs         = l.getCoeffs();
+    EXPECT_DOUBLE_EQ(coeffs.a, expectedCoeffs.a);
+    EXPECT_DOUBLE_EQ(coeffs.b, expectedCoeffs.b);
+    EXPECT_DOUBLE_EQ(coeffs.c, expectedCoeffs.c);
 }
 
 TEST(LineTest, two_points_constructor_invalid)
@@ -38,8 +41,11 @@ TEST(LineTest, vertical_line)
 {
     Line l(Point(1, -1), Point(1, 1));  // x = 1
     EXPECT_EQ(l.toNormalUnitVector(), Vector(-1, 0));
-    std::array<double, 3> expectedCoeffs = {-2, 0, 2};
-    EXPECT_EQ(l.getCoeffs(), expectedCoeffs);
+    Line::Coeffs expectedCoeffs = {-2, 0, 2};
+    Line::Coeffs coeffs         = l.getCoeffs();
+    EXPECT_DOUBLE_EQ(coeffs.a, expectedCoeffs.a);
+    EXPECT_DOUBLE_EQ(coeffs.b, expectedCoeffs.b);
+    EXPECT_DOUBLE_EQ(coeffs.c, expectedCoeffs.c);
 }
 
 TEST(LineTest, swapXY)
@@ -47,6 +53,9 @@ TEST(LineTest, swapXY)
     Line l(Point(-1.0, 2.0), Point(3.0, 4.0));  // -0.5x + y - 2.5 = 0
     l.swapXY();
     EXPECT_EQ(l.toNormalUnitVector(), Vector(2, -1).normalize());
-    std::array<double, 3> expectedCoeffs = {4, -2, -10};
-    EXPECT_EQ(l.getCoeffs(), expectedCoeffs);
+    Line::Coeffs expectedCoeffs = {4, -2, -10};
+    Line::Coeffs coeffs         = l.getCoeffs();
+    EXPECT_DOUBLE_EQ(coeffs.a, expectedCoeffs.a);
+    EXPECT_DOUBLE_EQ(coeffs.b, expectedCoeffs.b);
+    EXPECT_DOUBLE_EQ(coeffs.c, expectedCoeffs.c);
 }
