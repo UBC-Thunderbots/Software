@@ -100,22 +100,24 @@ TEST(PolygonTest, test_self_intersecting_polygon_contains)
      *  0    *
      *       0       2
      */
-    // Self intersecting polygon, each asterisk on the diagram is a point making up the polygon
-    Polygon intersecting_poly{{0.0f, 0.0f},
-                    {0.0f, 2.0f},
-                    {2.0f, 2.0f},
-                    {2.0f, 1.0f},
-                    {0.0f, 1.0f}};
+    // Self intersecting polygon, each asterisk on the diagram is a point making up the
+    // polygon
+    Polygon intersecting_poly{
+        {0.0f, 0.0f}, {0.0f, 2.0f}, {2.0f, 2.0f}, {2.0f, 1.0f}, {0.0f, 1.0f}};
 
-    EXPECT_FALSE(intersecting_poly.contains(Point()));          // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point()));  // on a "right" edge, see NOTE on Polygon::contains
     EXPECT_FALSE(intersecting_poly.contains(Point(2, 0)));
     EXPECT_FALSE(intersecting_poly.contains(Point(0.5, 0.5)));
-    EXPECT_FALSE(intersecting_poly.contains(Point(0, 0.5)));    // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, 0.5)));  // on a "right" edge, see NOTE on Polygon::contains
     EXPECT_TRUE(intersecting_poly.contains(Point(0, 1)));
     EXPECT_TRUE(intersecting_poly.contains(Point(1, 1.5)));
-    EXPECT_FALSE(intersecting_poly.contains(Point(0, 2)));      // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, 2)));  // on a top edge, see NOTE on Polygon::contains
     EXPECT_TRUE(intersecting_poly.contains(Point(1, 1)));
-    EXPECT_FALSE(intersecting_poly.contains(Point(1, 2)));      // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(1, 2)));  // on a top edge, see NOTE on Polygon::contains
     EXPECT_TRUE(intersecting_poly.contains(Point(0, 1.5)));
 }
 
@@ -134,31 +136,33 @@ TEST(PolygonTest, test_complex_self_intersecting_polygon_contains)
      *
      *      -2       0       2
      */
-    // Self intersecting polygon, each asterisk on the diagram is a point making up the polygon
-    Polygon intersecting_poly{{0.0f, 0.0f},
-                              {0.0f, 2.0f},
-                              {2.0f, 2.0f},
-                              {2.0f, 1.0f},
-                              {0.0f, 1.0f},
-                              {-0.0f, -2.0f},
-                              {-2.0f, -2.0f},
-                              {-2.0f, -1.0f},
-                              {0.0f, -1.0f}
-    };
+    // Self intersecting polygon, each asterisk on the diagram is a point making up the
+    // polygon
+    Polygon intersecting_poly{{0.0f, 0.0f},   {0.0f, 2.0f},   {2.0f, 2.0f},
+                              {2.0f, 1.0f},   {0.0f, 1.0f},   {-0.0f, -2.0f},
+                              {-2.0f, -2.0f}, {-2.0f, -1.0f}, {0.0f, -1.0f}};
 
-    EXPECT_FALSE(intersecting_poly.contains(Point()));          // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point()));  // on a "right" edge, see NOTE on Polygon::contains
     EXPECT_FALSE(intersecting_poly.contains(Point(2, 0)));
     EXPECT_FALSE(intersecting_poly.contains(Point(0.5, 0.5)));
-    EXPECT_FALSE(intersecting_poly.contains(Point(0, 0.5)));    // on a "right" edge, see NOTE on Polygon::contains
-    EXPECT_FALSE(intersecting_poly.contains(Point(0, 2)));      // on a top edge, see NOTE on Polygon::contains
-    EXPECT_FALSE(intersecting_poly.contains(Point(1, 2)));      // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, 0.5)));  // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, 2)));  // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(1, 2)));  // on a top edge, see NOTE on Polygon::contains
     EXPECT_FALSE(intersecting_poly.contains(Point(-2, 0)));
     EXPECT_FALSE(intersecting_poly.contains(Point(-0.5, -0.5)));
-    EXPECT_FALSE(intersecting_poly.contains(Point(0, -0.5)));   // on a "right" edge, see NOTE on Polygon::contains
-    EXPECT_FALSE(intersecting_poly.contains(Point(0, -2)));     // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, -0.5)));  // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, -2)));  // on a top edge, see NOTE on Polygon::contains
     EXPECT_FALSE(intersecting_poly.contains(Point(0, -1)));
-    EXPECT_FALSE(intersecting_poly.contains(Point(-1, -1)));    // on a "top" edge, see NOTE on Polygon::contains
-    EXPECT_FALSE(intersecting_poly.contains(Point(0, -1.5)));   // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(-1, -1)));  // on a "top" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, -1.5)));  // on a "right" edge, see NOTE on Polygon::contains
     EXPECT_TRUE(intersecting_poly.contains(Point(-1, -2)));
     EXPECT_TRUE(intersecting_poly.contains(Point(0, 1)));
     EXPECT_TRUE(intersecting_poly.contains(Point(1, 1.5)));

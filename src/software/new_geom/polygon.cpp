@@ -2,15 +2,9 @@
 
 #include <unordered_set>
 
-Polygon::Polygon(const std::vector<Point>& points)
-    : points_(points)
-{
-}
+Polygon::Polygon(const std::vector<Point>& points) : points_(points) {}
 
-Polygon::Polygon(const std::initializer_list<Point>& points)
-    : points_(points)
-{
-}
+Polygon::Polygon(const std::initializer_list<Point>& points) : points_(points) {}
 
 bool Polygon::contains(const Point& p) const
 {
@@ -32,11 +26,13 @@ bool Polygon::contains(const Point& p) const
     unsigned j              = points_.size() - 1;
     while (i < points_.size())
     {
-        bool p_within_edge_y_range = (points_.at(i).y() > p.y()) != (points_.at(j).y() > p.y());
-        bool p_in_half_plane_to_left_of_extended_edge = (p.x() < (points_.at(j).x() - points_.at(i).x()) *
+        bool p_within_edge_y_range =
+            (points_.at(i).y() > p.y()) != (points_.at(j).y() > p.y());
+        bool p_in_half_plane_to_left_of_extended_edge =
+            (p.x() < (points_.at(j).x() - points_.at(i).x()) *
                              (p.y() - points_.at(i).y()) /
                              (points_.at(j).y() - points_.at(i).y()) +
-                             points_.at(i).x());
+                         points_.at(i).x());
 
         if (p_within_edge_y_range && p_in_half_plane_to_left_of_extended_edge)
         {

@@ -4,7 +4,7 @@
 
 // This is a direct copy of geom/segment.h, this is needed to unblock work on the new_geom
 // shape hierarchy.
-// TODO: Refactor this to fit the new_geom hierarchy
+// TODO (Issue #1098): Refactor this to fit the new_geom hierarchy
 class Segment final
 {
    private:
