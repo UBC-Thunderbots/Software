@@ -1,7 +1,7 @@
 #include "software/new_geom/convex_polygon.h"
 
 /**
- * A rectangle.
+ * A rectangle that cannot be rotated.
  */
 class Rectangle : public ConvexPolygon
 {
@@ -81,16 +81,6 @@ class Rectangle : public ConvexPolygon
      * @return whether the Point p is contained within this Rectangle.
      */
     bool contains(const Point &p) const override;
-
-    /**
-     * Returns a digit corresponding to a specific corner for pos%4. (0 for <-x,-y>, 1
-     * for <-x,+y>, 2 for <+x,+y> and 3 for <+x,-y>)
-     *
-     * @param pos The position of the corner wanted
-     *
-     * @return Point A digit corresponding to position
-     */
-    Point operator[](unsigned int pos) const;
 
     /**
      * Returns the corner point of the rectangle that is the furthest from the input

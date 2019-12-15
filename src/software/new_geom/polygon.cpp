@@ -3,26 +3,13 @@
 #include <unordered_set>
 
 Polygon::Polygon(const std::vector<Point>& points)
-    : segments_(points.size()), points_(points)
+    : points_(points)
 {
-    for (unsigned i = 0; i < points.size(); i++)
-    {
-        // add a segment between consecutive points, but wrap index
-        // to draw a segment from the last point to first point.
-        segments_[i] = Segment{points[i], points[(i + 1) % points.size()]};
-    }
 }
 
 Polygon::Polygon(const std::initializer_list<Point>& points)
-    : segments_(points.size()), points_(points)
+    : points_(points)
 {
-    for (unsigned i = 0; i < points_.size(); i++)
-    {
-        // add a segment between consecutive points, but wrap index
-        // to draw a segment from the last point to first point.
-        segments_[i] =
-            Segment{*(points.begin() + i), *(points.begin() + ((i + 1) % points.size()))};
-    }
 }
 
 bool Polygon::contains(const Point& p) const
@@ -45,11 +32,13 @@ bool Polygon::contains(const Point& p) const
     unsigned j              = points_.size() - 1;
     while (i < points_.size())
     {
-        if (((points_.at(i).y() > p.y()) != (points_.at(j).y() > p.y())) &&
-            (p.x() < (points_.at(j).x() - points_.at(i).x()) *
+        bool p_within_edge_y_range = (points_.at(i).y() > p.y()) != (points_.at(j).y() > p.y());
+        bool p_in_half_plane_to_left_of_extended_edge = (p.x() < (points_.at(j).x() - points_.at(i).x()) *
                              (p.y() - points_.at(i).y()) /
                              (points_.at(j).y() - points_.at(i).y()) +
-                         points_.at(i).x()))
+                             points_.at(i).x());
+
+        if (p_within_edge_y_range && p_in_half_plane_to_left_of_extended_edge)
         {
             point_is_contained = !point_is_contained;
         }
@@ -60,9 +49,18 @@ bool Polygon::contains(const Point& p) const
     return point_is_contained;
 }
 
-const std::vector<Segment>& Polygon::getSegments() const
+const std::vector<Segment> Polygon::getSegments() const
 {
-    return segments_;
+    std::vector<Segment> segments;
+
+    for (unsigned i = 0; i < points_.size(); i++)
+    {
+        // add a segment between consecutive points, but wrap index
+        // to draw a segment from the last point to first point.
+        segments.emplace_back(Segment{points_[i], points_[(i + 1) % points_.size()]});
+    }
+
+    return segments;
 }
 
 const std::vector<Point>& Polygon::getPoints() const

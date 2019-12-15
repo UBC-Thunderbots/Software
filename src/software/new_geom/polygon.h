@@ -6,7 +6,7 @@
 #include "software/new_geom/shape.h"
 
 /**
- * A shape composed of segments.
+ * A shape composed of line segments.
  */
 class Polygon : public virtual Shape
 {
@@ -37,7 +37,7 @@ class Polygon : public virtual Shape
      * Returns the line segments that form this polygon.
      * @return the line segments that form this polygon.
      */
-    const std::vector<Segment>& getSegments() const;
+    const std::vector<Segment> getSegments() const;
 
     /**
      * Returns the points that form the polygon.
@@ -46,6 +46,5 @@ class Polygon : public virtual Shape
     const std::vector<Point>& getPoints() const;
 
    protected:
-    std::vector<Segment> segments_;
     std::vector<Point> points_;
 };

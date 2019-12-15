@@ -39,12 +39,12 @@ Point Rectangle::centre() const
 
 Point Rectangle::posXPosYCorner() const
 {
-    return negXNegYCorner() + diagonal();
+    return points_[2];
 }
 
 Point Rectangle::negXPosYCorner() const
 {
-    return negXNegYCorner() + Vector(0, diagonal().y());
+    return points_[1];
 }
 
 Point Rectangle::negXNegYCorner() const
@@ -54,7 +54,7 @@ Point Rectangle::negXNegYCorner() const
 
 Point Rectangle::posXNegYCorner() const
 {
-    return negXNegYCorner() + Vector(diagonal().x(), 0);
+    return points_[3];
 }
 
 bool Rectangle::contains(const Point &p) const
@@ -62,23 +62,6 @@ bool Rectangle::contains(const Point &p) const
     return p.x() >= negXNegYCorner().x() && p.y() >= negXNegYCorner().y() &&
            p.x() <= negXNegYCorner().x() + diagonal().x() &&
            p.y() <= negXNegYCorner().y() + diagonal().y();
-}
-
-Point Rectangle::operator[](unsigned int pos) const
-{
-    switch (pos)
-    {
-        case 0:
-            return negXNegYCorner();
-        case 1:
-            return negXPosYCorner();
-        case 2:
-            return posXPosYCorner();
-        case 3:
-            return posXNegYCorner();
-        default:
-            throw std::out_of_range("Rectangle only has 4 vertices.");
-    }
 }
 
 Point Rectangle::furthestCorner(const Point &p)

@@ -93,15 +93,6 @@ TEST(RectangleCornerTests, test_positive_and_negative_points)
     EXPECT_EQ(r.negXPosYCorner(), Point(-4, 2));
 }
 
-TEST(RectangleSubscriptOperatorTests, test_subscript_operator)
-{
-    Rectangle r = Rectangle(Point(-4, -3), Point(1, 2));
-    EXPECT_EQ(r[0], Point(-4, -3));
-    EXPECT_EQ(r[1], Point(-4, 2));
-    EXPECT_EQ(r[2], Point(1, 2));
-    EXPECT_EQ(r[3], Point(1, -3));
-}
-
 TEST(RectangleContainsPointTests, test_point_in_different_quadrant)
 {
     EXPECT_FALSE(Rectangle(Point(0, 0), Point(-2, -2)).contains(Point(1, 1)));

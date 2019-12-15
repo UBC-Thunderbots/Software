@@ -90,6 +90,83 @@ TEST(PolygonTest, test_polygon_hexagon_contains_point)
     EXPECT_TRUE(hexagon.contains(Point(-1.5, 0.75)));
 }
 
+TEST(PolygonTest, test_self_intersecting_polygon_contains)
+{
+    /*
+     *  2    *-------*
+     *       |       |
+     *  1    *-------*
+     *       |
+     *  0    *
+     *       0       2
+     */
+    // Self intersecting polygon, each asterisk on the diagram is a point making up the polygon
+    Polygon intersecting_poly{{0.0f, 0.0f},
+                    {0.0f, 2.0f},
+                    {2.0f, 2.0f},
+                    {2.0f, 1.0f},
+                    {0.0f, 1.0f}};
+
+    EXPECT_FALSE(intersecting_poly.contains(Point()));          // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(2, 0)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(0.5, 0.5)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, 0.5)));    // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(intersecting_poly.contains(Point(0, 1)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(1, 1.5)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, 2)));      // on a top edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(intersecting_poly.contains(Point(1, 1)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(1, 2)));      // on a top edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(intersecting_poly.contains(Point(0, 1.5)));
+}
+
+TEST(PolygonTest, test_complex_self_intersecting_polygon_contains)
+{
+    /*
+     *  2            *-------*
+     *               |       |
+     *  1            *-------*
+     *               |
+     *  0            *
+     *               |
+     *  -1   *-------*
+     *       |       |
+     *  -2   *-------*
+     *
+     *      -2       0       2
+     */
+    // Self intersecting polygon, each asterisk on the diagram is a point making up the polygon
+    Polygon intersecting_poly{{0.0f, 0.0f},
+                              {0.0f, 2.0f},
+                              {2.0f, 2.0f},
+                              {2.0f, 1.0f},
+                              {0.0f, 1.0f},
+                              {-0.0f, -2.0f},
+                              {-2.0f, -2.0f},
+                              {-2.0f, -1.0f},
+                              {0.0f, -1.0f}
+    };
+
+    EXPECT_FALSE(intersecting_poly.contains(Point()));          // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(2, 0)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(0.5, 0.5)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, 0.5)));    // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, 2)));      // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(1, 2)));      // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(-2, 0)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(-0.5, -0.5)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, -0.5)));   // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, -2)));     // on a top edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, -1)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(-1, -1)));    // on a "top" edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(intersecting_poly.contains(Point(0, -1.5)));   // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(intersecting_poly.contains(Point(-1, -2)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(0, 1)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(1, 1.5)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(1, 1)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(0, 1.5)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(-1, -1.5)));
+}
+
 // All of the below are what's known as "white box tests". That means these tests are
 // written with knowledge of how the function is implemented, to test certain internal
 // edge cases. These tests are written with the knowledge that the
