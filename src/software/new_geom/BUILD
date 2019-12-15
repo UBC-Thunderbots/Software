@@ -7,6 +7,7 @@ cc_library(
         "line.cpp",
         "point.cpp",
         "polynomial.cpp",
+        "ray.cpp",
         "vector.cpp",
     ],
     hdrs = [

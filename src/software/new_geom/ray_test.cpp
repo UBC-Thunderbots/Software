@@ -61,3 +61,10 @@ TEST(RayTest, rotate)
     EXPECT_EQ(Point(1, 1), r.getStart());
     EXPECT_EQ(Angle::zero(), r.getDirection());
 }
+
+TEST(RayTest, to_unit_vector)
+{
+    Angle a = Angle::fromDegrees(30);
+    Ray r   = Ray(Point(1, 1), a);
+    EXPECT_EQ(r.toUnitVector(), Vector(sqrt(3), 1).normalize());
+}

@@ -11,9 +11,9 @@
 #include <random>
 
 #include "shared/constants.h"
-#include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
+#include "software/new_geom/ray.h"
 #include "software/test_util/test_util.h"
 
 class BallFilterTest : public ::testing::Test
@@ -61,9 +61,9 @@ class BallFilterTest : public ::testing::Test
         double expected_velocity_magnitude_tolerance, unsigned int num_iterations,
         unsigned int num_steps_to_ignore)
     {
-        Point ball_starting_position = ball_trajectory.getRayStart();
+        Point ball_starting_position = ball_trajectory.getStart();
         Vector ball_velocity =
-            ball_trajectory.toVector().normalize(ball_velocity_magnitude);
+            ball_trajectory.toUnitVector().normalize(ball_velocity_magnitude);
         Duration max_ball_travel_duration =
             Duration::fromSeconds(std::numeric_limits<double>::max());
 

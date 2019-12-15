@@ -16,7 +16,6 @@ cc_library(
         "line.h",
         "polygon.h",
         "polynomial.h",
-        "ray.h",
         "rectangle.h",
         "segment.h",
         "shot.h",

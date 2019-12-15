@@ -150,11 +150,11 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
 Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)
 {
-    Vector shot_vector = shot.getDirection();
-    Angle shot_dir     = shot.getDirection().orientation();
+    Vector shot_vector = shot.toUnitVector();
+    Angle shot_dir     = shot.getDirection();
 
     Vector ball_vel    = ball.velocity();
-    Vector lateral_vel = ball_vel.project(shot_vector.normalize().perpendicular());
+    Vector lateral_vel = ball_vel.project(shot_vector.perpendicular());
     // The lateral speed is roughly a measure of the lateral velocity we need to
     // "cancel out" in order for our shot to go in the expected direction.
     // The scaling factor of 0.3 is a magic number that was carried over from the old
