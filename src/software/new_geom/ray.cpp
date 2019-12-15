@@ -8,7 +8,7 @@ Ray::Ray(const Point& start, const Angle& direction)
 }
 
 Ray::Ray(const Point& start, const Vector& direction)
-    : Ray(start, direction.orientation())
+    : start_(start), direction_(direction.orientation())
 {
 }
 
