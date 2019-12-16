@@ -85,6 +85,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "physics_robot_test",
+    srcs = ["physics_robot_test.cpp"],
+    deps = [
+        ":physics_ball",
+        ":physics_robot",
+        "//software/test_util",
+        "//software/world:robot",
+        "@box2d",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "physics_simulator",
     srcs = ["physics_simulator.cpp"],
