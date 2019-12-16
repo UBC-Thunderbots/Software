@@ -6,7 +6,7 @@ class Ray final
 {
    public:
     /**
-     * Creates a Ray starting at (0, 0) with zero angle
+     * Creates a Ray starting at (0, 0) with a degenerate direction vector (ie. (0, 0))
      */
     explicit Ray();
 
@@ -66,7 +66,7 @@ class Ray final
      *
      * @param angle the angle to rotate the Ray
      */
-    void rotate(Angle angle);
+    void rotate(const Angle& angle);
 
     /**
      * Returns a unit-magnitude Vector in the direction of the Ray

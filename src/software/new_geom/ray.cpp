@@ -1,6 +1,6 @@
 #include "software/new_geom/ray.h"
 
-Ray::Ray() {}
+Ray::Ray() : start_(Point(0, 0)), direction_(Angle::zero()) {}
 
 Ray::Ray(const Point& start, const Angle& direction)
     : start_(start), direction_(direction)
@@ -37,7 +37,7 @@ void Ray::setDirection(const Vector& direction)
     direction_ = direction.orientation();
 }
 
-void Ray::rotate(Angle angle)
+void Ray::rotate(const Angle& angle)
 {
     direction_ += angle;
 }
