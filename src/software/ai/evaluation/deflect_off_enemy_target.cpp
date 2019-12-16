@@ -1,5 +1,4 @@
 #include "shared/constants.h"
-#include "software/geom/line.h"
 #include "software/geom/util.h"
 #include "software/world/field.h"
 #include "software/world/world.h"

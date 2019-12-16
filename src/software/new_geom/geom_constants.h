@@ -1,3 +1,5 @@
+#pragma once
+
 namespace GeomConstants
 {
     // Due to internal representation of doubles being slightly less accurate/consistent

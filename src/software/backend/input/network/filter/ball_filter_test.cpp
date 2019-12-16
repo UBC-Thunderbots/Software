@@ -14,6 +14,7 @@
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
 
 class BallFilterTest : public ::testing::Test
@@ -515,8 +516,8 @@ TEST_F(BallFilterTest,
     ball_detections.push_front({p2, Timestamp::fromSeconds(2)});
     auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
 
-    double d1 = dist(x_vs_y_regression.regression_line, p1);
-    double d2 = dist(x_vs_y_regression.regression_line, p2);
+    double d1 = distance(x_vs_y_regression.regression_line, p1);
+    double d2 = distance(x_vs_y_regression.regression_line, p2);
 
     EXPECT_LT(d1, 0.001);
     EXPECT_LT(d2, 0.001);
@@ -529,19 +530,16 @@ TEST_F(BallFilterTest,
     }
 
     auto y_vs_x_regression = ball_filter.getLinearRegressionLine(inv_ball_detections);
-    y_vs_x_regression.regression_line =
-        Line(Point(y_vs_x_regression.regression_line.getFirst().y(),
-                   y_vs_x_regression.regression_line.getFirst().x()),
-             Point(y_vs_x_regression.regression_line.getSecond().y(),
-                   y_vs_x_regression.regression_line.getSecond().x()));
+    y_vs_x_regression.regression_line.swapXY();
 
-    double inv_d1 = dist(y_vs_x_regression.regression_line, p1);
-    double inv_d2 = dist(y_vs_x_regression.regression_line, p2);
+    double inv_d1 = distance(y_vs_x_regression.regression_line, p1);
+    double inv_d2 = distance(y_vs_x_regression.regression_line, p2);
 
     EXPECT_LT(inv_d1, 0.001);
     EXPECT_LT(inv_d2, 0.001);
 
     // Check the lines are pointing in the same direction
-    EXPECT_NEAR(x_vs_y_regression.regression_line.slope(),
-                y_vs_x_regression.regression_line.slope(), 1.0e-6);
+    EXPECT_LT(x_vs_y_regression.regression_line.toNormalUnitVector().cross(
+                  y_vs_x_regression.regression_line.toNormalUnitVector()),
+              GeomConstants::EPSILON);
 }
