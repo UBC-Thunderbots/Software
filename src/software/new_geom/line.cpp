@@ -6,22 +6,24 @@ Line::Line(const Point &first, const Point &second)
     {
         throw std::runtime_error("Cannot create a Line with two equal Points");
     }
-    coeffs[0] = first.y() - second.y();
-    coeffs[1] = second.x() - first.x();
-    coeffs[2] = first.x() * second.y() - second.x() * first.y();
+    coeffs.a = first.y() - second.y();
+    coeffs.b = second.x() - first.x();
+    coeffs.c = first.x() * second.y() - second.x() * first.y();
 }
 
 Line::Coeffs Line::getCoeffs() const
 {
-    return {coeffs[0], coeffs[1], coeffs[2]};
+    return coeffs;
 }
 
 Vector Line::toNormalUnitVector() const
 {
-    return Vector(coeffs[0], coeffs[1]).normalize();
+    return Vector(coeffs.a, coeffs.b).normalize();
 }
 
 void Line::swapXY()
 {
-    std::iter_swap(coeffs.begin(), coeffs.begin() + 1);
+    double a = coeffs.a;
+    coeffs.a = coeffs.b;
+    coeffs.b = a;
 }

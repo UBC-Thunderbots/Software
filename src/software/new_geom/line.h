@@ -49,6 +49,6 @@ class Line final
     void swapXY();
 
    private:
-    // Coefficients for a line in the form coeffs[0]*x + coeffs[1]*y + coeffs[2] = 0
-    std::array<double, 3> coeffs;
+    // Coefficients for a line
+    Coeffs coeffs;
 };
