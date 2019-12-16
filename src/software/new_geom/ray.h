@@ -6,7 +6,7 @@ class Ray final
 {
    public:
     /**
-     * Creates a Ray starting at (0, 0) with a degenerate direction vector (ie. (0, 0))
+     * Creates a Ray starting at (0, 0) pointing along the positive x-axis
      */
     explicit Ray();
 
