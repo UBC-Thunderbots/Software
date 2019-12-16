@@ -4,6 +4,17 @@
 
 #include "software/ai/intent/movespin_intent.h"
 
+TEST(MoveSpinActionTest, getDestination)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveSpinAction action = MoveSpinAction(0.05);
+
+    action.updateControlParams(robot, Point(7, 13), AngularVelocity::quarter(), 1.0);
+
+    EXPECT_EQ(Point(7, 13), action.getDestination());
+}
+
 TEST(MoveSpinActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),

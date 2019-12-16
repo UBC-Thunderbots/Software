@@ -8,8 +8,8 @@
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_size,
-             const std::set<RobotCapabilities::Capability> &capabilities)
-    : id_(id), states_(history_size), capabilities_(capabilities)
+             const std::set<RobotCapabilities::Capability> &unavailable_capabilities)
+    : id_(id), states_(history_size), unavailable_capabilities_(unavailable_capabilities)
 {
     if (history_size < 1)
     {
@@ -180,12 +180,12 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapabilities::Capability> &Robot::getRobotCapabilities() const
+const std::set<RobotCapabilities::Capability> &Robot::getCapabiltiesBlacklist() const
 {
-    return capabilities_;
+    return unavailable_capabilities_;
 }
 
 std::set<RobotCapabilities::Capability> &Robot::getMutableRobotCapabilities()
 {
-    return capabilities_;
+    return unavailable_capabilities_;
 }
