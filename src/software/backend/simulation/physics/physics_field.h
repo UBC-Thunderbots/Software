@@ -55,49 +55,54 @@ class PhysicsField
 
    private:
     /**
+     * A helper function that creates a physics body to represent the Field
+     * in the physics world
+     *
+     * @param world The physics world to setup the Field in
+     */
+    void createFieldBody(std::shared_ptr<b2World> world);
+
+    /**
      * A helper function that creates and sets up physics objects for the field
      * boundary in the physics world
      *
-     * @param world The physics world to setup the Field in
      * @param field The Field being created in the physics world
      */
-    void setupFieldBoundary(std::shared_ptr<b2World> world, const Field& field);
+    void setupFieldBoundary(const Field &field);
 
     /**
      * A helper function that creates and sets up physics objects for the enemy
      * goal in the physics world
      *
-     * @param world The physics world to setup the Field in
      * @param field The Field being created in the physics world
      */
-    void setupEnemyGoal(std::shared_ptr<b2World> world, const Field& field);
+    void setupEnemyGoal(const Field &field);
 
     /**
      * A helper function that creates and sets up physics objects for the friendly
      * goal in the physics world
      *
-     * @param world The physics world to setup the Field in
      * @param field The Field being created in the physics world
      */
-    void setupFriendlyGoal(std::shared_ptr<b2World> world, const Field& field);
+    void setupFriendlyGoal(const Field &field);
 
-    // This body represents the 4 boundary walls around the edge of the field
-    b2BodyDef field_boundary_body_def;
+    // This body represents the entire field object. Different fixtures and shapes
+    // are added to this body for the field boundary, goals, etc. The fixtures are what
+    // actually handle collisions, which is why we only need a single body to represent
+    // the whole field
+    b2BodyDef field_body_def;
+    b2Body* field_body;
+
     b2ChainShape field_boundary_shape;
-    b2Body* field_boundary_body;
     b2FixtureDef field_boundary_fixture_def;
 
-    // This body represents the enemy net
-    b2BodyDef enemy_goal_body_def;
     b2ChainShape enemy_goal_shape;
-    b2Body* enemy_goal_body;
     b2FixtureDef enemy_goal_fixture_def;
 
-    // This body represents the friendly goal
-    b2BodyDef friendly_goal_body_def;
     b2ChainShape friendly_goal_shape;
-    b2Body* friendly_goal_body;
     b2FixtureDef friendly_goal_fixture_def;
 
+    // Since the field never changes during simulation, we store the initial field
+    // used during construction to make it easy to return Field objects when requested
     Field field;
 };

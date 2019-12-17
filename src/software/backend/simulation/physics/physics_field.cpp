@@ -5,44 +5,37 @@
 PhysicsField::PhysicsField(std::shared_ptr<b2World> world, const Field &field)
     : field(field)
 {
-    setupFieldBoundary(world, field);
-    setupEnemyGoal(world, field);
-    setupFriendlyGoal(world, field);
+    // The body must be created first so that subsequent changes (like adding fixtures)
+    // work correctly
+    createFieldBody(world);
+    setupFieldBoundary(field);
+    setupEnemyGoal(field);
+    setupFriendlyGoal(field);
 }
 
 PhysicsField::~PhysicsField()
 {
     // Examples for removing bodies safely from
     // https://www.iforce2d.net/b2dtut/removing-bodies
-    b2World *field_boundary_world = field_boundary_body->GetWorld();
-    if (bodyExistsInWorld(field_boundary_body, field_boundary_world))
+    b2World *field_world = field_body->GetWorld();
+    if (bodyExistsInWorld(field_body, field_world))
     {
-        field_boundary_world->DestroyBody(field_boundary_body);
-    }
-
-    b2World *enemy_goal_world = enemy_goal_body->GetWorld();
-    if (bodyExistsInWorld(enemy_goal_body, enemy_goal_world))
-    {
-        enemy_goal_world->DestroyBody(enemy_goal_body);
-    }
-
-    b2World *friendly_goal_world = friendly_goal_body->GetWorld();
-    if (bodyExistsInWorld(friendly_goal_body, friendly_goal_world))
-    {
-        friendly_goal_world->DestroyBody(friendly_goal_body);
+        field_world->DestroyBody(field_body);
     }
 }
 
-void PhysicsField::setupFieldBoundary(std::shared_ptr<b2World> world, const Field &field)
-{
-    field_boundary_body_def.type = b2_staticBody;
+void PhysicsField::createFieldBody(std::shared_ptr<b2World> world) {
+    field_body_def.type = b2_staticBody;
     // Note that the body shape is defined relative to the body position. Setting the
     // body position to (0, 0) makes it easy to add the shape using the standard field
     // interface, since field coordinates are also relative to (0, 0)
     // https://www.iforce2d.net/b2dtut/fixtures
-    field_boundary_body_def.position.Set(0, 0);
-    field_boundary_body = world->CreateBody(&field_boundary_body_def);
+    field_body_def.position.Set(0, 0);
+    field_body = world->CreateBody(&field_body_def);
+}
 
+void PhysicsField::setupFieldBoundary(const Field &field)
+{
     const unsigned int num_field_boundary_vertices              = 4;
     b2Vec2 field_boundary_vertices[num_field_boundary_vertices] = {
         createVec2(field.fieldBoundary().posXPosYCorner()),
@@ -56,19 +49,11 @@ void PhysicsField::setupFieldBoundary(std::shared_ptr<b2World> world, const Fiel
     // no friction
     field_boundary_fixture_def.restitution = 1.0;
     field_boundary_fixture_def.friction    = 0.0;
-    field_boundary_body->CreateFixture(&field_boundary_fixture_def);
+    field_body->CreateFixture(&field_boundary_fixture_def);
 }
 
-void PhysicsField::setupEnemyGoal(std::shared_ptr<b2World> world, const Field &field)
+void PhysicsField::setupEnemyGoal(const Field &field)
 {
-    enemy_goal_body_def.type = b2_staticBody;
-    // Note that the body shape is defined relative to the body position. Setting the
-    // body position to (0, 0) makes it easy to add the shape using the standard field
-    // interface, since field coordinates are also relative to (0, 0)
-    // https://www.iforce2d.net/b2dtut/fixtures
-    enemy_goal_body_def.position.Set(0, 0);
-    enemy_goal_body = world->CreateBody(&enemy_goal_body_def);
-
     const unsigned int num_enemy_goal_vertices          = 4;
     b2Vec2 enemy_goal_vertices[num_enemy_goal_vertices] = {
         createVec2(field.enemyGoalpostNeg()),
@@ -80,19 +65,11 @@ void PhysicsField::setupEnemyGoal(std::shared_ptr<b2World> world, const Field &f
     // Collisions with the enemy goal are perfectly elastic and have no friction
     enemy_goal_fixture_def.restitution = 1.0;
     enemy_goal_fixture_def.friction    = 1.0;
-    enemy_goal_body->CreateFixture(&enemy_goal_fixture_def);
+    field_body->CreateFixture(&enemy_goal_fixture_def);
 }
 
-void PhysicsField::setupFriendlyGoal(std::shared_ptr<b2World> world, const Field &field)
+void PhysicsField::setupFriendlyGoal(const Field &field)
 {
-    friendly_goal_body_def.type = b2_staticBody;
-    // Note that the body shape is defined relative to the body position. Setting the
-    // body position to (0, 0) makes it easy to add the shape using the standard field
-    // interface, since field coordinates are also relative to (0, 0)
-    // https://www.iforce2d.net/b2dtut/fixtures
-    friendly_goal_body_def.position.Set(0, 0);
-    friendly_goal_body = world->CreateBody(&friendly_goal_body_def);
-
     const unsigned int num_friendly_goal_vertices             = 4;
     b2Vec2 friendly_goal_vertices[num_friendly_goal_vertices] = {
         createVec2(field.friendlyGoalpostNeg()),
@@ -104,7 +81,7 @@ void PhysicsField::setupFriendlyGoal(std::shared_ptr<b2World> world, const Field
     // Collisions with the friendly goal are perfectly elastic and have no friction
     friendly_goal_fixture_def.restitution = 1.0;
     friendly_goal_fixture_def.friction    = 1.0;
-    friendly_goal_body->CreateFixture(&friendly_goal_fixture_def);
+    field_body->CreateFixture(&friendly_goal_fixture_def);
 }
 
 Field PhysicsField::getFieldWithTimestamp(const Timestamp &timestamp) const

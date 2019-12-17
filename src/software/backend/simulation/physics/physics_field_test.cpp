@@ -32,8 +32,8 @@ TEST(PhysicsFieldTest, test_field_added_to_physics_world_on_creation)
 
     auto physics_field = PhysicsField(world, field_parameter);
 
-    // The field adds 3 bodies: 1 for the boundary and 1 for each goal
-    EXPECT_EQ(3, world->GetBodyCount());
+    // There is only 1 body that represents the entire field
+    EXPECT_EQ(1, world->GetBodyCount());
 }
 
 TEST(PhysicsFieldTest, test_physics_field_is_removed_from_world_when_destroyed)
@@ -48,7 +48,7 @@ TEST(PhysicsFieldTest, test_physics_field_is_removed_from_world_when_destroyed)
 
         auto physics_field = PhysicsField(world, field_parameter);
 
-        EXPECT_EQ(3, world->GetBodyCount());
+        EXPECT_EQ(1, world->GetBodyCount());
     }
 
     // Once we leave the above scope the field is destroyed, so it should have been
