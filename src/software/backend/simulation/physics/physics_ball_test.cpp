@@ -54,6 +54,14 @@ TEST(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
     EXPECT_EQ(0, world->GetBodyCount());
 }
 
+TEST(PhysicsBallTest, test_ball_mass) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Ball ball_parameter(Point(1, -1), Vector(1, -2), Timestamp::fromSeconds(0));
+    auto physics_ball = PhysicsBall(world, ball_parameter);
+}
+
 TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_step)
 {
     b2Vec2 gravity(0, 0);

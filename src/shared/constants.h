@@ -16,6 +16,8 @@ const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.07;
 const double DRIBBLER_WIDTH = 0.088;
 // The approximate radius of the ball according to the SSL rulebook
 const double BALL_MAX_RADIUS_METERS = 0.0215;
+// The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
+const double BALL_MASS_KG = 0.004593;
 // The maximum number of robots we can communicate with over radio.
 const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 // TODO: Determine a more realistic value. See Issue #178.
