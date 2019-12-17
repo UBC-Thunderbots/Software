@@ -5,12 +5,12 @@
 
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
-#include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/shot.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/ray.h"
 
 template <size_t N>
 using LegacyPolygon       = std::array<Point, N>;

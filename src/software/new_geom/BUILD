@@ -72,6 +72,7 @@ cc_library(
 
 cc_library(
     name = "ray",
+    srcs = ["ray.cpp"],
     hdrs = ["ray.h"],
     deps = [":point"],
 )
