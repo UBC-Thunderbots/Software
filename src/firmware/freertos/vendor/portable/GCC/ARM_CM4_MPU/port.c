@@ -78,9 +78,10 @@ task.h is included from an application file. */
 
 /* Scheduler includes. */
 #include "FreeRTOS.h"
-#include "queue.h"
 #include "event_groups.h"
 #include "mpu_prototypes.h"
+#include "portmacro.h"
+#include "queue.h"
 
 #include "portmacro.h"
 

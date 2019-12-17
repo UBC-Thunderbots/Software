@@ -30,11 +30,12 @@ class Robot
      * state
      * @param history_duration The number of previous robot states that should be stored.
      */
-    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
-                   const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp, unsigned int history_duration = 20,
-                   const std::set<RobotCapabilities::Capability> &capabilities =
-                       RobotCapabilities::allCapabilities());
+    explicit Robot(
+        RobotId id, const Point &position, const Vector &velocity,
+        const Angle &orientation, const AngularVelocity &angular_velocity,
+        const Timestamp &timestamp, unsigned int history_duration = 20,
+        const std::set<RobotCapabilities::Capability> &unavailable_capabilities =
+            std::set<RobotCapabilities::Capability>());
 
     /**
      * Updates the state of the robot.
@@ -251,7 +252,7 @@ class Robot
      *
      * @return the hardware capabilities of the robot
      */
-    const std::set<RobotCapabilities::Capability> &getRobotCapabilities() const;
+    const std::set<RobotCapabilities::Capability> &getCapabiltiesBlacklist() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
@@ -333,5 +334,5 @@ class Robot
     boost::circular_buffer<Timestamp> last_update_timestamps;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
-    std::set<RobotCapabilities::Capability> capabilities_;
+    std::set<RobotCapabilities::Capability> unavailable_capabilities_;
 };

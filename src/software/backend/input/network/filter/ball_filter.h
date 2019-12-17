@@ -3,32 +3,13 @@
 #include <boost/circular_buffer.hpp>
 #include <optional>
 
-#include "software/geom/line.h"
+#include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/sensor_fusion/ball_detection.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/ball.h"
 #include "software/world/ball_state.h"
 #include "software/world/field.h"
-
-/**
- * A lightweight datatype used to input new data into the filter.
- * We do this rather than taking the SSL_DetectionBall directly
- * so we can make this module more generic and abstract away
- * the protobuf for testing
- */
-struct SSLBallDetection
-{
-    // The position of the ball detection on the field, in meters
-    Point position;
-    // The timestamp of the detection. This is the timestamp for when the camera frame
-    // containing the detection was captured
-    Timestamp timestamp;
-
-    bool operator<(const SSLBallDetection &b) const
-    {
-        return timestamp < b.timestamp;
-    }
-};
 
 /**
  * A simple struct we use to pass around velocity estimate data
@@ -84,12 +65,12 @@ class BallFilter
      * Filters the new ball detection data, and returns the updated state of the ball
      * given the new data *
      * @param current_ball_state The current state of the Ball
-     * @param new_ball_detections A list of new SSL Ball detections
+     * @param new_ball_detections A list of new Ball detections
      *
      * @return The updated state of the ball given the new data
      */
     std::optional<Ball> getFilteredData(
-        const std::vector<SSLBallDetection> &new_ball_detections, const Field &field);
+        const std::vector<BallDetection> &new_ball_detections, const Field &field);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's
@@ -103,7 +84,7 @@ class BallFilter
      * occurs that prevents the size from being calculated correctly, returns std::nullopt
      */
     std::optional<size_t> getAdjustedBufferSize(
-        boost::circular_buffer<SSLBallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Adds ball detections to the buffer stored by this filter. This function will ignore
@@ -113,7 +94,7 @@ class BallFilter
      * @param new_ball_detections The ball detections to try add to the buffer
      * @param field The field being played on.
      */
-    void addNewDetectionsToBuffer(std::vector<SSLBallDetection> new_ball_detections,
+    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
                                   const Field &field);
 
     /**
@@ -129,7 +110,7 @@ class BallFilter
      * given detections. If no velocity can be estimated, std::nullopt is returned
      */
     std::optional<BallVelocityEstimate> estimateBallVelocity(
-        boost::circular_buffer<SSLBallDetection> ball_detections,
+        boost::circular_buffer<BallDetection> ball_detections,
         const std::optional<Line> &ball_regression_line = std::nullopt);
 
     /**
@@ -140,7 +121,7 @@ class BallFilter
      * @return A struct containing the regression line and error of the linear regression
      */
     LinearRegressionResults getLinearRegressionLine(
-        boost::circular_buffer<SSLBallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Uses linear regression to filter the given list of ball detections to fine the
@@ -151,7 +132,7 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     std::optional<BallState> estimateBallState(
-        boost::circular_buffer<SSLBallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections);
 
    private:
     unsigned int _min_buffer_size;
@@ -159,5 +140,5 @@ class BallFilter
 
     // A circular buffer used to store previous ball detections, so we can use them
     // in the filter
-    boost::circular_buffer<SSLBallDetection> ball_detection_buffer;
+    boost::circular_buffer<BallDetection> ball_detection_buffer;
 };

@@ -52,7 +52,7 @@ class ThetaStarPathPlanner : public PathPlanner
     class CellHeuristic
     {
        public:
-        CellHeuristic() {}
+        CellHeuristic() : parent_(0, 0), f_(0), g_(0), initialized_(false) {}
 
         /**
          * Updates CellHeuristics internal variables

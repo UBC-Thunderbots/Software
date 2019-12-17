@@ -50,6 +50,13 @@ class Action
     std::unique_ptr<Intent> getNextIntent();
 
     /**
+     * Gets the robot assigned to this action, if one is assigned
+     *
+     * @return the robot assigned to this action, if one is assigned
+     */
+    std::optional<Robot> getRobot();
+
+    /**
      * Accepts a Action Visitor and calls the visit function on itself
      *
      * @param visitor A Action Visitor
