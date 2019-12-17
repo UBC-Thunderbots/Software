@@ -1,7 +1,8 @@
 #include "software/backend/simulation/physics/physics_ball.h"
 
-#include "shared/constants.h"
 #include <cmath>
+
+#include "shared/constants.h"
 #include "software/backend/simulation/physics/box2d_util.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
@@ -22,8 +23,8 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
 
     ball_fixture_def.shape = &ball_shape;
 
-    float ball_area = M_PI * ball_shape.m_radius * ball_shape.m_radius;
-    ball_fixture_def.density     = BALL_MASS_KG / ball_area;
+    float ball_area          = M_PI * ball_shape.m_radius * ball_shape.m_radius;
+    ball_fixture_def.density = BALL_MASS_KG / ball_area;
     // These restitution and friction values are somewhat arbitrary. Because this is an
     // "ideal" simulation, we can approximate the ball as having perfectly elastic
     // collisions and no friction. Because we also do not generally depend on specific

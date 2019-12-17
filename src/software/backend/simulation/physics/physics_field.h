@@ -68,7 +68,7 @@ class PhysicsField
      *
      * @param field The Field being created in the physics world
      */
-    void setupFieldBoundary(const Field &field);
+    void setupFieldBoundary(const Field& field);
 
     /**
      * A helper function that creates and sets up physics objects for the enemy
@@ -76,7 +76,7 @@ class PhysicsField
      *
      * @param field The Field being created in the physics world
      */
-    void setupEnemyGoal(const Field &field);
+    void setupEnemyGoal(const Field& field);
 
     /**
      * A helper function that creates and sets up physics objects for the friendly
@@ -84,7 +84,7 @@ class PhysicsField
      *
      * @param field The Field being created in the physics world
      */
-    void setupFriendlyGoal(const Field &field);
+    void setupFriendlyGoal(const Field& field);
 
     // This body represents the entire field object. Different fixtures and shapes
     // are added to this body for the field boundary, goals, etc. The fixtures are what

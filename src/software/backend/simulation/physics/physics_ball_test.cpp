@@ -54,7 +54,8 @@ TEST(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
     EXPECT_EQ(0, world->GetBodyCount());
 }
 
-TEST(PhysicsBallTest, test_ball_mass) {
+TEST(PhysicsBallTest, test_ball_mass)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 

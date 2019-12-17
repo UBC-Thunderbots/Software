@@ -24,7 +24,8 @@ PhysicsField::~PhysicsField()
     }
 }
 
-void PhysicsField::createFieldBody(std::shared_ptr<b2World> world) {
+void PhysicsField::createFieldBody(std::shared_ptr<b2World> world)
+{
     field_body_def.type = b2_staticBody;
     // Note that the body shape is defined relative to the body position. Setting the
     // body position to (0, 0) makes it easy to add the shape using the standard field
