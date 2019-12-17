@@ -171,6 +171,52 @@ TEST(PolygonTest, test_complex_self_intersecting_polygon_contains)
     EXPECT_TRUE(intersecting_poly.contains(Point(-1, -1.5)));
 }
 
+TEST(PolygonTest, test_self_intersecting_loop_polygon_contains)
+{
+    /*
+     *  3    *------------------------------------------------*
+     *       |                                                |
+     *       |                                                |
+     *  2    |       *--------------------------------*       |
+     *       |             ------           ------            |
+     *       |                  ----      ----                |
+     *  1    |                       ------                   |
+     *       |                ------      ------              |
+     *       |         ------                   -------       |
+     *  0    *------                                   -------*
+     *      -3      -2       -1       0       1       2       3
+     */
+    // Self intersecting polygon, each asterisk on the diagram is a point making up the
+    // polygon
+    Polygon intersecting_poly{{-3.0f, 0.0f}, {-3.0f, 3.0f}, {3.0f, 3.0f},
+                              {3.0f, 0.0f},  {-2.0f, 2.0f}, {2.0f, 2.0f}};
+
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(3, 2)));  // on a right edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(
+        intersecting_poly.contains(Point(2, 2)));  // inner right edge should be contained
+
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, 3)));  // on a top edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(
+        intersecting_poly.contains(Point(0, 2)));  // inner top edge should be contained
+
+    EXPECT_FALSE(intersecting_poly.contains(Point(3.0f, 0.0f)));
+    EXPECT_FALSE(intersecting_poly.contains(Point(-3.0f, 0.0f)));
+
+    EXPECT_FALSE(intersecting_poly.contains(Point()));
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, 1.9)));  // in the hole of the polygon, not contained
+    EXPECT_FALSE(intersecting_poly.contains(
+        Point(0, 1.5)));  // in the hole of the polygon, not contained
+    EXPECT_FALSE(intersecting_poly.contains(Point(3, 0)));
+
+    EXPECT_TRUE(intersecting_poly.contains(Point(-2, 2)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(-2.5, 2)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(2.5, 2)));
+    EXPECT_TRUE(intersecting_poly.contains(Point(-3, 2)));
+}
+
 // All of the below are what's known as "white box tests". That means these tests are
 // written with knowledge of how the function is implemented, to test certain internal
 // edge cases. These tests are written with the knowledge that the
