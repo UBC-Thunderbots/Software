@@ -1,22 +1,26 @@
 #include "software/new_geom/convex_polygon.h"
 
-ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polygon(points) {}
+ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polygon(points)
+{
+}
 
 double ConvexPolygon::area() const
 {
     // Algorithm taken from http://mathwords.com/a/area_convex_polygon.htm
     //
-    // A = (1/2) * [(x1*y2 + x2y3 + x3y4 + ... + xny1) - (y1x2 + y2x3 + y3x4 + ... + ynx1)]
-    // Coordinates must be taken in counterclockwise order around the polygon, beginning and ending in the same point.
+    // A = (1/2) * [(x1*y2 + x2y3 + x3y4 + ... + xny1) - (y1x2 + y2x3 + y3x4 + ... +
+    // ynx1)] Coordinates must be taken in counterclockwise order around the polygon,
+    // beginning and ending in the same point.
     std::vector<Point> reversePoints = points_;
     std::reverse(reversePoints.begin(), reversePoints.end());
 
-    double first_term = 0;
+    double first_term  = 0;
     double second_term = 0;
 
     unsigned num_points = reversePoints.size();
 
-    for (unsigned i = 0; i < num_points; i++) {
+    for (unsigned i = 0; i < num_points; i++)
+    {
         first_term += reversePoints[i].x() * reversePoints[(i + 1) % num_points].y();
         second_term += reversePoints[i].y() * reversePoints[(i + 1) % num_points].x();
     }
