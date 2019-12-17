@@ -54,8 +54,31 @@ class PhysicsField
     Field getFieldWithTimestamp(const Timestamp& timestamp) const;
 
    private:
+    /**
+     * A helper function that creates and sets up physics objects for the field
+     * boundary in the physics world
+     *
+     * @param world The physics world to setup the Field in
+     * @param field The Field being created in the physics world
+     */
     void setupFieldBoundary(std::shared_ptr<b2World> world, const Field& field);
+
+    /**
+     * A helper function that creates and sets up physics objects for the enemy
+     * goal in the physics world
+     *
+     * @param world The physics world to setup the Field in
+     * @param field The Field being created in the physics world
+     */
     void setupEnemyGoal(std::shared_ptr<b2World> world, const Field& field);
+
+    /**
+     * A helper function that creates and sets up physics objects for the friendly
+     * goal in the physics world
+     *
+     * @param world The physics world to setup the Field in
+     * @param field The Field being created in the physics world
+     */
     void setupFriendlyGoal(std::shared_ptr<b2World> world, const Field& field);
 
     // This body represents the 4 boundary walls around the edge of the field
