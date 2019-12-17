@@ -34,13 +34,6 @@ class Rectangle : public ConvexPolygon
     double yLength() const;
 
     /**
-     * Returns the area of the rectangle
-     *
-     * @return The area of the rectangle
-     */
-    double area() const override;
-
-    /**
      * Returns the centre of the rectangle
      *
      * @return The centre of the rectangle

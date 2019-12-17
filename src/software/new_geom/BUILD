@@ -4,6 +4,7 @@ cc_library(
     name = "new_geom",
     srcs = [
         "circle.cpp",
+        "convex_polygon.cpp",
         "polygon.cpp",
         "rectangle.cpp",
     ],

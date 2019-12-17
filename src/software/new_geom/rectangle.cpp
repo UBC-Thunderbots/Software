@@ -1,7 +1,7 @@
 #include "software/new_geom/rectangle.h"
 
 Rectangle::Rectangle(const Point &point1, const Point &point2)
-    : Polygon({Point(point1.x() < point2.x() ? point1.x() : point2.x(),
+    : ConvexPolygon({Point(point1.x() < point2.x() ? point1.x() : point2.x(),
                      point1.y() < point2.y() ? point1.y() : point2.y()),
                Point(point1.x() < point2.x() ? point1.x() : point2.x(),
                      point1.y() > point2.y() ? point1.y() : point2.y()),
@@ -25,11 +25,6 @@ double Rectangle::xLength() const
 double Rectangle::yLength() const
 {
     return diagonal().y();
-}
-
-double Rectangle::area() const
-{
-    return diagonal().x() * diagonal().y();
 }
 
 Point Rectangle::centre() const
