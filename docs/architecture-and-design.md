@@ -45,6 +45,11 @@
     * [Navigation](#navigation)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
+    * [Diagram](#visualizer-diagram)
+    * [Draw Functions](#draw-functions)
+    * [Editing the Visualizer](#editing-the-visualizer)
+      * [Editing ui files](#editing-ui-files)
+      * [Promoting Widgets](#promoting-widgets)
 
 
 # Tools
@@ -387,7 +392,7 @@ Most [Intents](#intents) are easy to break down into  [Primitives](#primitives),
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
 
 ## AI Diagram
-![Backend Diagram](images/ai_diagram.svg)
+![AI Diagram](images/ai_diagram.svg)
 
 
 # Visualizer
@@ -404,8 +409,8 @@ The `Visualizer` is implemented using [Qt](https://www.qt.io/), a C++ library fo
 
 The `Visualizer` is made up of 2 major components: The actual Qt Widget that contains all of the graphical components used in the `Visualizer`, and the `VisualizerWrapper`. The `VisualizerWrapper` runs the `Visualizer` Widget in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
 
-## Diagram
-TODO
+## Visualizer Diagram
+![Visualizer Diagram](images/visualizer_diagram.svg)
 
 ## Inter-thread Communication
 The `VisualizerWrapper` needs to communicate with the `VisualizerWidget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and Visualizer Widget use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the VisualizerWrapper pops the data in a `Producer -> Consumer` pattern. This means the Visualizer Widget can handle data at its own rate, indepdendant from the `VisualizerWrapper`.
