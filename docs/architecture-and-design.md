@@ -396,18 +396,18 @@ In order for a robot to move to the desired destination of a `MoveIntent`, the N
 
 
 # Visualizer
-The `Visualizer` is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
+The [Visualizer](#visualizer) is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
-The `Visualizer` also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the `Visualizer`, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+The [Visualizer](#visualizer) also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the [Visualizer](#visualizer), we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
 
-The `Visualizer` is connected to the rest of the system using the [Observer Design Pattern](#observer-design-pattern). It observes Subjects that contain information it wants to display, such as the [World(#world) or [DrawFunctions](#draw-functions).
+The [Visualizer](#visualizer) is connected to the rest of the system using the [Observer Design Pattern](#observer-design-pattern). It observes Subjects that contain information it wants to display, such as the [World(#world) or [DrawFunctions](#draw-functions).
 
-The `Visualizer` is implemented using [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important fundamentals are:
+The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important fundamentals are:
 * [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
 * [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
 
-The `Visualizer` is made up of 2 major components: The actual Qt Widget that contains all of the graphical components used in the `Visualizer`, and the `VisualizerWrapper`. The `VisualizerWrapper` runs the `Visualizer` Widget in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
+The [Visualizer](#visualizer) is made up of 2 major components: The actual Qt Widget that contains all of the graphical components used in the [Visualizer](#visualizer), and the `VisualizerWrapper`. The `VisualizerWrapper` runs the [Visualizer](#visualizer) Widget in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
 
 ## Visualizer Diagram
 ![Visualizer Diagram](images/visualizer_diagram.svg)
@@ -418,9 +418,9 @@ The `VisualizerWrapper` needs to communicate with the `VisualizerWidget` running
 In some rare cases, we use the [Qt MetaObject](https://doc.qt.io/qt-5/moc.html) system to send signals to trigger functions in the Qt thread in a thread-safe way. This is further documented in the code.
 
 ## Draw Functions
-Although we want to display information about the [AI](#ai) in the `Visualizer`, we cannot send copies of an [AI](#ai) object to the `Visualizer` over the [Observer](#observer-design-pattern) system because the [AI](#ai) is non-copyable. `DrawFunctions` are our solution that allow us to draw information in the `Visualizer` for non-copyable types.
+Although we want to display information about the [AI](#ai) in the [Visualizer](#visualizer), we cannot send copies of an [AI](#ai) object to the [Visualizer](#visualizer) over the [Observer](#observer-design-pattern) system because the [AI](#ai) is non-copyable. [Draw Functions](#draw_functions) are our solution that allow us to draw information in the [Visualizer](#visualizer) for non-copyable types.
 
-A `DrawFunction` is essentially a function that tells the `Visualizer` _how_ to draw something. When created, `DrawFunctions` use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the Visualizer can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the Visualizer. The Visualizer can then run this function to perform the actual draw operation.
+A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
 ## Editing the Visualizer
 Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
@@ -435,7 +435,8 @@ To summarize, [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.
 1. Open QtCreator
 2. Click `File -> Open File or Project`
 3. Select the `.ui` file.
-4. Make your changes (don't forget to save. You must save the file for changes to be picked up in compilation)
+4. Make your changes
+  * Don't forget to save. You must save the file for changes to be picked up in compilation
 
 
 ### Promoting Widgets
