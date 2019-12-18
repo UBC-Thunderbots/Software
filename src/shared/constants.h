@@ -24,6 +24,9 @@ const double BALL_MASS_KG = 0.004593;
 const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 // TODO: Determine a more realistic value. See Issue #178.
 /* Robot Attributes */
+// The mass of a robot with a battery, in kg. Determined experimentally
+// by weighing the robot and battery
+const double ROBOT_WITH_BATTERY_MASS_KG = 2.465;
 // The maximum speed achievable by our robots, in metres per second.
 const double ROBOT_MAX_SPEED_METERS_PER_SECOND = 2.0;
 // The maximum angular speed achievable by our robots, in rad/sec
