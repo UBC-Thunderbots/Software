@@ -456,5 +456,6 @@ Now we have a nice loop from the `Backend -> WorldStateValidator -> AI -> Backen
 Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
 
 The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
+
 ![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
 
