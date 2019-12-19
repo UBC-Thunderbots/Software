@@ -45,6 +45,7 @@
     * [Navigation](#navigation)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
+* [Simulated Integration Tests](#simulated-integration-tests)
 
 
 # Tools
@@ -394,3 +395,54 @@ In order for a robot to move to the desired destination of a `MoveIntent`, the N
 The `Visualizer` is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the `World` as the [Backend](#backend) sees it, and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
 The `Visualizer` also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the `Visualizer`, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+
+
+# Simulated Integration Tests
+## Overview
+When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the indepdent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
+
+Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behavior.
+
+The primary goals of this test system are:
+1. **Determinism**
+  * We need tests to pass or fail consistently
+2. **Test "ideal" behaviour**
+  * We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
+
+## Architecture
+### Overview
+Fortunately, our abstractions and [Observer system](#observer-design-pattern) make it very easy to modify our system to support simulated integration tests. There are only 2 major changes we need to make to the system:
+1. Implement a [Backend](#backend) to handle the simulation
+2. Add another Observer to the system that will handle the "validation"
+
+The [SimulatorBackend](#simulator-backend) and [World State Validator](#world-state-validator) implement each of these changes respectively, and are further described in their own sections.
+
+
+not many changes need to be made to the high-level architecture to enable simulated testing. The easiest one is creating a `SimulatedBackend` that implements the `Backend` interface, so that we can have a simulated world respond to commands from the AI and publish new information about the state of the World. 
+
+We also add a new Observer to the system, the `WorldStateValidator`. It is connected in between the Backend and the AI, and is responsible for validating that hte state of the world is progressing as we expect.
+
+### SimulatorBackend
+The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes updates 
+
+how they change over time. As the simulated world changes, the SimulationBackend is also able to send these new World states to the rest of the system, just like the other backends.
+
+### WorldStateValidator
+The WorldStateValidator is an Observer shose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
+
+The WorldSTateValidator uses ValidationFunctions to check the state of the world
+
+
+### Diagram
+TODO
+
+
+### Connections
+During testing, the WorldStateValidator is connected in between the Backend and AI. The AI does not receive the World directly from the Backend. Rather, the WorldStateValidator observes the World from the Backend, performs validation on it, and then publishes it again. The AI observes the world from the WorldStateValidator.
+
+This means the AI will not make a new decision until the WorldStateValidator has finished validating the current world and published it.
+
+Furthermore, the SimulationBackend will wait for Primitives to be received from the AI before simulation the next N seconds of the WOrld and publishing a new state. This means that even if the simulation is able to run much faster than the AI can make decisions, the simulation will wait for the AI to make a decision before continuing.
+
+Overall, this means that the WorldStateValidator waits for the Backend, the AI waits for the WorldStateValidator, and the Backend waits for the AI. This synchronises these components such that they will all run at the same speed relative to one another. This loop of information can only run as fast as the slowest component in the system, meaning the system is robust to any variations in timing, which is important to have deterministic tests.
+
