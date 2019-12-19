@@ -46,6 +46,11 @@
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
 * [Simulated Integration Tests](#simulated-integration-tests)
+  * [Architecture](#simulated-integration-tests-architecture)
+    * [Simulator Backend](#simulator-backend)
+    * [World State Validator](#world-state-validator)
+  * [Component Connections and Determinism](#component-connections-and-determinism)
+  * [Diagram](#simulated-integration-tests-diagram)
 
 
 # Tools
@@ -395,23 +400,21 @@ In order for a robot to move to the desired destination of a `MoveIntent`, the N
 The `Visualizer` is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the `World` as the [Backend](#backend) sees it, and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
 The `Visualizer` also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the `Visualizer`, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
-
+  
 
 # Simulated Integration Tests
-## Overview
 When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the indepdent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
 
 Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behavior.
 
 The primary goals of this test system are:
 1. **Determinism**
-  * We need tests to pass or fail consistently
+    * We need tests to pass or fail consistently
 2. **Test "ideal" behaviour**
-  * We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
+    * We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
 
-## Architecture
-### Overview
-Fortunately, our abstractions and [Observer system](#observer-design-pattern) make it very easy to modify our system to support simulated integration tests. There are only 2 major changes we need to make to the system:
+## Simulated Integration Tests Architecture
+Fortunately, our abstractions and [Observer system](#observer-design-pattern) make it very easy to modify our system to support simulated integration tests. There are only 2 major changes we make to the system:
 1. Implement a [Backend](#backend) to handle the simulation
 2. Add another Observer to the system that will handle the "validation"
 
@@ -427,9 +430,9 @@ The `WorldStateValidator` is an Observer whose purpose is to check that the stat
 
 There are generally 2 "types" of conditions we want to validate.
 1. Some sequence of states or actions occur **in a given order**.
-  * Eg. A robot moves to point A, then point B, then kicks the  ball
+    * Eg. A robot moves to point A, then point B, then kicks the  ball
 2. Some condition is met for the duration of the test, or for "all time"
-  * Eg. The ball never leaves the field, or robots never collide
+    * Eg. The ball never leaves the field, or robots never collide
 
 We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
 
@@ -440,7 +443,7 @@ Benefits of `ValidationFunctions`:
 
 The `WorldStateValidator` accepts lists of `ValidationFunctions` that it will run against each [World](#world) it receives. Once all `ValidationFunctions` have been run, the `WorldStateValidator` publishes the [World](#world) again. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
 
-### Component Connections and Determinism
+## Component Connections and Determinism
 When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
 
 Most importantly, the [WorldStateValidator](#world-state-validator) acts as a "middleman" between the [Backend](#backend) and [AI](#ai). The [WorldStateValidator](#world-state-validator) observes the [World](#world) from the [Backend](#backend), and the [AI](#ai) observes the [World](#world) from the [WorldStateValidator](#world-state-validator). **The [AI](#ai) does not observe the [World](#world) directly from the [Backend](#backend) in this case.** See the [diagram](#simulated-integration-tests-diagram).
@@ -449,7 +452,7 @@ Now we have a nice loop from the `Backend -> WorldStateValidator -> AI -> Backen
 
 **What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
 
-### Simulated Integration Tests Diagram
+## Simulated Integration Tests Diagram
 Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
 
 The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
