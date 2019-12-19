@@ -417,32 +417,41 @@ Fortunately, our abstractions and [Observer system](#observer-design-pattern) ma
 
 The [SimulatorBackend](#simulator-backend) and [World State Validator](#world-state-validator) implement each of these changes respectively, and are further described in their own sections.
 
+### Simulator Backend
+The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes the state of the [World](#world) periodically.
 
-not many changes need to be made to the high-level architecture to enable simulated testing. The easiest one is creating a `SimulatedBackend` that implements the `Backend` interface, so that we can have a simulated world respond to commands from the AI and publish new information about the state of the World. 
+In order to achieve determinism, the `SimulatorBackend` will publish new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everyting will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
 
-We also add a new Observer to the system, the `WorldStateValidator`. It is connected in between the Backend and the AI, and is responsible for validating that hte state of the world is progressing as we expect.
+### World State Validator
+The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
 
-### SimulatorBackend
-The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes updates 
+There are generally 2 "types" of conditions we want to validate.
+1. Some sequence of states or actions occur **in a given order**.
+  * Eg. A robot moves to point A, then point B, then kicks the  ball
+2. Some condition is met for the duration of the test, or for "all time"
+  * Eg. The ball never leaves the field, or robots never collide
 
-how they change over time. As the simulated world changes, the SimulationBackend is also able to send these new World states to the rest of the system, just like the other backends.
+We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
 
-### WorldStateValidator
-The WorldStateValidator is an Observer shose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
+Benefits of `ValidationFunctions`:
+1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
+2. They can represent assertions for more complex behavior. For example, we can build up simpler `ValidationFunctions` until we have a single `Validation` function for a specific [Tactic](#tactics).
+3. They let us validate independent sequences of behaviour. For example, we can give the `WorldStateValidator` a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
 
-The WorldSTateValidator uses ValidationFunctions to check the state of the world
+The `WorldStateValidator` accepts lists of `ValidationFunctions` that it will run against each [World](#world) it receives. Once all `ValidationFunctions` have been run, the `WorldStateValidator` publishes the [World](#world) again. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
 
+### Component Connections and Determinism
+When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
 
-### Diagram
-TODO
+Most importantly, the [WorldStateValidator](#world-state-validator) acts as a "middleman" between the [Backend](#backend) and [AI](#ai). The [WorldStateValidator](#world-state-validator) observes the [World](#world) from the [Backend](#backend), and the [AI](#ai) observes the [World](#world) from the [WorldStateValidator](#world-state-validator). **The [AI](#ai) does not observe the [World](#world) directly from the [Backend](#backend) in this case.** See the [diagram](#simulated-integration-tests-diagram).
 
+Now we have a nice loop from the `Backend -> WorldStateValidator -> AI -> Backend ...`. As mentioned in their own sections, the [Simulator Backend](#simulator-backend) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [WorldStateValidator](#world-state-validator) waits to receive and validate a [World](#world) before re-publishing the [World](#world). **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
 
-### Connections
-During testing, the WorldStateValidator is connected in between the Backend and AI. The AI does not receive the World directly from the Backend. Rather, the WorldStateValidator observes the World from the Backend, performs validation on it, and then publishes it again. The AI observes the world from the WorldStateValidator.
+**What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
 
-This means the AI will not make a new decision until the WorldStateValidator has finished validating the current world and published it.
+### Simulated Integration Tests Diagram
+Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
 
-Furthermore, the SimulationBackend will wait for Primitives to be received from the AI before simulation the next N seconds of the WOrld and publishing a new state. This means that even if the simulation is able to run much faster than the AI can make decisions, the simulation will wait for the AI to make a decision before continuing.
-
-Overall, this means that the WorldStateValidator waits for the Backend, the AI waits for the WorldStateValidator, and the Backend waits for the AI. This synchronises these components such that they will all run at the same speed relative to one another. This loop of information can only run as fast as the slowest component in the system, meaning the system is robust to any variations in timing, which is important to have deterministic tests.
+The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
+![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
 
