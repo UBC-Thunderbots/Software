@@ -62,43 +62,6 @@ TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle)
     EXPECT_DOUBLE_EQ(std::sqrt(8.0), dist(p, rect));
 }
 
-TEST(GeomUtilTest, dist_line_vector2)
-{
-    double calculated_val, expected_val;
-
-    // case 1
-    Line test1line(Point(0, 1), Point(0, 0));
-    Point test1p(2, 0);
-    calculated_val = dist(test1line, test1p);
-    expected_val   = 2;
-    EXPECT_EQ(expected_val, calculated_val);
-
-    // case 2
-    Line test2line(Point(2, 0), Point(0, 2));
-    Point test2p(0, 0);
-    calculated_val = dist(test2line, test2p);
-    expected_val   = sqrt(2);
-    EXPECT_DOUBLE_EQ(expected_val, calculated_val);
-
-    // case 3
-    Line test3line(Point(0, 0), Point(0, 0));
-    Point test3p(1, 0);
-    calculated_val = dist(test3line, test3p);
-    expected_val   = 1;
-    EXPECT_EQ(expected_val, calculated_val);
-
-    Line line(Point(1, -1), Point(5, -2));
-    Point p(2, -3);
-
-    EXPECT_NEAR(1.69775, dist(line, p), 1e-5);
-
-    p = Point(2, 1);
-    EXPECT_NEAR(2.18282, dist(line, p), 1e-5);
-
-    p = Point(2, 0);
-    EXPECT_NEAR(1.21268, dist(line, p), 1e-5);
-}
-
 TEST(GeomUtilTest, test_proj_len)
 {
     double calculated_val, expected_val;
@@ -244,7 +207,7 @@ TEST(GeomUtilTest, test_calc_open_shot_circles)
     std::vector<Circle> obs;
     obs.clear();
     obs.push_back(Circle(Point(-9, 10), 1.0));
-    obs.push_back(Circle(Point(9, 10),1.0));
+    obs.push_back(Circle(Point(9, 10), 1.0));
 
     std::pair<Angle, Point> testshot =
         calcOpenDirection(Point(0, 0), Segment(Point(10, 10), Point(-10, 10)), obs);
@@ -252,7 +215,8 @@ TEST(GeomUtilTest, test_calc_open_shot_circles)
     // We expect to get a result
     EXPECT_TRUE(testshot.first != Angle::fromDegrees(0));
 
-    EXPECT_TRUE((testshot.second.toVector().normalize() - Vector(0, 1)).length() < 0.0001);
+    EXPECT_TRUE((testshot.second.toVector().normalize() - Vector(0, 1)).length() <
+                0.0001);
     EXPECT_NEAR(75.449, testshot.first.toDegrees(), 1e-4);
 
     obs.clear();
@@ -267,8 +231,8 @@ TEST(GeomUtilTest, test_calc_open_shot_circles)
     EXPECT_TRUE(testshot.first != Angle::fromDegrees(0));
 
     EXPECT_TRUE(
-        (testshot.second.toVector().normalize() - Point(-0.092577, 0.995702).toVector()).length() <
-        0.0001);
+        (testshot.second.toVector().normalize() - Point(-0.092577, 0.995702).toVector())
+            .length() < 0.0001);
     EXPECT_NEAR(42.1928, testshot.first.toDegrees(), 1e-4);
 }
 
@@ -702,7 +666,7 @@ TEST(GeomUtilTest, test_intersection)
 }
 
 // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point
-// along the ray (Should be ray.getRayStart() + ray.GetDirection())
+// along the ray (Should be ray.getStart() + ray.GetDirection())
 TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction)
 {
     Segment segment = Segment(Point(-1, 1), Point(1, 1));
@@ -855,7 +819,7 @@ TEST(GeomUtilTest, test_ray_segment_overlapping)
 
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection1.value(), ray.getStart());
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
@@ -868,7 +832,7 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_end)
 
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection1.value(), ray.getStart());
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
@@ -881,7 +845,7 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_start)
 
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection1.value(), ray.getStart());
     EXPECT_EQ(intersection2.value(), segment.getSegStart());
 }
 
@@ -1422,172 +1386,182 @@ TEST(GeomUtilTest, test_find_closest_point_many_points)
 
 TEST(GeomUtilTest, test_reduce_segments_collinear)
 {
-    Segment seg1 = Segment( Point( 0, 1), Point(0, 2));
-    Segment seg2 = Segment( Point( 0, 1.5), Point(0, 2.5));
-    Segment seg3 = Segment( Point( 0, 3), Point(0, 4));
-    Segment seg4 = Segment( Point(0,1.2), Point(0, 1.5));
+    Segment seg1 = Segment(Point(0, 1), Point(0, 2));
+    Segment seg2 = Segment(Point(0, 1.5), Point(0, 2.5));
+    Segment seg3 = Segment(Point(0, 3), Point(0, 4));
+    Segment seg4 = Segment(Point(0, 1.2), Point(0, 1.5));
 
-    Segment seg5 = Segment( Point(0,6), Point(0, 9));
-    Segment seg6 = Segment( Point(0,6), Point(0, 12));
+    Segment seg5 = Segment(Point(0, 6), Point(0, 9));
+    Segment seg6 = Segment(Point(0, 6), Point(0, 12));
 
-    Segment seg7 = Segment( Point(0,-2), Point(0, -5));
+    Segment seg7 = Segment(Point(0, -2), Point(0, -5));
 
     std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5, seg6, seg7};
 
     std::optional<std::vector<Segment>> reduced_segs = reduceParallelSegments(segs);
 
-    EXPECT_EQ(Segment(Point(0,1), Point(0,2.5)), reduced_segs.value()[0]);
+    EXPECT_EQ(Segment(Point(0, 1), Point(0, 2.5)), reduced_segs.value()[0]);
 }
 
 
 
 TEST(GeomUtilTest, test_circle_tangent_rays)
 {
-    Point reference = Point(0,0);
-    Circle circle = Circle( Point(0,1), 0.5);
-    std::pair<Ray,Ray> test = getCircleTangentRaysToReference(reference, circle);
+    Point reference          = Point(0, 0);
+    Circle circle            = Circle(Point(0, 1), 0.5);
+    std::pair<Ray, Ray> test = getCircleTangentRaysToReference(reference, circle);
 
-    EXPECT_EQ(test.second.getRayStart(),reference);
-    EXPECT_EQ(test.first.getRayStart(), reference);
+    EXPECT_EQ(test.second.getStart(), reference);
+    EXPECT_EQ(test.first.getStart(), reference);
 
-    EXPECT_NEAR(test.first.getDirection().x(), Vector(0.5,0.866025).x(), 0.001);
-    EXPECT_NEAR(test.second.getDirection().x(), Vector(-0.5,0.866025).x(), 0.001);
-    EXPECT_NEAR(test.first.getDirection().y(), Vector(0.5,0.866025).y(), 0.001);
-    EXPECT_NEAR(test.second.getDirection().y(), Vector(-0.5,0.866025).y(), 0.001);
+    EXPECT_NEAR(test.first.toUnitVector().x(), Vector(0.5, 0.866025).x(), 0.001);
+    EXPECT_NEAR(test.second.toUnitVector().x(), Vector(-0.5, 0.866025).x(), 0.001);
+    EXPECT_NEAR(test.first.toUnitVector().y(), Vector(0.5, 0.866025).y(), 0.001);
+    EXPECT_NEAR(test.second.toUnitVector().y(), Vector(-0.5, 0.866025).y(), 0.001);
 }
 
 
 TEST(GeomUtilTest, test_calc_most_open_seg_no_obstacles)
 {
     std::vector<Circle> obs = {};
-    Segment ref_segment = Segment( Point(202,15), Point(202,-15));
-    Point origin = Point(0,0);
+    Segment ref_segment     = Segment(Point(202, 15), Point(202, -15));
+    Point origin            = Point(0, 0);
 
-    std::pair<Angle, Point> open_shot = calcOpenDirection( origin, ref_segment, obs );
+    std::pair<Angle, Point> open_shot = calcOpenDirection(origin, ref_segment, obs);
 
-    EXPECT_EQ( (ref_segment.getSegStart() - origin).orientation() - (ref_segment.getEnd() - origin).orientation() , open_shot.first );
-    EXPECT_EQ( (ref_segment.getSegStart() + (ref_segment.getSegStart() - ref_segment.getEnd())/2), open_shot.second );
+    EXPECT_EQ((ref_segment.getSegStart() - origin).orientation() -
+                  (ref_segment.getEnd() - origin).orientation(),
+              open_shot.first);
+    EXPECT_EQ((ref_segment.getSegStart() +
+               (ref_segment.getSegStart() - ref_segment.getEnd()) / 2),
+              open_shot.second);
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg_obstacle_center_obstacle)
 {
-    Circle obst1 = Circle( Point(100, 0), 0.5);
+    Circle obst1 = Circle(Point(100, 0), 0.5);
 
 
     std::vector<Circle> obs = {obst1};
-    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), Segment( Point(202,15), Point(202,-15)), obs );
-    EXPECT_NEAR(open_shot.first.toRadians(),0.069121, 0.001);
-    EXPECT_NEAR(open_shot.second.x(), Point(202,8.00501).x(), 0.001);
-    EXPECT_NEAR(open_shot.second.y(), Point(202,8.00501).y(), 0.001);
+    std::pair<Angle, Point> open_shot =
+        calcOpenDirection(Point(0, 0), Segment(Point(202, 15), Point(202, -15)), obs);
+    EXPECT_NEAR(open_shot.first.toRadians(), 0.069121, 0.001);
+    EXPECT_NEAR(open_shot.second.x(), Point(202, 8.00501).x(), 0.001);
+    EXPECT_NEAR(open_shot.second.y(), Point(202, 8.00501).y(), 0.001);
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg)
 {
-    Circle obst1 = Circle( Point(200,1), 0.5);
-    Circle obst2 = Circle( Point(200,1.2), 0.5);
-    Circle obst3 = Circle( Point(200,-3), 0.5);
-    Circle obst4 = Circle( Point(200,-10), 0.5);
-    Circle obst5 = Circle( Point(200, 10), 0.5);
+    Circle obst1 = Circle(Point(200, 1), 0.5);
+    Circle obst2 = Circle(Point(200, 1.2), 0.5);
+    Circle obst3 = Circle(Point(200, -3), 0.5);
+    Circle obst4 = Circle(Point(200, -10), 0.5);
+    Circle obst5 = Circle(Point(200, 10), 0.5);
 
     std::vector<Circle> obs = {obst1, obst2, obst3, obst4, obst5};
-    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), Segment( Point(202,15), Point(202,-15)), obs );
-    EXPECT_NEAR(open_shot.first.toRadians(),0.038961, 0.0001);
+    std::pair<Angle, Point> open_shot =
+        calcOpenDirection(Point(0, 0), Segment(Point(202, 15), Point(202, -15)), obs);
+    EXPECT_NEAR(open_shot.first.toRadians(), 0.038961, 0.0001);
     EXPECT_NEAR(open_shot.second.x(), Point(202, 5.65572).x(), 0.001);
     EXPECT_NEAR(open_shot.second.y(), Point(202, 5.65572).y(), 0.001);
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg_line_of_obstacles_half_blocked)
 {
-    Segment ref_seg = Segment(Point(10,-10), Point(10,10));
+    Segment ref_seg = Segment(Point(10, -10), Point(10, 10));
 
     // Create a complete line of obstacles
     std::vector<Circle> obs;
 
-    for(int i = -11; i < 0; i++){
-        obs.push_back(Circle( Point(5,i), 0.5));
+    for (int i = -11; i < 0; i++)
+    {
+        obs.push_back(Circle(Point(5, i), 0.5));
     }
 
-    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
-    EXPECT_EQ(open_shot.first,open_shot.first);
+    std::pair<Angle, Point> open_shot = calcOpenDirection(Point(0, 0), ref_seg, obs);
+    EXPECT_EQ(open_shot.first, open_shot.first);
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg_line_of_obstacles_complete_blocked)
 {
-    Segment ref_seg = Segment(Point(10,-10), Point(10,10));
+    Segment ref_seg = Segment(Point(10, -10), Point(10, 10));
 
     // Create a complete line of obstacles
     std::vector<Circle> obs;
 
-    for(int i = -12; i < 12; i++){
-        obs.push_back(Circle( Point(5,i), 0.5));
+    for (int i = -12; i < 12; i++)
+    {
+        obs.push_back(Circle(Point(5, i), 0.5));
     }
 
-    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
-    EXPECT_EQ(open_shot.first,Angle::fromDegrees(0));
+    std::pair<Angle, Point> open_shot = calcOpenDirection(Point(0, 0), ref_seg, obs);
+    EXPECT_EQ(open_shot.first, Angle::fromDegrees(0));
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg_touching_blocking_obstacle)
 {
-Segment ref_seg = Segment(Point(10,-5), Point(10,5));
+    Segment ref_seg = Segment(Point(10, -5), Point(10, 5));
 
-// Create a complete line of obstacles
-std::vector<Circle> obs;
+    // Create a complete line of obstacles
+    std::vector<Circle> obs;
 
-obs.push_back(Circle( Point(0.5,0), 0.5));
+    obs.push_back(Circle(Point(0.5, 0), 0.5));
 
-std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
-EXPECT_EQ(open_shot.first, Angle::fromDegrees(0));
+    std::pair<Angle, Point> open_shot = calcOpenDirection(Point(0, 0), ref_seg, obs);
+    EXPECT_EQ(open_shot.first, Angle::fromDegrees(0));
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg_close_blocking_obstacle)
 {
-    Segment ref_seg = Segment(Point(10,-5), Point(10,5));
+    Segment ref_seg = Segment(Point(10, -5), Point(10, 5));
 
-// Create a complete line of obstacles
+    // Create a complete line of obstacles
     std::vector<Circle> obs;
 
-    obs.push_back(Circle( Point(0.55,0), 0.5));
+    obs.push_back(Circle(Point(0.55, 0), 0.5));
 
-    std::pair<Angle, Point> open_shot = calcOpenDirection( Point(0,0), ref_seg, obs );
+    std::pair<Angle, Point> open_shot = calcOpenDirection(Point(0, 0), ref_seg, obs);
     EXPECT_EQ(open_shot.first, Angle::fromDegrees(0));
 }
 
 TEST(GeomUtilTest, test_open_shot_with_a_dense_wall_of_obstacles)
 {
-std::vector<Circle> obs;
-obs.push_back(Circle(Point(3, -0.09), 0.09));
-obs.push_back(Circle(Point(3, 0), 0.09));
-obs.push_back(Circle(Point(3, 0.09), 0.09));
-// Using an obstacle radius of 0.1 passes, but 0.09 fails. Interesting...
-std::pair<Angle, Point> testpair_opt =
+    std::vector<Circle> obs;
+    obs.push_back(Circle(Point(3, -0.09), 0.09));
+    obs.push_back(Circle(Point(3, 0), 0.09));
+    obs.push_back(Circle(Point(3, 0.09), 0.09));
+    // Using an obstacle radius of 0.1 passes, but 0.09 fails. Interesting...
+    std::pair<Angle, Point> testpair_opt =
         calcOpenDirection(Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
-// We do not expect to get a result
-EXPECT_EQ(testpair_opt.first,testpair_opt.first);
+    // We do not expect to get a result
+    EXPECT_EQ(testpair_opt.first, testpair_opt.first);
 }
 
 TEST(GeomUtilTest, test_calc_open_shot_with_a_dense_wall_of_obstacles_2)
 {
-std::vector<Circle> obs;
-obs.push_back(Circle(Point(3, 0.05), 0.1));
-obs.push_back(Circle(Point(3, -0.05), 0.1));
+    std::vector<Circle> obs;
+    obs.push_back(Circle(Point(3, 0.05), 0.1));
+    obs.push_back(Circle(Point(3, -0.05), 0.1));
 
-std::pair<Angle, Point> testpair_opt =
+    std::pair<Angle, Point> testpair_opt =
         calcOpenDirection(Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
-// We do not expect to get a result
-EXPECT_EQ(testpair_opt.first, testpair_opt.first);
+    // We do not expect to get a result
+    EXPECT_EQ(testpair_opt.first, testpair_opt.first);
 }
 
 TEST(GeomUtilTest, test_calc_most_open_seg_obstacles_not_blocking)
 {
-    Segment ref_seg = Segment(Point(10,-10), Point(10,10));
-    Point reference = Point(0,0);
+    Segment ref_seg = Segment(Point(10, -10), Point(10, 10));
+    Point reference = Point(0, 0);
     // Create a complete line of obstacles
     std::vector<Circle> obs;
 
-    for(int i = -12; i < 12; i++){
-        obs.push_back(Circle( Point(-5,i), 0.5));
+    for (int i = -12; i < 12; i++)
+    {
+        obs.push_back(Circle(Point(-5, i), 0.5));
     }
 
-    std::pair<Angle, Point> open_shot = calcOpenDirection( reference, ref_seg, obs );
-    EXPECT_EQ(open_shot.first, (ref_seg.getSegStart() - reference).orientation() - (ref_seg.getEnd() - reference).orientation());
+    std::pair<Angle, Point> open_shot = calcOpenDirection(reference, ref_seg, obs);
+    EXPECT_EQ(open_shot.first, (ref_seg.getSegStart() - reference).orientation() -
+                                   (ref_seg.getEnd() - reference).orientation());
 }

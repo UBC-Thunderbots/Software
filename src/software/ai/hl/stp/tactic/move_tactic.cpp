@@ -30,16 +30,16 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
     return std::clamp<double>(cost, 0, 1);
 }
 
-void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction(0, Angle(), false);
+    auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
     do
     {
-        move_action.updateControlParams(
+        move_action->updateControlParams(
             *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
             MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
-        yield(move_action.getNextIntent());
-    } while (!move_action.done());
+        yield(move_action);
+    } while (!move_action->done());
 }
 
 void MoveTactic::accept(TacticVisitor &visitor) const

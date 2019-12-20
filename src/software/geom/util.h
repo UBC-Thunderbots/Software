@@ -4,13 +4,13 @@
 #include <vector>
 
 #include "software/geom/circle.h"
-#include "software/geom/line.h"
 #include "software/geom/polygon.h"
-#include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/shot.h"
+#include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/ray.h"
 
 template <size_t N>
 using LegacyPolygon       = std::array<Point, N>;
@@ -84,8 +84,6 @@ double dist(const Segment &first, const Segment &second);
 double dist(const Point &first, const Segment &second);
 double dist(const Segment &first, const Point &second);
 
-double dist(const Line &first, const Point &second);
-double dist(const Point &first, const Line &second);
 double dist(const Point &first, const Polygon &second);
 
 /**
@@ -100,12 +98,10 @@ double distsq(const Point &first, const Point &second);
 
 bool isDegenerate(const Segment &segment);
 bool isDegenerate(const Ray &segment);
-bool isDegenerate(const Line &line);
 
 double length(const Segment &segment);
 
 double lengthSquared(const Segment &segment);
-double lengthSquared(const Line &line);
 
 template <size_t N>
 Point getVertex(const LegacyPolygon<N> &poly, unsigned int i);
@@ -226,20 +222,6 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
  */
 Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
 Point closestPointOnSeg(const Point &p, const Segment &segment);
-
-/**
- * Finds the Point on line closest to point.
- *
- * @param centre the point.
- *
- * @param lineA one point on the line.
- *
- * @param lineB another point on the line segment.
- *
- * @return the Point on line closest to centre point.
- */
-Point closestPointOnLine(const Point &p, const Point &lineA, const Point &lineB);
-Point closestPointOnLine(const Point &p, const Line &line);
 
 /**
  * Finds the points of intersection between a circle and a line.
@@ -553,7 +535,8 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
  * @param circle: The circle to calculate the tangent vectors of
  * @return the mean point of points
  */
-std::pair<Ray, Ray> getCircleTangentRaysToReference(const Point reference, const Circle circle);
+std::pair<Ray, Ray> getCircleTangentRaysToReference(const Point reference,
+                                                    const Circle circle);
 
 bool pointIsRightOfLine(const Segment &line, const Point &point);
 
@@ -636,7 +619,8 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 
 std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> segments);
 
-std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles);
+std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment,
+                                          std::vector<Circle> obstacles);
 /**
  * Returns the binary trespass score of a point and rectangle
  *

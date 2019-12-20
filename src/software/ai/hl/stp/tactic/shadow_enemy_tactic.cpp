@@ -57,17 +57,17 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
     return std::clamp<double>(cost, 0, 1);
 }
 
-void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction(0, Angle(), false);
-    StopAction stop_action =
-        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
+    auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
+    auto stop_action = std::make_shared<StopAction>(
+        StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
     do
     {
         if (!enemy_threat)
         {
-            stop_action.updateControlParams(*robot, false);
-            yield(stop_action.getNextIntent());
+            stop_action->updateControlParams(*robot, false);
+            yield(stop_action);
         }
 
         Robot enemy_robot = enemy_threat->robot;
@@ -81,11 +81,11 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Point position_to_block_pass =
                 enemy_robot.position() +
                 enemy_to_passer_vector.normalize(this->shadow_distance);
-            move_action.updateControlParams(*robot, position_to_block_pass,
-                                            enemy_to_passer_vector.orientation(), 0,
-                                            DribblerEnable::OFF, MoveType::NORMAL,
-                                            AutokickType::NONE, BallCollisionType::AVOID);
-            yield(move_action.getNextIntent());
+            move_action->updateControlParams(
+                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::AVOID);
+            yield(move_action);
         }
         else
         {
@@ -116,24 +116,24 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
                 ball.velocity().length() <= ball_steal_speed)
             {
-                move_action.updateControlParams(
+                move_action->updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0,
                     DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
                     BallCollisionType::AVOID);
-                yield(move_action.getNextIntent());
+                yield(move_action);
             }
             else
             {
-                move_action.updateControlParams(
+                move_action->updateControlParams(
                     *robot, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0,
                     DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
                     BallCollisionType::AVOID);
-                yield(move_action.getNextIntent());
+                yield(move_action);
             }
         }
-    } while (!move_action.done());
+    } while (!move_action->done());
 }
 
 void ShadowEnemyTactic::accept(TacticVisitor &visitor) const

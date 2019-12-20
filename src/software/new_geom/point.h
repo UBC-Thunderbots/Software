@@ -82,7 +82,8 @@ class Point final
      * Returns the distance between this Point and origin (0,0)
      *
      * @return the distance
-     */    static Point getAverageOfPoints(std::vector<Point> points);
+     */
+    static Point getAverageOfPoints(std::vector<Point> points);
     double distanceFromOrigin() const;
 
     /**

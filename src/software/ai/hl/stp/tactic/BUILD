@@ -1,30 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "block_shot_path_tactic",
-    srcs = ["block_shot_path_tactic.cpp"],
-    hdrs = ["block_shot_path_tactic.h"],
-    deps = [
-        ":tactic",
-        ":tactic_visitor",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/geom",
-        "@g3log",
-    ],
-)
-
-cc_test(
-    name = "block_shot_path_tactic_test",
-    srcs = ["block_shot_path_tactic_test.cpp"],
-    deps = [
-        ":block_shot_path_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "cherry_pick_tactic",
     srcs = ["cherry_pick_tactic.cpp"],
     hdrs = ["cherry_pick_tactic.h"],
@@ -187,35 +163,6 @@ cc_test(
     deps = [
         ":goalie_tactic",
         "//software/geom",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "grab_ball_tactic",
-    srcs = ["grab_ball_tactic.cpp"],
-    hdrs = ["grab_ball_tactic.h"],
-    deps = [
-        ":tactic",
-        ":tactic_visitor",
-        "//shared:constants",
-        "//software/ai/evaluation:intercept",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:movespin_action",
-        "//software/geom",
-        "//software/util/logger",
-    ],
-)
-
-cc_test(
-    name = "grab_ball_tactic_test",
-    srcs = ["grab_ball_tactic_test.cpp"],
-    deps = [
-        ":grab_ball_tactic",
-        "//software/ai/intent:move_intent",
-        "//software/ai/intent:movespin_intent",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -458,13 +405,11 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":block_shot_path_tactic",
         ":cherry_pick_tactic",
         ":chip_tactic",
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
-        ":grab_ball_tactic",
         ":kickoff_chip_tactic",
         ":move_tactic",
         ":passer_tactic",

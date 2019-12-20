@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
 
-#include "software/ai/intent/stop_intent.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 
 StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
 
@@ -15,11 +15,11 @@ double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world
     return 0.5;
 }
 
-void StopTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do
     {
-        yield(std::make_unique<StopIntent>(this->robot->id(), false, 0));
+        yield(std::make_shared<StopAction>());
     } while (this->robot->velocity().length() > 0.05);
 }
 

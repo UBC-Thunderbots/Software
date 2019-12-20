@@ -11,9 +11,10 @@
 #include <random>
 
 #include "shared/constants.h"
-#include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
+#include "software/new_geom/ray.h"
+#include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
 
 class BallFilterTest : public ::testing::Test
@@ -61,9 +62,9 @@ class BallFilterTest : public ::testing::Test
         double expected_velocity_magnitude_tolerance, unsigned int num_iterations,
         unsigned int num_steps_to_ignore)
     {
-        Point ball_starting_position = ball_trajectory.getRayStart();
+        Point ball_starting_position = ball_trajectory.getStart();
         Vector ball_velocity =
-            ball_trajectory.toVector().normalize(ball_velocity_magnitude);
+            ball_trajectory.toUnitVector().normalize(ball_velocity_magnitude);
         Duration max_ball_travel_duration =
             Duration::fromSeconds(std::numeric_limits<double>::max());
 
@@ -196,8 +197,8 @@ class BallFilterTest : public ::testing::Test
             Point ball_position_with_noise = current_ball_position + position_noise;
 
             // Create the detection that would have been seen by the vision system
-            std::vector<SSLBallDetection> ball_detections = {
-                SSLBallDetection{ball_position_with_noise, current_timestamp}};
+            std::vector<BallDetection> ball_detections = {
+                BallDetection{ball_position_with_noise, current_timestamp}};
 
             // Get the filtered result given the new detection information
             auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);
@@ -508,40 +509,37 @@ TEST_F(BallFilterTest,
 TEST_F(BallFilterTest,
        test_linear_regression_returns_same_results_for_inverted_coordinates)
 {
-    boost::circular_buffer<SSLBallDetection> ball_detections(2);
+    boost::circular_buffer<BallDetection> ball_detections(2);
     Point p1(0, 0);
     Point p2(1, 0.5);
     ball_detections.push_front({p1, Timestamp::fromSeconds(1)});
     ball_detections.push_front({p2, Timestamp::fromSeconds(2)});
     auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
 
-    double d1 = dist(x_vs_y_regression.regression_line, p1);
-    double d2 = dist(x_vs_y_regression.regression_line, p2);
+    double d1 = distance(x_vs_y_regression.regression_line, p1);
+    double d2 = distance(x_vs_y_regression.regression_line, p2);
 
     EXPECT_LT(d1, 0.001);
     EXPECT_LT(d2, 0.001);
 
     // test the inverse regression
-    boost::circular_buffer<SSLBallDetection> inv_ball_detections = ball_detections;
+    boost::circular_buffer<BallDetection> inv_ball_detections = ball_detections;
     for (auto& detection : inv_ball_detections)
     {
         detection.position = Point(detection.position.y(), detection.position.x());
     }
 
     auto y_vs_x_regression = ball_filter.getLinearRegressionLine(inv_ball_detections);
-    y_vs_x_regression.regression_line =
-        Line(Point(y_vs_x_regression.regression_line.getFirst().y(),
-                   y_vs_x_regression.regression_line.getFirst().x()),
-             Point(y_vs_x_regression.regression_line.getSecond().y(),
-                   y_vs_x_regression.regression_line.getSecond().x()));
+    y_vs_x_regression.regression_line.swapXY();
 
-    double inv_d1 = dist(y_vs_x_regression.regression_line, p1);
-    double inv_d2 = dist(y_vs_x_regression.regression_line, p2);
+    double inv_d1 = distance(y_vs_x_regression.regression_line, p1);
+    double inv_d2 = distance(y_vs_x_regression.regression_line, p2);
 
     EXPECT_LT(inv_d1, 0.001);
     EXPECT_LT(inv_d2, 0.001);
 
     // Check the lines are pointing in the same direction
-    EXPECT_NEAR(x_vs_y_regression.regression_line.slope(),
-                y_vs_x_regression.regression_line.slope(), 1.0e-6);
+    EXPECT_LT(x_vs_y_regression.regression_line.toNormalUnitVector().cross(
+                  y_vs_x_regression.regression_line.toNormalUnitVector()),
+              GeomConstants::EPSILON);
 }
