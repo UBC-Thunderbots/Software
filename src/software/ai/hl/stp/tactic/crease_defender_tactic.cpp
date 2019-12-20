@@ -3,14 +3,14 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
+#include "software/new_geom/point.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
@@ -23,7 +23,6 @@ CreaseDefenderTactic::CreaseDefenderTactic(
       enemy_team(enemy_team),
       left_or_right(left_or_right)
 {
-    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string CreaseDefenderTactic::getName() const
@@ -51,7 +50,7 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World 
     double cost                                          = 0;
     if (desired_state)
     {
-        cost = (robot.position() - calculateDesiredState(robot)->first).len() /
+        cost = (robot.position() - calculateDesiredState(robot)->first).length() /
                world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
@@ -69,18 +68,24 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
         if (defender_reference_position)
         {
             // Figure out how far away the ball is
-            double ball_dist = (ball.position() - *defender_reference_position).len();
+            double ball_dist = (ball.position() - *defender_reference_position).length();
 
             double min_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::min_defender_seperation_deg
-                    .value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MinDefenderSeperationDeg()
+                    ->value();
             double max_defender_seperation_deg =
-                Util::DynamicParameters::DefenderCreaseTactic::max_defender_seperation_deg
-                    .value();
-            double min_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_min_defender_seperation.value();
-            double max_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-                                       ball_dist_for_max_defender_seperation.value();
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->MaxDefenderSeperationDeg()
+                    ->value();
+            double min_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMinDefenderSeperation()
+                    ->value();
+            double max_ball_dist =
+                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                    ->BallDistForMaxDefenderSeperation()
+                    ->value();
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
@@ -95,7 +100,7 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
                 return std::nullopt;
             }
 
-            Angle defender_seperation = Angle::ofDegrees(
+            Angle defender_seperation = Angle::fromDegrees(
                 (max_defender_seperation_deg - min_defender_seperation_deg) /
                     (max_ball_dist - min_ball_dist) *
                     std::clamp(ball_dist, min_ball_dist, max_ball_dist) +
@@ -182,14 +187,16 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            yield(move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP));
+                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+            yield(move_action.getNextIntent());
         }
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
-            yield(std::move(stop_action.updateStateAndGetNextIntent(*robot, false)));
+            stop_action.updateControlParams(*robot, false);
+            yield(std::move(stop_action.getNextIntent()));
         }
     } while (!move_action.done());
 }

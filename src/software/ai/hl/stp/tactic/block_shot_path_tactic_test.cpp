@@ -16,7 +16,7 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     BlockShotPathTactic tactic = BlockShotPathTactic(field);
     tactic.updateRobot(friendly_robot);
     // Shoot from 2m in front of the goal
-    Point shot_origin = field.friendlyGoal() + Point(2, 0);
+    Point shot_origin = field.friendlyGoal() + Vector(2, 0);
     tactic.updateControlParams(shot_origin);
     auto intent_ptr = tactic.getNextIntent();
 

@@ -25,8 +25,8 @@ std::optional<Robot> RobotFilter::getFilteredData(
     filtered_data.id               = this->getRobotId();
     filtered_data.position         = Point(0, 0);
     filtered_data.velocity         = Vector(0, 0);
-    filtered_data.orientation      = Angle().ofRadians(0);
-    filtered_data.angular_velocity = AngularVelocity().ofRadians(0);
+    filtered_data.orientation      = Angle::fromRadians(0);
+    filtered_data.angular_velocity = AngularVelocity::fromRadians(0);
     filtered_data.timestamp        = Timestamp().fromSeconds(0);
 
     for (const SSLRobotDetection &robot_data : new_robot_data)
@@ -35,7 +35,8 @@ std::optional<Robot> RobotFilter::getFilteredData(
         if (robot_data.id == this->getRobotId() &&
             robot_data.timestamp > this->current_robot_state.lastUpdateTimestamp())
         {
-            filtered_data.position = filtered_data.position + robot_data.position;
+            filtered_data.position =
+                filtered_data.position + robot_data.position.toVector();
             filtered_data.orientation =
                 filtered_data.orientation + robot_data.orientation;
 
@@ -71,7 +72,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
     else
     {
         // update data by returning filtered robot data
-        filtered_data.position    = filtered_data.position / data_num;
+        filtered_data.position    = Point(filtered_data.position.toVector() / data_num);
         filtered_data.orientation = filtered_data.orientation / data_num;
 
         filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(

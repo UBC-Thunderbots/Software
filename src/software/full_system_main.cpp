@@ -75,11 +75,11 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
 
     options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
-                       "Help screen")(
-        "backend", value<std::string>(&args.backend_name)->default_value(""),
-        backend_help_str.c_str())("headless",
-                                  boost::program_options::bool_switch(&args.headless),
-                                  "Run without the Visualizer");
+                       "Help screen")("backend",
+                                      value<std::string>(&args.backend_name)->required(),
+                                      backend_help_str.c_str())(
+        "headless", boost::program_options::bool_switch(&args.headless),
+        "Run without the Visualizer");
 
     variables_map vm;
     try

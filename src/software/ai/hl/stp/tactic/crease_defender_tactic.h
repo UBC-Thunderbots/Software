@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/segment.h"
 
@@ -61,11 +61,6 @@ class CreaseDefenderTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    /**
-     * Accepts a Tactic Visitor and calls the visit function on itself
-     *
-     * @param visitor A Tactic Visitor
-     */
     void accept(TacticVisitor &visitor) const override;
 
    private:

@@ -38,9 +38,9 @@ TEST_F(STPTacticAssignmentTest,
        test_correct_number_of_tactics_returned_when_equal_number_of_robots_and_tactics)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
@@ -62,7 +62,7 @@ TEST_F(STPTacticAssignmentTest,
        test_correct_number_of_tactics_returned_when_more_tactics_than_robots)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0});
     world.updateFriendlyTeamState(friendly_team);
@@ -84,9 +84,9 @@ TEST_F(STPTacticAssignmentTest,
        test_correct_number_of_tactics_returned_when_more_robots_than_tactics)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
@@ -122,9 +122,9 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
 TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_tactics)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
@@ -141,7 +141,7 @@ TEST_F(STPTacticAssignmentTest,
        test_correct_tactics_removed_when_more_tactics_than_robots)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0});
     world.updateFriendlyTeamState(friendly_team);
@@ -170,7 +170,7 @@ TEST_F(STPTacticAssignmentTest,
 TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0});
     world.updateFriendlyTeamState(friendly_team);
@@ -194,9 +194,9 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
 TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
@@ -232,9 +232,9 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
 TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(-3, 1.5), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(-3, 1.5), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
@@ -262,11 +262,11 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
 TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(2, 0.81), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_2(2, Point(0, 5.0), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
@@ -293,11 +293,11 @@ TEST_F(STPTacticAssignmentTest,
        test_assigning_3_robots_to_3_tactics_all_with_the_same_cost)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(2, 0.81), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_2(2, Point(0, 5.0), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
@@ -322,11 +322,11 @@ TEST_F(STPTacticAssignmentTest,
        test_assigning_3_robots_to_3_tactics_with_2_of_the_same_cost)
 {
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(2, 0.81), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    Robot robot_2(2, Point(0, 4.0), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_2(2, Point(0, 4.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
@@ -358,10 +358,11 @@ TEST_F(STPTacticAssignmentTest,
     // that doesn't even though the former has lower cost
     Team friendly_team(Duration::fromSeconds(0));
     // this robot has no capabilities
-    Robot robot_0(0, Point(0.1, 0.1), Point(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0), 10, RobotCapabilityFlags{});
+    Robot robot_0(0, Point(0.1, 0.1), Vector(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0), 10,
+                  std::set<RobotCapabilities::Capability>{});
     // default is all capabilities, if not specified otherwise
-    Robot robot_1(1, Point(-10, -10), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(-10, -10), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
@@ -376,5 +377,5 @@ TEST_F(STPTacticAssignmentTest,
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_EQ(assigned_tactics.size(), 1);
-    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_1);
+    EXPECT_TRUE(*assigned_tactics.at(0)->getAssignedRobot() == robot_1);
 }

@@ -25,7 +25,8 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
     // Prefer robots closer to the destination
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - destination).len() / world.field().totalXLength();
+    double cost =
+        (robot.position() - destination).length() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -34,9 +35,10 @@ void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     MoveAction move_action = MoveAction(0, Angle(), false);
     do
     {
-        yield(move_action.updateStateAndGetNextIntent(
+        move_action.updateControlParams(
             *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE));
+            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
+        yield(move_action.getNextIntent());
     } while (!move_action.done());
 }
 

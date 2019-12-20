@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "software/util/time/duration.h"
 #include "software/util/time/time.h"
 
@@ -122,6 +124,16 @@ class Timestamp : public Time
      * @return A Duration that is the difference in time between the two timestamps
      */
     Duration operator-(const Timestamp& timestamp) const;
+
+    /**
+     * Implements the << operator for printing
+     *
+     * @param ostream The stream to print to
+     * @param time The time to print
+     *
+     * @return The output stream with the string representation of the class appended
+     */
+    friend std::ostream& operator<<(std::ostream& output_stream, const Timestamp& time);
 
    private:
     /**

@@ -8,16 +8,27 @@ install:
 jobs:
   include:
     - name: "Build, Test, and Run Coverage"
-      script: >
-        cd src
-        &&
-        bazel coverage //... 
-        --compilation_mode=fastbuild 
-        --verbose_test_summary 
-        --instrumentation_filter=//... 
-        --test_output=errors
-        &&
-        bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/
+      script:
+        - cd src
+        # Build, test, run coverage
+        - >
+          bazel coverage //... 
+          --compilation_mode=fastbuild 
+          --verbose_test_summary 
+          --instrumentation_filter=//... 
+          --test_output=errors
+          --experimental_use_llvm_covmap
+          --collect_code_coverage
+        # Convert profdata results to lcov. We have to do this because of the
+        # current state of support for clang compiler coverage results in
+        # bazel. Once https://github.com/bazelbuild/bazel/issues/9406 is 
+        # addressed, we can probably change the `coverage_feature` flags in
+        # `cc_toolchain_config.bzl` to just `--coverage` and remove this script
+        - ./convert_profdata_to_lcov.sh
+        # Upload coverage results
+        - bash <(curl -s https://codecov.io/bash)
+        # Build our CPU-specific targets
+        - bazel build //firmware_new/... --cpu=stm32h7
     - name: "Check Formatting"
       script:
         - ./clang_format/check_formatting_ci.sh

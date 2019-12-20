@@ -34,7 +34,7 @@ TEST(ChipPrimTest, get_chip_origin_test)
 
 TEST(ChipPrimTest, get_chip_direction_test)
 {
-    const Angle chip_direction = Angle::ofRadians(1.35);
+    const Angle chip_direction = Angle::fromRadians(1.35);
 
     ChipPrimitive chip_prim = ChipPrimitive(0, Point(), chip_direction, 0.0);
 

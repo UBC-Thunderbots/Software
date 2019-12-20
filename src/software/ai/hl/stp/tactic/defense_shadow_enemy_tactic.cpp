@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
@@ -52,7 +52,7 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
     // Prefer robots closer to the enemy being shadowed
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - enemy_threat->robot.position()).len() /
+    double cost = (robot.position() - enemy_threat->robot.position()).length() /
                   world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
@@ -67,7 +67,8 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
         if (!enemy_threat)
         {
             LOG(WARNING) << "Running DefenseShadowEnemyTactic without an enemy threat";
-            yield(stop_action.updateStateAndGetNextIntent(*robot, false));
+            stop_action.updateControlParams(*robot, false);
+            yield(stop_action.getNextIntent());
         }
 
         Robot enemy_robot                   = enemy_threat->robot;
@@ -84,33 +85,38 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
 
         Vector enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
         Point position_to_block_shot =
-            enemy_robot.position() + enemy_shot_vector.norm(shadow_distance);
+            enemy_robot.position() + enemy_shot_vector.normalize(shadow_distance);
         if (best_enemy_shot_opt)
         {
             enemy_shot_vector =
                 best_enemy_shot_opt->getPointToShootAt() - enemy_robot.position();
             position_to_block_shot =
-                enemy_robot.position() + enemy_shot_vector.norm(shadow_distance);
+                enemy_robot.position() + enemy_shot_vector.normalize(shadow_distance);
         }
 
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
         if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-            ball.velocity().len() <
-                Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed
-                    .value())
+            ball.velocity().length() <
+                Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                    ->BallStealSpeed()
+                    ->value())
         {
-            yield(move_action.updateStateAndGetNextIntent(
+            move_action.updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP));
+                0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                BallCollisionType::AVOID);
+            yield(move_action.getNextIntent());
         }
         else
         {
             Angle facing_enemy_robot =
                 (enemy_robot.position() - robot->position()).orientation();
-            yield(move_action.updateStateAndGetNextIntent(
-                *robot, position_to_block_shot, facing_enemy_robot, 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP));
+            move_action.updateControlParams(*robot, position_to_block_shot,
+                                            facing_enemy_robot, 0, DribblerEnable::OFF,
+                                            MoveType::NORMAL, AutokickType::AUTOCHIP,
+                                            BallCollisionType::AVOID);
+            yield(move_action.getNextIntent());
         }
 
     } while (!move_action.done());

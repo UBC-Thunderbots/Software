@@ -78,7 +78,7 @@ TEST(MovePrimTest, get_final_speed_test)
 
 TEST(MovePrimTest, get_final_orientation_test)
 {
-    const Angle final_angle = Angle::ofRadians(3.15);
+    const Angle final_angle = Angle::fromRadians(3.15);
 
     MovePrimitive move_prim =
         MovePrimitive(0, Point(), final_angle, 0.0, DribblerEnable::OFF, MoveType::NORMAL,

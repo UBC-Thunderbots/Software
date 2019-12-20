@@ -6,8 +6,8 @@
 #pragma once
 
 #include "software/ai/primitive/primitive.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 
 enum AutokickType
 {

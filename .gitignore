@@ -47,6 +47,9 @@ Makefile
 *_REMOTE_*.txt
 *.orig
 
+# Misc. Log Files
+*.log
+
 ### Node ###
 
 # Dependencies
@@ -54,6 +57,7 @@ Makefile
 
 # Testing
 *coverage
+*.lcov
 
 # Production
 *build

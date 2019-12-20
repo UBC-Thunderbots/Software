@@ -13,7 +13,7 @@ void AIWrapper::onValueReceived(World world)
 
 void AIWrapper::runAIAndSendPrimitives()
 {
-    if (Util::DynamicParameters::AI::run_ai.value())
+    if (Util::DynamicParameters->getAIConfig()->RunAI()->value())
     {
         std::vector<std::unique_ptr<Primitive>> new_primitives =
             ai.getPrimitives(most_recent_world);

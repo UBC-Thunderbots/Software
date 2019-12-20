@@ -2,10 +2,10 @@
 
 #include <limits>
 
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/movespin_action.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
@@ -73,20 +73,25 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         {
             if (dist(robot->position(), ball.position()) < BALL_DIST_FROM_ENEMY)
             {
-                yield(movespin_action.updateStateAndGetNextIntent(
-                    *robot, ball.position(), STEAL_BALL_SPIN_SPEED, 0));
+                movespin_action.updateControlParams(*robot, ball.position(),
+                                                    STEAL_BALL_SPIN_SPEED, 0);
+                yield(movespin_action.getNextIntent());
             }
             else
             {
-                yield(move_action.updateStateAndGetNextIntent(
+                move_action.updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0.0,
-                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                    BallCollisionType::ALLOW);
+                yield(move_action.getNextIntent());
             }
         }
         else
         {
-            yield(intercept_action.updateStateAndGetNextIntent(*robot, field, ball));
+            intercept_action.updateWorldParams(field, ball);
+            intercept_action.updateControlParams(*robot);
+            yield(intercept_action.getNextIntent());
         }
     } while (true);
 }

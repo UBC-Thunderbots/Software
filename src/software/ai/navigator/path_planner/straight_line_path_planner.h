@@ -14,11 +14,13 @@ class StraightLinePathPlanner : public PathPlanner
      *
      * @param start start point
      * @param destination destination point
-     * @param field  WARNING: StraightLinePathPlanner does not respect the field
+     * @param navigable_area WARNING: StraightLinePathPlanner does not respect the
+     * navigable_area
      * @param obstacles WARNING: StraightLinePathPlanner does not avoid obstacles
      *
      * @return a vector that is {start, destination}
      */
-    PathType findPath(const Point &start, const Point &destination, const Field &field,
-                      const std::vector<Obstacle> &obstacles) override;
+    std::optional<Path> findPath(const Point &start, const Point &destination,
+                                 const Rectangle &navigable_area,
+                                 const std::vector<Obstacle> &obstacles) override;
 };

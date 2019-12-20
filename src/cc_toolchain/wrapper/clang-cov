@@ -1,0 +1,3 @@
+#!/bin/bash --norc
+
+exec external/llvm_clang/bin/llvm-cov "$@"

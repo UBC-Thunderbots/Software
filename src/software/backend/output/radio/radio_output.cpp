@@ -22,7 +22,8 @@ void RadioOutput::sendVisionPacket(
     std::vector<std::tuple<uint8_t, Point, Angle>> friendly_robots, Ball ball)
 {
     uint64_t timestamp = static_cast<uint64_t>(ball.lastUpdateTimestamp().getSeconds());
-    dongle.send_camera_packet(friendly_robots, ball.position() * MILLIMETERS_PER_METER,
+    dongle.send_camera_packet(friendly_robots,
+                              Point(ball.position().toVector() * MILLIMETERS_PER_METER),
                               timestamp);
 }
 

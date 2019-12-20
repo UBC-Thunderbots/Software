@@ -13,8 +13,9 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
-    Ball ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    world.updateBallState(ball);
+    BallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
+                        Timestamp::fromSeconds(0));
+    world.updateBallState(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -49,12 +50,13 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     world.mutableFriendlyTeam().updateRobots({robot});
     world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(4.5, 0.25)},
                                                      Timestamp::fromSeconds(0));
-    Ball ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    world.updateBallState(ball);
+    BallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
+                        Timestamp::fromSeconds(0));
+    world.updateBallState(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(6), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(6), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
@@ -135,12 +137,13 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
     world.mutableFriendlyTeam().updateRobots({robot});
     world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(1, 0)},
                                                      Timestamp::fromSeconds(0));
-    Ball ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    world.updateBallState(ball);
+    BallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
+                        Timestamp::fromSeconds(0));
+    world.updateBallState(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
@@ -171,12 +174,13 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     world.mutableFriendlyTeam().updateRobots({robot});
     world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.25, 0)},
                                                      Timestamp::fromSeconds(0));
-    Ball ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    world.updateBallState(ball);
+    BallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
+                        Timestamp::fromSeconds(0));
+    world.updateBallState(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());
@@ -206,12 +210,12 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
 
-    Ball ball(Point(0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    world.updateBallState(ball);
+    BallState ballState(Point(0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    world.updateBallState(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.0520833333;
@@ -225,12 +229,12 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
 
-    Ball ball(Point(3, -2.5), Vector(0, 0), Timestamp::fromSeconds(0));
-    world.updateBallState(ball);
+    BallState ballState(Point(3, -2.5), Vector(0, 0), Timestamp::fromSeconds(0));
+    world.updateBallState(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.40678383728;

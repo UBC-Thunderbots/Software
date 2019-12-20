@@ -5,11 +5,11 @@
 
 
 #include "shared/constants.h"
-#include "software/geom/angle.h"
 #include "software/geom/circle.h"
-#include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 
