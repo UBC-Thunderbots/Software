@@ -101,16 +101,20 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
     float current_angular_velocity = app_firmware_robot_getAngularVelocity(robot);
     float current_orientation      = app_firmware_robot_getOrientation(robot);
 
-    // get the desired acceleration by assuming we need to achieve the
-    // velocity delta in a single tick
-    float acceleration_x = (linear_velocity_x - current_vx) / TRACK_TIME;
-    float acceleration_y = (linear_velocity_y - current_vy) / TRACK_TIME;
+    // This is the "P" term in a PID controller. We essentially do proportional
+    // control of our acceleration based on velocity error
+    static const ACCELERATION_GAIN = 10;
 
-    rotate(cur_acc, -current_orientation);  // rotate into robot local coordinate from dr
+    float current_acceleration[2];
+    current_acceleration[0] = (linear_velocity_x - current_vx) * ACCELERATION_GAIN;
+    current_acceleration[1] = (linear_velocity_y - current_vy) * ACCELERATION_GAIN;
+
+    // Rotate the acceleration vector from the robot frame to the world frame
+    rotate(current_acceleration, -current_orientation);
 
     float angular_acceleration =
-        (angular_velocity - current_angular_velocity) / TRACK_TIME;
+        (angular_velocity - current_angular_velocity) * ACCELERATION_GAIN;
 
-    // send acceleration to wheels
-    app_control_applyAccel(robot, acceleration_x, acceleration_y, angular_acceleration);
+    app_control_applyAccel(robot, current_acceleration[0], current_acceleration[1],
+                           angular_acceleration);
 }

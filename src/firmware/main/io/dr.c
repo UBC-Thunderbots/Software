@@ -148,6 +148,42 @@ float dr_get_robot_position_y()
 }
 
 /**
+ * \brief Get the robot's orientation
+ * \return The orientation of the robot
+ */
+float dr_get_robot_orientation()
+{
+    return current_state.y;
+}
+
+/**
+ * \brief Get the x-component of the robot's velocity
+ * \return The x-component of the robot's velocity
+ */
+float dr_get_robot_velocity_x()
+{
+    return current_state.vx;
+}
+
+/**
+ * \brief Get the y-component of the robot's velocity
+ * \return The y-component of the robot's velocity
+ */
+float dr_get_robot_velocity_y()
+{
+    return current_state.vy;
+}
+
+/**
+ * \brief Get the robot's angular velocity
+ * \return The robot's angular velocity
+ */
+float dr_get_robot_angular_velocity()
+{
+    return current_state.avel;
+}
+
+/**
  * \brief Get the x-component of the ball's position
  * \return The x-component of the ball's position
  */

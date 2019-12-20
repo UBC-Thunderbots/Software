@@ -37,6 +37,14 @@ typedef struct RobotConstants
  *                             robot, in meters
  * @param get_robot_position_y A function that can be called to get the y-position of the
  *                             robot, in meters
+ * @param get_robot_orientation A function that can be called to get the orientation of
+ *                              the robot, in radians
+ * @param get_robot_velocity_x A function that can be called to get the x-velocity of the
+ *                             robot, in m/s
+ * @param get_robot_velocity_y A function that can be called to get the y-velocity of the
+ *                             robot, in m/s
+ * @param get_robot_angular_velocity A function that can be called to get the angular
+ *                                   velocity of the robot, in rad/s
  * @param front_right_wheel The front right wheel of the robot
  * @param front_left_wheel The front left wheel of the robot
  * @param back_right_wheel The back right wheel of the robot
@@ -47,7 +55,9 @@ typedef struct RobotConstants
  */
 FirmwareRobot_t* app_firmware_robot_create(
     Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(),
-    float (*get_robot_position_y)(), Wheel_t* front_right_wheel,
+    float (*get_robot_position_y)(), float (*get_robot_orientation)(),
+    float (*get_robot_velocity_x)(), float (*get_robot_velocity_y)(),
+    float (*get_robot_angular_velocity)(), Wheel_t* front_right_wheel,
     Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
     RobotConstants_t robot_constants);
 

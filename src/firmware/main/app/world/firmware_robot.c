@@ -8,6 +8,11 @@ struct FirmwareRobot
     Dribbler_t* dribbler;
     float (*get_robot_position_x)();
     float (*get_robot_position_y)();
+    // TODO: add new functions here to tests
+    float (*get_robot_orientation)();
+    float (*get_robot_velocity_x)();
+    float (*get_robot_velocity_y)();
+    float (*get_robot_angular_velocity)();
     Wheel_t* front_right_wheel;
     Wheel_t* front_left_wheel;
     Wheel_t* back_right_wheel;
@@ -18,21 +23,27 @@ struct FirmwareRobot
 
 FirmwareRobot_t* app_firmware_robot_create(
     Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(),
-    float (*get_robot_position_y)(), Wheel_t* front_right_wheel,
+    float (*get_robot_position_y)(), float (*get_robot_orientation)(),
+    float (*get_robot_velocity_x)(), float (*get_robot_velocity_y)(),
+    float (*get_robot_angular_velocity)(), Wheel_t* front_right_wheel,
     Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
     RobotConstants_t robot_constants)
 {
     FirmwareRobot_t* new_robot = malloc(sizeof(FirmwareRobot_t));
 
-    new_robot->chicker              = chicker;
-    new_robot->dribbler             = dribbler;
-    new_robot->get_robot_position_x = get_robot_position_x;
-    new_robot->get_robot_position_y = get_robot_position_y;
-    new_robot->front_right_wheel    = front_right_wheel;
-    new_robot->front_left_wheel     = front_left_wheel;
-    new_robot->back_right_wheel     = back_right_wheel;
-    new_robot->back_left_wheel      = back_left_wheel;
-    new_robot->robot_constants      = robot_constants;
+    new_robot->chicker                    = chicker;
+    new_robot->dribbler                   = dribbler;
+    new_robot->get_robot_position_x       = get_robot_position_x;
+    new_robot->get_robot_position_y       = get_robot_position_y;
+    new_robot->get_robot_orientation      = get_robot_orientation;
+    new_robot->get_robot_velocity_x       = get_robot_velocity_x;
+    new_robot->get_robot_velocity_y       = get_robot_velocity_y;
+    new_robot->get_robot_angular_velocity = get_robot_angular_velocity;
+    new_robot->front_right_wheel          = front_right_wheel;
+    new_robot->front_left_wheel           = front_left_wheel;
+    new_robot->back_right_wheel           = back_right_wheel;
+    new_robot->back_left_wheel            = back_left_wheel;
+    new_robot->robot_constants            = robot_constants;
 
     return new_robot;
 }
@@ -60,6 +71,25 @@ float app_firmware_robot_getPositionX(FirmwareRobot_t* robot)
 float app_firmware_robot_getPositionY(FirmwareRobot_t* robot)
 {
     return robot->get_robot_position_y();
+}
+
+float app_firmware_robot_getOrientation(FirmwareRobot_t* robot){
+    return robot->get_robot_orientation();
+}
+
+float app_firmware_robot_getVelocityX(FirmwareRobot_t* robot)
+{
+    return robot->get_robot_velocity_x();
+}
+
+float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot)
+{
+    return robot->get_robot_velocity_y();
+}
+
+float app_firmware_robot_getAngularVelocity(FirmwareRobot_t* robot)
+{
+    return robot->get_robot_angular_velocity();
 }
 
 Wheel_t* app_firmware_robot_getFrontRightWheel(FirmwareRobot_t* robot)
