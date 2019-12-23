@@ -42,7 +42,7 @@ class Robot
      * Updates the robot with new data, updating the current state as well as the
      * predictive model
      *
-     * @param new_robot_data A robot containing new robot data
+     * @param new_robot_state A robot state containing new robot data
      */
     void updateState(const RobotState &new_robot_state);
 
@@ -198,7 +198,7 @@ class Robot
      *
      * @return the hardware capabilities of the robot
      */
-    const std::set<RobotCapabilities::Capability> &getRobotCapabilities() const;
+    const std::set<RobotCapabilities::Capability> &getCapabiltiesBlacklist() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
@@ -255,5 +255,5 @@ class Robot
     boost::circular_buffer<RobotState> states_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
-    std::set<RobotCapabilities::Capability> capabilities_;
+    std::set<RobotCapabilities::Capability> unavailable_capabilities_;
 };

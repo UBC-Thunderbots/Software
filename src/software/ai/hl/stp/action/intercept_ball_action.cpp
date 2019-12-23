@@ -5,8 +5,10 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/ray.h"
 #include "software/geom/util.h"
+#include "software/new_geom/ray.h"
+#include "software/new_geom/util/closest_point.h"
+#include "software/new_geom/util/distance.h"
 #include "software/util/logger/init.h"
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
@@ -52,7 +54,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // the robot. If the time for the robot to get to that point is less than the time
     // for the ball to get to that point, the robot moves to that point to intercept the
     // ball. Once the robot is in the ball's path, it will move to a point just in
-    // frontkkk of the ball in order to meet it quicker, while staying in it's path.
+    // front of the ball in order to meet it quicker, while staying in it's path.
     //
     // If the robot cannot reach the closest point on the ray before the ball, the robot
     // will move to intercept the ball at the point it would leave the field. This
@@ -62,8 +64,8 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // Finally, if the ball is moving slowly the robot will go directly to the ball.
     do
     {
-        Point closest_point = closestPointOnLine(robot->position(), ball.position(),
-                                                 ball.position() + ball.velocity());
+        Point closest_point = closestPointOnLine(
+            robot->position(), Line(ball.position(), ball.position() + ball.velocity()));
         bool point_in_front_of_ball =
             pointInFrontVector(ball.position(), ball.velocity(), closest_point);
 
@@ -87,8 +89,9 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             {
                 moveToInterceptPosition(yield, closest_point);
 
-                closest_point = closestPointOnLine(robot->position(), ball.position(),
-                                                   ball.position() + ball.velocity());
+                closest_point = closestPointOnLine(
+                    robot->position(),
+                    Line(ball.position(), ball.position() + ball.velocity()));
                 point_in_front_of_ball =
                     pointInFrontVector(ball.position(), ball.velocity(), closest_point);
             }
@@ -122,8 +125,8 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
 {
     bool robot_on_ball_line =
         pointInFrontVector(ball.position(), ball.velocity(), robot->position()) &&
-        dist(robot->position(),
-             Line(ball.position(), ball.position() + ball.velocity())) <
+        distance(robot->position(),
+                 Line(ball.position(), ball.position() + ball.velocity())) <
             ROBOT_CLOSE_TO_BALL_TRAJECTORY_LINE_THRESHOLD;
 
     if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)

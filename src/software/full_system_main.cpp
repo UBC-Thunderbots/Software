@@ -6,9 +6,9 @@
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend_factory.h"
-#include "software/gui/visualizer_wrapper.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
+#include "software/visualizer/visualizer_wrapper.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -126,8 +126,6 @@ int main(int argc, char **argv)
     std::cout << BANNER << std::endl;
 
     Util::Logger::LoggerSingleton::initializeLogger();
-
-    ai = std::make_shared<AIWrapper>();
 
     commandLineArgs args = parseCommandLineArgs(argc, argv);
 

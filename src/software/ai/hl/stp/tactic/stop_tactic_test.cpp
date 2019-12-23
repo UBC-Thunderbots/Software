@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/test_util/test_util.h"
 
@@ -12,21 +13,16 @@ TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving)
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
     EXPECT_FALSE(tactic.done());
 
-    try
-    {
-        StopIntent stop_intent = dynamic_cast<StopIntent &>(*intent_ptr);
-        EXPECT_EQ(0, stop_intent.getRobotId());
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "StopIntent was not returned by the StopTactic!";
-    }
+    auto stop_action = std::dynamic_pointer_cast<StopAction>(action_ptr);
+    ASSERT_NE(nullptr, stop_action);
+    ASSERT_TRUE(stop_action->getRobot().has_value());
+    EXPECT_EQ(0, stop_action->getRobot()->id());
 }
 
 TEST(StopTacticTest, robot_stopping_while_already_stopped)
@@ -36,21 +32,16 @@ TEST(StopTacticTest, robot_stopping_while_already_stopped)
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
     EXPECT_FALSE(tactic.done());
 
-    try
-    {
-        StopIntent stop_intent = dynamic_cast<StopIntent &>(*intent_ptr);
-        EXPECT_EQ(0, stop_intent.getRobotId());
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "StopIntent was not returned by the StopTactic!";
-    }
+    auto stop_action = std::dynamic_pointer_cast<StopAction>(action_ptr);
+    ASSERT_NE(nullptr, stop_action);
+    ASSERT_TRUE(stop_action->getRobot().has_value());
+    EXPECT_EQ(0, stop_action->getRobot()->id());
 }
 
 TEST(StopTacticTest, test_calculate_robot_cost)

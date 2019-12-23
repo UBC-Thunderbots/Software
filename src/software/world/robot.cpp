@@ -180,12 +180,12 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapabilities::Capability> &Robot::getRobotCapabilities() const
+const std::set<RobotCapabilities::Capability> &Robot::getCapabiltiesBlacklist() const
 {
-    return capabilities_;
+    return unavailable_capabilities_;
 }
 
 std::set<RobotCapabilities::Capability> &Robot::getMutableRobotCapabilities()
 {
-    return capabilities_;
+    return unavailable_capabilities_;
 }
