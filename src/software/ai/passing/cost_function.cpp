@@ -91,22 +91,22 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
             ->IdealMaxRotationToShootDegrees()
             ->value();
 
-    std::vector<Point> obstacles;
+    std::vector<Circle> obstacles;
     for (const Robot& robot : enemy_team.getAllRobots())
     {
-        obstacles.emplace_back(robot.position());
+        obstacles.emplace_back(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS));
     }
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
-    auto shot_opt =
-        angleSweepCircles(pass.receiverPoint(), field.enemyGoalpostNeg(),
-                          field.enemyGoalpostPos(), obstacles, ROBOT_MAX_RADIUS_METERS);
+    auto shot_opt = calcMostOpenDirection(
+        pass.receiverPoint(), Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos()),
+        obstacles);
     Angle open_angle_to_goal = Angle::zero();
     Point shot_target        = field.enemyGoal();
-    if (shot_opt)
+    if (shot_opt.getOpenAngle().abs() > Angle::fromDegrees(0))
     {
-        open_angle_to_goal = shot_opt->getOpenAngle();
+        open_angle_to_goal = shot_opt.getOpenAngle();
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.

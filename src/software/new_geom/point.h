@@ -83,15 +83,7 @@ class Point final
      *
      * @return the distance
      */
-    static Point getAverageOfPoints(std::vector<Point> points);
     double distanceFromOrigin() const;
-
-    /**
-     * Returns the average Point given the series of Point parameters
-     *
-     * @return the average point
-     */
-
 
     /**
      * Returns the distance between this Point and the given point p
@@ -137,6 +129,14 @@ class Point final
      * @return this Point
      */
     Point &operator=(const Point &other);
+
+    /**
+     * Returns the average Point given the Vector of Points
+     *
+     * @param points : The vector of points to be averaged
+     * @return the average point
+     */
+    static Point getAverageOfPoints(std::vector<Point> points);
 
    private:
     /**

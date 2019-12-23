@@ -177,7 +177,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_ob
                                                       world.enemyTeam(), shooting_robot);
 
     // We should not be able to find a shot
-    ASSERT_FALSE(result);
+    EXPECT_NEAR(result->getOpenAngle().toRadians(), 0, 0.001);
 }
 
 TEST(CalcBestShotTest,
@@ -199,7 +199,7 @@ TEST(CalcBestShotTest,
         world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
 
     // We should not be able to find a shot
-    ASSERT_FALSE(result);
+    EXPECT_NEAR(result->getOpenAngle().toRadians(), 0, 0.001);
 }
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)

@@ -51,7 +51,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::fromDegrees(6), std::nullopt, false);
+                        world.ball(), Angle::fromDegrees(4), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                              world.ball());

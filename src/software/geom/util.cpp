@@ -289,153 +289,6 @@ Segment getSide(const LegacyPolygon<N> &poly, unsigned int i)
     return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
 
-std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1, const Point &p2,
-                                       const std::vector<Point> &obstacles,
-                                       const double &radius)
-{
-    Angle p1_angle = (p1 - src).orientation();
-    Angle p2_angle = (p2 - src).orientation();
-
-    Angle start_angle = std::min(p1_angle, p2_angle);
-    Angle end_angle   = std::max(p1_angle, p2_angle);
-
-    // This handles the special case where the start and end angle straddle the
-    // negative y axis, which causes some issues with angles "ticking over" from pi to
-    // -pi and vice-versa
-    if (end_angle - start_angle > Angle::half())
-    {
-        Angle start_angle_new = start_angle + (end_angle - start_angle).angleMod();
-        end_angle             = start_angle;
-        start_angle           = start_angle_new;
-    }
-
-    if (collinear(src, p1, p2))
-    {
-        // return a result that contains the direction of the line and zero angle if not
-        // blocked by obstacles
-        Segment collinear_seg = Segment(src, p1);
-        for (Point p : obstacles)
-        {
-            if (intersects(collinear_seg, Circle(p, radius)))
-            {
-                // intersection with obstacle found, we're done here and we return nothing
-                return {};
-            }
-        }
-
-        return {Shot(Point(collinear_seg.toVector()), Angle::zero())};
-    }
-
-    // "Sweep" a line from the `src` to the target line segment, and create an "event"
-    // whenever the line enters or leaves an obstacle, int value of `-1` to indicate the
-    // sweep "leaving" an obstacle, and `+1` to indicate the sweep "entering" another
-    // obstacle
-    // The angle for each event is measured relative to the start angle
-    std::vector<std::pair<Angle, int>> events;
-    for (const Point &obstacle : obstacles)
-    {
-        Vector diff = obstacle - src;
-        if (diff.length() < radius)
-        {
-            // `src` is within `radius` of this obstacle
-            return {};
-        }
-
-        const Angle cent   = (diff.orientation() - start_angle).angleMod();
-        const Angle span   = Angle::asin(radius / diff.length());
-        const Angle range1 = cent - span;
-        const Angle range2 = cent + span;
-
-        if (range1 < Angle::zero() && range2 > end_angle - start_angle)
-        {
-            // Obstacle takes up entire angle we are sweeping
-            return {};
-        }
-
-        if (range1 < -Angle::half() || range2 > Angle::half())
-        {
-            continue;
-        }
-        if (range1 > Angle::zero() && range1 < end_angle - start_angle)
-        {
-            events.push_back(std::make_pair(range1, -1));
-        }
-        if (range2 > Angle::zero() && range2 < end_angle - start_angle)
-        {
-            events.push_back(std::make_pair(range2, 1));
-        }
-    }
-
-    if (events.empty())
-    {
-        // No obstacles in the way, so just return a range hitting the entire target
-        // line segment
-        return {
-            Shot(Point((p1.toVector() + p2.toVector()) / 2), end_angle - start_angle)};
-    }
-
-    // Sort the events by angle
-    std::sort(events.begin(), events.end());
-
-    // Collapse all contiguous sections of "+1" and "-1" respectively, as these represent
-    // overlapping obstacles (from the perspective of the `src` point to the target line
-    // segment)
-    std::vector<std::pair<Angle, int>> events_collapsed;
-    for (auto &event : events)
-    {
-        if (events_collapsed.empty() || event.second != events_collapsed.back().second)
-        {
-            events_collapsed.emplace_back(event);
-        }
-    }
-
-    if (events_collapsed[0].second == -1)
-    {
-        events_collapsed.insert(events_collapsed.begin(),
-                                std::make_pair(Angle::zero(), 1));
-    }
-    if (events_collapsed.back().second == 1)
-    {
-        events_collapsed.emplace_back(std::make_pair(end_angle - start_angle, -1));
-    }
-
-    std::vector<Shot> result;
-    for (unsigned i = 1; i < events_collapsed.size(); i += 2)
-    {
-        // Calculate the center of this range on the target line segement
-        Angle range_start = events_collapsed[i - 1].first + start_angle;
-        Angle range_end   = events_collapsed[i].first + start_angle;
-        Angle mid         = (range_end - range_start) / 2 + range_start;
-        Vector ray        = Vector::createFromAngle(mid) * 10.0;
-        Point inter       = lineIntersection(src, src + ray, p1, p2).value();
-
-        // Offset the final values by the start angle
-        result.emplace_back(Shot(inter, range_end - range_start));
-    }
-
-    return result;
-}
-
-std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const Point &p2,
-                                      const std::vector<Point> &obstacles,
-                                      const double &radius)
-{
-    // Get all possible shots we could take
-    std::vector<Shot> possible_shots =
-        angleSweepCirclesAll(src, p1, p2, obstacles, radius);
-
-    // Sort by the interval angle (ie. the open angle the shot is going through)
-    std::sort(possible_shots.begin(), possible_shots.end(),
-              [](auto s1, auto s2) { return s1.getOpenAngle() > s2.getOpenAngle(); });
-
-    // Return the shot through the largest open interval if there are any
-    if (possible_shots.empty())
-    {
-        return std::nullopt;
-    }
-    return possible_shots[0];
-}
-
 std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points)
 {
     Angle rotate_amount = Angle::full() / num_points;
@@ -1139,7 +992,7 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
         return std::make_optional(Segment(intersect11.value(), intersect21.value()));
     }
     // If only one ray intersects the segment return the segment between the intersection
-    // and the segment extreme (intersection11 is real, intersection22 is not)
+    // and the segment extreme Point (intersection11 is real, intersection22 is not)
     else if (intersect11.has_value() && !intersect21.has_value())
     {
         const Ray extremes1 =
@@ -1209,7 +1062,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
     else if (contains(segment1, segment2.getSegStart()))
     {
         // If segment2.getSegStart() lays in segment1, then the combined segment is
-        // segment2,getEnd() and the point furthest from segmen2.getEnd()
+        // segment2,getEnd() and the point furthest from segment2.getEnd()
         return (segment1.getSegStart() - segment2.getEnd()).lengthSquared() >
                        (segment1.getEnd() - segment2.getEnd()).lengthSquared()
                    ? Segment(segment1.getSegStart(), segment2.getEnd())
@@ -1287,7 +1140,9 @@ std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> 
     std::vector<Segment> unique_segments;
 
     unsigned int j = 0;
-    // Loop through all segments
+    // Loop through all segments and combine segments
+    // to reduce the vector to the smallest number of independent (not overlapping)
+    // segments
     while (segments.size() > 0)
     {
         std::optional<Segment> temp_segment = segments[0];
@@ -1313,30 +1168,34 @@ std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> 
     return unique_segments;
 }
 
-std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment,
-                                          std::vector<Circle> obstacles)
+Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles)
 {
     std::vector<Segment> obstacle_segment_projections;
+    // If there are no obstacles, return the center of the Segment and the shot angle
     if (obstacles.size() == 0)
     {
-        return std::make_pair(
-            ((segment.getSegStart() - origin).orientation() -
-             (segment.getEnd() - origin).orientation())
-                .abs(),
-            (segment.getSegStart() + (segment.getSegStart() - segment.getEnd()) / 2));
+        return Shot(Point::getAverageOfPoints({segment.getSegStart(), segment.getEnd()}),
+                    ((segment.getSegStart() - origin)
+                         .orientation()
+                         .minDiff((segment.getEnd() - origin).orientation()))
+                        .abs());
     }
 
+    // Loop through all obstacles to create their 'blocking' Segment
     for (Circle circle : obstacles)
     {
         // If the reference is inside an obstacle there is no open direction
         if (contains(circle, origin))
         {
-            return std::make_pair(Angle::fromDegrees(0),
-                                  Point(segment.getSegStart() +
-                                        (segment.getSegStart() - segment.getEnd()) / 2));
+            return Shot(Point(segment.getSegStart() +
+                              (segment.getEnd() - segment.getSegStart()) / 2),
+                        Angle::fromDegrees(0));
         }
 
+        // Get the tangent rays from the reference point to the obstacle
         auto [ray1, ray2] = getCircleTangentRaysToReference(origin, circle);
+
+        // Project the tangent Rays to obtain a 'blocked' segment on the reference Segment
         std::optional<Segment> intersect_segment =
             getIntersectingSegment(ray1, ray2, segment);
 
@@ -1382,14 +1241,20 @@ std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment,
     // After this one, ever open angle is between segment(i).end and segment(i+1).start
     if (obstacle_segment_projections.size() == 0)
     {
-        return std::make_pair((segment.getSegStart() - origin).orientation() -
-                                  (segment.getEnd() - origin).orientation().abs(),
-                              Point(segment.getSegStart() +
-                                    (segment.getSegStart() - segment.getEnd()) / 2));
+        return Shot(
+            Point(segment.getSegStart() + (segment.getEnd() - segment.getSegStart()) / 2),
+            (segment.getSegStart() - origin)
+                .orientation()
+                .minDiff((segment.getEnd() - origin).orientation())
+                .abs());
     }
+
+    // Add the 'first' open segment as the Segment from the reference Segment start to the
+    // first Point of the nearest 'blocking' Segment
     open_segs.push_back(Segment(segment.getSegStart(),
                                 obstacle_segment_projections.front().getSegStart()));
 
+    // The 'open' Segment in the space between consecutive 'blocking' Segments
     for (std::vector<Segment>::const_iterator it = obstacle_segment_projections.begin();
          it != obstacle_segment_projections.end() - 1; it++)
     {
@@ -1410,10 +1275,11 @@ std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment,
         Point((largest_segment.getSegStart().x() + largest_segment.getEnd().x()) / 2,
               (largest_segment.getSegStart().y() + largest_segment.getEnd().y()) / 2);
 
-    return std::make_pair(((largest_segment.getSegStart() - origin).orientation() -
-                           (largest_segment.getEnd() - origin).orientation())
-                              .abs(),
-                          most_open_point);
+    return Shot(most_open_point,
+                ((largest_segment.getSegStart() - origin)
+                     .orientation()
+                     .minDiff((largest_segment.getEnd() - origin).orientation()))
+                    .abs());
 }
 
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)

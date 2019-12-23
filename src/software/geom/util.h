@@ -147,64 +147,6 @@ bool collinear(const Point &a, const Point &b, const Point &c);
 bool collinear(const Segment &segment1, const Segment &segment2);
 
 /**
- * Performs an angle sweep.
- * Suppose in this world, all objects are circles of fixed radius.
- * You are at point \p src, and you want to shoot a ray between \p p1 and \p p2.
- * This function calculates the largest open angle interval that you can shoot.
- *
- * @pre \p p1 must be to the right of \p p2.
- * In other words, if there is a counterclockwise ordering, \p p1 is before \p
- * p2 from \p src's point of view.
- *
- * @pre The angle \p p1, \p src, \p p2 must not be greater than 180 degrees.
- *
- * @pre \p src must not be between \p p1 and \p p2.
- *
- * @param src the location where you are standing.
- *
- * @param p1 the location of the right-hand edge of the target area.
- *
- * @param p2 the location of the left-hand edge of the target area.
- *
- * @param obstacles the coordinates of the centres of the obstacles.
- *
- * @param radius the radii of the obstacles.
- *
- * @return A feasible shot or std::nullopt if there is no feasible shot
- */
-std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const Point &p2,
-                                      const std::vector<Point> &obstacles,
-                                      const double &radius);
-
-/**
- * Performs an angle sweep.
- * Suppose in this world, all objects are circles of fixed radius.
- * You are at point \p src, and you want to shoot a ray from a point to an area
- * This function calculates the all open angle intervals that you can shoot.
- *
- * @pre The point \p src can't be within the radius of the obstacle
- *
- * @param src the location where the sweep is centered (think center of a clock)
- *
- * @param p1 the location of the right-hand edge of the target area.
- *
- * @param p2 the location of the left-hand edge of the target area.
- *
- * @param obstacles the coordinates of the centres of the obstacles.
- *
- * @param radius the radii of the obstacles.
- *
- * @return A vector of possible (ie. not blocked) Shots. If lines src
- * -> p1 and src -> p2 are collinear and src -> p1 is not blocked by an obstacle, the
- * result will contain a single Shot of the direction of src -> p1 and zero angle if the
- * line is not blocked by an obstacle. An empty vector is returned if the preconditions
- * aren't satisfied.
- */
-std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1, const Point &p2,
-                                       const std::vector<Point> &obstacles,
-                                       const double &radius);
-
-/**
  * returns a list of points that lie on the border of the circle
  */
 std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points);
@@ -606,6 +548,19 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                                                         Segment segment2);
 
 /**
+ * Function merges two parameter segments into a single segment ONLY IF one of the
+ * segments is contained ENTIRELY within the other
+ *
+ * @param segment1 : first segment
+ * @param segment2 : second segment
+ * @return Segment : The longer segment ONLY IF one of the segments is contained entirely
+ * within the other
+ * @return nullopt : One of the segments is not fully contained in the other, OR the
+ * segments are not collinear
+ */
+std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
+
+/**
  * Function calculates if the segment parameters are redundant, for example, if segment2
  * is parallel and contained within segment1
  *
@@ -615,12 +570,20 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
  *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
  * aren't redundant
  */
-std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
-
 std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> segments);
 
-std::pair<Angle, Point> calcOpenDirection(Point origin, Segment segment,
-                                          std::vector<Circle> obstacles);
+/**
+ * Function calculates the optimal shot location and the corresponding Angle representing
+ * the 'open' area of that shot at the segment
+ *
+ * @param origin : The origin of the shot
+ * @param segment : The segment at which shots are being evaluated on
+ * @param obstacles : Any obstacle that can block the shot
+ *
+ * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the given
+ * parameters
+ */
+Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles);
 /**
  * Returns the binary trespass score of a point and rectangle
  *
