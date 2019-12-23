@@ -394,7 +394,7 @@ In order for a robot to move to the desired destination of a `MoveIntent`, the N
 The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions. One approach is to add extra obstacles to cause the path planner to generate paths that avoid potential collisions; this is what `VelocityObstaclePathManager` implements. The approach is somewhat like using [Minkowski space](https://en.wikipedia.org/wiki/Minkowski_space), but where we assume that a robot will occupy all the positions along the path for the next time step. However, it's a very crude implementation.
 
 ### Path Objective
-A path objective is used to communicate between the navigator and the path manager. It conveys information for generating one path, such as start, destination, and obstacles.
+A path objective is a simple datastructure used to communicate between the navigator and the path manager. It conveys information for generating one path, such as start, destination, and obstacles. Path Objectives use very simple datastructures so that Path Planners do not need to know about any world-specific datastructures, such as Robots or the Field.
 
 ### Path Planner
 The `Path Planner` is an interface for the responsibility of path planning a single robot around a single set of obstacles from a given start to a given destination. The interface allows us to easily swap out path planners.
