@@ -39,7 +39,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
 {
     auto move_action =
         std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
-    Point defend_position  = robot->position();
+    Point defend_position = robot->position();
 
     do
     {

@@ -16,10 +16,10 @@
 
 class STPTacticAssignmentTest : public ::testing::Test
 {
-public:
+   public:
     STPTacticAssignmentTest() : stp([]() { return nullptr; }, 0) {}
 
-protected:
+   protected:
     void SetUp() override
     {
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
