@@ -4,10 +4,10 @@
 
 Tactic::Tactic(bool loop_forever,
                const std::set<RobotCapabilities::Capability> &capability_reqs_)
-    : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
-      done_(false),
-      loop_forever(loop_forever),
-      capability_reqs(capability_reqs_)
+        : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
+          done_(false),
+          loop_forever(loop_forever),
+          capability_reqs(capability_reqs_)
 {
     // require movement capability by default
     capability_reqs.emplace(RobotCapabilities::Capability::Move);
@@ -47,7 +47,7 @@ std::shared_ptr<Action> Tactic::getNextAction(void)
         {
             // Re-start the action sequence by re-creating it
             action_sequence = ActionCoroutine::pull_type(
-                boost::bind(&Tactic::calculateNextActionWrapper, this, _1));
+                    boost::bind(&Tactic::calculateNextActionWrapper, this, _1));
             next_action = getNextActionHelper();
         }
     }
