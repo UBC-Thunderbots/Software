@@ -106,20 +106,12 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                             std::shared_ptr<ChipAction> chip_action,
                                             ActionCoroutine::push_type &yield) const
 {
-    std::optional<Shot> shot_target;
-
-    if (this->getAssignedRobot().has_value())
-    {
-        shot_target = Evaluation::calcBestShotOnEnemyGoal(
+    std::optional<Shot>         shot_target = Evaluation::calcBestShotOnEnemyGoal(
             field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
             {*this->getAssignedRobot()});
-    }
-    else
-    {
-        shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                          enemy_team, ball.position(),
-                                                          ROBOT_MAX_RADIUS_METERS, {});
-    }
+
+
+
 
     while (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
     {
@@ -143,18 +135,10 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             yield(chip_action);
         }
 
-        if (this->getAssignedRobot().has_value())
-        {
             shot_target = Evaluation::calcBestShotOnEnemyGoal(
                 field, friendly_team, enemy_team, ball.position(),
                 ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
-        }
-        else
-        {
-            shot_target = Evaluation::calcBestShotOnEnemyGoal(
-                field, friendly_team, enemy_team, ball.position(),
-                ROBOT_MAX_RADIUS_METERS, {});
-        }
+
     }
 }
 
@@ -167,18 +151,10 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     std::optional<Shot> shot_target;
     do
     {
-        if (this->getAssignedRobot().has_value())
-        {
             shot_target = Evaluation::calcBestShotOnEnemyGoal(
                 field, friendly_team, enemy_team, ball.position(),
                 ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
-        }
-        else
-        {
-            shot_target = Evaluation::calcBestShotOnEnemyGoal(
-                field, friendly_team, enemy_team, ball.position(),
-                ROBOT_MAX_RADIUS_METERS, {});
-        }
+
         if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the

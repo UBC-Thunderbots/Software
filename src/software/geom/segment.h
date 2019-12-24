@@ -39,6 +39,7 @@ class Segment final
      */
     inline explicit Segment(const Point& start, const Point& end) : start(start), end(end)
     {
+
     }
 
     /**

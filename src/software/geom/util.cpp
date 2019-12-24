@@ -1145,8 +1145,8 @@ std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> 
     // segments
     while (segments.size() > 0)
     {
-        std::optional<Segment> temp_segment = segments[0];
-        unique_segments.push_back(temp_segment.value());
+        std::optional<Segment> temp_segment;
+        unique_segments.push_back(segments[0]);
         segments.erase(segments.begin());
 
         for (unsigned int i = 0; i < segments.size(); i++)
@@ -1166,120 +1166,6 @@ std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> 
     }
 
     return unique_segments;
-}
-
-Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles)
-{
-    std::vector<Segment> obstacle_segment_projections;
-    // If there are no obstacles, return the center of the Segment and the shot angle
-    if (obstacles.size() == 0)
-    {
-        return Shot(Point::getAverageOfPoints({segment.getSegStart(), segment.getEnd()}),
-                    ((segment.getSegStart() - origin)
-                         .orientation()
-                         .minDiff((segment.getEnd() - origin).orientation()))
-                        .abs());
-    }
-
-    // Loop through all obstacles to create their 'blocking' Segment
-    for (Circle circle : obstacles)
-    {
-        // If the reference is inside an obstacle there is no open direction
-        if (contains(circle, origin))
-        {
-            return Shot(Point(segment.getSegStart() +
-                              (segment.getEnd() - segment.getSegStart()) / 2),
-                        Angle::fromDegrees(0));
-        }
-
-        // Get the tangent rays from the reference point to the obstacle
-        auto [ray1, ray2] = getCircleTangentRaysToReference(origin, circle);
-
-        // Project the tangent Rays to obtain a 'blocked' segment on the reference Segment
-        std::optional<Segment> intersect_segment =
-            getIntersectingSegment(ray1, ray2, segment);
-
-        if (intersect_segment.has_value())
-        {
-            obstacle_segment_projections.push_back(intersect_segment.value());
-        }
-    }
-
-    // If we have more than 1 Segment from the obstacle projection then we must combine
-    // overlapping ones to simplify analysis
-    if (obstacle_segment_projections.size() >= 2)
-    {
-        obstacle_segment_projections =
-            reduceParallelSegments(obstacle_segment_projections).value();
-    }
-    // Next we must sort the Segments based on their closest point to the start of the
-    // reference Segment
-    for (auto &unordered_seg : obstacle_segment_projections)
-    {
-        if ((segment.getSegStart() - unordered_seg.getSegStart()).length() >
-            (segment.getSegStart() - unordered_seg.getEnd()).length())
-        {
-            Segment temp = unordered_seg;
-            unordered_seg.setSegStart(temp.getEnd());
-            unordered_seg.setEnd(temp.getSegStart());
-        }
-    }
-
-    // Now we must sort the segments so that we can iterate through them in order to
-    // generate open angles sort using a lambda expression
-    std::sort(obstacle_segment_projections.begin(), obstacle_segment_projections.end(),
-              [segment](Segment &a, Segment &b) {
-                  // We need to flip the start/end of the segment
-                  return (segment.getSegStart() - a.getSegStart()).length() <
-                         (segment.getSegStart() - b.getSegStart()).length();
-              });
-
-    // Now we need to find the largest open segment/angle
-    std::vector<Segment> open_segs;
-
-    // The first Angle is between the reference Segment and the first obstacle Segment
-    // After this one, ever open angle is between segment(i).end and segment(i+1).start
-    if (obstacle_segment_projections.size() == 0)
-    {
-        return Shot(
-            Point(segment.getSegStart() + (segment.getEnd() - segment.getSegStart()) / 2),
-            (segment.getSegStart() - origin)
-                .orientation()
-                .minDiff((segment.getEnd() - origin).orientation())
-                .abs());
-    }
-
-    // Add the 'first' open segment as the Segment from the reference Segment start to the
-    // first Point of the nearest 'blocking' Segment
-    open_segs.push_back(Segment(segment.getSegStart(),
-                                obstacle_segment_projections.front().getSegStart()));
-
-    // The 'open' Segment in the space between consecutive 'blocking' Segments
-    for (std::vector<Segment>::const_iterator it = obstacle_segment_projections.begin();
-         it != obstacle_segment_projections.end() - 1; it++)
-    {
-        open_segs.push_back(Segment(it->getEnd(), (it + 1)->getSegStart()));
-    }
-
-    // Lastly, the final open angle is between obstacles.end().getEnd() and
-    // reference_segment.getEnd()
-    open_segs.push_back(
-        Segment(obstacle_segment_projections.back().getEnd(), segment.getEnd()));
-
-
-    Segment largest_segment = *std::max_element(
-        open_segs.begin(), open_segs.end(),
-        [](const Segment &s1, const Segment &s2) { return s1.length() < s2.length(); });
-
-    const Point most_open_point =
-        Point((largest_segment.getSegStart().x() + largest_segment.getEnd().x()) / 2,
-              (largest_segment.getSegStart().y() + largest_segment.getEnd().y()) / 2);
-
-    return Shot(most_open_point,
-                ((largest_segment.getSegStart() - origin)
-                     .orientation()
-                     .minDiff((largest_segment.getEnd() - origin).orientation()))
-                    .abs());
 }
 
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)

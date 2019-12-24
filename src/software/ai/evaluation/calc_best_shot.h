@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/geom/shot.h"
+#include "software/geom/segment.h"
 #include "software/new_geom/point.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
@@ -180,5 +181,31 @@ namespace Evaluation
      */
     double calcShotOpenEnemyNetPercentage(const Field &field, const Point &shot_origin,
                                           const Shot &shot);
+
+    /**
+     * Function calculates the optimal shot location and the corresponding Angle representing
+     * the 'open' area of that shot at the segment
+     *
+     * @param origin : The origin of the shot
+     * @param segment : The segment at which shots are being evaluated on
+     * @param obstacles : Any obstacle that can block the shot
+     *
+     * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the given
+     * parameters
+     */
+    Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles);
+
+    /**
+     * Function calculates the optimal shot location and the corresponding Angle representing
+     * the 'open' area of that shot at the segment
+     *
+     * @param origin : The origin of the shot
+     * @param segment : The segment at which shots are being evaluated on
+     * @param robot_obstacles : Any Robot (friendly or enemy) that can block the shot
+     *
+     * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the given
+     * parameters
+     */
+    Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Robot> robot_obstacles);
 
 }  // namespace Evaluation

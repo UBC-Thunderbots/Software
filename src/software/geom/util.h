@@ -134,7 +134,7 @@ Segment getSide(const LegacyPolygon<N> &poly, unsigned int i);
 bool collinear(const Point &a, const Point &b, const Point &c);
 
 /**
- * Checks if 3 points are collinear.
+ * Checks if 2 Segments are collinear.
  *
  * @param segment1 : The first Segment
  *
@@ -561,29 +561,19 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
 std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
 
 /**
- * Function calculates if the segment parameters are redundant, for example, if segment2
- * is parallel and contained within segment1
+ * Function takes in a Vector of Segments and will reduce them to the fewest completely independent Segment sections that are independent of each other.
  *
- * @param segment1 : first segment
- * @param segment2 : second segment
- * @return Segment: If the segments are redundant, returns the larger segment
- *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
- * aren't redundant
+ * Ex.
+ *  Input:  *--------*       *--------*
+ *                *------*
+ *  Output: *------------*   *--------*
+ *
+ * @param segments : The vector of Segments to be reduced
+ * @return std::vector<Segment>: If the segments are parallel, the vector of the fewest independent Segments are returned
+ *         Returns std::nullopt if the segments aren't parallel
  */
 std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> segments);
 
-/**
- * Function calculates the optimal shot location and the corresponding Angle representing
- * the 'open' area of that shot at the segment
- *
- * @param origin : The origin of the shot
- * @param segment : The segment at which shots are being evaluated on
- * @param obstacles : Any obstacle that can block the shot
- *
- * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the given
- * parameters
- */
-Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles);
 /**
  * Returns the binary trespass score of a point and rectangle
  *

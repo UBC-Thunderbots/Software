@@ -99,7 +99,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
-    auto shot_opt = calcMostOpenDirection(
+    auto shot_opt = Evaluation::calcMostOpenDirection(
         pass.receiverPoint(), Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos()),
         obstacles);
     Angle open_angle_to_goal = Angle::zero();
