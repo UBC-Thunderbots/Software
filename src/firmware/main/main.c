@@ -565,13 +565,14 @@ static void run_normal(void)
 
     // TODO: put this in a function?
     app_firmware_world_destroy(world);
+    app_firmware_ball_destroy(ball);
     app_firmware_robot_destroy(robot);
     app_dribbler_destroy(dribbler);
     app_chicker_destroy(chicker);
-    app_wheel_destroy(front_right_wheel);
-    app_wheel_destroy(front_left_wheel);
-    app_wheel_destroy(back_right_wheel);
     app_wheel_destroy(back_left_wheel);
+    app_wheel_destroy(back_right_wheel);
+    app_wheel_destroy(front_left_wheel);
+    app_wheel_destroy(front_right_wheel);
 
     // Kick the hardware watchdog to avoid timeouts. Chicker shutdown sometimes
     // takes up to three seconds, particularly if the board is not plugged in,
