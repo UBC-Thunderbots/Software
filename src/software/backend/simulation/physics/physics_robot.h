@@ -84,7 +84,8 @@ class PhysicsRobot
      * @return A list of vertices that make up a polygon approximating the shape of the
      * robot body
      */
-    std::vector<Point> getRobotBodyVertices(const Robot& robot, unsigned int num_vertices);
+    std::vector<Point> getRobotBodyVertices(const Robot& robot,
+                                            unsigned int num_vertices);
 
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures

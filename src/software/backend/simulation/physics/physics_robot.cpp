@@ -6,8 +6,8 @@
 PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot)
     : robot_id(robot.id())
 {
-    // createRobotPhysicsBody must be called before the setup functions, so that the b2Body is
-    // instantiated before fixtures are added to it.
+    // createRobotPhysicsBody must be called before the setup functions, so that the
+    // b2Body is instantiated before fixtures are added to it.
     createRobotPhysicsBody(world, robot);
     setupRobotPhysicsBody(robot);
     setupChickerPhysicsBody(robot);
@@ -68,10 +68,10 @@ void PhysicsRobot::setupChickerPhysicsBody(const Robot& robot)
     // Create a very thin rectangle where the dribbler and chicker are on the
     // flat face of the robot
     robot_chicker_shape.SetAsBox(
-            0.001, DRIBBLER_WIDTH_METERS / 2.0,
-            createVec2(Vector::createFromAngle(robot.orientation())
+        0.001, DRIBBLER_WIDTH_METERS / 2.0,
+        createVec2(Vector::createFromAngle(robot.orientation())
                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS)),
-            robot.orientation().toRadians());
+        robot.orientation().toRadians());
     robot_chicker_def.shape = &robot_chicker_shape;
 
     // We don't want this shape to contribute to the mass of the overall robot, so density
@@ -89,19 +89,22 @@ void PhysicsRobot::setupChickerPhysicsBody(const Robot& robot)
     robot_body->CreateFixture(&robot_chicker_def);
 }
 
-std::vector<Point> PhysicsRobot::getRobotBodyVertices(const Robot &robot, unsigned int num_vertices) {
+std::vector<Point> PhysicsRobot::getRobotBodyVertices(const Robot& robot,
+                                                      unsigned int num_vertices)
+{
     // To create a polygon that approximates the shape of a robot, we find
     // one of the points at the edge of the flat face at the front of the robot,
     // and sweep around the back of the robot evenly distributing vertices until
     // we reach the other edge of the flat face.
 
     Angle angle_to_edge_of_flat_face_relative_to_robot_orientation =
-            Vector(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0).orientation();
+        Vector(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0)
+            .orientation();
     Angle global_angle_to_edge_of_flat_face =
-            angle_to_edge_of_flat_face_relative_to_robot_orientation + robot.orientation();
+        angle_to_edge_of_flat_face_relative_to_robot_orientation + robot.orientation();
 
     Angle angle_to_sweep_across =
-            Angle::full() - (2 * angle_to_edge_of_flat_face_relative_to_robot_orientation);
+        Angle::full() - (2 * angle_to_edge_of_flat_face_relative_to_robot_orientation);
     Angle angle_increment = angle_to_sweep_across / (num_vertices - 1);
 
     std::vector<Point> robot_body_vertex_points;
@@ -111,8 +114,8 @@ std::vector<Point> PhysicsRobot::getRobotBodyVertices(const Robot &robot, unsign
         // Shapes are defined relative to the body they are added to, so we do everything
         // relative to the centre of the robot body, which is treated as (0, 0)
         Vector vector_from_body_to_vertex =
-                Vector::createFromAngle(angle_to_vertex).normalize(ROBOT_MAX_RADIUS_METERS);
-        Point vertex           = Point(0, 0) + vector_from_body_to_vertex;
+            Vector::createFromAngle(angle_to_vertex).normalize(ROBOT_MAX_RADIUS_METERS);
+        Point vertex = Point(0, 0) + vector_from_body_to_vertex;
         robot_body_vertex_points.emplace_back(vertex);
     }
 
