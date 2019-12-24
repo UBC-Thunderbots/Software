@@ -400,7 +400,7 @@ The [Visualizer](#visualizer) is exactly what it sounds like: A visualizion of o
 
 The [Visualizer](#visualizer) also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the [Visualizer](#visualizer), we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
 
-The [Visualizer](#visualizer) is connected to the rest of the system using the [Observer Design Pattern](#observer-design-pattern). It observes Subjects that contain information it wants to display, such as the [World(#world) or [DrawFunctions](#draw-functions).
+The [Visualizer](#visualizer) is connected to the rest of the system using the [Observer Design Pattern](#observer-design-pattern). It observes Subjects that contain information it wants to display, such as the [World](#world) or [DrawFunctions](#draw-functions).
 
 The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important fundamentals are:
 * [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
