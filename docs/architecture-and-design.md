@@ -405,7 +405,7 @@ The `Visualizer` also lets us control the [AI](#ai) by setting [Dynamic Paramete
 # Simulated Integration Tests
 When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the indepdent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
 
-Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behavior.
+Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behaviour.
 
 The primary design goals of this test system are:
 1. **Determinism**
