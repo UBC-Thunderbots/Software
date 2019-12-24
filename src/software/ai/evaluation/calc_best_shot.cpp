@@ -138,7 +138,7 @@ namespace Evaluation
         // If there are no obstacles, return the center of the Segment and the shot angle
         if (obstacles.size() == 0)
         {
-            const Point center_of_segment = Point::getAverageOfPoints({segment.getSegStart(), segment.getEnd()});
+            const Point center_of_segment = getPointsMean({segment.getSegStart(), segment.getEnd()});
             const Angle angle_of_entire_segment = ((segment.getSegStart() - origin)
                     .orientation()
                     .minDiff((segment.getEnd() - origin).orientation()))
@@ -154,7 +154,7 @@ namespace Evaluation
             // If the reference is inside an obstacle there is no open direction
             if (contains(circle, origin))
             {
-                const Point center_of_segment = Point::getAverageOfPoints({segment.getSegStart(), segment.getEnd()});
+                const Point center_of_segment = getPointsMean({segment.getSegStart(), segment.getEnd()});
                 return Shot(center_of_segment,
                             Angle::fromDegrees(0));
             }
@@ -177,15 +177,16 @@ namespace Evaluation
         if (obstacle_segment_projections.size() >= 2)
         {
             obstacle_segment_projections =
-                    reduceParallelSegments(obstacle_segment_projections).value();
+                    reduceParallelSegments(obstacle_segment_projections);
         }
-        // Next we must sort the Segments based on their closest point to the start of the
-        // reference Segment
+        // Make sure the starting point of all segments is closer to the start of the reference segment
+        // to simplify the evaluation
         for (auto &unordered_seg : obstacle_segment_projections)
         {
             if ((segment.getSegStart() - unordered_seg.getSegStart()).length() >
                 (segment.getSegStart() - unordered_seg.getEnd()).length())
             {
+                // We need to flip the start/end of the segment
                 Segment temp = unordered_seg;
                 unordered_seg.setSegStart(temp.getEnd());
                 unordered_seg.setEnd(temp.getSegStart());
@@ -194,9 +195,9 @@ namespace Evaluation
 
         // Now we must sort the segments so that we can iterate through them in order to
         // generate open angles sort using a lambda expression
+        // We sort the segments based on how close their 'start' point is to the 'start' of the reference Semgnet
         std::sort(obstacle_segment_projections.begin(), obstacle_segment_projections.end(),
                   [segment](Segment &a, Segment &b) {
-                      // We need to flip the start/end of the segment
                       return (segment.getSegStart() - a.getSegStart()).length() <
                              (segment.getSegStart() - b.getSegStart()).length();
                   });
@@ -210,7 +211,7 @@ namespace Evaluation
         if (obstacle_segment_projections.size() == 0)
         {
 
-            const Point center_of_segment = Point::getAverageOfPoints({segment.getSegStart(), segment.getEnd()});
+            const Point center_of_segment = getPointsMean({segment.getSegStart(), segment.getEnd()});
             const Angle angle_of_entire_segment = ((segment.getSegStart() - origin)
                     .orientation()
                     .minDiff((segment.getEnd() - origin).orientation()))

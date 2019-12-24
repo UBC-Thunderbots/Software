@@ -118,23 +118,3 @@ bool operator!=(const Point &p, const Point &q)
 {
     return !(p == q);
 }
-
-Point Point::getAverageOfPoints(std::vector<Point> points)
-{
-    double sum_x = 0;
-    double sum_y = 0;
-
-    if (points.size() == 0)
-    {
-        return Point(0, 0);
-    }
-
-    for (Point p : points)
-    {
-        sum_x += p.x();
-        sum_y += p.y();
-    }
-    sum_x /= points.size();
-    sum_y /= points.size();
-    return Point(sum_x, sum_y);
-}

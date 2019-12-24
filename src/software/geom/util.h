@@ -570,9 +570,9 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
  *
  * @param segments : The vector of Segments to be reduced
  * @return std::vector<Segment>: If the segments are parallel, the vector of the fewest independent Segments are returned
- *         Returns std::nullopt if the segments aren't parallel
+ *         Returns an empty vector if the segments aren't parallel
  */
-std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> segments);
+std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments);
 
 /**
  * Returns the binary trespass score of a point and rectangle

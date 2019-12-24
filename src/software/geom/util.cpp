@@ -882,8 +882,8 @@ std::pair<Ray, Ray> getCircleTangentRaysToReference(const Point reference,
 {
     auto [tangent_point1, tangent_point2] = getCircleTangentPoints(reference, circle, 0);
 
-    return std::make_pair(Ray(reference, (tangent_point1 - reference).normalize()),
-                          Ray(reference, (tangent_point2 - reference).normalize()));
+    return std::make_pair(Ray(reference, (tangent_point1 - reference)),
+                          Ray(reference, (tangent_point2 - reference)));
 }
 
 bool pointIsRightOfLine(const Segment &line, const Point &point)
@@ -1116,17 +1116,17 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
     }
 }
 
-std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> segments)
+std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments)
 {
     // If there are no segments, return nullopt
     if (segments.size() == 0)
     {
-        return std::nullopt;
+        return std::vector<Segment>();
     }
     else if (segments.size() == 1)
     {
         // If there is only 1 segments, it is unique and should be returned
-        return std::make_optional(segments);
+        return segments;
     }
 
     // Check that all segments are collinear
@@ -1134,7 +1134,7 @@ std::optional<std::vector<Segment>> reduceParallelSegments(std::vector<Segment> 
     {
         if (!collinear(segments[i], segments[i + 1]))
         {
-            return std::nullopt;
+            return  std::vector<Segment>();
         }
     }
     std::vector<Segment> unique_segments;

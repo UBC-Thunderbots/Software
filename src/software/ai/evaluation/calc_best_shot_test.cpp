@@ -291,8 +291,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_no_obstacles)
     EXPECT_EQ((ref_segment.getSegStart() - origin).orientation() -
               (ref_segment.getEnd() - origin).orientation(),
               open_shot.getOpenAngle());
-    EXPECT_EQ(
-            Point::getAverageOfPoints({ref_segment.getSegStart(), ref_segment.getEnd()}),
+    EXPECT_EQ(getPointsMean({ref_segment.getSegStart(), ref_segment.getEnd()}),
             open_shot.getPointToShootAt());
 }
 

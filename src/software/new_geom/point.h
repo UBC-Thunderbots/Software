@@ -130,14 +130,6 @@ class Point final
      */
     Point &operator=(const Point &other);
 
-    /**
-     * Returns the average Point given the Vector of Points
-     *
-     * @param points : The vector of points to be averaged
-     * @return the average point
-     */
-    static Point getAverageOfPoints(std::vector<Point> points);
-
    private:
     /**
      * The X coordinate of the Point. The variable name starts with an underscore to
