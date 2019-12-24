@@ -407,13 +407,19 @@ The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C
 * [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
 
-The [Visualizer](#visualizer) is made up of 2 major components: The [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` that contains all of the graphical components used in the [Visualizer](#visualizer), and the `VisualizerWrapper`. The `VisualizerWrapper` runs the [QApplication](https://doc.qt.io/qt-5/qapplication.html) in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
+The [Visualizer](#visualizer) is made up of 3 major components:
+* Qt Components
+  * The [QApplication](https://doc.qt.io/qt-5/qapplication.html). This is the Qt component that manages the event loop and all the widgets in the GUI.
+  * The `Visualizer Widget`. This contains all of the graphical components used in the [Visualizer](#visualizer).
+* Non-Qt Components
+  * The `VisualizerWrapper`. The `VisualizerWrapper` contains the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget`. It runs the [QApplication](https://doc.qt.io/qt-5/qapplication.html) in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
+ 
 
 ## Visualizer Diagram
 ![Visualizer Diagram](images/visualizer_diagram.svg)
 
 ## Inter-thread Communication
-The `VisualizerWrapper` needs to communicate with the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and `Visualizer Widget` use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the `Visualizer Widget` pops the data in a `Producer -> Consumer` pattern. This means the `Visualizer Widget` can handle data at its own rate, indepdendant from the `VisualizerWrapper`.
+The `VisualizerWrapper` needs to communicate with the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and `Visualizer Widget` use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the `Visualizer Widget` pops the data in a `Producer -> Consumer` pattern. This means the `Visualizer Widget` can handle data at its own rate, indepdendent from the `VisualizerWrapper`.
 
 In some rare cases, we use the [Qt MetaObject](https://doc.qt.io/qt-5/moc.html) system to send signals to trigger functions in the Qt thread in a thread-safe way. This is further documented in the code.
 
@@ -435,9 +441,7 @@ To summarize, [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.
 1. Open QtCreator
 2. Click `File -> Open File or Project`
 3. Select the `.ui` file.
-4. Make your changes
-  * Don't forget to save. You must save the file for changes to be picked up in compilation
-
+4. Make your changes (*Don't forget to save. You must save the file for changes to be picked up in compilation*)
 
 ### Promoting Widgets
 The most important thing to know about editing the [Visualizer](#visualizer) in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), is how to promote generic widgets to custom widgets. If we want to extend a QtWidget with custom behavior, we need to create our own class that extends the Widget we want to customize. However, we would still prefer to use [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) to declare this widget and how it fits in the GUI layout.
