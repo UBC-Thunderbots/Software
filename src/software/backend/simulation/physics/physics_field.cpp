@@ -5,8 +5,8 @@
 PhysicsField::PhysicsField(std::shared_ptr<b2World> world, const Field &field)
     : field(field)
 {
-    // The body must be created first so that subsequent changes (like adding fixtures)
-    // work correctly
+    // createFieldBody must be called before the setup functions, so that the b2Body is
+    // instantiated before fixtures are added to it.
     createFieldBody(world);
     setupFieldBoundary(field);
     setupEnemyGoal(field);
@@ -26,6 +26,8 @@ PhysicsField::~PhysicsField()
 
 void PhysicsField::createFieldBody(std::shared_ptr<b2World> world)
 {
+    // All the BodyDef must be defined before the body is created.
+    // Changes made after aren't reflected
     field_body_def.type = b2_staticBody;
     // Note that the body shape is defined relative to the body position. Setting the
     // body position to (0, 0) makes it easy to add the shape using the standard field
