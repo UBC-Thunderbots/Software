@@ -419,7 +419,7 @@ The [Visualizer](#visualizer) is made up of 3 major components:
 ![Visualizer Diagram](images/visualizer_diagram.svg)
 
 ## Inter-thread Communication
-The `VisualizerWrapper` needs to communicate with the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and `Visualizer Widget` use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the `Visualizer Widget` pops the data in a `Producer -> Consumer` pattern. This means the `Visualizer Widget` can handle data at its own rate, indepdendent from the `VisualizerWrapper`.
+The `VisualizerWrapper` needs to communicate with the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and `Visualizer Widget` use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the `Visualizer Widget` pops the data in a `Producer -> Consumer` pattern. This means the `Visualizer Widget` can handle data at its own rate, independent from the `VisualizerWrapper`.
 
 In some rare cases, we use the [Qt MetaObject](https://doc.qt.io/qt-5/moc.html) system to send signals to trigger functions in the Qt thread in a thread-safe way. This is further documented in the code.
 
