@@ -49,17 +49,17 @@ namespace Evaluation
         // Calculate the best_shot based on what goal we're shooting at
         if (shoot_on_enemy_goal)
         {
-            const Segment enemy_goal_segment = Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos());
-            best_shot = std::make_optional(calcMostOpenDirection(
-                point, enemy_goal_segment,
-                obstacles));
+            const Segment enemy_goal_segment =
+                Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos());
+            best_shot = std::make_optional(
+                calcMostOpenDirection(point, enemy_goal_segment, obstacles));
         }
         else
         {
-            const Segment friendly_goal_segment = Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos());
-            best_shot = std::make_optional(calcMostOpenDirection(
-                point, friendly_goal_segment,
-                obstacles));
+            const Segment friendly_goal_segment =
+                Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos());
+            best_shot = std::make_optional(
+                calcMostOpenDirection(point, friendly_goal_segment, obstacles));
         }
 
         return best_shot;
@@ -123,29 +123,34 @@ namespace Evaluation
         return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 
-    Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Robot> robot_obstacles){
+    Shot calcMostOpenDirection(Point origin, Segment segment,
+                               std::vector<Robot> robot_obstacles)
+    {
         std::vector<Circle> obstacles;
 
-        for(Robot robo : robot_obstacles){
-            obstacles.push_back(Circle(robo.position(), ROBOT_MAX_RADIUS_METERS))    ;
+        for (Robot robo : robot_obstacles)
+        {
+            obstacles.push_back(Circle(robo.position(), ROBOT_MAX_RADIUS_METERS));
         }
 
         return calcMostOpenDirection(origin, segment, obstacles);
     }
-    Shot calcMostOpenDirection(Point origin, Segment segment, std::vector<Circle> obstacles)
+    Shot calcMostOpenDirection(Point origin, Segment segment,
+                               std::vector<Circle> obstacles)
     {
         std::vector<Segment> obstacle_segment_projections;
         // If there are no obstacles, return the center of the Segment and the shot angle
         if (obstacles.size() == 0)
         {
-            const Point center_of_segment = getPointsMean({segment.getSegStart(), segment.getEnd()});
-            const Angle angle_of_entire_segment = ((segment.getSegStart() - origin)
-                    .orientation()
-                    .minDiff((segment.getEnd() - origin).orientation()))
+            const Point center_of_segment =
+                getPointsMean({segment.getSegStart(), segment.getEnd()});
+            const Angle angle_of_entire_segment =
+                ((segment.getSegStart() - origin)
+                     .orientation()
+                     .minDiff((segment.getEnd() - origin).orientation()))
                     .abs();
 
-            return Shot(center_of_segment,
-                        angle_of_entire_segment);
+            return Shot(center_of_segment, angle_of_entire_segment);
         }
 
         // Loop through all obstacles to create their 'blocking' Segment
@@ -154,17 +159,18 @@ namespace Evaluation
             // If the reference is inside an obstacle there is no open direction
             if (contains(circle, origin))
             {
-                const Point center_of_segment = getPointsMean({segment.getSegStart(), segment.getEnd()});
-                return Shot(center_of_segment,
-                            Angle::fromDegrees(0));
+                const Point center_of_segment =
+                    getPointsMean({segment.getSegStart(), segment.getEnd()});
+                return Shot(center_of_segment, Angle::fromDegrees(0));
             }
 
             // Get the tangent rays from the reference point to the obstacle
             auto [ray1, ray2] = getCircleTangentRaysToReference(origin, circle);
 
-            // Project the tangent Rays to obtain a 'blocked' segment on the reference Segment
+            // Project the tangent Rays to obtain a 'blocked' segment on the reference
+            // Segment
             std::optional<Segment> intersect_segment =
-                    getIntersectingSegment(ray1, ray2, segment);
+                getIntersectingSegment(ray1, ray2, segment);
 
             if (intersect_segment.has_value())
             {
@@ -172,15 +178,15 @@ namespace Evaluation
             }
         }
 
-        // If we have more than 1 Segment from the obstacle projection then we must combine
-        // overlapping ones to simplify analysis
+        // If we have more than 1 Segment from the obstacle projection then we must
+        // combine overlapping ones to simplify analysis
         if (obstacle_segment_projections.size() >= 2)
         {
             obstacle_segment_projections =
-                    reduceParallelSegments(obstacle_segment_projections);
+                reduceParallelSegments(obstacle_segment_projections);
         }
-        // Make sure the starting point of all segments is closer to the start of the reference segment
-        // to simplify the evaluation
+        // Make sure the starting point of all segments is closer to the start of the
+        // reference segment to simplify the evaluation
         for (auto &unordered_seg : obstacle_segment_projections)
         {
             if ((segment.getSegStart() - unordered_seg.getSegStart()).length() >
@@ -195,9 +201,10 @@ namespace Evaluation
 
         // Now we must sort the segments so that we can iterate through them in order to
         // generate open angles sort using a lambda expression
-        // We sort the segments based on how close their 'start' point is to the 'start' of the reference Semgnet
-        std::sort(obstacle_segment_projections.begin(), obstacle_segment_projections.end(),
-                  [segment](Segment &a, Segment &b) {
+        // We sort the segments based on how close their 'start' point is to the 'start'
+        // of the reference Semgnet
+        std::sort(obstacle_segment_projections.begin(),
+                  obstacle_segment_projections.end(), [segment](Segment &a, Segment &b) {
                       return (segment.getSegStart() - a.getSegStart()).length() <
                              (segment.getSegStart() - b.getSegStart()).length();
                   });
@@ -207,27 +214,30 @@ namespace Evaluation
 
 
 
-        // If there are no obstacles that are obstructing the view of the reference Segment the entire Segment is open
+        // If there are no obstacles that are obstructing the view of the reference
+        // Segment the entire Segment is open
         if (obstacle_segment_projections.size() == 0)
         {
-
-            const Point center_of_segment = getPointsMean({segment.getSegStart(), segment.getEnd()});
-            const Angle angle_of_entire_segment = ((segment.getSegStart() - origin)
-                    .orientation()
-                    .minDiff((segment.getEnd() - origin).orientation()))
+            const Point center_of_segment =
+                getPointsMean({segment.getSegStart(), segment.getEnd()});
+            const Angle angle_of_entire_segment =
+                ((segment.getSegStart() - origin)
+                     .orientation()
+                     .minDiff((segment.getEnd() - origin).orientation()))
                     .abs();
 
-            return Shot(center_of_segment,
-                        angle_of_entire_segment);
+            return Shot(center_of_segment, angle_of_entire_segment);
         }
 
         // The first Angle is between the reference Segment and the first obstacle Segment
-        // After this one, ever open angle is between segment(i).end and segment(i+1).start
+        // After this one, ever open angle is between segment(i).end and
+        // segment(i+1).start
         open_segs.push_back(Segment(segment.getSegStart(),
                                     obstacle_segment_projections.front().getSegStart()));
 
         // The 'open' Segment in the space between consecutive 'blocking' Segments
-        for (std::vector<Segment>::const_iterator it = obstacle_segment_projections.begin();
+        for (std::vector<Segment>::const_iterator it =
+                 obstacle_segment_projections.begin();
              it != obstacle_segment_projections.end() - 1; it++)
         {
             open_segs.push_back(Segment(it->getEnd(), (it + 1)->getSegStart()));
@@ -236,22 +246,23 @@ namespace Evaluation
         // Lastly, the final open angle is between obstacles.end().getEnd() and
         // reference_segment.getEnd()
         open_segs.push_back(
-                Segment(obstacle_segment_projections.back().getEnd(), segment.getEnd()));
+            Segment(obstacle_segment_projections.back().getEnd(), segment.getEnd()));
 
 
         Segment largest_segment = *std::max_element(
-                open_segs.begin(), open_segs.end(),
-                [](const Segment &s1, const Segment &s2) { return s1.length() < s2.length(); });
+            open_segs.begin(), open_segs.end(), [](const Segment &s1, const Segment &s2) {
+                return s1.length() < s2.length();
+            });
 
         const Point most_open_point =
-                Point((largest_segment.getSegStart().x() + largest_segment.getEnd().x()) / 2,
-                      (largest_segment.getSegStart().y() + largest_segment.getEnd().y()) / 2);
-        const Angle largest_open_angle = ((largest_segment.getSegStart() - origin)
-                .orientation()
-                .minDiff((largest_segment.getEnd() - origin).orientation()))
+            Point((largest_segment.getSegStart().x() + largest_segment.getEnd().x()) / 2,
+                  (largest_segment.getSegStart().y() + largest_segment.getEnd().y()) / 2);
+        const Angle largest_open_angle =
+            ((largest_segment.getSegStart() - origin)
+                 .orientation()
+                 .minDiff((largest_segment.getEnd() - origin).orientation()))
                 .abs();
 
-        return Shot(most_open_point,
-                    largest_open_angle);
+        return Shot(most_open_point, largest_open_angle);
     }
 }  // namespace Evaluation

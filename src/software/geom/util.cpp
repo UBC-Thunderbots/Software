@@ -1134,7 +1134,7 @@ std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments)
     {
         if (!collinear(segments[i], segments[i + 1]))
         {
-            return  std::vector<Segment>();
+            return std::vector<Segment>();
         }
     }
     std::vector<Segment> unique_segments;
