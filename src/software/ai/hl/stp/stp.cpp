@@ -2,6 +2,7 @@
 
 #include <munkres/munkres.h>
 
+#include <algorithm>
 #include <chrono>
 #include <exception>
 #include <g3log/g3log.hpp>
@@ -168,21 +169,21 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     Matrix<double> matrix(num_rows, num_cols);
 
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
-    for (unsigned row = 0; row < num_rows; row++)
+    for (size_t row = 0; row < num_rows; row++)
     {
-        for (unsigned col = 0; col < num_cols; col++)
+        for (size_t col = 0; col < num_cols; col++)
         {
-            if (friendly_team_robots.at(row).getCapabiltiesBlacklist().size() > 0 &&
+            bool robot_missing_capability_required_for_tactic =
+                friendly_team_robots.at(row).getCapabiltiesBlacklist().size() > 0 &&
                 friendly_team_robots.at(row).getCapabiltiesBlacklist() <=
-                    tactics.at(col)->robotCapabilityRequirements())
+                    tactics.at(col)->robotCapabilityRequirements();
+            if (robot_missing_capability_required_for_tactic)
             {
-                // if the blacklist contains any subset of the required capabilties,
-                // set the cost to 10.0f
                 matrix(row, col) = 10.0f;
             }
             else
             {
-                // hardware requirements are satisfied, calculate real cost
+                // capability requirements are satisfied, calculate real cost
                 matrix(row, col) = tactics.at(col)->calculateRobotCost(
                     friendly_team_robots.at(row), world);
             }
@@ -202,9 +203,9 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     //        -1, 0,-1,         and            0,-1,
     //         0,-1,-1,                       -1, 0,
     //        -1,-1, 0,
-    for (unsigned row = 0; row < num_rows; row++)
+    for (size_t row = 0; row < num_rows; row++)
     {
-        for (unsigned col = 0; col < num_cols; col++)
+        for (size_t col = 0; col < num_cols; col++)
         {
             auto val = matrix(row, col);
             if (val == 0)
@@ -212,6 +213,37 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
                 tactics.at(col)->updateRobot(friendly_team_robots.at(row));
                 break;
             }
+        }
+    }
+
+    // Final sanity checks
+    for (std::shared_ptr<Tactic>& tactic : tactics)
+    {
+        std::optional<Robot> robot_optional = tactic->getAssignedRobot();
+        if (!robot_optional.has_value())
+        {
+            LOG(WARNING) << "No robot assigned to tactic: " << tactic->getName();
+            continue;
+        }
+        Robot robot = robot_optional.value();
+        std::set<RobotCapabilities::Capability> missing_capabilities;
+        std::set_difference(
+            tactic->robotCapabilityRequirements().begin(),
+            tactic->robotCapabilityRequirements().end(),
+            robot.getCapabiltiesBlacklist().begin(),
+            robot.getCapabiltiesBlacklist().end(),
+            std::inserter(missing_capabilities, missing_capabilities.begin()));
+        if (missing_capabilities.size() > 0)
+        {
+            std::stringstream warning_msg;
+            warning_msg << "Assigned robot " << robot.id() << " to tactic "
+                         << tactic->getName()
+                         << " but robot is missing the following required capabilities: ";
+            for (RobotCapabilities::Capability missing_capability : missing_capabilities) {
+                warning_msg << missing_capability << ", ";
+            }
+            warning_msg << std::endl;
+            LOG(WARNING) << warning_msg.str();
         }
     }
 
