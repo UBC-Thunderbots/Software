@@ -99,7 +99,7 @@ cc_test(
 cc_library(
     name = "robot_capabilities",
     hdrs = ["robot_capabilities.h"],
-    deps = [],
+    deps = ["@magic_enum"],
 )
 
 cc_test(

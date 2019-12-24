@@ -40,3 +40,12 @@ TEST(RobotCapabilitiesTest, test_all_capabilities)
     EXPECT_TRUE((all == std::set<Capability>{Capability::Dribble, Capability::Move,
                                              Capability::Chip, Capability::Kick}));
 }
+
+TEST(RobotCapabilitiesTest, stream_operator)
+{
+    Capability capability = Capability::Dribble;
+
+    std::stringstream out;
+    out << capability;
+    EXPECT_EQ("Dribble", out.str());
+}

@@ -1,5 +1,8 @@
 #pragma once
+#include <magic_enum/magic_enum.hpp>
+
 #include <algorithm>
+#include <string>
 #include <set>
 
 namespace RobotCapabilities
@@ -49,4 +52,19 @@ template <typename T>
 inline bool operator>=(const std::set<T>& lhs, const std::set<T>& rhs)
 {
     return std::includes(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+/**
+ * Print/stream operator for a robot capability
+ * @param os The output stream to print to
+ * @param capability The robot capability to print
+ * @return The given output stream with the capability printed to it
+ */
+std::ostream& operator<<(std::ostream& os, const RobotCapabilities::Capability capability){
+
+    std::string capability_name =
+        static_cast<std::string>(magic_enum::enum_name(capability));
+    os << capability_name;
+
+    return os;
 }
