@@ -46,7 +46,6 @@
       * [Path Manager](#path-manager)
       * [Path Objective](#path-objective)
       * [Path Planner](#path-planner)
-        * [Theta Star Path Planner](#theta-star-path-planner)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
 
@@ -391,18 +390,13 @@ Most [Intents](#intents) are easy to break down into  [Primitives](#primitives),
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
 
 ### Path Manager
-The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions. One simple approach is to add extra obstacles to cause the path planner to generate paths that avoid potential collisions. This approach implicitly uses the idea of [Minkowski space](https://en.wikipedia.org/wiki/Minkowski_space), but where we assume that a robot will occupy all the positions along the path for the next time step.
+The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions.
 
 ### Path Objective
 A path objective is a simple datastructure used to communicate between the navigator and the path manager. It conveys information for generating one path, such as start, destination, and obstacles. Path Objectives use very simple datastructures so that Path Planners do not need to know about any world-specific datastructures, such as Robots or the Field.
 
 ### Path Planner
 The `Path Planner` is an interface for the responsibility of path planning a single robot around a single set of obstacles from a given start to a given destination. The interface allows us to easily swap out path planners.
-
-#### Theta Star Path Planner
-The `Theta Star Path Planner` is a path planner that determines a series of points from the start and destination, such that none of the points are in an obstacle and none of the line segments between adjacent points cross an obstacle. It is a grid-based graph algorithm, but it allows any two nodes to be connected to each other, as long as there's line of sight. It will optimize for the shortest total path length.
-
-Theta Star (Theta\*) is closely related to A Star (A\*) (see [Reference A Star Implementation](https://www.geeksforgeeks.org/a-search-algorithm/)), but it will implicitly smooth paths as it explores the graph. Read [Theta Star Any Angle](https://web.archive.org/web/20190218161704/http://aigamedev.com/open/tutorial/theta-star-any-angle-paths/) for an explanation of how that works, including pseudocode and diagrams.
 
 ## AI Diagram
 ![Backend Diagram](images/ai_diagram.svg)
