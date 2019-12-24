@@ -407,7 +407,7 @@ When it comes to gameplay logic, it is very difficult if not impossible to unit 
 
 Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behavior.
 
-The primary goals of this test system are:
+The primary design goals of this test system are:
 1. **Determinism**
     * We need tests to pass or fail consistently
 2. **Test "ideal" behaviour**
@@ -458,4 +458,3 @@ Notice this is very similar to the [Architecture Overview Diagram](#architecture
 The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
 
 ![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
-
