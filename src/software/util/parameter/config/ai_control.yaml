@@ -105,3 +105,11 @@ AIConfig:
       description: >-
         When ignoreInvalidCameraData is true, any robot or ball detection with an x-coordinate greater than this
         value is ignored.
+  GuaranteeDeterminism:
+    type: "bool"
+    default: true
+    description: >-
+      Makes STP run deterministically. Ie. if 'getIntents' is called with
+      a sequence of 'N' worlds, the 'N' sets of (possible unique) intents
+      returned will always be the same, regardless of the time elapsed
+      between each call to 'getIntents'.
