@@ -403,20 +403,20 @@ The `Visualizer` also lets us control the [AI](#ai) by setting [Dynamic Paramete
   
 
 # Simulated Integration Tests
-When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the indepdent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
+When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
 
 Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behaviour.
 
 The primary design goals of this test system are:
-1. **Determinism**
-    * We need tests to pass or fail consistently
-2. **Test "ideal" behaviour**
-    * We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
+1. **Determinism:** We need tests to pass or fail consistently
+2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
+3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and understand what they are testing.
 
 ## Simulated Integration Tests Architecture
-Fortunately, our abstractions and [Observer system](#observer-design-pattern) make it very easy to modify our system to support simulated integration tests. There are only 2 major changes we make to the system:
+The system consists of three main components:
 1. Implement a [Backend](#backend) to handle the simulation
 2. Add another Observer to the system that will handle the "validation"
+3. The [AI](#ai) under test
 
 The [SimulatorBackend](#simulator-backend) and [World State Validator](#world-state-validator) implement each of these changes respectively, and are further described in their own sections.
 
@@ -429,10 +429,8 @@ In order to achieve determinism, the `SimulatorBackend` will publish new [World]
 The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
 
 There are generally 2 "types" of conditions we want to validate.
-1. Some sequence of states or actions occur **in a given order**.
-    * Eg. A robot moves to point A, then point B, then kicks the  ball
-2. Some condition is met for the duration of the test, or for "all time"
-    * Eg. The ball never leaves the field, or robots never collide
+1. Some sequence of states or actions occur **in a given order**. (*Eg. A robot moves to point A, then point B, then kicks the  ball*)
+2. Some condition is met for the duration of the test, or for "all time". (*Eg. The ball never leaves the field, or robots never collide*)
 
 We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
 
