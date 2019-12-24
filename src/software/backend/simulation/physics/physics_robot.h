@@ -58,18 +58,33 @@ class PhysicsRobot
     void createRobotPhysicsBody(std::shared_ptr<b2World> world, const Robot& robot);
 
     /**
-     * A helper function that sets up the robot body physics object
+     * A helper function that defines and adds fixtures to the robot physics object
+     * that represent the robot body
      *
      * @param robot The Robot being created in the Box2D world
      */
     void setupRobotPhysicsBody(const Robot& robot);
 
     /**
-     * A helper function that sets up the robot chicker physics object
+     * A helper function that defines and adds fixtures to the robot physics object
+     * that represent the robot's chicker
      *
      * @param robot The Robot being created in the Box2D world
      */
     void setupChickerPhysicsBody(const Robot& robot);
+
+    /**
+     * Returns a list of points that represent the vertices of a polygon approximating
+     * the shape of the robot body. The points are relative to the center of the robot,
+     * which is assumed to be at (0, 0)
+     *
+     * @param robot The robot
+     * @param num_vertices How many vertices to create
+     *
+     * @return A list of vertices that make up a polygon approximating the shape of the
+     * robot body
+     */
+    std::vector<Point> getRobotBodyVertices(const Robot& robot, unsigned int num_vertices);
 
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures

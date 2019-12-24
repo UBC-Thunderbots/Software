@@ -19,7 +19,6 @@ TEST(PhysicsRobotTest, test_get_robot_with_timestamp)
     PhysicsRobot physics_robot(world, robot_parameter);
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(3.3));
 
-    // TODO: CHECK ROBOT STATE
     EXPECT_EQ(robot_parameter.position(), robot.position());
     EXPECT_EQ(Timestamp::fromSeconds(3.3), robot.getMostRecentTimestamp());
 }
