@@ -49,6 +49,27 @@ class KickAction : public Action
     void updateControlParams(const Robot &robot, Point kick_origin, Angle kick_direction,
                              double kick_speed_meters_per_second);
 
+    /**
+     * Get the direction this action wants to kick in
+     *
+     * @return The direction this action wants to kick in
+     */
+    Angle getKickDirection();
+
+    /**
+     * Gets the origin of the kick this action is trying to perform
+     *
+     * @return The origin of the kick this action is trying to perform
+     */
+    Point getKickOrigin();
+
+    /**
+     * Gets the speed of the kick this action is trying to perform (in m/s)
+     *
+     * @return The speed of the kick this action is trying to perform (in m/s)
+     */
+    double getKickSpeed();
+
     void accept(ActionVisitor &visitor) const override;
 
    private:

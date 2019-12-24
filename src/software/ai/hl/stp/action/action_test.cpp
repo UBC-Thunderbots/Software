@@ -31,3 +31,15 @@ TEST(ActionTest, test_action_reports_done_at_same_time_nullptr_returned)
     EXPECT_FALSE(intent_ptr);
     EXPECT_TRUE(action.done());
 }
+
+TEST(ActionTest, getRobot)
+{
+    Robot robot           = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
+                        AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
+    MoveTestAction action = MoveTestAction(0.05);
+    action.updateControlParams(robot, Point());
+
+    std::optional<Robot> robot_opt = action.getRobot();
+    EXPECT_TRUE(robot_opt.has_value());
+    EXPECT_EQ(robot, *robot_opt);
+}

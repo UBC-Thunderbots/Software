@@ -48,6 +48,43 @@ class MoveAction : public Action
                              AutokickType autokick,
                              BallCollisionType ball_collision_type);
 
+    /**
+     * Get the destination this MoveAction is going to
+     *
+     * @return the destination this MoveAction is going to
+     */
+    Point getDestination();
+
+    /**
+     * Get the angle the robot should be at the destination
+     *
+     * @return the angle the robot should be at the destination
+     */
+    Angle getFinalOrientation();
+
+    /**
+     * Get the speed the robot should be moving at the destination
+     *
+     * @return the speed the robot should be moving at the destination
+     */
+    double getFinalSpeed();
+
+    /**
+     * Gets what auto-kick mode this move action should operate with
+     *
+     * (ex. "auto-kick", "auto-chip")
+     *
+     * @return The auto-kick mode this move action should operate with
+     */
+    AutokickType getAutoKickType();
+
+    /**
+     * Gets the dribbler mode this move action should operate with
+     *
+     * @return the dribbler mode this move action should operate with
+     */
+    DribblerEnable getDribblerEnabled();
+
     void accept(ActionVisitor& visitor) const override;
 
    private:
@@ -59,7 +96,7 @@ class MoveAction : public Action
     double final_speed;
     DribblerEnable enable_dribbler;
     MoveType move_type;
-    AutokickType autokick;
+    AutokickType autokick_type;
     BallCollisionType ball_collision_type;
 
     double close_to_dest_threshold;

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/intent/move_intent.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
@@ -22,24 +22,18 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::LEFT);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(
-            Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
-                      ROBOT_MAX_RADIUS_METERS,
-                  0.0),
-            0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
-    }
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(move_action->getDestination().isClose(
+        Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
+                  ROBOT_MAX_RADIUS_METERS,
+              0.0),
+        0.05));
 }
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side)
@@ -62,27 +56,21 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::LEFT);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    try
-    {
-        // The robot's position should be one full robot diameter to the left,
-        // perpendicular to the shot vector, so that the goalie is allowed to block the
-        // shot in the middle and the crease defender isn't overlapping with the goalie
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(
-            Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
-                      ROBOT_MAX_RADIUS_METERS,
-                  2 * ROBOT_MAX_RADIUS_METERS),
-            0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
-    }
+    // The robot's position should be one full robot diameter to the left,
+    // perpendicular to the shot vector, so that the goalie is allowed to block the
+    // shot in the middle and the crease defender isn't overlapping with the goalie
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(move_action->getDestination().isClose(
+        Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
+                  ROBOT_MAX_RADIUS_METERS,
+              2 * ROBOT_MAX_RADIUS_METERS),
+        0.05));
 }
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_side)
@@ -105,25 +93,19 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_sid
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::RIGHT);
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    try
-    {
-        // The robot's position should be one full robot diameter to the right,
-        // perpendicular to the shot vector, so that the goalie is allowed to block the
-        // shot in the middle and the crease defender isn't overlapping with the goalie
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(
-            Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
-                      ROBOT_MAX_RADIUS_METERS,
-                  -2 * ROBOT_MAX_RADIUS_METERS),
-            0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
-    }
+    // The robot's position should be one full robot diameter to the right,
+    // perpendicular to the shot vector, so that the goalie is allowed to block the
+    // shot in the middle and the crease defender isn't overlapping with the goalie
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(move_action->getDestination().isClose(
+        Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
+                  ROBOT_MAX_RADIUS_METERS,
+              -2 * ROBOT_MAX_RADIUS_METERS),
+        0.05));
 }
