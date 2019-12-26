@@ -23,39 +23,6 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
 {
 }
 
-std::string GoalieTactic::getName() const
-{
-    return "Goalie Tactic";
-}
-
-void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
-                                     const Team &friendly_team, const Team &enemy_team)
-{
-    // Update the world parameters stored by this Tactic
-    this->ball          = ball;
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-}
-
-double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
-{
-    // Strongly prefer the robot assigned to be the goalie.
-    // TODO: This is a hack to "ensure" the right robot will be assigned. We should
-    // normally return values in the range [0, 1]
-    if (world.friendlyTeam().getGoalieID() &&
-        robot.id() == world.friendlyTeam().getGoalieID().value())
-    {
-        return 0.0;
-    }
-    else
-    {
-        // TODO perform proper goalie assignment using plays
-        // https://github.com/UBC-Thunderbots/Software/issues/745
-        return std::numeric_limits<int>::max() - 10;
-    }
-}
-
 std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     Point goalie_desired_position, Rectangle goalie_restricted_area)
 {
@@ -83,8 +50,8 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
     auto width_x_goal    = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                         goalie_restricted_area.posXPosYCorner(),
-                                         goalie_restricted_area.posXNegYCorner());
+                                            goalie_restricted_area.posXPosYCorner(),
+                                            goalie_restricted_area.posXNegYCorner());
     auto pos_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
                                             goalie_restricted_area.posXPosYCorner(),
                                             goalie_restricted_area.negXPosYCorner());
@@ -98,9 +65,9 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     {
         return std::make_optional<Point>(goalie_desired_position);
     }
-    // Due to the nature of the line intersection, its important to make sure the
-    // corners are included, if the goalies desired position intersects with width (see
-    // above), use those positions
+        // Due to the nature of the line intersection, its important to make sure the
+        // corners are included, if the goalies desired position intersects with width (see
+        // above), use those positions
     else if (width_x_goal &&
              width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
              width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y())
@@ -108,7 +75,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
         return std::make_optional<Point>(*width_x_goal);
     }
 
-    // if either two sides of the goal are intercepted, then use those positions
+        // if either two sides of the goal are intercepted, then use those positions
     else if (pos_side_x_goal &&
              pos_side_x_goal->x() <= goalie_restricted_area.posXPosYCorner().x() &&
              pos_side_x_goal->x() >= goalie_restricted_area.negXPosYCorner().x())
@@ -122,11 +89,37 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
         return std::make_optional<Point>(*neg_side_x_goal);
     }
 
-    // if there are no intersections (ex. ball behind net), then we are out of luck
+        // if there are no intersections (ex. ball behind net), then we are out of luck
     else
     {
         return std::nullopt;
     }
+}
+
+std::string GoalieTactic::getName() const
+{
+    return "Goalie Tactic";
+}
+
+void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
+                                     const Team &friendly_team, const Team &enemy_team)
+{
+    // Update the world parameters stored by this Tactic
+    this->ball          = ball;
+    this->field         = field;
+    this->friendly_team = friendly_team;
+    this->enemy_team    = enemy_team;
+}
+
+bool isGoalieTactic() {
+    return true;
+}
+
+double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
+{
+    // We don't prefer any particular robot to be the goalie, as there should only
+    // ever be one robot that can act as the goalie
+    return 0.5;
 }
 
 void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)

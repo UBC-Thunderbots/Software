@@ -1,9 +1,7 @@
 #pragma once
-#include <magic_enum/magic_enum.hpp>
-
 #include <algorithm>
-#include <string>
 #include <set>
+#include <string>
 
 namespace RobotCapabilities
 {
@@ -12,7 +10,7 @@ namespace RobotCapabilities
         Dribble,
         Kick,
         Chip,
-        Move
+        Move,
     };
 
     /**
@@ -30,29 +28,21 @@ namespace RobotCapabilities
 
 /**
  * Returns true if lhs is a subset of rhs, otherwise false
- * @tparam T the parameter type of lhs and rhs
- * @param lhs an unordered_set
- * @param rhs another unordered_set
+ * @param lhs a set of capabilities
+ * @param rhs another set of capabilities
  * @return true if lhs is a subset of rhs
  */
-template <typename T>
-inline bool operator<=(const std::set<T>& lhs, const std::set<T>& rhs)
-{
-    return std::includes(rhs.begin(), rhs.end(), lhs.begin(), lhs.end());
-}
+bool operator<=(const std::set<RobotCapabilities::Capability>& lhs,
+                       const std::set<RobotCapabilities::Capability>& rhs);
 
 /**
  * Returns true if rhs is a subset of lhs, otherwise false
- * @tparam T the parameter type of lhs and rhs
- * @param lhs an unordered_set
- * @param rhs another unordered_set
- * @return true if rhs is a subset of lhs
+ * @param lhs a set of capabilities
+ * @param rhs another set of capabilities
+ * @return true if lhs is a subset of rhs
  */
-template <typename T>
-inline bool operator>=(const std::set<T>& lhs, const std::set<T>& rhs)
-{
-    return std::includes(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
+bool operator>=(const std::set<RobotCapabilities::Capability>& lhs,
+                       const std::set<RobotCapabilities::Capability>& rhs);
 
 /**
  * Print/stream operator for a robot capability
@@ -60,11 +50,4 @@ inline bool operator>=(const std::set<T>& lhs, const std::set<T>& rhs)
  * @param capability The robot capability to print
  * @return The given output stream with the capability printed to it
  */
-std::ostream& operator<<(std::ostream& os, const RobotCapabilities::Capability capability){
-
-    std::string capability_name =
-        static_cast<std::string>(magic_enum::enum_name(capability));
-    os << capability_name;
-
-    return os;
-}
+std::ostream& operator<<(std::ostream& os, const RobotCapabilities::Capability capability);

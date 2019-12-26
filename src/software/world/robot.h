@@ -248,11 +248,19 @@ class Robot
     Timestamp getMostRecentTimestamp() const;
 
     /**
-     * Returns the hardware capabilities of the robot
+     * Returns the missing capabilities of the robot
      *
-     * @return the hardware capabilities of the robot
+     * @return the missing capabilities of the robot
      */
-    const std::set<RobotCapabilities::Capability> &getCapabiltiesBlacklist() const;
+    const std::set<RobotCapabilities::Capability> &getCapabilitiesBlacklist() const;
+
+    // TODO: test me!
+    /**
+     * Returns all capabilities this robot has
+     *
+     * @return Returns all capabilities this robot has
+     */
+    std::set<RobotCapabilities::Capability> getCapabilitiesWhitelist() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot

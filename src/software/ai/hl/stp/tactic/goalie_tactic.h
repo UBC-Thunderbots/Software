@@ -26,6 +26,18 @@ class GoalieTactic : public Tactic
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team);
 
+    /*
+     * Restrains the goalie to a rectangle, with the prefered point being the one
+     * that intersects the point the goalie wants to move to and the center of the
+     * goal
+     *
+     * @param goalie_desired_position The point the goalie would like to go to
+     * @param goalie_restricted_area The rectangle that the goalie is to stay in
+     * @returns goalie_suggested_position That the goalie should go to
+     */
+    std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
+                                                   Rectangle goalie_restricted_area);
+
     std::string getName() const override;
 
     /**
@@ -39,28 +51,10 @@ class GoalieTactic : public Tactic
     void updateWorldParams(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team);
 
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. The goalie
-     * assigned through the dynamic parameter will be prioritized by setting the cost
-     * very high, so only the robot assigned to be the goalie will be the cheapest to
-     * do so.
-     *
-     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
-     * to this tactic. Lower cost values indicate a more preferred robot.
-     */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    /*
-     * Restrains the goalie to a rectangle, with the prefered point being the one
-     * that intersects the point the goalie wants to move to and the center of the
-     * goal
-     *
-     * @param goalie_desired_position The point the goalie would like to go to
-     * @param goalie_restricted_area The rectangle that the goalie is to stay in
-     * @returns goalie_suggested_position That the goalie should go to
-     */
-    std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
-                                                   Rectangle goalie_restricted_area);
+    bool isGoalieTactic();
+
     void accept(TacticVisitor &visitor) const override;
 
    private:

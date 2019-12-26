@@ -98,6 +98,7 @@ cc_test(
 
 cc_library(
     name = "robot_capabilities",
+    srcs = ["robot_capabilities.cpp"],
     hdrs = ["robot_capabilities.h"],
     deps = ["@magic_enum"],
 )

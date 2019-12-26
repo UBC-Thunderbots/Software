@@ -19,3 +19,12 @@ cc_library(
         "//software/ai/hl/stp/tactic",
     ],
 )
+
+cc_library(
+    name = "goalie_test_tactic",
+    srcs = ["goalie_test_tactic.cpp"],
+    hdrs = ["goalie_test_tactic.h"],
+    deps = [
+        "//software/ai/hl/stp/tactic",
+    ],
+)

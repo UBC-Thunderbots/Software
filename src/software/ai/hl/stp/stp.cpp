@@ -85,11 +85,15 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        // Assign robots to tactics
-        auto assigned_tactics = assignRobotsToTactics(world, *current_tactics);
+        assignRobotsToTactics(world, *current_tactics);
 
-        for (const std::shared_ptr<Tactic>& tactic : assigned_tactics)
+        for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
         {
+            // We only want to process tactics that have a robot assigned to them
+            if (!tactic->getAssignedRobot().has_value()){
+                continue;
+            }
+
             // Try to get an intent from the tactic
             std::shared_ptr<Action> action = tactic->getNextAction();
             std::unique_ptr<Intent> intent;
@@ -131,7 +135,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return getIntentsFromCurrentPlay(world);
 }
 
-std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
+// TODO: doesn't make any sense for this to return anything?
+void STP::assignRobotsToTactics(
     const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
 {
     // This functions optimizes the assignment of robots to tactics by minimizing
@@ -150,8 +155,8 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
         tactics.resize(world.friendlyTeam().numRobots());
     }
 
-    auto friendly_team        = world.friendlyTeam();
-    auto friendly_team_robots = friendly_team.getAllRobots();
+    auto friendly_team         = world.friendlyTeam();
+    auto& friendly_team_robots = friendly_team.getAllRobots();
 
     size_t num_rows = world.friendlyTeam().numRobots();
     size_t num_cols = tactics.size();
@@ -161,7 +166,7 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     // This represents the cases where there are either no tactics or no robots
     if (num_rows == 0 || num_cols == 0)
     {
-        return {};
+        return;
     }
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
@@ -173,19 +178,29 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (size_t col = 0; col < num_cols; col++)
         {
-            bool robot_missing_capability_required_for_tactic =
-                friendly_team_robots.at(row).getCapabiltiesBlacklist().size() > 0 &&
-                friendly_team_robots.at(row).getCapabiltiesBlacklist() <=
-                    tactics.at(col)->robotCapabilityRequirements();
-            if (robot_missing_capability_required_for_tactic)
+            Robot robot                     = friendly_team_robots.at(row);
+            std::shared_ptr<Tactic>& tactic = tactics.at(col);
+            double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
+
+
+            std::set<RobotCapabilities::Capability> required_capabilities =
+                tactic->robotCapabilityRequirements();
+            std::set<RobotCapabilities::Capability> robot_capabilities =
+                robot.getCapabilitiesWhitelist();
+            std::set<RobotCapabilities::Capability> missing_capabilities;
+            std::set_difference(
+                required_capabilities.begin(), required_capabilities.end(),
+                robot_capabilities.begin(), robot_capabilities.end(),
+                std::inserter(missing_capabilities, missing_capabilities.begin()));
+
+            if (missing_capabilities.size() > 0)
             {
-                matrix(row, col) = 10.0f;
+                matrix(row, col) = robot_cost_for_tactic + 10.0f;
             }
             else
             {
-                // capability requirements are satisfied, calculate real cost
-                matrix(row, col) = tactics.at(col)->calculateRobotCost(
-                    friendly_team_robots.at(row), world);
+                // capability requirements are satisfied, use real cost
+                matrix(row, col) = robot_cost_for_tactic;
             }
         }
     }
@@ -230,24 +245,23 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
         std::set_difference(
             tactic->robotCapabilityRequirements().begin(),
             tactic->robotCapabilityRequirements().end(),
-            robot.getCapabiltiesBlacklist().begin(),
-            robot.getCapabiltiesBlacklist().end(),
+            robot.getCapabilitiesBlacklist().begin(),
+            robot.getCapabilitiesBlacklist().end(),
             std::inserter(missing_capabilities, missing_capabilities.begin()));
         if (missing_capabilities.size() > 0)
         {
             std::stringstream warning_msg;
             warning_msg << "Assigned robot " << robot.id() << " to tactic "
-                         << tactic->getName()
-                         << " but robot is missing the following required capabilities: ";
-            for (RobotCapabilities::Capability missing_capability : missing_capabilities) {
+                        << tactic->getName()
+                        << " but robot is missing the following required capabilities: ";
+            for (RobotCapabilities::Capability missing_capability : missing_capabilities)
+            {
                 warning_msg << missing_capability << ", ";
             }
             warning_msg << std::endl;
             LOG(WARNING) << warning_msg.str();
         }
     }
-
-    return tactics;
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)

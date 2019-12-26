@@ -28,6 +28,11 @@ void Tactic::updateRobot(const Robot &robot)
     this->robot = robot;
 }
 
+bool Tactic::isGoalieTactic()
+{
+    return false;
+}
+
 std::shared_ptr<Action> Tactic::getNextAction(void)
 {
     std::shared_ptr<Action> next_action = nullptr;
