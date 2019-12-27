@@ -3,6 +3,7 @@
 #include <Box2D/Box2D.h>
 
 #include "software/new_geom/point.h"
+#include "software/new_geom/vector.h"
 
 /**
  * These functions are utilities and convenience functions to make certain operations
@@ -31,3 +32,12 @@ bool bodyExistsInWorld(b2Body* body, b2World* world);
  * @return A b2Vec2 equivalent to the given Point
  */
 b2Vec2 createVec2(const Point& point);
+
+/**
+ * Converts the given Vector into a b2Vec2, a 2D vector used in Box2D.
+ *
+ * @param vector The Vector to convert to a b2Vec2
+ *
+ * @return A b2Vec2 equivalent to the given Vector
+ */
+b2Vec2 createVec2(const Vector& vector);

@@ -252,7 +252,7 @@ class Robot
      *
      * @return the missing hardware capabilities of the robot
      */
-    const std::set<RobotCapabilities::Capability> &getCapabiltiesBlacklist() const;
+    const std::set<RobotCapabilities::Capability> &getCapabilitiesBlacklist() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
