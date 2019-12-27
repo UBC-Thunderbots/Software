@@ -53,7 +53,7 @@ class GoalieTactic : public Tactic
 
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    bool isGoalieTactic();
+    bool isGoalieTactic() const override;
 
     void accept(TacticVisitor &visitor) const override;
 

@@ -111,7 +111,7 @@ void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
     this->enemy_team    = enemy_team;
 }
 
-bool isGoalieTactic() {
+bool isGoalieTactic() const {
     return true;
 }
 
