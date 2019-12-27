@@ -28,7 +28,7 @@ void Tactic::updateRobot(const Robot &robot)
     this->robot = robot;
 }
 
-bool Tactic::isGoalieTactic()
+bool Tactic::isGoalieTactic() const
 {
     return false;
 }

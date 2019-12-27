@@ -19,7 +19,7 @@ class GoalieTestTactic : public Tactic {
 
     std::string getName() const override;
 
-    bool isGoalieTactic();
+    bool isGoalieTactic() const override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots

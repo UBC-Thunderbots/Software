@@ -108,7 +108,7 @@ class Tactic
      * Whether or not this tactic is one used by the goalie
      * @return Whether or not this tactic is one used by the goalie
      */
-    bool isGoalieTactic();
+    virtual bool isGoalieTactic() const;
 
     /**
      * Runs the coroutine and get the next Action to run from the calculateNextAction

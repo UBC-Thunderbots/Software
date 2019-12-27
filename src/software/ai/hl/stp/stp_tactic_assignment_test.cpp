@@ -401,7 +401,6 @@ TEST_F(STPTacticAssignmentTest,
 
     // Put two robots right in front of the friendly goal
     Team friendly_team(Duration::fromSeconds(0));
-    using RobotCapabilities::Capability;
     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -427,7 +426,6 @@ TEST_F(STPTacticAssignmentTest,
 
     // Put two robots right in front of the friendly goal
     Team friendly_team(Duration::fromSeconds(0));
-    using RobotCapabilities::Capability;
     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     // default is all capabilities, if not specified otherwise
@@ -457,81 +455,28 @@ TEST_F(STPTacticAssignmentTest,
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_1);
 }
 
-TEST_F(STPTacticAssignmentTest, test_assigning_goalie_then_clearing_goalie_from_team)
-{
-    // Test that when we clear the goalie from the team, the goalie tactic
-    // does not have any robot assigned to it after we re-assign
+TEST_F(STPTacticAssignmentTest,
+    test_assigning_multiple_robots_to_multiple_goalie_tactics_goalie_set_on_team){
 
     Team friendly_team(Duration::fromSeconds(0));
     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({robot_0});
+    // default is all capabilities, if not specified otherwise
+    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1});
+
     friendly_team.assignGoalie(0);
     world.updateFriendlyTeamState(friendly_team);
 
     auto goalie_tactic_1                         = std::make_shared<GoalieTestTactic>();
-    std::vector<std::shared_ptr<Tactic>> tactics = {goalie_tactic_1};
+    auto goalie_tactic_2                         = std::make_shared<GoalieTestTactic>();
+    std::vector<std::shared_ptr<Tactic>> tactics = {goalie_tactic_1, goalie_tactic_2};
 
     stp.assignRobotsToTactics(world, tactics);
 
     ASSERT_TRUE(goalie_tactic_1->getAssignedRobot().has_value());
+    EXPECT_FALSE(goalie_tactic_2->getAssignedRobot().has_value());
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_0);
-
-    // Change the goalie and perform the same check in case we have a fluke bug
-
-    friendly_team.clearGoalie();
-    world.updateFriendlyTeamState(friendly_team);
-
-    stp.assignRobotsToTactics(world, tactics);
-
-    ASSERT_FALSE(goalie_tactic_1->getAssignedRobot().has_value());
 }
 
-//
-// TEST_F(STPTacticAssignmentTest,
-//       test_assigning_multiple_robots_to_goalie_tactic_only_one_has_goalie_capability)
-//{
-//    // Test that if there are multiple robots, only one of which has the "goalie"
-//    // capability, then the robot with the goalie capability is the one assigned
-//
-//    std::set<RobotCapabilities::Capability> all_capabilities_except_goalie =
-//        RobotCapabilities::allCapabilities();
-//    all_capabilities_except_goalie.erase(RobotCapabilities::Capability::Goalie);
-//
-//    // Put two robots right in front of the friendly goal, but both with no goalie
-//    // capability
-//    Team friendly_team(Duration::fromSeconds(0));
-//    using RobotCapabilities::Capability;
-//    Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(),
-//    AngularVelocity::zero(),
-//                  Timestamp::fromSeconds(0), 10, all_capabilities_except_goalie);
-//    // default is all capabilities, if not specified otherwise
-//    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(),
-//    AngularVelocity::zero(),
-//                  Timestamp::fromSeconds(0), 10, all_capabilities_except_goalie);
-//    friendly_team.updateRobots({robot_0, robot_1});
-//    world.updateFriendlyTeamState(friendly_team);
-//
-//    // Give the first robot goalie capability
-//    robot_0.getMutableRobotCapabilities().emplace(RobotCapabilities::Capability::Goalie);
-//
-//    auto goalie_tactic                           =
-//    std::make_shared<GoalieTestTactic>(); std::vector<std::shared_ptr<Tactic>>
-//    tactics = {goalie_tactic};
-//
-//    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
-//
-//    ASSERT_EQ(assigned_tactics.size(), 1);
-//    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot().value(), robot_0);
-//
-//    // In order to check that this is order-invariant, take the goalie from the
-//    first
-//    // robot, give it to the second, and try again
-//    robot_0.getMutableRobotCapabilities() = {};
-//    robot_1.getMutableRobotCapabilities().emplace(RobotCapabilities::Capability::Goalie);
-//
-//    assigned_tactics = stp.assignRobotsToTactics(world, tactics);
-//
-//    ASSERT_EQ(assigned_tactics.size(), 1);
-//    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot().value(), robot_1);
-//}

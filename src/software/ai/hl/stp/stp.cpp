@@ -90,7 +90,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
         for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
         {
             // We only want to process tactics that have a robot assigned to them
-            if (!tactic->getAssignedRobot().has_value()){
+            if (!tactic->getAssignedRobot().has_value())
+            {
                 continue;
             }
 
@@ -135,9 +136,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return getIntentsFromCurrentPlay(world);
 }
 
-// TODO: doesn't make any sense for this to return anything?
-void STP::assignRobotsToTactics(
-    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
+void STP::assignRobotsToTactics(const World& world,
+                                std::vector<std::shared_ptr<Tactic>> tactics) const
 {
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -147,16 +147,55 @@ void STP::assignRobotsToTactics(
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
 
-    if (world.friendlyTeam().numRobots() < tactics.size())
+    auto friendly_team         = world.friendlyTeam();
+    auto& friendly_team_robots = friendly_team.getAllRobots();
+
+    // Special handling for the Goalie, since there should only ever be one and only
+    // one robot per team is ever permitted to be one
+    const std::optional<Robot> goalie = friendly_team.goalie();
+    // Assign the goalie to the first goalie tactic
+    auto it = tactics.begin();
+    if (goalie)
+    {
+        while (it != tactics.end())
+        {
+            if ((*it)->isGoalieTactic())
+            {
+                (*it)->updateRobot(*goalie);
+                break;
+            }
+            it++;
+        }
+    }
+
+    // Discard the goalie tactic we assigned and any other goalie tactics, since
+    // there is only one goalie
+    while (it != tactics.end())
+    {
+        if ((*it)->isGoalieTactic())
+        {
+            // "erase" invalidates the iterator, so we use the returned value
+            it = tactics.erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    std::vector<Robot> non_goalie_robots = friendly_team_robots;
+    if (goalie)
+    {
+        non_goalie_robots.erase(
+            std::find(non_goalie_robots.begin(), non_goalie_robots.end(), *goalie));
+    }
+
+
+    if (non_goalie_robots.size() < tactics.size())
     {
         // We do not have enough robots to assign all the tactics to. We "drop"
         // (aka don't assign) the tactics at the end of the vector since they are
         // considered lower priority
         tactics.resize(world.friendlyTeam().numRobots());
     }
-
-    auto friendly_team         = world.friendlyTeam();
-    auto& friendly_team_robots = friendly_team.getAllRobots();
 
     size_t num_rows = world.friendlyTeam().numRobots();
     size_t num_cols = tactics.size();
@@ -178,7 +217,7 @@ void STP::assignRobotsToTactics(
     {
         for (size_t col = 0; col < num_cols; col++)
         {
-            Robot robot                     = friendly_team_robots.at(row);
+            Robot robot                     = non_goalie_robots.at(row);
             std::shared_ptr<Tactic>& tactic = tactics.at(col);
             double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
 
@@ -225,7 +264,7 @@ void STP::assignRobotsToTactics(
             auto val = matrix(row, col);
             if (val == 0)
             {
-                tactics.at(col)->updateRobot(friendly_team_robots.at(row));
+                tactics.at(col)->updateRobot(non_goalie_robots.at(row));
                 break;
             }
         }
@@ -241,12 +280,14 @@ void STP::assignRobotsToTactics(
             continue;
         }
         Robot robot = robot_optional.value();
+        std::set<RobotCapabilities::Capability> required_capabilities =
+            tactic->robotCapabilityRequirements();
+        std::set<RobotCapabilities::Capability> robot_capabilities =
+            robot.getCapabilitiesWhitelist();
         std::set<RobotCapabilities::Capability> missing_capabilities;
         std::set_difference(
-            tactic->robotCapabilityRequirements().begin(),
-            tactic->robotCapabilityRequirements().end(),
-            robot.getCapabilitiesBlacklist().begin(),
-            robot.getCapabilitiesBlacklist().end(),
+            required_capabilities.begin(), required_capabilities.end(),
+            robot_capabilities.begin(), robot_capabilities.end(),
             std::inserter(missing_capabilities, missing_capabilities.begin()));
         if (missing_capabilities.size() > 0)
         {
