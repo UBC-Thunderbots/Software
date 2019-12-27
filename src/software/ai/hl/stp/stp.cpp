@@ -148,46 +148,30 @@ void STP::assignRobotsToTactics(const World& world,
     auto friendly_team         = world.friendlyTeam();
     auto& friendly_team_robots = friendly_team.getAllRobots();
 
-    // Special handling for the Goalie, since there should only ever be one and only
-    // one robot per team is ever permitted to be one
+    // Special handling for the Goalie tactics, since only one robot per team is permitted
+    // to act as the goalie
     const std::optional<Robot> goalie = friendly_team.goalie();
-    // Assign the goalie to the first goalie tactic
-    auto it = tactics.begin();
-    if (goalie)
-    {
-        while (it != tactics.end())
-        {
-            if ((*it)->isGoalieTactic())
-            {
-                (*it)->updateRobot(*goalie);
-                break;
-            }
-            it++;
-        }
-    }
-
-    // Discard the goalie tactic we assigned and any other goalie tactics, since
-    // there is only one goalie
-    while (it != tactics.end())
-    {
-        if ((*it)->isGoalieTactic())
-        {
-            // "erase" invalidates the iterator, so we use the returned value
-            it = tactics.erase(it);
-        }
-        else
-        {
-            it++;
-        }
-    }
-
     std::vector<Robot> non_goalie_robots = friendly_team_robots;
+    auto isGoalieTactic = [](std::shared_ptr<Tactic> tactic){
+      return tactic->isGoalieTactic();
+    };
+
+    auto it = tactics.begin();
     if (goalie)
     {
         non_goalie_robots.erase(
             std::find(non_goalie_robots.begin(), non_goalie_robots.end(), *goalie));
+
+        // Assign the goalie to the first goalie tactic
+        auto iter = std::find_if(tactics.begin(), tactics.end(), isGoalieTactic);
+        if (iter != tactics.end()){
+            (*iter)->updateRobot(*goalie);
+        }
     }
 
+    // Discard all goalie tactics, since we have already assigned the goalie robot (if
+    // there is one) to the first goalie tactic, and there should only ever be one goalie
+    tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic), tactics.end());
 
     if (non_goalie_robots.size() < tactics.size())
     {
@@ -266,40 +250,6 @@ void STP::assignRobotsToTactics(const World& world,
                 tactics.at(col)->updateRobot(non_goalie_robots.at(row));
                 break;
             }
-        }
-    }
-
-    // Final sanity checks
-    for (std::shared_ptr<Tactic>& tactic : tactics)
-    {
-        std::optional<Robot> robot_optional = tactic->getAssignedRobot();
-        if (!robot_optional.has_value())
-        {
-            LOG(WARNING) << "No robot assigned to tactic: " << tactic->getName();
-            continue;
-        }
-        Robot robot = robot_optional.value();
-        std::set<RobotCapabilities::Capability> required_capabilities =
-            tactic->robotCapabilityRequirements();
-        std::set<RobotCapabilities::Capability> robot_capabilities =
-            robot.getCapabilitiesWhitelist();
-        std::set<RobotCapabilities::Capability> missing_capabilities;
-        std::set_difference(
-            required_capabilities.begin(), required_capabilities.end(),
-            robot_capabilities.begin(), robot_capabilities.end(),
-            std::inserter(missing_capabilities, missing_capabilities.begin()));
-        if (missing_capabilities.size() > 0)
-        {
-            std::stringstream warning_msg;
-            warning_msg << "Assigned robot " << robot.id() << " to tactic "
-                        << tactic->getName()
-                        << " but robot is missing the following required capabilities: ";
-            for (RobotCapabilities::Capability missing_capability : missing_capabilities)
-            {
-                warning_msg << missing_capability << ", ";
-            }
-            warning_msg << std::endl;
-            LOG(WARNING) << warning_msg.str();
         }
     }
 }
