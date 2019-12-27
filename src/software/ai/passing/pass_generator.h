@@ -68,9 +68,13 @@ namespace Passing
          *                  NOTE: this will _try_ to generate a pass of the type given,
          *                  but it is not guaranteed, and can change during pass
          *                  execution because of Passer/Receiver decisions
+         * @param run_deterministically If true, this disables all threading so that
+         *                              the same sequence of calls to this function always
+         *                              returns the same values, no matter how much time
+         *                              passes between calls
          */
         explicit PassGenerator(const World& world, const Point& passer_point,
-                               const PassType& pass_type);
+                               const PassType& pass_type, const bool run_deterministically=false);
 
         /**
          * Updates the world
@@ -128,6 +132,10 @@ namespace Passing
         // (pass_start_x, pass_start_y, pass_speed, pass_start_time)
         static const int NUM_PARAMS_TO_OPTIMIZE = 4;
 
+        // TODO: better name for this variable
+        // The number of iterations to run on each call to `getBestPassSoFar()`
+        // **if** running determinstically
+        static const size_t NUM_ITERS_PER_DETERMINISTIC_CALL = 10;
 
         // Weights used to normalize the parameters that we pass to GradientDescent
         // (see the GradientDescent documentation for details)
@@ -144,9 +152,14 @@ namespace Passing
         /**
          * Continuously optimizes, prunes, and re-generates passes based on known info
          *
-         * This will only return when the in_destructor flag is set
+         * This will only return when the in_destructor flag is set to true
          */
         void continuouslyGeneratePasses();
+
+        /**
+         * Updates, Optimizes, And Prunes the Passes
+         */
+        void updateAndOptimizeAndPrunePasses();
 
         /**
          * Optimizes all current passes
@@ -255,6 +268,11 @@ namespace Passing
          * @return A vector containing the requested number of passes
          */
         std::vector<Pass> generatePasses(unsigned long num_passes_to_gen);
+
+        // Whether or not this generator is running deterministically (ie. threading
+        // disabled so that the same sequence of calls to this function always returns
+        // the same values, regardless of the time between calls)
+        bool running_deterministically;
 
         // The thread running the pass optimization/pruning/re-generation in the
         // background. This thread will run for the entire lifetime of the class
