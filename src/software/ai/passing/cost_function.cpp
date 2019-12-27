@@ -93,6 +93,10 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
+    auto shot_opt = Evaluation::calcBestShotOnGoal(field.enemyGoalpostNeg(),
+    field.enemyGoalpostPos(), pass.receiverPoint(),
+    enemy_team.getAllRobots());
+
     auto shot_opt = Evaluation::calcMostOpenDirection(
         pass.receiverPoint(), Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos()),
         enemy_team.getAllRobots());

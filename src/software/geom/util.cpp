@@ -877,8 +877,8 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     }
 }
 
-std::pair<Ray, Ray> getCircleTangentRaysToReference(const Point reference,
-                                                    const Circle circle)
+std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point reference,
+                                                            const Circle circle)
 {
     auto [tangent_point1, tangent_point2] = getCircleTangentPoints(reference, circle, 0);
 
@@ -1118,7 +1118,6 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 
 std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments)
 {
-    // If there are no segments, return nullopt
     if (segments.size() == 0)
     {
         return std::vector<Segment>();

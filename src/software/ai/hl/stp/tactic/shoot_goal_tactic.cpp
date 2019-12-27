@@ -110,8 +110,6 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
         field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
         {*this->getAssignedRobot()});
 
-
-
     while (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
     {
         if (!isEnemyAboutToStealBall())

@@ -138,7 +138,7 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  *
  * @param segment1 : The first Segment
  *
- * @param segment1 : The second Segment
+ * @param segment2 : The second Segment
  *
  * @return true : If the Segment1 and Segment2 are collinear within EPS disance
  *
@@ -471,14 +471,14 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
                                                double buffer = 0.0);
 
 /**
- * Returns the tangent vectors of a Circle and Point (Vectors are directed towards Circle)
+ * Calculates the pair of Rays that intercept the Circle tangentially with origin at the reference Point
  *
  * @param reference: The point which the tangent vectors will intersect
  * @param circle: The circle to calculate the tangent vectors of
  * @return the mean point of points
  */
-std::pair<Ray, Ray> getCircleTangentRaysToReference(const Point reference,
-                                                    const Circle circle);
+std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point reference,
+                                                            const Circle circle);
 
 bool pointIsRightOfLine(const Segment &line, const Point &point);
 
@@ -561,8 +561,8 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
 std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
 
 /**
- * Function takes in a Vector of Segments and will reduce them to the fewest completely
- * independent Segment sections that are independent of each other.
+ * Function takes in a Vector of Segments and will reduce them to the fewest
+ * Segment sections that are independent of each other.
  *
  * Ex.
  *  Input:  *--------*       *--------*

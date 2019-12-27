@@ -18,6 +18,20 @@ namespace Evaluation
         return std::make_optional(
             calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obs));
     }
+    std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
+                                           const Point &goal_post_pos, const Point &p,
+                                           const std::vector<Robot> &robot_obstacles
+                                           )
+    {
+        // Use shot evaluation function to get the best Shot
+        std::vector<Circle> obs;
+        for (Robot robot : robot_obstacles)
+        {
+            obs.push_back(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS));
+        }
+        return std::make_optional(
+                calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obs));
+    }
 
     std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
                                            const Team &enemy_team, const Point &point,
@@ -128,9 +142,9 @@ namespace Evaluation
     {
         std::vector<Circle> obstacles;
 
-        for (Robot robo : robot_obstacles)
+        for (Robot robot : robot_obstacles)
         {
-            obstacles.push_back(Circle(robo.position(), ROBOT_MAX_RADIUS_METERS));
+            obstacles.push_back(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS));
         }
 
         return calcMostOpenDirection(origin, segment, obstacles);
@@ -165,7 +179,7 @@ namespace Evaluation
             }
 
             // Get the tangent rays from the reference point to the obstacle
-            auto [ray1, ray2] = getCircleTangentRaysToReference(origin, circle);
+            auto [ray1, ray2] = getCircleTangentRaysWithReferenceOrigin(origin, circle);
 
             // Project the tangent Rays to obtain a 'blocked' segment on the reference
             // Segment
@@ -202,7 +216,7 @@ namespace Evaluation
         // Now we must sort the segments so that we can iterate through them in order to
         // generate open angles sort using a lambda expression
         // We sort the segments based on how close their 'start' point is to the 'start'
-        // of the reference Semgnet
+        // of the reference Segment
         std::sort(obstacle_segment_projections.begin(),
                   obstacle_segment_projections.end(), [segment](Segment &a, Segment &b) {
                       return (segment.getSegStart() - a.getSegStart()).length() <

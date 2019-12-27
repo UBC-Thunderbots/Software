@@ -1375,7 +1375,7 @@ TEST(GeomUtilTest, test_circle_tangent_rays)
 {
     Point reference          = Point(0, 0);
     Circle circle            = Circle(Point(0, 1), 0.5);
-    std::pair<Ray, Ray> test = getCircleTangentRaysToReference(reference, circle);
+    std::pair<Ray, Ray> test = getCircleTangentRaysWithReferenceOrigin(reference, circle);
 
     EXPECT_EQ(test.second.getStart(), reference);
     EXPECT_EQ(test.first.getStart(), reference);
