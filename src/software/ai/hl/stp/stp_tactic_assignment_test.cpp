@@ -456,8 +456,8 @@ TEST_F(STPTacticAssignmentTest,
 }
 
 TEST_F(STPTacticAssignmentTest,
-    test_assigning_multiple_robots_to_multiple_goalie_tactics_goalie_set_on_team){
-
+       test_assigning_multiple_robots_to_multiple_goalie_tactics_goalie_set_on_team)
+{
     Team friendly_team(Duration::fromSeconds(0));
     Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
@@ -479,4 +479,3 @@ TEST_F(STPTacticAssignmentTest,
     EXPECT_FALSE(goalie_tactic_2->getAssignedRobot().has_value());
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_0);
 }
-

@@ -1,14 +1,14 @@
 #include "software/ai/hl/stp/tactic/test_tactics/goalie_test_tactic.h"
 
-GoalieTestTactic::GoalieTestTactic(bool loop_forever) : Tactic(loop_forever) {
-}
+GoalieTestTactic::GoalieTestTactic(bool loop_forever) : Tactic(loop_forever) {}
 
 std::string GoalieTestTactic::getName() const
 {
     return "Goalie Test Tactic";
 }
 
-bool GoalieTestTactic::isGoalieTactic() const {
+bool GoalieTestTactic::isGoalieTactic() const
+{
     return true;
 }
 

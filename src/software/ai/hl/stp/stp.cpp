@@ -174,7 +174,9 @@ void STP::assignRobotsToTactics(const World& world,
         {
             // "erase" invalidates the iterator, so we use the returned value
             it = tactics.erase(it);
-        } else {
+        }
+        else
+        {
             it++;
         }
     }

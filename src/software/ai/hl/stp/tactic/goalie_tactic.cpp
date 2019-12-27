@@ -50,8 +50,8 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
     auto width_x_goal    = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                            goalie_restricted_area.posXPosYCorner(),
-                                            goalie_restricted_area.posXNegYCorner());
+                                         goalie_restricted_area.posXPosYCorner(),
+                                         goalie_restricted_area.posXNegYCorner());
     auto pos_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
                                             goalie_restricted_area.posXPosYCorner(),
                                             goalie_restricted_area.negXPosYCorner());
@@ -65,9 +65,9 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     {
         return std::make_optional<Point>(goalie_desired_position);
     }
-        // Due to the nature of the line intersection, its important to make sure the
-        // corners are included, if the goalies desired position intersects with width (see
-        // above), use those positions
+    // Due to the nature of the line intersection, its important to make sure the
+    // corners are included, if the goalies desired position intersects with width (see
+    // above), use those positions
     else if (width_x_goal &&
              width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
              width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y())
@@ -75,7 +75,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
         return std::make_optional<Point>(*width_x_goal);
     }
 
-        // if either two sides of the goal are intercepted, then use those positions
+    // if either two sides of the goal are intercepted, then use those positions
     else if (pos_side_x_goal &&
              pos_side_x_goal->x() <= goalie_restricted_area.posXPosYCorner().x() &&
              pos_side_x_goal->x() >= goalie_restricted_area.negXPosYCorner().x())
@@ -89,7 +89,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
         return std::make_optional<Point>(*neg_side_x_goal);
     }
 
-        // if there are no intersections (ex. ball behind net), then we are out of luck
+    // if there are no intersections (ex. ball behind net), then we are out of luck
     else
     {
         return std::nullopt;
@@ -111,7 +111,8 @@ void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
     this->enemy_team    = enemy_team;
 }
 
-bool isGoalieTactic() const {
+bool isGoalieTactic() const
+{
     return true;
 }
 

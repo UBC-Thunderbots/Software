@@ -7,7 +7,8 @@
  *
  * This tactic requires the "Goalie" capability
  */
-class GoalieTestTactic : public Tactic {
+class GoalieTestTactic : public Tactic
+{
    public:
     /**
      * Creates a new GoalieTestTactic
