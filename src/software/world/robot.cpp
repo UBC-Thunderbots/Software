@@ -253,7 +253,7 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapabilities::Capability> &Robot::getCapabiltiesBlacklist() const
+const std::set<RobotCapabilities::Capability> &Robot::getCapabilitiesBlacklist() const
 {
     return unavailable_capabilities_;
 }

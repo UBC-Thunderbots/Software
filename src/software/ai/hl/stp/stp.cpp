@@ -33,22 +33,18 @@ void STP::updateCurrentPlay(const World& world)
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
-    auto all_play_names = PlayFactory::getRegisteredPlayNames();
+    bool no_current_play = !current_play || current_play->done();
 
-    // Assign a new play if we don't currently have a play assigned, the current play's
-    // invariant no longer holds, or the current play is done
-    if (!current_play || (!override_play && !current_play->invariantHolds(world)) ||
-        current_play->done() || override_play_name_value_changed ||
-        override_play_value_changed)
+    if (override_play)
     {
-        if (override_play)
+        if (no_current_play || override_play_name_value_changed ||
+            override_play_value_changed)
         {
-            if (std::find(all_play_names.begin(), all_play_names.end(),
-                          override_play_name) != all_play_names.end())
+            try
             {
                 current_play = PlayFactory::createPlay(override_play_name);
             }
-            else
+            catch (std::invalid_argument)
             {
                 auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
@@ -58,7 +54,10 @@ void STP::updateCurrentPlay(const World& world)
                 current_play = std::move(default_play);
             }
         }
-        else
+    }
+    else
+    {
+        if (no_current_play || !current_play->invariantHolds(world))
         {
             try
             {
@@ -84,12 +83,10 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        // Assign robots to tactics
         auto assigned_tactics = assignRobotsToTactics(world, *current_tactics);
 
         for (const std::shared_ptr<Tactic>& tactic : assigned_tactics)
         {
-            // Try to get an intent from the tactic
             std::shared_ptr<Action> action = tactic->getNextAction();
             std::unique_ptr<Intent> intent;
             if (action)
@@ -99,7 +96,6 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 
             if (intent)
             {
-                // Set Motion Constraints
                 auto motion_constraints = motion_constraint_manager.getMotionConstraints(
                     world.gameState(), *tactic);
                 intent->setMotionConstraints(motion_constraints);
@@ -172,8 +168,8 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (unsigned col = 0; col < num_cols; col++)
         {
-            if (friendly_team_robots.at(row).getCapabiltiesBlacklist().size() > 0 &&
-                friendly_team_robots.at(row).getCapabiltiesBlacklist() <=
+            if (friendly_team_robots.at(row).getCapabilitiesBlacklist().size() > 0 &&
+                friendly_team_robots.at(row).getCapabilitiesBlacklist() <=
                     tactics.at(col)->robotCapabilityRequirements())
             {
                 // if the blacklist contains any subset of the required capabilties,
