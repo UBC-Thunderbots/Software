@@ -172,14 +172,3 @@ TEST_F(STPTest, test_get_play_info)
 
     EXPECT_EQ(play_info, expected_play_info);
 }
-
-// Test where there are some robots that don't have required capabilities, but there
-// are enough robots with the requisite capabilities to fill the tactics, no goalie tactic
-
-// Test where we try to force a robot with all capabilities except the "Goalie" capability
-// to assign to a Goalie tactic
-
-TEST_F(STPTest, rename_me){
-}
-
-

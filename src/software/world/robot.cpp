@@ -253,25 +253,9 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapabilities::Capability> &Robot::getCapabilitiesBlacklist() const
+const std::set<RobotCapabilities::Capability> &Robot::getCapabiltiesBlacklist() const
 {
     return unavailable_capabilities_;
-}
-
-std::set<RobotCapabilities::Capability> Robot::getCapabilitiesWhitelist() const
-{
-    // robot capabilities = all possible capabilities - unavailable capabilities
-
-    std::set<RobotCapabilities::Capability > all_capabilities = RobotCapabilities::allCapabilities();
-    std::set<RobotCapabilities::Capability > robot_capabilities;
-    std::set_difference(
-        all_capabilities.begin(),
-        all_capabilities.end(),
-        getCapabilitiesBlacklist().begin(),
-        getCapabilitiesBlacklist().end(),
-        std::inserter(robot_capabilities, robot_capabilities.begin()));
-
-    return robot_capabilities;
 }
 
 std::set<RobotCapabilities::Capability> &Robot::getMutableRobotCapabilities()

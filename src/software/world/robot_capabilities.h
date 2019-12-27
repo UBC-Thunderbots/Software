@@ -1,7 +1,6 @@
 #pragma once
 #include <algorithm>
 #include <set>
-#include <string>
 
 namespace RobotCapabilities
 {
@@ -10,7 +9,7 @@ namespace RobotCapabilities
         Dribble,
         Kick,
         Chip,
-        Move,
+        Move
     };
 
     /**
@@ -28,26 +27,26 @@ namespace RobotCapabilities
 
 /**
  * Returns true if lhs is a subset of rhs, otherwise false
- * @param lhs a set of capabilities
- * @param rhs another set of capabilities
+ * @tparam T the parameter type of lhs and rhs
+ * @param lhs an unordered_set
+ * @param rhs another unordered_set
  * @return true if lhs is a subset of rhs
  */
-bool operator<=(const std::set<RobotCapabilities::Capability>& lhs,
-                       const std::set<RobotCapabilities::Capability>& rhs);
+template <typename T>
+inline bool operator<=(const std::set<T>& lhs, const std::set<T>& rhs)
+{
+    return std::includes(rhs.begin(), rhs.end(), lhs.begin(), lhs.end());
+}
 
 /**
  * Returns true if rhs is a subset of lhs, otherwise false
- * @param lhs a set of capabilities
- * @param rhs another set of capabilities
- * @return true if lhs is a subset of rhs
+ * @tparam T the parameter type of lhs and rhs
+ * @param lhs an unordered_set
+ * @param rhs another unordered_set
+ * @return true if rhs is a subset of lhs
  */
-bool operator>=(const std::set<RobotCapabilities::Capability>& lhs,
-                       const std::set<RobotCapabilities::Capability>& rhs);
-
-/**
- * Print/stream operator for a robot capability
- * @param os The output stream to print to
- * @param capability The robot capability to print
- * @return The given output stream with the capability printed to it
- */
-std::ostream& operator<<(std::ostream& os, const RobotCapabilities::Capability capability);
+template <typename T>
+inline bool operator>=(const std::set<T>& lhs, const std::set<T>& rhs)
+{
+    return std::includes(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}

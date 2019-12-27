@@ -221,7 +221,6 @@ void STP::assignRobotsToTactics(const World& world,
             std::shared_ptr<Tactic>& tactic = tactics.at(col);
             double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
 
-
             std::set<RobotCapabilities::Capability> required_capabilities =
                 tactic->robotCapabilityRequirements();
             std::set<RobotCapabilities::Capability> robot_capabilities =
