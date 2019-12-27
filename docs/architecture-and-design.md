@@ -414,16 +414,14 @@ The primary design goals of this test system are:
 
 ## Simulated Integration Tests Architecture
 The system consists of three main components:
-1. Implement a [Backend](#backend) to handle the simulation
-2. Add another Observer to the system that will handle the "validation"
+1. A [Backend](#backend) that performs the simulation
+2. A [World State Validator](#world-state-validator) Observer that will handle the "validation"
 3. The [AI](#ai) under test
-
-The [SimulatorBackend](#simulator-backend) and [World State Validator](#world-state-validator) implement each of these changes respectively, and are further described in their own sections.
 
 ### Simulator Backend
 The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes the state of the [World](#world) periodically.
 
-In order to achieve determinism, the `SimulatorBackend` will publish new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
+In order to achieve determinism, the `SimulatorBackend` publishes new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
 
 ### World State Validator
 The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
