@@ -150,10 +150,10 @@ void STP::assignRobotsToTactics(const World& world,
 
     // Special handling for the Goalie tactics, since only one robot per team is permitted
     // to act as the goalie
-    const std::optional<Robot> goalie = friendly_team.goalie();
+    const std::optional<Robot> goalie    = friendly_team.goalie();
     std::vector<Robot> non_goalie_robots = friendly_team_robots;
-    auto isGoalieTactic = [](std::shared_ptr<Tactic> tactic){
-      return tactic->isGoalieTactic();
+    auto isGoalieTactic                  = [](std::shared_ptr<Tactic> tactic) {
+        return tactic->isGoalieTactic();
     };
 
     auto it = tactics.begin();
@@ -164,14 +164,16 @@ void STP::assignRobotsToTactics(const World& world,
 
         // Assign the goalie to the first goalie tactic
         auto iter = std::find_if(tactics.begin(), tactics.end(), isGoalieTactic);
-        if (iter != tactics.end()){
+        if (iter != tactics.end())
+        {
             (*iter)->updateRobot(*goalie);
         }
     }
 
     // Discard all goalie tactics, since we have already assigned the goalie robot (if
     // there is one) to the first goalie tactic, and there should only ever be one goalie
-    tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic), tactics.end());
+    tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic),
+                  tactics.end());
 
     if (non_goalie_robots.size() < tactics.size())
     {
