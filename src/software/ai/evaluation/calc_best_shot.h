@@ -219,6 +219,24 @@ namespace Evaluation
      * Function calculates the optimal shot location and the corresponding Angle
      * representing the 'open' area of that shot at the segment
      *
+     *   Open          Blocked Segment        Open
+     * *______X---------------------------X___________________*  <-- reference Segment
+     *          .                        .
+     *           .                      .
+     *            .                    .
+     *             .                  .
+     *              .                .
+     *               .              .
+     *                .            .
+     *                 .  +----+  .
+     *                  . |OBS | .
+     *                   .+----+.
+     *                    .    .
+     *                     .  .
+     *                      ..
+     *                      X
+     *                 Reference Point
+     *
      * @param origin : The origin of the shot
      * @param segment : The segment at which shots are being evaluated on
      * @param robot_obstacles : Any Robot (friendly or enemy) that can block the shot
