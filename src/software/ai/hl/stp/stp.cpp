@@ -174,7 +174,7 @@ void STP::assignRobotsToTactics(const World& world,
         // We do not have enough robots to assign all the tactics to. We "drop"
         // (aka don't assign) the tactics at the end of the vector since they are
         // considered lower priority
-        tactics.resize(world.friendlyTeam().numRobots());
+        tactics.resize(non_goalie_robots.size());
     }
 
     size_t num_rows = world.friendlyTeam().numRobots();

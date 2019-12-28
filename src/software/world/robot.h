@@ -254,7 +254,6 @@ class Robot
      */
     const std::set<RobotCapabilities::Capability> &getCapabilitiesBlacklist() const;
 
-    // TODO: test me!
     /**
      * Returns all capabilities this robot has
      *
