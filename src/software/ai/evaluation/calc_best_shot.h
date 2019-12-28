@@ -73,12 +73,30 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
+
     std::optional<Shot> calcBestShotOnGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Point &point, bool shoot_at_enemy_goal,
         double radius                              = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
-
+    /**
+ * Finds the best shot on the given goal, and returns the best target to shoot at and
+ * the largest open angle interval for the shot (this is the total angle between the
+ * obstacles on either side of the shot vector).
+ *
+ * @param goal_post_neg The goal post of the net with the negative y-coordinate
+ * @param goal_post_pos The goal post of the net with the positive y-coordinate
+ * @param p The point that the shot will be taken from
+ * @param obstacles The locations of any circular obstacles on the field that may obstruct the
+ * shot. These are usually robots on the field.
+ *
+ * @return the best target to shoot at and the largest open angle interval for the
+ * shot (this is the total angle between the obstacles on either side of the shot
+ * vector). If no shot is possible, returns `std::nullopt`
+ */
+    std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
+                                           const Point &goal_post_pos, const Point &p,
+                                           const std::vector<Circle> &obstacles);
     /**
      * Finds the best shot on the enemy goal, and returns the best target to shoot at and
      * the largest open angle interval for the shot (this is the total angle between the

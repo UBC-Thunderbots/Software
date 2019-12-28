@@ -32,6 +32,15 @@ namespace Evaluation
         return std::make_optional(
                 calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obs));
     }
+    std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
+                                           const Point &goal_post_pos, const Point &p,
+                                           const std::vector<Circle> &obstacles
+    )
+    {
+        // Use shot evaluation function to get the best Shot
+        return std::make_optional(
+                calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obstacles));
+    }
 
     std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
                                            const Team &enemy_team, const Point &point,
@@ -63,17 +72,11 @@ namespace Evaluation
         // Calculate the best_shot based on what goal we're shooting at
         if (shoot_on_enemy_goal)
         {
-            const Segment enemy_goal_segment =
-                Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos());
-            best_shot = std::make_optional(
-                calcMostOpenDirection(point, enemy_goal_segment, obstacles));
+            best_shot = calcBestShotOnGoal(field.enemyGoalpostNeg(), field.enemyGoalpostPos(), point, obstacles);
         }
         else
         {
-            const Segment friendly_goal_segment =
-                Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos());
-            best_shot = std::make_optional(
-                calcMostOpenDirection(point, friendly_goal_segment, obstacles));
+            best_shot = calcBestShotOnGoal(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), point, obstacles);
         }
 
         return best_shot;
