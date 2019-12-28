@@ -88,12 +88,6 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 
         for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
         {
-            // We only want to process tactics that have a robot assigned to them
-            if (!tactic->getAssignedRobot().has_value())
-            {
-                continue;
-            }
-
             // Try to get an intent from the tactic
             std::shared_ptr<Action> action = tactic->getNextAction();
             std::unique_ptr<Intent> intent;
