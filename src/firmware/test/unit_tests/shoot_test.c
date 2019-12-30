@@ -1,8 +1,7 @@
-#include "test.h"
-#include "check.h"
 #include "main/primitives/shoot.h"
 
+#include "check.h"
+#include "test.h"
 
-void run_shoot_test() {
 
-}
+void run_shoot_test() {}

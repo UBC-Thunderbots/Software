@@ -6,8 +6,8 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/intent/kick_intent.h"
-#include "software/ai/intent/move_intent.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
 
 using namespace Passing;
@@ -32,12 +32,13 @@ TEST(PasserTacticTest,
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
-    EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
-    EXPECT_EQ(-90, move_intent.getFinalAngle().toDegrees());
-    EXPECT_EQ(0, move_intent.getFinalSpeed());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
+    EXPECT_NEAR(0, move_action->getDestination().x(), 1e-5);
+    EXPECT_NEAR(robot_offset_meters, move_action->getDestination().y(), 1e-5);
+    EXPECT_EQ(-90, move_action->getFinalOrientation().toDegrees());
+    EXPECT_EQ(0, move_action->getFinalSpeed());
 }
 
 TEST(PasserTacticTest,
@@ -60,12 +61,13 @@ TEST(PasserTacticTest,
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
-    EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
-    EXPECT_EQ(-90, move_intent.getFinalAngle().toDegrees());
-    EXPECT_EQ(0, move_intent.getFinalSpeed());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
+    EXPECT_NEAR(0, move_action->getDestination().x(), 1e-5);
+    EXPECT_NEAR(robot_offset_meters, move_action->getDestination().y(), 1e-5);
+    EXPECT_EQ(-90, move_action->getFinalOrientation().toDegrees());
+    EXPECT_EQ(0, move_action->getFinalSpeed());
 }
 
 TEST(
@@ -90,12 +92,13 @@ TEST(
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
-    EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
-    EXPECT_EQ(-90, move_intent.getFinalAngle().toDegrees());
-    EXPECT_EQ(0, move_intent.getFinalSpeed());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
+    EXPECT_NEAR(0, move_action->getDestination().x(), 1e-5);
+    EXPECT_NEAR(robot_offset_meters, move_action->getDestination().y(), 1e-5);
+    EXPECT_EQ(-90, move_action->getFinalOrientation().toDegrees());
+    EXPECT_EQ(0, move_action->getFinalSpeed());
 }
 
 TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started)
@@ -118,12 +121,13 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started)
 
     // We're in the perfect position to kick, but pass hasn't started yet, so
     // we should just be moving
-    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
-    EXPECT_EQ(13, move_intent.getRobotId());
-    EXPECT_NEAR(0, move_intent.getDestination().x(), 1e-5);
-    EXPECT_NEAR(robot_offset_meters, move_intent.getDestination().y(), 1e-5);
-    EXPECT_EQ(-90, move_intent.getFinalAngle().toDegrees());
-    EXPECT_EQ(0, move_intent.getFinalSpeed());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
+    EXPECT_NEAR(0, move_action->getDestination().x(), 1e-5);
+    EXPECT_NEAR(robot_offset_meters, move_action->getDestination().y(), 1e-5);
+    EXPECT_EQ(-90, move_action->getFinalOrientation().toDegrees());
+    EXPECT_EQ(0, move_action->getFinalSpeed());
 }
 
 TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
@@ -143,11 +147,12 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
     tactic.updateRobot(robot);
 
     // We should try to kick the ball
-    KickIntent kick_intent = dynamic_cast<KickIntent &>(*tactic.getNextIntent());
-    EXPECT_EQ(13, kick_intent.getRobotId());
-    EXPECT_EQ(-90, kick_intent.getKickDirection().toDegrees());
-    EXPECT_EQ(Point(0, 0), kick_intent.getKickOrigin());
-    EXPECT_EQ(2.29, kick_intent.getKickSpeed());
+    auto kick_action = std::dynamic_pointer_cast<KickAction>(tactic.getNextAction());
+    ASSERT_TRUE(kick_action->getRobot().has_value());
+    EXPECT_EQ(13, kick_action->getRobot()->id());
+    EXPECT_EQ(-90, kick_action->getKickDirection().toDegrees());
+    EXPECT_EQ(Point(0, 0), kick_action->getKickOrigin());
+    EXPECT_EQ(2.29, kick_action->getKickSpeed());
 
     // Ball starts moving as if we've kicked it
     ball = Ball({0, 0}, {0, -2}, Timestamp::fromSeconds(5.1));
@@ -155,7 +160,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
     tactic.updateControlParams(pass);
 
     // We need to try to get the next the intent to make the tactic finish
-    tactic.getNextIntent();
+    tactic.getNextAction();
 
     // The tactic should now be done
     EXPECT_TRUE(tactic.done());

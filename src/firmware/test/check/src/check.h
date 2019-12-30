@@ -22,12 +22,11 @@
 #ifndef CHECK_H
 #define CHECK_H
 
+#include <check_stdint.h>
+#include <float.h>
+#include <math.h>
 #include <stddef.h>
 #include <string.h>
-#include <math.h>
-#include <float.h>
-
-#include <check_stdint.h>
 
 /*
    Macros and functions starting with _ (underscore) are internal and
@@ -36,27 +35,28 @@
 
 
 #ifdef __cplusplus
-#define CK_CPPSTART extern "C" {
+#define CK_CPPSTART                                                                      \
+    extern "C"                                                                           \
+    {
 #define CK_CPPEND }
 CK_CPPSTART
 #endif
 
 #if defined(__GNUC__) && defined(__GNUC_MINOR__)
-#define GCC_VERSION_AT_LEAST(major, minor) \
-((__GNUC__ > (major)) || \
- (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#define GCC_VERSION_AT_LEAST(major, minor)                                               \
+    ((__GNUC__ > (major)) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #define GCC_VERSION_AT_LEAST(major, minor) 0
 #endif
 
-#if GCC_VERSION_AT_LEAST(2,95)
-#define CK_ATTRIBUTE_UNUSED __attribute__ ((unused))
+#if GCC_VERSION_AT_LEAST(2, 95)
+#define CK_ATTRIBUTE_UNUSED __attribute__((unused))
 #else
 #define CK_ATTRIBUTE_UNUSED
 #endif /* GCC 2.95 */
 
-#if GCC_VERSION_AT_LEAST(2,5)
-#define CK_ATTRIBUTE_NORETURN __attribute__ ((noreturn))
+#if GCC_VERSION_AT_LEAST(2, 5)
+#define CK_ATTRIBUTE_NORETURN __attribute__((noreturn))
 #else
 #define CK_ATTRIBUTE_NORETURN
 #endif /* GCC 2.5 */
@@ -94,7 +94,7 @@ CK_DLL_EXP extern int CK_EXPORT check_minor_version;
 CK_DLL_EXP extern int CK_EXPORT check_micro_version;
 
 #ifndef NULL
-#define NULL ((void*)0)
+#define NULL ((void *)0)
 #endif
 
 /**
@@ -103,18 +103,18 @@ CK_DLL_EXP extern int CK_EXPORT check_micro_version;
  * A TCase represents a test case.  Create with tcase_create, free
  * with tcase_free.  For the moment, test cases can only be run
  * through a suite
-*/
+ */
 typedef struct TCase TCase;
 
 /**
  * Type for a test function
  */
-typedef void (*TFun) (int);
+typedef void (*TFun)(int);
 
 /**
  * Type for a setup/teardown function
  */
-typedef void (*SFun) (void);
+typedef void (*SFun)(void);
 
 /**
  * Type for a test suite
@@ -149,7 +149,7 @@ CK_DLL_EXP Suite *CK_EXPORT suite_create(const char *name);
  *
  * @since 0.9.9
  */
-CK_DLL_EXP int CK_EXPORT suite_tcase(Suite * s, const char *tcname);
+CK_DLL_EXP int CK_EXPORT suite_tcase(Suite *s, const char *tcname);
 
 /**
  * Add a test case to a suite.
@@ -162,7 +162,7 @@ CK_DLL_EXP int CK_EXPORT suite_tcase(Suite * s, const char *tcname);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP void CK_EXPORT suite_add_tcase(Suite * s, TCase * tc);
+CK_DLL_EXP void CK_EXPORT suite_add_tcase(Suite *s, TCase *tc);
 
 /**
  * Create a test case.
@@ -190,8 +190,7 @@ CK_DLL_EXP TCase *CK_EXPORT tcase_create(const char *name);
  *
  * @since 0.11.0
  * */
-CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase * tc,
-					 const char *tags);
+CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase *tc, const char *tags);
 /**
  * Add a test function to a test case
  *
@@ -200,7 +199,7 @@ CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase * tc,
  *
  * @since 0.6.0
  * */
-#define tcase_add_test(tc,tf) tcase_add_test_raise_signal(tc,tf,0)
+#define tcase_add_test(tc, tf) tcase_add_test_raise_signal(tc, tf, 0)
 
 /**
  * Add a test function with signal handling to a test case
@@ -214,8 +213,8 @@ CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase * tc,
  *
  * @since 0.9.2
  * */
-#define tcase_add_test_raise_signal(tc,tf,signal) \
-   _tcase_add_test((tc),(tf),"" # tf "",(signal), 0, 0, 1)
+#define tcase_add_test_raise_signal(tc, tf, signal)                                      \
+    _tcase_add_test((tc), (tf), "" #tf "", (signal), 0, 0, 1)
 
 /**
  * Add a test function with an expected exit value to a test case
@@ -229,8 +228,8 @@ CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase * tc,
  *
  * @since 0.9.7
  */
-#define tcase_add_exit_test(tc, tf, expected_exit_value) \
-  _tcase_add_test((tc),(tf),"" # tf "",0,(expected_exit_value),0,1)
+#define tcase_add_exit_test(tc, tf, expected_exit_value)                                 \
+    _tcase_add_test((tc), (tf), "" #tf "", 0, (expected_exit_value), 0, 1)
 
 /**
  * Add a looping test function to a test case
@@ -246,8 +245,8 @@ CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase * tc,
  *
  * @since 0.9.4
  */
-#define tcase_add_loop_test(tc,tf,s,e) \
-  _tcase_add_test((tc),(tf),"" # tf "",0,0,(s),(e))
+#define tcase_add_loop_test(tc, tf, s, e)                                                \
+    _tcase_add_test((tc), (tf), "" #tf "", 0, 0, (s), (e))
 
 /**
  * Add a looping test function with signal handling to a test case
@@ -267,8 +266,8 @@ CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase * tc,
  *
  * @since 0.9.5
  */
-#define tcase_add_loop_test_raise_signal(tc,tf,signal,s,e) \
-  _tcase_add_test((tc),(tf),"" # tf "",(signal),0,(s),(e))
+#define tcase_add_loop_test_raise_signal(tc, tf, signal, s, e)                           \
+    _tcase_add_test((tc), (tf), "" #tf "", (signal), 0, (s), (e))
 
 /**
  * Add a looping test function with an expected exit value to a test case
@@ -288,15 +287,14 @@ CK_DLL_EXP void CK_EXPORT tcase_set_tags(TCase * tc,
  *
  * @since 0.9.7
  */
-#define tcase_add_loop_exit_test(tc,tf,expected_exit_value,s,e) \
-  _tcase_add_test((tc),(tf),"" # tf "",0,(expected_exit_value),(s),(e))
+#define tcase_add_loop_exit_test(tc, tf, expected_exit_value, s, e)                      \
+    _tcase_add_test((tc), (tf), "" #tf "", 0, (expected_exit_value), (s), (e))
 
 /* Add a test function to a test case
   (function version -- use this when the macro won't work
 */
-CK_DLL_EXP void CK_EXPORT _tcase_add_test(TCase * tc, TFun tf,
-                                          const char *fname, int _signal,
-                                          int allowed_exit_value, int start,
+CK_DLL_EXP void CK_EXPORT _tcase_add_test(TCase *tc, TFun tf, const char *fname,
+                                          int _signal, int allowed_exit_value, int start,
                                           int end);
 
 /**
@@ -324,7 +322,7 @@ CK_DLL_EXP void CK_EXPORT _tcase_add_test(TCase * tc, TFun tf,
  *               if NULL no teardown function is added
  * @since 0.8.0
  */
-CK_DLL_EXP void CK_EXPORT tcase_add_unchecked_fixture(TCase * tc, SFun setup,
+CK_DLL_EXP void CK_EXPORT tcase_add_unchecked_fixture(TCase *tc, SFun setup,
                                                       SFun teardown);
 
 /**
@@ -352,9 +350,8 @@ CK_DLL_EXP void CK_EXPORT tcase_add_unchecked_fixture(TCase * tc, SFun setup,
  *               the test case; if NULL no teardown function is added
  *
  * @since 0.8.0
-*/
-CK_DLL_EXP void CK_EXPORT tcase_add_checked_fixture(TCase * tc, SFun setup,
-                                                    SFun teardown);
+ */
+CK_DLL_EXP void CK_EXPORT tcase_add_checked_fixture(TCase *tc, SFun setup, SFun teardown);
 
 /**
  * Set the timeout for all tests in a test case.
@@ -376,11 +373,10 @@ CK_DLL_EXP void CK_EXPORT tcase_add_checked_fixture(TCase * tc, SFun setup,
  *
  * @since 0.9.2
  */
-CK_DLL_EXP void CK_EXPORT tcase_set_timeout(TCase * tc, double timeout);
+CK_DLL_EXP void CK_EXPORT tcase_set_timeout(TCase *tc, double timeout);
 
 /* Internal function to mark the start of a test function */
-CK_DLL_EXP void CK_EXPORT tcase_fn_start(const char *fname, const char *file,
-                                         int line);
+CK_DLL_EXP void CK_EXPORT tcase_fn_start(const char *fname, const char *file, int line);
 
 /**
  * Retreive the name of the current running test. This is the name
@@ -390,7 +386,7 @@ CK_DLL_EXP void CK_EXPORT tcase_fn_start(const char *fname, const char *file,
  *
  * @since 0.11.0
  */
-CK_DLL_EXP const char* CK_EXPORT tcase_name(void);
+CK_DLL_EXP const char *CK_EXPORT tcase_name(void);
 
 /**
  * Start a unit test with START_TEST(unit_name), end with END_TEST.
@@ -399,10 +395,10 @@ CK_DLL_EXP const char* CK_EXPORT tcase_name(void);
  *
  * @since 0.6.0
  */
-#define START_TEST(__testname)\
-static void __testname (int _i CK_ATTRIBUTE_UNUSED)\
-{\
-  tcase_fn_start (""# __testname, __FILE__, __LINE__);
+#define START_TEST(__testname)                                                           \
+    static void __testname(int _i CK_ATTRIBUTE_UNUSED)                                   \
+    {                                                                                    \
+        tcase_fn_start("" #__testname, __FILE__, __LINE__);
 
 /**
  *  End a unit test
@@ -428,10 +424,10 @@ static void __testname (int _i CK_ATTRIBUTE_UNUSED)\
  * FIXME: these macros may conflict with C89 if expr is
  * FIXME:   strcmp (str1, str2) due to excessive string length.
  */
-#define fail_if(expr, ...)\
-  (expr) ? \
-     _ck_assert_failed(__FILE__, __LINE__, "Failure '"#expr"' occurred" , ## __VA_ARGS__, NULL) \
-     : _mark_point(__FILE__, __LINE__)
+#define fail_if(expr, ...)                                                               \
+    (expr) ? _ck_assert_failed(__FILE__, __LINE__, "Failure '" #expr "' occurred",       \
+                               ##__VA_ARGS__, NULL)                                      \
+           : _mark_point(__FILE__, __LINE__)
 
 /*
  * Fail the test
@@ -449,12 +445,11 @@ static void __testname (int _i CK_ATTRIBUTE_UNUSED)\
  * which are not valid, as longjmp() is like a return.
  */
 #if 1
-CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line,
-                                            const char *expr,
+CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line, const char *expr,
                                             ...) CK_ATTRIBUTE_NORETURN;
 #else
-CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line,
-                                            const char *expr, ...);
+CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line, const char *expr,
+                                            ...);
 #endif
 
 /**
@@ -481,10 +476,10 @@ CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line,
  *
  * @since 0.9.6
  */
-#define ck_assert_msg(expr, ...) \
-  (expr) ? \
-     _mark_point(__FILE__, __LINE__) : \
-     _ck_assert_failed(__FILE__, __LINE__, "Assertion '"#expr"' failed" , ## __VA_ARGS__, NULL)
+#define ck_assert_msg(expr, ...)                                                         \
+    (expr) ? _mark_point(__FILE__, __LINE__)                                             \
+           : _ck_assert_failed(__FILE__, __LINE__, "Assertion '" #expr "' failed",       \
+                               ##__VA_ARGS__, NULL)
 
 /**
  * Unconditionally fail the test
@@ -503,15 +498,20 @@ CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line,
  *
  * @since 0.9.6
  */
-#define ck_abort_msg(...) _ck_assert_failed(__FILE__, __LINE__, "Failed" , ## __VA_ARGS__, NULL)
+#define ck_abort_msg(...)                                                                \
+    _ck_assert_failed(__FILE__, __LINE__, "Failed", ##__VA_ARGS__, NULL)
 
-/* Signed and unsigned integer comparison macros with improved output compared to ck_assert(). */
+/* Signed and unsigned integer comparison macros with improved output compared to
+ * ck_assert(). */
 /* OP may be any comparison operator. */
-#define _ck_assert_int(X, OP, Y) do { \
-  intmax_t _ck_x = (X); \
-  intmax_t _ck_y = (Y); \
-  ck_assert_msg(_ck_x OP _ck_y, "Assertion '%s' failed: %s == %jd, %s == %jd", #X" "#OP" "#Y, #X, _ck_x, #Y, _ck_y); \
-} while (0)
+#define _ck_assert_int(X, OP, Y)                                                         \
+    do                                                                                   \
+    {                                                                                    \
+        intmax_t _ck_x = (X);                                                            \
+        intmax_t _ck_y = (Y);                                                            \
+        ck_assert_msg(_ck_x OP _ck_y, "Assertion '%s' failed: %s == %jd, %s == %jd",     \
+                      #X " " #OP " " #Y, #X, _ck_x, #Y, _ck_y);                          \
+    } while (0)
 
 /**
  * Check two signed integers to determine if X==Y
@@ -592,11 +592,14 @@ CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line,
  */
 #define ck_assert_int_ge(X, Y) _ck_assert_int(X, >=, Y)
 
-#define _ck_assert_uint(X, OP, Y) do { \
-  uintmax_t _ck_x = (X); \
-  uintmax_t _ck_y = (Y); \
-  ck_assert_msg(_ck_x OP _ck_y, "Assertion '%s' failed: %s == %ju, %s == %ju", #X" "#OP" "#Y, #X, _ck_x, #Y, _ck_y); \
-} while (0)
+#define _ck_assert_uint(X, OP, Y)                                                        \
+    do                                                                                   \
+    {                                                                                    \
+        uintmax_t _ck_x = (X);                                                           \
+        uintmax_t _ck_y = (Y);                                                           \
+        ck_assert_msg(_ck_x OP _ck_y, "Assertion '%s' failed: %s == %ju, %s == %ju",     \
+                      #X " " #OP " " #Y, #X, _ck_x, #Y, _ck_y);                          \
+    } while (0)
 /**
  * Check two unsigned integers to determine if X==Y
  *
@@ -678,96 +681,96 @@ CK_DLL_EXP void CK_EXPORT _ck_assert_failed(const char *file, int line,
 
 /* Number of digits after the decimal point to output via printf */
 #ifndef CK_FLOATING_DIG
-# define CK_FLOATING_DIG 6
+#define CK_FLOATING_DIG 6
 #endif /* CK_FLOATING_DIG */
 
 /* Floating point number comparison macros with improved output
  * compared to ck_assert(). */
 /* OP may be any comparison operator, TP is type, TM is type modifier. */
-#define _ck_assert_floating(X, OP, Y, TP, TM) do { \
-  TP _ck_x = (X); \
-  TP _ck_y = (Y); \
-  ck_assert_msg(_ck_x OP _ck_y, \
-  "Assertion '%s' failed: %s == %.*" TM "g, %s == %.*" TM "g", \
-  #X" "#OP" "#Y, \
-  #X, (int)CK_FLOATING_DIG, _ck_x, \
-  #Y, (int)CK_FLOATING_DIG, _ck_y); \
-} while (0)
+#define _ck_assert_floating(X, OP, Y, TP, TM)                                            \
+    do                                                                                   \
+    {                                                                                    \
+        TP _ck_x = (X);                                                                  \
+        TP _ck_y = (Y);                                                                  \
+        ck_assert_msg(_ck_x OP _ck_y,                                                    \
+                      "Assertion '%s' failed: %s == %.*" TM "g, %s == %.*" TM "g",       \
+                      #X " " #OP " " #Y, #X, (int)CK_FLOATING_DIG, _ck_x, #Y,            \
+                      (int)CK_FLOATING_DIG, _ck_y);                                      \
+    } while (0)
 
 /* Check floating point number is finise. */
 /* TP is type, TM is type modifier. */
-#define _ck_assert_floating_finite(X, TP, TM) \
-do { \
-  TP _ck_x = (X); \
-  ck_assert_msg(isfinite(_ck_x), \
-    "Assertion '%s' failed: %s == %.*" TM "g", \
-    #X" is finite", \
-    #X, (int)CK_FLOATING_DIG, _ck_x); \
-} while (0)
+#define _ck_assert_floating_finite(X, TP, TM)                                            \
+    do                                                                                   \
+    {                                                                                    \
+        TP _ck_x = (X);                                                                  \
+        ck_assert_msg(isfinite(_ck_x), "Assertion '%s' failed: %s == %.*" TM "g",        \
+                      #X " is finite", #X, (int)CK_FLOATING_DIG, _ck_x);                 \
+    } while (0)
 
 /* Check floating point number is infinise. */
 /* TP is type, TM is type modifier. */
-#define _ck_assert_floating_infinite(X, TP, TM) \
-do { \
-  TP _ck_x = (X); \
-  ck_assert_msg(isinf(_ck_x), \
-    "Assertion '%s' failed: %s == %.*" TM "g", \
-    #X" is infinite", \
-    #X, (int)CK_FLOATING_DIG, _ck_x); \
-} while (0)
+#define _ck_assert_floating_infinite(X, TP, TM)                                          \
+    do                                                                                   \
+    {                                                                                    \
+        TP _ck_x = (X);                                                                  \
+        ck_assert_msg(isinf(_ck_x), "Assertion '%s' failed: %s == %.*" TM "g",           \
+                      #X " is infinite", #X, (int)CK_FLOATING_DIG, _ck_x);               \
+    } while (0)
 
 /* Check floating point number is "Not a Number". */
 /* TP is type, TM is type modifier. */
-#define _ck_assert_floating_nan(X, TP, TM) \
-do { \
-  TP _ck_x = (X); \
-  ck_assert_msg(isnan(_ck_x), \
-    "Assertion '%s' failed: %s == %.*" TM "g", \
-    #X" is NaN", \
-    #X, (int)CK_FLOATING_DIG, _ck_x); \
-} while (0)
+#define _ck_assert_floating_nan(X, TP, TM)                                               \
+    do                                                                                   \
+    {                                                                                    \
+        TP _ck_x = (X);                                                                  \
+        ck_assert_msg(isnan(_ck_x), "Assertion '%s' failed: %s == %.*" TM "g",           \
+                      #X " is NaN", #X, (int)CK_FLOATING_DIG, _ck_x);                    \
+    } while (0)
 
 /* Check floating point number is not "Not a Number". */
 /* TP is type, TM is type modifier. */
-#define _ck_assert_floating_nonnan(X, TP, TM) \
-do { \
-  TP _ck_x = (X); \
-  ck_assert_msg(!isnan(_ck_x), \
-    "Assertion '%s' failed: %s == %.*" TM "g", \
-    #X" is not NaN", \
-    #X, (int)CK_FLOATING_DIG, _ck_x); \
-} while (0)
+#define _ck_assert_floating_nonnan(X, TP, TM)                                            \
+    do                                                                                   \
+    {                                                                                    \
+        TP _ck_x = (X);                                                                  \
+        ck_assert_msg(!isnan(_ck_x), "Assertion '%s' failed: %s == %.*" TM "g",          \
+                      #X " is not NaN", #X, (int)CK_FLOATING_DIG, _ck_x);                \
+    } while (0)
 
 /* Floating point tolerance comparison macros with improved output
  * compared to ck_assert(). */
 /* OP, D can have values: >, -1; <, 1. */
-#define _ck_assert_floating_op_tol(X, OP, Y, T, D, TP, TM) do { \
-  TP _ck_x = (X); \
-  TP _ck_y = (Y); \
-  TP _ck_t = (T); \
-  ck_assert_msg((_ck_x - _ck_y) OP _ck_t * (D), \
-  "Assertion '%s' failed: %s == %.*" TM "g, %s == %.*" TM "g, %s == %.*" TM "g", \
-  #X" "#OP"= "#Y", error < "#T, \
-  #X, (int)CK_FLOATING_DIG, _ck_x, \
-  #Y, (int)CK_FLOATING_DIG, _ck_y, \
-  #T, (int)CK_FLOATING_DIG, _ck_t); \
-} while (0)
+#define _ck_assert_floating_op_tol(X, OP, Y, T, D, TP, TM)                               \
+    do                                                                                   \
+    {                                                                                    \
+        TP _ck_x = (X);                                                                  \
+        TP _ck_y = (Y);                                                                  \
+        TP _ck_t = (T);                                                                  \
+        ck_assert_msg((_ck_x - _ck_y) OP _ck_t *(D),                                     \
+                      "Assertion '%s' failed: %s == %.*" TM "g, %s == %.*" TM            \
+                      "g, %s == %.*" TM "g",                                             \
+                      #X " " #OP "= " #Y ", error < " #T, #X, (int)CK_FLOATING_DIG,      \
+                      _ck_x, #Y, (int)CK_FLOATING_DIG, _ck_y, #T, (int)CK_FLOATING_DIG,  \
+                      _ck_t);                                                            \
+    } while (0)
 
 /* Floating point tolerance comparison macros with improved output
  * compared to ck_assert(). */
 /* OP can have values: <; >=. */
-#define _ck_assert_floating_absdiff_op_tol(X, Y, OP, T, TP, TM) \
-do { \
-  TP _ck_x = (X); \
-  TP _ck_y = (Y); \
-  TP _ck_t = (T); \
-  ck_assert_msg(fabsl(_ck_y - _ck_x) OP _ck_t, \
-    "Assertion '%s' failed: %s == %.*" TM "g, %s == %.*" TM "g, %s == %.*" TM "g", \
-    "fabsl("#Y" - "#X") "#OP" "#T, \
-    #X, (int)CK_FLOATING_DIG, _ck_x, \
-    #Y, (int)CK_FLOATING_DIG, _ck_y, \
-    #T, (int)CK_FLOATING_DIG, _ck_t); \
-} while (0)
+#define _ck_assert_floating_absdiff_op_tol(X, Y, OP, T, TP, TM)                          \
+    do                                                                                   \
+    {                                                                                    \
+        TP _ck_x = (X);                                                                  \
+        TP _ck_y = (Y);                                                                  \
+        TP _ck_t = (T);                                                                  \
+        ck_assert_msg(fabsl(_ck_y - _ck_x) OP _ck_t,                                     \
+                      "Assertion '%s' failed: %s == %.*" TM "g, %s == %.*" TM            \
+                      "g, %s == %.*" TM "g",                                             \
+                      "fabsl(" #Y " - " #X ") " #OP " " #T, #X, (int)CK_FLOATING_DIG,    \
+                      _ck_x, #Y, (int)CK_FLOATING_DIG, _ck_y, #T, (int)CK_FLOATING_DIG,  \
+                      _ck_t);                                                            \
+    } while (0)
 
 /**
  * Check two single precision floating point numbers to determine if X == Y
@@ -862,7 +865,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_float_eq_tol(X, Y, T)  _ck_assert_floating_absdiff_op_tol(X, Y, <, T, float, "")
+#define ck_assert_float_eq_tol(X, Y, T)                                                  \
+    _ck_assert_floating_absdiff_op_tol(X, Y, <, T, float, "")
 
 /**
  * Check two single precision floating point numbers to determine if not X≈Y
@@ -878,7 +882,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_float_ne_tol(X, Y, T) _ck_assert_floating_absdiff_op_tol(X, Y, >=, T, float, "")
+#define ck_assert_float_ne_tol(X, Y, T)                                                  \
+    _ck_assert_floating_absdiff_op_tol(X, Y, >=, T, float, "")
 
 /**
  * Check two single precision floating point numbers to determine if X>≈Y
@@ -894,7 +899,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_float_ge_tol(X, Y, T) _ck_assert_floating_op_tol(X, >, Y, T, -1, float, "")
+#define ck_assert_float_ge_tol(X, Y, T)                                                  \
+    _ck_assert_floating_op_tol(X, >, Y, T, -1, float, "")
 
 /**
  * Check two single precision floating point numbers to determine if X<≈Y
@@ -910,7 +916,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_float_le_tol(X, Y, T) _ck_assert_floating_op_tol(X, <, Y, T, 1, float, "")
+#define ck_assert_float_le_tol(X, Y, T)                                                  \
+    _ck_assert_floating_op_tol(X, <, Y, T, 1, float, "")
 
 /**
  * Check that a single precision floating point number is finite; i.e. is
@@ -943,7 +950,7 @@ do { \
 /**
  * Check that a single precision floating point number
  * is "Not a Number" (NaN)
- *  
+ *
  * If X is not NaN, the test fails.
  *
  * @param X floating point number (float) to be checked
@@ -1061,7 +1068,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_double_eq_tol(X, Y, T)  _ck_assert_floating_absdiff_op_tol(X, Y, <, T, double, "")
+#define ck_assert_double_eq_tol(X, Y, T)                                                 \
+    _ck_assert_floating_absdiff_op_tol(X, Y, <, T, double, "")
 
 /**
  * Check two double precision floating point numbers to determine if not X≈Y
@@ -1077,7 +1085,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_double_ne_tol(X, Y, T) _ck_assert_floating_absdiff_op_tol(X, Y, >=, T, double, "")
+#define ck_assert_double_ne_tol(X, Y, T)                                                 \
+    _ck_assert_floating_absdiff_op_tol(X, Y, >=, T, double, "")
 
 /**
  * Check two double precision floating point numbers to determine if X>≈Y
@@ -1093,7 +1102,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_double_ge_tol(X, Y, T) _ck_assert_floating_op_tol(X, >, Y, T, -1, double, "")
+#define ck_assert_double_ge_tol(X, Y, T)                                                 \
+    _ck_assert_floating_op_tol(X, >, Y, T, -1, double, "")
 
 /**
  * Check two double precision floating point numbers to determine if X<≈Y
@@ -1109,7 +1119,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_double_le_tol(X, Y, T) _ck_assert_floating_op_tol(X, <, Y, T, 1, double, "")
+#define ck_assert_double_le_tol(X, Y, T)                                                 \
+    _ck_assert_floating_op_tol(X, <, Y, T, 1, double, "")
 
 /**
  * Check that a double precision floating point number is finite; i.e. is
@@ -1142,7 +1153,7 @@ do { \
 /**
  * Check that a double precision floating point number
  * is "Not a Number" (NaN)
- *  
+ *
  * If X is not NaN, the test fails.
  *
  * @param X floating point number (double) to be checked
@@ -1167,7 +1178,7 @@ do { \
  */
 #define ck_assert_double_nonnan(X) _ck_assert_floating_nonnan(X, double, "")
 
-/** 
+/**
  * Check two double precision floating point numbers to determine if X == Y
  *
  * If not X == Y, the test fails.
@@ -1260,7 +1271,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_ldouble_eq_tol(X, Y, T)  _ck_assert_floating_absdiff_op_tol(X, Y, <, T, long double, "L")
+#define ck_assert_ldouble_eq_tol(X, Y, T)                                                \
+    _ck_assert_floating_absdiff_op_tol(X, Y, <, T, long double, "L")
 
 /**
  * Check two double precision floating point numbers to determine if not X≈Y
@@ -1276,7 +1288,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_ldouble_ne_tol(X, Y, T) _ck_assert_floating_absdiff_op_tol(X, Y, >=, T, long double, "L")
+#define ck_assert_ldouble_ne_tol(X, Y, T)                                                \
+    _ck_assert_floating_absdiff_op_tol(X, Y, >=, T, long double, "L")
 
 /**
  * Check two double precision floating point numbers to determine if X>≈Y
@@ -1292,7 +1305,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_ldouble_ge_tol(X, Y, T) _ck_assert_floating_op_tol(X, >, Y, T, -1, long double, "L")
+#define ck_assert_ldouble_ge_tol(X, Y, T)                                                \
+    _ck_assert_floating_op_tol(X, >, Y, T, -1, long double, "L")
 
 /**
  * Check two double precision floating point numbers to determine if X<≈Y
@@ -1308,7 +1322,8 @@ do { \
  *
  * @since 0.11.0
  */
-#define ck_assert_ldouble_le_tol(X, Y, T) _ck_assert_floating_op_tol(X, <, Y, T, 1, long double, "L")
+#define ck_assert_ldouble_le_tol(X, Y, T)                                                \
+    _ck_assert_floating_op_tol(X, <, Y, T, 1, long double, "L")
 
 /**
  * Check that a double precision floating point number is finite; i.e. is
@@ -1341,7 +1356,7 @@ do { \
 /**
  * Check that a double precision floating point number
  * is "Not a Number" (NaN)
- *  
+ *
  * If X is not NaN, the test fails.
  *
  * @param X floating point number (long double) to be checked
@@ -1368,39 +1383,46 @@ do { \
 
 /* String comparison macros with improved output compared to ck_assert() */
 /* OP might be any operator that can be used in '0 OP strcmp(X,Y)' comparison. */
-/* String pointer could be compared againts NULL with == (NULLEQ = 1) and != (NULLNE = 1) operators. */
+/* String pointer could be compared againts NULL with == (NULLEQ = 1) and != (NULLNE = 1)
+ * operators. */
 /* The x and y parameter swap in strcmp() is needed to handle >, >=, <, <= operators. */
 /* If the x or y parameter is NULL its value will be printed without quotes. */
-#define _ck_assert_str(X, OP, Y, NULLEQ, NULLNE) do { \
-  const char* _ck_x = (X); \
-  const char* _ck_y = (Y); \
-  const char* _ck_x_s; \
-  const char* _ck_y_s; \
-  const char* _ck_x_q; \
-  const char* _ck_y_q; \
-  if (_ck_x != NULL) { \
-    _ck_x_q = "\""; \
-    _ck_x_s = _ck_x; \
-  } else { \
-    _ck_x_q = ""; \
-    _ck_x_s = "(null)"; \
-  } \
-  if (_ck_y != NULL) { \
-    _ck_y_q = "\""; \
-    _ck_y_s = _ck_y; \
-  } else { \
-    _ck_y_q = ""; \
-    _ck_y_s = "(null)"; \
-  } \
-  ck_assert_msg( \
-    (NULLEQ && (_ck_x == NULL) && (_ck_y == NULL)) || \
-    (NULLNE && ((_ck_x == NULL) || (_ck_y == NULL)) && (_ck_x != _ck_y)) || \
-    ((_ck_x != NULL) && (_ck_y != NULL) && (0 OP strcmp(_ck_y, _ck_x))), \
-    "Assertion '%s' failed: %s == %s%s%s, %s == %s%s%s", \
-    #X" "#OP" "#Y, \
-    #X, _ck_x_q, _ck_x_s, _ck_x_q, \
-    #Y, _ck_y_q, _ck_y_s, _ck_y_q); \
-} while (0)
+#define _ck_assert_str(X, OP, Y, NULLEQ, NULLNE)                                         \
+    do                                                                                   \
+    {                                                                                    \
+        const char *_ck_x = (X);                                                         \
+        const char *_ck_y = (Y);                                                         \
+        const char *_ck_x_s;                                                             \
+        const char *_ck_y_s;                                                             \
+        const char *_ck_x_q;                                                             \
+        const char *_ck_y_q;                                                             \
+        if (_ck_x != NULL)                                                               \
+        {                                                                                \
+            _ck_x_q = "\"";                                                              \
+            _ck_x_s = _ck_x;                                                             \
+        }                                                                                \
+        else                                                                             \
+        {                                                                                \
+            _ck_x_q = "";                                                                \
+            _ck_x_s = "(null)";                                                          \
+        }                                                                                \
+        if (_ck_y != NULL)                                                               \
+        {                                                                                \
+            _ck_y_q = "\"";                                                              \
+            _ck_y_s = _ck_y;                                                             \
+        }                                                                                \
+        else                                                                             \
+        {                                                                                \
+            _ck_y_q = "";                                                                \
+            _ck_y_s = "(null)";                                                          \
+        }                                                                                \
+        ck_assert_msg(                                                                   \
+            (NULLEQ && (_ck_x == NULL) && (_ck_y == NULL)) ||                            \
+                (NULLNE && ((_ck_x == NULL) || (_ck_y == NULL)) && (_ck_x != _ck_y)) ||  \
+                ((_ck_x != NULL) && (_ck_y != NULL) && (0 OP strcmp(_ck_y, _ck_x))),     \
+            "Assertion '%s' failed: %s == %s%s%s, %s == %s%s%s", #X " " #OP " " #Y, #X,  \
+            _ck_x_q, _ck_x_s, _ck_x_q, #Y, _ck_y_q, _ck_y_s, _ck_y_q);                   \
+    } while (0)
 
 /**
  * Check two strings to determine if 0==strcmp(X,Y)
@@ -1493,7 +1515,7 @@ do { \
 #define ck_assert_str_ge(X, Y) _ck_assert_str(X, >=, Y, 0, 0)
 
 /**
- * Check two strings to determine if 0==strcmp(X,Y) or if both are undefined 
+ * Check two strings to determine if 0==strcmp(X,Y) or if both are undefined
  *
  * If both X and Y are NULL the test passes. However, if only one is NULL
  * the test fails.
@@ -1540,32 +1562,39 @@ do { \
 #define CK_MAX_ASSERT_MEM_PRINT_SIZE 64
 #endif
 
-#define _ck_assert_mem(X, OP, Y, L) do { \
-  const uint8_t* _ck_x = (const uint8_t*)(X); \
-  const uint8_t* _ck_y = (const uint8_t*)(Y); \
-  size_t _ck_l = (L); \
-  char _ck_x_str[CK_MAX_ASSERT_MEM_PRINT_SIZE * 2 + 1]; \
-  char _ck_y_str[CK_MAX_ASSERT_MEM_PRINT_SIZE * 2 + 1]; \
-  static const char _ck_hexdigits[] = "0123456789abcdef"; \
-  size_t _ck_i; \
-  size_t _ck_maxl = (_ck_l > CK_MAX_ASSERT_MEM_PRINT_SIZE) ? CK_MAX_ASSERT_MEM_PRINT_SIZE : _ck_l; \
-  for (_ck_i = 0; _ck_i < _ck_maxl; _ck_i++) { \
-    _ck_x_str[_ck_i * 2  ]   = _ck_hexdigits[(_ck_x[_ck_i] >> 4) & 0xF]; \
-    _ck_y_str[_ck_i * 2  ]   = _ck_hexdigits[(_ck_y[_ck_i] >> 4) & 0xF]; \
-    _ck_x_str[_ck_i * 2 + 1] = _ck_hexdigits[_ck_x[_ck_i] & 0xF]; \
-    _ck_y_str[_ck_i * 2 + 1] = _ck_hexdigits[_ck_y[_ck_i] & 0xF]; \
-  } \
-  _ck_x_str[_ck_i * 2] = 0; \
-  _ck_y_str[_ck_i * 2] = 0; \
-  if (_ck_maxl != _ck_l) { \
-    _ck_x_str[_ck_i * 2 - 2] = '.'; \
-    _ck_y_str[_ck_i * 2 - 2] = '.'; \
-    _ck_x_str[_ck_i * 2 - 1] = '.'; \
-    _ck_y_str[_ck_i * 2 - 1] = '.'; \
-  } \
-  ck_assert_msg(0 OP memcmp(_ck_y, _ck_x, _ck_l), \
-    "Assertion '%s' failed: %s == \"%s\", %s == \"%s\"", #X" "#OP" "#Y, #X, _ck_x_str, #Y, _ck_y_str); \
-} while (0)
+#define _ck_assert_mem(X, OP, Y, L)                                                      \
+    do                                                                                   \
+    {                                                                                    \
+        const uint8_t *_ck_x = (const uint8_t *)(X);                                     \
+        const uint8_t *_ck_y = (const uint8_t *)(Y);                                     \
+        size_t _ck_l         = (L);                                                      \
+        char _ck_x_str[CK_MAX_ASSERT_MEM_PRINT_SIZE * 2 + 1];                            \
+        char _ck_y_str[CK_MAX_ASSERT_MEM_PRINT_SIZE * 2 + 1];                            \
+        static const char _ck_hexdigits[] = "0123456789abcdef";                          \
+        size_t _ck_i;                                                                    \
+        size_t _ck_maxl = (_ck_l > CK_MAX_ASSERT_MEM_PRINT_SIZE)                         \
+                              ? CK_MAX_ASSERT_MEM_PRINT_SIZE                             \
+                              : _ck_l;                                                   \
+        for (_ck_i = 0; _ck_i < _ck_maxl; _ck_i++)                                       \
+        {                                                                                \
+            _ck_x_str[_ck_i * 2]     = _ck_hexdigits[(_ck_x[_ck_i] >> 4) & 0xF];         \
+            _ck_y_str[_ck_i * 2]     = _ck_hexdigits[(_ck_y[_ck_i] >> 4) & 0xF];         \
+            _ck_x_str[_ck_i * 2 + 1] = _ck_hexdigits[_ck_x[_ck_i] & 0xF];                \
+            _ck_y_str[_ck_i * 2 + 1] = _ck_hexdigits[_ck_y[_ck_i] & 0xF];                \
+        }                                                                                \
+        _ck_x_str[_ck_i * 2] = 0;                                                        \
+        _ck_y_str[_ck_i * 2] = 0;                                                        \
+        if (_ck_maxl != _ck_l)                                                           \
+        {                                                                                \
+            _ck_x_str[_ck_i * 2 - 2] = '.';                                              \
+            _ck_y_str[_ck_i * 2 - 2] = '.';                                              \
+            _ck_x_str[_ck_i * 2 - 1] = '.';                                              \
+            _ck_y_str[_ck_i * 2 - 1] = '.';                                              \
+        }                                                                                \
+        ck_assert_msg(0 OP memcmp(_ck_y, _ck_x, _ck_l),                                  \
+                      "Assertion '%s' failed: %s == \"%s\", %s == \"%s\"",               \
+                      #X " " #OP " " #Y, #X, _ck_x_str, #Y, _ck_y_str);                  \
+    } while (0)
 /**
  * Check two memory locations to determine if 0==memcmp(X,Y,L)
  *
@@ -1647,22 +1676,25 @@ do { \
 
 /* Pointer comparison macros with improved output compared to ck_assert(). */
 /* OP may only be == or !=  */
-#define _ck_assert_ptr(X, OP, Y) do { \
-  const void* _ck_x = (X); \
-  const void* _ck_y = (Y); \
-  ck_assert_msg(_ck_x OP _ck_y, "Assertion '%s' failed: %s == %#x, %s == %#x", #X" "#OP" "#Y, #X, _ck_x, #Y, _ck_y); \
-} while (0)
+#define _ck_assert_ptr(X, OP, Y)                                                         \
+    do                                                                                   \
+    {                                                                                    \
+        const void *_ck_x = (X);                                                         \
+        const void *_ck_y = (Y);                                                         \
+        ck_assert_msg(_ck_x OP _ck_y, "Assertion '%s' failed: %s == %#x, %s == %#x",     \
+                      #X " " #OP " " #Y, #X, _ck_x, #Y, _ck_y);                          \
+    } while (0)
 
 /* Pointer against NULL comparison macros with improved output
  * compared to ck_assert(). */
 /* OP may only be == or !=  */
-#define _ck_assert_ptr_null(X, OP) do { \
-  const void* _ck_x = (X); \
-  ck_assert_msg(_ck_x OP NULL, \
-  "Assertion '%s' failed: %s == %#x", \
-  #X" "#OP" NULL", \
-  #X, _ck_x); \
-} while (0)
+#define _ck_assert_ptr_null(X, OP)                                                       \
+    do                                                                                   \
+    {                                                                                    \
+        const void *_ck_x = (X);                                                         \
+        ck_assert_msg(_ck_x OP NULL, "Assertion '%s' failed: %s == %#x",                 \
+                      #X " " #OP " NULL", #X, _ck_x);                                    \
+    } while (0)
 
 /**
  * Check if two pointers are equal.
@@ -1726,8 +1758,8 @@ do { \
  * crashes or exits).
  *
  * @since 0.6.0
-*/
-#define mark_point() _mark_point(__FILE__,__LINE__)
+ */
+#define mark_point() _mark_point(__FILE__, __LINE__)
 
 /* Non macro version of #mark_point */
 CK_DLL_EXP void CK_EXPORT _mark_point(const char *file, int line);
@@ -1737,11 +1769,11 @@ CK_DLL_EXP void CK_EXPORT _mark_point(const char *file, int line);
  */
 enum test_result
 {
-    CK_TEST_RESULT_INVALID,     /**< Default value; should not encounter this */
-    CK_PASS,                    /**< Test passed */
-    CK_FAILURE,                 /**< Test completed but failed */
-    CK_ERROR                    /**< Test failed to complete
-                                   (unexpected signal or non-zero early exit) */
+    CK_TEST_RESULT_INVALID, /**< Default value; should not encounter this */
+    CK_PASS,                /**< Test passed */
+    CK_FAILURE,             /**< Test completed but failed */
+    CK_ERROR                /**< Test failed to complete
+                               (unexpected signal or non-zero early exit) */
 };
 
 /**
@@ -1749,19 +1781,19 @@ enum test_result
  */
 enum print_output
 {
-    CK_SILENT,                  /**< No output */
-    CK_MINIMAL,                 /**< Only summary output */
-    CK_NORMAL,                  /**< All failed tests */
-    CK_VERBOSE,                 /**< All tests */
-    CK_ENV,                     /**< Look at environment var CK_VERBOSITY
-                                     for what verbosity to use, which can be
-                                     either "silent", "minimal", "normal",
-                                     or "verbose". If the environment variable
-                                     is not set, then CK_NORMAL will be used.*/
+    CK_SILENT,  /**< No output */
+    CK_MINIMAL, /**< Only summary output */
+    CK_NORMAL,  /**< All failed tests */
+    CK_VERBOSE, /**< All tests */
+    CK_ENV,     /**< Look at environment var CK_VERBOSITY
+                     for what verbosity to use, which can be
+                     either "silent", "minimal", "normal",
+                     or "verbose". If the environment variable
+                     is not set, then CK_NORMAL will be used.*/
 #if 0
     CK_SUBUNIT,                 /**< Run as a subunit child process */
 #endif
-    CK_LAST                     /**< Not a valid option */
+    CK_LAST /**< Not a valid option */
 };
 
 /**
@@ -1779,10 +1811,10 @@ typedef struct TestResult TestResult;
  */
 enum ck_result_ctx
 {
-    CK_CTX_INVALID,             /**< Default value; should not encounter this */
-    CK_CTX_SETUP,               /**< Setup before a test */
-    CK_CTX_TEST,                /**< Body of test itself */
-    CK_CTX_TEARDOWN             /**< Teardown after a test */
+    CK_CTX_INVALID, /**< Default value; should not encounter this */
+    CK_CTX_SETUP,   /**< Setup before a test */
+    CK_CTX_TEST,    /**< Body of test itself */
+    CK_CTX_TEARDOWN /**< Teardown after a test */
 };
 
 /**
@@ -1797,7 +1829,7 @@ enum ck_result_ctx
  *
  * @since 0.6.0
  */
-CK_DLL_EXP int CK_EXPORT tr_rtype(TestResult * tr);
+CK_DLL_EXP int CK_EXPORT tr_rtype(TestResult *tr);
 
 /**
  * Retrieve context in which the result occurred for the given test result.
@@ -1811,7 +1843,7 @@ CK_DLL_EXP int CK_EXPORT tr_rtype(TestResult * tr);
  *
  * @since 0.8.0
  */
-CK_DLL_EXP enum ck_result_ctx CK_EXPORT tr_ctx(TestResult * tr);
+CK_DLL_EXP enum ck_result_ctx CK_EXPORT tr_ctx(TestResult *tr);
 
 /**
  * Retrieve failure message from test result, if applicable.
@@ -1820,7 +1852,7 @@ CK_DLL_EXP enum ck_result_ctx CK_EXPORT tr_ctx(TestResult * tr);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP const char *CK_EXPORT tr_msg(TestResult * tr);
+CK_DLL_EXP const char *CK_EXPORT tr_msg(TestResult *tr);
 
 /**
  * Retrieve line number at which a failure occurred, if applicable.
@@ -1830,7 +1862,7 @@ CK_DLL_EXP const char *CK_EXPORT tr_msg(TestResult * tr);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP int CK_EXPORT tr_lno(TestResult * tr);
+CK_DLL_EXP int CK_EXPORT tr_lno(TestResult *tr);
 
 /**
  * Retrieve file name at which a failure occurred, if applicable.
@@ -1841,7 +1873,7 @@ CK_DLL_EXP int CK_EXPORT tr_lno(TestResult * tr);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP const char *CK_EXPORT tr_lfile(TestResult * tr);
+CK_DLL_EXP const char *CK_EXPORT tr_lfile(TestResult *tr);
 
 /**
  * Retrieve test case name in which a failure occurred, if applicable.
@@ -1852,7 +1884,7 @@ CK_DLL_EXP const char *CK_EXPORT tr_lfile(TestResult * tr);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP const char *CK_EXPORT tr_tcname(TestResult * tr);
+CK_DLL_EXP const char *CK_EXPORT tr_tcname(TestResult *tr);
 
 /**
  * Creates a suite runner for the given suite.
@@ -1868,7 +1900,7 @@ CK_DLL_EXP const char *CK_EXPORT tr_tcname(TestResult * tr);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP SRunner *CK_EXPORT srunner_create(Suite * s);
+CK_DLL_EXP SRunner *CK_EXPORT srunner_create(Suite *s);
 
 /**
  * Add an additional suite to a suite runner.
@@ -1881,7 +1913,7 @@ CK_DLL_EXP SRunner *CK_EXPORT srunner_create(Suite * s);
  *
  * @since 0.7.0
  */
-CK_DLL_EXP void CK_EXPORT srunner_add_suite(SRunner * sr, Suite * s);
+CK_DLL_EXP void CK_EXPORT srunner_add_suite(SRunner *sr, Suite *s);
 
 /**
  * Frees a suite runner, including all contained suite and test cases.
@@ -1894,7 +1926,7 @@ CK_DLL_EXP void CK_EXPORT srunner_add_suite(SRunner * sr, Suite * s);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP void CK_EXPORT srunner_free(SRunner * sr);
+CK_DLL_EXP void CK_EXPORT srunner_free(SRunner *sr);
 
 /**
  * Runs a suite runner and all contained suite, printing results to
@@ -1912,8 +1944,7 @@ CK_DLL_EXP void CK_EXPORT srunner_free(SRunner * sr);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP void CK_EXPORT srunner_run_all(SRunner * sr,
-                                          enum print_output print_mode);
+CK_DLL_EXP void CK_EXPORT srunner_run_all(SRunner *sr, enum print_output print_mode);
 
 /**
  * Run a specific suite or test case from a suite runner, printing results
@@ -1927,7 +1958,7 @@ CK_DLL_EXP void CK_EXPORT srunner_run_all(SRunner * sr,
  * then the function will fallback to using the environment variables
  * CK_RUN_SUITE and CK_RUN_CASE respectively in order to select the
  * suite/cases.
- * 
+ *
  * Similarly if the CK_INCLUDE_TAGS and/or CK_EXCLUDE_TAGS environment
  * variables are defined then these will further filter the test cases
  * (see srunner_run_tagged, below).
@@ -1943,8 +1974,7 @@ CK_DLL_EXP void CK_EXPORT srunner_run_all(SRunner * sr,
  *
  * @since 0.9.9
  */
-CK_DLL_EXP void CK_EXPORT srunner_run(SRunner * sr, const char *sname,
-                                      const char *tcname,
+CK_DLL_EXP void CK_EXPORT srunner_run(SRunner *sr, const char *sname, const char *tcname,
                                       enum print_output print_mode);
 
 
@@ -1982,11 +2012,10 @@ CK_DLL_EXP void CK_EXPORT srunner_run(SRunner * sr, const char *sname,
  *
  * @since 0.11.0
  */
-CK_DLL_EXP void CK_EXPORT srunner_run_tagged(SRunner * sr, const char *sname,
-					     const char *tcname,
-					     const char *include_tags,
-					     const char *exclude_tags,
-					     enum print_output print_mode);
+CK_DLL_EXP void CK_EXPORT srunner_run_tagged(SRunner *sr, const char *sname,
+                                             const char *tcname, const char *include_tags,
+                                             const char *exclude_tags,
+                                             enum print_output print_mode);
 
 /**
  * Retrieve the number of failed tests executed by a suite runner.
@@ -1999,7 +2028,7 @@ CK_DLL_EXP void CK_EXPORT srunner_run_tagged(SRunner * sr, const char *sname,
  *
  * @since 0.6.1
  */
-CK_DLL_EXP int CK_EXPORT srunner_ntests_failed(SRunner * sr);
+CK_DLL_EXP int CK_EXPORT srunner_ntests_failed(SRunner *sr);
 
 /**
  * Retrieve the total number of tests run by a suite runner.
@@ -2010,7 +2039,7 @@ CK_DLL_EXP int CK_EXPORT srunner_ntests_failed(SRunner * sr);
  *
  * @since 0.6.1
  */
-CK_DLL_EXP int CK_EXPORT srunner_ntests_run(SRunner * sr);
+CK_DLL_EXP int CK_EXPORT srunner_ntests_run(SRunner *sr);
 
 /**
  * Return an array of results for all failures found by a suite runner.
@@ -2029,7 +2058,7 @@ CK_DLL_EXP int CK_EXPORT srunner_ntests_run(SRunner * sr);
  *
  * @since 0.6.0
  */
-CK_DLL_EXP TestResult **CK_EXPORT srunner_failures(SRunner * sr);
+CK_DLL_EXP TestResult **CK_EXPORT srunner_failures(SRunner *sr);
 
 /**
  * Return an array of results for all tests run by a suite runner.
@@ -2048,8 +2077,8 @@ CK_DLL_EXP TestResult **CK_EXPORT srunner_failures(SRunner * sr);
  * @return array of TestResult objects
  *
  * @since 0.6.1
-*/
-CK_DLL_EXP TestResult **CK_EXPORT srunner_results(SRunner * sr);
+ */
+CK_DLL_EXP TestResult **CK_EXPORT srunner_results(SRunner *sr);
 
 /**
  * Print the results contained in an SRunner to stdout.
@@ -2060,8 +2089,7 @@ CK_DLL_EXP TestResult **CK_EXPORT srunner_results(SRunner * sr);
  *
  * @since 0.7.0
  */
-CK_DLL_EXP void CK_EXPORT srunner_print(SRunner * sr,
-                                        enum print_output print_mode);
+CK_DLL_EXP void CK_EXPORT srunner_print(SRunner *sr, enum print_output print_mode);
 
 /**
  * Set the suite runner to output the result in log format to the
@@ -2078,8 +2106,8 @@ CK_DLL_EXP void CK_EXPORT srunner_print(SRunner * sr,
  * @param fname file name to output log results to
  *
  * @since 0.7.1
-*/
-CK_DLL_EXP void CK_EXPORT srunner_set_log(SRunner * sr, const char *fname);
+ */
+CK_DLL_EXP void CK_EXPORT srunner_set_log(SRunner *sr, const char *fname);
 
 /**
  * Checks if the suite runner is assigned a file for log output.
@@ -2091,7 +2119,7 @@ CK_DLL_EXP void CK_EXPORT srunner_set_log(SRunner * sr, const char *fname);
  *
  * @since 0.7.1
  */
-CK_DLL_EXP int CK_EXPORT srunner_has_log(SRunner * sr);
+CK_DLL_EXP int CK_EXPORT srunner_has_log(SRunner *sr);
 
 /**
  * Retrieves the name of the currently assigned file
@@ -2101,7 +2129,7 @@ CK_DLL_EXP int CK_EXPORT srunner_has_log(SRunner * sr);
  *
  * @since 0.7.1
  */
-CK_DLL_EXP const char *CK_EXPORT srunner_log_fname(SRunner * sr);
+CK_DLL_EXP const char *CK_EXPORT srunner_log_fname(SRunner *sr);
 
 /**
  * Set the suite runner to output the result in XML format to the
@@ -2118,8 +2146,8 @@ CK_DLL_EXP const char *CK_EXPORT srunner_log_fname(SRunner * sr);
  * @param fname file name to output XML results to
  *
  * @since 0.9.1
-*/
-CK_DLL_EXP void CK_EXPORT srunner_set_xml(SRunner * sr, const char *fname);
+ */
+CK_DLL_EXP void CK_EXPORT srunner_set_xml(SRunner *sr, const char *fname);
 
 /**
  * Checks if the suite runner is assigned a file for XML output.
@@ -2131,7 +2159,7 @@ CK_DLL_EXP void CK_EXPORT srunner_set_xml(SRunner * sr, const char *fname);
  *
  * @since 0.9.1
  */
-CK_DLL_EXP int CK_EXPORT srunner_has_xml(SRunner * sr);
+CK_DLL_EXP int CK_EXPORT srunner_has_xml(SRunner *sr);
 
 /**
  * Retrieves the name of the currently assigned file
@@ -2141,7 +2169,7 @@ CK_DLL_EXP int CK_EXPORT srunner_has_xml(SRunner * sr);
  *
  * @since 0.9.1
  */
-CK_DLL_EXP const char *CK_EXPORT srunner_xml_fname(SRunner * sr);
+CK_DLL_EXP const char *CK_EXPORT srunner_xml_fname(SRunner *sr);
 
 /**
  * Set the suite runner to output the result in TAP format to the
@@ -2158,8 +2186,8 @@ CK_DLL_EXP const char *CK_EXPORT srunner_xml_fname(SRunner * sr);
  * @param fname file name to output TAP results to
  *
  * @since 0.9.12
-*/
-CK_DLL_EXP void CK_EXPORT srunner_set_tap(SRunner * sr, const char *fname);
+ */
+CK_DLL_EXP void CK_EXPORT srunner_set_tap(SRunner *sr, const char *fname);
 
 /**
  * Checks if the suite runner is assigned a file for TAP output.
@@ -2171,7 +2199,7 @@ CK_DLL_EXP void CK_EXPORT srunner_set_tap(SRunner * sr, const char *fname);
  *
  * @since 0.9.12
  */
-CK_DLL_EXP int CK_EXPORT srunner_has_tap(SRunner * sr);
+CK_DLL_EXP int CK_EXPORT srunner_has_tap(SRunner *sr);
 
 /**
  * Retrieves the name of the currently assigned file
@@ -2181,16 +2209,16 @@ CK_DLL_EXP int CK_EXPORT srunner_has_tap(SRunner * sr);
  *
  * @since 0.9.12
  */
-CK_DLL_EXP const char *CK_EXPORT srunner_tap_fname(SRunner * sr);
+CK_DLL_EXP const char *CK_EXPORT srunner_tap_fname(SRunner *sr);
 
 /**
  * Enum describing the current fork usage.
  */
 enum fork_status
 {
-    CK_FORK_GETENV,             /**< look in the environment for CK_FORK */
-    CK_FORK,                    /**< call fork to run tests */
-    CK_NOFORK                   /**< don't call fork */
+    CK_FORK_GETENV, /**< look in the environment for CK_FORK */
+    CK_FORK,        /**< call fork to run tests */
+    CK_NOFORK       /**< don't call fork */
 };
 
 /**
@@ -2200,7 +2228,7 @@ enum fork_status
  *
  * @since 0.8.0
  */
-CK_DLL_EXP enum fork_status CK_EXPORT srunner_fork_status(SRunner * sr);
+CK_DLL_EXP enum fork_status CK_EXPORT srunner_fork_status(SRunner *sr);
 
 /**
  * Set the fork status for a given suite runner.
@@ -2222,8 +2250,7 @@ CK_DLL_EXP enum fork_status CK_EXPORT srunner_fork_status(SRunner * sr);
  *
  * @since 0.8.0
  */
-CK_DLL_EXP void CK_EXPORT srunner_set_fork_status(SRunner * sr,
-                                                  enum fork_status fstat);
+CK_DLL_EXP void CK_EXPORT srunner_set_fork_status(SRunner *sr, enum fork_status fstat);
 
 /**
  * Invoke fork() during a test and assign the child to the same

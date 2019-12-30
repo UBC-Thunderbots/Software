@@ -118,3 +118,6 @@ cscope*
 
 # Explicitly un-ignore the .bazelproject file
 !/src/.bazelproject
+
+#kcachegrind
+src/callgrind*

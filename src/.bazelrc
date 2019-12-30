@@ -11,3 +11,8 @@ build --crosstool_top=//cc_toolchain:toolchain
 # Automatically set the CPU environment based on the `--cpu` flag as per our
 # defined CPU environments
 build --auto_cpu_environment_group=//cc_toolchain:cpus
+
+# Use a local directory as a remote cache. This shares artifacts when switching
+# between git branches or workspaces for the same project.
+# See https://docs.bazel.build/versions/master/remote-caching.html#disk-cache
+build --disk_cache=~/.cache/thunderbots_bazel_disk_cache

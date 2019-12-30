@@ -40,12 +40,7 @@ namespace
                                             MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::FRIENDLY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new BlockShotPathTactic(world.field()), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ChipTactic(world.ball(), true), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new GrabBallTactic(world.field(), world.ball(), world.enemyTeam(), true),
-                std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new KickoffChipTactic(world.ball(), true),
                 std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,

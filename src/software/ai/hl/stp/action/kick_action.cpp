@@ -32,6 +32,21 @@ void KickAction::updateControlParams(const Robot &robot, Point kick_origin,
     this->kick_speed_meters_per_second = kick_speed_meters_per_second;
 }
 
+Angle KickAction::getKickDirection()
+{
+    return kick_direction;
+}
+
+Point KickAction::getKickOrigin()
+{
+    return kick_origin;
+}
+
+double KickAction::getKickSpeed()
+{
+    return kick_speed_meters_per_second;
+}
+
 void KickAction::accept(ActionVisitor &visitor) const
 {
     visitor.visit(*this);

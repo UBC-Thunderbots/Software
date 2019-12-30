@@ -2,9 +2,9 @@
 
 #include "software/ai/ai.h"
 #include "software/ai/hl/stp/play_info.h"
-#include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/visualizer/drawing/draw_functions.h"
 #include "software/world/world.h"
 
 /**
