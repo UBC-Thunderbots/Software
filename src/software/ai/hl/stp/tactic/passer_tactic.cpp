@@ -45,10 +45,10 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
     return std::clamp<double>(cost, 0, 1);
 }
 
-void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
+void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    MoveAction move_action =
-        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+    auto move_action = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
     while (ball.lastUpdateTimestamp() < pass.startTime())
@@ -60,25 +60,25 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
         Point wait_position = pass.passerPoint() - ball_offset;
 
-        move_action.updateControlParams(*robot, wait_position, pass.passerOrientation(),
-                                        0, DribblerEnable::OFF, MoveType::NORMAL,
-                                        AutokickType::NONE, BallCollisionType::ALLOW);
-        yield(move_action.getNextIntent());
+        move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
+                                         0, DribblerEnable::OFF, MoveType::NORMAL,
+                                         AutokickType::NONE, BallCollisionType::ALLOW);
+        yield(move_action);
     }
 
     // The angle between the ball velocity vector and a vector from the passer
     // point to the receiver point
     Angle ball_velocity_to_pass_orientation;
 
-    KickAction kick_action = KickAction();
+    auto kick_action = std::make_shared<KickAction>();
     do
     {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
-        kick_action.updateWorldParams(ball);
-        kick_action.updateControlParams(*robot, ball.position(), pass.receiverPoint(),
-                                        pass.speed());
-        yield(kick_action.getNextIntent());
+        kick_action->updateWorldParams(ball);
+        kick_action->updateControlParams(*robot, ball.position(), pass.receiverPoint(),
+                                         pass.speed());
+        yield(kick_action);
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity

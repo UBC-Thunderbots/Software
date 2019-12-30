@@ -72,6 +72,33 @@ cc_test(
 )
 
 cc_library(
+    name = "physics_robot",
+    srcs = ["physics_robot.cpp"],
+    hdrs = ["physics_robot.h"],
+    deps = [
+        ":box2d_util",
+        "//shared:constants",
+        "//software/geom",
+        "//software/util/time:timestamp",
+        "//software/world:robot",
+        "@box2d",
+    ],
+)
+
+cc_test(
+    name = "physics_robot_test",
+    srcs = ["physics_robot_test.cpp"],
+    deps = [
+        ":physics_ball",
+        ":physics_robot",
+        "//software/test_util",
+        "//software/world:robot",
+        "@box2d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "physics_simulator",
     srcs = ["physics_simulator.cpp"],
     hdrs = ["physics_simulator.h"],

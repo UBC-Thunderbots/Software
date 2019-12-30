@@ -62,43 +62,6 @@ TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle)
     EXPECT_DOUBLE_EQ(std::sqrt(8.0), dist(p, rect));
 }
 
-TEST(GeomUtilTest, dist_line_vector2)
-{
-    double calculated_val, expected_val;
-
-    // case 1
-    Line test1line(Point(0, 1), Point(0, 0));
-    Point test1p(2, 0);
-    calculated_val = dist(test1line, test1p);
-    expected_val   = 2;
-    EXPECT_EQ(expected_val, calculated_val);
-
-    // case 2
-    Line test2line(Point(2, 0), Point(0, 2));
-    Point test2p(0, 0);
-    calculated_val = dist(test2line, test2p);
-    expected_val   = sqrt(2);
-    EXPECT_DOUBLE_EQ(expected_val, calculated_val);
-
-    // case 3
-    Line test3line(Point(0, 0), Point(0, 0));
-    Point test3p(1, 0);
-    calculated_val = dist(test3line, test3p);
-    expected_val   = 1;
-    EXPECT_EQ(expected_val, calculated_val);
-
-    Line line(Point(1, -1), Point(5, -2));
-    Point p(2, -3);
-
-    EXPECT_NEAR(1.69775, dist(line, p), 1e-5);
-
-    p = Point(2, 1);
-    EXPECT_NEAR(2.18282, dist(line, p), 1e-5);
-
-    p = Point(2, 0);
-    EXPECT_NEAR(1.21268, dist(line, p), 1e-5);
-}
-
 TEST(GeomUtilTest, test_proj_len)
 {
     double calculated_val, expected_val;
@@ -849,7 +812,7 @@ TEST(GeomUtilTest, test_intersection)
 }
 
 // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point
-// along the ray (Should be ray.getRayStart() + ray.GetDirection())
+// along the ray (Should be ray.getStart() + ray.GetDirection())
 TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction)
 {
     Segment segment = Segment(Point(-1, 1), Point(1, 1));
@@ -1002,7 +965,7 @@ TEST(GeomUtilTest, test_ray_segment_overlapping)
 
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection1.value(), ray.getStart());
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
@@ -1015,7 +978,7 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_end)
 
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection1.value(), ray.getStart());
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
@@ -1028,7 +991,7 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_start)
 
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection1.value(), ray.getStart());
     EXPECT_EQ(intersection2.value(), segment.getSegStart());
 }
 
