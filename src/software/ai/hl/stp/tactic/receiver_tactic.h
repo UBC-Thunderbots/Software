@@ -5,8 +5,8 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
-#include "software/geom/ray.h"
 #include "software/geom/shot.h"
+#include "software/new_geom/ray.h"
 
 /**
  * This tactic is for a robot receiving a pass. It should be used in conjunction with
@@ -99,7 +99,7 @@ class ReceiverTactic : public Tactic
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     /**
      * Finds a feasible shot for the robot, if any.

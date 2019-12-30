@@ -52,39 +52,38 @@ double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
     }
 }
 
-void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     if (patrol_points.empty())
     {
-        StopAction stop_action = StopAction(false, true);
+        auto stop_action = std::make_shared<StopAction>(false, true);
         do
         {
             LOG(WARNING) << "Running a Patrol Tactic with no patrol points" << std::endl;
-            stop_action.updateControlParams(*robot, false);
-            yield(stop_action.getNextIntent());
+            stop_action->updateControlParams(*robot, false);
+            yield(stop_action);
         } while (true);
     }
 
-    MoveAction move_action = MoveAction(this->at_patrol_point_tolerance, Angle(), false);
+    auto move_action =
+        std::make_shared<MoveAction>(this->at_patrol_point_tolerance, Angle(), false);
     do
     {
-        move_action.updateControlParams(
+        move_action->updateControlParams(
             *robot, patrol_points.at(patrol_point_index), orientation_at_patrol_points,
             linear_speed_at_patrol_points, DribblerEnable::OFF, MoveType::NORMAL,
             AutokickType::NONE, BallCollisionType::AVOID);
-        auto next_intent = move_action.getNextIntent();
-        if (!next_intent || move_action.done())
+        if (move_action->done())
         {
             patrol_point_index = (patrol_point_index + 1) % patrol_points.size();
-            move_action.updateControlParams(*robot, patrol_points.at(patrol_point_index),
-                                            orientation_at_patrol_points,
-                                            linear_speed_at_patrol_points,
-                                            DribblerEnable::OFF, MoveType::NORMAL,
-                                            AutokickType::NONE, BallCollisionType::AVOID);
-            next_intent = move_action.getNextIntent();
+            move_action->updateControlParams(
+                *robot, patrol_points.at(patrol_point_index),
+                orientation_at_patrol_points, linear_speed_at_patrol_points,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::AVOID);
         }
 
-        yield(std::move(next_intent));
+        yield(move_action);
     } while (true);
 }
 

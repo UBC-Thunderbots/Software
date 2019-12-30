@@ -9,18 +9,16 @@ class ShadowFreekickerTactic;
 class GoalieTactic;
 class CreaseDefenderTactic;
 class ShadowEnemyTactic;
-class BlockShotPathTactic;
 class MoveTactic;
 class ChipTactic;
 class KickoffChipTactic;
 class StopTactic;
+class PatrolTactic;
 class PenaltyKickTactic;
 class PenaltySetupTactic;
 class ReceiverTactic;
-class PatrolTactic;
 class ShootGoalTactic;
 class PasserTactic;
-class GrabBallTactic;
 class MoveTestTactic;
 class StopTestTactic;
 class DefenseShadowEnemyTactic;
@@ -43,23 +41,22 @@ class TacticVisitor
      *
      * @param tactic The tactic to visit
      */
-    virtual void visit(CherryPickTactic &tactic) = 0;
+
+    virtual void visit(CherryPickTactic &tactic)         = 0;
     virtual void visit(ShadowFreekickerTactic &tactic) = 0;
     virtual void visit(GoalieTactic &tactic) = 0;
     virtual void visit(CreaseDefenderTactic &tactic) = 0;
     virtual void visit(ShadowEnemyTactic &tactic) = 0;
-    virtual void visit(BlockShotPathTactic &tactic) = 0;
     virtual void visit(MoveTactic &tactic) = 0;
     virtual void visit(ChipTactic &tactic) = 0;
-    virtual void visit(KickoffChipTactic &tactic) = 0;
+    virtual void visit(KickoffChipTactic &tactic)        = 0;
     virtual void visit(StopTactic &tactic) = 0;
+    virtual void visit(PatrolTactic &tactic)             = 0;
     virtual void visit(PenaltyKickTactic &tactic) = 0;
-    virtual void visit(PenaltySetupTactic &tactic) = 0;
+    virtual void visit(PenaltySetupTactic &tactic)       = 0;
     virtual void visit(ReceiverTactic &tactic) = 0;
-    virtual void visit(PatrolTactic &tactic) = 0;
     virtual void visit(ShootGoalTactic &tactic) = 0;
     virtual void visit(PasserTactic &tactic) = 0;
-    virtual void visit(GrabBallTactic &tactic) = 0;
     virtual void visit(MoveTestTactic &tactic) = 0;
     virtual void visit(StopTestTactic &tactic) = 0;
     virtual void visit(DefenseShadowEnemyTactic &tactic) = 0;

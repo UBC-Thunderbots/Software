@@ -6,6 +6,7 @@
 #include "software/test_util/test_util.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/intent/kick_intent.h"
+#include "software/new_geom/util/distance.h"
 
 
 TEST(TacticUpdateVisitorTest, update_cherry_pick_tactic) {
@@ -49,24 +50,18 @@ TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
     world.mutableFriendlyTeam().updateRobots({friendly_robot});
 
     tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
 
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(
-                Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
-                      ROBOT_MAX_RADIUS_METERS,
-                      0.0),
-        0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
-    }
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(move_action->getDestination().isClose(
+            Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
+                  ROBOT_MAX_RADIUS_METERS,
+                  0.0),
+            0.05));
 }
 
 TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
@@ -92,61 +87,21 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
     tactic.accept(visitor);
     tactic.updateControlParams(enemy_threat);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
 
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
-        EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::zero()),
-                Angle::fromDegrees(1));
-        EXPECT_TRUE(move_intent.getAutoKickType() == AutokickType::AUTOCHIP);
-    }
-    catch (std::bad_cast &)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
-    }
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
+              Angle::fromDegrees(1));
+    EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
 }
 
 TEST(TacticUpdateVisitorTest, update_goalie_tactic)
 {
     //add goalie test
-}
-
-TEST(TacticUpdateVisitorTest, update_grab_ball_tactic)
-{
-    World blank_world = ::Test::TestUtil::createBlankTestingWorld();
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-    ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    world = ::Test::TestUtil::setBallVelocity(world, Vector(0.5, 0),
-                                              Timestamp::fromSeconds(0));
-
-    Robot friendly_robot = Robot(0, Point(2, -1), Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({friendly_robot});
-
-    GrabBallTactic tactic =
-            GrabBallTactic(blank_world.field(), blank_world.ball(), blank_world.enemyTeam(), true);
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
-    tactic.accept(visitor);
-    tactic.updateRobot(friendly_robot);
-    auto intent_ptr = tactic.getNextIntent();
-
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(intent_ptr);
-
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(2, 0), 0.05));
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the GrabBallTactic!";
-    }
 }
 
 TEST(TacticUpdateVisitorTest, update_passer_tactic)
@@ -200,18 +155,19 @@ TEST(TacticUpdateVisitorTest, update_receiver_tactic)
     {
         TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
         tactic.accept(visitor);
-        //tactic.updateWorldParams(friendly_team, enemy_team, ball);
         tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
-        EXPECT_EQ(13, move_intent.getRobotId());
-        EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
-        EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
+        auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+        ASSERT_NE(move_action, nullptr);
+        ASSERT_TRUE(move_action->getRobot().has_value());
+        EXPECT_EQ(13, move_action->getRobot()->id());
+        EXPECT_DOUBLE_EQ(0.5, move_action->getDestination().x());
+        EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
-        move_intent.getFinalAngle());
-        EXPECT_FALSE(move_intent.getDribblerEnable());
-        EXPECT_EQ(move_intent.getAutoKickType(), NONE);
+                  move_action->getFinalOrientation());
+        EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
+        EXPECT_EQ(move_action->getAutoKickType(), NONE);
     }
 }
 
@@ -238,22 +194,16 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
     //tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat, 0.5);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
 
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
-        EXPECT_LT(move_intent.getFinalAngle().minDiff(Angle::zero()),
-                Angle::fromDegrees(1));
-        EXPECT_TRUE(move_intent.getAutoKickType() == NONE);
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
-    }
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
+              Angle::fromDegrees(1));
+    EXPECT_TRUE(move_action->getAutoKickType() == NONE);
 }
 
 TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
@@ -274,38 +224,31 @@ TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
     world.mutableFriendlyTeam().updateRobots({friendly_robot});
 
     ShadowFreekickerTactic tactic =
-            ShadowFreekickerTactic(ShadowFreekickerTactic::RIGHT, blank_world.enemyTeam(),
+            ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT, blank_world.enemyTeam(),
                                    blank_world.ball(), blank_world.field(), false);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
     tactic.accept(visitor);
     tactic.updateRobot(friendly_robot);
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_TRUE(action_ptr);
 
-    try
-    {
-        MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        // The edge of the robot should be slightly more than 0.5m from the ball
-        EXPECT_NEAR((world.ball().position() - move_intent.getDestination()).length(),
-        0.62, 0.05);
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    // The edge of the robot should be slightly more than 0.5m from the ball
+    EXPECT_NEAR((world.ball().position() - move_action->getDestination()).length(), 0.62,
+                0.05);
 
-        // The robot should be just to the right of the line between the friendly net and
-        // the ball (from the POV of the friendly net)
-        Line ball_to_net_line =
-                Line(world.ball().position(), world.field().friendlyGoal());
-        EXPECT_NEAR(dist(ball_to_net_line, move_intent.getDestination()), 0.09, 0.01);
-        Angle goal_to_ball_angle =
-                (world.ball().position() - world.field().friendlyGoal()).orientation();
-        Angle goal_to_dest_angle =
-                (move_intent.getDestination() - world.field().friendlyGoal()).orientation();
-        EXPECT_LT(goal_to_dest_angle, goal_to_ball_angle);
-    }
-    catch (std::bad_cast &)
-    {
-        ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
-    }
+    // The robot should be just to the left of the line between the friendly net and
+    // the ball (from the POV of the friendly net)
+    Line ball_to_net_line = Line(world.ball().position(), world.field().friendlyGoal());
+    EXPECT_NEAR(distance(ball_to_net_line, move_action->getDestination()), 0.09, 0.01);
+    Angle goal_to_ball_angle =
+            (world.ball().position() - world.field().friendlyGoal()).orientation();
+    Angle goal_to_dest_angle =
+            (move_action->getDestination() - world.field().friendlyGoal()).orientation();
+    EXPECT_GT(goal_to_dest_angle, goal_to_ball_angle);
 }
 
 TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
@@ -326,21 +269,16 @@ TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
     //tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
     //        world.ball());
 
-    auto intent_ptr = tactic.getNextIntent();
+    auto action_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
-    ASSERT_TRUE(intent_ptr);
+    ASSERT_NE(nullptr, action_ptr);
     EXPECT_FALSE(tactic.done());
     EXPECT_TRUE(tactic.hasShotAvailable());
 
-    try
-    {
-        KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
-    }
-    catch (...)
-    {
-        ADD_FAILURE() << "KickIntent was not returned by the ShootGoalTactic!";
-    }
+    auto kick_action = std::dynamic_pointer_cast<KickAction>(action_ptr);
+    ASSERT_NE(nullptr, kick_action);
+    ASSERT_TRUE(kick_action->getRobot().has_value());
+    EXPECT_EQ(0, kick_action->getRobot()->id());
 }
 

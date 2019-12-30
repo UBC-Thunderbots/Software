@@ -21,7 +21,7 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
 {
 }
 
-std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
+void STP::updateCurrentPlay(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
@@ -33,22 +33,18 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
-    auto all_play_names = PlayFactory::getRegisteredPlayNames();
+    bool no_current_play = !current_play || current_play->done();
 
-    // Assign a new play if we don't currently have a play assigned, the current play's
-    // invariant no longer holds, or the current play is done
-    if (!current_play || (!override_play && !current_play->invariantHolds(world)) ||
-        current_play->done() || override_play_name_value_changed ||
-        override_play_value_changed)
+    if (override_play)
     {
-        if (override_play)
+        if (no_current_play || override_play_name_value_changed ||
+            override_play_value_changed)
         {
-            if (std::find(all_play_names.begin(), all_play_names.end(),
-                          override_play_name) != all_play_names.end())
+            try
             {
                 current_play = PlayFactory::createPlay(override_play_name);
             }
-            else
+            catch (std::invalid_argument)
             {
                 auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
@@ -58,7 +54,10 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
                 current_play = std::move(default_play);
             }
         }
-        else
+    }
+    else
+    {
+        if (no_current_play || !current_play->invariantHolds(world))
         {
             try
             {
@@ -75,27 +74,28 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             }
         }
     }
+}
 
-    // Run the current play
+std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
+{
     current_tactics = current_play->getTactics(world);
 
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        // Assign robots to tactics
         auto assigned_tactics = assignRobotsToTactics(world, *current_tactics);
 
-        for (const auto& tactic : assigned_tactics)
+        for (const std::shared_ptr<Tactic>& tactic : assigned_tactics)
         {
-            // Get the Intent the tactic wants to run
-            auto intent = tactic->getNextIntent();
-
-            // If the tactic is not done and a valid intent was returned, the intent will
-            // be run by the robot. Otherwise, the robot will default to running a
-            // StopIntent so it doesn't do anything crazy.
-            if (intent && !tactic->done())
+            std::shared_ptr<Action> action = tactic->getNextAction();
+            std::unique_ptr<Intent> intent;
+            if (action)
             {
-                // Set Motion Constraints
+                intent = action->getNextIntent();
+            }
+
+            if (intent)
+            {
                 auto motion_constraints = motion_constraint_manager.getMotionConstraints(
                     world.gameState(), *tactic);
                 intent->setMotionConstraints(motion_constraints);
@@ -104,15 +104,26 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             }
             else if (tactic->getAssignedRobot())
             {
-                // If the assigned tactic is done, we send the robot a StopIntent so it
-                // doesn't do anything crazy until it starts running a new Tactic
+                // If we couldn't get an intent, we send the robot a StopIntent so
+                // it doesn't do anything crazy until it starts running a new Tactic
                 intents.emplace_back(std::make_unique<StopIntent>(
                     tactic->getAssignedRobot()->id(), false, 0));
+            }
+            else
+            {
+                LOG(WARNING) << "Tried to run a tactic that didn't yield an Intent"
+                             << "and did not have a robot assigned!";
             }
         }
     }
 
     return intents;
+}
+
+std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
+{
+    updateCurrentPlay(world);
+    return getIntentsFromCurrentPlay(world);
 }
 
 std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
@@ -157,11 +168,12 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (unsigned col = 0; col < num_cols; col++)
         {
-            if (!(tactics.at(col)->robotCapabilityRequirements() <=
-                  friendly_team_robots.at(row).getRobotCapabilities()))
+            if (friendly_team_robots.at(row).getCapabilitiesBlacklist().size() > 0 &&
+                friendly_team_robots.at(row).getCapabilitiesBlacklist() <=
+                    tactics.at(col)->robotCapabilityRequirements())
             {
-                // hardware requirements of tactic are not satisfied by the current robot
-                // set cost to 10.0f
+                // if the blacklist contains any subset of the required capabilties,
+                // set the cost to 10.0f
                 matrix(row, col) = 10.0f;
             }
             else
@@ -177,10 +189,10 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     Munkres<double> m;
     m.solve(matrix);
 
-    // The Munkres matrix gets solved such that there will be exactly one 0 in every row
-    // and exactly one 0 in every column. All other values will be -1. The 0's indicate
-    // the "workers" and "jobs" (robots and tactics for us) that are most optimally paired
-    // together
+    // The Munkres matrix gets solved such that there will be exactly one 0 in every
+    // row and exactly one 0 in every column. All other values will be -1. The 0's
+    // indicate the "workers" and "jobs" (robots and tactics for us) that are most
+    // optimally paired together
     //
     // Example matrices:
     //        -1, 0,-1,         and            0,-1,
@@ -245,9 +257,9 @@ PlayInfo STP::getPlayInfo()
     info.play_type = name(current_game_state);
     info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
 
-    // Sort the tactics by the id of the robot they are assigned to, so we can report the
-    // tactics in order or robot id. This makes it much easier to read if tactics or
-    // robots change, since the order of the robots won't change
+    // Sort the tactics by the id of the robot they are assigned to, so we can report
+    // the tactics in order or robot id. This makes it much easier to read if tactics
+    // or robots change, since the order of the robots won't change
     if (current_play && current_tactics)
     {
         auto compare_tactic_by_robot_id = [](auto t1, auto t2) {

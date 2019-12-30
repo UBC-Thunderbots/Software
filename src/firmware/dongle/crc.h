@@ -6,4 +6,3 @@
 uint16_t crc_update(uint16_t crc, uint8_t byte);
 
 #endif
-

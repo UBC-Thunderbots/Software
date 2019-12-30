@@ -1,10 +1,11 @@
 #ifndef UPGRADE_INTERNAL_H
 #define UPGRADE_INTERNAL_H
 
-#include "constants.h"
-#include "../sdcard.h"
 #include <stddef.h>
 #include <stdint.h>
+
+#include "io/sdcard.h"
+#include "upgrade/constants.h"
 
 /**
  * \ingroup UPGRADE
@@ -30,6 +31,7 @@
  */
 #define UPGRADE_FPGA_FIRST_SECTOR UPGRADE_SD_AREA_SECTORS
 
-bool upgrade_int_check_area(uint32_t sector, uint32_t magic, size_t *length, uint32_t *flags, uint32_t *crc);
+bool upgrade_int_check_area(uint32_t sector, uint32_t magic, size_t *length,
+                            uint32_t *flags, uint32_t *crc);
 
 #endif

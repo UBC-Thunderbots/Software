@@ -8,11 +8,11 @@
 #include "software/backend/input/network/filter/robot_team_filter.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
+#include "software/sensor_fusion/refbox_data.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/ball.h"
 #include "software/world/ball_state.h"
 #include "software/world/field.h"
-#include "software/world/refbox_constants.h"
 #include "software/world/team.h"
 
 class NetworkFilter

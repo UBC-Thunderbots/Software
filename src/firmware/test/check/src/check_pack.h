@@ -52,8 +52,7 @@ typedef struct DurationMsg
     int duration;
 } DurationMsg;
 
-typedef union
-{
+typedef union {
     CtxMsg ctx_msg;
     FailMsg fail_msg;
     LocMsg loc_msg;
@@ -72,13 +71,13 @@ typedef struct RcvMsg
     int duration;
 } RcvMsg;
 
-void rcvmsg_free(RcvMsg * rmsg);
+void rcvmsg_free(RcvMsg *rmsg);
 
 
-int pack(enum ck_msg_type type, char **buf, CheckMsg * msg);
-int upack(char *buf, CheckMsg * msg, enum ck_msg_type *type);
+int pack(enum ck_msg_type type, char **buf, CheckMsg *msg);
+int upack(char *buf, CheckMsg *msg, enum ck_msg_type *type);
 
-void ppack(FILE * fdes, enum ck_msg_type type, CheckMsg * msg);
-RcvMsg *punpack(FILE * fdes);
+void ppack(FILE *fdes, enum ck_msg_type type, CheckMsg *msg);
+RcvMsg *punpack(FILE *fdes);
 
 #endif /*CHECK_PACK_H */

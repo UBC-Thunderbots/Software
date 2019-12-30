@@ -131,17 +131,17 @@ Point PenaltyKickTactic::evaluate_next_position()
     }
 }
 
-void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
+void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     // We will need to keep track of time so we don't break the rules by taking too long
     Timestamp penalty_kick_start = robot->getMostRecentTimestamp();
 
 
-    MoveAction approach_ball_move_act =
-        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
-    MoveAction rotate_with_ball_move_act =
-        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
-    KickAction kick_action = KickAction();
+    auto approach_ball_move_act = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
+    auto rotate_with_ball_move_act = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
+    auto kick_action = std::make_shared<KickAction>();
 
     do
     {
@@ -163,33 +163,33 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             if (evaluate_penalty_shot())
             {
-                kick_action.updateWorldParams(ball);
-                kick_action.updateControlParams(*robot, ball.position(),
-                                                robot.value().orientation(),
-                                                PENALTY_KICK_SHOT_SPEED);
-                yield(kick_action.getNextIntent());
+                kick_action->updateWorldParams(ball);
+                kick_action->updateControlParams(*robot, ball.position(),
+                                                 robot.value().orientation(),
+                                                 PENALTY_KICK_SHOT_SPEED);
+                yield(kick_action);
             }
         }
-        else if (!approach_ball_move_act.done())
+        else if (!approach_ball_move_act->done())
         {
-            approach_ball_move_act.updateControlParams(
+            approach_ball_move_act->updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
                 DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
                 BallCollisionType::ALLOW);
-            yield(approach_ball_move_act.getNextIntent());
+            yield(approach_ball_move_act);
         }
         else
         {
             const Point next_shot_position = evaluate_next_position();
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
-            rotate_with_ball_move_act.updateControlParams(
+            rotate_with_ball_move_act->updateControlParams(
                 *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
                 MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
-            yield(rotate_with_ball_move_act.getNextIntent());
+            yield(rotate_with_ball_move_act);
         }
 
     } while (
-        !(kick_action.done() ||
+        !(kick_action->done() ||
           (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
 }
 

@@ -31,7 +31,6 @@ void TacticUpdateVisitor::visit(ShadowEnemyTactic &tactic)
     tactic.updateWorldParams(world.field(),world.friendlyTeam(),world.enemyTeam(),world.ball());
 }
 
-void TacticUpdateVisitor::visit(BlockShotPathTactic &tactic){}
 void TacticUpdateVisitor::visit(MoveTactic &tactic){}
 void TacticUpdateVisitor::visit(ChipTactic &tactic)
 {
@@ -60,11 +59,6 @@ void TacticUpdateVisitor::visit(ShootGoalTactic &tactic)
 void TacticUpdateVisitor::visit(PasserTactic &tactic)
 {
     tactic.updateWorldParams(world.ball());
-}
-
-void TacticUpdateVisitor::visit(GrabBallTactic &tactic)
-{
-    tactic.updateParams(world.field(), world.ball(), world.enemyTeam());
 }
 
 void TacticUpdateVisitor::visit(MoveTestTactic &tactic) {}

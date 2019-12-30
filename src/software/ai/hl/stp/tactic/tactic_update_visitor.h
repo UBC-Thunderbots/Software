@@ -23,7 +23,6 @@ public:
      void visit(GoalieTactic &tactic) override;
      void visit(CreaseDefenderTactic &tactic) override;
      void visit(ShadowEnemyTactic &tactic) override;
-     void visit(BlockShotPathTactic &tactic) override;
      void visit(MoveTactic &tactic) override;
      void visit(ChipTactic &tactic) override;
      void visit(KickoffChipTactic &tactic) override;
@@ -34,7 +33,6 @@ public:
      void visit(PatrolTactic &tactic) override;
      void visit(ShootGoalTactic &tactic) override;
      void visit(PasserTactic &tactic) override;
-     void visit(GrabBallTactic &tactic) override;
      void visit(MoveTestTactic &tactic) override;
      void visit(StopTestTactic &tactic) override;
      void visit(DefenseShadowEnemyTactic &tactic) override;
