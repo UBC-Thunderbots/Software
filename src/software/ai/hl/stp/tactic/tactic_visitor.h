@@ -43,21 +43,21 @@ class TacticVisitor
      */
 
     virtual void visit(CherryPickTactic &tactic)         = 0;
-    virtual void visit(ShadowFreekickerTactic &tactic) = 0;
-    virtual void visit(GoalieTactic &tactic) = 0;
-    virtual void visit(CreaseDefenderTactic &tactic) = 0;
-    virtual void visit(ShadowEnemyTactic &tactic) = 0;
-    virtual void visit(MoveTactic &tactic) = 0;
-    virtual void visit(ChipTactic &tactic) = 0;
+    virtual void visit(ShadowFreekickerTactic &tactic)   = 0;
+    virtual void visit(GoalieTactic &tactic)             = 0;
+    virtual void visit(CreaseDefenderTactic &tactic)     = 0;
+    virtual void visit(ShadowEnemyTactic &tactic)        = 0;
+    virtual void visit(MoveTactic &tactic)               = 0;
+    virtual void visit(ChipTactic &tactic)               = 0;
     virtual void visit(KickoffChipTactic &tactic)        = 0;
-    virtual void visit(StopTactic &tactic) = 0;
+    virtual void visit(StopTactic &tactic)               = 0;
     virtual void visit(PatrolTactic &tactic)             = 0;
-    virtual void visit(PenaltyKickTactic &tactic) = 0;
+    virtual void visit(PenaltyKickTactic &tactic)        = 0;
     virtual void visit(PenaltySetupTactic &tactic)       = 0;
-    virtual void visit(ReceiverTactic &tactic) = 0;
-    virtual void visit(ShootGoalTactic &tactic) = 0;
-    virtual void visit(PasserTactic &tactic) = 0;
-    virtual void visit(MoveTestTactic &tactic) = 0;
-    virtual void visit(StopTestTactic &tactic) = 0;
+    virtual void visit(ReceiverTactic &tactic)           = 0;
+    virtual void visit(ShootGoalTactic &tactic)          = 0;
+    virtual void visit(PasserTactic &tactic)             = 0;
+    virtual void visit(MoveTestTactic &tactic)           = 0;
+    virtual void visit(StopTestTactic &tactic)           = 0;
     virtual void visit(DefenseShadowEnemyTactic &tactic) = 0;
 };

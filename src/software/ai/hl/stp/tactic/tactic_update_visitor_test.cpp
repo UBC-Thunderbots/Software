@@ -2,24 +2,26 @@
 
 #include <gtest/gtest.h>
 
-#include "software/geom/util.h"
-#include "software/test_util/test_util.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/intent/kick_intent.h"
+#include "software/geom/util.h"
 #include "software/new_geom/util/distance.h"
+#include "software/test_util/test_util.h"
 
 
-TEST(TacticUpdateVisitorTest, update_cherry_pick_tactic) {
-    //add cherry pick test
+TEST(TacticUpdateVisitorTest, update_cherry_pick_tactic)
+{
+    // add cherry pick test
 }
 
 TEST(TacticUpdateVisitorTest, update_chip_tactic)
 {
-    Robot robot = Robot(0, Point(1, 0), Vector(0, 0), Angle::zero(),
-            AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot robot  = Robot(0, Point(1, 0), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world1 = ::Test::TestUtil::createBlankTestingWorld();
     World world2 = ::Test::TestUtil::createBlankTestingWorld();
-    world2 = ::Test::TestUtil::setBallPosition(world2, Point(1,0), Timestamp::fromSeconds(0));
+    world2 =
+        ::Test::TestUtil::setBallPosition(world2, Point(1, 0), Timestamp::fromSeconds(0));
     ChipTactic tactic = ChipTactic(world1.ball());
 
     EXPECT_NE(tactic.calculateRobotCost(robot, world1), 0.0);
@@ -35,12 +37,12 @@ TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     CreaseDefenderTactic tactic =
-            CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
-                                 world.enemyTeam(), CreaseDefenderTactic::LEFT);
+        CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
+                             world.enemyTeam(), CreaseDefenderTactic::LEFT);
     ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
     ::Test::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
     ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
-    Timestamp::fromSeconds(0));
+                                             Timestamp::fromSeconds(0));
 
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
     tactic.accept(visitor);
@@ -58,10 +60,10 @@ TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
     EXPECT_TRUE(move_action->getDestination().isClose(
-            Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
+        Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
                   ROBOT_MAX_RADIUS_METERS,
-                  0.0),
-            0.05));
+              0.0),
+        0.05));
 }
 
 TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
@@ -81,7 +83,7 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
     World world = World(field, ball, friendly_team, enemy_team, 20);
 
     DefenseShadowEnemyTactic tactic =
-            DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true);
+        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true);
     tactic.updateRobot(friendly_robot);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
     tactic.accept(visitor);
@@ -101,22 +103,24 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
 
 TEST(TacticUpdateVisitorTest, update_goalie_tactic)
 {
-    //add goalie test
+    // add goalie test
 }
 
 TEST(TacticUpdateVisitorTest, update_passer_tactic)
 {
-//add passer test
+    // add passer test
 }
 
 TEST(TacticUpdateVisitorTest, update_penalty_kick_tactic)
 {
-    Robot robot = Robot(0, Point(1, 0), Vector(0, 0), Angle::zero(),
+    Robot robot  = Robot(0, Point(1, 0), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world1 = ::Test::TestUtil::createBlankTestingWorld();
     World world2 = ::Test::TestUtil::createBlankTestingWorld();
-    world2 = ::Test::TestUtil::setBallPosition(world2, Point(1,0), Timestamp::fromSeconds(0));
-    PenaltyKickTactic tactic = PenaltyKickTactic(world1.ball(), world1.field(), world1.enemyTeam().goalie(), true);
+    world2 =
+        ::Test::TestUtil::setBallPosition(world2, Point(1, 0), Timestamp::fromSeconds(0));
+    PenaltyKickTactic tactic = PenaltyKickTactic(world1.ball(), world1.field(),
+                                                 world1.enemyTeam().goalie(), true);
 
     EXPECT_NE(tactic.calculateRobotCost(robot, world1), 0.0);
 
@@ -186,12 +190,12 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-            ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
     tactic.updateRobot(friendly_robot);
-    World world = World(field, ball, friendly_team, enemy_team, 20);
+    World world                 = World(field, ball, friendly_team, enemy_team, 20);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
     tactic.accept(visitor);
-    //tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    // tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat, 0.5);
 
     auto action_ptr = tactic.getNextAction();
@@ -209,23 +213,23 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
 TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
 {
     World blank_world = ::Test::TestUtil::createBlankTestingWorld();
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world       = ::Test::TestUtil::setEnemyRobotPositions(
-            world, {0, Point(world.field().friendlyCornerPos().y(), 0)},
-            Timestamp::fromSeconds(0));
+    World world       = ::Test::TestUtil::createBlankTestingWorld();
+    world             = ::Test::TestUtil::setEnemyRobotPositions(
+        world, {0, Point(world.field().friendlyCornerPos().y(), 0)},
+        Timestamp::fromSeconds(0));
     world = ::Test::TestUtil::setBallPosition(
-            world, Point(-0.09, world.field().friendlyCornerPos().y() - 0.09),
-            Timestamp::fromSeconds(0));
+        world, Point(-0.09, world.field().friendlyCornerPos().y() - 0.09),
+        Timestamp::fromSeconds(0));
     world =
-    ::Test::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
     Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({friendly_robot});
 
     ShadowFreekickerTactic tactic =
-            ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT, blank_world.enemyTeam(),
-                                   blank_world.ball(), blank_world.field(), false);
+        ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT, blank_world.enemyTeam(),
+                               blank_world.ball(), blank_world.field(), false);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
     tactic.accept(visitor);
     tactic.updateRobot(friendly_robot);
@@ -245,9 +249,9 @@ TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
     Line ball_to_net_line = Line(world.ball().position(), world.field().friendlyGoal());
     EXPECT_NEAR(distance(ball_to_net_line, move_action->getDestination()), 0.09, 0.01);
     Angle goal_to_ball_angle =
-            (world.ball().position() - world.field().friendlyGoal()).orientation();
+        (world.ball().position() - world.field().friendlyGoal()).orientation();
     Angle goal_to_dest_angle =
-            (move_action->getDestination() - world.field().friendlyGoal()).orientation();
+        (move_action->getDestination() - world.field().friendlyGoal()).orientation();
     EXPECT_GT(goal_to_dest_angle, goal_to_ball_angle);
 }
 
@@ -257,16 +261,17 @@ TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
-    BallState ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    BallState ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
+                   Timestamp::fromSeconds(0));
     world.updateBallState(ball);
 
     ShootGoalTactic tactic =
-            ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                            world.ball(), Angle::zero(), std::nullopt, false);
+        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                        world.ball(), Angle::zero(), std::nullopt, false);
     tactic.updateRobot(robot);
     TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
     tactic.accept(visitor);
-    //tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+    // tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
     //        world.ball());
 
     auto action_ptr = tactic.getNextAction();
@@ -281,4 +286,3 @@ TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
     ASSERT_TRUE(kick_action->getRobot().has_value());
     EXPECT_EQ(0, kick_action->getRobot()->id());
 }
-

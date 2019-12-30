@@ -1,11 +1,11 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 class TacticUpdateVisitor : public TacticVisitor
 {
-public:
+   public:
     /**
      * Creates a new TacticUpdateVisitor
      *
@@ -18,24 +18,24 @@ public:
      *
      * @param tactic The Tactic to update
      */
-     void visit(CherryPickTactic &tactic) override;
-     void visit(ShadowFreekickerTactic &tactic) override;
-     void visit(GoalieTactic &tactic) override;
-     void visit(CreaseDefenderTactic &tactic) override;
-     void visit(ShadowEnemyTactic &tactic) override;
-     void visit(MoveTactic &tactic) override;
-     void visit(ChipTactic &tactic) override;
-     void visit(KickoffChipTactic &tactic) override;
-     void visit(StopTactic &tactic) override;
-     void visit(PenaltyKickTactic &tactic) override;
-     void visit(PenaltySetupTactic &tactic) override;
-     void visit(ReceiverTactic &tactic) override;
-     void visit(PatrolTactic &tactic) override;
-     void visit(ShootGoalTactic &tactic) override;
-     void visit(PasserTactic &tactic) override;
-     void visit(MoveTestTactic &tactic) override;
-     void visit(StopTestTactic &tactic) override;
-     void visit(DefenseShadowEnemyTactic &tactic) override;
+    void visit(CherryPickTactic &tactic) override;
+    void visit(ShadowFreekickerTactic &tactic) override;
+    void visit(GoalieTactic &tactic) override;
+    void visit(CreaseDefenderTactic &tactic) override;
+    void visit(ShadowEnemyTactic &tactic) override;
+    void visit(MoveTactic &tactic) override;
+    void visit(ChipTactic &tactic) override;
+    void visit(KickoffChipTactic &tactic) override;
+    void visit(StopTactic &tactic) override;
+    void visit(PenaltyKickTactic &tactic) override;
+    void visit(PenaltySetupTactic &tactic) override;
+    void visit(ReceiverTactic &tactic) override;
+    void visit(PatrolTactic &tactic) override;
+    void visit(ShootGoalTactic &tactic) override;
+    void visit(PasserTactic &tactic) override;
+    void visit(MoveTestTactic &tactic) override;
+    void visit(StopTestTactic &tactic) override;
+    void visit(DefenseShadowEnemyTactic &tactic) override;
 
-     World world;
+    World world;
 };
