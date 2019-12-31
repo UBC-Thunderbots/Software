@@ -133,7 +133,6 @@ namespace Passing
         // (pass_start_x, pass_start_y, pass_speed, pass_start_time)
         static const int NUM_PARAMS_TO_OPTIMIZE = 4;
 
-        // TODO: better name for this variable
         // The number of iterations to run on each call to `getBestPassSoFar()`
         // **if** running determinstically
         static const size_t NUM_ITERS_PER_DETERMINISTIC_CALL = 10;

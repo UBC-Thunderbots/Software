@@ -52,13 +52,11 @@ class PassGeneratorTest : public testing::Test
             auto curr_pass_and_score = pass_generator->getBestPassSoFar();
             curr_score               = curr_pass_and_score.rating;
 
-            // TODO: the "is small" part of this is _incredibly_ suspect, can we remove
-            //       it *PLEASE*
             // Run until the pass has converged with sufficient tolerance or the given
             // time has expired, whichever comes first. We also check that the score
             // is not small, otherwise we can get "false convergence" as the
             // pass just starts to "move" towards the converged point
-            if (std::abs(curr_score - prev_score) < min_score_diff && curr_score > 0.01)
+            if (std::abs(curr_score - prev_score) < min_score_diff)
             {
                 break;
             }
