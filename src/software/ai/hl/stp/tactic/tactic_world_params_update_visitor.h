@@ -1,9 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/all_tactics.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 
-class TacticUpdateVisitor : public TacticVisitor
+class TacticWorldParamsUpdateVisitor : public MutableTacticVisitor
 {
    public:
     /**
@@ -11,7 +11,7 @@ class TacticUpdateVisitor : public TacticVisitor
      *
      * @param world The World we would like to update the Tactics with
      */
-    explicit TacticUpdateVisitor(const World &world);
+    explicit TacticWorldParamsUpdateVisitor(const World &world);
 
     /**
      * Calls the updateWorldParam in tactic to update params
@@ -33,9 +33,10 @@ class TacticUpdateVisitor : public TacticVisitor
     void visit(PatrolTactic &tactic) override;
     void visit(ShootGoalTactic &tactic) override;
     void visit(PasserTactic &tactic) override;
+    void visit(DefenseShadowEnemyTactic &tactic) override;
     void visit(MoveTestTactic &tactic) override;
     void visit(StopTestTactic &tactic) override;
-    void visit(DefenseShadowEnemyTactic &tactic) override;
 
+   private:
     World world;
 };

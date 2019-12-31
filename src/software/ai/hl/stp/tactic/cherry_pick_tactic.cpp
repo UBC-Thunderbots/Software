@@ -5,7 +5,8 @@
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
@@ -52,7 +53,12 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     } while (true);
 }
 
-void CherryPickTactic::accept(TacticVisitor& visitor)
+void CherryPickTactic::accept(NonMutableTacticVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
+void CherryPickTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

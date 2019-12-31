@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/tactic_update_visitor.h"
+#include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 
 #include <gtest/gtest.h>
 
@@ -7,12 +7,6 @@
 #include "software/geom/util.h"
 #include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
-
-
-TEST(TacticUpdateVisitorTest, update_cherry_pick_tactic)
-{
-    // add cherry pick test
-}
 
 TEST(TacticUpdateVisitorTest, update_chip_tactic)
 {
@@ -26,7 +20,7 @@ TEST(TacticUpdateVisitorTest, update_chip_tactic)
 
     EXPECT_NE(tactic.calculateRobotCost(robot, world1), 0.0);
 
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world2);
+    TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world2);
     visitor.visit(tactic);
     tactic.accept(visitor);
     EXPECT_EQ(tactic.calculateRobotCost(robot, world2), 0.0);
@@ -44,7 +38,7 @@ TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
     ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
                                              Timestamp::fromSeconds(0));
 
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+    TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world);
     tactic.accept(visitor);
 
     Robot friendly_robot = Robot(0, Point(-2, 0), Vector(0, 0), Angle::zero(),
@@ -85,7 +79,7 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
     DefenseShadowEnemyTactic tactic =
         DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true);
     tactic.updateRobot(friendly_robot);
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+    TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world);
     tactic.accept(visitor);
     tactic.updateControlParams(enemy_threat);
 
@@ -101,16 +95,6 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
     EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
 }
 
-TEST(TacticUpdateVisitorTest, update_goalie_tactic)
-{
-    // add goalie test
-}
-
-TEST(TacticUpdateVisitorTest, update_passer_tactic)
-{
-    // add passer test
-}
-
 TEST(TacticUpdateVisitorTest, update_penalty_kick_tactic)
 {
     Robot robot  = Robot(0, Point(1, 0), Vector(0, 0), Angle::zero(),
@@ -124,7 +108,7 @@ TEST(TacticUpdateVisitorTest, update_penalty_kick_tactic)
 
     EXPECT_NE(tactic.calculateRobotCost(robot, world1), 0.0);
 
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world2);
+    TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world2);
     visitor.visit(tactic);
     tactic.accept(visitor);
     EXPECT_EQ(tactic.calculateRobotCost(robot, world2), 0.0);
@@ -157,7 +141,7 @@ TEST(TacticUpdateVisitorTest, update_receiver_tactic)
     // we're at the target position
     for (int i = 0; i < 5; i++)
     {
-        TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+        TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world);
         tactic.accept(visitor);
         tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
@@ -193,9 +177,8 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
     tactic.updateRobot(friendly_robot);
     World world                 = World(field, ball, friendly_team, enemy_team, 20);
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+    TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world);
     tactic.accept(visitor);
-    // tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat, 0.5);
 
     auto action_ptr = tactic.getNextAction();
@@ -230,7 +213,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
     ShadowFreekickerTactic tactic =
         ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT, blank_world.enemyTeam(),
                                blank_world.ball(), blank_world.field(), false);
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+    TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world);
     tactic.accept(visitor);
     tactic.updateRobot(friendly_robot);
 
@@ -269,10 +252,8 @@ TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::zero(), std::nullopt, false);
     tactic.updateRobot(robot);
-    TacticUpdateVisitor visitor = TacticUpdateVisitor(world);
+    TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world);
     tactic.accept(visitor);
-    // tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-    //        world.ball());
 
     auto action_ptr = tactic.getNextAction();
 

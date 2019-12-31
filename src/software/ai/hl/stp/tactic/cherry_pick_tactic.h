@@ -43,7 +43,8 @@ class CherryPickTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(TacticVisitor& visitor) override;
+    void accept(NonMutableTacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

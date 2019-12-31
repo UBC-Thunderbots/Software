@@ -20,5 +20,6 @@ class PenaltySetupTactic : public MoveTactic
 
     std::string getName() const override;
 
-    void accept(TacticVisitor& visitor) override;
+    void accept(NonMutableTacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
 };

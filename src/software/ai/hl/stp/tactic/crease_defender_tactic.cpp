@@ -6,7 +6,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
@@ -242,7 +243,12 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
     return std::nullopt;
 }
 
-void CreaseDefenderTactic::accept(TacticVisitor &visitor)
+void CreaseDefenderTactic::accept(NonMutableTacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
