@@ -471,7 +471,8 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
                                                double buffer = 0.0);
 
 /**
- * Calculates the pair of Rays that intercept the Circle tangentially with origin at the reference Point
+ * Calculates the pair of Rays that intercept the Circle tangentially with origin at the
+ * reference Point
  *
  * @param reference: The point which the tangent vectors will intersect
  * @param circle: The circle to calculate the tangent vectors of

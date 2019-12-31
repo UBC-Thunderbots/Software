@@ -20,8 +20,7 @@ namespace Evaluation
     }
     std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                            const Point &goal_post_pos, const Point &p,
-                                           const std::vector<Robot> &robot_obstacles
-                                           )
+                                           const std::vector<Robot> &robot_obstacles)
     {
         // Use shot evaluation function to get the best Shot
         std::vector<Circle> obs;
@@ -30,16 +29,15 @@ namespace Evaluation
             obs.push_back(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS));
         }
         return std::make_optional(
-                calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obs));
+            calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obs));
     }
     std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                            const Point &goal_post_pos, const Point &p,
-                                           const std::vector<Circle> &obstacles
-    )
+                                           const std::vector<Circle> &obstacles)
     {
         // Use shot evaluation function to get the best Shot
         return std::make_optional(
-                calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obstacles));
+            calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obstacles));
     }
 
     std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
@@ -72,11 +70,13 @@ namespace Evaluation
         // Calculate the best_shot based on what goal we're shooting at
         if (shoot_on_enemy_goal)
         {
-            best_shot = calcBestShotOnGoal(field.enemyGoalpostNeg(), field.enemyGoalpostPos(), point, obstacles);
+            best_shot = calcBestShotOnGoal(field.enemyGoalpostNeg(),
+                                           field.enemyGoalpostPos(), point, obstacles);
         }
         else
         {
-            best_shot = calcBestShotOnGoal(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), point, obstacles);
+            best_shot = calcBestShotOnGoal(field.friendlyGoalpostNeg(),
+                                           field.friendlyGoalpostPos(), point, obstacles);
         }
 
         return best_shot;
