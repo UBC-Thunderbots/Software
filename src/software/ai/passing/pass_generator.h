@@ -74,7 +74,8 @@ namespace Passing
          *                              passes between calls
          */
         explicit PassGenerator(const World& world, const Point& passer_point,
-                               const PassType& pass_type, const bool run_deterministically=false);
+                               const PassType& pass_type,
+                               const bool run_deterministically = false);
 
         /**
          * Updates the world
@@ -323,7 +324,6 @@ namespace Passing
         std::optional<Rectangle> target_region;
 
         // A random number generator for use across the class
-        std::random_device random_device;
         std::mt19937 random_num_gen;
 
         // What type of pass we're trying to generate

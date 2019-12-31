@@ -45,7 +45,8 @@ class PassGeneratorTest : public testing::Test
     {
         double curr_score = 0;
         double prev_score = 0;
-        for (int i = 0; i < max_iters; i++){
+        for (int i = 0; i < max_iters; i++)
+        {
             prev_score = curr_score;
 
             auto curr_pass_and_score = pass_generator->getBestPassSoFar();
@@ -57,7 +58,8 @@ class PassGeneratorTest : public testing::Test
             // time has expired, whichever comes first. We also check that the score
             // is not small, otherwise we can get "false convergence" as the
             // pass just starts to "move" towards the converged point
-            if (std::abs(curr_score - prev_score) < min_score_diff && curr_score > 0.01){
+            if (std::abs(curr_score - prev_score) < min_score_diff && curr_score > 0.01)
+            {
                 break;
             }
         }
@@ -114,16 +116,10 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     // Find what pass we converged to
     auto [converged_pass, converged_score] = pass_generator->getBestPassSoFar();
 
-    std::cout << converged_score;
-    std::cout << converged_pass;
-
     // Check that we keep converging to the same pass
     for (int i = 0; i < 7; i++)
     {
         auto [pass, score] = pass_generator->getBestPassSoFar();
-
-        std::cout << score;
-        std::cout << pass;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).length(), 0.3);
@@ -153,9 +149,9 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
     // We put a few enemies in to force the pass generator to make a decision,
     // otherwise most of the field would be a valid point to pass to
     enemy_team.updateRobots({
-        Robot(0, {3, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+        Robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
-        Robot(1, {-3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+        Robot(1, {-2, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
     world.updateEnemyTeamState(enemy_team);
@@ -173,7 +169,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
     // We expect to have converged to a point near robot 1. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - robot_1.position()).length(), 0.5);
+    EXPECT_LE((converged_pass.receiverPoint() - robot_1.position()).length(), 0.6);
 }
 
 TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
@@ -225,7 +221,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     // We expect to have converged to a point near robot 2. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).length(), 0.6);
+    EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).length(), 0.55);
 }
 
 TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
@@ -234,9 +230,9 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Put a friendly robot on the +y and -y sides of the field, both on the enemy half
     Team friendly_team(Duration::fromSeconds(10));
-    Robot pos_y_friendly = Robot(0, {2, 3}, {0, 0}, Angle::zero(),
+    Robot pos_y_friendly = Robot(0, {2, 2}, {0, 0}, Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot neg_y_friendly = Robot(1, {2, -3}, {0, 0}, Angle::zero(),
+    Robot neg_y_friendly = Robot(1, {2, -2}, {0, 0}, Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     friendly_team.updateRobots({pos_y_friendly, neg_y_friendly});
     world.updateFriendlyTeamState(friendly_team);
@@ -279,7 +275,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     // We expect to have converged to a point near the robot in +y. The tolerance is
     // fairly generous here because the enemies on the field can "force" the point
     // slightly away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - pos_y_friendly.position()).length(), 0.5);
+    EXPECT_LE((converged_pass.receiverPoint() - pos_y_friendly.position()).length(), 0.7);
 
     // Set the passer point so that the only reasonable pass is to the robot
     // on the -y side
@@ -295,7 +291,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     // We expect to have converged to a point near the robot in +y. The tolerance is
     // fairly generous here because the enemies on the field can "force" the point
     // slightly away from the chosen receiver robot
-    EXPECT_LE((converged_pass.receiverPoint() - neg_y_friendly.position()).length(), 0.5);
+    EXPECT_LE((converged_pass.receiverPoint() - neg_y_friendly.position()).length(), 0.7);
 }
 
 TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_region)

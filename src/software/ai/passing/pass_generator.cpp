@@ -17,7 +17,7 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
       passer_point(passer_point),
       best_known_pass({0, 0}, {0, 0}, 0, Timestamp::fromSeconds(0)),
       target_region(std::nullopt),
-      random_num_gen(random_device()),
+      random_num_gen(13),
       pass_type(pass_type),
       in_destructor(false),
       running_deterministically(running_deterministically)
@@ -28,7 +28,8 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
     // Start the thread to do the pass generation in the background
     // The lambda expression here is needed so that we can call
     // `continuouslyGeneratePasses()`, which is not a static function
-    if (!running_deterministically){
+    if (!running_deterministically)
+    {
         pass_generation_thread =
             std::thread([this]() { return continuouslyGeneratePasses(); });
     }
@@ -64,8 +65,10 @@ PassWithRating PassGenerator::getBestPassSoFar()
 {
     // If we're running deterministically, then we need to manually optimize the
     // passes rather then assuming the optimization thread has done the work for us
-    if (running_deterministically){
-        for (size_t i = 0; i < NUM_ITERS_PER_DETERMINISTIC_CALL; i++){
+    if (running_deterministically)
+    {
+        for (size_t i = 0; i < NUM_ITERS_PER_DETERMINISTIC_CALL; i++)
+        {
             updateAndOptimizeAndPrunePasses();
         }
     }
@@ -97,7 +100,8 @@ PassGenerator::~PassGenerator()
     // the thread object. If we do not wait for thread to finish executing, it will
     // call `std::terminate` when we deallocate the thread object and kill our whole
     // program
-    if (!running_deterministically){
+    if (!running_deterministically)
+    {
         pass_generation_thread.join();
     }
 }
@@ -125,7 +129,8 @@ void PassGenerator::continuouslyGeneratePasses()
     }
 }
 
-void PassGenerator::updateAndOptimizeAndPrunePasses(){
+void PassGenerator::updateAndOptimizeAndPrunePasses()
+{
     // Copy over the updated world and remove the passer robot
     world_mutex.lock();
     updated_world_mutex.lock();
