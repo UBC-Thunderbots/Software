@@ -105,6 +105,12 @@ class Tactic
     virtual double calculateRobotCost(const Robot &robot, const World &world) = 0;
 
     /**
+     * Whether or not this tactic is one used by the goalie
+     * @return Whether or not this tactic is one used by the goalie
+     */
+    virtual bool isGoalieTactic() const;
+
+    /**
      * Runs the coroutine and get the next Action to run from the calculateNextAction
      * function. If the Tactic is not done, the next Action is returned. If the Tactic
      * is done, a nullptr is returned.
