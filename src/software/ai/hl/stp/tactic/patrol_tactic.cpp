@@ -4,8 +4,8 @@
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 
 PatrolTactic::PatrolTactic(const std::vector<Point> &points,
                            double at_patrol_point_tolerance,

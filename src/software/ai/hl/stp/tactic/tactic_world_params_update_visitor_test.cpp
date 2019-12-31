@@ -176,7 +176,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
     tactic.updateRobot(friendly_robot);
-    World world                 = World(field, ball, friendly_team, enemy_team, 20);
+    World world = World(field, ball, friendly_team, enemy_team, 20);
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(world);
     tactic.accept(visitor);
     tactic.updateControlParams(enemy_threat, 0.5);

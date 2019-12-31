@@ -4,8 +4,8 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
 

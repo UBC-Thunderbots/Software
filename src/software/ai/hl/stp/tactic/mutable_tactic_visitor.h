@@ -25,16 +25,16 @@ class StopTestTactic;
 
 
 /**
- * This class provides a mutable interface for all Tactic Visitors. The Visitor design pattern
- * allows us to perform operations on Tactic objects without needing to check which
- * concrete type it is with an if/else statement, and we don't need to pollute the
+ * This class provides a mutable interface for all Tactic Visitors. The Visitor design
+ * pattern allows us to perform operations on Tactic objects without needing to check
+ * which concrete type it is with an if/else statement, and we don't need to pollute the
  * Tactic classes with information or functions that are specific to the task we
  * want to perform. The mutable version allows us to update parameters within
  * each Tactic.
  */
 class MutableTacticVisitor
 {
-public:
+   public:
     virtual ~MutableTacticVisitor() = default;
 
     // The javadoc comment for all methods here can be read as:

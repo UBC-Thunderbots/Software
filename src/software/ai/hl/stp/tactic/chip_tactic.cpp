@@ -3,8 +3,8 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/chip_action.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
     : Tactic(loop_forever, {RobotCapabilities::Capability::Chip}), ball(ball)
@@ -51,12 +51,12 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!chip_action->done());
 }
 
-void ChipTactic::accept(NonMutableTacticVisitor& visitor) const
+void ChipTactic::accept(NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void ChipTactic::accept(MutableTacticVisitor& visitor)
+void ChipTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
