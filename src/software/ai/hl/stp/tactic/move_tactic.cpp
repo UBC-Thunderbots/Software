@@ -43,12 +43,12 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void MoveTactic::accept(NonMutableTacticVisitor &visitor) const
+void MoveTactic::accept(const  NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void MoveTactic::accept(MutableTacticVisitor &visitor)
+void MoveTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

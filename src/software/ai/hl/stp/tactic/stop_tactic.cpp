@@ -32,12 +32,12 @@ void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!stop_action->done());
 }
 
-void StopTactic::accept(NonMutableTacticVisitor &visitor) const
+void StopTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void StopTactic::accept(MutableTacticVisitor &visitor)
+void StopTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

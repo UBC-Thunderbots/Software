@@ -53,22 +53,10 @@ class GoalieTactic : public Tactic
 
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    /*
-     * Restrains the goalie to a rectangle, with the prefered point being the one
-     * that intersects the point the goalie wants to move to and the center of the
-     * goal
-     *
-     * @param goalie_desired_position The point the goalie would like to go to
-     * @param goalie_restricted_area The rectangle that the goalie is to stay in
-     * @returns goalie_suggested_position That the goalie should go to
-     */
-    std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
-                                                   Rectangle goalie_restricted_area);
-
     bool isGoalieTactic() const override;
 
-    void accept(NonMutableTacticVisitor &visitor) const override;
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(const  NonMutableTacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;

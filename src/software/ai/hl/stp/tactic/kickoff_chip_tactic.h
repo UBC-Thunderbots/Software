@@ -21,6 +21,6 @@ class KickoffChipTactic : public ChipTactic
 
     std::string getName() const override;
 
-    void accept(NonMutableTacticVisitor& visitor) const override;
+    void accept(const NonMutableTacticVisitor& visitor) const override;
     void accept(MutableTacticVisitor& visitor) override;
 };

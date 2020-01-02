@@ -1,6 +1,8 @@
 #include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 
-
+// We disable clang-format here because it makes these lists borderline unreadable,
+// and certainly way more difficult to edit
+// clang-format off
 TacticWorldParamsUpdateVisitor::TacticWorldParamsUpdateVisitor(const World &world)
 {
     this->world = world;
@@ -68,3 +70,4 @@ void TacticWorldParamsUpdateVisitor::visit(PasserTactic &tactic)
 void TacticWorldParamsUpdateVisitor::visit(DefenseShadowEnemyTactic &tactic) {}
 void TacticWorldParamsUpdateVisitor::visit(MoveTestTactic &tactic) {}
 void TacticWorldParamsUpdateVisitor::visit(StopTestTactic &tactic) {}
+// clang-format on

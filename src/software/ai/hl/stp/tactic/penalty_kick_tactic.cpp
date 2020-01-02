@@ -194,7 +194,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
           (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
 }
 
-void PenaltyKickTactic::accept(NonMutableTacticVisitor& visitor) const
+void PenaltyKickTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

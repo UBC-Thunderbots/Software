@@ -137,12 +137,12 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void ShadowEnemyTactic::accept(NonMutableTacticVisitor &visitor) const
+void ShadowEnemyTactic::accept(const  NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void ShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+void ShadowEnemyTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

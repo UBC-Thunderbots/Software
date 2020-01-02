@@ -16,12 +16,12 @@ std::string KickoffChipTactic::getName() const
     return "Kickoff Chip Tactic";
 }
 
-void KickoffChipTactic::accept(NonMutableTacticVisitor &visitor) const
+void KickoffChipTactic::accept(const  NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void KickoffChipTactic::accept(MutableTacticVisitor &visitor)
+void KickoffChipTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

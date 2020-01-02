@@ -186,12 +186,12 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!(kick_action->done() || chip_action->done()));
 }
 
-void ShootGoalTactic::accept(NonMutableTacticVisitor &visitor) const
+void ShootGoalTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
+void ShootGoalTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

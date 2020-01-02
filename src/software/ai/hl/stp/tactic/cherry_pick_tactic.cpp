@@ -53,7 +53,7 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     } while (true);
 }
 
-void CherryPickTactic::accept(NonMutableTacticVisitor& visitor) const
+void CherryPickTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

@@ -73,7 +73,7 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
-    void accept(NonMutableTacticVisitor& visitor) const override;
+    void accept(const NonMutableTacticVisitor& visitor) const override;
     void accept(MutableTacticVisitor& visitor) override;
 
    private:

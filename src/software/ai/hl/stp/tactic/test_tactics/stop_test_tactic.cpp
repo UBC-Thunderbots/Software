@@ -23,7 +23,7 @@ void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (this->robot->velocity().length() > 0.05);
 }
 
-void StopTestTactic::accept(NonMutableTacticVisitor &visitor) const
+void StopTestTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     // StopTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic
@@ -31,7 +31,7 @@ void StopTestTactic::accept(NonMutableTacticVisitor &visitor) const
             "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
 }
 
-void StopTestTactic::accept(MutableTacticVisitor &visitor)
+void StopTestTactic::accept(MutableTacticVisitor& visitor)
 {
     // StopTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic

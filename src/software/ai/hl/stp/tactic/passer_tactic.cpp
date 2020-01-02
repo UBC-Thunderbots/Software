@@ -91,7 +91,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
              ball.velocity().length() < 0.5);
 }
 
-void PasserTactic::accept(NonMutableTacticVisitor& visitor) const
+void PasserTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

@@ -123,12 +123,12 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
     } while (!move_action->done());
 }
 
-void DefenseShadowEnemyTactic::accept(NonMutableTacticVisitor &visitor) const
+void DefenseShadowEnemyTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
 
-void DefenseShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+void DefenseShadowEnemyTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }
