@@ -51,12 +51,12 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!chip_action->done());
 }
 
-void ChipTactic::accept(const NonMutableTacticVisitor& visitor) const
+void ChipTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void ChipTactic::accept(MutableTacticVisitor& visitor)
+void ChipTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

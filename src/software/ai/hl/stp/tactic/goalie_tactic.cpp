@@ -321,12 +321,12 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void GoalieTactic::accept(const  NonMutableTacticVisitor& visitor) const
+void GoalieTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void GoalieTactic::accept(MutableTacticVisitor& visitor)
+void GoalieTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

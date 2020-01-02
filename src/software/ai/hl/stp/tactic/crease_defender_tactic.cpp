@@ -243,12 +243,12 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
     return std::nullopt;
 }
 
-void CreaseDefenderTactic::accept(const NonMutableTacticVisitor& visitor) const
+void CreaseDefenderTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void CreaseDefenderTactic::accept(MutableTacticVisitor& visitor)
+void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

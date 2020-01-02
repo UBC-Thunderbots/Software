@@ -55,8 +55,8 @@ class GoalieTactic : public Tactic
 
     bool isGoalieTactic() const override;
 
-    void accept(const  NonMutableTacticVisitor& visitor) const override;
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(const NonMutableTacticVisitor &visitor) const override;
+    void accept(MutableTacticVisitor &visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;

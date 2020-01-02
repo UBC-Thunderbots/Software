@@ -92,12 +92,12 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
     } while (true);
 }
 
-void ShadowFreekickerTactic::accept(const NonMutableTacticVisitor& visitor) const
+void ShadowFreekickerTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void ShadowFreekickerTactic::accept(MutableTacticVisitor& visitor)
+void ShadowFreekickerTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

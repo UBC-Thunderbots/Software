@@ -12,7 +12,7 @@ std::string PenaltySetupTactic::getName() const
     return "Penalty Setup Tactic";
 }
 
-void PenaltySetupTactic::accept(const  NonMutableTacticVisitor& visitor) const
+void PenaltySetupTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

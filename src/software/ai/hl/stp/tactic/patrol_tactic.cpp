@@ -88,12 +88,12 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (true);
 }
 
-void PatrolTactic::accept(const  NonMutableTacticVisitor& visitor) const
+void PatrolTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-void PatrolTactic::accept(MutableTacticVisitor& visitor)
+void PatrolTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

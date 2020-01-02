@@ -39,15 +39,15 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 
-void MoveTestTactic::accept(const NonMutableTacticVisitor& visitor) const
+void MoveTestTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     // MoveTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic
     throw std::invalid_argument(
-            "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
+        "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
 }
 
-void MoveTestTactic::accept(MutableTacticVisitor& visitor)
+void MoveTestTactic::accept(MutableTacticVisitor &visitor)
 {
     // MoveTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic
