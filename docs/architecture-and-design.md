@@ -45,6 +45,11 @@
     * [Navigation](#navigation)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
+    * [Diagram](#visualizer-diagram)
+    * [Draw Functions](#draw-functions)
+    * [Editing the Visualizer](#editing-the-visualizer)
+      * [Editing ui files](#editing-ui-files)
+      * [Promoting Widgets](#promoting-widgets)
 
 
 # Tools
@@ -387,10 +392,64 @@ Most [Intents](#intents) are easy to break down into  [Primitives](#primitives),
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
 
 ## AI Diagram
-![Backend Diagram](images/ai_diagram.svg)
+![AI Diagram](images/ai_diagram.svg)
 
 
 # Visualizer
-The `Visualizer` is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the `World` as the [Backend](#backend) sees it, and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
+The [Visualizer](#visualizer) is exactly what it sounds like: A visualizion of our [AI](#ai). It provides a GUI that shows us the state of the [World](#world), and is also able to display extra information that the [AI](#ai) would like to show. For example, it can show the planned paths of each friendly robot on the field, or highlight which enemy robots it thinks are a threat. Furthermore, it displays any warnings or status messages from the robots, such as if a robot is low on battery.
 
-The `Visualizer` also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the `Visualizer`, we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+The [Visualizer](#visualizer) also lets us control the [AI](#ai) by setting [Dynamic Parameters](#dynamic-parameters). Through the [Visualizer](#visualizer), we can manually choose what strategy the [AI](#ai) should use, what colour we are playing as (yellow or blue), and tune more granular behaviour such as how close an enemy must be to the ball before we consider them a threat.
+
+The [Visualizer](#visualizer) is connected to the rest of the system using the [Observer Design Pattern](#observer-design-pattern). It observes Subjects that contain information it wants to display, such as the [World](#world) or [DrawFunctions](#draw-functions).
+
+The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C++ library for creating cross-platform GUIs. The general documentation for [Qt](https://www.qt.io/) can be found [here](https://doc.qt.io/qt-5/index.html). The most important parts for the Visualizer are:
+* [Signals and Slots](https://doc.qt.io/qt-5/signalsandslots.html)
+* [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
+* [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
+
+The [Visualizer](#visualizer) is made up of 3 major components:
+* Qt Components
+  * The [QApplication](https://doc.qt.io/qt-5/qapplication.html). This is the Qt component that manages the event loop and all the widgets in the GUI.
+  * The `Visualizer Widget`. This contains all of the graphical components used in the [Visualizer](#visualizer).
+* Non-Qt Components
+  * The `VisualizerWrapper`. The `VisualizerWrapper` contains the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget`. It runs the [QApplication](https://doc.qt.io/qt-5/qapplication.html) in a separate thread, so that Qt can run its event loop and handle events and rendering without blocking our main thread.
+ 
+
+## Visualizer Diagram
+![Visualizer Diagram](images/visualizer_diagram.svg)
+
+## Inter-thread Communication
+The `VisualizerWrapper` needs to communicate with the [QApplication](https://doc.qt.io/qt-5/qapplication.html) and `Visualizer Widget` running in its separate thread in order to trigger events like drawing when new data is received. In order to do this, the `VisualizerWrapper` and `Visualizer Widget` use our `ThreadsafeBuffer` class to communicate. The `VisualizerWrapper` pushes data into the buffers, and the `Visualizer Widget` pops the data in a `Producer -> Consumer` pattern. This means the `Visualizer Widget` can handle data at its own rate, independent from the `VisualizerWrapper`.
+
+In some rare cases, we use the [Qt MetaObject](https://doc.qt.io/qt-5/moc.html) system to send signals to trigger functions in the Qt thread in a thread-safe way. This is further documented in the code.
+
+## Draw Functions
+Although we want to display information about the [AI](#ai) in the [Visualizer](#visualizer), we cannot send copies of an [AI](#ai) object to the [Visualizer](#visualizer) over the [Observer](#observer-design-pattern) system because the [AI](#ai) is non-copyable. [Draw Functions](#draw_functions) are our solution that allow us to draw information in the [Visualizer](#visualizer) for non-copyable types.
+
+A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
+
+## Editing the Visualizer
+Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
+
+Our rule of thumb is that [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) should be used to define all the widgets in the [Visualizer](#visualizer), and define the layout for everything. All logic (including connecting signals and slots, receiving data from buffers, etc.) should be implemented in the code ourselves.
+
+For a very quick tutorial on how to use QtCreator, see [this video](https://www.youtube.com/watch?v=R6zWLfHIYJw)
+
+To summarize, [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) creates and modifies a `.ui` file, which is more-or-less an `XML` describing the GUI application (what components exist, how they are positioned relative to one another, and their attributes). During compilation, this `.ui` file gets generated into code which handles all the setup and layout of the GUI components that have been defined in the `.ui` file. We include the autogenerated code in our [Visualizer](#visualizer) code where we are then able to connect the autogenerated widgets to various functions, and implement the logic we need to.
+
+### Editing `.ui` files
+1. Open QtCreator
+2. Click `File -> Open File or Project`
+3. Select the `.ui` file.
+4. Make your changes (*Don't forget to save. You must save the file for changes to be picked up in compilation*)
+
+### Promoting Widgets
+The most important thing to know about editing the [Visualizer](#visualizer) in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), is how to promote generic widgets to custom widgets. If we want to extend a QtWidget with custom behavior, we need to create our own class that extends the Widget we want to customize. However, we would still prefer to use [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) to declare this widget and how it fits in the GUI layout.
+
+"Promoting" a widget in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) allows us to place a "generic" widget in the layout, and then tell [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) we actually want that widget to be our custom class. To promote a widget:
+1. Right-click the widget you want to promote
+2. Click `Promote To` or `Promoted Widgets`
+3. Choose the custom widget this widget should be promoted to. Create a new promoted class if necessary.
+    1. When creating new promoted classes, make sure to provide the path to the header file relative to the bazel `WORKSPACE` file. This will make the `#include` statements in the generated code use the full path, which is required by `bazel`.
+
+More information about defining custom widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) can be found [here](https://doc.qt.io/qt-5/designer-using-custom-widgets.html).
