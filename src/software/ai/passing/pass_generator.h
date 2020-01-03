@@ -134,7 +134,9 @@ namespace Passing
         static const int NUM_PARAMS_TO_OPTIMIZE = 4;
 
         // The number of iterations to run on each call to `getBestPassSoFar()`
-        // **if** running determinstically
+        // **if** running deterministically.
+        // This value was determined to work for unit tests, it will likely need to be
+        // configurable in the future.
         static const size_t NUM_ITERS_PER_DETERMINISTIC_CALL = 10;
 
         // Weights used to normalize the parameters that we pass to GradientDescent

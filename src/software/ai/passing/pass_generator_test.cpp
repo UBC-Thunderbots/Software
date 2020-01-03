@@ -61,6 +61,7 @@ class PassGeneratorTest : public testing::Test
                 break;
             }
         }
+        EXPECT_LE(std::abs(curr_score - prev_score), min_score_diff);
     }
 
     World world;
