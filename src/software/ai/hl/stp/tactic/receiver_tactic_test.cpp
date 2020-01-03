@@ -8,6 +8,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
+#include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
 
 using namespace Passing;
@@ -377,7 +378,7 @@ TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_pos
     // ball contact point to intersect with the ball's trajectory, meaning that we are
     // in the correct position to make contact with the ball
     Line ball_path = Line(ball.position(), ball.position() + ball.velocity());
-    double dist_to_ball_passthrough = dist(ball_path, ball_contact_position);
+    double dist_to_ball_passthrough = distance(ball_path, ball_contact_position);
 
     EXPECT_TRUE(dist_to_ball_passthrough < 0.001);
 }

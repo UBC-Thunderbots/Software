@@ -23,6 +23,13 @@ TEST(RayTest, vector_constructor)
     EXPECT_EQ(Vector(2, 3).orientation(), r.getDirection());
 }
 
+TEST(RayTest, vector_constructor_zero_vector)
+{
+    Ray r = Ray(Point(1, 2), Vector());
+    EXPECT_EQ(Point(1, 2), r.getStart());
+    EXPECT_EQ(Vector().orientation(), r.getDirection());
+}
+
 TEST(RayTest, point_setter)
 {
     Ray r = Ray(Point(3, 2), Angle::half());
@@ -60,4 +67,11 @@ TEST(RayTest, rotate)
     r.rotate(Angle::threeQuarter());
     EXPECT_EQ(Point(1, 1), r.getStart());
     EXPECT_EQ(Angle::zero(), r.getDirection());
+}
+
+TEST(RayTest, to_unit_vector)
+{
+    Angle a = Angle::fromDegrees(30);
+    Ray r   = Ray(Point(1, 1), a);
+    EXPECT_EQ(r.toUnitVector(), Vector(sqrt(3), 1).normalize());
 }

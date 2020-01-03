@@ -6,10 +6,10 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/ray.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 
@@ -21,39 +21,6 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
       friendly_team(friendly_team),
       enemy_team(enemy_team)
 {
-}
-
-std::string GoalieTactic::getName() const
-{
-    return "Goalie Tactic";
-}
-
-void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
-                                     const Team &friendly_team, const Team &enemy_team)
-{
-    // Update the world parameters stored by this Tactic
-    this->ball          = ball;
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-}
-
-double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
-{
-    // Strongly prefer the robot assigned to be the goalie.
-    // TODO: This is a hack to "ensure" the right robot will be assigned. We should
-    // normally return values in the range [0, 1]
-    if (world.friendlyTeam().getGoalieID() &&
-        robot.id() == world.friendlyTeam().getGoalieID().value())
-    {
-        return 0.0;
-    }
-    else
-    {
-        // TODO perform proper goalie assignment using plays
-        // https://github.com/UBC-Thunderbots/Software/issues/745
-        return std::numeric_limits<int>::max() - 10;
-    }
 }
 
 std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
@@ -127,6 +94,33 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     {
         return std::nullopt;
     }
+}
+
+std::string GoalieTactic::getName() const
+{
+    return "Goalie Tactic";
+}
+
+void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
+                                     const Team &friendly_team, const Team &enemy_team)
+{
+    // Update the world parameters stored by this Tactic
+    this->ball          = ball;
+    this->field         = field;
+    this->friendly_team = friendly_team;
+    this->enemy_team    = enemy_team;
+}
+
+bool GoalieTactic::isGoalieTactic() const
+{
+    return true;
+}
+
+double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
+{
+    // We don't prefer any particular robot to be the goalie, as there should only
+    // ever be one robot that can act as the goalie
+    return 0.5;
 }
 
 void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)

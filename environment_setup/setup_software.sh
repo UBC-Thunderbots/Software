@@ -56,6 +56,19 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+echo "================================================================"
+echo "Installing Newer Valgrind Version"
+echo "================================================================"
+# The default version of valgrind on Ubuntu 18.04 via `apt` is '3.13', but
+# the version of clang we use requires at least '3.15'. To get around this, we
+# remove the version installed by `apt` and get the version from `snap` instead
+sudo apt remove valgrind
+sudo snap install valgrind --channel=stable --classic
+
+echo "================================================================"
+echo "Done Installing Newer Valgrind Version"
+echo "================================================================"
+
 # Install Bazel
 echo "================================================================" 
 echo "Installing Bazel"

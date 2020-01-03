@@ -13,10 +13,8 @@ cc_library(
     ],
     hdrs = [
         "circle.h",
-        "line.h",
         "polygon.h",
         "polynomial.h",
-        "ray.h",
         "rectangle.h",
         "segment.h",
         "shot.h",
