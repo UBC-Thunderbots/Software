@@ -185,7 +185,7 @@ class World final
      * @param other The world to compare against for equality
      * @return True if the other robot is equal to this world, and false otherwise
      */
-    bool operator==(const World &other) const;
+    bool operator==(const World& other) const;
 
    private:
     Field field_;
