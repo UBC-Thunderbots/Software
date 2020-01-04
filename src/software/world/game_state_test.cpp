@@ -55,7 +55,6 @@ TEST(GameStateTest, equality_diff_state)
     GameState gameState2;
     gameState2.state = GameState::STOP;
     EXPECT_NE(gameState1, gameState2);
-
 }
 
 TEST(GameStateTest, equality_diff_restart_reason)
@@ -79,7 +78,8 @@ TEST(GameStateTest, equality_diff_ball_state)
     GameState gameState1;
     GameState gameState2;
     gameState2.state = GameState::READY;
-    gameState2.updateBall(Ball(Point(100,100), Vector(20,0), Timestamp::fromSeconds(0)));
+    gameState2.updateBall(
+        Ball(Point(100, 100), Vector(20, 0), Timestamp::fromSeconds(0)));
     EXPECT_NE(gameState1, gameState2);
 }
 
@@ -95,7 +95,7 @@ TEST(GameStateTest, equality_diff_placement_point)
 {
     GameState gameState1;
     GameState gameState2;
-    gameState2.setBallPlacementPoint(Point(100,100));
+    gameState2.setBallPlacementPoint(Point(100, 100));
     EXPECT_NE(gameState1, gameState2);
 }
 

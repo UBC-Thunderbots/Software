@@ -335,7 +335,8 @@ class GameState
      * Defines the inequality operator for a GameState
      *
      * @param other The GameState to compare against for equality
-     * @return True if the other GameState is not equal to this GameState and true otherwise
+     * @return True if the other GameState is not equal to this GameState and true
+     * otherwise
      */
     bool operator!=(const GameState& other) const;
 
