@@ -36,5 +36,5 @@ void GoalieTestTactic::accept(MutableTacticVisitor &visitor)
     // GoalieTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic
     throw std::invalid_argument(
-            "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
+        "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
 }
