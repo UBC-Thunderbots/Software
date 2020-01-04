@@ -30,9 +30,13 @@ class STP : public HL
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
     /**
-     * Given a list of tactics and the current World, returns a new list of tactics
-     * with robots assigned to them. Only tactics with a robot assigned are returned,
-     * and the tactics are returned in the same order that they were given.
+     * Given a list of tactics and the current World, assigns robots from the friendly
+     * team to each tactic
+     *
+     * Some tactics may not be assigned a robot, depending on if there is a robot
+     * capable of performing that tactic
+     *
+     * This will clear all assigned robots from all tactics
      *
      * The order of the given tactics determines their priority, with the tactics as the
      * beginning of the vector being a higher priority than those at the end. The priority
@@ -42,13 +46,11 @@ class STP : public HL
      * would be assigned to robots and run.
      *
      * @param world The state of the world, which contains the friendly Robots that will
-     * be mapped to a Tactic
-     * @param tactics The list of tactics that should be run (and paired with a Robot)
-     * @return A list of tactics, where each tactic has a robot assigned to it. Only
-     * tactics with a robot assigned are returned
+     * be assigned to each tactic
+     * @param tactics The list of tactics that should be assigned a robot
      */
-    std::vector<std::shared_ptr<Tactic>> assignRobotsToTactics(
-        const World &world, std::vector<std::shared_ptr<Tactic>> tactics) const;
+    void assignRobotsToTactics(const World &world,
+                               std::vector<std::shared_ptr<Tactic>> tactics) const;
 
     /**
      * Given the state of the world, returns a unique_ptr to the Play that should be run

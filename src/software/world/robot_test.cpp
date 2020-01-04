@@ -540,3 +540,37 @@ TEST_F(RobotTest, get_timestamp_index_no_matching_timestamp)
 
     EXPECT_EQ(std::nullopt, robot.getHistoryIndexFromTimestamp(no_matching_time));
 }
+
+TEST_F(RobotTest, get_capabilities_blacklist)
+{
+    std::set<RobotCapabilities::Capability> blacklist = {
+        RobotCapabilities::Capability::Dribble,
+        RobotCapabilities::Capability::Chip,
+    };
+
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+                        AngularVelocity::fromDegrees(25), current_time, 3, blacklist);
+
+    EXPECT_EQ(blacklist, robot.getCapabilitiesBlacklist());
+}
+
+TEST_F(RobotTest, get_capabilities_whitelist)
+{
+    std::set<RobotCapabilities::Capability> blacklist = {
+        RobotCapabilities::Capability::Dribble,
+        RobotCapabilities::Capability::Chip,
+    };
+
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+                        AngularVelocity::fromDegrees(25), current_time, 3, blacklist);
+
+    // whitelist = all capabilities - blacklist
+    std::set<RobotCapabilities::Capability> all_capabilities =
+        RobotCapabilities::allCapabilities();
+    std::set<RobotCapabilities::Capability> expected_whitelist;
+    std::set_difference(all_capabilities.begin(), all_capabilities.end(),
+                        blacklist.begin(), blacklist.end(),
+                        std::inserter(expected_whitelist, expected_whitelist.begin()));
+
+    EXPECT_EQ(expected_whitelist, robot.getCapabilitiesWhitelist());
+}
