@@ -330,3 +330,23 @@ void GoalieTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
+
+Ball GoalieTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field GoalieTactic::getField() const
+{
+    return this->field;
+}
+
+Team GoalieTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team GoalieTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
+}

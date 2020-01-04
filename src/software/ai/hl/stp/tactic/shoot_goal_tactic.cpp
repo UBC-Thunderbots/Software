@@ -195,3 +195,23 @@ void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
+
+Ball ShootGoalTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShootGoalTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShootGoalTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team ShootGoalTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
+}

@@ -67,7 +67,11 @@ void TacticWorldParamsUpdateVisitor::visit(PasserTactic &tactic)
     tactic.updateWorldParams(world.ball());
 }
 
-void TacticWorldParamsUpdateVisitor::visit(DefenseShadowEnemyTactic &tactic) {}
+void TacticWorldParamsUpdateVisitor::visit(DefenseShadowEnemyTactic &tactic)
+{
+    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                             world.ball());
+}
 void TacticWorldParamsUpdateVisitor::visit(MoveTestTactic &tactic) {}
 void TacticWorldParamsUpdateVisitor::visit(StopTestTactic &tactic) {}
 // clang-format on

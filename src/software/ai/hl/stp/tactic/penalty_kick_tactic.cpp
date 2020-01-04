@@ -203,3 +203,13 @@ void PenaltyKickTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }
+
+Ball PenaltyKickTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field PenaltyKickTactic::getField() const
+{
+    return this->field;
+}

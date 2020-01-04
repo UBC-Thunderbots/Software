@@ -39,6 +39,7 @@ class ShadowFreekickerTactic : public Tactic
     /**
      * Updates the world parameters for this ShadowFreekicker tactic
      *
+     * @param field : The field being played on
      * @param enemy_team : The enemy team of robots.
      * @param ball  : The Ball being played with
      */
@@ -57,6 +58,10 @@ class ShadowFreekickerTactic : public Tactic
 
     void accept(const NonMutableTacticVisitor& visitor) const override;
     void accept(MutableTacticVisitor& visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
+    Team getEnemyTeam() const;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

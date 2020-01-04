@@ -100,3 +100,8 @@ void PasserTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }
+
+Ball PasserTactic::getBall() const
+{
+    return this->ball;
+}

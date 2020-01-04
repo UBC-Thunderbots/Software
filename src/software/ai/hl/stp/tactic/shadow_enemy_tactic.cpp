@@ -146,3 +146,23 @@ void ShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
+
+Ball ShadowEnemyTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShadowEnemyTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShadowEnemyTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team ShadowEnemyTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
+}

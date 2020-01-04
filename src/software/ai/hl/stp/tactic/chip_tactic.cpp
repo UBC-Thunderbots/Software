@@ -60,3 +60,8 @@ void ChipTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
+
+Ball ChipTactic::getBall() const
+{
+    return this->ball;
+}

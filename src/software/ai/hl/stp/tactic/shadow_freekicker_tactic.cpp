@@ -101,3 +101,18 @@ void ShadowFreekickerTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
+
+Ball ShadowFreekickerTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShadowFreekickerTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShadowFreekickerTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
+}

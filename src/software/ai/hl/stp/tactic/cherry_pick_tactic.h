@@ -45,6 +45,11 @@ class CherryPickTactic : public Tactic
 
     void accept(const NonMutableTacticVisitor& visitor) const override;
     void accept(MutableTacticVisitor& visitor) override;
+    /**
+     *
+     * @return
+     */
+    World getWorld() const;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

@@ -24,11 +24,7 @@ class StopTestTactic;
 class DefenseShadowEnemyTactic;
 
 /**
- * This class provides a non mutable interface for all Tactic Visitors. The Visitor design
- * pattern allows us to perform operations on Tactic objects without needing to check
- * which concrete type it is with an if/else statement, and we don't need to pollute the
- * Tactic classes with information or functions that are specific to the task we
- * want to perform.
+ * Refer to the docs about why we use the Visitor Design Pattern
  */
 class NonMutableTacticVisitor
 {

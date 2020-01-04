@@ -252,3 +252,23 @@ void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
+
+Ball CreaseDefenderTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field CreaseDefenderTactic::getField() const
+{
+    return this->field;
+}
+
+Team CreaseDefenderTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
+}
+
+Team CreaseDefenderTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}

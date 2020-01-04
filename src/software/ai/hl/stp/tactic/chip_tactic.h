@@ -52,6 +52,8 @@ class ChipTactic : public Tactic
     void accept(const NonMutableTacticVisitor& visitor) const override;
     void accept(MutableTacticVisitor& visitor) override;
 
+    Ball getBall() const;
+
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 

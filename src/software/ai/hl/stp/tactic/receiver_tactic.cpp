@@ -254,3 +254,20 @@ void ReceiverTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
 }
+
+Ball ReceiverTactic::getBall() const {
+    return this->ball;
+}
+
+Field ReceiverTactic::getField() const {
+    return this->field;
+}
+
+Team ReceiverTactic::getEnemyTeam() const {
+    return this->enemy_team;
+}
+
+Team ReceiverTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}

@@ -488,8 +488,6 @@ cc_test(
     name = "tactic_world_params_update_visitor_test",
     srcs = ["tactic_world_params_update_visitor_test.cpp"],
     deps = [
-        ":defense_shadow_enemy_tactic",
-        ":tactic",
         ":tactic_world_params_update_visitor",
         "//software/geom",
         "//software/test_util",
