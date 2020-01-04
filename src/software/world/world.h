@@ -186,6 +186,13 @@ class World final
      * @return True if the other robot is equal to this world, and false otherwise
      */
     bool operator==(const World& other) const;
+    /**
+     * Defines the inequality operator for a World.
+     *
+     * @param other The world to compare against for inequality
+     * @return True if the other world is not equal to this world and false otherwise
+     */
+    bool operator!=(const World& other) const;
 
    private:
     Field field_;

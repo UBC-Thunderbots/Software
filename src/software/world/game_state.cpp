@@ -301,3 +301,8 @@ bool GameState::operator==(const GameState& other) const
            this->our_restart == other.our_restart &&
            this->ball_placement_point == other.ball_placement_point;
 }
+
+bool GameState::operator!=(const GameState& other) const
+{
+    return !(*this == other);
+}

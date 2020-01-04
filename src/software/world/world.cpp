@@ -171,8 +171,13 @@ GameState &World::mutableGameState()
 
 bool World::operator==(const World &other) const
 {
-    return this->field_ == other.field_ && this->ball_ == other.ball_ &&
-           this->friendly_team_ == other.friendly_team_ &&
-           this->enemy_team_ == other.enemy_team_ &&
-           this->game_state_ == other.game_state_;
+    return this->field() == other.field() && this->ball() == other.ball() &&
+           this->friendlyTeam() == other.friendlyTeam() &&
+           this->enemyTeam() == other.enemyTeam() &&
+           this->gameState() == other.gameState();
+}
+
+bool World::operator!=(const World &other) const
+{
+    return !(*this == other);
 }

@@ -108,3 +108,66 @@ TEST_F(WorldTest, get_timestamp_history)
     EXPECT_EQ(world.getTimestampHistory()[1], timestamp_2);
     EXPECT_EQ(world.getTimestampHistory()[0], timestamp_3);
 }
+
+TEST_F(WorldTest, equality_basic_tests)
+{
+    World world1;
+    World world2;
+    EXPECT_EQ(world1, world2);
+    EXPECT_EQ(world2, world1);
+    EXPECT_EQ(world1, world1);
+}
+
+TEST_F(WorldTest, equality_different_timestamp)
+{
+    World world1;
+    World world3;
+    world3.updateTimestamp(Timestamp::fromSeconds(100));
+    EXPECT_EQ(world1, world3);
+}
+
+TEST_F(WorldTest, equality_different_ball)
+{
+    World world1;
+    Ball ball = Ball(Point(1,0), Vector(13,0), Timestamp::fromSeconds(0));
+    Field field = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
+    Team friendly_team = Team(Duration::fromMilliseconds(0));
+    Team enemy_team = Team(Duration::fromMilliseconds(0));
+    World world2 = World(field, ball, friendly_team, enemy_team);
+    EXPECT_NE(world1, world2);
+}
+
+TEST_F(WorldTest, equality_different_field)
+{
+    World world1;
+    Ball ball = Ball(Point(0,0), Vector(0,0), Timestamp::fromSeconds(0));
+    Field field = Field(0, 5, 03, 0, 0, 2, 0, Timestamp::fromSeconds(0));
+    Team friendly_team = Team(Duration::fromMilliseconds(0));
+    Team enemy_team = Team(Duration::fromMilliseconds(0));
+    World world2 = World(field, ball, friendly_team, enemy_team);
+    EXPECT_NE(world1, world2);
+}
+
+TEST_F(WorldTest, equality_different_friendly_team)
+{
+    World world1;
+    Ball ball = Ball(Point(0,0), Vector(0,0), Timestamp::fromSeconds(0));
+    Field field = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
+    Team friendly_team = Team(Duration::fromMilliseconds(1500));
+    Team enemy_team = Team(Duration::fromMilliseconds(0));
+    World world2 = World(field, ball, friendly_team, enemy_team);
+    EXPECT_NE(world1, world2);
+}
+
+TEST_F(WorldTest, equality_different_enemy_team)
+{
+    World world1;
+    Ball ball = Ball(Point(0,0), Vector(0,0), Timestamp::fromSeconds(0));
+    Field field = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
+    Team friendly_team = Team(Duration::fromMilliseconds(0));
+    Team enemy_team = Team(Duration::fromMilliseconds(1300));
+    World world2 = World(field, ball, friendly_team, enemy_team);
+    EXPECT_NE(world1, world2);
+}
+
+
