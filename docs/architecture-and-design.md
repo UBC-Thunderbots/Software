@@ -43,6 +43,9 @@
       * [Tactics](#tactics)
       * [Plays](#plays)
     * [Navigation](#navigation)
+      * [Path Manager](#path-manager)
+      * [Path Objective](#path-objective)
+      * [Path Planner](#path-planner)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
@@ -390,6 +393,15 @@ The `Navigator` is responsible for path planning and navigation. Once our strate
 Most [Intents](#intents) are easy to break down into  [Primitives](#primitives), and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behaviour like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
 
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+
+### Path Manager
+The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions.
+
+### Path Objective
+A path objective is a simple datastructure used to communicate between the navigator and the path manager. It conveys information for generating one path, such as start, destination, and obstacles. Path Objectives use very simple datastructures so that Path Planners do not need to know about any world-specific datastructures, such as Robots or the Field.
+
+### Path Planner
+The `Path Planner` is an interface for the responsibility of path planning a single robot around a single set of obstacles from a given start to a given destination. The interface allows us to easily swap out path planners.
 
 ## AI Diagram
 ![AI Diagram](images/ai_diagram.svg)
