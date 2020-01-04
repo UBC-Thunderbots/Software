@@ -17,6 +17,9 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
       passer_point(passer_point),
       best_known_pass({0, 0}, {0, 0}, 0, Timestamp::fromSeconds(0)),
       target_region(std::nullopt),
+      // We initialize the random number generator with a specific value to
+      // allow generated passes to be deterministic. The value used here has
+      // no special meaning.
       random_num_gen(13),
       pass_type(pass_type),
       in_destructor(false),
