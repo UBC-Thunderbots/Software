@@ -293,3 +293,13 @@ void GameState::setRestartCompleted()
     state          = PLAYING;
     restart_reason = NONE;
 }
+
+bool GameState::operator==(const GameState& other) const
+{
+    return this->state == other.state &&
+            this->restart_reason == other.restart_reason &&
+            this->game_state == other.game_state &&
+            this->ball_state == other.ball_state &&
+            this->our_restart == other.our_restart &&
+            this->ball_placement_point == other.ball_placement_point;
+}

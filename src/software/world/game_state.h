@@ -323,6 +323,8 @@ class GameState
      */
     bool stayBehindPenaltyLine() const;
 
+    bool operator==(const GameState& other) const;
+
     /**
      * Sets the point on the field where the ball should be placed.
      * See Robocup SSL Rules Law 9.2.

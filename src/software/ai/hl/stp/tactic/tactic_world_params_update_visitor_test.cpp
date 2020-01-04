@@ -14,16 +14,10 @@ TEST(TacticUpdateVisitorTest, update_cherry_pick_tactic)
     update_world.updateFieldGeometry(
         Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
     CherryPickTactic tactic = CherryPickTactic(initial_world, target_region);
-    EXPECT_EQ(tactic.getWorld().field(), initial_world.field());
-    EXPECT_EQ(tactic.getWorld().enemyTeam(), initial_world.enemyTeam());
-    EXPECT_EQ(tactic.getWorld().friendlyTeam(), initial_world.friendlyTeam());
-    EXPECT_EQ(tactic.getWorld().ball(), initial_world.ball());
+    EXPECT_EQ(tactic.getWorld(), initial_world);
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
     tactic.accept(visitor);
-    EXPECT_EQ(tactic.getWorld().field(), update_world.field());
-    EXPECT_EQ(tactic.getWorld().enemyTeam(), update_world.enemyTeam());
-    EXPECT_EQ(tactic.getWorld().friendlyTeam(), update_world.friendlyTeam());
-    EXPECT_EQ(tactic.getWorld().ball(), update_world.ball());
+    EXPECT_EQ(tactic.getWorld(), update_world);
 }
 
 TEST(TacticUpdateVisitorTest, update_chip_tactic)
