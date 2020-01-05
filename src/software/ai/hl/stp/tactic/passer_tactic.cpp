@@ -8,7 +8,8 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 
 using namespace Passing;
@@ -90,7 +91,17 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
              ball.velocity().length() < 0.5);
 }
 
-void PasserTactic::accept(TacticVisitor& visitor) const
+void PasserTactic::accept(const NonMutableTacticVisitor& visitor) const
 {
     visitor.visit(*this);
+}
+
+void PasserTactic::accept(MutableTacticVisitor& visitor)
+{
+    visitor.visit(*this);
+}
+
+Ball PasserTactic::getBall() const
+{
+    return this->ball;
 }

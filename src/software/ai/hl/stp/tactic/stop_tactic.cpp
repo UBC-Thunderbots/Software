@@ -3,7 +3,8 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 
 StopTactic::StopTactic(bool coast, bool loop_forever) : Tactic(loop_forever), coast(coast)
 {
@@ -31,7 +32,12 @@ void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!stop_action->done());
 }
 
-void StopTactic::accept(TacticVisitor &visitor) const
+void StopTactic::accept(const NonMutableTacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void StopTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
