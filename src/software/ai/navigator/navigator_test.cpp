@@ -15,7 +15,8 @@ class NoPathNavigatorFixture : public Navigator, public testing::Test
    public:
     NoPathNavigatorFixture()
         : Navigator(std::make_unique<VelocityObstaclePathManager>(
-              std::make_unique<NoPathTestPathPlanner>())),
+                        std::make_unique<NoPathTestPathPlanner>()),
+                    std::make_shared<NavigatorConfig>()),
           current_time(Timestamp::fromSeconds(123)),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
           friendly_team(Team(Duration::fromMilliseconds(1000))),
@@ -36,7 +37,8 @@ class ThetaStarNavigatorFixture : public Navigator, public testing::Test
    public:
     ThetaStarNavigatorFixture()
         : Navigator(std::make_unique<VelocityObstaclePathManager>(
-              std::make_unique<ThetaStarPathPlanner>()))
+                        std::make_unique<ThetaStarPathPlanner>()),
+                    std::make_shared<NavigatorConfig>())
     {
     }
 };
@@ -262,7 +264,8 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     World world = World(field, ball, friendly_team, enemy_team);
 
     Navigator navigator(std::make_unique<VelocityObstaclePathManager>(
-        std::make_unique<OnePointPathTestPathPlanner>()));
+                            std::make_unique<OnePointPathTestPathPlanner>()),
+                        std::make_shared<NavigatorConfig>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(

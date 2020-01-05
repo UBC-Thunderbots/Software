@@ -20,7 +20,7 @@
 class Navigator : public IntentVisitor
 {
    public:
-    explicit Navigator(std::unique_ptr<PathManager> path_manager);
+    explicit Navigator(std::unique_ptr<PathManager> path_manager, std::shared_ptr<NavigatorConfig> config);
 
     /**
      * Get assigned primitives for given assigned intents
@@ -128,6 +128,8 @@ class Navigator : public IntentVisitor
                                                    const Point &p3, double final_speed);
 
    private:
+    std::shared_ptr<NavigatorConfig> config;
+
     // Path manager used to navigate around obstacles
     std::unique_ptr<PathManager> path_manager;
 

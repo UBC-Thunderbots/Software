@@ -2,8 +2,9 @@
 
 #include <g3log/g3log.hpp>
 
-Navigator::Navigator(std::unique_ptr<PathManager> path_manager)
-    : path_manager(std::move(path_manager))
+Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
+                     std::shared_ptr<NavigatorConfig> config)
+    : path_manager(std::move(path_manager)), config(config)
 {
 }
 
@@ -178,10 +179,8 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getPrimitivesFromMoveIntents(
 
 void Navigator::registerNonMoveIntentRobotId(RobotId id)
 {
-    double inflation_factor = Util::DynamicParameters->getNavigatorConfig()
-                                  ->RobotObstacleInflationFactor()
-                                  ->value();
-    auto robot = (world.friendlyTeam().getRobotById(id));
+    double inflation_factor = config->RobotObstacleInflationFactor()->value();
+    auto robot              = (world.friendlyTeam().getRobotById(id));
     if (robot)
     {
         friendly_non_move_intent_robot_obstacles.push_back(
@@ -209,9 +208,7 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
         {
             // we are going to some intermediate point so we transition smoothly
             double transition_final_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                                            Util::DynamicParameters->getNavigatorConfig()
-                                                ->TransitionSpeedFactor()
-                                                ->value();
+                                            config->TransitionSpeedFactor()->value();
 
             desired_final_speed = calculateTransitionSpeedBetweenSegments(
                 path_points[0], path_points[1], path_points[2], transition_final_speed);
@@ -236,9 +233,7 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
 
 double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team)
 {
-    double robot_proximity_limit = Util::DynamicParameters->getNavigatorConfig()
-                                       ->EnemyRobotProximityLimit()
-                                       ->value();
+    double robot_proximity_limit = config->EnemyRobotProximityLimit()->value();
 
     // find min dist between p and any robot
     double closest_dist = DBL_MAX;
