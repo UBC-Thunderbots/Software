@@ -9,7 +9,7 @@ TEST(TestVelocityObstaclePathManager, test_no_obostacles)
 {
     Point start{0, 0}, dest{1, 1};
     auto path_manager = std::make_unique<VelocityObstaclePathManager>(
-        std::make_unique<StraightLinePathPlanner>());
+        std::make_unique<StraightLinePathPlanner>(), std::make_shared<VelocityObstaclePathManagerConfig>());
     std::vector<Obstacle> obstacles;
 
     Rectangle navigable_area = Rectangle(Point(0, 0), 0, 0);

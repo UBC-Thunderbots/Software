@@ -14,7 +14,7 @@ class VelocityObstaclePathManager : public PathManager
         const std::unordered_set<PathObjective> &objectives,
         const Rectangle &navigable_area) override;
 
-    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner);
+    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner, std::shared_ptr<VelocityObstaclePathManagerConfig> config );
 
    private:
     /**
@@ -23,14 +23,15 @@ class VelocityObstaclePathManager : public PathManager
      *
      * @param objectives objectives to make obstacles
      * @param current_objective objective to skip
-     * @param inflation_factor how much to inflate obstacle
      *
      * @return list of obstacles that around other objectives' starts
      */
     const std::vector<Obstacle> getObstaclesAroundStartOfOtherObjectives(
-        const std::unordered_set<PathObjective> &objectives,
-        const PathObjective &current_objective, double inflation_factor);
+        const std::unordered_set<PathObjective>& objectives,
+        const PathObjective& current_objective);
 
     // Path planner used to get paths
     std::unique_ptr<PathPlanner> path_planner;
+
+    std::shared_ptr<VelocityObstaclePathManagerConfig> config;
 };
