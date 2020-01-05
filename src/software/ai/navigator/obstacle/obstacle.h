@@ -13,6 +13,8 @@
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 
+// TODO: a lot of the obstacle generation methods from this class probably belong in
+//       the ObstacleFactory class, file a ticket
 class Obstacle
 {
    public:

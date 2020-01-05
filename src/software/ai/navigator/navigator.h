@@ -6,7 +6,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_generation.h"
+#include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/ai/primitive/all_primitives.h"
 #include "software/ai/primitive/primitive.h"
@@ -20,7 +20,10 @@
 class Navigator : public IntentVisitor
 {
    public:
-    explicit Navigator(std::unique_ptr<PathManager> path_manager, std::shared_ptr<NavigatorConfig> config);
+    // TODO: jdoc
+    explicit Navigator(std::unique_ptr<PathManager> path_manager,
+                       ObstacleFactory obstacle_factory,
+                       std::shared_ptr<NavigatorConfig> config);
 
     /**
      * Get assigned primitives for given assigned intents
@@ -129,6 +132,7 @@ class Navigator : public IntentVisitor
 
    private:
     std::shared_ptr<NavigatorConfig> config;
+    ObstacleFactory obstacle_factory;
 
     // Path manager used to navigate around obstacles
     std::unique_ptr<PathManager> path_manager;

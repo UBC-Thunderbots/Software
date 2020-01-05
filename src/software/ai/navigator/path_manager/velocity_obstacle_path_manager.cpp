@@ -2,8 +2,11 @@
 
 VelocityObstaclePathManager::VelocityObstaclePathManager(
     std::unique_ptr<PathPlanner> path_planner,
+    ObstacleFactory obstacle_factory,
     std::shared_ptr<VelocityObstaclePathManagerConfig> config)
-    : path_planner(std::move(path_planner)), config(config)
+    : path_planner(std::move(path_planner)),
+      obstacle_factory(std::move(obstacle_factory)),
+      config(config)
 {
 }
 
@@ -17,10 +20,6 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
     // to this list so that paths planned later do not collide with the path we just
     // planned. Please see: https://en.wikipedia.org/wiki/Velocity_obstacle
     std::vector<Obstacle> current_velocity_obstacles;
-
-    // cache dynamic params
-    double robot_obstacle_inflation = config->ObstacleRobotWidthScalingFactor()->value();
-    double velocity_obstacle_inflation = config->ObstacleVelocityScalingFactor()->value();
 
     for (auto const &current_objective : objectives)
     {
@@ -40,12 +39,17 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
         // store velocity obstacle for current path
         if (path && path->size() >= 2)
         {
+            // We want to avoid the start of every other path, assuming that
+            // there is a robot moving along the path from the path's start
             std::vector<Point> path_points = path->getKnots();
+            Vector initial_path_velocity =
+                (path_points[1] - current_objective.start)
+                    .normalize(current_objective.current_speed);
+            Robot mock_path_robot(0, current_objective.start, initial_path_velocity,
+                                  Angle::zero(), AngularVelocity::zero(),
+                                  Timestamp::fromSeconds(0));
             current_velocity_obstacles.emplace_back(
-                Obstacle::createVelocityObstacleWithScalingParams(
-                    current_objective.start, path_points[1],
-                    current_objective.current_speed, robot_obstacle_inflation,
-                    velocity_obstacle_inflation));
+                obstacle_factory.getVelocityObstacleFromRobot(mock_path_robot));
         }
     }
 

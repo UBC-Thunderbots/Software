@@ -3,8 +3,11 @@
 #include <g3log/g3log.hpp>
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
+                     ObstacleFactory obstacle_factory,
                      std::shared_ptr<NavigatorConfig> config)
-    : path_manager(std::move(path_manager)), config(config)
+    : path_manager(std::move(path_manager)),
+      obstacle_factory(std::move(obstacle_factory)),
+      config(config)
 {
 }
 
@@ -114,13 +117,16 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
         auto obstacles = friendly_non_move_intent_robot_obstacles;
 
         auto motion_constraint_obstacles =
-            getObstaclesFromMotionConstraints(intent.getMotionConstraints(), world);
+            obstacle_factory.getObstaclesFromMotionConstraints(
+                intent.getMotionConstraints(), world);
         obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                          motion_constraint_obstacles.end());
 
         if (intent.getBallCollisionType() == BallCollisionType::AVOID)
         {
-            obstacles.push_back(Obstacle::createCircularBallObstacle(world.ball(), 0.06));
+            auto ball_obstacle = Obstacle::createCircularBallObstacle(
+                world.ball(), 0.06);
+            obstacles.push_back(ball_obstacle);
         }
 
         auto robot = world.friendlyTeam().getRobotById(intent.getRobotId());
@@ -179,12 +185,11 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getPrimitivesFromMoveIntents(
 
 void Navigator::registerNonMoveIntentRobotId(RobotId id)
 {
-    double inflation_factor = config->RobotObstacleInflationFactor()->value();
-    auto robot              = (world.friendlyTeam().getRobotById(id));
+    auto robot = world.friendlyTeam().getRobotById(id);
     if (robot)
     {
-        friendly_non_move_intent_robot_obstacles.push_back(
-            Obstacle::createCircularRobotObstacle(*robot, inflation_factor));
+        auto robot_obstacle = obstacle_factory.getVelocityObstacleFromRobot(*robot);
+        friendly_non_move_intent_robot_obstacles.push_back(robot_obstacle);
     }
 }
 
@@ -237,7 +242,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
 
     // find min dist between p and any robot
     double closest_dist = DBL_MAX;
-    auto obstacles      = getObstaclesFromTeam(enemy_team);
+    auto obstacles      = obstacle_factory.getVelocityObstaclesFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {
         double current_dist = dist(p, (*obstacle.getBoundaryPolygon()));

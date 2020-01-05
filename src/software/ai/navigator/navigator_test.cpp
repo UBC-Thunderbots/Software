@@ -10,12 +10,22 @@
 #include "software/ai/primitive/all_primitives.h"
 #include "software/test_util/test_util.h"
 
+// TODO: Having the tests just extend the navigator directly is logically
+//       inconsistent with proper usage of inheritance. The navigator should
+//       be a class member instead
+
+
+// TODO: initialization lists are real incomprehensible now, clean them up
+
 class NoPathNavigatorFixture : public Navigator, public testing::Test
 {
    public:
     NoPathNavigatorFixture()
         : Navigator(std::make_unique<VelocityObstaclePathManager>(
-                        std::make_unique<NoPathTestPathPlanner>()),
+                        std::make_unique<NoPathTestPathPlanner>(),
+                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
+                        std::make_shared<VelocityObstaclePathManagerConfig>()),
+                    ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                     std::make_shared<NavigatorConfig>()),
           current_time(Timestamp::fromSeconds(123)),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
@@ -37,7 +47,10 @@ class ThetaStarNavigatorFixture : public Navigator, public testing::Test
    public:
     ThetaStarNavigatorFixture()
         : Navigator(std::make_unique<VelocityObstaclePathManager>(
-                        std::make_unique<ThetaStarPathPlanner>()),
+                        std::make_unique<ThetaStarPathPlanner>(),
+                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
+                        std::make_shared<VelocityObstaclePathManagerConfig>()),
+                    ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                     std::make_shared<NavigatorConfig>())
     {
     }
@@ -263,8 +276,12 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     // Construct the world with arguments
     World world = World(field, ball, friendly_team, enemy_team);
 
+    // TODO: this expression is real nasty now, make it more comprehensible
     Navigator navigator(std::make_unique<VelocityObstaclePathManager>(
-                            std::make_unique<OnePointPathTestPathPlanner>()),
+                            std::make_unique<OnePointPathTestPathPlanner>(),
+                            ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
+                            std::make_shared<VelocityObstaclePathManagerConfig>()),
+                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                         std::make_shared<NavigatorConfig>());
 
     std::vector<std::unique_ptr<Intent>> intents;
