@@ -14,8 +14,12 @@
 //       inconsistent with proper usage of inheritance. The navigator should
 //       be a class member instead
 
+// TODO: should manually set config values in this test, and the others we've changed
+//       in the navigator stack
 
-// TODO: initialization lists are real incomprehensible now, clean them up
+// TODO: initialization lists are real incomprehensible now, clean them up (see above
+//       comment about changing these classes to use encapsulation instead of
+//       inheritance)
 
 class NoPathNavigatorFixture : public Navigator, public testing::Test
 {
