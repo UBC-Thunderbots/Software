@@ -43,6 +43,9 @@
       * [Tactics](#tactics)
       * [Plays](#plays)
     * [Navigation](#navigation)
+      * [Path Manager](#path-manager)
+      * [Path Objective](#path-objective)
+      * [Path Planner](#path-planner)
     * [Diagram](#ai-diagram)
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
@@ -50,6 +53,12 @@
     * [Editing the Visualizer](#editing-the-visualizer)
       * [Editing ui files](#editing-ui-files)
       * [Promoting Widgets](#promoting-widgets)
+* [Simulated Integration Tests](#simulated-integration-tests)
+  * [Architecture](#simulated-integration-tests-architecture)
+    * [Simulator Backend](#simulator-backend)
+    * [World State Validator](#world-state-validator)
+  * [Component Connections and Determinism](#component-connections-and-determinism)
+  * [Diagram](#simulated-integration-tests-diagram)
 
 
 # Tools
@@ -391,6 +400,15 @@ Most [Intents](#intents) are easy to break down into  [Primitives](#primitives),
 
 In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
 
+### Path Manager
+The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions.
+
+### Path Objective
+A path objective is a simple datastructure used to communicate between the navigator and the path manager. It conveys information for generating one path, such as start, destination, and obstacles. Path Objectives use very simple datastructures so that Path Planners do not need to know about any world-specific datastructures, such as Robots or the Field.
+
+### Path Planner
+The `Path Planner` is an interface for the responsibility of path planning a single robot around a single set of obstacles from a given start to a given destination. The interface allows us to easily swap out path planners.
+
 ## AI Diagram
 ![AI Diagram](images/ai_diagram.svg)
 
@@ -453,3 +471,58 @@ The most important thing to know about editing the [Visualizer](#visualizer) in 
     1. When creating new promoted classes, make sure to provide the path to the header file relative to the bazel `WORKSPACE` file. This will make the `#include` statements in the generated code use the full path, which is required by `bazel`.
 
 More information about defining custom widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) can be found [here](https://doc.qt.io/qt-5/designer-using-custom-widgets.html).
+
+
+# Simulated Integration Tests
+When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
+
+Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behaviour.
+
+The primary design goals of this test system are:
+1. **Determinism:** We need tests to pass or fail consistently
+2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
+3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and understand what they are testing.
+
+## Simulated Integration Tests Architecture
+The system consists of three main components:
+1. A [Backend](#backend) that performs the simulation
+2. A [World State Validator](#world-state-validator) Observer that will handle the "validation"
+3. The [AI](#ai) under test
+
+### Simulator Backend
+The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes the state of the [World](#world) periodically.
+
+In order to achieve determinism, the `SimulatorBackend` publishes new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
+
+### World State Validator
+The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
+
+There are generally 2 "types" of conditions we want to validate.
+1. Some sequence of states or actions occur **in a given order**. (*Eg. A robot moves to point A, then point B, then kicks the  ball*)
+2. Some condition is met for the duration of the test, or for "all time". (*Eg. The ball never leaves the field, or robots never collide*)
+
+We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
+
+Benefits of `ValidationFunctions`:
+1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
+2. They can represent assertions for more complex behavior. For example, we can build up simpler `ValidationFunctions` until we have a single `Validation` function for a specific [Tactic](#tactics).
+3. They let us validate independent sequences of behaviour. For example, we can give the `WorldStateValidator` a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
+
+The `WorldStateValidator` accepts lists of `ValidationFunctions` that it will run against each [World](#world) it receives. Once all `ValidationFunctions` have been run, the `WorldStateValidator` publishes the [World](#world) again. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
+
+## Component Connections and Determinism
+When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
+
+Most importantly, the [WorldStateValidator](#world-state-validator) acts as a "middleman" between the [Backend](#backend) and [AI](#ai). The [WorldStateValidator](#world-state-validator) observes the [World](#world) from the [Backend](#backend), and the [AI](#ai) observes the [World](#world) from the [WorldStateValidator](#world-state-validator). **The [AI](#ai) does not observe the [World](#world) directly from the [Backend](#backend) in this case.** See the [diagram](#simulated-integration-tests-diagram).
+
+Now we have a nice loop from the `Backend -> WorldStateValidator -> AI -> Backend ...`. As mentioned in their own sections, the [Simulator Backend](#simulator-backend) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [WorldStateValidator](#world-state-validator) waits to receive and validate a [World](#world) before re-publishing the [World](#world). **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
+
+**What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
+
+## Simulated Integration Tests Diagram
+Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
+
+The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
+
+![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
+

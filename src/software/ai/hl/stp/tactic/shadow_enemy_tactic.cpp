@@ -4,7 +4,8 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
                                      const Team &enemy_team, bool ignore_goalie,
@@ -136,7 +137,32 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void ShadowEnemyTactic::accept(TacticVisitor &visitor) const
+void ShadowEnemyTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+void ShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+Ball ShadowEnemyTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShadowEnemyTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShadowEnemyTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team ShadowEnemyTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }
