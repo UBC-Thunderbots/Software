@@ -4,27 +4,87 @@ cc_library(
     name = "new_geom",
     srcs = [
         "circle.cpp",
-        "line.cpp",
-        "point.cpp",
-        "polynomial.cpp",
-        "vector.cpp",
     ],
     hdrs = [
-        "angle.h",
-        "angular_velocity.h",
         "circle.h",
         "convex_shape.h",
-        "geom_constants.h",
-        "line.h",
-        "point.h",
-        "polynomial.h",
-        "ray.h",
         "shape.h",
-        "vector.h",
     ],
     deps = [
+        ":angle",
+        ":angular_velocity",
+        ":geom_constants",
+        ":line",
+        ":point",
+        ":polynomial",
+        ":ray",
+        ":vector",
+        "//software/new_geom/util",
+    ],
+)
+
+cc_library(
+    name = "angle",
+    hdrs = ["angle.h"],
+)
+
+cc_library(
+    name = "angular_velocity",
+    hdrs = ["angular_velocity.h"],
+    deps = [":angle"],
+)
+
+cc_library(
+    name = "geom_constants",
+    hdrs = ["geom_constants.h"],
+)
+
+cc_library(
+    name = "line",
+    srcs = ["line.cpp"],
+    hdrs = ["line.h"],
+    deps = [
+        ":angle",
+        ":point",
+        ":vector",
+    ],
+)
+
+cc_library(
+    name = "point",
+    srcs = ["point.cpp"],
+    hdrs = ["point.h"],
+    deps = [
+        ":angle",
+        ":geom_constants",
+        ":vector",
         "@boost//:geometry",
         "@boost//:polygon",
+    ],
+)
+
+cc_library(
+    name = "polynomial",
+    srcs = ["polynomial.cpp"],
+    hdrs = ["polynomial.h"],
+    deps = [":geom_constants"],
+)
+
+cc_library(
+    name = "ray",
+    srcs = ["ray.cpp"],
+    hdrs = ["ray.h"],
+    deps = [":point"],
+)
+
+cc_library(
+    name = "vector",
+    srcs = ["vector.cpp"],
+    hdrs = ["vector.h"],
+    deps = [
+        "angle",
+        "geom_constants",
+        "@boost//:geometry",
     ],
 )
 

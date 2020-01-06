@@ -4,7 +4,8 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
@@ -57,18 +58,18 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
     return std::clamp<double>(cost, 0, 1);
 }
 
-void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction();
-    StopAction stop_action =
-        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
+    auto move_action = std::make_shared<MoveAction>();
+    auto stop_action = std::make_shared<StopAction>(
+        StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
     do
     {
         if (!enemy_threat)
         {
             LOG(WARNING) << "Running DefenseShadowEnemyTactic without an enemy threat";
-            stop_action.updateControlParams(*robot, false);
-            yield(stop_action.getNextIntent());
+            stop_action->updateControlParams(*robot, false);
+            yield(stop_action);
         }
 
         Robot enemy_robot                   = enemy_threat->robot;
@@ -102,27 +103,52 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
                     ->BallStealSpeed()
                     ->value())
         {
-            move_action.updateControlParams(
+            move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
                 0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
                 BallCollisionType::AVOID);
-            yield(move_action.getNextIntent());
+            yield(move_action);
         }
         else
         {
             Angle facing_enemy_robot =
                 (enemy_robot.position() - robot->position()).orientation();
-            move_action.updateControlParams(*robot, position_to_block_shot,
-                                            facing_enemy_robot, 0, DribblerEnable::OFF,
-                                            MoveType::NORMAL, AutokickType::AUTOCHIP,
-                                            BallCollisionType::AVOID);
-            yield(move_action.getNextIntent());
+            move_action->updateControlParams(*robot, position_to_block_shot,
+                                             facing_enemy_robot, 0, DribblerEnable::OFF,
+                                             MoveType::NORMAL, AutokickType::AUTOCHIP,
+                                             BallCollisionType::AVOID);
+            yield(move_action);
         }
 
-    } while (!move_action.done());
+    } while (!move_action->done());
 }
 
-void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor) const
+void DefenseShadowEnemyTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+void DefenseShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+Ball DefenseShadowEnemyTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field DefenseShadowEnemyTactic::getField() const
+{
+    return this->field;
+}
+
+Team DefenseShadowEnemyTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team DefenseShadowEnemyTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }

@@ -6,11 +6,12 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/geom/ray.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/ray.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
@@ -176,10 +177,10 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
     }
 }
 
-void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction(0, Angle(), false);
-    StopAction stop_action = StopAction();
+    auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
+    auto stop_action = std::make_shared<StopAction>();
     do
     {
         std::optional<std::pair<Point, Angle>> desired_robot_state_opt =
@@ -187,18 +188,18 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            move_action.updateControlParams(
+            move_action->updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
                 MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
-            yield(move_action.getNextIntent());
+            yield(move_action);
         }
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
-            stop_action.updateControlParams(*robot, false);
-            yield(std::move(stop_action.getNextIntent()));
+            stop_action->updateControlParams(*robot, false);
+            yield(stop_action);
         }
-    } while (!move_action.done());
+    } while (!move_action->done());
 }
 
 std::vector<Segment> CreaseDefenderTactic::getPathSegments(Field field)
@@ -242,7 +243,32 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
     return std::nullopt;
 }
 
-void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
+void CreaseDefenderTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+Ball CreaseDefenderTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field CreaseDefenderTactic::getField() const
+{
+    return this->field;
+}
+
+Team CreaseDefenderTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
+}
+
+Team CreaseDefenderTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
 }

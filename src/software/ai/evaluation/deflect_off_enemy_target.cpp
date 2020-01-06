@@ -1,5 +1,4 @@
 #include "shared/constants.h"
-#include "software/geom/line.h"
 #include "software/geom/util.h"
 #include "software/world/field.h"
 #include "software/world/world.h"
@@ -49,7 +48,7 @@ namespace Evaluation
         // edge of the field
         Vector dir     = enemyClosestToEdge.position() - world.ball().position();
         Vector dirPerp = dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS * 0.75);
-        Point target  = Point(0, 0);
+        Point target   = Point(0, 0);
 
         // choose point closest to edge of field
         if (fabs((world.ball().position() + dir + dirPerp).y() - closestEdgeY) >

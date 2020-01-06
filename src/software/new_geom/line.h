@@ -9,6 +9,16 @@
 class Line final
 {
    public:
+    /**
+     * Struct to wrap the coefficients in the form a*x + b*y + c = 0
+     */
+    struct Coeffs
+    {
+        double a;
+        double b;
+        double c;
+    };
+
     Line() = delete;
 
     /**
@@ -20,11 +30,18 @@ class Line final
     explicit Line(const Point& first, const Point& second);
 
     /**
+     * Returns the coefficient struct
+     *
+     * @return the coefficient struct
+     */
+    Coeffs getCoeffs() const;
+
+    /**
      * Returns the normal unit vector of the Line
      *
      * @return the normal unit vector of the Line
      */
-    Vector toNormalUnitVector();
+    Vector toNormalUnitVector() const;
 
     /**
      * Reflects the Line about the line y = x
@@ -32,6 +49,6 @@ class Line final
     void swapXY();
 
    private:
-    // Coefficients for a line in the form coeffs[0]*x + coeffs[1]*y + coeffs[2] = 0
-    std::array<double, 3> coeffs;
+    // Coefficients for a line
+    Coeffs coeffs;
 };

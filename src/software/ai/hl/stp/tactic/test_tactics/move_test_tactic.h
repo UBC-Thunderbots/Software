@@ -45,10 +45,11 @@ class MoveTestTactic : public Tactic
      *
      * @throws std::invalid_argument always
      */
-    void accept(TacticVisitor& visitor) const override;
+    void accept(const NonMutableTacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // Tactic parameters
     // The point the robot is trying to move to

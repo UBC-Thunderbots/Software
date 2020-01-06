@@ -67,13 +67,12 @@ cc_library(
     ],
 )
 
-# TODO: (Issue #655) un-comment this and fix the flaky tests in it
-#cc_test(
-#    name = "pass_generator_test",
-#    srcs = ["pass_generator_test.cpp"],
-#    deps = [
-#        ":pass_generator",
-#        "//software/test_util",
-#        "@gtest//:gtest_main",
-#    ],
-#)
+cc_test(
+    name = "pass_generator_test",
+    srcs = ["pass_generator_test.cpp"],
+    deps = [
+        ":pass_generator",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

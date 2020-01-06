@@ -3,7 +3,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
@@ -102,9 +103,9 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     return false;
 }
 
-void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
-                                            ChipAction &chip_action,
-                                            IntentCoroutine::push_type &yield) const
+void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_action,
+                                            std::shared_ptr<ChipAction> chip_action,
+                                            ActionCoroutine::push_type &yield) const
 {
     auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
                                                            enemy_team, ball.position());
@@ -112,11 +113,11 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
     {
         if (!isEnemyAboutToStealBall())
         {
-            kick_action.updateWorldParams(ball);
-            kick_action.updateControlParams(*robot, ball.position(),
-                                            shot_target->getPointToShootAt(),
-                                            BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
-            yield(kick_action.getNextIntent());
+            kick_action->updateWorldParams(ball);
+            kick_action->updateControlParams(*robot, ball.position(),
+                                             shot_target->getPointToShootAt(),
+                                             BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
+            yield(kick_action);
         }
         else
         {
@@ -124,10 +125,10 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            chip_action.updateWorldParams(ball);
-            chip_action.updateControlParams(*robot, ball.position(),
-                                            shot_target->getPointToShootAt(), CHIP_DIST);
-            yield(chip_action.getNextIntent());
+            chip_action->updateWorldParams(ball);
+            chip_action->updateControlParams(*robot, ball.position(),
+                                             shot_target->getPointToShootAt(), CHIP_DIST);
+            yield(chip_action);
         }
 
         shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
@@ -135,12 +136,12 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
     }
 }
 
-void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    KickAction kick_action = KickAction();
-    ChipAction chip_action = ChipAction();
-    MoveAction move_action =
-        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+    auto kick_action = std::make_shared<KickAction>();
+    auto chip_action = std::make_shared<ChipAction>();
+    auto move_action = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
 
     do
     {
@@ -160,10 +161,10 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
             Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
-            chip_action.updateWorldParams(ball);
-            chip_action.updateControlParams(*robot, ball.position(), fallback_chip_target,
-                                            CHIP_DIST);
-            yield(chip_action.getNextIntent());
+            chip_action->updateWorldParams(ball);
+            chip_action->updateControlParams(*robot, ball.position(),
+                                             fallback_chip_target, CHIP_DIST);
+            yield(chip_action);
         }
         else
         {
@@ -176,16 +177,41 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                       DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
 
             // The default behaviour is to move behind the ball and face the net
-            move_action.updateControlParams(*robot, behind_ball,
-                                            (-behind_ball_vector).orientation(), 0,
-                                            DribblerEnable::OFF, MoveType::NORMAL,
-                                            AutokickType::NONE, BallCollisionType::ALLOW);
-            yield(move_action.getNextIntent());
+            move_action->updateControlParams(
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::ALLOW);
+            yield(move_action);
         }
-    } while (!(kick_action.done() || chip_action.done()));
+    } while (!(kick_action->done() || chip_action->done()));
 }
 
-void ShootGoalTactic::accept(TacticVisitor &visitor) const
+void ShootGoalTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+Ball ShootGoalTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShootGoalTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShootGoalTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team ShootGoalTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }

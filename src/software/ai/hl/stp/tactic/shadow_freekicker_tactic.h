@@ -39,6 +39,7 @@ class ShadowFreekickerTactic : public Tactic
     /**
      * Updates the world parameters for this ShadowFreekicker tactic
      *
+     * @param field : The field being played on
      * @param enemy_team : The enemy team of robots.
      * @param ball  : The Ball being played with
      */
@@ -55,10 +56,15 @@ class ShadowFreekickerTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(const NonMutableTacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
+    Team getEnemyTeam() const;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // Used for defining whether this robot is a left/right Freekick Shadower
     FreekickShadower free_kick_shadower;

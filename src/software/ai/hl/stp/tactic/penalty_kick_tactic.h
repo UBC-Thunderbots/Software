@@ -45,10 +45,14 @@ class PenaltyKickTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(TacticVisitor &visitor) const override;
+    void accept(const NonMutableTacticVisitor &visitor) const override;
+    void accept(MutableTacticVisitor &visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
+    void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
     // Evaluation function designed specifically for 1-on-1 penalty shots
     bool evaluate_penalty_shot();

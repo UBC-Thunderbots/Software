@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "software/ai/intent/move_intent.h"
+#include "software/ai/hl/stp/action/move_action.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
     : Tactic(loop_forever,
@@ -31,18 +31,23 @@ double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world
     return std::clamp<double>(cost, 0, 1);
 }
 
-void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do
     {
-        yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
-                                           Angle::zero(), 0.0, 0, DribblerEnable::OFF,
-                                           MoveType::NORMAL, AutokickType::NONE,
-                                           BallCollisionType::AVOID));
+        yield(std::make_shared<MoveAction>());
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 
-void MoveTestTactic::accept(TacticVisitor &visitor) const
+void MoveTestTactic::accept(const NonMutableTacticVisitor &visitor) const
+{
+    // MoveTestTactic is meant to be a simple test tactic and so
+    // we invoke YAGNI to not implement the visitor for this tactic
+    throw std::invalid_argument(
+        "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
+}
+
+void MoveTestTactic::accept(MutableTacticVisitor &visitor)
 {
     // MoveTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic

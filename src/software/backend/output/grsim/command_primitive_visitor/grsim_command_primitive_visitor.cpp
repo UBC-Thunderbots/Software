@@ -16,6 +16,7 @@
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/util/closest_point.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)
@@ -88,7 +89,7 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
                              Vector::createFromAngle(chip_direction).y());
 
     Point closest_point_to_line =
-        closestPointOnLine(robot.position(), chip_origin, point_behind);
+        closestPointOnLine(robot.position(), Line(chip_origin, point_behind));
 
     // If current robot position is in line with the shot (i.e. less than two robot radius
     // within the line in the direction of the shot), can go for the shot
@@ -164,7 +165,7 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
                              Vector::createFromAngle(kick_direction).y());
 
     Point closest_point_to_line =
-        closestPointOnLine(robot.position(), kick_origin, point_behind);
+        closestPointOnLine(robot.position(), Line(kick_origin, point_behind));
 
     // If current robot position is in line with the shot (i.e. less than two robot radius
     // within the line in the direction of the shot), can go for the shot

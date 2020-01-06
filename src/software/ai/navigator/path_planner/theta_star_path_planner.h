@@ -6,8 +6,13 @@
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
  * the PathPlanner interface.
- * https://www.geeksforgeeks.org/a-search-algorithm/
- * http://aigamedev.com/open/tutorial/theta-star-any-angle-paths/
+ * It is a grid-based graph algorithm, but it allows any two nodes to be connected to each
+ * other, as long as there's line of sight. It will optimize for the shortest total path
+ * length. Theta Star (Theta*) is closely related to A Star (A*) (see
+ * https://www.geeksforgeeks.org/a-search-algorithm/), but it will implicitly smooth paths
+ * as it explores the graph. Read
+ * https://web.archive.org/web/20190218161704/http://aigamedev.com/open/tutorial/theta-star-any-angle-paths/
+ * for an explanation of how that works, including pseudocode and diagrams.
  */
 
 class ThetaStarPathPlanner : public PathPlanner
@@ -52,7 +57,7 @@ class ThetaStarPathPlanner : public PathPlanner
     class CellHeuristic
     {
        public:
-        CellHeuristic() {}
+        CellHeuristic() : parent_(0, 0), f_(0), g_(0), initialized_(false) {}
 
         /**
          * Updates CellHeuristics internal variables

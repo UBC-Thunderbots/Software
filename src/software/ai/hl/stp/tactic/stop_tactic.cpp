@@ -3,7 +3,8 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 
 StopTactic::StopTactic(bool coast, bool loop_forever) : Tactic(loop_forever), coast(coast)
 {
@@ -20,18 +21,23 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
     return 0.5;
 }
 
-void StopTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    StopAction stop_action =
-        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, false);
+    auto stop_action = std::make_shared<StopAction>(
+        StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, false);
     do
     {
-        stop_action.updateControlParams(*robot, this->coast);
-        yield(stop_action.getNextIntent());
-    } while (!stop_action.done());
+        stop_action->updateControlParams(*robot, this->coast);
+        yield(stop_action);
+    } while (!stop_action->done());
 }
 
-void StopTactic::accept(TacticVisitor &visitor) const
+void StopTactic::accept(const NonMutableTacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
+void StopTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
 }
