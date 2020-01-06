@@ -6,7 +6,6 @@
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-
 #include "software/geom/util.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
