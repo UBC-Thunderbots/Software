@@ -153,7 +153,7 @@ float dr_get_robot_position_y()
  */
 float dr_get_robot_orientation()
 {
-    return current_state.y;
+    return current_state.angle;
 }
 
 /**
