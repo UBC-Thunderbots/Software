@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
+
 
 MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
 
@@ -41,11 +41,6 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (!move_action->done());
-}
-
-void MoveTactic::accept(const NonMutableTacticVisitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 void MoveTactic::accept(MutableTacticVisitor &visitor)

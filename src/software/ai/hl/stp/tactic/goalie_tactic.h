@@ -55,7 +55,6 @@ class GoalieTactic : public Tactic
 
     bool isGoalieTactic() const override;
 
-    void accept(const NonMutableTacticVisitor &visitor) const override;
     void accept(MutableTacticVisitor &visitor) override;
 
     Ball getBall() const;
