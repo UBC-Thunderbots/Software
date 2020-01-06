@@ -88,7 +88,13 @@ class ReceiverTactic : public Tactic
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target);
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(const NonMutableTacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
+    Team getEnemyTeam() const;
+    Team getFriendlyTeam() const;
 
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net

@@ -4,7 +4,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
@@ -39,7 +40,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
 {
     auto move_action =
         std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
-    Point defend_position  = robot->position();
+    Point defend_position = robot->position();
 
     do
     {
@@ -91,7 +92,27 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
     } while (true);
 }
 
-void ShadowFreekickerTactic::accept(TacticVisitor &visitor) const
+void ShadowFreekickerTactic::accept(const NonMutableTacticVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+void ShadowFreekickerTactic::accept(MutableTacticVisitor &visitor)
+{
+    visitor.visit(*this);
+}
+
+Ball ShadowFreekickerTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShadowFreekickerTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShadowFreekickerTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }

@@ -324,6 +324,23 @@ class GameState
     bool stayBehindPenaltyLine() const;
 
     /**
+     * Defines the equality operator for a GameState
+     *
+     * @param other The GameState to compare against for equality
+     * @return True if the other GameState is equal to this GameState and false otherwise
+     */
+    bool operator==(const GameState& other) const;
+
+    /**
+     * Defines the inequality operator for a GameState
+     *
+     * @param other The GameState to compare against for equality
+     * @return True if the other GameState is not equal to this GameState and true
+     * otherwise
+     */
+    bool operator!=(const GameState& other) const;
+
+    /**
      * Sets the point on the field where the ball should be placed.
      * See Robocup SSL Rules Law 9.2.
      *
