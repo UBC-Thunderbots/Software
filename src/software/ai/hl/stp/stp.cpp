@@ -26,11 +26,11 @@ void STP::updateCurrentPlay(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
-    override_play = Util::DynamicParameters->getAIConfig()->OverrideAIPlay()->value();
+    override_play = Util::DynamicParameters->getAIControlConfig()->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name = Util::DynamicParameters->getAIConfig()->CurrentAIPlay()->value();
+    override_play_name = Util::DynamicParameters->getAIControlConfig()->CurrentAIPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 

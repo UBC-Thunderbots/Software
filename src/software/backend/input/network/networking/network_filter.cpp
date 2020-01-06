@@ -135,15 +135,15 @@ BallState NetworkFilter::getFilteredBallData(
             // TODO remove Util::DynamicParameters as part of
             // https://github.com/UBC-Thunderbots/Software/issues/960
             bool ball_position_invalid =
-                Util::DynamicParameters->getAIConfig()
+                Util::DynamicParameters->getAIControlConfig()
                         ->getRefboxConfig()
                         ->MinValidX()
                         ->value() > ball_detection.position.x() ||
-                Util::DynamicParameters->getAIConfig()
+                Util::DynamicParameters->getAIControlConfig()
                         ->getRefboxConfig()
                         ->MaxValidX()
                         ->value() < ball_detection.position.x();
-            bool ignore_ball = Util::DynamicParameters->getAIConfig()
+            bool ignore_ball = Util::DynamicParameters->getAIControlConfig()
                                    ->getRefboxConfig()
                                    ->IgnoreInvalidCameraData()
                                    ->value() &&
@@ -176,7 +176,7 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
         auto ssl_robots = detection.robots_yellow();
         // TODO remove Util::DynamicParameters as part of
         // https://github.com/UBC-Thunderbots/Software/issues/960
-        if (!Util::DynamicParameters->getAIConfig()
+        if (!Util::DynamicParameters->getAIControlConfig()
                  ->getRefboxConfig()
                  ->FriendlyColorYellow()
                  ->value())
@@ -199,15 +199,15 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
 
 
             bool robot_position_invalid =
-                Util::DynamicParameters->getAIConfig()
+                Util::DynamicParameters->getAIControlConfig()
                         ->getRefboxConfig()
                         ->MinValidX()
                         ->value() > robot_detection.position.x() ||
-                Util::DynamicParameters->getAIConfig()
+                Util::DynamicParameters->getAIControlConfig()
                         ->getRefboxConfig()
                         ->MaxValidX()
                         ->value() < robot_detection.position.x();
-            bool ignore_robot = Util::DynamicParameters->getAIConfig()
+            bool ignore_robot = Util::DynamicParameters->getAIControlConfig()
                                     ->getRefboxConfig()
                                     ->IgnoreInvalidCameraData()
                                     ->value() &&
@@ -235,7 +235,7 @@ Team NetworkFilter::getFilteredEnemyTeamData(
     for (const auto &detection : detections)
     {
         auto ssl_robots = detection.robots_blue();
-        if (!Util::DynamicParameters->getAIConfig()
+        if (!Util::DynamicParameters->getAIControlConfig()
                  ->getRefboxConfig()
                  ->FriendlyColorYellow()
                  ->value())
@@ -257,15 +257,15 @@ Team NetworkFilter::getFilteredEnemyTeamData(
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
             bool robot_position_invalid =
-                Util::DynamicParameters->getAIConfig()
+                Util::DynamicParameters->getAIControlConfig()
                         ->getRefboxConfig()
                         ->MinValidX()
                         ->value() > robot_detection.position.x() ||
-                Util::DynamicParameters->getAIConfig()
+                Util::DynamicParameters->getAIControlConfig()
                         ->getRefboxConfig()
                         ->MaxValidX()
                         ->value() < robot_detection.position.x();
-            bool ignore_robot = Util::DynamicParameters->getAIConfig()
+            bool ignore_robot = Util::DynamicParameters->getAIControlConfig()
                                     ->getRefboxConfig()
                                     ->IgnoreInvalidCameraData()
                                     ->value() &&
@@ -336,7 +336,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
 
 RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
 {
-    if (!Util::DynamicParameters->getAIConfig()
+    if (!Util::DynamicParameters->getAIControlConfig()
              ->getRefboxConfig()
              ->FriendlyColorYellow()
              ->value())
@@ -353,7 +353,7 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
 {
     if (blue_team_on_positive_half)
     {
-        if (!Util::DynamicParameters->getAIConfig()
+        if (!Util::DynamicParameters->getAIControlConfig()
                  ->getRefboxConfig()
                  ->FriendlyColorYellow()
                  ->value())
@@ -367,7 +367,7 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
     }
     else
     {
-        if (!Util::DynamicParameters->getAIConfig()
+        if (!Util::DynamicParameters->getAIControlConfig()
                  ->getRefboxConfig()
                  ->FriendlyColorYellow()
                  ->value())

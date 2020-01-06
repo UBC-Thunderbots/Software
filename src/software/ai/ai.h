@@ -14,10 +14,10 @@
 class AI final
 {
    public:
-    /**
-     * Creates a new AI
-     */
-    explicit AI();
+    AI() = delete;
+
+    // TODO: jdoc
+    AI(std::shared_ptr<const AIConfig> config);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current

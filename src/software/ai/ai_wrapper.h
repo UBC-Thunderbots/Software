@@ -18,7 +18,10 @@ class AIWrapper : public ThreadedObserver<World>,
                   public Subject<PlayInfo>
 {
    public:
-    AIWrapper() = default;
+    AIWrapper() = delete;
+
+    // TODO: jdoc
+    AIWrapper(std::shared_ptr<const AIConfig> config);
 
    private:
     void onValueReceived(World world) override;
