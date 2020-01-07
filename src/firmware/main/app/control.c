@@ -47,8 +47,6 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float scaling = app_control_getMaximalAccelScaling(robot_constants, linear_accel_x,
                                                        linear_accel_y, angular_accel);
 
-    iprintf("Maximal accel scaling: %d \r \n", P(scaling));
-
     // if the naive 1 tick acceleration violates the limits of the robot
     // scale it to maximum
     // if the 1 tick acceleration is below the limit, then leave it
@@ -93,9 +91,6 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
 
-    iprintf("Wheel forces: %d %d %d %d \r \n", P(wheel_force[0]), P(wheel_force[1]),
-            P(wheel_force[2]), P(wheel_force[3]));
-
     app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot), wheel_force[0]);
     app_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot), wheel_force[3]);
     app_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot), wheel_force[1]);
@@ -111,9 +106,6 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
     float current_orientation      = app_firmware_robot_getOrientation(robot);
 
 
-    iprintf("Current state: %d %d %d %d \r \n", P(current_vx), P(current_vy),
-            P(current_angular_velocity), P(current_orientation));
-
     // This is the "P" term in a PID controller. We essentially do proportional
     // control of our acceleration based on velocity error
     static const float ACCELERATION_GAIN = 10.0f;
@@ -122,18 +114,11 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
     current_acceleration[0] = (linear_velocity_x - current_vx) * ACCELERATION_GAIN;
     current_acceleration[1] = (linear_velocity_y - current_vy) * ACCELERATION_GAIN;
 
-    iprintf("Acceleration in world coordinates: %d %d \r \n", P(current_acceleration[0]),
-            P(current_acceleration[1]));
-
     // Rotate the acceleration vector from the robot frame to the world frame
     rotate(current_acceleration, -current_orientation);
 
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * ACCELERATION_GAIN;
-
-    iprintf("Acceleration in robot coordinates: %d %d %d \r \n",
-            P(current_acceleration[0]), P(current_acceleration[1]),
-            P(angular_acceleration));
 
     app_control_applyAccel(robot, current_acceleration[0], current_acceleration[1],
                            angular_acceleration);
