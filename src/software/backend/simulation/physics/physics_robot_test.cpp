@@ -20,7 +20,7 @@ TEST(PhysicsRobotTest, test_get_robot_with_timestamp)
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(3.3));
 
     EXPECT_EQ(robot_parameter.position(), robot.position());
-    EXPECT_EQ(Timestamp::fromSeconds(3.3), robot.getMostRecentTimestamp());
+    EXPECT_EQ(Timestamp::fromSeconds(3.3), robot.lastUpdateTimestamp());
 }
 
 TEST(PhysicsRobotTest, test_robot_added_to_physics_world_on_creation)
