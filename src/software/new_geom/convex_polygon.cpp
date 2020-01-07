@@ -39,7 +39,7 @@ bool ConvexPolygon::isConvex()
         totalAngle += (180 - vertexAngleInDegrees);
     }
 
-    return totalAngle == 360;
+    return std::abs(totalAngle - 360) < GeomConstants::EPSILON;
 }
 
 double ConvexPolygon::area() const
