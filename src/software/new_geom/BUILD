@@ -184,6 +184,17 @@ cc_test(
 )
 
 cc_test(
+    name = "convex_polygon_test",
+    srcs = [
+        "convex_polygon_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "rectangle_test",
     srcs = [
         "rectangle_test.cpp",

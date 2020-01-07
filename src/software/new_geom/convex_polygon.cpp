@@ -1,7 +1,45 @@
 #include "software/new_geom/convex_polygon.h"
 
+#include <string>
+
+ConvexPolygon::ConvexPolygon(const std::vector<Point>& points) : Polygon(points)
+{
+    if (!isConvex())
+    {
+        throw std::invalid_argument("Points do not make a convex polygon");
+    }
+}
+
 ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polygon(points)
 {
+    if (!isConvex())
+    {
+        throw std::invalid_argument("Points do not make a convex polygon");
+    }
+}
+
+bool ConvexPolygon::isConvex()
+{
+    double totalAngle = 0;
+
+    for (unsigned i = 1; i <= points_.size(); i++)
+    {
+        // A vector from point i to point i-1
+        Vector a = points_[i - 1] - points_[i % points_.size()];
+        // The vector from point i to i+1
+        Vector b = points_[(i + 1) % points_.size()] - points_[i % points_.size()];
+        // The angle of this vertex, in degrees
+        double vertexAngleInDegrees = a.angleWith(b).toDegrees();
+
+        if (vertexAngleInDegrees > 180)
+        {
+            return false;
+        }
+
+        totalAngle += (180 - vertexAngleInDegrees);
+    }
+
+    return totalAngle == 360;
 }
 
 double ConvexPolygon::area() const
