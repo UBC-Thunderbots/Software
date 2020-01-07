@@ -42,7 +42,6 @@ class MoveTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(const NonMutableTacticVisitor& visitor) const override;
     void accept(MutableTacticVisitor& visitor) override;
 
    private:
