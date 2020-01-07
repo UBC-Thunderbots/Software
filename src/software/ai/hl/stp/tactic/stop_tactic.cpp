@@ -4,7 +4,7 @@
 
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
+
 
 StopTactic::StopTactic(bool coast, bool loop_forever) : Tactic(loop_forever), coast(coast)
 {
@@ -30,11 +30,6 @@ void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         stop_action->updateControlParams(*robot, this->coast);
         yield(stop_action);
     } while (!stop_action->done());
-}
-
-void StopTactic::accept(const NonMutableTacticVisitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 void StopTactic::accept(MutableTacticVisitor &visitor)

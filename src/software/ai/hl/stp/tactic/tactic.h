@@ -133,7 +133,6 @@ class Tactic
      *
      * @param visitor A Tactic Visitor
      */
-    virtual void accept(const NonMutableTacticVisitor &visitor) const = 0;
     virtual void accept(MutableTacticVisitor &visitor)                = 0;
 
     virtual ~Tactic() = default;

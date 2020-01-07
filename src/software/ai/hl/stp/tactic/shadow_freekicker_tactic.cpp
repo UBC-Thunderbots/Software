@@ -5,7 +5,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
@@ -90,11 +89,6 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
             BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
-}
-
-void ShadowFreekickerTactic::accept(const NonMutableTacticVisitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 void ShadowFreekickerTactic::accept(MutableTacticVisitor &visitor)
