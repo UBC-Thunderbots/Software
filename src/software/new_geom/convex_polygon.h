@@ -18,10 +18,10 @@ class ConvexPolygon : public Polygon, public ConvexShape
     /**
      * Construct a convex polygon by drawing line segments between consecutive
      * Points, and then from the last Point to the first Point.
-     * 
+     *
      * @param points Points that form a convex polygon
-     * 
-     * @throws std::invalid_argument if the given points do not form a 
+     *
+     * @throws std::invalid_argument if the given points do not form a
      *                               convex polygon
      */
     explicit ConvexPolygon(const std::vector<Point>& points);
@@ -31,8 +31,8 @@ class ConvexPolygon : public Polygon, public ConvexShape
      * Points, and then from the last Point to the first Point.
      *
      * @param points Points that form a convex polygon
-     * 
-     * @throws std::invalid_argument if the given points do not form a 
+     *
+     * @throws std::invalid_argument if the given points do not form a
      *                               convex polygon
      */
     explicit ConvexPolygon(const std::initializer_list<Point>& points);
