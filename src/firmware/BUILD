@@ -88,7 +88,10 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32f4"],
     deps = [
+        "//firmware/main/app:control",
         "//firmware/main/app/world:firmware_world",
+        "//firmware/main/physics",
+        "//firmware/main/util",
         "//shared:constants",
         "//shared:robot_constants",
     ],

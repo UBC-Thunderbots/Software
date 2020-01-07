@@ -3,21 +3,21 @@
 #include "physics/physics.h"
 #include "util/util.h"
 
-#define P(f) (int)round(1000 * f)
-
 // TODO: finish this jdoc
 /**
- * Compute the maximum
- * @param robot_constants
+ * Compute the maximum TODO
+ * @param robot
  * @param linear_accel_x
  * @param linear_accel_y
  * @param angular_accel
  * @return
  */
-float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
+float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
                                          const float linear_accel_x,
                                          const float linear_accel_y, float angular_accel)
 {
+    const RobotConstants_t robot_constants = app_firmware_robot_getPhysicalConstants(robot);
+
     // first convert accelerations into consistent units
     // choose units of Force (N)
     float normed_force[3];
@@ -44,7 +44,7 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
         app_firmware_robot_getPhysicalConstants(robot);
 
     // check for max acceleration in direction of the vel difference
-    float scaling = app_control_getMaximalAccelScaling(robot_constants, linear_accel_x,
+    float scaling = app_control_getMaximalAccelScaling(robot, linear_accel_x,
                                                        linear_accel_y, angular_accel);
 
     // if the naive 1 tick acceleration violates the limits of the robot

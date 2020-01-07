@@ -1,18 +1,37 @@
 #pragma once
 
+// TODO: unit tests for new functionality
+
 /**
- * This struct represents a robot wheel, from the perspective of firmware
+ * This struct represents a robot wheel/motor, from the perspective of firmware
  */
 typedef struct Wheel Wheel_t;
 
+// TOOD: should it be "wheelconstants" or "physical wheel constants"? same for function(s)?
+/**
+ * This struct holds wheel/motor constants
+ */
+typedef struct WheelConstants
+{
+    // TODO: jdocs for members
+    float current_per_unit_torque;
+    float phase_resistance;
+} WheelConstants_t;
+
 /**
  * Create a wheel object with functions for interacting with it
+ *
  * @param apply_wheel_force A function that we can call to apply a force to this wheel,
  *                          in newtons
+ * @param get_wheel_speed_rpm A function that we can call to get the speed of this wheel,
+ *                            in RPM
+ * @param wheel_constants Constants for this wheel
  *
  * @return A pointer to the created wheel, ownership is given to the caller
  */
-Wheel_t* app_wheel_create(void (*apply_wheel_force)(float force_in_newtons));
+Wheel_t* app_wheel_create(void (*apply_wheel_force)(float force_in_newtons),
+                          float (*get_wheel_speed_rpm)(),
+                          WheelConstants_t wheel_constants);
 
 /**
  * Destroy the given wheel, freeing any memory allocated for it
@@ -30,3 +49,17 @@ void app_wheel_destroy(Wheel_t* wheel);
  * @param force_in_newtons The force to apply to the wheel, in newtons
  */
 void app_wheel_applyForce(Wheel_t* wheel, float force_in_newtons);
+
+/**
+ * Get the speed of the given wheel in RPM
+ * @param wheel The wheel to get the speed for
+ * @return The speed of the given wheel in RPM
+ */
+float app_wheel_getSpeedRPM(Wheel_t* wheel);
+
+/**
+ * Get the constants for the given wheel
+ * @param wheel The wheel to get the constants for
+ * @return The constants for the given wheel
+ */
+const WheelConstants_t app_wheel_getWheelConstants(Wheel_t* wheel);
