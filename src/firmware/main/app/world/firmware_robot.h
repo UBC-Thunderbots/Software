@@ -18,9 +18,6 @@ typedef struct RobotConstants
     float linear_mass;
     float rotational_mass;
     float robot_radius;
-    float wheel_radius;
-    // TODO: which direction is this ratio in?
-    float gear_ratio;
     float jerk_limit;
 } RobotConstants_t;
 
@@ -159,6 +156,14 @@ Wheel_t* app_firmware_robot_getBackRightWheel(FirmwareRobot_t* robot);
  * @return The back left wheel from the given robot
  */
 Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot);
+
+// TODO: test and implement me
+/**
+ * Get the battery voltage for the given robot
+ * @param robot The robot to get the battery voltage for
+ * @return The battery voltage for the given robot, in volts
+ */
+float app_firmware_robot_getBatteryVoltage(FirmwareRobot_t* robot);
 
 /**
  * Get the physical constants for this robot

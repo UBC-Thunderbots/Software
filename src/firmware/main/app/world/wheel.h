@@ -16,6 +16,11 @@ typedef struct WheelConstants
     // TODO: jdocs for members
     float current_per_unit_torque;
     float phase_resistance;
+    float back_emf_per_rpm;
+    float max_delta_voltage_before_wheel_slip;
+    float wheel_radius;
+    // TODO: which direction is this ratio in?
+    float gear_ratio;
 } WheelConstants_t;
 
 /**
