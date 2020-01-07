@@ -187,7 +187,7 @@ TEST(PolygonTest, test_self_intersecting_loop_polygon_contains)
      *      -3      -2       -1       0       1       2       3
      */
     // Self intersecting polygon, each asterisk on the diagram is a point making up the
-    // polygon
+    // polygon.
     Polygon intersecting_poly{{-3.0f, 0.0f}, {-3.0f, 3.0f}, {3.0f, 3.0f},
                               {3.0f, 0.0f},  {-2.0f, 2.0f}, {2.0f, 2.0f}};
 
