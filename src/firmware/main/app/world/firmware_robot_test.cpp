@@ -10,9 +10,19 @@ class FirmwareRobotTest : public testing::Test
    protected:
     virtual void SetUp()
     {
+        RobotConstants_t robot_constants = {
+            .mass = 1.1,
+            .moment_of_inertia = 1.2,
+            .robot_radius = 1.3,
+            .jerk_limit = 1.4
+        };
+
         firmware_robot = app_firmware_robot_create(
             chicker, dribbler, &(this->returnEight), &(this->returnNine),
-            front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel);
+            &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
+            &(this->returnThirteen), &(this->returnFourteen), &(this->returnFifteen),
+            &(this->returnSixteen), front_right_wheel, front_left_wheel, back_right_wheel,
+            back_left_wheel, robot_constants);
     }
 
     virtual void TearDown()
@@ -34,10 +44,45 @@ class FirmwareRobotTest : public testing::Test
         return 9;
     }
 
-    Wheel* front_left_wheel  = (Wheel*)11;
-    Wheel* front_right_wheel = (Wheel*)12;
-    Wheel* back_left_wheel   = (Wheel*)13;
-    Wheel* back_right_wheel  = (Wheel*)14;
+    static float returnTen()
+    {
+        return 10;
+    }
+
+    static float returnEleven()
+    {
+        return 11;
+    }
+
+    static float returnTwelve()
+    {
+        return 12;
+    }
+
+    static float returnThirteen()
+    {
+        return 13;
+    }
+
+    static float returnFourteen()
+    {
+        return 14;
+    }
+
+    static float returnFifteen()
+    {
+        return 15;
+    }
+
+    static float returnSixteen()
+    {
+        return 16;
+    }
+
+        Wheel* front_left_wheel = (Wheel*)11;
+    Wheel* front_right_wheel    = (Wheel*)12;
+    Wheel* back_left_wheel      = (Wheel*)13;
+    Wheel* back_right_wheel     = (Wheel*)14;
 
     FirmwareRobot_t* firmware_robot;
 };
@@ -62,6 +107,34 @@ TEST_F(FirmwareRobotTest, getPositionY)
     EXPECT_EQ(9, app_firmware_robot_getPositionY(firmware_robot));
 }
 
+TEST_F(FirmwareRobotTest, getOrientation){
+    EXPECT_EQ(10, app_firmware_robot_getOrientation(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getVelocityX){
+    EXPECT_EQ(11, app_firmware_robot_getVelocityX(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getVelocityY){
+    EXPECT_EQ(12, app_firmware_robot_getVelocityY(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getVelocityAngular){
+    EXPECT_EQ(13, app_firmware_robot_getVelocityAngular(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getAccelerationX){
+    EXPECT_EQ(14, app_firmware_robot_getAccelerationX(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getAccelerationY){
+    EXPECT_EQ(15, app_firmware_robot_getAccelerationY(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getAccelerationAngular){
+    EXPECT_EQ(16, app_firmware_robot_getAccelerationAngular(firmware_robot));
+}
+
 TEST_F(FirmwareRobotTest, getFrontRightWheel)
 {
     EXPECT_EQ(front_right_wheel, app_firmware_robot_getFrontRightWheel(firmware_robot));
@@ -80,4 +153,13 @@ TEST_F(FirmwareRobotTest, getBackRightWheel)
 TEST_F(FirmwareRobotTest, getBackLeftWheel)
 {
     EXPECT_EQ(back_left_wheel, app_firmware_robot_getBackLeftWheel(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getRobotConstants){
+    RobotConstants_t constants = app_firmware_robot_getPhysicalConstants(firmware_robot);
+
+    EXPECT_NEAR(1.1, constants.mass, 1e-5);
+    EXPECT_NEAR(1.2, constants.moment_of_inertia, 1e-5);
+    EXPECT_NEAR(1.3, constants.robot_radius, 1e-5);
+    EXPECT_NEAR(1.4, constants.jerk_limit, 1e-5);
 }

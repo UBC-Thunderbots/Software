@@ -25,18 +25,21 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
 
     for (long i = 0; i < 4; i++)
     {
+        // TODO: better variable names here
         Wheel_t* wheel                   = wheels[i];
         const WheelConstants_t constants = app_wheel_getWheelConstants(wheel);
         float force                      = wheel_forces[i];
-        float torque   = force * constants.wheel_radius * constants.gear_ratio;
-        float curr_rpm = app_wheel_getSpeedRPM(wheel);
+        float motor_torque =
+            force * constants.wheel_radius * constants.motor_rotations_per_wheel_rotation;
+        float curr_motor_rpm = app_wheel_getMotorSpeedRPM(wheel);
 
-        float volt =
-            torque * constants.current_per_unit_torque * constants.phase_resistance;
-        float back_emf  = curr_rpm * constants.back_emf_per_rpm;
+        float volt = motor_torque * constants.motor_current_per_unit_torque *
+                     constants.motor_phase_resistance;
+        float back_emf  = curr_motor_rpm * constants.motor_back_emf_per_rpm;
         float appl_volt = fabsf(volt + back_emf);
 
-        float slip_ratio = constants.max_delta_voltage_before_wheel_slip / fabsf(volt);
+        float slip_ratio =
+            constants.motor_max_delta_voltage_before_wheel_slip / fabsf(volt);
         if (slip_ratio < slip_ratio_min)
         {
             slip_ratio_min = slip_ratio;
@@ -115,11 +118,9 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
         angular_accel *= scaling;
     }
 
-    // TODO: static member variables like this are _bad_ we should put it in the
-    //       abstraction?? Or maybe at least as a single global member?
-    static float prev_linear_accel_x = 0;
-    static float prev_linear_accel_y = 0;
-    static float prev_angular_accel  = 0;
+    float prev_linear_accel_x = app_firmware_robot_getAccelerationX(robot);
+    float prev_linear_accel_y = app_firmware_robot_getAccelerationY(robot);
+    float prev_angular_accel  = app_firmware_robot_getAccelerationAngular(robot);
 
     float linear_diff_x = linear_accel_x - prev_linear_accel_x;
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
@@ -133,10 +134,6 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     linear_accel_x = prev_linear_accel_x + linear_diff_x;
     linear_accel_y = prev_linear_accel_y + linear_diff_y;
     angular_accel  = prev_angular_accel + angular_diff;
-
-    prev_linear_accel_x = linear_accel_x;
-    prev_linear_accel_y = linear_accel_y;
-    prev_angular_accel  = angular_accel;
 
     float robot_force[3];
     robot_force[0] = linear_accel_x * robot_constants.mass;
