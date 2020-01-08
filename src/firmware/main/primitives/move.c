@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "control/bangbang.h"
-#include "control/control.h"
+#include "app/control.h"
 #include "io/dr.h"
 #include "io/leds.h"
 #include "physics/physics.h"
@@ -257,7 +257,9 @@ static void move_tick(log_record_t* log, FirmwareWorld_t* world)
     float accel[3] = {0, 0, pb.rot.accel};
     // rotate the accel and apply it
     to_local_coords(accel, pb, current_states.angle, major_vec, minor_vec);
-    apply_accel(accel, accel[2]);
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 
     if (log)
     {

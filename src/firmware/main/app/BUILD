@@ -11,6 +11,5 @@ cc_library(
     deps = [
         "//firmware/main/app/world:firmware_robot",
         "//firmware/main/physics",
-        "//firmware/main/util",
     ],
 )

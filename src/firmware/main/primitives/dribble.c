@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "control/bangbang.h"
-#include "control/control.h"
+#include "app/control.h"
 #include "io/dr.h"
 #include "physics/physics.h"
 
@@ -119,7 +119,10 @@ static void dribble_tick(log_record_t* logajectory, FirmwareWorld_t* world)
     }
 
     rotate(accel, -current_states.angle);
-    apply_accel(accel, accel[2]);
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 /**

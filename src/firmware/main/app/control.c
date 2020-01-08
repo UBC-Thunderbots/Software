@@ -1,7 +1,7 @@
 #include "app/control.h"
 
 #include "physics/physics.h"
-#include "util/util.h"
+//#include "util/util.h"
 
 /**
  * Computes the scaling constant to bring the wheel forces to their maximum
@@ -30,7 +30,7 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
         const WheelConstants_t constants = app_wheel_getWheelConstants(wheel);
         float force                      = wheel_forces[i];
         float motor_torque =
-            force * constants.wheel_radius * constants.motor_rotations_per_wheel_rotation;
+            force * constants.wheel_radius * constants.wheel_rotations_per_motor_rotation;
         float curr_motor_rpm = app_wheel_getMotorSpeedRPM(wheel);
 
         float volt = motor_torque * constants.motor_current_per_unit_torque *

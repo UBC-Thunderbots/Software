@@ -50,6 +50,8 @@ typedef struct RobotConstants
  *                                 robot, in m/s^2
  * @param get_robot_acceleration_angular A function that can be called to get the angular
  *                                       acceleration of the robot, in rad/s^2
+ * @param get_battery_voltage A function that can be called to the batter voltage, in
+ *                            volts
  * @param front_right_wheel The front right wheel of the robot
  * @param front_left_wheel The front left wheel of the robot
  * @param back_right_wheel The back right wheel of the robot
@@ -67,6 +69,7 @@ FirmwareRobot_t* app_firmware_robot_create(
     float (*get_robot_acceleration_x)(),
     float (*get_robot_acceleration_y)(),
     float (*get_robot_acceleration_angular)(),
+    float (*get_battery_voltage)(),
     Wheel_t* front_right_wheel,
     Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
     RobotConstants_t robot_constants);
@@ -165,6 +168,14 @@ float app_firmware_robot_getAccelerationY(FirmwareRobot_t* robot);
  */
 float app_firmware_robot_getAccelerationAngular(FirmwareRobot_t* robot);
 
+// TODO: test and implement me
+/**
+ * Get the battery voltage for the given robot
+ * @param robot The robot to get the battery voltage for
+ * @return The battery voltage for the given robot, in volts
+ */
+float app_firmware_robot_getBatteryVoltage(FirmwareRobot_t* robot);
+
 /**
  * Get the front right wheel from the given robot
  * @param robot The robot to get the front right wheel from
@@ -193,14 +204,6 @@ Wheel_t* app_firmware_robot_getBackRightWheel(FirmwareRobot_t* robot);
  * @return The back left wheel from the given robot
  */
 Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot);
-
-// TODO: test and implement me
-/**
- * Get the battery voltage for the given robot
- * @param robot The robot to get the battery voltage for
- * @return The battery voltage for the given robot, in volts
- */
-float app_firmware_robot_getBatteryVoltage(FirmwareRobot_t* robot);
 
 /**
  * Get the physical constants for this robot

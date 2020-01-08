@@ -255,3 +255,28 @@ void wheels_tick(log_record_t *log)
     }
 #endif  // FWSIM
 }
+
+/**
+ * Gets the RPM of the wheel with the given index
+ * @param wheel_index The index of the wheel to get the RPM for
+ * @return The RPM of the wheel with the given index
+ */
+float wheels_get_wheel_rpm(int wheel_index){
+    return encoder_speed(wheel_index)* QUARTERDEGREE_TO_RPM;
+}
+
+float wheels_get_front_left_rpm(){
+    return wheels_get_wheel_rpm(0);
+}
+
+float wheels_get_front_right_rpm(){
+    return wheels_get_wheel_rpm(3);
+}
+
+float wheels_get_back_left_rpm(){
+    return wheels_get_wheel_rpm(1);
+}
+
+float wheels_get_back_right_rpm(){
+    return wheels_get_wheel_rpm(2);
+}

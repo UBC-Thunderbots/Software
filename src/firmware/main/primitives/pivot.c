@@ -1,7 +1,7 @@
 #include "pivot.h"
 
 #include "control/bangbang.h"
-#include "control/control.h"
+#include "app/control.h"
 #include "io/dr.h"
 #include "physics/physics.h"
 
@@ -187,7 +187,9 @@ static void pivot_tick(log_record_t *log, FirmwareWorld_t *world)
     float target_avel = 1.6f * angle / TIME_HORIZON;
     accel[2]          = (target_avel - vel[2]) / TIME_HORIZON;
     limit(&accel[2], MAX_T_A);
-    apply_accel(accel, accel[2]);  // apply accelerations all in local coordinates
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 

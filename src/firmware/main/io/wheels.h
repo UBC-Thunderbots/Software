@@ -40,4 +40,10 @@ void wheels_brake(unsigned int index);
 void wheels_drive(unsigned int index, int power);
 void wheels_tick(log_record_t *record);
 
+// TODO: jdoc
+float wheels_get_front_left_rpm();
+float wheels_get_front_right_rpm();
+float wheels_get_back_left_rpm();
+float wheels_get_back_right_rpm();
+
 #endif

@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <unused.h>
 
+#include "app/control.h"
 #include "catch.h"
 #include "control/bangbang.h"
-#include "control/control.h"
 #include "io/breakbeam.h"
 #include "io/dr.h"
 #include "physics/physics.h"
@@ -274,7 +274,9 @@ static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
     // Apply acceleration to robot
     accel[3] = 0;
     limit(&accel[2], MAX_T_A);
-    apply_accel(accel, accel[2]);  // accel is already in local coords
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 /**

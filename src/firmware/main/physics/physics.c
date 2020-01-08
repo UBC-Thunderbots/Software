@@ -3,16 +3,6 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "io/encoder.h"
-
-#ifndef FWSIM
-#include "io/adc.h"
-#else
-#include <stdio.h>
-#include <stdlib.h>
-#endif
-
-
 // Wheel angles for these matricies are (55, 135, 225, 305) degrees
 // these matrices may be derived as per omnidrive_kiart paper
 

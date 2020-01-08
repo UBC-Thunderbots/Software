@@ -3,7 +3,7 @@
 #include "app/world/firmware_robot.h"
 
 /**
- * Apply the given acceleration to the given robot
+ * Apply the given acceleration (in robot coordinates) to the given robot
  *
  * @param robot The robot to apply acceleration to
  * @param linear_accel_x The linear acceleration, in robot coordinates, in the x

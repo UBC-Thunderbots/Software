@@ -6,7 +6,7 @@
 #include <util/physbot.h>
 
 #include "control/bangbang.h"
-#include "control/control.h"
+#include "app/control.h"
 #include "physics/physics.h"
 #include "util/log.h"
 #include "util/physbot.h"
@@ -209,7 +209,10 @@ static void shoot_tick(log_record_t *log, FirmwareWorld_t *world)
     float accel[3] = {0, 0, pb.rot.accel};
     scale(&pb);
     to_local_coords(accel, pb, states.angle, major_vec, minor_vec);
-    apply_accel(accel, accel[2]);
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
+
     if (log)
     {
         to_log(log, pb.rot.time, accel);

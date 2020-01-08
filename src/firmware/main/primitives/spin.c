@@ -4,14 +4,10 @@
 #include <stdio.h>
 
 #include "control/bangbang.h"
-#include "control/control.h"
+#include "app/control.h"
 #include "physics/physics.h"
 
-#ifndef FWSIM
 #include "io/dr.h"
-#else
-#include "simulate.h"
-#endif
 
 #define TIME_HORIZON 0.5f
 
@@ -163,7 +159,9 @@ static void spin_tick(log_record_t *log, FirmwareWorld_t *world)
         x_accel,
         y_accel,
     };
-    apply_accel(linear_acc, a_accel);
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, linear_acc[0], linear_acc[1], a_accel);
 }
 
 /**

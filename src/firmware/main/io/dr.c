@@ -211,7 +211,7 @@ float dr_get_robot_acceleration_y()
  * \brief Get the robot's angular acceleration
  * \return The robot's angular acceleration
  */
-float dr_get_robot_angular_acceleration()
+float dr_get_robot_acceleration_angular()
 {
     return current_state.angular_acceleration;
 }
