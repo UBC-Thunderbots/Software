@@ -460,27 +460,37 @@ static void run_normal(void)
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
     // TODO: put this in a function?
-    Wheel_t* front_right_wheel = app_wheel_create(apply_wheel_force_front_right);
-    Wheel_t* front_left_wheel  = app_wheel_create(apply_wheel_force_front_left);
-    Wheel_t* back_right_wheel  = app_wheel_create(apply_wheel_force_back_right);
-    Wheel_t* back_left_wheel   = app_wheel_create(apply_wheel_force_back_left);
-    Chicker_t* chicker         = app_chicker_create(
+    WheelConstants_t wheel_constants = {
+        .wheel_rotations_per_motor_rotation        = GEAR_RATIO,
+        .wheel_radius                              = WHEEL_RADIUS,
+        .motor_max_delta_voltage_before_wheel_slip = DELTA_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm                    = 1.0 / RPM_TO_VOLT,
+        .motor_phase_resistance                    = PHASE_RESISTANCE,
+        .motor_current_per_unit_torque             = CURRENT_PER_TORQUE};
+    Wheel_t* front_right_wheel = app_wheel_create(
+        apply_wheel_force_front_right, wheels_get_front_right_rpm, wheel_constants);
+    Wheel_t* front_left_wheel = app_wheel_create(
+        apply_wheel_force_front_left, wheels_get_front_left_rpm, wheel_constants);
+    Wheel_t* back_right_wheel = app_wheel_create(
+        apply_wheel_force_back_right, wheels_get_back_right_rpm, wheel_constants);
+    Wheel_t* back_left_wheel = app_wheel_create(
+        apply_wheel_force_back_left, wheels_get_back_left_rpm, wheel_constants);
+    Chicker_t* chicker = app_chicker_create(
         chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
         chicker_auto_disarm, chicker_auto_disarm);
     Dribbler_t* dribbler = app_dribbler_create(dribbler_set_speed, dribbler_temperature);
     const RobotConstants_t robot_constants = {
-        .mass            = ROBOT_MASS[0],
+        .mass              = ROBOT_MASS[0],
         .moment_of_inertia = ROBOT_MASS[2],
-        .robot_radius    = ROBOT_RADIUS,
-        .gear_ratio      = GEAR_RATIO,
-        .wheel_radius    = WHEEL_RADIUS,
-        .jerk_limit      = JERK_LIMIT,
+        .robot_radius      = ROBOT_RADIUS,
+        .jerk_limit        = JERK_LIMIT,
     };
     FirmwareRobot_t* robot = app_firmware_robot_create(
         chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
         dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
-        dr_get_robot_angular_velocity, front_right_wheel, front_left_wheel,
-        back_right_wheel, back_left_wheel, robot_constants);
+        dr_get_robot_angular_velocity, dr_get_robot_acceleration_x,
+        dr_get_robot_acceleration_y, dr_get_robot_acceleration_angular, front_right_wheel,
+        front_left_wheel, back_right_wheel, back_left_wheel, robot_constants);
     FirmwareBall_t* ball =
         app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
                                  dr_get_ball_velocity_x, dr_get_ball_velocity_y);

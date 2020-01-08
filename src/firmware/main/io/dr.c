@@ -87,6 +87,12 @@ void dr_tick(log_record_t *log)
     // Convert to global reference frame for state update
     rotate(wheel_speeds, current_state.angle);
 
+    // Update the current acceleration by getting the difference in velocity
+    current_state.ax = (wheel_speeds[0] - current_state.vx) / TICK_TIME;
+    current_state.ay = (wheel_speeds[1] - current_state.vy) / TICK_TIME;
+    current_state.angular_acceleration =
+        (wheel_speeds[2] - current_state.avel) / TICK_TIME;
+
     // Update the current velocity to match wheel velocities
     current_state.vx   = wheel_speeds[0];
     current_state.vy   = wheel_speeds[1];
@@ -181,6 +187,33 @@ float dr_get_robot_velocity_y()
 float dr_get_robot_angular_velocity()
 {
     return current_state.avel;
+}
+
+/**
+ * \brief Get the x-component of the robot's acceleration
+ * \return The x-component of the robot's acceleration
+ */
+float dr_get_robot_acceleration_x()
+{
+    return current_state.ax;
+}
+
+/**
+ * \brief Get the y-component of the robot's acceleration
+ * \return The y-component of the robot's acceleration
+ */
+float dr_get_robot_acceleration_y()
+{
+    return current_state.ay;
+}
+
+/**
+ * \brief Get the robot's angular acceleration
+ * \return The robot's angular acceleration
+ */
+float dr_get_robot_angular_acceleration()
+{
+    return current_state.angular_acceleration;
 }
 
 /**
