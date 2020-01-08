@@ -4,6 +4,8 @@
 #include "app/world/dribbler.h"
 #include "app/world/wheel.h"
 
+// TODO: return structs instead of having functions for each vector component?
+
 /**
  * This struct represents a robot from the perspective of firmware
  */
