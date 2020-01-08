@@ -84,6 +84,11 @@ double Vector::cross(const Vector &other) const
     return x_ * other.y() - y_ * other.x();
 }
 
+Angle Vector::angleWith(const Vector &other)
+{
+    return Angle::fromRadians(acos(dot(other) / (length() * other.length())));
+}
+
 Vector &Vector::operator=(const Vector &q)
 {
     x_ = q.x();
