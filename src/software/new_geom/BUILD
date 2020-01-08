@@ -7,6 +7,7 @@ cc_library(
         "convex_polygon.cpp",
         "polygon.cpp",
         "rectangle.cpp",
+        "triangle.cpp",
     ],
     hdrs = [
         "circle.h",
@@ -16,6 +17,7 @@ cc_library(
         "rectangle.h",
         "segment.h",
         "shape.h",
+        "triangle.h",
     ],
     deps = [
         ":angle",
@@ -198,6 +200,17 @@ cc_test(
     name = "rectangle_test",
     srcs = [
         "rectangle_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "triangle_test",
+    srcs = [
+        "triangle_test.cpp",
     ],
     deps = [
         ":new_geom",
