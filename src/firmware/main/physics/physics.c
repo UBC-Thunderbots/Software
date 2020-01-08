@@ -517,6 +517,7 @@ void force3_to_force4(float force3[3], float force4[4])
     matrix_mult_t(force4, 4, force3, 3, speed4_to_speed3_mat);
 }
 
+// TODO: delete this (and in header)
 // need the ifndef here so that we can ignore this code when compiling
 // the firmware tests
 #ifndef FWTEST

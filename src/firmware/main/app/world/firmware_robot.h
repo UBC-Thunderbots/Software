@@ -15,8 +15,8 @@ typedef struct FirmwareRobot FirmwareRobot_t;
 typedef struct RobotConstants
 {
     // TODO: jdocs for members
-    float linear_mass;
-    float rotational_mass;
+    float mass;
+    float moment_of_inertia;
     float robot_radius;
     float jerk_limit;
 } RobotConstants_t;
@@ -126,7 +126,31 @@ float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot);
  * @param robot The robot to get the angular velocity for
  * @return The angular velocity of the given robot, in rad/s
  */
-float app_firmware_robot_getAngularVelocity(FirmwareRobot_t* robot);
+float app_firmware_robot_getVelocityAngular(FirmwareRobot_t* robot);
+
+// TODO: implement and test me
+/**
+ * Get the x-component of acceleration for the given robot
+ * @param robot The robot to get the x-component of acceleration for
+ * @return The x-component of acceleration for the given robot in m/s^2
+ */
+float app_firmware_robot_getAccelerationX(FirmwareRobot_t* robot);
+
+// TODO: implement and test me
+/**
+ * Get the y-component of acceleration for the given robot
+ * @param robot The robot to get the y-component of acceleration for
+ * @return The y-component of acceleration for the given robot in m/s^2
+ */
+float app_firmware_robot_getAccelerationY(FirmwareRobot_t* robot);
+
+// TODO: implement and test me
+/**
+ * Get the angular acceleration for the given robot
+ * @param robot The robot to get the angular acceleration for
+ * @return The angular acceleration for the given robot in rad/s^2
+ */
+float app_firmware_robot_getAccelerationAngular(FirmwareRobot_t* robot);
 
 /**
  * Get the front right wheel from the given robot

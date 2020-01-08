@@ -6,8 +6,8 @@
 /**
  * Computes the scaling constant to bring the wheel forces to their maximum
  *
- * Note that this could scale the motor torques *down* if the given forces exceed the
- * physical capabilities of the robot (ex. wheel slip).
+ * Note that this could scale the forces *down* if they exceed the physical capabilities
+ * of the robot (ex. wheel slip).
  *
  * @param wheels Wheels to compute the maximum torque scaling from
  * @param wheel_forces Forces to apply to each wheel
@@ -20,12 +20,11 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
                                           const float wheel_forces[4],
                                           float battery_voltage)
 {
-    float vapp_max = -INFINITY;
+    float vapp_max       = -INFINITY;
     float slip_ratio_min = INFINITY;
 
     for (long i = 0; i < 4; i++)
     {
-        // TODO: better variable names here, some comment(s) would be good to
         Wheel_t* wheel                   = wheels[i];
         const WheelConstants_t constants = app_wheel_getWheelConstants(wheel);
         float force                      = wheel_forces[i];
@@ -36,10 +35,10 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
             torque * constants.current_per_unit_torque * constants.phase_resistance;
         float back_emf  = curr_rpm * constants.back_emf_per_rpm;
         float appl_volt = fabsf(volt + back_emf);
-        float max_app   = fabsf(volt);
 
-        float slip_ratio = constants.max_delta_voltage_before_wheel_slip / max_app;
-        if (slip_ratio < slip_ratio_min){
+        float slip_ratio = constants.max_delta_voltage_before_wheel_slip / fabsf(volt);
+        if (slip_ratio < slip_ratio_min)
+        {
             slip_ratio_min = slip_ratio;
         }
         if (appl_volt > vapp_max)
@@ -48,19 +47,24 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
         }
     }
 
-    float emf_ratio_min  = battery_voltage / vapp_max;
+    float emf_ratio_min = battery_voltage / vapp_max;
 
     return (emf_ratio_min > slip_ratio_min) ? slip_ratio_min : emf_ratio_min;
 }
 
-// TODO: finish this jdoc
 /**
- * Compute the maximum TODO
- * @param robot
- * @param linear_accel_x
- * @param linear_accel_y
- * @param angular_accel
- * @return
+ * Computes the scaling constant for all acceleration components to achieve max abs accel.
+ *
+ * Note that this could scale the accelerations *down* if the given forces exceed the
+ * physical capabilities of the robot (ex. wheel slip).
+ *
+ * @param robot The robot to compute the acceleration scaling constant for
+ * @param linear_accel_x [m/s^2] The linear x acceleration to scale
+ * @param linear_accel_y [m/s^2] The linear y acceleration to scale
+ * @param angular_accel [rad/s^2] The angular acceleration to scale
+ *
+ * @return The scaling constant to multiply the all acceleration values by in order to
+ *         accelerate the robot as fast as physically possible
  */
 float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
                                          const float linear_accel_x,
@@ -72,10 +76,10 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
     // first convert accelerations into consistent units
     // choose units of Force (N)
     float normed_force[3];
-    normed_force[0] = linear_accel_x * robot_constants.linear_mass;
-    normed_force[1] = linear_accel_y * robot_constants.linear_mass;
+    normed_force[0] = linear_accel_x * robot_constants.mass;
+    normed_force[1] = linear_accel_y * robot_constants.mass;
     normed_force[2] =
-        angular_accel * robot_constants.rotational_mass * robot_constants.robot_radius;
+        angular_accel * robot_constants.moment_of_inertia * robot_constants.robot_radius;
 
     float wheel_forces[4];
     force3_to_force4(normed_force, wheel_forces);
@@ -86,7 +90,7 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
     wheels[2] = app_firmware_robot_getBackRightWheel(robot);
     wheels[3] = app_firmware_robot_getFrontRightWheel(robot);
 
-    float battery_voltage =app_firmware_robot_getBatteryVoltage(robot);
+    float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
 
     return app_control_getMaximalTorqueScaling(wheels, wheel_forces, battery_voltage);
 }
@@ -134,14 +138,12 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     prev_linear_accel_y = linear_accel_y;
     prev_angular_accel  = angular_accel;
 
-    // TODO: change linear and rotational masss to mass and moment of inertia
-
     float robot_force[3];
-    robot_force[0] = linear_accel_x * robot_constants.linear_mass;
-    robot_force[1] = linear_accel_y * robot_constants.linear_mass;
+    robot_force[0] = linear_accel_x * robot_constants.mass;
+    robot_force[1] = linear_accel_y * robot_constants.mass;
     // input is angular acceleration so mass * Radius * radians/second^2 gives newtons
     robot_force[2] =
-        angular_accel * robot_constants.robot_radius * robot_constants.rotational_mass;
+        angular_accel * robot_constants.robot_radius * robot_constants.moment_of_inertia;
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
 
@@ -156,7 +158,7 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
 {
     float current_vx               = app_firmware_robot_getVelocityX(robot);
     float current_vy               = app_firmware_robot_getVelocityY(robot);
-    float current_angular_velocity = app_firmware_robot_getAngularVelocity(robot);
+    float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
     float current_orientation      = app_firmware_robot_getOrientation(robot);
 
 

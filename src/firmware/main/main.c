@@ -469,8 +469,8 @@ static void run_normal(void)
         chicker_auto_disarm, chicker_auto_disarm);
     Dribbler_t* dribbler = app_dribbler_create(dribbler_set_speed, dribbler_temperature);
     const RobotConstants_t robot_constants = {
-        .linear_mass     = ROBOT_MASS[0],
-        .rotational_mass = ROBOT_MASS[2],
+        .mass            = ROBOT_MASS[0],
+        .moment_of_inertia = ROBOT_MASS[2],
         .robot_radius    = ROBOT_RADIUS,
         .gear_ratio      = GEAR_RATIO,
         .wheel_radius    = WHEEL_RADIUS,

@@ -87,7 +87,7 @@ float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot)
     return robot->get_robot_velocity_y();
 }
 
-float app_firmware_robot_getAngularVelocity(FirmwareRobot_t* robot)
+float app_firmware_robot_getVelocityAngular(FirmwareRobot_t* robot)
 {
     return robot->get_robot_angular_velocity();
 }
