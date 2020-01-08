@@ -30,8 +30,8 @@ typedef struct WheelConstants
     float wheel_radius;
 
     // The gear ratio between the motor shaft and wheel shaft
-    // [# of motor rotations / # of wheel rotations]
-    float motor_rotations_per_wheel_rotation;
+    // [# of wheel rotations / 1 motor rotation]
+    float wheel_rotations_per_motor_rotation;
 } WheelConstants_t;
 
 /**
@@ -39,14 +39,14 @@ typedef struct WheelConstants
  *
  * @param apply_wheel_force A function that we can call to apply a force to this wheel,
  *                          in newtons
- * @param get_wheel_speed_rpm A function that we can call to get the speed of this wheel,
+ * @param get_motor_speed_rpm A function that we can call to get the speed of this wheel,
  *                            in RPM
  * @param wheel_constants Constants for this wheel
  *
  * @return A pointer to the created wheel, ownership is given to the caller
  */
 Wheel_t* app_wheel_create(void (*apply_wheel_force)(float force_in_newtons),
-                          float (*get_wheel_speed_rpm)(),
+                          float (*get_motor_speed_rpm)(),
                           WheelConstants_t wheel_constants);
 
 /**

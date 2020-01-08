@@ -18,9 +18,9 @@ class WheelTest : public testing::Test
             .motor_back_emf_per_rpm                    = 1.3,
             .motor_max_delta_voltage_before_wheel_slip = 1.4,
             .wheel_radius                              = 1.5,
-            .motor_rotations_per_wheel_rotation        = 2};
+            .wheel_rotations_per_motor_rotation        = 0.5};
 
-        wheel = app_wheel_create(&(this->request_wheel_force), &(this->get_wheel_speed),
+        wheel = app_wheel_create(&(this->request_wheel_force), &(this->get_motor_speed),
                                  wheel_constants);
     }
 
@@ -34,7 +34,7 @@ class WheelTest : public testing::Test
         requested_wheel_force = force;
     }
 
-    static float get_wheel_speed()
+    static float get_motor_speed()
     {
         return 17.2;
     }
@@ -54,13 +54,13 @@ TEST_F(WheelTest, applyForce)
 TEST_F(WheelTest, getMotorSpeed){
     float speed = app_wheel_getMotorSpeedRPM(wheel);
 
-    EXPECT_NEAR(2*17.2, speed, 1e-5);
+    EXPECT_NEAR(17.2, speed, 1e-5);
 }
 
 TEST_F(WheelTest, getWheelSpeed){
     float speed = app_wheel_getWheelSpeedRPM(wheel);
 
-    EXPECT_NEAR(17.2, speed, 1e-5);
+    EXPECT_NEAR(17.2*0.5, speed, 1e-5);
 }
 
 TEST_F(WheelTest, getWheelConstants){
@@ -71,6 +71,6 @@ TEST_F(WheelTest, getWheelConstants){
     EXPECT_NEAR(1.3, constants.motor_back_emf_per_rpm, 1e-4);
     EXPECT_NEAR(1.4, constants.motor_max_delta_voltage_before_wheel_slip, 1e-4);
     EXPECT_NEAR(1.5, constants.wheel_radius, 1e-4);
-    EXPECT_NEAR(2, constants.motor_rotations_per_wheel_rotation, 1e-4);
+    EXPECT_NEAR(0.5, constants.wheel_rotations_per_motor_rotation, 1e-4);
 }
 
