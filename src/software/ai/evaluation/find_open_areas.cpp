@@ -6,7 +6,7 @@
 std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
 {
     Rectangle target_area_rectangle =
-        findBestChipTargetArea(world, Util::DynamicParameters->getEvaluationConfig()
+        findBestChipTargetArea(world, Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                           ->getIndirectChipConfig()
                                           ->ChipTargetAreaInset()
                                           ->value());

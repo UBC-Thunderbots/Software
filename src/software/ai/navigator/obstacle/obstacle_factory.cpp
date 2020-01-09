@@ -1,6 +1,6 @@
 #include "software/ai/navigator/obstacle/obstacle_factory.h"
 
-ObstacleFactory::ObstacleFactory(std::shared_ptr<ObstacleFactoryConfig> config)
+ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config)
     : config(config)
 {
 }

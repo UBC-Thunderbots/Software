@@ -61,7 +61,7 @@ namespace Evaluation
             while (
                 i < robot_history_timestamps.size() &&
                 robot.lastUpdateTimestamp() - robot_history_timestamps[i] <=
-                    Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
+                    Duration::fromSeconds(Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                               ->getPossessionConfig()
                                               ->PossessionBufferTimeSeconds()
                                               ->value()))
@@ -87,7 +87,7 @@ namespace Evaluation
 
             // Check that the robot has had possession of the ball recently.
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                   Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
+                   Duration::fromSeconds(Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                              ->getPossessionConfig()
                                              ->PassBufferTimeSeconds()
                                              ->value()))

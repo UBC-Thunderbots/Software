@@ -62,7 +62,7 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
 
     // check if the ball is within a certain distance of the robot
     auto max_dist_to_robot =
-        ROBOT_MAX_RADIUS_METERS + Util::DynamicParameters->getEvaluationConfig()
+        ROBOT_MAX_RADIUS_METERS + Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                       ->getPossessionConfig()
                                       ->PossessionDist()
                                       ->value();
@@ -116,11 +116,11 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
         ball_velocity.project(ball_to_robot_vector.normalize()).length();
     return std::make_optional<bool>(
         (ball_angle_deviation <
-         Angle::fromDegrees(Util::DynamicParameters->getEvaluationConfig()
+         Angle::fromDegrees(Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                 ->getPossessionConfig()
                                 ->PassedToAngleTolerance()
                                 ->value())) &&
-        pass_axis_speed > Util::DynamicParameters->getEvaluationConfig()
+        pass_axis_speed > Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                               ->getPossessionConfig()
                               ->MinPassSpeed()
                               ->value());

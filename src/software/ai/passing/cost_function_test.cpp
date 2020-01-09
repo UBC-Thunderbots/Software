@@ -39,17 +39,17 @@ class PassingEvaluationTest : public testing::Test
 
     // We get these values here so we can make these tests robust to change
     double min_pass_speed_param =
-        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value();
+        Util::DynamicParameters->getAIConfig()->getPassingConfig()->MinPassSpeedMPerS()->value();
     double max_pass_speed_param =
-        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value();
+        Util::DynamicParameters->getAIConfig()->getPassingConfig()->MaxPassSpeedMPerS()->value();
     double avg_desired_pass_speed;
 
     double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters->getPassingConfig()
+        Util::DynamicParameters->getAIConfig()->getPassingConfig()
             ->MinTimeOffsetForPassSeconds()
             ->value();
     double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters->getPassingConfig()
+        Util::DynamicParameters->getAIConfig()->getPassingConfig()
             ->MaxTimeOffsetForPassSeconds()
             ->value();
     double avg_time_offset_for_pass_seconds;
@@ -108,17 +108,17 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
                                                   world.field().yLength() / 2);
 
     double curr_time             = world.getMostRecentTimestamp().getSeconds();
-    double min_start_time_offset = Util::DynamicParameters->getPassingConfig()
+    double min_start_time_offset = Util::DynamicParameters->getAIConfig()->getPassingConfig()
                                        ->MinTimeOffsetForPassSeconds()
                                        ->value();
-    double max_start_time_offset = Util::DynamicParameters->getPassingConfig()
+    double max_start_time_offset = Util::DynamicParameters->getAIConfig()->getPassingConfig()
                                        ->MaxTimeOffsetForPassSeconds()
                                        ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value(),
-        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
+        Util::DynamicParameters->getAIConfig()->getPassingConfig()->MinPassSpeedMPerS()->value(),
+        Util::DynamicParameters->getAIConfig()->getPassingConfig()->MaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
 

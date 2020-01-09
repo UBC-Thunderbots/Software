@@ -190,26 +190,26 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
 
     world.updateBallState(BallState(
         {0.1, 2.5}, {0, 10},
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
+        Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
                                        ->value())));
 
     robot0.updateState(
         Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
+        Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
                                        ->value()));
     robot1.updateState(
         Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
+        Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
                                        ->value()));
     robot2.updateState(
         Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
+        Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
                                        ->getPossessionConfig()
                                        ->PossessionBufferTimeSeconds()
                                        ->value()));

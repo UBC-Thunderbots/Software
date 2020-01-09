@@ -20,7 +20,7 @@ class ObstacleFactory
      *
      * @param config The configuration used to determine how obstacles should be generated
      */
-    ObstacleFactory(std::shared_ptr<ObstacleFactoryConfig> config);
+    ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config);
 
     /**
      * Create obstacles for the given motion constraints
@@ -60,5 +60,5 @@ class ObstacleFactory
     std::vector<Obstacle> getVelocityObstaclesFromTeam(const Team &team);
 
    private:
-    std::shared_ptr<ObstacleFactoryConfig> config;
+    std::shared_ptr<const ObstacleFactoryConfig> config;
 };

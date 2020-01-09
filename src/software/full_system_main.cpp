@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 
         // The ai has to be initialized after the backend (which is started in
         // parseCommandLineArgs) This is a bug. See #834
-        ai = std::make_shared<AIWrapper>();
+        ai = std::make_shared<AIWrapper>(thunderbots_config->getAIConfig());
 
         setBackendFromString(args.backend_name);
 

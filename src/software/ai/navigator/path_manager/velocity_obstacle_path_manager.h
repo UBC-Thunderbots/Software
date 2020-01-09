@@ -18,7 +18,7 @@ class VelocityObstaclePathManager : public PathManager
     explicit VelocityObstaclePathManager(
         std::unique_ptr<PathPlanner> path_planner,
         ObstacleFactory obstacle_factory,
-        std::shared_ptr<VelocityObstaclePathManagerConfig> config);
+        std::shared_ptr<const VelocityObstaclePathManagerConfig> config);
 
    private:
     /**
@@ -36,5 +36,5 @@ class VelocityObstaclePathManager : public PathManager
 
     std::unique_ptr<PathPlanner> path_planner;
     ObstacleFactory obstacle_factory;
-    std::shared_ptr<VelocityObstaclePathManagerConfig> config;
+    std::shared_ptr<const VelocityObstaclePathManagerConfig> config;
 };

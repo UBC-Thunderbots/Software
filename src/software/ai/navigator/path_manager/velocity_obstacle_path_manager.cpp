@@ -3,7 +3,7 @@
 VelocityObstaclePathManager::VelocityObstaclePathManager(
     std::unique_ptr<PathPlanner> path_planner,
     ObstacleFactory obstacle_factory,
-    std::shared_ptr<VelocityObstaclePathManagerConfig> config)
+    std::shared_ptr<const VelocityObstaclePathManagerConfig> config)
     : path_planner(std::move(path_planner)),
       obstacle_factory(std::move(obstacle_factory)),
       config(config)

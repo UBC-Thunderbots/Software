@@ -4,7 +4,7 @@
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      ObstacleFactory obstacle_factory,
-                     std::shared_ptr<NavigatorConfig> config)
+                     std::shared_ptr<const NavigatorConfig> config)
     : path_manager(std::move(path_manager)),
       obstacle_factory(std::move(obstacle_factory)),
       config(config)

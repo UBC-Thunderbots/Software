@@ -23,7 +23,7 @@ class Navigator : public IntentVisitor
     // TODO: jdoc
     explicit Navigator(std::unique_ptr<PathManager> path_manager,
                        ObstacleFactory obstacle_factory,
-                       std::shared_ptr<NavigatorConfig> config);
+                       std::shared_ptr<const NavigatorConfig> config);
 
     /**
      * Get assigned primitives for given assigned intents
@@ -131,31 +131,6 @@ class Navigator : public IntentVisitor
                                                    const Point &p3, double final_speed);
 
    private:
-    std::shared_ptr<NavigatorConfig> config;
-    ObstacleFactory obstacle_factory;
-
-    // Path manager used to navigate around obstacles
-    std::unique_ptr<PathManager> path_manager;
-
-    // This navigators knowledge / state of the world
-    World world;
-
-    // The current Primitive the navigator has created from an Intent.
-    // This variable is set by each `visit` function
-    std::unique_ptr<Primitive> current_primitive;
-
-    // This is used by the visualizer to see the planned paths
-    std::vector<std::vector<Point>> planned_paths;
-
-    // These are obstacles that represent robots that aren't
-    // assigned move intents
-    // When move intents are processed to path plan,
-    // we can avoid these non-"moving" robots
-    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
-
-    // intents that need path planning
-    std::vector<MoveIntent> move_intents_for_path_planning;
-
     /**
      * Registers this robot id as a robot that is not assigned a MoveIntent
      *
@@ -207,4 +182,29 @@ class Navigator : public IntentVisitor
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
     double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
+
+    std::shared_ptr<const NavigatorConfig> config;
+    ObstacleFactory obstacle_factory;
+
+    // Path manager used to navigate around obstacles
+    std::unique_ptr<PathManager> path_manager;
+
+    // This navigators knowledge / state of the world
+    World world;
+
+    // The current Primitive the navigator has created from an Intent.
+    // This variable is set by each `visit` function
+    std::unique_ptr<Primitive> current_primitive;
+
+    // This is used by the visualizer to see the planned paths
+    std::vector<std::vector<Point>> planned_paths;
+
+    // These are obstacles that represent robots that aren't
+    // assigned move intents
+    // When move intents are processed to path plan,
+    // we can avoid these non-"moving" robots
+    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
+
+    // intents that need path planning
+    std::vector<MoveIntent> move_intents_for_path_planning;
 };
