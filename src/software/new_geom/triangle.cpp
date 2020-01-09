@@ -1,7 +1,11 @@
-#include "software/new_geom/point.h"
 #include "software/new_geom/triangle.h"
 
-Triangle::Triangle(const Point &point1, const Point &point2, const Point &point3) : ConvexPolygon({point1, point2, point3}) {}
+#include "software/new_geom/point.h"
+
+Triangle::Triangle(const Point &point1, const Point &point2, const Point &point3)
+    : ConvexPolygon({point1, point2, point3})
+{
+}
 
 Point Triangle::center() const
 {

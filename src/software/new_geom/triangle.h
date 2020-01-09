@@ -5,7 +5,7 @@
  */
 class Triangle : public ConvexPolygon
 {
-  public:
+   public:
     /**
      * Creates a Triangle from three points.
      *
