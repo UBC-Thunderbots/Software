@@ -7,9 +7,6 @@
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
-// TODO: class-level jdoc
-// TODO: all the functions in this class need to be tested, probably out-of-scope for
-//       this change though, file a ticket
 class ObstacleFactory
 {
    public:
