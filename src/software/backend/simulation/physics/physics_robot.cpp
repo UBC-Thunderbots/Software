@@ -52,7 +52,7 @@ void PhysicsRobot::setupRobotPhysicsBody(const Robot& robot)
     robot_body_shape.Set(robot_body_vertices, num_robot_body_vertices);
     robot_fixture_def.shape = &robot_body_shape;
 
-    float robot_body_area = polygonArea(robot_body_shape);
+    float robot_body_area     = polygonArea(robot_body_shape);
     robot_fixture_def.density = ROBOT_WITH_BATTERY_MASS_KG / robot_body_area;
     // This is a somewhat arbitrary value. Collisions with robots are not perfectly
     // elastic. However because this is an "ideal" simulation and we generally don't care
@@ -136,6 +136,7 @@ Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
     return robot;
 }
 
-RobotId PhysicsRobot::getRobotId() const {
+RobotId PhysicsRobot::getRobotId() const
+{
     return robot_id;
 }

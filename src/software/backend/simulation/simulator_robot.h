@@ -2,6 +2,7 @@
 
 #include <cinttypes>
 #include <optional>
+
 #include "software/backend/simulation/physics/physics_robot.h"
 extern "C"
 {
@@ -24,8 +25,9 @@ extern "C"
  * instantiated object. This is our workaround to maintain and simulate multiple
  * "instances" of robot firmware at once.
  */
-class SimulatorRobot {
-public:
+class SimulatorRobot
+{
+   public:
     /**
      * Sets the ID of the robot being controlled by this class
      *
@@ -134,7 +136,7 @@ public:
     static void applyWheelForceBackRight(float force_in_newtons);
     static void applyWheelForceFrontRight(float force_in_newtons);
 
-private:
+   private:
     /**
      * Returns the PhysicsRobot currently selected from the list of controllable
      * physics_robots by the current robot_id

@@ -117,13 +117,10 @@ TEST(Box2DUtilTest, test_create_b2Vec2_from_vector)
     EXPECT_EQ(expected, createVec2(Vector(0.0, 100.100)));
 }
 
-TEST(Box2DUtilTest, test_polygon_area_with_triangle) {
-    const unsigned int num_vertices = 3;
-    b2Vec2 polygon_vertices[num_vertices] = {
-            {0, 0},
-            {1, 0},
-            {0, 1}
-    };
+TEST(Box2DUtilTest, test_polygon_area_with_triangle)
+{
+    const unsigned int num_vertices       = 3;
+    b2Vec2 polygon_vertices[num_vertices] = {{0, 0}, {1, 0}, {0, 1}};
     b2PolygonShape polygon;
     polygon.Set(polygon_vertices, num_vertices);
 
@@ -131,14 +128,10 @@ TEST(Box2DUtilTest, test_polygon_area_with_triangle) {
     EXPECT_FLOAT_EQ(result, 0.5);
 }
 
-TEST(Box2DUtilTest, test_polygon_area_with_rectangle) {
-    const unsigned int num_vertices = 4;
-    b2Vec2 polygon_vertices[num_vertices] = {
-            {-1, -1},
-            {-1, 3},
-            {3.5, 3},
-            {3.5, -1}
-    };
+TEST(Box2DUtilTest, test_polygon_area_with_rectangle)
+{
+    const unsigned int num_vertices       = 4;
+    b2Vec2 polygon_vertices[num_vertices] = {{-1, -1}, {-1, 3}, {3.5, 3}, {3.5, -1}};
     b2PolygonShape polygon;
     polygon.Set(polygon_vertices, num_vertices);
 
@@ -146,14 +139,11 @@ TEST(Box2DUtilTest, test_polygon_area_with_rectangle) {
     EXPECT_FLOAT_EQ(result, 18.0);
 }
 
-TEST(Box2DUtilTest, test_polygon_area_with_irregular_polygon) {
-    const unsigned int num_vertices = 5;
+TEST(Box2DUtilTest, test_polygon_area_with_irregular_polygon)
+{
+    const unsigned int num_vertices       = 5;
     b2Vec2 polygon_vertices[num_vertices] = {
-            {-3, -2},
-            {-1, -4},
-            {6, 1},
-            {3, 10},
-            {-4, 9},
+        {-3, -2}, {-1, -4}, {6, 1}, {3, 10}, {-4, 9},
     };
     b2PolygonShape polygon;
     polygon.Set(polygon_vertices, num_vertices);
