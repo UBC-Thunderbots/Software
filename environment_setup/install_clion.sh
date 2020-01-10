@@ -43,7 +43,7 @@ echo "Installing Bazel Plugin"
 echo "================================================================"
 
 clion_plugin_dir="${HOME}/.CLion${clion_version_year}.${clion_version_major}/config/plugins"
-bazel_plugin_version="v2019.10.28"
+bazel_plugin_version="v2019.12.16"
 
 if [ -d "${clion_plugin_dir}/clwb" ]
 then
