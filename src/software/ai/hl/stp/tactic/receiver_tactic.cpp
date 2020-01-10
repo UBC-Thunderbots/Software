@@ -5,7 +5,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 #include "software/new_geom/util/closest_point.h"
 
@@ -244,7 +244,27 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
     return Shot(ideal_position, ideal_orientation);
 }
 
-void ReceiverTactic::accept(TacticVisitor& visitor) const
+void ReceiverTactic::accept(MutableTacticVisitor& visitor)
 {
     visitor.visit(*this);
+}
+
+Ball ReceiverTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ReceiverTactic::getField() const
+{
+    return this->field;
+}
+
+Team ReceiverTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
+}
+
+Team ReceiverTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
 }

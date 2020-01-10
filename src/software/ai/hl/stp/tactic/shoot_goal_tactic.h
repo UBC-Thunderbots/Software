@@ -73,7 +73,12 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
+    Team getFriendlyTeam() const;
+    Team getEnemyTeam() const;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

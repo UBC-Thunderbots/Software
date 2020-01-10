@@ -39,7 +39,7 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 
-void MoveTestTactic::accept(TacticVisitor &visitor) const
+void MoveTestTactic::accept(MutableTacticVisitor &visitor)
 {
     // MoveTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic

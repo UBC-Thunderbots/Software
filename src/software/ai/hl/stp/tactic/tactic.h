@@ -6,12 +6,13 @@
 #include "software/ai/hl/stp/action/action.h"
 #include "software/world/world.h"
 
-// We forward-declare the TacticVisitor interface (pure virtual class) because we need
+// We forward-declare the TacticVisitor interfaces (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
 // accept() function. We cannot use an #include statement because this creates a cyclic
 // dependency
 //
-class TacticVisitor;
+class NonMutableTacticVisitor;
+class MutableTacticVisitor;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
@@ -132,7 +133,7 @@ class Tactic
      *
      * @param visitor A Tactic Visitor
      */
-    virtual void accept(TacticVisitor &visitor) const = 0;
+    virtual void accept(MutableTacticVisitor &visitor)                = 0;
 
     virtual ~Tactic() = default;
 

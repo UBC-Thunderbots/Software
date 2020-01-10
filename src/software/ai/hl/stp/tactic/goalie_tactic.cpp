@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
@@ -320,7 +320,27 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void GoalieTactic::accept(TacticVisitor &visitor) const
+void GoalieTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
+}
+
+Ball GoalieTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field GoalieTactic::getField() const
+{
+    return this->field;
+}
+
+Team GoalieTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team GoalieTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }
