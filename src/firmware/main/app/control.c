@@ -123,9 +123,10 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
         angular_accel *= scaling;
     }
 
-    float prev_linear_accel_x = app_firmware_robot_getAccelerationX(robot);
-    float prev_linear_accel_y = app_firmware_robot_getAccelerationY(robot);
-    float prev_angular_accel  = app_firmware_robot_getAccelerationAngular(robot);
+    ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
+    float prev_linear_accel_x = controller_state->last_applied_acceleration_x;
+    float prev_linear_accel_y = controller_state->last_applied_acceleration_y;
+    float prev_angular_accel = controller_state->last_applied_acceleration_angular;
 
     iprintf("Previous Acceleration: %d, %d, %d \r \n", P(prev_linear_accel_x), P(prev_linear_accel_y), P(prev_angular_accel));
 
@@ -147,6 +148,10 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     angular_accel  = prev_angular_accel + angular_diff;
 
     iprintf("Jerk Limited Acceleration: %d, %d, %d\r \n", P(linear_accel_x), P(linear_accel_y), P(angular_accel));
+
+    controller_state->last_applied_acceleration_x = prev_linear_accel_x;
+    controller_state->last_applied_acceleration_y = prev_linear_accel_y;
+    controller_state->last_applied_acceleration_angular = prev_angular_accel;
 
     float robot_force[3];
     robot_force[0] = linear_accel_x * robot_constants.mass;

@@ -57,20 +57,6 @@ typedef struct
      */
     float avel;
 
-    /**
-     * \brief The X component of the robot’s acceleration. [m/s^2]
-     */
-    float ax;
-
-    /**
-     * \brief The Y component of the robot’s acceleration. [m/s^2]
-     */
-    float ay;
-
-    /**
-     * \brief The robot’s angular acceleration. [rad/s^2]
-     */
-    float angular_acceleration;
 } dr_data_t;
 
 typedef struct
@@ -160,9 +146,6 @@ float dr_get_robot_orientation();
 float dr_get_robot_velocity_x();
 float dr_get_robot_velocity_y();
 float dr_get_robot_angular_velocity();
-float dr_get_robot_acceleration_x();
-float dr_get_robot_acceleration_y();
-float dr_get_robot_acceleration_angular();
 float dr_get_ball_position_x();
 float dr_get_ball_position_y();
 float dr_get_ball_velocity_x();

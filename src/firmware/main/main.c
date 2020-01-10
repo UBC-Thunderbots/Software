@@ -488,10 +488,8 @@ static void run_normal(void)
     FirmwareRobot_t* robot = app_firmware_robot_create(
         chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
         dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
-        dr_get_robot_angular_velocity, dr_get_robot_acceleration_x,
-        dr_get_robot_acceleration_y, dr_get_robot_acceleration_angular, adc_battery,
-        front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel,
-        robot_constants);
+        dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
+        back_right_wheel, back_left_wheel, robot_constants);
     FirmwareBall_t* ball =
         app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
                                  dr_get_ball_velocity_x, dr_get_ball_velocity_y);

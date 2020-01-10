@@ -23,6 +23,17 @@ typedef struct RobotConstants
     float jerk_limit;
 } RobotConstants_t;
 
+/**
+ * This struct holds the state of the controller.
+ * This is a carryover from legacy code, and should be deleted when the controller is
+ * replaced.
+ */
+typedef struct ControllerState {
+    float last_applied_acceleration_x;
+    float last_applied_acceleration_y;
+    float last_applied_acceleration_angular;
+} ControllerState_t;
+
 // TODO: this constructor needs to take functions for robot velocity
 /**
  * Create a robot with the given hardware
@@ -44,12 +55,7 @@ typedef struct RobotConstants
  *                             robot, in m/s
  * @param get_robot_velocity_angular A function that can be called to get the angular
  *                                   velocity of the robot, in rad/s
- * @param get_robot_acceleration_x A function that can be called to get the x-acceleration of the
- *                                 robot, in m/s^2
- * @param get_robot_acceleration_y A function that can be called to get the y-acceleration of the
- *                                 robot, in m/s^2
- * @param get_robot_acceleration_angular A function that can be called to get the angular
- *                                       acceleration of the robot, in rad/s^2
+ * @param
  * @param get_battery_voltage A function that can be called to the batter voltage, in
  *                            volts
  * @param front_right_wheel The front right wheel of the robot
@@ -66,9 +72,6 @@ FirmwareRobot_t* app_firmware_robot_create(
     float (*get_robot_velocity_x)(),
     float (*get_robot_velocity_y)(),
     float (*get_robot_velocity_angular)(),
-    float (*get_robot_acceleration_x)(),
-    float (*get_robot_acceleration_y)(),
-    float (*get_robot_acceleration_angular)(),
     float (*get_battery_voltage)(),
     Wheel_t* front_right_wheel,
     Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
@@ -144,30 +147,6 @@ float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot);
  */
 float app_firmware_robot_getVelocityAngular(FirmwareRobot_t* robot);
 
-// TODO: implement and test me
-/**
- * Get the x-component of acceleration for the given robot
- * @param robot The robot to get the x-component of acceleration for
- * @return The x-component of acceleration for the given robot in m/s^2
- */
-float app_firmware_robot_getAccelerationX(FirmwareRobot_t* robot);
-
-// TODO: implement and test me
-/**
- * Get the y-component of acceleration for the given robot
- * @param robot The robot to get the y-component of acceleration for
- * @return The y-component of acceleration for the given robot in m/s^2
- */
-float app_firmware_robot_getAccelerationY(FirmwareRobot_t* robot);
-
-// TODO: implement and test me
-/**
- * Get the angular acceleration for the given robot
- * @param robot The robot to get the angular acceleration for
- * @return The angular acceleration for the given robot in rad/s^2
- */
-float app_firmware_robot_getAccelerationAngular(FirmwareRobot_t* robot);
-
 // TODO: test and implement me
 /**
  * Get the battery voltage for the given robot
@@ -212,3 +191,11 @@ Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot);
  */
 // TODO: should this be "physical constants", or just "constants"
 const RobotConstants_t app_firmware_robot_getPhysicalConstants(FirmwareRobot_t* robot);
+
+// TODO: test me!
+/**
+ * Get the controller state for the given robot
+ * @param robot The robot to get the controller state for
+ * @return A pointer to the controller state for the given robot
+ */
+ControllerState_t* app_firmware_robot_getControllerState(FirmwareRobot_t* robot);
