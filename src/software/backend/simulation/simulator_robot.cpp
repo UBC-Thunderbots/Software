@@ -6,7 +6,7 @@
 
 void SimulatorRobot::setRobotId(unsigned int id)
 {
-    robot_id = id;
+    SimulatorRobot::robot_id = id;
 }
 
 FirmwareRobot_t* SimulatorRobot::createFirmwareRobot()

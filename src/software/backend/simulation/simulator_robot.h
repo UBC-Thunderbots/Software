@@ -1,5 +1,7 @@
 #include <cinttypes>
+extern "C" {
 #include "app/world/firmware_robot.h"
+}
 
 /**
  * This class acts as a wrapper around a PhysicsRobot so that the PhysicsRobot
@@ -112,3 +114,4 @@ private:
     // The id of the robot currently being controlled by this class
     static unsigned int robot_id;
 };
+unsigned int SimulatorRobot::robot_id = 0;
