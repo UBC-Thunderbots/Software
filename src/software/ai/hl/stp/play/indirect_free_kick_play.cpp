@@ -214,7 +214,7 @@ void IndirectFreeKickPlay::chipAtGoalStage(
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset =
-        Util::DynamicParameters->getShootOrChipPlayConfig()
+        Util::DynamicParameters->getAIConfig()->getShootOrChipPlayConfig()
             ->FallbackChipTargetEnemyGoalOffset()
             ->value();
     Point chip_target =

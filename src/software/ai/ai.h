@@ -16,7 +16,10 @@ class AI final
    public:
     AI() = delete;
 
-    // TODO: jdoc
+    /**
+     * Create an AI with given configuration
+     * @param config The AI configuration
+     */
     AI(std::shared_ptr<const AIConfig> config);
 
     /**

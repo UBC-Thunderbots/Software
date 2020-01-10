@@ -87,7 +87,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset =
-        Util::DynamicParameters->getShootOrChipPlayConfig()
+        Util::DynamicParameters->getAIConfig()->getShootOrChipPlayConfig()
             ->FallbackChipTargetEnemyGoalOffset()
             ->value();
 

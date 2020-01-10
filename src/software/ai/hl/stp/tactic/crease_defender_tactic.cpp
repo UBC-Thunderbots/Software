@@ -71,19 +71,19 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             double ball_dist = (ball.position() - *defender_reference_position).length();
 
             double min_defender_seperation_deg =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                Util::DynamicParameters->getAIConfig()->getDefenderCreaseTacticConfig()
                     ->MinDefenderSeperationDeg()
                     ->value();
             double max_defender_seperation_deg =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                Util::DynamicParameters->getAIConfig()->getDefenderCreaseTacticConfig()
                     ->MaxDefenderSeperationDeg()
                     ->value();
             double min_ball_dist =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                Util::DynamicParameters->getAIConfig()->getDefenderCreaseTacticConfig()
                     ->BallDistForMinDefenderSeperation()
                     ->value();
             double max_ball_dist =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
+                Util::DynamicParameters->getAIConfig()->getDefenderCreaseTacticConfig()
                     ->BallDistForMaxDefenderSeperation()
                     ->value();
 
