@@ -33,12 +33,3 @@ cc_library(
         "//software/world",
     ],
 )
-
-cc_test(
-    name = "obstacle_factory_test",
-    srcs = ["obstacle_factory_test.cpp"],
-    deps = [
-        ":obstacle_factory",
-        "@gtest//:gtest_main",
-    ],
-)

@@ -20,7 +20,11 @@ class AIWrapper : public ThreadedObserver<World>,
    public:
     AIWrapper() = delete;
 
-    // TODO: jdoc
+    /**
+     * Create an AI with the given config
+     *
+     * @param config The AI configuration
+     */
     AIWrapper(std::shared_ptr<const AIConfig> config);
 
    private:

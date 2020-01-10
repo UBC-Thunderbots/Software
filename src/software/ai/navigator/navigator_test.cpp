@@ -298,9 +298,6 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
 TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
 {
-    // TODO: refactor this into the setup and constructor and add more of these types of
-    // tests
-
     Robot friendly_robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
                                    AngularVelocity::threeQuarter(), current_time);
 

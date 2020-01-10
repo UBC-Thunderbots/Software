@@ -22,16 +22,14 @@ class ObstacleFactory
     /**
      * Create obstacles for the given motion constraints
      *
-     * @param motion_constraints
-     * @param world world to create obstacles for
+     * @param motion_constraints The motion constraints to create obstacles for
+     * @param world World we're enforcing motion constraints in
      *
-     * @return obstacles
+     * @return Obstacles representing the given motion constraints
      */
-    // TODO: real @return for this function..........
     std::vector<Obstacle> getObstaclesFromMotionConstraints(
         const std::set<MotionConstraint> &motion_constraints, const World &world);
 
-    // TODO: test me
     /**
      * Gets an obstacle representing the given robot
      *
