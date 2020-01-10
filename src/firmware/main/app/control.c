@@ -3,6 +3,9 @@
 #include "physics/physics.h"
 //#include "util/util.h"
 
+#define P(x) (int)round(x*1000)
+
+
 /**
  * Computes the scaling constant to bring the wheel forces to their maximum
  *
@@ -108,6 +111,8 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float scaling = app_control_getMaximalAccelScaling(robot, linear_accel_x,
                                                        linear_accel_y, angular_accel);
 
+    iprintf("Scaling factor: %d \r \n", P(scaling));
+
     // if the naive 1 tick acceleration violates the limits of the robot
     // scale it to maximum
     // if the 1 tick acceleration is below the limit, then leave it
@@ -122,18 +127,26 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float prev_linear_accel_y = app_firmware_robot_getAccelerationY(robot);
     float prev_angular_accel  = app_firmware_robot_getAccelerationAngular(robot);
 
+    iprintf("Previous Acceleration: %d, %d, %d \r \n", P(prev_linear_accel_x), P(prev_linear_accel_y), P(prev_angular_accel));
+
     float linear_diff_x = linear_accel_x - prev_linear_accel_x;
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
     float angular_diff  = angular_accel - prev_angular_accel;
+
+    iprintf("Acceleration diffs: %d, %d, %d \r \n", P(linear_diff_x), P(linear_diff_y), P(angular_diff));
 
     const float jerk_limit = robot_constants.jerk_limit;
     limit(&linear_diff_x, jerk_limit * TICK_TIME);
     limit(&linear_diff_y, jerk_limit * TICK_TIME);
     limit(&angular_diff, jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f);
 
+    iprintf("limited Acceleration diffs: %d, %d, %d \r \n", P(linear_diff_x), P(linear_diff_y), P(angular_diff));
+
     linear_accel_x = prev_linear_accel_x + linear_diff_x;
     linear_accel_y = prev_linear_accel_y + linear_diff_y;
     angular_accel  = prev_angular_accel + angular_diff;
+
+    iprintf("Jerk Limited Acceleration: %d, %d, %d\r \n", P(linear_accel_x), P(linear_accel_y), P(angular_accel));
 
     float robot_force[3];
     robot_force[0] = linear_accel_x * robot_constants.mass;
@@ -143,6 +156,8 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
         angular_accel * robot_constants.robot_radius * robot_constants.moment_of_inertia;
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
+
+    iprintf("Wheel forces: %d, %d, %d, %d \r \n", P(wheel_force[0]), P(wheel_force[1]), P(wheel_force[2]), P(wheel_force[3]));
 
     app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot), wheel_force[0]);
     app_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot), wheel_force[3]);
@@ -172,6 +187,8 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
 
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * ACCELERATION_GAIN;
+
+    iprintf("Acceleration In Robot Coordinates: %d, %d, %d \r \n", P(current_acceleration[0]), P(current_acceleration[1]), P(angular_acceleration));
 
     app_control_applyAccel(robot, current_acceleration[0], current_acceleration[1],
                            angular_acceleration);
