@@ -131,8 +131,6 @@ int main(int argc, char **argv)
 
     if (!args.help && !args.err)
     {
-        // TODO: all uses of parameters in navigator should not be mutable....
-
         // Setup dynamic parameters
         // TODO (Issue #960): Once we're using injected parameters everywhere (instead of
         //                    just global accesses, `Util::DynamicParameters` should be

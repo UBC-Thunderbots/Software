@@ -20,7 +20,13 @@
 class Navigator : public IntentVisitor
 {
    public:
-    // TODO: jdoc
+    /**
+     * Create a Navigator
+     * @param path_manager The path manager that will be used for path creation for all
+     *                     the robots
+     * @param obstacle_factory Will be used to generate obstacles from various constructs
+     * @param config The navigator config
+     */
     explicit Navigator(std::unique_ptr<PathManager> path_manager,
                        ObstacleFactory obstacle_factory,
                        std::shared_ptr<const NavigatorConfig> config);
@@ -113,7 +119,6 @@ class Navigator : public IntentVisitor
      */
     void visit(const StopIntent &stop_intent) override;
 
-   protected:
     /**
      * Calculates the transition speed for the robot between two line segments
      *
@@ -121,14 +126,18 @@ class Navigator : public IntentVisitor
      * given line segment in order to smoothly transition to another given line segment,
      * given a final speed at the end of the two line segments
      *
+     * This is only public so it is testable.
+     *
      * @param p1, p2, p3 are 3 points that define two line segments that form a path
      * @param final_speed is the intended final speed at the end of the path
      * @return the first segment's final speed after travelling from p1 to p2
      * for a smooth transition to the p2 to p3 path, scaled by the final speed at the end
      * of the path
      */
-    double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
-                                                   const Point &p3, double final_speed);
+    static double calculateTransitionSpeedBetweenSegments(const Point &p1,
+                                                          const Point &p2,
+                                                          const Point &p3,
+                                                          double final_speed);
 
    private:
     /**

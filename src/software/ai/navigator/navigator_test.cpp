@@ -10,22 +10,11 @@
 #include "software/ai/primitive/all_primitives.h"
 #include "software/test_util/test_util.h"
 
-// TODO: Having the tests just extend the navigator directly is logically
-//       inconsistent with proper usage of inheritance. The navigator should
-//       be a class member instead
-
-// TODO: should manually set config values in this test, and the others we've changed
-//       in the navigator stack
-
-// TODO: initialization lists are real incomprehensible now, clean them up (see above
-//       comment about changing these classes to use encapsulation instead of
-//       inheritance)
-
-class NoPathNavigatorFixture : public Navigator, public testing::Test
+class NoPathNavigatorTest : public testing::Test
 {
    public:
-    NoPathNavigatorFixture()
-        : Navigator(std::make_unique<VelocityObstaclePathManager>(
+    NoPathNavigatorTest()
+        : navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<NoPathTestPathPlanner>(),
                         ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                         std::make_shared<VelocityObstaclePathManagerConfig>()),
@@ -39,6 +28,9 @@ class NoPathNavigatorFixture : public Navigator, public testing::Test
     {
     }
 
+    // The navigator under test
+    Navigator navigator;
+
     Timestamp current_time;
     Field field;
     Ball ball;
@@ -46,11 +38,11 @@ class NoPathNavigatorFixture : public Navigator, public testing::Test
     Team enemy_team;
 };
 
-class ThetaStarNavigatorFixture : public Navigator, public testing::Test
+class ThetaStarNavigatorTest : public testing::Test
 {
    public:
-    ThetaStarNavigatorFixture()
-        : Navigator(std::make_unique<VelocityObstaclePathManager>(
+    ThetaStarNavigatorTest()
+        : navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<ThetaStarPathPlanner>(),
                         ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                         std::make_shared<VelocityObstaclePathManagerConfig>()),
@@ -58,16 +50,18 @@ class ThetaStarNavigatorFixture : public Navigator, public testing::Test
                     std::make_shared<NavigatorConfig>())
     {
     }
+
+    Navigator navigator;
 };
 
-TEST_F(ThetaStarNavigatorFixture, convert_catch_intent_to_catch_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_catch_intent_to_catch_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<CatchIntent>(1, 0, 10, 0.3, 0));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -77,7 +71,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_catch_intent_to_catch_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_chip_intent_to_chip_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
@@ -85,7 +79,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_chip_intent_to_chip_primitive)
     intents.emplace_back(
         std::make_unique<ChipIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -95,7 +89,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_chip_intent_to_chip_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture,
+TEST_F(ThetaStarNavigatorTest,
        convert_direct_velocity_intent_to_direct_velocity_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
@@ -103,7 +97,7 @@ TEST_F(ThetaStarNavigatorFixture,
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<DirectVelocityIntent>(3, 1, -2, 0.4, 1000, 4));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -113,7 +107,7 @@ TEST_F(ThetaStarNavigatorFixture,
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_direct_wheels_intent_to_direct_wheels_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
@@ -121,7 +115,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_direct_wheels_intent_to_direct_wheels_
     intents.emplace_back(
         std::make_unique<DirectWheelsIntent>(2, 80, 22, 55, 201, 5000, 60));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -131,7 +125,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_direct_wheels_intent_to_direct_wheels_
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_dribble_intent_to_dribble_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_dribble_intent_to_dribble_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
@@ -139,7 +133,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_dribble_intent_to_dribble_primitive)
     intents.emplace_back(
         std::make_unique<DribbleIntent>(0, Point(), Angle::quarter(), 8888, true, 50));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -149,7 +143,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_dribble_intent_to_dribble_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_kick_intent_to_kick_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
@@ -157,7 +151,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_kick_intent_to_kick_primitive)
     intents.emplace_back(
         std::make_unique<KickIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -167,7 +161,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_kick_intent_to_kick_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_movespin_intent_to_movespin_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
@@ -175,7 +169,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_movespin_intent_to_movespin_primitive)
     intents.emplace_back(
         std::make_unique<MoveSpinIntent>(0, Point(), AngularVelocity::full(), 1, 0));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -185,7 +179,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_movespin_intent_to_movespin_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_pivot_intent_to_pivot_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_pivot_intent_to_pivot_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
@@ -193,7 +187,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_pivot_intent_to_pivot_primitive)
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
                                                        Angle::fromRadians(3.2), true, 1));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -204,14 +198,14 @@ TEST_F(ThetaStarNavigatorFixture, convert_pivot_intent_to_pivot_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_stop_intent_to_stop_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -221,7 +215,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_stop_intent_to_stop_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorFixture, convert_multiple_intents_to_primitives)
+TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
@@ -232,7 +226,7 @@ TEST_F(ThetaStarNavigatorFixture, convert_multiple_intents_to_primitives)
     //    intents.emplace_back(
     //        std::make_unique<MoveIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 3 primitives back
     EXPECT_EQ(primitive_ptrs.size(), 2);
@@ -280,7 +274,6 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     // Construct the world with arguments
     World world = World(field, ball, friendly_team, enemy_team);
 
-    // TODO: this expression is real nasty now, make it more comprehensible
     Navigator navigator(std::make_unique<VelocityObstaclePathManager>(
                             std::make_unique<OnePointPathTestPathPlanner>(),
                             ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
@@ -303,7 +296,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     EXPECT_EQ(primitive.getDestination(), poi);
 }
 
-TEST_F(NoPathNavigatorFixture, move_intent_with_no_path_test_path_planner)
+TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
 {
     // TODO: refactor this into the setup and constructor and add more of these types of
     // tests
@@ -334,7 +327,7 @@ TEST_F(NoPathNavigatorFixture, move_intent_with_no_path_test_path_planner)
         0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
         AutokickType::NONE, BallCollisionType::AVOID));
 
-    auto primitive_ptrs = getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -345,7 +338,7 @@ TEST_F(NoPathNavigatorFixture, move_intent_with_no_path_test_path_planner)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(NoPathNavigatorFixture,
+TEST_F(NoPathNavigatorTest,
        calculateTransitionSpeedBetweenSegments_tests_parallel_segments)
 {
     Point testp1, testp2, testp3;
@@ -355,7 +348,7 @@ TEST_F(NoPathNavigatorFixture,
     testp2      = Point(2, 0);
     testp3      = Point(3, 0);
     final_speed = 2.2;
-    EXPECT_DOUBLE_EQ(final_speed, calculateTransitionSpeedBetweenSegments(
+    EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
                                       testp1, testp2, testp3, final_speed));
 
     // case 2
@@ -363,11 +356,11 @@ TEST_F(NoPathNavigatorFixture,
     testp2      = Point(1, 2);
     testp3      = Point(1, 3);
     final_speed = -2.2;
-    EXPECT_DOUBLE_EQ(final_speed, calculateTransitionSpeedBetweenSegments(
+    EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
                                       testp1, testp2, testp3, final_speed));
 }
 
-TEST_F(NoPathNavigatorFixture,
+TEST_F(NoPathNavigatorTest,
        calculateTransitionSpeedBetweenSegments_tests_perpendicular_segments)
 {
     Point testp1, testp2, testp3;
@@ -377,20 +370,20 @@ TEST_F(NoPathNavigatorFixture,
     testp2      = Point(1, 1);
     testp3      = Point(1, 2);
     final_speed = -2.2;
-    EXPECT_DOUBLE_EQ(
-        0, calculateTransitionSpeedBetweenSegments(testp1, testp2, testp3, final_speed));
+    EXPECT_DOUBLE_EQ(0, navigator.calculateTransitionSpeedBetweenSegments(
+                            testp1, testp2, testp3, final_speed));
 
     // case 2
     testp1      = Point(1, 0);
     testp2      = Point(2, 0);
     testp3      = Point(2, 1);
     final_speed = 2.2;
-    EXPECT_DOUBLE_EQ(
-        0, calculateTransitionSpeedBetweenSegments(testp1, testp2, testp3, final_speed));
+    EXPECT_DOUBLE_EQ(0, navigator.calculateTransitionSpeedBetweenSegments(
+                            testp1, testp2, testp3, final_speed));
 }
 
 
-TEST_F(NoPathNavigatorFixture,
+TEST_F(NoPathNavigatorTest,
        calculateTransitionSpeedBetweenSegments_tests_nan_corner_cases)
 {
     Point testp1, testp2, testp3;
@@ -400,14 +393,14 @@ TEST_F(NoPathNavigatorFixture,
     testp2      = Point(0, 1);
     testp3      = Point(1, 2);
     final_speed = -2.2;
-    EXPECT_FALSE(isnormal(
-        calculateTransitionSpeedBetweenSegments(testp1, testp2, testp3, final_speed)));
+    EXPECT_FALSE(isnormal(navigator.calculateTransitionSpeedBetweenSegments(
+        testp1, testp2, testp3, final_speed)));
 
     // case 2
     testp1      = Point(1, 0);
     testp2      = Point(2, 0);
     testp3      = Point(2, 0);
     final_speed = 2.2;
-    EXPECT_FALSE(isnormal(
-        calculateTransitionSpeedBetweenSegments(testp1, testp2, testp3, final_speed)));
+    EXPECT_FALSE(isnormal(navigator.calculateTransitionSpeedBetweenSegments(
+        testp1, testp2, testp3, final_speed)));
 }
