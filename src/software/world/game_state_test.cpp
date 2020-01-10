@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "software/sensor_fusion/refbox_data.h"
 #include "software/test_util/test_util.h"
-#include "software/world/refbox_constants.h"
 
 TEST(GameStateTest, default_constructor)
 {
@@ -38,6 +38,65 @@ TEST(GameStateTest, default_constructor)
     EXPECT_TRUE(game_state.stayAwayFromBall());
     EXPECT_FALSE(game_state.stayOnSide());
     EXPECT_FALSE(game_state.stayBehindPenaltyLine());
+}
+
+TEST(GameStateTest, equality)
+{
+    GameState gameState1;
+    GameState gameState2;
+    EXPECT_EQ(gameState1, gameState2);
+    EXPECT_EQ(gameState2, gameState1);
+    EXPECT_EQ(gameState1, gameState1);
+}
+
+TEST(GameStateTest, equality_diff_state)
+{
+    GameState gameState1;
+    GameState gameState2;
+    gameState2.state = GameState::STOP;
+    EXPECT_NE(gameState1, gameState2);
+}
+
+TEST(GameStateTest, equality_diff_restart_reason)
+{
+    GameState gameState1;
+    GameState gameState2;
+    gameState2.restart_reason = GameState::PENALTY;
+    EXPECT_NE(gameState1, gameState2);
+}
+
+TEST(GameStateTest, equality_diff_game_state)
+{
+    GameState gameState1;
+    GameState gameState2;
+    gameState2.game_state = RefboxGameState::STOP;
+    EXPECT_NE(gameState1, gameState2);
+}
+
+TEST(GameStateTest, equality_diff_ball_state)
+{
+    GameState gameState1;
+    GameState gameState2;
+    gameState2.state = GameState::READY;
+    gameState2.updateBall(
+        Ball(Point(100, 100), Vector(20, 0), Timestamp::fromSeconds(0)));
+    EXPECT_NE(gameState1, gameState2);
+}
+
+TEST(GameStateTest, equality_diff_our_restart)
+{
+    GameState gameState1;
+    GameState gameState2;
+    gameState2.our_restart = true;
+    EXPECT_NE(gameState1, gameState2);
+}
+
+TEST(GameStateTest, equality_diff_placement_point)
+{
+    GameState gameState1;
+    GameState gameState2;
+    gameState2.setBallPlacementPoint(Point(100, 100));
+    EXPECT_NE(gameState1, gameState2);
 }
 
 // tuple of start state, update state, end state, our_restart, restart reason

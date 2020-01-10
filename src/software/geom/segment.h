@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/geom/line.h"
 #include "software/new_geom/point.h"
 
 class Segment final
@@ -61,14 +60,6 @@ class Segment final
     inline double length() const
     {
         return (end - start).length();
-    }
-
-    /**
-     * Makes a line out of this Segment.
-     */
-    inline Line toLine()
-    {
-        return Line(start, end);
     }
 
     inline double slope() const

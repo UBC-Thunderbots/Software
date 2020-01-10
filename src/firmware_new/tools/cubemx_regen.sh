@@ -12,7 +12,7 @@ WORKSPACE_DIR="$CURR_DIR/../../"
 THIS_SCRIPT_FILENAME=$(basename "$0")
 
 TEMP_DIR="/tmp/tbots_autogen"
-CUBE_EXECUTABLE="/usr/local/bin/STM32CubeMX"
+CUBE_EXECUTABLE="/opt/STM32CubeMX_5.4.0/STM32CubeMX"
 
 # cleanup temp dir and create Src/Inc folder, the way Cube expects this output
 mkdir -p $TEMP_DIR/Src

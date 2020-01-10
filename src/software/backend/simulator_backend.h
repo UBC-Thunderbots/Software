@@ -1,10 +1,12 @@
 #pragma once
 
-#include <future>
+#include <atomic>
 #include <mutex>
+#include <thread>
 
 #include "software/backend/backend.h"
-#include "software/backend/simulation/physics_simulator.h"
+#include "software/backend/simulation/physics/physics_simulator.h"
+#include "software/multithreading/thread_safe_buffer.h"
 #include "software/world/world.h"
 
 /**
@@ -21,9 +23,9 @@ class SimulatorBackend : public Backend
      *
      * - FAST_SIMULATION will run the simulation as fast a possible
      * - REALTIME_SIMULATION will run the simulation in real-time, meaning
-     * if timestamps in published data are 'n' seconds apart, they will be published
-     * 'n' seconds apart in real "wall-clock" time. This is useful
-     * if you want to visualize the simulation.
+     *   if timestamps in published data are 'n' seconds apart, they will be published
+     *   'n' seconds apart in real "wall-clock" time. This is useful
+     *   if you want to visualize the simulation.
      */
     enum SimulationSpeed
     {
@@ -63,6 +65,13 @@ class SimulatorBackend : public Backend
                               const Duration& world_time_increment,
                               SimulationSpeed simulation_speed_mode);
 
+    explicit SimulatorBackend();
+
+    /**
+     * Destroys the SimulatorBackend and stops any currently running simulation
+     */
+    ~SimulatorBackend() override;
+
     /**
      * Sets the SimulationSpeed for the simulation
      *
@@ -71,20 +80,50 @@ class SimulatorBackend : public Backend
     void setSimulationSpeed(SimulationSpeed simulation_speed_mode);
 
     /**
-     * Simulates the world given the initial state until the simulation times out
+     * Starts the simulation. This is a non-blocking call. The simulation will continue to
+     * run until the stopSimulation() function is called.
      *
-     * @param world The initial state of the world in the simulation
-     * @param timeout How long to run the simulation for before failing
-     * @return true if the simulation succeeds, and false if it times out and fails
+     * @param world The initial state of the world to start the simulation with
      */
-    bool runSimulation(World world, const Duration& timeout);
+    void startSimulation(World world);
+
+    /**
+     * Stops the simulation if it is running
+     */
+    void stopSimulation();
 
    private:
+    /**
+     * The function that runs inside the simulation thread, running the physics simulation
+     * steps inside a loop. This function will continue to run until stopSimulation() is
+     * called
+     *
+     * @param world The initial state of the world to start the simulation with
+     */
+    void runSimulationLoop(World world);
+
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
-    const Duration physics_time_step;
-    const Duration world_time_increment;
-    SimulationSpeed simulation_speed_mode;
+    std::thread simulation_thread;
+    bool simulation_thread_started;
 
-    std::promise<ConstPrimitiveVectorPtr> primitive_promise;
+    // This flag is used to indicate that we are in the destructor. We use this to
+    // communicate with pass_generation_thread that it is
+    // time to stop
+    bool in_destructor;
+    // The mutex for the in_destructor flag
+    std::mutex in_destructor_mutex;
+
+    // The time increment the physics simulation is updated by
+    const Duration physics_time_step;
+    // The time increment between each World published by the backend
+    const Duration world_time_increment;
+    std::atomic<SimulationSpeed> simulation_speed_mode;
+
+    // We only want to simulate the most recently receive primitives so have no reason
+    // to buffer more than 1 value
+    const unsigned int primitive_buffer_size = 1;
+    ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
+    // How long to wait for primitives, in wall-clock time
+    const Duration primitive_timeout = Duration::fromSeconds(1);
 };

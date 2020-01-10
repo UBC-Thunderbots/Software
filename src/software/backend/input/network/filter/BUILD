@@ -9,6 +9,7 @@ cc_library(
         "//software/util/math:math_functions",
         "//software/world:ball",
         "//software/world:field",
+        "//software/sensor_fusion:detection",
         "@eigen",
     ],
 )
@@ -28,7 +29,9 @@ cc_library(
     srcs = ["robot_filter.cpp"],
     hdrs = ["robot_filter.h"],
     deps = [
+        "//software/geom",
         "//software/world:robot",
+        "//software/sensor_fusion:detection",
     ],
 )
 

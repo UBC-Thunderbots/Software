@@ -2,6 +2,7 @@
 
 #include <munkres/munkres.h>
 
+#include <algorithm>
 #include <chrono>
 #include <exception>
 #include <g3log/g3log.hpp>
@@ -21,7 +22,7 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
 {
 }
 
-std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
+void STP::updateCurrentPlay(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
@@ -33,22 +34,18 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
-    auto all_play_names = PlayFactory::getRegisteredPlayNames();
+    bool no_current_play = !current_play || current_play->done();
 
-    // Assign a new play if we don't currently have a play assigned, the current play's
-    // invariant no longer holds, or the current play is done
-    if (!current_play || (!override_play && !current_play->invariantHolds(world)) ||
-        current_play->done() || override_play_name_value_changed ||
-        override_play_value_changed)
+    if (override_play)
     {
-        if (override_play)
+        if (no_current_play || override_play_name_value_changed ||
+            override_play_value_changed)
         {
-            if (std::find(all_play_names.begin(), all_play_names.end(),
-                          override_play_name) != all_play_names.end())
+            try
             {
                 current_play = PlayFactory::createPlay(override_play_name);
             }
-            else
+            catch (std::invalid_argument)
             {
                 auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
@@ -58,7 +55,10 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
                 current_play = std::move(default_play);
             }
         }
-        else
+    }
+    else
+    {
+        if (no_current_play || !current_play->invariantHolds(world))
         {
             try
             {
@@ -75,27 +75,29 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             }
         }
     }
+}
 
-    // Run the current play
+std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
+{
     current_tactics = current_play->getTactics(world);
 
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        // Assign robots to tactics
-        auto assigned_tactics = assignRobotsToTactics(world, *current_tactics);
+        assignRobotsToTactics(world, *current_tactics);
 
-        for (const auto& tactic : assigned_tactics)
+        for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
         {
-            // Get the Intent the tactic wants to run
-            auto intent = tactic->getNextIntent();
-
-            // If the tactic is not done and a valid intent was returned, the intent will
-            // be run by the robot. Otherwise, the robot will default to running a
-            // StopIntent so it doesn't do anything crazy.
-            if (intent && !tactic->done())
+            // Try to get an intent from the tactic
+            std::shared_ptr<Action> action = tactic->getNextAction();
+            std::unique_ptr<Intent> intent;
+            if (action)
             {
-                // Set Motion Constraints
+                intent = action->getNextIntent();
+            }
+
+            if (intent)
+            {
                 auto motion_constraints = motion_constraint_manager.getMotionConstraints(
                     world.gameState(), *tactic);
                 intent->setMotionConstraints(motion_constraints);
@@ -104,10 +106,15 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             }
             else if (tactic->getAssignedRobot())
             {
-                // If the assigned tactic is done, we send the robot a StopIntent so it
-                // doesn't do anything crazy until it starts running a new Tactic
+                // If we couldn't get an intent, we send the robot a StopIntent so
+                // it doesn't do anything crazy until it starts running a new Tactic
                 intents.emplace_back(std::make_unique<StopIntent>(
                     tactic->getAssignedRobot()->id(), false, 0));
+            }
+            else
+            {
+                LOG(WARNING) << "Tried to run a tactic that didn't yield an Intent"
+                             << "and did not have a robot assigned!";
             }
         }
     }
@@ -115,8 +122,14 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return intents;
 }
 
-std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
-    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
+std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
+{
+    updateCurrentPlay(world);
+    return getIntentsFromCurrentPlay(world);
+}
+
+void STP::assignRobotsToTactics(const World& world,
+                                std::vector<std::shared_ptr<Tactic>> tactics) const
 {
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -126,16 +139,43 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
 
-    if (world.friendlyTeam().numRobots() < tactics.size())
+    auto friendly_team         = world.friendlyTeam();
+    auto& friendly_team_robots = friendly_team.getAllRobots();
+
+    // Special handling for the Goalie tactics, since only one robot per team is permitted
+    // to act as the goalie
+    const std::optional<Robot> goalie    = friendly_team.goalie();
+    std::vector<Robot> non_goalie_robots = friendly_team_robots;
+    auto isGoalieTactic                  = [](std::shared_ptr<Tactic> tactic) {
+        return tactic->isGoalieTactic();
+    };
+
+    auto it = tactics.begin();
+    if (goalie)
+    {
+        non_goalie_robots.erase(
+            std::find(non_goalie_robots.begin(), non_goalie_robots.end(), *goalie));
+
+        // Assign the goalie to the first goalie tactic
+        auto iter = std::find_if(tactics.begin(), tactics.end(), isGoalieTactic);
+        if (iter != tactics.end())
+        {
+            (*iter)->updateRobot(*goalie);
+        }
+    }
+
+    // Discard all goalie tactics, since we have already assigned the goalie robot (if
+    // there is one) to the first goalie tactic, and there should only ever be one goalie
+    tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic),
+                  tactics.end());
+
+    if (non_goalie_robots.size() < tactics.size())
     {
         // We do not have enough robots to assign all the tactics to. We "drop"
         // (aka don't assign) the tactics at the end of the vector since they are
         // considered lower priority
-        tactics.resize(world.friendlyTeam().numRobots());
+        tactics.resize(non_goalie_robots.size());
     }
-
-    auto friendly_team        = world.friendlyTeam();
-    auto friendly_team_robots = friendly_team.getAllRobots();
 
     size_t num_rows = world.friendlyTeam().numRobots();
     size_t num_cols = tactics.size();
@@ -145,7 +185,7 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     // This represents the cases where there are either no tactics or no robots
     if (num_rows == 0 || num_cols == 0)
     {
-        return {};
+        return;
     }
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
@@ -153,22 +193,32 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     Matrix<double> matrix(num_rows, num_cols);
 
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
-    for (unsigned row = 0; row < num_rows; row++)
+    for (size_t row = 0; row < num_rows; row++)
     {
-        for (unsigned col = 0; col < num_cols; col++)
+        for (size_t col = 0; col < num_cols; col++)
         {
-            if (!(tactics.at(col)->robotCapabilityRequirements() <=
-                  friendly_team_robots.at(row).getRobotCapabilities()))
+            Robot robot                     = non_goalie_robots.at(row);
+            std::shared_ptr<Tactic>& tactic = tactics.at(col);
+            double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
+
+            std::set<RobotCapabilities::Capability> required_capabilities =
+                tactic->robotCapabilityRequirements();
+            std::set<RobotCapabilities::Capability> robot_capabilities =
+                robot.getCapabilitiesWhitelist();
+            std::set<RobotCapabilities::Capability> missing_capabilities;
+            std::set_difference(
+                required_capabilities.begin(), required_capabilities.end(),
+                robot_capabilities.begin(), robot_capabilities.end(),
+                std::inserter(missing_capabilities, missing_capabilities.begin()));
+
+            if (missing_capabilities.size() > 0)
             {
-                // hardware requirements of tactic are not satisfied by the current robot
-                // set cost to 10.0f
-                matrix(row, col) = 10.0f;
+                matrix(row, col) = robot_cost_for_tactic + 10.0f;
             }
             else
             {
-                // hardware requirements are satisfied, calculate real cost
-                matrix(row, col) = tactics.at(col)->calculateRobotCost(
-                    friendly_team_robots.at(row), world);
+                // capability requirements are satisfied, use real cost
+                matrix(row, col) = robot_cost_for_tactic;
             }
         }
     }
@@ -177,29 +227,27 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     Munkres<double> m;
     m.solve(matrix);
 
-    // The Munkres matrix gets solved such that there will be exactly one 0 in every row
-    // and exactly one 0 in every column. All other values will be -1. The 0's indicate
-    // the "workers" and "jobs" (robots and tactics for us) that are most optimally paired
-    // together
+    // The Munkres matrix gets solved such that there will be exactly one 0 in every
+    // row and exactly one 0 in every column. All other values will be -1. The 0's
+    // indicate the "workers" and "jobs" (robots and tactics for us) that are most
+    // optimally paired together
     //
     // Example matrices:
     //        -1, 0,-1,         and            0,-1,
     //         0,-1,-1,                       -1, 0,
     //        -1,-1, 0,
-    for (unsigned row = 0; row < num_rows; row++)
+    for (size_t row = 0; row < num_rows; row++)
     {
-        for (unsigned col = 0; col < num_cols; col++)
+        for (size_t col = 0; col < num_cols; col++)
         {
             auto val = matrix(row, col);
             if (val == 0)
             {
-                tactics.at(col)->updateRobot(friendly_team_robots.at(row));
+                tactics.at(col)->updateRobot(non_goalie_robots.at(row));
                 break;
             }
         }
     }
-
-    return tactics;
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
@@ -245,9 +293,9 @@ PlayInfo STP::getPlayInfo()
     info.play_type = name(current_game_state);
     info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
 
-    // Sort the tactics by the id of the robot they are assigned to, so we can report the
-    // tactics in order or robot id. This makes it much easier to read if tactics or
-    // robots change, since the order of the robots won't change
+    // Sort the tactics by the id of the robot they are assigned to, so we can report
+    // the tactics in order or robot id. This makes it much easier to read if tactics
+    // or robots change, since the order of the robots won't change
     if (current_play && current_tactics)
     {
         auto compare_tactic_by_robot_id = [](auto t1, auto t2) {

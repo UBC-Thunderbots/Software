@@ -60,7 +60,7 @@ cc_library(
     hdrs = ["game_state.h"],
     deps = [
         ":ball",
-        ":refbox_constants",
+        "//software/sensor_fusion:refbox_data",
         "@g3log",
     ],
 )
@@ -76,30 +76,26 @@ cc_test(
 )
 
 cc_library(
-    name = "refbox_constants",
-    srcs = ["refbox_constants.cpp"],
-    hdrs = ["refbox_constants.h"],
-    deps = ["@magic_enum"],
-)
-
-cc_test(
-    name = "refbox_constants_test",
-    srcs = ["refbox_constants_test.cpp"],
-    deps = [
-        ":refbox_constants",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "robot",
     srcs = ["robot.cpp"],
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
+        ":robot_state",
         "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
+    ],
+)
+
+cc_library(
+    name = "robot_state",
+    srcs = ["robot_state.cpp"],
+    hdrs = ["robot_state.h"],
+    deps = [
+        ":robot_capabilities",
+        "//software/geom",
+        "//software/util/time:timestamp",
     ],
 )
 

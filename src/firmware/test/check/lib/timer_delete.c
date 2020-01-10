@@ -32,9 +32,9 @@ int timer_delete(timer_t timerid CK_ATTRIBUTE_UNUSED)
     /*
      * Setting values to '0' results in disabling the running timer.
      */
-    interval.it_value.tv_sec = 0;
-    interval.it_value.tv_usec = 0;
-    interval.it_interval.tv_sec = 0;
+    interval.it_value.tv_sec     = 0;
+    interval.it_value.tv_usec    = 0;
+    interval.it_interval.tv_sec  = 0;
     interval.it_interval.tv_usec = 0;
 
     return setitimer(ITIMER_REAL, &interval, NULL);

@@ -11,6 +11,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/patrol_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
@@ -63,6 +64,23 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                world.friendlyTeam(), world.enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
+
+    std::array<std::shared_ptr<PatrolTactic>, 2> patrol_tactics = {
+        std::make_shared<PatrolTactic>(
+            std::vector<Point>(
+                {Point(world.field().enemyCornerPos().x() - 3 * ROBOT_MAX_RADIUS_METERS,
+                       world.field().enemyCornerPos().y() - 3 * ROBOT_MAX_RADIUS_METERS),
+                 Point(3 * ROBOT_MAX_RADIUS_METERS,
+                       world.field().yLength() / 2 - 3 * ROBOT_MAX_RADIUS_METERS)}),
+            .03, Angle::half(), 0),
+        std::make_shared<PatrolTactic>(
+            std::vector<Point>(
+                {Point(3 * ROBOT_MAX_RADIUS_METERS,
+                       -world.field().yLength() / 2 + 3 * ROBOT_MAX_RADIUS_METERS),
+                 Point(
+                     world.field().enemyCornerNeg().x() - 3 * ROBOT_MAX_RADIUS_METERS,
+                     world.field().enemyCornerNeg().y() + 3 * ROBOT_MAX_RADIUS_METERS)}),
+            .03, Angle::half(), 0)};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
@@ -140,6 +158,12 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);
+
+        // If we can't do anything else then patrol?
+        for (auto &patrol_tactic : patrol_tactics)
+        {
+            result.emplace_back(patrol_tactic);
+        }
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);

@@ -39,7 +39,7 @@ void World::updateFieldGeometry(const Field &new_field_data)
 
 void World::updateBallState(const BallState &new_ball_state)
 {
-    ball_.updateCurrentState(new_ball_state);
+    ball_.updateState(new_ball_state);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -167,4 +167,17 @@ const GameState &World::gameState() const
 GameState &World::mutableGameState()
 {
     return game_state_;
+}
+
+bool World::operator==(const World &other) const
+{
+    return this->field() == other.field() && this->ball() == other.ball() &&
+           this->friendlyTeam() == other.friendlyTeam() &&
+           this->enemyTeam() == other.enemyTeam() &&
+           this->gameState() == other.gameState();
+}
+
+bool World::operator!=(const World &other) const
+{
+    return !(*this == other);
 }

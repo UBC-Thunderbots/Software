@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
 
 // The following tests will make sure the goalie stays in the requested

@@ -5,6 +5,45 @@
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
 
+TEST(KickActionTest, getKickDirection)
+{
+    Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Ball ball({-1, 2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    KickAction action = KickAction();
+
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, ball.position(), Angle::quarter(), 5.0);
+
+    EXPECT_EQ(Angle::quarter(), action.getKickDirection());
+}
+
+TEST(KickActionTest, getKickOrigin)
+{
+    Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Ball ball({-1, 2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    KickAction action = KickAction();
+
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, Point(10, -11), Angle::quarter(), 5.0);
+
+    EXPECT_EQ(Point(10, -11), action.getKickOrigin());
+}
+
+TEST(KickActionTest, getKickSpeed)
+{
+    Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Ball ball({-1, 2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    KickAction action = KickAction();
+
+    action.updateWorldParams(ball);
+    action.updateControlParams(robot, Point(10, -11), Angle::quarter(), 5.0);
+
+    EXPECT_EQ(5.0, action.getKickSpeed());
+}
+
 TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
 {
     Robot robot(0, Point(-0.3, 0), Vector(), Angle::zero(), AngularVelocity::zero(),

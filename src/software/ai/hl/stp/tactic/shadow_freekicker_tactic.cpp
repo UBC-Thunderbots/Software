@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
@@ -35,10 +35,11 @@ double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const Worl
                   world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
-void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
-    Point defend_position  = robot->position();
+    auto move_action =
+        std::make_shared<MoveAction>(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    Point defend_position = robot->position();
 
     do
     {
@@ -82,15 +83,30 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
                                         perpendicular_to_ball_direction;
         }
 
-        move_action.updateControlParams(
+        move_action->updateControlParams(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
             0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
             BallCollisionType::AVOID);
-        yield(move_action.getNextIntent());
+        yield(move_action);
     } while (true);
 }
 
-void ShadowFreekickerTactic::accept(TacticVisitor &visitor) const
+void ShadowFreekickerTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
+}
+
+Ball ShadowFreekickerTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShadowFreekickerTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShadowFreekickerTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }
