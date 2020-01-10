@@ -4,10 +4,17 @@ cc_library(
     name = "new_geom",
     srcs = [
         "circle.cpp",
+        "convex_polygon.cpp",
+        "polygon.cpp",
+        "rectangle.cpp",
     ],
     hdrs = [
         "circle.h",
+        "convex_polygon.h",
         "convex_shape.h",
+        "polygon.h",
+        "rectangle.h",
+        "segment.h",
         "shape.h",
     ],
     deps = [
@@ -158,6 +165,39 @@ cc_test(
     name = "circle_test",
     srcs = [
         "circle_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "polygon_test",
+    srcs = [
+        "polygon_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "convex_polygon_test",
+    srcs = [
+        "convex_polygon_test.cpp",
+    ],
+    deps = [
+        ":new_geom",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "rectangle_test",
+    srcs = [
+        "rectangle_test.cpp",
     ],
     deps = [
         ":new_geom",

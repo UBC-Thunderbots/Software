@@ -4,8 +4,11 @@
 #include "software/util/parameter/dynamic_parameters.h"
 
 /**
- * VelocityObstaclePathManager uses static_obstacles to arbitrate between paths to
- * implement the PathManager interface.
+ * VelocityObstaclePathManager uses obstacles to arbitrate between paths.
+ * The added obstacles to cause the path planner to generate paths that avoid potential
+ * collisions. This approach implicitly uses the idea of [Minkowski
+ * space](https://en.wikipedia.org/wiki/Minkowski_space), but where we assume that a robot
+ * will occupy all the positions along the path for the next time step.
  */
 
 class VelocityObstaclePathManager : public PathManager

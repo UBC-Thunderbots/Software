@@ -9,7 +9,7 @@
 using namespace Passing;
 
 PassGenerator::PassGenerator(const World& world, const Point& passer_point,
-                             const PassType& pass_type)
+                             const PassType& pass_type, bool running_deterministically)
     : updated_world(world),
       world(world),
       passer_robot_id(std::nullopt),
@@ -17,9 +17,13 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
       passer_point(passer_point),
       best_known_pass({0, 0}, {0, 0}, 0, Timestamp::fromSeconds(0)),
       target_region(std::nullopt),
-      random_num_gen(random_device()),
+      // We initialize the random number generator with a specific value to
+      // allow generated passes to be deterministic. The value used here has
+      // no special meaning.
+      random_num_gen(13),
       pass_type(pass_type),
-      in_destructor(false)
+      in_destructor(false),
+      running_deterministically(running_deterministically)
 {
     // Generate the initial set of passes
     passes_to_optimize = generatePasses(getNumPassesToOptimize());
@@ -27,8 +31,11 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
     // Start the thread to do the pass generation in the background
     // The lambda expression here is needed so that we can call
     // `continuouslyGeneratePasses()`, which is not a static function
-    pass_generation_thread =
-        std::thread([this]() { return continuouslyGeneratePasses(); });
+    if (!running_deterministically)
+    {
+        pass_generation_thread =
+            std::thread([this]() { return continuouslyGeneratePasses(); });
+    }
 }
 
 void PassGenerator::setWorld(World world)
@@ -59,7 +66,17 @@ void PassGenerator::setPasserRobotId(unsigned int robot_id)
 
 PassWithRating PassGenerator::getBestPassSoFar()
 {
-    // Take ownership of the best_known_pass for the duration of this function
+    // If we're running deterministically, then we need to manually optimize the
+    // passes rather then assuming the optimization thread has done the work for us
+    if (running_deterministically)
+    {
+        for (size_t i = 0; i < NUM_ITERS_PER_DETERMINISTIC_CALL; i++)
+        {
+            updateAndOptimizeAndPrunePasses();
+        }
+    }
+
+    // Take ownership of the best_known_pass for the rest of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
     Pass best_known_pass_copy = best_known_pass;
@@ -86,7 +103,10 @@ PassGenerator::~PassGenerator()
     // the thread object. If we do not wait for thread to finish executing, it will
     // call `std::terminate` when we deallocate the thread object and kill our whole
     // program
-    pass_generation_thread.join();
+    if (!running_deterministically)
+    {
+        pass_generation_thread.join();
+    }
 }
 
 void PassGenerator::continuouslyGeneratePasses()
@@ -100,22 +120,7 @@ void PassGenerator::continuouslyGeneratePasses()
         // conditional check
         in_destructor_mutex.unlock();
 
-        // Copy over the updated world and remove the passer robot
-        world_mutex.lock();
-        updated_world_mutex.lock();
-
-        world = updated_world;
-
-        // Update the passer point for all the passes
-        updated_world_mutex.unlock();
-        world_mutex.unlock();
-
-        passer_point_mutex.lock();
-        updatePasserPointOfAllPasses(passer_point);
-        passer_point_mutex.unlock();
-        optimizePasses();
-        pruneAndReplacePasses();
-        saveBestPass();
+        updateAndOptimizeAndPrunePasses();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -125,6 +130,26 @@ void PassGenerator::continuouslyGeneratePasses()
         // check
         in_destructor_mutex.lock();
     }
+}
+
+void PassGenerator::updateAndOptimizeAndPrunePasses()
+{
+    // Copy over the updated world and remove the passer robot
+    world_mutex.lock();
+    updated_world_mutex.lock();
+
+    world = updated_world;
+
+    // Update the passer point for all the passes
+    updated_world_mutex.unlock();
+    world_mutex.unlock();
+
+    passer_point_mutex.lock();
+    updatePasserPointOfAllPasses(passer_point);
+    passer_point_mutex.unlock();
+    optimizePasses();
+    pruneAndReplacePasses();
+    saveBestPass();
 }
 
 void PassGenerator::optimizePasses()

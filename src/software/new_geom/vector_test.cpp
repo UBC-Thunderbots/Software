@@ -235,3 +235,27 @@ TEST(VectorOperatorTests, vector_equality_inequality_test)
     EXPECT_FALSE(u == v);
     EXPECT_TRUE(u != v);
 }
+
+TEST(VectorAngleWithTests, vector_right_angle_with_other_test)
+{
+    Vector u = Vector(0, 5);
+    Vector v = Vector(4, 0);
+
+    EXPECT_EQ(v.angleWith(u), Angle::fromDegrees(90));
+}
+
+TEST(VectorAngleWithTests, vector_acute_angle_with_other_test)
+{
+    Vector u = Vector(0, -1);
+    Vector v = Vector(-1, -1);
+
+    EXPECT_EQ(v.angleWith(u), Angle::fromDegrees(45));
+}
+
+TEST(VectorAngleWithTests, vector_obtuse_angle_with_other_test)
+{
+    Vector u = Vector(1, 0);
+    Vector v = Vector(-1, -1);
+
+    EXPECT_EQ(v.angleWith(u), Angle::fromDegrees(135));
+}

@@ -3,7 +3,7 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
@@ -187,7 +187,27 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!(kick_action->done() || chip_action->done()));
 }
 
-void ShootGoalTactic::accept(TacticVisitor &visitor) const
+void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
+}
+
+Ball ShootGoalTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShootGoalTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShootGoalTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team ShootGoalTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }
