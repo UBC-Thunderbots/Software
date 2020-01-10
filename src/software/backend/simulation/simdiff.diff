@@ -1,0 +1,919 @@
+diff --git a/src/core b/src/core
+new file mode 100644
+index 00000000..e697b5a9
+Binary files /dev/null and b/src/core differ
+diff --git a/src/software/backend/simulation/BUILD b/src/software/backend/simulation/BUILD
+new file mode 100644
+index 00000000..3cff8016
+--- /dev/null
++++ b/src/software/backend/simulation/BUILD
+@@ -0,0 +1,50 @@
++package(default_visibility = ["//software/backend/simulation:__subpackages__"])
++
++cc_binary(
++    name = "testmain",
++    srcs = [":testmain.cpp"],
++    deps = [
++        "@boost//:geometry",
++    ],
++)
++
++cc_binary(
++    name = "static_robot_test_main",
++    srcs = ["static_robot_test_main.cpp"],
++    deps = [
++        "//firmware/main/app/world:chicker",
++        "//firmware/main/app/world:dribbler",
++        "//firmware/main/app/world:firmware_robot",
++        "//firmware/main/app/world:wheel",
++        "//software/backend/simulation/physics:physics_ball",
++        "//software/backend/simulation/physics:physics_robot",
++    ],
++)
++
++cc_library(
++    name = "firmware_object_library",
++    srcs = [":firmware_object_factory.cpp"],
++    hdrs = [":firmware_object_factory.h"],
++    deps = [
++        "//firmware/main/app/world:chicker",
++        "//firmware/main/app/world:dribbler",
++        "//firmware/main/app/world:firmware_robot",
++        "//firmware/main/app/world:wheel",
++        "//software/backend/simulation/physics:physics_ball",
++        "//software/backend/simulation/physics:physics_robot",
++    ],
++)
++
++cc_library(
++    name = "firmware_conversion",
++    srcs = [":firmware_conversion.cpp"],
++    hdrs = [":firmware_conversion.h"],
++    deps = [
++        "//firmware/main/app/world:chicker",
++        "//firmware/main/app/world:dribbler",
++        "//firmware/main/app/world:firmware_robot",
++        "//firmware/main/app/world:wheel",
++        "//software/backend/simulation/physics:physics_ball",
++        "//software/backend/simulation/physics:physics_robot",
++    ],
++)
+diff --git a/src/software/backend/simulation/firmware_conversion.cpp b/src/software/backend/simulation/firmware_conversion.cpp
+new file mode 100644
+index 00000000..867d2d57
+--- /dev/null
++++ b/src/software/backend/simulation/firmware_conversion.cpp
+@@ -0,0 +1,41 @@
++#include "software/backend/simulation/firmware_conversion.h"
++
++//Chicker_t* createRobotFirmwareChicker(PhysicsRobot& physics_robot, PhysicsBall& physics_ball) {
++//    auto kick_function = [&physics_robot, &physics_ball](float speed_m_per_s) {
++//        // if ball in chicker area
++//        //      apply impulse in direction of robot orientation
++//    };
++//
++//    auto chip_function = [&physics_robot, &physics_ball](float distance_m) {
++//        // if ball in chicker area
++//        //      apply impulse in direction of robot orientation
++//        //      disable ball collisions until position / distance
++//    };
++//
++//    auto enable_autokick_function = [&physics_robot, &physics_ball](float speed_m_per_s) {
++////        robot.enableAutokick(speed_m_per_s);
++//    };
++//
++//    auto enable_autochip_function = [&physics_robot, &physics_ball](float distance_m) {
++////        robot.enableAutochip(distance_m);
++//    };
++//
++//    auto disable_autokick_function = [&physics_robot, &physics_ball]() {
++////        robot.disableAutokick();
++//    };
++//
++//    auto disable_autochip_function = [&physics_robot, &physics_ball]() {
++////        robot.disableAutochip();
++//    };
++//
++//    Chicker_t* firmware_chicker = app_chicker_create(kick_function,
++//            chip_function,
++//            enable_autokick_function,
++//            enable_autochip_function,
++//            disable_autokick_function,
++//            disable_autochip_function);
++//
++//    return firmware_chicker;
++//}
++
++
+diff --git a/src/software/backend/simulation/firmware_conversion.h b/src/software/backend/simulation/firmware_conversion.h
+new file mode 100644
+index 00000000..eaaf8f10
+--- /dev/null
++++ b/src/software/backend/simulation/firmware_conversion.h
+@@ -0,0 +1,9 @@
++#pragma once
++
++#include "app/world/chicker.h"
++#include "software/backend/simulation/physics/physics_robot.h"
++#include "software/backend/simulation/physics/physics_ball.h"
++
++//Chicker_t* createRobotFirmwareChicker(PhysicsRobot& physics_robot, PhysicsBall& physics_ball);
++
++
+diff --git a/src/software/backend/simulation/firmware_object_factory.cpp b/src/software/backend/simulation/firmware_object_factory.cpp
+new file mode 100644
+index 00000000..467bab2c
+--- /dev/null
++++ b/src/software/backend/simulation/firmware_object_factory.cpp
+@@ -0,0 +1,71 @@
++#include "software/backend/simulation/firmware_object_factory.h"
++#include <boost/bind.hpp>
++
++FirmwareObjectFactory::FirmwareObjectFactory(std::shared_ptr<PhysicsRobot> friendly_physics_robot,
++                                             std::shared_ptr<PhysicsBall> physics_ball)
++                                             : friendly_physics_robot(friendly_physics_robot), physics_ball(physics_ball){
++}
++
++void kick(std::shared_ptr<PhysicsRobot> physics_robot, std::shared_ptr<PhysicsBall> physics_ball, float speed_m_per_s) {
++
++}
++
++void chip(float speed_m_per_s) {
++
++}
++
++//void FirmwareObjectFactory::chip(PhysicsRobot& physics_robot, PhysicsBall& physics_ball, float distance_m) {
++//
++//}
++//
++//void FirmwareObjectFactory::enableAutokick(PhysicsRobot& physics_robot, PhysicsBall& physics_ball, float speed_m_per_s) {
++//
++//}
++//
++//void FirmwareObjectFactory::enableAutochip(PhysicsRobot& physics_robot, PhysicsBall& physics_ball, float distance_m) {
++//
++//}
++//
++void FirmwareObjectFactory::disableAutokick() {
++
++}
++//
++//void FirmwareObjectFactory::disableAutochip() {
++//
++//}
++std::function<void()> FirmwareObjectFactory::getFunc() {
++    int a = 0;
++    return []() {
++        std::cout << a << std::endl;
++    };
++}
++
++Chicker_t * FirmwareObjectFactory::createRobotFirmwareChicker() {
++    auto tempf = [](float foo) {};
++    auto temp = []() {};
++
++
++//    auto myfunc = boost::bind(&FirmwareObjectFactory::kick, friendly_physics_robot, physics_ball, _1);
++    Chicker_t* chicker = app_chicker_create(
++//            myfunc,
++tempf,
++//get_wrapper<0>(boost::bind(&FirmwareObjectFactory::disableAutokick)),
++            tempf,
++            tempf,
++            tempf,
++//get_wrapper<0>(boost::bind(&FirmwareObjectFactory::disableAutokick)),
++            temp,
++            temp
++            );
++
++//    const void* kick_func_ptr = &(this->kick);
++//    Chicker_t* firmware_chicker = app_chicker_create(&(this->kick),
++//    &(this->chip),
++//    &(this->enableAutokick),
++//    &(this->enableAutochip),
++//    &(this->disableAutokick),
++//    &(this->disableAutochip));
++
++
++//    return firmware_chicker;
++}
+diff --git a/src/software/backend/simulation/firmware_object_factory.h b/src/software/backend/simulation/firmware_object_factory.h
+new file mode 100644
+index 00000000..0c02bb1d
+--- /dev/null
++++ b/src/software/backend/simulation/firmware_object_factory.h
+@@ -0,0 +1,59 @@
++#pragma once
++
++#include "app/world/chicker.h"
++#include "software/backend/simulation/physics/physics_robot.h"
++#include "software/backend/simulation/physics/physics_ball.h"
++
++#include <boost/optional.hpp>
++#include <boost/bind.hpp>
++#include <iostream>
++#include <ostream>
++using namespace std;
++
++template<unsigned ID,typename Functor>
++boost::optional<Functor> &get_local()
++{
++    static boost::optional<Functor> local;
++    return local;
++}
++
++template<unsigned ID,typename Functor>
++typename Functor::result_type wrapper()
++{
++    return get_local<ID,Functor>().get()();
++}
++
++template<typename ReturnType>
++struct Func
++{
++    typedef ReturnType (*type)();
++};
++
++template<unsigned ID,typename Functor>
++typename Func<typename Functor::result_type>::type get_wrapper(Functor f)
++{
++    (get_local<ID,Functor>()) = f;
++    return wrapper<ID,Functor>;
++}
++
++class FirmwareObjectFactory {
++public:
++    // TODO: replace with PhysicsWorld
++    explicit FirmwareObjectFactory(std::shared_ptr<PhysicsRobot> friendly_physics_robot, std::shared_ptr<PhysicsBall> physics_ball);
++    FirmwareObjectFactory() = delete;
++
++    Chicker_t* createRobotFirmwareChicker();
++
++    static std::function<void()> getFunc();
++
++    void kick(std::shared_ptr<PhysicsRobot> physics_robot, std::shared_ptr<PhysicsBall> physics_ball, float speed_m_per_s);
++    void chip(float distance_m);
++//    static void enableAutokick(PhysicsRobot& physics_robot, PhysicsBall& physics_ball, float speed_m_per_s);
++//    static void enableAutochip(PhysicsRobot& physics_robot, PhysicsBall& physics_ball, float distance_m);
++    void disableAutokick();
++//    static void disableAutochip();
++
++private:
++    std::shared_ptr<PhysicsRobot> friendly_physics_robot;
++    std::shared_ptr<PhysicsBall> physics_ball;
++};
+diff --git a/src/software/backend/simulation/physics/BUILD b/src/software/backend/simulation/physics/BUILD
+index 82c225ad..0cab7cb8 100644
+--- a/src/software/backend/simulation/physics/BUILD
++++ b/src/software/backend/simulation/physics/BUILD
+@@ -105,6 +105,8 @@ cc_library(
+     deps = [
+         ":physics_ball",
+         ":physics_field",
++        ":physics_robot",
++        "//firmware/main/app/world:firmware_world",
+         "//software/util/time:duration",
+         "//software/util/time:timestamp",
+         "//software/world",
+diff --git a/src/software/backend/simulation/physics/physics_robot.h b/src/software/backend/simulation/physics/physics_robot.h
+index 48c54e5f..7afb5df4 100644
+--- a/src/software/backend/simulation/physics/physics_robot.h
++++ b/src/software/backend/simulation/physics/physics_robot.h
+@@ -9,6 +9,15 @@
+ class PhysicsRobot
+ {
+    public:
++    /**
++     * Represents the different states the chicker can be in at any given time
++     */
++    enum ChickerState {
++        DISABLED,
++        AUTOKICK_ENABLED,
++        AUTOCHIP_ENABLED
++    };
++
+     /**
+      * Creates a new PhysicsRobot given a Box2D world and a Robot object. A Box2D body
+      * will be automatically added to the Box2D world and updated during world update
+@@ -48,7 +57,13 @@ class PhysicsRobot
+      */
+     Robot getRobotWithTimestamp(const Timestamp& timestamp) const;
+ 
++
++
++    ChickerState getChickerState() const;
++
++
+    private:
++
+     /**
+      * A helper function that creates the robot body object in the physics world
+      *
+@@ -97,4 +112,7 @@ class PhysicsRobot
+     b2Body* robot_body;
+ 
+     RobotId robot_id;
++
++
++
+ };
+diff --git a/src/software/backend/simulation/physics/physics_simulator.cpp b/src/software/backend/simulation/physics/physics_simulator.cpp
+index 43e633e8..cc1f353e 100644
+--- a/src/software/backend/simulation/physics/physics_simulator.cpp
++++ b/src/software/backend/simulation/physics/physics_simulator.cpp
+@@ -15,26 +15,43 @@ World PhysicsSimulator::stepSimulation(const Duration& time_step)
+ {
+     physics_world->Step(time_step.getSeconds(), velocity_iterations, position_iterations);
+     physics_world_timestamp = physics_world_timestamp + time_step;
++}
+ 
++World PhysicsSimulator::getWorld() const {
+     World new_world;
+     new_world.updateTimestamp(physics_world_timestamp);
+-    if (physics_ball)
++    if(physics_ball)
+     {
+         new_world.mutableBall() =
+-            physics_ball->getBallWithTimestamp(physics_world_timestamp);
++                physics_ball->getBallWithTimestamp(physics_world_timestamp);
+     }
+-    if (physics_field)
++    if(physics_field)
+     {
+         new_world.mutableField() =
+-            physics_field->getFieldWithTimestamp(physics_world_timestamp);
++                physics_field->getFieldWithTimestamp(physics_world_timestamp);
+     }
++    if(friendly_physics_robots)
+ 
+     return new_world;
+ }
+ 
++std::vector<std::unique_ptr<FirmwareWorld_t>> PhysicsSimulator::getFirmwareWorldForEachRobot() const {
++    std::vector<std::unique_ptr<FirmwareWorld_t>> firmware_worlds;
++
++    for(/)
++}
++
+ void PhysicsSimulator::setWorld(const World& world)
+ {
+     physics_field = std::make_unique<PhysicsField>(physics_world, world.field());
+     physics_ball  = std::make_unique<PhysicsBall>(physics_world, world.ball());
++    friendly_physics_robots.clear();
++    for(const auto& friendly_robot : world.friendlyTeam().getAllRobots()) {
++        friendly_physics_robots.emplace_back(std::make_unique<PhysicsRobot>(physics_world, friendly_robot));
++    }
++    enemy_physics_robots.clear();
++    for(const auto& enemy_robot : world.friendlyTeam().getAllRobots()) {
++        enemy_physics_robots.emplace_back(std::make_unique<PhysicsRobot>(physics_world, enemy_robot));
++    }
+     physics_world_timestamp = world.getMostRecentTimestamp();
+ }
+diff --git a/src/software/backend/simulation/physics/physics_simulator.h b/src/software/backend/simulation/physics/physics_simulator.h
+index 4d0b6813..a128e45a 100644
+--- a/src/software/backend/simulation/physics/physics_simulator.h
++++ b/src/software/backend/simulation/physics/physics_simulator.h
+@@ -4,8 +4,10 @@
+ 
+ #include "software/backend/simulation/physics/physics_ball.h"
+ #include "software/backend/simulation/physics/physics_field.h"
++#include "software/backend/simulation/physics/physics_robot.h"
+ #include "software/util/time/duration.h"
+ #include "software/util/time/timestamp.h"
++#include "firmware/main/app/world/firmware_world.h"
+ #include "software/world/world.h"
+ 
+ /**
+@@ -49,14 +51,24 @@ class PhysicsSimulator
+     PhysicsSimulator(const PhysicsSimulator&)            = delete;
+ 
+     /**
+-     * Advances the physics simulation by the given time step, and returns the new state
+-     * of the world
++     * Advances the physics simulation by the given time step
+      *
+      * @param time_step How much to advance the simulation by
++     */
++    void stepSimulation(const Duration& time_step);
++
++    /**
++     * Returns the current state of the world
++     * @return the current state of the world
++     */
++    World getWorld() const;
++
++    /**
++     * Returns a FirmwareWorld for each robot in the simulation
+      *
+-     * @return The new state of the world after simulating the time step
++     * @return a vector of FirmwareWorlds, with one FirmwareWorld for each robot in the simulation
+      */
+-    World stepSimulation(const Duration& time_step);
++    std::vector<std::unique_ptr<FirmwareWorld_t>> getFirmwareWorldForEachRobot() const;
+ 
+    private:
+     /**
+@@ -79,4 +91,6 @@ class PhysicsSimulator
+     // Our abstractions of objects in the physics world
+     std::unique_ptr<PhysicsBall> physics_ball;
+     std::unique_ptr<PhysicsField> physics_field;
++    std::vector<std::unique_ptr<PhysicsRobot>> friendly_physics_robots;
++    std::vector<std::unique_ptr<PhysicsRobot>> enemy_physics_robots;
+ };
+diff --git a/src/software/backend/simulation/simulation_firmware_robot.cpp b/src/software/backend/simulation/simulation_firmware_robot.cpp
+new file mode 100644
+index 00000000..9bc618de
+--- /dev/null
++++ b/src/software/backend/simulation/simulation_firmware_robot.cpp
+@@ -0,0 +1,5 @@
++//
++// Created by mathew on 2020-01-09.
++//
++
++#include "simulation_firmware_robot.h"
+diff --git a/src/software/backend/simulation/simulation_firmware_robot.h b/src/software/backend/simulation/simulation_firmware_robot.h
+new file mode 100644
+index 00000000..d24ef6e5
+--- /dev/null
++++ b/src/software/backend/simulation/simulation_firmware_robot.h
+@@ -0,0 +1,11 @@
++#pragma once
++
++#include <iostream>
++
++class SimulationFirmwareRobot {
++public:
++    void kick(float speed_m_per_s) {
++        std::cout << "kicking" << std::endl;
++    }
++};
++
+diff --git a/src/software/backend/simulation/simulation_firmware_robot_test.cpp b/src/software/backend/simulation/simulation_firmware_robot_test.cpp
+new file mode 100644
+index 00000000..21926951
+--- /dev/null
++++ b/src/software/backend/simulation/simulation_firmware_robot_test.cpp
+@@ -0,0 +1,94 @@
++#include "software/backend/simulation/physics/physics_robot.h"
++
++#include <Box2D/Box2D.h>
++#include <gtest/gtest.h>
++
++#include "shared/constants.h"
++#include "software/backend/simulation/physics/physics_ball.h"
++#include "software/test_util/test_util.h"
++#include "software/world/robot.h"
++
++class SimulatedRobotKickingSpeedTest
++        : public ::testing::TestWithParam<std::tuple<double, double>>
++{
++};
++TEST_P(SimulatedRobotKickingSpeedTest, test_shot_towards_enemy_net)
++{
++    double initial_ball_speed_towards_robot = std::get<2>(GetParam());
++    double expected_final_speed = std::get<3>(GetParam());
++
++    b2Vec2 gravity(0, 0);
++    auto world = std::make_shared<b2World>(gravity);
++
++    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
++                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
++    PhysicsRobot physics_robot(world, robot_parameter);
++    auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(3.3));
++
++    // The ball is right next to the robot's chicker
++    Ball ball_parameter(
++            Point(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS, 0),
++            Vector(0, 0), Timestamp::fromSeconds(0));
++    auto physics_ball = PhysicsBall(world, ball_parameter);
++
++    // Get ffirmware robot
++    // kick with low speed
++
++
++    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
++    // Check final speed is within 1mm/s of target, since some precision can be
++    // lost in simulationt
++    EXPECT_NEAR(ball.velocity().len(), expected_final_speed, 0.001);
++}
++// Since the exact direction for one time shots is highly variable and depends a lot on
++// physical tests, we check the exact angles, but we can at least test that they're in
++// the right range
++INSTANTIATE_TEST_CASE_P(
++        All, OneTimeShotDirectionTest,
++        ::testing::Values(
++                // Robot at the origin, ball coming at it from different directions
++                std::make_tuple<Point, Point, double, double>({0, 0}, {1, 1}, 1, 20),
++                std::make_tuple<Point, Point, double, double>({0, 0}, {3, 1}, 1, 20),
++                std::make_tuple<Point, Point, double, double>({0, 0}, {3, -1}, -20, -1),
++                std::make_tuple<Point, Point, double, double>({0, 0}, {1, -1}, -20, -1),
++                std::make_tuple<Point, Point, double, double>({0, 0}, {0, 1}, 1, 40),
++                std::make_tuple<Point, Point, double, double>({0, 0}, {0, -1}, -40, -1),
++                // Corner kicks, robot is roughly in the opposite corner of the goal crease to
++                // where the corner kick is coming from
++                std::make_tuple<Point, Point, double, double>({3, 1}, {4.5, -3}, -45, -5),
++                std::make_tuple<Point, Point, double, double>({3, -1}, {4.5, 3}, 5, 45),
++                // Corner kicks, robot is roughly in the same corner of the goal crease to
++                // where the corner kick is coming from
++                std::make_tuple<Point, Point, double, double>({3, -1}, {4.5, -3}, 0, 45),
++                std::make_tuple<Point, Point, double, double>({3, 1}, {4.5, 3}, -45, 0),
++                // Corner kick, robot is close to the goal and directly in front of it
++                std::make_tuple<Point, Point, double, double>({4, 0}, {4.5, -3}, -45, -1)));
++
++
++
++// MAKE THIS PARAMETERIZED
++TEST(PhysicsRobotTest, test_robot_kick_slow_speed)
++{
++    b2Vec2 gravity(0, 0);
++    auto world = std::make_shared<b2World>(gravity);
++
++    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
++                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
++    PhysicsRobot physics_robot(world, robot_parameter);
++    auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(3.3));
++
++    // The ball is right next to the robot's chicker
++    Ball ball_parameter(
++            Point(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS, 0),
++            Vector(0, 0), Timestamp::fromSeconds(0));
++    auto physics_ball = PhysicsBall(world, ball_parameter);
++
++    // Get ffirmware robot
++    // kick with low speed
++
++
++    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
++    EXPECT_EQ(ball.velocity(), Vector(1, 0));
++}
++
++
+diff --git a/src/software/backend/simulation/static_robot_test_main.cpp b/src/software/backend/simulation/static_robot_test_main.cpp
+new file mode 100644
+index 00000000..943c8251
+--- /dev/null
++++ b/src/software/backend/simulation/static_robot_test_main.cpp
+@@ -0,0 +1,178 @@
++// VERY IMPORTANT http://p-nand-q.com/programming/cplusplus/using_member_functions_with_c_function_pointers.html
++#include <algorithm>
++#include <stdexcept>
++#include <vector>
++#include <iostream>
++#include <string>
++extern "C" {
++#include "app/world/chicker.h"
++}
++
++
++//class SimulationFirmwareRobot {
++//public:
++//    explicit SimulationFirmwareRobot(float kick_speed_m_s) : kick_speed_m_s(kick_speed_m_s) {}
++//
++//    void kick() {
++//        std::cout << "kicking at " << kick_speed_m_s << " m/s" << std::endl;
++//    }
++//private:
++//    float kick_speed_m_s;
++//};
++
++
++
++//class RobotBase {
++//public:
++//    RobotBase() : foo(3) {}
++//    void kick() {
++//        std::cout << "kicking with " << foo << std::endl;
++//    }
++//
++//private:
++//    int foo;
++//};
++//
++//class RobotFactory {
++//public:
++//    RobotBase *createRobot();
++//    struct RobotTableEntry {
++//        RobotBase *robot;
++//        bool in_use;
++//    };
++//    template <long robot_index> RobotBase *initRobot();
++//    template <long robot_index> RobotTableEntry createTableEntry();
++//};
++//
++//template <long index> class Robot : public RobotBase {
++//public:
++//    static int getRobotIndex() { return index; }
++//protected:
++//    Robot() {}
++//private:
++//    template <long asd> friend RobotBase *RobotFactory::initRobot();
++//};
++//
++//template <long robot_index> RobotBase *RobotFactory::initRobot() {
++//    return new Robot<robot_index>();
++//}
++//
++//template <long robot_index>
++//RobotFactory::RobotTableEntry RobotFactory::createTableEntry() {
++//    return RobotTableEntry{
++//            .robot = initRobot<robot_index>(),
++//            .in_use = false,
++//    };
++//}
++//RobotBase *RobotFactory::createRobot() {
++//    // TODO: We might be able to  template `RobotFactory` on the size of this list
++//    // and generate it
++//    static std::vector<RobotTableEntry> robots = {
++//            createTableEntry<0>(),
++//            createTableEntry<1>()
++//    };
++//    static std::vector<bool> robot_usage(robots.size(), false);
++//    // Find an unused robot
++//    auto iter = std::find_if(robots.begin(), robots.end(), [](RobotTableEntry table_entry){
++//        return table_entry.in_use == false;
++//    });
++//    if (iter == robots.end()){
++//        // We've already given out all the robots
++//        throw std::out_of_range("No robots left in static table");
++//    }
++//    iter->in_use = true;
++//    return iter->robot;
++//}
++//
++
++
++//int main(int argc, char **argv) {
++//    RobotFactory factory;
++//    RobotBase* robot = factory.createRobot();
++//    robot->kick();
++//
++//
++//    Chicker_t* firmware_chicker = app_chicker_create(
++//            &(robot->kick),
++//            &(robot->kick),
++//            &(robot->kick),
++//            &(robot->kick),
++//            &(robot->kick),
++//            &(robot->kick)
++//    );
++//
++//    return firmware_chicker;
++//}
++
++
++// MY STUFF ===================================================================================
++
++class RobotBase {
++public:
++    static void kick(float speed);
++
++};
++
++template<long ID>
++class Robot : public RobotBase{
++public:
++//    static std::string name = "";
++    Robot() = delete;
++    Robot(std::string name) {
++//        getName(name);
++        Robot<ID>::name = name;
++    }
++//    static std::string getName(std::string n = "noname") {
++//        static std::string name = "noname";
++//        if(n != "nonmame") {
++//            name = n;
++//        }
++//        return name;
++//    }
++//    static void create(std::string name) {
++//        Robot<ID>::name = name;
++//    };
++    static void kick(float speed) {
++        std::cout << "Robot ID " << ID << " name: " << name << " kicking with speed: " << speed << std::endl;
++    }
++    static std::string name;
++};
++template <long ID> std::string Robot<ID>::name = "nomame";
++
++template <long ID>
++class RobotFactory {
++public:
++
++};
++//std::string Robot::name = "no name";
++
++
++
++int main() {
++    auto func_no_args = [](){};
++    auto func_1_arg = [](float foo){};
++
++//    auto robot = Robot<0>::create("foo");
++    RobotBase* robot0 = new Robot<0>("mynameZERO");
++//    auto robot = Robot<0>("mynameZERO");
++//    auto robot1 = Robot<1>("mynameONE");
++//    auto factory = RobotFactory<0>();
++//    auto robot = factory.createRobot("");
++//    auto robot = RobotFactory<0>::createRobot("");
++//    auto
++
++
++    Chicker_t* firmware_chicker = app_chicker_create(
++            &(robot0->kick),
++//            func_1_arg,
++//            &(robot1.kick),
++            func_1_arg,
++            func_1_arg,
++            func_1_arg,
++            func_no_args,
++            func_no_args
++    );
++
++    app_chicker_kick(firmware_chicker, 5.0);
++    app_chicker_chip(firmware_chicker, 3.0);
++}
+diff --git a/src/software/backend/simulation/testmain.cpp b/src/software/backend/simulation/testmain.cpp
+new file mode 100644
+index 00000000..d0c6046b
+--- /dev/null
++++ b/src/software/backend/simulation/testmain.cpp
+@@ -0,0 +1,179 @@
++
++#include <boost/optional.hpp>
++#include <boost/bind.hpp>
++#include <iostream>
++#include <ostream>
++//using namespace std;
++//
++//template<unsigned ID,typename Functor>
++//boost::optional<Functor> &get_local()
++//{
++//    static boost::optional<Functor> local;
++//    return local;
++//}
++//
++//template<unsigned ID,typename Functor>
++//typename Functor::result_type wrapper()
++//{
++//    return get_local<ID,Functor>().get()();
++//}
++//
++//template<typename ReturnType>
++//struct Func
++//{
++//    typedef ReturnType (*type)();
++//};
++//
++//template<typename ReturnType>
++//struct Func1Arg
++//{
++//    typedef ReturnType (*type)(int arg);
++//};
++//
++//template<unsigned ID,typename Functor>
++//typename Func<typename Functor::result_type>::type get_wrapper(Functor f)
++//{
++//    (get_local<ID,Functor>()) = f;
++//    return wrapper<ID,Functor>;
++//}
++//
++//template<unsigned ID,typename Functor>
++//typename Func1Arg<typename Functor::result_type>::type get_wrapper_1_arg(Functor f)
++//{
++//    (get_local<ID,Functor>()) = f;
++//    return wrapper<ID,Functor>;
++//}
++//
++//// ----------------------------------------------------------------------
++//
++//void test(void (*fptr)())
++//{
++//    fptr();
++//}
++//
++//
++//
++//struct SomeStruct
++//{
++//    void some_method()
++//    {
++//        cout << data << endl;
++//    }
++//    void another_method()
++//    {
++//        cout << -data << endl;
++//    }
++//    int my_method() {
++//        return data;
++//    }
++//    int my_method_with_args(int arg) {
++//        return arg;
++//    }
++//    void my_fun_method() {
++//        auto foo = get_wrapper<0>(  boost::bind(&SomeStruct::my_method, this) );
++//        auto result = foo();
++//        std::cout << result << std::endl;
++//    }
++//
++//    void my_fun_method_with_args(int arg) {
++////        auto foo = get_wrapper<0>(  boost::bind(&SomeStruct::my_method_with_args, this, _1) );
++////        auto result = foo();
++//        std::cout << arg << std::endl;
++//    }
++//    int data;
++//};
++//
++////struct SomeStruct
++////{
++////    int my_method() {
++////        return 5;
++////    }
++////    int foo;
++////};
++//void exec(void (*kick)(int arg, void* user_data), void* ud) {
++//    kick(6, ud);
++//}
++//
++//int main()
++//{
++//    SomeStruct local[] = { {11}, {22}, {33} };
++////    SomeStruct local[] = { {}, {}, {} };
++//
++////    local[0].my_fun_method();
++////    local[1].my_fun_method_with_args(99);
++////    local[2].my_fun_method();
++//
++////    auto baz = boost::bind(&SomeStruct::my_fun_method_with_args ,local[0], _1);
++////    exec(baz);
++////    baz.
++////    baz(5);
++//    auto foo_no_args = get_wrapper<0>(  boost::bind(&SomeStruct::my_method,local[0]) );
++//    auto foo_one_args = get_wrapper_1_arg<1>(  boost::bind(&SomeStruct::my_fun_method_with_args,local[0], _1) );
++////    auto foo = get_wrapper<0>(  boost::bind(&SomeStruct::my_method) );
++////    auto result = foo();
++////    std::cout << result << std::endl;
++////    test(get_wrapper<0>(  boost::bind(&SomeStruct::some_method,local[0]) ));
++////    test(get_wrapper<1>(  boost::bind(&SomeStruct::another_method,local[0]) ));
++////
++////    test(get_wrapper<2>(  boost::bind(&SomeStruct::some_method,local[1]) ));
++////    test(get_wrapper<3>(  boost::bind(&SomeStruct::another_method,local[1]) ));
++////
++////    test(get_wrapper<4>(  boost::bind(&SomeStruct::some_method,local[2]) ));
++////    test(get_wrapper<5>(  boost::bind(&SomeStruct::another_method,local[2]) ));
++//}
++
++
++
++struct Chicker_t {
++    void (*kick)(float speed_m_per_s, void* user_data);
++    void* ud;
++};
++
++Chicker_t* app_chicker_create(
++        void (*kick)(float speed_m_per_s, void* user_data),
++        void* ud) {
++    Chicker_t* new_chicker = new Chicker_t();//malloc(sizeof(Chicker_t));
++
++    new_chicker->kick = kick;
++    new_chicker->ud = ud;
++
++    return new_chicker;
++}
++
++void app_chicker_kick(Chicker_t* chicker, float speed_m_per_s) {
++    std::cout << "in app chicker kcick" << std::endl;
++    chicker->kick(speed_m_per_s, chicker->ud);
++}
++
++struct PhysicsRobot_t {
++    void kick(float arg) {
++        std::cout << "kicking in sim with: " << arg << std::endl;
++    }
++};
++
++int main() {
++    auto kick_function = [](float smps, void* user_data) {
++        std::cout << "in kick function given to chicker" << std::endl;
++//        std::function<void(float)>* kf = static_cast<std::function<void(float)>*>(user_datar;
++        std::function<void(float)>* kf_ptr = (std::function<void(float)>*)(user_data);
++        std::function<void(float)> kf = *kf_ptr;
++        std::cout << "about to call userdata" << std::endl;
++        kf(smps);
++//        (*kf)(smps);
++//        kf->target().;
++//        std::cout << "kick : " << smps << std::endl;
++    };
++
++    PhysicsRobot_t* robot = new PhysicsRobot_t;
++
++    auto robot_kick = [&robot](float arg) {
++        std::cout << "in robot kcik lambda" << std::endl;
++        robot->kick(arg);
++    };
++    void* robot_kick_ptr = static_cast<void*>(&robot_kick);
++
++
++    Chicker_t* chicker = app_chicker_create(kick_function, robot_kick_ptr);
++    app_chicker_kick(chicker, 5.5);
++//    chicker->kick
++}

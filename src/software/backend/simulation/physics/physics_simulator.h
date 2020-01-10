@@ -1,9 +1,8 @@
 #pragma once
 
-#include <optional>
-
 #include "software/backend/simulation/physics/physics_ball.h"
 #include "software/backend/simulation/physics/physics_field.h"
+#include "software/backend/simulation/physics/physics_robot.h"
 #include "software/util/time/duration.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/world.h"
@@ -49,14 +48,21 @@ class PhysicsSimulator
     PhysicsSimulator(const PhysicsSimulator&)            = delete;
 
     /**
-     * Advances the physics simulation by the given time step, and returns the new state
-     * of the world
+     * Advances the physics simulation by the given time step
      *
      * @param time_step How much to advance the simulation by
-     *
-     * @return The new state of the world after simulating the time step
      */
-    World stepSimulation(const Duration& time_step);
+    void stepSimulation(const Duration& time_step);
+
+    /**
+     * Returns the current state of the world
+     *
+     * @return the current state of the world
+     */
+    World getWorld() const;
+
+    // TODO: Implement getSimulatorWorld (shared ptr)
+    std::vector<std::shared_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
 
    private:
     /**
@@ -79,4 +85,9 @@ class PhysicsSimulator
     // Our abstractions of objects in the physics world
     std::unique_ptr<PhysicsBall> physics_ball;
     std::unique_ptr<PhysicsField> physics_field;
+    std::vector<std::shared_ptr<PhysicsRobot>> friendly_physics_robots;
+    // Keep track of enemy physics robots as well, because although we don't
+    // necessarily control them with our firmware they can still be
+    // simulated to move given initial velocities
+    std::vector<std::shared_ptr<PhysicsRobot>> enemy_physics_robots;
 };
