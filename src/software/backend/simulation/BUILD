@@ -13,3 +13,14 @@ cc_library(
         "@box2d",
     ],
 )
+
+cc_library(
+    name = "simulator_ball",
+    srcs = ["simulator_ball.cpp"],
+    hdrs = ["simulator_ball.h"],
+    deps = [
+        "//firmware/main/app/world:firmware_ball",
+        "//software/backend/simulation/physics:physics_ball",
+        "@box2d",
+    ],
+)
