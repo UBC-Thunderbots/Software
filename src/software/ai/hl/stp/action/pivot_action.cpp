@@ -44,7 +44,8 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             // if the robot is close enough to the final position, call it a day
             Angle threshold_angle =
-                Angle::fromDegrees(Util::DynamicParameters->getAIConfig()->getPivotActionConfig()
+                Angle::fromDegrees(Util::DynamicParameters->getAIConfig()
+                                       ->getPivotActionConfig()
                                        ->FinishAngleThreshold()
                                        ->value() /
                                    2);
