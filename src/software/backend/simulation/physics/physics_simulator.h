@@ -61,8 +61,18 @@ class PhysicsSimulator
      */
     World getWorld() const;
 
-    // TODO: Implement getSimulatorWorld (shared ptr)
-    std::vector<std::shared_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
+    // TODO: Implement std::weak_ptr<SimulatorWorld> getSimulatorWorld and replace this
+    /**
+     * Returns the PhysicsRobots being used in this simulator.
+     *
+     * We return weak pointers because this class owns the physics world the robots are a
+     * part of, and this world is not exposed. Therefore we can't give ownership of any
+     * members that are a part of the physics world otherwise the robots may exist longer
+     * than the physics world, and segfault when they are destroyed.
+     *
+     * @return the PhysicsRobots being used in this simulator
+     */
+    std::vector<std::weak_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
 
    private:
     /**

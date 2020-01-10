@@ -4,9 +4,18 @@
 #include "app/world/dribbler.h"
 #include "app/world/wheel.h"
 
+std::optional<unsigned int> SimulatorRobot::robot_id = std::nullopt;
+std::vector<std::weak_ptr<PhysicsRobot>> SimulatorRobot::physics_robots = {};
+
 void SimulatorRobot::setRobotId(unsigned int id)
 {
-    SimulatorRobot::robot_id = id;
+    // TODO: you are here. Need to do final test of this class and fix ball
+    // trying to find dulpicate static members?
+    robot_id = std::make_optional<unsigned int>(id);
+}
+
+void SimulatorRobot::setPhysicsRobots(const std::vector<std::weak_ptr<PhysicsRobot>>& robots) {
+    physics_robots = robots;
 }
 
 FirmwareRobot_t* SimulatorRobot::createFirmwareRobot()
@@ -37,7 +46,14 @@ FirmwareRobot_t* SimulatorRobot::createFirmwareRobot()
     return firmware_robot;
 }
 
-float SimulatorRobot::getPositionX() {}
+float SimulatorRobot::getPositionX() {
+    // Temporary implementation for testing
+    auto robot = getCurrentPhysicsRobot();
+    if(auto robot_lock = robot.lock()) {
+        return static_cast<float>(robot_lock->getRobotId());
+    }
+    return 0.0;
+}
 
 float SimulatorRobot::getPositionY() {}
 
@@ -69,3 +85,23 @@ void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons) {}
 void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons) {}
 
 void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons) {}
+
+std::weak_ptr<PhysicsRobot> SimulatorRobot::getCurrentPhysicsRobot() {
+    if(!robot_id.has_value()) {
+        throw std::invalid_argument("Robot ID has no value");
+    }
+
+    unsigned int robot_id_value = *robot_id;
+    auto robot_id_comparator = [robot_id_value](std::weak_ptr<PhysicsRobot> robot_ptr) {
+        if(auto robot_ptr_lock = robot_ptr.lock()) {
+            return robot_ptr_lock->getRobotId() == robot_id_value;
+        }
+        return false;
+    };
+    auto physics_robot_iter = std::find_if(physics_robots.begin(), physics_robots.end(), robot_id_comparator);
+    if(physics_robot_iter == physics_robots.end()) {
+        throw std::invalid_argument("Robot ID not found in list of Physics Robots");
+    }
+
+    return *physics_robot_iter;
+}

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "app/world/firmware_ball.h"
 #include "software/backend/simulation/physics/physics_ball.h"
 

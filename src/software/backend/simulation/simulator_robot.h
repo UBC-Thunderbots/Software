@@ -1,4 +1,8 @@
+#pragma once
+
 #include <cinttypes>
+#include <optional>
+#include "software/backend/simulation/physics/physics_robot.h"
 extern "C" {
 #include "app/world/firmware_robot.h"
 }
@@ -6,6 +10,8 @@ extern "C" {
 /**
  * This class acts as a wrapper around a PhysicsRobot so that the PhysicsRobot
  * can provide the interface of a FirmwareRobot
+ *
+ * TODO more comments on C function pointers and static functions
  */
 class SimulatorRobot {
 public:
@@ -15,6 +21,13 @@ public:
      * @param id The ID of the robot to control
      */
     static void setRobotId(unsigned int id);
+
+    /**
+     * Sets the PhysicsRobots that can be controlled by this class
+     *
+     * @param robots the PhysicsRobots that can be controlled by this class
+     */
+    static void setPhysicsRobots(const std::vector<std::weak_ptr<PhysicsRobot>>& robots);
 
     /**
      * Creates a FirmwareRobot corresponding to the current PhysicsRobot
@@ -110,8 +123,19 @@ public:
     static void applyWheelForceBackRight(float force_in_newtons);
     static void applyWheelForceFrontRight(float force_in_newtons);
 
+    /**
+     * Returns the PhysicsRobot currently selected from the list of controllable
+     * physics_robots by the current robot_id
+     *
+     * @return the PhysicsRobot currently selected to be controlled
+     * @throws std::invalid_argument if the robot_id has not been set, or
+     * if no robot in the list of physics_robots has the current robot_id
+     */
+    static std::weak_ptr<PhysicsRobot> getCurrentPhysicsRobot();
+
 private:
     // The id of the robot currently being controlled by this class
-    static unsigned int robot_id;
+    static std::optional<unsigned int> robot_id;
+    // All the physics robots this class can control
+    static std::vector<std::weak_ptr<PhysicsRobot>> physics_robots;
 };
-unsigned int SimulatorRobot::robot_id = 0;

@@ -135,3 +135,7 @@ Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
         Robot(robot_id, position, velocity, orientation, angular_velocity, timestamp);
     return robot;
 }
+
+RobotId PhysicsRobot::getRobotId() const {
+    return robot_id;
+}

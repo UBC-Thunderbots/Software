@@ -9,7 +9,7 @@ cc_library(
         "//firmware/main/app/world:dribbler",
         "//firmware/main/app/world:firmware_robot",
         "//firmware/main/app/world:wheel",
-        "//software/backend/simulation/physics:physics_simulator",
+        "//software/backend/simulation/physics:physics_robot",
         "@box2d",
     ],
 )
@@ -19,6 +19,7 @@ cc_test(
     srcs = ["simulator_robot_test.cpp"],
     deps = [
         ":simulator_robot",
+        "//firmware/main/app/world:firmware_robot",
         "//software/backend/simulation/physics:physics_robot",
         "//software/backend/simulation/physics:physics_simulator",
         "//software/test_util",

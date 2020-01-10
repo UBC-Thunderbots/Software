@@ -48,8 +48,12 @@ World PhysicsSimulator::getWorld() const {
     return new_world;
 }
 
-std::vector<std::shared_ptr<PhysicsRobot>> PhysicsSimulator::getFriendlyPhysicsRobots() const {
-    return friendly_physics_robots;
+std::vector<std::weak_ptr<PhysicsRobot>> PhysicsSimulator::getFriendlyPhysicsRobots() const {
+    std::vector<std::weak_ptr<PhysicsRobot>> robots;
+    for(const auto& friendly_physics_robot : friendly_physics_robots) {
+        robots.emplace_back(friendly_physics_robot);
+    }
+    return robots;
 }
 
 void PhysicsSimulator::setWorld(const World& world)
