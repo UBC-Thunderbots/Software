@@ -3,15 +3,26 @@
 #include <cinttypes>
 #include <optional>
 #include "software/backend/simulation/physics/physics_robot.h"
-extern "C" {
+extern "C"
+{
 #include "app/world/firmware_robot.h"
 }
 
 /**
  * This class acts as a wrapper around a PhysicsRobot so that the PhysicsRobot
- * can provide the interface of a FirmwareRobot
+ * can provide the interface of a FirmwareRobot.
  *
- * TODO more comments on C function pointers and static functions
+ * Because our firmware structs rely on C-style function pointers, we
+ * cannot use C++ constructs like std::function to provide to the structs.
+ * Therefore we use this class's static functions to provide the function
+ * pointers, since static functions work as C-style function pointers
+ * (because there is no instance associated with them).
+ *
+ * Whenever a caller needs to get a firmware struct or perform an operation, they
+ * need to set which robot they want to control so that all the static functions
+ * that have been provided to the firmware struct operate on the correct
+ * instantiated object. This is our workaround to maintain and simulate multiple
+ * "instances" of robot firmware at once.
  */
 class SimulatorRobot {
 public:
@@ -123,17 +134,17 @@ public:
     static void applyWheelForceBackRight(float force_in_newtons);
     static void applyWheelForceFrontRight(float force_in_newtons);
 
+private:
     /**
      * Returns the PhysicsRobot currently selected from the list of controllable
      * physics_robots by the current robot_id
      *
-     * @return the PhysicsRobot currently selected to be controlled
-     * @throws std::invalid_argument if the robot_id has not been set, or
-     * if no robot in the list of physics_robots has the current robot_id
+     * @return the PhysicsRobot currently selected to be controlled. Returns an empty
+     * weak_ptr if the robot_id is not set, or a physics robot with a matching ID
+     * cannot be found.
      */
     static std::weak_ptr<PhysicsRobot> getCurrentPhysicsRobot();
 
-private:
     // The id of the robot currently being controlled by this class
     static std::optional<unsigned int> robot_id;
     // All the physics robots this class can control

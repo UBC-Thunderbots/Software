@@ -9,8 +9,6 @@ std::vector<std::weak_ptr<PhysicsRobot>> SimulatorRobot::physics_robots = {};
 
 void SimulatorRobot::setRobotId(unsigned int id)
 {
-    // TODO: you are here. Need to do final test of this class and fix ball
-    // trying to find dulpicate static members?
     robot_id = std::make_optional<unsigned int>(id);
 }
 
@@ -48,28 +46,59 @@ FirmwareRobot_t* SimulatorRobot::createFirmwareRobot()
 
 float SimulatorRobot::getPositionX() {
     // Temporary implementation for testing
-    auto robot = getCurrentPhysicsRobot();
-    if(auto robot_lock = robot.lock()) {
-        return static_cast<float>(robot_lock->getRobotId());
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        return static_cast<float>(robot->getRobotId());
     }
     return 0.0;
 }
 
-float SimulatorRobot::getPositionY() {}
+float SimulatorRobot::getPositionY() {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::kick(float speed_m_per_s) {}
+void SimulatorRobot::kick(float speed_m_per_s) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::chip(float distance_m) {}
+void SimulatorRobot::chip(float distance_m) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::enableAutokick(float speed_m_per_s) {}
+void SimulatorRobot::enableAutokick(float speed_m_per_s) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::enableAutochip(float distance_m) {}
+void SimulatorRobot::enableAutochip(float distance_m) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::disableAutokick() {}
+void SimulatorRobot::disableAutokick() {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::disableAutochip() {}
+void SimulatorRobot::disableAutochip() {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::setDribblerSpeed(uint32_t rpm) {}
+void SimulatorRobot::setDribblerSpeed(uint32_t rpm) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
 unsigned int SimulatorRobot::getDribblerTemperatureDegC()
 {
@@ -78,17 +107,33 @@ unsigned int SimulatorRobot::getDribblerTemperatureDegC()
     return 25;
 }
 
-void SimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons) {}
+void SimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons) {}
+void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons) {}
+void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
-void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons) {}
+void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons) {
+    if(auto robot = getCurrentPhysicsRobot().lock()) {
+        // TODO: Implement me
+    }
+}
 
 std::weak_ptr<PhysicsRobot> SimulatorRobot::getCurrentPhysicsRobot() {
     if(!robot_id.has_value()) {
-        throw std::invalid_argument("Robot ID has no value");
+        return std::weak_ptr<PhysicsRobot>();
     }
 
     unsigned int robot_id_value = *robot_id;
@@ -100,7 +145,7 @@ std::weak_ptr<PhysicsRobot> SimulatorRobot::getCurrentPhysicsRobot() {
     };
     auto physics_robot_iter = std::find_if(physics_robots.begin(), physics_robots.end(), robot_id_comparator);
     if(physics_robot_iter == physics_robots.end()) {
-        throw std::invalid_argument("Robot ID not found in list of Physics Robots");
+        return std::weak_ptr<PhysicsRobot>();
     }
 
     return *physics_robot_iter;

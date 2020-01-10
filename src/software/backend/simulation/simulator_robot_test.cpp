@@ -11,9 +11,10 @@
 #include "software/backend/simulation/physics/physics_simulator.h"
 #include "app/world/firmware_robot.h"
 
-// Roll the ball along the left side of the robot just inside of the robot radius
-// and check it does collide
-TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_inside_radius)
+// This is a temporary tests to validate that the SimulatorRobot works as expected
+// when binding and switching robots behind the scenes. It will be replaced with a
+// better test once its functions are implemented properly
+TEST(PhysicsRobotTest, test_simulator_robot_manages_multiple_robots_correctly)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world = ::Test::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 2)}, Timestamp::fromSeconds(0));

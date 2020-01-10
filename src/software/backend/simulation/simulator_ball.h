@@ -1,11 +1,26 @@
 #pragma once
 
+extern "C"
+{
 #include "app/world/firmware_ball.h"
+}
 #include "software/backend/simulation/physics/physics_ball.h"
 
 /**
  * This class acts as a wrapper around a PhysicsBall so that the PhysicsBall
  * can provide the interface of a FirmwareBall
+ *
+ * Because our firmware structs rely on C-style function pointers, we
+ * cannot use C++ constructs like std::function to provide to the structs.
+ * Therefore we use this class's static functions to provide the function
+ * pointers, since static functions work as C-style function pointers
+ * (because there is no instance associated with them).
+ *
+ * Whenever a caller needs to get a firmware struct or perform an operation, they
+ * need to set which ball they want to control so that all the static functions
+ * that have been provided to the firmware struct operate on the correct
+ * instantiated object. This is our workaround to maintain and simulate multiple
+ * "instances" of firmware at once.
  */
 class SimulatorBall {
 public:
@@ -14,7 +29,7 @@ public:
      *
      * @param ball The PhysicsBall to control by this class. Must not be null
      */
-    void setPhysicsBall(std::shared_ptr<PhysicsBall> ball);
+    static void setPhysicsBall(std::weak_ptr<PhysicsBall> ball);
 
     /**
      * Creates a FirmwareBall corresponding to the current PhysicsBall
@@ -52,12 +67,6 @@ public:
     static float getBallVelocityY();
 
 private:
-    /**
-     * Checks that the current physics_ball is a valid value
-     *
-     * @throws std::invalid_argument if the physics_ball is a nullptr
-     */
-    void checkPhysicsBallValid();
-
-    static std::shared_ptr<PhysicsBall> physics_ball;
+    // The physics ball being controlled by this class
+    static std::weak_ptr<PhysicsBall> physics_ball_weak_ptr;
 };

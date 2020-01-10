@@ -1,15 +1,14 @@
 #include "software/backend/simulation/simulator_ball.h"
 
-void SimulatorBall::setPhysicsBall(std::shared_ptr<PhysicsBall> ball)
+std::weak_ptr<PhysicsBall> SimulatorBall::physics_ball_weak_ptr = std::weak_ptr<PhysicsBall>();
+
+void SimulatorBall::setPhysicsBall(std::weak_ptr<PhysicsBall> ball)
 {
-    physics_ball = ball;
-    checkPhysicsBallValid();
+    physics_ball_weak_ptr = ball;
 }
 
 FirmwareBall_t* SimulatorBall::createFirmwareBall()
 {
-    checkPhysicsBallValid();
-
     FirmwareBall_t* firmware_ball = app_firmware_ball_create(
         &(SimulatorBall::getBallPositionX), &(SimulatorBall::getBallPositionY),
         &(SimulatorBall::getBallVelocityX), &(SimulatorBall::getBallVelocityY));
@@ -17,17 +16,26 @@ FirmwareBall_t* SimulatorBall::createFirmwareBall()
     return firmware_ball;
 }
 
-float SimulatorBall::getBallPositionX() {}
+float SimulatorBall::getBallPositionX() {
+    if(auto physics_ball = physics_ball_weak_ptr.lock()) {
+        // TODO: implement me
+    }
+}
 
-float SimulatorBall::getBallPositionY() {}
+float SimulatorBall::getBallPositionY() {
+    if(auto physics_ball = physics_ball_weak_ptr.lock()) {
+        // TODO: implement me
+    }
+}
 
-float SimulatorBall::getBallVelocityX() {}
+float SimulatorBall::getBallVelocityX() {
+    if(auto physics_ball = physics_ball_weak_ptr.lock()) {
+        // TODO: implement me
+    }
+}
 
-float SimulatorBall::getBallVelocityY() {}
-
-void SimulatorBall::checkPhysicsBallValid() {
-    if (!physics_ball)
-    {
-        throw std::invalid_argument("PhysicsBall is a nullptr");
+float SimulatorBall::getBallVelocityY() {
+    if(auto physics_ball = physics_ball_weak_ptr.lock()) {
+        // TODO: implement me
     }
 }
