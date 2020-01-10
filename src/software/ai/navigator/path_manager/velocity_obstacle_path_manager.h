@@ -1,6 +1,6 @@
 #pragma once
-#include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 /**
@@ -16,8 +16,7 @@ class VelocityObstaclePathManager : public PathManager
         const Rectangle& navigable_area) override;
 
     explicit VelocityObstaclePathManager(
-        std::unique_ptr<PathPlanner> path_planner,
-        ObstacleFactory obstacle_factory,
+        std::unique_ptr<PathPlanner> path_planner, ObstacleFactory obstacle_factory,
         std::shared_ptr<const VelocityObstaclePathManagerConfig> config);
 
    private:

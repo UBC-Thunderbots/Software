@@ -31,7 +31,8 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
         findOpenTriangles(allTriangles, all_enemy_positions);
 
     Rectangle target_area_rectangle =
-        findBestChipTargetArea(world, Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
+        findBestChipTargetArea(world, Util::DynamicParameters->getAIConfig()
+                                          ->getEvaluationConfig()
                                           ->getIndirectChipConfig()
                                           ->ChipTargetAreaInset()
                                           ->value());
@@ -54,11 +55,13 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
         // minimum edge length of chip target triangle
         std::optional<LegacyTriangle> largest_triangle =
             getLargestValidTriangle(triangles,
-                                    Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
+                                    Util::DynamicParameters->getAIConfig()
+                                        ->getEvaluationConfig()
                                         ->getIndirectChipConfig()
                                         ->MinChipTriArea()
                                         ->value(),
-                                    Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
+                                    Util::DynamicParameters->getAIConfig()
+                                        ->getEvaluationConfig()
                                         ->getIndirectChipConfig()
                                         ->MinChipTriEdgeLen()
                                         ->value());
@@ -67,26 +70,26 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
         Point target = getTriangleCenter(t);
         // Adjust the target point to have a length of distance between itself and the
         // ball's position, then scaling it by a certain percentage
-        target = Point(
-            target.toVector().normalize((target - ball_position).length() *
-                                        Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
-                                            ->getIndirectChipConfig()
-                                            ->ChipCherryPowerDownscale()
-                                            ->value()));
+        target = Point(target.toVector().normalize((target - ball_position).length() *
+                                                   Util::DynamicParameters->getAIConfig()
+                                                       ->getEvaluationConfig()
+                                                       ->getIndirectChipConfig()
+                                                       ->ChipCherryPowerDownscale()
+                                                       ->value()));
 
         // Target should never be further away than maximum chip power
-        if ((target - ball_position).length() >
-            Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
-                ->getIndirectChipConfig()
-                ->MaxChipPower()
-                ->value())
+        if ((target - ball_position).length() > Util::DynamicParameters->getAIConfig()
+                                                    ->getEvaluationConfig()
+                                                    ->getIndirectChipConfig()
+                                                    ->MaxChipPower()
+                                                    ->value())
         {
-            target = ball_position +
-                     (target - ball_position)
-                         .normalize(Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
-                                        ->getIndirectChipConfig()
-                                        ->MaxChipPower()
-                                        ->value());
+            target = ball_position + (target - ball_position)
+                                         .normalize(Util::DynamicParameters->getAIConfig()
+                                                        ->getEvaluationConfig()
+                                                        ->getIndirectChipConfig()
+                                                        ->MaxChipPower()
+                                                        ->value());
         }
 
         return std::optional(target);

@@ -97,10 +97,10 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
         if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-            ball.velocity().length() <
-                Util::DynamicParameters->getAIConfig()->getDefenseShadowEnemyTacticConfig()
-                    ->BallStealSpeed()
-                    ->value())
+            ball.velocity().length() < Util::DynamicParameters->getAIConfig()
+                                           ->getDefenseShadowEnemyTacticConfig()
+                                           ->BallStealSpeed()
+                                           ->value())
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),

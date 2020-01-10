@@ -58,13 +58,13 @@ namespace Evaluation
             unsigned i = 0;
 
             // Check that the robot has had possession of the ball recently.
-            while (
-                i < robot_history_timestamps.size() &&
-                robot.lastUpdateTimestamp() - robot_history_timestamps[i] <=
-                    Duration::fromSeconds(Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
-                                              ->getPossessionConfig()
-                                              ->PossessionBufferTimeSeconds()
-                                              ->value()))
+            while (i < robot_history_timestamps.size() &&
+                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <=
+                       Duration::fromSeconds(Util::DynamicParameters->getAIConfig()
+                                                 ->getEvaluationConfig()
+                                                 ->getPossessionConfig()
+                                                 ->PossessionBufferTimeSeconds()
+                                                 ->value()))
             {
                 std::optional<bool> robot_has_possession =
                     robotHasPossession(world.ball(), robot, robot_history_timestamps[i]);
@@ -87,7 +87,8 @@ namespace Evaluation
 
             // Check that the robot has had possession of the ball recently.
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                   Duration::fromSeconds(Util::DynamicParameters->getAIConfig()->getEvaluationConfig()
+                   Duration::fromSeconds(Util::DynamicParameters->getAIConfig()
+                                             ->getEvaluationConfig()
                                              ->getPossessionConfig()
                                              ->PassBufferTimeSeconds()
                                              ->value()))
