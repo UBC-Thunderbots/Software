@@ -578,6 +578,23 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments);
 
 /**
+ * Function takes in a Vector of Segments and will combine their projections onto the direction Vector into the fewest
+ * Segment sections that are independent of each other.
+ *
+ * Ex.
+ *  Input:  *--------*       *--------*
+ *                *------*
+ *  Output: *------------*   *--------*
+ *
+ * @param segments : The vector of Segments to be reduced
+ * @param direction : The direction that all input vectors will be projected onto
+ *
+ * @return std::vector<Segment>: The vector of the fewest
+ * independent Segments
+ */
+std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Vector direction);
+
+/**
  * Returns the binary trespass score of a point and rectangle
  *
  * @param point The point to check for trespassing

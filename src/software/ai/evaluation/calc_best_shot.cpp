@@ -200,7 +200,7 @@ namespace Evaluation
         if (obstacle_segment_projections.size() >= 2)
         {
             obstacle_segment_projections =
-                reduceParallelSegments(obstacle_segment_projections);
+                combineToParallelSegments(obstacle_segment_projections, obstacle_segment_projections.front().toVector());
         }
         // Make sure the starting point of all segments is closer to the start of the
         // reference segment to simplify the evaluation

@@ -1116,6 +1116,57 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
     }
 }
 
+std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Vector direction)
+{
+
+    if (segments.size() <= 1)
+    {
+        // If there is only 1 segments, it is unique and should be returned
+        return segments;
+    }
+
+    std::vector<Segment> projected_segments = {};
+    // The projection of the Segment without including the original Segment location
+    Vector raw_projection = Vector(0,0);
+
+    // Project all Segments onto the direction Vector
+    for (Segment segment : segments)
+    {
+        raw_projection = segment.toVector().project(direction);
+
+        projected_segments.push_back( Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));
+    }
+    std::vector<Segment> unique_segments;
+
+    unsigned int j = 0;
+    // Loop through all segments and combine segments
+    // to reduce the vector to the smallest number of independent (not overlapping)
+    // segments
+    while (projected_segments.size() > 0)
+    {
+        std::optional<Segment> temp_segment;
+        unique_segments.push_back(projected_segments[0]);
+        projected_segments.erase(projected_segments.begin());
+
+        for (unsigned int i = 0; i < projected_segments.size(); i++)
+        {
+            temp_segment =
+            mergeOverlappingParallelSegments(unique_segments[j], projected_segments[i]);
+
+            if (temp_segment.has_value())
+            {
+                unique_segments[j] = temp_segment.value();
+                // Remove segments[i] from the list as it is not unique
+                projected_segments.erase(projected_segments.begin() + i);
+                i--;
+            }
+        }
+        j++;
+    }
+
+    return unique_segments;
+}
+
 std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments)
 {
     if (segments.size() == 0)
