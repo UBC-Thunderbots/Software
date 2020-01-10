@@ -130,7 +130,6 @@ AIConfig:
       type: "double"
       description: "TODO: Add description as part of #149"
 
-  # TODO: The "config" suffix at the end of each config is really redundant
   NavigatorConfig:
     TransitionSpeedFactor:
       min: 0
