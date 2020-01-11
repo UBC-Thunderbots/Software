@@ -30,6 +30,8 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+// global proto msg that will be updated to the most recent msg sent
+/*control_msg control = control_msg_init_zero;*/
 /* Private function prototypes -----------------------------------------------*/
 void udp_echoserver_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port);
 
@@ -85,6 +87,15 @@ void udp_echoserver_receive_callback(void *arg, struct udp_pcb *upcb, struct pbu
   if(p_tx != NULL)
   {
     pbuf_take(p_tx, (char*)p->payload, p->len);
+
+    // Create a stream that reads from the buffer
+    /*pb_istream_t in_stream = pb_istream_from_buffer((char*)p->payload, p->len);*/
+
+    /*if (pb_decode(&in_stream, control_msg_fields, &control))*/
+    /*{*/
+        /*return 0;*/
+    /*}*/
+
     /* Connect to the remote client */
     udp_connect(upcb, addr, 42069);
     
