@@ -30,7 +30,7 @@ static void direct_velocity_start(const primitive_params_t* params,
 {
     direct_target_velocity_x       = params->params[0] / 1000.0f;
     direct_target_velocity_y       = params->params[1] / 1000.0f;
-    direct_target_velocity_angular = params->params[2] / 1000.0f;
+    direct_target_velocity_angular = params->params[2] / 100.0f;
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));

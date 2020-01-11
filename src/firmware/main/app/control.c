@@ -163,7 +163,7 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     limit(&linear_diff_y, jerk_limit * TICK_TIME);
     limit(&angular_diff, jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f);
 
-    iprintf("jerk_limit * TICK_TIME: %d \r \n", P(jerk_limit * TICK_TIME));
+    iprintf("jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f: %d \r \n", P(jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f));
 
     iprintf("limited Acceleration diffs: %d, %d, %d \r \n", P(linear_diff_x),
             P(linear_diff_y), P(angular_diff));
