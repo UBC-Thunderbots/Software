@@ -54,6 +54,8 @@ cc_library(
         "//software/ai/evaluation:robot",
         "//software/ai/intent:move_intent",
         "//software/geom",
+        "//software/new_geom/util:closest_point",
+        "//software/new_geom/util:distance",
         "//software/util/logger",
         "//software/world:ball",
         "//software/world:field",
