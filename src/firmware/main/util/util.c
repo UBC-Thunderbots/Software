@@ -89,13 +89,19 @@ void fabs_of_array(float array[], float abs_array[], unsigned size)
     }
 }
 
+
+#define P(x) (int)round(x * 1000)
+
 void limit(float *value, float limiting_value)
 {
+    iprintf("In limit: %d %d\r \n", P(*value), P(limiting_value));
     clamp(value, -limiting_value, limiting_value);
 }
 
+
 void clamp(float *value, float lower, float upper)
 {
+    iprintf("Value: %d, Upper: %d, Lower: %d \r \n",P(*value), P(upper), P(lower));
     if (*value > upper)
     {
         *value = upper;
@@ -104,6 +110,7 @@ void clamp(float *value, float lower, float upper)
     {
         *value = lower;
     }
+    iprintf("Value after: %d\r \n",P(*value));
 }
 
 float radians(float degrees)

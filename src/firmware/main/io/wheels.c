@@ -262,7 +262,7 @@ void wheels_tick(log_record_t *log)
  * @return The RPM of the wheel with the given index
  */
 float wheels_get_wheel_rpm(int wheel_index){
-    return encoder_speed(wheel_index)* QUARTERDEGREE_TO_RPM;
+    return (float)encoder_speed(wheel_index) * QUARTERDEGREE_TO_RPM;
 }
 
 float wheels_get_front_left_rpm(){

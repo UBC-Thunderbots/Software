@@ -3,7 +3,9 @@
 #include "physics/physics.h"
 //#include "util/util.h"
 
-#define P(x) (int)round(x*1000)
+#define P(x) (int)round(x * 1000)
+
+void limit(float *value, float limiting_value);
 
 
 /**
@@ -38,8 +40,12 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
 
         float volt = motor_torque * constants.motor_current_per_unit_torque *
                      constants.motor_phase_resistance;
-        float back_emf  = curr_motor_rpm * constants.motor_back_emf_per_rpm;
+        float back_emf = curr_motor_rpm * constants.motor_back_emf_per_rpm;
+        // iprintf("curr_motor_rpm: %d, back_emf_per_rpm: %d \r \n", P(curr_motor_rpm),
+        //                P(constants.motor_back_emf_per_rpm));
         float appl_volt = fabsf(volt + back_emf);
+
+        // iprintf("Volt: %d, back_emf: %d \r \n", P(volt), P(back_emf));
 
         float slip_ratio =
             constants.motor_max_delta_voltage_before_wheel_slip / fabsf(volt);
@@ -54,6 +60,18 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
     }
 
     float emf_ratio_min = battery_voltage / vapp_max;
+
+    // TODO: deleteme
+    // iprintf("Battery voltage: %d, vapp_max: %d \r \n", P(battery_voltage),
+    // P(vapp_max));
+    //    if (emf_ratio_min > slip_ratio_min)
+    //    {
+    //        iprintf("Limiting based on slip ratio of: %d \r \n", P(slip_ratio_min));
+    //    }
+    //    else
+    //    {
+    //        iprintf("Limiting based on emf ratio of: %d \r \n", P(emf_ratio_min));
+    //    }
 
     return (emf_ratio_min > slip_ratio_min) ? slip_ratio_min : emf_ratio_min;
 }
@@ -124,34 +142,42 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     }
 
     ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
-    float prev_linear_accel_x = controller_state->last_applied_acceleration_x;
-    float prev_linear_accel_y = controller_state->last_applied_acceleration_y;
+    float prev_linear_accel_x           = controller_state->last_applied_acceleration_x;
+    float prev_linear_accel_y           = controller_state->last_applied_acceleration_y;
     float prev_angular_accel = controller_state->last_applied_acceleration_angular;
 
-    iprintf("Previous Acceleration: %d, %d, %d \r \n", P(prev_linear_accel_x), P(prev_linear_accel_y), P(prev_angular_accel));
+    iprintf("Previous Acceleration: %d, %d, %d \r \n", P(prev_linear_accel_x),
+            P(prev_linear_accel_y), P(prev_angular_accel));
 
     float linear_diff_x = linear_accel_x - prev_linear_accel_x;
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
     float angular_diff  = angular_accel - prev_angular_accel;
 
-    iprintf("Acceleration diffs: %d, %d, %d \r \n", P(linear_diff_x), P(linear_diff_y), P(angular_diff));
+    iprintf("Acceleration diffs: %d, %d, %d \r \n", P(linear_diff_x), P(linear_diff_y),
+            P(angular_diff));
 
     const float jerk_limit = robot_constants.jerk_limit;
-    limit(&linear_diff_x, jerk_limit * TICK_TIME);
+    const float linear_jerk_limit = robot_constants.jerk_limit * TICK_TIME;
+    iprintf("Jerk limit: %d, TICK_TIME: %d, linear_jerk_limit: %d \r \n", P(robot_constants.jerk_limit), P(TICK_TIME), P(linear_jerk_limit));
+    limit(&linear_diff_x, linear_jerk_limit);
     limit(&linear_diff_y, jerk_limit * TICK_TIME);
     limit(&angular_diff, jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f);
 
-    iprintf("limited Acceleration diffs: %d, %d, %d \r \n", P(linear_diff_x), P(linear_diff_y), P(angular_diff));
+    iprintf("jerk_limit * TICK_TIME: %d \r \n", P(jerk_limit * TICK_TIME));
+
+    iprintf("limited Acceleration diffs: %d, %d, %d \r \n", P(linear_diff_x),
+            P(linear_diff_y), P(angular_diff));
 
     linear_accel_x = prev_linear_accel_x + linear_diff_x;
     linear_accel_y = prev_linear_accel_y + linear_diff_y;
     angular_accel  = prev_angular_accel + angular_diff;
 
-    iprintf("Jerk Limited Acceleration: %d, %d, %d\r \n", P(linear_accel_x), P(linear_accel_y), P(angular_accel));
+    iprintf("Jerk Limited Acceleration: %d, %d, %d\r \n", P(linear_accel_x),
+            P(linear_accel_y), P(angular_accel));
 
-    controller_state->last_applied_acceleration_x = prev_linear_accel_x;
-    controller_state->last_applied_acceleration_y = prev_linear_accel_y;
-    controller_state->last_applied_acceleration_angular = prev_angular_accel;
+    controller_state->last_applied_acceleration_x       = linear_accel_x;
+    controller_state->last_applied_acceleration_y       = linear_accel_y;
+    controller_state->last_applied_acceleration_angular = angular_accel;
 
     float robot_force[3];
     robot_force[0] = linear_accel_x * robot_constants.mass;
@@ -162,7 +188,8 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
 
-    iprintf("Wheel forces: %d, %d, %d, %d \r \n", P(wheel_force[0]), P(wheel_force[1]), P(wheel_force[2]), P(wheel_force[3]));
+    iprintf("Wheel forces: %d, %d, %d, %d \r \n", P(wheel_force[0]), P(wheel_force[1]),
+            P(wheel_force[2]), P(wheel_force[3]));
 
     app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot), wheel_force[0]);
     app_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot), wheel_force[3]);
@@ -193,7 +220,9 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * ACCELERATION_GAIN;
 
-    iprintf("Acceleration In Robot Coordinates: %d, %d, %d \r \n", P(current_acceleration[0]), P(current_acceleration[1]), P(angular_acceleration));
+    iprintf("Acceleration In Robot Coordinates: %d, %d, %d \r \n",
+            P(current_acceleration[0]), P(current_acceleration[1]),
+            P(angular_acceleration));
 
     app_control_applyAccel(robot, current_acceleration[0], current_acceleration[1],
                            angular_acceleration);

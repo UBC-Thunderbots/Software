@@ -48,6 +48,9 @@ FirmwareRobot_t* app_firmware_robot_create(
     new_robot->back_left_wheel            = back_left_wheel;
     new_robot->robot_constants            = robot_constants;
 
+    // TODO: pass this in
+    new_robot->controller_state = (ControllerState_t*)malloc(sizeof(ControllerState_t));
+
     new_robot->controller_state->last_applied_acceleration_x       = 0;
     new_robot->controller_state->last_applied_acceleration_y       = 0;
     new_robot->controller_state->last_applied_acceleration_angular = 0;

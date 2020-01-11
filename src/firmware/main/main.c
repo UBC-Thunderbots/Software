@@ -464,7 +464,7 @@ static void run_normal(void)
         .wheel_rotations_per_motor_rotation        = GEAR_RATIO,
         .wheel_radius                              = WHEEL_RADIUS,
         .motor_max_delta_voltage_before_wheel_slip = DELTA_VOLTAGE_LIMIT,
-        .motor_back_emf_per_rpm                    = 1.0 / RPM_TO_VOLT,
+        .motor_back_emf_per_rpm                    = RPM_TO_VOLT,
         .motor_phase_resistance                    = PHASE_RESISTANCE,
         .motor_current_per_unit_torque             = CURRENT_PER_TORQUE};
     Wheel_t* front_right_wheel = app_wheel_create(
