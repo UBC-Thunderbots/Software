@@ -52,7 +52,7 @@ class RobotCommunicator
      * @param sent_callback The callback to run when a msg has been sent
      * @param received_callback The callback to run when a msg has been received
      */
-    RobotCommunicator(const TransferMedium& medium,
+    RobotCommunicator(std::unique_ptr<TransferMedium> medium,
                       MsgSentCallback<SendProto> sent_callback,
                       MsgReceivedCallback<ReceiveProto> received_callback);
 
@@ -89,7 +89,7 @@ class RobotCommunicator
     std::mutex in_destructor_mutex;
 
     // medium to transfer data through
-    TransferMedium medium;
+    std::unique_ptr<TransferMedium> medium;
 
     // buffer that holds msgs to be sent
     std::shared_ptr<ThreadSafeBuffer<SendProto>> send_buffer;

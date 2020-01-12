@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 /*
  * A TransferMedium is an abstraction around the medium used to communicate
@@ -17,7 +18,10 @@ class TransferMedium
      *
      * @param data The data to be sent over the medium
      */
-    void send_data(const std::string& data){};
+    virtual void send_data(const std::string& data)
+    {
+        std::cout << "CALLING UNIMPLEMENTED FUNCTION" << std::endl;
+    }
 
     /*
      * Returns when a data packet has arrived through the medium
@@ -29,5 +33,8 @@ class TransferMedium
      *
      * @param func The function to call when data is received
      */
-    void receive_data(std::function<void(std::string)>){};
+    virtual void receive_data(std::function<void(std::string)>)
+    {
+        std::cout << "CALLING UNIMPLEMENTED FUNCTION" << std::endl;
+    }
 };

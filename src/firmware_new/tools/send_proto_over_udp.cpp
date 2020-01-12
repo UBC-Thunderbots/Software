@@ -28,14 +28,12 @@ int main(int argc, char *argv[])
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
 
-    // connect to the network medium
-    NetworkMedium medium("192.168.0.21", 42069);
-
     // create a RobotCommunicator with a NetworkMedium
-    RobotCommunicator<control_msg, robot_ack> communicator(medium, nullptr, nullptr);
+    RobotCommunicator<control_msg, robot_ack> communicator(
+        std::make_unique<NetworkMedium>("10.10.10.0", 42069), nullptr, nullptr);
 
-    // while (1)
-    communicator.send_proto(control_req);
+    while (1)
+        communicator.send_proto(control_req);
 
     google::protobuf::ShutdownProtobufLibrary();
 

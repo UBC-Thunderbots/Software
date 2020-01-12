@@ -9,9 +9,10 @@ using google::protobuf::Message;
 
 template <class SendProto, class ReceiveProto>
 RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
-    const TransferMedium& medium, MsgSentCallback<SendProto> sent_callback,
+    std::unique_ptr<TransferMedium> medium, MsgSentCallback<SendProto> sent_callback,
     MsgReceivedCallback<ReceiveProto> received_callback)
-    : in_destructor(false),
+    : medium(std::move(medium)),
+      in_destructor(false),
       sent_callback(sent_callback),
       received_callback(received_callback)
 {
@@ -49,7 +50,10 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
 
         if (new_val)
         {
-            medium.send_data("halaleuyah");
+            std::string data;
+            (*new_val).SerializeToString(&data);
+
+            medium->send_data("TESTTESTTEST");
 
             if (sent_callback)
             {
