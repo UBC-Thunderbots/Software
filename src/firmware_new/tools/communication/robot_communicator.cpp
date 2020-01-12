@@ -1,5 +1,6 @@
 #include "firmware_new/tools/communication/robot_communicator.h"
 
+#include "firmware_new/proto/control.pb.h"
 #include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
 #include "software/multithreading/thread_safe_buffer.h"
 
@@ -8,20 +9,31 @@ using google::protobuf::Message;
 
 template <class SendProto, class ReceiveProto>
 RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
-    const TransferMedium& medium, const MsgSentCallback<SendProto>& sent_callback,
-    const MsgReceivedCallback<ReceiveProto>& received_callback)
+    const TransferMedium& medium, MsgSentCallback<SendProto> sent_callback,
+    MsgReceivedCallback<ReceiveProto> received_callback)
+    : in_destructor(false),
+      sent_callback(sent_callback),
+      received_callback(received_callback)
 {
-    // connect to the medium
-    medium.connect();
-
     // start thread to send data from the buffer
-    send_thread = std::thread(this->send_loop, std::ref(send_buffer));
+    send_buffer.reset(new ThreadSafeBuffer<SendProto>(10));
+    send_thread = std::thread(&RobotCommunicator::send_loop, this, std::ref(send_buffer));
+}
+
+template <class SendProto, class ReceiveProto>
+RobotCommunicator<SendProto, ReceiveProto>::~RobotCommunicator()
+{
+    in_destructor_mutex.lock();
+    in_destructor = true;
+    in_destructor_mutex.unlock();
+
+    send_thread.join();
 }
 
 template <class SendProto, class ReceiveProto>
 void RobotCommunicator<SendProto, ReceiveProto>::send_proto(const SendProto& proto)
 {
-    send_buffer.push(proto);
+    send_buffer->push(proto);
 }
 
 template <class SendProto, class ReceiveProto>
@@ -32,12 +44,12 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
     {
         in_destructor_mutex.unlock();
 
-        std::optional<T> new_val =
-            send_buffer->popMostRecentlyReceivedValue(Duration::fromSeconds(0.1));
+        std::optional<SendProto> new_val =
+            buffer->popMostRecentlyAddedValue(Duration::fromSeconds(0.1));
 
         if (new_val)
         {
-            medium.send_data((*new_val).SerializeAsString());
+            medium.send_data("halaleuyah");
 
             if (sent_callback)
             {
@@ -49,3 +61,6 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
 
     } while (!in_destructor);
 }
+
+// place all templated communcation msg send/receive pair initializations here
+template class RobotCommunicator<control_msg, robot_ack>;

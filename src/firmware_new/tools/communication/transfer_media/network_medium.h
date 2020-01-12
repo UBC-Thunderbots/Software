@@ -18,7 +18,28 @@ using boost::asio::ip::udp;
 class NetworkMedium : public TransferMedium
 {
    public:
-    NetworkMedium();
+    NetworkMedium() = delete;
+    virtual ~NetworkMedium();
+
+    NetworkMedium(std::string local_ipaddr, unsigned port);
+    /*
+     * Packages the data and sends it through the medium
+     *
+     * @param data The data to be sent over the medium
+     */
+    void send_data(const std::string& data);
+
+    /*
+     * Returns when a data packet has arrived through the medium
+     *
+     * NOTE: Depending on the implementation of send_data
+     * this function may be triggered by a packet sent by the
+     * same instance of the class. (example: UDP broadcast, the sender
+     * also gets a packet)
+     *
+     * @param func The function to call when data is received
+     */
+    void receive_data(std::function<void(std::string)>);
 
    private:
     std::string data_buffer;

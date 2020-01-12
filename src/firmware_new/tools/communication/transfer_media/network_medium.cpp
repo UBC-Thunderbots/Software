@@ -5,20 +5,19 @@
 #include "boost/asio/error.hpp"
 #include "boost/bind.hpp"
 
+
 using boost::asio::socket_base;
 using boost::asio::ip::address_v4;
 using boost::asio::ip::udp;
 
-void NetworkMedium::connect()
+NetworkMedium::NetworkMedium(std::string local_ipaddr, unsigned port)
 {
     // TODO explain options
     socket.reset(new udp::socket(io_service));
-    socket->set_option(udp::socket::reuse_address(true));
-    socket->set_option(socket_base::broadcast(true));
 
     // TODO explain endpoints
-    local_endpoint  = udp::endpoint(address_v4::any(), 42069);
-    remote_endpoint = udp::endpoint(address_v4::broadcast(), 42069);
+    local_endpoint  = udp::endpoint(address_v4::from_string(local_ipaddr), port);
+    remote_endpoint = udp::endpoint(address_v4::broadcast(), port);
 
     boost::system::error_code error;
     socket->open(udp::v4(), error);
@@ -39,10 +38,10 @@ void NetworkMedium::connect()
     }
 }
 
-void NetworkMedium::disconnect()
+NetworkMedium::~NetworkMedium()
 {
     socket->close();
-    socket.reset();
+    // socket.reset();
 }
 
 void NetworkMedium::send_data(const std::string& data)

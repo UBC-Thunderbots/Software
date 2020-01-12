@@ -42,7 +42,7 @@ class RobotCommunicator
     RobotCommunicator& operator=(const RobotCommunicator&) = delete;
     RobotCommunicator(const RobotCommunicator&)            = delete;
 
-    virtual ~RobotCommunicator() = default;
+    virtual ~RobotCommunicator();
 
     /*
      * Inject a TransferMedium as a dependency, used to transmit protobuf.
@@ -53,8 +53,8 @@ class RobotCommunicator
      * @param received_callback The callback to run when a msg has been received
      */
     RobotCommunicator(const TransferMedium& medium,
-                      const MsgSentCallback<SendProto>& sent_callback,
-                      const MsgReceivedCallback<ReceiveProto>& received_callback);
+                      MsgSentCallback<SendProto> sent_callback,
+                      MsgReceivedCallback<ReceiveProto> received_callback);
 
     /*
      * Send proto over TransferMedium asynchronously, returns immediately.
@@ -75,8 +75,18 @@ class RobotCommunicator
     // function that runs in the send_thread
     void send_loop(std::shared_ptr<ThreadSafeBuffer<SendProto>> buffer);
 
+    // callbacks
+    MsgSentCallback<SendProto> sent_callback;
+    MsgReceivedCallback<ReceiveProto> received_callback;
+
     // thread to handle sending
     std::thread send_thread;
+
+    // flags to handle shutting down thread
+    bool in_destructor;
+
+    // mutex to protect in_destructor flag
+    std::mutex in_destructor_mutex;
 
     // medium to transfer data through
     TransferMedium medium;

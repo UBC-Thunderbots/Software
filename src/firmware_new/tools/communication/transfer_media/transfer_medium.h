@@ -9,29 +9,15 @@
 class TransferMedium
 {
    public:
-    TransferMedium();
-    virtual ~TransferMedium();
-
-    /*
-     * Connect to the medium
-     *
-     * @returns bool True if successful
-     */
-    virtual void connect();
-
-    /*
-     * Disconnect from the medium
-     *
-     * @returns bool True if successful
-     */
-    virtual void disconnect();
+    TransferMedium()          = default;
+    virtual ~TransferMedium() = default;
 
     /*
      * Packages the data and sends it through the medium
      *
      * @param data The data to be sent over the medium
      */
-    virtual void send_data(const std::string& data);
+    void send_data(const std::string& data){};
 
     /*
      * Returns when a data packet has arrived through the medium
@@ -43,5 +29,5 @@ class TransferMedium
      *
      * @param func The function to call when data is received
      */
-    virtual void receive_data(std::function<void(std::string)>);
+    void receive_data(std::function<void(std::string)>){};
 };
