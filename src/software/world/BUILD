@@ -95,6 +95,7 @@ cc_library(
     deps = [
         ":robot_capabilities",
         "//software/geom",
+        "//software/new_geom:angular_velocity",
         "//software/util/time:timestamp",
     ],
 )
