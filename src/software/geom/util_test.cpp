@@ -1364,12 +1364,44 @@ TEST(GeomUtilTest, test_reduce_segments_collinear)
 
     std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5, seg6, seg7};
 
-    std::optional<std::vector<Segment>> reduced_segs = reduceParallelSegments(segs);
+    std::optional<std::vector<Segment>> reduced_segs = combineToParallelSegments(segs, segs.front().toVector());
 
     EXPECT_EQ(Segment(Point(0, 1), Point(0, 2.5)), reduced_segs.value()[0]);
 }
 
+TEST(GeomUtilTest, test_reduce_segments_perpendicular)
+{
+    Segment seg1 = Segment(Point(0, 0), Point(0, 10));
+    Segment seg2 = Segment(Point(0, 1), Point(1, 1));
+    Segment seg3 = Segment(Point(-5, -5), Point(5, -5));
 
+
+    std::vector<Segment> segs = {seg1, seg2, seg3};
+
+    std::optional<std::vector<Segment>> reduced_segs = combineToParallelSegments(segs, segs.front().toVector());
+
+    EXPECT_EQ(reduced_segs->size(), 1);
+    EXPECT_EQ(reduced_segs->front().length(), 10);
+}
+
+
+TEST(GeomUtilTest, test_reduce_segments_perpendicular_and_parallel)
+{
+    Segment seg1 = Segment(Point(0, 0), Point(0, 10));
+    Segment seg2 = Segment(Point(0, 1), Point(1, 1));
+    Segment seg3 = Segment(Point(-5, -5), Point(5, -5));
+    Segment seg4 = Segment(Point(0, 2), Point(0, 15));
+    Segment seg5 = Segment(Point(0, 7), Point(9, 7));
+
+
+    std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5};
+
+    std::optional<std::vector<Segment>> reduced_segs = combineToParallelSegments(segs, seg1.toVector());
+
+    EXPECT_EQ(reduced_segs->size(), 1);
+    EXPECT_EQ(reduced_segs->front().length(), 15);
+    EXPECT_EQ(reduced_segs->front().getEnd().y(), 15);
+}
 
 TEST(GeomUtilTest, test_circle_tangent_rays)
 {

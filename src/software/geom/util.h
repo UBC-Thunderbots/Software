@@ -562,22 +562,6 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
 std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
 
 /**
- * Function takes in a Vector of Segments and will reduce them to the fewest
- * Segment sections that are independent of each other.
- *
- * Ex.
- *  Input:  *--------*       *--------*
- *                *------*
- *  Output: *------------*   *--------*
- *
- * @param segments : The vector of Segments to be reduced
- * @return std::vector<Segment>: If the segments are parallel, the vector of the fewest
- * independent Segments are returned Returns an empty vector if the segments aren't
- * parallel
- */
-std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments);
-
-/**
  * Function takes in a Vector of Segments and will combine their projections onto the direction Vector into the fewest
  * Segment sections that are independent of each other.
  *

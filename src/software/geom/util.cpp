@@ -1134,7 +1134,10 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Ve
     {
         raw_projection = segment.toVector().project(direction);
 
-        projected_segments.push_back( Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));
+        // Only count projections that have a non-zero magnitude
+        if(raw_projection.lengthSquared() > EPS){
+            projected_segments.push_back( Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));    
+        }
     }
     std::vector<Segment> unique_segments;
 
@@ -1158,57 +1161,6 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Ve
                 unique_segments[j] = temp_segment.value();
                 // Remove segments[i] from the list as it is not unique
                 projected_segments.erase(projected_segments.begin() + i);
-                i--;
-            }
-        }
-        j++;
-    }
-
-    return unique_segments;
-}
-
-std::vector<Segment> reduceParallelSegments(std::vector<Segment> segments)
-{
-    if (segments.size() == 0)
-    {
-        return std::vector<Segment>();
-    }
-    else if (segments.size() == 1)
-    {
-        // If there is only 1 segments, it is unique and should be returned
-        return segments;
-    }
-
-    // Check that all segments are collinear
-    for (unsigned int i = 0; i < segments.size() - 1; i++)
-    {
-        if (!collinear(segments[i], segments[i + 1]))
-        {
-            return std::vector<Segment>();
-        }
-    }
-    std::vector<Segment> unique_segments;
-
-    unsigned int j = 0;
-    // Loop through all segments and combine segments
-    // to reduce the vector to the smallest number of independent (not overlapping)
-    // segments
-    while (segments.size() > 0)
-    {
-        std::optional<Segment> temp_segment;
-        unique_segments.push_back(segments[0]);
-        segments.erase(segments.begin());
-
-        for (unsigned int i = 0; i < segments.size(); i++)
-        {
-            temp_segment =
-                mergeOverlappingParallelSegments(unique_segments[j], segments[i]);
-
-            if (temp_segment.has_value())
-            {
-                unique_segments[j] = temp_segment.value();
-                // Remove segments[i] from the list as it is not unique
-                segments.erase(segments.begin() + i);
                 i--;
             }
         }
