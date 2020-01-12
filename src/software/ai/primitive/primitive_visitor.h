@@ -33,13 +33,13 @@ class PrimitiveVisitor
      */
 
     virtual void visit(const CatchPrimitive &catch_primitive)                    = 0;
-    virtual void visit(const ChipPrimitive &chip_primitive) = 0;
+    virtual void visit(const ChipPrimitive &chip_primitive)                      = 0;
     virtual void visit(const DirectVelocityPrimitive &direct_velocity_primitive) = 0;
-    virtual void visit(const DirectWheelsPrimitive &direct_wheels_primitive) = 0;
-    virtual void visit(const KickPrimitive &kick_primitive) = 0;
-    virtual void visit(const MovePrimitive &move_primitive) = 0;
-    virtual void visit(const MoveSpinPrimitive &movespin_primitive) = 0;
-    virtual void visit(const DribblePrimitive &dribble_primitive) = 0;
-    virtual void visit(const PivotPrimitive &pivot_primitive) = 0;
-    virtual void visit(const StopPrimitive &stop_primitive) = 0;
+    virtual void visit(const DirectWheelsPrimitive &direct_wheels_primitive)     = 0;
+    virtual void visit(const KickPrimitive &kick_primitive)                      = 0;
+    virtual void visit(const MovePrimitive &move_primitive)                      = 0;
+    virtual void visit(const MoveSpinPrimitive &movespin_primitive)              = 0;
+    virtual void visit(const DribblePrimitive &dribble_primitive)                = 0;
+    virtual void visit(const PivotPrimitive &pivot_primitive)                    = 0;
+    virtual void visit(const StopPrimitive &stop_primitive)                      = 0;
 };

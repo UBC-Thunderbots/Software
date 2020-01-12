@@ -43,21 +43,21 @@ class TacticVisitor
      */
 
     virtual void visit(const CherryPickTactic &tactic)         = 0;
-    virtual void visit(const ShadowFreekickerTactic &tactic) = 0;
-    virtual void visit(const GoalieTactic &tactic) = 0;
-    virtual void visit(const CreaseDefenderTactic &tactic) = 0;
-    virtual void visit(const ShadowEnemyTactic &tactic) = 0;
-    virtual void visit(const MoveTactic &tactic) = 0;
-    virtual void visit(const ChipTactic &tactic) = 0;
+    virtual void visit(const ShadowFreekickerTactic &tactic)   = 0;
+    virtual void visit(const GoalieTactic &tactic)             = 0;
+    virtual void visit(const CreaseDefenderTactic &tactic)     = 0;
+    virtual void visit(const ShadowEnemyTactic &tactic)        = 0;
+    virtual void visit(const MoveTactic &tactic)               = 0;
+    virtual void visit(const ChipTactic &tactic)               = 0;
     virtual void visit(const KickoffChipTactic &tactic)        = 0;
-    virtual void visit(const StopTactic &tactic) = 0;
+    virtual void visit(const StopTactic &tactic)               = 0;
     virtual void visit(const PatrolTactic &tactic)             = 0;
-    virtual void visit(const PenaltyKickTactic &tactic) = 0;
+    virtual void visit(const PenaltyKickTactic &tactic)        = 0;
     virtual void visit(const PenaltySetupTactic &tactic)       = 0;
-    virtual void visit(const ReceiverTactic &tactic) = 0;
-    virtual void visit(const ShootGoalTactic &tactic) = 0;
-    virtual void visit(const PasserTactic &tactic) = 0;
-    virtual void visit(const MoveTestTactic &tactic) = 0;
-    virtual void visit(const StopTestTactic &tactic) = 0;
+    virtual void visit(const ReceiverTactic &tactic)           = 0;
+    virtual void visit(const ShootGoalTactic &tactic)          = 0;
+    virtual void visit(const PasserTactic &tactic)             = 0;
+    virtual void visit(const MoveTestTactic &tactic)           = 0;
+    virtual void visit(const StopTestTactic &tactic)           = 0;
     virtual void visit(const DefenseShadowEnemyTactic &tactic) = 0;
 };
