@@ -110,7 +110,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     pass_generator->setWorld(world);
     pass_generator->setPasserPoint(world.ball().position());
 
-    waitForConvergence(pass_generator, 0.001, 30);
+    waitForConvergence(pass_generator, 0.001, 40);
 
     // Find what pass we converged to
     auto [converged_pass, converged_score] = pass_generator->getBestPassSoFar();
