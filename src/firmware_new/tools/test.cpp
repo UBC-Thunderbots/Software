@@ -25,7 +25,7 @@ This tool sends protobuf over serial to the STM32 to do simple arithmatic.It ser
 #include "boost/crc.hpp"
 #include "firmware_new/proto/control.pb.h"
 #include "g3log/g3log.hpp"
-#include "google/protobuf/util/delimited_message_util.h"
+#include "google/protobuf/message.h"
 
     void send_proto_over_serial(boost::asio::serial_port & port,
                                 const google::protobuf::Message&proto_msg);

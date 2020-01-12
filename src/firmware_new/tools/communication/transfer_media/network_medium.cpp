@@ -1,56 +1,69 @@
+#include "firmware_new/tools/communication/transfer_media/network_medium.h"
+
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
+#include "boost/asio/error.hpp"
 #include "boost/bind.hpp"
-#include "boost/error.hpp"
 
 using boost::asio::socket_base;
 using boost::asio::ip::address_v4;
 using boost::asio::ip::udp;
 
-NetworkMedium::connect()
+void NetworkMedium::connect()
 {
-    boost::asio::error_code error;
-
+    // TODO explain options
     socket.reset(new udp::socket(io_service));
+    socket->set_option(udp::socket::reuse_address(true));
+    socket->set_option(socket_base::broadcast(true));
+
+    // TODO explain endpoints
+    local_endpoint  = udp::endpoint(address_v4::any(), 42069);
+    remote_endpoint = udp::endpoint(address_v4::broadcast(), 42069);
+
+    boost::system::error_code error;
     socket->open(udp::v4(), error);
 
     if (!error)
     {
-        socket.set_option(udp::socket::reuse_address(true));
-        socket.set_option(socket_base::broadcast(true));
+        socket->set_option(udp::socket::reuse_address(true));
+        socket->set_option(socket_base::broadcast(true));
     }
 
-    endpoint.reset(new address_v4::broadcast(), port);
-    socket.open(ba::ip::udp::v4(), error);
+    try
+    {
+        socket->bind(local_endpoint);
+    }
+    catch (boost::system::system_error e)
+    {
+        // std::cerr << e.what() << std::endl;
+    }
 }
 
-NetworkMedium::disconnect()
+void NetworkMedium::disconnect()
 {
-    socket.close();
+    socket->close();
     socket.reset();
-    endpoint.reset();
 }
 
-NetworkMedium::send_data(const std::string& data)
+void NetworkMedium::send_data(const std::string& data)
 {
-    boost::asio::error_code err;
-    socket->send_to(boost::asio::buffer(data), endpoint, 0, err);
+    socket->send_to(boost::asio::buffer(data), remote_endpoint);
 }
 
-NetworkMedium::receive_data(std::function<void(std::string)> receive_callback)
+void NetworkMedium::receive_data(std::function<void(std::string)> receive_callback)
 {
     // Implemented according to this to continue receiving data
     // https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/example/cpp11/echo/async_udp_echo_server.cpp
-    socket->async_receive_from(
-        boost::asio::buffer(data_buffer, max_length), enpoint,
-        [this](boost::system::error_code ec, std::size_t bytes_recvd) {
-            if (!ec && bytes_recvd > 0)
-            {
-                receive_callback(data);
-            }
-            else
-            {
-                this->receive_data(receive_callback);
-            }
-        });
+    // socket->async_receive_from(
+    // boost::asio::buffer(data_buffer, 1000), local_endpoint,
+    //[this](boost::system::error_code ec, std::size_t bytes_recvd) {
+    // if (!ec && bytes_recvd > 0)
+    //{
+    // receive_callback(data_buffer);
+    //}
+    // else
+    //{
+    // this->receive_data(receive_callback);
+    //}
+    //});
 }

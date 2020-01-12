@@ -17,21 +17,21 @@ class TransferMedium
      *
      * @returns bool True if successful
      */
-    virtual bool connect() = 0;
+    virtual void connect();
 
     /*
      * Disconnect from the medium
      *
      * @returns bool True if successful
      */
-    virtual bool disconnect() = 0;
+    virtual void disconnect();
 
     /*
      * Packages the data and sends it through the medium
      *
      * @param data The data to be sent over the medium
      */
-    virtual bool send_data(const std::string& data) = 0;
+    virtual void send_data(const std::string& data);
 
     /*
      * Returns when a data packet has arrived through the medium
@@ -41,7 +41,7 @@ class TransferMedium
      * same instance of the class. (example: UDP broadcast, the sender
      * also gets a packet)
      *
-     * @returns std::string The data that arrived through the medium
+     * @param func The function to call when data is received
      */
-    virtual std::string receive_data(std::function<void(std::string)>) = 0;
+    virtual void receive_data(std::function<void(std::string)>);
 };

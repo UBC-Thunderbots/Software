@@ -2,8 +2,9 @@
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
-#include "firmware_new/proto/control.pb.h"
+#include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
 #include "g3log/g3log.hpp"
+#include "google/protobuf/message.h"
 #include "software/multithreading/thread_safe_buffer.h"
 
 using boost::asio::ip::udp;
@@ -23,11 +24,13 @@ using google::protobuf::Message;
  * NOTE: All receiving is done asynchronously.
  *
  */
-template <class SendProto, class ReceiveProto>
+template <class SendProto>
+using MsgSentCallback = std::function<void(const SendProto& msg)>;
 
-using MsgSentCallback     = std::function<void(const SendProto& msg)>;
+template <class ReceiveProto>
 using MsgReceivedCallback = std::function<void(const ReceiveProto& msg)>;
 
+template <class SendProto, class ReceiveProto>
 class RobotCommunicator
 {
    public:
@@ -42,18 +45,16 @@ class RobotCommunicator
     virtual ~RobotCommunicator() = default;
 
     /*
-     * Inject a TransferMedium as a dependency, used to transmit protobuf. A unique
-     * ptr is used so that it is moved into this class and the class gets full ownership.
-     *
+     * Inject a TransferMedium as a dependency, used to transmit protobuf.
      * The callbacks to be executed on send/receive of a msg. Use nullptr for no callback.
      *
      * @param medium TransferMedium for the protobuf to be sent through
      * @param sent_callback The callback to run when a msg has been sent
      * @param received_callback The callback to run when a msg has been received
      */
-    RobotCommunicator(std::unique_ptr<TransferMedium> medium,
-                      const MsgSentCallback& sent_callback,
-                      const MsgReceivedCallback& received_callback);
+    RobotCommunicator(const TransferMedium& medium,
+                      const MsgSentCallback<SendProto>& sent_callback,
+                      const MsgReceivedCallback<ReceiveProto>& received_callback);
 
     /*
      * Send proto over TransferMedium asynchronously, returns immediately.
@@ -66,26 +67,19 @@ class RobotCommunicator
      * Callback is executed when the msg sends (if not nullptr)
      *
      * @param proto The msg to send over medium
-     * @param blocking Defaults to false, set to true if call needs to be blocking
      */
-    void send_proto(const SendProto& proto, bool blocking = false);
+    void send_proto(const SendProto& proto);
 
 
    private:
     // function that runs in the send_thread
     void send_loop(std::shared_ptr<ThreadSafeBuffer<SendProto>> buffer);
 
-    // function that runs in the receive_thread
-    void receive_loop(std::shared_ptr<ThreadSafeBuffer<ReceiveProto>> buffer);
-
     // thread to handle sending
     std::thread send_thread;
 
-    // thread to handle receiving
-    std::thread receive_thread;
-
     // medium to transfer data through
-    std::unique_ptr<TransferMedium> medium;
+    TransferMedium medium;
 
     // buffer that holds msgs to be sent
     std::shared_ptr<ThreadSafeBuffer<SendProto>> send_buffer;

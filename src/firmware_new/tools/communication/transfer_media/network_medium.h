@@ -2,14 +2,13 @@
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
-#include "boost/error.hpp"
-#include "firmware_new/tools/transfer_media/medium.h"
+#include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
 
 using boost::asio::ip::udp;
 
 /*
  * NetworkMedium establishes a UDP socket and then broadcasts and listens
- * through that socket. There is no client/server model inplace, robots
+ * through that socket. There is no client/server model in-place, robots
  * and computers are all clients "peers" and broadcast msgs through the network.
  *
  * It is up to the peer to identify which msgs to process.
@@ -23,8 +22,8 @@ class NetworkMedium : public TransferMedium
 
    private:
     std::string data_buffer;
-    std::unique_ptr<udp::socket> send_socket;
-    std::unique_ptr<udp::socket> receive_socket;
-    std::unique_ptr<udp::endpoint> endpoint;
-    std::unique_ptr<boost::asio::io_service> io_service;
+    std::unique_ptr<udp::socket> socket;
+    boost::asio::io_service io_service;
+    udp::endpoint local_endpoint;
+    udp::endpoint remote_endpoint;
 };

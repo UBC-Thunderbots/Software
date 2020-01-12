@@ -4,6 +4,7 @@ load(":nanopb.bzl", "c_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
+# add more proto here
 proto_files = [
 	"control.proto",
 ]
