@@ -25,7 +25,7 @@ class AIWrapper : public ThreadedObserver<World>,
      *
      * @param config The AI configuration
      */
-    AIWrapper(std::shared_ptr<const AIConfig> config);
+    explicit AIWrapper(std::shared_ptr<const AIConfig> config);
 
    private:
     void onValueReceived(World world) override;

@@ -20,7 +20,7 @@ class AI final
      * Create an AI with given configuration
      * @param config The AI configuration
      */
-    AI(std::shared_ptr<const AIConfig> config);
+    explicit AI(std::shared_ptr<const AIConfig> config);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current
