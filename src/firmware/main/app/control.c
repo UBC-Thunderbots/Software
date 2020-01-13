@@ -21,7 +21,7 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
                                           float battery_voltage)
 {
     float max_effective_motor_voltage = -INFINITY;
-    float slip_ratio_min = INFINITY;
+    float slip_ratio_min              = INFINITY;
 
     for (long i = 0; i < 4; i++)
     {
@@ -33,8 +33,8 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
         float curr_motor_rpm = app_wheel_getMotorSpeedRPM(wheel);
 
         float applied_voltage = motor_torque * constants.motor_current_per_unit_torque *
-                     constants.motor_phase_resistance;
-        float back_emf = curr_motor_rpm * constants.motor_back_emf_per_rpm;
+                                constants.motor_phase_resistance;
+        float back_emf          = curr_motor_rpm * constants.motor_back_emf_per_rpm;
         float effective_voltage = fabsf(applied_voltage + back_emf);
 
         float slip_ratio =
@@ -72,8 +72,7 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
                                          const float linear_accel_x,
                                          const float linear_accel_y, float angular_accel)
 {
-    const RobotConstants_t robot_constants =
-        app_firmware_robot_getRobotConstants(robot);
+    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
 
     // first convert accelerations into consistent units
     // choose units of Force (N)
@@ -100,8 +99,7 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
 void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
                             float linear_accel_y, float angular_accel)
 {
-    const RobotConstants_t robot_constants =
-        app_firmware_robot_getRobotConstants(robot);
+    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
 
     // check for max acceleration in direction of the vel difference
     float scaling = app_control_getMaximalAccelScaling(robot, linear_accel_x,
@@ -126,7 +124,7 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
     float angular_diff  = angular_accel - prev_angular_accel;
 
-    const float jerk_limit = robot_constants.jerk_limit;
+    const float jerk_limit        = robot_constants.jerk_limit;
     const float linear_jerk_limit = robot_constants.jerk_limit * TICK_TIME;
     limit(&linear_diff_x, linear_jerk_limit);
     limit(&linear_diff_y, jerk_limit * TICK_TIME);

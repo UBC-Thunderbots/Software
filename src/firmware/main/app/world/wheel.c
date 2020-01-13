@@ -9,9 +9,9 @@ struct Wheel
     WheelConstants_t wheel_constants;
 };
 
-Wheel_t* app_wheel_create(
-    void (*apply_wheel_force)(float force_in_newtons), float (*get_motor_speed_rpm)(),
-    WheelConstants_t wheel_constants)
+Wheel_t* app_wheel_create(void (*apply_wheel_force)(float force_in_newtons),
+                          float (*get_motor_speed_rpm)(),
+                          WheelConstants_t wheel_constants)
 {
     Wheel_t* new_wheel = malloc(sizeof(Wheel_t));
 

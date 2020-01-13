@@ -3,16 +3,16 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "control/bangbang.h"
 #include "app/control.h"
+#include "control/bangbang.h"
 #include "io/dr.h"
 #include "io/leds.h"
 #include "physics/physics.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
+#include "shared/util.h"
 #include "util/log.h"
 #include "util/physbot.h"
-#include "shared/util.h"
 
 
 // these are set to decouple the 3 axis from each other

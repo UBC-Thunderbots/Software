@@ -7,4 +7,3 @@
 
 // define our own PI value here that is a float because M_PI in math.h is a double
 #define P_PI 3.14159265f
-

@@ -51,19 +51,22 @@ TEST_F(WheelTest, applyForce)
     EXPECT_EQ(13, requested_wheel_force);
 }
 
-TEST_F(WheelTest, getMotorSpeed){
+TEST_F(WheelTest, getMotorSpeed)
+{
     float speed = app_wheel_getMotorSpeedRPM(wheel);
 
     EXPECT_NEAR(17.2, speed, 1e-5);
 }
 
-TEST_F(WheelTest, getWheelSpeed){
+TEST_F(WheelTest, getWheelSpeed)
+{
     float speed = app_wheel_getWheelSpeedRPM(wheel);
 
-    EXPECT_NEAR(17.2*0.5, speed, 1e-5);
+    EXPECT_NEAR(17.2 * 0.5, speed, 1e-5);
 }
 
-TEST_F(WheelTest, getWheelConstants){
+TEST_F(WheelTest, getWheelConstants)
+{
     WheelConstants_t constants = app_wheel_getWheelConstants(wheel);
 
     EXPECT_NEAR(1.1, constants.motor_current_per_unit_torque, 1e-4);
@@ -73,4 +76,3 @@ TEST_F(WheelTest, getWheelConstants){
     EXPECT_NEAR(1.5, constants.wheel_radius, 1e-4);
     EXPECT_NEAR(0.5, constants.wheel_rotations_per_motor_rotation, 1e-4);
 }
-

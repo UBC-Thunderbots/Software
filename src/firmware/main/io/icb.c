@@ -929,12 +929,12 @@ void spi1_isr(void)
 {
     SPI_SR_t sr = SPI1.SR;
     checked_sr  = sr;
-    // We disable this assertion because the old firmware will fail on it after 
-    // a few minutes of running, and we can't justify the time/effort to fix it 
-    // given that it's functional and no longer under active development. The 
+    // We disable this assertion because the old firmware will fail on it after
+    // a few minutes of running, and we can't justify the time/effort to fix it
+    // given that it's functional and no longer under active development. The
     // old firmware worked when built with CMake because assertions were disabled.
     // We have no idea why this is failing.
-    //assert(!sr.OVR);
+    // assert(!sr.OVR);
     assert(!sr.MODF);
     if (sr.RXNE)
     {

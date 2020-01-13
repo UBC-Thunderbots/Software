@@ -11,9 +11,10 @@ class DribblerTest : public testing::Test
     virtual void SetUp()
     {
         requested_rpm = 0;
-        coast = false;
+        coast         = false;
 
-        dribbler = app_dribbler_create(&(this->setRequestedRpm), &(this->enable_coast), &(this->returnSeven));
+        dribbler = app_dribbler_create(&(this->setRequestedRpm), &(this->enable_coast),
+                                       &(this->returnSeven));
     }
 
     virtual void TearDown()
@@ -31,7 +32,8 @@ class DribblerTest : public testing::Test
         return 7;
     }
 
-    static void enable_coast(){
+    static void enable_coast()
+    {
         coast = true;
     }
 
@@ -48,7 +50,8 @@ TEST_F(DribblerTest, setSpeed)
     EXPECT_EQ(34, requested_rpm);
 }
 
-TEST_F(DribblerTest, coast){
+TEST_F(DribblerTest, coast)
+{
     app_dribbler_coast(dribbler);
     EXPECT_TRUE(coast);
 }

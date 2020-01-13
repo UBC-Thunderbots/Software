@@ -5,14 +5,13 @@
 #include <stdlib.h>
 #include <util/physbot.h>
 
-#include "control/bangbang.h"
 #include "app/control.h"
+#include "control/bangbang.h"
+#include "io/dr.h"
+#include "io/leds.h"
 #include "physics/physics.h"
 #include "util/log.h"
 #include "util/physbot.h"
-
-#include "io/dr.h"
-#include "io/leds.h"
 
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
@@ -210,7 +209,7 @@ static void shoot_tick(log_record_t *log, FirmwareWorld_t *world)
     scale(&pb);
     to_local_coords(accel, pb, states.angle, major_vec, minor_vec);
 
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 
     if (log)

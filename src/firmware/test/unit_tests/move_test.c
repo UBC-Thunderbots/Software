@@ -4,8 +4,8 @@
 #include "main/physics.h"
 #include "main/util/physbot.h"
 #include "shared/robot_constants.h"
-#include "test.h"
 #include "shared/util.h"
+#include "test.h"
 
 // Common PhysBot to use throughout tests
 static PhysBot pb;

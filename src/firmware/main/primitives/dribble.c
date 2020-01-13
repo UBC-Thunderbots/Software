@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-#include "control/bangbang.h"
 #include "app/control.h"
+#include "control/bangbang.h"
 #include "io/dr.h"
 #include "physics/physics.h"
 

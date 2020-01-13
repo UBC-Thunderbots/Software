@@ -47,7 +47,8 @@ static void stop_start(const primitive_params_t *params, FirmwareWorld_t *world)
     }
     if (!params->extra)
     {
-        Dribbler_t* dribbler = app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+        Dribbler_t *dribbler =
+            app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
         app_dribbler_coast(dribbler);
     }
 }

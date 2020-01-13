@@ -1,12 +1,10 @@
 #include "pivot.h"
 
-#include "control/bangbang.h"
 #include "app/control.h"
-#include "io/dr.h"
-#include "physics/physics.h"
-
+#include "control/bangbang.h"
 #include "io/dr.h"
 #include "io/leds.h"
+#include "physics/physics.h"
 
 #define TIME_HORIZON 0.05f  // s
 #define FALSE 0
@@ -188,7 +186,7 @@ static void pivot_tick(log_record_t *log, FirmwareWorld_t *world)
     accel[2]          = (target_avel - vel[2]) / TIME_HORIZON;
     limit(&accel[2], MAX_T_A);
 
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
