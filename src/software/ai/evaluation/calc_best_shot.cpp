@@ -15,7 +15,8 @@ namespace Evaluation
         {
             obs.push_back(Circle(point, radius));
         }
-        return calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obs);
+        return calcMostOpenDirectionFromCircleObstacles(
+            p, Segment(goal_post_neg, goal_post_pos), obs);
     }
     std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                            const Point &goal_post_pos, const Point &p,
@@ -27,14 +28,16 @@ namespace Evaluation
         {
             obs.push_back(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS));
         }
-        return calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obs);
+        return calcMostOpenDirectionFromCircleObstacles(
+            p, Segment(goal_post_neg, goal_post_pos), obs);
     }
     std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                            const Point &goal_post_pos, const Point &p,
                                            const std::vector<Circle> &obstacles)
     {
         // Use shot evaluation function to get the best Shot
-        return calcMostOpenDirection(p, Segment(goal_post_neg, goal_post_pos), obstacles);
+        return calcMostOpenDirectionFromCircleObstacles(
+            p, Segment(goal_post_neg, goal_post_pos), obstacles);
     }
 
     std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
@@ -137,8 +140,8 @@ namespace Evaluation
         return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 
-    std::optional<Shot> calcMostOpenDirection(Point origin, Segment segment,
-                                              std::vector<Robot> robot_obstacles)
+    std::optional<Shot> calcMostOpenDirectionFromRobotObstacles(
+        Point origin, Segment segment, std::vector<Robot> robot_obstacles)
     {
         std::vector<Circle> obstacles;
 
@@ -147,10 +150,10 @@ namespace Evaluation
             obstacles.push_back(Circle(robot.position(), ROBOT_MAX_RADIUS_METERS));
         }
 
-        return calcMostOpenDirection(origin, segment, obstacles);
+        return calcMostOpenDirectionFromCircleObstacles(origin, segment, obstacles);
     }
-    std::optional<Shot> calcMostOpenDirection(Point origin, Segment segment,
-                                              std::vector<Circle> obstacles)
+    std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
+        Point origin, Segment segment, std::vector<Circle> obstacles)
     {
         std::vector<Segment> obstacle_segment_projections;
 
