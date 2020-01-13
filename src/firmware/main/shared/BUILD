@@ -4,12 +4,11 @@ package(default_visibility = ["//visibility:public"])
 #       from top-level
 
 cc_library(
-    name = "physics",
-    srcs = ["physics.c"],
-    hdrs = ["physics.h"],
+    name = "util",
+    srcs = ["util.c"],
+    hdrs = ["util.h"],
     strip_include_prefix = "/firmware/main",
     deps = [
         "//firmware/main/math:tbots_math",
-        "//firmware/main/shared:util",
     ],
 )

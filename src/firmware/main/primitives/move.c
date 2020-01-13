@@ -12,7 +12,7 @@
 #include "shared/robot_constants.h"
 #include "util/log.h"
 #include "util/physbot.h"
-#include "util/util.h"
+#include "shared/util.h"
 
 
 // these are set to decouple the 3 axis from each other

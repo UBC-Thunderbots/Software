@@ -1,7 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "util/util.h"
+#include "shared/util.h"
 
 // TODO: where should this go?
 #define JERK_LIMIT 40.0f  //(m/s^3)

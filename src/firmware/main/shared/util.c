@@ -1,6 +1,6 @@
-#include "util.h"
+#include "shared/util.h"
 
-#include "physics/physics.h"
+#include "math/tbots_math.h"
 
 float fmax_of_array(float array[], unsigned size)
 {

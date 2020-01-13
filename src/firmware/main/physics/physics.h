@@ -1,26 +1,7 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#include <math.h>
-
-// define our own PI value here that is a float because M_PI in math.h is a double
-#define P_PI 3.14159265f
-
-#ifdef FWSIM
-#define max(a, b)                                                                        \
-    ({                                                                                   \
-        __typeof__(a) _a = (a);                                                          \
-        __typeof__(b) _b = (b);                                                          \
-        _a > _b ? _a : _b;                                                               \
-    })
-
-#define min(a, b)                                                                        \
-    ({                                                                                   \
-        __typeof__(a) _a = (a);                                                          \
-        __typeof__(b) _b = (b);                                                          \
-        _a < _b ? _a : _b;                                                               \
-    })
-#endif
+#include "math/tbots_math.h"
 
 // This file contains all the physical constants of the robot
 // Dimensions and the like as well as

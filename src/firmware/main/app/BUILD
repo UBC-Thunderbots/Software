@@ -11,12 +11,6 @@ cc_library(
     deps = [
         "//firmware/main/app/world:firmware_robot",
         "//firmware/main/physics",
+        "//firmware/main/shared:util",
     ],
-)
-
-cc_library(
-    name = "util",
-    srcs = ["util.c"],
-    hdrs = ["util.h"],
-    deps = [],
 )

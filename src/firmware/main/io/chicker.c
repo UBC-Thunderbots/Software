@@ -16,7 +16,7 @@
 #include "adc.h"
 #include "breakbeam.h"
 #include "charger.h"
-#include "util/util.h"
+#include "shared/util.h"
 
 /**
  *  \brief Defines max limits for kicking and chipping.
