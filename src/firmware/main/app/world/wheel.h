@@ -1,14 +1,10 @@
 #pragma once
 
-// TODO: unit tests for new functionality
-
 /**
  * This struct represents a robot wheel/motor, from the perspective of firmware
  */
 typedef struct Wheel Wheel_t;
 
-// TOOD: should it be "wheelconstants" or "physical wheel constants"? same for
-// function(s)?
 /**
  * This struct holds wheel/motor constants
  */
@@ -73,7 +69,6 @@ void app_wheel_applyForce(Wheel_t* wheel, float force_in_newtons);
  */
 float app_wheel_getWheelSpeedRPM(Wheel_t* wheel);
 
-// TODO: implement and test me
 /**
  * Get the speed of the motor attached to the given wheel
  * @param wheel The wheel to get the motor RPM for
