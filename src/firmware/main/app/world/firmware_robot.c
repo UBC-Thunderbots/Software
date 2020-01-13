@@ -29,7 +29,8 @@ FirmwareRobot_t* app_firmware_robot_create(
     float (*get_robot_velocity_x)(), float (*get_robot_velocity_y)(),
     float (*get_robot_velocity_angular)(), float (*get_battery_voltage)(),
     Wheel_t* front_right_wheel, Wheel_t* front_left_wheel, Wheel_t* back_right_wheel,
-    Wheel_t* back_left_wheel, RobotConstants_t robot_constants)
+    Wheel_t* back_left_wheel, ControllerState_t* controller_state,
+    RobotConstants_t robot_constants)
 {
     FirmwareRobot_t* new_robot = malloc(sizeof(FirmwareRobot_t));
 
@@ -47,13 +48,7 @@ FirmwareRobot_t* app_firmware_robot_create(
     new_robot->back_right_wheel           = back_right_wheel;
     new_robot->back_left_wheel            = back_left_wheel;
     new_robot->robot_constants            = robot_constants;
-
-    // TODO: pass this in
-    new_robot->controller_state = (ControllerState_t*)malloc(sizeof(ControllerState_t));
-
-    new_robot->controller_state->last_applied_acceleration_x       = 0;
-    new_robot->controller_state->last_applied_acceleration_y       = 0;
-    new_robot->controller_state->last_applied_acceleration_angular = 0;
+    new_robot->controller_state           = controller_state;
 
     return new_robot;
 }

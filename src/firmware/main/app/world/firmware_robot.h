@@ -62,6 +62,8 @@ typedef struct ControllerState {
  * @param front_left_wheel The front left wheel of the robot
  * @param back_right_wheel The back right wheel of the robot
  * @param back_left_wheel The back left wheel of the robot
+ * @param controller_state The controller state
+ * @param robot_constants Set of constants particular to this robot
  *
  * @return A pointer to a robot with the given hardware, ownership of the robot is
  *         given to the caller
@@ -75,6 +77,7 @@ FirmwareRobot_t* app_firmware_robot_create(
     float (*get_battery_voltage)(),
     Wheel_t* front_right_wheel,
     Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
+    ControllerState_t* controller_state,
     RobotConstants_t robot_constants);
 
 /**

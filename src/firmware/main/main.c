@@ -485,11 +485,16 @@ static void run_normal(void)
         .robot_radius      = ROBOT_RADIUS,
         .jerk_limit        = JERK_LIMIT,
     };
+    ControllerState_t controller_state = {
+        .last_applied_acceleration_x       = 0,
+        .last_applied_acceleration_y       = 0,
+        .last_applied_acceleration_angular = 0,
+    };
     FirmwareRobot_t* robot = app_firmware_robot_create(
         chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
         dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
         dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
-        back_right_wheel, back_left_wheel, robot_constants);
+        back_right_wheel, back_left_wheel, &controller_state, robot_constants);
     FirmwareBall_t* ball =
         app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
                                  dr_get_ball_velocity_x, dr_get_ball_velocity_y);

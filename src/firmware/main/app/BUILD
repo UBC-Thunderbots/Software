@@ -13,3 +13,10 @@ cc_library(
         "//firmware/main/physics",
     ],
 )
+
+cc_library(
+    name = "util",
+    srcs = ["util.c"],
+    hdrs = ["util.h"],
+    deps = [],
+)
