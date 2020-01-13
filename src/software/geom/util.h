@@ -3,11 +3,11 @@
 #include <cstddef>
 #include <vector>
 
-#include "software/geom/circle.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/shot.h"
+#include "software/new_geom/circle.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"

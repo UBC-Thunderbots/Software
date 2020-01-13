@@ -12,7 +12,6 @@ cc_library(
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "circle.h",
         "polygon.h",
         "polynomial.h",
         "rectangle.h",
@@ -26,6 +25,7 @@ cc_library(
         "-std=c++17",
     ],
     deps = [
+        "//software/new_geom:circle",
         "//software/new_geom:line",
         "//software/new_geom:point",
         "//software/new_geom:ray",
