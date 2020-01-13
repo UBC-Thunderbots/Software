@@ -6,7 +6,7 @@ echo "================================================================"
 
 clion_version_year="2019"
 clion_version_major="2"
-clion_version_minor="2"
+clion_version_minor="5"
 clion_version="${clion_version_year}.${clion_version_major}.${clion_version_minor}"
 clion_executable_path="/usr/local/bin/clion"
 
@@ -43,7 +43,10 @@ echo "Installing Bazel Plugin"
 echo "================================================================"
 
 clion_plugin_dir="${HOME}/.CLion${clion_version_year}.${clion_version_major}/config/plugins"
-bazel_plugin_version="v2019.10.28"
+bazel_plugin_version_year="2019"
+bazel_plugin_version_major="12"
+bazel_plugin_version_minor="16"
+bazel_plugin_version="v${bazel_plugin_version_year}.${bazel_plugin_version_major}.${bazel_plugin_version_minor}"
 
 if [ -d "${clion_plugin_dir}/clwb" ]
 then
