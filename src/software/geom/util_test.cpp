@@ -1364,7 +1364,8 @@ TEST(GeomUtilTest, test_reduce_segments_collinear)
 
     std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5, seg6, seg7};
 
-    std::optional<std::vector<Segment>> reduced_segs = combineToParallelSegments(segs, segs.front().toVector());
+    std::optional<std::vector<Segment>> reduced_segs =
+        combineToParallelSegments(segs, segs.front().toVector());
 
     EXPECT_EQ(Segment(Point(0, 1), Point(0, 2.5)), reduced_segs.value()[0]);
 }
@@ -1378,7 +1379,8 @@ TEST(GeomUtilTest, test_reduce_segments_perpendicular)
 
     std::vector<Segment> segs = {seg1, seg2, seg3};
 
-    std::optional<std::vector<Segment>> reduced_segs = combineToParallelSegments(segs, segs.front().toVector());
+    std::optional<std::vector<Segment>> reduced_segs =
+        combineToParallelSegments(segs, segs.front().toVector());
 
     EXPECT_EQ(reduced_segs->size(), 1);
     EXPECT_EQ(reduced_segs->front().length(), 10);
@@ -1396,7 +1398,8 @@ TEST(GeomUtilTest, test_reduce_segments_perpendicular_and_parallel)
 
     std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5};
 
-    std::optional<std::vector<Segment>> reduced_segs = combineToParallelSegments(segs, seg1.toVector());
+    std::optional<std::vector<Segment>> reduced_segs =
+        combineToParallelSegments(segs, seg1.toVector());
 
     EXPECT_EQ(reduced_segs->size(), 1);
     EXPECT_EQ(reduced_segs->front().length(), 15);
@@ -1420,11 +1423,12 @@ TEST(GeomUtilTest, test_circle_tangent_rays)
 
 TEST(GeomUtilTest, test_project_circles_origin_inside_circle)
 {
-    Point reference          = Point(0, 0);
-    Circle circle            = Circle(Point(0, 0), 0.5);
-    Segment segment = Segment(Point(5,5), Point(-5,5));
+    Point reference = Point(0, 0);
+    Circle circle   = Circle(Point(0, 0), 0.5);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
 
-    std::vector<Segment> proj_segments = projectCirclesOntoSegment(segment, {circle}, reference);
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle}, reference);
 
     EXPECT_EQ(proj_segments.size(), 1);
     EXPECT_EQ(proj_segments.front().length(), 10);
@@ -1436,11 +1440,12 @@ TEST(GeomUtilTest, test_project_circles_origin_inside_circle)
 
 TEST(GeomUtilTest, test_project_circles_one_circle)
 {
-    Point reference          = Point(0, 0);
-    Circle circle            = Circle(Point(0, 4), 0.5);
-    Segment segment = Segment(Point(5,5), Point(-5,5));
+    Point reference = Point(0, 0);
+    Circle circle   = Circle(Point(0, 4), 0.5);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
 
-    std::vector<Segment> proj_segments = projectCirclesOntoSegment(segment, {circle}, reference);
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle}, reference);
 
     EXPECT_EQ(proj_segments.size(), 1);
     EXPECT_NEAR(proj_segments.front().length(), 1.26, 0.01);
@@ -1452,12 +1457,13 @@ TEST(GeomUtilTest, test_project_circles_one_circle)
 
 TEST(GeomUtilTest, test_project_circles_multiple_circles)
 {
-    Point reference          = Point(0, 0);
-    Circle circle1            = Circle(Point(-1, 4), 0.5);
-    Circle circle2            = Circle(Point(1, 4), 0.5);
-    Segment segment = Segment(Point(5,5), Point(-5,5));
+    Point reference = Point(0, 0);
+    Circle circle1  = Circle(Point(-1, 4), 0.5);
+    Circle circle2  = Circle(Point(1, 4), 0.5);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
 
-    std::vector<Segment> proj_segments = projectCirclesOntoSegment(segment, {circle1, circle2}, reference);
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle1, circle2}, reference);
 
     EXPECT_EQ(proj_segments.size(), 2);
     EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
@@ -1478,13 +1484,14 @@ TEST(GeomUtilTest, test_project_circles_multiple_circles)
 
 TEST(GeomUtilTest, test_project_circles_multiple_circles_one_has_zero_projection)
 {
-    Point reference          = Point(0, 0);
-    Circle circle1            = Circle(Point(-1, 4), 0.5);
-    Circle circle2            = Circle(Point(1, 4), 0.5);
-    Circle circle3 = Circle(Point(5,-5), 1);
-    Segment segment = Segment(Point(5,5), Point(-5,5));
+    Point reference = Point(0, 0);
+    Circle circle1  = Circle(Point(-1, 4), 0.5);
+    Circle circle2  = Circle(Point(1, 4), 0.5);
+    Circle circle3  = Circle(Point(5, -5), 1);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
 
-    std::vector<Segment> proj_segments = projectCirclesOntoSegment(segment, {circle1, circle2, circle3}, reference);
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle1, circle2, circle3}, reference);
 
     EXPECT_EQ(proj_segments.size(), 2);
     EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
@@ -1501,4 +1508,51 @@ TEST(GeomUtilTest, test_project_circles_multiple_circles_one_has_zero_projection
     EXPECT_DOUBLE_EQ(proj_segments.back().getSegStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.back().getEnd().x(), 0.62, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.back().getEnd().y(), 5.0);
+}
+
+TEST(GeomUtilTest, test_get_empty_space_between_segment_no_space)
+{
+    Segment reference = Segment(Point(-10, 0), Point(10, 0));
+
+    Segment seg1 = Segment(Point(-10, 0), Point(0, 0));
+    Segment seg2 = Segment(Point(0, 0), Point(10, 0));
+
+    std::vector<Segment> segs = {seg1, seg2};
+
+    std::vector<Segment> open_segs = getEmptySpaceWithinParentSegment(segs, reference);
+
+    EXPECT_EQ(open_segs.size(), 0);
+}
+TEST(GeomUtilTest, test_get_empty_space_between_segment_2_blocks)
+{
+    Segment reference = Segment(Point(-10, 0), Point(10, 0));
+
+    Segment seg1 = Segment(Point(-8, 0), Point(0, 0));
+    Segment seg2 = Segment(Point(0, 0), Point(8, 0));
+
+    std::vector<Segment> segs = {seg1, seg2};
+
+    std::vector<Segment> open_segs = getEmptySpaceWithinParentSegment(segs, reference);
+
+    EXPECT_EQ(open_segs.size(), 2);
+
+    EXPECT_EQ(open_segs[0].length(), 2);
+    EXPECT_EQ(open_segs[1].length(), 2);
+}
+TEST(GeomUtilTest, test_get_empty_space_between_segment_2_blocks_3_open)
+{
+    Segment reference = Segment(Point(-10, 0), Point(10, 0));
+
+    Segment seg1 = Segment(Point(-8, 0), Point(-2, 0));
+    Segment seg2 = Segment(Point(2, 0), Point(8, 0));
+
+    std::vector<Segment> segs = {seg1, seg2};
+
+    std::vector<Segment> open_segs = getEmptySpaceWithinParentSegment(segs, reference);
+
+    EXPECT_EQ(open_segs.size(), 3);
+
+    EXPECT_EQ(open_segs[0].length(), 2);
+    EXPECT_EQ(open_segs[1].length(), 4);
+    EXPECT_EQ(open_segs[2].length(), 2);
 }

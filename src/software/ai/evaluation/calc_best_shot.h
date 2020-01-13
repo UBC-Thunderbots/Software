@@ -229,9 +229,10 @@ namespace Evaluation
      *
      * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the
      * given parameters
+     * @return nullopt : A Shot does not exist
      */
-    Shot calcMostOpenDirection(Point origin, Segment segment,
-                               std::vector<Circle> obstacles);
+    std::optional<Shot> calcMostOpenDirection(Point origin, Segment segment,
+                                              std::vector<Circle> obstacles);
 
     /**
      * Function calculates the optimal shot location and the corresponding Angle
@@ -261,8 +262,9 @@ namespace Evaluation
      *
      * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the
      * given parameters
+     * @return nullopt : A Shot does not exist
      */
-    Shot calcMostOpenDirection(Point origin, Segment segment,
-                               std::vector<Robot> robot_obstacles);
+    std::optional<Shot> calcMostOpenDirection(Point origin, Segment segment,
+                                              std::vector<Robot> robot_obstacles);
 
 }  // namespace Evaluation

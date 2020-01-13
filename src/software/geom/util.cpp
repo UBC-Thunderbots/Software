@@ -1116,38 +1116,104 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
     }
 }
 
-std::vector<Segment> projectCirclesOntoSegment(Segment segment, std::vector<Circle> circles, Point origin) {
- // Loop through all obstacles to create their 'blocking' Segment
-std::vector<Segment> obstacle_segment_projections = {};
-
-        for (Circle circle : circles)
+std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segments,
+                                                      Segment parent_segment)
+{
+    // Make sure the starting point of all segments is closer to the start of the
+    // reference segment to simplify the evaluation
+    for (auto &unordered_seg : segments)
+    {
+        if ((parent_segment.getSegStart() - unordered_seg.getSegStart()).length() >
+            (parent_segment.getSegStart() - unordered_seg.getEnd()).length())
         {
-            // If the reference is inside an obstacle there is no open direction
-            if (contains(circle, origin))
-            {
-                obstacle_segment_projections.push_back(segment);
-                return obstacle_segment_projections;
-            }
-
-            // Get the tangent rays from the reference point to the obstacle
-            auto [ray1, ray2] = getCircleTangentRaysWithReferenceOrigin(origin, circle);
-
-            // Project the tangent Rays to obtain a 'blocked' segment on the reference
-            // Segment
-            std::optional<Segment> intersect_segment =
-                getIntersectingSegment(ray1, ray2, segment);
-
-            if (intersect_segment.has_value())
-            {
-                obstacle_segment_projections.push_back(intersect_segment.value());
-            }
+            // We need to flip the start/end of the segment
+            Segment temp = unordered_seg;
+            unordered_seg.setSegStart(temp.getEnd());
+            unordered_seg.setEnd(temp.getSegStart());
         }
-    return obstacle_segment_projections;
     }
 
-std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Vector direction)
-{
+    // Now we must sort the segments so that we can iterate through them in order to
+    // generate open angles sort using a lambda expression
+    // We sort the segments based on how close their 'start' point is to the 'start'
+    // of the reference Segment
+    std::sort(segments.begin(), segments.end(), [parent_segment](Segment &a, Segment &b) {
+        return (parent_segment.getSegStart() - a.getSegStart()).length() <
+               (parent_segment.getSegStart() - b.getSegStart()).length();
+    });
 
+    // Now we need to find the largest open segment/angle
+    std::vector<Segment> open_segs;
+
+    // The first Angle is between the reference Segment and the first obstacle Segment
+    // After this one, ever open angle is between segment(i).end and
+    // segment(i+1).start
+    open_segs.push_back(
+        Segment(parent_segment.getSegStart(), segments.front().getSegStart()));
+
+    // The 'open' Segment in the space between consecutive 'blocking' Segments
+    for (std::vector<Segment>::const_iterator it = segments.begin();
+         it != segments.end() - 1; it++)
+    {
+        open_segs.push_back(Segment(it->getEnd(), (it + 1)->getSegStart()));
+    }
+
+    // Lastly, the final open angle is between obstacles.end().getEnd() and
+    // reference_segment.getEnd()
+    open_segs.push_back(Segment(segments.back().getEnd(), parent_segment.getEnd()));
+
+    // Remove all zero length open Segments
+    for (std::vector<Segment>::const_iterator it = open_segs.begin();
+         it != open_segs.end();)
+    {
+        if (it->length() < EPS)
+        {
+            open_segs.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+
+    return open_segs;
+}
+
+
+std::vector<Segment> projectCirclesOntoSegment(Segment segment,
+                                               std::vector<Circle> circles, Point origin)
+{
+    // Loop through all obstacles to create their projected Segment
+    std::vector<Segment> obstacle_segment_projections = {};
+
+    for (Circle circle : circles)
+    {
+        // If the reference is inside an obstacle there is no open direction
+        if (contains(circle, origin))
+        {
+            obstacle_segment_projections.push_back(segment);
+            return obstacle_segment_projections;
+        }
+
+        // Get the tangent rays from the reference point to the obstacle
+        auto [ray1, ray2] = getCircleTangentRaysWithReferenceOrigin(origin, circle);
+
+        // Project the tangent Rays to obtain a 'blocked' segment on the reference
+        // Segment
+        std::optional<Segment> intersect_segment =
+            getIntersectingSegment(ray1, ray2, segment);
+
+        if (intersect_segment.has_value())
+        {
+            obstacle_segment_projections.push_back(intersect_segment.value());
+        }
+    }
+    return obstacle_segment_projections;
+}
+
+std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
+                                               Vector direction)
+{
     if (segments.size() <= 1)
     {
         // If there is only 1 segments, it is unique and should be returned
@@ -1156,7 +1222,7 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Ve
 
     std::vector<Segment> projected_segments = {};
     // The projection of the Segment without including the original Segment location
-    Vector raw_projection = Vector(0,0);
+    Vector raw_projection = Vector(0, 0);
 
     // Project all Segments onto the direction Vector
     for (Segment segment : segments)
@@ -1164,8 +1230,10 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Ve
         raw_projection = segment.toVector().project(direction);
 
         // Only count projections that have a non-zero magnitude
-        if(raw_projection.lengthSquared() > EPS){
-            projected_segments.push_back( Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));    
+        if (raw_projection.lengthSquared() > EPS)
+        {
+            projected_segments.push_back(
+                Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));
         }
     }
     std::vector<Segment> unique_segments;
@@ -1182,8 +1250,8 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Ve
 
         for (unsigned int i = 0; i < projected_segments.size(); i++)
         {
-            temp_segment =
-            mergeOverlappingParallelSegments(unique_segments[j], projected_segments[i]);
+            temp_segment = mergeOverlappingParallelSegments(unique_segments[j],
+                                                            projected_segments[i]);
 
             if (temp_segment.has_value())
             {

@@ -563,36 +563,63 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 
 /**
  * Function projects Circle objects onto a Segment with respect to an origin Point
- * 
-     *               projected Segment        
-     * *______X---------------------------X___________________*  <-- reference Segment
-     *          .                        .
-     *           .                      .
-     *            .                    .
-     *             .                  .
-     *              .                .
-     *               .              .
-     *                .   Circle   .
-     *                 .  /----\  .
-     *                  . |    | .
-     *                   .\----/.
-     *                    .    .
-     *                     .  .
-     *                      ..
-     *                       X
-     *                 Reference Origin
-     * 
+ *
+ *               projected Segment
+ * *______X---------------------------X___________________*  <-- reference Segment
+ *          .                        .
+ *           .                      .
+ *            .                    .
+ *             .                  .
+ *              .                .
+ *               .              .
+ *                .   Circle   .
+ *                 .  /----\  .
+ *                  . |    | .
+ *                   .\----/.
+ *                    .    .
+ *                     .  .
+ *                      ..
+ *                       X
+ *                 Reference Origin
+ *
  * @param segment : The reference Segment to project onto
  * @param circles : The vector of circles to project onto the reference Segment
  * @param origin : The Point origin to calculate the projection of the Circles from
- * 
- * @return vector<Segment> : All of the projections of the Circles onto the reference Segment
+ *
+ * @return vector<Segment> : All of the projections of the Circles onto the reference
+ * Segment
  */
-std::vector<Segment> projectCirclesOntoSegment(Segment segment, std::vector<Circle> circles, Point origin);
+std::vector<Segment> projectCirclesOntoSegment(Segment segment,
+                                               std::vector<Circle> circles, Point origin);
 
 /**
- * Function takes in a Vector of Segments and will combine their projections onto the direction Vector into the fewest
- * Segment sections that are independent of each other.
+ * Function that returns a Segment of the 'Empty' space between the Vector of Segments AND
+ * within the parent_segment.
+ *
+ * NOTE: All segments must be COLLINEAR and must NOT occupy any of the same space
+ *       Additionally, the parent segment completely contain ALL segments in the same
+ * space
+ *
+ *  *-------------------------------------------------* <-- Parent segment
+ *        *xxxxxxxx*          *xxxxxxxxxx*    *xxxx*    <-- Occupied space (input
+ * Segments)
+ *  *_____*         *_________*          *____*    *__* <-- Empty space (output Segments)
+ *
+ * @param segments : The vector of Segments that represent the 'occupied' space. These
+ * will be used to find the Segments representing the 'Empty' space
+ * @param parent_segment : The Segment representing the entire linear space to calculate
+ * the 'Empty' space Segments from
+ *
+ * @return vector<Segment> : All of the 'Empty' space Segments enclosed in the parent
+ * segment
+ */
+std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segments,
+                                                      Segment parent_segment);
+
+
+/**
+ * Function takes in a Vector of Segments and will combine their projections onto the
+ * direction Vector into the fewest Segment sections that are independent of each other.
  *
  * Ex.
  *  Input:  *--------*       *--------*
@@ -605,7 +632,8 @@ std::vector<Segment> projectCirclesOntoSegment(Segment segment, std::vector<Circ
  * @return std::vector<Segment>: The vector of the fewest
  * independent Segments
  */
-std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Vector direction);
+std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
+                                               Vector direction);
 
 /**
  * Returns the binary trespass score of a point and rectangle

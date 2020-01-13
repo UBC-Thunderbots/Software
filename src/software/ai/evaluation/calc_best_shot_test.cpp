@@ -286,13 +286,13 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_no_obstacles)
     Segment ref_segment     = Segment(Point(202, 15), Point(202, -15));
     Point origin            = Point(0, 0);
 
-    Shot open_shot = Evaluation::calcMostOpenDirection(origin, ref_segment, obs);
+    auto open_shot = Evaluation::calcMostOpenDirection(origin, ref_segment, obs);
 
     EXPECT_EQ((ref_segment.getSegStart() - origin).orientation() -
                   (ref_segment.getEnd() - origin).orientation(),
-              open_shot.getOpenAngle());
+              open_shot->getOpenAngle());
     EXPECT_EQ(getPointsMean({ref_segment.getSegStart(), ref_segment.getEnd()}),
-              open_shot.getPointToShootAt());
+              open_shot->getPointToShootAt());
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_obstacle_center_obstacle)
@@ -300,11 +300,11 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_obstacle_center_obstacle)
     Circle obst1 = Circle(Point(100, 0), 0.5);
 
     std::vector<Circle> obs = {obst1};
-    Shot open_shot          = Evaluation::calcMostOpenDirection(
+    auto open_shot          = Evaluation::calcMostOpenDirection(
         Point(0, 0), Segment(Point(202, 15), Point(202, -15)), obs);
-    EXPECT_NEAR(open_shot.getOpenAngle().toRadians(), 0.069121, 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().x(), Point(202, 8.00501).x(), 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().y(), Point(202, 8.00501).y(), 0.001);
+    EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.069121, 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(202, 8.00501).x(), 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().y(), Point(202, 8.00501).y(), 0.001);
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg)
@@ -316,11 +316,11 @@ TEST(CalcBestShotTest, test_calc_most_open_seg)
     Circle obst5 = Circle(Point(200, 10), 0.5);
 
     std::vector<Circle> obs = {obst1, obst2, obst3, obst4, obst5};
-    Shot open_shot          = Evaluation::calcMostOpenDirection(
+    auto open_shot          = Evaluation::calcMostOpenDirection(
         Point(0, 0), Segment(Point(202, 15), Point(202, -15)), obs);
-    EXPECT_NEAR(open_shot.getOpenAngle().toRadians(), 0.038961, 0.0001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().x(), Point(202, 5.65572).x(), 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().y(), Point(202, 5.65572).y(), 0.001);
+    EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.038961, 0.0001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(202, 5.65572).x(), 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().y(), Point(202, 5.65572).y(), 0.001);
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_line_of_obstacles_half_blocked)
@@ -335,10 +335,10 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_line_of_obstacles_half_blocked)
         obs.push_back(Circle(Point(5, i), 0.5));
     }
 
-    Shot open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
-    EXPECT_NEAR(open_shot.getOpenAngle().toRadians(), 0.884578, 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().x(), 10.0, 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().y(), 4.5024, 0.001);
+    auto open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
+    EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.884578, 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().x(), 10.0, 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().y(), 4.5024, 0.001);
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_line_of_obstacles_complete_blocked)
@@ -353,8 +353,8 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_line_of_obstacles_complete_blocke
         obs.push_back(Circle(Point(5, i), 0.5));
     }
 
-    Shot open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
-    EXPECT_EQ(open_shot.getOpenAngle(), Angle::fromDegrees(0));
+    auto open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
+    EXPECT_FALSE(open_shot.has_value());
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_touching_blocking_obstacle)
@@ -366,8 +366,8 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_touching_blocking_obstacle)
 
     obs.push_back(Circle(Point(0.5, 0), 0.5));
 
-    Shot open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
-    EXPECT_EQ(open_shot.getOpenAngle(), Angle::fromDegrees(0));
+    auto open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
+    EXPECT_FALSE(open_shot.has_value());
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_close_blocking_obstacle)
@@ -379,8 +379,8 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_close_blocking_obstacle)
 
     obs.push_back(Circle(Point(0.55, 0), 0.5));
 
-    Shot open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
-    EXPECT_EQ(open_shot.getOpenAngle(), Angle::fromDegrees(0));
+    auto open_shot = Evaluation::calcMostOpenDirection(Point(0, 0), ref_seg, obs);
+    EXPECT_FALSE(open_shot.has_value());
 }
 
 TEST(CalcBestShotTest, test_open_shot_with_a_dense_wall_of_obstacles)
@@ -390,10 +390,10 @@ TEST(CalcBestShotTest, test_open_shot_with_a_dense_wall_of_obstacles)
     obs.push_back(Circle(Point(3, 0), 0.09));
     obs.push_back(Circle(Point(3, 0.09), 0.09));
     // Using an obstacle radius of 0.1 passes, but 0.09 fails. Interesting...
-    Shot testpair_opt = Evaluation::calcMostOpenDirection(
+    auto testpair_opt = Evaluation::calcMostOpenDirection(
         Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
     // We do not expect to get a result
-    EXPECT_EQ(testpair_opt.getOpenAngle(), Angle::zero());
+    EXPECT_FALSE(testpair_opt.has_value());
 }
 
 TEST(CalcBestShotTest, test_calc_open_shot_with_a_dense_wall_of_obstacles_2)
@@ -402,10 +402,10 @@ TEST(CalcBestShotTest, test_calc_open_shot_with_a_dense_wall_of_obstacles_2)
     obs.push_back(Circle(Point(3, 0.05), 0.1));
     obs.push_back(Circle(Point(3, -0.05), 0.1));
 
-    Shot testpair_opt = Evaluation::calcMostOpenDirection(
+    auto testpair_opt = Evaluation::calcMostOpenDirection(
         Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
     // We do not expect to get a result
-    EXPECT_EQ(testpair_opt.getOpenAngle(), Angle::zero());
+    EXPECT_FALSE(testpair_opt.has_value());
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_obstacles_behind)
@@ -420,8 +420,8 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_obstacles_behind)
         obs.push_back(Circle(Point(-5, i), 0.5));
     }
 
-    Shot open_shot = Evaluation::calcMostOpenDirection(reference, ref_seg, obs);
-    EXPECT_EQ(open_shot.getOpenAngle(),
+    auto open_shot = Evaluation::calcMostOpenDirection(reference, ref_seg, obs);
+    EXPECT_EQ(open_shot->getOpenAngle(),
               (ref_seg.getSegStart() - reference)
                   .orientation()
                   .minDiff((ref_seg.getEnd() - reference).orientation())
@@ -442,10 +442,10 @@ TEST(CalcBestShotTest,
     // Blocking obstacles-
     obs.push_back(Circle(Point(8, 0), 1));
     obs.push_back(Circle(Point(8, 1), 1));
-    Shot open_shot = Evaluation::calcMostOpenDirection(reference, ref_seg, obs);
-    EXPECT_EQ(open_shot.getOpenAngle(), Angle::fromRadians(0.66007033222938283));
-    EXPECT_NEAR(open_shot.getPointToShootAt().x(), Point(10, -5.629940788).x(), 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().y(), Point(10, -5.629940788).y(), 0.001);
+    auto open_shot = Evaluation::calcMostOpenDirection(reference, ref_seg, obs);
+    EXPECT_EQ(open_shot->getOpenAngle(), Angle::fromRadians(0.66007033222938283));
+    EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(10, -5.629940788).x(), 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().y(), Point(10, -5.629940788).y(), 0.001);
 }
 TEST(CalcBestShotTest, test_calc_most_open_seg_robot_parameter_version)
 {
@@ -465,10 +465,10 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_robot_parameter_version)
                            AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0)));
     robots.push_back(Robot(14, Point(8, 0), Vector(0, 0), Angle::fromRadians(0),
                            AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0)));
-    Shot open_shot = Evaluation::calcMostOpenDirection(reference, ref_seg, robots);
-    EXPECT_NEAR(open_shot.getOpenAngle().toRadians(), 0.774148, 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().x(), Point(10, -5.05625).x(), 0.001);
-    EXPECT_NEAR(open_shot.getPointToShootAt().y(), Point(10, -5.05625).y(), 0.001);
+    auto open_shot = Evaluation::calcMostOpenDirection(reference, ref_seg, robots);
+    EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.774148, 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(10, -5.05625).x(), 0.001);
+    EXPECT_NEAR(open_shot->getPointToShootAt().y(), Point(10, -5.05625).y(), 0.001);
 }
 TEST(CalcBestShotTest, test_calc_open_shot_circles)
 {
@@ -477,16 +477,16 @@ TEST(CalcBestShotTest, test_calc_open_shot_circles)
     obs.push_back(Circle(Point(-9, 10), 1.0));
     obs.push_back(Circle(Point(9, 10), 1.0));
 
-    Shot testshot = Evaluation::calcMostOpenDirection(
+    auto testshot = Evaluation::calcMostOpenDirection(
         Point(0, 0), Segment(Point(10, 10), Point(-10, 10)), obs);
 
     // We expect to get a result
-    EXPECT_TRUE(testshot.getOpenAngle() != Angle::fromDegrees(0));
+    EXPECT_TRUE(testshot->getOpenAngle() != Angle::fromDegrees(0));
 
     EXPECT_TRUE(
-        (testshot.getPointToShootAt().toVector().normalize() - Vector(0, 1)).length() <
+        (testshot->getPointToShootAt().toVector().normalize() - Vector(0, 1)).length() <
         0.0001);
-    EXPECT_NEAR(75.449, testshot.getOpenAngle().toDegrees(), 1e-4);
+    EXPECT_NEAR(75.449, testshot->getOpenAngle().toDegrees(), 1e-4);
 
     obs.clear();
     obs.push_back(Circle(Point(-4, 6), 1.0));
@@ -497,10 +497,10 @@ TEST(CalcBestShotTest, test_calc_open_shot_circles)
         Point(0, 0), Segment(Point(10, 10), Point(-10, 10)), obs);
 
     // We expect to get a result
-    EXPECT_TRUE(testshot.getOpenAngle() != Angle::fromDegrees(0));
+    EXPECT_TRUE(testshot->getOpenAngle() != Angle::fromDegrees(0));
 
-    EXPECT_TRUE((testshot.getPointToShootAt().toVector().normalize() -
+    EXPECT_TRUE((testshot->getPointToShootAt().toVector().normalize() -
                  Point(-0.092577, 0.995702).toVector())
                     .length() < 0.0001);
-    EXPECT_NEAR(42.1928, testshot.getOpenAngle().toDegrees(), 1e-4);
+    EXPECT_NEAR(42.1928, testshot->getOpenAngle().toDegrees(), 1e-4);
 }
