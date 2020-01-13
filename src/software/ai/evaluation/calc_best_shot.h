@@ -220,8 +220,8 @@ namespace Evaluation
                                           const Shot &shot);
 
     /**
-     * Function calculates the optimal shot location and the corresponding Angle
-     * representing the 'open' area of that shot at the segment
+     * Function calculates the optimal shot and the corresponding Angle
+     * representing the 'open' area of that shot on a given segment to shoot at
      *
      * @param origin : The origin of the shot
      * @param segment : The segment at which shots are being evaluated on
@@ -235,8 +235,8 @@ namespace Evaluation
         Point origin, Segment segment, std::vector<Circle> obstacles);
 
     /**
-     * Function calculates the optimal shot location and the corresponding Angle
-     * representing the 'open' area of that shot at the segment
+     * Function calculates the optimal shot and the corresponding Angle
+     * representing the 'open' area of that shot on a given segment to shoot at
      *
      *   Open          Blocked Segment        Open
      * *______X---------------------------X___________________*  <-- reference Segment
