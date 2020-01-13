@@ -7,6 +7,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom:angle",
+        "//software/new_geom:point",
         "//software/world:ball",
         "//software/world:robot",
     ],
@@ -17,6 +19,7 @@ cc_test(
     srcs = ["obstacle_test.cpp"],
     deps = [
         ":obstacle",
+        "//software/new_geom:point",
         "@gtest//:gtest_main",
     ],
 )
