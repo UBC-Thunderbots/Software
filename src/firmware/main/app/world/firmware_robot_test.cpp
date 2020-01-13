@@ -17,12 +17,16 @@ class FirmwareRobotTest : public testing::Test
             .jerk_limit = 1.4
         };
 
+        controller_state = (ControllerState_t*)malloc(sizeof(ControllerState_t));
+        controller_state->last_applied_acceleration_x = 2.33f;
+        controller_state->last_applied_acceleration_y = 1.22f;
+        controller_state->last_applied_acceleration_angular = 3.22f;
+
         firmware_robot = app_firmware_robot_create(
             chicker, dribbler, &(this->returnEight), &(this->returnNine),
             &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
-            &(this->returnThirteen), &(this->returnFourteen), &(this->returnFifteen),
-            &(this->returnSixteen), front_right_wheel, front_left_wheel, back_right_wheel,
-            back_left_wheel, robot_constants);
+            &(this->returnThirteen), &(this->returnFourteen), front_right_wheel, front_left_wheel, back_right_wheel,
+            back_left_wheel, controller_state, robot_constants);
     }
 
     virtual void TearDown()
@@ -33,6 +37,8 @@ class FirmwareRobotTest : public testing::Test
     Chicker* chicker = (Chicker*)7;
 
     Dribbler* dribbler = (Dribbler*)8;
+
+    ControllerState_t* controller_state;
 
     static float returnEight()
     {
@@ -123,16 +129,8 @@ TEST_F(FirmwareRobotTest, getVelocityAngular){
     EXPECT_EQ(13, app_firmware_robot_getVelocityAngular(firmware_robot));
 }
 
-TEST_F(FirmwareRobotTest, getAccelerationX){
-    EXPECT_EQ(14, app_firmware_robot_getAccelerationX(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getAccelerationY){
-    EXPECT_EQ(15, app_firmware_robot_getAccelerationY(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getAccelerationAngular){
-    EXPECT_EQ(16, app_firmware_robot_getAccelerationAngular(firmware_robot));
+TEST_F(FirmwareRobotTest, getBatteryVoltage){
+    EXPECT_EQ(14, app_firmware_robot_getBatteryVoltage(firmware_robot));
 }
 
 TEST_F(FirmwareRobotTest, getFrontRightWheel)
@@ -156,10 +154,32 @@ TEST_F(FirmwareRobotTest, getBackLeftWheel)
 }
 
 TEST_F(FirmwareRobotTest, getRobotConstants){
-    RobotConstants_t constants = app_firmware_robot_getPhysicalConstants(firmware_robot);
+    RobotConstants_t constants = app_firmware_robot_getRobotConstants(firmware_robot);
 
     EXPECT_NEAR(1.1, constants.mass, 1e-5);
     EXPECT_NEAR(1.2, constants.moment_of_inertia, 1e-5);
     EXPECT_NEAR(1.3, constants.robot_radius, 1e-5);
     EXPECT_NEAR(1.4, constants.jerk_limit, 1e-5);
+}
+
+TEST_F(FirmwareRobotTest, getAndModifyControllerState){
+    ControllerState_t* controller_state = app_firmware_robot_getControllerState(firmware_robot);
+
+    // Check initial values
+    EXPECT_NEAR(2.33, controller_state->last_applied_acceleration_x, 1e-6);
+    EXPECT_NEAR(1.22, controller_state->last_applied_acceleration_y, 1e-6);
+    EXPECT_NEAR(3.22, controller_state->last_applied_acceleration_angular, 1e-6);
+
+    // Modify the values
+    controller_state->last_applied_acceleration_x = 3.4;
+    controller_state->last_applied_acceleration_y = 3.55;
+    controller_state->last_applied_acceleration_angular = 3.88;
+
+    // Check that the modified values are reflected when we get the ControllerState
+    // from the robot again
+    controller_state = app_firmware_robot_getControllerState(firmware_robot);
+
+    EXPECT_NEAR(3.4, controller_state->last_applied_acceleration_x, 1e-6);
+    EXPECT_NEAR(3.55, controller_state->last_applied_acceleration_y, 1e-6);
+    EXPECT_NEAR(3.88, controller_state->last_applied_acceleration_angular, 1e-6);
 }

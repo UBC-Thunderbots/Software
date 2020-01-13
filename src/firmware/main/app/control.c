@@ -20,12 +20,11 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
                                           const float wheel_forces[4],
                                           float battery_voltage)
 {
-    float vapp_max       = -INFINITY;
+    float max_effective_motor_voltage = -INFINITY;
     float slip_ratio_min = INFINITY;
 
     for (long i = 0; i < 4; i++)
     {
-        // TODO: better variable names here
         Wheel_t* wheel                   = wheels[i];
         const WheelConstants_t constants = app_wheel_getWheelConstants(wheel);
         float force                      = wheel_forces[i];
@@ -33,24 +32,24 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
             force * constants.wheel_radius * constants.wheel_rotations_per_motor_rotation;
         float curr_motor_rpm = app_wheel_getMotorSpeedRPM(wheel);
 
-        float volt = motor_torque * constants.motor_current_per_unit_torque *
+        float applied_voltage = motor_torque * constants.motor_current_per_unit_torque *
                      constants.motor_phase_resistance;
         float back_emf = curr_motor_rpm * constants.motor_back_emf_per_rpm;
-        float appl_volt = fabsf(volt + back_emf);
+        float effective_voltage = fabsf(applied_voltage + back_emf);
 
         float slip_ratio =
-            constants.motor_max_delta_voltage_before_wheel_slip / fabsf(volt);
+            constants.motor_max_delta_voltage_before_wheel_slip / fabsf(applied_voltage);
         if (slip_ratio < slip_ratio_min)
         {
             slip_ratio_min = slip_ratio;
         }
-        if (appl_volt > vapp_max)
+        if (effective_voltage > max_effective_motor_voltage)
         {
-            vapp_max = appl_volt;
+            max_effective_motor_voltage = effective_voltage;
         }
     }
 
-    float emf_ratio_min = battery_voltage / vapp_max;
+    float emf_ratio_min = battery_voltage / max_effective_motor_voltage;
 
     return (emf_ratio_min > slip_ratio_min) ? slip_ratio_min : emf_ratio_min;
 }
@@ -74,7 +73,7 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
                                          const float linear_accel_y, float angular_accel)
 {
     const RobotConstants_t robot_constants =
-        app_firmware_robot_getPhysicalConstants(robot);
+        app_firmware_robot_getRobotConstants(robot);
 
     // first convert accelerations into consistent units
     // choose units of Force (N)
@@ -102,7 +101,7 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
                             float linear_accel_y, float angular_accel)
 {
     const RobotConstants_t robot_constants =
-        app_firmware_robot_getPhysicalConstants(robot);
+        app_firmware_robot_getRobotConstants(robot);
 
     // check for max acceleration in direction of the vel difference
     float scaling = app_control_getMaximalAccelScaling(robot, linear_accel_x,

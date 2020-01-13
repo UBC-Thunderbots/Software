@@ -4,8 +4,6 @@
 #include "app/world/dribbler.h"
 #include "app/world/wheel.h"
 
-// TODO: return structs instead of having functions for each vector component?
-
 /**
  * This struct represents a robot from the perspective of firmware
  */
@@ -16,10 +14,13 @@ typedef struct FirmwareRobot FirmwareRobot_t;
  */
 typedef struct RobotConstants
 {
-    // TODO: jdocs for members
+    // The mass of the entire robot
     float mass;
+    // The moment of inertia of the entire robot
     float moment_of_inertia;
+    // The maximum radius of the robot
     float robot_radius;
+    // The maximum jerk this robot may safely undergo
     float jerk_limit;
 } RobotConstants_t;
 
@@ -34,7 +35,6 @@ typedef struct ControllerState {
     float last_applied_acceleration_angular;
 } ControllerState_t;
 
-// TODO: this constructor needs to take functions for robot velocity
 /**
  * Create a robot with the given hardware
  *
@@ -118,7 +118,6 @@ float app_firmware_robot_getPositionX(FirmwareRobot_t* robot);
  */
 float app_firmware_robot_getPositionY(FirmwareRobot_t* robot);
 
-// TODO: testme
 /**
  * Get the current orientation of the given robot
  *
@@ -127,7 +126,6 @@ float app_firmware_robot_getPositionY(FirmwareRobot_t* robot);
  */
 float app_firmware_robot_getOrientation(FirmwareRobot_t* robot);
 
-// TODO: test me!
 /**
  * Get the x-velocity of the given robot
  * @param robot The robot to get the y-velocity for
@@ -135,7 +133,6 @@ float app_firmware_robot_getOrientation(FirmwareRobot_t* robot);
  */
 float app_firmware_robot_getVelocityX(FirmwareRobot_t* robot);
 
-// TODO: test me!
 /**
  * Get the y-velocity of the given robot
  * @param robot The robot to get the y-velocity for
@@ -150,7 +147,6 @@ float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot);
  */
 float app_firmware_robot_getVelocityAngular(FirmwareRobot_t* robot);
 
-// TODO: test and implement me
 /**
  * Get the battery voltage for the given robot
  * @param robot The robot to get the battery voltage for
@@ -188,14 +184,12 @@ Wheel_t* app_firmware_robot_getBackRightWheel(FirmwareRobot_t* robot);
 Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot);
 
 /**
- * Get the physical constants for this robot
- * @param robot The robot to get physical constants from
- * @return The physical constants for the given robot
+ * Get the constants for this robot
+ * @param robot The robot to get constants from
+ * @return The constants for the given robot
  */
-// TODO: should this be "physical constants", or just "constants"
-const RobotConstants_t app_firmware_robot_getPhysicalConstants(FirmwareRobot_t* robot);
+const RobotConstants_t app_firmware_robot_getRobotConstants(FirmwareRobot_t* robot);
 
-// TODO: test me!
 /**
  * Get the controller state for the given robot
  * @param robot The robot to get the controller state for
