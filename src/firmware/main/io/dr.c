@@ -87,13 +87,6 @@ void dr_tick(log_record_t *log)
     // Convert to global reference frame for state update
     rotate(wheel_speeds, current_state.angle);
 
-#define P(x) (int)round(x*1000)
-
-    iprintf("DR: Updating Speeds \r \n");
-    iprintf("  linear_x: %d - %d \r \n", P(wheel_speeds[0]), P(current_state.vx));
-    iprintf("  linear_y: %d - %d \r \n", P(wheel_speeds[1]), P(current_state.vy));
-    iprintf("  angular: %d - %d \r \n", P(wheel_speeds[2]), P(current_state.avel));
-
     // Update the current velocity to match wheel velocities
     current_state.vx   = wheel_speeds[0];
     current_state.vy   = wheel_speeds[1];
