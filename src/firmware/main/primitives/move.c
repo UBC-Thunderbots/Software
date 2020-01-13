@@ -153,7 +153,7 @@ static void move_init(void)
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
@@ -203,7 +203,7 @@ static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
  *
  * This function runs when the host computer requests a new movement while a
  * move movement is already in progress.
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  *
  * @return void
  */

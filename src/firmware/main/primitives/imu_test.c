@@ -50,7 +50,7 @@ static void imu_test_start(const primitive_params_t *params)
  *
  * This function runs when the host computer requests a new movement while a
  * spin movement is already in progress.
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void imu_test_end(FirmwareWorld_t *world) {}
 
@@ -61,7 +61,7 @@ static void imu_test_end(FirmwareWorld_t *world) {}
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void imu_test_tick(log_record_t *log, FirmwareWorld_t *world)
 {

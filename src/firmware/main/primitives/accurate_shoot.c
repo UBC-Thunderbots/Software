@@ -62,7 +62,7 @@ static void accurate_shoot_init(void) {}
  *	2. there is no need to worry about recording the start position
  *	   because the primitive start function already does it
  *
- * \param[in] world TODO
+ * \param[in] world The world to perform the primitive in
  */
 static void accurate_shoot_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
@@ -87,7 +87,7 @@ static void accurate_shoot_start(const primitive_params_t* params, FirmwareWorld
  * This function runs when the host computer requests a new movement while an
  * accurate shoot movement is already in progress.
  *
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void accurate_shoot_end(FirmwareWorld_t* world)
 {

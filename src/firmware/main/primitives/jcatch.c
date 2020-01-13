@@ -57,7 +57,7 @@ float dribbler_speed;
  * \param[in] primitive_params_t the catch parameters, which are only valid until this
  * primitive ends. Three parameters are the catchmargin and velocity ratios as well as
  * dribbler set speed in rpm
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void catch_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
@@ -83,7 +83,7 @@ static void catch_start(const primitive_params_t* params, FirmwareWorld_t* world
  *
  * This function runs when the host computer requests a new movement while a
  * catch movement is already in progress.
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void catch_end(FirmwareWorld_t* world) {}
 

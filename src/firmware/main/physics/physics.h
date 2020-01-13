@@ -1,5 +1,4 @@
-#ifndef PHYSICS_H
-#define PHYSICS_H
+#pragma once
 
 #include "math/tbots_math.h"
 
@@ -98,10 +97,6 @@ float min_angle_delta(float, float);
 
 float norm2(float a1, float a2);
 
-#ifdef FWSIM
-float min_angle_delta_alt(float, float);  // Todo: what is this suppose to be?
-#endif
-
 // rotate a velocity vector through angle
 void rotate(float speed3[2], float angle);
 
@@ -161,4 +156,3 @@ float dot_product(float vec1[], float vec2[], int size);
 float dot2D(float vec1[2], float vec2[2]);
 
 float dot3D(float vec1[3], float vec2[3]);
-#endif

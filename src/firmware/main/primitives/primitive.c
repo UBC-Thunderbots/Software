@@ -93,7 +93,7 @@ void primitive_init(void)
  *
  * \param[in] primitive the index of the primitive to run
  * \param[in] params the parameters to the primitive
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 void primitive_start(unsigned int primitive, const primitive_params_t *params,
                      FirmwareWorld_t *world)

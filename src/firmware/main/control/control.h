@@ -3,7 +3,6 @@
 
 #include "shared/util.h"
 
-// TODO: where should this go?
 #define JERK_LIMIT 40.0f  //(m/s^3)
 
 // Apply wheel force to specific wheels

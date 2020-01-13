@@ -59,7 +59,7 @@ typedef struct
      * \param[in] params the parameters to the primitive, which are only valid
      * until this function returns and must be copied into primitive-local
      * storage if needed subsequently
-     * \param[in] world TODO? REALLY CONSIDER
+     * \param[in] world The world to perform the primitive in
      */
     void (*start)(const primitive_params_t *params, FirmwareWorld_t *world);
 
@@ -69,7 +69,7 @@ typedef struct
      * This is invoked every time a new movement begins after a primitive has
      * been in use, regardless of whether the new movement is of the same or a
      * different type.
-     * \param[in] world TODO? REALLY CONSIDER
+     * \param[in] world The world to perform the primitive in
      */
     void (*end)(FirmwareWorld_t *world);
 
@@ -81,7 +81,7 @@ typedef struct
      *
      * \param[out] log the log record to fill with information about the tick,
      * or \c NULL if no record is to be filled
-     * \param[in] world TODO?
+     * \param[in] world The world to perform the primitive in
      */
     void (*tick)(log_record_t *log, FirmwareWorld_t *world);
 } primitive_t;

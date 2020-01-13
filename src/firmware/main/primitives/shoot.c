@@ -118,7 +118,7 @@ static void shoot_init(void) {}
  *	1. record the movement intent
  *	2. there is no need to worry about recording the start position
  *	   because the primitive start function already does it
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void shoot_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
@@ -171,7 +171,7 @@ static void shoot_start(const primitive_params_t *params, FirmwareWorld_t *world
     rotate(minor_vec, P_PI / 2);
  * This function runs when the host computer requests a new movement while a
  * shoot movement is already in progress.
- * \param[in] world TODO?
+ * \param[in] world The world to perform the primitive in
  */
 static void shoot_end(FirmwareWorld_t *world)
 {

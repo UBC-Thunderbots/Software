@@ -459,7 +459,6 @@ static void run_normal(void)
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
-    // TODO: put this in a function?
     WheelConstants_t wheel_constants = {
         .wheel_rotations_per_motor_rotation        = GEAR_RATIO,
         .wheel_radius                              = WHEEL_RADIUS,
@@ -478,7 +477,8 @@ static void run_normal(void)
     Chicker_t* chicker = app_chicker_create(
         chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
         chicker_auto_disarm, chicker_auto_disarm);
-    Dribbler_t* dribbler = app_dribbler_create(dribbler_set_speed, dribbler_temperature);
+    Dribbler_t* dribbler =
+        app_dribbler_create(dribbler_set_speed, dribbler_coast, dribbler_temperature);
     const RobotConstants_t robot_constants = {
         .mass              = ROBOT_MASS[0],
         .moment_of_inertia = ROBOT_MASS[2],
@@ -577,7 +577,6 @@ static void run_normal(void)
     charger_shutdown();
     motor_shutdown();
 
-    // TODO: put this in a function?
     app_firmware_world_destroy(world);
     app_firmware_ball_destroy(ball);
     app_firmware_robot_destroy(robot);
