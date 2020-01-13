@@ -1214,12 +1214,6 @@ std::vector<Segment> projectCirclesOntoSegment(Segment segment,
 std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
                                                Vector direction)
 {
-    if (segments.size() <= 1)
-    {
-        // If there is only 1 segments, it is unique and should be returned
-        return segments;
-    }
-
     std::vector<Segment> projected_segments = {};
     // The projection of the Segment without including the original Segment location
     Vector raw_projection = Vector(0, 0);
