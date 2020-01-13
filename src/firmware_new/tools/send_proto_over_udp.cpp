@@ -11,7 +11,7 @@
 using boost::asio::ip::udp;
 using google::protobuf::Message;
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -29,8 +29,9 @@ int main(int argc, char *argv[])
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
 
     // create a RobotCommunicator with a NetworkMedium
-    RobotCommunicator<control_msg, robot_ack> communicator(
-        std::make_unique<NetworkMedium>("10.10.10.0", 42069), nullptr, nullptr);
+    RobotCommunicator<control_msg, control_msg> communicator(
+        std::make_unique<NetworkMedium>("127.0.0.1", 42069), nullptr,
+        [=](const control_msg& msg) { std::cerr << "got msg!" << std::endl; });
 
     while (1)
         communicator.send_proto(control_req);

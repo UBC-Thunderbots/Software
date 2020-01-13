@@ -93,7 +93,4 @@ class RobotCommunicator
 
     // buffer that holds msgs to be sent
     std::shared_ptr<ThreadSafeBuffer<SendProto>> send_buffer;
-
-    // buffer to hold incoming msgs
-    std::shared_ptr<ThreadSafeBuffer<ReceiveProto>> recv_buffer;
 };

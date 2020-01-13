@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+#include "software/multithreading/thread_safe_buffer.h"
 
 /*
  * A TransferMedium is an abstraction around the medium used to communicate
@@ -20,7 +20,7 @@ class TransferMedium
      */
     virtual void send_data(const std::string& data)
     {
-        std::cout << "CALLING UNIMPLEMENTED FUNCTION" << std::endl;
+        throw std::logic_error("base TransferMedium send_data called");
     }
 
     /*
@@ -33,8 +33,8 @@ class TransferMedium
      *
      * @param func The function to call when data is received
      */
-    virtual void receive_data(std::function<void(std::string)>)
+    virtual void receive_data(std::function<void(std::string)> receive_callback)
     {
-        std::cout << "CALLING UNIMPLEMENTED FUNCTION" << std::endl;
+        throw std::logic_error("base TransferMedium receive_data called");
     }
 };

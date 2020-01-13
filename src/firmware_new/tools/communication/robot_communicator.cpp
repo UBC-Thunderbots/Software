@@ -1,5 +1,7 @@
 #include "firmware_new/tools/communication/robot_communicator.h"
 
+#include <iostream>
+
 #include "firmware_new/proto/control.pb.h"
 #include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
 #include "software/multithreading/thread_safe_buffer.h"
@@ -18,7 +20,14 @@ RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
 {
     // start thread to send data from the buffer
     send_buffer.reset(new ThreadSafeBuffer<SendProto>(10));
+
     send_thread = std::thread(&RobotCommunicator::send_loop, this, std::ref(send_buffer));
+
+    this->medium->receive_data([&](std::string incoming_data) {
+        ReceiveProto msg;
+        msg.ParseFromString(incoming_data);
+        received_callback(msg);
+    });
 }
 
 template <class SendProto, class ReceiveProto>
@@ -53,7 +62,7 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
             std::string data;
             (*new_val).SerializeToString(&data);
 
-            medium->send_data("TESTTESTTEST");
+            medium->send_data(data);
 
             if (sent_callback)
             {
@@ -67,4 +76,4 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
 }
 
 // place all templated communcation msg send/receive pair initializations here
-template class RobotCommunicator<control_msg, robot_ack>;
+template class RobotCommunicator<control_msg, control_msg>;
