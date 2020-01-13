@@ -1116,6 +1116,35 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
     }
 }
 
+std::vector<Segment> projectCirclesOntoSegment(Segment segment, std::vector<Circle> circles, Point origin) {
+ // Loop through all obstacles to create their 'blocking' Segment
+std::vector<Segment> obstacle_segment_projections = {};
+
+        for (Circle circle : circles)
+        {
+            // If the reference is inside an obstacle there is no open direction
+            if (contains(circle, origin))
+            {
+                obstacle_segment_projections.push_back(segment);
+                return obstacle_segment_projections;
+            }
+
+            // Get the tangent rays from the reference point to the obstacle
+            auto [ray1, ray2] = getCircleTangentRaysWithReferenceOrigin(origin, circle);
+
+            // Project the tangent Rays to obtain a 'blocked' segment on the reference
+            // Segment
+            std::optional<Segment> intersect_segment =
+                getIntersectingSegment(ray1, ray2, segment);
+
+            if (intersect_segment.has_value())
+            {
+                obstacle_segment_projections.push_back(intersect_segment.value());
+            }
+        }
+    return obstacle_segment_projections;
+    }
+
 std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments, Vector direction)
 {
 

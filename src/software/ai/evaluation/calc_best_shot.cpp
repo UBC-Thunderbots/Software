@@ -156,6 +156,7 @@ namespace Evaluation
                                std::vector<Circle> obstacles)
     {
         std::vector<Segment> obstacle_segment_projections;
+        
         // If there are no obstacles, return the center of the Segment and the shot angle
         if (obstacles.size() == 0)
         {
@@ -170,30 +171,7 @@ namespace Evaluation
             return Shot(center_of_segment, angle_of_entire_segment);
         }
 
-        // Loop through all obstacles to create their 'blocking' Segment
-        for (Circle circle : obstacles)
-        {
-            // If the reference is inside an obstacle there is no open direction
-            if (contains(circle, origin))
-            {
-                const Point center_of_segment =
-                    getPointsMean({segment.getSegStart(), segment.getEnd()});
-                return Shot(center_of_segment, Angle::fromDegrees(0));
-            }
-
-            // Get the tangent rays from the reference point to the obstacle
-            auto [ray1, ray2] = getCircleTangentRaysWithReferenceOrigin(origin, circle);
-
-            // Project the tangent Rays to obtain a 'blocked' segment on the reference
-            // Segment
-            std::optional<Segment> intersect_segment =
-                getIntersectingSegment(ray1, ray2, segment);
-
-            if (intersect_segment.has_value())
-            {
-                obstacle_segment_projections.push_back(intersect_segment.value());
-            }
-        }
+       obstacle_segment_projections = projectCirclesOntoSegment(segment, obstacles, origin);
 
         // If we have more than 1 Segment from the obstacle projection then we must
         // combine overlapping ones to simplify analysis

@@ -562,6 +562,35 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
 std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
 
 /**
+ * Function projects Circle objects onto a Segment with respect to an origin Point
+ * 
+     *               projected Segment        
+     * *______X---------------------------X___________________*  <-- reference Segment
+     *          .                        .
+     *           .                      .
+     *            .                    .
+     *             .                  .
+     *              .                .
+     *               .              .
+     *                .   Circle   .
+     *                 .  /----\  .
+     *                  . |    | .
+     *                   .\----/.
+     *                    .    .
+     *                     .  .
+     *                      ..
+     *                       X
+     *                 Reference Origin
+     * 
+ * @param segment : The reference Segment to project onto
+ * @param circles : The vector of circles to project onto the reference Segment
+ * @param origin : The Point origin to calculate the projection of the Circles from
+ * 
+ * @return vector<Segment> : All of the projections of the Circles onto the reference Segment
+ */
+std::vector<Segment> projectCirclesOntoSegment(Segment segment, std::vector<Circle> circles, Point origin);
+
+/**
  * Function takes in a Vector of Segments and will combine their projections onto the direction Vector into the fewest
  * Segment sections that are independent of each other.
  *
