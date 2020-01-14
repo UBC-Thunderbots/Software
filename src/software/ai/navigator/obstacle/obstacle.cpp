@@ -14,7 +14,7 @@ const std::optional<Circle> Obstacle::getBoundaryCircle() const
 Obstacle::Obstacle(Polygon polygon) : _polygon(std::make_optional<Polygon>(polygon)) {}
 
 Obstacle::Obstacle(Rectangle rectangle)
-    : Obstacle({rectangle.negXNegYCorner(), rectangle.negXPosYCorner(),
+    : Obstacle(Polygon{rectangle.negXNegYCorner(), rectangle.negXPosYCorner(),
                 rectangle.posXPosYCorner(), rectangle.posXNegYCorner()})
 {
 }
@@ -186,7 +186,7 @@ bool Obstacle::containsPoint(const Point& point) const
 {
     if (isPolygon())
     {
-        return (*_polygon).containsPoint(point);
+        return (*_polygon).contains(point);
     }
     else
     {
@@ -198,7 +198,7 @@ bool Obstacle::intersects(const Segment& segment) const
 {
     if (isPolygon())
     {
-        return (*_polygon).intersects(segment);
+        return ::intersects((*_polygon), segment);
     }
     else
     {

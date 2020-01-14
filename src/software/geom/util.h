@@ -3,9 +3,9 @@
 #include <cstddef>
 #include <vector>
 
-#include "software/geom/polygon.h"
+#include "software/new_geom/polygon.h"
 #include "software/geom/rectangle.h"
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 #include "software/geom/shot.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/line.h"

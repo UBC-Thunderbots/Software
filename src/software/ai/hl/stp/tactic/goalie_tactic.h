@@ -3,7 +3,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/rectangle.h"
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 #include "software/new_geom/point.h"
 
 /**

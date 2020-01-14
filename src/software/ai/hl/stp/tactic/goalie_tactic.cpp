@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"

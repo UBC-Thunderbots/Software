@@ -3,7 +3,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "geom",
     srcs = [
-        "polygon.cpp",
         "polynomial.cpp",
         "rectangle.cpp",
         "shot.cpp",
@@ -12,10 +11,8 @@ cc_library(
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "polygon.h",
         "polynomial.h",
         "rectangle.h",
-        "segment.h",
         "shot.h",
         "spline.h",
         "util.h",
@@ -28,6 +25,7 @@ cc_library(
         "//software/new_geom:circle",
         "//software/new_geom:line",
         "//software/new_geom:point",
+        "//software/new_geom:polygon",
         "//software/new_geom:ray",
         "@boost//:geometry",
         "@boost//:polygon",
@@ -50,17 +48,6 @@ cc_test(
     name = "polynomial_test",
     srcs = [
         "polynomial_test.cpp",
-    ],
-    deps = [
-        ":geom",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "polygon_test",
-    srcs = [
-        "polygon_test.cpp",
     ],
     deps = [
         ":geom",

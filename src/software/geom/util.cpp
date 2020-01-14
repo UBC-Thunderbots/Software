@@ -12,7 +12,7 @@
 #include <tuple>
 
 #include "software/geom/rectangle.h"
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 #include "software/geom/voronoi_diagram.h"
 #include "software/new_geom/angle.h"
 
@@ -54,7 +54,7 @@ double dist(const Segment &first, const Point &second)
 
 double dist(const Point &first, const Polygon &second)
 {
-    if (second.containsPoint(first))
+    if (second.contains(first))
     {
         return 0;
     }

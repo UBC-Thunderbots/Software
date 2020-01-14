@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/polygon.h"
+#include "software/new_geom/polygon.h"
 #include "software/geom/util.h"
 
 ChipAction::ChipAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
@@ -77,6 +77,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         // We make the region close enough to the ball so that the robot will still be
         // inside it when taking the chip.
+        // TODO: Maybe use new geom Triangle for this
         Point behind_ball_vertex_A = chip_origin;
         Point behind_ball_vertex_B =
             behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
@@ -88,7 +89,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         Polygon behind_ball_region =
             Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
 
-        bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
+        bool robot_behind_ball = behind_ball_region.contains(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
             chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
