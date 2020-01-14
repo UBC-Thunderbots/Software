@@ -24,17 +24,18 @@ class TransferMedium
     }
 
     /*
-     * Returns when a data packet has arrived through the medium
+     * Calls the provided callback everytime a new packet is received
      *
      * NOTE: Depending on the implementation of send_data
      * this function may be triggered by a packet sent by the
      * same instance of the class. (example: UDP broadcast, the sender
      * also gets a packet)
      *
-     * @param func The function to call when data is received
+     * NOTE: this function does NOT block, it returns immediately after
+     * registering the callback
      */
-    virtual void receive_data(std::function<void(std::string)> receive_callback)
+    virtual void receive_data_async(std::function<void(std::string)> receive_callback)
     {
-        throw std::logic_error("base TransferMedium receive_data called");
+        throw std::logic_error("base TransferMedium receive_data_async called");
     }
 };

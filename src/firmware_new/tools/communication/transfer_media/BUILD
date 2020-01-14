@@ -11,6 +11,7 @@ cc_library(
     hdrs = ["network_medium.h"],
     deps = [
         ":transfer_medium",
+        "@g3log",
         "//software/multithreading:thread_safe_buffer",
     ],
 )

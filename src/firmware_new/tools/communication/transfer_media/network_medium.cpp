@@ -1,5 +1,7 @@
 #include "firmware_new/tools/communication/transfer_media/network_medium.h"
 
+#include <g3log/g3log.hpp>
+
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/asio/error.hpp"
@@ -14,56 +16,85 @@ NetworkMedium::NetworkMedium(std::string local_ipaddr, unsigned port)
     socket.reset(new udp::socket(io_service));
 
     // TODO explain endpoints
-    local_endpoint  = udp::endpoint(address_v4::from_string(local_ipaddr), port);
-    remote_endpoint = udp::endpoint(address_v4::broadcast(), port);
+    local_endpoint     = udp::endpoint(address_v4::from_string(local_ipaddr), port);
+    broadcast_endpoint = udp::endpoint(address_v4::broadcast(), port);
 
-    boost::system::error_code error;
-    socket->open(udp::v4(), error);
+    socket->open(local_endpoint.protocol());
 
-    if (!error)
+    try
     {
-        // TODO explain options
-        socket->set_option(udp::socket::reuse_address(true));
-        socket->set_option(socket_base::broadcast(true));
+        socket->bind(local_endpoint);
+    }
+    catch (const boost::exception& ex)
+    {
+        LOG(WARNING) << "There was an issue binding the socket to the endpoint when"
+                        "trying to connect to the provided port"
+                        "Please make sure no other program is using the port"
+                     << std::endl;
+
+        // Throw this exception up to top-level, as we have no valid
+        // recovery action here
+        throw ex;
     }
 
-    socket->bind(local_endpoint);
-    io_service.run();
+    // TODO explain options
+    socket->set_option(udp::socket::reuse_address(true));
+    socket->set_option(socket_base::broadcast(true));
 }
 
 NetworkMedium::~NetworkMedium()
 {
+    // Stop the io_service. This is safe to call from another thread.
+    // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service
+    // This MUST be done before attempting to join the thread because otherwise the
+    // io_service will not stop and the thread will not join
+    io_service.stop();
+
+    // Join the io_service_thread so that we wait for it to exit before destructing the
+    // thread object. If we do not wait for the thread to finish executing, it will call
+    // `std::terminate` when we deallocate the thread object and kill our whole program
+    io_service_thread.join();
+
     socket->close();
     socket.reset();
 }
 
 void NetworkMedium::send_data(const std::string& data)
 {
-    socket->send_to(boost::asio::buffer(data), remote_endpoint);
+    socket->send_to(boost::asio::buffer(data), broadcast_endpoint);
 }
 
-void handle_receive_from(const boost::system::error_code& error, size_t bytes_recvd) {}
-
-void NetworkMedium::receive_data(std::function<void(std::string)> receive_callback)
+void NetworkMedium::receive_data_async(std::function<void(std::string)> receive_callback)
 {
-    // Implemented according to this to continue receiving data
-    // https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/example/cpp11/echo/async_udp_echo_server.cpp
+    this->receive_callback = receive_callback;
 
-    // TODO fix 1000 fixed syse
-    std::vector<char> buffer(1000);
+    socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
+                               broadcast_endpoint,
+                               boost::bind(&NetworkMedium::handle_data_reception, this,
+                                           boost::asio::placeholders::error,
+                                           boost::asio::placeholders::bytes_transferred));
 
-    if (!error && bytes_recvd > 0)
+    // start the thread to run the io_service in the background
+    io_service_thread = std::thread([this]() { io_service.run(); });
+}
+
+void NetworkMedium::handle_data_reception(const boost::system::error_code& error,
+                                          size_t num_bytes_received)
+{
+    if (!error)
     {
-        received_callback(std::string(buffer.begin(), buffer.end()));
+        receive_callback(std::string(data_buffer.begin(), data_buffer.end()));
     }
     else
     {
-        socket->async_receive_from(
-            boost::asio::buffer(data_, max_length), sender_endpoint_,
-            boost::bind(&NetworkMedium::receive_data, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+        LOG(WARNING) << "An unknown network error occurred when attempting"
+                        "to receive SSL Vision Data. The boost system error code is "
+                     << error << std::endl;
     }
 
-    io_service.run();
+    socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
+                               broadcast_endpoint,
+                               boost::bind(&NetworkMedium::handle_data_reception, this,
+                                           boost::asio::placeholders::error,
+                                           boost::asio::placeholders::bytes_transferred));
 }

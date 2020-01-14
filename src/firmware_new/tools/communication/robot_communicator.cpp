@@ -20,13 +20,13 @@ RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
 {
     // start thread to send data from the buffer
     send_buffer.reset(new ThreadSafeBuffer<SendProto>(10));
-
     send_thread = std::thread(&RobotCommunicator::send_loop, this, std::ref(send_buffer));
 
-    this->medium->receive_data([&](std::string incoming_data) {
+    this->medium->receive_data_async([&](std::string incoming_data) {
         ReceiveProto msg;
         msg.ParseFromString(incoming_data);
         received_callback(msg);
+        std::cerr << incoming_data << std::endl;
     });
 }
 
