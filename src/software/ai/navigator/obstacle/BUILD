@@ -31,7 +31,8 @@ cc_library(
     deps = [
         ":obstacle",
         "//software/ai/motion_constraint",
-        "//software/new_geom",
+        "//software/geom",
+        "//software/new_geom:point",
         "//software/util/parameter:dynamic_parameters",
         "//software/world",
     ],
