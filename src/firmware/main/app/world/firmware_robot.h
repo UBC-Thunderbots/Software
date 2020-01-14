@@ -39,8 +39,9 @@ typedef struct ControllerState
 /**
  * Create a robot with the given hardware
  *
- * NOTE: All positions are in global field coordinates (ie. 0,0 is the center of the
- *       field)
+ * NOTE: Everything in this class are in global field coordinates (ie. 0,0 is the
+ *       center of the field, 0 degrees is towards the enemy goal) unless
+ *       otherwise specified
  *
  * @param chicker The robot chicker
  * @param dribbler The robot dribbler

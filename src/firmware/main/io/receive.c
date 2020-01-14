@@ -134,7 +134,7 @@ static void receive_task(void *UNUSED(param))
  * \brief Initializes the receive task.
  *
  * \param[in] index The robot index
- * \param[in] world_ The world the "high level" firmware can use to interact with the
+ * \param[in] _world The world the "high level" firmware can use to interact with the
  *                   outside world
  */
 void receive_init(unsigned int index, FirmwareWorld_t *_world)

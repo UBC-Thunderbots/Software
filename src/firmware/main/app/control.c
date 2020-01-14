@@ -124,11 +124,12 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
     float angular_diff  = angular_accel - prev_angular_accel;
 
-    const float jerk_limit        = robot_constants.jerk_limit;
-    const float linear_jerk_limit = robot_constants.jerk_limit * TICK_TIME;
+    const float jerk_limit         = robot_constants.jerk_limit;
+    const float linear_jerk_limit  = robot_constants.jerk_limit * TICK_TIME;
+    const float angular_jerk_limit = jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f;
     limit(&linear_diff_x, linear_jerk_limit);
-    limit(&linear_diff_y, jerk_limit * TICK_TIME);
-    limit(&angular_diff, jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f);
+    limit(&linear_diff_y, linear_jerk_limit);
+    limit(&angular_diff, angular_jerk_limit);
 
     linear_accel_x = prev_linear_accel_x + linear_diff_x;
     linear_accel_y = prev_linear_accel_y + linear_diff_y;

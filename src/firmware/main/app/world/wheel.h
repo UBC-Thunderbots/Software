@@ -16,13 +16,14 @@ typedef struct WheelConstants
     // The phase resistance for the motor attached to this wheel [Ohms]
     float motor_phase_resistance;
 
-    // The back emf per motor rpm for the motor attached to this wheel [rpm / volt]
+    // The back emf per motor rpm for the motor attached to this wheel [volt / rpm]
     float motor_back_emf_per_rpm;
 
     // The maximum voltage change that can be exerted on the motor attached to this
     // wheel before the wheel will slip [Volts]
     float motor_max_delta_voltage_before_wheel_slip;
 
+    // The radius of the wheel, in meters
     float wheel_radius;
 
     // The gear ratio between the motor shaft and wheel shaft

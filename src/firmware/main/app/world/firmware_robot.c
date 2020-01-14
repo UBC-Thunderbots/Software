@@ -8,7 +8,6 @@ struct FirmwareRobot
     Dribbler_t* dribbler;
     float (*get_robot_position_x)();
     float (*get_robot_position_y)();
-    // TODO: add new functions here to tests
     float (*get_robot_orientation)();
     float (*get_robot_velocity_x)();
     float (*get_robot_velocity_y)();
@@ -19,7 +18,6 @@ struct FirmwareRobot
     Wheel_t* front_left_wheel;
     Wheel_t* back_right_wheel;
     Wheel_t* back_left_wheel;
-    // TODO: add this to tests
     RobotConstants_t robot_constants;
 };
 

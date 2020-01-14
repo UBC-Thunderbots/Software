@@ -3,8 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "app/control.h"
 #include "control/bangbang.h"
-#include "control/control.h"
 #include "io/dr.h"
 #include "io/leds.h"
 #include "physics/physics.h"
@@ -315,7 +315,8 @@ static void accurate_shoot_tick(log_record_t* log, FirmwareWorld_t* world)
                 (local_y_norm_vec[0] * major_vec[0] + local_y_norm_vec[1] * major_vec[1]);
 
     // GO! GO! GO!
-    apply_accel(accel, accel[2]);  // accel is already in local coords
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 /**
