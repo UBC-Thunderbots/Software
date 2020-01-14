@@ -34,7 +34,7 @@ NetworkMedium::NetworkMedium(std::string local_ipaddr, unsigned port)
 
         // Throw this exception up to top-level, as we have no valid
         // recovery action here
-        throw ex;
+        throw;
     }
 
     // TODO explain options

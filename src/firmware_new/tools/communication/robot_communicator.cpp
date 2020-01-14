@@ -26,7 +26,6 @@ RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
         ReceiveProto msg;
         msg.ParseFromString(incoming_data);
         received_callback(msg);
-        std::cerr << incoming_data << std::endl;
     });
 }
 
