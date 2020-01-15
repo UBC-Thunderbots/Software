@@ -622,9 +622,13 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
  * All of the re-aligned Segments will then be combined so that the returned vector<Segment> contains the minimum about of Segments that covers the same linear space in the direction of the input Vector
  *
  * Ex.
- *  Input:  *--------*       *--------*
- *                *------*
- *  Output: *------------*   *--------*
+ *  Input:  *--------*       *--------*  *
+ *                *------*              /
+ *                                     /
+ *                                    /
+ *                                   *
+ * 
+ *  Output: *------------*   *-----------*
  *
  * @param segments : The vector of Segments to be reduced
  * @param direction : The direction that all input vectors will be projected onto
