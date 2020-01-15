@@ -536,7 +536,7 @@ float get_maximal_torque_scaling(const float torque[4])
         }
     }
 
-    float slip_ratio = DELTA_VOLTAGE_LIMIT / acc_max;
+    float slip_ratio = WHEEL_SLIP_VOLTAGE_LIMIT / acc_max;
     float emf_ratio  = adc_battery() / vapp_max;
 
     return (emf_ratio > slip_ratio) ? slip_ratio : emf_ratio;

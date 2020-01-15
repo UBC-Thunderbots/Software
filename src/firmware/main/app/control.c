@@ -4,7 +4,8 @@
 #include "shared/util.h"
 
 /**
- * Computes the constant to scale the wheel forces to the maximum possible
+ * Computes a scaling constant that can be used to maximize wheel force while obeying
+ * physical dynamics
  *
  * Note that this could scale the forces *down* if they exceed the physical capabilities
  * of the robot (ex. wheel slip).
@@ -38,8 +39,8 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
         float back_emf          = curr_motor_rpm * constants.motor_back_emf_per_rpm;
         float effective_voltage = fabsf(resistive_voltage_loss + back_emf);
 
-        float slip_ratio = constants.motor_max_delta_voltage_before_wheel_slip /
-                           fabsf(resistive_voltage_loss);
+        float slip_ratio =
+            constants.motor_max_voltage_before_wheel_slip / fabsf(resistive_voltage_loss);
         if (slip_ratio < slip_ratio_min)
         {
             slip_ratio_min = slip_ratio;
@@ -106,7 +107,7 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float scaling = app_control_getMaximalAccelScaling(robot, linear_accel_x,
                                                        linear_accel_y, angular_accel);
 
-    // if the naive 1 tick acceleration violates the limits of the robot
+    // if the (very naive) 1 tick acceleration violates the physical limits of the robot
     // scale it to maximum
     // if the 1 tick acceleration is below the limit, then leave it
     if (scaling < 1.0f)

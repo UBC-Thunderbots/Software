@@ -18,7 +18,7 @@
 #define ROBOT_RADIUS 0.085f
 #define TICK_TIME (1.0f / (float)CONTROL_LOOP_HZ)
 #define ROBOT_POINT_MASS 2.48f
-#define DELTA_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
+#define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
 
 
 // all the interial components of the robot
