@@ -1215,13 +1215,13 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
                                                Vector direction)
 {
     std::vector<Segment> projected_segments = {};
-    // The projection of the Segment without including the original Segment location
-    Vector raw_projection = Vector(0, 0);
+
 
     // Project all Segments onto the direction Vector
     for (Segment segment : segments)
     {
-        raw_projection = segment.toVector().project(direction);
+        // The projection of the Segment without including the original Segment location
+        Vector raw_projection = segment.toVector().project(direction);
 
         // Only count projections that have a non-zero magnitude
         if (raw_projection.lengthSquared() > EPS)

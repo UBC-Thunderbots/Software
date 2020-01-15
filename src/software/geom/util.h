@@ -618,8 +618,8 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
 
 
 /**
- * Function takes in a Vector of Segments and will combine their projections onto the
- * direction Vector into the fewest Segment sections that are independent of each other.
+ * Function takes in a Vector of Segments and will re-align the Segment to it's equivalent component in the direction of the input Vector.
+ * All of the re-aligned Segments will then be combined so that the returned vector<Segment> contains the minimum about of Segments that covers the same linear space in the direction of the input Vector
  *
  * Ex.
  *  Input:  *--------*       *--------*

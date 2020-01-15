@@ -1413,12 +1413,9 @@ TEST(GeomUtilTest, test_circle_tangent_rays)
     std::pair<Ray, Ray> test = getCircleTangentRaysWithReferenceOrigin(reference, circle);
 
     EXPECT_EQ(test.second.getStart(), reference);
-    EXPECT_EQ(test.first.getStart(), reference);
 
-    EXPECT_NEAR(test.first.toUnitVector().x(), Vector(0.5, 0.866025).x(), 0.001);
-    EXPECT_NEAR(test.second.toUnitVector().x(), Vector(-0.5, 0.866025).x(), 0.001);
-    EXPECT_NEAR(test.first.toUnitVector().y(), Vector(0.5, 0.866025).y(), 0.001);
-    EXPECT_NEAR(test.second.toUnitVector().y(), Vector(-0.5, 0.866025).y(), 0.001);
+    EXPECT_LT((test.first.toUnitVector() - Vector(0.5, 0.866025)).length(), 0.001);
+    EXPECT_LT((test.second.toUnitVector() - Vector(-0.5, 0.866025)).length(), 0.001);
 }
 
 TEST(GeomUtilTest, test_project_circles_origin_inside_circle)
