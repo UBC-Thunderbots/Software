@@ -653,7 +653,6 @@ void chicker_tick_fast(void)
     }
 }
 
-
 /**
  * @}
  */

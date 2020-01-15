@@ -4,6 +4,8 @@
 
 struct FirmwareRobot
 {
+    // NOTE: Everything here is in the global field reference frame (ie. 0,0 is the center
+    // of the field, 0 degrees is towards the enemy goal) unless otherwise specified.
     Chicker_t* chicker;
     Dribbler_t* dribbler;
     float (*get_robot_position_x)();

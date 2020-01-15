@@ -10,7 +10,7 @@ typedef struct Wheel Wheel_t;
  */
 typedef struct WheelConstants
 {
-    // The current per unit torque for the motor attached to this wheel [A/(n*m)]
+    // The current per unit torque for the motor attached to this wheel [A/(N*m)]
     float motor_current_per_unit_torque;
 
     // The phase resistance for the motor attached to this wheel [Ohms]

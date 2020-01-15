@@ -4,7 +4,7 @@
 #include "shared/util.h"
 
 /**
- * Computes the scaling constant to bring the wheel forces to their maximum
+ * Computes the constant to scale the wheel forces to the maximum possible
  *
  * Note that this could scale the forces *down* if they exceed the physical capabilities
  * of the robot (ex. wheel slip).
@@ -32,13 +32,14 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
             force * constants.wheel_radius * constants.wheel_rotations_per_motor_rotation;
         float curr_motor_rpm = app_wheel_getMotorSpeedRPM(wheel);
 
-        float applied_voltage = motor_torque * constants.motor_current_per_unit_torque *
-                                constants.motor_phase_resistance;
+        float resistive_voltage_loss = motor_torque *
+                                       constants.motor_current_per_unit_torque *
+                                       constants.motor_phase_resistance;
         float back_emf          = curr_motor_rpm * constants.motor_back_emf_per_rpm;
-        float effective_voltage = fabsf(applied_voltage + back_emf);
+        float effective_voltage = fabsf(resistive_voltage_loss + back_emf);
 
-        float slip_ratio =
-            constants.motor_max_delta_voltage_before_wheel_slip / fabsf(applied_voltage);
+        float slip_ratio = constants.motor_max_delta_voltage_before_wheel_slip /
+                           fabsf(resistive_voltage_loss);
         if (slip_ratio < slip_ratio_min)
         {
             slip_ratio_min = slip_ratio;
@@ -80,7 +81,7 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
     normed_force[0] = linear_accel_x * robot_constants.mass;
     normed_force[1] = linear_accel_y * robot_constants.mass;
     normed_force[2] =
-        angular_accel * robot_constants.moment_of_inertia * robot_constants.robot_radius;
+        angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
 
     float wheel_forces[4];
     force3_to_force4(normed_force, wheel_forces);
@@ -124,12 +125,13 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
     float angular_diff  = angular_accel - prev_angular_accel;
 
-    const float jerk_limit         = robot_constants.jerk_limit;
-    const float linear_jerk_limit  = robot_constants.jerk_limit * TICK_TIME;
-    const float angular_jerk_limit = jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f;
-    limit(&linear_diff_x, linear_jerk_limit);
-    limit(&linear_diff_y, linear_jerk_limit);
-    limit(&angular_diff, angular_jerk_limit);
+    const float jerk_limit                       = robot_constants.jerk_limit;
+    const float linear_acceleration_change_limit = robot_constants.jerk_limit * TICK_TIME;
+    const float angular_acceleration_change_limit =
+        jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f;
+    limit(&linear_diff_x, linear_acceleration_change_limit);
+    limit(&linear_diff_y, linear_acceleration_change_limit);
+    limit(&angular_diff, angular_acceleration_change_limit);
 
     linear_accel_x = prev_linear_accel_x + linear_diff_x;
     linear_accel_y = prev_linear_accel_y + linear_diff_y;
@@ -144,7 +146,7 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     robot_force[1] = linear_accel_y * robot_constants.mass;
     // input is angular acceleration so mass * Radius * radians/second^2 gives newtons
     robot_force[2] =
-        angular_accel * robot_constants.robot_radius * robot_constants.moment_of_inertia;
+        angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
 
@@ -165,18 +167,18 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
 
     // This is the "P" term in a PID controller. We essentially do proportional
     // control of our acceleration based on velocity error
-    static const float ACCELERATION_GAIN = 10.0f;
+    static const float VELOCITY_ERROR_GAIN = 10.0f;
 
-    float current_acceleration[2];
-    current_acceleration[0] = (linear_velocity_x - current_vx) * ACCELERATION_GAIN;
-    current_acceleration[1] = (linear_velocity_y - current_vy) * ACCELERATION_GAIN;
+    float desired_acceleration[2];
+    desired_acceleration[0] = (linear_velocity_x - current_vx) * VELOCITY_ERROR_GAIN;
+    desired_acceleration[1] = (linear_velocity_y - current_vy) * VELOCITY_ERROR_GAIN;
 
     // Rotate the acceleration vector from the robot frame to the world frame
-    rotate(current_acceleration, -current_orientation);
+    rotate(desired_acceleration, -current_orientation);
 
     float angular_acceleration =
-        (angular_velocity - current_angular_velocity) * ACCELERATION_GAIN;
+        (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
 
-    app_control_applyAccel(robot, current_acceleration[0], current_acceleration[1],
+    app_control_applyAccel(robot, desired_acceleration[0], desired_acceleration[1],
                            angular_acceleration);
 }

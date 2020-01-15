@@ -14,13 +14,13 @@ typedef struct FirmwareRobot FirmwareRobot_t;
  */
 typedef struct RobotConstants
 {
-    // The mass of the entire robot
+    // The mass of the entire robot [kg]
     float mass;
-    // The moment of inertia of the entire robot
+    // The moment of inertia of the entire robot [kg m^2]
     float moment_of_inertia;
-    // The maximum radius of the robot
+    // The maximum radius of the robot [m]
     float robot_radius;
-    // The maximum jerk this robot may safely undergo
+    // The maximum jerk this robot may safely undergo [m/s^3]
     float jerk_limit;
 } RobotConstants_t;
 
@@ -39,9 +39,8 @@ typedef struct ControllerState
 /**
  * Create a robot with the given hardware
  *
- * NOTE: Everything in this class are in global field coordinates (ie. 0,0 is the
- *       center of the field, 0 degrees is towards the enemy goal) unless
- *       otherwise specified
+ * NOTE: Everything here is in the global field reference frame (ie. 0,0 is the center of
+ *       the field, 0 degrees is towards the enemy goal) unless otherwise specified.
  *
  * @param chicker The robot chicker
  * @param dribbler The robot dribbler
