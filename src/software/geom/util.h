@@ -618,8 +618,10 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
 
 
 /**
- * Function takes in a Vector of Segments and will re-align the Segment to it's equivalent component in the direction of the input Vector.
- * All of the re-aligned Segments will then be combined so that the returned vector<Segment> contains the minimum about of Segments that covers the same linear space in the direction of the input Vector
+ * Function takes in a Vector of Segments and will re-align the Segment to it's equivalent
+ * component in the direction of the input Vector. All of the re-aligned Segments will
+ * then be combined so that the returned vector<Segment> contains the minimum about of
+ * Segments that covers the same linear space in the direction of the input Vector
  *
  * Ex.
  *  Input:  *--------*       *--------*  *
@@ -627,7 +629,7 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
  *                                     /
  *                                    /
  *                                   *
- * 
+ *
  *  Output: *------------*   *-----------*
  *
  * @param segments : The vector of Segments to be reduced
