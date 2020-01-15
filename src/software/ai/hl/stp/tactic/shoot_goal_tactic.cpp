@@ -108,9 +108,11 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                             std::shared_ptr<ChipAction> chip_action,
                                             ActionCoroutine::push_type &yield) const
 {
-    auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                           enemy_team, ball.position());
-    while (shot_target)
+    std::optional<Shot> shot_target = Evaluation::calcBestShotOnEnemyGoal(
+        field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+        {*this->getAssignedRobot()});
+
+    while (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
     {
         if (!isEnemyAboutToStealBall())
         {
@@ -132,8 +134,9 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             yield(chip_action);
         }
 
-        shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                          enemy_team, ball.position());
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+            {*this->getAssignedRobot()});
     }
 }
 
@@ -143,11 +146,13 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     auto move_action = std::make_shared<MoveAction>(
         MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
-
+    std::optional<Shot> shot_target;
     do
     {
-        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(
-            field, friendly_team, enemy_team, ball.position());
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+            {*this->getAssignedRobot()});
+
         if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the
