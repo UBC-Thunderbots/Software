@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config", "cc_toolchain_config_stm32")
+load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config", "cc_toolchain_config_stm32")
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
@@ -51,6 +51,60 @@ filegroup(
     srcs = [
         "@arm_developer_gcc//:everything",
     ] + glob(["wrapper/arm-none-eabi-*"]),
+)
+
+filegroup(
+    name = "k8_gcc_wrappers",
+    srcs = glob(["wrapper/k8_gcc-*"]),
+)
+
+filegroup(
+    name = "k8_gcc_all",
+    srcs = [
+        ":k8_gcc_wrappers",
+        "@k8_gcc//:binaries",
+        "@k8_gcc//:k8_gcc_libs",
+        "@k8_gcc//:includes",
+        "@k8_gcc//:runtime_libs",
+        "@k8_gcc//:static_libs",
+    ],
+)
+
+cc_toolchain_config_k8(
+    name = "k8_gcc",
+    builtin_include_directories = [
+        "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/include/",
+        "/usr/include/",
+        "/usr/local/include/",
+    ],
+    cpu = "k8",
+    #TODO
+    host_compiler_path = "wrapper/k8_gcc-k8_gcc",
+    host_compiler_prefix = "wrapper",
+    target_cpu = "k8",
+    target_system_name = "k8",
+    toolchain_identifier = "k8_gcc-k8",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_linux_gcc",
+    all_files = ":k8_gcc_all",
+    ar_files = ":k8_gcc_all",
+    as_files = ":k8_gcc_all",
+    compiler_files = ":k8_gcc_all",
+    dwp_files = ":k8_gcc_all",
+    dynamic_runtime_lib = "@k8_gcc//:runtime_libs",
+    linker_files = ":k8_gcc_all",
+    objcopy_files = ":k8_gcc_all",
+    static_runtime_lib = "@k8_gcc//:static_libs",
+    strip_files = ":k8_gcc_all",
+    supports_param_files = True,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
+    toolchain_config = ":k8_gcc",
+    toolchain_identifier = "k8_gcc-x86_64",
 )
 
 filegroup(

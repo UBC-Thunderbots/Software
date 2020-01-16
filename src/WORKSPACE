@@ -94,6 +94,13 @@ http_archive(
     ],
 )
 
+new_local_repository(
+    name = "k8_gcc",
+    build_file = "@//external:k8_gcc.BUILD",
+    path = "/",
+)
+
+
 http_archive(
     name = "arm_developer_gcc",
     build_file = "@//external:arm_gcc.BUILD",
