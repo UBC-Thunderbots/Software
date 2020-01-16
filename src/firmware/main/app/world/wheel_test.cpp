@@ -12,13 +12,12 @@ class WheelTest : public testing::Test
     {
         requested_wheel_force = 0;
 
-        WheelConstants_t wheel_constants = {
-            .motor_current_per_unit_torque             = 1.1,
-            .motor_phase_resistance                    = 1.2,
-            .motor_back_emf_per_rpm                    = 1.3,
-            .motor_max_delta_voltage_before_wheel_slip = 1.4,
-            .wheel_radius                              = 1.5,
-            .wheel_rotations_per_motor_rotation        = 0.5};
+        WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1,
+                                            .motor_phase_resistance              = 1.2,
+                                            .motor_back_emf_per_rpm              = 1.3,
+                                            .motor_max_voltage_before_wheel_slip = 1.4,
+                                            .wheel_radius                        = 1.5,
+                                            .wheel_rotations_per_motor_rotation  = 0.5};
 
         wheel = app_wheel_create(&(this->request_wheel_force), &(this->get_motor_speed),
                                  wheel_constants);
@@ -72,7 +71,7 @@ TEST_F(WheelTest, getWheelConstants)
     EXPECT_NEAR(1.1, constants.motor_current_per_unit_torque, 1e-4);
     EXPECT_NEAR(1.2, constants.motor_phase_resistance, 1e-4);
     EXPECT_NEAR(1.3, constants.motor_back_emf_per_rpm, 1e-4);
-    EXPECT_NEAR(1.4, constants.motor_max_delta_voltage_before_wheel_slip, 1e-4);
+    EXPECT_NEAR(1.4, constants.motor_max_voltage_before_wheel_slip, 1e-4);
     EXPECT_NEAR(1.5, constants.wheel_radius, 1e-4);
     EXPECT_NEAR(0.5, constants.wheel_rotations_per_motor_rotation, 1e-4);
 }

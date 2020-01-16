@@ -21,7 +21,7 @@ typedef struct WheelConstants
 
     // The maximum voltage change that can be exerted on the motor attached to this
     // wheel before the wheel will slip [Volts]
-    float motor_max_delta_voltage_before_wheel_slip;
+    float motor_max_voltage_before_wheel_slip;
 
     // The radius of the wheel, in meters
     float wheel_radius;

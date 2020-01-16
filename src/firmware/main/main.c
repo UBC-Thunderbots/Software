@@ -460,12 +460,12 @@ static void run_normal(void)
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
     WheelConstants_t wheel_constants = {
-        .wheel_rotations_per_motor_rotation        = GEAR_RATIO,
-        .wheel_radius                              = WHEEL_RADIUS,
-        .motor_max_delta_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
-        .motor_back_emf_per_rpm                    = RPM_TO_VOLT,
-        .motor_phase_resistance                    = PHASE_RESISTANCE,
-        .motor_current_per_unit_torque             = CURRENT_PER_TORQUE};
+        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+        .wheel_radius                        = WHEEL_RADIUS,
+        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+        .motor_phase_resistance              = PHASE_RESISTANCE,
+        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
     Wheel_t* front_right_wheel = app_wheel_create(
         apply_wheel_force_front_right, wheels_get_front_right_rpm, wheel_constants);
     Wheel_t* front_left_wheel = app_wheel_create(
