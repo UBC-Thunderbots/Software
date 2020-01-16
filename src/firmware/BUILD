@@ -91,6 +91,7 @@ cc_library(
         "//firmware/main/app:control",
         "//firmware/main/app/world:firmware_world",
         "//firmware/main/physics",
+        "//firmware/main/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
     ],
