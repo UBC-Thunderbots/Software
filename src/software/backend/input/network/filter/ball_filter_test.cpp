@@ -11,9 +11,9 @@
 #include <random>
 
 #include "shared/constants.h"
-#include "software/new_geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/segment.h"
 #include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
 

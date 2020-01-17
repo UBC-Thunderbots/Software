@@ -2,9 +2,9 @@
 
 #include <boost/polygon/voronoi.hpp>
 
-#include "software/new_geom/rectangle.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/rectangle.h"
 
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;

@@ -94,16 +94,16 @@ class Rectangle : public ConvexPolygon
     Vector diagonal() const;
 
     /**
-    * Attempts to move all edges of the rectangle outwards or inwards towards
-    * the centre by an "amount" while maintaining the same location for the center of the
-    * rectangle. The rectangle will not shrink to anything smaller than a point.
-    *
-    * @param amount The amount to expand or shrink the rectangle by on all sides, can be
-    * positive or negative
-    *
-    * @return bool Whether it was possible to expand or shrink the rectangle by
-    * amount requested
-    */
+     * Attempts to move all edges of the rectangle outwards or inwards towards
+     * the centre by an "amount" while maintaining the same location for the center of the
+     * rectangle. The rectangle will not shrink to anything smaller than a point.
+     *
+     * @param amount The amount to expand or shrink the rectangle by on all sides, can be
+     * positive or negative
+     *
+     * @return bool Whether it was possible to expand or shrink the rectangle by
+     * amount requested
+     */
     bool expand(double amount);
 
     bool operator==(const Rectangle &p) const;

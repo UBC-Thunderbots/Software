@@ -3,14 +3,14 @@
 #include <cstddef>
 #include <vector>
 
-#include "software/new_geom/polygon.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
 #include "software/geom/shot.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/polygon.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/rectangle.h"
+#include "software/new_geom/segment.h"
 
 template <size_t N>
 using LegacyPolygon       = std::array<Point, N>;

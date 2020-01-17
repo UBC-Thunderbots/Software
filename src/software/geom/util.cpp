@@ -11,10 +11,10 @@
 #include <limits>
 #include <tuple>
 
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
 #include "software/geom/voronoi_diagram.h"
 #include "software/new_geom/angle.h"
+#include "software/new_geom/rectangle.h"
+#include "software/new_geom/segment.h"
 
 double proj_length(const Segment &first, const Vector &second)
 {
@@ -420,9 +420,12 @@ std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
     {
         Segment recSegment = r.getSegments()[i];
         if (intersects(recSegment, Segment(segA, segB)) &&
-            uniqueLineIntersects(recSegment.getSegStart(), recSegment.getEnd(), segA, segB))
+            uniqueLineIntersects(recSegment.getSegStart(), recSegment.getEnd(), segA,
+                                 segB))
         {
-            ans.push_back(lineIntersection(recSegment.getSegStart(), recSegment.getEnd(), segA, segB).value());
+            ans.push_back(lineIntersection(recSegment.getSegStart(), recSegment.getEnd(),
+                                           segA, segB)
+                              .value());
         }
     }
     return ans;

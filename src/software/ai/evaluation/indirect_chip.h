@@ -1,8 +1,8 @@
-#include "software/new_geom/rectangle.h"
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/new_geom/rectangle.h"
 #include "software/world/world.h"
 
 /**

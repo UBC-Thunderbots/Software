@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/new_geom/polygon.h"
 #include "software/geom/util.h"
+#include "software/new_geom/polygon.h"
 
 ChipAction::ChipAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 

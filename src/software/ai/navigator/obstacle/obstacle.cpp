@@ -15,7 +15,7 @@ Obstacle::Obstacle(Polygon polygon) : _polygon(std::make_optional<Polygon>(polyg
 
 Obstacle::Obstacle(Rectangle rectangle)
     : Obstacle(Polygon{rectangle.negXNegYCorner(), rectangle.negXPosYCorner(),
-                rectangle.posXPosYCorner(), rectangle.posXNegYCorner()})
+                       rectangle.posXPosYCorner(), rectangle.posXNegYCorner()})
 {
 }
 

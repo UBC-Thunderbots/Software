@@ -1,8 +1,8 @@
 #pragma once
 
+#include "software/geom/util.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
-#include "software/geom/util.h"
 
 /**
  * Returns true if the segment intersects the polygon, false otherwise.

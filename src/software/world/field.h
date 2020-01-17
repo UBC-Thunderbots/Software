@@ -1,10 +1,10 @@
 #pragma once
 
 #include "boost/circular_buffer.hpp"
-#include "software/new_geom/rectangle.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/time/timestamp.h"
+#include "software/new_geom/rectangle.h"
 
 typedef enum
 {
