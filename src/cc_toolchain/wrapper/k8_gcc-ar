@@ -14,4 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-exec /usr/bin/x86_64-linux-gnu-gcc-ar "$@"
+if [[ "$@" == "@"* ]]; then
+    # need to parse location following @
+    INPUT=$@
+    #echo $INPUT
+    #echo $(cat ${INPUT:1})
+    exec /usr/bin/x86_64-linux-gnu-gcc-ar $(cat ${INPUT:1})
+else
+    exec /usr/bin/x86_64-linux-gnu-gcc-ar "$@"
+fi

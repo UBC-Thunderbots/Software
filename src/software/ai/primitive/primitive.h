@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 // We forward-declare the PrimitiveVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the

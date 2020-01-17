@@ -536,7 +536,7 @@ def _k8_gcc_impl(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [flag_group(
                     flags = [
-                        "-isystem{}".format(dir)
+                        "-I{}".format(dir)
                         for dir in ctx.attr.builtin_include_directories
                     ],
                 )],
