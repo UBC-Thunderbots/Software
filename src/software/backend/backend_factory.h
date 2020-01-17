@@ -51,7 +51,7 @@ class BackendFactory
      * @return a list of constructor functions for all the existing Backends
      */
     static std::vector<std::function<std::unique_ptr<Backend>()>>
-    getRegisteredBackendConstructors();
+    getRegisteredGenericConstructors();
 
    protected:
     /**
