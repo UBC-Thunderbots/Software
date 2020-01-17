@@ -39,8 +39,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom:rectangle",
         "//software/time:timestamp",
-        "@boost//:circular_buffer",
     ],
 )
 

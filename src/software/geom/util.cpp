@@ -11,7 +11,7 @@
 #include <limits>
 #include <tuple>
 
-#include "software/geom/rectangle.h"
+#include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
 #include "software/geom/voronoi_diagram.h"
 #include "software/new_geom/angle.h"
@@ -75,7 +75,7 @@ double dist(const Point &first, const Polygon &second)
 
 double dist(const Point &first, const Rectangle &second)
 {
-    if (second.containsPoint(first))
+    if (second.contains(first))
     {
         return 0;
     }
@@ -201,7 +201,7 @@ bool contains(const Ray &out, const Point &in)
 
 bool contains(const Rectangle &out, const Point &in)
 {
-    return out.containsPoint(in);
+    return out.contains(in);
 }
 
 bool intersects(const LegacyTriangle &first, const Circle &second)
@@ -418,13 +418,11 @@ std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
     std::vector<Point> ans;
     for (unsigned int i = 0; i < 4; i++)
     {
-        const Point &a = r[i];
-        // to draw a line segment from point 3 to point 0
-        const Point &b = r[(i + 1) % 4];
-        if (intersects(Segment(a, b), Segment(segA, segB)) &&
-            uniqueLineIntersects(a, b, segA, segB))
+        Segment recSegment = r.getSegments()[i];
+        if (intersects(recSegment, Segment(segA, segB)) &&
+            uniqueLineIntersects(recSegment.getSegStart(), recSegment.getEnd(), segA, segB))
         {
-            ans.push_back(lineIntersection(a, b, segA, segB).value());
+            ans.push_back(lineIntersection(recSegment.getSegStart(), recSegment.getEnd(), segA, segB).value());
         }
     }
     return ans;
@@ -1263,7 +1261,7 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
 
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
 {
-    if (rectangle.containsPoint(point))
+    if (rectangle.contains(point))
     {
         return 1;
     }
@@ -1294,7 +1292,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     // Filters out points that are outside of the bounding box
     points.erase(std::remove_if(points.begin(), points.end(),
                                 [&bounding_box](const Point &p) {
-                                    return !bounding_box.containsPoint(p);
+                                    return !bounding_box.contains(p);
                                 }),
                  points.end());
 
@@ -1312,7 +1310,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     {
         // If there is only 1 point, return circles centered at all four corners of the
         // bounding bounding_box.
-        for (Point &corner : bounding_box.corners())
+        for (const Point &corner : bounding_box.getPoints())
         {
             empty_circles.emplace_back(Circle(corner, dist(points.front(), corner)));
         }
@@ -1333,7 +1331,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
                 (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)),
             halfPoint -
                 (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)));
-        std::vector<Point> corners = bounding_box.corners();
+        std::vector<Point> corners = bounding_box.getPoints();
         intersects.insert(intersects.end(), corners.begin(), corners.end());
         for (const Point &intersect : intersects)
         {
@@ -1348,7 +1346,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
 
     // The corners of the rectangles are locations for the centre of circles with their
     // radius being the distance to the corner's closest point.
-    for (const Point &corner : bounding_box.corners())
+    for (const Point &corner : bounding_box.getPoints())
     {
         Point closest = findClosestPoint(corner, points).value();
         empty_circles.emplace_back(Circle(corner, dist(corner, closest)));

@@ -4,7 +4,6 @@ cc_library(
     name = "geom",
     srcs = [
         "polynomial.cpp",
-        "rectangle.cpp",
         "shot.cpp",
         "spline.cpp",
         "util.cpp",
@@ -12,7 +11,6 @@ cc_library(
     ],
     hdrs = [
         "polynomial.h",
-        "rectangle.h",
         "shot.h",
         "spline.h",
         "util.h",
@@ -27,6 +25,7 @@ cc_library(
         "//software/new_geom:point",
         "//software/new_geom:polygon",
         "//software/new_geom:ray",
+        "//software/new_geom:rectangle",
         "@boost//:geometry",
         "@boost//:polygon",
         "@g3log",

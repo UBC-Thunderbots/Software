@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "software/new_geom/polygon.h"
-#include "software/geom/rectangle.h"
+#include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
 #include "software/geom/shot.h"
 #include "software/new_geom/circle.h"

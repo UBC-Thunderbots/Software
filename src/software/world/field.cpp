@@ -3,8 +3,8 @@
 #include <boost/circular_buffer.hpp>
 
 #include "shared/constants.h"
-#include "software/geom/rectangle.h"
 #include "software/time/timestamp.h"
+#include "software/new_geom/rectangle.h"
 
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
              double defense_y_length, double goal_y_length, double boundary_buffer_size,
@@ -212,17 +212,17 @@ double Field::boundaryYLength() const
 
 bool Field::pointInFriendlyDefenseArea(const Point p) const
 {
-    return friendlyDefenseArea().containsPoint(p);
+    return friendlyDefenseArea().contains(p);
 }
 
 bool Field::pointInEnemyDefenseArea(const Point p) const
 {
-    return enemyDefenseArea().containsPoint(p);
+    return enemyDefenseArea().contains(p);
 }
 
 bool Field::pointInFieldLines(const Point &p) const
 {
-    return fieldLines().containsPoint(p);
+    return fieldLines().contains(p);
 }
 
 boost::circular_buffer<Timestamp> Field::getTimestampHistory() const
@@ -258,7 +258,7 @@ bool Field::pointInEntireField(const Point &p) const
 {
     Rectangle entire_field = Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
                                        Point(totalXLength() / 2, totalYLength() / 2));
-    return entire_field.containsPoint(p);
+    return entire_field.contains(p);
 }
 
 bool Field::operator==(const Field &other) const

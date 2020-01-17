@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/indirect_chip.h"
 
 #include "shared/constants.h"
-#include "software/geom/rectangle.h"
+#include "software/new_geom/rectangle.h"
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
@@ -207,27 +207,12 @@ std::vector<LegacyTriangle> Evaluation::removeTrianglesOutsideRectangle(
     Rectangle rectangle, std::vector<LegacyTriangle> triangles)
 {
     std::vector<LegacyTriangle> valid_triangles;
-    std::vector<Point> rectangle_corners = {rectangle[0], rectangle[1], rectangle[2],
-                                            rectangle[3]};
     Point center;
 
-    double smallest_x = rectangle_corners[0].x();
-    double smallest_y = rectangle_corners[0].y();
-    double largest_x  = rectangle_corners[0].x();
-    double largest_y  = rectangle_corners[0].y();
-
-    for (unsigned int i = 0; i < rectangle_corners.size(); i++)
-    {
-        Point p = rectangle_corners[i];
-        if (p.x() < smallest_x)
-            smallest_x = p.x();
-        if (p.x() > largest_x)
-            largest_x = p.x();
-        if (p.y() < smallest_y)
-            smallest_y = p.y();
-        if (p.y() > largest_y)
-            largest_y = p.y();
-    }
+    double smallest_x = rectangle.negXNegYCorner().x();
+    double smallest_y = rectangle.negXNegYCorner().y();
+    double largest_x  = rectangle.posXPosYCorner().x();
+    double largest_y  = rectangle.posXPosYCorner().y();
 
     for (unsigned int i = 0; i < triangles.size(); i++)
     {

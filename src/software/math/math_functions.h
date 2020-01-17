@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "software/geom/rectangle.h"
+#include "software/new_geom/rectangle.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 
