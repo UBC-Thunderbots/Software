@@ -437,12 +437,6 @@ def _k8_gcc_impl(ctx):
         name = "stdlib",
         flag_sets = [
             flag_set(
-                actions = ALL_COMPILE_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-stdlib=libc++",
-                ])],
-            ),
-            flag_set(
                 actions = ALL_LINK_ACTIONS,
                 flag_groups = [flag_group(flags = [
                     "-lm",
@@ -554,7 +548,6 @@ def _k8_gcc_impl(ctx):
         name = "common",
         implies = [
             "builtin_include_directories",
-            "stdlib",
             "c++17",
             "determinism",
             "hardening",
@@ -570,7 +563,6 @@ def _k8_gcc_impl(ctx):
         static_libgcc,
         pic_feature,
         supports_pic_feature,
-        stdlib_feature,
         builtin_include_directories_feature,
         common_feature,
         lld_feature,
@@ -581,18 +573,18 @@ def _k8_gcc_impl(ctx):
 
     tool_paths = [
         tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
-        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/clang-ar"),
-        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
-        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/clang-cpp"),
-        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/clang-dwp"),
+        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/k8_gcc-ar"),
+        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/k8_gcc-lld"),
+        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/k8_gcc-cpp"),
+        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/k8_gcc-dwp"),
         # TODO: note about executable we're using here (ie. not 'llvm-profdata')
         #tool_path(name = "gcov", path = "/usr/bin/gcov"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/clang-profdata"),
-        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
-        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/clang-nm"),
-        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/clang-objcopy"),
-        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/clang-objdump"),
-        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/clang-strip"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/k8_gcc-profdata"),
+        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/k8_gcc-lld"),
+        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/k8_gcc-nm"),
+        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/k8_gcc-objcopy"),
+        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/k8_gcc-objdump"),
+        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/k8_gcc-strip"),
     ]
 
     out = ctx.actions.declare_file(ctx.label.name)

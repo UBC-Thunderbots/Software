@@ -50,8 +50,6 @@ filegroup(
     name = "runtime_libs",
     srcs = [
         "usr/lib/gcc/x86_64-linux-gnu/7.4.0/libstdc++.so",
-        #"lib/libc++abi.so.1",
-        #"lib/libunwind.so.1",
     ],
 )
 
@@ -59,7 +57,5 @@ filegroup(
     name = "static_libs",
     srcs = [
         "usr/lib/gcc/x86_64-linux-gnu/7.4.0/libstdc++.a",
-#        "lib/libc++abi.a",
-#        "lib/libunwind.a",
     ],
 )

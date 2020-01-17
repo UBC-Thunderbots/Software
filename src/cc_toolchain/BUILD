@@ -30,8 +30,8 @@ cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
         # k8 is any x86 system
-        "k8": "cc_toolchain_linux",
-        "k8|compiler": "cc_toolchain_linux",
+        "k8": "cc_toolchain_linux_gcc",
+        "k8|compiler": "cc_toolchain_linux_gcc",
         # stm32f4 MCU
         "stm32f4": "cc_toolchain_stm32f4",
         "stm32f4|compiler": "cc_toolchain_stm32f4",
@@ -74,11 +74,12 @@ cc_toolchain_config_k8(
     name = "k8_gcc",
     builtin_include_directories = [
         "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/include/",
+        "/usr/lib/gcc/x86_64-linux-gnu/7/include/",
+        "/usr/lib/gcc/c++/7/include/",
         "/usr/include/",
         "/usr/local/include/",
     ],
     cpu = "k8",
-    #TODO
     host_compiler_path = "wrapper/k8_gcc-k8_gcc",
     host_compiler_prefix = "wrapper",
     target_cpu = "k8",
