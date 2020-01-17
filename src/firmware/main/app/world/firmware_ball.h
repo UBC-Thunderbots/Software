@@ -39,7 +39,7 @@ FirmwareBall_t* app_firmware_ball_create(float (*get_ball_position_x)(),
 void app_firmware_ball_destroy(FirmwareBall_t* ball);
 
 /**
- * Get th, x-position of the given ball
+ * Get the x-position of the given ball
  * @param ball The ball to get the x-position for
  * @return The x-position of the given ball, in meters, in global field coordinates
  */

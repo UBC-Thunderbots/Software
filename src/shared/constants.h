@@ -22,7 +22,6 @@ const double BALL_MAX_RADIUS_METERS = 0.0215;
 const double BALL_MASS_KG = 0.004593;
 // The maximum number of robots we can communicate with over radio.
 const unsigned MAX_ROBOTS_OVER_RADIO = 8;
-// TODO: Determine a more realistic value. See Issue #178.
 /* Robot Attributes */
 // The mass of a robot with a battery, in kg. Determined experimentally
 // by weighing the robot and battery

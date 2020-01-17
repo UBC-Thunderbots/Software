@@ -36,7 +36,7 @@ b2Vec2 createVec2(const Vector& vector)
 float polygonArea(const b2PolygonShape& polygon)
 {
     // Box2D already asserts that Polygons are not degenerate (have < 3 vertices) when
-    // they area created, so we do not need to check for that here.
+    // they are created, so we do not need to check for that here.
 
     // Using the shoelace formula / algorithm from
     // https://www.geeksforgeeks.org/area-of-a-polygon-with-given-n-ordered-vertices/
