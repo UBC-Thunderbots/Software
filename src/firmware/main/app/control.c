@@ -149,7 +149,7 @@ void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
     robot_force[2] =
         angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
     float wheel_force[4];
-    speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate syste
+    speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate system
 
     app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot), wheel_force[0]);
     app_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot), wheel_force[3]);
