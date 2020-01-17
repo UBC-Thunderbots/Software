@@ -232,7 +232,7 @@ TEST(TestThetaStarPathPlanner, no_navigable_area)
     Point start{-1.0, -1.0}, dest{1.0, 1.0};
 
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-    Rectangle navigable_area({0, 0}, {0, 0});
+    Rectangle navigable_area({0, 0}, {1, 1});
     auto path = ThetaStarPathPlanner().findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_EQ(std::nullopt, path);

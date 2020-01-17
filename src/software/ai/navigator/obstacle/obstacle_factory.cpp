@@ -9,7 +9,7 @@ std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
     const std::set<MotionConstraint> &motion_constraints, const World &world)
 {
     std::vector<Obstacle> obstacles;
-    Rectangle rectangle({0, 0}, {0, 0});
+    Rectangle rectangle({0, 0}, {1, 1});
     for (auto motion_constraint : motion_constraints)
     {
         switch (motion_constraint)
