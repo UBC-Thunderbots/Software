@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "detection",
+    name = "vision_detection",
     srcs = [
         "vision_detection.cpp",
     ],
@@ -34,6 +34,21 @@ cc_test(
     deps = [
         ":refbox_data",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "sensor_fusion",
+    hdrs = ["sensor_fusion.h"],
+    srcs = ["sensor_fusion.cpp"],
+    deps = [
+        "//software/backend:robot_status",
+        "//software/ai/primitive",
+        "//software/multithreading:subject",
+        "//software/multithreading:threaded_observer",
+        "//software/world",
+        ":refbox_data",
+        ":vision_detection",
     ],
 )
 
