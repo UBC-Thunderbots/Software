@@ -32,7 +32,7 @@
 #include "io/sdcard.h"
 #include "main.h"
 #include "upgrade/constants.h"
-#include "software/constants.h"
+#include "util/constants.h"
 
 /**
  * \brief Erases the entire Flash memory space and copies data from the SD card

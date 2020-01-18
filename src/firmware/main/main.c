@@ -58,7 +58,7 @@
 #include "upgrade/dfu.h"
 #include "upgrade/fpga.h"
 #include "upgrade/fw.h"
-#include "software/constants.h"
+#include "util/constants.h"
 #include "util/log.h"
 
 static void stm32_main(void) __attribute__((noreturn));
