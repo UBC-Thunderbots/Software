@@ -11,7 +11,6 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 
 
@@ -135,7 +134,7 @@ Point PenaltyKickTactic::evaluate_next_position()
 void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     // We will need to keep track of time so we don't break the rules by taking too long
-    Timestamp penalty_kick_start = robot->getMostRecentTimestamp();
+    Timestamp penalty_kick_start = robot->lastUpdateTimestamp();
 
 
     auto approach_ball_move_act = std::make_shared<MoveAction>(
@@ -191,12 +190,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
     } while (
         !(kick_action->done() ||
-          (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
-}
-
-void PenaltyKickTactic::accept(const NonMutableTacticVisitor& visitor) const
-{
-    visitor.visit(*this);
+          (penalty_kick_start - robot->lastUpdateTimestamp()) < penalty_shot_timeout));
 }
 
 void PenaltyKickTactic::accept(MutableTacticVisitor& visitor)

@@ -5,7 +5,6 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
@@ -98,10 +97,10 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
         if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-            ball.velocity().length() <
-                Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-                    ->BallStealSpeed()
-                    ->value())
+            ball.velocity().length() < Util::DynamicParameters->getAIConfig()
+                                           ->getDefenseShadowEnemyTacticConfig()
+                                           ->BallStealSpeed()
+                                           ->value())
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
@@ -121,11 +120,6 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         }
 
     } while (!move_action->done());
-}
-
-void DefenseShadowEnemyTactic::accept(const NonMutableTacticVisitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 void DefenseShadowEnemyTactic::accept(MutableTacticVisitor &visitor)

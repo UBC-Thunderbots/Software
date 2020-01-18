@@ -7,7 +7,6 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
@@ -71,22 +70,22 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             // Figure out how far away the ball is
             double ball_dist = (ball.position() - *defender_reference_position).length();
 
-            double min_defender_seperation_deg =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->MinDefenderSeperationDeg()
-                    ->value();
-            double max_defender_seperation_deg =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->MaxDefenderSeperationDeg()
-                    ->value();
-            double min_ball_dist =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->BallDistForMinDefenderSeperation()
-                    ->value();
-            double max_ball_dist =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->BallDistForMaxDefenderSeperation()
-                    ->value();
+            double min_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
+                                                     ->getDefenderCreaseTacticConfig()
+                                                     ->MinDefenderSeperationDeg()
+                                                     ->value();
+            double max_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
+                                                     ->getDefenderCreaseTacticConfig()
+                                                     ->MaxDefenderSeperationDeg()
+                                                     ->value();
+            double min_ball_dist = Util::DynamicParameters->getAIConfig()
+                                       ->getDefenderCreaseTacticConfig()
+                                       ->BallDistForMinDefenderSeperation()
+                                       ->value();
+            double max_ball_dist = Util::DynamicParameters->getAIConfig()
+                                       ->getDefenderCreaseTacticConfig()
+                                       ->BallDistForMaxDefenderSeperation()
+                                       ->value();
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
@@ -241,11 +240,6 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
     }
 
     return std::nullopt;
-}
-
-void CreaseDefenderTactic::accept(const NonMutableTacticVisitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)

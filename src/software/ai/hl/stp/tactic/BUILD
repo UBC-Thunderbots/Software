@@ -6,7 +6,6 @@ cc_library(
     hdrs = ["cherry_pick_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
@@ -33,7 +32,6 @@ cc_library(
     hdrs = ["chip_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
@@ -79,7 +77,6 @@ cc_library(
     deps = [
         ":chip_tactic",
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
@@ -93,7 +90,6 @@ cc_library(
     hdrs = ["crease_defender_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
@@ -122,7 +118,6 @@ cc_library(
     hdrs = ["defense_shadow_enemy_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
@@ -151,7 +146,6 @@ cc_library(
     hdrs = ["goalie_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
@@ -180,7 +174,6 @@ cc_library(
     hdrs = ["move_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
@@ -205,7 +198,6 @@ cc_library(
     hdrs = ["passer_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:kick_action",
@@ -232,7 +224,6 @@ cc_library(
     hdrs = ["patrol_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
@@ -248,7 +239,6 @@ cc_library(
     hdrs = ["penalty_kick_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
@@ -267,7 +257,6 @@ cc_library(
     deps = [
         ":move_tactic",
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:dribble_action",
@@ -284,13 +273,13 @@ cc_library(
     hdrs = ["receiver_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
+        "//software/new_geom/util",
         "@g3log",
     ],
 )
@@ -312,7 +301,6 @@ cc_library(
     hdrs = ["shadow_enemy_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
@@ -339,12 +327,12 @@ cc_library(
     hdrs = ["shadow_freekicker_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
+        "//software/new_geom/util:distance",
         "//software/util/parameter:dynamic_parameters",
         "@g3log",
     ],
@@ -367,7 +355,6 @@ cc_library(
     hdrs = ["shoot_goal_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
@@ -397,7 +384,6 @@ cc_library(
     hdrs = ["stop_tactic.h"],
     deps = [
         ":mutable_tactic_visitor",
-        ":non_mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
@@ -460,12 +446,6 @@ cc_test(
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
-)
-
-cc_library(
-    name = "non_mutable_tactic_visitor",
-    hdrs = ["non_mutable_tactic_visitor.h"],
-    deps = [":tactic"],
 )
 
 cc_library(

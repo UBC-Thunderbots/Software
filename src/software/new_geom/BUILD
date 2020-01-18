@@ -1,37 +1,81 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "new_geom",
-    srcs = [
-        "circle.cpp",
-    ],
-    hdrs = [
-        "circle.h",
-        "convex_shape.h",
-        "shape.h",
-    ],
-    deps = [
-        ":angle",
-        ":angular_velocity",
-        ":geom_constants",
-        ":line",
-        ":point",
-        ":polynomial",
-        ":ray",
-        ":vector",
-        "//software/new_geom/util",
-    ],
+    name = "angle",
+    hdrs = ["angle.h"],
+    deps = [":geom_constants"],
 )
 
 cc_library(
-    name = "angle",
-    hdrs = ["angle.h"],
+    name = "segment",
+    hdrs = ["segment.h"],
+    deps = [":point"],
 )
 
 cc_library(
     name = "angular_velocity",
     hdrs = ["angular_velocity.h"],
     deps = [":angle"],
+)
+
+cc_library(
+    name = "shape",
+    hdrs = ["shape.h"],
+    deps = [":point"],
+)
+
+cc_library(
+    name = "convex_shape",
+    hdrs = ["convex_shape.h"],
+    deps = [":shape"],
+)
+
+cc_library(
+    name = "polygon",
+    srcs = ["polygon.cpp"],
+    hdrs = ["polygon.h"],
+    deps = [
+        ":segment",
+        ":shape",
+    ],
+)
+
+cc_library(
+    name = "convex_polygon",
+    srcs = ["convex_polygon.cpp"],
+    hdrs = ["convex_polygon.h"],
+    deps = [
+        ":convex_shape",
+        ":polygon",
+    ],
+)
+
+cc_library(
+    name = "circle",
+    srcs = ["circle.cpp"],
+    hdrs = ["circle.h"],
+    deps = [
+        ":convex_shape",
+        ":point",
+    ],
+)
+
+cc_library(
+    name = "rectangle",
+    srcs = ["rectangle.cpp"],
+    hdrs = ["rectangle.h"],
+    deps = [
+        ":convex_polygon",
+    ],
+)
+
+cc_library(
+    name = "triangle",
+    srcs = ["triangle.cpp"],
+    hdrs = ["triangle.h"],
+    deps = [
+        ":convex_polygon",
+    ],
 )
 
 cc_library(
@@ -94,7 +138,7 @@ cc_test(
         "angle_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":angle",
         "@gtest//:gtest_main",
     ],
 )
@@ -105,7 +149,7 @@ cc_test(
         "line_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":line",
         "@gtest//:gtest_main",
     ],
 )
@@ -116,7 +160,7 @@ cc_test(
         "point_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":point",
         "@gtest//:gtest_main",
     ],
 )
@@ -127,7 +171,7 @@ cc_test(
         "polynomial_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":polynomial",
         "@gtest//:gtest_main",
     ],
 )
@@ -138,7 +182,7 @@ cc_test(
         "ray_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":ray",
         "@gtest//:gtest_main",
     ],
 )
@@ -149,7 +193,8 @@ cc_test(
         "vector_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":point",
+        ":vector",
         "@gtest//:gtest_main",
     ],
 )
@@ -160,7 +205,51 @@ cc_test(
         "circle_test.cpp",
     ],
     deps = [
-        ":new_geom",
+        ":circle",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "polygon_test",
+    srcs = [
+        "polygon_test.cpp",
+    ],
+    deps = [
+        ":polygon",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "convex_polygon_test",
+    srcs = [
+        "convex_polygon_test.cpp",
+    ],
+    deps = [
+        ":convex_polygon",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "rectangle_test",
+    srcs = [
+        "rectangle_test.cpp",
+    ],
+    deps = [
+        ":rectangle",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "triangle_test",
+    srcs = [
+        "triangle_test.cpp",
+    ],
+    deps = [
+        ":triangle",
         "@gtest//:gtest_main",
     ],
 )

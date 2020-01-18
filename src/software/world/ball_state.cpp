@@ -29,5 +29,5 @@ bool BallState::operator==(const BallState &other) const
 
 bool BallState::operator!=(const BallState &other) const
 {
-    return false;
+    return !(*this == other);
 }

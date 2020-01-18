@@ -60,11 +60,13 @@ TEST_F(WorldTest, default_constructor)
     // Check that objects used for construction are returned by the accessors
     EXPECT_EQ(Field(0, 0, 0, 0, 0, 0, 0, current_time), world.field());
     EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
-    EXPECT_EQ(Team(Duration::fromMilliseconds(
-                  Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
+    EXPECT_EQ(Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
+                                                  ->RobotExpiryBufferMilliseconds()
+                                                  ->value())),
               world.friendlyTeam());
-    EXPECT_EQ(Team(Duration::fromMilliseconds(
-                  Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
+    EXPECT_EQ(Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
+                                                  ->RobotExpiryBufferMilliseconds()
+                                                  ->value())),
               world.enemyTeam());
 }
 

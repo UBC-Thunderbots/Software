@@ -5,7 +5,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
@@ -46,10 +45,10 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
     {
         std::optional<Robot> enemy_with_ball =
             Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
-        double robot_separation_scaling_factor =
-            Util::DynamicParameters->getShadowFreekickerTacticConfig()
-                ->RobotSeparationScalingFactor()
-                ->value();
+        double robot_separation_scaling_factor = Util::DynamicParameters->getAIConfig()
+                                                     ->getShadowFreekickerTacticConfig()
+                                                     ->RobotSeparationScalingFactor()
+                                                     ->value();
 
         if (enemy_with_ball.has_value())
         {
@@ -90,11 +89,6 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
             BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
-}
-
-void ShadowFreekickerTactic::accept(const NonMutableTacticVisitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 void ShadowFreekickerTactic::accept(MutableTacticVisitor &visitor)

@@ -4,7 +4,7 @@
 
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
+
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
     : Tactic(loop_forever, {RobotCapabilities::Capability::Chip}), ball(ball)
@@ -49,11 +49,6 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                                          chip_distance_meters);
         yield(chip_action);
     } while (!chip_action->done());
-}
-
-void ChipTactic::accept(const NonMutableTacticVisitor &visitor) const
-{
-    visitor.visit(*this);
 }
 
 void ChipTactic::accept(MutableTacticVisitor &visitor)
