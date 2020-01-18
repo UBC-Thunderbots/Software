@@ -15,6 +15,7 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/triangle.h"
 
 double proj_length(const Segment &first, const Vector &second)
 {
@@ -138,17 +139,18 @@ double lengthSquared(const Segment &segment)
     return distsq(segment.getSegStart(), segment.getEnd());
 }
 
-bool contains(const LegacyTriangle &out, const Point &in)
+bool contains(const Triangle &out, const Point &in)
 {
     double angle = 0;
+    std::vector<Point> outPoints = out.getPoints();
     for (int i = 0, j = 2; i < 3; j = i++)
     {
-        if ((in - out[i]).length() < EPS)
+        if ((in - outPoints[i]).length() < EPS)
         {
             return true;  // SPECIAL CASE
         }
         double a =
-            atan2((out[i] - in).cross(out[j] - in), (out[i] - in).dot(out[j] - in));
+                atan2((outPoints[i] - in).cross(outPoints[j] - in), (outPoints[i] - in).dot(outPoints[j] - in));
         angle += a;
     }
     return std::fabs(angle) > 6;
@@ -204,14 +206,16 @@ bool contains(const Rectangle &out, const Point &in)
     return out.contains(in);
 }
 
-bool intersects(const LegacyTriangle &first, const Circle &second)
+bool intersects(const Triangle &first, const Circle &second)
 {
+    std::vector<Segment> firstSegments = first.getSegments();
+
     return contains(first, second.getOrigin()) ||
-           dist(getSide(first, 0), second.getOrigin()) < second.getRadius() ||
-           dist(getSide(first, 1), second.getOrigin()) < second.getRadius() ||
-           dist(getSide(first, 2), second.getOrigin()) < second.getRadius();
+           dist(firstSegments[0], second.getOrigin()) < second.getRadius() ||
+           dist(firstSegments[1], second.getOrigin()) < second.getRadius() ||
+           dist(firstSegments[2], second.getOrigin()) < second.getRadius();
 }
-bool intersects(const Circle &first, const LegacyTriangle &second)
+bool intersects(const Circle &first, const Triangle &second)
 {
     return intersects(second, first);
 }
@@ -265,28 +269,151 @@ bool intersects(const Segment &first, const Segment &second)
     return boost::geometry::intersects(AB, CD);
 }
 
-template <size_t N>
-Point getVertex(const LegacyPolygon<N> &poly, unsigned int i)
+std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1, const Point &p2,
+                                       const std::vector<Point> &obstacles,
+                                       const double &radius)
 {
-    if (i > N)
-        throw std::out_of_range("poly does not have that many sides!!!");
-    else
-        return poly[i];
+    Angle p1_angle = (p1 - src).orientation();
+    Angle p2_angle = (p2 - src).orientation();
+
+    Angle start_angle = std::min(p1_angle, p2_angle);
+    Angle end_angle   = std::max(p1_angle, p2_angle);
+
+    // This handles the special case where the start and end angle straddle the
+    // negative y axis, which causes some issues with angles "ticking over" from pi to
+    // -pi and vice-versa
+    if (end_angle - start_angle > Angle::half())
+    {
+        Angle start_angle_new = start_angle + (end_angle - start_angle).angleMod();
+        end_angle             = start_angle;
+        start_angle           = start_angle_new;
+    }
+
+    if (collinear(src, p1, p2))
+    {
+        // return a result that contains the direction of the line and zero angle if not
+        // blocked by obstacles
+        Segment collinear_seg = Segment(src, p1);
+        for (Point p : obstacles)
+        {
+            if (intersects(collinear_seg, Circle(p, radius)))
+            {
+                // intersection with obstacle found, we're done here and we return nothing
+                return {};
+            }
+        }
+
+        return {Shot(Point(collinear_seg.toVector()), Angle::zero())};
+    }
+
+    // "Sweep" a line from the `src` to the target line segment, and create an "event"
+    // whenever the line enters or leaves an obstacle, int value of `-1` to indicate the
+    // sweep "leaving" an obstacle, and `+1` to indicate the sweep "entering" another
+    // obstacle
+    // The angle for each event is measured relative to the start angle
+    std::vector<std::pair<Angle, int>> events;
+    for (const Point &obstacle : obstacles)
+    {
+        Vector diff = obstacle - src;
+        if (diff.length() < radius)
+        {
+            // `src` is within `radius` of this obstacle
+            return {};
+        }
+
+        const Angle cent   = (diff.orientation() - start_angle).angleMod();
+        const Angle span   = Angle::asin(radius / diff.length());
+        const Angle range1 = cent - span;
+        const Angle range2 = cent + span;
+
+        if (range1 < Angle::zero() && range2 > end_angle - start_angle)
+        {
+            // Obstacle takes up entire angle we are sweeping
+            return {};
+        }
+
+        if (range1 < -Angle::half() || range2 > Angle::half())
+        {
+            continue;
+        }
+        if (range1 > Angle::zero() && range1 < end_angle - start_angle)
+        {
+            events.push_back(std::make_pair(range1, -1));
+        }
+        if (range2 > Angle::zero() && range2 < end_angle - start_angle)
+        {
+            events.push_back(std::make_pair(range2, 1));
+        }
+    }
+
+    if (events.empty())
+    {
+        // No obstacles in the way, so just return a range hitting the entire target
+        // line segment
+        return {
+            Shot(Point((p1.toVector() + p2.toVector()) / 2), end_angle - start_angle)};
+    }
+
+    // Sort the events by angle
+    std::sort(events.begin(), events.end());
+
+    // Collapse all contiguous sections of "+1" and "-1" respectively, as these represent
+    // overlapping obstacles (from the perspective of the `src` point to the target line
+    // segment)
+    std::vector<std::pair<Angle, int>> events_collapsed;
+    for (auto &event : events)
+    {
+        if (events_collapsed.empty() || event.second != events_collapsed.back().second)
+        {
+            events_collapsed.emplace_back(event);
+        }
+    }
+
+    if (events_collapsed[0].second == -1)
+    {
+        events_collapsed.insert(events_collapsed.begin(),
+                                std::make_pair(Angle::zero(), 1));
+    }
+    if (events_collapsed.back().second == 1)
+    {
+        events_collapsed.emplace_back(std::make_pair(end_angle - start_angle, -1));
+    }
+
+    std::vector<Shot> result;
+    for (unsigned i = 1; i < events_collapsed.size(); i += 2)
+    {
+        // Calculate the center of this range on the target line segement
+        Angle range_start = events_collapsed[i - 1].first + start_angle;
+        Angle range_end   = events_collapsed[i].first + start_angle;
+        Angle mid         = (range_end - range_start) / 2 + range_start;
+        Vector ray        = Vector::createFromAngle(mid) * 10.0;
+        Point inter       = lineIntersection(src, src + ray, p1, p2).value();
+
+        // Offset the final values by the start angle
+        result.emplace_back(Shot(inter, range_end - range_start));
+    }
+
+    return result;
 }
 
-template <size_t N>
-void setVertex(LegacyPolygon<N> &poly, unsigned int i, const Vector &v)
+std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const Point &p2,
+                                      const std::vector<Point> &obstacles,
+                                      const double &radius)
 {
-    if (i > N)
-        throw std::out_of_range("poly does not have that many sides!!!");
-    else
-        poly[i] = v;
-}
+    // Get all possible shots we could take
+    std::vector<Shot> possible_shots =
+        angleSweepCirclesAll(src, p1, p2, obstacles, radius);
 
-template <size_t N>
-Segment getSide(const LegacyPolygon<N> &poly, unsigned int i)
-{
-    return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
+    // Sort by the interval angle (ie. the open angle the shot is going through)
+    std::sort(possible_shots.begin(), possible_shots.end(),
+              [](auto s1, auto s2) { return s1.getOpenAngle() > s2.getOpenAngle(); });
+
+    // Return the shot through the largest open interval if there are any
+    if (possible_shots.empty())
+    {
+        return std::nullopt;
+    }
+    return possible_shots[0];
 }
 
 std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points)

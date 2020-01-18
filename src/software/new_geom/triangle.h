@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/new_geom/convex_polygon.h"
 
 /**

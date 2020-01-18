@@ -5,7 +5,6 @@
 #include "software/geom/util.h"
 #include "software/test_util/test_util.h"
 
-
 TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
 {
     Robot friendly_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),

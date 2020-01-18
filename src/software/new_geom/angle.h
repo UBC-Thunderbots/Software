@@ -444,7 +444,7 @@ inline constexpr double Angle::toRadians() const
 
 inline constexpr double Angle::toDegrees() const
 {
-    return rads / M_PI * 180.0;
+    return rads / M_PI * 180.0f;
 }
 
 inline constexpr Angle Angle::mod(Angle divisor) const

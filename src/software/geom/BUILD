@@ -26,6 +26,7 @@ cc_library(
         "//software/new_geom:polygon",
         "//software/new_geom:ray",
         "//software/new_geom:rectangle",
+        "//software/new_geom:triangle",
         "@boost//:geometry",
         "@boost//:polygon",
         "@g3log",

@@ -70,6 +70,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom:triangle",
         "//software/world",
     ],
 )
@@ -156,6 +157,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom:triangle",
         "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
