@@ -52,19 +52,24 @@ namespace Evaluation
     {
         for (const Robot &robot : team.getAllRobots())
         {
-            std::vector<Timestamp> robot_history_timestamps =
-                robot.getPreviousTimestamps();
+            boost::circular_buffer<RobotState> previous_states =
+                robot.getPreviousStates();
+            std::vector<Timestamp> robot_history_timestamps{};
+            for (int i = 0; i < previous_states.size(); i++)
+            {
+                robot_history_timestamps.push_back(previous_states.at(i).timestamp());
+            }
 
             unsigned i = 0;
 
             // Check that the robot has had possession of the ball recently.
-            while (
-                i < robot_history_timestamps.size() &&
-                robot.lastUpdateTimestamp() - robot_history_timestamps[i] <=
-                    Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
-                                              ->getPossessionConfig()
-                                              ->PossessionBufferTimeSeconds()
-                                              ->value()))
+            while (i < robot_history_timestamps.size() &&
+                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <=
+                       Duration::fromSeconds(Util::DynamicParameters->getAIConfig()
+                                                 ->getEvaluationConfig()
+                                                 ->getPossessionConfig()
+                                                 ->PossessionBufferTimeSeconds()
+                                                 ->value()))
             {
                 std::optional<bool> robot_has_possession =
                     robotHasPossession(world.ball(), robot, robot_history_timestamps[i]);
@@ -80,14 +85,20 @@ namespace Evaluation
     {
         for (const Robot &robot : team.getAllRobots())
         {
-            std::vector<Timestamp> robot_history_timestamps =
-                robot.getPreviousTimestamps();
+            boost::circular_buffer<RobotState> previous_states =
+                robot.getPreviousStates();
+            std::vector<Timestamp> robot_history_timestamps{};
+            for (int i = 0; i < previous_states.size(); i++)
+            {
+                robot_history_timestamps.push_back(previous_states.at(i).timestamp());
+            }
 
             int i = 0;
 
             // Check that the robot has had possession of the ball recently.
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                   Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
+                   Duration::fromSeconds(Util::DynamicParameters->getAIConfig()
+                                             ->getEvaluationConfig()
                                              ->getPossessionConfig()
                                              ->PassBufferTimeSeconds()
                                              ->value()))

@@ -1,4 +1,4 @@
-AIConfig:
+AIControlConfig:
   VisionFlippingFilterEnabled:
     type: "bool"
     default: true

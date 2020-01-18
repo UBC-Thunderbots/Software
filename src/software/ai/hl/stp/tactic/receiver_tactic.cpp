@@ -6,7 +6,6 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/ai/hl/stp/tactic/non_mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 #include "software/new_geom/util/closest_point.h"
 
@@ -243,11 +242,6 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
         closest_ball_pos - ideal_orientation_vec.normalize(dist_to_ball_in_dribbler);
 
     return Shot(ideal_position, ideal_orientation);
-}
-
-void ReceiverTactic::accept(const NonMutableTacticVisitor& visitor) const
-{
-    visitor.visit(*this);
 }
 
 void ReceiverTactic::accept(MutableTacticVisitor& visitor)
