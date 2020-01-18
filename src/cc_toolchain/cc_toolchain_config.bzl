@@ -454,8 +454,7 @@ def _k8_gcc_impl(ctx):
             flag_set(
                 actions = ALL_LINK_ACTIONS,
                 flag_groups = [flag_group(flags = [
-                    "-fuse-ld=lld",
-                    "-rtlib=compiler-rt",
+                    "-fuse-ld=gold",
                 ])],
             ),
         ],

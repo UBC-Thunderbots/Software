@@ -73,7 +73,6 @@ filegroup(
 cc_toolchain_config_k8(
     name = "k8_gcc",
     builtin_include_directories = [
-        "/usr/lib/gcc/x86_64-linux-gnu/7.4.0/include/",
         "/usr/lib/gcc/x86_64-linux-gnu/",
         "/usr/include/",
         "/usr/local/include/",
