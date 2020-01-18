@@ -5,8 +5,7 @@
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      ObstacleFactory obstacle_factory,
                      std::shared_ptr<const NavigatorConfig> config)
-    :
-      config(config),
+    : config(config),
       obstacle_factory(std::move(obstacle_factory)),
       path_manager(std::move(path_manager))
 
