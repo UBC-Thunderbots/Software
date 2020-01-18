@@ -106,6 +106,7 @@ cc_library(
         ":box2d_util",
         "//shared:constants",
         "//software/geom",
+        "//software/util/time:duration",
         "//software/util/time:timestamp",
         "//software/world",
         "//software/world:robot",

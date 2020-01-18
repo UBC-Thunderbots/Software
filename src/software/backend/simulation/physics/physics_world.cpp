@@ -1,5 +1,12 @@
 #include "physics_world.h"
 
+#include "software/backend/simulation/physics/physics_ball.h"
+#include "software/backend/simulation/physics/physics_field.h"
+#include "software/backend/simulation/physics/physics_robot.h"
+#include "software/util/time/duration.h"
+#include "software/util/time/timestamp.h"
+#include "software/world/world.h"
+
 PhysicsWorld::PhysicsWorld(const World& world)
 {
     b2Vec2 gravity(0, 0);
