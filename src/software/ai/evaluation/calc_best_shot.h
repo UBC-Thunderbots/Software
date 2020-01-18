@@ -1,9 +1,9 @@
 #pragma once
 
 #include "shared/constants.h"
-#include "software/new_geom/segment.h"
 #include "software/geom/shot.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/segment.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
