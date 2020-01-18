@@ -99,6 +99,21 @@ cc_test(
 )
 
 cc_library(
+    name = "physics_world",
+    srcs = ["physics_world.cpp"],
+    hdrs = ["physics_world.h"],
+    deps = [
+        ":box2d_util",
+        "//shared:constants",
+        "//software/geom",
+        "//software/util/time:timestamp",
+        "//software/world",
+        "//software/world:robot",
+        "@box2d",
+    ],
+)
+
+cc_library(
     name = "physics_simulator",
     srcs = ["physics_simulator.cpp"],
     hdrs = ["physics_simulator.h"],
