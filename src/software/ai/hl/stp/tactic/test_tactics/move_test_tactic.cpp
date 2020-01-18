@@ -35,7 +35,7 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do
     {
-        yield(std::make_shared<MoveAction>());
+        yield(std::make_shared<MoveAction>(false));
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 

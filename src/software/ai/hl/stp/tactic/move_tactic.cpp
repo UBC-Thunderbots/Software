@@ -33,7 +33,7 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
+    auto move_action = std::make_shared<MoveAction>(false, 0, Angle();
     do
     {
         move_action->updateControlParams(

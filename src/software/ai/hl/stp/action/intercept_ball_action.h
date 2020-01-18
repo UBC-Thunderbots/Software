@@ -18,7 +18,7 @@ class InterceptBallAction : public Action
      *                     our goal
      */
     explicit InterceptBallAction(const Field& field, const Ball& ball,
-                                 bool loop_forever = false);
+                                 bool loop_forever);
 
     /**
      * Updates this action with all the parameters it needs from the world

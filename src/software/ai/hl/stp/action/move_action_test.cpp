@@ -8,7 +8,7 @@ TEST(MoveActionTest, getDestination)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveAction action = MoveAction(0.05, Angle(), false);
+    MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(11, 12), Angle::quarter(), 1.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
@@ -21,7 +21,7 @@ TEST(MoveActionTest, getFinalOrientation)
 {
     Robot robot       = Robot(13, Point(1, 0), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveAction action = MoveAction(0.05, Angle(), false);
+    MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
@@ -34,7 +34,7 @@ TEST(MoveActionTest, getFinalSpeed)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveAction action = MoveAction(0.05, Angle(), false);
+    MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
@@ -47,7 +47,7 @@ TEST(MoveActionTest, getAutoKickType)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveAction action = MoveAction();
+    MoveAction action = MoveAction(false, 0, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
@@ -66,7 +66,7 @@ TEST(MoveActionTest, getDribblerEnabled)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveAction action = MoveAction();
+    MoveAction action = MoveAction(false, 0, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
@@ -85,7 +85,7 @@ TEST(MoveActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle(), false);
+    MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
@@ -109,7 +109,7 @@ TEST(MoveActionTest, robot_at_destination)
 {
     Robot robot = Robot(0, Point(), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.02, Angle(), false);
+    MoveAction action = MoveAction(false, 0.02, Angle());
 
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
@@ -127,7 +127,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle(), false);
+    MoveAction action = MoveAction(false, 0.05, Angle());
 
     // Run the Action several times
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
@@ -148,7 +148,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle::fromDegrees(0.01), false);
+    MoveAction action = MoveAction(false, 0.05, Angle::fromDegrees(0.01));
 
     // Run the Action several times
     action.updateControlParams(robot, Point(0, 0), Angle::quarter(), 1.0,
@@ -168,7 +168,7 @@ TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
 {
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle::fromDegrees(359), false);
+    MoveAction action = MoveAction(false, 0.05, Angle::fromDegrees(359));
 
     // Run the Action several times
     action.updateControlParams(robot, Point(0, 0), Angle::quarter(), 1.0,
@@ -189,7 +189,7 @@ TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle(), false);
+    MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
                                DribblerEnable::OFF, MoveType::NORMAL,
@@ -213,7 +213,7 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05, Angle(), false);
+    MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
                                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,

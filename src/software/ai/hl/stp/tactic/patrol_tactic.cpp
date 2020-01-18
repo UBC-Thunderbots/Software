@@ -69,7 +69,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     }
 
     auto move_action =
-        std::make_shared<MoveAction>(this->at_patrol_point_tolerance, Angle(), false);
+        std::make_shared<MoveAction>(false, this->at_patrol_point_tolerance, Angle());
     do
     {
         move_action->updateControlParams(

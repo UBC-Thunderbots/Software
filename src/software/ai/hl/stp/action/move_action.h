@@ -23,10 +23,8 @@ class MoveAction : public Action
      * @param loop_forever Continue yielding new Move Intents, even after we have reached
      *                     our goal
      */
-    explicit MoveAction(
-        double close_to_dest_threshold       = ROBOT_CLOSE_TO_DEST_THRESHOLD,
-        Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD,
-        bool loop_forever                    = false);
+    explicit MoveAction(bool loop_forever, double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
+                        Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
 
     /**
      * Updates the params that cannot be derived from the world for this action

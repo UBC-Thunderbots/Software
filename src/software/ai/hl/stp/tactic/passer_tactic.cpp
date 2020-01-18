@@ -47,8 +47,8 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action = std::make_shared<MoveAction>(
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+    auto move_action = std::make_shared<MoveAction>(true,
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
     while (ball.lastUpdateTimestamp() < pass.startTime())

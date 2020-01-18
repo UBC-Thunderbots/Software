@@ -61,7 +61,7 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
 void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
 
-    auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
+    auto move_action = std::make_shared<MoveAction>(false,0, Angle());
     auto stop_action = std::make_shared<StopAction>(
         StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
 
