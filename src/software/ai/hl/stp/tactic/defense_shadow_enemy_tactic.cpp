@@ -61,8 +61,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
 {
 
     auto move_action = std::make_shared<MoveAction>(false);
-    auto stop_action = std::make_shared<StopAction>(
-        StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
+    auto stop_action = std::make_shared<StopAction>();
 
     do
     {
