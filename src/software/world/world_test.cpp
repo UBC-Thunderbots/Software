@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test_util/test_util.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/test_util/test_util.h"
 
 class WorldTest : public ::testing::Test
 {
