@@ -76,7 +76,7 @@ namespace Evaluation
      * @return Vector of triangles with no enemy robots
      */
     std::vector<Triangle> findOpenTriangles(std::vector<Triangle> triangles,
-                                                  std::vector<Point> enemy_players);
+                                            std::vector<Point> enemy_players);
 
     /**
      * Remove all Triangles in a given list whose centers do not fall
@@ -125,7 +125,8 @@ namespace Evaluation
      *
      * @return Largest triangle
      */
-    std::optional<Triangle> getLargestValidTriangle(
-        std::vector<Triangle> allTriangles, double min_area = 0,
-        double min_edge_len = 0, double min_edge_angle = 0);
+    std::optional<Triangle> getLargestValidTriangle(std::vector<Triangle> allTriangles,
+                                                    double min_area       = 0,
+                                                    double min_edge_len   = 0,
+                                                    double min_edge_angle = 0);
 };  // namespace Evaluation

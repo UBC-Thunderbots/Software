@@ -135,8 +135,8 @@ std::vector<Triangle> Evaluation::getAllTrianglesBetweenEnemyPlayers(
     return all_triangles;
 }
 
-std::vector<Triangle> Evaluation::findOpenTriangles(
-    std::vector<Triangle> triangles, std::vector<Point> enemy_players)
+std::vector<Triangle> Evaluation::findOpenTriangles(std::vector<Triangle> triangles,
+                                                    std::vector<Point> enemy_players)
 {
     std::vector<Triangle> filtered_triangles;
 
@@ -145,19 +145,16 @@ std::vector<Triangle> Evaluation::findOpenTriangles(
     // smaller
     for (Triangle t : triangles)
     {
-        const std::vector<Point>& tPoints = t.getPoints();
+        const std::vector<Point> &tPoints = t.getPoints();
         // Takes vector of triangles from input and adjust every single triangle within it
-        Point p1 =
-            tPoints[0] +
-            (t.center() - tPoints[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
-        Point p2 =
-            tPoints[1] +
-            (t.center() - tPoints[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
-        Point p3 =
-            tPoints[2] +
-            (t.center() - tPoints[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p1 = tPoints[0] +
+                   (t.center() - tPoints[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p2 = tPoints[1] +
+                   (t.center() - tPoints[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p3 = tPoints[2] +
+                   (t.center() - tPoints[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
 
-        Triangle adjusted_triangle = Triangle(p1, p2, p3);
+        Triangle adjusted_triangle       = Triangle(p1, p2, p3);
         bool containsEnemy               = false;
 
         for (Point enemy_robot : enemy_players)
@@ -192,7 +189,7 @@ std::vector<Triangle> Evaluation::removeTrianglesOutsideRectangle(
     for (unsigned int i = 0; i < triangles.size(); i++)
     {
         Triangle t = triangles[i];
-        center           = t.center();
+        center     = t.center();
         if (center.x() <= largest_x && center.x() >= smallest_x &&
             center.y() <= largest_y && center.y() >= smallest_y)
         {
@@ -222,21 +219,24 @@ std::optional<Triangle> Evaluation::getLargestValidTriangle(
 {
     if (!(allTriangles.empty()))
     {
-        Triangle largest = allTriangles[0];
-        double largest_area    = largest.area();
+        Triangle largest    = allTriangles[0];
+        double largest_area = largest.area();
 
         for (unsigned int i = 0; i < allTriangles.size(); i++)
         {
-            Triangle t = allTriangles[i];
-            double area      = t.area();
-            const std::vector<Point>& tPoints = t.getPoints();
-            double l1        = (tPoints[1] - tPoints[0]).length();
-            double l2        = (tPoints[2] - tPoints[0]).length();
-            double l3        = (tPoints[2] - tPoints[1]).length();
+            Triangle t                        = allTriangles[i];
+            double area                       = t.area();
+            const std::vector<Point> &tPoints = t.getPoints();
+            double l1                         = (tPoints[1] - tPoints[0]).length();
+            double l2                         = (tPoints[2] - tPoints[0]).length();
+            double l3                         = (tPoints[2] - tPoints[1]).length();
 
-            Angle a1 = acuteVertexAngle(tPoints[1], tPoints[0], tPoints[2]).angleMod().abs();
-            Angle a2 = acuteVertexAngle(tPoints[0], tPoints[1], tPoints[2]).angleMod().abs();
-            Angle a3 = acuteVertexAngle(tPoints[0], tPoints[2], tPoints[1]).angleMod().abs();
+            Angle a1 =
+                acuteVertexAngle(tPoints[1], tPoints[0], tPoints[2]).angleMod().abs();
+            Angle a2 =
+                acuteVertexAngle(tPoints[0], tPoints[1], tPoints[2]).angleMod().abs();
+            Angle a3 =
+                acuteVertexAngle(tPoints[0], tPoints[2], tPoints[1]).angleMod().abs();
 
             if (area >= largest_area && area >= min_area && l1 >= min_edge_len &&
                 l2 >= min_edge_len && l3 >= min_edge_len &&

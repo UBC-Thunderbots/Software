@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <iostream>
 #include <sstream>
 
 #include "software/new_geom/angle.h"

@@ -10,8 +10,8 @@
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/rectangle.h"
-#include "software/new_geom/triangle.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/triangle.h"
 
 constexpr double EPS = 1e-9;
 

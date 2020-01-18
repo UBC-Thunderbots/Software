@@ -149,8 +149,8 @@ bool contains(const Triangle &out, const Point &in)
         {
             return true;  // SPECIAL CASE
         }
-        double a =
-                atan2((outPoints[i] - in).cross(outPoints[j] - in), (outPoints[i] - in).dot(outPoints[j] - in));
+        double a = atan2((outPoints[i] - in).cross(outPoints[j] - in),
+                         (outPoints[i] - in).dot(outPoints[j] - in));
         angle += a;
     }
     return std::fabs(angle) > 6;

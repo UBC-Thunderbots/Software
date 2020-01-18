@@ -39,8 +39,8 @@ bool ConvexPolygon::isConvex()
         totalAngle += (180 - vertexAngleInDegrees);
     }
 
-    // TODO: Some polygons that SHOULD be convex aren't passing this with GeomConstants::EPSILON,
-    // needed more tolerance for these polygons.
+    // TODO: Some polygons that SHOULD be convex aren't passing this with
+    // GeomConstants::EPSILON, needed more tolerance for these polygons.
     return std::fabs(totalAngle - 360) < 1e-12;
 }
 

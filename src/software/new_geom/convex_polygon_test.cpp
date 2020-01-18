@@ -118,7 +118,8 @@ TEST(ConvexPolygonAreaTest, test_rhombus_area)
 
 TEST(ConvexPolygonIsConvexTest, test_barely_convex_polygon)
 {
-    // This triangle is barely convex. Doesn't pass isConvex(...) if using GeomConstants::EPSILON
-    // but does pass it with a little more tolerance. Related to the TODO in isConvex(...)
+    // This triangle is barely convex. Doesn't pass isConvex(...) if using
+    // GeomConstants::EPSILON but does pass it with a little more tolerance. Related to
+    // the TODO in isConvex(...)
     ConvexPolygon triangle = ConvexPolygon{{0, 0}, {4.5, 0.5}, {4.5, -0.5}};
 }

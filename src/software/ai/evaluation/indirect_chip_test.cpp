@@ -12,10 +12,12 @@
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 
-void testVectorTrianglesEqual(const std::vector<Triangle>& vec1, const std::vector<Triangle>& vec2)
+void testVectorTrianglesEqual(const std::vector<Triangle>& vec1,
+                              const std::vector<Triangle>& vec2)
 {
     ASSERT_EQ(vec1.size(), vec2.size());
-    for (int i = 0; i < vec1.size(); ++i) {
+    for (int i = 0; i < vec1.size(); ++i)
+    {
         EXPECT_TRUE(vec1[i].getPoints() == vec2[i].getPoints());
     }
 }
@@ -87,7 +89,7 @@ TEST(getAllTrianglesBetweenEnemyPlayersTest, get_all_triangles_test)
         Triangle(Point(6 - 1.5, 3), Point(0, 3), Point(0, -3))};
 
     std::vector<Triangle> triangles_between_enemies =
-            Evaluation::getAllTrianglesBetweenEnemyPlayers(test_world, enemy_players);
+        Evaluation::getAllTrianglesBetweenEnemyPlayers(test_world, enemy_players);
 
     testVectorTrianglesEqual(all_triangles, triangles_between_enemies);
 }
@@ -116,7 +118,8 @@ TEST(findOpenTrianglesTest, find_open_triangles_test)
 
     std::vector<Triangle> open_triangles;
     open_triangles.emplace_back(adjusted_triangle);
-    std::vector<Triangle> found_open_triangles = Evaluation::findOpenTriangles(triangles, enemy_players);
+    std::vector<Triangle> found_open_triangles =
+        Evaluation::findOpenTriangles(triangles, enemy_players);
 
     testVectorTrianglesEqual(open_triangles, found_open_triangles);
 }
@@ -139,7 +142,7 @@ TEST(removeTrianglesOutsideRectangleTest, remove_triangles_outside_rectangle_tes
     valid_triangles.emplace_back(t2);
 
     std::vector<Triangle> within_chip_triangles =
-            Evaluation::removeTrianglesOutsideRectangle(target_rectangle, triangles);
+        Evaluation::removeTrianglesOutsideRectangle(target_rectangle, triangles);
 
     testVectorTrianglesEqual(valid_triangles, within_chip_triangles);
 }
@@ -175,8 +178,9 @@ TEST(getLargestValidTriangleTest, get_largest_valid_triangle_test)
 
     Triangle largest = t2;
 
-    EXPECT_TRUE(std::optional(largest).value().getPoints() ==
-              Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0).value().getPoints());
+    EXPECT_TRUE(
+        std::optional(largest).value().getPoints() ==
+        Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0).value().getPoints());
 }
 
 
