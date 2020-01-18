@@ -1,6 +1,11 @@
-#include "software/ai/navigator/obstacle/obstacle_generation.h"
+#include "software/ai/navigator/obstacle/obstacle_factory.h"
 
-std::vector<Obstacle> getObstaclesFromMotionConstraints(
+ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config)
+    : config(config)
+{
+}
+
+std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
     const std::set<MotionConstraint> &motion_constraints, const World &world)
 {
     std::vector<Obstacle> obstacles;
@@ -12,7 +17,7 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
             case MotionConstraint::ENEMY_ROBOTS_COLLISION:
             {
                 std::vector<Obstacle> enemy_robot_obstacles =
-                    getObstaclesFromTeam(world.enemyTeam());
+                    getVelocityObstaclesFromTeam(world.enemyTeam());
                 obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
                                  enemy_robot_obstacles.end());
             }
@@ -23,9 +28,7 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
                 rectangle = Rectangle(
                     world.field().friendlyDefenseArea().posXPosYCorner(),
                     Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
-                rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
-                                     ->RobotObstacleInflationFactor()
-                                     ->value() *
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
@@ -35,17 +38,13 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
                 rectangle = Rectangle(
                     world.field().enemyDefenseArea().negXPosYCorner(),
                     Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
-                rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
-                                     ->RobotObstacleInflationFactor()
-                                     ->value() *
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
                 rectangle = world.field().enemyDefenseArea();
-                rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
-                                         ->RobotObstacleInflationFactor()
-                                         ->value() *
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
                                      ROBOT_MAX_RADIUS_METERS +
                                  0.3);  // 0.3 is by definition what inflated means
                 obstacles.push_back(Obstacle(rectangle));
@@ -53,24 +52,18 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
             case MotionConstraint::CENTER_CIRCLE:
                 obstacles.push_back(Obstacle::createCircleObstacle(
                     world.field().centerPoint(), world.field().centerCircleRadius(),
-                    Util::DynamicParameters->getNavigatorConfig()
-                        ->RobotObstacleInflationFactor()
-                        ->value()));
+                    config->RobotObstacleInflationFactor()->value()));
                 break;
             case MotionConstraint::HALF_METER_AROUND_BALL:
                 obstacles.push_back(Obstacle::createCircleObstacle(
                     world.ball().position(), 0.5,  // 0.5 represents half a metre radius
-                    Util::DynamicParameters->getNavigatorConfig()
-                        ->RobotObstacleInflationFactor()
-                        ->value()));
+                    config->RobotObstacleInflationFactor()->value()));
                 break;
             case MotionConstraint::ENEMY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().enemyCornerNeg() -
                                           Vector(0, world.field().boundaryYLength()));
-                rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
-                                     ->RobotObstacleInflationFactor()
-                                     ->value() *
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
@@ -78,9 +71,7 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().friendlyCornerNeg() -
                                           Vector(0, world.field().boundaryYLength()));
-                rectangle.expand(Util::DynamicParameters->getNavigatorConfig()
-                                     ->RobotObstacleInflationFactor()
-                                     ->value() *
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
                                  ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
@@ -90,20 +81,21 @@ std::vector<Obstacle> getObstaclesFromMotionConstraints(
     return obstacles;
 }
 
-std::vector<Obstacle> getObstaclesFromTeam(const Team &team)
+Obstacle ObstacleFactory::getVelocityObstacleFromRobot(const Robot &robot)
 {
-    double robot_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
-                                        ->RobotObstacleInflationFactor()
-                                        ->value();
-    double velocity_inflation_factor = Util::DynamicParameters->getNavigatorConfig()
-                                           ->VelocityObstacleInflationFactor()
-                                           ->value();
+    double speed_scaling_factor = config->SpeedScalingFactor()->value();
+    double robot_scaling_factor = config->RobotObstacleInflationFactor()->value();
+
+    return Obstacle::createRobotObstacleWithScalingParams(robot, speed_scaling_factor,
+                                                          robot_scaling_factor);
+}
+
+std::vector<Obstacle> ObstacleFactory::getVelocityObstaclesFromTeam(const Team &team)
+{
     std::vector<Obstacle> obstacles;
-    for (auto &robot : team.getAllRobots())
+    for (const auto &robot : team.getAllRobots())
     {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
-            robot, robot_inflation_factor, velocity_inflation_factor);
-        obstacles.push_back(o);
+        obstacles.push_back(getVelocityObstacleFromRobot(robot));
     }
     return obstacles;
 }

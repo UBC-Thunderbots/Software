@@ -6,10 +6,12 @@
 World::World()
     : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
             Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
-            Team(Duration::fromMilliseconds(
-                Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
-            Team(Duration::fromMilliseconds(
-                Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())))
+            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
+                                                ->RobotExpiryBufferMilliseconds()
+                                                ->value())),
+            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
+                                                ->RobotExpiryBufferMilliseconds()
+                                                ->value())))
 {
     // Set the default Timestamp as this parameter is not caught when using the World
     // contructor

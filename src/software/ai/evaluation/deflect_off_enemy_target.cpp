@@ -53,6 +53,7 @@ namespace Evaluation
         Vector dir_perp = dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS * 0.75);
         Point target    = Point(0, 0);
 
+
         // choose point closest to edge of field
         if (fabs((world.ball().position() + dir + dir_perp).y() - closestEdgeY) >
             fabs((world.ball().position() + dir - dir_perp).y() - closestEdgeY))

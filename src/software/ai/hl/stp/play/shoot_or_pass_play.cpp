@@ -29,7 +29,8 @@ std::string ShootOrPassPlay::getName() const
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
     bool use_shoot_or_pass_instead_of_shoot_or_chip =
-        Util::DynamicParameters->getHighLevelStrategyConfig()
+        Util::DynamicParameters->getAIConfig()
+            ->getHighLevelStrategyConfig()
             ->UseShootOrPassInsteadOfShootOrChip()
             ->value();
 
@@ -97,7 +98,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Have a robot keep trying to take a shot
     Angle min_open_angle_for_shot =
-        Angle::fromDegrees(Util::DynamicParameters->getShootOrPassPlayConfig()
+        Angle::fromDegrees(Util::DynamicParameters->getAIConfig()
+                               ->getShootOrPassPlayConfig()
                                ->MinOpenAngleForShotDeg()
                                ->value());
 
@@ -123,12 +125,14 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Whether or not we've set the passer robot in the PassGenerator
     bool set_passer_robot_in_passgenerator = false;
 
-    double abs_min_pass_score =
-        Util::DynamicParameters->getShootOrPassPlayConfig()->AbsMinPassScore()->value();
-    double pass_score_ramp_down_duration =
-        Util::DynamicParameters->getShootOrPassPlayConfig()
-            ->PassScoreRampDownDuration()
-            ->value();
+    double abs_min_pass_score = Util::DynamicParameters->getAIConfig()
+                                    ->getShootOrPassPlayConfig()
+                                    ->AbsMinPassScore()
+                                    ->value();
+    double pass_score_ramp_down_duration = Util::DynamicParameters->getAIConfig()
+                                               ->getShootOrPassPlayConfig()
+                                               ->PassScoreRampDownDuration()
+                                               ->value();
     do
     {
         updateCreaseDefenderTactics(crease_defender_tactics);

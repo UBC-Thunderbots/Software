@@ -7,9 +7,14 @@
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
-AI::AI()
-    : navigator(std::make_shared<Navigator>(std::make_unique<VelocityObstaclePathManager>(
-          std::make_unique<ThetaStarPathPlanner>()))),
+AI::AI(std::shared_ptr<const AIConfig> config)
+    : navigator(std::make_shared<Navigator>(
+          std::make_unique<VelocityObstaclePathManager>(
+              std::make_unique<ThetaStarPathPlanner>(),
+              ObstacleFactory(config->getObstacleFactoryConfig()),
+              config->getVelocityObstaclePathManagerConfig()),
+          ObstacleFactory(config->getObstacleFactoryConfig()),
+          config->getNavigatorConfig())),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
           []() { return std::make_unique<HaltPlay>(); },

@@ -174,17 +174,24 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
         // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
-        auto ball_speed_panic =
-            Util::DynamicParameters->getGoalieTacticConfig()->BallSpeedPanic()->value();
+        auto ball_speed_panic = Util::DynamicParameters->getAIConfig()
+                                    ->getGoalieTacticConfig()
+                                    ->BallSpeedPanic()
+                                    ->value();
         // what should the final goalie speed be, so that the goalie accelerates faster
-        auto goalie_final_speed =
-            Util::DynamicParameters->getGoalieTacticConfig()->GoalieFinalSpeed()->value();
+        auto goalie_final_speed = Util::DynamicParameters->getAIConfig()
+                                      ->getGoalieTacticConfig()
+                                      ->GoalieFinalSpeed()
+                                      ->value();
         // how far in should the goalie wedge itself into the block cone, to block balls
-        auto block_cone_radius =
-            Util::DynamicParameters->getGoalieTacticConfig()->BlockConeRadius()->value();
+        auto block_cone_radius = Util::DynamicParameters->getAIConfig()
+                                     ->getGoalieTacticConfig()
+                                     ->BlockConeRadius()
+                                     ->value();
         // by how much should the defense are be decreased so the goalie stays close
         // towards the net
-        auto defense_area_deflation = Util::DynamicParameters->getGoalieTacticConfig()
+        auto defense_area_deflation = Util::DynamicParameters->getAIConfig()
+                                          ->getGoalieTacticConfig()
                                           ->DefenseAreaDeflation()
                                           ->value();
 
@@ -241,7 +248,8 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         else
         {
             // block the cone by default
-            float radius = Util::DynamicParameters->getGoalieTacticConfig()
+            float radius = Util::DynamicParameters->getAIConfig()
+                               ->getGoalieTacticConfig()
                                ->BlockConeBuffer()
                                ->value() +
                            ROBOT_MAX_RADIUS_METERS;
