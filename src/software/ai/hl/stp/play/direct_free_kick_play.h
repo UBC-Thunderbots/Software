@@ -73,7 +73,7 @@ class DirectFreeKickPlay : public Play
      * @param pass_generator The pass generator that will generate passes
      * @param best_pass_and_score_so_far The best pass and score so far
      */
-    void shootOrfindPassStage(
+    void shootOrFindPassStage(
         TacticCoroutine::push_type &yield,
         std::shared_ptr<MoveTactic> align_to_ball_tactic,
         std::shared_ptr<ShootGoalTactic> shoot_tactic,

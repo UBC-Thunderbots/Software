@@ -50,8 +50,8 @@ void DirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     /**
      * This play is basically:
-     * - One robot attempts to shoot first. If there is no good shot, it will attempt to pass, and finally chips
-     *   towards the enemy goal if it can't find a pass in time
+     * - One robot attempts to shoot first. If there is no good shot, it will attempt to
+     * pass, and finally chips towards the enemy goal if it can't find a pass in time
      * - Two robots try to get in good positions in the enemy end to receive a pass
      * - Two robots crease defend
      * - One robot is goalie
@@ -90,6 +90,7 @@ void DirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         cherry_pick_2_target_region =
             Rectangle(Point(0, world.field().xLength() / 4.0), Point(0, y_offset));
     }
+
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
     auto cherry_pick_tactic_1 =
@@ -146,18 +147,19 @@ void DirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished aligning to ball";
 
     Angle min_open_angle_for_shot =
-            Angle::fromDegrees(Util::DynamicParameters->getShootOrPassPlayConfig()
-                                       ->MinOpenAngleForShotDeg()
-                                       ->value());
+        Angle::fromDegrees(Util::DynamicParameters->getAIConfig()
+                               ->getShootOrPassPlayConfig()
+                               ->MinOpenAngleForShotDeg()
+                               ->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-            min_open_angle_for_shot, std::nullopt, false);
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        min_open_angle_for_shot, std::nullopt, false);
 
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
-    shootOrfindPassStage(yield, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                         crease_defender_tactics, goalie_tactic, pass_generator,
-                         best_pass_and_score_so_far);
+    shootOrFindPassStage(yield, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
+                         cherry_pick_tactic_2, crease_defender_tactics, goalie_tactic,
+                         pass_generator, best_pass_and_score_so_far);
 
     if (shoot_tactic->done())
     {
@@ -208,7 +210,8 @@ void DirectFreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
     pass_generator.setPasserPoint(world.ball().position());
 }
 
-void DirectFreeKickPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
+void DirectFreeKickPlay::updateShootGoalTactic(
+    std::shared_ptr<ShootGoalTactic> shoot_tactic)
 {
     shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
                                     world.enemyTeam(), world.ball());
@@ -291,7 +294,7 @@ void DirectFreeKickPlay::performPassStage(
     } while (!receiver->done());
 }
 
-void DirectFreeKickPlay::shootOrfindPassStage(
+void DirectFreeKickPlay::shootOrFindPassStage(
     TacticCoroutine::push_type &yield, std::shared_ptr<MoveTactic> align_to_ball_tactic,
     std::shared_ptr<ShootGoalTactic> shoot_tactic,
     std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
@@ -328,7 +331,8 @@ void DirectFreeKickPlay::shootOrfindPassStage(
         min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
                                      MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
                                  1.0);
-    } while (best_pass_and_score_so_far.rating < min_score || shoot_tactic->hasShotAvailable());
+    } while (best_pass_and_score_so_far.rating < min_score ||
+             shoot_tactic->hasShotAvailable());
 }
 
 // Register this play in the PlayFactory
