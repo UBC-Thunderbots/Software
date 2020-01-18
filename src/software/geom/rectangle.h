@@ -35,21 +35,21 @@ class Rectangle final
      *
      * @return The length along the x-axis of the rectangle
      */
-    constexpr double xLength() const;
+    double xLength() const;
 
     /**
      * Returns the length along the y-axis of the rectangle
      *
      * @return The length along the y-axis of the rectangle
      */
-    constexpr double yLength() const;
+    double yLength() const;
 
     /**
      * Returns the area of the rectangle
      *
      * @return The area of the rectangle
      */
-    constexpr double area() const;
+    double area() const;
 
     /**
      * Returns the centre of the rectangle
@@ -110,7 +110,7 @@ class Rectangle final
      *
      * @return bool Whether the point is inside the boundary of the rectangle
      */
-    constexpr bool containsPoint(const Point &p) const;
+    bool containsPoint(const Point &p) const;
 
     /**
      * Attempts to move all edges of the rectangle outwards or inwards towards
@@ -172,17 +172,17 @@ inline Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double x_length,
 {
 }
 
-inline constexpr double Rectangle::xLength() const
+inline double Rectangle::xLength() const
 {
     return diagonal.x();
 }
 
-inline constexpr double Rectangle::yLength() const
+inline double Rectangle::yLength() const
 {
     return diagonal.y();
 }
 
-inline constexpr double Rectangle::area() const
+inline double Rectangle::area() const
 {
     return diagonal.x() * diagonal.y();
 }
@@ -234,7 +234,7 @@ inline void Rectangle::translate(const Vector &offset)
     min_corner += offset;
 }
 
-inline constexpr bool Rectangle::containsPoint(const Point &p) const
+inline bool Rectangle::containsPoint(const Point &p) const
 {
     return p.x() >= min_corner.x() && p.y() >= min_corner.y() &&
            p.x() <= min_corner.x() + diagonal.x() &&
