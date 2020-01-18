@@ -121,3 +121,5 @@ cscope*
 
 #kcachegrind
 src/callgrind*
+src/core*
+

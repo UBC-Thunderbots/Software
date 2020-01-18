@@ -133,11 +133,11 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         // provided by refbox. The 'defending_positive_side' parameter dictates the side
         // we are defending if we are overriding the value
         // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-        if (Util::DynamicParameters->getAIConfig()
+        if (Util::DynamicParameters->getAIControlConfig()
                 ->getRefboxConfig()
                 ->OverrideRefboxDefendingSide()
                 ->value() &&
-            Util::DynamicParameters->getAIConfig()
+            Util::DynamicParameters->getAIControlConfig()
                 ->getRefboxConfig()
                 ->DefendingPositiveSide()
                 ->value())
@@ -176,7 +176,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             world.updateBallState(ball_state);
 
             Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
-            int friendly_goalie_id = Util::DynamicParameters->getAIConfig()
+            int friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
                                          ->getRefboxConfig()
                                          ->FriendlyGoalieId()
                                          ->value();
@@ -184,7 +184,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             world.mutableFriendlyTeam() = friendly_team;
 
             Team enemy_team     = network_filter.getFilteredEnemyTeamData({detection});
-            int enemy_goalie_id = Util::DynamicParameters->getAIConfig()
+            int enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
                                       ->getRefboxConfig()
                                       ->EnemyGoalieId()
                                       ->value();

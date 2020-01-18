@@ -260,7 +260,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
     }
 }
 
-void GameState::updateBall(const Ball &ball)
+void GameState::updateBall(const Ball& ball)
 {
     if (state == READY && restart_reason != PENALTY)
     {

@@ -6,7 +6,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_generation.h"
+#include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/ai/primitive/all_primitives.h"
 #include "software/ai/primitive/primitive.h"
@@ -20,7 +20,16 @@
 class Navigator : public IntentVisitor
 {
    public:
-    explicit Navigator(std::unique_ptr<PathManager> path_manager);
+    /**
+     * Create a Navigator
+     * @param path_manager The path manager that will be used for path creation for all
+     *                     the robots
+     * @param obstacle_factory Will be used to generate obstacles from various constructs
+     * @param config The navigator config
+     */
+    explicit Navigator(std::unique_ptr<PathManager> path_manager,
+                       ObstacleFactory obstacle_factory,
+                       std::shared_ptr<const NavigatorConfig> config);
 
     /**
      * Get assigned primitives for given assigned intents
@@ -110,7 +119,6 @@ class Navigator : public IntentVisitor
      */
     void visit(const StopIntent &stop_intent) override;
 
-   protected:
     /**
      * Calculates the transition speed for the robot between two line segments
      *
@@ -118,38 +126,20 @@ class Navigator : public IntentVisitor
      * given line segment in order to smoothly transition to another given line segment,
      * given a final speed at the end of the two line segments
      *
+     * This is only public so it is testable.
+     *
      * @param p1, p2, p3 are 3 points that define two line segments that form a path
      * @param final_speed is the intended final speed at the end of the path
      * @return the first segment's final speed after travelling from p1 to p2
      * for a smooth transition to the p2 to p3 path, scaled by the final speed at the end
      * of the path
      */
-    double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
-                                                   const Point &p3, double final_speed);
+    static double calculateTransitionSpeedBetweenSegments(const Point &p1,
+                                                          const Point &p2,
+                                                          const Point &p3,
+                                                          double final_speed);
 
    private:
-    // Path manager used to navigate around obstacles
-    std::unique_ptr<PathManager> path_manager;
-
-    // This navigators knowledge / state of the world
-    World world;
-
-    // The current Primitive the navigator has created from an Intent.
-    // This variable is set by each `visit` function
-    std::unique_ptr<Primitive> current_primitive;
-
-    // This is used by the visualizer to see the planned paths
-    std::vector<std::vector<Point>> planned_paths;
-
-    // These are obstacles that represent robots that aren't
-    // assigned move intents
-    // When move intents are processed to path plan,
-    // we can avoid these non-"moving" robots
-    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
-
-    // intents that need path planning
-    std::vector<MoveIntent> move_intents_for_path_planning;
-
     /**
      * Registers this robot id as a robot that is not assigned a MoveIntent
      *
@@ -201,4 +191,29 @@ class Navigator : public IntentVisitor
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
     double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
+
+    std::shared_ptr<const NavigatorConfig> config;
+    ObstacleFactory obstacle_factory;
+
+    // Path manager used to navigate around obstacles
+    std::unique_ptr<PathManager> path_manager;
+
+    // This navigators knowledge / state of the world
+    World world;
+
+    // The current Primitive the navigator has created from an Intent.
+    // This variable is set by each `visit` function
+    std::unique_ptr<Primitive> current_primitive;
+
+    // This is used by the visualizer to see the planned paths
+    std::vector<std::vector<Point>> planned_paths;
+
+    // These are obstacles that represent robots that aren't
+    // assigned move intents
+    // When move intents are processed to path plan,
+    // we can avoid these non-"moving" robots
+    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
+
+    // intents that need path planning
+    std::vector<MoveIntent> move_intents_for_path_planning;
 };

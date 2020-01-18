@@ -46,6 +46,8 @@ host_software_packages=(
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
     python3-yaml # yaml for cfg generation (Dynamic Parameters)
+    python-minimal # This is required for bazel, we've seen some issues where
+                   # the bazel install hasn't installed it properly
 )
 sudo apt-get install ${host_software_packages[@]} -y
 
