@@ -25,3 +25,10 @@ b2Vec2 createVec2(const Point& point)
     ret.Set(point.x(), point.y());
     return ret;
 }
+
+b2Vec2 createVec2(const Vector& vector)
+{
+    b2Vec2 ret;
+    ret.Set(vector.x(), vector.y());
+    return ret;
+}

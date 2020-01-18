@@ -6,6 +6,7 @@
 
 #include "shared/constants.h"
 #include "software/geom/util.h"
+#include "software/new_geom/util/closest_point.h"
 #include "software/util/math/math_functions.h"
 
 BallFilter::BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size)
@@ -289,11 +290,7 @@ std::optional<BallState> BallFilter::estimateBallState(
     auto y_vs_x_regression = getLinearRegressionLine(swapped_ball_detections);
     // Because we swapped the coordinates of the input, we have to swap the coordinates of
     // the output to get back to our expected coordinate space
-    y_vs_x_regression.regression_line =
-        Line(Point(y_vs_x_regression.regression_line.getFirst().y(),
-                   y_vs_x_regression.regression_line.getFirst().x()),
-             Point(y_vs_x_regression.regression_line.getSecond().y(),
-                   y_vs_x_regression.regression_line.getSecond().x()));
+    y_vs_x_regression.regression_line.swapXY();
 
     // We use the regression from above with the least error
     Line regression_line =
@@ -323,8 +320,8 @@ std::optional<BallState> BallFilter::estimateBallState(
         // more robust to fluctuations in ball position, so will not vary as much as using
         // the "raw" ball velocity
         auto velocity_direction_along_regression_line =
-            velocity_estimate->average_velocity.project(regression_line.getSecond() -
-                                                        regression_line.getFirst());
+            velocity_estimate->average_velocity.project(
+                regression_line.toNormalUnitVector().perpendicular());
         Vector filtered_velocity = velocity_direction_along_regression_line.normalize(
             velocity_estimate->average_velocity_magnitude);
 

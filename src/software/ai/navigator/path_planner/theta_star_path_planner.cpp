@@ -117,7 +117,6 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
         // If the successor is already on the closed
         // list or if it is blocked, then ignore it.
         // Else do the following
-        //
         if (closed_list.find(new_coord) == closed_list.end() &&
             isUnBlocked(new_coord) == true)
         {

@@ -108,3 +108,12 @@ TEST(Box2DUtilTest, test_create_b2Vec2_from_point)
     expected = {0.0, 100.100};
     EXPECT_EQ(expected, createVec2(Point(0.0, 100.100)));
 }
+
+TEST(Box2DUtilTest, test_create_b2Vec2_from_vector)
+{
+    b2Vec2 expected = {-1.02, 5.4};
+    EXPECT_EQ(expected, createVec2(Vector(-1.02, 5.4)));
+
+    expected = {0.0, 100.100};
+    EXPECT_EQ(expected, createVec2(Vector(0.0, 100.100)));
+}

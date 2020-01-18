@@ -13,10 +13,8 @@ cc_library(
     ],
     hdrs = [
         "circle.h",
-        "line.h",
         "polygon.h",
         "polynomial.h",
-        "ray.h",
         "rectangle.h",
         "segment.h",
         "shot.h",
@@ -28,7 +26,9 @@ cc_library(
         "-std=c++17",
     ],
     deps = [
-        "//software/new_geom",
+        "//software/new_geom:line",
+        "//software/new_geom:point",
+        "//software/new_geom:ray",
         "@boost//:geometry",
         "@boost//:polygon",
         "@g3log",

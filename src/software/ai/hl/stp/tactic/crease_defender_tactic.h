@@ -61,10 +61,15 @@ class CreaseDefenderTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(TacticVisitor &visitor) const override;
+    void accept(MutableTacticVisitor &visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
+    Team getEnemyTeam() const;
+    Team getFriendlyTeam() const;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
+    void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
     /**
      * Calculate the position and orientation we would like the defender to be in

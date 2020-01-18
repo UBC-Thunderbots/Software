@@ -6,9 +6,9 @@
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend_factory.h"
-#include "software/gui/visualizer_wrapper.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
+#include "software/visualizer/visualizer_wrapper.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -127,15 +127,20 @@ int main(int argc, char **argv)
 
     Util::Logger::LoggerSingleton::initializeLogger();
 
-    ai = std::make_shared<AIWrapper>();
-
     commandLineArgs args = parseCommandLineArgs(argc, argv);
 
     if (!args.help && !args.err)
     {
+        // Setup dynamic parameters
+        // TODO (Issue #960): Once we're using injected parameters everywhere (instead of
+        //                    just global accesses, `Util::DynamicParameters` should be
+        //                    deleted, and we should just create an instance here instead)
+        std::shared_ptr<const ThunderbotsConfig> thunderbots_config =
+            Util::DynamicParameters;
+
         // The ai has to be initialized after the backend (which is started in
         // parseCommandLineArgs) This is a bug. See #834
-        ai = std::make_shared<AIWrapper>();
+        ai = std::make_shared<AIWrapper>(thunderbots_config->getAIConfig());
 
         setBackendFromString(args.backend_name);
 

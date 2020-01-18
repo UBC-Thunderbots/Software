@@ -25,13 +25,13 @@ declare -a OBJECT_FILES_FOLDERS=(
 # "error: Could not load coverage information"
 # So we ignore them.
 # At the time of writing, the known bad files are:
-#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/parameters/moc_parameters.pic.o 
-#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/robot_status/moc_robot_status.pic.o 
-#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/world_view/moc_world_view.pic.o 
-#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/ai_control/moc_ai_control.pic.o 
+#   bazel-out/k8-fastbuild/bin/software/visualizer/widgets/_objs/parameters/moc_parameters.pic.o
+#   bazel-out/k8-fastbuild/bin/software/visualizer/widgets/_objs/robot_status/moc_robot_status.pic.o
+#   bazel-out/k8-fastbuild/bin/software/visualizer/widgets/_objs/world_view/moc_world_view.pic.o
+#   bazel-out/k8-fastbuild/bin/software/visualizer/widgets/_objs/ai_control/moc_ai_control.pic.o
 # Please refer to this post for how to construct a prune argument. It's not
 # as simple as you think. https://stackoverflow.com/a/4210072
-BLACKLIST_ARG="-path bazel-out/k8-fastbuild/bin/software/gui/widgets -prune -o"
+BLACKLIST_ARG="-path bazel-out/k8-fastbuild/bin/software/visualizer/widgets -prune -o"
 
 # Find all object files
 declare -a OBJECT_FILES=()

@@ -46,6 +46,8 @@ host_software_packages=(
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
     python3-yaml # yaml for cfg generation (Dynamic Parameters)
+    python-minimal # This is required for bazel, we've seen some issues where
+                   # the bazel install hasn't installed it properly
 )
 sudo apt-get install ${host_software_packages[@]} -y
 
@@ -55,6 +57,19 @@ if [ $? -ne 0 ]; then
     echo "##############################################################"
     exit 1
 fi
+
+echo "================================================================"
+echo "Installing Newer Valgrind Version"
+echo "================================================================"
+# The default version of valgrind on Ubuntu 18.04 via `apt` is '3.13', but
+# the version of clang we use requires at least '3.15'. To get around this, we
+# remove the version installed by `apt` and get the version from `snap` instead
+sudo apt remove valgrind
+sudo snap install valgrind --channel=stable --classic
+
+echo "================================================================"
+echo "Done Installing Newer Valgrind Version"
+echo "================================================================"
 
 # Install Bazel
 echo "================================================================" 

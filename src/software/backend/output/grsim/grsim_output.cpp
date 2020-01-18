@@ -105,7 +105,7 @@ void GrSimOutput::sendPrimitives(
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
                 prim->getRobotId(),
-                Util::DynamicParameters->getAIConfig()
+                Util::DynamicParameters->getAIControlConfig()
                     ->getRefboxConfig()
                     ->FriendlyColorYellow()
                     ->value(),
