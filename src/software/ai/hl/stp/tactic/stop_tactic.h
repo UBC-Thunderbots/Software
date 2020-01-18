@@ -31,10 +31,10 @@ class StopTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // Tactic parameters
     // Whether or not the robot should coast to a stop

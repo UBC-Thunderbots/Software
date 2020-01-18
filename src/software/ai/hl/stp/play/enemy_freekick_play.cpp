@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/play/play_factory.h"
-#include "software/ai/hl/stp/tactic/block_shot_path_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -53,14 +52,16 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+        Util::DynamicParameters->getAIConfig()
+            ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
             ->value(),
         Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
         true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+        Util::DynamicParameters->getAIConfig()
+            ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
             ->value(),
         Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),

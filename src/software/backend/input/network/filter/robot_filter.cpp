@@ -6,7 +6,7 @@ RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_durat
 {
 }
 
-RobotFilter::RobotFilter(SSLRobotDetection current_robot_state,
+RobotFilter::RobotFilter(RobotDetection current_robot_state,
                          Duration expiry_buffer_duration)
     : current_robot_state(current_robot_state.id, current_robot_state.position,
                           Vector(0, 0), current_robot_state.orientation,
@@ -16,7 +16,7 @@ RobotFilter::RobotFilter(SSLRobotDetection current_robot_state,
 }
 
 std::optional<Robot> RobotFilter::getFilteredData(
-    const std::vector<SSLRobotDetection> &new_robot_data)
+    const std::vector<RobotDetection> &new_robot_data)
 {
     int data_num               = 0;
     Timestamp latest_timestamp = Timestamp().fromSeconds(0);
@@ -29,7 +29,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
     filtered_data.angular_velocity = AngularVelocity::fromRadians(0);
     filtered_data.timestamp        = Timestamp().fromSeconds(0);
 
-    for (const SSLRobotDetection &robot_data : new_robot_data)
+    for (const RobotDetection &robot_data : new_robot_data)
     {
         // add up all data points for this robot and then average it
         if (robot_data.id == this->getRobotId() &&

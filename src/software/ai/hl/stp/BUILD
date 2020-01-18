@@ -10,8 +10,8 @@ cc_library(
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:stop_intent",
-        "//software/util/parameter:dynamic_parameters",
         "//software/ai/motion_constraint:motion_constraint_manager",
+        "//software/util/parameter:dynamic_parameters",
         "@munkres_cpp",
     ],
 )
@@ -40,6 +40,7 @@ cc_test(
     deps = [
         ":stp",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
+        "//software/ai/hl/stp/tactic/test_tactics:goalie_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
         "//software/test_util",

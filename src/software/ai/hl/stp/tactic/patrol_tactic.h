@@ -39,10 +39,10 @@ class PatrolTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // Tactic parameters
     // The list of points the robot will patrol, in order

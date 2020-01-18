@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
-
 cc_binary(
     name = "firmware_old_main",
     srcs = ["main/main.c"],
@@ -80,6 +78,7 @@ cc_library(
         "STM32LIB_USE_FREERTOS",
     ],
     includes = [
+        ".",
         "cdcacm/include",
         "freertos/include",
         "freertos/vendor/portable/GCC/ARM_CM4F",
@@ -89,6 +88,7 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32f4"],
     deps = [
+        "//firmware/main/app/world:firmware_world",
         "//shared:constants",
         "//shared:robot_constants",
     ],

@@ -6,10 +6,12 @@
 World::World()
     : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
             Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
-            Team(Duration::fromMilliseconds(
-                Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
-            Team(Duration::fromMilliseconds(
-                Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())))
+            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
+                                                ->RobotExpiryBufferMilliseconds()
+                                                ->value())),
+            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
+                                                ->RobotExpiryBufferMilliseconds()
+                                                ->value())))
 {
     // Set the default Timestamp as this parameter is not caught when using the World
     // contructor
@@ -39,7 +41,7 @@ void World::updateFieldGeometry(const Field &new_field_data)
 
 void World::updateBallState(const BallState &new_ball_state)
 {
-    ball_.updateCurrentState(new_ball_state);
+    ball_.updateState(new_ball_state);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -167,4 +169,17 @@ const GameState &World::gameState() const
 GameState &World::mutableGameState()
 {
     return game_state_;
+}
+
+bool World::operator==(const World &other) const
+{
+    return this->field() == other.field() && this->ball() == other.ball() &&
+           this->friendlyTeam() == other.friendlyTeam() &&
+           this->enemyTeam() == other.enemyTeam() &&
+           this->gameState() == other.gameState();
+}
+
+bool World::operator!=(const World &other) const
+{
+    return !(*this == other);
 }

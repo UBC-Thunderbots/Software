@@ -6,9 +6,9 @@ class Ray final
 {
    public:
     /**
-     * Creates a degenerate Ray at (0, 0)
+     * Creates a Ray starting at (0, 0) pointing along the positive x-axis
      */
-    inline explicit Ray() {}
+    explicit Ray();
 
     /**
      * Creates a Ray with a start point and a direction angle
@@ -16,10 +16,7 @@ class Ray final
      * @param start the start point of Ray
      * @param direction the direction angle of Ray
      */
-    inline explicit Ray(const Point& start, const Angle& direction)
-        : start_(start), direction_(direction)
-    {
-    }
+    explicit Ray(const Point& start, const Angle& direction);
 
     /**
      * Creates a Ray with a start point and a direction vector
@@ -27,70 +24,56 @@ class Ray final
      * @param start the start point of Ray
      * @param direction the direction vector of Ray
      */
-    inline explicit Ray(const Point& start, const Vector& direction)
-        : Ray(start, direction.orientation())
-    {
-    }
+    explicit Ray(const Point& start, const Vector& direction);
 
     /**
      * Returns the start point of this Ray
      *
      * @return the start point of this Ray
      */
-    inline Point getStart() const
-    {
-        return start_;
-    }
+    Point getStart() const;
 
     /**
      * Returns the direction of this Ray
      *
      * @return the direction of this Ray
      */
-    inline Angle getDirection() const
-    {
-        return direction_;
-    }
+    Angle getDirection() const;
 
     /**
      * Sets the start point of this Ray
      *
      * @param point the new start point
      */
-    inline void setStart(const Point& start)
-    {
-        start_ = start;
-    }
+    void setStart(const Point& start);
 
     /**
      * Sets the direction of this Ray with an angle
      *
      * @param direction the new direction as an angle
      */
-    inline void setDirection(const Angle& direction)
-    {
-        direction_ = direction;
-    }
+    void setDirection(const Angle& direction);
 
     /**
      * Sets the direction of this Ray with a vector
      *
      * @param direction the new direction as a vector
      */
-    inline void setDirection(const Vector& direction)
-    {
-        direction_ = direction.orientation();
-    }
+    void setDirection(const Vector& direction);
 
     /**
      * Rotates this Ray counterclockwise by an angle
      *
      * @param angle the angle to rotate the Ray
      */
-    inline void rotate(Angle angle)
-    {
-        direction_ += angle;
-    }
+    void rotate(const Angle& angle);
+
+    /**
+     * Returns a unit-magnitude Vector in the direction of the Ray
+     *
+     * @return a unit-magnitude Vector in the direction of the Ray
+     */
+    Vector toUnitVector() const;
 
    private:
     /**

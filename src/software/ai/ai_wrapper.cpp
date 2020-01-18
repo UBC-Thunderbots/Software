@@ -2,8 +2,10 @@
 
 #include <boost/bind.hpp>
 
-#include "software/gui/drawing/navigator.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/visualizer/drawing/navigator.h"
+
+AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> config) : ai(config) {}
 
 void AIWrapper::onValueReceived(World world)
 {
@@ -13,7 +15,7 @@ void AIWrapper::onValueReceived(World world)
 
 void AIWrapper::runAIAndSendPrimitives()
 {
-    if (Util::DynamicParameters->getAIConfig()->RunAI()->value())
+    if (Util::DynamicParameters->getAIControlConfig()->RunAI()->value())
     {
         std::vector<std::unique_ptr<Primitive>> new_primitives =
             ai.getPrimitives(most_recent_world);

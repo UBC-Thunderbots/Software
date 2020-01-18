@@ -4,13 +4,13 @@
 #include <vector>
 
 #include "software/geom/circle.h"
-#include "software/geom/line.h"
 #include "software/geom/polygon.h"
-#include "software/geom/ray.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
 #include "software/geom/shot.h"
+#include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/ray.h"
 
 template <size_t N>
 using LegacyPolygon       = std::array<Point, N>;
@@ -84,8 +84,6 @@ double dist(const Segment &first, const Segment &second);
 double dist(const Point &first, const Segment &second);
 double dist(const Segment &first, const Point &second);
 
-double dist(const Line &first, const Point &second);
-double dist(const Point &first, const Line &second);
 double dist(const Point &first, const Polygon &second);
 
 /**
@@ -100,12 +98,10 @@ double distsq(const Point &first, const Point &second);
 
 bool isDegenerate(const Segment &segment);
 bool isDegenerate(const Ray &segment);
-bool isDegenerate(const Line &line);
 
 double length(const Segment &segment);
 
 double lengthSquared(const Segment &segment);
-double lengthSquared(const Line &line);
 
 template <size_t N>
 Point getVertex(const LegacyPolygon<N> &poly, unsigned int i);
@@ -138,62 +134,17 @@ Segment getSide(const LegacyPolygon<N> &poly, unsigned int i);
 bool collinear(const Point &a, const Point &b, const Point &c);
 
 /**
- * Performs an angle sweep.
- * Suppose in this world, all objects are circles of fixed radius.
- * You are at point \p src, and you want to shoot a ray between \p p1 and \p p2.
- * This function calculates the largest open angle interval that you can shoot.
+ * Checks if 2 Segments are collinear.
  *
- * @pre \p p1 must be to the right of \p p2.
- * In other words, if there is a counterclockwise ordering, \p p1 is before \p
- * p2 from \p src's point of view.
+ * @param segment1 : The first Segment
  *
- * @pre The angle \p p1, \p src, \p p2 must not be greater than 180 degrees.
+ * @param segment2 : The second Segment
  *
- * @pre \p src must not be between \p p1 and \p p2.
+ * @return true : If the Segment1 and Segment2 are collinear within EPS disance
  *
- * @param src the location where you are standing.
- *
- * @param p1 the location of the right-hand edge of the target area.
- *
- * @param p2 the location of the left-hand edge of the target area.
- *
- * @param obstacles the coordinates of the centres of the obstacles.
- *
- * @param radius the radii of the obstacles.
- *
- * @return A feasible shot or std::nullopt if there is no feasible shot
+ * @return false : If Segment1 and Segment2 are NOT collinear within EPS distance
  */
-std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const Point &p2,
-                                      const std::vector<Point> &obstacles,
-                                      const double &radius);
-
-/**
- * Performs an angle sweep.
- * Suppose in this world, all objects are circles of fixed radius.
- * You are at point \p src, and you want to shoot a ray from a point to an area
- * This function calculates the all open angle intervals that you can shoot.
- *
- * @pre The point \p src can't be within the radius of the obstacle
- *
- * @param src the location where the sweep is centered (think center of a clock)
- *
- * @param p1 the location of the right-hand edge of the target area.
- *
- * @param p2 the location of the left-hand edge of the target area.
- *
- * @param obstacles the coordinates of the centres of the obstacles.
- *
- * @param radius the radii of the obstacles.
- *
- * @return A vector of possible (ie. not blocked) Shots. If lines src
- * -> p1 and src -> p2 are collinear and src -> p1 is not blocked by an obstacle, the
- * result will contain a single Shot of the direction of src -> p1 and zero angle if the
- * line is not blocked by an obstacle. An empty vector is returned if the preconditions
- * aren't satisfied.
- */
-std::vector<Shot> angleSweepCirclesAll(const Point &src, const Point &p1, const Point &p2,
-                                       const std::vector<Point> &obstacles,
-                                       const double &radius);
+bool collinear(const Segment &segment1, const Segment &segment2);
 
 /**
  * returns a list of points that lie on the border of the circle
@@ -213,20 +164,6 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
  */
 Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
 Point closestPointOnSeg(const Point &p, const Segment &segment);
-
-/**
- * Finds the Point on line closest to point.
- *
- * @param centre the point.
- *
- * @param lineA one point on the line.
- *
- * @param lineB another point on the line segment.
- *
- * @return the Point on line closest to centre point.
- */
-Point closestPointOnLine(const Point &p, const Point &lineA, const Point &lineB);
-Point closestPointOnLine(const Point &p, const Line &line);
 
 /**
  * Finds the points of intersection between a circle and a line.
@@ -534,13 +471,15 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
                                                double buffer = 0.0);
 
 /**
- * Returns the tangent vectors of a Circle and Point (Vectors are directed towards Circle)
+ * Calculates the pair of Rays that intercept the Circle tangentially with origin at the
+ * reference Point
  *
  * @param reference: The point which the tangent vectors will intersect
  * @param circle: The circle to calculate the tangent vectors of
  * @return the mean point of points
  */
-std::pair<Ray, Ray> getCircleTangentRays(const Point reference, const Circle circle);
+std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point reference,
+                                                            const Circle circle);
 
 bool pointIsRightOfLine(const Segment &line, const Point &point);
 
@@ -610,16 +549,97 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                                                         Segment segment2);
 
 /**
- * Function calculates if the segment parameters are redundant, for example, if segment2
- * is parallel and contained within segment1
+ * Function merges two parameter segments into a single segment ONLY IF one of the
+ * segments is contained ENTIRELY within the other
  *
  * @param segment1 : first segment
  * @param segment2 : second segment
- * @return Segment: If the segments are redundant, returns the larger segment
- *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
- * aren't redundant
+ * @return Segment : The longer segment ONLY IF one of the segments is contained entirely
+ * within the other
+ * @return nullopt : One of the segments is not fully contained in the other, OR the
+ * segments are not collinear
  */
 std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
+
+/**
+ * Function projects Circle objects onto a Segment with respect to an origin Point
+ *
+ *               projected Segment
+ * *______X---------------------------X___________________*  <-- reference Segment
+ *          .                        .
+ *           .                      .
+ *            .                    .
+ *             .                  .
+ *              .                .
+ *               .              .
+ *                .   Circle   .
+ *                 .  /----\  .
+ *                  . |    | .
+ *                   .\----/.
+ *                    .    .
+ *                     .  .
+ *                      ..
+ *                       X
+ *                 Reference Origin
+ *
+ * @param segment : The reference Segment to project onto
+ * @param circles : The vector of circles to project onto the reference Segment
+ * @param origin : The Point origin to calculate the projection of the Circles from
+ *
+ * @return vector<Segment> : All of the projections of the Circles onto the reference
+ * Segment
+ */
+std::vector<Segment> projectCirclesOntoSegment(Segment segment,
+                                               std::vector<Circle> circles, Point origin);
+
+/**
+ * Function that returns a Segment of the 'Empty' space between the Vector of Segments AND
+ * within the parent_segment.
+ *
+ * NOTE: All segments must be COLLINEAR and must NOT occupy any of the same space
+ *       Additionally, the parent segment completely contain ALL segments in the same
+ * space
+ *
+ *  *-------------------------------------------------* <-- Parent segment
+ *        *xxxxxxxx*          *xxxxxxxxxx*    *xxxx*    <-- Occupied space (input
+ * Segments)
+ *  *_____*         *_________*          *____*    *__* <-- Empty space (output Segments)
+ *
+ * @param segments : The vector of Segments that represent the 'occupied' space. These
+ * will be used to find the Segments representing the 'Empty' space
+ * @param parent_segment : The Segment representing the entire linear space to calculate
+ * the 'Empty' space Segments from
+ *
+ * @return vector<Segment> : All of the 'Empty' space Segments enclosed in the parent
+ * segment
+ */
+std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segments,
+                                                      Segment parent_segment);
+
+
+/**
+ * Function takes in a Vector of Segments and will re-align the Segment to it's equivalent
+ * component in the direction of the input Vector. All of the re-aligned Segments will
+ * then be combined so that the returned vector<Segment> contains the minimum about of
+ * Segments that covers the same linear space in the direction of the input Vector
+ *
+ * Ex.
+ *  Input:  *--------*       *--------*  *
+ *                *------*              /
+ *                                     /
+ *                                    /
+ *                                   *
+ *
+ *  Output: *------------*   *-----------*
+ *
+ * @param segments : The vector of Segments to be reduced
+ * @param direction : The direction that all input vectors will be projected onto
+ *
+ * @return std::vector<Segment>: The vector of the fewest
+ * independent Segments
+ */
+std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
+                                               Vector direction);
 
 /**
  * Returns the binary trespass score of a point and rectangle

@@ -43,10 +43,15 @@ class CherryPickTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
+    /**
+     *
+     * @return
+     */
+    World getWorld() const;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // The pass optimizer being used to figure out the best position for the robot
     Passing::PassGenerator pass_generator;

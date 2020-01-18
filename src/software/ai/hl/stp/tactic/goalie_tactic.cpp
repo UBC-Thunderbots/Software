@@ -5,11 +5,11 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/geom/ray.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/ray.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 
@@ -21,39 +21,6 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
       friendly_team(friendly_team),
       enemy_team(enemy_team)
 {
-}
-
-std::string GoalieTactic::getName() const
-{
-    return "Goalie Tactic";
-}
-
-void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
-                                     const Team &friendly_team, const Team &enemy_team)
-{
-    // Update the world parameters stored by this Tactic
-    this->ball          = ball;
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-}
-
-double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
-{
-    // Strongly prefer the robot assigned to be the goalie.
-    // TODO: This is a hack to "ensure" the right robot will be assigned. We should
-    // normally return values in the range [0, 1]
-    if (world.friendlyTeam().getGoalieID() &&
-        robot.id() == world.friendlyTeam().getGoalieID().value())
-    {
-        return 0.0;
-    }
-    else
-    {
-        // TODO perform proper goalie assignment using plays
-        // https://github.com/UBC-Thunderbots/Software/issues/745
-        return std::numeric_limits<int>::max() - 10;
-    }
 }
 
 std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
@@ -129,13 +96,40 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     }
 }
 
-void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
+std::string GoalieTactic::getName() const
 {
-    MoveAction move_action =
-        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
-                   MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, true);
-    ChipAction chip_action = ChipAction();
-    StopAction stop_action = StopAction();
+    return "Goalie Tactic";
+}
+
+void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
+                                     const Team &friendly_team, const Team &enemy_team)
+{
+    // Update the world parameters stored by this Tactic
+    this->ball          = ball;
+    this->field         = field;
+    this->friendly_team = friendly_team;
+    this->enemy_team    = enemy_team;
+}
+
+bool GoalieTactic::isGoalieTactic() const
+{
+    return true;
+}
+
+double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
+{
+    // We don't prefer any particular robot to be the goalie, as there should only
+    // ever be one robot that can act as the goalie
+    return 0.5;
+}
+
+void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
+{
+    auto move_action = std::make_shared<MoveAction>(
+        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
+        MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, true);
+    auto chip_action = std::make_shared<ChipAction>();
+    auto stop_action = std::make_shared<StopAction>();
 
     do
     {
@@ -158,7 +152,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         //      goal post) The goalie also snaps to a rectangle inside the defense area,
         //      to avoid leaving the defense area
         //
-        std::unique_ptr<Intent> next_intent;
+        std::shared_ptr<Action> next_action;
 
         // Create a segment along the goal line, slightly shortened to account for the
         // robot radius so as we move along the segment we don't try run into the goal
@@ -180,17 +174,24 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
-        auto ball_speed_panic =
-            Util::DynamicParameters->getGoalieTacticConfig()->BallSpeedPanic()->value();
+        auto ball_speed_panic = Util::DynamicParameters->getAIConfig()
+                                    ->getGoalieTacticConfig()
+                                    ->BallSpeedPanic()
+                                    ->value();
         // what should the final goalie speed be, so that the goalie accelerates faster
-        auto goalie_final_speed =
-            Util::DynamicParameters->getGoalieTacticConfig()->GoalieFinalSpeed()->value();
+        auto goalie_final_speed = Util::DynamicParameters->getAIConfig()
+                                      ->getGoalieTacticConfig()
+                                      ->GoalieFinalSpeed()
+                                      ->value();
         // how far in should the goalie wedge itself into the block cone, to block balls
-        auto block_cone_radius =
-            Util::DynamicParameters->getGoalieTacticConfig()->BlockConeRadius()->value();
+        auto block_cone_radius = Util::DynamicParameters->getAIConfig()
+                                     ->getGoalieTacticConfig()
+                                     ->BlockConeRadius()
+                                     ->value();
         // by how much should the defense are be decreased so the goalie stays close
         // towards the net
-        auto defense_area_deflation = Util::DynamicParameters->getGoalieTacticConfig()
+        auto defense_area_deflation = Util::DynamicParameters->getAIConfig()
+                                          ->getGoalieTacticConfig()
                                           ->DefenseAreaDeflation()
                                           ->value();
 
@@ -213,10 +214,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-            move_action.updateControlParams(
+            move_action->updateControlParams(
                 *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
                 MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
-            next_intent = move_action.getNextIntent();
+            next_action = move_action;
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
@@ -228,18 +229,18 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
             if (dont_chip_rectangle.containsPoint(ball.position()) == true)
             {
-                stop_action.updateControlParams(*robot, false);
-                next_intent = stop_action.getNextIntent();
+                stop_action->updateControlParams(*robot, false);
+                next_action = stop_action;
             }
             // if the ball is slow or stationary inside our defense area, and is safe
             // to do so, chip it out
             else
             {
-                chip_action.updateWorldParams(ball);
-                chip_action.updateControlParams(
+                chip_action->updateWorldParams(ball);
+                chip_action->updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - field.friendlyGoal()).orientation(), 2);
-                next_intent = chip_action.getNextIntent();
+                next_action = chip_action;
             }
         }
         // case 3: ball does not have a clear velocity vector towards the goal, so
@@ -247,7 +248,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         else
         {
             // block the cone by default
-            float radius = Util::DynamicParameters->getGoalieTacticConfig()
+            float radius = Util::DynamicParameters->getAIConfig()
+                               ->getGoalieTacticConfig()
                                ->BlockConeBuffer()
                                ->value() +
                            ROBOT_MAX_RADIUS_METERS;
@@ -263,11 +265,11 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
-            move_action.updateControlParams(*robot, goalie_restricted_pos,
-                                            goalie_orientation, 0.0, DribblerEnable::OFF,
-                                            MoveType::NORMAL, AUTOCHIP,
-                                            BallCollisionType::ALLOW);
-            next_intent = move_action.getNextIntent();
+            move_action->updateControlParams(*robot, goalie_restricted_pos,
+                                             goalie_orientation, 0.0, DribblerEnable::OFF,
+                                             MoveType::NORMAL, AUTOCHIP,
+                                             BallCollisionType::ALLOW);
+            next_action = move_action;
         }
 
         // compute angle between two vectors, negative goal post to ball and positive
@@ -317,16 +319,36 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
         Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-        move_action.updateControlParams(
+        move_action->updateControlParams(
             *robot, goalie_pos, goalie_orientation, goalie_final_speed,
             DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP, BallCollisionType::ALLOW);
-        next_intent = move_action.getNextIntent();
+        next_action = move_action;
 
-        yield(std::move(next_intent));
-    } while (!move_action.done());
+        yield(next_action);
+    } while (!move_action->done());
 }
 
-void GoalieTactic::accept(TacticVisitor &visitor) const
+void GoalieTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
+}
+
+Ball GoalieTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field GoalieTactic::getField() const
+{
+    return this->field;
+}
+
+Team GoalieTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team GoalieTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }

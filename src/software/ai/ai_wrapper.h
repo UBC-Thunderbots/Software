@@ -2,9 +2,9 @@
 
 #include "software/ai/ai.h"
 #include "software/ai/hl/stp/play_info.h"
-#include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/visualizer/drawing/draw_functions.h"
 #include "software/world/world.h"
 
 /**
@@ -18,7 +18,14 @@ class AIWrapper : public ThreadedObserver<World>,
                   public Subject<PlayInfo>
 {
    public:
-    AIWrapper() = default;
+    AIWrapper() = delete;
+
+    /**
+     * Create an AI with the given config
+     *
+     * @param config The AI configuration
+     */
+    explicit AIWrapper(std::shared_ptr<const AIConfig> config);
 
    private:
     void onValueReceived(World world) override;
