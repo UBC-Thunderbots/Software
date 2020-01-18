@@ -105,6 +105,9 @@ cc_library(
     deps = [
         ":box2d_util",
         "//shared:constants",
+        "//software/backend/simulation/physics:physics_ball",
+        "//software/backend/simulation/physics:physics_field",
+        "//software/backend/simulation/physics:physics_robot",
         "//software/geom",
         "//software/util/time:duration",
         "//software/util/time:timestamp",

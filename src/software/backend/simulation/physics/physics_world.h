@@ -2,10 +2,10 @@
 
 #include <Box2D/Box2D.h>
 
-#include "software/world/world.h"
-#include "software/backend/simulation/physics/physics_field.h"
 #include "software/backend/simulation/physics/physics_ball.h"
+#include "software/backend/simulation/physics/physics_field.h"
 #include "software/backend/simulation/physics/physics_robot.h"
+#include "software/world/world.h"
 
 /**
  * This class represents a World in a Box2D physics simulation. It provides a convenient
@@ -14,7 +14,7 @@
  */
 class PhysicsWorld
 {
-public:
+   public:
     /**
      * Creates a new PhysicsWorld given a Box2D world.
      * @param world
@@ -65,7 +65,7 @@ public:
      */
     std::shared_ptr<PhysicsField> getPhysicsField() const;
 
-private:
+   private:
     std::shared_ptr<b2World> physics_world;
     // The timestamp of the simulated physics world
     Timestamp physics_world_timestamp;
@@ -91,4 +91,3 @@ private:
     // simulated to move given initial velocities
     std::vector<std::shared_ptr<PhysicsRobot>> enemy_physics_robots;
 };
-

@@ -10,7 +10,7 @@
 PhysicsWorld::PhysicsWorld(const World& world)
 {
     b2Vec2 gravity(0, 0);
-    physics_world = std::make_shared<b2World>(gravity);
+    physics_world           = std::make_shared<b2World>(gravity);
     physics_world_timestamp = Timestamp::fromSeconds(0);
 
     initWorld(world);
@@ -24,13 +24,13 @@ void PhysicsWorld::initWorld(const World& world)
     for (const auto& friendly_robot : world.friendlyTeam().getAllRobots())
     {
         friendly_physics_robots.emplace_back(
-                std::make_shared<PhysicsRobot>(physics_world, friendly_robot));
+            std::make_shared<PhysicsRobot>(physics_world, friendly_robot));
     }
     enemy_physics_robots.clear();
     for (const auto& enemy_robot : world.enemyTeam().getAllRobots())
     {
         enemy_physics_robots.emplace_back(
-                std::make_shared<PhysicsRobot>(physics_world, enemy_robot));
+            std::make_shared<PhysicsRobot>(physics_world, enemy_robot));
     }
     physics_world_timestamp = world.getMostRecentTimestamp();
 }
@@ -42,12 +42,12 @@ World PhysicsWorld::getWorld() const
     if (physics_ball)
     {
         new_world.mutableBall() =
-                physics_ball->getBallWithTimestamp(physics_world_timestamp);
+            physics_ball->getBallWithTimestamp(physics_world_timestamp);
     }
     if (physics_field)
     {
         new_world.mutableField() =
-                physics_field->getFieldWithTimestamp(physics_world_timestamp);
+            physics_field->getFieldWithTimestamp(physics_world_timestamp);
     }
 
     new_world.mutableFriendlyTeam().clearAllRobots();
@@ -55,7 +55,7 @@ World PhysicsWorld::getWorld() const
     for (const auto& robot : friendly_physics_robots)
     {
         friendly_robots.emplace_back(
-                robot->getRobotWithTimestamp(physics_world_timestamp));
+            robot->getRobotWithTimestamp(physics_world_timestamp));
     }
     new_world.mutableFriendlyTeam().updateRobots(friendly_robots);
 
@@ -96,4 +96,3 @@ std::shared_ptr<PhysicsField> PhysicsWorld::getPhysicsField() const
 {
     return physics_field;
 }
-
