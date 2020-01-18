@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shared/constants.h"
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 #include "software/geom/shot.h"
 #include "software/new_geom/point.h"
 #include "software/world/field.h"

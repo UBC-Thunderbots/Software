@@ -47,6 +47,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom:segment",
         "//software/world",
     ],
 )
