@@ -249,7 +249,7 @@
 #include "io/pins.h"
 #include "io/sdcard.h"
 #include "main.h"
-#include "util/constants.h"
+#include "software/constants.h"
 
 /**
  * \brief The possible types of jobs the writeout task performs.

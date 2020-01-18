@@ -10,7 +10,7 @@
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/team.h"
 
 

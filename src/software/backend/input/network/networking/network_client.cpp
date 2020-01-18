@@ -4,8 +4,8 @@
 #include <g3log/g3log.hpp>
 #include <limits>
 
-#include "software/util/constants.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/constants.h"
+#include "software/parameter/dynamic_parameters.h"
 
 NetworkClient::NetworkClient(std::string vision_multicast_address,
                              int vision_multicast_port,

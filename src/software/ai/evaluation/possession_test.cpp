@@ -9,7 +9,7 @@
 
 #include "shared/constants.h"
 #include "software/test_util/test_util.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 
 TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)

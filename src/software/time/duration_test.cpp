@@ -1,4 +1,4 @@
-#include "software/util/time/duration.h"
+#include "software/time/duration.h"
 
 #include <gtest/gtest.h>
 

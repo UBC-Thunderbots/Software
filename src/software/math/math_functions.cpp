@@ -2,7 +2,7 @@
 // Created by roark on 28/03/19.
 //
 
-#include "software/util/math/math_functions.h"
+#include "software/math/math_functions.h"
 
 #include <algorithm>
 

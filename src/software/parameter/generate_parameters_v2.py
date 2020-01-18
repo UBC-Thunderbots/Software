@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-This script runs as a gen_rule for bazel build //software/util/parameter and
+This script runs as a gen_rule for bazel build //software/parameter and
 generates the necessary c++ files before compiling to setup DynamicParameters
 
 """

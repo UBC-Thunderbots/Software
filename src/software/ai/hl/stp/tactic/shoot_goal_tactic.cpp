@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/rectangle.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
