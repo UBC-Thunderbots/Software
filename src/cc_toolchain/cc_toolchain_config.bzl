@@ -171,11 +171,11 @@ def _make_common_features(ctx):
                     ACTION_NAMES.cpp_link_dynamic_library,
                     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
                 ],
-                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now", "-Wl,--no-as-needed"])],
+                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now"])],
             ),
             flag_set(
                 actions = [ACTION_NAMES.cpp_link_executable],
-                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now", "-Wl,--no-as-needed"])],
+                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now"])],
             ),
         ],
     )
