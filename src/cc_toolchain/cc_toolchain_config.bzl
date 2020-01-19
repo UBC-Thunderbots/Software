@@ -171,11 +171,11 @@ def _make_common_features(ctx):
                     ACTION_NAMES.cpp_link_dynamic_library,
                     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
                 ],
-                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now"])],
+                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now", "-Wl,--no-as-needed"])],
             ),
             flag_set(
                 actions = [ACTION_NAMES.cpp_link_executable],
-                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now"])],
+                flag_groups = [flag_group(flags = ["-Wl,-z,relro,-z,now", "-Wl,--no-as-needed"])],
             ),
         ],
     )
@@ -454,10 +454,6 @@ def _k8_gcc_impl(ctx):
             flag_set(
                 actions = ALL_LINK_ACTIONS,
                 flag_groups = [flag_group(flags = [
-                    "-lm",
-                    "-lpthread",
-                    "-ldl",
-                    "-lrt",
                     "-fuse-ld=gold",
                 ])],
             ),
@@ -556,6 +552,7 @@ def _k8_gcc_impl(ctx):
             "hardening",
             "build-id",
             "no-canonical-prefixes",
+            "stdlib",
             "lld",
             "frame-pointer",
             "static_link_cpp_runtimes",
@@ -568,6 +565,7 @@ def _k8_gcc_impl(ctx):
         supports_pic_feature,
         builtin_include_directories_feature,
         common_feature,
+        stdlib_feature,
         lld_feature,
         coverage_feature,
         opt_feature,
