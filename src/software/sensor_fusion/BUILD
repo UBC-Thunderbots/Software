@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/util/time:timestamp",
+        "//software/world",
     ],
 )
 
@@ -42,6 +43,7 @@ cc_library(
     hdrs = ["sensor_fusion.h"],
     srcs = ["sensor_fusion.cpp"],
     deps = [
+        "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/backend:robot_status",
         "//software/ai/primitive",
         "//software/multithreading:subject",
@@ -51,4 +53,3 @@ cc_library(
         ":vision_detection",
     ],
 )
-

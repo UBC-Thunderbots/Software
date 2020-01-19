@@ -1,37 +1,55 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "software/util/constants.h"
+
 SensorFusion::SensorFusion()
-//    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-//                    Util::Constants::SSL_VISION_MULTICAST_PORT,
-//                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-//                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
-//                    boost::bind(&RadioBackend::receiveWorld, this, _1)),
-//      radio_output(DEFAULT_RADIO_CONFIG, [this](RobotStatus status) {
-//          Subject<RobotStatus>::sendValueToObservers(status);
-//      })
+    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
+      ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
+      friendly_team_state(Duration::fromMilliseconds(
+          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
+      enemy_team_state(Duration::fromMilliseconds(
+          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
+      ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
+                  BallFilter::DEFAULT_MAX_BUFFER_SIZE),
+      friendly_team_filter(),
+      enemy_team_filter()
 {
 }
 
 void SensorFusion::onValueReceived(RefboxData refbox_data)
 {
     updateWorld(refbox_data);
-    Subject<World>::sendValueToObservers(world);
+    // Subject<World>::sendValueToObservers(world);
 }
 
 void SensorFusion::onValueReceived(RobotStatus robot_status)
 {
     updateWorld(robot_status);
-    Subject<World>::sendValueToObservers(world);
+    // Subject<World>::sendValueToObservers(world);
 }
 
 void SensorFusion::onValueReceived(VisionDetection vision_detection)
 {
     updateWorld(vision_detection);
-    Subject<World>::sendValueToObservers(world);
+    // Subject<World>::sendValueToObservers(world);
 }
 
-void updateWorld(RefboxData refbox_data) {}
+void SensorFusion::updateWorld(RefboxData refbox_data) {}
 
-void updateWorld(RobotStatus robot_status) {}
+void SensorFusion::updateWorld(RobotStatus robot_status) {}
 
-void updateWorld(VisionDetection vision_detection) {}
+void SensorFusion::updateWorld(VisionDetection vision_detection)
+{
+    std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
+    std::vector<RobotDetection> friendly_robot_detections =
+        vision_detection.getFriendlyTeamDetections();
+    std::vector<RobotDetection> enemy_robot_detections =
+        vision_detection.getEnemyTeamDetections();
+
+    std::optional<Ball> new_ball =
+        ball_filter.getFilteredData(ball_detections, field_state);
+    Team new_friendly_team = friendly_team_filter.getFilteredData(
+        friendly_team_state, friendly_robot_detections);
+    Team new_enemy_team =
+        enemy_team_filter.getFilteredData(enemy_team_state, enemy_robot_detections);
+}

@@ -3,8 +3,12 @@
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/sensor_fusion/filter/ball_filter.h"
+#include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/sensor_fusion/vision_detection.h"
+#include "software/world/ball.h"
+#include "software/world/team.h"
 #include "software/world/world.h"
 
 /**
@@ -40,5 +44,15 @@ class SensorFusion : public Subject<World>,
     void updateWorld(RobotStatus robot_status);
     void updateWorld(VisionDetection vision_detection);
 
-    World world;
+    // Objects used to aggregate and store state. We use these to aggregate the state
+    // so that we always publish "complete" data, not just data from a single frame/
+    // part of the field
+    Field field_state;
+    BallState ball_state;
+    Team friendly_team_state;
+    Team enemy_team_state;
+
+    BallFilter ball_filter;
+    RobotTeamFilter friendly_team_filter;
+    RobotTeamFilter enemy_team_filter;
 };
