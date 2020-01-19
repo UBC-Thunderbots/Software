@@ -40,8 +40,25 @@ class SensorFusion : public Subject<World>,
     void onValueReceived(RobotStatus robot_status) override;
     void onValueReceived(VisionDetection vision_detection) override;
 
+    /**
+     * Updates world based on new refbox data
+     *
+     * @param refbox_data new refbox data
+     */
     void updateWorld(RefboxData refbox_data);
+
+    /**
+     * Updates world based on a new robot status
+     *
+     * @param robot_status new robot status
+     */
     void updateWorld(RobotStatus robot_status);
+
+    /**
+     * Updates world based on a new vision detection
+     *
+     * @param vision_detection new vision detection
+     */
     void updateWorld(VisionDetection vision_detection);
 
     // Objects used to aggregate and store state. We use these to aggregate the state

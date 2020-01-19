@@ -34,7 +34,10 @@ void SensorFusion::onValueReceived(VisionDetection vision_detection)
     Subject<World>::sendValueToObservers(world);
 }
 
-void SensorFusion::updateWorld(RefboxData refbox_data) {}
+void SensorFusion::updateWorld(RefboxData refbox_data)
+{
+    world.updateRefboxData(refbox_data);
+}
 
 void SensorFusion::updateWorld(RobotStatus robot_status) {}
 

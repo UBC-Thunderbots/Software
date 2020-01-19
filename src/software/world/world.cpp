@@ -136,6 +136,11 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
     }
 }
 
+void World::updateRefboxData(const RefboxData &refbox_data)
+{
+    updateRefboxGameState(refbox_data.getGameState());
+}
+
 Timestamp World::getMostRecentTimestampFromMembers()
 {
     // Intit to 0.0. This way we will always get a larger or equal timestamp from one of
