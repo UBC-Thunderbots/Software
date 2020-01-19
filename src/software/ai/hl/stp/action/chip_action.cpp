@@ -77,7 +77,6 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         // We make the region close enough to the ball so that the robot will still be
         // inside it when taking the chip.
-        // TODO: Maybe use new geom Triangle for this
         Point behind_ball_vertex_A = chip_origin;
         Point behind_ball_vertex_B =
             behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
@@ -86,8 +85,8 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
             behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
-        Polygon behind_ball_region =
-            Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
+        Triangle behind_ball_region =
+            Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
         bool robot_behind_ball = behind_ball_region.contains(robot->position());
         // The point in the middle of the region behind the ball

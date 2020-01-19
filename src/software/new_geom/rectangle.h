@@ -101,8 +101,8 @@ class Rectangle : public ConvexPolygon
      * @param amount The amount to expand or shrink the rectangle by on all sides, can be
      * positive or negative
      *
-     * @return bool Whether it was possible to expand or shrink the rectangle by
-     * amount requested
+     * @return bool Whether it was possible to expand/shrink the rectangle by
+     * amount requested, rectangle remains unchanged if impossible to expand/shrink
      */
     bool expand(double amount);
 
