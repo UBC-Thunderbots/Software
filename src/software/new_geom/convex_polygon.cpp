@@ -28,20 +28,18 @@ bool ConvexPolygon::isConvex()
         Vector a = points_[i - 1] - points_[i % points_.size()];
         // The vector from point i to i+1
         Vector b = points_[(i + 1) % points_.size()] - points_[i % points_.size()];
-        // The angle of this vertex, in degrees
-        double vertexAngleInDegrees = a.angleWith(b).toDegrees();
 
-        if (vertexAngleInDegrees > 180)
+        double vertexAngle = a.angleWith(b).toRadians();
+
+        if (std::abs(vertexAngle) > M_PI)
         {
             return false;
         }
 
-        totalAngle += (180 - vertexAngleInDegrees);
+        totalAngle += (M_PI - vertexAngle);
     }
 
-    // TODO: Some polygons that SHOULD be convex aren't passing this with
-    // GeomConstants::EPSILON, needed more tolerance for these polygons.
-    return std::fabs(totalAngle - 360) < 1e-12;
+    return std::fabs(totalAngle - (2.0 * M_PI)) < (2 * GeomConstants::EPSILON);
 }
 
 double ConvexPolygon::area() const
