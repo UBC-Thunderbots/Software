@@ -8,6 +8,7 @@
 #include "software/sensor_fusion/robot_detection.h"
 #include "software/util/time/timestamp.h"
 #include "software/world/field.h"
+#include "software/world/world.h"
 
 /**
  * VisionDetection represents ball and robot detections

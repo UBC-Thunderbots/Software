@@ -51,6 +51,7 @@ class SensorFusion : public Subject<World>,
     BallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;
+    World world;
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
