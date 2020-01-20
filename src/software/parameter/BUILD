@@ -1,8 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-        name = "yaml_config_descriptions",
-        srcs = glob(["config/*.yaml",]),
+    name = "yaml_config_descriptions",
+    srcs = glob(["config/*.yaml"]),
 )
 
 genrule(
@@ -10,13 +10,13 @@ genrule(
     srcs = [
         "generate_parameters_v2.py",
         "constants.py",
-        "//software/util/parameter:yaml_config_descriptions",
+        "//software/parameter:yaml_config_descriptions",
     ],
     outs = [
         "config.hpp",
     ],
-    cmd = "python3 software/util/parameter/generate_parameters_v2.py \
-           $(locations //software/util/parameter:yaml_config_descriptions) \
+    cmd = "python3 software/parameter/generate_parameters_v2.py \
+           $(locations //software/parameter:yaml_config_descriptions) \
            $(OUTS)",
     visibility = ["//visibility:private"],
 )
@@ -29,8 +29,12 @@ cc_library(
 
 cc_library(
     name = "dynamic_parameters",
-    hdrs = ["config.hpp", "config_utils.hpp", "dynamic_parameters.h"],
     srcs = ["dynamic_parameters.cpp"],
+    hdrs = [
+        "config.hpp",
+        "config_utils.hpp",
+        "dynamic_parameters.h",
+    ],
     deps = [":parameter"],
 )
 
@@ -46,12 +50,12 @@ cc_test(
 cc_test(
     name = "config_test",
     srcs = ["config_test.cpp"],
-    data = ["//software/util/parameter:yaml_config_descriptions"],
+    data = ["//software/parameter:yaml_config_descriptions"],
     deps = [
         ":dynamic_parameters",
         ":parameter",
         "@boost//:filesystem",
-        "@yaml-cpp",
         "@gtest//:gtest_main",
+        "@yaml-cpp",
     ],
 )

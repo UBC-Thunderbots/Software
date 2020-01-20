@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "software/new_geom/point.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/ball_state.h"
 
 class Ball final

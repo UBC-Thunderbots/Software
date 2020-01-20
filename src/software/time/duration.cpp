@@ -2,7 +2,7 @@
  * Implementation for the Duration class
  */
 
-#include "software/util/time/duration.h"
+#include "software/time/duration.h"
 
 #include <cmath>
 #include <iomanip>

@@ -1,4 +1,4 @@
-#include "software/util/parameter/parameter.h"
+#include "software/parameter/parameter.h"
 
 #include <gtest/gtest.h>
 

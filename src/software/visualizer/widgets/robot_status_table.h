@@ -5,7 +5,7 @@
 #include <chrono>
 
 #include "software/backend/robot_status.h"
-#include "software/util/time/duration.h"
+#include "software/time/duration.h"
 
 /**
  * A custom TableWidget designed to display robot status. This class manages the ordering

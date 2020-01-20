@@ -29,11 +29,16 @@ unsigned int chicker_power_to_pulse_width(float power, bool chip);
 void chicker_init(unsigned int robot_index);
 void chicker_shutdown(void);
 void chicker_discharge(bool discharge);
-void chicker_fire(chicker_device_t device, unsigned int width);
+void chicker_fire_with_pulsewidth(chicker_device_t device, unsigned int width);
+void chicker_fire_with_power(chicker_device_t device, float power);
 void chicker_auto_arm(chicker_device_t device, float power);
 void chicker_auto_disarm(void);
 bool chicker_auto_armed(void);
 bool chicker_auto_fired_test_clear(void);
+void chicker_kick(float speed_m_per_s);
+void chicker_chip(float distance_m);
+void chicker_enable_auto_kick(float speed_m_per_s);
+void chicker_enable_auto_chip(float distance_m);
 void chicker_tick(void);
 void chicker_tick_fast(void);
 

@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
     ],
 )
 
@@ -22,8 +22,8 @@ cc_library(
     hdrs = ["refbox_data.h"],
     deps = [
         "//software/geom",
-        "//software/util/time:timestamp",
         "//software/proto:ssl_cc_proto",
+        "//software/time:timestamp",
         "@magic_enum",
     ],
 )
@@ -36,4 +36,3 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
-

@@ -1,11 +1,11 @@
-#include "software/util/parameter/config.hpp"
+#include "software/parameter/config.hpp"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
 
-#include "software/util/parameter/parameter.h"
+#include "software/parameter/parameter.h"
 #include "yaml-cpp/yaml.h"
 
 
@@ -38,7 +38,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./software/util/parameter/config");
+        boost::filesystem::path path("./software/parameter/config");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {

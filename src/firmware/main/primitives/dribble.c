@@ -2,10 +2,9 @@
 
 #include <stdio.h>
 
+#include "app/control.h"
 #include "control/bangbang.h"
-#include "control/control.h"
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "physics/physics.h"
 
 #define DRIBBLE_TIME_HORIZON 0.05f  // s
@@ -28,8 +27,9 @@ static void dribble_init(void) {}
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
+ * \param[in] world The world to perform the primitive in
  */
-static void dribble_start(const primitive_params_t *params)
+static void dribble_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     for (unsigned int i = 0; i < 4; i++)
     {
@@ -41,14 +41,19 @@ static void dribble_start(const primitive_params_t *params)
     destination[0] = ((float)(params->params[0]) / 1000.0f);
     destination[1] = ((float)(params->params[1]) / 1000.0f);
     destination[2] = ((float)(params->params[2]) / 100.0f);
-    dribbler_set_speed(((unsigned int)(params->params[3])));
+
+    Dribbler_t* dribbler =
+        app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    app_dribbler_setSpeed(dribbler, (unsigned int)(params->params[3]));
 }
 
 /**
  * \brief Ends a movement of this type.
- * * This function runs when the host computer requests a new movement while a * dribble
- * movement is already in progress. */
-static void dribble_end(void) {}
+ * This function runs when the host computer requests a new movement while a dribble
+ * movement is already in progress.
+ * \param[in] world The world to perform the primitive in
+ */
+static void dribble_end(FirmwareWorld_t* world) {}
 
 /**
  * \brief Ticks a movement of this type.
@@ -57,8 +62,9 @@ static void dribble_end(void) {}
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world an object representing the world
  */
-static void dribble_tick(log_record_t *logajectory)
+static void dribble_tick(log_record_t* logajectory, FirmwareWorld_t* world)
 {
     // TODO: what would you like to log?
 
@@ -113,7 +119,10 @@ static void dribble_tick(log_record_t *logajectory)
     }
 
     rotate(accel, -current_states.angle);
-    apply_accel(accel, accel[2]);
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 /**
