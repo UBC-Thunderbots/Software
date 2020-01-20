@@ -66,9 +66,9 @@ class PhysicsWorld
     std::shared_ptr<PhysicsField> getPhysicsField() const;
 
    private:
-    std::shared_ptr<b2World> physics_world;
+    std::shared_ptr<b2World> b2_world;
     // The timestamp of the simulated physics world
-    Timestamp physics_world_timestamp;
+    Timestamp current_timestamp;
 
     /**
      * Sets the state of the internal world used for simulation
