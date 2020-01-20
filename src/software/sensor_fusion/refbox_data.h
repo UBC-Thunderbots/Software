@@ -8,12 +8,29 @@
 #include "software/util/enum_string_macro/enum_string_macro.h"
 #include "software/util/time/timestamp.h"
 
+// clang-format off
 MAKE_ENUM(RefboxGameState,
           // these enum items map to the constants in RefboxCommand.msg
-          HALT, STOP, NORMAL_START, FORCE_START, PREPARE_KICKOFF_US, PREPARE_KICKOFF_THEM,
-          PREPARE_PENALTY_US, PREPARE_PENALTY_THEM, DIRECT_FREE_US, DIRECT_FREE_THEM,
-          INDIRECT_FREE_US, INDIRECT_FREE_THEM, TIMEOUT_US, TIMEOUT_THEM, GOAL_US,
-          GOAL_THEM, BALL_PLACEMENT_US, BALL_PLACEMENT_THEM, REFBOX_GAME_STATE_COUNT);
+          HALT,
+          STOP,
+          NORMAL_START,
+          FORCE_START,
+          PREPARE_KICKOFF_US,
+          PREPARE_KICKOFF_THEM,
+          PREPARE_PENALTY_US,
+          PREPARE_PENALTY_THEM,
+          DIRECT_FREE_US,
+          DIRECT_FREE_THEM,
+          INDIRECT_FREE_US,
+          INDIRECT_FREE_THEM,
+          TIMEOUT_US,
+          TIMEOUT_THEM,
+          GOAL_US,
+          GOAL_THEM,
+          BALL_PLACEMENT_US,
+          BALL_PLACEMENT_THEM,
+          REFBOX_GAME_STATE_COUNT);
+// clang-format on
 
 MAKE_ENUM(RefboxStage,
           // The first half is about to start.
