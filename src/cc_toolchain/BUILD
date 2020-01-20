@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config", "cc_toolchain_config_stm32")
+load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config_stm32")
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
@@ -105,59 +105,6 @@ cc_toolchain(
     tags = ["no-ide"],
     toolchain_config = ":k8_gcc",
     toolchain_identifier = "k8_gcc-x86_64",
-)
-
-filegroup(
-    name = "clang_wrappers",
-    srcs = glob(["wrapper/clang-*"]),
-)
-
-filegroup(
-    name = "clang_all",
-    srcs = [
-        ":clang_wrappers",
-        "@llvm_clang//:binaries",
-        "@llvm_clang//:clang_libs",
-        "@llvm_clang//:includes",
-        "@llvm_clang//:runtime_libs",
-        "@llvm_clang//:static_libs",
-    ],
-)
-
-cc_toolchain_config(
-    name = "clang-k8",
-    builtin_include_directories = [
-        "external/llvm_clang/include/c++/v1/",
-        "/usr/include/",
-        "/usr/local/include/",
-    ],
-    cpu = "k8",
-    host_compiler_path = "wrapper/clang-clang",
-    host_compiler_prefix = "wrapper",
-    target_cpu = "k8",
-    target_system_name = "k8",
-    toolchain_identifier = "clang-k8",
-)
-
-cc_toolchain(
-    name = "cc_toolchain_linux",
-    all_files = ":clang_all",
-    ar_files = ":clang_all",
-    as_files = ":clang_all",
-    compiler_files = ":clang_all",
-    dwp_files = ":clang_all",
-    dynamic_runtime_lib = "@llvm_clang//:runtime_libs",
-    linker_files = ":clang_all",
-    objcopy_files = ":clang_all",
-    static_runtime_lib = "@llvm_clang//:static_libs",
-    strip_files = ":clang_all",
-    supports_param_files = True,
-    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
-    # when possible
-    # https://github.com/bazelbuild/intellij/issues/486
-    tags = ["no-ide"],
-    toolchain_config = ":clang-k8",
-    toolchain_identifier = "clang-x86_64",
 )
 
 cc_toolchain_config_stm32(
