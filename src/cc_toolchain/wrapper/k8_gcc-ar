@@ -17,8 +17,6 @@
 if [[ "$@" == "@"* ]]; then
     # need to parse location following @
     INPUT=$@
-    #echo $INPUT
-    #echo $(cat ${INPUT:1})
     exec /usr/bin/x86_64-linux-gnu-gcc-ar $(cat ${INPUT:1})
 else
     exec /usr/bin/x86_64-linux-gnu-gcc-ar "$@"
