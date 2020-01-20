@@ -1,23 +1,27 @@
 #include "software/backend/simulation/simulator_ball.h"
 
-std::weak_ptr<PhysicsBall> SimulatorBall::physics_ball_weak_ptr =
+std::weak_ptr<PhysicsBall> SimulatorBallSingleton::physics_ball_weak_ptr =
     std::weak_ptr<PhysicsBall>();
 
-void SimulatorBall::setPhysicsBall(std::weak_ptr<PhysicsBall> ball)
+void SimulatorBallSingleton::setPhysicsBall(std::weak_ptr<PhysicsBall> ball)
 {
     physics_ball_weak_ptr = ball;
 }
 
-FirmwareBall_t* SimulatorBall::createFirmwareBall()
+FirmwareBall_t* SimulatorBallSingleton::createFirmwareBall()
 {
-    FirmwareBall_t* firmware_ball = app_firmware_ball_create(
-        &(SimulatorBall::getBallPositionX), &(SimulatorBall::getBallPositionY),
-        &(SimulatorBall::getBallVelocityX), &(SimulatorBall::getBallVelocityY));
+    // TODO: Make sure all objects de-allocated properly
+    // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
+    FirmwareBall_t* firmware_ball =
+        app_firmware_ball_create(&(SimulatorBallSingleton::getBallPositionX),
+                                 &(SimulatorBallSingleton::getBallPositionY),
+                                 &(SimulatorBallSingleton::getBallVelocityX),
+                                 &(SimulatorBallSingleton::getBallVelocityY));
 
     return firmware_ball;
 }
 
-float SimulatorBall::getBallPositionX()
+float SimulatorBallSingleton::getBallPositionX()
 {
     if (auto physics_ball = physics_ball_weak_ptr.lock())
     {
@@ -25,7 +29,7 @@ float SimulatorBall::getBallPositionX()
     }
 }
 
-float SimulatorBall::getBallPositionY()
+float SimulatorBallSingleton::getBallPositionY()
 {
     if (auto physics_ball = physics_ball_weak_ptr.lock())
     {
@@ -33,7 +37,7 @@ float SimulatorBall::getBallPositionY()
     }
 }
 
-float SimulatorBall::getBallVelocityX()
+float SimulatorBallSingleton::getBallVelocityX()
 {
     if (auto physics_ball = physics_ball_weak_ptr.lock())
     {
@@ -41,7 +45,7 @@ float SimulatorBall::getBallVelocityX()
     }
 }
 
-float SimulatorBall::getBallVelocityY()
+float SimulatorBallSingleton::getBallVelocityY()
 {
     if (auto physics_ball = physics_ball_weak_ptr.lock())
     {

@@ -25,7 +25,7 @@ extern "C"
  * instantiated object. This is our workaround to maintain and simulate multiple
  * "instances" of robot firmware at once.
  */
-class SimulatorRobot
+class SimulatorRobotSingleton
 {
    public:
     /**
@@ -49,6 +49,7 @@ class SimulatorRobot
      */
     static FirmwareRobot_t* createFirmwareRobot();
 
+   private:
     /* Position functions */
     /**
      * Returns the x-position of the robot, in global field coordinates
@@ -136,7 +137,6 @@ class SimulatorRobot
     static void applyWheelForceBackRight(float force_in_newtons);
     static void applyWheelForceFrontRight(float force_in_newtons);
 
-   private:
     /**
      * Returns the PhysicsRobot currently selected from the list of controllable
      * physics_robots by the current robot_id

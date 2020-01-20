@@ -4,49 +4,53 @@
 #include "app/world/dribbler.h"
 #include "app/world/wheel.h"
 
-std::optional<unsigned int> SimulatorRobot::robot_id                    = std::nullopt;
-std::vector<std::weak_ptr<PhysicsRobot>> SimulatorRobot::physics_robots = {};
+std::optional<unsigned int> SimulatorRobotSingleton::robot_id = std::nullopt;
+std::vector<std::weak_ptr<PhysicsRobot>> SimulatorRobotSingleton::physics_robots = {};
 
-void SimulatorRobot::setRobotId(unsigned int id)
+void SimulatorRobotSingleton::setRobotId(unsigned int id)
 {
     robot_id = std::make_optional<unsigned int>(id);
 }
 
-void SimulatorRobot::setPhysicsRobots(
+void SimulatorRobotSingleton::setPhysicsRobots(
     const std::vector<std::weak_ptr<PhysicsRobot>>& robots)
 {
     physics_robots = robots;
 }
 
-FirmwareRobot_t* SimulatorRobot::createFirmwareRobot()
+FirmwareRobot_t* SimulatorRobotSingleton::createFirmwareRobot()
 {
-    Chicker_t* chicker = app_chicker_create(
-        &(SimulatorRobot::kick), &(SimulatorRobot::chip),
-        &(SimulatorRobot::enableAutokick), &(SimulatorRobot::enableAutochip),
-        &(SimulatorRobot::disableAutokick), &(SimulatorRobot::disableAutochip));
+    // TODO: Make sure all objects de-allocated properly
+    // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
+    Chicker_t* chicker = app_chicker_create(&(SimulatorRobotSingleton::kick),
+                                            &(SimulatorRobotSingleton::chip),
+                                            &(SimulatorRobotSingleton::enableAutokick),
+                                            &(SimulatorRobotSingleton::enableAutochip),
+                                            &(SimulatorRobotSingleton::disableAutokick),
+                                            &(SimulatorRobotSingleton::disableAutochip));
 
     Dribbler_t* dribbler =
-        app_dribbler_create(&(SimulatorRobot::setDribblerSpeed),
-                            &(SimulatorRobot::getDribblerTemperatureDegC));
+        app_dribbler_create(&(SimulatorRobotSingleton::setDribblerSpeed),
+                            &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
     Wheel_t* front_left_wheel =
-        app_wheel_create(&(SimulatorRobot::applyWheelForceFrontLeft));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontLeft));
     Wheel_t* front_right_wheel =
-        app_wheel_create(&(SimulatorRobot::applyWheelForceFrontRight));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontRight));
     Wheel_t* back_left_wheel =
-        app_wheel_create(&(SimulatorRobot::applyWheelForceBackLeft));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackLeft));
     Wheel_t* back_right_wheel =
-        app_wheel_create(&(SimulatorRobot::applyWheelForceBackRight));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackRight));
 
-    FirmwareRobot_t* firmware_robot =
-        app_firmware_robot_create(chicker, dribbler, &(SimulatorRobot::getPositionX),
-                                  &(SimulatorRobot::getPositionY), front_right_wheel,
-                                  front_left_wheel, back_right_wheel, back_left_wheel);
+    FirmwareRobot_t* firmware_robot = app_firmware_robot_create(
+        chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
+        &(SimulatorRobotSingleton::getPositionY), front_right_wheel, front_left_wheel,
+        back_right_wheel, back_left_wheel);
 
     return firmware_robot;
 }
 
-float SimulatorRobot::getPositionX()
+float SimulatorRobotSingleton::getPositionX()
 {
     // Temporary implementation for testing
     if (auto robot = getCurrentPhysicsRobot().lock())
@@ -56,7 +60,7 @@ float SimulatorRobot::getPositionX()
     return 0.0;
 }
 
-float SimulatorRobot::getPositionY()
+float SimulatorRobotSingleton::getPositionY()
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -64,7 +68,7 @@ float SimulatorRobot::getPositionY()
     }
 }
 
-void SimulatorRobot::kick(float speed_m_per_s)
+void SimulatorRobotSingleton::kick(float speed_m_per_s)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -72,7 +76,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
     }
 }
 
-void SimulatorRobot::chip(float distance_m)
+void SimulatorRobotSingleton::chip(float distance_m)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -80,7 +84,7 @@ void SimulatorRobot::chip(float distance_m)
     }
 }
 
-void SimulatorRobot::enableAutokick(float speed_m_per_s)
+void SimulatorRobotSingleton::enableAutokick(float speed_m_per_s)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -88,7 +92,7 @@ void SimulatorRobot::enableAutokick(float speed_m_per_s)
     }
 }
 
-void SimulatorRobot::enableAutochip(float distance_m)
+void SimulatorRobotSingleton::enableAutochip(float distance_m)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -96,7 +100,7 @@ void SimulatorRobot::enableAutochip(float distance_m)
     }
 }
 
-void SimulatorRobot::disableAutokick()
+void SimulatorRobotSingleton::disableAutokick()
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -104,7 +108,7 @@ void SimulatorRobot::disableAutokick()
     }
 }
 
-void SimulatorRobot::disableAutochip()
+void SimulatorRobotSingleton::disableAutochip()
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -112,7 +116,7 @@ void SimulatorRobot::disableAutochip()
     }
 }
 
-void SimulatorRobot::setDribblerSpeed(uint32_t rpm)
+void SimulatorRobotSingleton::setDribblerSpeed(uint32_t rpm)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -120,14 +124,14 @@ void SimulatorRobot::setDribblerSpeed(uint32_t rpm)
     }
 }
 
-unsigned int SimulatorRobot::getDribblerTemperatureDegC()
+unsigned int SimulatorRobotSingleton::getDribblerTemperatureDegC()
 {
     // Return a somewhat arbitrary "room temperature" temperature.
     // This is an ideal simulation so the dribbler will not overheat
     return 25;
 }
 
-void SimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons)
+void SimulatorRobotSingleton::applyWheelForceFrontLeft(float force_in_newtons)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -135,7 +139,7 @@ void SimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons)
     }
 }
 
-void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons)
+void SimulatorRobotSingleton::applyWheelForceBackLeft(float force_in_newtons)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -143,7 +147,7 @@ void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons)
     }
 }
 
-void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons)
+void SimulatorRobotSingleton::applyWheelForceBackRight(float force_in_newtons)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -151,7 +155,7 @@ void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons)
     }
 }
 
-void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons)
+void SimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
@@ -159,7 +163,7 @@ void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons)
     }
 }
 
-std::weak_ptr<PhysicsRobot> SimulatorRobot::getCurrentPhysicsRobot()
+std::weak_ptr<PhysicsRobot> SimulatorRobotSingleton::getCurrentPhysicsRobot()
 {
     if (!robot_id.has_value())
     {

@@ -12,9 +12,9 @@
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 
-// This is a temporary tests to validate that the SimulatorRobot works as expected
-// when binding and switching robots behind the scenes. It will be replaced with a
-// better test once its functions are implemented properly
+// This is a temporary tests to validate that the SimulatorRobotSingleton works as
+// expected when binding and switching robots behind the scenes. It will be replaced with
+// a better test once its functions are implemented properly
 TEST(PhysicsRobotTest, test_simulator_robot_manages_multiple_robots_correctly)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
@@ -25,13 +25,13 @@ TEST(PhysicsRobotTest, test_simulator_robot_manages_multiple_robots_correctly)
     auto friendly_physics_robots = physics_simulator.getFriendlyPhysicsRobots();
 
     FirmwareRobot_t *firmware_robot = nullptr;
-    SimulatorRobot::setPhysicsRobots(friendly_physics_robots);
+    SimulatorRobotSingleton::setPhysicsRobots(friendly_physics_robots);
     for (const auto &physics_robot : friendly_physics_robots)
     {
         if (auto physics_robot_lock = physics_robot.lock())
         {
-            SimulatorRobot::setRobotId(physics_robot_lock->getRobotId());
-            firmware_robot = SimulatorRobot::createFirmwareRobot();
+            SimulatorRobotSingleton::setRobotId(physics_robot_lock->getRobotId());
+            firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
             std::cout << app_firmware_robot_getPositionX(firmware_robot) << std::endl;
         }
     }

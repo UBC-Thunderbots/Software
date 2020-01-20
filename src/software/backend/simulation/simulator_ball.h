@@ -22,7 +22,7 @@ extern "C"
  * instantiated object. This is our workaround to maintain and simulate multiple
  * "instances" of firmware at once.
  */
-class SimulatorBall
+class SimulatorBallSingleton
 {
    public:
     /**
@@ -39,6 +39,7 @@ class SimulatorBall
      */
     static FirmwareBall_t* createFirmwareBall();
 
+   private:
     /**
      * Returns the x-position of the current physics ball
      *
@@ -67,7 +68,6 @@ class SimulatorBall
      */
     static float getBallVelocityY();
 
-   private:
     // The physics ball being controlled by this class
     static std::weak_ptr<PhysicsBall> physics_ball_weak_ptr;
 };
