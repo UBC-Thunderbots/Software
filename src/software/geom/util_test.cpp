@@ -11,7 +11,7 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/test_util/test_util.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 
 
 TEST(GeomUtilTest, dist_point_rectangle_point_within)

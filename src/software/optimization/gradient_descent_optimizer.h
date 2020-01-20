@@ -188,4 +188,4 @@ namespace Util
 
 }  // namespace Util
 
-#include "software/util/optimization/gradient_descent_optimizer.tpp"
+#include "software/optimization/gradient_descent_optimizer.tpp"

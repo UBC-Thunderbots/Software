@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "software/new_geom/point.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 
 class BallState final
 {

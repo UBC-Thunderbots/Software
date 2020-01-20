@@ -19,9 +19,9 @@
 #include <random>
 
 #include "shared/constants.h"
+#include "software/math/math_functions.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
-#include "software/util/math/math_functions.h"
-#include "software/util/parameter/dynamic_parameters.h"
 
 using namespace Passing;
 

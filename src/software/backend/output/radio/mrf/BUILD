@@ -42,10 +42,10 @@ cc_library(
         ":messages",
         ":mrf_primitive_visitor",
         "//shared:constants",
+        "//software:constants",
         "//software/ai/primitive",
         "//software/backend:robot_status",
         "//software/backend/output/radio/mrf/usb:libusb",
         "//software/geom",
-        "//software/util:constants",
     ],
 )

@@ -2,7 +2,7 @@
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
 /**

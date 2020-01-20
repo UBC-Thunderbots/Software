@@ -2,7 +2,7 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 
 /**
  * A lightweight datatype used to input new data into the filter.

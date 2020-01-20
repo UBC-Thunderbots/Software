@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/evaluation/team.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 

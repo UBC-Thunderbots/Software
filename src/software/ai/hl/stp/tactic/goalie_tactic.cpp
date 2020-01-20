@@ -10,7 +10,7 @@
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,

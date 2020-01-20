@@ -68,8 +68,8 @@ cc_library(
         ":backend",
         ":backend_factory",
         "//software/backend/simulation/physics:physics_simulator",
+        "//software/logger",
         "//software/multithreading:thread_safe_buffer",
-        "//software/util/logger",
         "//software/world",
     ],
     # We force linking so that the static variables required for the "factory"

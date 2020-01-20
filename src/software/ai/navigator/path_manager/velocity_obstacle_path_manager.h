@@ -1,7 +1,7 @@
 #pragma once
 #include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * VelocityObstaclePathManager uses obstacles to arbitrate between paths.

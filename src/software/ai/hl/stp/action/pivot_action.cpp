@@ -7,7 +7,7 @@
 #include "software/ai/intent/pivot_intent.h"
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 PivotAction::PivotAction() : Action() {}
 

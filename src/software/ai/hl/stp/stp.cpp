@@ -13,7 +13,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          long random_seed)
