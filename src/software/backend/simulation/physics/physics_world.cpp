@@ -41,8 +41,7 @@ World PhysicsWorld::getWorld() const
     new_world.updateTimestamp(current_timestamp);
     if (physics_ball)
     {
-        new_world.mutableBall() =
-            physics_ball->getBallWithTimestamp(current_timestamp);
+        new_world.mutableBall() = physics_ball->getBallWithTimestamp(current_timestamp);
     }
     if (physics_field)
     {
@@ -54,8 +53,7 @@ World PhysicsWorld::getWorld() const
     std::vector<Robot> friendly_robots;
     for (const auto& robot : friendly_physics_robots)
     {
-        friendly_robots.emplace_back(
-            robot->getRobotWithTimestamp(current_timestamp));
+        friendly_robots.emplace_back(robot->getRobotWithTimestamp(current_timestamp));
     }
     new_world.mutableFriendlyTeam().updateRobots(friendly_robots);
 
