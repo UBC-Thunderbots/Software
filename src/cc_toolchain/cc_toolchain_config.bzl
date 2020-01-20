@@ -495,17 +495,7 @@ def _k8_gcc_impl(ctx):
                 actions = ALL_COMPILE_ACTIONS,
                 flag_groups = [
                     flag_group(
-                            #TODO: revert this
-                        # We're using clang's built-in coverage here instead
-                        # of `gcov` here because
-                        # 1) It's faster
-                        # 2) We couldn't get gcov to play nice with `bazel coverage`
-                        # Please see:
-                        #   Clang docs: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
-                        #   Ticket tracking an issue that could solve this: https://github.com/bazelbuild/bazel/issues/9406
-                        # To switch to `gcov` just remove these flags and add
-                        # `--coverage`, similairly for the linker flags below
-                        flags = ["-fprofile-instr-generate", "-fcoverage-mapping"],
+                        flags = ["--coverage"],
                     ),
                 ],
             ),
@@ -513,7 +503,7 @@ def _k8_gcc_impl(ctx):
                 actions = ALL_LINK_ACTIONS,
                 flag_groups = [
                     flag_group(
-                        flags = ["-fprofile-instr-generate"],
+                        flags = ["--coverage"],
                     ),
                 ],
             ),
