@@ -18,13 +18,12 @@ cc_library(
 
 cc_library(
     name = "refbox_data",
-    srcs = ["refbox_data.cpp"],
     hdrs = ["refbox_data.h"],
     deps = [
         "//software/geom",
         "//software/util/time:timestamp",
         "//software/proto:ssl_cc_proto",
-        "@magic_enum",
+        "//software/util/enum_string_macro:enum_string_macro",
     ],
 )
 
