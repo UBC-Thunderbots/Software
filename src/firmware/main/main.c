@@ -480,8 +480,8 @@ static void run_normal(void)
     Dribbler_t* dribbler =
         app_dribbler_create(dribbler_set_speed, dribbler_coast, dribbler_temperature);
     const RobotConstants_t robot_constants = {
-        .mass              = ROBOT_MASS[0],
-        .moment_of_inertia = ROBOT_MASS[2],
+        .mass              = ROBOT_POINT_MASS,
+        .moment_of_inertia = INERTIA,
         .robot_radius      = ROBOT_RADIUS,
         .jerk_limit        = JERK_LIMIT,
     };
