@@ -30,8 +30,10 @@ int main(int argc, char* argv[])
 
     // create a RobotCommunicator with a NetworkMedium
     RobotCommunicator<control_msg, control_msg> communicator(
-        std::make_unique<NetworkMedium>("127.0.0.1", 42069), nullptr,
+        std::make_unique<NetworkMedium>("10.10.10.0", 42069),
+        [=](const control_msg& msg) { std::cerr << "sent msg!" << std::endl; },
         [=](const control_msg& msg) { std::cerr << "got msg!" << std::endl; });
+
 
     while (1)
         communicator.send_proto(control_req);

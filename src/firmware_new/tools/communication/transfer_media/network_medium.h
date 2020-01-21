@@ -30,7 +30,7 @@ class NetworkMedium : public TransferMedium
      * @param local_ipaddr The local ip for this endpoint
      * @param port The port to bind to
      */
-    NetworkMedium(std::string local_ipaddr, unsigned port);
+    NetworkMedium(const std::string& local_ipaddr, unsigned port);
 
     /*
      * Packages the data and sends it through the medium
@@ -48,6 +48,7 @@ class NetworkMedium : public TransferMedium
     void receive_data_async(std::function<void(std::string)> receive_callback);
 
    private:
+
     // The maximum length of the buffer we use to receive data packets from the network
     static constexpr unsigned int max_buffer_length = 4096;
 

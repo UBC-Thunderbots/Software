@@ -11,13 +11,16 @@ using boost::asio::socket_base;
 using boost::asio::ip::address_v4;
 using boost::asio::ip::udp;
 
-NetworkMedium::NetworkMedium(std::string local_ipaddr, unsigned port)
+NetworkMedium::NetworkMedium(const std::string& local_ipaddr, unsigned port)
 {
     socket.reset(new udp::socket(io_service));
 
-    // TODO explain endpoints
-    local_endpoint     = udp::endpoint(address_v4::from_string(local_ipaddr), port);
-    broadcast_endpoint = udp::endpoint(address_v4::broadcast(), port);
+    auto addr = address_v4::from_string(local_ipaddr);
+
+    local_endpoint     = udp::endpoint(address_v4::any(), port);
+
+    // TODO change to multicast after firmware is on RTOS
+    broadcast_endpoint = udp::endpoint(address_v4::from_string("10.10.10.1"), port);
 
     socket->open(local_endpoint.protocol());
 
@@ -36,10 +39,6 @@ NetworkMedium::NetworkMedium(std::string local_ipaddr, unsigned port)
         // recovery action here
         throw;
     }
-
-    // TODO explain options
-    socket->set_option(udp::socket::reuse_address(true));
-    socket->set_option(socket_base::broadcast(true));
 }
 
 NetworkMedium::~NetworkMedium()
@@ -88,7 +87,7 @@ void NetworkMedium::handle_data_reception(const boost::system::error_code& error
     else
     {
         LOG(WARNING) << "An unknown network error occurred when attempting"
-                        "to receive SSL Vision Data. The boost system error code is "
+                        "to receive the packet. The boost system error code is "
                      << error << std::endl;
     }
 

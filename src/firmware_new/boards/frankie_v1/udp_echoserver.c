@@ -57,7 +57,7 @@ void udp_echoserver_init(void)
     {
         /* Bind the upcb to the UDP_PORT port */
         /* Using IP_ADDR_ANY allow the upcb to be used by any local interface */
-        err = udp_bind(upcb, IP_ADDR_ANY, 42070);
+        err = udp_bind(upcb, IP_ADDR_ANY, 42069);
 
         if (err == ERR_OK)
         {
@@ -102,7 +102,7 @@ void udp_echoserver_receive_callback(void *arg, struct udp_pcb *upcb, struct pbu
         /*}*/
 
         /* Connect to the remote client */
-        udp_connect(upcb, addr, 42069);
+        udp_connect(upcb, IP_ADDR_BROADCAST, 42069);
 
         /* Tell the client that we have accepted it */
         udp_send(upcb, p_tx);
