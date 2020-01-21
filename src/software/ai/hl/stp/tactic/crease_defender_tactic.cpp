@@ -11,7 +11,7 @@
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,
@@ -195,6 +195,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
+
             stop_action->updateControlParams(*robot, false);
             yield(stop_action);
         }

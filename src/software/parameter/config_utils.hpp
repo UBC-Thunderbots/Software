@@ -4,13 +4,13 @@
 #include <variant>
 #include <vector>
 
-#include "software/util/parameter/parameter.h"
+#include "software/parameter/parameter.h"
 
 class Config;
 
 // A MutableParameterVariant is a variant of shared_ptrs of parameters of
 // int/bool/double/string or to a Config object which is a collection of parameters or
-// configs iteslf. The objects in this variant can be mutated
+// configs itself. The objects in this variant can be mutated
 using MutableParameterVariant =
     std::variant<std::shared_ptr<Parameter<int>>, std::shared_ptr<Parameter<bool>>,
                  std::shared_ptr<Parameter<double>>,

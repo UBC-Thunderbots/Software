@@ -1,4 +1,4 @@
-#include "software/util/math/math_functions.h"
+#include "software/math/math_functions.h"
 
 #include <gtest/gtest.h>
 

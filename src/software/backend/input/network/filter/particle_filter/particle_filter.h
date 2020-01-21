@@ -4,7 +4,7 @@
 #include <random>
 
 #include "software/new_geom/point.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * Finds and filters the "real" ball from the received data

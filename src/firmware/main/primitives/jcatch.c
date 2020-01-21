@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <unused.h>
 
+#include "app/control.h"
 #include "catch.h"
 #include "control/bangbang.h"
-#include "control/control.h"
 #include "io/breakbeam.h"
 #include "io/dr.h"
 #include "physics/physics.h"
@@ -43,24 +43,23 @@ static primitive_params_t catch_param;
  */
 static void catch_init(void) {}
 
+
+float catchvelocity;  // 0.4
+float catchmargin;    // 8.8
+float dribbler_speed;
+
 /**
  * \brief Starts a movement of this type.
  *
  * This function runs each time the host computer requests to start a catch
  * movement.
  *
- * @param primitive_params_t the catch parameters, which are only valid until this
+ * \param[in] primitive_params_t the catch parameters, which are only valid until this
  * primitive ends. Three parameters are the catchmargin and velocity ratios as well as
  * dribbler set speed in rpm
- * @return void - function returns and must be copied into this module if needed
+ * \param[in] world The world to perform the primitive in
  */
-
-float catchvelocity;  // 0.4
-float catchmargin;    // 8.8
-
-float dribbler_speed;
-
-static void catch_start(const primitive_params_t *params)
+static void catch_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     for (unsigned int i = 0; i < 4; i++)
     {
@@ -69,18 +68,14 @@ static void catch_start(const primitive_params_t *params)
     catch_param.slow  = params->slow;
     catch_param.extra = params->extra;
 
-    // TO-DO set dribbler speed in GUI
-    unsigned int rpm = 6000;
-    dribbler_set_speed(rpm);
-
-    // pass params in (to do, add dribbler speed as a parameter)
+    // pass params in
     catchvelocity  = (float)catch_param.params[0];
     catchmargin    = (float)catch_param.params[2];
     dribbler_speed = (float)catch_param.params[1];
 
-    // unsigned int rpm = 6000;
-    dribbler_set_speed(dribbler_speed);
-    // finalangle = (float)catch_param.params[1]; //currently being unused
+    Dribbler_t* dribbler =
+        app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+    app_dribbler_setSpeed(dribbler, dribbler_speed);
 }
 
 /**
@@ -88,8 +83,9 @@ static void catch_start(const primitive_params_t *params)
  *
  * This function runs when the host computer requests a new movement while a
  * catch movement is already in progress.
+ * \param[in] world The world to perform the primitive in
  */
-static void catch_end(void) {}
+static void catch_end(FirmwareWorld_t* world) {}
 
 /**
  * \brief Ticks a movement of this type.
@@ -98,8 +94,9 @@ static void catch_end(void) {}
  *
  * @param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world an object representing the world
  */
-static void catch_tick(log_record_t *log)
+static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
 {
     // Grab Camera Data
     dr_data_t current_states;
@@ -277,7 +274,9 @@ static void catch_tick(log_record_t *log)
     // Apply acceleration to robot
     accel[3] = 0;
     limit(&accel[2], MAX_T_A);
-    apply_accel(accel, accel[2]);  // accel is already in local coords
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 /**

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/util/parameter/config.hpp"
+#include "software/parameter/config.hpp"
 
 namespace Util
 {

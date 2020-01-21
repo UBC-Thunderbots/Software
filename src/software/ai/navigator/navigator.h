@@ -10,7 +10,7 @@
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/ai/primitive/all_primitives.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
 /**

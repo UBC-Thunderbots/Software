@@ -17,7 +17,7 @@ cc_library(
         "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
         "//software/ai/primitive",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "//software/world",
     ],
 )
@@ -30,7 +30,7 @@ cc_library(
         "//software/ai",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "//software/visualizer/drawing:draw_functions",
         "//software/visualizer/drawing:navigator",
         "//software/world",

@@ -6,10 +6,10 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/util.h"
+#include "software/logger/init.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/util/closest_point.h"
 #include "software/new_geom/util/distance.h"
-#include "software/util/logger/init.h"
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
                                          bool loop_forever)
