@@ -21,7 +21,8 @@ void SimulatorRobotSingleton::setPhysicsRobots(
     physics_robots = robots;
 }
 
-std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> SimulatorRobotSingleton::createFirmwareRobot()
+std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
+SimulatorRobotSingleton::createFirmwareRobot()
 {
     // TODO: Make sure all objects de-allocated properly
     // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
@@ -50,7 +51,8 @@ std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> SimulatorRobotSingleton::
         &(SimulatorRobotSingleton::getPositionY), front_right_wheel, front_left_wheel,
         back_right_wheel, back_left_wheel);
 
-    return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot, FirmwareRobotDeleter());
+    return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot,
+                                                                  FirmwareRobotDeleter());
 }
 
 float SimulatorRobotSingleton::getPositionX()

@@ -12,10 +12,13 @@ extern "C"
  * because it doesn't know the size of the object. Therefore we need to create our own
  * "Deleter" class we can provide to the smart pointers to handle that instead.
  *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and examples
+ * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
+ * examples
  */
-struct FirmwareBallDeleter {
-    void operator()(FirmwareBall_t* firmware_ball) const {
+struct FirmwareBallDeleter
+{
+    void operator()(FirmwareBall_t* firmware_ball) const
+    {
         app_firmware_ball_destroy(firmware_ball);
     };
 };

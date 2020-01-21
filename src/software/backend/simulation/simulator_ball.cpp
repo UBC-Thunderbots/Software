@@ -8,7 +8,8 @@ void SimulatorBallSingleton::setPhysicsBall(std::weak_ptr<PhysicsBall> ball)
     physics_ball_weak_ptr = ball;
 }
 
-std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter> SimulatorBallSingleton::createFirmwareBall()
+std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>
+SimulatorBallSingleton::createFirmwareBall()
 {
     // TODO: Make sure all objects de-allocated properly
     // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
@@ -18,7 +19,8 @@ std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter> SimulatorBallSingleton::cre
                                  &(SimulatorBallSingleton::getBallVelocityX),
                                  &(SimulatorBallSingleton::getBallVelocityY));
 
-    return std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>(firmware_ball, FirmwareBallDeleter());
+    return std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>(firmware_ball,
+                                                                FirmwareBallDeleter());
 }
 
 float SimulatorBallSingleton::getBallPositionX()

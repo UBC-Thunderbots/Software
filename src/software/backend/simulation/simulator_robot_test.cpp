@@ -34,7 +34,8 @@ TEST(PhysicsRobotTest, test_simulator_robot_manages_multiple_robots_correctly)
         {
             SimulatorRobotSingleton::setRobotId(physics_robot_lock->getRobotId());
             auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
-            std::cout << app_firmware_robot_getPositionX(firmware_robot.get()) << std::endl;
+            std::cout << app_firmware_robot_getPositionX(firmware_robot.get())
+                      << std::endl;
         }
     }
 }
