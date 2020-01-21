@@ -75,11 +75,11 @@ float app_wheel_getWheelSpeedRPM(Wheel_t* wheel);
  * @param wheel The wheel to get the motor RPM for
  * @return The speed of the motor attached to the given wheel, in RPM
  */
-float app_wheel_getMotorSpeedRPM(Wheel_t* wheel);
+float app_wheel_getMotorSpeedRPM(const Wheel_t* wheel);
 
 /**
  * Get the constants for the given wheel
  * @param wheel The wheel to get the constants for
  * @return The constants for the given wheel
  */
-const WheelConstants_t app_wheel_getWheelConstants(Wheel_t* wheel);
+const WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel);

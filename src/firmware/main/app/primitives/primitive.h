@@ -1,10 +1,9 @@
-#ifndef PRIMITIVES_PRIMITIVE_H
-#define PRIMITIVES_PRIMITIVE_H
+#pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
-#include "app/world/firmware_world.h"
-#include "util/log.h"
+#include "firmware/main/app/world/firmware_world.h"
 
 /**
  * \brief The information about a movement sent from the host computer.
@@ -35,8 +34,6 @@ typedef struct
  * Therefore, it is safe to, for example, access global variables in both the
  * \ref start and the \ref tick functions.
  */
-
-//#ifndef FWSIM
 typedef struct
 {
     /**
@@ -83,16 +80,5 @@ typedef struct
      * or \c NULL if no record is to be filled
      * \param[in] world The world to perform the primitive in
      */
-    void (*tick)(log_record_t *log, FirmwareWorld_t *world);
+    void (*tick)(FirmwareWorld_t *world);
 } primitive_t;
-
-void primitive_init(void);
-void primitive_start(unsigned int primitive, const primitive_params_t *params,
-                     FirmwareWorld_t *world);
-void primitive_tick(log_record_t *log, FirmwareWorld_t *world);
-bool primitive_is_direct(unsigned int primitive);
-unsigned int get_primitive_index();
-bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params);
-//#endif // FWSIM
-
-#endif

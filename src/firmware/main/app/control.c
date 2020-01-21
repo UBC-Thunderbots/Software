@@ -1,4 +1,4 @@
-#include "app/control.h"
+#include "firmware/main/app/control.h"
 
 #include "physics/physics.h"
 #include "shared/util.h"

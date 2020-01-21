@@ -1,4 +1,4 @@
-#include "app/world/firmware_robot.h"
+#include "firmware/main/app/world/firmware_robot.h"
 
 #include <stdlib.h>
 
@@ -58,77 +58,77 @@ void app_firmware_robot_destroy(FirmwareRobot_t* robot)
     free(robot);
 }
 
-Chicker_t* app_firmware_robot_getChicker(FirmwareRobot_t* robot)
+Chicker_t* app_firmware_robot_getChicker(const FirmwareRobot_t* robot)
 {
     return robot->chicker;
 }
 
-Dribbler_t* app_firmware_robot_getDribbler(FirmwareRobot_t* robot)
+Dribbler_t* app_firmware_robot_getDribbler(const FirmwareRobot_t* robot)
 {
     return robot->dribbler;
 }
 
-float app_firmware_robot_getPositionX(FirmwareRobot_t* robot)
+float app_firmware_robot_getPositionX(const FirmwareRobot_t* robot)
 {
     return robot->get_robot_position_x();
 }
 
-float app_firmware_robot_getPositionY(FirmwareRobot_t* robot)
+float app_firmware_robot_getPositionY(const FirmwareRobot_t* robot)
 {
     return robot->get_robot_position_y();
 }
 
-float app_firmware_robot_getOrientation(FirmwareRobot_t* robot)
+float app_firmware_robot_getOrientation(const FirmwareRobot_t* robot)
 {
     return robot->get_robot_orientation();
 }
 
-float app_firmware_robot_getVelocityX(FirmwareRobot_t* robot)
+float app_firmware_robot_getVelocityX(const FirmwareRobot_t* robot)
 {
     return robot->get_robot_velocity_x();
 }
 
-float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot)
+float app_firmware_robot_getVelocityY(const FirmwareRobot_t* robot)
 {
     return robot->get_robot_velocity_y();
 }
 
-float app_firmware_robot_getVelocityAngular(FirmwareRobot_t* robot)
+float app_firmware_robot_getVelocityAngular(const FirmwareRobot_t* robot)
 {
     return robot->get_robot_velocity_angular();
 }
 
-float app_firmware_robot_getBatteryVoltage(FirmwareRobot_t* robot)
+float app_firmware_robot_getBatteryVoltage(const FirmwareRobot_t* robot)
 {
     return robot->get_battery_voltage();
 }
 
-Wheel_t* app_firmware_robot_getFrontRightWheel(FirmwareRobot_t* robot)
+Wheel_t* app_firmware_robot_getFrontRightWheel(const FirmwareRobot_t* robot)
 {
     return robot->front_right_wheel;
 }
 
-Wheel_t* app_firmware_robot_getFrontLeftWheel(FirmwareRobot_t* robot)
+Wheel_t* app_firmware_robot_getFrontLeftWheel(const FirmwareRobot_t* robot)
 {
     return robot->front_left_wheel;
 }
 
-Wheel_t* app_firmware_robot_getBackRightWheel(FirmwareRobot_t* robot)
+Wheel_t* app_firmware_robot_getBackRightWheel(const FirmwareRobot_t* robot)
 {
     return robot->back_right_wheel;
 }
 
-Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot)
+Wheel_t* app_firmware_robot_getBackLeftWheel(const FirmwareRobot_t* robot)
 {
     return robot->back_left_wheel;
 }
 
-const RobotConstants_t app_firmware_robot_getRobotConstants(FirmwareRobot_t* robot)
+const RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* robot)
 {
     return robot->robot_constants;
 }
 
-ControllerState_t* app_firmware_robot_getControllerState(FirmwareRobot_t* robot)
+ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot)
 {
     return robot->controller_state;
 }

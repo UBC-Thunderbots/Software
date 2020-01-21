@@ -7,8 +7,6 @@
  */
 #include "direct_wheels.h"
 
-#include <unused.h>
-
 #include "io/wheels.h"
 #include "primitive.h"
 #include "util/log.h"

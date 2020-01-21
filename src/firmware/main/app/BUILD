@@ -7,7 +7,6 @@ cc_library(
     name = "control",
     srcs = ["control.c"],
     hdrs = ["control.h"],
-    strip_include_prefix = "/firmware/main",
     deps = [
         "//firmware/main/app/world:firmware_robot",
         "//firmware/main/physics",

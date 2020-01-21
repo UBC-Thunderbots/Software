@@ -1,4 +1,4 @@
-#include "app/world/wheel.h"
+#include "firmware/main/app/world/wheel.h"
 
 #include <stdlib.h>
 
@@ -38,12 +38,12 @@ float app_wheel_getWheelSpeedRPM(Wheel_t* wheel)
     return wheel->get_motor_speed_rpm() * gear_ratio;
 }
 
-float app_wheel_getMotorSpeedRPM(Wheel_t* wheel)
+float app_wheel_getMotorSpeedRPM(const Wheel_t* wheel)
 {
     return wheel->get_motor_speed_rpm();
 }
 
-const WheelConstants_t app_wheel_getWheelConstants(Wheel_t* wheel)
+const WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel)
 {
     return wheel->wheel_constants;
 }

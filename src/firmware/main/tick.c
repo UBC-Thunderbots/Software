@@ -105,10 +105,11 @@ static void normal_task(void *UNUSED(param))
         {
             feedback_pend_autokick();
         }
+
         hall_tick();
         encoder_tick();
-
-        primitive_tick(record, world);
+        uint8_t primitive_current_index = primitive_tick(world);
+        dr_tick(record);
         wheels_tick(record);
         dribbler_tick(record);
         charger_tick();
@@ -118,6 +119,8 @@ static void normal_task(void *UNUSED(param))
         // Submit the log record, if we filled one.
         if (record)
         {
+            log->tick.drive_serial = receive_last_serial();
+            log->tick.primitive    = (uint8_t)primitive_current_index;
             record->tick.idle_cpu_cycles = main_read_clear_idle_cycles();
             log_queue(record);
         }

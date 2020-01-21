@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/world/firmware_robot.h"
+#include "firmware/main/app/world/firmware_robot.h"
 
 /**
  * Apply the given acceleration (in robot coordinates) to the given robot

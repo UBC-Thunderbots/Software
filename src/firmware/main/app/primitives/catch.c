@@ -1,10 +1,11 @@
 /**
- * jcatch.c allows robots to do 2 motions
+ * catch.c allows robots to do 2 motions
  * 1. Make robots to move toward the stationary ball
  * 2. Move robots to the estimated location of the moving ball
  * @author: lynx, seung
  * @version: 1.0
  */
+#include "catch.h"
 
 #include <math.h>
 #include <stdio.h>
