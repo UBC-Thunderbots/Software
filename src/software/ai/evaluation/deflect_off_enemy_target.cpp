@@ -49,10 +49,10 @@ namespace Evaluation
 
         // want to shoot at the edge of a robot so the ball deflects towards the
         // edge of the field
+
         Vector dir      = enemy_closest_to_edge.position() - world.ball().position();
         Vector dir_perp = dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS * 0.75);
         Point target    = Point(0, 0);
-
 
         // choose point closest to edge of field
         if (fabs((world.ball().position() + dir + dir_perp).y() - closestEdgeY) >

@@ -195,6 +195,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
+
             stop_action->updateControlParams(*robot, false);
             yield(stop_action);
         }

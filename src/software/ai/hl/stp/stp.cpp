@@ -152,7 +152,6 @@ void STP::assignRobotsToTactics(const World& world,
         return tactic->isGoalieTactic();
     };
 
-    auto it = tactics.begin();
     if (goalie)
     {
         non_goalie_robots.erase(
