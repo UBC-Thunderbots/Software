@@ -1,23 +1,20 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <vector>
 #include <unordered_map>
-
-// TODO should be removed later
 #include <functional>
 //#include "software/backend/backend.h" // Should make generic.h
 
-
 // A quality of life typedef to make things shorter and more readable
-template <class GenericType>
-        using GenericRegistry = std::unordered_map<std::string, std::function<std::unique_ptr<GenericType>()>>;
-
+template <class IndexType, class TypeToCreate>
+using GenericRegistry = std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>()>>;
 /**
- * The GenericFactory is an Abstract class that provides an interface for Backend and Play
+ * The GenericFactory is an Abstract class that provides an interface for generic type
  * Factories to follow. This makes it easy to maintain a list of factories and get the
- * corresponding backends and plays through the generic interface.
+ * corresponding generic types through the generic interface.
  */
-template <class GenericType>
+template <class IndexType, class TypeToCreate>
 class GenericFactory
 {
 public:
@@ -31,7 +28,7 @@ public:
      *
      * @return a unique pointer to a newly constructed Generic of the given type/name
      */
-    static std::unique_ptr<GenericType> createGeneric(const std::string& generic_name);
+    static std::unique_ptr<IndexType, TypeToCreate> createGeneric(const std::string& generic_name);
 
     /**
      * Returns a const reference to the Generic registry. The registry is a map of Generic
@@ -40,7 +37,7 @@ public:
      *
      * @return a const reference to the Generic registry
      */
-    static const GenericRegistry<GenericType>& getRegistry();
+    static const GenericRegistry<IndexType, TypeToCreate>& getRegistry();
 
     /**
      * Returns a list of names of all the existing Generics
@@ -54,7 +51,7 @@ public:
      *
      * @return a list of constructor functions for all the existing Generics
      */
-    static std::vector<std::function<std::unique_ptr<GenericType>()>>
+    static std::vector<std::function<std::unique_ptr<TypeToCreate>()>>
     getRegisteredGenericConstructors();
 
 protected:
@@ -67,7 +64,7 @@ protected:
      */
     static void registerGeneric(
             std::string generic_name,
-            std::function<std::unique_ptr<GenericType>()> generic_creator);
+            std::function<std::unique_ptr<TypeToCreate>()> generic_creator);
 
 private:
     /**
@@ -83,39 +80,38 @@ private:
      *
      * @return a mutable reference to the Generic registry
      */
-    static GenericRegistry<GenericType>& getMutableRegistry();
+    static GenericRegistry<IndexType, TypeToCreate>& getMutableRegistry();
 };
 
 /**
- * This templated backend factory class is used by Backends that are derived from the
- * Abstract Backend class. Its purpose is to create a Factory for the implemented Backend
+ * This templated generic factory class is used by Backends that are derived from the
+ * Abstract Generic class. Its purpose is to create a Factory for the implemented Generic
  * and automatically register the backend in the BackendFactory registry.
  *
  * Declaring the static variable will also cause it to be initialized at the start of the
  * program (because it's static). This will immediately call the constructor, which adds
- * the backend T to the BackendFactory registry. From then on, the rest of the program
+ * the backend T to the GenericFactory registry. From then on, the rest of the program
  * can use the registry to find all the Backends that are available (and register with
  * this templated class).
  *
- * @tparam T The class of the Backend to be added to the registry. For example, to add a
+ * @tparam T The class of the Generic to be added to the registry. For example, to add a
  * new class called MoveBackend that inherits from Backend, the following line should be
  * added to the end of the .cpp file (without the quotations): "static
  * TGenericFactory<MoveBackend> factory;"
  */
- // TODO not sure how to 'template'
-template <class GenericType, class T>
-class TGenericFactory : public GenericFactory<GenericType>
+template <class IndexType, class TypeToCreate, class T>
+class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
 {
     // compile time type checking that T is derived class of Generic
-    static_assert(std::is_base_of<GenericType, T>::value,
-                  "T must be derived class of GenericType!");
+    static_assert(std::is_base_of<TypeToCreate, T>::value,
+                  "T must be derived class of TypeToCreate!");
 
 public:
     TGenericFactory()
     {
-        auto generic_creator = []() -> std::unique_ptr<GenericType> {
+        auto generic_creator = []() -> std::unique_ptr<TypeToCreate> {
             return std::make_unique<T>();
         };
-        GenericFactory<GenericType>::registerGeneric(T::name, generic_creator);
+        GenericFactory<IndexType, TypeToCreate>::registerGeneric(T::name, generic_creator);
     }
 };

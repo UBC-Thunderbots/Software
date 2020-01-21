@@ -1,5 +1,4 @@
-// TODO get this in
-#include "util/design_patterns/generic_factory.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 #include <gtest/gtest.h>
 
@@ -7,54 +6,42 @@
 #include <iostream>
 
 // Create and register two test generics with the factory here
-class BackendA : public Generic
-{
-public:
-    static const std::string name;
+class testGenericA {
 };
-const std::string BackendA::name = "A";
-static TBackendFactory<BackendA> factoryA;
-class BackendB : public Backend
-{
-public:
-    static const std::string name;
+
+class testGenericB : public testGenericA {
+    public:
+        static const std::string name;
 };
-const std::string BackendB::name = "B";
-// Register this backend in the BackendFactory
-static TBackendFactory<BackendB> factoryB;
+const std::string testGenericB::name = "A";
 
+static TGenericFactory<std::string, testGenericA, testGenericB> testFactory;
 
-TEST(BackendFactoryTest, test_create_backend_with_invalid_name)
+TEST(GenericFactoryTest, test_create_generic_with_invalid_name)
 {
-    EXPECT_THROW(BackendFactory::createBackend("_FooBar_"), std::invalid_argument);
+    EXPECT_THROW((GenericFactory<std::string, testGenericA>::createGeneric("_FooBar_")), std::invalid_argument);
 }
+//
+//TEST(BackendFactoryTest, test_create_backend_with_valid_name)
+//{
+//    auto backend_ptr = BackendFactory::createBackend("A");
+//
+//    EXPECT_TRUE(backend_ptr);
+//}
+//
+//TEST(BackendFactoryTest, test_get_registered_backend_names)
+//{
+//    auto registered_names = BackendFactory::getRegisteredBackendNames();
+//    EXPECT_EQ(registered_names.size(), 2);
+//    // Make sure we get the names we are expecting
+//    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), "A"), 1);
+//    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), "B"), 1);
+//}
+//
+//TEST(BackendFactoryTest, test_get_registered_backend_constructors)
+//{
+//    auto registered_constructors = BackendFactory::getRegisteredBackendConstructors();
+//    EXPECT_EQ(registered_constructors.size(), 2);
+//}
 
-TEST(BackendFactoryTest, test_create_backend_with_valid_name)
-{
-    auto backend_ptr = BackendFactory::createBackend("A");
-
-    EXPECT_TRUE(backend_ptr);
-}
-
-TEST(BackendFactoryTest, test_get_registered_backend_names)
-{
-    auto registered_names = BackendFactory::getRegisteredBackendNames();
-    EXPECT_EQ(registered_names.size(), 2);
-    // Make sure we get the names we are expecting
-    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), "A"), 1);
-    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), "B"), 1);
-}
-
-TEST(BackendFactoryTest, test_get_registered_backend_constructors)
-{
-    auto registered_constructors = BackendFactory::getRegisteredBackendConstructors();
-    EXPECT_EQ(registered_constructors.size(), 2);
-}
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-
+// construct factory from valid and invalid string

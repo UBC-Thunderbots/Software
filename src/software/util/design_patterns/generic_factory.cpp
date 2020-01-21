@@ -1,40 +1,41 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 // A quality of life typedef to make things shorter and more readable
-template <class GenericType>
-using GenericRegistry = std::unordered_map<std::string, std::function<std::unique_ptr<GenericType>()>>;
+template <class IndexType, class TypeToCreate>
+using GenericRegistry = std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>()>>;
 
-template <class GenericType>
-GenericRegistry<GenericType>& GenericFactory<GenericType>::getMutableRegistry()
+
+template <class IndexType, class TypeToCreate>
+GenericRegistry<IndexType, TypeToCreate>& GenericFactory<IndexType, TypeToCreate>::getMutableRegistry()
 {
-    static GenericRegistry<GenericType> instance;
+    static GenericRegistry<IndexType, TypeToCreate> instance;
     return instance;
 }
 
-template <class GenericType>
-const GenericRegistry<GenericType>& GenericFactory<GenericType>::getRegistry()
+template <class IndexType, class TypeToCreate>
+const GenericRegistry<IndexType, TypeToCreate>& GenericFactory<IndexType, TypeToCreate>::getRegistry()
 {
     return GenericFactory::getMutableRegistry();
 }
 
-template <class GenericType>
-std::vector<std::string> GenericFactory<GenericType>::getRegisteredGenericNames()
+template <class IndexType, class TypeToCreate>
+std::vector<std::string> GenericFactory<IndexType, TypeToCreate>::getRegisteredGenericNames()
 {
     std::vector<std::string> names;
 
-    for (auto iter = GenericFactory<GenericType>::getRegistry().begin();
-         iter != GenericFactory<GenericType>::getRegistry().end(); iter++)
+    for (auto iter = GenericFactory<IndexType, TypeToCreate>::getRegistry().begin();
+         iter != GenericFactory<IndexType, TypeToCreate>::getRegistry().end(); iter++)
     {
         names.emplace_back(iter->first);
     }
     return names;
 }
 
-template <class GenericType>
-std::vector<std::function<std::unique_ptr<GenericType>()>>
-GenericFactory<GenericType>::getRegisteredGenericConstructors()
+template <class IndexType, class TypeToCreate>
+std::vector<std::function<std::unique_ptr<TypeToCreate>()>>
+GenericFactory<IndexType, TypeToCreate>::getRegisteredGenericConstructors()
 {
-    std::vector<std::function<std::unique_ptr<GenericType>()>> constructors;
+    std::vector<std::function<std::unique_ptr<TypeToCreate>()>> constructors;
 
     for (auto iter = GenericFactory::getRegistry().begin();
          iter != GenericFactory::getRegistry().end(); iter++)
@@ -44,17 +45,17 @@ GenericFactory<GenericType>::getRegisteredGenericConstructors()
     return constructors;
 }
 
-template <class GenericType>
-void GenericFactory<GenericType>::registerGeneric(
+template <class IndexType, class TypeToCreate>
+void GenericFactory<IndexType, TypeToCreate>::registerGeneric(
         std::string generic_name,
-        std::function<std::unique_ptr<GenericType>()> generic_creator)
+        std::function<std::unique_ptr<TypeToCreate>()> generic_creator)
 {
     GenericFactory::getMutableRegistry().insert(
             std::make_pair(generic_name, generic_creator));
 }
 
-template <class GenericType>
-std::unique_ptr<GenericType> GenericFactory<GenericType>::createGeneric(const std::string& generic_name)
+template <class IndexType, class TypeToCreate>
+std::unique_ptr<IndexType, TypeToCreate> GenericFactory<IndexType, TypeToCreate>::createGeneric(const std::string& generic_name)
 {
     auto registry = GenericFactory::getRegistry();
     auto iter     = registry.find(generic_name);
