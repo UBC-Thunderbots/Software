@@ -100,18 +100,6 @@ float norm2(float a1, float a2);
 // rotate a velocity vector through angle
 void rotate(float speed3[2], float angle);
 
-// returns the amount to scale accel by to hit
-// the acceleraton limits for the robot
-// acceleration should be in robot local coordinates
-// vector is accelerations in
-// {m/s^2 m/s^2 rad/s^2}
-float get_maximal_accel_scaling(const float linear_accel[2], float angular_accel);
-
-// returns the amount to scale wheel torque by to hit the voltage limits
-// takes a vector of motor torques in (Nm)
-
-float get_maximal_torque_scaling(const float torque[4]);
-
 // Vector addition
 void vectorSub(float* a, const float* b, int len);
 // Vector addition

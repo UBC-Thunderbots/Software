@@ -26,7 +26,7 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
 
     for (long i = 0; i < 4; i++)
     {
-        Wheel_t* wheel                   = wheels[i];
+        const Wheel_t* wheel                   = wheels[i];
         const WheelConstants_t constants = app_wheel_getWheelConstants(wheel);
         float force                      = wheel_forces[i];
         float motor_torque =
@@ -87,7 +87,7 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
     float wheel_forces[4];
     force3_to_force4(normed_force, wheel_forces);
 
-    Wheel_t* wheels[4];
+    const Wheel_t* wheels[4];
     wheels[0] = app_firmware_robot_getFrontLeftWheel(robot);
     wheels[1] = app_firmware_robot_getBackLeftWheel(robot);
     wheels[2] = app_firmware_robot_getBackRightWheel(robot);

@@ -30,9 +30,6 @@ const float ROBOT_MASS[3] = {ROBOT_POINT_MASS, ROBOT_POINT_MASS, ROT_MASS};
 const float MAX_VEL[3] = {MAX_X_V, MAX_Y_V, MAX_T_V* ROBOT_RADIUS};
 const float MAX_ACC[3] = {MAX_X_A, MAX_Y_A, MAX_T_A* ROBOT_RADIUS};
 
-// contention vector, where in forces will simply consume power.
-static const float contention_vector[4] = {-0.4621, 0.5353, -0.5353, 0.4621};
-
 float norm2(float a1, float a2)
 {
     return (sqrtf(a1 * a1 + a2 * a2));
@@ -505,70 +502,6 @@ void rotate(float speed[2], float angle)
 void force3_to_force4(float force3[3], float force4[4])
 {
     matrix_mult_t(force4, 4, force3, 3, speed4_to_speed3_mat);
-}
-
-/**
- * \ingroup Physics
- *
- * \brief compute the scaling constant to bring motor torques to maximum
- *
- * \param[in] attempted torque to exert per wheel
- *
- * \return the amount by which to scale the torque vector to max it out
- */
-float get_maximal_torque_scaling(const float torque[4])
-{
-    float acc_max  = -INFINITY;
-    float vapp_max = -INFINITY;
-    for (int i = 0; i < 4; i++)
-    {
-        float volt      = torque[i] * CURRENT_PER_TORQUE * PHASE_RESISTANCE;
-        float back_emf  = (float)encoder_speed(i) * QUARTERDEGREE_TO_VOLT;
-        float appl_volt = fabsf(volt + back_emf);
-        float max_app   = fabsf(volt);
-        if (max_app > acc_max)
-        {
-            acc_max = max_app;
-        }
-        if (appl_volt > vapp_max)
-        {
-            vapp_max = appl_volt;
-        }
-    }
-
-    float slip_ratio = WHEEL_SLIP_VOLTAGE_LIMIT / acc_max;
-    float emf_ratio  = adc_battery() / vapp_max;
-
-    return (emf_ratio > slip_ratio) ? slip_ratio : emf_ratio;
-}
-
-
-/**
- * \ingroup Physics
- *
- * \brief compute the scaling constant to bring robot acceleration to maximum
- *
- * \param[in] attempted linear acceleration in robot coordinates
- * \param[in] attempted angular acceleration
- *
- * \return amount by which to scale acceleration
- */
-float get_maximal_accel_scaling(const float linear_accel[2], float angular_accel)
-{
-    // first convert accelerations into consistent units
-    // choose units of Force (N)
-    float normed_force[3];
-    normed_force[0] = linear_accel[0] * ROBOT_MASS[0];
-    normed_force[1] = linear_accel[1] * ROBOT_MASS[1];
-    normed_force[2] = angular_accel * ROBOT_MASS[2] * ROBOT_RADIUS;
-
-    float wheel_force[4];
-    force3_to_force4(normed_force, wheel_force);
-    for (int i = 0; i < 4; ++i)
-    {
-        wheel_force[i] *= WHEEL_RADIUS * GEAR_RATIO;  // convert to motor torque
-    }
-    return get_maximal_torque_scaling(wheel_force);
 }
 
 /**
