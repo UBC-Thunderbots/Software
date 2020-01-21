@@ -10,6 +10,21 @@ extern "C"
 }
 
 /**
+ * Because the FirmwareRobot_t struct is defined in the .c file (rather than the .h file),
+ * C++ considers it an incomplete type and is unable to use it with smart pointers
+ * because it doesn't know the size of the object. Therefore we need to create our own
+ * "Deleter" class we can provide to the smart pointers to handle that instead.
+ *
+ * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and examples
+ */
+struct FirmwareRobotDeleter {
+    void operator()(FirmwareRobot_t* firmware_robot) const {
+        app_firmware_robot_destroy(firmware_robot);
+    };
+};
+
+
+/**
  * This class acts as a wrapper around a PhysicsRobot so that the PhysicsRobot
  * can provide the interface of a FirmwareRobot.
  *
@@ -47,7 +62,7 @@ class SimulatorRobotSingleton
      *
      * @return a FirmwareRobot corresponding to the current PhysicsRobot
      */
-    static FirmwareRobot_t* createFirmwareRobot();
+    static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
 
    private:
     /* Position functions */

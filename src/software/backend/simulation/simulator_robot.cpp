@@ -1,8 +1,11 @@
 #include "software/backend/simulation/simulator_robot.h"
 
+extern "C"
+{
 #include "app/world/chicker.h"
 #include "app/world/dribbler.h"
 #include "app/world/wheel.h"
+}
 
 std::optional<unsigned int> SimulatorRobotSingleton::robot_id = std::nullopt;
 std::vector<std::weak_ptr<PhysicsRobot>> SimulatorRobotSingleton::physics_robots = {};
@@ -18,7 +21,7 @@ void SimulatorRobotSingleton::setPhysicsRobots(
     physics_robots = robots;
 }
 
-FirmwareRobot_t* SimulatorRobotSingleton::createFirmwareRobot()
+std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> SimulatorRobotSingleton::createFirmwareRobot()
 {
     // TODO: Make sure all objects de-allocated properly
     // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
@@ -47,7 +50,7 @@ FirmwareRobot_t* SimulatorRobotSingleton::createFirmwareRobot()
         &(SimulatorRobotSingleton::getPositionY), front_right_wheel, front_left_wheel,
         back_right_wheel, back_left_wheel);
 
-    return firmware_robot;
+    return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot, FirmwareRobotDeleter());
 }
 
 float SimulatorRobotSingleton::getPositionX()

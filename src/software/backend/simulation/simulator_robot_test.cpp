@@ -5,7 +5,10 @@
 
 #include <cmath>
 
+extern "C"
+{
 #include "app/world/firmware_robot.h"
+}
 #include "shared/constants.h"
 #include "software/backend/simulation/physics/physics_robot.h"
 #include "software/backend/simulation/physics/physics_simulator.h"
@@ -24,15 +27,14 @@ TEST(PhysicsRobotTest, test_simulator_robot_manages_multiple_robots_correctly)
     PhysicsSimulator physics_simulator(world);
     auto friendly_physics_robots = physics_simulator.getFriendlyPhysicsRobots();
 
-    FirmwareRobot_t *firmware_robot = nullptr;
     SimulatorRobotSingleton::setPhysicsRobots(friendly_physics_robots);
     for (const auto &physics_robot : friendly_physics_robots)
     {
         if (auto physics_robot_lock = physics_robot.lock())
         {
             SimulatorRobotSingleton::setRobotId(physics_robot_lock->getRobotId());
-            firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
-            std::cout << app_firmware_robot_getPositionX(firmware_robot) << std::endl;
+            auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
+            std::cout << app_firmware_robot_getPositionX(firmware_robot.get()) << std::endl;
         }
     }
 }
