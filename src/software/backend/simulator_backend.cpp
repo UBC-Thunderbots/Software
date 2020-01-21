@@ -12,12 +12,12 @@ const std::string SimulatorBackend::name = "simulator";
 SimulatorBackend::SimulatorBackend(
     const Duration &physics_time_step, const Duration &world_time_increment,
     SimulatorBackend::SimulationSpeed simulation_speed_mode)
-    : physics_time_step(physics_time_step),
+    : simulation_thread_started(false),
+      in_destructor(false),
+      physics_time_step(physics_time_step),
       world_time_increment(world_time_increment),
       simulation_speed_mode(simulation_speed_mode),
-      primitive_buffer(primitive_buffer_size),
-      in_destructor(false),
-      simulation_thread_started(false)
+      primitive_buffer(primitive_buffer_size)
 {
 }
 
