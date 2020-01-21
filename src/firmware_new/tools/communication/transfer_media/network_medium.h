@@ -48,7 +48,6 @@ class NetworkMedium : public TransferMedium
     void receive_data_async(std::function<void(std::string)> receive_callback);
 
    private:
-
     // The maximum length of the buffer we use to receive data packets from the network
     static constexpr unsigned int max_buffer_length = 4096;
 

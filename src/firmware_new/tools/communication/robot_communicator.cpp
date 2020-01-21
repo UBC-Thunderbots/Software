@@ -25,7 +25,7 @@ RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
     this->medium->receive_data_async([&](std::string incoming_data) {
         ReceiveProto msg;
         msg.ParseFromString(incoming_data);
-        if(received_callback)
+        if (received_callback)
             received_callback(msg);
     });
 }
@@ -76,4 +76,4 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
 }
 
 // place all templated communcation msg send/receive pair initializations here
-template class RobotCommunicator<control_msg, control_msg>;
+template class RobotCommunicator<control_msg, robot_ack>;

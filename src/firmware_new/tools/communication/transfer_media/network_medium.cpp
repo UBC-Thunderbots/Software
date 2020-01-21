@@ -15,12 +15,9 @@ NetworkMedium::NetworkMedium(const std::string& local_ipaddr, unsigned port)
 {
     socket.reset(new udp::socket(io_service));
 
-    auto addr = address_v4::from_string(local_ipaddr);
-
-    local_endpoint     = udp::endpoint(address_v4::any(), port);
-
     // TODO change to multicast after firmware is on RTOS
-    broadcast_endpoint = udp::endpoint(address_v4::from_string("10.10.10.1"), port);
+    local_endpoint     = udp::endpoint(address_v4::any(), port);
+    broadcast_endpoint = udp::endpoint(address_v4::from_string(local_ipaddr), port);
 
     socket->open(local_endpoint.protocol());
 

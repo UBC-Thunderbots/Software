@@ -25,5 +25,5 @@ message wheel_speed_msg {
 
 // Robot response
 message robot_ack {
-    required uint32 error_code = 1;
+    required uint32 msg_count = 1;
 }

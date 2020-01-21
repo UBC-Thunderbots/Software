@@ -1,3 +1,4 @@
+
 /**
  ******************************************************************************
  * @file    LwIP/LwIP_UDP_Echo_Server/Src/udp_echoserver.c
@@ -23,17 +24,26 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "firmware_new/proto/control.pb.h"
 #include "lwip/pbuf.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
 #include "main.h"
+#include "pb.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 // global proto msg that will be updated to the most recent msg sent
-/*control_msg control = control_msg_init_zero;*/
+// TODO remove this file as part of RTOS upgrade + add API
+control_msg control = control_msg_init_zero;
+robot_ack ack       = robot_ack_init_zero;
+uint8_t buffer[robot_ack_size];
+uint32_t msg_count = 0;
+
 /* Private function prototypes -----------------------------------------------*/
 void udp_echoserver_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p,
                                      const ip_addr_t *addr, u16_t port);
@@ -94,21 +104,33 @@ void udp_echoserver_receive_callback(void *arg, struct udp_pcb *upcb, struct pbu
         pbuf_take(p_tx, (char *)p->payload, p->len);
 
         // Create a stream that reads from the buffer
-        /*pb_istream_t in_stream = pb_istream_from_buffer((char*)p->payload, p->len);*/
+        pb_istream_t in_stream = pb_istream_from_buffer((char *)p->payload, p->len);
 
-        /*if (pb_decode(&in_stream, control_msg_fields, &control))*/
-        /*{*/
-        /*return 0;*/
-        /*}*/
+        if (pb_decode(&in_stream, control_msg_fields, &control))
+        {
+            // access msg to kill time
+            control.wheel_1_control.rpm;
+            control.wheel_2_control.rpm;
+            control.wheel_3_control.rpm;
+            control.wheel_4_control.rpm;
 
-        /* Connect to the remote client */
-        udp_connect(upcb, IP_ADDR_BROADCAST, 42069);
+            pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
-        /* Tell the client that we have accepted it */
-        udp_send(upcb, p_tx);
+            ack.msg_count = msg_count++;
 
-        /* free the UDP connection, so we can accept new clients */
-        udp_disconnect(upcb);
+            pb_encode(&stream, robot_ack_fields, &ack);
+
+            p_tx->payload = buffer;
+
+            /* Connect to the remote client */
+            udp_connect(upcb, IP_ADDR_BROADCAST, 42069);
+
+            /* Tell the client that we have accepted it */
+            udp_send(upcb, p_tx);
+
+            /* free the UDP connection, so we can accept new clients */
+            udp_disconnect(upcb);
+        }
 
         /* Free the p_tx buffer */
         pbuf_free(p_tx);

@@ -1,3 +1,6 @@
+#include <chrono>
+#include <thread>
+
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
@@ -7,6 +10,7 @@
 #include "g3log/g3log.hpp"
 #include "google/protobuf/message.h"
 #include "software/multithreading/thread_safe_buffer.h"
+
 
 using boost::asio::ip::udp;
 using google::protobuf::Message;
@@ -28,15 +32,26 @@ int main(int argc, char* argv[])
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
     control_req.mutable_wheel_2_control()->CopyFrom(wheel_control);
 
+    int count = 0;
+
     // create a RobotCommunicator with a NetworkMedium
-    RobotCommunicator<control_msg, control_msg> communicator(
-        std::make_unique<NetworkMedium>("10.10.10.0", 42069),
-        [=](const control_msg& msg) { std::cerr << "sent msg!" << std::endl; },
-        [=](const control_msg& msg) { std::cerr << "got msg!" << std::endl; });
+    RobotCommunicator<control_msg, robot_ack> communicator(
+        std::make_unique<NetworkMedium>("10.10.10.1", 42069),
+        [&](const control_msg& msg) {
+            std::cout << "COMP Txed " << count++ << " msgs " << std::endl;
+        },
+        [&](const robot_ack& msg) {
+            std::cout << "STM32 Rxed " << msg.msg_count() << " msgs " << std::endl;
+        });
 
 
     while (1)
+    {
         communicator.send_proto(control_req);
+
+        // 4000 hz test
+        std::this_thread::sleep_for(std::chrono::nanoseconds(250000));
+    }
 
     google::protobuf::ShutdownProtobufLibrary();
 
