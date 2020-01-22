@@ -12,12 +12,12 @@ extern "C"
 // TODO: These are all hardcoded values copied from firmware/main/physics/physics.h
 // and firmware/main/control/control.h
 // They should be replaced with the proper constants once firmware cleanup is done
-#define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
+#define GEAR_RATIO 0.5143f  // define as speed multiplication from motor to wheel
 #define WHEEL_RADIUS 0.0254f
 #define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
-#define RPM_TO_VOLT (1.0f / 374.0f)  // motor RPM to back EMF
-#define PHASE_RESISTANCE 1.6f      // adjust this number as calculated
-#define CURRENT_PER_TORQUE 39.21f  // from motor data sheet (1/25.5 mNm)
+#define RPM_TO_VOLT (1.0f / 374.0f)     // motor RPM to back EMF
+#define PHASE_RESISTANCE 1.6f           // adjust this number as calculated
+#define CURRENT_PER_TORQUE 39.21f       // from motor data sheet (1/25.5 mNm)
 #define ROBOT_POINT_MASS 2.48f
 #define ROBOT_RADIUS 0.085f
 #define INERTIAL_FACTOR 0.37f

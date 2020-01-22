@@ -39,37 +39,46 @@ SimulatorRobotSingleton::createFirmwareRobot()
                             &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
     WheelConstants_t wheel_constants = {
-            .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
-            .wheel_radius                        = WHEEL_RADIUS,
-            .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
-            .motor_back_emf_per_rpm              = RPM_TO_VOLT,
-            .motor_phase_resistance              = PHASE_RESISTANCE,
-            .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
-    Wheel_t* front_left_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontLeft), &(SimulatorRobotSingleton::getMotorSpeedFrontLeft), wheel_constants);
-    Wheel_t* front_right_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontRight), &(SimulatorRobotSingleton::getMotorSpeedFrontRight), wheel_constants);
-    Wheel_t* back_left_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackLeft), &(SimulatorRobotSingleton::getMotorSpeedBackLeft), wheel_constants);
-    Wheel_t* back_right_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackRight), &(SimulatorRobotSingleton::getMotorSpeedBackRight), wheel_constants);
+        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+        .wheel_radius                        = WHEEL_RADIUS,
+        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+        .motor_phase_resistance              = PHASE_RESISTANCE,
+        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+    Wheel_t* front_left_wheel = app_wheel_create(
+        &(SimulatorRobotSingleton::applyWheelForceFrontLeft),
+        &(SimulatorRobotSingleton::getMotorSpeedFrontLeft), wheel_constants);
+    Wheel_t* front_right_wheel = app_wheel_create(
+        &(SimulatorRobotSingleton::applyWheelForceFrontRight),
+        &(SimulatorRobotSingleton::getMotorSpeedFrontRight), wheel_constants);
+    Wheel_t* back_left_wheel = app_wheel_create(
+        &(SimulatorRobotSingleton::applyWheelForceBackLeft),
+        &(SimulatorRobotSingleton::getMotorSpeedBackLeft), wheel_constants);
+    Wheel_t* back_right_wheel = app_wheel_create(
+        &(SimulatorRobotSingleton::applyWheelForceBackRight),
+        &(SimulatorRobotSingleton::getMotorSpeedBackRight), wheel_constants);
 
     const RobotConstants_t robot_constants = {
-            .mass              = ROBOT_POINT_MASS,
-            .moment_of_inertia = INERTIA,
-            .robot_radius      = ROBOT_RADIUS,
-            .jerk_limit        = JERK_LIMIT,
+        .mass              = ROBOT_POINT_MASS,
+        .moment_of_inertia = INERTIA,
+        .robot_radius      = ROBOT_RADIUS,
+        .jerk_limit        = JERK_LIMIT,
     };
     ControllerState_t* controller_state = new ControllerState_t{
-            .last_applied_acceleration_x       = 0,
-            .last_applied_acceleration_y       = 0,
-            .last_applied_acceleration_angular = 0,
+        .last_applied_acceleration_x       = 0,
+        .last_applied_acceleration_y       = 0,
+        .last_applied_acceleration_angular = 0,
     };
     FirmwareRobot_t* firmware_robot = app_firmware_robot_create(
         chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
-        &(SimulatorRobotSingleton::getPositionY), &(SimulatorRobotSingleton::getOrientation), &(SimulatorRobotSingleton::getVelocityX), &(SimulatorRobotSingleton::getVelocityY), &(SimulatorRobotSingleton::getVelocityAngular), &(SimulatorRobotSingleton::getBatteryVoltage),
-        front_right_wheel, front_left_wheel,
-        back_right_wheel, back_left_wheel, controller_state, robot_constants);
+        &(SimulatorRobotSingleton::getPositionY),
+        &(SimulatorRobotSingleton::getOrientation),
+        &(SimulatorRobotSingleton::getVelocityX),
+        &(SimulatorRobotSingleton::getVelocityY),
+        &(SimulatorRobotSingleton::getVelocityAngular),
+        &(SimulatorRobotSingleton::getBatteryVoltage), front_right_wheel,
+        front_left_wheel, back_right_wheel, back_left_wheel, controller_state,
+        robot_constants);
 
     return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot,
                                                                   FirmwareRobotDeleter());
@@ -94,7 +103,8 @@ float SimulatorRobotSingleton::getPositionY()
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getOrientation() {
+float SimulatorRobotSingleton::getOrientation()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -102,7 +112,8 @@ float SimulatorRobotSingleton::getOrientation() {
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getVelocityX() {
+float SimulatorRobotSingleton::getVelocityX()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -110,7 +121,8 @@ float SimulatorRobotSingleton::getVelocityX() {
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getVelocityY() {
+float SimulatorRobotSingleton::getVelocityY()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -118,7 +130,8 @@ float SimulatorRobotSingleton::getVelocityY() {
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getVelocityAngular() {
+float SimulatorRobotSingleton::getVelocityAngular()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -126,7 +139,8 @@ float SimulatorRobotSingleton::getVelocityAngular() {
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getBatteryVoltage() {
+float SimulatorRobotSingleton::getBatteryVoltage()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -197,7 +211,8 @@ unsigned int SimulatorRobotSingleton::getDribblerTemperatureDegC()
     return 25;
 }
 
-void SimulatorRobotSingleton::dribblerCoast() {
+void SimulatorRobotSingleton::dribblerCoast()
+{
     // Do nothing
 }
 
@@ -233,7 +248,8 @@ void SimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
     }
 }
 
-float SimulatorRobotSingleton::getMotorSpeedFrontLeft() {
+float SimulatorRobotSingleton::getMotorSpeedFrontLeft()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -241,7 +257,8 @@ float SimulatorRobotSingleton::getMotorSpeedFrontLeft() {
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getMotorSpeedBackLeft() {
+float SimulatorRobotSingleton::getMotorSpeedBackLeft()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -249,7 +266,8 @@ float SimulatorRobotSingleton::getMotorSpeedBackLeft() {
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getMotorSpeedBackRight() {
+float SimulatorRobotSingleton::getMotorSpeedBackRight()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
@@ -257,7 +275,8 @@ float SimulatorRobotSingleton::getMotorSpeedBackRight() {
     return 0.0;
 }
 
-float SimulatorRobotSingleton::getMotorSpeedFrontRight() {
+float SimulatorRobotSingleton::getMotorSpeedFrontRight()
+{
     if (auto robot = getCurrentPhysicsRobot().lock())
     {
         // TODO: Implement me
