@@ -29,6 +29,7 @@ float SimulatorBallSingleton::getBallPositionX()
     {
         // TODO: implement me
     }
+    return 0.0;
 }
 
 float SimulatorBallSingleton::getBallPositionY()
@@ -37,6 +38,7 @@ float SimulatorBallSingleton::getBallPositionY()
     {
         // TODO: implement me
     }
+    return 0.0;
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
@@ -45,6 +47,7 @@ float SimulatorBallSingleton::getBallVelocityX()
     {
         // TODO: implement me
     }
+    return 0.0;
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
@@ -53,4 +56,5 @@ float SimulatorBallSingleton::getBallVelocityY()
     {
         // TODO: implement me
     }
+    return 0.0;
 }

@@ -56,7 +56,6 @@ typedef struct ControllerState
  *                             robot, in m/s
  * @param get_robot_velocity_angular A function that can be called to get the angular
  *                                   velocity of the robot, in rad/s
- * @param
  * @param get_battery_voltage A function that can be called to the batter voltage, in
  *                            volts
  * @param front_right_wheel The front right wheel of the robot

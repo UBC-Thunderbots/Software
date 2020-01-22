@@ -35,21 +35,41 @@ SimulatorRobotSingleton::createFirmwareRobot()
 
     Dribbler_t* dribbler =
         app_dribbler_create(&(SimulatorRobotSingleton::setDribblerSpeed),
+                            &(SimulatorRobotSingleton::dribblerCoast),
                             &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
+    WheelConstants_t wheel_constants = {
+            .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+            .wheel_radius                        = WHEEL_RADIUS,
+            .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+            .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+            .motor_phase_resistance              = PHASE_RESISTANCE,
+            .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
     Wheel_t* front_left_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontLeft));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontLeft), &(SimulatorRobotSingleton::getMotorSpeedFrontLeft), wheel_constants);
     Wheel_t* front_right_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontRight));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceFrontRight), &(SimulatorRobotSingleton::getMotorSpeedFrontRight), wheel_constants);
     Wheel_t* back_left_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackLeft));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackLeft), &(SimulatorRobotSingleton::getMotorSpeedBackLeft), wheel_constants);
     Wheel_t* back_right_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackRight));
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackRight), &(SimulatorRobotSingleton::getMotorSpeedBackRight), wheel_constants);
 
+    const RobotConstants_t robot_constants = {
+            .mass              = ROBOT_POINT_MASS,
+            .moment_of_inertia = INERTIA,
+            .robot_radius      = ROBOT_RADIUS,
+            .jerk_limit        = JERK_LIMIT,
+    };
+    ControllerState_t* controller_state = new ControllerState_t{
+            .last_applied_acceleration_x       = 0,
+            .last_applied_acceleration_y       = 0,
+            .last_applied_acceleration_angular = 0,
+    };
     FirmwareRobot_t* firmware_robot = app_firmware_robot_create(
         chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
-        &(SimulatorRobotSingleton::getPositionY), front_right_wheel, front_left_wheel,
-        back_right_wheel, back_left_wheel);
+        &(SimulatorRobotSingleton::getPositionY), &(SimulatorRobotSingleton::getOrientation), &(SimulatorRobotSingleton::getVelocityX), &(SimulatorRobotSingleton::getVelocityY), &(SimulatorRobotSingleton::getVelocityAngular), &(SimulatorRobotSingleton::getBatteryVoltage),
+        front_right_wheel, front_left_wheel,
+        back_right_wheel, back_left_wheel, controller_state, robot_constants);
 
     return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot,
                                                                   FirmwareRobotDeleter());
@@ -71,6 +91,47 @@ float SimulatorRobotSingleton::getPositionY()
     {
         // TODO: Implement me
     }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getOrientation() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getVelocityX() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getVelocityY() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getVelocityAngular() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getBatteryVoltage() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
 }
 
 void SimulatorRobotSingleton::kick(float speed_m_per_s)
@@ -136,6 +197,10 @@ unsigned int SimulatorRobotSingleton::getDribblerTemperatureDegC()
     return 25;
 }
 
+void SimulatorRobotSingleton::dribblerCoast() {
+    // Do nothing
+}
+
 void SimulatorRobotSingleton::applyWheelForceFrontLeft(float force_in_newtons)
 {
     if (auto robot = getCurrentPhysicsRobot().lock())
@@ -166,6 +231,38 @@ void SimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
     {
         // TODO: Implement me
     }
+}
+
+float SimulatorRobotSingleton::getMotorSpeedFrontLeft() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getMotorSpeedBackLeft() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getMotorSpeedBackRight() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
+}
+
+float SimulatorRobotSingleton::getMotorSpeedFrontRight() {
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+    return 0.0;
 }
 
 std::weak_ptr<PhysicsRobot> SimulatorRobotSingleton::getCurrentPhysicsRobot()

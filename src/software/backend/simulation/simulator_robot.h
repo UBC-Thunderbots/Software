@@ -9,6 +9,23 @@ extern "C"
 #include "app/world/firmware_robot.h"
 }
 
+// TODO: These are all hardcoded values copied from firmware/main/physics/physics.h
+// and firmware/main/control/control.h
+// They should be replaced with the proper constants once firmware cleanup is done
+#define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
+#define WHEEL_RADIUS 0.0254f
+#define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
+#define RPM_TO_VOLT (1.0f / 374.0f)  // motor RPM to back EMF
+#define PHASE_RESISTANCE 1.6f      // adjust this number as calculated
+#define CURRENT_PER_TORQUE 39.21f  // from motor data sheet (1/25.5 mNm)
+#define ROBOT_POINT_MASS 2.48f
+#define ROBOT_RADIUS 0.085f
+#define INERTIAL_FACTOR 0.37f
+#define ROT_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)
+#define INERTIA (ROT_MASS * ROBOT_RADIUS * ROBOT_RADIUS)
+#define JERK_LIMIT 40.0f  //(m/s^3)
+
+
 /**
  * Because the FirmwareRobot_t struct is defined in the .c file (rather than the .h file),
  * C++ considers it an incomplete type and is unable to use it with smart pointers
@@ -68,22 +85,55 @@ class SimulatorRobotSingleton
     static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
 
    private:
-    /* Position functions */
     /**
-     * Returns the x-position of the robot, in global field coordinates
+     * Returns the x-position of the robot, in global field coordinates, in meters
      *
-     * @return the x-position of the robot, in global field coordinates
+     * @return the x-position of the robot, in global field coordinates, in meters
      */
     static float getPositionX();
 
     /**
-     * Returns the y-position of the robot, in global field coordinates
+     * Returns the y-position of the robot, in global field coordinates, in meters
      *
-     * @return the y-position of the robot, in global field coordinates
+     * @return the y-position of the robot, in global field coordinates, in meters
      */
     static float getPositionY();
 
-    /* Chicker functions */
+    /**
+     * Returns the orientation of the robot, in global field coordinates, in radians
+     *
+     * @return the orientation of the robot, in global field coordinates, in radians
+     */
+    static float getOrientation();
+
+    /**
+     * Returns the x-velocity of the robot, in global field coordinates, in m/s
+     *
+     * @return the x-velocity of the robot, in global field coordinates, in m/s
+     */
+    static float getVelocityX();
+
+    /**
+     * Returns the y-velocity of the robot, in global field coordinates, in m/s
+     *
+     * @return the y-velocity of the robot, in global field coordinates, in m/s
+     */
+    static float getVelocityY();
+
+    /**
+     * Returns the angular velocity of the robot, in rad/s
+     *
+     * @return the angular of the robot, in rad/s
+     */
+    static float getVelocityAngular();
+
+    /**
+     * Returns the battery voltage, in volts
+     *
+     * @return the battery voltage, in volts
+     */
+    static float getBatteryVoltage();
+
     /**
      * Fires the kicker, kicking the ball in the direction the robot is facing
      * at the given speed if the ball is very close to the kicker
@@ -138,6 +188,11 @@ class SimulatorRobotSingleton
     static void setDribblerSpeed(uint32_t rpm);
 
     /**
+     * Makes the dribbler coast until another operation is applied to it
+     */
+    static void dribblerCoast();
+
+    /**
      * Returns the temperature of the dribbler, in degrees C
      *
      * @return the temperature of the dribbler, in degrees C
@@ -154,6 +209,14 @@ class SimulatorRobotSingleton
     static void applyWheelForceBackLeft(float force_in_newtons);
     static void applyWheelForceBackRight(float force_in_newtons);
     static void applyWheelForceFrontRight(float force_in_newtons);
+
+    /**
+     * Gets the motor speed for the wheel, in RPM
+     */
+    static float getMotorSpeedFrontLeft();
+    static float getMotorSpeedBackLeft();
+    static float getMotorSpeedBackRight();
+    static float getMotorSpeedFrontRight();
 
     /**
      * Returns the PhysicsRobot currently selected from the list of controllable
