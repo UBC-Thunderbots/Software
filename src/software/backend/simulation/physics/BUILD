@@ -124,9 +124,11 @@ cc_library(
     deps = [
         ":physics_ball",
         ":physics_field",
+        ":physics_robot",
         "//software/time:duration",
         "//software/time:timestamp",
         "//software/world",
+        "//software/world:robot",
         "@box2d",
     ],
 )

@@ -48,6 +48,8 @@ class PhysicsRobot
      */
     Robot getRobotWithTimestamp(const Timestamp& timestamp) const;
 
+    RobotId getRobotId() const;
+
    private:
     /**
      * A helper function that creates the robot body object in the physics world
