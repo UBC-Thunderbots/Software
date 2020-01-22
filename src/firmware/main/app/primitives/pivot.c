@@ -27,9 +27,9 @@ static void pivot_init(void) {}
 float compute_acceleration(BBProfile *profile, float disp, float curvel, float finvel,
                            float maxa, float maxv)
 {
-    PrepareBBTrajectoryMaxV(profile, disp, curvel, finvel, maxa, maxv);
-    PlanBBTrajectory(profile);
-    return BBComputeAvgAccel(profile, TIME_HORIZON);
+    app_bangbang_prepareTrajectoryMaxV(profile, disp, curvel, finvel, maxa, maxv);
+    app_bangbang_planTrajectory(profile);
+    return app_bangbang_computeAvgAccel(profile, TIME_HORIZON);
 }
 
 /**

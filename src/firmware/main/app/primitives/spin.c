@@ -92,16 +92,18 @@ static void spin_tick(FirmwareWorld_t *world)
     float minor_vel     = curr_vx * minor_vec[0] + curr_vy * minor_vec[1];
 
     // Prepare trajectory
-    PrepareBBTrajectoryMaxV(&major, major_disp, major_vel, end_speed, MAX_X_A, MAX_X_V);
-    PrepareBBTrajectoryMaxV(&minor, minor_disp, minor_vel, 0, MAX_Y_A, MAX_Y_V);
+    app_bangbang_prepareTrajectoryMaxV(&major, major_disp, major_vel, end_speed, MAX_X_A,
+                                       MAX_X_V);
+    app_bangbang_prepareTrajectoryMaxV(&minor, minor_disp, minor_vel, 0, MAX_Y_A,
+                                       MAX_Y_V);
 
     // Plan
-    PlanBBTrajectory(&major);
-    PlanBBTrajectory(&minor);
+    app_bangbang_planTrajectory(&major);
+    app_bangbang_planTrajectory(&minor);
 
     // Compute acceleration
-    float major_accel = BBComputeAccel(&major, TIME_HORIZON);
-    float minor_accel = BBComputeAccel(&minor, TIME_HORIZON);
+    float major_accel = app_bangbang_computeAccel(&major, TIME_HORIZON);
+    float minor_accel = app_bangbang_computeAccel(&minor, TIME_HORIZON);
     float a_accel = (avel_final - app_firmware_robot_getVelocityAngular(robot)) / 0.05f;
 
     // Clamp acceleration

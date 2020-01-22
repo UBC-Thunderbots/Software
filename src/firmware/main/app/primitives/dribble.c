@@ -51,19 +51,19 @@ static void dribble_tick(FirmwareWorld_t* world)
 
     BBProfile Xprofile;
     // dribbling too fast with the ball: specify max V
-    PrepareBBTrajectoryMaxV(&Xprofile, destination[0] - pos[0], vel[0], 0, max_accel[0],
-                            0.7f);
-    PlanBBTrajectory(&Xprofile);
-    accel[0]    = BBComputeAvgAccel(&Xprofile, DRIBBLE_TIME_HORIZON);
-    float timeX = GetBBTime(&Xprofile);
+    app_bangbang_prepareTrajectoryMaxV(&Xprofile, destination[0] - pos[0], vel[0], 0,
+                                       max_accel[0], 0.7f);
+    app_bangbang_planTrajectory(&Xprofile);
+    accel[0]    = app_bangbang_computeAvgAccel(&Xprofile, DRIBBLE_TIME_HORIZON);
+    float timeX = app_bangbang_computeProfileDuration(&Xprofile);
 
     // same as above comment^
     BBProfile Yprofile;
-    PrepareBBTrajectoryMaxV(&Yprofile, destination[1] - pos[1], vel[1], 0, max_accel[1],
-                            0.7f);
-    PlanBBTrajectory(&Yprofile);
-    accel[1]    = BBComputeAvgAccel(&Yprofile, DRIBBLE_TIME_HORIZON);
-    float timeY = GetBBTime(&Yprofile);
+    app_bangbang_prepareTrajectoryMaxV(&Yprofile, destination[1] - pos[1], vel[1], 0,
+                                       max_accel[1], 0.7f);
+    app_bangbang_planTrajectory(&Yprofile);
+    accel[1]    = app_bangbang_computeAvgAccel(&Yprofile, DRIBBLE_TIME_HORIZON);
+    float timeY = app_bangbang_computeProfileDuration(&Yprofile);
 
     float deltaD     = destination[2] - pos[2];
     float timeTarget = (timeY > timeX) ? timeY : timeX;

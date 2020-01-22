@@ -6,7 +6,7 @@
 
 // decreases current by the maxmum of current or limit
 // and returns the amount it decreased by
-// this is used by GetState for walking the plan
+// this is used by app_bangbang_getState for walking the plan
 float timeLimit(float *current, float limit)
 {
     float temp;
@@ -42,7 +42,7 @@ void stepTime(float *dist, float *vel, float time, float accel)
  * \param[in] maximum acceleration
  *
  */
-void PrepareBBTrajectory(BBProfile *b, float d, float vi, float vf, float MaxA)
+void app_bangbang_prepareTrajectory(BBProfile *b, float d, float vi, float vf, float MaxA)
 {
     if (vf * d < 0)
         vf = 0;  // not allowed- must be in same direction
@@ -54,7 +54,7 @@ void PrepareBBTrajectory(BBProfile *b, float d, float vi, float vf, float MaxA)
 }
 
 // Computes how long a movement will take
-float GetBBTime(BBProfile *b)
+float app_bangbang_computeProfileDuration(BBProfile *b)
 {
     return b->t1 + b->t2 + b->t3;
 }
@@ -72,7 +72,7 @@ float GetBBTime(BBProfile *b)
  * \param[in] maximum velocity
  *
  */
-void PrepareBBTrajectoryMaxV(BBProfile *b, float d, float vi, float vf, float MaxA,
+void app_bangbang_prepareTrajectoryMaxV(BBProfile *b, float d, float vi, float vf, float MaxA,
                              float MaxV)
 {
     if (vf * d < 0)
@@ -86,7 +86,7 @@ void PrepareBBTrajectoryMaxV(BBProfile *b, float d, float vi, float vf, float Ma
 // does the actually trajectory planning
 // do not call this method directly as it assumes
 // that the accelerations are already fixed
-// call PlanBBTrajectory instead.
+// call app_bangbang_planTrajectory instead.
 void BBPositivePlan(BBProfile *b)
 {
     // first we will assume we are not in the coast condition
@@ -226,7 +226,7 @@ void BBPositivePlan(BBProfile *b)
  *
  * \param[in,out] bang bang trajectory
  */
-void PlanBBTrajectory(BBProfile *b)
+void app_bangbang_planTrajectory(BBProfile *b)
 {
     // This code goes through the cases where we can't accelerate positively initially
     // and in those cases pre-flips the signs of the inputs so that the planning code
@@ -280,7 +280,7 @@ void PlanBBTrajectory(BBProfile *b)
  * \param[out] distance traveled
  * \param[out] velocity at that point
  **/
-void GetState(const BBProfile *b, float time, float *d, float *v)
+void app_bangbang_getState(const BBProfile *b, float time, float *d, float *v)
 {
     *v         = b->Vinitial;
     *d         = 0.0f;
@@ -305,7 +305,7 @@ void GetState(const BBProfile *b, float time, float *d, float *v)
  * \param[out] Jerk the quantity of jerk to apply
  * \return the initial acceleration
  */
-float ConstantJerkCompute(float Vinit, float Vfinal, float Distance, float time,
+float app_bangbang_computeInitialAccelerationForConstantJerkProfile(float Vinit, float Vfinal, float Distance, float time,
                           float *Jerk)
 {
     // D = t^3*J/6 + t^2 * A / 2 + Vinit*t
@@ -343,11 +343,12 @@ float ConstantJerkCompute(float Vinit, float Vfinal, float Distance, float time,
  * \param[in] time horizon in future
  * \return acceleration to apply
  */
-float BBComputeAccel(const BBProfile *b, float horizon)
+float app_bangbang_computeAccel(const BBProfile *b, float horizon)
 {
     float dist, vel;
-    GetState(b, horizon, &dist, &vel);
-    return ConstantJerkCompute(b->Vinitial, vel, dist, horizon, 0);
+    app_bangbang_getState(b, horizon, &dist, &vel);
+    return app_bangbang_computeInitialAccelerationForConstantJerkProfile(
+        b->Vinitial, vel, dist, horizon, 0);
 }
 
 
@@ -363,50 +364,9 @@ float BBComputeAccel(const BBProfile *b, float horizon)
  * \param[in] time horizon in future
  * \return acceleration to apply
  */
-float BBComputeAvgAccel(const BBProfile *b, float horizon)
+float app_bangbang_computeAvgAccel(const BBProfile *b, float horizon)
 {
     float dist, vel;
-    GetState(b, horizon, &dist, &vel);
+    app_bangbang_getState(b, horizon, &dist, &vel);
     return (vel - b->Vinitial) / horizon;
-}
-
-/**
- * \ingroup Controls
- *
- * \brief Implements a horizon accel computation for Koko's secret sauce
- *
- * \param[in] bb controller profile
- * \param[in] time horizon in future
- * \return acceleration to apply
- */
-float BBKokoComputeAccel(const BBProfile *b, float Horizon)
-{
-    float d_future, v_target, v_diff, a_target;
-
-    float d_hysteresis = b->MaxA * 0.005f;
-    float v_hysteresis = b->MaxA * 0.05f;
-
-
-    GetState(b, Horizon, &d_future, &v_target);
-
-    if (fabsf(b->Distance) < d_hysteresis)
-    {
-        v_target = 0.0;
-    }
-
-    v_diff = v_target - b->Vinitial;
-
-    a_target = 0.0f;
-
-    if (v_diff < -v_hysteresis)
-    {
-        a_target = -b->MaxA;
-    }
-
-    if (v_diff > v_hysteresis)
-    {
-        a_target = b->MaxA;
-    }
-
-    return a_target;
 }

@@ -2,8 +2,6 @@
 
 #include "firmware/main/app/world/firmware_robot.h"
 
-// TODO: need to prefix everything with "_app"
-
 /**
  * component to build information along major axis, minor axis, or rotation.
  * disp is the displacement along that axis.
@@ -56,8 +54,8 @@ typedef struct
  * @param minor_vec the minor vector components on the global axis
  * @return a new PhysBot data container
  */
-PhysBot create_physbot(const FirmwareRobot_t *robot, float *destination, float *major_vec,
-                  float *minor_vec);
+PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
+                           float *major_vec, float *minor_vec);
 
 /**
  * Creates the BBProfile for a component. It is assumed that the displacement,
@@ -69,7 +67,7 @@ PhysBot create_physbot(const FirmwareRobot_t *robot, float *destination, float *
  * @param p A 3 length array of {final velocity, max acceleration, max_velocity}
  * @return void
  */
-void plan_move(Component *c, float p[3]);
+void app_physbots_planMove(Component *c, float *p);
 
 /**
  * Uses a rotaion matrix to rotate the acceleration vectors of the given
@@ -85,5 +83,5 @@ void plan_move(Component *c, float p[3]);
  * @param minor_vec the minor vector components on the global axis
  * @return void
  */
-void to_local_coords(float accel[3], PhysBot pb, float angle, float major_vec[2],
-                     float minor_vec[2]);
+void app_physbot_computeAccelInLocalCoordinates(float *accel, PhysBot pb, float angle,
+                                                float *major_vec, float *minor_vec);

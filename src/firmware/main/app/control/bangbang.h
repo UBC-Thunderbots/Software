@@ -6,17 +6,18 @@
  * Profile struct to compete. The next stage is to call Plan which will analyze the inputs
  * and complete the trajectory computing things like which way to accelerate, for how long
  * and what speed will be reached. Finally, various pieces of information can be gleaned
- * from the completed trajectory such as the total traversal time(GetBBTime), or the
- * expected stat at a given time in the future(GetState). Finally, users may wish to use
- * the information to compute an acceleration to apply as a form of control law.
+ * from the completed trajectory such as the total traversal time(app_bangbang_computeProfileDuration), or the
+ * expected stat at a given time in the future(app_bangbang_getState). Finally, users may
+ * wish to use the information to compute an acceleration to apply as a form of control
+ * law.
  *
  * There are many control laws which one could apply to a planed trajectory, such as
  * simply taking a1 and using that. However, such simple approaches will tend to oscillate
- * severely and their use is discouraged. The default method is BBComputeAccel which takes
- * a point in the future at which to look. At this future time it computes the expected
- * velocity and position and then asks the question, if I were to apply a trajectory of
- * constant jerk from now until this final horizon time, what should my initial
- * acceleration and jerk be to acheive this final state.
+ * severely and their use is discouraged. The default method is app_bangbang_computeAccel
+ * which takes a point in the future at which to look. At this future time it computes the
+ * expected velocity and position and then asks the question, if I were to apply a
+ * trajectory of constant jerk from now until this final horizon time, what should my
+ * initial acceleration and jerk be to acheive this final state.
  *
  * It should be noted however that there are many possible control laws which could be
  * mapped on top of a computed BB plan. Take for example the plan of looking some time
@@ -28,10 +29,7 @@
  * application.
  */
 
-// TODO: need to prefix everything with "_app"
-
-
-// a full trajector plan for a vehicle undergoing maximum acceleration control
+// a full trajectory plan for a vehicle undergoing maximum acceleration control
 typedef struct
 {
     // inputs
@@ -64,36 +62,33 @@ typedef struct
 
 
 // wrappers to fill out the Profile struct with the input information
-void PrepareBBTrajectoryMaxV(BBProfile *b, float d, float vi, float vf, float MaxA,
-                             float MaxV);
-void PrepareBBTrajectory(BBProfile *b, float d, float vi, float vf, float MaxA);
+void app_bangbang_prepareTrajectoryMaxV(BBProfile *b, float d, float vi, float vf,
+                                        float MaxA, float MaxV);
+void app_bangbang_prepareTrajectory(BBProfile *b, float d, float vi, float vf,
+                                    float MaxA);
 
 // meat and potatoes, computes the relavent details of the trajectory
-void PlanBBTrajectory(BBProfile *b);
+void app_bangbang_planTrajectory(BBProfile *b);
 
 // the default acceleration calculator, a typical horizon would be on
 // the time scale fo the vehicle in question say 1/2 second for our robots.
-float BBComputeAccel(const BBProfile *b, float horizon);
+float app_bangbang_computeAccel(const BBProfile *b, float horizon);
 
 
 // takes the velocity that should be obtained at time horizon and
 // apply that average velocity to the wheels
-float BBComputeAvgAccel(const BBProfile *b, float horizon);
+float app_bangbang_computeAvgAccel(const BBProfile *b, float horizon);
 
-// retreive the state at some point in the future if the plan were
+// retrieve the state at some point in the future if the plan were
 // to be followed exactly
-void GetState(const BBProfile *b, float time, float *d, float *v);
+void app_bangbang_getState(const BBProfile *b, float time, float *d, float *v);
 
 // This should perhaps be in physics, this takes an initial and fianl velocoty as well as
 // a distance and a time and computes the initial acceleration and jerk to experience over
 // that time such that the velocity and distance constraints are met
-float ConstantJerkCompute(float Vinit, float Vfinal, float Distance, float time,
-                          float *Jerk);
+float app_bangbang_computeInitialAccelerationForConstantJerkProfile(
+    float Vinit, float Vfinal, float Distance, float time, float *jjjjjjJerk);
 
+// Computes how long a movement profile will take
+float app_bangbang_computeProfileDuration(BBProfile *b);
 
-// Computes how long a movement will take
-float GetBBTime(BBProfile *b);
-
-
-// koko's magic function
-float BBKokoComputeAccel(const BBProfile *B, float Horizon);

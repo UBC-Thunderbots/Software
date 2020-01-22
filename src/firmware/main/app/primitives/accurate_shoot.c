@@ -135,31 +135,35 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
     if (major_disp < 0)
     {
         // get behind ball
-        PrepareBBTrajectoryMaxV(&major_profile, major_disp - TARGET_RADIUS / 3, major_vel,
-                                -2, MAX_ROT_SPEED, MAX_ROT_SPEED);
-        PlanBBTrajectory(&major_profile);
-        major_accel -= BBComputeAvgAccel(&major_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
+        app_bangbang_prepareTrajectoryMaxV(&major_profile, major_disp - TARGET_RADIUS / 3,
+                                           major_vel, -2, MAX_ROT_SPEED, MAX_ROT_SPEED);
+        app_bangbang_planTrajectory(&major_profile);
+        major_accel -=
+            app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
 
         float outDisp = minor_disp / fabs(minor_disp) * TARGET_RADIUS / 2;
-        PrepareBBTrajectoryMaxV(&minor_profile, outDisp, minor_vel, 1, MAX_ROT_SPEED,
-                                MAX_ROT_SPEED);
-        PlanBBTrajectory(&minor_profile);
-        minor_accel -= BBComputeAvgAccel(&minor_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
+        app_bangbang_prepareTrajectoryMaxV(&minor_profile, outDisp, minor_vel, 1,
+                                           MAX_ROT_SPEED, MAX_ROT_SPEED);
+        app_bangbang_planTrajectory(&minor_profile);
+        minor_accel -=
+            app_bangbang_computeAvgAccel(&minor_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
     }
     else if (major_disp < TARGET_RADIUS / 3)
     {
-        PrepareBBTrajectoryMaxV(&major_profile, major_disp - TARGET_RADIUS / 3, major_vel,
-                                -1, MAX_ROT_SPEED, MAX_ROT_SPEED);
-        PlanBBTrajectory(&major_profile);
-        major_accel -= BBComputeAvgAccel(&major_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
+        app_bangbang_prepareTrajectoryMaxV(&major_profile, major_disp - TARGET_RADIUS / 3,
+                                           major_vel, -1, MAX_ROT_SPEED, MAX_ROT_SPEED);
+        app_bangbang_planTrajectory(&major_profile);
+        major_accel -=
+            app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
     }
     else if (minor_disp > 0.005f || minor_disp < -0.005f)
     {
         // align to major axis
-        PrepareBBTrajectoryMaxV(&minor_profile, minor_disp, minor_vel, 0, MAX_ROT_SPEED,
-                                MAX_ROT_SPEED);
-        PlanBBTrajectory(&minor_profile);
-        minor_accel += BBComputeAvgAccel(&minor_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
+        app_bangbang_prepareTrajectoryMaxV(&minor_profile, minor_disp, minor_vel, 0,
+                                           MAX_ROT_SPEED, MAX_ROT_SPEED);
+        app_bangbang_planTrajectory(&minor_profile);
+        minor_accel +=
+            app_bangbang_computeAvgAccel(&minor_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
         major_accel += 0;
     }
     else
@@ -186,9 +190,10 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
             app_dribbler_setSpeed(dribbler, 8000);
         }
 
-        PrepareBBTrajectoryMaxV(&major_profile, major_disp, major_vel, 1.0, 1.5, 1.5);
-        PlanBBTrajectory(&major_profile);
-        major_accel             = BBComputeAvgAccel(&major_profile, TIME_HORIZON);
+        app_bangbang_prepareTrajectoryMaxV(&major_profile, major_disp, major_vel, 1.0,
+                                           1.5, 1.5);
+        app_bangbang_planTrajectory(&major_profile);
+        major_accel             = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
         minor_accel             = 0;
         relative_destination[2] = 0;
         toBall                  = true;
@@ -201,19 +206,19 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
         // this code brings bot to TARGET_RADIUS away from ball
 
         // adjust in major direction
-        PrepareBBTrajectoryMaxV(&major_profile,
-                                major_disp * (1 - TARGET_RADIUS / dist_ball), major_vel,
-                                0, MAX_RAD_SPEED, MAX_RAD_SPEED);
-        PlanBBTrajectory(&major_profile);
+        app_bangbang_prepareTrajectoryMaxV(&major_profile,
+                                           major_disp * (1 - TARGET_RADIUS / dist_ball),
+                                           major_vel, 0, MAX_RAD_SPEED, MAX_RAD_SPEED);
+        app_bangbang_planTrajectory(&major_profile);
         float major_accel_radial =
-            BBComputeAvgAccel(&major_profile, TIME_HORIZON) * RADIAL_COEFF;
+            app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON) * RADIAL_COEFF;
 
-        PrepareBBTrajectoryMaxV(&minor_profile,
-                                minor_disp * (1 - TARGET_RADIUS / dist_ball), minor_vel,
-                                0, MAX_RAD_SPEED, MAX_RAD_SPEED);
-        PlanBBTrajectory(&minor_profile);
+        app_bangbang_prepareTrajectoryMaxV(&minor_profile,
+                                           minor_disp * (1 - TARGET_RADIUS / dist_ball),
+                                           minor_vel, 0, MAX_RAD_SPEED, MAX_RAD_SPEED);
+        app_bangbang_planTrajectory(&minor_profile);
         float minor_accel_radial =
-            BBComputeAvgAccel(&minor_profile, TIME_HORIZON) * RADIAL_COEFF;
+            app_bangbang_computeAvgAccel(&minor_profile, TIME_HORIZON) * RADIAL_COEFF;
 
         bool maj = major_accel_radial * major_accel > 0;
         bool min = minor_accel_radial * minor_accel > 0;

@@ -229,7 +229,7 @@ static void move_tick(FirmwareWorld_t* world)
 {
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    PhysBot pb = create_physbot(robot, destination, major_vec, minor_vec);
+    PhysBot pb = app_physbot_create(robot, destination, major_vec, minor_vec);
 
     // choose a wheel axis to rotate onto
     // TODO: try to make this less jittery
@@ -239,13 +239,13 @@ static void move_tick(FirmwareWorld_t* world)
     float max_major_a     = 3.5;
     float max_major_v     = slow ? 1.25 : 3.0;
     float major_params[3] = {end_speed, max_major_a, max_major_v};
-    plan_move(&pb.maj, major_params);
+    app_physbots_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
     float max_minor_a     = 1.5;
     float max_minor_v     = 1.5;
     float minor_params[3] = {0, max_minor_a, max_minor_v};
-    plan_move(&pb.min, minor_params);
+    app_physbots_planMove(&pb.min, minor_params);
 
     // plan rotation movement
     plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
@@ -253,8 +253,8 @@ static void move_tick(FirmwareWorld_t* world)
     float accel[3] = {0, 0, pb.rot.accel};
 
     // rotate the accel and apply it
-    to_local_coords(accel, pb, app_firmware_robot_getOrientation(robot), major_vec,
-                    minor_vec);
+    app_physbot_computeAccelInLocalCoordinates(
+        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 

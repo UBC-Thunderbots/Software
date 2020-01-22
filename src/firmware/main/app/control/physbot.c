@@ -7,7 +7,7 @@
 // Used for computing accelerations
 #define TIME_HORIZON 0.05f  // s
 
-PhysBot create_physbot(const FirmwareRobot_t *robot, float *destination, float *major_vec,
+PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination, float *major_vec,
                   float *minor_vec)
 {
     float v[2]            = {app_firmware_robot_getVelocityX(robot),
@@ -30,17 +30,17 @@ PhysBot create_physbot(const FirmwareRobot_t *robot, float *destination, float *
     return pb;
 }
 
-void plan_move(Component *c, float p[3])
+void app_physbots_planMove(Component *c, float *p)
 {
     BBProfile profile;
-    PrepareBBTrajectoryMaxV(&profile, c->disp, c->vel, p[0], p[1], p[2]);
-    PlanBBTrajectory(&profile);
-    c->accel = BBComputeAvgAccel(&profile, TIME_HORIZON);
-    c->time  = GetBBTime(&profile);
+    app_bangbang_prepareTrajectoryMaxV(&profile, c->disp, c->vel, p[0], p[1], p[2]);
+    app_bangbang_planTrajectory(&profile);
+    c->accel = app_bangbang_computeAvgAccel(&profile, TIME_HORIZON);
+    c->time  = app_bangbang_computeProfileDuration(&profile);
 }
 
-void to_local_coords(float accel[3], PhysBot pb, float angle, float major_vec[2],
-                     float minor_vec[2])
+void app_physbot_computeAccelInLocalCoordinates(float *accel, PhysBot pb, float angle, float *major_vec,
+                     float *minor_vec)
 {
     float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},
                                   {cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};

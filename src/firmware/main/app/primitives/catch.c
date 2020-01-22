@@ -152,20 +152,22 @@ static void catch_tick(FirmwareWorld_t* world)
         float max_major_a = 3.0;  //(get_var(0x00)/4.0);
         float max_major_v = 3.0;  //(get_var(0x01)/4.0);
         float major_vel   = major_vec[0] * vel[0] + major_vec[1] * vel[1];
-        PrepareBBTrajectoryMaxV(&major_profile, major_disp, major_vel, end_speed,
-                                max_major_a, max_major_v);  // 3.5, 3.0
-        PlanBBTrajectory(&major_profile);
-        major_accel      = BBComputeAvgAccel(&major_profile, TIME_HORIZON);
-        float time_major = GetBBTime(&major_profile);
+        app_bangbang_prepareTrajectoryMaxV(&major_profile, major_disp, major_vel,
+                                           end_speed, max_major_a,
+                                           max_major_v);  // 3.5, 3.0
+        app_bangbang_planTrajectory(&major_profile);
+        major_accel      = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
+        float time_major = app_bangbang_computeProfileDuration(&major_profile);
 
         float max_minor_a = 1;  //(get_var(0x02)/4.0);
         float max_minor_v = 1;  //(get_var(0x03)/4.0);
 
         float minor_vel = minor_vec[0] * vel[0] + minor_vec[1] * vel[1];
-        PrepareBBTrajectoryMaxV(&minor_profile, minor_disp, minor_vel, 0, max_minor_a,
-                                max_minor_v);  // 1.5, 1.5
-        PlanBBTrajectory(&minor_profile);
-        minor_accel      = BBComputeAvgAccel(&minor_profile, TIME_HORIZON);
+        app_bangbang_prepareTrajectoryMaxV(&minor_profile, minor_disp, minor_vel, 0,
+                                           max_minor_a,
+                                           max_minor_v);  // 1.5, 1.5
+        app_bangbang_planTrajectory(&minor_profile);
+        minor_accel      = app_bangbang_computeAvgAccel(&minor_profile, TIME_HORIZON);
 
         // timetarget is used for the robot's rotation. It is alwways bigger than 0.1m/s
         timeTarget = (time_major > TIME_HORIZON) ? time_major : TIME_HORIZON;
@@ -194,12 +196,12 @@ static void catch_tick(FirmwareWorld_t* world)
             minor_vec[0] * (ballpos[0] - pos[0]) + minor_vec[1] * (ballpos[1] - pos[1]);
 
         BBProfile minor_profile;
-        PrepareBBTrajectoryMaxV(&minor_profile, minor_disp_cur, minor_vel_cur, 0, MAX_X_A,
-                                MAX_X_V);
+        app_bangbang_prepareTrajectoryMaxV(&minor_profile, minor_disp_cur, minor_vel_cur,
+                                           0, MAX_X_A, MAX_X_V);
 
-        PlanBBTrajectory(&minor_profile);
-        minor_accel      = BBComputeAvgAccel(&minor_profile, TIME_HORIZON);
-        float time_minor = GetBBTime(&minor_profile);
+        app_bangbang_planTrajectory(&minor_profile);
+        minor_accel      = app_bangbang_computeAvgAccel(&minor_profile, TIME_HORIZON);
+        float time_minor = app_bangbang_computeProfileDuration(&minor_profile);
 
         // how long it would take to get onto the velocity line with 0 minor vel
         timeTarget = (time_minor > TIME_HORIZON) ? time_minor : TIME_HORIZON;
@@ -226,10 +228,11 @@ static void catch_tick(FirmwareWorld_t* world)
 
         float major_vel = major_vec[0] * vel[0] + major_vec[1] * vel[1];
         BBProfile major_profile;
-        PrepareBBTrajectoryMaxV(&major_profile, major_disp_intercept, major_vel,
-                                major_vel_intercept, CATCH_MAX_X_V, CATCH_MAX_X_A);
-        PlanBBTrajectory(&major_profile);
-        major_accel      = BBComputeAvgAccel(&major_profile, TIME_HORIZON);
+        app_bangbang_prepareTrajectoryMaxV(&major_profile, major_disp_intercept,
+                                           major_vel, major_vel_intercept, CATCH_MAX_X_V,
+                                           CATCH_MAX_X_A);
+        app_bangbang_planTrajectory(&major_profile);
+        major_accel      = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
 
         major_angle      = atan2f(major_vec[1], major_vec[0]);
         float angle_disp = min_angle_delta(pos[2], major_angle + M_PI);

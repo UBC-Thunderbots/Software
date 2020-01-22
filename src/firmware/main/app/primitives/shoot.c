@@ -171,20 +171,21 @@ static void shoot_tick(FirmwareWorld_t *world)
 {
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    PhysBot pb = create_physbot(robot, destination, major_vec, minor_vec);
+    PhysBot pb = app_physbot_create(robot, destination, major_vec, minor_vec);
     if (pb.maj.disp > 0)
     {
         // tuned constants from testing
         float major_par[3] = {1.0f, MAX_X_A * 0.5f, MAX_X_V};
-        plan_move(&pb.maj, major_par);
+        app_physbots_planMove(&pb.maj, major_par);
     }
     // tuned constants from testing
     float minor_par[3] = {0, MAX_Y_A * 3, MAX_Y_V / 2};
-    plan_move(&pb.min, minor_par);
+    app_physbots_planMove(&pb.min, minor_par);
     plan_shoot_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
     float accel[3] = {0, 0, pb.rot.accel};
     scale(&pb);
-    to_local_coords(accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
+    app_physbot_computeAccelInLocalCoordinates(
+        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 
