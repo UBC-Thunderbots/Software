@@ -78,6 +78,20 @@ float app_wheel_getWheelSpeedRPM(Wheel_t* wheel);
 float app_wheel_getMotorSpeedRPM(const Wheel_t* wheel);
 
 /**
+ * Allow this wheel to spin freely
+ * @param wheel The wheel to allow to spin freely
+ */
+ // TODO: implement
+void app_wheel_coast(const Wheel_t* wheel);
+
+/**
+ * Brake this wheel
+ * @param wheel The wheel to brake
+ */
+// TODO: implement
+void app_wheel_brake(const Wheel_t* wheel);
+
+/**
  * Get the constants for the given wheel
  * @param wheel The wheel to get the constants for
  * @return The constants for the given wheel

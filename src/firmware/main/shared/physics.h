@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: move physics into `app`
+
 #include "math/tbots_math.h"
 
 // This file contains all the physical constants of the robot
@@ -139,7 +141,7 @@ void mm_inv(int n, float a[n][n]);
 void decompose_radial(const float speed, float* vf, const float* init_pos,
                       const float* final_pos);
 
-float dot_product(float vec1[], float vec2[], int size);
+float dot_product(const float vec1[], const float vec2[], const int size);
 
 float dot2D(float vec1[2], float vec2[2]);
 

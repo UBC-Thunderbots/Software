@@ -1,10 +1,8 @@
-#ifndef PHYSBOT_H
-#define PHYSBOT_H
+#pragma once
 
-#include "io/dr.h"
+#include "firmware/main/app/world/firmware_robot.h"
 
-// Used for computing accelerations
-#define TIME_HORIZON 0.05f  // s
+// TODO: need to prefix everything with "_app"
 
 /**
  * component to build information along major axis, minor axis, or rotation.
@@ -27,7 +25,7 @@ typedef struct
  * use this to pass information around between functions so that we don't
  * have to have functions with a ton of arguments.
  *
- * dr is the x, y values for displacement on the global axis
+ * pos is the x, y values for displacement on the global axis
  * major_vec is the x, y components of the major axis on the global axis
  * minor_vec is the x, y components of the minor axis on the global axis
  * min is a Component container to hold minor axis information
@@ -36,7 +34,7 @@ typedef struct
  */
 typedef struct
 {
-    float dr[2];
+    float pos[2];
     float major_vec[2];
     float minor_vec[2];
     Component min;
@@ -51,15 +49,15 @@ typedef struct
  * as well as data about the bot on the global axis. Details about what
  * can go in the PhysBot are in the physbot.h file.
  *
- * @param states The current state of the robot
+ * @param robot The current state of the robot
  * @param destination a 3 length array of {x, y, rotation} destination values
  * on the global axis
  * @param major_vec the major vector components on the global axis
  * @param minor_vec the minor vector components on the global axis
  * @return a new PhysBot data container
  */
-PhysBot setup_bot(dr_data_t states, float destination[3], float major_vec[2],
-                  float minor_vec[2]);
+PhysBot create_physbot(const FirmwareRobot_t *robot, float *destination, float *major_vec,
+                  float *minor_vec);
 
 /**
  * Creates the BBProfile for a component. It is assumed that the displacement,
@@ -89,5 +87,3 @@ void plan_move(Component *c, float p[3]);
  */
 void to_local_coords(float accel[3], PhysBot pb, float angle, float major_vec[2],
                      float minor_vec[2]);
-
-#endif

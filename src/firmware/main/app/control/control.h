@@ -2,6 +2,8 @@
 
 #include "firmware/main/app/world/firmware_robot.h"
 
+// TODO: need to prefix everything with "_app"
+
 /**
  * Apply the given acceleration (in robot coordinates) to the given robot
  *
@@ -12,7 +14,7 @@
  *                       (side-to-side) direction (m/s^2)
  * @param angular_accel The angular acceleration to apply to the robot (rad/s^2)
  */
-void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
+void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
                             float linear_accel_y, float angular_accel);
 
 /**

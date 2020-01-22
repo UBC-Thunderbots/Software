@@ -5,19 +5,15 @@
  * @author: lynx, seung
  * @version: 1.0
  */
-#include "catch.h"
+#include "firmware/main/app/primitives/catch.h"
 
 #include <math.h>
 #include <stdio.h>
-#include <unused.h>
 
-#include "app/control.h"
-#include "catch.h"
-#include "control/bangbang.h"
-#include "io/breakbeam.h"
-#include "io/dr.h"
-#include "physics/physics.h"
-#include "primitives/move.h"
+#include "firmware/main/app/control/bangbang.h"
+#include "firmware/main/app/control/control.h"
+#include "firmware/main/shared/physics.h"
+#include "firmware/main/shared/util.h"
 
 #define CATCH_MAX_X_V (MAX_X_V / 2)
 #define CATCH_MAX_Y_V (MAX_Y_V / 2)
@@ -50,15 +46,15 @@ float catchmargin;    // 8.8
 float dribbler_speed;
 
 /**
- * \brief Starts a movement of this type.
+ * Starts a movement of this type.
  *
  * This function runs each time the host computer requests to start a catch
  * movement.
  *
- * \param[in] primitive_params_t the catch parameters, which are only valid until this
+ * @param primitive_params_t the catch parameters, which are only valid until this
  * primitive ends. Three parameters are the catchmargin and velocity ratios as well as
  * dribbler set speed in rpm
- * \param[in] world The world to perform the primitive in
+ * @param world The world to perform the primitive in
  */
 static void catch_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
@@ -79,42 +75,27 @@ static void catch_start(const primitive_params_t* params, FirmwareWorld_t* world
     app_dribbler_setSpeed(dribbler, dribbler_speed);
 }
 
-/**
- * \brief Ends a movement of this type.
- *
- * This function runs when the host computer requests a new movement while a
- * catch movement is already in progress.
- * \param[in] world The world to perform the primitive in
- */
 static void catch_end(FirmwareWorld_t* world) {}
 
-/**
- * \brief Ticks a movement of this type.
- *
- * This function runs at the system tick rate while this primitive is active.
- *
- * @param[out] log the log record to fill with information about the tick, or
- * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
- */
-static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
+static void catch_tick(FirmwareWorld_t* world)
 {
-    // Grab Camera Data
-    dr_data_t current_states;
-    dr_get(&current_states);
-
-    dr_ball_data_t current_ball_states;
-    dr_get_ball(&current_ball_states);
-
+    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    const FirmwareBall_t* ball   = app_firmware_world_getBall(world);
 
     // Initializing:
     // robot's x,y and angular velocity
     // robot's x, y coorrdinates and its angle from major axis (Angle between the robot
     // and the ball) ball's x, y velocity ball's x, y coordinates
-    float vel[3]     = {current_states.vx, current_states.vy, current_states.avel};
-    float pos[3]     = {current_states.x, current_states.y, current_states.angle};
-    float ballvel[2] = {current_ball_states.vx, current_ball_states.vy};
-    float ballpos[2] = {current_ball_states.x, current_ball_states.y};
+    const float vel[3]     = {app_firmware_robot_getVelocityX(robot),
+                    app_firmware_robot_getVelocityY(robot),
+                    app_firmware_robot_getVelocityAngular(robot)};
+    const float pos[3]     = {app_firmware_robot_getPositionX(robot),
+                    app_firmware_robot_getPositionY(robot),
+                    app_firmware_robot_getOrientation(robot)};
+    const float ballvel[2] = {app_firmware_ball_getVelocityX(ball),
+                        app_firmware_ball_getVelocityY(ball)};
+    const float ballpos[2] = {app_firmware_ball_getPositionX(ball),
+                        app_firmware_ball_getPositionY(ball)};
 
     float major_vec[2];  // x and y of major axis
     float minor_vec[2];  // x and y of minor axis
@@ -136,26 +117,26 @@ static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
         // relative angle difference between the ball and robot; how much angle is
         // difference from the field's y axis.
         float distance =
-            norm2(ballpos[0] - current_states.x, ballpos[1] - current_states.y) -
+            norm2(ballpos[0] - pos[0], ballpos[1] - pos[1]) -
             ROBOTRADIUS;
         float relativeangle = atan2f((pos[1] - ballpos[1]), (pos[0] - ballpos[0]));
 
         // major_vel shows how fast the robot is approaching to the ball
         // minor_vel is perpendicular to major axis
         major_vec[0] =
-            (ballpos[0] - current_states.x - ROBOTRADIUS * cos(relativeangle)) / distance;
+            (ballpos[0] - pos[0] - ROBOTRADIUS * cos(relativeangle)) / distance;
         major_vec[1] =
-            (ballpos[1] - current_states.y - ROBOTRADIUS * sin(relativeangle)) / distance;
+            (ballpos[1] - pos[1] - ROBOTRADIUS * sin(relativeangle)) / distance;
         minor_vec[0] = major_vec[0];
         minor_vec[1] = major_vec[1];
 
         rotate(minor_vec, M_PI / 2);
         major_angle = atan2f(major_vec[1], major_vec[0]);
 
-        relative_destination[0] = ballpos[0] - current_states.x;
-        relative_destination[1] = ballpos[1] - current_states.y;
+        relative_destination[0] = ballpos[0] - pos[0];
+        relative_destination[1] = ballpos[1] - pos[1];
         relative_destination[2] = min_angle_delta(
-            current_states.angle, major_angle);  // This need to be modified later
+            pos[2], major_angle);  // This need to be modified later
 
         // implement PID controller in future
 
@@ -185,7 +166,6 @@ static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
                                 max_minor_v);  // 1.5, 1.5
         PlanBBTrajectory(&minor_profile);
         minor_accel      = BBComputeAvgAccel(&minor_profile, TIME_HORIZON);
-        float time_minor = GetBBTime(&minor_profile);
 
         // timetarget is used for the robot's rotation. It is alwways bigger than 0.1m/s
         timeTarget = (time_major > TIME_HORIZON) ? time_major : TIME_HORIZON;
@@ -225,8 +205,9 @@ static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
         timeTarget = (time_minor > TIME_HORIZON) ? time_minor : TIME_HORIZON;
 
         // now calculate where we would want to end up intercepting the ball
-        float ball_pos_proj[2] = {ballpos[0] + ballvel[0] * timeTarget,
-                                  ballpos[1] + ballvel[1] * timeTarget};
+        // TODO: should we be using this?
+        //float ball_pos_proj[2] = {ballpos[0] + ballvel[0] * timeTarget,
+        //                          ballpos[1] + ballvel[1] * timeTarget};
 
         // get our major axis distance from where the ball would be by the time we get to
         // the velocity line
@@ -249,7 +230,6 @@ static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
                                 major_vel_intercept, CATCH_MAX_X_V, CATCH_MAX_X_A);
         PlanBBTrajectory(&major_profile);
         major_accel      = BBComputeAvgAccel(&major_profile, TIME_HORIZON);
-        float time_major = GetBBTime(&major_profile);
 
         major_angle      = atan2f(major_vec[1], major_vec[0]);
         float angle_disp = min_angle_delta(pos[2], major_angle + M_PI);
@@ -258,9 +238,9 @@ static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
     }
 
     // get robot local coordinates
-    float local_x_norm_vec[2] = {cosf(current_states.angle), sinf(current_states.angle)};
-    float local_y_norm_vec[2] = {cosf(current_states.angle + M_PI / 2),
-                                 sinf(current_states.angle + M_PI / 2)};
+    float local_x_norm_vec[2] = {cosf(pos[2]), sinf(pos[2])};
+    float local_y_norm_vec[2] = {cosf(pos[2] + M_PI / 2),
+                                 sinf(pos[2] + M_PI / 2)};
 
     // rotate acceleration onto robot local coordinates
     accel[0] = minor_accel *
@@ -273,10 +253,8 @@ static void catch_tick(log_record_t* log, FirmwareWorld_t* world)
                 (local_y_norm_vec[0] * major_vec[0] + local_y_norm_vec[1] * major_vec[1]);
 
     // Apply acceleration to robot
-    accel[3] = 0;
     limit(&accel[2], MAX_T_A);
 
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 

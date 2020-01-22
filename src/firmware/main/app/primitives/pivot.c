@@ -1,10 +1,9 @@
 #include "pivot.h"
 
-#include "app/control.h"
-#include "control/bangbang.h"
-#include "io/dr.h"
-#include "io/leds.h"
-#include "physics/physics.h"
+#include "firmware/main/app/control/bangbang.h"
+#include "firmware/main/app/control/control.h"
+#include "firmware/main/shared/physics.h"
+#include "firmware/main/shared/util.h"
 
 #define TIME_HORIZON 0.05f  // s
 #define FALSE 0
@@ -19,12 +18,9 @@
 
 static float radius, speed, angle, center[2], final_dest[2];
 static int dir = 1;
-/**
- * \brief Initializes the pivot primitive.
- *
- * This function runs once at system startup.
- */
+
 static void pivot_init(void) {}
+
 /**
  * \brief Does bangbang stuff and returns the acceleration value
  */
@@ -35,6 +31,7 @@ float compute_acceleration(BBProfile *profile, float disp, float curvel, float f
     PlanBBTrajectory(profile);
     return BBComputeAvgAccel(profile, TIME_HORIZON);
 }
+
 /**
  * \brief Computes the magnitude of a vector
  */
@@ -42,18 +39,7 @@ float compute_magnitude(float a[2])
 {
     return sqrtf(a[0] * a[0] + a[1] * a[1]);
 }
-/**
- * \brief Starts a movement of this type.
- *
- * This function runs each time the host computer requests to start a pivot
- * movement.
- * This function needs to run every time the center of the pivot moves as
- * optimal direction and final position needs to be recalculated
- *
- * \param[in] params the movement parameters, which are only valid until this
- * function returns and must be copied into this module if needed
- * \param[in] world The world to perform the primitive in
- */
+
 static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
     center[0] = params->params[0] / 1000.0;
@@ -70,11 +56,10 @@ static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world
 
     radius = 0.15;  // ball radius + robot radius + buffer
 
-    dr_data_t current_bot_state;
-    dr_get(&current_bot_state);
+    const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
-    float rel_dest[2] = {center[0] - current_bot_state.x,
-                         center[1] - current_bot_state.y};
+    float rel_dest[2] = {center[0] - app_firmware_robot_getPositionX(robot),
+                         center[1] - app_firmware_robot_getPositionY(robot)};
     float cur_radius  = compute_magnitude(rel_dest);
 
     rel_dest[0] /= cur_radius;
@@ -85,8 +70,8 @@ static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world
 
     // find the general direction to travel, project those onto the two possible
     // directions and see which one is better
-    float general_dir[2]      = {final_dest[0] - current_bot_state.x,
-                            final_dest[1] - current_bot_state.y};
+    float general_dir[2]      = {final_dest[0] - app_firmware_robot_getPositionX(robot),
+                            final_dest[1] - app_firmware_robot_getPositionY(robot)};
     float tangential_dir_1[2] = {rel_dest[1] / cur_radius, -rel_dest[0] / cur_radius};
     float tangential_dir_2[2] = {-rel_dest[1] / cur_radius, rel_dest[0] / cur_radius};
     float dir1                = dot_product(general_dir, tangential_dir_1, 2);
@@ -96,35 +81,20 @@ static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world
 }
 
 
-/**
- * \brief Ends a movement of this type.
- *
- * This function runs when the host computer requests a new movement while a
- * pivot movement is already in progress.
- * \param[in] world The world to perform the primitive in
- */
 static void pivot_end(FirmwareWorld_t *world) {}
 
-/**
- * \brief Ticks a movement of this type.
- *
- * This function runs at the system tick rate while this primitive is active.
- *
- * \param[out] log the log record to fill with information about the tick, or
- * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
- */
-static void pivot_tick(log_record_t *log, FirmwareWorld_t *world)
+static void pivot_tick(FirmwareWorld_t *world)
 {
-    dr_data_t current_bot_state;
-    dr_get(&current_bot_state);
+    const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
     float rel_dest[3], tangential_dir[2], radial_dir[2];
-    float vel[3] = {current_bot_state.vx, current_bot_state.vy, current_bot_state.avel};
+    const float vel[3]     = {app_firmware_robot_getVelocityX(robot),
+                              app_firmware_robot_getVelocityY(robot),
+                              app_firmware_robot_getVelocityAngular(robot)};
 
     // calculate the relative displacement and the current radius
-    rel_dest[0]      = center[0] - current_bot_state.x;
-    rel_dest[1]      = center[1] - current_bot_state.y;
+    rel_dest[0]      = center[0] - app_firmware_robot_getPositionX(robot);
+    rel_dest[1]      = center[1] - app_firmware_robot_getPositionY(robot);
     float cur_radius = compute_magnitude(rel_dest);
 
     // direction to travel to move into the bot
@@ -136,14 +106,9 @@ static void pivot_tick(log_record_t *log, FirmwareWorld_t *world)
     tangential_dir[1] = dir * rel_dest[0] / cur_radius;
 
     BBProfile rotation_profile;
-    BBProfile correction_profile;
 
-    // if correction is negative, bot is closer to ball so it needs to move away, so
-    // negative
-    float correction = cur_radius - radius;
-
-    float end_goal_vect[2]   = {final_dest[0] - current_bot_state.x,
-                              final_dest[1] - current_bot_state.y};
+    float end_goal_vect[2]   = {final_dest[0] - app_firmware_robot_getPositionX(robot),
+                              final_dest[1] - app_firmware_robot_getPositionY(robot)};
     float disp_to_final_dest = compute_magnitude(end_goal_vect);
 
     if (WITHIN_THRESH(disp_to_final_dest))
@@ -153,40 +118,32 @@ static void pivot_tick(log_record_t *log, FirmwareWorld_t *world)
 
     // figure out all velocities in prioritized directions
     float current_rot_vel = dot_product(tangential_dir, vel, 2);
-    float current_cor_vel = dot_product(radial_dir, vel, 2);
 
     float mag_accel_orbital =
         speed * compute_acceleration(&rotation_profile, disp_to_final_dest,
                                      current_rot_vel, STOPPED, MAX_A, MAX_V);
-    float mag_accel_correction = compute_acceleration(
-        &correction_profile, correction, current_cor_vel, STOPPED, MAX_A, MAX_V);
 
     // create the local vectors to the bot
-    float local_x_norm_vec[2] = {cosf(current_bot_state.angle),
-                                 sinf(current_bot_state.angle)};
-    float local_y_norm_vec[2] = {cosf(current_bot_state.angle + (float)M_PI / 2),
-                                 sinf(current_bot_state.angle + (float)M_PI / 2)};
+    float curr_orientation = app_firmware_robot_getOrientation(robot);
+    float local_x_norm_vec[2] = {cosf(curr_orientation),
+                                 sinf(curr_orientation)};
+    float local_y_norm_vec[2] = {cosf(curr_orientation + P_PI / 2),
+                                 sinf(curr_orientation + P_PI / 2)};
 
     // add the 3 directions together
     float accel[3] = {0};
 
-    // accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
-    // accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
-
-    //    if(WITHIN_THRESH(correction)){
     accel[0] = mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
     accel[1] = mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
-    //  }
 
     // find the angle between what the bot currently is at, and the angle to face the
     // destination
     float angle =
-        min_angle_delta(current_bot_state.angle, atan2f(rel_dest[1], rel_dest[0]));
+        min_angle_delta(curr_orientation, atan2f(rel_dest[1], rel_dest[0]));
     float target_avel = 1.6f * angle / TIME_HORIZON;
     accel[2]          = (target_avel - vel[2]) / TIME_HORIZON;
     limit(&accel[2], MAX_T_A);
 
-    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 

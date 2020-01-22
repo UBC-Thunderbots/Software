@@ -1,7 +1,7 @@
-#include "firmware/main/app/control.h"
+#include "firmware/main/app/control/control.h"
 
-#include "physics/physics.h"
-#include "shared/util.h"
+#include "firmware/main/shared/physics.h"
+#include "firmware/main/shared/util.h"
 
 /**
  * Computes a scaling constant that can be used to maximize wheel force while obeying
@@ -98,7 +98,7 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
     return app_control_getMaximalTorqueScaling(wheels, wheel_forces, battery_voltage);
 }
 
-void app_control_applyAccel(FirmwareRobot_t* robot, float linear_accel_x,
+void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
                             float linear_accel_y, float angular_accel)
 {
     const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);

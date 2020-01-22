@@ -6,6 +6,10 @@ cc_library(
     hdrs = ["accurate_shoot.h"],
     deps = [
         ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/shared:physics",
+        "//firmware/main/shared:util",
     ],
 )
 
@@ -15,6 +19,10 @@ cc_library(
     hdrs = ["catch.h"],
     deps = [
         ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/shared:physics",
+        "//firmware/main/shared:util",
     ],
 )
 
@@ -24,7 +32,7 @@ cc_library(
     hdrs = ["direct_velocity.h"],
     deps = [
         ":primitive",
-        "//firmware/main/app:control",
+        "//firmware/main/app/control",
     ],
 )
 
@@ -42,6 +50,10 @@ cc_library(
     srcs = ["dribble.c"],
     hdrs = ["dribble.h"],
     deps = [
+        ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/shared:physics",
     ],
 )
 
@@ -50,6 +62,10 @@ cc_library(
     srcs = ["imu_test.c"],
     hdrs = ["imu_test.h"],
     deps = [
+        ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/shared:physics",
     ],
 )
 
@@ -58,6 +74,14 @@ cc_library(
     srcs = ["move.c"],
     hdrs = ["move.h"],
     deps = [
+        ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/app/control:physbot",
+        "//firmware/main/shared:physics",
+        "//firmware/main/shared:util",
+        "//shared:constants",
+        "//shared:robot_constants",
     ],
 )
 
@@ -66,6 +90,10 @@ cc_library(
     srcs = ["pivot.c"],
     hdrs = ["pivot.h"],
     deps = [
+        ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/shared:util",
     ],
 )
 
@@ -103,6 +131,12 @@ cc_library(
     srcs = ["shoot.c"],
     hdrs = ["shoot.h"],
     deps = [
+        ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/app/control:physbot",
+        "//firmware/main/shared:physics",
+        "//firmware/main/shared:util",
     ],
 )
 
@@ -111,6 +145,7 @@ cc_library(
     srcs = ["stop.c"],
     hdrs = ["stop.h"],
     deps = [
+        ":primitive",
     ],
 )
 
@@ -118,5 +153,10 @@ cc_library(
     name = "spin",
     srcs = ["spin.c"],
     hdrs = ["spin.h"],
-    deps = [],
+    deps = [
+        ":primitive",
+        "//firmware/main/app/control",
+        "//firmware/main/app/control:bangbang",
+        "//firmware/main/shared:physics",
+    ],
 )

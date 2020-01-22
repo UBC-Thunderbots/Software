@@ -3,25 +3,19 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <util/physbot.h>
 
-#include "app/control.h"
-#include "control/bangbang.h"
-#include "io/dr.h"
-#include "io/leds.h"
-#include "physics/physics.h"
-#include "util/log.h"
-#include "util/physbot.h"
+#include "firmware/main/app/control/bangbang.h"
+#include "firmware/main/app/control/control.h"
+#include "firmware/main/app/control/physbot.h"
+#include "firmware/main/shared/physics.h"
+#include "firmware/main/shared/util.h"
 
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
 #define TIME_HORIZON 0.05f  // s
-#ifdef FWSIM
-#define NUM_SPLINE_POINTS 50
-#endif
 
-static float destination[3], major_vec[2], minor_vec[2], total_rot, shoot_power;
+static float destination[3], major_vec[2], minor_vec[2], total_rot;
 static bool chip;
 
 /**
@@ -72,20 +66,15 @@ void plan_shoot_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void to_log(log_record_t *log, float time_target, float accel[3])
-{
-    log_destination(log, destination);
-    log_accel(log, accel);
-    log_time_target(log, time_target);
-}
+// TODO: figure out logging
+// void to_log(log_record_t *log, float time_target, float accel[3])
+//{
+//    log_destination(log, destination);
+//    log_accel(log, accel);
+//    log_time_target(log, time_target);
+//}
 
-// Only need two data points to form major axis vector.
 
-/**
- * \brief Initializes the shoot primitive.
- *
- * This function runs once at system startup.
- */
 static void shoot_init(void) {}
 
 /**
@@ -121,12 +110,10 @@ static void shoot_init(void) {}
  */
 static void shoot_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
-    printf("Shoot start called.\n");
     // Convert into m/s and rad/s because physics is in m and s
     destination[0] = ((float)(params->params[0]) / 1000.0f);
     destination[1] = ((float)(params->params[1]) / 1000.0f);
     destination[2] = ((float)(params->params[2]) / 100.0f);
-
 
     // cosine and sine of orientation angle to global x axis
     major_vec[0] = cosf(destination[2]);
@@ -135,9 +122,9 @@ static void shoot_start(const primitive_params_t *params, FirmwareWorld_t *world
     minor_vec[1] = major_vec[1];
     rotate(minor_vec, P_PI / 2);
 
-    dr_data_t states;
-    dr_get(&states);
-    total_rot         = min_angle_delta(destination[2], states.angle);
+    const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+
+    total_rot = min_angle_delta(destination[2], app_firmware_robot_getOrientation(robot));
     float shoot_power = (float)params->params[3] / 1000.0f;
     chip              = params->extra & 1;
 
@@ -180,21 +167,11 @@ static void shoot_end(FirmwareWorld_t *world)
     app_chicker_disableAutochip(chicker);
 }
 
-/**
- * \brief Ticks a movement of this type.
- *
- * This function runs at the system tick rate while this primitive is active.
- *
- * \param[out] log the log record to fill with information about the tick, or
- * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
- */
-static void shoot_tick(log_record_t *log, FirmwareWorld_t *world)
+static void shoot_tick(FirmwareWorld_t *world)
 {
-    printf("Shoot tick called.\n");
-    dr_data_t states;
-    dr_get(&states);
-    PhysBot pb = setup_bot(states, destination, major_vec, minor_vec);
+    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+
+    PhysBot pb = create_physbot(robot, destination, major_vec, minor_vec);
     if (pb.maj.disp > 0)
     {
         // tuned constants from testing
@@ -204,18 +181,18 @@ static void shoot_tick(log_record_t *log, FirmwareWorld_t *world)
     // tuned constants from testing
     float minor_par[3] = {0, MAX_Y_A * 3, MAX_Y_V / 2};
     plan_move(&pb.min, minor_par);
-    plan_shoot_rotation(&pb, states.avel);
+    plan_shoot_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
     float accel[3] = {0, 0, pb.rot.accel};
     scale(&pb);
-    to_local_coords(accel, pb, states.angle, major_vec, minor_vec);
+    to_local_coords(accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
-    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 
-    if (log)
-    {
-        to_log(log, pb.rot.time, accel);
-    }
+    // TODO: figure out logging
+//    if (log)
+//    {
+//        to_log(log, pb.rot.time, accel);
+//    }
 }
 
 

@@ -1,8 +1,4 @@
-#ifndef PRIMITIVES_SPIN_H
-#define PRIMITIVES_SPIN_H
+#pragma once
+#include "firmware/main/app/primitives/primitive.h"
 
-#include "physics/physics.h"
-#include "primitive.h"
 extern const primitive_t SPIN_PRIMITIVE;
-
-#endif

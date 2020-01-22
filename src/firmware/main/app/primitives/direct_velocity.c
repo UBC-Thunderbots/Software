@@ -1,6 +1,6 @@
 #include "direct_velocity.h"
 
-#include "firmware/main/app/control.h"
+#include "firmware/main/app/control/control.h"
 
 static float direct_target_velocity_x;
 static float direct_target_velocity_y;

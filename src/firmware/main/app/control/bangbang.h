@@ -1,6 +1,4 @@
-#ifndef BANGBANG_H
-#define BANGBANG_H
-
+#pragma once
 /*
  * This file implements a bang bang trajectory planner with optional control methods on
  * top to use this library first prepare a trajectory via one of the Perpare functions.
@@ -29,6 +27,8 @@
  * every controller iteration. Again it is up to the user to decide what is the best
  * application.
  */
+
+// TODO: need to prefix everything with "_app"
 
 
 // a full trajector plan for a vehicle undergoing maximum acceleration control
@@ -97,5 +97,3 @@ float GetBBTime(BBProfile *b);
 
 // koko's magic function
 float BBKokoComputeAccel(const BBProfile *B, float Horizon);
-
-#endif

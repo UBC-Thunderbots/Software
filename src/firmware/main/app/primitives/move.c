@@ -3,16 +3,14 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "app/control.h"
-#include "control/bangbang.h"
-#include "io/dr.h"
-#include "io/leds.h"
-#include "physics/physics.h"
+#include "firmware/main/app/control/bangbang.h"
+#include "firmware/main/app/control/control.h"
+#include "firmware/main/app/control/physbot.h"
+#include "firmware/main/shared/physics.h"
+#include "firmware/main/shared/util.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
-#include "shared/util.h"
-#include "util/log.h"
-#include "util/physbot.h"
+
 
 
 // these are set to decouple the 3 axis from each other
@@ -31,6 +29,42 @@ static float wheel_axes[8];
 
 static bool slow;
 
+// The minimum distance away from our destination that we must be if we
+// are going to rotate the bot onto its wheel axis
+// 2 * P_PI * ROBOT_RADIUS = robot circumference, which is approximately
+// how far the bot would have to turn for one full rotation, so we
+// set it a litle larger than that.
+static const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
+
+#define VAL_EQUIVALENT_2_ZERO (5e-3f)
+#define CONTROL_TICK (1.0f / CONTROL_LOOP_HZ)
+#define LOOK_AHEAD_T 10
+
+/**
+ * call from move_start to choose which wheel axis we will be
+ * using for preliminary rotation. The idea is to pick the wheel
+ * axis that will result in the minimum remaining rotation onto
+ * the bot's final destination angle.
+ *
+ * @param dx the global x position of the bot
+ * @param dy the global y position of the bot
+ * @param current_angle the current angle of the bot
+ * @param final_angle the final destination angle
+ * @return the index of the wheel axis to use
+ */
+unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_angle);
+
+/**
+ * Calculates the rotation time, velocity, and acceleration to be stored
+ * in a PhysBot data container.
+ *
+ * @param pb The data container that has information about major axis time
+ * and will store the rotational information
+ * @param avel The current rotational velocity of the bot
+ * @return void
+ */
+void plan_move_rotation(PhysBot* pb, float avel);
+
 /**
  * builds an array that contains all of the axes perpendicular to
  * each of the wheels on the bot.
@@ -40,6 +74,8 @@ static bool slow;
  */
 static void build_wheel_axes(float angle)
 {
+    // TODO: we should be accessing the wheel angles from the FirmwareRobot,
+    //       NOT through constants like this
     wheel_axes[0] = angle + ANGLE_TO_FRONT_WHEELS - PI_2;
     wheel_axes[1] = angle + ANGLE_TO_FRONT_WHEELS + PI_2;
     wheel_axes[2] = angle - ANGLE_TO_FRONT_WHEELS - PI_2;
@@ -90,21 +126,21 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * @param angle The angle that the robot is currently facing
  * @return void
  */
-void choose_rotation_destination(PhysBot *pb, float angle)
+void choose_rotation_destination(PhysBot* pb, float angle)
 {
     // if we are close enough then we should just allow the bot to rotate
     // onto its destination angle, so skip this if block
     if ((float)fabs(pb->maj.disp) > APPROACH_LIMIT)
     {
         build_wheel_axes(angle);
-        float theta_norm = atan2f(pb->dr[1], pb->dr[0]);
+        float theta_norm = atan2f(pb->pos[1], pb->pos[0]);
         // use the pre-determined wheel axis
         pb->rot.disp = min_angle_delta(wheel_axes[wheel_index], theta_norm);
     }
 }
 
 
-void plan_move_rotation(PhysBot *pb, float avel)
+void plan_move_rotation(PhysBot* pb, float avel)
 {
     float time_target = (pb->maj.time > TIME_HORIZON) ? pb->maj.time : TIME_HORIZON;
     if (time_target > 0.5f)
@@ -117,44 +153,24 @@ void plan_move_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-/**
- * Pass information to be logged.
- *
- * @param log The log object.
- * @param time_target The time target to log
- * @param accel A 3 length array of {x, y, rotation} accelerations
- * @return void
- */
-void move_to_log(log_record_t *log, float time_target, float accel[3])
-{
-    log_destination(log, destination);
-    log_accel(log, accel);
-    log_time_target(log, time_target);
-}
+// TODO: figure out logging
+///**
+// * Pass information to be logged.
+// *
+// * @param log The log object.
+// * @param time_target The time target to log
+// * @param accel A 3 length array of {x, y, rotation} accelerations
+// * @return void
+// */
+// void move_to_log(log_record_t *log, float time_target, float accel[3])
+//{
+//    log_destination(log, destination);
+//    log_accel(log, accel);
+//    log_time_target(log, time_target);
+//}
 
-// need the ifndef here so that we can ignore this code when compiling
-// the firmware tests
-#ifndef FWTEST
-/**
- * Initializes the move primitive.
- *
- * This function runs once at system startup.
- */
-static void move_init(void)
-{
-    // Currently has nothing to do
-}
+static void move_init(void) {}
 
-/**
- * \brief Starts a movement of this type.
- *
- * This function runs each time the host computer requests to start a move
- * movement.
- *
- * \param[in] params the movement parameters, which are only valid until this
- * function returns and must be copied into this module if needed
- * \param[in] world The world to perform the primitive in
- */
 static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     // Parameters:     destination_x [mm]
@@ -170,12 +186,10 @@ static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
     end_speed      = (float)(params->params[3]) / 1000.0f;
     slow           = params->slow;
 
+    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    dr_data_t current_states;
-    dr_get(&current_states);
-
-    float dx         = destination[0] - current_states.x;
-    float dy         = destination[1] - current_states.y;
+    float dx         = destination[0] - app_firmware_robot_getPositionX(robot);
+    float dy         = destination[1] - app_firmware_robot_getPositionY(robot);
     float total_disp = sqrtf(dx * dx + dy * dy);
     major_vec[0]     = dx / total_disp;
     major_vec[1]     = dy / total_disp;
@@ -184,11 +198,11 @@ static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
     rotate(minor_vec, P_PI / 2);
 
     // pick the wheel axis that will be used for faster movement
-    wheel_index = choose_wheel_axis(dx, dy, current_states.angle, destination[2]);
+    wheel_index = choose_wheel_axis(dx, dy, app_firmware_robot_getOrientation(robot),
+                                    destination[2]);
 
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-    Chicker_t* chicker     = app_firmware_robot_getChicker(robot);
-    Dribbler_t* dribbler   = app_firmware_robot_getDribbler(robot);
+    Chicker_t* chicker   = app_firmware_robot_getChicker(robot);
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
 
     if (params->extra & 0x01)
         app_chicker_enableAutokick(chicker, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
@@ -198,15 +212,6 @@ static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
         app_chicker_enableAutochip(chicker, 2);
 }
 
-/**
- * Ends a movement of this type.
- *
- * This function runs when the host computer requests a new movement while a
- * move movement is already in progress.
- * \param[in] world The world to perform the primitive in
- *
- * @return void
- */
 static void move_end(FirmwareWorld_t* world)
 {
     FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
@@ -220,51 +225,44 @@ static void move_end(FirmwareWorld_t* world)
 }
 
 
-/**
- * Ticks a movement of this type.
- *
- * This function runs at the system tick rate while this primitive is active.
- *
- * @param log the log record to fill with information about the tick, or
- * NULL if no record is to be filled
- * @param[in] world an object representing the world
- * @return void
- */
-static void move_tick(log_record_t* log, FirmwareWorld_t* world)
+static void move_tick(FirmwareWorld_t* world)
 {
-    printf("Move tick called.\n");
-    // get the state of the bot
-    dr_data_t current_states;
-    dr_get(&current_states);
-    // setup the PhysBot data container
-    PhysBot pb = setup_bot(current_states, destination, major_vec, minor_vec);
+    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+
+    PhysBot pb = create_physbot(robot, destination, major_vec, minor_vec);
+
     // choose a wheel axis to rotate onto
     // TODO: try to make this less jittery
     //    choose_rotation_destination(&pb, current_states.angle);
+
     // plan major axis movement
     float max_major_a     = 3.5;
     float max_major_v     = slow ? 1.25 : 3.0;
     float major_params[3] = {end_speed, max_major_a, max_major_v};
     plan_move(&pb.maj, major_params);
+
     // plan minor axis movement
     float max_minor_a     = 1.5;
     float max_minor_v     = 1.5;
     float minor_params[3] = {0, max_minor_a, max_minor_v};
     plan_move(&pb.min, minor_params);
+
     // plan rotation movement
-    plan_move_rotation(&pb, current_states.avel);
+    plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
 
     float accel[3] = {0, 0, pb.rot.accel};
-    // rotate the accel and apply it
-    to_local_coords(accel, pb, current_states.angle, major_vec, minor_vec);
 
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    // rotate the accel and apply it
+    to_local_coords(accel, pb, app_firmware_robot_getOrientation(robot), major_vec,
+                    minor_vec);
+
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 
-    if (log)
-    {
-        move_to_log(log, pb.rot.time, accel);
-    }
+    // TODO: figure out logging
+    // if (log)
+    //{
+    //    move_to_log(log, pb.rot.time, accel);
+    //}
 }
 
 /**
@@ -277,5 +275,3 @@ const primitive_t MOVE_PRIMITIVE = {
     .end    = &move_end,
     .tick   = &move_tick,
 };
-
-#endif

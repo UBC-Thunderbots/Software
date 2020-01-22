@@ -1,4 +1,4 @@
-#include "physics/physics.h"
+#include "firmware/main/shared/physics.h"
 
 #include <math.h>
 #include <stdint.h>
@@ -534,7 +534,7 @@ void decompose_radial(const float speed, float* vf, const float* init_pos,
  * @param size the size of the vectors. They should be the same size
  * @return the dot product result of the vectors
  */
-float dot_product(float vec1[], float vec2[], int size)
+float dot_product(const float vec1[], const float vec2[], const int size)
 {
     float result = 0;
     for (int i = 0; i < size; i++)

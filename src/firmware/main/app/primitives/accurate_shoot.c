@@ -1,13 +1,13 @@
 #include "accurate_shoot.h"
 
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
-#include "app/control.h"
-#include "control/bangbang.h"
-#include "io/dr.h"
-#include "io/leds.h"
-#include "physics/physics.h"
+#include "firmware/main/app/control/bangbang.h"
+#include "firmware/main/app/control/control.h"
+#include "firmware/main/shared/physics.h"
+#include "firmware/main/shared/util.h"
 
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
@@ -23,13 +23,8 @@
 static float destination[3], major_vec[2], minor_vec[2];
 // Only need two data points to form major axis vector.
 
-primitive_params_t *global_params;
+const primitive_params_t* global_params;
 
-/**
- * \brief Initializes the accurate shoot primitive.
- *
- * This function runs once at system startup.
- */
 static void accurate_shoot_init(void) {}
 
 /**
@@ -81,14 +76,6 @@ static void accurate_shoot_start(const primitive_params_t* params, FirmwareWorld
     rotate(minor_vec, M_PI / 2);
 }
 
-/**
- * \brief Ends a movement of this type.
- *
- * This function runs when the host computer requests a new movement while an
- * accurate shoot movement is already in progress.
- *
- * \param[in] world The world to perform the primitive in
- */
 static void accurate_shoot_end(FirmwareWorld_t* world)
 {
     Chicker_t* chicker =
@@ -96,37 +83,27 @@ static void accurate_shoot_end(FirmwareWorld_t* world)
     app_chicker_disableAutokick(chicker);
 }
 
-/**
- * \brief Ticks a movement of this type.
- *
- * This function runs at the system tick rate while this primitive is active.
- *
- * \param[out] log the log record to fill with information about the tick, or
- * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
- */
-static void accurate_shoot_tick(log_record_t* log, FirmwareWorld_t* world)
+static void accurate_shoot_tick(FirmwareWorld_t* world)
 {
-    // TODO: what would you like to log?
+    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    // grabs vision data
-    dr_data_t current_states;
-    dr_get(&current_states);
-
-    float vel[3] = {current_states.vx, current_states.vy, current_states.avel};
+    float vel[3] = {app_firmware_robot_getVelocityX(robot),
+                    app_firmware_robot_getVelocityY(robot),
+                    app_firmware_robot_getVelocityAngular(robot)};
 
     float relative_destination[3];
 
     // useful state for vision data
-    relative_destination[0] = destination[0] - current_states.x;
-    relative_destination[1] = destination[1] - current_states.y;
+    relative_destination[0] = destination[0] - app_firmware_robot_getPositionX(robot);
+    relative_destination[1] = destination[1] - app_firmware_robot_getPositionY(robot);
 
     // get angle to face ball
     float angle_face_ball = atanf(relative_destination[1] / relative_destination[0]);
     angle_face_ball += relative_destination[0] < 0 ? M_PI : 0;
 
     // sets relative destination so that code later will cause bot to face ball
-    relative_destination[2] = min_angle_delta(current_states.angle, angle_face_ball);
+    relative_destination[2] =
+        min_angle_delta(app_firmware_robot_getOrientation(robot), angle_face_ball);
     // stop wobbling by setting threshold
     relative_destination[2] =
         (fabs(relative_destination[2]) > .1) ? relative_destination[2] : 0;
@@ -287,22 +264,25 @@ static void accurate_shoot_tick(log_record_t* log, FirmwareWorld_t* world)
     accel[0]        = accel[0] / len_accel;
     accel[1]        = accel[1] / len_accel;
 
-    // logs data
-    if (log)
-    {
-        log->tick.primitive_data[0] = destination[0];  // accel[0];
-        log->tick.primitive_data[1] = destination[1];  // accel[1];
-        log->tick.primitive_data[2] = destination[2];  // accel[2];
-        log->tick.primitive_data[3] = accel[0];        // timeX;
-        log->tick.primitive_data[4] = accel[1];        // timeY;
-        log->tick.primitive_data[5] = accel[2];
-        log->tick.primitive_data[6] = timeTarget;
-    }
+    // TODO: need to figure out logging
+    //    // logs data
+    //    if (log)
+    //    {
+    //        log->tick.primitive_data[0] = destination[0];  // accel[0];
+    //        log->tick.primitive_data[1] = destination[1];  // accel[1];
+    //        log->tick.primitive_data[2] = destination[2];  // accel[2];
+    //        log->tick.primitive_data[3] = accel[0];        // timeX;
+    //        log->tick.primitive_data[4] = accel[1];        // timeY;
+    //        log->tick.primitive_data[5] = accel[2];
+    //        log->tick.primitive_data[6] = timeTarget;
+    //    }
 
     // gets matrix for converting from maj/min axes to local bot coords
-    float local_x_norm_vec[2] = {cosf(current_states.angle), sinf(current_states.angle)};
-    float local_y_norm_vec[2] = {cosf(current_states.angle + M_PI / 2),
-                                 sinf(current_states.angle + M_PI / 2)};
+    const float current_orientation = app_firmware_robot_getOrientation(robot);
+    float local_x_norm_vec[2] = {cosf(current_orientation),
+                                 sinf(current_orientation)};
+    float local_y_norm_vec[2] = {cosf(current_orientation + M_PI / 2),
+                                 sinf(current_orientation + M_PI / 2)};
 
     // converts maj/min accel to local bot coordinates (matrix mult)
     accel[0] = minor_accel *
@@ -315,7 +295,6 @@ static void accurate_shoot_tick(log_record_t* log, FirmwareWorld_t* world)
                 (local_y_norm_vec[0] * major_vec[0] + local_y_norm_vec[1] * major_vec[1]);
 
     // GO! GO! GO!
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 

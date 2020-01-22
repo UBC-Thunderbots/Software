@@ -1,8 +1,5 @@
-#ifndef PRIMITIVES_CATCH_H
-#define PRIMITIVES_CATCH_H
-
-#include "primitive.h"
+#pragma once
+#include "firmware/main/app/primitives/primitive.h"
 
 extern const primitive_t CATCH_PRIMITIVE;
 
-#endif

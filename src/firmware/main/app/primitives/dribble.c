@@ -2,33 +2,18 @@
 
 #include <stdio.h>
 
-#include "app/control.h"
-#include "control/bangbang.h"
-#include "io/dr.h"
-#include "physics/physics.h"
+#include "firmware/main/app/control/control.h"
+#include "firmware/main/app/control/bangbang.h"
+#include "firmware/main/shared/physics.h"
+#include "firmware/main/shared/util.h"
 
 #define DRIBBLE_TIME_HORIZON 0.05f  // s
 
 static primitive_params_t dribble_param;
 static float destination[3];
 
-/**
- * \brief Initializes the dribble primitive.
- *
- * This function runs once at system startup.
- */
 static void dribble_init(void) {}
 
-/**
- * \brief Starts a movement of this type.
- *
- * This function runs each time the host computer requests to start a dribble
- * movement.
- *
- * \param[in] params the movement parameters, which are only valid until this
- * function returns and must be copied into this module if needed
- * \param[in] world The world to perform the primitive in
- */
 static void dribble_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     for (unsigned int i = 0; i < 4; i++)
@@ -47,35 +32,20 @@ static void dribble_start(const primitive_params_t* params, FirmwareWorld_t* wor
     app_dribbler_setSpeed(dribbler, (unsigned int)(params->params[3]));
 }
 
-/**
- * \brief Ends a movement of this type.
- * This function runs when the host computer requests a new movement while a dribble
- * movement is already in progress.
- * \param[in] world The world to perform the primitive in
- */
 static void dribble_end(FirmwareWorld_t* world) {}
 
-/**
- * \brief Ticks a movement of this type.
- *
- * This function runs at the system tick rate while this primitive is active.
- *
- * \param[out] log the log record to fill with information about the tick, or
- * \c NULL if no record is to be filled
- * \param[in] world an object representing the world
- */
-static void dribble_tick(log_record_t* logajectory, FirmwareWorld_t* world)
+static void dribble_tick(FirmwareWorld_t* world)
 {
-    // TODO: what would you like to log?
 
-    dr_data_t current_states;
-    dr_get(&current_states);
+    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    float vel[3]       = {current_states.vx, current_states.vy, current_states.avel};
-    float pos[3]       = {current_states.x, current_states.y, current_states.angle};
+    const float vel[3]     = {app_firmware_robot_getVelocityX(robot),
+                              app_firmware_robot_getVelocityY(robot),
+                              app_firmware_robot_getVelocityAngular(robot)};
+    const float pos[3]     = {app_firmware_robot_getPositionX(robot),
+                              app_firmware_robot_getPositionY(robot),
+                              app_firmware_robot_getOrientation(robot)};
     float max_accel[3] = {MAX_X_A, MAX_Y_A, MAX_T_A};
-    printf("x=%f\ty=%f\tt=%f\n", (double)current_states.vx, (double)current_states.vy,
-           (double)current_states.angle);
 
     float accel[3];
 
@@ -106,21 +76,20 @@ static void dribble_tick(log_record_t* logajectory, FirmwareWorld_t* world)
     accel[2]        = (targetVel - vel[2]) / DRIBBLE_TIME_HORIZON;
     limit(&accel[2], MAX_T_A);
 
-    if (logajectory)
-    {
-        logajectory->tick.primitive_data[0] = accel[0];
-        logajectory->tick.primitive_data[1] = accel[1];
-        logajectory->tick.primitive_data[2] = accel[2];
-        logajectory->tick.primitive_data[3] = timeX;
-        logajectory->tick.primitive_data[4] = timeY;
-        logajectory->tick.primitive_data[5] = timeTarget;
-        logajectory->tick.primitive_data[6] = deltaD;
-        logajectory->tick.primitive_data[7] = targetVel;
-    }
+    // TODO: figure out logging
+//    if (logajectory)
+//    {
+//        logajectory->tick.primitive_data[0] = accel[0];
+//        logajectory->tick.primitive_data[1] = accel[1];
+//        logajectory->tick.primitive_data[2] = accel[2];
+//        logajectory->tick.primitive_data[3] = timeX;
+//        logajectory->tick.primitive_data[4] = timeY;
+//        logajectory->tick.primitive_data[5] = timeTarget;
+//        logajectory->tick.primitive_data[6] = deltaD;
+//        logajectory->tick.primitive_data[7] = targetVel;
+//    }
 
-    rotate(accel, -current_states.angle);
-
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    rotate(accel, -pos[2]);
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
