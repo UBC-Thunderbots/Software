@@ -7,8 +7,8 @@ cc_library(
     #    visibility = ["//visibility:private"],
     deps = [
         "//software/proto:ssl_cc_proto",
-        "@g3log",
         "@boost//:asio",
+        "@g3log",
     ],
 )
 
@@ -19,8 +19,8 @@ cc_library(
     #    visibility = ["//visibility:private"],
     deps = [
         "//software/proto:ssl_cc_proto",
-        "@g3log",
         "@boost//:asio",
+        "@g3log",
     ],
 )
 
@@ -29,16 +29,16 @@ cc_library(
     srcs = ["network_filter.cpp"],
     hdrs = ["network_filter.h"],
     deps = [
-        "//software/world:ball",
-        "//software/world:ball_state",
-        "//software/world:field",
-        "//software/sensor_fusion:refbox_data",
-        "//software/world:team",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
+        "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/sensor_fusion:refbox_data",
+        "//software/world:ball",
+        "//software/world:ball_state",
+        "//software/world:field",
+        "//software/world:team",
     ],
 )
 
@@ -56,11 +56,11 @@ cc_library(
         ":network_filter",
         ":ssl_gamecontroller_client",
         ":ssl_vision_client",
-        "//software/world",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
         "//software/proto:ssl_cc_proto",
+        "//software/world",
         "@g3log",
     ],
 )

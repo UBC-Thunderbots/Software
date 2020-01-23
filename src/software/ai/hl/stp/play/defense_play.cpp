@@ -12,8 +12,8 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/geom/util.h"
-#include "software/util/logger/init.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/logger/init.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
 
 const std::string DefensePlay::name = "Defense Play";

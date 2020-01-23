@@ -132,7 +132,7 @@ TEST(DirectWheelsPrimTest,
     DirectWheelsPrimitive directwheels_primitive =
         DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
     DirectWheelsPrimitive directwheels_primitive_other =
-        DirectWheelsPrimitive(0, 0, 0, 0, -100.1, 0.0);
+        DirectWheelsPrimitive(0, 0, 0, 0, -100, 0.0);
 
     EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
 }

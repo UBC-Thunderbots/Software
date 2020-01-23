@@ -13,7 +13,7 @@ cc_library(
         "//software/ai/navigator/obstacle:obstacle_factory",
         "//software/ai/navigator/path_manager",
         "//software/ai/primitive:all_primitives",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
         "@g3log",
     ],

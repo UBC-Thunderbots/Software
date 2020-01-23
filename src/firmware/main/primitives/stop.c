@@ -10,9 +10,8 @@
 #include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/wheels.h"
-#ifndef FWSIM
 #include <unused.h>
-#endif  // FWSIM
+
 /**
  * \brief Initializes the stop primitive.
  *
@@ -31,8 +30,9 @@ static void stop_init(void)
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
+ * \param[in] world
  */
-static void stop_start(const primitive_params_t *params)
+static void stop_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
     for (unsigned int i = 0; i != 4; ++i)
     {
@@ -47,7 +47,9 @@ static void stop_start(const primitive_params_t *params)
     }
     if (!params->extra)
     {
-        dribbler_coast();
+        Dribbler_t *dribbler =
+            app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+        app_dribbler_coast(dribbler);
     }
 }
 
@@ -56,8 +58,10 @@ static void stop_start(const primitive_params_t *params)
  *
  * This function runs when the host computer requests a new movement while a
  * stop movement is already in progress.
+ *
+ * \param[in] world The world to perform the primitive in
  */
-static void stop_end(void)
+static void stop_end(FirmwareWorld_t *world)
 {
     // Nothing to do here.
 }
@@ -69,8 +73,9 @@ static void stop_end(void)
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world an object representing the world
  */
-static void stop_tick(log_record_t *log) {}
+static void stop_tick(log_record_t *log, FirmwareWorld_t *world) {}
 
 /**
  * \brief The stop movement primitive.

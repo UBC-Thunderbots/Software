@@ -1,3 +1,4 @@
+
 # We rely on all symbols being included when linking for our implementation of
 # the "factory" design pattern.
 build --incompatible_remove_legacy_whole_archive=False

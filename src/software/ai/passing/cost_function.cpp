@@ -12,7 +12,7 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/util.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 using namespace Passing;
 using namespace AI::Evaluation;
@@ -214,7 +214,7 @@ double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pas
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration time_until_pass     = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+    Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
     Duration enemy_reaction_time =
         Duration::fromSeconds(Util::DynamicParameters->getAIConfig()
                                   ->getPassingConfig()

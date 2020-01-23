@@ -112,7 +112,8 @@ void dr_tick(log_record_t *log)
 }
 
 /**
- * \brief provides current state information to caller
+ * \brief provides current state information about the robot to caller
+ * \param ret The struct to populate with the robot data
  */
 void dr_get(dr_data_t *ret)
 {
@@ -120,11 +121,102 @@ void dr_get(dr_data_t *ret)
 }
 
 /**
- * \brief provides current state information to caller
+ * \brief provides current state information about the ball to caller
+ * \param ret The struct to populate with the ball data
  */
 void dr_get_ball(dr_ball_data_t *ret)
 {
     *ret = current_ball_state;
+}
+
+/**
+ * \brief Get the x-component of the robot's position
+ * \return The x-component of the robot's position
+ */
+float dr_get_robot_position_x()
+{
+    return current_state.x;
+}
+
+/**
+ * \brief Get the y-component of the robot's position
+ * \return The y-component of the robot's position
+ */
+float dr_get_robot_position_y()
+{
+    return current_state.y;
+}
+
+/**
+ * \brief Get the robot's orientation
+ * \return The orientation of the robot
+ */
+float dr_get_robot_orientation()
+{
+    return current_state.angle;
+}
+
+/**
+ * \brief Get the x-component of the robot's velocity
+ * \return The x-component of the robot's velocity
+ */
+float dr_get_robot_velocity_x()
+{
+    return current_state.vx;
+}
+
+/**
+ * \brief Get the y-component of the robot's velocity
+ * \return The y-component of the robot's velocity
+ */
+float dr_get_robot_velocity_y()
+{
+    return current_state.vy;
+}
+
+/**
+ * \brief Get the robot's angular velocity
+ * \return The robot's angular velocity
+ */
+float dr_get_robot_angular_velocity()
+{
+    return current_state.avel;
+}
+
+/**
+ * \brief Get the x-component of the ball's position
+ * \return The x-component of the ball's position
+ */
+float dr_get_ball_position_x()
+{
+    return current_ball_state.x;
+}
+
+/**
+ * \brief Get the y-component of the ball's position
+ * \return The y-component of the ball's position
+ */
+float dr_get_ball_position_y()
+{
+    return current_ball_state.y;
+}
+
+/**
+ * \brief Get the x-component of the ball's velocity
+ * \return The x-component of the ball's velocity
+ */
+float dr_get_ball_velocity_x()
+{
+    return current_ball_state.vx;
+}
+
+/**
+ * \brief Get the y-component of the ball's velocity
+ * \return The y-component of the ball's velocity
+ */
+float dr_get_ball_velocity_y()
+{
+    return current_ball_state.vy;
 }
 
 /**
@@ -246,46 +338,6 @@ void dr_set_ball_timestamp(uint64_t timestamp)
     ball_camera_data.timestamp = timestamp;
 }
 
-
-void dr_do_maneuver()
-{
-    int16_t dests[3][3] = {{700, -700, (int16_t)(P_PI * 100)},
-                           {2000, 1000, 30},
-                           {0, 0, (int16_t)(P_PI / 2.0)}};
-
-
-
-    if (tick_count > 800 || (get_primitive_index() != 1))
-    {
-        tick_count = 0;
-        maneuver_stage++;
-        if (maneuver_stage >= 3)
-        {
-            maneuver_stage = 0;
-        }
-
-        primitive_params_t move_params;
-        move_params.params[0] = dests[maneuver_stage][0];
-        move_params.params[1] = dests[maneuver_stage][1];
-        move_params.params[2] = dests[maneuver_stage][2];
-        move_params.params[3] = 0.0;
-        primitive_start(1, &move_params);
-    }
-}
-
-void dr_follow_ball()
-{
-    if (tick_count > 10 || (get_primitive_index() != 1))
-    {
-        tick_count = 0;
-
-        primitive_params_t move_params;
-        move_params.params[0] = ball_camera_data.x;
-        move_params.params[1] = ball_camera_data.y;
-        move_params.params[2] = 0;
-        primitive_start(1, &move_params);
-    }
-}
 
 void dr_log(log_record_t *log)
 {

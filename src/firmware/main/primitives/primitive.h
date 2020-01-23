@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include "app/world/firmware_world.h"
 #include "util/log.h"
 
 /**
@@ -58,8 +59,9 @@ typedef struct
      * \param[in] params the parameters to the primitive, which are only valid
      * until this function returns and must be copied into primitive-local
      * storage if needed subsequently
+     * \param[in] world The world to perform the primitive in
      */
-    void (*start)(const primitive_params_t *params);
+    void (*start)(const primitive_params_t *params, FirmwareWorld_t *world);
 
     /**
      * \brief Ends a movement using the primitive.
@@ -67,8 +69,9 @@ typedef struct
      * This is invoked every time a new movement begins after a primitive has
      * been in use, regardless of whether the new movement is of the same or a
      * different type.
+     * \param[in] world The world to perform the primitive in
      */
-    void (*end)(void);
+    void (*end)(FirmwareWorld_t *world);
 
     /**
      * \brief Advances time in the primitive.
@@ -78,13 +81,15 @@ typedef struct
      *
      * \param[out] log the log record to fill with information about the tick,
      * or \c NULL if no record is to be filled
+     * \param[in] world The world to perform the primitive in
      */
-    void (*tick)(log_record_t *log);
+    void (*tick)(log_record_t *log, FirmwareWorld_t *world);
 } primitive_t;
 
 void primitive_init(void);
-void primitive_start(unsigned int primitive, const primitive_params_t *params);
-void primitive_tick(log_record_t *log);
+void primitive_start(unsigned int primitive, const primitive_params_t *params,
+                     FirmwareWorld_t *world);
+void primitive_tick(log_record_t *log, FirmwareWorld_t *world);
 bool primitive_is_direct(unsigned int primitive);
 unsigned int get_primitive_index();
 bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params);

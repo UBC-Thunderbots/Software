@@ -8,9 +8,9 @@
 #include "software/ai/primitive/primitive.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
-#include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/team.h"
 
 
@@ -32,7 +32,8 @@ GrSimOutput::GrSimOutput(std::string network_address, unsigned short port)
     : network_address(network_address), port(port), socket(io_service)
 {
     socket.open(ip::udp::v4());
-    remote_endpoint = ip::udp::endpoint(ip::address::from_string(network_address), port);
+    remote_endpoint =
+        ip::udp::endpoint(ip::address::from_string(network_address), this->port);
 }
 
 GrSimOutput::~GrSimOutput()

@@ -104,7 +104,7 @@ cc_test(
         ":detect_threat",
         "//software/geom",
         "//software/test_util",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "//software/world:ball",
         "@gtest//:gtest_main",
     ],
@@ -144,7 +144,7 @@ cc_library(
     deps = [
         ":indirect_chip",
         "//software/geom",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )
@@ -156,7 +156,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )
@@ -181,7 +181,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:pass",
         "//software/geom",
-        "//software/util/optimization:gradient_descent",
+        "//software/optimization:gradient_descent",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",
@@ -207,7 +207,7 @@ cc_library(
         ":robot",
         ":team",
         "//software/geom",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",
@@ -232,7 +232,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )
