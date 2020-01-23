@@ -30,7 +30,7 @@ function run_clang_format () {
     # clang-format as arguments
     # We remove the last -o flag from the extension string
     find $CURR_DIR/../src/ ${EXTENSION_STRING::-2}  \
-        | xargs -I{} -n1000 bazel run \
+        | xargs -I{} -n1000 bazel run --experimental_ui_limit_console_output=1 \
           @llvm_clang//:clang-format -- -i -style=file
             
     if [[ "$?" != 0 ]]; then
