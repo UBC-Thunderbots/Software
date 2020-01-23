@@ -18,10 +18,7 @@ using namespace Passing;
 
 const std::string FreeKickPlay::name = "Direct Free Kick Play";
 
-FreeKickPlay::FreeKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
-{
-}
+FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
 
 std::string FreeKickPlay::getName() const
 {
@@ -210,8 +207,7 @@ void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
     pass_generator.setPasserPoint(world.ball().position());
 }
 
-void FreeKickPlay::updateShootGoalTactic(
-    std::shared_ptr<ShootGoalTactic> shoot_tactic)
+void FreeKickPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
 {
     shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
                                     world.enemyTeam(), world.ball());
