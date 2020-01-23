@@ -1,4 +1,4 @@
-sudo: true
+os: linux
 dist: bionic
 language: generic
 
