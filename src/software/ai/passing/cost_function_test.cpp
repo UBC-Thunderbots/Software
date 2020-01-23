@@ -19,9 +19,9 @@
 #include <random>
 
 #include "shared/constants.h"
+#include "software/math/math_functions.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
-#include "software/util/math/math_functions.h"
-#include "software/util/parameter/dynamic_parameters.h"
 
 using namespace Passing;
 
@@ -38,20 +38,24 @@ class PassingEvaluationTest : public testing::Test
     }
 
     // We get these values here so we can make these tests robust to change
-    double min_pass_speed_param =
-        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value();
-    double max_pass_speed_param =
-        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value();
+    double min_pass_speed_param = Util::DynamicParameters->getAIConfig()
+                                      ->getPassingConfig()
+                                      ->MinPassSpeedMPerS()
+                                      ->value();
+    double max_pass_speed_param = Util::DynamicParameters->getAIConfig()
+                                      ->getPassingConfig()
+                                      ->MaxPassSpeedMPerS()
+                                      ->value();
     double avg_desired_pass_speed;
 
-    double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters->getPassingConfig()
-            ->MinTimeOffsetForPassSeconds()
-            ->value();
-    double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters->getPassingConfig()
-            ->MaxTimeOffsetForPassSeconds()
-            ->value();
+    double min_time_offset_for_pass_seconds_param = Util::DynamicParameters->getAIConfig()
+                                                        ->getPassingConfig()
+                                                        ->MinTimeOffsetForPassSeconds()
+                                                        ->value();
+    double max_time_offset_for_pass_seconds_param = Util::DynamicParameters->getAIConfig()
+                                                        ->getPassingConfig()
+                                                        ->MaxTimeOffsetForPassSeconds()
+                                                        ->value();
     double avg_time_offset_for_pass_seconds;
 };
 
@@ -108,17 +112,25 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
                                                   world.field().yLength() / 2);
 
     double curr_time             = world.getMostRecentTimestamp().getSeconds();
-    double min_start_time_offset = Util::DynamicParameters->getPassingConfig()
+    double min_start_time_offset = Util::DynamicParameters->getAIConfig()
+                                       ->getPassingConfig()
                                        ->MinTimeOffsetForPassSeconds()
                                        ->value();
-    double max_start_time_offset = Util::DynamicParameters->getPassingConfig()
+    double max_start_time_offset = Util::DynamicParameters->getAIConfig()
+                                       ->getPassingConfig()
                                        ->MaxTimeOffsetForPassSeconds()
                                        ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters->getPassingConfig()->MinPassSpeedMPerS()->value(),
-        Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
+        Util::DynamicParameters->getAIConfig()
+            ->getPassingConfig()
+            ->MinPassSpeedMPerS()
+            ->value(),
+        Util::DynamicParameters->getAIConfig()
+            ->getPassingConfig()
+            ->MaxPassSpeedMPerS()
+            ->value());
 
     std::vector<Pass> passes;
 
@@ -147,7 +159,8 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
 
     std::chrono::duration<double> duration = end_time - start_time;
 
-    std::chrono::duration<double> avg = duration / (double)num_passes_to_gen;
+    std::chrono::duration<double> avg;
+    avg = duration / static_cast<double>(num_passes_to_gen);
 
     // At the time of this tests creation, ratePass ran at an average 0.105ms
     // in debug on an i7

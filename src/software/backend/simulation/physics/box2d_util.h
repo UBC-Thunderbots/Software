@@ -41,3 +41,12 @@ b2Vec2 createVec2(const Point& point);
  * @return A b2Vec2 equivalent to the given Vector
  */
 b2Vec2 createVec2(const Vector& vector);
+
+/**
+ * Calculates and returns the area of the given polygon. The polygon must be convex.
+ *
+ * @param polygon The polygon to calculate the area of
+ *
+ * @return the area of the polygon, in m^2
+ */
+float polygonArea(const b2PolygonShape& polygon);

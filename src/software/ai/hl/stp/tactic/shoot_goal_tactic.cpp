@@ -3,9 +3,9 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/rectangle.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
@@ -79,10 +79,12 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = Util::DynamicParameters->getShootGoalTacticConfig()
+    auto steal_ball_rect_width = Util::DynamicParameters->getAIConfig()
+                                     ->getShootGoalTacticConfig()
                                      ->EnemyAboutToStealBallRectangleWidth()
                                      ->value();
-    auto steal_ball_rect_length = Util::DynamicParameters->getShootGoalTacticConfig()
+    auto steal_ball_rect_length = Util::DynamicParameters->getAIConfig()
+                                      ->getShootGoalTacticConfig()
                                       ->EnemyAboutToStealBallRectangleExtensionLength()
                                       ->value();
     Rectangle baller_frontal_area = Rectangle(
@@ -106,9 +108,11 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                             std::shared_ptr<ChipAction> chip_action,
                                             ActionCoroutine::push_type &yield) const
 {
-    auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                           enemy_team, ball.position());
-    while (shot_target)
+    std::optional<Shot> shot_target = Evaluation::calcBestShotOnEnemyGoal(
+        field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+        {*this->getAssignedRobot()});
+
+    while (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
     {
         if (!isEnemyAboutToStealBall())
         {
@@ -130,8 +134,9 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             yield(chip_action);
         }
 
-        shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                          enemy_team, ball.position());
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+            {*this->getAssignedRobot()});
     }
 }
 
@@ -141,11 +146,13 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     auto move_action = std::make_shared<MoveAction>(
         MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
-
+    std::optional<Shot> shot_target;
     do
     {
-        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(
-            field, friendly_team, enemy_team, ball.position());
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+            {*this->getAssignedRobot()});
+
         if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the
@@ -185,7 +192,27 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!(kick_action->done() || chip_action->done()));
 }
 
-void ShootGoalTactic::accept(TacticVisitor &visitor) const
+void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
+}
+
+Ball ShootGoalTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field ShootGoalTactic::getField() const
+{
+    return this->field;
+}
+
+Team ShootGoalTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team ShootGoalTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }

@@ -23,7 +23,7 @@ void GoalieTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     // Yield nothing
 }
 
-void GoalieTestTactic::accept(TacticVisitor &visitor) const
+void GoalieTestTactic::accept(MutableTacticVisitor &visitor)
 {
     // GoalieTestTactic is meant to be a simple test tactic and so
     // we invoke YAGNI to not implement the visitor for this tactic

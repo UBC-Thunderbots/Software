@@ -4,9 +4,9 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/util/logger/init.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/logger/init.h"
+#include "software/parameter/dynamic_parameters.h"
 
 DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(
     const Field &field, const Team &friendly_team, const Team &enemy_team,
@@ -97,10 +97,10 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
         if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-            ball.velocity().length() <
-                Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-                    ->BallStealSpeed()
-                    ->value())
+            ball.velocity().length() < Util::DynamicParameters->getAIConfig()
+                                           ->getDefenseShadowEnemyTacticConfig()
+                                           ->BallStealSpeed()
+                                           ->value())
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
@@ -122,7 +122,27 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
     } while (!move_action->done());
 }
 
-void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor) const
+void DefenseShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
 {
     visitor.visit(*this);
+}
+
+Ball DefenseShadowEnemyTactic::getBall() const
+{
+    return this->ball;
+}
+
+Field DefenseShadowEnemyTactic::getField() const
+{
+    return this->field;
+}
+
+Team DefenseShadowEnemyTactic::getFriendlyTeam() const
+{
+    return this->friendly_team;
+}
+
+Team DefenseShadowEnemyTactic::getEnemyTeam() const
+{
+    return this->enemy_team;
 }

@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "software/new_geom/point.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/ball_state.h"
 
 class Ball final
@@ -45,19 +45,7 @@ class Ball final
      *
      * @param new_state the new state of the ball
      */
-    void updateCurrentState(const BallState &new_state);
-
-    /**
-     * Updates the ball with new data, updating the current data as well as the predictive
-     * model, converts the given parameters to a BallState and calls
-     * updateCurrentState(BallState &new_state)
-     *
-     * @param new_position , the new position of the ball
-     * @param new_velocity , the new velocity of the ball
-     * @param timestamp , the timestamp of the given position and velocity
-     */
-    void updateCurrentState(const Point &new_position, const Vector &new_velocity,
-                            const Timestamp &timestamp);
+    void updateState(const BallState &new_state);
 
     /**
      * Updates the ball's state to be its predicted state at the given timestamp.
@@ -77,27 +65,11 @@ class Ball final
     Timestamp lastUpdateTimestamp() const;
 
     /**
-     * Gets the previous timestamps for each state stored in states_
-     *
-     * @return Vector containing the update timestamp history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<Timestamp> getPreviousTimestamps() const;
-
-    /**
      * Returns the current position of the ball
      *
      * @return the current position of the ball
      */
     Point position() const;
-
-    /**
-     * Gets the previous positions for each state stored in states_
-     *
-     * @return Vector containing the position history starting with the oldest available
-     * data at index 0
-     */
-    std::vector<Point> getPreviousPositions() const;
 
     /**
      * Returns the estimated position of the ball at a future time, relative to when the
@@ -121,14 +93,6 @@ class Ball final
      * @return the current velocity of the ball
      */
     Vector velocity() const;
-
-    /**
-     * Gets the previous velocities for each state stored in states_
-     *
-     * @return Vector containing the velocity history starting with the oldest available
-     * data at index 0
-     */
-    std::vector<Vector> getPreviousVelocities() const;
 
     /**
      * Returns the estimated velocity of the ball at a future time, relative to when the
@@ -182,7 +146,7 @@ class Ball final
     bool operator!=(const Ball &other) const;
 
    private:
-    // All previous states of the ball, with the most recent position at the front of the
+    // All previous states of the ball, with the most recent state at the front of the
     // queue, This buffer will never be empty as it's initialized with a BallState on
     // creation
     // The buffer size (history_size) must be > 0

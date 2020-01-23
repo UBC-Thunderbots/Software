@@ -7,8 +7,9 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
+#include "software/world/robot_state.h"
 
 using RobotId = unsigned int;
 /**
@@ -28,39 +29,25 @@ class Robot
      * per second
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state
-     * @param history_duration The number of previous robot states that should be stored.
+     * @param history_size The number of previous robot states that should be stored. Must
+     * be > 0
      */
     explicit Robot(
         RobotId id, const Point &position, const Vector &velocity,
         const Angle &orientation, const AngularVelocity &angular_velocity,
-        const Timestamp &timestamp, unsigned int history_duration = 20,
+        const Timestamp &timestamp, unsigned int history_size = 20,
         const std::set<RobotCapabilities::Capability> &unavailable_capabilities =
             std::set<RobotCapabilities::Capability>());
-
-    /**
-     * Updates the state of the robot.
-     *
-     * @throws std::invalid_argument if the robot is updated with a time from the past
-     * @param new_position the new position of the robot. Coordinates are in metres.
-     * @param new_velocity the new velocity of the robot, in metres / second.
-     * @param new_orientation the new orientation of the robot, in Radians.
-     * @param new_angular_velocity the new angular velocity of the robot, in Radians
-     * per second
-     * @param timestamp The timestamp at which the robot was observed to be in the given
-     * state. The timestamp must be >= the robot's latest update timestamp
-     */
-    void updateState(const Point &new_position, const Vector &new_velocity,
-                     const Angle &new_orientation,
-                     const AngularVelocity &new_angular_velocity,
-                     const Timestamp &timestamp);
 
     /**
      * Updates the robot with new data, updating the current state as well as the
      * predictive model
      *
-     * @param new_robot_data A robot containing new robot data
+     * @param new_robot_state A robot state containing new robot data
      */
-    void updateState(const Robot &new_robot_data);
+    void updateState(const RobotState &new_robot_state);
+
+    RobotState currentState() const;
 
     /**
      * Updates the robot's state to be its predicted state at the given timestamp.
@@ -190,44 +177,12 @@ class Robot
         const Duration &duration_in_future) const;
 
     /**
-     * Gets the buffer which holds all the previous position states of the robot
+     * Gets the buffer which holds all of the previous states
      *
-     * @return Vector containing the position history starting with the oldest available
-     * data at index 0
+     * @return circular_buffer containing all previous states up to the history_size field
+     * cap
      */
-    std::vector<Point> getPreviousPositions() const;
-
-    /**
-     * Gets the buffer which holds all the previous velocity states of the robot
-     *
-     * @return Vector containing the velocity history starting with the oldest available
-     * data at index 0
-     */
-    std::vector<Vector> getPreviousVelocities() const;
-
-    /**
-     * Gets the buffer which holds all the previous orientation states of the robot
-     *
-     * @return Vector containing the orientation history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<Angle> getPreviousOrientations() const;
-
-    /**
-     * Gets the buffer which holds all the previous angular velocity states of the robot
-     *
-     * @return Vector containing the angular velocity history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<AngularVelocity> getPreviousAngularVelocities() const;
-
-    /**
-     * Gets the buffer which holds all the timestamps of the previous states
-     *
-     * @return Vector containing the update timestamp history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<Timestamp> getPreviousTimestamps() const;
+    boost::circular_buffer<RobotState> getPreviousStates() const;
 
     /**
      * Finds an update timestamp that is close to the provided timestamp and returns the
@@ -238,14 +193,6 @@ class Robot
      * std::nullopt if there is not matching timestamp.
      */
     std::optional<int> getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
-
-    /**
-     * Returns the most Timestamp corresponding to the most recent update to Robot object
-     *
-     * @return Timestamp : The Timestamp corresponding to the most recent update to the
-     * Robot object
-     */
-    Timestamp getMostRecentTimestamp() const;
 
     /**
      * Returns the missing capabilities of the robot
@@ -307,38 +254,13 @@ class Robot
     };
 
    private:
-    /**
-     * Adds a state to the front of the circular buffers storing the state histories of
-     * the robot.
-     *
-     * @param position Position of robot.
-     * @param velocity Velocity of robot
-     * @param orientation Orientation of robot.
-     * @param angular_velocity Angular velocity of robot
-     * @param timestamp Time that the robot was in this state.
-     */
-    void addStateToRobotHistory(const Point &position, const Vector &velocity,
-                                const Angle &orientation,
-                                const AngularVelocity &angular_velocity,
-                                const Timestamp &timestamp);
-
     // The id of this robot
     RobotId id_;
-    // All previous positions of the robot, with the most recent position at the front of
-    // the queue, coordinates in meters
-    boost::circular_buffer<Point> positions_;
-    // All previous velocities of the robot, with the most recent velocity at the front of
-    // the queue, in metres per second
-    boost::circular_buffer<Vector> velocities_;
-    // All previous orientations of the robot, with the most recent orientation at the
-    // front of the queue, in radians
-    boost::circular_buffer<Angle> orientations_;
-    // All previous angular velocities of the robot, with the most recent angular velocity
-    // at the front of the queue, in radians per second
-    boost::circular_buffer<AngularVelocity> angularVelocities_;
-    // All previous timestamps of when the robot was updated, with the most recent
-    // timestamp at the front of the queue,
-    boost::circular_buffer<Timestamp> last_update_timestamps;
+    // All previous states of the robot, with the most recent state at the front of the
+    // queue, This buffer will never be empty as it's initialized with a RobotState on
+    // creation
+    // The buffer size (history_size) must be > 0
+    boost::circular_buffer<RobotState> states_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapabilities::Capability> unavailable_capabilities_;

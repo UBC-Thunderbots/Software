@@ -73,7 +73,12 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
-    void accept(TacticVisitor& visitor) const override;
+    void accept(MutableTacticVisitor& visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
+    Team getFriendlyTeam() const;
+    Team getEnemyTeam() const;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
@@ -117,9 +122,6 @@ class ShootGoalTactic : public Tactic
     // percentage of the net open
     bool has_shot_available;
 
-    // How far from the ball an enemy must be to be considered a danger that may steal the
-    // ball
-    const double ENEMY_DANGER_DIST = 0.5 + ROBOT_MAX_RADIUS_METERS;
     // How far we try chip when chipping over an enemy. This value is relatively small so
     // that we chip over the enemy, but don't launch the ball so far we have no chance of
     // recovering possession

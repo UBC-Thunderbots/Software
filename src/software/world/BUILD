@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["ball.h"],
     deps = [
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "//software/world:ball_state",
         "@boost//:circular_buffer",
     ],
@@ -28,7 +28,7 @@ cc_library(
     hdrs = ["ball_state.h"],
     deps = [
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
     ],
 )
 
@@ -39,7 +39,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "@boost//:circular_buffer",
     ],
 )
@@ -81,9 +81,22 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
+        ":robot_state",
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "@boost//:circular_buffer",
+    ],
+)
+
+cc_library(
+    name = "robot_state",
+    srcs = ["robot_state.cpp"],
+    hdrs = ["robot_state.h"],
+    deps = [
+        ":robot_capabilities",
+        "//software/geom",
+        "//software/new_geom:angular_velocity",
+        "//software/time:timestamp",
     ],
 )
 
@@ -137,7 +150,7 @@ cc_library(
         ":game_state",
         ":robot",
         ":team",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
     ],
 )
 

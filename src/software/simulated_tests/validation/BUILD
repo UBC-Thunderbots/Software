@@ -61,11 +61,11 @@ cc_library(
         ":continuous_function_validator",
         ":function_validator",
         ":validation_function",
+        "//software/logger",
         "//software/multithreading:subject",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
-        "//software/util/logger",
-        "//software/util/time:duration",
+        "//software/time:duration",
         "//software/world",
     ],
 )

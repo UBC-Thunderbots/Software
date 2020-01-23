@@ -45,7 +45,10 @@ class PenaltyKickTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(TacticVisitor &visitor) const override;
+    void accept(MutableTacticVisitor &visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
@@ -60,8 +63,6 @@ class PenaltyKickTactic : public Tactic
     Ball ball;
     Field field;
     std::optional<Robot> enemy_goalie;
-
-    const bool ENABLE_DRIBBLER = true;
 
     static constexpr double PENALTY_KICK_SHOT_SPEED     = 5.0;
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;

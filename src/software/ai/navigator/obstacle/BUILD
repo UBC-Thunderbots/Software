@@ -7,6 +7,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom:angle",
+        "//software/new_geom:point",
         "//software/world:ball",
         "//software/world:robot",
     ],
@@ -17,19 +19,21 @@ cc_test(
     srcs = ["obstacle_test.cpp"],
     deps = [
         ":obstacle",
+        "//software/new_geom:point",
         "@gtest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "obstacle_generation",
-    srcs = ["obstacle_generation.cpp"],
-    hdrs = ["obstacle_generation.h"],
+    name = "obstacle_factory",
+    srcs = ["obstacle_factory.cpp"],
+    hdrs = ["obstacle_factory.h"],
     deps = [
-        "//software/new_geom",
         ":obstacle",
-        "//software/util/parameter:dynamic_parameters",
-        "//software/ai/motion_constraint:motion_constraint",
+        "//software/ai/motion_constraint",
+        "//software/geom",
+        "//software/new_geom:point",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )

@@ -8,7 +8,7 @@ cc_library(
         ":pass",
         "//software/ai/evaluation:pass",
         "//software/geom",
-        "//software/util/math:math_functions",
+        "//software/math:math_functions",
         "//software/world",
         "@g3log",
     ],
@@ -19,8 +19,8 @@ cc_test(
     srcs = ["cost_function_test.cpp"],
     deps = [
         ":evaluation",
+        "//software/math:math_functions",
         "//software/test_util",
-        "//software/util/math:math_functions",
         "@gtest//:gtest_main",
     ],
 )
@@ -31,7 +31,7 @@ cc_library(
     hdrs = ["pass.h"],
     deps = [
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "//software/world:field",
     ],
 )
@@ -62,18 +62,17 @@ cc_library(
         ":evaluation",
         ":pass",
         ":pass_with_rating",
-        "//software/util/optimization:gradient_descent",
+        "//software/optimization:gradient_descent",
         "//software/world",
     ],
 )
 
-# TODO: (Issue #655) un-comment this and fix the flaky tests in it
-#cc_test(
-#    name = "pass_generator_test",
-#    srcs = ["pass_generator_test.cpp"],
-#    deps = [
-#        ":pass_generator",
-#        "//software/test_util",
-#        "@gtest//:gtest_main",
-#    ],
-#)
+cc_test(
+    name = "pass_generator_test",
+    srcs = ["pass_generator_test.cpp"],
+    deps = [
+        ":pass_generator",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

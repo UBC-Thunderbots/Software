@@ -177,6 +177,22 @@ class World final
      * @param Timestamp corresponding to when the World was last updated
      */
     void updateTimestamp(Timestamp timestamp);
+    /**
+     * Defines the equality operator for a World. Worlds are equal if their field, ball
+     * friendly_team, enemy_team and game_state are equal. The last update
+     * timestamp and refbox_game_state_history are not part of the equality.
+     *
+     * @param other The world to compare against for equality
+     * @return True if the other robot is equal to this world, and false otherwise
+     */
+    bool operator==(const World& other) const;
+    /**
+     * Defines the inequality operator for a World.
+     *
+     * @param other The world to compare against for inequality
+     * @return True if the other world is not equal to this world and false otherwise
+     */
+    bool operator!=(const World& other) const;
 
    private:
     Field field_;

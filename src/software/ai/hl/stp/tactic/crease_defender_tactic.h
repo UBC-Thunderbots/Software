@@ -61,7 +61,12 @@ class CreaseDefenderTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(TacticVisitor &visitor) const override;
+    void accept(MutableTacticVisitor &visitor) override;
+
+    Ball getBall() const;
+    Field getField() const;
+    Team getEnemyTeam() const;
+    Team getFriendlyTeam() const;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
@@ -101,7 +106,4 @@ class CreaseDefenderTactic : public Tactic
     Team friendly_team;
     Team enemy_team;
     LeftOrRight left_or_right;
-
-    // How slow the ball must be moving for us to clear it from the defense area
-    double BALL_SLOW_SPEED_THRESHOLD = 0.2;
 };
