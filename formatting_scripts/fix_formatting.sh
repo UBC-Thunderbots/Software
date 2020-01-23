@@ -2,6 +2,7 @@
 
 # This script allows us to automatically format the entire codebase using
 # clang-format, or some set of changes based on a diff via `git-clang-format`
+# It also allows us to format the bazel files
 
 # Will set the `FILES_CHANGED` environment variable to 1 if we changed any
 # files, and 0 otherwise (assuming no error occured)
@@ -24,6 +25,12 @@ SCRIPT_NAME="$0"
 # Extensions to check formatting
 EXTENSIONS=(h cpp c hpp tpp)
 
+# Function to format all bazel files
+function format_bazel_files() {
+    cd $CURR_DIR/../src
+    bazel run //:buildifier
+}
+
 # Check that we have at least some arguments
 if (( $# == 0 )); then
     echo "Missing arguments (\"$SCRIPT_NAME --help\" for help)"
@@ -38,7 +45,7 @@ fi
 while test $# -gt 0; do
     case "$1" in
         -h|--help)
-            echo "$SCRIPT_NAME - Run clang-format on our codebase"
+            echo "$SCRIPT_NAME - Run clang-format and bazel buildifier on our codebase"
             echo " "
             echo "$SCRIPT_NAME [options]"
             echo " "
@@ -46,6 +53,7 @@ while test $# -gt 0; do
             echo "-h, --help       show help"
             echo "-a, --all        format all files in our codebase"
             echo "-b, --branch     specify a git branch to diff against, and only format the files you have changed (NOTE: This argument will also accept a git commit hash)"
+            echo "NOTE: Both -a and -b will format all bazel buildfiles"
             echo " "
             echo "Examples:"
             echo "$SCRIPT_NAME -a"
@@ -83,6 +91,9 @@ while test $# -gt 0; do
                 exit 1
             fi
             ;;
+
+            format_bazel_files()
+
         -b|--branch)
             # Shift the arguents to check for the argument to this flag
             shift
@@ -128,6 +139,9 @@ while test $# -gt 0; do
 
             shift
             ;;
+
+            format_bazel_files()
+
         *)
             echo "Invalid arguments (\"$SCRIPT_NAME --help\" for help)"
             exit 1
