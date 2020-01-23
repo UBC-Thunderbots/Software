@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/direct_free_kick_play.h"
+#include "software/ai/hl/stp/play/free_kick_play.h"
 
 #include <g3log/g3log.hpp>
 
@@ -16,19 +16,19 @@
 
 using namespace Passing;
 
-const std::string DirectFreeKickPlay::name = "Direct Free Kick Play";
+const std::string FreeKickPlay::name = "Direct Free Kick Play";
 
-DirectFreeKickPlay::DirectFreeKickPlay()
+FreeKickPlay::FreeKickPlay()
     : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
 
-std::string DirectFreeKickPlay::getName() const
+std::string FreeKickPlay::getName() const
 {
-    return DirectFreeKickPlay::name;
+    return FreeKickPlay::name;
 }
 
-bool DirectFreeKickPlay::isApplicable(const World &world) const
+bool FreeKickPlay::isApplicable(const World &world) const
 {
     double min_dist_to_corner =
         std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
@@ -39,14 +39,14 @@ bool DirectFreeKickPlay::isApplicable(const World &world) const
            min_dist_to_corner >= CornerKickPlay::BALL_IN_CORNER_RADIUS;
 }
 
-bool DirectFreeKickPlay::invariantHolds(const World &world) const
+bool FreeKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
            (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
             Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
-void DirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     /**
      * This play is basically:
@@ -183,7 +183,7 @@ void DirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished";
 }
 
-void DirectFreeKickPlay::updateCherryPickTactics(
+void FreeKickPlay::updateCherryPickTactics(
     std::vector<std::shared_ptr<CherryPickTactic>> tactics)
 {
     for (auto &tactic : tactics)
@@ -192,7 +192,7 @@ void DirectFreeKickPlay::updateCherryPickTactics(
     }
 }
 
-void DirectFreeKickPlay::updateAlignToBallTactic(
+void FreeKickPlay::updateAlignToBallTactic(
     std::shared_ptr<MoveTactic> align_to_ball_tactic)
 {
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
@@ -204,20 +204,20 @@ void DirectFreeKickPlay::updateAlignToBallTactic(
         ball_to_center_vec.orientation(), 0);
 }
 
-void DirectFreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
+void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());
 }
 
-void DirectFreeKickPlay::updateShootGoalTactic(
+void FreeKickPlay::updateShootGoalTactic(
     std::shared_ptr<ShootGoalTactic> shoot_tactic)
 {
     shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
                                     world.enemyTeam(), world.ball());
 }
 
-void DirectFreeKickPlay::updateCreaseDefenderTactics(
+void FreeKickPlay::updateCreaseDefenderTactics(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders)
 {
     for (auto &crease_defender : crease_defenders)
@@ -227,7 +227,7 @@ void DirectFreeKickPlay::updateCreaseDefenderTactics(
     }
 }
 
-void DirectFreeKickPlay::chipAtGoalStage(
+void FreeKickPlay::chipAtGoalStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic)
@@ -258,7 +258,7 @@ void DirectFreeKickPlay::chipAtGoalStage(
     } while (!chip_tactic->done());
 }
 
-void DirectFreeKickPlay::performPassStage(
+void FreeKickPlay::performPassStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic,
@@ -294,7 +294,7 @@ void DirectFreeKickPlay::performPassStage(
     } while (!receiver->done());
 }
 
-void DirectFreeKickPlay::shootOrFindPassStage(
+void FreeKickPlay::shootOrFindPassStage(
     TacticCoroutine::push_type &yield, std::shared_ptr<MoveTactic> align_to_ball_tactic,
     std::shared_ptr<ShootGoalTactic> shoot_tactic,
     std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
@@ -336,4 +336,4 @@ void DirectFreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the PlayFactory
-static TPlayFactory<DirectFreeKickPlay> factory;
+static TPlayFactory<FreeKickPlay> factory;

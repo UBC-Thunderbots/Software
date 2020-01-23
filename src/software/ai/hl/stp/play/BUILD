@@ -127,9 +127,9 @@ cc_test(
 )
 
 cc_library(
-    name = "direct_free_kick_play",
-    srcs = ["direct_free_kick_play.cpp"],
-    hdrs = ["direct_free_kick_play.h"],
+    name = "free_kick_play",
+    srcs = ["free_kick_play.cpp"],
+    hdrs = ["free_kick_play.h"],
     deps = [
         ":corner_kick_play",
         ":play",

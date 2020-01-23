@@ -11,12 +11,12 @@
 /**
  * A Play for Direct Free kicks
  */
-class DirectFreeKickPlay : public Play
+class FreeKickPlay : public Play
 {
    public:
     static const std::string name;
 
-    DirectFreeKickPlay();
+    FreeKickPlay();
 
     std::string getName() const override;
 
