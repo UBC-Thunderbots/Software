@@ -13,10 +13,10 @@ template <class SendProto, class ReceiveProto>
 RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
     std::unique_ptr<TransferMedium> medium, MsgSentCallback<SendProto> sent_callback,
     MsgReceivedCallback<ReceiveProto> received_callback)
-    : medium(std::move(medium)),
+    : sent_callback(sent_callback),
+      received_callback(received_callback),
       in_destructor(false),
-      sent_callback(sent_callback),
-      received_callback(received_callback)
+      medium(std::move(medium))
 {
     // start thread to send data from the buffer
     send_buffer.reset(new ThreadSafeBuffer<SendProto>(10));

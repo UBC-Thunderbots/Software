@@ -104,16 +104,10 @@ void udp_echoserver_receive_callback(void *arg, struct udp_pcb *upcb, struct pbu
         pbuf_take(p_tx, (char *)p->payload, p->len);
 
         // Create a stream that reads from the buffer
-        pb_istream_t in_stream = pb_istream_from_buffer((char *)p->payload, p->len);
+        pb_istream_t in_stream = pb_istream_from_buffer((uint8_t *)p->payload, p->len);
 
         if (pb_decode(&in_stream, control_msg_fields, &control))
         {
-            // access msg to kill time
-            control.wheel_1_control.rpm;
-            control.wheel_2_control.rpm;
-            control.wheel_3_control.rpm;
-            control.wheel_4_control.rpm;
-
             pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
             ack.msg_count = msg_count++;

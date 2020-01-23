@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
     // create a RobotCommunicator with a NetworkMedium
     RobotCommunicator<control_msg, robot_ack> communicator(
-        std::make_unique<NetworkMedium>("192.168.1.143", 42069),
+        std::make_unique<NetworkMedium>("192.168.1.140", 42069),
         [&](const control_msg& msg) {
             std::cout << "COMP Txed " << count++ << " msgs " << std::endl;
         },
