@@ -16,7 +16,7 @@ proto_library(
     visibility = ["//visibility:private"]
 )
 
-# c library (TODO since this a macro we lack context to use :fw_proto) check w/ Gareth
+# TODO add ctx to macro https://github.com/UBC-Thunderbots/Software/issues/1133
 c_proto_library(
     name = "fw_c_proto",
     srcs = proto_files,

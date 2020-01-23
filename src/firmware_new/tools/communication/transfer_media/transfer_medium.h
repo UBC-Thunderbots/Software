@@ -18,10 +18,7 @@ class TransferMedium
      *
      * @param data The data to be sent over the medium
      */
-    virtual void send_data(const std::string& data)
-    {
-        throw std::logic_error("base TransferMedium send_data called");
-    }
+    virtual void send_data(const std::string& data) = 0;
 
     /*
      * Calls the provided callback everytime a new packet is received
@@ -29,8 +26,6 @@ class TransferMedium
      * NOTE: this function does NOT block, it returns immediately after
      * registering the callback
      */
-    virtual void receive_data_async(std::function<void(std::string)> receive_callback)
-    {
-        throw std::logic_error("base TransferMedium receive_data_async called");
-    }
+    virtual void receive_data_async(
+        std::function<void(std::string)> receive_callback) = 0;
 };
