@@ -90,7 +90,7 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * @param angle The angle that the robot is currently facing
  * @return void
  */
-void choose_rotation_destination(PhysBot *pb, float angle)
+void choose_rotation_destination(PhysBot* pb, float angle)
 {
     // if we are close enough then we should just allow the bot to rotate
     // onto its destination angle, so skip this if block
@@ -104,7 +104,7 @@ void choose_rotation_destination(PhysBot *pb, float angle)
 }
 
 
-void plan_move_rotation(PhysBot *pb, float avel)
+void plan_move_rotation(PhysBot* pb, float avel)
 {
     float time_target = (pb->maj.time > TIME_HORIZON) ? pb->maj.time : TIME_HORIZON;
     if (time_target > 0.5f)
@@ -125,7 +125,7 @@ void plan_move_rotation(PhysBot *pb, float avel)
  * @param accel A 3 length array of {x, y, rotation} accelerations
  * @return void
  */
-void move_to_log(log_record_t *log, float time_target, float accel[3])
+void move_to_log(log_record_t* log, float time_target, float accel[3])
 {
     log_destination(log, destination);
     log_accel(log, accel);
