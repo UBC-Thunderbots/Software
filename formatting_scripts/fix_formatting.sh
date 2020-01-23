@@ -23,15 +23,20 @@ function run_clang_format () {
     EXTENSION_STRING=""
     for value in "${CLANG_FORMAT_EXTENSIONS[@]}"
     do
-        EXTENSION_STRING="$EXTENSION_STRING -iname *.$value -o"
+        EXTENSION_STRING="$EXTENSION_STRING -name *.$value -o"
     done
 
     # Find all the files that we want to format, and pass them to
     # clang-format as arguments
     # We remove the last -o flag from the extension string
-    find $CURR_DIR/../src/ ${EXTENSION_STRING::-2} \
-        | xargs bazel run @llvm_clang//:clang-format -- -i -style=file
-    shift
+    find $CURR_DIR/../src/ ${EXTENSION_STRING::-2}  \
+        | xargs -I{} -n1000 bazel run --experimental_ui_limit_console_output=1 \
+          @llvm_clang//:clang-format -- -i -style=file
+            
+    if [[ "$?" != 0 ]]; then
+        # There was a problem in at least one execution of clang-format
+        exit 1
+    fi
 }
 
 # Function to run bazel formatting
@@ -39,6 +44,10 @@ function run_bazel_formatting () {
     echo "Running bazel buildifier to format all bazel files..."
     cd $BAZEL_ROOT_DIR
     bazel run @com_github_bazelbuild_buildtools//:buildifier
+
+    if [[ "$?" != 0 ]]; then
+        exit 1
+    fi
 }
 
 # Run formatting
