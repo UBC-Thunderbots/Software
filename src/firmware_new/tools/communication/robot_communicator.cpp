@@ -25,6 +25,7 @@ RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
     this->medium->receive_data_async([&](std::string incoming_data) {
         ReceiveProto msg;
         msg.ParseFromString(incoming_data);
+
         if (received_callback)
             received_callback(msg);
     });

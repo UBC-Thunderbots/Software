@@ -4,7 +4,7 @@
 /*
  * A TransferMedium is an abstraction around the medium used to communicate
  * between computers and robots. Any medium such as UART, SPI, Ethernet/WiFi
- * used must extend this class.
+ * used to transfer data to and from robots can extend this class.
  *
  */
 class TransferMedium
@@ -25,11 +25,6 @@ class TransferMedium
 
     /*
      * Calls the provided callback everytime a new packet is received
-     *
-     * NOTE: Depending on the implementation of send_data
-     * this function may be triggered by a packet sent by the
-     * same instance of the class. (example: UDP broadcast, the sender
-     * also gets a packet)
      *
      * NOTE: this function does NOT block, it returns immediately after
      * registering the callback

@@ -27,7 +27,7 @@ class NetworkMedium : public TransferMedium
     /*
      * Creates a NetworkMedium provided the ip and port
      *
-     * @param local_ipaddr The local ip for this endpoint
+     * @param local_ipaddr The local ip to connect to
      * @param port The port to bind to
      */
     NetworkMedium(const std::string& local_ipaddr, unsigned port);
