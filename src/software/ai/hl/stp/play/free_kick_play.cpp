@@ -51,7 +51,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     /**
      * This play is basically:
      * - One robot attempts to shoot first. If there is no good shot, it will attempt to
-     * pass, and finally chips towards the enemy goal if it can't find a pass in time
+     *   pass, and finally chips towards the enemy goal if it can't find a pass in time
      * - Two robots try to get in good positions in the enemy end to receive a pass
      * - Two robots crease defend
      * - One robot is goalie
