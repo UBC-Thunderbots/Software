@@ -7,10 +7,11 @@
  */
 #include "stop.h"
 
+#include <unused.h>
+
 #include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/wheels.h"
-#include <unused.h>
 
 /**
  * \brief Initializes the stop primitive.

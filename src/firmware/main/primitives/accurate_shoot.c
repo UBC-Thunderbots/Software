@@ -23,7 +23,7 @@
 static float destination[3], major_vec[2], minor_vec[2];
 // Only need two data points to form major axis vector.
 
-primitive_params_t *global_params;
+primitive_params_t* global_params;
 
 /**
  * \brief Initializes the accurate shoot primitive.
