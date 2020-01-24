@@ -10,10 +10,37 @@
 typedef struct FirmwareRobot FirmwareRobot_t;
 
 /**
+ * This struct represents robot constants
+ */
+typedef struct RobotConstants
+{
+    // The mass of the entire robot [kg]
+    float mass;
+    // The moment of inertia of the entire robot [kg m^2]
+    float moment_of_inertia;
+    // The maximum radius of the robot [m]
+    float robot_radius;
+    // The maximum jerk this robot may safely undergo [m/s^3]
+    float jerk_limit;
+} RobotConstants_t;
+
+/**
+ * This struct holds the state of the controller.
+ * This is a carryover from legacy code, and should be deleted when the controller is
+ * replaced.
+ */
+typedef struct ControllerState
+{
+    float last_applied_acceleration_x;
+    float last_applied_acceleration_y;
+    float last_applied_acceleration_angular;
+} ControllerState_t;
+
+/**
  * Create a robot with the given hardware
  *
- * NOTE: All positions are in global field coordinates (ie. 0,0 is the center of the
- *       field)
+ * NOTE: Everything here is in the global field reference frame (ie. 0,0 is the center of
+ *       the field, 0 degrees is towards the enemy goal) unless otherwise specified.
  *
  * @param chicker The robot chicker
  * @param dribbler The robot dribbler
@@ -21,18 +48,34 @@ typedef struct FirmwareRobot FirmwareRobot_t;
  *                             robot, in meters
  * @param get_robot_position_y A function that can be called to get the y-position of the
  *                             robot, in meters
+ * @param get_robot_orientation A function that can be called to get the orientation of
+ *                              the robot, in radians
+ * @param get_robot_velocity_x A function that can be called to get the x-velocity of the
+ *                             robot, in m/s
+ * @param get_robot_velocity_y A function that can be called to get the y-velocity of the
+ *                             robot, in m/s
+ * @param get_robot_velocity_angular A function that can be called to get the angular
+ *                                   velocity of the robot, in rad/s
+ * @param get_battery_voltage A function that can be called to the batter voltage, in
+ *                            volts
  * @param front_right_wheel The front right wheel of the robot
  * @param front_left_wheel The front left wheel of the robot
  * @param back_right_wheel The back right wheel of the robot
  * @param back_left_wheel The back left wheel of the robot
+ * @param controller_state The controller state
+ * @param robot_constants Set of constants particular to this robot
  *
  * @return A pointer to a robot with the given hardware, ownership of the robot is
  *         given to the caller
  */
 FirmwareRobot_t* app_firmware_robot_create(
     Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(),
-    float (*get_robot_position_y)(), Wheel_t* front_right_wheel,
-    Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel);
+    float (*get_robot_position_y)(), float (*get_robot_orientation)(),
+    float (*get_robot_velocity_x)(), float (*get_robot_velocity_y)(),
+    float (*get_robot_velocity_angular)(), float (*get_battery_voltage)(),
+    Wheel_t* front_right_wheel, Wheel_t* front_left_wheel, Wheel_t* back_right_wheel,
+    Wheel_t* back_left_wheel, ControllerState_t* controller_state,
+    RobotConstants_t robot_constants);
 
 /**
  * Destroy the given robot, freeing any memory allocated for it
@@ -59,18 +102,54 @@ Chicker_t* app_firmware_robot_getChicker(FirmwareRobot_t* robot);
 Dribbler_t* app_firmware_robot_getDribbler(FirmwareRobot_t* robot);
 
 /**
- * Get the x-position of the given ball
- * @param ball The ball to get the y-position for
- * @return The x-position of the given ball, in meters, in global coordinates
+ * Get the x-position of the given robot
+ * @param robot The robot to get the y-position for
+ * @return The x-position of the given robot, in meters, in global coordinates
  */
 float app_firmware_robot_getPositionX(FirmwareRobot_t* robot);
 
 /**
- * Get the y-position of the given ball
- * @param ball The ball to get the y-position for
- * @return The y-position of the given ball, in meters, in global coordinates
+ * Get the y-position of the given robot
+ * @param robot The robot to get the y-position for
+ * @return The y-position of the given robot, in meters, in global coordinates
  */
 float app_firmware_robot_getPositionY(FirmwareRobot_t* robot);
+
+/**
+ * Get the current orientation of the given robot
+ *
+ * @param robot The robot to get the orientation of
+ * @return The orientation of the robot, in radians
+ */
+float app_firmware_robot_getOrientation(FirmwareRobot_t* robot);
+
+/**
+ * Get the x-velocity of the given robot
+ * @param robot The robot to get the y-velocity for
+ * @return The x-velocity of the given robot, in m/s, in global coordinates
+ */
+float app_firmware_robot_getVelocityX(FirmwareRobot_t* robot);
+
+/**
+ * Get the y-velocity of the given robot
+ * @param robot The robot to get the y-velocity for
+ * @return The y-velocity of the given robot, in m/s, in global coordinates
+ */
+float app_firmware_robot_getVelocityY(FirmwareRobot_t* robot);
+
+/**
+ * Get the current angular velocity for the given robot
+ * @param robot The robot to get the angular velocity for
+ * @return The angular velocity of the given robot, in rad/s
+ */
+float app_firmware_robot_getVelocityAngular(FirmwareRobot_t* robot);
+
+/**
+ * Get the battery voltage for the given robot
+ * @param robot The robot to get the battery voltage for
+ * @return The battery voltage for the given robot, in volts
+ */
+float app_firmware_robot_getBatteryVoltage(FirmwareRobot_t* robot);
 
 /**
  * Get the front right wheel from the given robot
@@ -100,3 +179,17 @@ Wheel_t* app_firmware_robot_getBackRightWheel(FirmwareRobot_t* robot);
  * @return The back left wheel from the given robot
  */
 Wheel_t* app_firmware_robot_getBackLeftWheel(FirmwareRobot_t* robot);
+
+/**
+ * Get the constants for this robot
+ * @param robot The robot to get constants from
+ * @return The constants for the given robot
+ */
+const RobotConstants_t app_firmware_robot_getRobotConstants(FirmwareRobot_t* robot);
+
+/**
+ * Get the controller state for the given robot
+ * @param robot The robot to get the controller state for
+ * @return A pointer to the controller state for the given robot
+ */
+ControllerState_t* app_firmware_robot_getControllerState(FirmwareRobot_t* robot);

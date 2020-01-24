@@ -4,9 +4,6 @@
 #include <cmath>
 #include <vector>
 
-#include "software/util/constants.h"
-
-
 RobotTeamFilter::RobotTeamFilter() {}
 
 Team RobotTeamFilter::getFilteredData(

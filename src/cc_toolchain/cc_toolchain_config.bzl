@@ -192,7 +192,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion"] +
+                        flags = ["-Wall", "-Werror"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -494,6 +494,20 @@ def _clang_impl(ctx):
         ],
         implies = ["common"],
     )
+    clang_warnings_feature = feature(
+        name = "clang_warnings",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-Wno-overloaded-virtual"] +
+                                ctx.attr.host_compiler_warnings,
+                    ),
+                ],
+            ),
+        ],
+    )
 
     coverage_feature = feature(
         name = "coverage",
@@ -557,6 +571,8 @@ def _clang_impl(ctx):
             "c++17",
             "determinism",
             "hardening",
+            "warnings",
+            "clang_warnings",
             "build-id",
             "no-canonical-prefixes",
             "lld",
@@ -573,6 +589,7 @@ def _clang_impl(ctx):
         builtin_include_directories_feature,
         common_feature,
         lld_feature,
+        clang_warnings_feature,
         coverage_feature,
         opt_feature,
         runtime_library_search_directories,

@@ -57,8 +57,8 @@ cc_test(
     srcs = ["theta_star_path_planner_test.cpp"],
     deps = [
         ":theta_star_path_planner",
-        "//software/world:field",
         "//software/test_util",
+        "//software/world:field",
         "@gtest//:gtest_main",
     ],
 )

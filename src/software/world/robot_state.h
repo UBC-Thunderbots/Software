@@ -3,7 +3,7 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 
 // This class represents the state of a Robot at a single point in time

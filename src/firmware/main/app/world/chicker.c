@@ -51,7 +51,7 @@ void app_chicker_enableAutokick(Chicker_t* chicker, float speed_m_per_s)
     chicker->enable_autokick(speed_m_per_s);
 }
 
-void app_chicker_enableAutoChip(Chicker_t* chicker, float distance_m)
+void app_chicker_enableAutochip(Chicker_t* chicker, float distance_m)
 {
     chicker->enable_autochip(distance_m);
 }

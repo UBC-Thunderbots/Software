@@ -7,9 +7,6 @@ cc_library(
     name = "box2d",
     srcs = glob(["Box2D/**/*.cpp"]),
     hdrs = glob(["Box2D/**/*.h"]),
-    includes = [
-        ".",
-    ],
     defines = [
         # Slightly increase the max vertices to better represent robot shapes
         "b2_maxPolygonVertices=10",
@@ -22,6 +19,9 @@ cc_library(
         # this speed (1mm/s). Collisions below this speed will "stick", but we can
         # tolerate those since we don't care about anything that slow
         "b2_velocityThreshold=0.001f",
+    ],
+    includes = [
+        ".",
     ],
     visibility = ["//visibility:public"],
 )

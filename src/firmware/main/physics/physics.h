@@ -1,26 +1,6 @@
-#ifndef PHYSICS_H
-#define PHYSICS_H
+#pragma once
 
-#include <math.h>
-
-// define our own PI value here that is a float because M_PI in math.h is a double
-#define P_PI 3.14159265f
-
-#ifdef FWSIM
-#define max(a, b)                                                                        \
-    ({                                                                                   \
-        __typeof__(a) _a = (a);                                                          \
-        __typeof__(b) _b = (b);                                                          \
-        _a > _b ? _a : _b;                                                               \
-    })
-
-#define min(a, b)                                                                        \
-    ({                                                                                   \
-        __typeof__(a) _a = (a);                                                          \
-        __typeof__(b) _b = (b);                                                          \
-        _a < _b ? _a : _b;                                                               \
-    })
-#endif
+#include "math/tbots_math.h"
 
 // This file contains all the physical constants of the robot
 // Dimensions and the like as well as
@@ -36,9 +16,9 @@
 #define QUARTERDEGREE_TO_VOLT (QUARTERDEGREE_TO_RPM * RPM_TO_VOLT)
 
 #define ROBOT_RADIUS 0.085f
-#define TICK_TIME (1.0f / CONTROL_LOOP_HZ)
+#define TICK_TIME (1.0f / (float)CONTROL_LOOP_HZ)
 #define ROBOT_POINT_MASS 2.48f
-#define DELTA_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
+#define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
 
 
 // all the interial components of the robot
@@ -104,17 +84,18 @@ extern const float MAX_VEL[3];
 // robot relative coordinates
 void speed4_to_speed3(const float speed4[4], float speed3[3]);
 void speed3_to_speed4(const float speed3[3], float speed4[4]);
-#ifdef FWSIM
+
+// transformation matricies to convert forces in the
+// two different domains commonly used by the robot
+// force4 which is the listing of wheel forces
+// and force3 which is a force in x,y,rotation in
+// robot relative coordinates
 void force4_to_force3(const float force4[4], float force3[3]);
-#endif
+void force3_to_force4(float force3[3], float force4[4]);
 
 float min_angle_delta(float, float);
 
 float norm2(float a1, float a2);
-
-#ifdef FWSIM
-float min_angle_delta_alt(float, float);  // Todo: what is this suppose to be?
-#endif
 
 // rotate a velocity vector through angle
 void rotate(float speed3[2], float angle);
@@ -175,4 +156,3 @@ float dot_product(float vec1[], float vec2[], int size);
 float dot2D(float vec1[2], float vec2[2]);
 
 float dot3D(float vec1[3], float vec2[3]);
-#endif

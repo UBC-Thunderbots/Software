@@ -403,7 +403,7 @@ SRunner *srunner_create(Suite *s)
     sr->log_fname = NULL;
     sr->xml_fname = NULL;
     sr->tap_fname = NULL;
-    sr->loglst                                                       = NULL;
+    sr->loglst    = NULL;
 
 #if defined(HAVE_FORK)
     sr->fstat = CK_FORK_GETENV;

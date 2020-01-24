@@ -6,7 +6,7 @@
 #include "software/new_geom/point.h"
 #include "software/sensor_fusion/ball_detection.h"
 #include "software/sensor_fusion/robot_detection.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/field.h"
 #include "software/world/world.h"
 
@@ -70,9 +70,9 @@ class VisionDetection
     const Timestamp getLatestTimestamp(void) const;
 
    private:
-    Timestamp latest_timestamp;
     std::vector<BallDetection> ball_detections;
     std::vector<RobotDetection> friendly_team_detections;
     std::vector<RobotDetection> enemy_team_detections;
     std::optional<Field> field_detection;
+    Timestamp latest_timestamp;
 };

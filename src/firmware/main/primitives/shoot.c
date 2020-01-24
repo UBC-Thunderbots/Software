@@ -5,20 +5,13 @@
 #include <stdlib.h>
 #include <util/physbot.h>
 
+#include "app/control.h"
 #include "control/bangbang.h"
-#include "control/control.h"
+#include "io/dr.h"
+#include "io/leds.h"
 #include "physics/physics.h"
 #include "util/log.h"
 #include "util/physbot.h"
-
-#ifndef FWSIM
-#include "io/chicker.h"
-#include "io/dr.h"
-#include "io/dribbler.h"
-#include "io/leds.h"
-#else
-#include "simulate.h"
-#endif
 
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
@@ -124,9 +117,9 @@ static void shoot_init(void) {}
  *	1. record the movement intent
  *	2. there is no need to worry about recording the start position
  *	   because the primitive start function already does it
- *
+ * \param[in] world The world to perform the primitive in
  */
-static void shoot_start(const primitive_params_t *params)
+static void shoot_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
     printf("Shoot start called.\n");
     // Convert into m/s and rad/s because physics is in m and s
@@ -147,7 +140,17 @@ static void shoot_start(const primitive_params_t *params)
     total_rot         = min_angle_delta(destination[2], states.angle);
     float shoot_power = (float)params->params[3] / 1000.0f;
     chip              = params->extra & 1;
-    chicker_auto_arm(chip ? CHICKER_CHIP : CHICKER_KICK, shoot_power);
+
+    Chicker_t *chicker =
+        app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    if (chip)
+    {
+        app_chicker_enableAutochip(chicker, shoot_power);
+    }
+    else
+    {
+        app_chicker_enableAutokick(chicker, shoot_power);
+    }
 }
 
 /**
@@ -167,12 +170,14 @@ static void shoot_start(const primitive_params_t *params)
     rotate(minor_vec, P_PI / 2);
  * This function runs when the host computer requests a new movement while a
  * shoot movement is already in progress.
+ * \param[in] world The world to perform the primitive in
  */
-static void shoot_end(void)
+static void shoot_end(FirmwareWorld_t *world)
 {
-#ifndef FWSIM
-    chicker_auto_disarm();
-#endif
+    Chicker_t *chicker =
+        app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    app_chicker_disableAutokick(chicker);
+    app_chicker_disableAutochip(chicker);
 }
 
 /**
@@ -182,8 +187,9 @@ static void shoot_end(void)
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world an object representing the world
  */
-static void shoot_tick(log_record_t *log)
+static void shoot_tick(log_record_t *log, FirmwareWorld_t *world)
 {
     printf("Shoot tick called.\n");
     dr_data_t states;
@@ -202,20 +208,14 @@ static void shoot_tick(log_record_t *log)
     float accel[3] = {0, 0, pb.rot.accel};
     scale(&pb);
     to_local_coords(accel, pb, states.angle, major_vec, minor_vec);
-    apply_accel(accel, accel[2]);
-#ifndef FWSIm
+
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
+
     if (log)
     {
         to_log(log, pb.rot.time, accel);
     }
-#endif
-    /*
-        if(fabs(pb.rot.disp) < 10.0*M_PI/180.0){
-            //TODO: add a flag for 'accurate' or not
-            chicker_auto_arm( chip ? CHICKER_CHIP : CHICKER_KICK, shoot_power);
-        }else{
-            chicker_auto_disarm();
-        }*/
 }
 
 

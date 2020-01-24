@@ -33,7 +33,7 @@ cc_library(
         "//software/ai/motion_constraint",
         "//software/geom",
         "//software/new_geom:point",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )

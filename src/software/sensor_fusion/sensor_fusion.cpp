@@ -1,6 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
-#include "software/util/constants.h"
+#include "software/constants.h"
 
 SensorFusion::SensorFusion()
     : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),

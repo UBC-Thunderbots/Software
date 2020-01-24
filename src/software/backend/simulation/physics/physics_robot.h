@@ -3,7 +3,7 @@
 #include <Box2D/Box2D.h>
 
 #include "software/new_geom/point.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
 class PhysicsRobot
@@ -47,6 +47,8 @@ class PhysicsRobot
      * object will have the same timestamp as the one provided in the parameter
      */
     Robot getRobotWithTimestamp(const Timestamp& timestamp) const;
+
+    RobotId getRobotId() const;
 
    private:
     /**

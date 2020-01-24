@@ -11,7 +11,7 @@ cc_library(
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_manager",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "@munkres_cpp",
     ],
 )

@@ -6,7 +6,7 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/sensor_fusion/robot_detection.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
 /**

@@ -5,7 +5,7 @@
 
 #include "software/new_geom/point.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 
 enum class RefboxGameState
 {

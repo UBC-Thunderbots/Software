@@ -8,6 +8,12 @@
  */
 #include "io/wheels.h"
 
+#include <math.h>
+#include <rcc.h>
+#include <registers/timer.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "control/control.h"
 #include "io/adc.h"
 #include "io/encoder.h"
@@ -15,13 +21,6 @@
 #include "io/motor.h"
 #include "io/receive.h"
 #include "util/error.h"
-#ifndef FWSIM
-#include <rcc.h>
-#include <registers/timer.h>
-#endif
-#include <math.h>
-#include <stdbool.h>
-#include <stdlib.h>
 
 #define THERMAL_TIME_CONSTANT 13.2f  // seconds—EC45 datasheet
 #define THERMAL_RESISTANCE 4.57f  // kelvins per Watt—EC45 datasheet (winding to housing)
@@ -256,4 +255,34 @@ void wheels_tick(log_record_t *log)
         }
     }
 #endif  // FWSIM
+}
+
+/**
+ * Gets the RPM of the wheel with the given index
+ * @param wheel_index The index of the wheel to get the RPM for
+ * @return The RPM of the wheel with the given index
+ */
+float wheels_get_wheel_rpm(int wheel_index)
+{
+    return (float)encoder_speed(wheel_index) * QUARTERDEGREE_TO_RPM;
+}
+
+float wheels_get_front_left_rpm()
+{
+    return wheels_get_wheel_rpm(0);
+}
+
+float wheels_get_front_right_rpm()
+{
+    return wheels_get_wheel_rpm(3);
+}
+
+float wheels_get_back_left_rpm()
+{
+    return wheels_get_wheel_rpm(1);
+}
+
+float wheels_get_back_right_rpm()
+{
+    return wheels_get_wheel_rpm(2);
 }

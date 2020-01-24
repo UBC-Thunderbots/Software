@@ -60,6 +60,7 @@
         1 /*Status*/
 
 static unsigned int robot_index;
+static FirmwareWorld_t *world;
 static uint8_t *dma_buffer;
 static SemaphoreHandle_t drive_mtx;
 static unsigned int timeout_ticks;
@@ -132,14 +133,17 @@ static void receive_task(void *UNUSED(param))
 /**
  * \brief Initializes the receive task.
  *
- * \param[in] index the robot index
+ * \param[in] index The robot index
+ * \param[in] _world The world the "high level" firmware can use to interact with the
+ *                   outside world
  */
-void receive_init(unsigned int index)
+void receive_init(unsigned int index, FirmwareWorld_t *_world)
 {
     static StaticSemaphore_t drive_mtx_storage;
     drive_mtx = xSemaphoreCreateMutexStatic(&drive_mtx_storage);
 
     robot_index = index;
+    world       = _world;
 
     dma_memory_handle_t dma_buffer_handle = dma_alloc(128U);
     assert(dma_buffer_handle);
@@ -175,7 +179,7 @@ void receive_tick(log_record_t *record)
 
         primitive_params_t stop_params;
         xSemaphoreTake(drive_mtx, portMAX_DELAY);
-        primitive_start(0, &stop_params);
+        primitive_start(0, &stop_params, world);
         xSemaphoreGive(drive_mtx);
     }
     else if (timeout_ticks > 1)
@@ -295,7 +299,7 @@ void handle_drive_packet(uint8_t *dma_buffer)
             pparams_previous.slow  = pparams.slow;
             pparams_previous.extra = pparams.extra;
             // Apply the movement primitive.
-            primitive_start(primitive, &pparams);
+            primitive_start(primitive, &pparams, world);
         }
     }
 
@@ -391,7 +395,7 @@ void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
                 uint16_t width = dma_buffer[MESSAGE_PAYLOAD_ADDR + 2U];
                 width <<= 8U;
                 width |= dma_buffer[MESSAGE_PAYLOAD_ADDR + 1U];
-                chicker_fire(which ? CHICKER_CHIP : CHICKER_KICK, width);
+                chicker_fire_with_pulsewidth(which ? CHICKER_CHIP : CHICKER_KICK, width);
             }
             break;
         case 0x01U:  // Arm autokick
