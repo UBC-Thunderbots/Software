@@ -10,4 +10,5 @@ cc_library(
         "//software/multithreading:thread_safe_buffer",
         "//firmware_new/proto:fw_cc_proto",
     ],
+    restricted_to = ["//cc_toolchain:k8"],
 )

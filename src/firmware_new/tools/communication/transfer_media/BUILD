@@ -14,4 +14,5 @@ cc_library(
         "@g3log",
         "//software/multithreading:thread_safe_buffer",
     ],
+    restricted_to = ["//cc_toolchain:k8"],
 )

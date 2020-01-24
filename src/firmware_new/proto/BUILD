@@ -20,10 +20,12 @@ proto_library(
 c_proto_library(
     name = "fw_c_proto",
     srcs = proto_files,
+    restricted_to = ["//cc_toolchain:stm32h7"],
 )
 
 cc_proto_library(
     name = "fw_cc_proto",
     deps = [":fw_proto"],
+    restricted_to = ["//cc_toolchain:k8"],
 )
 

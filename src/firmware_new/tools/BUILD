@@ -24,4 +24,5 @@ cc_binary(
             "//firmware_new/tools/communication/transfer_media:network_medium", 
             "//firmware_new/tools/communication:robot_communicator", 
             "//firmware_new/proto:fw_cc_proto"],
+    restricted_to = ["//cc_toolchain:k8"],
 )
