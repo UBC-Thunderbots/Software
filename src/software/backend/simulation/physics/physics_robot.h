@@ -48,55 +48,110 @@ class PhysicsRobot
      */
     Robot getRobotWithTimestamp(const Timestamp& timestamp) const;
 
+    /**
+     * Returns the id of this physics robot
+     *
+     * @return the id of this physics robot
+     */
     RobotId getRobotId() const;
 
    private:
     /**
-     * A helper function that creates the robot body object in the physics world
+     * Creates as many fixtures as necessary to represent the shape of the robot body, and
+     * adds them to the robot's b2Body
      *
-     * @param world A shared_ptr to a Box2D World
-     * @param robot The Robot being created in the Box2D world
+     * @param robot The robot to create fixtures for
+     * @param chicker_depth How far inset into the front of the robot the chicker is
      */
-    void createRobotPhysicsBody(std::shared_ptr<b2World> world, const Robot& robot);
+    void setupRobotBodyFixtures(const Robot& robot, double chicker_depth);
 
     /**
-     * A helper function that defines and adds fixtures to the robot physics object
-     * that represent the robot body
+     * Creates a fixture to represent the chicker of the robot. It is partially inset into
+     * the front of the robot.
      *
-     * @param robot The Robot being created in the Box2D world
+     * @param robot The robot to create the fixture for
+     * @param chicker_depth How far inset into the front of the robot the chicker is
      */
-    void setupRobotPhysicsBody(const Robot& robot);
+    void setupChickerFixture(const Robot& robot, double chicker_depth);
 
     /**
-     * A helper function that defines and adds fixtures to the robot physics object
-     * that represent the robot's chicker
+     * Creates a fixture to represent the dribbler of the robot. It does not interact
+     * physically with the world, it just serves as a way to detect when the ball is in
+     * the dribbling area. The dribbler area fills the inset area at the front of the
+     * robot.
      *
-     * @param robot The Robot being created in the Box2D world
+     * @param robot The robot to create the fixture for
+     * @param chicker_depth How far inset into the front of the robot the chicker is
      */
-    void setupChickerPhysicsBody(const Robot& robot);
+    void setupDribblerFixture(const Robot& robot, double chicker_depth);
 
     /**
-     * Returns a list of points that represent the vertices of a polygon approximating
-     * the shape of the robot body. The points are relative to the center of the robot,
-     * which is assumed to be at (0, 0)
+     * Together these functions return 3 polygons that together make up the shape of the
+     * robot. It is broken up this way because Box2D can only have convex polygons. We
+     * split the body into 3 parts:
+     * - The main body, which is everything behind the chicker
+     * - The front-left part, which is the bit that is to the front-left of the chicker,
+     * partially enclosing it
+     * - The front-right part, which is the bit that is to the front-right of the chicker,
+     * partially enclosing it
      *
-     * @param robot The robot
-     * @param num_vertices How many vertices to create
+     * See the ASCII diagram below for a rough view of how the robot is created.
+     * - The regions made with the '+' symbol are the front left and right bodies
+     * - The region made with the 'x' symbol is the main body
      *
-     * @return A list of vertices that make up a polygon approximating the shape of the
-     * robot body
+     *                                      xxxxxxxxxxxxxxxxxx
+     *                                   x                      x
+     *                                x                            x
+     *                             x                                  x
+     *                          x                                       X
+     *                       x                                          x+++
+     *                    x                                             x+  ++
+     *                 x                                                x+   +
+     *                 x                                                x+   +
+     *                 x                                                x+++++
+     *                 x                                                x|c|d|
+     *                 x                                                x|h|r|
+     *                 x                                                x|i|i|
+     *                 x                                                x|c|b|
+     *                 x                                                x|k|b|
+     *                 x                                                x|e|l|
+     *                 x                                                x|r|e|
+     *                 x                                                x+++++
+     *                 x                                                x+   +
+     *                 x                                                x+   +
+     *                    x                                             x+  ++
+     *                       x                                          x+++
+     *                          x                                       x
+     *                             x                                  x
+     *                                x                            x
+     *                                   x                      x
+     *                                      xxxxxxxxxxxxxxxxxx
+     *
+     *
+     * @param robot The robot to create
+     * @param chicker_depth How far inset into the front of the robot the chicker is
+     *
+     * @return A b2PolygonShape for the corresponding part of the robot body
      */
-    std::vector<Point> getRobotBodyVertices(const Robot& robot,
-                                            unsigned int num_vertices);
+    b2PolygonShape* getMainRobotBodyShape(const Robot& robot, double chicker_depth);
+    b2PolygonShape* getRobotBodyShapeFrontLeft(const Robot& robot, double chicker_depth);
+    b2PolygonShape* getRobotBodyShapeFrontRight(const Robot& robot, double chicker_depth);
+
+    /**
+     * A helper function that returns the points that make up the front-left shape
+     * for the robot body. The points that are returned assume the robot is at (0, 0)
+     * and is facing the +x axis (aka has an orientation of 0)
+     *
+     * @param robot The robot to create
+     * @param chicker_depth How far inset into the front of the robot the chicker is
+     *
+     * @return The points that make up the front-left shape for the robot body
+     */
+    std::vector<Point> getRobotFrontLeftShapePoints(const Robot& robot,
+                                                    double chicker_depth);
 
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
-    b2PolygonShape robot_body_shape;
-    b2FixtureDef robot_fixture_def;
-    b2PolygonShape robot_chicker_shape;
-    b2FixtureDef robot_chicker_def;
-    b2BodyDef robot_body_def;
     b2Body* robot_body;
-
     RobotId robot_id;
 };

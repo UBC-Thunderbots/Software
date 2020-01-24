@@ -18,6 +18,9 @@ const double FRONT_OF_ROBOT_WIDTH_METERS = 0.11;
 const double DRIBBLER_WIDTH_METERS = 0.088;
 // The approximate radius of the ball according to the SSL rulebook
 const double BALL_MAX_RADIUS_METERS = 0.0215;
+// According to the rules, 80% of the ball must be seen at all times. Robots may not
+// cover more than 20% of the ball
+const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
 const double BALL_MASS_KG = 0.004593;
 // The maximum number of robots we can communicate with over radio.
