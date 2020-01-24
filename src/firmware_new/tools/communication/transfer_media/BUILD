@@ -9,10 +9,10 @@ cc_library(
     name = "network_medium",
     srcs = ["network_medium.cpp"],
     hdrs = ["network_medium.h"],
+    restricted_to = ["//cc_toolchain:k8"],
     deps = [
         ":transfer_medium",
-        "@g3log",
         "//software/multithreading:thread_safe_buffer",
+        "@g3log",
     ],
-    restricted_to = ["//cc_toolchain:k8"],
 )

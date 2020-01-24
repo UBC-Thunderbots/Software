@@ -63,7 +63,6 @@ http_archive(
     ],
 )
 
-
 new_local_repository(
     name = "libusb",
     build_file = "@//external:libusb.BUILD",
