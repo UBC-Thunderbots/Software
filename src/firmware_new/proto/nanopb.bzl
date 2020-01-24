@@ -1,4 +1,4 @@
-load("@rules_proto//proto:defs.bzl", "ProtoInfo", "proto_lang_toolchain", "proto_library")
+load("@rules_proto//proto:defs.bzl", "ProtoInfo", "proto_library")
 load("@com_google_protobuf//:protobuf.bzl", "proto_gen")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
