@@ -96,7 +96,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
