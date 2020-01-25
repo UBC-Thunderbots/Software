@@ -7,16 +7,17 @@
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
 
-NetworkClient::NetworkClient(std::string vision_multicast_address,
-                             int vision_multicast_port,
-                             std::string gamecontroller_multicast_address,
-                             int gamecontroller_multicast_port,
-                             std::function<void(World)> received_world_callback)
+NetworkClient::NetworkClient(
+    std::string vision_multicast_address, int vision_multicast_port,
+    std::string gamecontroller_multicast_address, int gamecontroller_multicast_port,
+    std::function<void(VisionDetection)> received_vision_detection_callback,
+    std::function<void(RefboxData)> received_refbox_data_callback)
     : network_filter(),
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
-      received_world_callback(received_world_callback)
+      received_vision_detection_callback(received_vision_detection_callback),
+      received_refbox_data_callback(received_refbox_data_callback)
 {
     setupVisionClient(vision_multicast_address, vision_multicast_port);
 
@@ -167,13 +168,13 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     VisionDetection vision_detection(ball_detections, friendly_team_detections,
                                      enemy_team_detections, field_detection,
                                      latest_timestamp);
-    // received_vision_detection_callback(vision_detection);
+    received_vision_detection_callback(vision_detection);
 }
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
     RefboxData refbox_data = network_filter.getRefboxData(packet);
-    // received_refbox_data_callback(refbox_data);
+    received_refbox_data_callback(refbox_data);
 }
 
 void NetworkClient::invertFieldSide(SSL_DetectionFrame& frame)

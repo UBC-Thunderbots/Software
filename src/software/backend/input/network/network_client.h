@@ -31,14 +31,16 @@ class NetworkClient
      * @param gamecontroller_multicast_address A string representation of the ip address
      *                                         the gamecontroller is running on
      * @param gamecontroller_multicast_port The port the gamecontroller is running on
-     * @param received_world_callback This function will be called with a new world
-     *                                every time one is received
+     * @param received_vision_detection_callback This function will be called with a new
+     * VisionDetection every time one is received
+     * @param received_refbox_data_callback This function will be called with a new
+     * RefboxData every time one is received
      */
-    explicit NetworkClient(std::string vision_multicast_address,
-                           int vision_multicast_port,
-                           std::string gamecontroller_multicast_address,
-                           int gamecontroller_multicast_port,
-                           std::function<void(World)> received_world_callback);
+    explicit NetworkClient(
+        std::string vision_multicast_address, int vision_multicast_port,
+        std::string gamecontroller_multicast_address, int gamecontroller_multicast_port,
+        std::function<void(VisionDetection)> received_vision_detection_callback,
+        std::function<void(RefboxData)> received_refbox_data_callback);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and
@@ -156,6 +158,9 @@ class NetworkClient
     // before passing the packets on to the actual logic
     int initial_packet_count;
 
-    // The callback function that we pass newly received/filtered worlds to
-    std::function<void(World)> received_world_callback;
+    // The callback function that we pass newly received/filtered VisionDetection to
+    std::function<void(VisionDetection)> received_vision_detection_callback;
+
+    // The callback function that we pass newly received/filtered RefboxData to
+    std::function<void(RefboxData)> received_refbox_data_callback;
 };
