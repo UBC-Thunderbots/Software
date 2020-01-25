@@ -172,7 +172,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
         Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
     ShadowEnemyTactic tactic = ShadowEnemyTactic(
         initial_world.field(), initial_world.friendlyTeam(), initial_world.enemyTeam(),
-        true, initial_world.ball(), 10.0, false);
+        true, initial_world.ball(), 10.0, false, false);
     EXPECT_EQ(tactic.getField(), initial_world.field());
     EXPECT_EQ(tactic.getEnemyTeam(), initial_world.enemyTeam());
     EXPECT_EQ(tactic.getFriendlyTeam(), initial_world.friendlyTeam());

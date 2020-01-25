@@ -53,7 +53,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(), 0.5,
-                                            enemy_team_can_pass);
+                                            enemy_team_can_pass,false);
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
