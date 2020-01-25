@@ -10,8 +10,8 @@
 
 DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(
     const Field &field, const Team &friendly_team, const Team &enemy_team,
-    const Ball &ball, bool ignore_goalie, double shadow_distance, bool loop_forever)
-    : Tactic(loop_forever),
+    const Ball &ball, bool ignore_goalie, double shadow_distance)
+    : Tactic(true),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
