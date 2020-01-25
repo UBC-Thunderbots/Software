@@ -81,4 +81,21 @@ typedef struct
      * \param[in] world The world to perform the primitive in
      */
     void (*tick)(FirmwareWorld_t *world);
+
+    // TODO: better names
+    // TODO: better jdocs
+
+    /**
+     * Allocate a "state" variable that will be passed into all the primitive functions
+     * @return A pointer to a "state" object, ie. whatever this primitive wants to store
+     *         in terms of stateful information
+     */
+    void* (*create_state)();
+
+    /**
+     * Destroy an instance of the "state" object for this primitive
+     * @param state A void pointer to the state object to destroy
+     */
+    void (*destroy_state)(void* state);
+
 } primitive_t;

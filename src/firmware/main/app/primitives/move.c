@@ -12,22 +12,10 @@
 #include "shared/robot_constants.h"
 
 
-
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
 #define TIME_HORIZON 0.05f  // s
-
-const float PI_2 = P_PI / 2.0f;
-static float destination[3], end_speed, major_vec[2], minor_vec[2];
-// store a wheel index here so we only have to calculate the axis
-// we want to use when move start is called
-static unsigned wheel_index;
-// an array to store the wheel axes in that are perpendicular to
-// each wheel
-static float wheel_axes[8];
-
-static bool slow;
 
 // The minimum distance away from our destination that we must be if we
 // are going to rotate the bot onto its wheel axis
@@ -36,9 +24,18 @@ static bool slow;
 // set it a litle larger than that.
 static const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
 
-#define VAL_EQUIVALENT_2_ZERO (5e-3f)
-#define CONTROL_TICK (1.0f / CONTROL_LOOP_HZ)
-#define LOOK_AHEAD_T 10
+const float PI_2 = P_PI / 2.0f;
+
+typedef struct MovePrimitiveState {
+    float destination[3], end_speed, major_vec[2], minor_vec[2];
+    // We store a wheel index here so we only have to calculate the axis
+    // we want to use when move start is called
+    unsigned wheel_index;
+    // an array to store the wheel axes in that are perpendicular to
+    // each wheel
+    float wheel_axes[8];
+    bool slow;
+} MovePrimitiveState_t;
 
 /**
  * call from move_start to choose which wheel axis we will be
