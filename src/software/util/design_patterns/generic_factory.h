@@ -10,7 +10,7 @@
 template <class IndexType, class TypeToCreate>
 using GenericRegistry = std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>()>>;
 /**
- * The GenericFactory is an Abstract class that provides an interface for generic type
+ * The GenericFactory is an Abstract class that provides an interface for Generic type
  * Factories to follow. This makes it easy to maintain a list of factories and get the
  * corresponding generic types through the generic interface.
  */
@@ -84,9 +84,9 @@ private:
 };
 
 /**
- * This templated generic factory class is used by Backends that are derived from the
+ * This templated generic factory class is used by Generic types that are derived from the
  * Abstract Generic class. Its purpose is to create a Factory for the implemented Generic
- * and automatically register the backend in the BackendFactory registry.
+ * and automatically register the Generic type in the GenericFactory registry.
  *
  * Declaring the static variable will also cause it to be initialized at the start of the
  * program (because it's static). This will immediately call the constructor, which adds
@@ -95,9 +95,9 @@ private:
  * this templated class).
  *
  * @tparam T The class of the Generic to be added to the registry. For example, to add a
- * new class called MoveBackend that inherits from Backend, the following line should be
- * added to the end of the .cpp file (without the quotations): "static
- * TGenericFactory<MoveBackend> factory;"
+ * new class called MoveBackend that inherits from Backend (or any other Generic), the
+ * following line should be added to the end of the .cpp file (without the quotations):
+ * "static TGenericFactory<MoveBackend> factory;"
  */
 template <class IndexType, class TypeToCreate, class T>
 class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
