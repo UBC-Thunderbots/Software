@@ -28,7 +28,7 @@ TEST(TacticUpdateVisitorTest, update_chip_tactic)
                                                      Timestamp::fromSeconds(0));
     update_world.updateFieldGeometry(
         Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
-    ChipTactic tactic = ChipTactic(initial_world.ball());
+    ChipTactic tactic = ChipTactic(initial_world.ball(),false);
     EXPECT_EQ(tactic.getBall(), initial_world.ball());
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
     tactic.accept(visitor);

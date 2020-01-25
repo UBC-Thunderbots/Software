@@ -228,7 +228,7 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic)
 {
-    auto chip_tactic = std::make_shared<ChipTactic>(world.ball());
+    auto chip_tactic = std::make_shared<ChipTactic>(world.ball(),false);
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset = Util::DynamicParameters->getAIConfig()
