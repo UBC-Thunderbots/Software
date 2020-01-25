@@ -49,6 +49,7 @@ cc_library(
         "//software/backend:robot_status",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/parameter:dynamic_parameters",
         "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/world",
     ],

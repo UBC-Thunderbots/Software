@@ -1,6 +1,7 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
 #include "software/constants.h"
+#include "software/parameter/dynamic_parameters.h"
 
 SensorFusion::SensorFusion()
     : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
@@ -58,6 +59,18 @@ void SensorFusion::updateWorld(VisionDetection vision_detection)
         friendly_team_state, friendly_robot_detections);
     Team new_enemy_team =
         enemy_team_filter.getFilteredData(enemy_team_state, enemy_robot_detections);
+
+    // Set team goalies
+    int friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
+                                 ->getRefboxConfig()
+                                 ->FriendlyGoalieId()
+                                 ->value();
+    new_friendly_team.assignGoalie(friendly_goalie_id);
+    int enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
+                              ->getRefboxConfig()
+                              ->EnemyGoalieId()
+                              ->value();
+    new_enemy_team.assignGoalie(enemy_goalie_id);
 
     // Update World
     if (field_detection)
