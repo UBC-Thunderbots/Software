@@ -47,10 +47,6 @@ cc_library(
     name = "network_client",
     srcs = [
         "network_client.cpp",
-        # TODO: We shouldn't have to have the *_client.cpp files here, but full_system
-        #       fails to link if we don't.......
-        #        "ssl_vision_client.cpp",
-        #        "ssl_gamecontroller_client.cpp",
     ],
     hdrs = ["network_client.h"],
     deps = [

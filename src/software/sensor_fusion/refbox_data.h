@@ -75,85 +75,116 @@ enum class RefboxStage
 class TeamInfo
 {
    public:
-    TeamInfo() {}
+    /**
+     * Default constructor
+     */
+    TeamInfo();
+
+    /**
+     * Constructor that initializes all fields
+     *
+     * @param
+     * @param name name
+     * @param score score
+     * @param red_cards red_cards
+     * @param yellow_card_times yellow_card_times
+     * @param yellow_cards yellow_cards
+     * @param timeouts timeouts
+     * @param timeout_time timeout_time
+     * @param goalkeeper goalkeeper
+     * @param foul_counter foul_counter
+     * @param ball_placement_failures ball_placement_failures
+     * @param can_place_ball can_place_ball
+     * @param max_allowed_bots max_allowed_bots
+     */
     TeamInfo(std::string name, int score, int red_cards,
              std::vector<int> yellow_card_times, int yellow_cards, int timeouts,
              int timeout_time, int goalkeeper, int foul_counter,
-             int ball_placement_failures, bool can_place_ball, int max_allowed_bots)
-        : name(name),
-          score(score),
-          red_cards(red_cards),
-          yellow_card_times(yellow_card_times),
-          yellow_cards(yellow_cards),
-          timeouts(timeouts),
-          timeout_time(timeout_time),
-          goalkeeper(goalkeeper),
-          foul_counter(foul_counter),
-          ball_placement_failures(ball_placement_failures),
-          can_place_ball(can_place_ball),
-          max_allowed_bots(max_allowed_bots)
-    {
-    }
+             int ball_placement_failures, bool can_place_ball, int max_allowed_bots);
 
-    std::string getName(void)
-    {
-        return name;
-    }
+    /**
+     * Return name
+     *
+     * @return name
+     */
+    std::string getName(void) const;
 
-    int getScore(void)
-    {
-        return score;
-    }
+    /**
+     * Return score
+     *
+     * @return score
+     */
+    int getScore(void) const;
 
-    int getRedCards(void)
-    {
-        return red_cards;
-    }
+    /**
+     * Return number of red cards
+     *
+     * @return number of red cards
+     */
+    int getRedCards(void) const;
 
-    std::vector<int> getYellowCardTimes(void)
-    {
-        return yellow_card_times;
-    }
+    /**
+     * Return yellow card times
+     *
+     * @return yellow card times
+     */
+    std::vector<int> getYellowCardTimes(void) const;
 
-    int getYellowCards(void)
-    {
-        return yellow_cards;
-    }
+    /**
+     * Return number of red cards
+     *
+     * @return number of red cards
+     */
+    int getYellowCards(void) const;
 
-    int getTimeouts(void)
-    {
-        return timeouts;
-    }
+    /**
+     * Return number of timeouts
+     *
+     * @return number of timeouts
+     */
+    int getTimeouts(void) const;
 
-    int getTimeoutTime(void)
-    {
-        return timeout_time;
-    }
+    /**
+     * Return timeout time
+     *
+     * @return timeout time
+     */
+    int getTimeoutTime(void) const;
 
-    int getGoalkeeper(void)
-    {
-        return goalkeeper;
-    }
+    /**
+     * Return goalkeeper
+     *
+     * @return goalkeeper
+     */
+    int getGoalkeeper(void) const;
 
-    int getFoulCounter(void)
-    {
-        return foul_counter;
-    }
+    /**
+     * Return foul counter
+     *
+     * @return foul counter
+     */
+    int getFoulCounter(void) const;
 
-    int getBallPlacementFailures(void)
-    {
-        return ball_placement_failures;
-    }
+    /**
+     * Return ball placement failures
+     *
+     * @return ball placement failures
+     */
+    int getBallPlacementFailures(void) const;
 
-    bool getCanPlaceBall(void)
-    {
-        return can_place_ball;
-    }
+    /**
+     * Return can place ball
+     *
+     * @return can place ball
+     */
+    bool getCanPlaceBall(void) const;
 
-    int getMaxAllowedBots(void)
-    {
-        return max_allowed_bots;
-    }
+    /**
+     * Return max allowed bots
+     *
+     * @return max allowed bots
+     */
+    int getMaxAllowedBots(void) const;
 
    private:
     // The team's name (empty string if operator has not typed anything).

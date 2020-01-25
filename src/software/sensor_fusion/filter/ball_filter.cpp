@@ -27,7 +27,6 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
     for (const auto &detection : new_ball_detections)
     {
         // Ignore any detections that are not anywhere within the field
-        // and ignore any detections that are in the past
         if (!field.pointInEntireField(detection.position))
         {
             continue;
