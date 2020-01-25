@@ -107,20 +107,21 @@ class NetworkFilter
     void setOurFieldSide(bool blue_team_on_positive_half);
 
     /**
-     * Converts a protobuf Referee::Command into a RefboxCommand constant for the
+     * Converts a protobuf Referee::Command into a RefboxGameState for the
      * corresponding Refbox command, based on which team we are (blue or yellow).
      *
      * @param command a referee command from the protobuf message
-     * @return a ROS message RefboxCommand constant corresponding to the input command
+     *
+     * @return RefboxGameState from command
      */
-    RefboxGameState getTeamCommand(const Referee::Command &command);
+    RefboxGameState getRefboxGameState(const Referee::Command &command);
 
     /**
-     * Filters GameState from a Referee proto message
+     * Converts a protobuf stage into a RefboxStage
      *
-     * @param packet Referee proto to filter
+     * @param stage Referee protobuf Stage
      *
-     * @return RefboxGameState filtered from the packet
+     * @return RefboxStage from stage
      */
-    RefboxGameState getRefboxGameState(const Referee &packet);
+    RefboxStage getRefboxStage(const Referee::Stage &stage);
 };

@@ -221,26 +221,60 @@ std::vector<RobotDetection> NetworkFilter::getTeamDetections(
     return robot_detections;
 }
 
-// RefboxData NetworkFilter::getRefboxData(const Referee &packet)
-//{
-//    // SSL Referee proto messages' `Command` fields map to `RefboxGameState` data
-//    structures RefboxGameState game_state = getTeamCommand(packet.command());
-//    RefboxGameState next_game_state = getTeamCommand(packet.next_command());
-//    TeamInfo friendly_team_info =
-//    TeamInfo enemy_team_info =
-//
-//    return RefboxData(packet.packet_timestamp(), packet.command_timestamp(),
-//               packet.command_counter(), packet.designated_position(),
-//               packet.blue_team_on_positive_half(),
-//               packet.current_action_time_remaining(), friendly_team_info,
-//               enemy_team_info, game_state, next_game_state, RefboxStage stage,
-//               std::vector<GameEvent> game_events,
-//               std::vector<ProposedGameEvent> proposed_game_events)
-//}
-
-RefboxGameState NetworkFilter::getRefboxGameState(const Referee &packet)
+RefboxData NetworkFilter::getRefboxData(const Referee &packet)
 {
-    return getTeamCommand(packet.command());
+    // SSL Referee proto messages' `Command` fields map to `RefboxGameState` data
+    // structures
+    RefboxGameState game_state      = getRefboxGameState(packet.command());
+    RefboxGameState next_game_state = getRefboxGameState(packet.next_command());
+
+    TeamInfo friendly_team_info, enemy_team_info;
+
+    TeamInfo yellow_team_info(
+        packet.yellow().name(), packet.yellow().score(), packet.yellow().red_cards(),
+        std::vector<int>(packet.yellow().yellow_card_times().begin(),
+                         packet.yellow().yellow_card_times().begin()),
+        packet.yellow().yellow_cards(), packet.yellow().timeouts(),
+        packet.yellow().timeout_time(), packet.yellow().goalkeeper(),
+        packet.yellow().foul_counter(), packet.yellow().ball_placement_failures(),
+        packet.yellow().can_place_ball(), packet.yellow().max_allowed_bots());
+
+    TeamInfo blue_team_info(
+        packet.blue().name(), packet.blue().score(), packet.blue().red_cards(),
+        std::vector<int>(packet.blue().yellow_card_times().begin(),
+                         packet.blue().yellow_card_times().begin()),
+        packet.blue().yellow_cards(), packet.blue().timeouts(),
+        packet.blue().timeout_time(), packet.blue().goalkeeper(),
+        packet.blue().foul_counter(), packet.blue().ball_placement_failures(),
+        packet.blue().can_place_ball(), packet.blue().max_allowed_bots());
+
+    if (Util::DynamicParameters->getAIControlConfig()
+            ->getRefboxConfig()
+            ->FriendlyColorYellow()
+            ->value())
+    {
+        friendly_team_info = yellow_team_info;
+        enemy_team_info    = blue_team_info;
+    }
+    else
+    {
+        friendly_team_info = blue_team_info;
+        enemy_team_info    = yellow_team_info;
+    }
+
+    RefboxStage stage = getRefboxStage(packet.stage());
+
+    return RefboxData(
+        Timestamp::fromMilliseconds(packet.packet_timestamp() / 1000),
+        Timestamp::fromMilliseconds(packet.command_timestamp() / 1000),
+        packet.command_counter(),
+        Point(packet.designated_position().x(), packet.designated_position().y()),
+        packet.blue_team_on_positive_half(),
+        Duration::fromMilliseconds(packet.current_action_time_remaining() / 1000),
+        friendly_team_info, enemy_team_info, game_state, next_game_state, stage,
+        std::vector<GameEvent>(packet.game_events().begin(), packet.game_events().end()),
+        std::vector<ProposedGameEvent>(packet.proposed_game_events().begin(),
+                                       packet.proposed_game_events().end()));
 }
 
 // this maps a protobuf Referee_Command enum to its ROS message equivalent
@@ -288,7 +322,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
         {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
         {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
-RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
+RefboxGameState NetworkFilter::getRefboxGameState(const Referee::Command &command)
 {
     if (!Util::DynamicParameters->getAIControlConfig()
              ->getRefboxConfig()
@@ -301,6 +335,28 @@ RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
     {
         return yellow_team_command_map.at(command);
     }
+}
+
+// this maps a protobuf Referee_Stage enum to its RefboxStage equivalent
+const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = {
+    {Referee_Stage_NORMAL_FIRST_HALF_PRE, RefboxStage::NORMAL_FIRST_HALF_PRE},
+    {Referee_Stage_NORMAL_FIRST_HALF, RefboxStage::NORMAL_FIRST_HALF},
+    {Referee_Stage_NORMAL_HALF_TIME, RefboxStage::NORMAL_HALF_TIME},
+    {Referee_Stage_NORMAL_SECOND_HALF_PRE, RefboxStage::NORMAL_SECOND_HALF_PRE},
+    {Referee_Stage_NORMAL_SECOND_HALF, RefboxStage::NORMAL_SECOND_HALF},
+    {Referee_Stage_EXTRA_TIME_BREAK, RefboxStage::EXTRA_TIME_BREAK},
+    {Referee_Stage_EXTRA_FIRST_HALF_PRE, RefboxStage::EXTRA_FIRST_HALF_PRE},
+    {Referee_Stage_EXTRA_FIRST_HALF, RefboxStage::EXTRA_FIRST_HALF},
+    {Referee_Stage_EXTRA_HALF_TIME, RefboxStage::EXTRA_HALF_TIME},
+    {Referee_Stage_EXTRA_SECOND_HALF_PRE, RefboxStage::EXTRA_SECOND_HALF_PRE},
+    {Referee_Stage_EXTRA_SECOND_HALF, RefboxStage::EXTRA_SECOND_HALF},
+    {Referee_Stage_PENALTY_SHOOTOUT_BREAK, RefboxStage::PENALTY_SHOOTOUT_BREAK},
+    {Referee_Stage_PENALTY_SHOOTOUT, RefboxStage::PENALTY_SHOOTOUT},
+    {Referee_Stage_POST_GAME, RefboxStage::POST_GAME}};
+
+RefboxStage NetworkFilter::getRefboxStage(const Referee::Stage &stage)
+{
+    return refbox_stage_map.at(stage);
 }
 
 void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)

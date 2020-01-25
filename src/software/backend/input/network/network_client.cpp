@@ -172,7 +172,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    // RefboxData refbox_data =  network_filter.getRefboxData(packet);
+    RefboxData refbox_data = network_filter.getRefboxData(packet);
     // received_refbox_data_callback(refbox_data);
 }
 

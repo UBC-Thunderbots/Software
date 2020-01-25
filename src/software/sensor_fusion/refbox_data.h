@@ -75,6 +75,7 @@ enum class RefboxStage
 class TeamInfo
 {
    public:
+    TeamInfo() {}
     TeamInfo(std::string name, int score, int red_cards,
              std::vector<int> yellow_card_times, int yellow_cards, int timeouts,
              int timeout_time, int goalkeeper, int foul_counter,
