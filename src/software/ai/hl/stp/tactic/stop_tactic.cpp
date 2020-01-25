@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 
 
-StopTactic::StopTactic(bool coast, bool loop_forever) : Tactic(loop_forever), coast(coast)
+StopTactic::StopTactic(bool coast) : Tactic(true), coast(coast)
 {
 }
 
