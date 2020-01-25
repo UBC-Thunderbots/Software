@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/ball.h"
 
 // Test where the ball will intersect the friendly net

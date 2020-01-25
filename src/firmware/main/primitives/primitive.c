@@ -13,9 +13,7 @@
 #include "direct_velocity.h"
 #include "direct_wheels.h"
 #include "dribble.h"
-#include "io/chicker.h"
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/receive.h"
 #include "move.h"
 #include "pivot.h"
@@ -95,20 +93,28 @@ void primitive_init(void)
  *
  * \param[in] primitive the index of the primitive to run
  * \param[in] params the parameters to the primitive
+ * \param[in] world The world to perform the primitive in
  */
-void primitive_start(unsigned int primitive, const primitive_params_t *params)
+void primitive_start(unsigned int primitive, const primitive_params_t *params,
+                     FirmwareWorld_t *world)
 {
     assert(primitive < PRIMITIVE_COUNT);
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
     if (primitive_current)
     {
-        primitive_current->end();
+        primitive_current->end(world);
     }
-    chicker_auto_disarm();
-    dribbler_set_speed(0);
+
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
+    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
+
+    app_chicker_disableAutochip(chicker);
+    app_chicker_disableAutokick(chicker);
+    app_dribbler_setSpeed(dribbler, 0);
     primitive_current       = PRIMITIVES[primitive];
     primitive_current_index = primitive;
-    primitive_current->start(params);
+    primitive_current->start(params, world);
     xSemaphoreGive(primitive_mutex);
 }
 
@@ -117,8 +123,9 @@ void primitive_start(unsigned int primitive, const primitive_params_t *params)
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world An object representing the world
  */
-void primitive_tick(log_record_t *log)
+void primitive_tick(log_record_t *log, FirmwareWorld_t *world)
 {
     xSemaphoreTake(primitive_mutex, portMAX_DELAY);
     if (log)
@@ -128,7 +135,7 @@ void primitive_tick(log_record_t *log)
     }
     if (primitive_current)
     {
-        primitive_current->tick(log);
+        primitive_current->tick(log, world);
     }
     dr_tick(log);
     xSemaphoreGive(primitive_mutex);

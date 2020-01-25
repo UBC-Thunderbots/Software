@@ -1,7 +1,7 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/util/logger/init.h"
-#include "software/util/time/duration.h"
+#include "software/logger/init.h"
+#include "software/time/duration.h"
 
 void SimulatedTest::SetUp()
 {

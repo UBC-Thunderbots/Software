@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/robot.h"
 
 #include "shared/constants.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 
 bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,

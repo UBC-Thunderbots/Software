@@ -3,16 +3,6 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "io/encoder.h"
-
-#ifndef FWSIM
-#include "io/adc.h"
-#else
-#include <stdio.h>
-#include <stdlib.h>
-#endif
-
-
 // Wheel angles for these matricies are (55, 135, 225, 305) degrees
 // these matrices may be derived as per omnidrive_kiart paper
 
@@ -517,9 +507,6 @@ void force3_to_force4(float force3[3], float force4[4])
     matrix_mult_t(force4, 4, force3, 3, speed4_to_speed3_mat);
 }
 
-// need the ifndef here so that we can ignore this code when compiling
-// the firmware tests
-#ifndef FWTEST
 /**
  * \ingroup Physics
  *
@@ -529,7 +516,6 @@ void force3_to_force4(float force3[3], float force4[4])
  *
  * \return the amount by which to scale the torque vector to max it out
  */
-#ifndef FWSIM
 float get_maximal_torque_scaling(const float torque[4])
 {
     float acc_max  = -INFINITY;
@@ -550,12 +536,11 @@ float get_maximal_torque_scaling(const float torque[4])
         }
     }
 
-    float slip_ratio = DELTA_VOLTAGE_LIMIT / acc_max;
+    float slip_ratio = WHEEL_SLIP_VOLTAGE_LIMIT / acc_max;
     float emf_ratio  = adc_battery() / vapp_max;
 
     return (emf_ratio > slip_ratio) ? slip_ratio : emf_ratio;
 }
-#endif
 
 
 /**
@@ -568,7 +553,6 @@ float get_maximal_torque_scaling(const float torque[4])
  *
  * \return amount by which to scale acceleration
  */
-#ifndef FWSIM
 float get_maximal_accel_scaling(const float linear_accel[2], float angular_accel)
 {
     // first convert accelerations into consistent units
@@ -586,9 +570,6 @@ float get_maximal_accel_scaling(const float linear_accel[2], float angular_accel
     }
     return get_maximal_torque_scaling(wheel_force);
 }
-#endif
-
-#endif
 
 /**
  * \ingroup Physics

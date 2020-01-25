@@ -10,7 +10,8 @@ using namespace Passing;
 
 PassGenerator::PassGenerator(const World& world, const Point& passer_point,
                              const PassType& pass_type, bool running_deterministically)
-    : updated_world(world),
+    : running_deterministically(running_deterministically),
+      updated_world(world),
       world(world),
       passer_robot_id(std::nullopt),
       optimizer(optimizer_param_weights),
@@ -22,8 +23,7 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
       // no special meaning.
       random_num_gen(13),
       pass_type(pass_type),
-      in_destructor(false),
-      running_deterministically(running_deterministically)
+      in_destructor(false)
 {
     // Generate the initial set of passes
     passes_to_optimize = generatePasses(getNumPassesToOptimize());

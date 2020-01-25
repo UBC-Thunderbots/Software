@@ -21,10 +21,10 @@ class NoPathNavigatorTest : public testing::Test
                     ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                     std::make_shared<NavigatorConfig>()),
           current_time(Timestamp::fromSeconds(123)),
+          field(::Test::TestUtil::createSSLDivBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
           friendly_team(Team(Duration::fromMilliseconds(1000))),
-          enemy_team(Team(Duration::fromMilliseconds(1000))),
-          field(::Test::TestUtil::createSSLDivBField())
+          enemy_team(Team(Duration::fromMilliseconds(1000)))
     {
     }
 

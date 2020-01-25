@@ -29,7 +29,7 @@ cc_library(
         ":box2d_util",
         "//shared:constants",
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "//software/world:ball",
         "@box2d",
     ],
@@ -52,7 +52,7 @@ cc_library(
     hdrs = ["physics_field.h"],
     deps = [
         ":box2d_util",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "//software/world:field",
         "@box2d",
     ],
@@ -79,7 +79,7 @@ cc_library(
         ":box2d_util",
         "//shared:constants",
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
         "//software/world:robot",
         "@box2d",
     ],
@@ -99,15 +99,36 @@ cc_test(
 )
 
 cc_library(
+    name = "physics_world",
+    srcs = ["physics_world.cpp"],
+    hdrs = ["physics_world.h"],
+    deps = [
+        ":box2d_util",
+        "//shared:constants",
+        "//software/backend/simulation/physics:physics_ball",
+        "//software/backend/simulation/physics:physics_field",
+        "//software/backend/simulation/physics:physics_robot",
+        "//software/geom",
+        "//software/time:duration",
+        "//software/time:timestamp",
+        "//software/world",
+        "//software/world:robot",
+        "@box2d",
+    ],
+)
+
+cc_library(
     name = "physics_simulator",
     srcs = ["physics_simulator.cpp"],
     hdrs = ["physics_simulator.h"],
     deps = [
         ":physics_ball",
         ":physics_field",
-        "//software/util/time:duration",
-        "//software/util/time:timestamp",
+        ":physics_robot",
+        "//software/time:duration",
+        "//software/time:timestamp",
         "//software/world",
+        "//software/world:robot",
         "@box2d",
     ],
 )

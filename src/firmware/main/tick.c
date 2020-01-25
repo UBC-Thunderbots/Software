@@ -46,6 +46,7 @@
 #include <task.h>
 #include <unused.h>
 
+#include "app/world/firmware_world.h"
 #include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
@@ -68,6 +69,7 @@ _Static_assert(portTICK_PERIOD_MS *CONTROL_LOOP_HZ == 1000U,
                "Tick rate is not equal to control loop period.");
 
 static bool shutdown = false;
+static FirmwareWorld_t *world;
 
 static void normal_task(void *UNUSED(param))
 {
@@ -106,7 +108,7 @@ static void normal_task(void *UNUSED(param))
         hall_tick();
         encoder_tick();
 
-        primitive_tick(record);
+        primitive_tick(record, world);
         wheels_tick(record);
         dribbler_tick(record);
         charger_tick();
@@ -131,9 +133,14 @@ static void normal_task(void *UNUSED(param))
 
 /**
  * \brief Initializes the tick generators.
+ *
+ * \param[in] _world The world the "high level" firmware can use to interact with the
+ *                   outside world
  */
-void tick_init(void)
+void tick_init(FirmwareWorld_t *_world)
 {
+    world = _world;
+
     // Configure timer 6 to run the fast ticks.
     rcc_enable_reset(APB1, TIM6);
     TIM6.PSC            = 84000000U / 1000000U;  // One microsecond per timer tick
