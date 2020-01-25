@@ -37,8 +37,7 @@ double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const Worl
 }
 void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action =
-        std::make_shared<MoveAction>(false);
+    auto move_action      = std::make_shared<MoveAction>(false);
     Point defend_position = robot->position();
 
     do

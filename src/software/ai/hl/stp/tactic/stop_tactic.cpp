@@ -6,9 +6,7 @@
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 
 
-StopTactic::StopTactic(bool coast) : Tactic(true), coast(coast)
-{
-}
+StopTactic::StopTactic(bool coast) : Tactic(true), coast(coast) {}
 
 std::string StopTactic::getName() const
 {
@@ -23,7 +21,6 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-
     auto stop_action = std::make_shared<StopAction>();
 
     do

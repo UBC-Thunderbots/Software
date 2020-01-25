@@ -3,8 +3,7 @@
 #include "software/ai/intent/stop_intent.h"
 
 StopAction::StopAction(double stopped_speed_threshold)
-    : Action(),
-      stopped_speed_threshold(stopped_speed_threshold)
+    : Action(), stopped_speed_threshold(stopped_speed_threshold)
 
 {
 }

@@ -144,8 +144,8 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto kick_action = std::make_shared<KickAction>();
     auto chip_action = std::make_shared<ChipAction>();
-    auto move_action = std::make_shared<MoveAction>(true,
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
+    auto move_action = std::make_shared<MoveAction>(
+        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     std::optional<Shot> shot_target;
     do
     {

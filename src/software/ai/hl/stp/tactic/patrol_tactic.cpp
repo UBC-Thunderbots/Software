@@ -57,7 +57,6 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     if (patrol_points.empty())
     {
-
         auto stop_action = std::make_shared<StopAction>();
 
         do

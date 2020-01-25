@@ -8,9 +8,11 @@
 #include "software/logger/init.h"
 #include "software/parameter/dynamic_parameters.h"
 
-DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(
-    const Field &field, const Team &friendly_team, const Team &enemy_team,
-    const Ball &ball, bool ignore_goalie, double shadow_distance)
+DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
+                                                   const Team &friendly_team,
+                                                   const Team &enemy_team,
+                                                   const Ball &ball, bool ignore_goalie,
+                                                   double shadow_distance)
     : Tactic(true),
       field(field),
       friendly_team(friendly_team),
@@ -59,7 +61,6 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
 
 void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-
     auto move_action = std::make_shared<MoveAction>(false);
     auto stop_action = std::make_shared<StopAction>();
 
