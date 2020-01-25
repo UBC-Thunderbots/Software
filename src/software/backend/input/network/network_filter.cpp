@@ -221,6 +221,23 @@ std::vector<RobotDetection> NetworkFilter::getTeamDetections(
     return robot_detections;
 }
 
+// RefboxData NetworkFilter::getRefboxData(const Referee &packet)
+//{
+//    // SSL Referee proto messages' `Command` fields map to `RefboxGameState` data
+//    structures RefboxGameState game_state = getTeamCommand(packet.command());
+//    RefboxGameState next_game_state = getTeamCommand(packet.next_command());
+//    TeamInfo friendly_team_info =
+//    TeamInfo enemy_team_info =
+//
+//    return RefboxData(packet.packet_timestamp(), packet.command_timestamp(),
+//               packet.command_counter(), packet.designated_position(),
+//               packet.blue_team_on_positive_half(),
+//               packet.current_action_time_remaining(), friendly_team_info,
+//               enemy_team_info, game_state, next_game_state, RefboxStage stage,
+//               std::vector<GameEvent> game_events,
+//               std::vector<ProposedGameEvent> proposed_game_events)
+//}
+
 RefboxGameState NetworkFilter::getRefboxGameState(const Referee &packet)
 {
     return getTeamCommand(packet.command());

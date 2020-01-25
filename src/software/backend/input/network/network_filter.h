@@ -58,7 +58,14 @@ class NetworkFilter
     std::vector<RobotDetection> getTeamDetections(
         const std::vector<SSL_DetectionFrame> &detections, TeamType team_type);
 
-    RefboxGameState getRefboxGameState(const Referee &packet);
+    /**
+     * Parses RefboxData from a Referee proto message
+     *
+     * @param packet Referee proto to parse
+     *
+     * @return RefboxData parsed from the packet
+     */
+    RefboxData getRefboxData(const Referee &packet);
 
     virtual ~NetworkFilter() = default;
 
@@ -107,4 +114,13 @@ class NetworkFilter
      * @return a ROS message RefboxCommand constant corresponding to the input command
      */
     RefboxGameState getTeamCommand(const Referee::Command &command);
+
+    /**
+     * Filters GameState from a Referee proto message
+     *
+     * @param packet Referee proto to filter
+     *
+     * @return RefboxGameState filtered from the packet
+     */
+    RefboxGameState getRefboxGameState(const Referee &packet);
 };

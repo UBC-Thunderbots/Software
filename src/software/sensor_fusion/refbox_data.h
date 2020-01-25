@@ -72,8 +72,89 @@ enum class RefboxStage
     REFBOX_STAGE_COUNT
 };
 
-struct TeamInfo
+class TeamInfo
 {
+   public:
+    TeamInfo(std::string name, int score, int red_cards,
+             std::vector<int> yellow_card_times, int yellow_cards, int timeouts,
+             int timeout_time, int goalkeeper, int foul_counter,
+             int ball_placement_failures, bool can_place_ball, int max_allowed_bots)
+        : name(name),
+          score(score),
+          red_cards(red_cards),
+          yellow_card_times(yellow_card_times),
+          yellow_cards(yellow_cards),
+          timeouts(timeouts),
+          timeout_time(timeout_time),
+          goalkeeper(goalkeeper),
+          foul_counter(foul_counter),
+          ball_placement_failures(ball_placement_failures),
+          can_place_ball(can_place_ball),
+          max_allowed_bots(max_allowed_bots)
+    {
+    }
+
+    std::string getName(void)
+    {
+        return name;
+    }
+
+    int getScore(void)
+    {
+        return score;
+    }
+
+    int getRedCards(void)
+    {
+        return red_cards;
+    }
+
+    std::vector<int> getYellowCardTimes(void)
+    {
+        return yellow_card_times;
+    }
+
+    int getYellowCards(void)
+    {
+        return yellow_cards;
+    }
+
+    int getTimeouts(void)
+    {
+        return timeouts;
+    }
+
+    int getTimeoutTime(void)
+    {
+        return timeout_time;
+    }
+
+    int getGoalkeeper(void)
+    {
+        return goalkeeper;
+    }
+
+    int getFoulCounter(void)
+    {
+        return foul_counter;
+    }
+
+    int getBallPlacementFailures(void)
+    {
+        return ball_placement_failures;
+    }
+
+    bool getCanPlaceBall(void)
+    {
+        return can_place_ball;
+    }
+
+    int getMaxAllowedBots(void)
+    {
+        return max_allowed_bots;
+    }
+
+   private:
     // The team's name (empty string if operator has not typed anything).
     std::string name;
     // The number of goals scored by the team during normal play and overtime.
