@@ -47,7 +47,7 @@ TEST(MoveActionTest, getAutoKickType)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveAction action = MoveAction(false, 0, Angle());
+    MoveAction action = MoveAction(false);
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
@@ -66,7 +66,7 @@ TEST(MoveActionTest, getDribblerEnabled)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveAction action = MoveAction(false, 0, Angle());
+    MoveAction action = MoveAction(false);
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
                                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
