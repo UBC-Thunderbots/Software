@@ -28,7 +28,7 @@ public:
      *
      * @return a unique pointer to a newly constructed Generic of the given type/name
      */
-    static std::unique_ptr<IndexType, TypeToCreate> createGeneric(const std::string& generic_name);
+    static std::unique_ptr<TypeToCreate> createGeneric(const std::string& generic_name);
 
     /**
      * Returns a const reference to the Generic registry. The registry is a map of Generic

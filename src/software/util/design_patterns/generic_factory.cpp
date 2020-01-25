@@ -55,7 +55,7 @@ void GenericFactory<IndexType, TypeToCreate>::registerGeneric(
 }
 
 template <class IndexType, class TypeToCreate>
-std::unique_ptr<IndexType, TypeToCreate> GenericFactory<IndexType, TypeToCreate>::createGeneric(const std::string& generic_name)
+std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate>::createGeneric(const std::string& generic_name)
 {
     auto registry = GenericFactory<IndexType, TypeToCreate>::getRegistry();
     auto iter     = registry.find(generic_name);
