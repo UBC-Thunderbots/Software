@@ -179,19 +179,18 @@ std::vector<Triangle> Evaluation::removeTrianglesOutsideRectangle(
     Rectangle rectangle, std::vector<Triangle> triangles)
 {
     std::vector<Triangle> valid_triangles;
-    Point center;
+    Point mean;
 
     double smallest_x = rectangle.negXNegYCorner().x();
     double smallest_y = rectangle.negXNegYCorner().y();
     double largest_x  = rectangle.posXPosYCorner().x();
     double largest_y  = rectangle.posXPosYCorner().y();
 
-    for (unsigned int i = 0; i < triangles.size(); i++)
+    for (const Triangle& t : triangles)
     {
-        Triangle t = triangles[i];
-        center     = t.mean();
-        if (center.x() <= largest_x && center.x() >= smallest_x &&
-            center.y() <= largest_y && center.y() >= smallest_y)
+        mean     = t.mean();
+        if (mean.x() <= largest_x && mean.x() >= smallest_x &&
+            mean.y() <= largest_y && mean.y() >= smallest_y)
         {
             valid_triangles.emplace_back(t);
         }
@@ -222,9 +221,8 @@ std::optional<Triangle> Evaluation::getLargestValidTriangle(
         Triangle largest    = allTriangles[0];
         double largest_area = largest.area();
 
-        for (unsigned int i = 0; i < allTriangles.size(); i++)
+        for (const Triangle& t : allTriangles)
         {
-            Triangle t                        = allTriangles[i];
             double area                       = t.area();
             const std::vector<Point> &tPoints = t.getPoints();
             double l1                         = (tPoints[1] - tPoints[0]).length();
