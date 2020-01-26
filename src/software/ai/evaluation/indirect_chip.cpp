@@ -67,7 +67,7 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
                                         ->value());
         Triangle t = largest_triangle.value();
 
-        Point target = t.center();
+        Point target = t.mean();
         // Adjust the target point to have a length of distance between itself and the
         // ball's position, then scaling it by a certain percentage
         target = Point(target.toVector().normalize((target - ball_position).length() *
@@ -148,11 +148,11 @@ std::vector<Triangle> Evaluation::findOpenTriangles(std::vector<Triangle> triang
         const std::vector<Point> &tPoints = t.getPoints();
         // Takes vector of triangles from input and adjust every single triangle within it
         Point p1 = tPoints[0] +
-                   (t.center() - tPoints[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+                   (t.mean() - tPoints[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
         Point p2 = tPoints[1] +
-                   (t.center() - tPoints[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+                   (t.mean() - tPoints[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
         Point p3 = tPoints[2] +
-                   (t.center() - tPoints[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+                   (t.mean() - tPoints[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
 
         Triangle adjusted_triangle = Triangle(p1, p2, p3);
         bool containsEnemy         = false;
@@ -189,7 +189,7 @@ std::vector<Triangle> Evaluation::removeTrianglesOutsideRectangle(
     for (unsigned int i = 0; i < triangles.size(); i++)
     {
         Triangle t = triangles[i];
-        center     = t.center();
+        center     = t.mean();
         if (center.x() <= largest_x && center.x() >= smallest_x &&
             center.y() <= largest_y && center.y() >= smallest_y)
         {
