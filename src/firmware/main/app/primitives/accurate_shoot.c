@@ -20,10 +20,21 @@
 #define RADIAL_COEFF 0.8f
 #define TANGENTIAL_COEFF 1.0f
 
-static float destination[3], major_vec[2], minor_vec[2];
-// Only need two data points to form major axis vector.
-
-const primitive_params_t* global_params;
+typedef struct AccurateShootPrimitiveState
+{
+    // Destination to move to {x,y,theta}
+    float destination[3];
+    // The major vector to move along
+    float major_vec[2];
+    // The minor vector to move along
+    float minor_vec[2];
+    // Whether or not we're chipping
+    bool chipping;
+    // The chip distance in meters, or kick speed in m/s, depending on if we're
+    // chipping or not
+    float chip_distance_or_kick_speed;
+} AccurateShootPrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(AccurateShootPrimitiveState_t);
 
 static void accurate_shoot_init(void) {}
 
@@ -57,35 +68,39 @@ static void accurate_shoot_init(void) {}
  *	2. there is no need to worry about recording the start position
  *	   because the primitive start function already does it
  *
+ * \param[in] A pointer to a state object for this primitive
  * \param[in] world The world to perform the primitive in
  */
-static void accurate_shoot_start(const primitive_params_t* params, FirmwareWorld_t* world)
+static void accurate_shoot_start(const primitive_params_t* params, void* void_state_ptr,
+                                 FirmwareWorld_t* world)
 {
-    global_params = params;
+    AccurateShootPrimitiveState_t* state = (AccurateShootPrimitiveState_t*)void_state_ptr;
+
     // Convert into m/s and rad/s because physics is in m and s
-    destination[0] = ((float)(params->params[0]) / 1000.0f);
-    destination[1] = ((float)(params->params[1]) / 1000.0f);
-    destination[2] = ((float)(params->params[2]) / 100.0f);
+    state->destination[0] = ((float)(params->params[0]) / 1000.0f);
+    state->destination[1] = ((float)(params->params[1]) / 1000.0f);
+    state->destination[2] = ((float)(params->params[2]) / 100.0f);
 
     // get x and y components of major (shooting dir)
     // and minor (pi/2 from shooting dir) axes
-    major_vec[0] = cosf(destination[2]);
-    major_vec[1] = sinf(destination[2]);
-    minor_vec[0] = major_vec[0];
-    minor_vec[1] = major_vec[1];
-    rotate(minor_vec, M_PI / 2);
+    state->major_vec[0] = cosf(state->destination[2]);
+    state->major_vec[1] = sinf(state->destination[2]);
+    state->minor_vec[0] = state->major_vec[0];
+    state->minor_vec[1] = state->major_vec[1];
+    rotate(state->minor_vec, M_PI / 2);
 }
 
-static void accurate_shoot_end(FirmwareWorld_t* world)
+static void accurate_shoot_end(void* void_state_ptr, FirmwareWorld_t* world)
 {
     Chicker_t* chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
     app_chicker_disableAutokick(chicker);
 }
 
-static void accurate_shoot_tick(FirmwareWorld_t* world)
+static void accurate_shoot_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
-    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    AccurateShootPrimitiveState_t* state = (AccurateShootPrimitiveState_t*)void_state_ptr;
+    const FirmwareRobot_t* robot         = app_firmware_world_getRobot(world);
 
     float vel[3] = {app_firmware_robot_getVelocityX(robot),
                     app_firmware_robot_getVelocityY(robot),
@@ -94,8 +109,10 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
     float relative_destination[3];
 
     // useful state for vision data
-    relative_destination[0] = destination[0] - app_firmware_robot_getPositionX(robot);
-    relative_destination[1] = destination[1] - app_firmware_robot_getPositionY(robot);
+    relative_destination[0] =
+        state->destination[0] - app_firmware_robot_getPositionX(robot);
+    relative_destination[1] =
+        state->destination[1] - app_firmware_robot_getPositionY(robot);
 
     // get angle to face ball
     float angle_face_ball = atanf(relative_destination[1] / relative_destination[0]);
@@ -114,17 +131,17 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
 
     // major disp and minor disp are disps on the major (shooting dir)
     // and minor (pi/2 from shooting dir) axes
-    float major_disp =
-        relative_destination[0] * major_vec[0] + relative_destination[1] * major_vec[1];
-    float minor_disp =
-        minor_vec[0] * relative_destination[0] + minor_vec[1] * relative_destination[1];
+    float major_disp = relative_destination[0] * state->major_vec[0] +
+                       relative_destination[1] * state->major_vec[1];
+    float minor_disp = state->minor_vec[0] * relative_destination[0] +
+                       state->minor_vec[1] * relative_destination[1];
 
     float major_accel = 0;
     float minor_accel = 0;
 
     float dist_ball = sqrtf(major_disp * major_disp + minor_disp * minor_disp);
-    float major_vel = major_vec[0] * vel[0] + major_vec[1] * vel[1];
-    float minor_vel = minor_vec[0] * vel[0] + minor_vec[1] * vel[1];
+    float major_vel = state->major_vec[0] * vel[0] + state->major_vec[1] * vel[1];
+    float minor_vel = state->minor_vec[0] * vel[0] + state->minor_vec[1] * vel[1];
 
     const float MAX_RAD_SPEED = 2.0f;
     const float MAX_ROT_SPEED = 2.0f;
@@ -172,19 +189,18 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
 
         // accelerate at ball to kick it
         Chicker_t* chicker = app_firmware_robot_getChicker(robot);
-        bool chipping      = global_params->extra & 1;
-        if (chipping)
+        if (state->chipping)
         {
-            float chip_distance = global_params->params[3];
-            app_chicker_enableAutokick(chicker, chip_distance);
+            float chip_distance_meters = state->chip_distance_or_kick_speed;
+            app_chicker_enableAutokick(chicker, chip_distance_meters);
         }
         else
         {
-            float speed_m_per_s = global_params->params[3];
+            float speed_m_per_s = state->chip_distance_or_kick_speed;
             app_chicker_enableAutochip(chicker, speed_m_per_s);
         }
 
-        if (!chipping)
+        if (!state->chipping)
         {
             Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
             app_dribbler_setSpeed(dribbler, 8000);
@@ -193,8 +209,8 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
         app_bangbang_prepareTrajectoryMaxV(&major_profile, major_disp, major_vel, 1.0,
                                            1.5, 1.5);
         app_bangbang_planTrajectory(&major_profile);
-        major_accel             = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
-        minor_accel             = 0;
+        major_accel = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
+        minor_accel = 0;
         relative_destination[2] = 0;
         toBall                  = true;
     }
@@ -269,35 +285,21 @@ static void accurate_shoot_tick(FirmwareWorld_t* world)
     accel[0]        = accel[0] / len_accel;
     accel[1]        = accel[1] / len_accel;
 
-    // TODO: need to figure out logging
-    //    // logs data
-    //    if (log)
-    //    {
-    //        log->tick.primitive_data[0] = destination[0];  // accel[0];
-    //        log->tick.primitive_data[1] = destination[1];  // accel[1];
-    //        log->tick.primitive_data[2] = destination[2];  // accel[2];
-    //        log->tick.primitive_data[3] = accel[0];        // timeX;
-    //        log->tick.primitive_data[4] = accel[1];        // timeY;
-    //        log->tick.primitive_data[5] = accel[2];
-    //        log->tick.primitive_data[6] = timeTarget;
-    //    }
-
     // gets matrix for converting from maj/min axes to local bot coords
     const float current_orientation = app_firmware_robot_getOrientation(robot);
-    float local_x_norm_vec[2] = {cosf(current_orientation),
-                                 sinf(current_orientation)};
+    float local_x_norm_vec[2] = {cosf(current_orientation), sinf(current_orientation)};
     float local_y_norm_vec[2] = {cosf(current_orientation + M_PI / 2),
                                  sinf(current_orientation + M_PI / 2)};
 
     // converts maj/min accel to local bot coordinates (matrix mult)
-    accel[0] = minor_accel *
-               (local_x_norm_vec[0] * minor_vec[0] + local_x_norm_vec[1] * minor_vec[1]);
-    accel[0] += major_accel *
-                (local_x_norm_vec[0] * major_vec[0] + local_x_norm_vec[1] * major_vec[1]);
-    accel[1] = minor_accel *
-               (local_y_norm_vec[0] * minor_vec[0] + local_y_norm_vec[1] * minor_vec[1]);
-    accel[1] += major_accel *
-                (local_y_norm_vec[0] * major_vec[0] + local_y_norm_vec[1] * major_vec[1]);
+    accel[0] = minor_accel * (local_x_norm_vec[0] * state->minor_vec[0] +
+                              local_x_norm_vec[1] * state->minor_vec[1]);
+    accel[0] += major_accel * (local_x_norm_vec[0] * state->major_vec[0] +
+                               local_x_norm_vec[1] * state->major_vec[1]);
+    accel[1] = minor_accel * (local_y_norm_vec[0] * state->minor_vec[0] +
+                              local_y_norm_vec[1] * state->minor_vec[1]);
+    accel[1] += major_accel * (local_y_norm_vec[0] * state->major_vec[0] +
+                               local_y_norm_vec[1] * state->major_vec[1]);
 
     // GO! GO! GO!
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
@@ -312,4 +314,6 @@ const primitive_t ACCURATE_SHOOT_PRIMITIVE = {
     .start  = &accurate_shoot_start,
     .end    = &accurate_shoot_end,
     .tick   = &accurate_shoot_tick,
+    .create_state = &createAccurateShootPrimitiveState_t,
+    .destroy_state = &destroyAccurateShootPrimitiveState_t
 };

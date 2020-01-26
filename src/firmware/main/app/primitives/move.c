@@ -11,6 +11,10 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 
+// TODO: all primitive functions need prefixing
+// TODO: note in firmware docs about not using static in `app`
+// TODO: suffix primitive files with `_primitive`
+
 
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
@@ -22,20 +26,19 @@
 // 2 * P_PI * ROBOT_RADIUS = robot circumference, which is approximately
 // how far the bot would have to turn for one full rotation, so we
 // set it a litle larger than that.
-static const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
+const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
 
 const float PI_2 = P_PI / 2.0f;
 
-typedef struct MovePrimitiveState {
+typedef struct MovePrimitiveState
+{
     float destination[3], end_speed, major_vec[2], minor_vec[2];
     // We store a wheel index here so we only have to calculate the axis
     // we want to use when move start is called
-    unsigned wheel_index;
-    // an array to store the wheel axes in that are perpendicular to
-    // each wheel
-    float wheel_axes[8];
+    unsigned optimal_wheel_axes_index;
     bool slow;
 } MovePrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MovePrimitiveState_t);
 
 /**
  * call from move_start to choose which wheel axis we will be
@@ -66,26 +69,37 @@ void plan_move_rotation(PhysBot* pb, float avel);
  * builds an array that contains all of the axes perpendicular to
  * each of the wheels on the bot.
  *
+ * @param wheel_axes A pointer to the wheel_axes array to populate
  * @param angle the current angle that the bot is facing
  * @return void
  */
-static void build_wheel_axes(float angle)
+void build_wheel_axes(float (*wheel_axes)[8], float angle)
 {
     // TODO: we should be accessing the wheel angles from the FirmwareRobot,
     //       NOT through constants like this
-    wheel_axes[0] = angle + ANGLE_TO_FRONT_WHEELS - PI_2;
-    wheel_axes[1] = angle + ANGLE_TO_FRONT_WHEELS + PI_2;
-    wheel_axes[2] = angle - ANGLE_TO_FRONT_WHEELS - PI_2;
-    wheel_axes[3] = angle - ANGLE_TO_FRONT_WHEELS + PI_2;
-    wheel_axes[4] = angle + ANGLE_TO_BACK_WHEELS - PI_2;
-    wheel_axes[5] = angle + ANGLE_TO_BACK_WHEELS - (3 * PI_2);
-    wheel_axes[6] = angle - ANGLE_TO_BACK_WHEELS + PI_2;
-    wheel_axes[7] = angle - ANGLE_TO_BACK_WHEELS + (3 * PI_2);
+    (*wheel_axes)[0] = angle + ANGLE_TO_FRONT_WHEELS - PI_2;
+    (*wheel_axes)[1] = angle + ANGLE_TO_FRONT_WHEELS + PI_2;
+    (*wheel_axes)[2] = angle - ANGLE_TO_FRONT_WHEELS - PI_2;
+    (*wheel_axes)[3] = angle - ANGLE_TO_FRONT_WHEELS + PI_2;
+    (*wheel_axes)[4] = angle + ANGLE_TO_BACK_WHEELS - PI_2;
+    (*wheel_axes)[5] = angle + ANGLE_TO_BACK_WHEELS - (3 * PI_2);
+    (*wheel_axes)[6] = angle - ANGLE_TO_BACK_WHEELS + PI_2;
+    (*wheel_axes)[7] = angle - ANGLE_TO_BACK_WHEELS + (3 * PI_2);
 }
 
+// TODO: finish jdoc?
+/**
+ * Finds the index of the wheel axes we should rotate onto
+ * @param dx
+ * @param dy
+ * @param current_angle
+ * @param final_angle
+ * @return The index of the optimal axes to rotate onto array
+ */
 unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_angle)
 {
-    build_wheel_axes(current_angle);
+    float wheel_axes[8];
+    build_wheel_axes(&wheel_axes, current_angle);
     // the angle on the global axis corresponding to the bot's movement
     float theta_norm = atan2f(dy, dx);
     // initialize a variable to store the minimum rotation
@@ -118,21 +132,24 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * to rotate to get to its destination angle after rotating onto an
  * axis.
  *
+ * @param optimal_wheel_axes_index The index of the wheel axes to rotate onto
  * @param pb The data container that contains information about
  * the direction the robot will move along.
  * @param angle The angle that the robot is currently facing
  * @return void
  */
-void choose_rotation_destination(PhysBot* pb, float angle)
+void choose_rotation_destination(unsigned optimal_wheel_axes_index, PhysBot* pb,
+                                 float angle)
 {
     // if we are close enough then we should just allow the bot to rotate
     // onto its destination angle, so skip this if block
     if ((float)fabs(pb->maj.disp) > APPROACH_LIMIT)
     {
-        build_wheel_axes(angle);
+        float wheel_axes[8];
+        build_wheel_axes(&wheel_axes, angle);
         float theta_norm = atan2f(pb->pos[1], pb->pos[0]);
         // use the pre-determined wheel axis
-        pb->rot.disp = min_angle_delta(wheel_axes[wheel_index], theta_norm);
+        pb->rot.disp = min_angle_delta(wheel_axes[optimal_wheel_axes_index], theta_norm);
     }
 }
 
@@ -150,26 +167,12 @@ void plan_move_rotation(PhysBot* pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-// TODO: figure out logging
-///**
-// * Pass information to be logged.
-// *
-// * @param log The log object.
-// * @param time_target The time target to log
-// * @param accel A 3 length array of {x, y, rotation} accelerations
-// * @return void
-// */
-// void move_to_log(log_record_t *log, float time_target, float accel[3])
-//{
-//    log_destination(log, destination);
-//    log_accel(log, accel);
-//    log_time_target(log, time_target);
-//}
+void move_init(void) {}
 
-static void move_init(void) {}
-
-static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
+void move_start(const primitive_params_t* params, void* void_state_ptr,
+                       FirmwareWorld_t* world)
 {
+    MovePrimitiveState_t* state = (MovePrimitiveState_t*)void_state_ptr;
     // Parameters:     destination_x [mm]
     //                destination_y [mm]
     //                destination_ang [centi-rad]
@@ -177,26 +180,26 @@ static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
 
     // Convert into m/s and rad/s because physics is in m and s
     printf("Move start called.\n");
-    destination[0] = (float)(params->params[0]) / 1000.0f;
-    destination[1] = (float)(params->params[1]) / 1000.0f;
-    destination[2] = (float)(params->params[2]) / 100.0f;
-    end_speed      = (float)(params->params[3]) / 1000.0f;
-    slow           = params->slow;
+    state->destination[0] = (float)(params->params[0]) / 1000.0f;
+    state->destination[1] = (float)(params->params[1]) / 1000.0f;
+    state->destination[2] = (float)(params->params[2]) / 100.0f;
+    state->end_speed      = (float)(params->params[3]) / 1000.0f;
+    state->slow           = params->slow;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    float dx         = destination[0] - app_firmware_robot_getPositionX(robot);
-    float dy         = destination[1] - app_firmware_robot_getPositionY(robot);
-    float total_disp = sqrtf(dx * dx + dy * dy);
-    major_vec[0]     = dx / total_disp;
-    major_vec[1]     = dy / total_disp;
-    minor_vec[0]     = major_vec[0];
-    minor_vec[1]     = major_vec[1];
-    rotate(minor_vec, P_PI / 2);
+    float dx            = state->destination[0] - app_firmware_robot_getPositionX(robot);
+    float dy            = state->destination[1] - app_firmware_robot_getPositionY(robot);
+    float total_disp    = sqrtf(dx * dx + dy * dy);
+    state->major_vec[0] = dx / total_disp;
+    state->major_vec[1] = dy / total_disp;
+    state->minor_vec[0] = state->major_vec[0];
+    state->minor_vec[1] = state->major_vec[1];
+    rotate(state->minor_vec, P_PI / 2);
 
     // pick the wheel axis that will be used for faster movement
-    wheel_index = choose_wheel_axis(dx, dy, app_firmware_robot_getOrientation(robot),
-                                    destination[2]);
+    state->optimal_wheel_axes_index = choose_wheel_axis(
+        dx, dy, app_firmware_robot_getOrientation(robot), state->destination[2]);
 
     Chicker_t* chicker   = app_firmware_robot_getChicker(robot);
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
@@ -209,7 +212,7 @@ static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
         app_chicker_enableAutochip(chicker, 2);
 }
 
-static void move_end(FirmwareWorld_t* world)
+void move_end(void* void_state_ptr, FirmwareWorld_t* world)
 {
     FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
@@ -222,20 +225,23 @@ static void move_end(FirmwareWorld_t* world)
 }
 
 
-static void move_tick(FirmwareWorld_t* world)
+void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
+    MovePrimitiveState_t* state  = (MovePrimitiveState_t*)(void_state_ptr);
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    PhysBot pb = app_physbot_create(robot, destination, major_vec, minor_vec);
+    PhysBot pb =
+        app_physbot_create(robot, state->destination, state->major_vec, state->minor_vec);
 
     // choose a wheel axis to rotate onto
     // TODO: try to make this less jittery
-    //    choose_rotation_destination(&pb, current_states.angle);
+    //    choose_rotation_destination(state->optimial_wheel_axes_index, &pb,
+    //    current_states.angle);
 
     // plan major axis movement
     float max_major_a     = 3.5;
-    float max_major_v     = slow ? 1.25 : 3.0;
-    float major_params[3] = {end_speed, max_major_a, max_major_v};
+    float max_major_v     = state->slow ? 1.25 : 3.0;
+    float major_params[3] = {state->end_speed, max_major_a, max_major_v};
     app_physbots_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
@@ -250,25 +256,20 @@ static void move_tick(FirmwareWorld_t* world)
     float accel[3] = {0, 0, pb.rot.accel};
 
     // rotate the accel and apply it
-    app_physbot_computeAccelInLocalCoordinates(
-        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
+    app_physbot_computeAccelInLocalCoordinates(accel, pb,
+                                               app_firmware_robot_getOrientation(robot),
+                                               state->major_vec, state->minor_vec);
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
-
-    // TODO: figure out logging
-    // if (log)
-    //{
-    //    move_to_log(log, pb.rot.time, accel);
-    //}
 }
 
 /**
  * The move movement primitive.
  */
-const primitive_t MOVE_PRIMITIVE = {
-    .direct = false,
-    .init   = &move_init,
-    .start  = &move_start,
-    .end    = &move_end,
-    .tick   = &move_tick,
-};
+const primitive_t MOVE_PRIMITIVE = {.direct        = false,
+                                    .init          = &move_init,
+                                    .start         = &move_start,
+                                    .end           = &move_end,
+                                    .tick          = &move_tick,
+                                    .create_state  = &createMovePrimitiveState_t,
+                                    .destroy_state = &destroyMovePrimitiveState_t};

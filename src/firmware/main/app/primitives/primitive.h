@@ -41,6 +41,7 @@ typedef struct
      */
     bool direct;
 
+    // TODO: need to pass state into `init`?
     /**
      * \brief Initializes the primitive.
      *
@@ -56,9 +57,11 @@ typedef struct
      * \param[in] params the parameters to the primitive, which are only valid
      * until this function returns and must be copied into primitive-local
      * storage if needed subsequently
+     * \param[in] state_void_ptr A pointer to the state object for this primitive, as
+     *                           created by the `create_state` function
      * \param[in] world The world to perform the primitive in
      */
-    void (*start)(const primitive_params_t *params, FirmwareWorld_t *world);
+    void (*start)(const primitive_params_t *params, void* state_void_ptr, FirmwareWorld_t *world);
 
     /**
      * \brief Ends a movement using the primitive.
@@ -66,9 +69,11 @@ typedef struct
      * This is invoked every time a new movement begins after a primitive has
      * been in use, regardless of whether the new movement is of the same or a
      * different type.
+     * \param[in] state_void_ptr A pointer to the state object for this primitive, as
+     *                           created by the `create_state` function
      * \param[in] world The world to perform the primitive in
      */
-    void (*end)(FirmwareWorld_t *world);
+    void (*end)(void* state_void_ptr, FirmwareWorld_t *world);
 
     /**
      * \brief Advances time in the primitive.
@@ -76,11 +81,11 @@ typedef struct
      * This is invoked at the system tick rate, and must drive the robot’s
      * hardware.
      *
-     * \param[out] log the log record to fill with information about the tick,
-     * or \c NULL if no record is to be filled
+     * \param[in] state_void_ptr A pointer to the state object for this primitive, as
+     *                           created by the `create_state` function
      * \param[in] world The world to perform the primitive in
      */
-    void (*tick)(FirmwareWorld_t *world);
+    void (*tick)(void* state_void_ptr, FirmwareWorld_t *world);
 
     // TODO: better names
     // TODO: better jdocs
@@ -99,3 +104,19 @@ typedef struct
     void (*destroy_state)(void* state);
 
 } primitive_t;
+
+/**
+ * Implements create and destroy methods for the given state object type
+ *
+ * This should be used to implement the `create_state` and `destroy_state` functions
+ * in each primitive
+ *
+ * @param STATE_TYPE The type of the state object
+ */
+#define DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(STATE_TYPE) \
+void* create##STATE_TYPE(){ \
+    return malloc(sizeof(STATE_TYPE)); \
+} \
+void destroy##STATE_TYPE(void* state){ \
+    free((STATE_TYPE*)state); \
+}
