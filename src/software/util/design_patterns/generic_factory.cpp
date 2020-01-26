@@ -1,10 +1,5 @@
 #include "software/util/design_patterns/generic_factory.h"
 
-// A quality of life typedef to make things shorter and more readable
-template <class IndexType, class TypeToCreate>
-using GenericRegistry = std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>()>>;
-
-
 template <class IndexType, class TypeToCreate>
 GenericRegistry<IndexType, TypeToCreate>& GenericFactory<IndexType, TypeToCreate>::getMutableRegistry()
 {
@@ -19,7 +14,7 @@ const GenericRegistry<IndexType, TypeToCreate>& GenericFactory<IndexType, TypeTo
 }
 
 template <class IndexType, class TypeToCreate>
-std::vector<std::string> GenericFactory<IndexType, TypeToCreate>::getRegisteredGenericNames()
+std::vector<std::string> GenericFactory<IndexType, TypeToCreate>::getRegisteredNames()
 {
     std::vector<std::string> names;
 
@@ -33,7 +28,7 @@ std::vector<std::string> GenericFactory<IndexType, TypeToCreate>::getRegisteredG
 
 template <class IndexType, class TypeToCreate>
 std::vector<std::function<std::unique_ptr<TypeToCreate>()>>
-GenericFactory<IndexType, TypeToCreate>::getRegisteredGenericConstructors()
+GenericFactory<IndexType, TypeToCreate>::getRegisteredConstructors()
 {
     std::vector<std::function<std::unique_ptr<TypeToCreate>()>> constructors;
 
@@ -46,7 +41,7 @@ GenericFactory<IndexType, TypeToCreate>::getRegisteredGenericConstructors()
 }
 
 template <class IndexType, class TypeToCreate>
-void GenericFactory<IndexType, TypeToCreate>::registerGeneric(
+void GenericFactory<IndexType, TypeToCreate>::registerCreator(
         std::string generic_name,
         std::function<std::unique_ptr<TypeToCreate>()> generic_creator)
 {
@@ -55,7 +50,7 @@ void GenericFactory<IndexType, TypeToCreate>::registerGeneric(
 }
 
 template <class IndexType, class TypeToCreate>
-std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate>::createGeneric(const std::string& generic_name)
+std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate>::create(const std::string& generic_name)
 {
     auto registry = GenericFactory<IndexType, TypeToCreate>::getRegistry();
     auto iter     = registry.find(generic_name);

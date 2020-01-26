@@ -19,58 +19,57 @@ class GenericFactory
 {
 public:
     /**
-     * Returns a unique pointer to a newly constructed Generic of the given type/name
+     * Returns a unique pointer to a newly constructed type of the given type/name
      *
-     * @param generic_name The name of the Generic to construct. This value must be in the
+     * @param generic_name The name of the type to construct. This value must be in the
      * Generic registry
      * @throws std::invalid_argument if the given generic_name is not found in the Generic
      * registry
      *
-     * @return a unique pointer to a newly constructed Generic of the given type/name
+     * @return a unique pointer to a newly constructed type of the given type/name
      */
-    static std::unique_ptr<TypeToCreate> createGeneric(const std::string& generic_name);
+    static std::unique_ptr<TypeToCreate> create(const std::string& generic_name);
 
     /**
-     * Returns a const reference to the Generic registry. The registry is a map of Generic
+     * Returns a const reference to the generic type registry. The registry is a map of generic
      * names to a "create" function that will create and return a unique_ptr to a new
-     * concrete instance of the Generic.
+     * concrete instance of the generic type.
      *
-     * @return a const reference to the Generic registry
+     * @return a const reference to the generic registry
      */
     static const GenericRegistry<IndexType, TypeToCreate>& getRegistry();
 
     /**
-     * Returns a list of names of all the existing Generics
+     * Returns a list of names of all the existing generic types
      *
-     * @return a list of names of all the existing Generics
+     * @return a list of names of all the existing generic types
      */
-    static std::vector<std::string> getRegisteredGenericNames();
+    static std::vector<std::string> getRegisteredNames();
 
     /**
-     * Returns a list of constructor functions for all the existing Generics
+     * Returns a list of constructor functions for all the existing generic types
      *
-     * @return a list of constructor functions for all the existing Generics
+     * @return a list of constructor functions for all the existing generic types
      */
-    static std::vector<std::function<std::unique_ptr<TypeToCreate>()>>
-    getRegisteredGenericConstructors();
+    static std::vector<std::function<std::unique_ptr<TypeToCreate>()>> getRegisteredConstructors();
 
 protected:
     /**
-     * Adds a Generic to the Generic Registry
+     * Adds a generic creator function to the registry
      *
-     * @param generic_name The name of the Generic to be added
+     * @param generic_name The name of the generic creator function to be added
      * @param generic_creator A "create" function that takes no arguments and will return
-     * a unique_ptr to a new instance of the specified Generic
+     * a unique_ptr to a new instance of the specified generic type
      */
-    static void registerGeneric(
+    static void registerCreator(
             std::string generic_name,
             std::function<std::unique_ptr<TypeToCreate>()> generic_creator);
 
 private:
     /**
-     * Returns a reference to the Generic registry. The registry is a map of Generic names
+     * Returns a reference to the generic registry. The registry is a map of Generic names
      * to a "create" function that will create and return a unique_ptr to a new concrete
-     * instance of the Generic, which allows the code to be aware
+     * instance of the generic type, which allows the code to be aware
      * of all the Generics that are available.
      *
      * This is the same as the above public getRegistry function. We need a mutable
@@ -78,15 +77,15 @@ private:
      * only this class can make the modifications. Outside sources should not have direct
      * access to modify the registry.
      *
-     * @return a mutable reference to the Generic registry
+     * @return a mutable reference to the generic registry
      */
     static GenericRegistry<IndexType, TypeToCreate>& getMutableRegistry();
 };
 
 /**
- * This templated generic factory class is used by Generic types that are derived from the
- * Abstract Generic class. Its purpose is to create a Factory for the implemented Generic
- * and automatically register the Generic type in the GenericFactory registry.
+ * This templated generic factory class is used by generic types that are derived from the
+ * Abstract TypeToCreate template class. Its purpose is to create a Factory for the implemented
+ * generic type and automatically register the Generic type in the GenericFactory registry.
  *
  * Declaring the static variable will also cause it to be initialized at the start of the
  * program (because it's static). This will immediately call the constructor, which adds
@@ -94,7 +93,7 @@ private:
  * can use the registry to find all the Backends that are available (and register with
  * this templated class).
  *
- * @tparam T The class of the Generic to be added to the registry. For example, to add a
+ * @tparam T The class of the generic type neric to be added to the registry. For example, to add a
  * new class called MoveBackend that inherits from Backend (or any other Generic), the
  * following line should be added to the end of the .cpp file (without the quotations):
  * "static TGenericFactory<MoveBackend> factory;"
@@ -112,6 +111,6 @@ public:
         auto generic_creator = []() -> std::unique_ptr<TypeToCreate> {
             return std::make_unique<T>();
         };
-        GenericFactory<IndexType, TypeToCreate>::registerGeneric(T::name, generic_creator);
+        GenericFactory<IndexType, TypeToCreate>::registerCreator(T::name, generic_creator);
     }
 };
