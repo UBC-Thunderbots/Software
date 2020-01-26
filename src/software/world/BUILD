@@ -41,6 +41,7 @@ cc_library(
         "//software/geom",
         "//software/new_geom:rectangle",
         "//software/time:timestamp",
+        "@boost//:circular_buffer",
     ],
 )
 
