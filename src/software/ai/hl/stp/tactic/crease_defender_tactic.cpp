@@ -10,8 +10,8 @@
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/new_geom/segment.h"
+#include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,

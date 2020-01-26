@@ -141,7 +141,7 @@ double lengthSquared(const Segment &segment)
 
 bool contains(const Triangle &out, const Point &in)
 {
-    double angle = 0;
+    double angle                 = 0;
     std::vector<Point> outPoints = out.getPoints();
     for (int i = 0, j = 2; i < 3; j = i++)
     {

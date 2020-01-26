@@ -154,8 +154,8 @@ std::vector<Triangle> Evaluation::findOpenTriangles(std::vector<Triangle> triang
         Point p3 = tPoints[2] +
                    (t.center() - tPoints[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
 
-        Triangle adjusted_triangle       = Triangle(p1, p2, p3);
-        bool containsEnemy               = false;
+        Triangle adjusted_triangle = Triangle(p1, p2, p3);
+        bool containsEnemy         = false;
 
         for (Point enemy_robot : enemy_players)
         {
