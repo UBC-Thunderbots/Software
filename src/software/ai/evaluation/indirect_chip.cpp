@@ -147,12 +147,12 @@ std::vector<Triangle> Evaluation::findOpenTriangles(std::vector<Triangle> triang
     {
         const std::vector<Point> &tPoints = t.getPoints();
         // Takes vector of triangles from input and adjust every single triangle within it
-        Point p1 = tPoints[0] +
-                   (t.mean() - tPoints[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
-        Point p2 = tPoints[1] +
-                   (t.mean() - tPoints[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
-        Point p3 = tPoints[2] +
-                   (t.mean() - tPoints[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p1 =
+            tPoints[0] + (t.mean() - tPoints[0]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p2 =
+            tPoints[1] + (t.mean() - tPoints[1]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p3 =
+            tPoints[2] + (t.mean() - tPoints[2]).normalize(2.5 * ROBOT_MAX_RADIUS_METERS);
 
         Triangle adjusted_triangle = Triangle(p1, p2, p3);
         bool containsEnemy         = false;
@@ -186,11 +186,11 @@ std::vector<Triangle> Evaluation::removeTrianglesOutsideRectangle(
     double largest_x  = rectangle.posXPosYCorner().x();
     double largest_y  = rectangle.posXPosYCorner().y();
 
-    for (const Triangle& t : triangles)
+    for (const Triangle &t : triangles)
     {
-        mean     = t.mean();
-        if (mean.x() <= largest_x && mean.x() >= smallest_x &&
-            mean.y() <= largest_y && mean.y() >= smallest_y)
+        mean = t.mean();
+        if (mean.x() <= largest_x && mean.x() >= smallest_x && mean.y() <= largest_y &&
+            mean.y() >= smallest_y)
         {
             valid_triangles.emplace_back(t);
         }
@@ -221,7 +221,7 @@ std::optional<Triangle> Evaluation::getLargestValidTriangle(
         Triangle largest    = allTriangles[0];
         double largest_area = largest.area();
 
-        for (const Triangle& t : allTriangles)
+        for (const Triangle &t : allTriangles)
         {
             double area                       = t.area();
             const std::vector<Point> &tPoints = t.getPoints();
