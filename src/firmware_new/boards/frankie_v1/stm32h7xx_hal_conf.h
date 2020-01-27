@@ -39,7 +39,7 @@ extern "C"
 /* #define HAL_FDCAN_MODULE_ENABLED   */
 /* #define HAL_CEC_MODULE_ENABLED   */
 /* #define HAL_COMP_MODULE_ENABLED   */
-/* #define HAL_CRC_MODULE_ENABLED   */
+#define HAL_CRC_MODULE_ENABLED
 /* #define HAL_CRYP_MODULE_ENABLED   */
 /* #define HAL_DAC_MODULE_ENABLED   */
 /* #define HAL_DCMI_MODULE_ENABLED   */
@@ -99,7 +99,7 @@ extern "C"
 #if !defined(HSE_VALUE)
 #define HSE_VALUE                                                                        \
     ((uint32_t)8000000) /*!< Value of the External oscillator in Hz : FPGA case fixed to \
-                           60MHZ */
+                           \ \ 60MHZ */
 #endif                  /* HSE_VALUE */
 
 #if !defined(HSE_STARTUP_TIMEOUT)
