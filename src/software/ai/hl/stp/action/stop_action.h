@@ -22,8 +22,8 @@ class StopAction : public Action
      * @param stopped_speed_threshold How slow the robot must be moving before the action
      * is considered done
      */
-    explicit StopAction(
-        bool loop_forever, double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
+    explicit StopAction(bool loop_forever, double stopped_speed_threshold =
+                                               ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
 
     /**
      * Updates the params that cannot be derived from the world for this action
