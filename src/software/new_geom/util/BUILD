@@ -5,6 +5,7 @@ cc_library(
     deps = [
         ":closest_point",
         ":distance",
+        ":intersects",
     ],
 )
 
@@ -22,6 +23,21 @@ cc_library(
         "//software/new_geom:line",
         "//software/new_geom:point",
         "//software/new_geom:vector",
+    ],
+)
+
+cc_library(
+    name = "intersects",
+    srcs = [
+        "intersects.cpp",
+    ],
+    hdrs = [
+        "intersects.h",
+    ],
+    deps = [
+        "//software/geom",
+        "//software/new_geom:polygon",
+        "//software/new_geom:segment",
     ],
 )
 

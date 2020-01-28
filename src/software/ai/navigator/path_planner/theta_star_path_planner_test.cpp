@@ -12,7 +12,7 @@ void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
 {
     for (auto const& path_point : path_points)
     {
-        EXPECT_TRUE(bounding_box.containsPoint(path_point))
+        EXPECT_TRUE(bounding_box.contains(path_point))
             << "Path point " << path_point << " not in bounding box {"
             << bounding_box.negXNegYCorner() << "," << bounding_box.posXPosYCorner()
             << "}";
@@ -232,7 +232,7 @@ TEST(TestThetaStarPathPlanner, no_navigable_area)
     Point start{-1.0, -1.0}, dest{1.0, 1.0};
 
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-    Rectangle navigable_area({0, 0}, {0, 0});
+    Rectangle navigable_area({0, 0}, {1, 1});
     auto path = ThetaStarPathPlanner().findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_EQ(std::nullopt, path);

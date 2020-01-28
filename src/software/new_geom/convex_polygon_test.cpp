@@ -115,3 +115,10 @@ TEST(ConvexPolygonAreaTest, test_rhombus_area)
     ConvexPolygon rhombus = ConvexPolygon{{0, 0}, {5, 3}, {10, 0}, {5, -7}};
     EXPECT_EQ(rhombus.area(), 50);
 }
+
+TEST(ConvexPolygonIsConvexTest, test_barely_convex_polygon)
+{
+    // This triangle is barely convex. Doesn't pass isConvex(...) if using
+    // GeomConstants::EPSILON but does pass it with a little more tolerance.
+    ConvexPolygon triangle = ConvexPolygon{{0, 0}, {4.5, 0.5}, {4.5, -0.5}};
+}

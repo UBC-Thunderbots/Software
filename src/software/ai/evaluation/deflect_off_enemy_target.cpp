@@ -1,6 +1,6 @@
 #include "shared/constants.h"
 #include "software/geom/util.h"
-#include "software/world/field.h"
+#include "software/new_geom/triangle.h"
 #include "software/world/world.h"
 
 namespace Evaluation
@@ -12,8 +12,8 @@ namespace Evaluation
 
         // The triangle formed by the enemy goalposts and the ball. Any robots in
         // this triangle could block a chip/shot
-        LegacyTriangle chip_target_area =
-            triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
+        Triangle chip_target_area =
+            Triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
 
         Robot enemy_closest_to_edge = world.enemyTeam().getRobotById(0).value();
         double shortest_len_to_edge = 100.0;
@@ -29,7 +29,7 @@ namespace Evaluation
         // field
         for (Robot enemy_robot : world.enemyTeam().getAllRobots())
         {
-            if ((contains(chip_target_area, enemy_robot.position()) ||
+            if ((chip_target_area.contains(enemy_robot.position()) ||
                  offsetToLine(enemy_goal_negative, world.ball().position(),
                               enemy_robot.position()) <= ROBOT_MAX_RADIUS_METERS ||
                  offsetToLine(enemy_goal_positive, world.ball().position(),
