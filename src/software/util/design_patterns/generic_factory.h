@@ -40,16 +40,16 @@ public:
     static const GenericRegistry<IndexType, TypeToCreate>& getRegistry();
 
     /**
-     * Returns a list of names of all the existing generic types
+     * Returns the list of names for all creator functions registered in the factory
      *
-     * @return a list of names of all the existing generic types
+     * @return a list of names for all creator functions registered in the factory
      */
     static std::vector<std::string> getRegisteredNames();
 
     /**
-     * Returns a list of constructor functions for all the existing generic types
+     * Returns the list of creator functions that are registered in this factory
      *
-     * @return a list of constructor functions for all the existing generic types
+     * @return a list of creator functions that are registered in this factory
      */
     static std::vector<std::function<std::unique_ptr<TypeToCreate>()>> getRegisteredConstructors();
 
@@ -108,6 +108,7 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
 public:
     TGenericFactory()
     {
+        // TODO (Issue #1142): Change to use a function instead of a static variable
         auto generic_creator = []() -> std::unique_ptr<TypeToCreate> {
             return std::make_unique<T>();
         };
