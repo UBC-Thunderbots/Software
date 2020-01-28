@@ -127,7 +127,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto move_action = std::make_shared<MoveAction>(true);
     auto chip_action = std::make_shared<ChipAction>();
-    auto stop_action = std::make_shared<StopAction>();
+    auto stop_action = std::make_shared<StopAction>(false);
 
     do
     {

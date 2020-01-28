@@ -23,7 +23,7 @@ class StopAction : public Action
      * is considered done
      */
     explicit StopAction(
-        double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
+        bool loop_forever, double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -44,4 +44,5 @@ class StopAction : public Action
     bool coast;
     // The maximum speed the robot may be moving at to be considered stopped
     double stopped_speed_threshold;
+    bool loop_forever;
 };

@@ -62,7 +62,7 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
 void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto move_action = std::make_shared<MoveAction>(false);
-    auto stop_action = std::make_shared<StopAction>();
+    auto stop_action = std::make_shared<StopAction>(true);
 
     do
     {
