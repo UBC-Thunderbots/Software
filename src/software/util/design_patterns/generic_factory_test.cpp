@@ -6,17 +6,20 @@
 #include <iostream>
 
 // Create and register two test generics with the factory here
-class testGeneric {
+class testGeneric
+{
 };
 
-class testGenericA : public testGeneric {
-    public:
-        static const std::string name;
+class testGenericA : public testGeneric
+{
+   public:
+    static const std::string name;
 };
 const std::string testGenericA::name = "A";
 
-class testGenericB : public testGeneric {
-public:
+class testGenericB : public testGeneric
+{
+   public:
     static const std::string name;
 };
 const std::string testGenericB::name = "B";
@@ -27,7 +30,8 @@ static TGenericFactory<std::string, testGeneric, testGenericB> testFactoryB;
 
 TEST(GenericFactoryTest, test_create_generic_with_invalid_name)
 {
-    EXPECT_THROW((GenericFactory<std::string, testGeneric>::create("_FooBar_")), std::invalid_argument);
+    EXPECT_THROW((GenericFactory<std::string, testGeneric>::create("_FooBar_")),
+                 std::invalid_argument);
 }
 
 TEST(GenericFactoryTest, test_create_generic_with_valid_name)
@@ -39,7 +43,8 @@ TEST(GenericFactoryTest, test_create_generic_with_valid_name)
 
 TEST(GenericFactoryTest, test_get_registered_generic_names)
 {
-    auto registered_names = GenericFactory<std::string, testGeneric>::getRegisteredNames();
+    auto registered_names =
+        GenericFactory<std::string, testGeneric>::getRegisteredNames();
     EXPECT_EQ(registered_names.size(), 2);
     // Make sure we get the names we are expecting
     EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), "A"), 1);
@@ -48,6 +53,7 @@ TEST(GenericFactoryTest, test_get_registered_generic_names)
 
 TEST(GenericFactoryTest, test_get_registered_generic_constructors)
 {
-    auto registered_constructors = GenericFactory<std::string, testGeneric>::getRegisteredConstructors();
+    auto registered_constructors =
+        GenericFactory<std::string, testGeneric>::getRegisteredConstructors();
     EXPECT_EQ(registered_constructors.size(), 2);
 }

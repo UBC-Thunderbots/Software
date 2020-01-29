@@ -1,14 +1,16 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 template <class IndexType, class TypeToCreate>
-GenericRegistry<IndexType, TypeToCreate>& GenericFactory<IndexType, TypeToCreate>::getMutableRegistry()
+GenericRegistry<IndexType, TypeToCreate>&
+GenericFactory<IndexType, TypeToCreate>::getMutableRegistry()
 {
     static GenericRegistry<IndexType, TypeToCreate> instance;
     return instance;
 }
 
 template <class IndexType, class TypeToCreate>
-const GenericRegistry<IndexType, TypeToCreate>& GenericFactory<IndexType, TypeToCreate>::getRegistry()
+const GenericRegistry<IndexType, TypeToCreate>&
+GenericFactory<IndexType, TypeToCreate>::getRegistry()
 {
     return GenericFactory::getMutableRegistry();
 }
@@ -42,15 +44,16 @@ GenericFactory<IndexType, TypeToCreate>::getRegisteredConstructors()
 
 template <class IndexType, class TypeToCreate>
 void GenericFactory<IndexType, TypeToCreate>::registerCreator(
-        std::string generic_name,
-        std::function<std::unique_ptr<TypeToCreate>()> generic_creator)
+    std::string generic_name,
+    std::function<std::unique_ptr<TypeToCreate>()> generic_creator)
 {
     GenericFactory::getMutableRegistry().insert(
-            std::make_pair(generic_name, generic_creator));
+        std::make_pair(generic_name, generic_creator));
 }
 
 template <class IndexType, class TypeToCreate>
-std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate>::create(const std::string& generic_name)
+std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate>::create(
+    const std::string& generic_name)
 {
     auto registry = GenericFactory<IndexType, TypeToCreate>::getRegistry();
     auto iter     = registry.find(generic_name);

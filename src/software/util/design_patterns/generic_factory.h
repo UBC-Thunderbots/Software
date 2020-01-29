@@ -1,14 +1,15 @@
 #pragma once
+#include <functional>
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
-#include <functional>
+#include <vector>
 //#include "software/backend/backend.h" // Should make generic.h
 
 // A quality of life typedef to make things shorter and more readable
 template <class IndexType, class TypeToCreate>
-using GenericRegistry = std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>()>>;
+using GenericRegistry =
+    std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>()>>;
 /**
  * The GenericFactory is an Abstract class that provides an interface for Generic type
  * Factories to follow. This makes it easy to maintain a list of factories and get the
@@ -17,7 +18,7 @@ using GenericRegistry = std::unordered_map<IndexType, std::function<std::unique_
 template <class IndexType, class TypeToCreate>
 class GenericFactory
 {
-public:
+   public:
     /**
      * Returns a unique pointer to a newly constructed type of the given type/name
      *
@@ -31,9 +32,9 @@ public:
     static std::unique_ptr<TypeToCreate> create(const std::string& generic_name);
 
     /**
-     * Returns a const reference to the generic type registry. The registry is a map of generic
-     * names to a "create" function that will create and return a unique_ptr to a new
-     * concrete instance of the generic type.
+     * Returns a const reference to the generic type registry. The registry is a map of
+     * generic names to a "create" function that will create and return a unique_ptr to a
+     * new concrete instance of the generic type.
      *
      * @return a const reference to the generic registry
      */
@@ -51,9 +52,10 @@ public:
      *
      * @return a list of creator functions that are registered in this factory
      */
-    static std::vector<std::function<std::unique_ptr<TypeToCreate>()>> getRegisteredConstructors();
+    static std::vector<std::function<std::unique_ptr<TypeToCreate>()>>
+    getRegisteredConstructors();
 
-protected:
+   protected:
     /**
      * Adds a generic creator function to the registry
      *
@@ -62,10 +64,10 @@ protected:
      * a unique_ptr to a new instance of the specified generic type
      */
     static void registerCreator(
-            std::string generic_name,
-            std::function<std::unique_ptr<TypeToCreate>()> generic_creator);
+        std::string generic_name,
+        std::function<std::unique_ptr<TypeToCreate>()> generic_creator);
 
-private:
+   private:
     /**
      * Returns a reference to the generic registry. The registry is a map of Generic names
      * to a "create" function that will create and return a unique_ptr to a new concrete
@@ -84,8 +86,9 @@ private:
 
 /**
  * This templated generic factory class is used by generic types that are derived from the
- * Abstract TypeToCreate template class. Its purpose is to create a Factory for the implemented
- * generic type and automatically register the Generic type in the GenericFactory registry.
+ * Abstract TypeToCreate template class. Its purpose is to create a Factory for the
+ * implemented generic type and automatically register the Generic type in the
+ * GenericFactory registry.
  *
  * Declaring the static variable will also cause it to be initialized at the start of the
  * program (because it's static). This will immediately call the constructor, which adds
@@ -93,10 +96,10 @@ private:
  * can use the registry to find all the Backends that are available (and register with
  * this templated class).
  *
- * @tparam T The class of the generic type neric to be added to the registry. For example, to add a
- * new class called MoveBackend that inherits from Backend (or any other Generic), the
- * following line should be added to the end of the .cpp file (without the quotations):
- * "static TGenericFactory<MoveBackend> factory;"
+ * @tparam T The class of the generic type neric to be added to the registry. For example,
+ * to add a new class called MoveBackend that inherits from Backend (or any other
+ * Generic), the following line should be added to the end of the .cpp file (without the
+ * quotations): "static TGenericFactory<MoveBackend> factory;"
  */
 template <class IndexType, class TypeToCreate, class T>
 class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
@@ -105,13 +108,14 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
     static_assert(std::is_base_of<TypeToCreate, T>::value,
                   "T must be derived class of TypeToCreate!");
 
-public:
+   public:
     TGenericFactory()
     {
         // TODO (Issue #1142): Change to use a function instead of a static variable
         auto generic_creator = []() -> std::unique_ptr<TypeToCreate> {
             return std::make_unique<T>();
         };
-        GenericFactory<IndexType, TypeToCreate>::registerCreator(T::name, generic_creator);
+        GenericFactory<IndexType, TypeToCreate>::registerCreator(T::name,
+                                                                 generic_creator);
     }
 };
