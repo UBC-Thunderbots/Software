@@ -3,7 +3,7 @@
 #include <cinttypes>
 #include <optional>
 
-#include "software/backend/simulation/physics/physics_robot.h"
+#include "software/backend/simulation/simulator_robot.h"
 extern "C"
 {
 #include "app/world/firmware_robot.h"
@@ -45,7 +45,7 @@ struct FirmwareRobotDeleter
 
 
 /**
- * This class acts as a wrapper around a PhysicsRobot so that the PhysicsRobot
+ * This class acts as a wrapper around a SimulatorRobot so that the SimulatorRobot
  * can provide the interface of a FirmwareRobot.
  *
  * Because our firmware structs rely on C-style function pointers, we
@@ -63,30 +63,18 @@ struct FirmwareRobotDeleter
 class SimulatorRobotSingleton
 {
    public:
-    /**
-     * Sets the ID of the robot being controlled by this class
-     *
-     * @param id The ID of the robot to control
-     */
-    static void setRobotId(unsigned int id);
+    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot);
 
+// TODO: update comment
     /**
-     * Sets the PhysicsRobots that can be controlled by this class
+     * Creates a FirmwareRobot corresponding to the current SimulatorRobot
      *
-     * @param robots the PhysicsRobots that can be controlled by this class
-     */
-    static void setPhysicsRobots(const std::vector<std::weak_ptr<PhysicsRobot>>& robots);
-
-    /**
-     * Creates a FirmwareRobot corresponding to the current PhysicsRobot
-     *
-     * @return a FirmwareRobot corresponding to the current PhysicsRobot
+     * @return a FirmwareRobot corresponding to the current SimulatorRobot
      */
     static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
 
    private:
-    /**
-     * Returns the x-position of the robot, in global field coordinates, in meters
+    /** * Returns the x-position of the robot, in global field coordinates, in meters
      *
      * @return the x-position of the robot, in global field coordinates, in meters
      */
@@ -179,7 +167,6 @@ class SimulatorRobotSingleton
      */
     static void disableAutochip();
 
-    /* Dribbler functions */
     /**
      * Sets the speed of the dribbler
      *
@@ -199,7 +186,6 @@ class SimulatorRobotSingleton
      */
     static unsigned int getDribblerTemperatureDegC();
 
-    /* Wheel functions */
     /**
      * Applies the given force to the wheel
      *
@@ -218,18 +204,5 @@ class SimulatorRobotSingleton
     static float getMotorSpeedBackRight();
     static float getMotorSpeedFrontRight();
 
-    /**
-     * Returns the PhysicsRobot currently selected from the list of controllable
-     * physics_robots by the current robot_id
-     *
-     * @return the PhysicsRobot currently selected to be controlled. Returns an empty
-     * weak_ptr if the robot_id is not set, or a physics robot with a matching ID
-     * cannot be found.
-     */
-    static std::weak_ptr<PhysicsRobot> getCurrentPhysicsRobot();
-
-    // The id of the robot currently being controlled by this class
-    static std::optional<unsigned int> robot_id;
-    // All the physics robots this class can control
-    static std::vector<std::weak_ptr<PhysicsRobot>> physics_robots;
+    static std::shared_ptr<SimulatorRobot> simulator_robot;
 };

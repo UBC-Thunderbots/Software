@@ -17,7 +17,7 @@ class PhysicsWorld
    public:
     /**
      * Creates a new PhysicsWorld given a Box2D world.
-     * @param world
+     * @param world the world to create
      */
     explicit PhysicsWorld(const World& world);
 
@@ -37,33 +37,37 @@ class PhysicsWorld
 
     /**
      * Advances the Box2D world physics by the given time step
+     *
      * @param time_step how much to advance the world physics by
      */
-    void step(const Duration& time_step);
+    void stepSimulation(const Duration& time_step);
 
     /**
      * Returns the friendly PhysicsRobots currently in the world
+     *
      * @return the friendly PhysicsRobots in the world
      */
-    std::vector<std::shared_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
+    std::vector<std::weak_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
 
-    /**
-     * Returns the enemy PhysicsRobots currently in the world
-     * @return the enemy PhysicsRobots in the world
-     */
-    std::vector<std::shared_ptr<PhysicsRobot>> getEnemyPhysicsRobots() const;
 
-    /**
-     * Returns the PhysicsBall currently in the world
-     * @return the PhysicsBall in the world
-     */
-    std::shared_ptr<PhysicsBall> getPhysicsBall() const;
-
+//    /**
+//     * Returns the enemy PhysicsRobots currently in the world
+//     * @return the enemy PhysicsRobots in the world
+//     */
+//    std::vector<std::shared_ptr<PhysicsRobot>> getEnemyPhysicsRobots() const;
+//
     /**
      * Returns the PhysicsBall currently in the world
+     *
      * @return the PhysicsBall in the world
      */
-    std::shared_ptr<PhysicsField> getPhysicsField() const;
+    std::weak_ptr<PhysicsBall> getPhysicsBall() const;
+//
+//    /**
+//     * Returns the PhysicsBall currently in the world
+//     * @return the PhysicsBall in the world
+//     */
+//    std::shared_ptr<PhysicsField> getPhysicsField() const;
 
    private:
     std::shared_ptr<b2World> b2_world;

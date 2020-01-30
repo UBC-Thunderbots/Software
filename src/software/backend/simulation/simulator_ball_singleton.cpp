@@ -1,4 +1,4 @@
-#include "software/backend/simulation/simulator_ball.h"
+#include "software/backend/simulation/simulator_ball_singleton.h"
 
 std::weak_ptr<PhysicsBall> SimulatorBallSingleton::physics_ball_weak_ptr =
     std::weak_ptr<PhysicsBall>();

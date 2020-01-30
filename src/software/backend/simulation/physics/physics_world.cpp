@@ -68,28 +68,35 @@ World PhysicsWorld::getWorld() const
     return new_world;
 }
 
-void PhysicsWorld::step(const Duration& time_step)
+void PhysicsWorld::stepSimulation(const Duration& time_step)
 {
     b2_world->Step(time_step.getSeconds(), velocity_iterations, position_iterations);
     current_timestamp = current_timestamp + time_step;
 }
 
-std::vector<std::shared_ptr<PhysicsRobot>> PhysicsWorld::getFriendlyPhysicsRobots() const
+std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getFriendlyPhysicsRobots() const
 {
-    return friendly_physics_robots;
+    std::vector<std::weak_ptr<PhysicsRobot>> robots;
+    for (const auto& friendly_physics_robot : friendly_physics_robots)
+    {
+        robots.emplace_back(friendly_physics_robot);
+    }
+    return robots;
 }
 
-std::vector<std::shared_ptr<PhysicsRobot>> PhysicsWorld::getEnemyPhysicsRobots() const
+//std::vector<std::shared_ptr<PhysicsRobot>> PhysicsWorld::getEnemyPhysicsRobots() const
+//{
+//    return enemy_physics_robots;
+//}
+//
+std::weak_ptr<PhysicsBall> PhysicsWorld::getPhysicsBall() const
 {
-    return enemy_physics_robots;
+    return std::weak_ptr<PhysicsBall>(physics_ball);
 }
+//
+//std::shared_ptr<PhysicsField> PhysicsWorld::getPhysicsField() const
+//{
+//    return physics_field;
+//}
 
-std::shared_ptr<PhysicsBall> PhysicsWorld::getPhysicsBall() const
-{
-    return physics_ball;
-}
 
-std::shared_ptr<PhysicsField> PhysicsWorld::getPhysicsField() const
-{
-    return physics_field;
-}

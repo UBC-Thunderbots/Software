@@ -1,4 +1,4 @@
-#include "software/backend/simulation/simulator_robot.h"
+#include "software/backend/simulation/simulator_robot_singleton.h"
 
 extern "C"
 {
@@ -7,18 +7,11 @@ extern "C"
 #include "app/world/wheel.h"
 }
 
-std::optional<unsigned int> SimulatorRobotSingleton::robot_id = std::nullopt;
-std::vector<std::weak_ptr<PhysicsRobot>> SimulatorRobotSingleton::physics_robots = {};
+std::shared_ptr<SimulatorRobot> SimulatorRobotSingleton::simulator_robot = nullptr;
 
-void SimulatorRobotSingleton::setRobotId(unsigned int id)
-{
-    robot_id = std::make_optional<unsigned int>(id);
-}
-
-void SimulatorRobotSingleton::setPhysicsRobots(
-    const std::vector<std::weak_ptr<PhysicsRobot>>& robots)
-{
-    physics_robots = robots;
+// TODO: should have a null check on all functions in case this is not called first
+void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot) {
+    simulator_robot = robot;
 }
 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
@@ -86,225 +79,120 @@ SimulatorRobotSingleton::createFirmwareRobot()
 
 float SimulatorRobotSingleton::getPositionX()
 {
-    // Temporary implementation for testing
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        return static_cast<float>(robot->getRobotId());
-    }
-    return 0.0;
+    return simulator_robot->getPositionX();
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getPositionY();
 }
 
 float SimulatorRobotSingleton::getOrientation()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getOrientation();
 }
 
 float SimulatorRobotSingleton::getVelocityX()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getVelocityX();
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getVelocityY();
 }
 
 float SimulatorRobotSingleton::getVelocityAngular()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getVelocityAngular();
 }
 
 float SimulatorRobotSingleton::getBatteryVoltage()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getBatteryVoltage();
 }
 
 void SimulatorRobotSingleton::kick(float speed_m_per_s)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->kick(speed_m_per_s);
 }
 
 void SimulatorRobotSingleton::chip(float distance_m)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->chip(distance_m);
 }
 
 void SimulatorRobotSingleton::enableAutokick(float speed_m_per_s)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->enableAutokick(speed_m_per_s);
 }
 
 void SimulatorRobotSingleton::enableAutochip(float distance_m)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->enableAutochip(distance_m);
 }
 
 void SimulatorRobotSingleton::disableAutokick()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->disableAutokick();
 }
 
 void SimulatorRobotSingleton::disableAutochip()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->disableAutochip();
 }
 
 void SimulatorRobotSingleton::setDribblerSpeed(uint32_t rpm)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->setDribblerSpeed(rpm);
 }
 
 unsigned int SimulatorRobotSingleton::getDribblerTemperatureDegC()
 {
-    // Return a somewhat arbitrary "room temperature" temperature.
-    // This is an ideal simulation so the dribbler will not overheat
-    return 25;
+    return simulator_robot->getDribblerTemperatureDegC();
 }
 
 void SimulatorRobotSingleton::dribblerCoast()
 {
-    // Do nothing
+    simulator_robot->dribblerCoast();
 }
 
 void SimulatorRobotSingleton::applyWheelForceFrontLeft(float force_in_newtons)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->applyWheelForceFrontLeft(force_in_newtons);
 }
 
 void SimulatorRobotSingleton::applyWheelForceBackLeft(float force_in_newtons)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->applyWheelForceBackLeft(force_in_newtons);
 }
 
 void SimulatorRobotSingleton::applyWheelForceBackRight(float force_in_newtons)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->applyWheelForceBackRight(force_in_newtons);
 }
 
 void SimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
+    simulator_robot->applyWheelForceFrontRight(force_in_newtons);
 }
 
 float SimulatorRobotSingleton::getMotorSpeedFrontLeft()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getMotorSpeedFrontLeft();
 }
 
 float SimulatorRobotSingleton::getMotorSpeedBackLeft()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getMotorSpeedBackLeft();
 }
 
 float SimulatorRobotSingleton::getMotorSpeedBackRight()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
+    return simulator_robot->getMotorSpeedBackRight();
 }
 
 float SimulatorRobotSingleton::getMotorSpeedFrontRight()
 {
-    if (auto robot = getCurrentPhysicsRobot().lock())
-    {
-        // TODO: Implement me
-    }
-    return 0.0;
-}
-
-std::weak_ptr<PhysicsRobot> SimulatorRobotSingleton::getCurrentPhysicsRobot()
-{
-    if (!robot_id.has_value())
-    {
-        return std::weak_ptr<PhysicsRobot>();
-    }
-
-    unsigned int robot_id_value = *robot_id;
-    auto robot_id_comparator = [robot_id_value](std::weak_ptr<PhysicsRobot> robot_ptr) {
-        if (auto robot_ptr_lock = robot_ptr.lock())
-        {
-            return robot_ptr_lock->getRobotId() == robot_id_value;
-        }
-        return false;
-    };
-    auto physics_robot_iter =
-        std::find_if(physics_robots.begin(), physics_robots.end(), robot_id_comparator);
-    if (physics_robot_iter == physics_robots.end())
-    {
-        return std::weak_ptr<PhysicsRobot>();
-    }
-
-    return *physics_robot_iter;
+    return simulator_robot->getMotorSpeedFrontRight();
 }

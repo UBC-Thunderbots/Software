@@ -1,16 +1,25 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "simulator_robot",
+    srcs = ["simulator_robot.cpp"],
+    hdrs = ["simulator_robot.h"],
+    deps = [
+        "//software/ai/primitive",
+        "//software/backend/simulation/physics:physics_robot",
+    ],
+)
+
+cc_library(
     name = "simulator_robot_singleton",
     srcs = ["simulator_robot_singleton.cpp"],
     hdrs = ["simulator_robot_singleton.h"],
     deps = [
+        ":simulator_robot",
         "//firmware/main/app/world:chicker",
         "//firmware/main/app/world:dribbler",
         "//firmware/main/app/world:firmware_robot",
         "//firmware/main/app/world:wheel",
-        "//software/backend/simulation/physics:physics_robot",
-        "@box2d",
     ],
 )
 
@@ -38,5 +47,15 @@ cc_library(
         "//firmware/main/app/world:firmware_ball",
         "//software/backend/simulation/physics:physics_ball",
         "@box2d",
+    ],
+)
+
+cc_library(
+    name = "simulator",
+    srcs = ["simulator.cpp"],
+    hdrs = ["simulator.h"],
+    deps = [
+        "//software/ai/primitive",
+        "//software/world",
     ],
 )

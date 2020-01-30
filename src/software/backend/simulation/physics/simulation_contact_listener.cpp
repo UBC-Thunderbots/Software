@@ -99,6 +99,13 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
 }
 
 void SimulationContactListener::handleBallChickerContact(b2Contact *contact, PhysicsBall *ball, PhysicsRobot *robot) {
+     if(robot->autokick_enabled) {
+         get kick vector
+         ball->applyImpulse(kick vector);
+     }else if(robot->autochip_enabled) {
+         get chip vector
+         ball->applyImpulse(chip vector);
+     }
 
 }
 
