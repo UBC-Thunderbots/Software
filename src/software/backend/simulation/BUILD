@@ -23,6 +23,26 @@ cc_test(
 )
 
 cc_library(
+    name = "simulator_ball",
+    srcs = ["simulator_ball.cpp"],
+    hdrs = ["simulator_ball.h"],
+    deps = [
+        "//software/backend/simulation/physics:physics_ball",
+    ],
+)
+
+cc_library(
+    name = "simulator_ball_test",
+    srcs = ["simulator_ball_test.cpp"],
+    deps = [
+        ":simulator_ball",
+        "//software/backend/simulation/physics:physics_ball",
+        "@box2d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "simulator_robot_singleton",
     srcs = ["simulator_robot_singleton.cpp"],
     hdrs = ["simulator_robot_singleton.h"],

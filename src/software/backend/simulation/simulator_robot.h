@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cinttypes>
 #include <memory>
 #include "software/backend/simulation/physics/physics_robot.h"

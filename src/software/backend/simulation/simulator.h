@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/world/world.h"
 #include "software/backend/simulation/physics/physics_world.h"
 #include "software/backend/simulation/simulator_robot.h"

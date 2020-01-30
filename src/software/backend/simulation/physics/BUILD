@@ -22,13 +22,6 @@ cc_test(
 )
 
 cc_library(
-    name = "physics_object",
-    srcs = ["physics_object.cpp"],
-    hdrs = ["physics_object.h"],
-    deps = [],
-)
-
-cc_library(
     name = "physics_ball",
     srcs = ["physics_ball.cpp"],
     hdrs = ["physics_ball.h"],
@@ -132,6 +125,7 @@ cc_library(
         ":physics_ball",
         ":physics_object",
         ":physics_robot",
+        "//software/backend/simulation:simulator_robot",
         "@box2d",
     ],
 )

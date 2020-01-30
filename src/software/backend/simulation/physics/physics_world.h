@@ -70,6 +70,9 @@ class PhysicsWorld
 //    std::shared_ptr<PhysicsField> getPhysicsField() const;
 
    private:
+    // Note: we declare the b2World first so it is destroyed last. If it is destroyed before the
+    // physics objects, segfaults will occur due to pointers internal to Box2D
+    // https://stackoverflow.com/questions/2254263/order-of-member-constructor-and-destructor-calls
     std::shared_ptr<b2World> b2_world;
     // The timestamp of the simulated physics world
     Timestamp current_timestamp;

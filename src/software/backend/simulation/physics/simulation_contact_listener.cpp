@@ -39,7 +39,7 @@ void SimulationContactListener::PreSolve(b2Contact *contact, const b2Manifold *o
     }
 }
 
-std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener::isBallChickerContact(PhysicsObjectUserData *user_data_a,
+std::optional<std::pair<PhysicsBall*, SimulatorRobot*>> SimulationContactListener::isBallChickerContact(PhysicsObjectUserData *user_data_a,
                                                      PhysicsObjectUserData *user_data_b)
 {
     if(!user_data_a || !user_data_b) {
@@ -54,12 +54,12 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
         ball = static_cast<PhysicsBall*>(user_data_b->physics_object);
     }
 
-    PhysicsRobot* robot = nullptr;
+    SimulatorRobot* robot = nullptr;
     if(user_data_a->type == PhysicsObjectType::ROBOT_CHICKER) {
-        robot = static_cast<PhysicsRobot*>(user_data_a->physics_object);
+        robot = static_cast<SimulatorRobot*>(user_data_a->physics_object);
     }
     if(user_data_b->type == PhysicsObjectType::ROBOT_CHICKER) {
-        robot = static_cast<PhysicsRobot*>(user_data_b->physics_object);
+        robot = static_cast<SimulatorRobot*>(user_data_b->physics_object);
     }
 
     if(ball && robot) {
@@ -69,7 +69,7 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
     return std::nullopt;
 }
 
-std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener::isBallDribblerContact(
+std::optional<std::pair<PhysicsBall*, SimulatorRobot*>> SimulationContactListener::isBallDribblerContact(
         PhysicsObjectUserData *user_data_a, PhysicsObjectUserData *user_data_b) {
     if(!user_data_a || !user_data_b) {
         return std::nullopt;
@@ -83,12 +83,12 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
         ball = static_cast<PhysicsBall*>(user_data_b->physics_object);
     }
 
-    PhysicsRobot* robot = nullptr;
+    SimulatorRobot* robot = nullptr;
     if(user_data_a->type == PhysicsObjectType::ROBOT_DRIBBLER) {
-        robot = static_cast<PhysicsRobot*>(user_data_a->physics_object);
+        robot = static_cast<SimulatorRobot*>(user_data_a->physics_object);
     }
     if(user_data_b->type == PhysicsObjectType::ROBOT_DRIBBLER) {
-        robot = static_cast<PhysicsRobot*>(user_data_b->physics_object);
+        robot = static_cast<SimulatorRobot*>(user_data_b->physics_object);
     }
 
     if(ball && robot) {
@@ -98,19 +98,24 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
     return std::nullopt;
 }
 
-void SimulationContactListener::handleBallChickerContact(b2Contact *contact, PhysicsBall *ball, PhysicsRobot *robot) {
-     if(robot->autokick_enabled) {
-         get kick vector
-         ball->applyImpulse(kick vector);
-     }else if(robot->autochip_enabled) {
-         get chip vector
-         ball->applyImpulse(chip vector);
+void SimulationContactListener::handleBallChickerContact(b2Contact *contact, PhysicsBall *ball, SimulatorRobot *robot) {
+     if(auto autokick_speed_m_per_s = robot->getAutokickSpeed()) {
+         Vector kick_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation())).normalize(autokick_speed_m_per_s.value());
+         ball->applyImpulse(kick_vector);
+     }else if(auto autochip_distance_m = robot->getAutochipDistance()) {
+         Vector chip_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation())).normalize(autochip_distance_m.value());
+         // TODO: chipping logic
+         ball->applyImpulse(chip_vector);
      }
-
 }
 
-void SimulationContactListener::handleBallDribblerContact(b2Contact *contact, PhysicsBall *ball, PhysicsRobot *robot) {
-
+void SimulationContactListener::handleBallDribblerContact(b2Contact *contact, PhysicsBall *ball, SimulatorRobot *robot) {
+    if(robot->getDribblerSpeed() > 0) {
+        Vector orthogonal_force_vector = -Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
+        orthogonal_force_vector.normalize(100);
+        ball->applyForce(orthogonal_force_vector);
+        // TODO: centering force
+    }
 }
 
 
