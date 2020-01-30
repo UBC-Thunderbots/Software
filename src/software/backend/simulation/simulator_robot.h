@@ -101,6 +101,24 @@ public:
     void enableAutochip(float distance_m);
 
     /**
+     * Returns the current autokick speed (in m/s) if autokick is enabled, otherwise
+     * returns std::nullopt
+     *
+     * @return the current autokick speed (in m/s) if autokick is enabled, otherwise
+     * returns std::nullopt
+     */
+    std::optional<double> getAutokickSpeed() const;
+
+    /**
+     * Returns the current autochip distance (in m) if autochip is enabled, otherwise
+     * returns std::nullopt
+     *
+     * @return the current autochip distance (in m) if autochip is enabled, otherwise
+     * returns std::nullopt
+     */
+    std::optional<double> getAutochipDistance() const;
+
+    /**
      * Disables autokick
      */
     void disableAutokick();
@@ -116,6 +134,13 @@ public:
      * @param rpm The rpm to set for the dribbler
      */
     void setDribblerSpeed(uint32_t rpm);
+
+    /**
+     * Returns the dribbler speed in rpm
+     *
+     * @return the dribbler speed in rpm
+     */
+    uint32_t getDribblerSpeed() const;
 
     /**
      * Makes the dribbler coast until another operation is applied to it
@@ -149,4 +174,7 @@ public:
 
 private:
     std::weak_ptr<PhysicsRobot> physics_robot;
+    std::optional<double> kick_speed_m_per_s;
+    std::optional<double> chip_distance_m;
+    uint32_t dribbler_rpm;
 };
