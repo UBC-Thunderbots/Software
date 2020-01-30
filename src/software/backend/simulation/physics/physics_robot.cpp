@@ -6,7 +6,7 @@
 #include "shared/constants.h"
 #include "software/backend/simulation/physics/box2d_util.h"
 
-PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot)
+PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, double mass_kg)
     : robot_id(robot.id())
 {
     b2BodyDef robot_body_def;
@@ -24,7 +24,7 @@ PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot)
     // to determine the depth of the inset
     double chicker_depth = BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 
-    setupRobotBodyFixtures(robot, chicker_depth);
+    setupRobotBodyFixtures(robot, chicker_depth, mass_kg);
     setupDribblerFixture(robot, chicker_depth);
     setupChickerFixture(robot, chicker_depth);
 }
@@ -40,7 +40,7 @@ PhysicsRobot::~PhysicsRobot()
     }
 }
 
-void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_depth)
+void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_depth, double mass_kg)
 {
     b2FixtureDef robot_body_fixture_def;
     // This is a somewhat arbitrary value. Collisions with robots are not perfectly
@@ -68,7 +68,7 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_dep
     {
         robot_body_fixture_def.shape = shape;
         double shape_area            = polygonArea(*shape);
-        double mass_of_shape = shape_area / total_shape_area * ROBOT_WITH_BATTERY_MASS_KG;
+        double mass_of_shape = shape_area / total_shape_area * mass_kg;
         robot_body_fixture_def.density = mass_of_shape / shape_area;
         robot_body->CreateFixture(&robot_body_fixture_def);
     }
@@ -246,4 +246,8 @@ Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
 RobotId PhysicsRobot::getRobotId() const
 {
     return robot_id;
+}
+
+double PhysicsRobot::getMassKg() const {
+    return static_cast<double>(robot_body->GetMass());
 }

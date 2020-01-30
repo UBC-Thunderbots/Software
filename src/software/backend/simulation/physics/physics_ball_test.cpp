@@ -12,12 +12,23 @@ TEST(PhysicsBallTest, test_get_ball_with_timestamp)
     auto world = std::make_shared<b2World>(gravity);
 
     Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
     auto ball         = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
     EXPECT_TRUE(ball_parameter.position().isClose(ball.position(), 1e-7));
     EXPECT_LT((ball_parameter.velocity() - ball.velocity()).length(), 1e-7);
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
+}
+
+TEST(PhysicsBallTest, test_get_mass)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Ball ball_parameter(Point(0.1, -0.04), Vector(1, -2), Timestamp::fromSeconds(0));
+    auto physics_ball = PhysicsBall(world, ball_parameter, 0.0443);
+
+    EXPECT_NEAR(physics_ball.getMassKg(), 0.0443, 1e-6);
 }
 
 TEST(PhysicsBallTest, test_ball_added_to_physics_world_on_creation)
@@ -29,7 +40,7 @@ TEST(PhysicsBallTest, test_ball_added_to_physics_world_on_creation)
 
     EXPECT_EQ(0, world->GetBodyCount());
 
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     EXPECT_EQ(1, world->GetBodyCount());
 }
@@ -44,7 +55,7 @@ TEST(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
 
         EXPECT_EQ(0, world->GetBodyCount());
 
-        auto physics_ball = PhysicsBall(world, ball_parameter);
+        auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
         EXPECT_EQ(1, world->GetBodyCount());
     }
@@ -60,7 +71,7 @@ TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_
     auto world = std::make_shared<b2World>(gravity);
 
     Ball ball_parameter(Point(1, -1), Vector(1, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -85,7 +96,7 @@ TEST(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simulat
     auto world = std::make_shared<b2World>(gravity);
 
     Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -125,7 +136,7 @@ TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collisio
     wall_body->CreateFixture(&wall_fixture_def);
 
     Ball ball_parameter(Point(0, 0), Vector(0.5, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -167,7 +178,7 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
     wall_body->CreateFixture(&wall_fixture_def);
 
     Ball ball_parameter(Point(0, 0), Vector(1.0, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -182,4 +193,40 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
     EXPECT_LT((Vector(0.0, -1.0) - ball.velocity()).length(), 1e-5);
+}
+
+TEST(PhysicsBallTest, test_apply_force_to_ball) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+    Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+
+    // Apply force for 1 second
+    // We have to take lots of small steps because a significant amount of accuracy
+    // is lost if we take a single step of 1 second
+    for(unsigned int i = 0; i < 60; i++) {
+        physics_ball.applyForce(Vector(1, 2));
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(1.0 / 60.0, 5, 8);
+    }
+
+    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
+    EXPECT_LT((ball.velocity() - Vector(1, 2)).length(), 0.05);
+}
+
+TEST(PhysicsBallTest, test_apply_impulse_to_ball) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+    Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+
+    physics_ball.applyImpulse(Vector(1, 2));
+    // 5 and 8 here are somewhat arbitrary values for the velocity and position
+    // iterations but are the recommended defaults from
+    // https://www.iforce2d.net/b2dtut/worlds
+    world->Step(1.0 / 60.0, 5, 8);
+    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
+    EXPECT_LT((ball.velocity() - Vector(1, 2)).length(), 0.05);
 }

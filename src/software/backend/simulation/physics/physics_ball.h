@@ -20,8 +20,9 @@ class PhysicsBall
      *
      * @param world A shared_ptr to a Box2D World
      * @param ball The Ball to be created in the Box2D world
+     * @param mass_kg The mass of the ball in kg
      */
-    explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball);
+    explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball, const double mass_kg);
 
     PhysicsBall() = delete;
 
@@ -51,6 +52,13 @@ class PhysicsBall
      * will have the same timestamp as the one provided in the parameter
      */
     Ball getBallWithTimestamp(const Timestamp& timestamp) const;
+
+    /**
+     * Returns the mass of the ball in kg
+     *
+     * @return the mass of the ball in kg
+     */
+    double getMassKg() const;
 
     void applyForce(const Vector& force);
     void applyImpulse(const Vector& impulse);

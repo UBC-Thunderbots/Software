@@ -5,7 +5,7 @@
 #include "shared/constants.h"
 #include "software/backend/simulation/physics/box2d_util.h"
 
-PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
+PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -26,7 +26,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
     // Calculate the density the fixture / ball must have in order for it to have the
     // desired mass. The density is uniform across the shape.
     float ball_area          = M_PI * ball_shape.m_radius * ball_shape.m_radius;
-    ball_fixture_def.density = BALL_MASS_KG / ball_area;
+    ball_fixture_def.density = mass_kg / ball_area;
     // These restitution and friction values are somewhat arbitrary. Because this is an
     // "ideal" simulation, we can approximate the ball as having perfectly elastic
     // collisions and no friction. Because we also do not generally depend on specific
@@ -57,6 +57,10 @@ Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
     return Ball(position, velocity, timestamp);
 }
 
+double PhysicsBall::getMassKg() const {
+    return static_cast<double>(ball_body->GetMass());
+}
+
 void PhysicsBall::applyForce(const Vector& force) {
     b2Vec2 force_vector = createVec2(force);
     ball_body->ApplyForce(force_vector, ball_body->GetWorldCenter(), true);
@@ -64,5 +68,5 @@ void PhysicsBall::applyForce(const Vector& force) {
 
 void PhysicsBall::applyImpulse(const Vector& impulse) {
     b2Vec2 impulse_vector = createVec2(impulse);
-    ball_body->ApplyForce(impulse_vector, ball_body->GetWorldCenter(), true);
+    ball_body->ApplyLinearImpulseToCenter(impulse_vector, true);
 }

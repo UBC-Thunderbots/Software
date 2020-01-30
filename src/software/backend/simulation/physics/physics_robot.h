@@ -16,8 +16,9 @@ class PhysicsRobot
      *
      * @param world A shared_ptr to a Box2D World
      * @param robot The Robot to be created in the Box2D world
+     * @param mass_kg The mass of the robot in kg
      */
-    explicit PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot);
+    explicit PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, double mass_kg);
 
     PhysicsRobot() = delete;
 
@@ -55,6 +56,13 @@ class PhysicsRobot
      */
     RobotId getRobotId() const;
 
+    /**
+     * Returns the mass of the robot in kg
+     *
+     * @return the mass of the robot in kg
+     */
+    double getMassKg() const;
+
    private:
     /**
      * Creates as many fixtures as necessary to represent the shape of the robot body, and
@@ -62,8 +70,9 @@ class PhysicsRobot
      *
      * @param robot The robot to create fixtures for
      * @param chicker_depth How far inset into the front of the robot the chicker is
+     * @param mass_kg The mass of the robot in kg
      */
-    void setupRobotBodyFixtures(const Robot& robot, double chicker_depth);
+    void setupRobotBodyFixtures(const Robot& robot, double chicker_depth, double mass_kg);
 
     /**
      * Creates a fixture to represent the chicker of the robot. It is partially inset into

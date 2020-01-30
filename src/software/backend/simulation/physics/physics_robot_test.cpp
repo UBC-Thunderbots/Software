@@ -16,11 +16,22 @@ TEST(PhysicsRobotTest, test_get_robot_with_timestamp)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(3.3));
 
     EXPECT_EQ(robot_parameter.position(), robot.position());
     EXPECT_EQ(Timestamp::fromSeconds(3.3), robot.lastUpdateTimestamp());
+}
+
+TEST(PhysicsRobotTest, test_get_mass) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 2.421);
+
+    EXPECT_NEAR(physics_robot.getMassKg(), 2.421, 1e-6);
 }
 
 TEST(PhysicsRobotTest, test_robot_added_to_physics_world_on_creation)
@@ -33,7 +44,7 @@ TEST(PhysicsRobotTest, test_robot_added_to_physics_world_on_creation)
 
     EXPECT_EQ(0, world->GetBodyCount());
 
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     EXPECT_EQ(1, world->GetBodyCount());
 }
@@ -49,7 +60,7 @@ TEST(PhysicsRobotTest, test_physics_robot_is_removed_from_world_when_destroyed)
 
         EXPECT_EQ(0, world->GetBodyCount());
 
-        PhysicsRobot physics_robot(world, robot_parameter);
+        PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
         EXPECT_EQ(1, world->GetBodyCount());
     }
@@ -68,13 +79,13 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_outside_radius)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     // The ball should pass right next to the robot without colliding, so should not
     // change direction
     Ball ball_parameter(Point(1, ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS),
                         Vector(-2, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -99,12 +110,12 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_inside_radius)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     Ball ball_parameter(
         Point(1, ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS - 0.005), Vector(-2, 0),
         Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -129,11 +140,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_outside_radius)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     Ball ball_parameter(Point(1, -ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS),
                         Vector(-2, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -158,12 +169,12 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_inside_radius)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     Ball ball_parameter(
         Point(1, -ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS + 0.005),
         Vector(-2, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -188,13 +199,13 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_outside_radius)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     // The ball should pass right next to the robot without colliding, so should not
     // change direction
     Ball ball_parameter(Point(-ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS, 1),
                         Vector(0, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -220,14 +231,14 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_inside_radius)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     // The ball should pass right next to the robot without colliding, so should not
     // change direction
     Ball ball_parameter(
         Point(-ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS + 0.005, 1),
         Vector(0, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -253,14 +264,14 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_in_front_of_chic
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     // The ball should pass right next to the robot without colliding, so should not
     // change direction
     Ball ball_parameter(
         Point(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.003, 1),
         Vector(0, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -286,14 +297,14 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_behind_chicker)
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter);
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     // The ball should pass right next to the robot without colliding, so should not
     // change direction
     Ball ball_parameter(
         Point(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS - 0.005, 1),
         Vector(0, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter);
+    PhysicsBall physics_ball(world, ball_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
