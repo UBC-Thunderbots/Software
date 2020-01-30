@@ -52,6 +52,9 @@ class PhysicsBall
      */
     Ball getBallWithTimestamp(const Timestamp& timestamp) const;
 
+    void applyForce(const Vector& force);
+    void applyImpulse(const Vector& impulse);
+
    private:
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures

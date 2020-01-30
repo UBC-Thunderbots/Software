@@ -56,3 +56,13 @@ Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
         Vector(ball_body->GetLinearVelocity().x, ball_body->GetLinearVelocity().y);
     return Ball(position, velocity, timestamp);
 }
+
+void PhysicsBall::applyForce(const Vector& force) {
+    b2Vec2 force_vector = createVec2(force);
+    ball_body->ApplyForce(force_vector, ball_body->GetWorldCenter(), true);
+}
+
+void PhysicsBall::applyImpulse(const Vector& impulse) {
+    b2Vec2 impulse_vector = createVec2(impulse);
+    ball_body->ApplyForce(impulse_vector, ball_body->GetWorldCenter(), true);
+}
