@@ -22,6 +22,13 @@ cc_test(
 )
 
 cc_library(
+    name = "physics_object",
+    srcs = ["physics_object.cpp"],
+    hdrs = ["physics_object.h"],
+    deps = [],
+)
+
+cc_library(
     name = "physics_ball",
     srcs = ["physics_ball.cpp"],
     hdrs = ["physics_ball.h"],
@@ -113,6 +120,18 @@ cc_library(
         "//software/time:timestamp",
         "//software/world",
         "//software/world:robot",
+        "@box2d",
+    ],
+)
+
+cc_library(
+    name = "simulation_contact_listener",
+    srcs = ["simulation_contact_listener.cpp"],
+    hdrs = ["simulation_contact_listener.h"],
+    deps = [
+        ":physics_ball",
+        ":physics_object",
+        ":physics_robot",
         "@box2d",
     ],
 )
