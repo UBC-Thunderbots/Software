@@ -7,7 +7,7 @@
 #include "software/backend/simulation/physics/box2d_util.h"
 
 PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, double mass_kg)
-    : robot_id(robot.id())
+    : robot_id(robot.id()), simulator_robot(nullptr)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -250,4 +250,12 @@ RobotId PhysicsRobot::getRobotId() const
 
 double PhysicsRobot::getMassKg() const {
     return static_cast<double>(robot_body->GetMass());
+}
+
+void PhysicsRobot::setSimulatorRobot(SimulatorRobot *simulator_robot) {
+    this->simulator_robot = simulator_robot;
+}
+
+SimulatorRobot* PhysicsRobot::getSimulatorRobot() const {
+    return simulator_robot;
 }

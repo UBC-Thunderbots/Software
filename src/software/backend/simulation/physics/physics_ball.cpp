@@ -4,8 +4,9 @@
 
 #include "shared/constants.h"
 #include "software/backend/simulation/physics/box2d_util.h"
+#include "software/backend/simulation/physics/simulation_contact_listener.h"
 
-PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg)
+PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg) : simulator_ball(nullptr)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -34,6 +35,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, doubl
     // match reality isn't too important.
     ball_fixture_def.restitution = 1.0;
     ball_fixture_def.friction    = 0.0;
+    ball_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 
     ball_body->CreateFixture(&ball_fixture_def);
 }
@@ -69,4 +71,15 @@ void PhysicsBall::applyForce(const Vector& force) {
 void PhysicsBall::applyImpulse(const Vector& impulse) {
     b2Vec2 impulse_vector = createVec2(impulse);
     ball_body->ApplyLinearImpulseToCenter(impulse_vector, true);
+}
+
+// TODO: YOu are here. Currently working on getting pointers to SImulator objects into the fixtures of physics objects
+// in order to implement collision logic. Just ran into cyclic dependency between PhyusicsBall and SimulatorBall.
+// May need to consider Qt-style parent param in constructor?
+void PhysicsBall::setSimulatorBall(SimulatorBall *simulator_ball) {
+    this->simulator_ball = simulator_ball;
+}
+
+SimulatorBall* PhysicsBall::getSimulatorBall() const {
+    return simulator_ball;
 }

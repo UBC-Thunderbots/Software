@@ -6,6 +6,9 @@
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
+// Forward-declare to avoid circular dependencies
+class SimulatorRobot;
+
 class PhysicsRobot
 {
    public:
@@ -62,6 +65,22 @@ class PhysicsRobot
      * @return the mass of the robot in kg
      */
     double getMassKg() const;
+
+    // TODO: test
+    /**
+     * Sets the SimulatorRobot that this PhysicsRobot is associated with
+     *
+     * @param simulator_robot A pointer to the SimulatorRobot that this PhysicsRobot
+     * is associated with
+     */
+    void setSimulatorRobot(SimulatorRobot* simulator_robot);
+
+    /**
+     * Returns a pointer to the SimulatorRobot this PhysicsRobot is associated with
+     *
+     * @return a pointer to the SimulatorRobot this PhysicsRobot is associated with
+     */
+    SimulatorRobot* getSimulatorRobot() const;
 
    private:
     /**
@@ -163,4 +182,7 @@ class PhysicsRobot
     // Bodies, and Fixtures
     b2Body* robot_body;
     RobotId robot_id;
+
+    // The SimulatorRobot associated with this PhysicsRobot, if any
+    SimulatorRobot* simulator_robot;
 };

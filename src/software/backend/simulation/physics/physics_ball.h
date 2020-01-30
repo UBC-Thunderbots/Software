@@ -6,6 +6,9 @@
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
 
+// Forward-delcare to avoid circular dependencies
+class SimulatorBall;
+
 /**
  * This class represents a ball in a Box2D physics simulation. It provides a convenient
  * way for us to abstract the ball and convert to our own Ball class when data is needed
@@ -74,6 +77,22 @@ class PhysicsBall
      */
     void applyImpulse(const Vector& impulse);
 
+    // TODO: test
+    /**
+     * Sets the SimulatorBall that this PhysicsBall is associated with
+     *
+     * @param simulator_ball A pointer to the SimulatorBall that this PhysicsBall
+     * is associated with
+     */
+    void setSimulatorBall(SimulatorBall* simulator_ball);
+
+    /**
+     * Returns a pointer to the SimulatorBall this PhysicsBall is associated with
+     *
+     * @return a pointer to the SimulatorBall this PhysicsBall is associated with
+     */
+    SimulatorBall* getSimulatorBall() const;
+
    private:
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
@@ -81,4 +100,7 @@ class PhysicsBall
     b2BodyDef ball_body_def;
     b2FixtureDef ball_fixture_def;
     b2Body* ball_body;
+
+    // The SimulatorBall associated with this PhysicsBall, if any
+    SimulatorBall* simulator_ball;
 };

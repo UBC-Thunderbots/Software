@@ -3,6 +3,7 @@
 #include <Box2D/Box2D.h>
 #include "software/backend/simulation/physics/physics_ball.h"
 #include "software/backend/simulation/simulator_robot.h"
+#include "software/backend/simulation/simulator_ball.h"
 #include "software/backend/simulation/physics/physics_robot.h"
 
 /**
@@ -36,8 +37,8 @@ public:
     void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 
 private:
-    std::optional<std::pair<PhysicsBall*, SimulatorRobot*>> isBallChickerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
-    std::optional<std::pair<PhysicsBall*, SimulatorRobot*>> isBallDribblerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
-    void handleBallChickerContact(b2Contact* contact, PhysicsBall* ball, SimulatorRobot* robot);
-    void handleBallDribblerContact(b2Contact* contact, PhysicsBall* ball, SimulatorRobot* robot);
+    std::optional<std::pair<SimulatorBall*, SimulatorRobot*>> isBallChickerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
+    std::optional<std::pair<SimulatorBall*, SimulatorRobot*>> isBallDribblerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
+    void handleBallChickerContact(b2Contact* contact, SimulatorBall* ball, SimulatorRobot* robot);
+    void handleBallDribblerContact(b2Contact* contact, SimulatorBall* ball, SimulatorRobot* robot);
 };

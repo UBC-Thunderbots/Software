@@ -125,6 +125,7 @@ cc_library(
         ":physics_ball",
         ":physics_object",
         ":physics_robot",
+        "//software/backend/simulation:simulator_ball",
         "//software/backend/simulation:simulator_robot",
         "@box2d",
     ],
