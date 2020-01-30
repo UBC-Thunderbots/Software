@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "firmware/main/app/world/firmware_world.h"
 
@@ -40,14 +41,6 @@ typedef struct
      * \brief Whether or not the primitive is a type of direct-mode operation.
      */
     bool direct;
-
-    // TODO: need to pass state into `init`?
-    /**
-     * \brief Initializes the primitive.
-     *
-     * This is called once at system startup.
-     */
-    void (*init)(void);
 
     /**
      * \brief Starts performing a movement using the primitive.
@@ -120,3 +113,6 @@ void* create##STATE_TYPE(){ \
 void destroy##STATE_TYPE(void* state){ \
     free((STATE_TYPE*)state); \
 }
+
+// TODO: jdoc
+bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params);

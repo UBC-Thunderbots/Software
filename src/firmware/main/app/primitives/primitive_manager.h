@@ -1,38 +1,46 @@
 #pragma once
 
+#include "firmware/main/app/primitives/primitive.h"
 #include "firmware/main/app/world/firmware_world.h"
 
-// TODO: convert to new jdoc style
+typedef struct PrimitiveManager PrimitiveManager_t;
 
 /**
- * \brief Initializes the movement primitive manager and all the primitives.
+ * Create a PrimitiveManager
+ * @return A PrimitiveManager
  */
-void primitive_init(void);
+PrimitiveManager_t* app_primitive_manager_create(void);
 
 /**
- * \brief Starts a new movement.
+ * Sets the current primitive to a new one
  *
- * \param[in] primitive the index of the primitive to run
- * \param[in] params the parameters to the primitive
- * \param[in] world The world to perform the primitive in
+ * @param manager The primitive manager to set the current primitive on
+ * @param world The world to run the primitive in
+ * @param primitive_index The index of the primitive to run
+ * @param params The parameters for the primitive
  */
-void primitive_start(unsigned int primitive, const primitive_params_t *params,
-                     FirmwareWorld_t *world);
-
-// TODO: jdoc
-uint8_t primitive_tick(FirmwareWorld_t *world);
+void app_primitive_manager_start_new_primitive(PrimitiveManager_t *manager,
+                                               FirmwareWorld_t *world,
+                                               unsigned int primitive_index,
+                                               const primitive_params_t *params);
 
 /**
- * \brief Checks whether a particular primitive is direct.
+ * Runs the current primitive
  *
- * \param[in] primitive the primitive to check
- * \retval true the primitive is direct
- * \retval false the primitive is a movement primitive
+ * @param manager The primitive manager to set the current primitive on
+ * @param world The world to run the primitive in
+ * @return ?? TODO ??
  */
-bool primitive_is_direct(unsigned int primitive);
+void app_primitive_manager_run_current_primitive(PrimitiveManager_t *manager,
+                                                    FirmwareWorld_t *world);
 
-// TODO: jdoc
-unsigned int get_primitive_index();
+// TODO: does this belong here
+// TODO: new jdoc style
+/**
+ * Checks whether a particular primitive is direct.
+ *
+ * @param primitive the primitive to check
+ * @return true if the primitive is direct primitive, false otherwise
+ */
+bool app_primitive_manager_primitiveIsDirect(unsigned int primitive);
 
-// TODO: jdoc
-bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params);

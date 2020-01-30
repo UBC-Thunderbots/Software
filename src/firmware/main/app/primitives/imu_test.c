@@ -3,58 +3,41 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "firmware/main/app/control/bangbang.h"
+#include "firmware/main/app/control/control.h"
+#include "firmware/main/shared/physics.h"
 
 #define SPACE_FACTOR 0.01f
 #define TICK 0.005f
 #define MAX_VX_STEP MAX_X_A* TICK
 #define MAX_VY_STEP MAX_Y_A* TICK
-
-#include "firmware/main/app/control/bangbang.h"
-#include "firmware/main/app/control/control.h"
-#include "firmware/main/shared/physics.h"
-
 #define TIME_HORIZON 0.5f
 
-// TODO: how to deal with static variables like these?
-//       For now can just pass `primitive_params_t` in again, but trickier with protobuf
-static float x_dest;
-static float y_dest;
-static float avel_final;
-static bool slow;
 
-static void imu_test_init(void) {}
+typedef struct ImuTestPrimitiveState {
+    float x_dest;
+    float y_dest;
+    float avel_final;
+    bool slow;
+}ImuTestPrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ImuTestPrimitiveState_t)
 
-// 0th is x (mm), 1st is y (mm), 2nd is angular velocity in centirad/s
-// input to 3->4 matrix is quarter-degrees per 5 ms, matrix is dimensionless
-// linear ramp up for velocity and linear fall as robot approaches point
-// constant angular velocity
-static void imu_test_start(const primitive_params_t *params,  FirmwareWorld_t *world)
+static void imu_test_start(const primitive_params_t *params, void* void_state_ptr,  FirmwareWorld_t *world)
 {
-    x_dest     = (float)(params->params[0] / 1000.0f);
-    y_dest     = (float)(params->params[1] / 1000.0f);
-    avel_final = (float)(params->params[2] / 100.0f);
-    slow       = params->slow;
+    ImuTestPrimitiveState_t* state = (ImuTestPrimitiveState_t*)void_state_ptr;
+    // 0th is x (mm), 1st is y (mm), 2nd is angular velocity in centirad/s
+    // input to 3->4 matrix is quarter-degrees per 5 ms, matrix is dimensionless
+    // linear ramp up for velocity and linear fall as robot approaches point
+    // constant angular velocity
+    state->x_dest     = (float)(params->params[0] / 1000.0f);
+    state->y_dest     = (float)(params->params[1] / 1000.0f);
+    state->avel_final = (float)(params->params[2] / 100.0f);
+    state->slow       = params->slow;
 }
 
-/**
- * \brief Ends a movement of this type.
- *
- * This function runs when the host computer requests a new movement while a
- * spin movement is already in progress.
- * \param[in] world The world to perform the primitive in
- */
-static void imu_test_end(FirmwareWorld_t *world) {}
+static void imu_test_end(void* void_state_ptr, FirmwareWorld_t *world) {}
 
-/**
- * \brief Ticks a movement of this type.
- *
- * This function runs at the system tick rate while this primitive is active.
- *
- * \param[out] log the log record to fill with information about the tick, or
- * \c NULL if no record is to be filled
- * \param[in] world The world to perform the primitive in
- */
-static void imu_test_tick(FirmwareWorld_t *world)
+static void imu_test_tick(void* void_state_ptr, FirmwareWorld_t *world)
 {
     // TODO: this primitive does nothing. Delete?
 }
@@ -64,8 +47,9 @@ static void imu_test_tick(FirmwareWorld_t *world)
  */
 const primitive_t IMU_TEST_PRIMITIVE = {
     .direct = false,
-    .init   = &imu_test_init,
     .start  = &imu_test_start,
     .end    = &imu_test_end,
     .tick   = &imu_test_tick,
+    .create_state = &createImuTestPrimitiveState_t,
+    .destroy_state = &destroyImuTestPrimitiveState_t
 };

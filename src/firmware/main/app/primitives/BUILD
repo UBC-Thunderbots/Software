@@ -141,15 +141,6 @@ cc_library(
 )
 
 cc_library(
-    name = "stop",
-    srcs = ["stop.c"],
-    hdrs = ["stop.h"],
-    deps = [
-        ":primitive",
-    ],
-)
-
-cc_library(
     name = "spin",
     srcs = ["spin.c"],
     hdrs = ["spin.h"],
@@ -158,5 +149,14 @@ cc_library(
         "//firmware/main/app/control",
         "//firmware/main/app/control:bangbang",
         "//firmware/main/shared:physics",
+    ],
+)
+
+cc_library(
+    name = "stop",
+    srcs = ["stop.c"],
+    hdrs = ["stop.h"],
+    deps = [
+        ":primitive",
     ],
 )

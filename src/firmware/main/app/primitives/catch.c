@@ -30,72 +30,51 @@
 #define CURR_STATE_UNIT_CONV 1000000
 #define ROBOTRADIUS (0.06f)
 
-static primitive_params_t catch_param;
-
-/**
- * \brief Initializes the catch primitive.
- *
- * This function runs once at system startup.
- * @param void
- */
-static void catch_init(void) {}
-
-
-float catchvelocity;  // 0.4
-float catchmargin;    // 8.8
-float dribbler_speed;
-
-/**
- * Starts a movement of this type.
- *
- * This function runs each time the host computer requests to start a catch
- * movement.
- *
- * @param primitive_params_t the catch parameters, which are only valid until this
- * primitive ends. Three parameters are the catchmargin and velocity ratios as well as
- * dribbler set speed in rpm
- * @param world The world to perform the primitive in
- */
-static void catch_start(const primitive_params_t* params, FirmwareWorld_t* world)
+typedef struct CatchPrimitiveState
 {
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        catch_param.params[i] = params->params[i];
-    }
-    catch_param.slow  = params->slow;
-    catch_param.extra = params->extra;
+    float catchvelocity;  // 0.4
+    float catchmargin;    // 8.8
+    float dribbler_speed;
+} CatchPrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(CatchPrimitiveState_t)
+
+static void catch_start(const primitive_params_t* params, void* void_state_ptr,
+                        FirmwareWorld_t* world)
+{
+    CatchPrimitiveState_t* state = (CatchPrimitiveState_t*)void_state_ptr;
 
     // pass params in
-    catchvelocity  = (float)catch_param.params[0];
-    catchmargin    = (float)catch_param.params[2];
-    dribbler_speed = (float)catch_param.params[1];
+    state->catchvelocity  = (float)params->params[0];
+    state->catchmargin    = (float)params->params[2];
+    state->dribbler_speed = (float)params->params[1];
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
-    app_dribbler_setSpeed(dribbler, dribbler_speed);
+    app_dribbler_setSpeed(dribbler, state->dribbler_speed);
 }
 
-static void catch_end(FirmwareWorld_t* world) {}
+static void catch_end(void* void_state_ptr, FirmwareWorld_t* world) {}
 
-static void catch_tick(FirmwareWorld_t* world)
+static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
     const FirmwareBall_t* ball   = app_firmware_world_getBall(world);
+    CatchPrimitiveState_t* state = (CatchPrimitiveState_t*)void_state_ptr;
 
     // Initializing:
     // robot's x,y and angular velocity
     // robot's x, y coorrdinates and its angle from major axis (Angle between the robot
     // and the ball) ball's x, y velocity ball's x, y coordinates
     const float vel[3]     = {app_firmware_robot_getVelocityX(robot),
-                    app_firmware_robot_getVelocityY(robot),
-                    app_firmware_robot_getVelocityAngular(robot)};
+                          app_firmware_robot_getVelocityY(robot),
+                          app_firmware_robot_getVelocityAngular(robot)};
     const float pos[3]     = {app_firmware_robot_getPositionX(robot),
-                    app_firmware_robot_getPositionY(robot),
-                    app_firmware_robot_getOrientation(robot)};
+                          app_firmware_robot_getPositionY(robot),
+                          app_firmware_robot_getOrientation(robot)};
     const float ballvel[2] = {app_firmware_ball_getVelocityX(ball),
-                        app_firmware_ball_getVelocityY(ball)};
+                              app_firmware_ball_getVelocityY(ball)};
     const float ballpos[2] = {app_firmware_ball_getPositionX(ball),
-                        app_firmware_ball_getPositionY(ball)};
+                              app_firmware_ball_getPositionY(ball)};
 
     float major_vec[2];  // x and y of major axis
     float minor_vec[2];  // x and y of minor axis
@@ -116,9 +95,7 @@ static void catch_tick(FirmwareWorld_t* world)
         // distance between the ball and the robot
         // relative angle difference between the ball and robot; how much angle is
         // difference from the field's y axis.
-        float distance =
-            norm2(ballpos[0] - pos[0], ballpos[1] - pos[1]) -
-            ROBOTRADIUS;
+        float distance = norm2(ballpos[0] - pos[0], ballpos[1] - pos[1]) - ROBOTRADIUS;
         float relativeangle = atan2f((pos[1] - ballpos[1]), (pos[0] - ballpos[0]));
 
         // major_vel shows how fast the robot is approaching to the ball
@@ -135,8 +112,8 @@ static void catch_tick(FirmwareWorld_t* world)
 
         relative_destination[0] = ballpos[0] - pos[0];
         relative_destination[1] = ballpos[1] - pos[1];
-        relative_destination[2] = min_angle_delta(
-            pos[2], major_angle);  // This need to be modified later
+        relative_destination[2] =
+            min_angle_delta(pos[2], major_angle);  // This need to be modified later
 
         // implement PID controller in future
 
@@ -167,7 +144,7 @@ static void catch_tick(FirmwareWorld_t* world)
                                            max_minor_a,
                                            max_minor_v);  // 1.5, 1.5
         app_bangbang_planTrajectory(&minor_profile);
-        minor_accel      = app_bangbang_computeAvgAccel(&minor_profile, TIME_HORIZON);
+        minor_accel = app_bangbang_computeAvgAccel(&minor_profile, TIME_HORIZON);
 
         // timetarget is used for the robot's rotation. It is alwways bigger than 0.1m/s
         timeTarget = (time_major > TIME_HORIZON) ? time_major : TIME_HORIZON;
@@ -208,7 +185,7 @@ static void catch_tick(FirmwareWorld_t* world)
 
         // now calculate where we would want to end up intercepting the ball
         // TODO: should we be using this?
-        //float ball_pos_proj[2] = {ballpos[0] + ballvel[0] * timeTarget,
+        // float ball_pos_proj[2] = {ballpos[0] + ballvel[0] * timeTarget,
         //                          ballpos[1] + ballvel[1] * timeTarget};
 
         // get our major axis distance from where the ball would be by the time we get to
@@ -218,12 +195,12 @@ static void catch_tick(FirmwareWorld_t* world)
 
         // calculate the position along the major axis where we want to catch the ball
         float safetydistance =
-            catchmargin * norm2(vel[1] - ballvel[1], vel[0] - ballvel[0]);
+           state->catchmargin * norm2(vel[1] - ballvel[1], vel[0] - ballvel[0]);
         float major_disp_intercept = major_disp_proj + safetydistance;
 
         // desired end interception velocity
         float major_catch_vel =
-            catchvelocity * norm2(vel[1] - ballvel[1], vel[0] - ballvel[0]);
+            state->catchvelocity * norm2(vel[1] - ballvel[1], vel[0] - ballvel[0]);
         float major_vel_intercept = norm2(ballvel[0], ballvel[1]) - major_catch_vel;
 
         float major_vel = major_vec[0] * vel[0] + major_vec[1] * vel[1];
@@ -232,7 +209,7 @@ static void catch_tick(FirmwareWorld_t* world)
                                            major_vel, major_vel_intercept, CATCH_MAX_X_V,
                                            CATCH_MAX_X_A);
         app_bangbang_planTrajectory(&major_profile);
-        major_accel      = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
+        major_accel = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
 
         major_angle      = atan2f(major_vec[1], major_vec[0]);
         float angle_disp = min_angle_delta(pos[2], major_angle + M_PI);
@@ -242,8 +219,7 @@ static void catch_tick(FirmwareWorld_t* world)
 
     // get robot local coordinates
     float local_x_norm_vec[2] = {cosf(pos[2]), sinf(pos[2])};
-    float local_y_norm_vec[2] = {cosf(pos[2] + M_PI / 2),
-                                 sinf(pos[2] + M_PI / 2)};
+    float local_y_norm_vec[2] = {cosf(pos[2] + M_PI / 2), sinf(pos[2] + M_PI / 2)};
 
     // rotate acceleration onto robot local coordinates
     accel[0] = minor_accel *
@@ -266,8 +242,9 @@ static void catch_tick(FirmwareWorld_t* world)
  */
 const primitive_t CATCH_PRIMITIVE = {
     .direct = false,
-    .init   = &catch_init,
     .start  = &catch_start,
     .end    = &catch_end,
     .tick   = &catch_tick,
+    .create_state = &createCatchPrimitiveState_t,
+    .destroy_state = &destroyCatchPrimitiveState_t
 };

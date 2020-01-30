@@ -16,10 +16,11 @@
 #define END_SPEED 1.5f
 #define WITHIN_THRESH(X) (X <= THRESH && X >= -THRESH)
 
-static float radius, speed, angle, center[2], final_dest[2];
-static int dir = 1;
-
-static void pivot_init(void) {}
+typedef struct PivotPrimitiveState {
+    float radius, speed, angle, center[2], final_dest[2];
+    int dir;
+}PivotPrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(PivotPrimitiveState_t)
 
 /**
  * \brief Does bangbang stuff and returns the acceleration value
@@ -40,12 +41,13 @@ float compute_magnitude(float a[2])
     return sqrtf(a[0] * a[0] + a[1] * a[1]);
 }
 
-static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world)
+static void pivot_start(const primitive_params_t *params, void* void_state_ptr, FirmwareWorld_t *world)
 {
-    center[0] = params->params[0] / 1000.0;
-    center[1] = params->params[1] / 1000.0;
-    angle     = params->params[2] / 100.0;
-    speed     = params->params[3] / 100.0;
+    PivotPrimitiveState_t* state = (PivotPrimitiveState_t*)void_state_ptr;
+    state->center[0] = params->params[0] / 1000.0;
+    state->center[1] = params->params[1] / 1000.0;
+    state->angle     = params->params[2] / 100.0;
+    state->speed     = params->params[3] / 100.0;
 
     if (params->extra & 0x01)
     {
@@ -54,38 +56,39 @@ static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world
         app_dribbler_setSpeed(dribbler, 16000);
     }
 
-    radius = 0.15;  // ball radius + robot radius + buffer
+    state->radius = 0.15;  // ball radius + robot radius + buffer
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
-    float rel_dest[2] = {center[0] - app_firmware_robot_getPositionX(robot),
-                         center[1] - app_firmware_robot_getPositionY(robot)};
+    float rel_dest[2] = {state->center[0] - app_firmware_robot_getPositionX(robot),
+                         state->center[1] - app_firmware_robot_getPositionY(robot)};
     float cur_radius  = compute_magnitude(rel_dest);
 
     rel_dest[0] /= cur_radius;
     rel_dest[1] /= cur_radius;
 
-    final_dest[0] = center[0] + radius * cosf(angle);
-    final_dest[1] = center[1] + radius * sinf(angle);
+    state->final_dest[0] = state->center[0] + state->radius * cosf(state->angle);
+    state->final_dest[1] = state->center[1] + state->radius * sinf(state->angle);
 
     // find the general direction to travel, project those onto the two possible
     // directions and see which one is better
-    float general_dir[2]      = {final_dest[0] - app_firmware_robot_getPositionX(robot),
-                            final_dest[1] - app_firmware_robot_getPositionY(robot)};
+    float general_dir[2]      = {state->final_dest[0] - app_firmware_robot_getPositionX(robot),
+                                 state->final_dest[1] - app_firmware_robot_getPositionY(robot)};
     float tangential_dir_1[2] = {rel_dest[1] / cur_radius, -rel_dest[0] / cur_radius};
     float tangential_dir_2[2] = {-rel_dest[1] / cur_radius, rel_dest[0] / cur_radius};
     float dir1                = dot_product(general_dir, tangential_dir_1, 2);
     float dir2                = dot_product(general_dir, tangential_dir_2, 2);
 
-    dir = (dir1 >= dir2) ? -1 : 1;
+    state->dir = (dir1 >= dir2) ? -1 : 1;
 }
 
 
-static void pivot_end(FirmwareWorld_t *world) {}
+static void pivot_end(void* void_state_ptr, FirmwareWorld_t *world) {}
 
-static void pivot_tick(FirmwareWorld_t *world)
+static void pivot_tick(void* void_state_ptr, FirmwareWorld_t *world)
 {
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    const PivotPrimitiveState_t* state = (PivotPrimitiveState_t*)void_state_ptr;
 
     float rel_dest[3], tangential_dir[2], radial_dir[2];
     const float vel[3]     = {app_firmware_robot_getVelocityX(robot),
@@ -93,8 +96,8 @@ static void pivot_tick(FirmwareWorld_t *world)
                               app_firmware_robot_getVelocityAngular(robot)};
 
     // calculate the relative displacement and the current radius
-    rel_dest[0]      = center[0] - app_firmware_robot_getPositionX(robot);
-    rel_dest[1]      = center[1] - app_firmware_robot_getPositionY(robot);
+    rel_dest[0]      = state->center[0] - app_firmware_robot_getPositionX(robot);
+    rel_dest[1]      = state->center[1] - app_firmware_robot_getPositionY(robot);
     float cur_radius = compute_magnitude(rel_dest);
 
     // direction to travel to move into the bot
@@ -102,13 +105,13 @@ static void pivot_tick(FirmwareWorld_t *world)
     radial_dir[1] = rel_dest[1] / cur_radius;
 
     // direction to travel to rotate around the bot, dir is selected at the start
-    tangential_dir[0] = -dir * rel_dest[1] / cur_radius;
-    tangential_dir[1] = dir * rel_dest[0] / cur_radius;
+    tangential_dir[0] = -state->dir * rel_dest[1] / cur_radius;
+    tangential_dir[1] = state->dir * rel_dest[0] / cur_radius;
 
     BBProfile rotation_profile;
 
-    float end_goal_vect[2]   = {final_dest[0] - app_firmware_robot_getPositionX(robot),
-                              final_dest[1] - app_firmware_robot_getPositionY(robot)};
+    float end_goal_vect[2]   = {state->final_dest[0] - app_firmware_robot_getPositionX(robot),
+                                state->final_dest[1] - app_firmware_robot_getPositionY(robot)};
     float disp_to_final_dest = compute_magnitude(end_goal_vect);
 
     if (WITHIN_THRESH(disp_to_final_dest))
@@ -120,7 +123,7 @@ static void pivot_tick(FirmwareWorld_t *world)
     float current_rot_vel = dot_product(tangential_dir, vel, 2);
 
     float mag_accel_orbital =
-        speed * compute_acceleration(&rotation_profile, disp_to_final_dest,
+        state->speed * compute_acceleration(&rotation_profile, disp_to_final_dest,
                                      current_rot_vel, STOPPED, MAX_A, MAX_V);
 
     // create the local vectors to the bot
@@ -154,8 +157,9 @@ static void pivot_tick(FirmwareWorld_t *world)
  */
 const primitive_t PIVOT_PRIMITIVE = {
     .direct = false,
-    .init   = &pivot_init,
     .start  = &pivot_start,
     .end    = &pivot_end,
     .tick   = &pivot_tick,
+    .create_state = &createPivotPrimitiveState_t,
+    .destroy_state = &destroyPivotPrimitiveState_t
 };

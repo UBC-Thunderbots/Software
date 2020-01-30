@@ -1,8 +1,10 @@
 #include "firmware/main/app/primitives/direct_wheels.h"
 
-static void direct_wheels_init(void) {}
+typedef struct DirectWheelsPrimitiveState {
+}DirectWheelsPrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DirectWheelsPrimitiveState_t)
 
-static void direct_wheels_start(const primitive_params_t* params, FirmwareWorld_t* world)
+static void direct_wheels_start(const primitive_params_t* params, void* void_state_ptr, FirmwareWorld_t* world)
 {
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
@@ -20,9 +22,9 @@ static void direct_wheels_start(const primitive_params_t* params, FirmwareWorld_
     app_dribbler_setSpeed(dribbler, (params->extra) * 300);
 }
 
-static void direct_wheels_end(FirmwareWorld_t* world) {}
+static void direct_wheels_end( void* void_state_ptr,FirmwareWorld_t* world) {}
 
-static void direct_wheels_tick(FirmwareWorld_t* world)
+static void direct_wheels_tick( void* void_state_ptr,FirmwareWorld_t* world)
 {
     // TODO: redo this comment
     // Nothing to do here; the PWM values are sent to the wheels as soon as
@@ -34,9 +36,10 @@ static void direct_wheels_tick(FirmwareWorld_t* world)
  */
 const primitive_t DIRECT_WHEELS_PRIMITIVE = {
     .direct = true,
-    .init   = &direct_wheels_init,
     .start  = &direct_wheels_start,
     .end    = &direct_wheels_end,
     .tick   = &direct_wheels_tick,
+    .create_state = &createDirectWheelsPrimitiveState_t,
+    .destroy_state = &destroyDirectWheelsPrimitiveState_t
 };
 

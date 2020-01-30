@@ -36,8 +36,6 @@ typedef struct AccurateShootPrimitiveState
 } AccurateShootPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(AccurateShootPrimitiveState_t);
 
-static void accurate_shoot_init(void) {}
-
 /**
  * \brief Starts a movement of this type.
  *
@@ -310,7 +308,6 @@ static void accurate_shoot_tick(void* void_state_ptr, FirmwareWorld_t* world)
  */
 const primitive_t ACCURATE_SHOOT_PRIMITIVE = {
     .direct = false,
-    .init   = &accurate_shoot_init,
     .start  = &accurate_shoot_start,
     .end    = &accurate_shoot_end,
     .tick   = &accurate_shoot_tick,

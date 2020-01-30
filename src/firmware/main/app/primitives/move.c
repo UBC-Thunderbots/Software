@@ -167,8 +167,6 @@ void plan_move_rotation(PhysBot* pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void move_init(void) {}
-
 void move_start(const primitive_params_t* params, void* void_state_ptr,
                        FirmwareWorld_t* world)
 {
@@ -267,7 +265,6 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * The move movement primitive.
  */
 const primitive_t MOVE_PRIMITIVE = {.direct        = false,
-                                    .init          = &move_init,
                                     .start         = &move_start,
                                     .end           = &move_end,
                                     .tick          = &move_tick,
