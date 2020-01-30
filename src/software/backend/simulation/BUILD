@@ -76,8 +76,8 @@ cc_library(
     srcs = ["simulator_ball_singleton.cpp"],
     hdrs = ["simulator_ball_singleton.h"],
     deps = [
+        ":simulator_ball",
         "//firmware/main/app/world:firmware_ball",
-        "//software/backend/simulation/physics:physics_ball",
         "@box2d",
     ],
 )

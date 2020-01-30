@@ -1,11 +1,11 @@
 #include "software/backend/simulation/simulator_ball_singleton.h"
 
-std::weak_ptr<PhysicsBall> SimulatorBallSingleton::physics_ball_weak_ptr =
-    std::weak_ptr<PhysicsBall>();
+std::shared_ptr<SimulatorBall> SimulatorBallSingleton::simulator_ball = nullptr;
 
-void SimulatorBallSingleton::setPhysicsBall(std::weak_ptr<PhysicsBall> ball)
+// TODO: should have a null check on all functions in case this is not called first
+void SimulatorBallSingleton::setSimulatorBall(std::shared_ptr<SimulatorBall> ball)
 {
-    physics_ball_weak_ptr = ball;
+    simulator_ball = ball;
 }
 
 std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>
@@ -25,36 +25,20 @@ SimulatorBallSingleton::createFirmwareBall()
 
 float SimulatorBallSingleton::getBallPositionX()
 {
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
-    {
-        // TODO: implement me
-    }
-    return 0.0;
+    return simulator_ball->getPositionX();
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
-    {
-        // TODO: implement me
-    }
-    return 0.0;
+    return simulator_ball->getPositionY();
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
-    {
-        // TODO: implement me
-    }
-    return 0.0;
+    return simulator_ball->getVelocityX();
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
-    {
-        // TODO: implement me
-    }
-    return 0.0;
+    return simulator_ball->getVelocityY();
 }

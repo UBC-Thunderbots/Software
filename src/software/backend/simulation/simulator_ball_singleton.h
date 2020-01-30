@@ -4,7 +4,7 @@ extern "C"
 {
 #include "app/world/firmware_ball.h"
 }
-#include "software/backend/simulation/physics/physics_ball.h"
+#include "software/backend/simulation/simulator_ball.h"
 
 /**
  * Because the FirmwareBall_t struct is defined in the .c file (rather than the .h file),
@@ -24,7 +24,7 @@ struct FirmwareBallDeleter
 };
 
 /**
- * This class acts as a wrapper around a PhysicsBall so that the PhysicsBall
+ * This class acts as a wrapper around a SimulatorBall so that the SimulatorBall
  * can provide the interface of a FirmwareBall
  *
  * Because our firmware structs rely on C-style function pointers, we
@@ -43,16 +43,16 @@ class SimulatorBallSingleton
 {
    public:
     /**
-     * Sets the PhysicsBall being controlled by this class
+     * Sets the SimulatorBall being controlled by this class
      *
-     * @param ball The PhysicsBall to control by this class. Must not be null
+     * @param ball The SimulatorBall to control with this class. Must not be null
      */
-    static void setPhysicsBall(std::weak_ptr<PhysicsBall> ball);
+    static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball);
 
     /**
-     * Creates a FirmwareBall corresponding to the current PhysicsBall
+     * Creates a FirmwareBall corresponding to the current SimulatorBall
      *
-     * @return a FirmwareBall corresponding to the current PhysicsBall
+     * @return a FirmwareBall corresponding to the current SimulatorBall
      */
     static std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter> createFirmwareBall();
 
@@ -85,6 +85,6 @@ class SimulatorBallSingleton
      */
     static float getBallVelocityY();
 
-    // The physics ball being controlled by this class
-    static std::weak_ptr<PhysicsBall> physics_ball_weak_ptr;
+    // The simulator ball being controlled by this class
+    static std::shared_ptr<SimulatorBall> simulator_ball;
 };
