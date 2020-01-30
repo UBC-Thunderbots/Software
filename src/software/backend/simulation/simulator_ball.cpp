@@ -1,8 +1,12 @@
 #include "software/backend/simulation/simulator_ball.h"
 
-SimulatorBall::SimulatorBall(std::weak_ptr<PhysicsBall> physics_ball) :physics_ball(physics_ball){}
+SimulatorBall::SimulatorBall(std::weak_ptr<PhysicsBall> physics_ball) :physics_ball(physics_ball){
+    if(auto ball = this->physics_ball.lock()) {
+        ball->setSimulatorBall(this);
+    }
+}
 
-float SimulatorBall::getPositionX() {
+float SimulatorBall::getPositionX() const {
     if (auto ball = physics_ball.lock())
     {
         return ball->getBallWithTimestamp(Timestamp::fromSeconds(0)).position().x();
@@ -10,7 +14,7 @@ float SimulatorBall::getPositionX() {
     return 0.0;
 }
 
-float SimulatorBall::getPositionY() {
+float SimulatorBall::getPositionY() const {
     if (auto ball = physics_ball.lock())
     {
         return ball->getBallWithTimestamp(Timestamp::fromSeconds(0)).position().y();
@@ -18,7 +22,11 @@ float SimulatorBall::getPositionY() {
     return 0.0;
 }
 
-float SimulatorBall::getVelocityX() {
+Point SimulatorBall::position() const {
+    return Point(getPositionX(), getPositionY());
+}
+
+float SimulatorBall::getVelocityX() const {
     if (auto ball = physics_ball.lock())
     {
         return ball->getBallWithTimestamp(Timestamp::fromSeconds(0)).velocity().x();
@@ -26,12 +34,16 @@ float SimulatorBall::getVelocityX() {
     return 0.0;
 }
 
-float SimulatorBall::getVelocityY() {
+float SimulatorBall::getVelocityY() const {
     if (auto ball = physics_ball.lock())
     {
         return ball->getBallWithTimestamp(Timestamp::fromSeconds(0)).velocity().y();
     }
     return 0.0;
+}
+
+Vector SimulatorBall::velocity() const {
+    return Vector(getVelocityX(), getVelocityY());
 }
 
 void SimulatorBall::applyForce(const Vector &force) {
@@ -46,4 +58,12 @@ void SimulatorBall::applyImpulse(const Vector &impulse) {
     {
         ball->applyImpulse(impulse);
     }
+}
+
+double SimulatorBall::getMassKg() const {
+    if (auto ball = physics_ball.lock())
+    {
+        return ball->getMassKg();
+    }
+    return 0.0;
 }

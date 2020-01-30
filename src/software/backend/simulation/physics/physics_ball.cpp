@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/backend/simulation/physics/box2d_util.h"
-#include "software/backend/simulation/physics/simulation_contact_listener.h"
+#include "software/backend/simulation/physics/physics_object_user_data.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg) : simulator_ball(nullptr)
 {
@@ -73,9 +73,6 @@ void PhysicsBall::applyImpulse(const Vector& impulse) {
     ball_body->ApplyLinearImpulseToCenter(impulse_vector, true);
 }
 
-// TODO: YOu are here. Currently working on getting pointers to SImulator objects into the fixtures of physics objects
-// in order to implement collision logic. Just ran into cyclic dependency between PhyusicsBall and SimulatorBall.
-// May need to consider Qt-style parent param in constructor?
 void PhysicsBall::setSimulatorBall(SimulatorBall *simulator_ball) {
     this->simulator_ball = simulator_ball;
 }

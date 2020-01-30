@@ -22,11 +22,18 @@ cc_test(
 )
 
 cc_library(
+    name = "physics_object_user_data",
+    hdrs = ["physics_object_user_data.h"],
+    deps = [],
+)
+
+cc_library(
     name = "physics_ball",
     srcs = ["physics_ball.cpp"],
     hdrs = ["physics_ball.h"],
     deps = [
         ":box2d_util",
+        ":physics_object_user_data",
         "//shared:constants",
         "//software/geom",
         "//software/time:timestamp",
@@ -77,6 +84,7 @@ cc_library(
     hdrs = ["physics_robot.h"],
     deps = [
         ":box2d_util",
+        ":physics_object_user_data",
         "//shared:constants",
         "//software/geom",
         "//software/time:timestamp",
@@ -104,15 +112,14 @@ cc_library(
     hdrs = ["physics_world.h"],
     deps = [
         ":box2d_util",
+        ":simulation_contact_listener",
         "//shared:constants",
         "//software/backend/simulation/physics:physics_ball",
         "//software/backend/simulation/physics:physics_field",
         "//software/backend/simulation/physics:physics_robot",
-        "//software/geom",
         "//software/time:duration",
         "//software/time:timestamp",
         "//software/world",
-        "//software/world:robot",
         "@box2d",
     ],
 )
@@ -123,7 +130,7 @@ cc_library(
     hdrs = ["simulation_contact_listener.h"],
     deps = [
         ":physics_ball",
-        ":physics_object",
+        ":physics_object_user_data",
         ":physics_robot",
         "//software/backend/simulation:simulator_ball",
         "//software/backend/simulation:simulator_robot",

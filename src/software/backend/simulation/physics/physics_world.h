@@ -6,6 +6,9 @@
 #include "software/backend/simulation/physics/physics_field.h"
 #include "software/backend/simulation/physics/physics_robot.h"
 #include "software/world/world.h"
+#include "software/time/duration.h"
+#include "software/time/timestamp.h"
+#include "software/backend/simulation/physics/simulation_contact_listener.h"
 
 /**
  * This class represents a World in a Box2D physics simulation. It provides a convenient
@@ -16,7 +19,8 @@ class PhysicsWorld
 {
    public:
     /**
-     * Creates a new PhysicsWorld given a Box2D world.
+     * Creates a new PhysicsWorld given a World.
+     *
      * @param world the world to create
      */
     explicit PhysicsWorld(const World& world);
@@ -49,25 +53,12 @@ class PhysicsWorld
      */
     std::vector<std::weak_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
 
-
-//    /**
-//     * Returns the enemy PhysicsRobots currently in the world
-//     * @return the enemy PhysicsRobots in the world
-//     */
-//    std::vector<std::shared_ptr<PhysicsRobot>> getEnemyPhysicsRobots() const;
-//
     /**
      * Returns the PhysicsBall currently in the world
      *
      * @return the PhysicsBall in the world
      */
     std::weak_ptr<PhysicsBall> getPhysicsBall() const;
-//
-//    /**
-//     * Returns the PhysicsBall currently in the world
-//     * @return the PhysicsBall in the world
-//     */
-//    std::shared_ptr<PhysicsField> getPhysicsField() const;
 
    private:
     // Note: we declare the b2World first so it is destroyed last. If it is destroyed before the
@@ -88,6 +79,8 @@ class PhysicsWorld
     // https://www.iforce2d.net/b2dtut/worlds
     const unsigned int velocity_iterations = 8;
     const unsigned int position_iterations = 3;
+
+    std::unique_ptr<SimulationContactListener> contact_listener;
 
     // Abstractions of objects in the world
     std::shared_ptr<PhysicsBall> physics_ball;

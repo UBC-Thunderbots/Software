@@ -1,4 +1,5 @@
 #include "software/backend/simulation/physics/physics_robot.h"
+#include "software/backend/simulation/physics/physics_object_user_data.h"
 
 #include <algorithm>
 #include <numeric>
@@ -83,6 +84,7 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double chicker_depth
     robot_dribbler_fixture_def.friction    = 0.0;
     robot_dribbler_fixture_def.density     = 0.0;
     robot_dribbler_fixture_def.isSensor    = true;
+    robot_dribbler_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::ROBOT_DRIBBLER, this});
 
     const unsigned int num_vertices              = 4;
     b2Vec2 dribbler_shape_vertices[num_vertices] = {
@@ -112,6 +114,7 @@ void PhysicsRobot::setupChickerFixture(const Robot& robot, double chicker_depth)
     // The chicker has no mass in simulation. Mass is already accounted for by the robot
     // body
     robot_chicker_fixture_def.density = 0.0;
+    robot_chicker_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::ROBOT_CHICKER, this});
 
     const unsigned int num_vertices             = 4;
     b2Vec2 chicker_shape_vertices[num_vertices] = {

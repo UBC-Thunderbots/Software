@@ -110,10 +110,13 @@ std::optional<std::pair<SimulatorBall*, SimulatorRobot*>> SimulationContactListe
 
 void SimulationContactListener::handleBallChickerContact(b2Contact *contact, SimulatorBall *ball, SimulatorRobot *robot) {
      if(auto autokick_speed_m_per_s = robot->getAutokickSpeed()) {
-         Vector kick_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation())).normalize(autokick_speed_m_per_s.value());
+         Vector kick_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
+         // Figure out how much impulse to apply to change the speed of the ball by the autokick_speed
+         double change_in_momentum = ball->getMassKg() * autokick_speed_m_per_s.value();
+         kick_vector.normalize(change_in_momentum);
          ball->applyImpulse(kick_vector);
      }else if(auto autochip_distance_m = robot->getAutochipDistance()) {
-         Vector chip_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation())).normalize(autochip_distance_m.value());
+         Vector chip_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
          // TODO: chipping logic
          ball->applyImpulse(chip_vector);
      }

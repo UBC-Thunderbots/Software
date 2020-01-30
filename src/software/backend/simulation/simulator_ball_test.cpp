@@ -40,11 +40,13 @@ private:
 TEST_F(SimulatorBallTest, test_get_position) {
     EXPECT_FLOAT_EQ(simulator_ball_non_zero_state.getPositionX(), 1.01);
     EXPECT_FLOAT_EQ(simulator_ball_non_zero_state.getPositionY(), -0.4);
+    EXPECT_LT((simulator_ball_non_zero_state.position() - Point(1.01, -0.4)).length(), 0.001);
 }
 
 TEST_F(SimulatorBallTest, test_get_linear_velocity) {
-    EXPECT_NEAR(simulator_ball_non_zero_state.getVelocityX(), 0.02, 0.01);
-    EXPECT_NEAR(simulator_ball_non_zero_state.getVelocityY(), -4.5, 0.01);
+    EXPECT_FLOAT_EQ(simulator_ball_non_zero_state.getVelocityX(), 0.02);
+    EXPECT_FLOAT_EQ(simulator_ball_non_zero_state.getVelocityY(), -4.5);
+    EXPECT_LT((simulator_ball_non_zero_state.velocity() - Vector(0.02, -4.5)).length(), 0.001);
 }
 
 TEST_F(SimulatorBallTest, test_apply_force_to_ball) {

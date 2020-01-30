@@ -14,28 +14,42 @@ public:
      *
      * @return the x-position of the ball, in global field coordinates, in meters
      */
-    float getPositionX();
+    float getPositionX() const;
 
     /**
      * Returns the y-position of the ball, in global field coordinates, in meters
      *
      * @return the y-position of the ball, in global field coordinates, in meters
      */
-    float getPositionY();
+    float getPositionY() const;
 
     /**
-     * Returns the x-velocity of the ball, in global field coordinates, in meters
+     * Returns the current position of the ball, in global field coordinates, in meters
      *
-     * @return the x-velocity of the ball, in global field coordinates, in meters
+     * @return the current position of the ball, in global field coordinates, in meters
      */
-    float getVelocityX();
+    Point position() const;
 
     /**
-     * Returns the y-velocity of the ball, in global field coordinates, in meters
+     * Returns the x-velocity of the ball, in global field coordinates, in m/s
      *
-     * @return the y-velocity of the ball, in global field coordinates, in meters
+     * @return the x-velocity of the ball, in global field coordinates, in m/s
      */
-    float getVelocityY();
+    float getVelocityX() const;
+
+    /**
+     * Returns the y-velocity of the ball, in global field coordinates, in m/s
+     *
+     * @return the y-velocity of the ball, in global field coordinates, in m/s
+     */
+    float getVelocityY() const;
+
+    /**
+     * Returns the current velocity of the ball, in global field coordinates, in m/s
+     *
+     * @return the current velocity of the ball, in global field coordinates, in m/s
+     */
+    Vector velocity() const;
 
     /**
      * Applies the given force vector to the ball at its center of mass
@@ -50,6 +64,14 @@ public:
      * @param impulse The impulse to apply
      */
     void applyImpulse(const Vector& impulse);
+
+    // TODO: test
+    /**
+     * Returns the mass of the ball, in kg
+     *
+     * @return the mass of the ball, in kg
+     */
+    double getMassKg() const;
 
 private:
     std::weak_ptr<PhysicsBall> physics_ball;

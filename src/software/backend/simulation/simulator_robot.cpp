@@ -1,6 +1,9 @@
 #include "software/backend/simulation/simulator_robot.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot) : physics_robot(physics_robot), kick_speed_m_per_s(std::nullopt), chip_distance_m(std::nullopt), dribbler_rpm(0){
+    if(auto robot = this->physics_robot.lock()) {
+        robot->setSimulatorRobot(this);
+    }
 }
 
 unsigned int SimulatorRobot::getRobotId() {
