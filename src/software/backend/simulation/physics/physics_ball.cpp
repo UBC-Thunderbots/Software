@@ -6,10 +6,11 @@
 #include "software/backend/simulation/physics/box2d_util.h"
 #include "software/backend/simulation/physics/physics_object_user_data.h"
 
-PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg) : simulator_ball(nullptr)
+PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg, const double gravity) : gravity(gravity), chip_origin(std::nullopt), chip_distance_m(0.0)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
+    b2BodyDef ball_body_def;
     ball_body_def.type = b2_dynamicBody;
     ball_body_def.position.Set(ball.position().x(), ball.position().y());
     ball_body_def.linearVelocity.Set(ball.velocity().x(), ball.velocity().y());
@@ -20,10 +21,11 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, doubl
     ball_body_def.bullet = true;
     ball_body            = world->CreateBody(&ball_body_def);
 
+    b2CircleShape ball_shape;
     ball_shape.m_radius = BALL_MAX_RADIUS_METERS;
 
+    b2FixtureDef ball_fixture_def;
     ball_fixture_def.shape = &ball_shape;
-
     // Calculate the density the fixture / ball must have in order for it to have the
     // desired mass. The density is uniform across the shape.
     float ball_area          = M_PI * ball_shape.m_radius * ball_shape.m_radius;
@@ -59,8 +61,27 @@ Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
     return Ball(position, velocity, timestamp);
 }
 
-double PhysicsBall::getMassKg() const {
-    return static_cast<double>(ball_body->GetMass());
+void PhysicsBall::kick(Vector kick_vector) {
+    // Figure out how much impulse to apply to change the speed of the ball by the magnitude
+    // of the kick_vector
+    double change_in_momentum = ball_body->GetMass() * kick_vector.length();
+    kick_vector.normalize(change_in_momentum);
+    applyImpulse(kick_vector);
+}
+
+void PhysicsBall::chip(const Vector &chip_vector) {
+    // Assume the ball is chipped at at a 45 degree angle
+    Angle chip_angle = Angle::fromDegrees(45);
+    // Use the formula for the Range of a parabolic projectile
+    // Rearrange to solve for the initial velocity
+    double range = chip_vector.length();
+    double numerator = range * gravity;
+    double denominator = 2 * (chip_angle * 2).sin();
+    double initial_velocity = std::sqrt(numerator / denominator);
+    double ground_velocity = initial_velocity * chip_angle.cos();
+    kick(chip_vector.normalize(ground_velocity));
+    chip_origin = getBallWithTimestamp(Timestamp::fromSeconds(0)).position();
+    chip_distance_m = chip_vector.length();
 }
 
 void PhysicsBall::applyForce(const Vector& force) {
@@ -73,10 +94,18 @@ void PhysicsBall::applyImpulse(const Vector& impulse) {
     ball_body->ApplyLinearImpulseToCenter(impulse_vector, true);
 }
 
-void PhysicsBall::setSimulatorBall(SimulatorBall *simulator_ball) {
-    this->simulator_ball = simulator_ball;
-}
+bool PhysicsBall::isInFlight() {
+    bool chip_in_progress = chip_origin.has_value();
+    if(chip_in_progress) {
+        double current_chip_distance = (getBallWithTimestamp(Timestamp::fromSeconds(0)).position() - chip_origin.value()).length();
+        if(current_chip_distance >= chip_distance_m) {
+            chip_origin = std::nullopt;
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 
-SimulatorBall* PhysicsBall::getSimulatorBall() const {
-    return simulator_ball;
+    return false;
 }

@@ -6,9 +6,6 @@
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
 
-// Forward-delcare to avoid circular dependencies
-class SimulatorBall;
-
 /**
  * This class represents a ball in a Box2D physics simulation. It provides a convenient
  * way for us to abstract the ball and convert to our own Ball class when data is needed
@@ -24,8 +21,9 @@ class PhysicsBall
      * @param world A shared_ptr to a Box2D World
      * @param ball The Ball to be created in the Box2D world
      * @param mass_kg The mass of the ball in kg
+     * @param gravity The force due to gravity on the ball
      */
-    explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball, const double mass_kg);
+    explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball, const double mass_kg, const double gravity);
 
     PhysicsBall() = delete;
 
@@ -57,11 +55,30 @@ class PhysicsBall
     Ball getBallWithTimestamp(const Timestamp& timestamp) const;
 
     /**
-     * Returns the mass of the ball in kg
+     * Kicks the ball in the direction of the given vector, and applies a change in velocity
+     * equal to the magnitude of the vector.
      *
-     * @return the mass of the ball in kg
+     * @param kick_vector The kick vector to apply
      */
-    double getMassKg() const;
+    void kick(Vector kick_vector);
+
+    /**
+     * Chips the ball in the direction of the given vector. The isInFlight() function will return
+     * true until the ball has travelled a distance equal to the magnitude of the vector from its
+     * current location when this function is called.
+     *
+     * @param chip_vector The chip_vector to apply
+     */
+    void chip(const Vector& chip_vector);
+
+    /**
+     * Returns true if the ball is currently in flight / a chip is in progress,
+     * and false otherwise
+     *
+     * @return true if the ball is currently in flight / a chip is in progress,
+     * and false otherwise
+     */
+    bool isInFlight();
 
     /**
      * Applies the given force vector to the ball at its center of mass
@@ -73,34 +90,20 @@ class PhysicsBall
     /**
      * Applies the given impulse vector to the ball at its center of mass
      *
-     * @param impulse The impulse to apply
+     * @param force The impulse to apply
      */
     void applyImpulse(const Vector& impulse);
-
-    // TODO: test
-    /**
-     * Sets the SimulatorBall that this PhysicsBall is associated with
-     *
-     * @param simulator_ball A pointer to the SimulatorBall that this PhysicsBall
-     * is associated with
-     */
-    void setSimulatorBall(SimulatorBall* simulator_ball);
-
-    /**
-     * Returns a pointer to the SimulatorBall this PhysicsBall is associated with
-     *
-     * @return a pointer to the SimulatorBall this PhysicsBall is associated with
-     */
-    SimulatorBall* getSimulatorBall() const;
 
    private:
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
-    b2CircleShape ball_shape;
-    b2BodyDef ball_body_def;
-    b2FixtureDef ball_fixture_def;
     b2Body* ball_body;
 
-    // The SimulatorBall associated with this PhysicsBall, if any
-    SimulatorBall* simulator_ball;
+    // The gravity acting on this ball, pulling it towards the ground
+    double gravity;
+    // If the ball is currently being chipped, the chip_origin holds the point
+    // where the chip was started from
+    std::optional<Point> chip_origin;
+    // The distance of the most recent chip
+    double chip_distance_m;
 };
