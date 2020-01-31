@@ -92,8 +92,10 @@ void SimulatorBackend::runSimulationLoop(World world)
 
         for (unsigned int i = 0; i < num_physics_steps_per_world_published; i++)
         {
-            world = physics_simulator.stepSimulation(physics_time_step);
+            physics_simulator.stepSimulation(physics_time_step);
         }
+
+        world = physics_simulator.getWorld();
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {

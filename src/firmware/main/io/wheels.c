@@ -8,6 +8,12 @@
  */
 #include "io/wheels.h"
 
+#include <math.h>
+#include <rcc.h>
+#include <registers/timer.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "control/control.h"
 #include "io/adc.h"
 #include "io/encoder.h"
@@ -15,11 +21,6 @@
 #include "io/motor.h"
 #include "io/receive.h"
 #include "util/error.h"
-#include <rcc.h>
-#include <registers/timer.h>
-#include <math.h>
-#include <stdbool.h>
-#include <stdlib.h>
 
 #define THERMAL_TIME_CONSTANT 13.2f  // seconds—EC45 datasheet
 #define THERMAL_RESISTANCE 4.57f  // kelvins per Watt—EC45 datasheet (winding to housing)
