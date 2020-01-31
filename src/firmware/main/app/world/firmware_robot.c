@@ -123,7 +123,7 @@ Wheel_t* app_firmware_robot_getBackLeftWheel(const FirmwareRobot_t* robot)
     return robot->back_left_wheel;
 }
 
-const RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* robot)
+RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* robot)
 {
     return robot->robot_constants;
 }

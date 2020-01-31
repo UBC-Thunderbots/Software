@@ -57,7 +57,7 @@ void app_wheel_brake(const Wheel_t* wheel)
     wheel->brake();
 }
 
-const WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel)
+WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel)
 {
     return wheel->wheel_constants;
 }

@@ -94,4 +94,4 @@ void app_wheel_brake(const Wheel_t* wheel);
  * @param wheel The wheel to get the constants for
  * @return The constants for the given wheel
  */
-const WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel);
+WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel);

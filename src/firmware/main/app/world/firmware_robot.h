@@ -185,7 +185,7 @@ Wheel_t* app_firmware_robot_getBackLeftWheel(const FirmwareRobot_t* robot);
  * @param robot The robot to get constants from
  * @return The constants for the given robot
  */
-const RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* robot);
+RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* robot);
 
 /**
  * Get the controller state for the given robot
