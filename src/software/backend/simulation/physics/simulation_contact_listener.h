@@ -13,6 +13,7 @@ public:
     void BeginContact(b2Contact* contact) override;
     // Continually called at each physics step for the duration of the contact
     void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
+    void EndContact(b2Contact* contact) override;
 
 private:
     std::optional<std::pair<SimulatorBall*, SimulatorRobot*>> isBallChickerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
