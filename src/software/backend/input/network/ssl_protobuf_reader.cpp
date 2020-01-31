@@ -29,15 +29,24 @@ Field SSLProtobufReader::getFieldData(const SSL_GeometryData &geometry_packet)
     if (geometry_packet.has_field())
     {
         SSL_GeometryFieldSize field_data = geometry_packet.field();
-        Field field                      = createFieldFromPacketGeometry(field_data);
+        std::optional<Field> field_opt   = createFieldFromPacketGeometry(field_data);
 
-        field_state = field;
+        if (field_opt)
+        {
+            field_state = *field_opt;
+        }
+        else
+        {
+            LOG(WARNING)
+                << "Invalid field packet has been detected, which means field_state may be unreliable "
+                << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
+        }
     }
 
     return field_state;
 }
 
-Field SSLProtobufReader::createFieldFromPacketGeometry(
+std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
     const SSL_GeometryFieldSize &packet_geometry) const
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
@@ -85,29 +94,49 @@ Field SSLProtobufReader::createFieldFromPacketGeometry(
         ssl_field_lines[line_name]       = line;
     }
 
+    // Check that CenterCircle exists before using it
+    auto ssl_center_circle = ssl_circular_arcs.find("CenterCircle");
+    if (ssl_center_circle == ssl_circular_arcs.end())
+    {
+        return std::nullopt;
+    }
+
     // Extract the data we care about and convert all units to meters
     double field_length   = packet_geometry.field_length() * METERS_PER_MILLIMETER;
     double field_width    = packet_geometry.field_width() * METERS_PER_MILLIMETER;
     double goal_width     = packet_geometry.goalwidth() * METERS_PER_MILLIMETER;
     double boundary_width = packet_geometry.boundary_width() * METERS_PER_MILLIMETER;
     double center_circle_radius =
-        ssl_circular_arcs["CenterCircle"].radius() * METERS_PER_MILLIMETER;
+        ssl_center_circle->second.radius() * METERS_PER_MILLIMETER;
+
+    // Check that LeftFieldLeftPenaltyStretch exists before using it
+    auto ssl_left_field_left_penalty_stretch =
+        ssl_field_lines.find("LeftFieldLeftPenaltyStretch");
+    if (ssl_left_field_left_penalty_stretch == ssl_field_lines.end())
+    {
+        return std::nullopt;
+    }
 
     // We arbitraily use the left side here since the left and right sides are identical
-    Point defense_length_p1 =
-        Point(ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().x(),
-              ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().y());
-    Point defense_length_p2 =
-        Point(ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().x(),
-              ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().y());
+    Point defense_length_p1 = Point(ssl_left_field_left_penalty_stretch->second.p1().x(),
+                                    ssl_left_field_left_penalty_stretch->second.p1().y());
+    Point defense_length_p2 = Point(ssl_left_field_left_penalty_stretch->second.p2().x(),
+                                    ssl_left_field_left_penalty_stretch->second.p2().y());
     double defense_length =
         (defense_length_p2 - defense_length_p1).length() * METERS_PER_MILLIMETER;
 
+    // Check that LeftPenaltyStretch exists before using it
+    auto ssl_left_penalty_stretch = ssl_field_lines.find("LeftPenaltyStretch");
+    if (ssl_left_penalty_stretch == ssl_field_lines.end())
+    {
+        return std::nullopt;
+    }
+
     // We arbitraily use the left side here since the left and right sides are identical
-    Point defense_width_p1 = Point(ssl_field_lines["LeftPenaltyStretch"].p1().x(),
-                                   ssl_field_lines["LeftPenaltyStretch"].p1().y());
-    Point defense_width_p2 = Point(ssl_field_lines["LeftPenaltyStretch"].p2().x(),
-                                   ssl_field_lines["LeftPenaltyStretch"].p2().y());
+    Point defense_width_p1 = Point(ssl_left_penalty_stretch->second.p1().x(),
+                                   ssl_left_penalty_stretch->second.p1().y());
+    Point defense_width_p2 = Point(ssl_left_penalty_stretch->second.p2().x(),
+                                   ssl_left_penalty_stretch->second.p2().y());
     double defense_width =
         (defense_width_p1 - defense_width_p2).length() * METERS_PER_MILLIMETER;
 

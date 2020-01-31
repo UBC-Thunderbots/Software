@@ -1,5 +1,6 @@
 #pragma once
 
+#include <g3log/g3log.hpp>
 #include <optional>
 #include <queue>
 
@@ -76,8 +77,9 @@ class SSLProtobufReader
      * @param packet_geometry The SSL_GeometryFieldSize data from a protobuf packet
      * containing field geometry
      * @return A Field object representing the field specified with the provided geometry
+     *      If packet_geometry is not a valid packet, then will return std::nullopt
      */
-    Field createFieldFromPacketGeometry(
+    std::optional<Field> createFieldFromPacketGeometry(
         const SSL_GeometryFieldSize &packet_geometry) const;
 
     // Objects used to aggregate and store state. We use these to aggregate the state

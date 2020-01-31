@@ -40,6 +40,7 @@ cc_library(
         "//software/world:ball_state",
         "//software/world:field",
         "//software/world:team",
+        "@g3log",
     ],
 )
 
