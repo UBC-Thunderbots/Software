@@ -5,7 +5,7 @@
 
 #include "software/new_geom/point.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/util/enum_string_macro/enum_string_macro.h"
+#include "software/util/printable_enum_macro/printable_enum_macro.h"
 #include "software/time/timestamp.h"
 
 // clang-format off

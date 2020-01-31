@@ -22,7 +22,7 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/proto:ssl_cc_proto",
-        "//software/util/enum_string_macro:enum_string_macro",
+        "//software/util/printable_enum_macro:printable_enum_macro",
         "//software/time:timestamp",
     ],
 )
