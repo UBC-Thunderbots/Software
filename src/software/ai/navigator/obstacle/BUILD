@@ -25,13 +25,15 @@ cc_test(
 )
 
 cc_library(
-    name = "obstacle_generation",
-    srcs = ["obstacle_generation.cpp"],
-    hdrs = ["obstacle_generation.h"],
+    name = "obstacle_factory",
+    srcs = ["obstacle_factory.cpp"],
+    hdrs = ["obstacle_factory.h"],
     deps = [
         ":obstacle",
         "//software/ai/motion_constraint",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/geom",
+        "//software/new_geom:point",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )

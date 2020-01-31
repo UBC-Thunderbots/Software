@@ -71,7 +71,7 @@ class GameState
      *
      * @param ball The new ball
      */
-    void updateBall(const Ball &ball);
+    void updateBall(const Ball& ball);
 
     /**
      * Clears restart state and enters normal play. Should be

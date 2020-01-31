@@ -6,11 +6,11 @@ cc_library(
     hdrs = ["grsim_output.h"],
     deps = [
         "//shared:constants",
-        "//software/world:team",
         "//software/backend/output/grsim/command_primitive_visitor:grsim_command_primitive_visitor",
+        "//software/parameter:dynamic_parameters",
         "//software/proto:grsim_cc_proto",
-        "//software/util/parameter:dynamic_parameters",
-        "@boost//:asio"
+        "//software/world:team",
+        "@boost//:asio",
     ],
 )
 

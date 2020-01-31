@@ -7,10 +7,16 @@ cc_library(
     name = "munkres_cpp",
     # This library is entirely header based, even the `.cpp` files are really headers
     hdrs = glob(
-        ["src/**/*.h", "src/**/*.cpp"],
+        [
+            "src/**/*.h",
+            "src/**/*.cpp",
+        ],
     ),
     include_prefix = "munkres/",
+    includes = [
+        "./src",
+        "./src/adapters",
+    ],
     strip_include_prefix = "src/",
-    includes = ["./src", "./src/adapters"],
     visibility = ["//visibility:public"],
 )

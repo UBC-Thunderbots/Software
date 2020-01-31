@@ -3,15 +3,10 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "app/control.h"
 #include "control/bangbang.h"
-#include "control/control.h"
-#include "physics/physics.h"
-
-#ifndef FWSIM
 #include "io/dr.h"
-#else
-#include "simulate.h"
-#endif
+#include "physics/physics.h"
 
 #define TIME_HORIZON 0.5f
 
@@ -38,13 +33,15 @@ static void spin_init(void) {}
  * This function runs each time the host computer requests to start a spin
  * movement.
  *
+ * input to 3->4 matrix is quarter-degrees per 5 ms, matrix is dimensionless
+ * linear ramp up for velocity and linear fall as robot approaches point
+ * constant angular velocity
+ *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
+ * \param[in] world The world to perform the primitive in
  */
-// input to 3->4 matrix is quarter-degrees per 5 ms, matrix is dimensionless
-// linear ramp up for velocity and linear fall as robot approaches point
-// constant angular velocity
-static void spin_start(const primitive_params_t *p)
+static void spin_start(const primitive_params_t *p, FirmwareWorld_t *world)
 {
     // Parameters:  param[0]: g_destination_x   [mm]
     //              param[1]: g_destination_y   [mm]
@@ -83,8 +80,10 @@ static void spin_start(const primitive_params_t *p)
  *
  * This function runs when the host computer requests a new movement while a
  * spin movement is already in progress.
+ *
+ * \param[in] world The world to perform the primitive in
  */
-static void spin_end(void) {}
+static void spin_end(FirmwareWorld_t *world) {}
 
 /**
  * \brief Ticks a movement of this type.
@@ -93,9 +92,10 @@ static void spin_end(void) {}
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world an object representing the world
  */
 
-static void spin_tick(log_record_t *log)
+static void spin_tick(log_record_t *log, FirmwareWorld_t *world)
 {
     dr_data_t now;
     dr_get(&now);
@@ -158,7 +158,9 @@ static void spin_tick(log_record_t *log)
         x_accel,
         y_accel,
     };
-    apply_accel(linear_acc, a_accel);
+
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, linear_acc[0], linear_acc[1], a_accel);
 }
 
 /**

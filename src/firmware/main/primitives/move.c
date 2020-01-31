@@ -3,18 +3,16 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "app/control.h"
 #include "control/bangbang.h"
-#include "control/control.h"
-#include "io/chicker.h"
 #include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/leds.h"
 #include "physics/physics.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
+#include "shared/util.h"
 #include "util/log.h"
 #include "util/physbot.h"
-#include "util/util.h"
 
 
 // these are set to decouple the 3 axis from each other
@@ -92,7 +90,7 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * @param angle The angle that the robot is currently facing
  * @return void
  */
-void choose_rotation_destination(PhysBot *pb, float angle)
+void choose_rotation_destination(PhysBot* pb, float angle)
 {
     // if we are close enough then we should just allow the bot to rotate
     // onto its destination angle, so skip this if block
@@ -106,7 +104,7 @@ void choose_rotation_destination(PhysBot *pb, float angle)
 }
 
 
-void plan_move_rotation(PhysBot *pb, float avel)
+void plan_move_rotation(PhysBot* pb, float avel)
 {
     float time_target = (pb->maj.time > TIME_HORIZON) ? pb->maj.time : TIME_HORIZON;
     if (time_target > 0.5f)
@@ -127,7 +125,7 @@ void plan_move_rotation(PhysBot *pb, float avel)
  * @param accel A 3 length array of {x, y, rotation} accelerations
  * @return void
  */
-void move_to_log(log_record_t *log, float time_target, float accel[3])
+void move_to_log(log_record_t* log, float time_target, float accel[3])
 {
     log_destination(log, destination);
     log_accel(log, accel);
@@ -148,16 +146,16 @@ static void move_init(void)
 }
 
 /**
- * Starts a movement of this type.
+ * \brief Starts a movement of this type.
  *
  * This function runs each time the host computer requests to start a move
  * movement.
  *
- * @param params the movement parameters, which are only valid until this
+ * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
- * @return void
+ * \param[in] world The world to perform the primitive in
  */
-static void move_start(const primitive_params_t *params)
+static void move_start(const primitive_params_t* params, FirmwareWorld_t* world)
 {
     // Parameters:     destination_x [mm]
     //                destination_y [mm]
@@ -188,12 +186,16 @@ static void move_start(const primitive_params_t *params)
     // pick the wheel axis that will be used for faster movement
     wheel_index = choose_wheel_axis(dx, dy, current_states.angle, destination[2]);
 
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    Chicker_t* chicker     = app_firmware_robot_getChicker(robot);
+    Dribbler_t* dribbler   = app_firmware_robot_getDribbler(robot);
+
     if (params->extra & 0x01)
-        chicker_auto_arm(CHICKER_KICK, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+        app_chicker_enableAutokick(chicker, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     if (params->extra & 0x02)
-        dribbler_set_speed(16000);
+        app_dribbler_setSpeed(dribbler, 16000);
     if (params->extra & 0x04)
-        chicker_auto_arm(CHICKER_CHIP, 2);
+        app_chicker_enableAutochip(chicker, 2);
 }
 
 /**
@@ -201,13 +203,20 @@ static void move_start(const primitive_params_t *params)
  *
  * This function runs when the host computer requests a new movement while a
  * move movement is already in progress.
+ * \param[in] world The world to perform the primitive in
  *
  * @return void
  */
-static void move_end(void)
+static void move_end(FirmwareWorld_t* world)
 {
-    chicker_auto_disarm();
-    dribbler_set_speed(0);
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(robot);
+    app_chicker_disableAutochip(chicker);
+    app_chicker_disableAutokick(chicker);
+
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
+    app_dribbler_setSpeed(dribbler, 0);
 }
 
 
@@ -218,9 +227,10 @@ static void move_end(void)
  *
  * @param log the log record to fill with information about the tick, or
  * NULL if no record is to be filled
+ * @param[in] world an object representing the world
  * @return void
  */
-static void move_tick(log_record_t *log)
+static void move_tick(log_record_t* log, FirmwareWorld_t* world)
 {
     printf("Move tick called.\n");
     // get the state of the bot
@@ -247,7 +257,9 @@ static void move_tick(log_record_t *log)
     float accel[3] = {0, 0, pb.rot.accel};
     // rotate the accel and apply it
     to_local_coords(accel, pb, current_states.angle, major_vec, minor_vec);
-    apply_accel(accel, accel[2]);
+
+    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 
     if (log)
     {

@@ -552,7 +552,7 @@ static void exception_fill_thread_isr(const exception_isr_frame_t *swframe,
                 // the application wasn’t using FP, the data can be ignored.
                 asm volatile("vstm %[dest], {s0-s31}" ::[dest] "r"(&thread->arm_vfp.sregs)
                              : "memory");
-                asm("vmrs %[dest], fpscr" : [dest] "=r"(thread->arm_vfp.fpscr));
+                asm("vmrs %[dest], fpscr" : [ dest ] "=r"(thread->arm_vfp.fpscr));
             }
         }
     }
@@ -797,7 +797,7 @@ static void common_fault_isr(const exception_isr_frame_t *sp, unsigned int cause
         "mov r1, %[cause_constant]\n\t"                                                  \
         "b common_fault_isr\n\t"                                                         \
         :                                                                                \
-        : [cause_constant] "i"(cause));                                                  \
+        : [ cause_constant ] "i"(cause));                                                \
     __builtin_unreachable();
 
 /**

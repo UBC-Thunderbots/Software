@@ -18,8 +18,7 @@ class FirmwareWorldTest : public testing::Test
         app_firmware_world_destroy(firmware_world);
     }
 
-    FirmwareWorld* firmware_world;
-
+    FirmwareWorld_t* firmware_world;
     FirmwareRobot_t* robot = (FirmwareRobot*)8;
     FirmwareBall_t* ball   = (FirmwareBall*)9;
 };

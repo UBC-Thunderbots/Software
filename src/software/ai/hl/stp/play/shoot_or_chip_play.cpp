@@ -15,7 +15,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
 
 using namespace Evaluation;
@@ -86,10 +86,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
     // Figure out where the fallback chip target is
-    double fallback_chip_target_x_offset =
-        Util::DynamicParameters->getShootOrChipPlayConfig()
-            ->FallbackChipTargetEnemyGoalOffset()
-            ->value();
+    double fallback_chip_target_x_offset = Util::DynamicParameters->getAIConfig()
+                                               ->getShootOrChipPlayConfig()
+                                               ->FallbackChipTargetEnemyGoalOffset()
+                                               ->value();
 
     Point fallback_chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);

@@ -8,8 +8,8 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
-#include "software/util/parameter/dynamic_parameters.h"
 
 
 TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)
@@ -188,31 +188,35 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
     Robot robot2 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
-    world.updateBallState(BallState(
-        {0.1, 2.5}, {0, 10},
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
-                                       ->getPossessionConfig()
-                                       ->PossessionBufferTimeSeconds()
-                                       ->value())));
+    world.updateBallState(
+        BallState({0.1, 2.5}, {0, 10},
+                  Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()
+                                                 ->getEvaluationConfig()
+                                                 ->getPossessionConfig()
+                                                 ->PossessionBufferTimeSeconds()
+                                                 ->value())));
 
-    robot0.updateState(RobotState(
-        Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
-                                       ->getPossessionConfig()
-                                       ->PossessionBufferTimeSeconds()
-                                       ->value())));
-    robot1.updateState(RobotState(
-        Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
-                                       ->getPossessionConfig()
-                                       ->PossessionBufferTimeSeconds()
-                                       ->value())));
-    robot2.updateState(RobotState(
-        Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(2 + Util::DynamicParameters->getEvaluationConfig()
-                                       ->getPossessionConfig()
-                                       ->PossessionBufferTimeSeconds()
-                                       ->value())));
+    robot0.updateState(
+        RobotState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
+                   Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()
+                                                  ->getEvaluationConfig()
+                                                  ->getPossessionConfig()
+                                                  ->PossessionBufferTimeSeconds()
+                                                  ->value())));
+    robot1.updateState(
+        RobotState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
+                   Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()
+                                                  ->getEvaluationConfig()
+                                                  ->getPossessionConfig()
+                                                  ->PossessionBufferTimeSeconds()
+                                                  ->value())));
+    robot2.updateState(
+        RobotState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
+                   Timestamp::fromSeconds(2 + Util::DynamicParameters->getAIConfig()
+                                                  ->getEvaluationConfig()
+                                                  ->getPossessionConfig()
+                                                  ->PossessionBufferTimeSeconds()
+                                                  ->value())));
 
     team.updateRobots({robot0, robot1, robot2});
     world.updateFriendlyTeamState(team);

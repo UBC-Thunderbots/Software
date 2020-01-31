@@ -7,7 +7,7 @@
 #include <mutex>
 #include <optional>
 
-#include "software/util/time/duration.h"
+#include "software/time/duration.h"
 
 /**
  * This class represents a buffer of objects

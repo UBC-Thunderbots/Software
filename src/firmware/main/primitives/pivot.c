@@ -1,18 +1,10 @@
 #include "pivot.h"
 
+#include "app/control.h"
 #include "control/bangbang.h"
-#include "control/control.h"
 #include "io/dr.h"
-#include "physics/physics.h"
-
-#ifndef FWSIM
-#include "io/chicker.h"
-#include "io/dr.h"
-#include "io/dribbler.h"
 #include "io/leds.h"
-#else
-#include "simulate.h"
-#endif
+#include "physics/physics.h"
 
 #define TIME_HORIZON 0.05f  // s
 #define FALSE 0
@@ -55,14 +47,14 @@ float compute_magnitude(float a[2])
  *
  * This function runs each time the host computer requests to start a pivot
  * movement.
+ * This function needs to run every time the center of the pivot moves as
+ * optimal direction and final position needs to be recalculated
  *
  * \param[in] params the movement parameters, which are only valid until this
  * function returns and must be copied into this module if needed
- *
- * This function needs to run every time the center of the pivot moves as
- * optimal direction and final position needs to be recalculated
+ * \param[in] world The world to perform the primitive in
  */
-static void pivot_start(const primitive_params_t *params)
+static void pivot_start(const primitive_params_t *params, FirmwareWorld_t *world)
 {
     center[0] = params->params[0] / 1000.0;
     center[1] = params->params[1] / 1000.0;
@@ -70,7 +62,11 @@ static void pivot_start(const primitive_params_t *params)
     speed     = params->params[3] / 100.0;
 
     if (params->extra & 0x01)
-        dribbler_set_speed(16000);
+    {
+        Dribbler_t *dribbler =
+            app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+        app_dribbler_setSpeed(dribbler, 16000);
+    }
 
     radius = 0.15;  // ball radius + robot radius + buffer
 
@@ -105,8 +101,9 @@ static void pivot_start(const primitive_params_t *params)
  *
  * This function runs when the host computer requests a new movement while a
  * pivot movement is already in progress.
- **/
-static void pivot_end(void) {}
+ * \param[in] world The world to perform the primitive in
+ */
+static void pivot_end(FirmwareWorld_t *world) {}
 
 /**
  * \brief Ticks a movement of this type.
@@ -115,8 +112,9 @@ static void pivot_end(void) {}
  *
  * \param[out] log the log record to fill with information about the tick, or
  * \c NULL if no record is to be filled
+ * \param[in] world an object representing the world
  */
-static void pivot_tick(log_record_t *log)
+static void pivot_tick(log_record_t *log, FirmwareWorld_t *world)
 {
     dr_data_t current_bot_state;
     dr_get(&current_bot_state);
@@ -187,7 +185,9 @@ static void pivot_tick(log_record_t *log)
     float target_avel = 1.6f * angle / TIME_HORIZON;
     accel[2]          = (target_avel - vel[2]) / TIME_HORIZON;
     limit(&accel[2], MAX_T_A);
-    apply_accel(accel, accel[2]);  // apply accelerations all in local coordinates
+
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 

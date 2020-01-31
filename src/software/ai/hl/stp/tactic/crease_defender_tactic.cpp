@@ -11,7 +11,7 @@
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,
@@ -70,22 +70,22 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             // Figure out how far away the ball is
             double ball_dist = (ball.position() - *defender_reference_position).length();
 
-            double min_defender_seperation_deg =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->MinDefenderSeperationDeg()
-                    ->value();
-            double max_defender_seperation_deg =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->MaxDefenderSeperationDeg()
-                    ->value();
-            double min_ball_dist =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->BallDistForMinDefenderSeperation()
-                    ->value();
-            double max_ball_dist =
-                Util::DynamicParameters->getDefenderCreaseTacticConfig()
-                    ->BallDistForMaxDefenderSeperation()
-                    ->value();
+            double min_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
+                                                     ->getDefenderCreaseTacticConfig()
+                                                     ->MinDefenderSeperationDeg()
+                                                     ->value();
+            double max_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
+                                                     ->getDefenderCreaseTacticConfig()
+                                                     ->MaxDefenderSeperationDeg()
+                                                     ->value();
+            double min_ball_dist = Util::DynamicParameters->getAIConfig()
+                                       ->getDefenderCreaseTacticConfig()
+                                       ->BallDistForMinDefenderSeperation()
+                                       ->value();
+            double max_ball_dist = Util::DynamicParameters->getAIConfig()
+                                       ->getDefenderCreaseTacticConfig()
+                                       ->BallDistForMaxDefenderSeperation()
+                                       ->value();
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
@@ -195,6 +195,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
+
             stop_action->updateControlParams(*robot, false);
             yield(stop_action);
         }

@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/world.h"
 
 /**
@@ -14,10 +14,13 @@
 class AI final
 {
    public:
+    AI() = delete;
+
     /**
-     * Creates a new AI
+     * Create an AI with given configuration
+     * @param config The AI configuration
      */
-    explicit AI();
+    explicit AI(std::shared_ptr<const AIConfig> config);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current

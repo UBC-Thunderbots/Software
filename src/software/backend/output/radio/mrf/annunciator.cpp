@@ -12,17 +12,6 @@
 namespace
 {
     /**
-     * The number of attempts to request the build IDs before giving up.
-     */
-    const unsigned int REQUEST_BUILD_IDS_COUNT = 7;
-
-    /**
-     * The number of seconds to wait between consecutive requests for
-     * the build IDs.
-     */
-    const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
-
-    /**
      * Amount of time to keep an edge-triggered message sending, in seconds.
      */
     const int ET_MESSAGE_KEEPALIVE_TIME = 10;

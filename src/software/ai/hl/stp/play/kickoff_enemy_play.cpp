@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 const std::string KickoffEnemyPlay::name = "KickoffEnemy Play";
 
@@ -35,24 +35,27 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-                ->BallStealSpeed()
-                ->value(),
-            false, true),
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-                ->BallStealSpeed()
-                ->value(),
-            false, true),
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-                ->BallStealSpeed()
-                ->value(),
-            false, true)};
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, world.ball(),
+                                            Util::DynamicParameters->getAIConfig()
+                                                ->getDefenseShadowEnemyTacticConfig()
+                                                ->BallStealSpeed()
+                                                ->value(),
+                                            false, true),
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, world.ball(),
+                                            Util::DynamicParameters->getAIConfig()
+                                                ->getDefenseShadowEnemyTacticConfig()
+                                                ->BallStealSpeed()
+                                                ->value(),
+                                            false, true),
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, world.ball(),
+                                            Util::DynamicParameters->getAIConfig()
+                                                ->getDefenseShadowEnemyTacticConfig()
+                                                ->BallStealSpeed()
+                                                ->value(),
+                                            false, true)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg

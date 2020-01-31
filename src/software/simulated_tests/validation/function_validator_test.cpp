@@ -26,6 +26,7 @@ TEST(FunctionValidatorTest,
         int foo = 0;
         int bar = 3;
         int baz = foo + bar;
+        baz++;
     };
 
     auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
