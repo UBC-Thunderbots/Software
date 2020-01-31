@@ -4,8 +4,8 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <thread>
 
-#include "software/backend/input/network/network_filter.h"
 #include "software/backend/input/network/ssl_gamecontroller_client.h"
+#include "software/backend/input/network/ssl_protobuf_reader.h"
 #include "software/backend/input/network/ssl_vision_client.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
@@ -22,8 +22,7 @@ class NetworkClient
 {
    public:
     /**
-     * Creates a new NetworkClient for the given NodeHandle. This allows this class to
-     * create and own its own publishers
+     * Creates a new NetworkClient. This class creates and owns its own publishers
      *
      * @param vision_multicast_address A string representation of the ip address the
      *                                 vision system is running on
@@ -132,7 +131,7 @@ class NetworkClient
     static void invertFieldSide(SSL_DetectionFrame& frame);
 
     // The backend that handles data filtering and processing
-    NetworkFilter network_filter;
+    SSLProtobufReader ssl_protobuf_reader;
 
     // The client that handles data reception, filtering, and publishing for vision data
     std::unique_ptr<SSLVisionClient> ssl_vision_client;

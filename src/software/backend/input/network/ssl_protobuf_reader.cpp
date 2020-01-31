@@ -1,4 +1,4 @@
-#include "software/backend/input/network/network_filter.h"
+#include "software/backend/input/network/ssl_protobuf_reader.h"
 
 #include "shared/constants.h"
 #include "software/constants.h"
@@ -10,7 +10,7 @@
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
-NetworkFilter::NetworkFilter()
+SSLProtobufReader::SSLProtobufReader()
     : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
       friendly_team_state(Duration::fromMilliseconds(
@@ -24,7 +24,7 @@ NetworkFilter::NetworkFilter()
 {
 }
 
-Field NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
+Field SSLProtobufReader::getFieldData(const SSL_GeometryData &geometry_packet)
 {
     if (geometry_packet.has_field())
     {
@@ -37,7 +37,7 @@ Field NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
     return field_state;
 }
 
-Field NetworkFilter::createFieldFromPacketGeometry(
+Field SSLProtobufReader::createFieldFromPacketGeometry(
     const SSL_GeometryFieldSize &packet_geometry) const
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
@@ -117,7 +117,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     return field;
 }
 
-std::vector<BallDetection> NetworkFilter::getBallDetections(
+std::vector<BallDetection> SSLProtobufReader::getBallDetections(
     const std::vector<SSL_DetectionFrame> &detections)
 {
     auto ball_detections = std::vector<BallDetection>();
@@ -158,7 +158,7 @@ std::vector<BallDetection> NetworkFilter::getBallDetections(
     return ball_detections;
 }
 
-std::vector<RobotDetection> NetworkFilter::getTeamDetections(
+std::vector<RobotDetection> SSLProtobufReader::getTeamDetections(
     const std::vector<SSL_DetectionFrame> &detections, TeamType team_type)
 {
     std::vector<RobotDetection> robot_detections = std::vector<RobotDetection>();
@@ -221,7 +221,7 @@ std::vector<RobotDetection> NetworkFilter::getTeamDetections(
     return robot_detections;
 }
 
-RefboxData NetworkFilter::getRefboxData(const Referee &packet)
+RefboxData SSLProtobufReader::getRefboxData(const Referee &packet)
 {
     // SSL Referee proto messages' `Command` fields map to `RefboxGameState` data
     // structures
@@ -322,7 +322,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
         {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
         {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
-RefboxGameState NetworkFilter::getRefboxGameState(const Referee::Command &command)
+RefboxGameState SSLProtobufReader::getRefboxGameState(const Referee::Command &command)
 {
     if (!Util::DynamicParameters->getAIControlConfig()
              ->getRefboxConfig()
@@ -354,12 +354,12 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
     {Referee_Stage_PENALTY_SHOOTOUT, RefboxStage::PENALTY_SHOOTOUT},
     {Referee_Stage_POST_GAME, RefboxStage::POST_GAME}};
 
-RefboxStage NetworkFilter::getRefboxStage(const Referee::Stage &stage)
+RefboxStage SSLProtobufReader::getRefboxStage(const Referee::Stage &stage)
 {
     return refbox_stage_map.at(stage);
 }
 
-void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
+void SSLProtobufReader::setOurFieldSide(bool blue_team_on_positive_half)
 {
     if (blue_team_on_positive_half)
     {

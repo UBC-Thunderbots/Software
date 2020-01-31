@@ -12,7 +12,7 @@ NetworkClient::NetworkClient(
     std::string gamecontroller_multicast_address, int gamecontroller_multicast_port,
     std::function<void(VisionDetection)> received_vision_detection_callback,
     std::function<void(RefboxData)> received_refbox_data_callback)
-    : network_filter(),
+    : ssl_protobuf_reader(),
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
@@ -86,7 +86,8 @@ NetworkClient::~NetworkClient()
 
 void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
 {
-    // We analyze the first 60 packets we receive to find the "real" starting time.
+    // We analyze the first 60 packets we receive to find the "real" starting time,
+    // because GrSim will sometimes give us garbage packets.
     // The real starting time is the smaller value of the ones we receive
     if (initial_packet_count < 60)
     {
@@ -127,7 +128,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     if (packet.has_geometry())
     {
         const auto& latest_geometry_data = packet.geometry();
-        Field field = network_filter.getFieldData(latest_geometry_data);
+        Field field = ssl_protobuf_reader.getFieldData(latest_geometry_data);
         world.updateFieldGeometry(field);
         field_detection = field;
     }
@@ -155,11 +156,11 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         if (isCameraEnabled(detection))
         {
             // filter protos into internal data structures
-            ball_detections = network_filter.getBallDetections({detection});
+            ball_detections = ssl_protobuf_reader.getBallDetections({detection});
             friendly_team_detections =
-                network_filter.getTeamDetections({detection}, TeamType::FRIENDLY);
+                ssl_protobuf_reader.getTeamDetections({detection}, TeamType::FRIENDLY);
             enemy_team_detections =
-                network_filter.getTeamDetections({detection}, TeamType::ENEMY);
+                ssl_protobuf_reader.getTeamDetections({detection}, TeamType::ENEMY);
         }
 
         latest_timestamp = Timestamp::fromSeconds(detection.t_capture());
@@ -173,7 +174,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    RefboxData refbox_data = network_filter.getRefboxData(packet);
+    RefboxData refbox_data = ssl_protobuf_reader.getRefboxData(packet);
     received_refbox_data_callback(refbox_data);
 }
 

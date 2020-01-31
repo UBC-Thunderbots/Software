@@ -15,13 +15,13 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 
-class NetworkFilter
+class SSLProtobufReader
 {
    public:
     /**
-     * Creates a new NetworkFilter for data input and filtering
+     * Creates a new SSLProtobufReader for data input and filtering
      */
-    explicit NetworkFilter();
+    explicit SSLProtobufReader();
 
     /**
      * Returns a new Field object containing the most up to date state of the field given
@@ -67,7 +67,7 @@ class NetworkFilter
      */
     RefboxData getRefboxData(const Referee &packet);
 
-    virtual ~NetworkFilter() = default;
+    virtual ~SSLProtobufReader() = default;
 
    private:
     /**
