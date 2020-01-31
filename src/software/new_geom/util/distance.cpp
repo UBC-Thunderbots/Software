@@ -23,10 +23,13 @@ double distance(const Segment &first, const Segment &second)
     {
         return 0.0;
     }
-    return std::sqrt(std::min(std::min(distanceSquared(first, second.getSegStart()),
-                                       distanceSquared(first, second.getEnd())),
-                              std::min(distanceSquared(second, first.getSegStart()),
-                                       distanceSquared(second, first.getEnd()))));
+    double first_to_second_start_distsq = distanceSquared(first, second.getSegStart());
+    double first_to_second_end_distsq   = distanceSquared(first, second.getEnd());
+    double second_to_first_start_distsq = distanceSquared(second, first.getSegStart());
+    double second_to_first_end_distsq   = distanceSquared(second, first.getEnd());
+    return std::sqrt(
+        std::min({first_to_second_start_distsq, first_to_second_end_distsq,
+                  second_to_first_start_distsq, second_to_first_end_distsq}));
 }
 
 double distance(const Point &first, const Segment &second)
@@ -84,10 +87,10 @@ double distanceSquared(const Point &first, const Segment &second)
         return std::fabs(cross * cross / seg_lensq);
     }
 
-    double seg_start_to_point_lensq = distanceSquared(second.getSegStart(), first),
-           seg_end_to_point_lensq   = distanceSquared(second.getEnd(), first);
+    double seg_start_to_point_distsq = distanceSquared(second.getSegStart(), first);
+    double seg_end_to_point_distsq   = distanceSquared(second.getEnd(), first);
 
-    return std::min(seg_start_to_point_lensq, seg_end_to_point_lensq);
+    return std::min(seg_start_to_point_distsq, seg_end_to_point_distsq);
 }
 
 double distanceSquared(const Segment &first, const Point &second)
