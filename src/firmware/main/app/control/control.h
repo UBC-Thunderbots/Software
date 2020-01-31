@@ -2,8 +2,6 @@
 
 #include "firmware/main/app/world/firmware_robot.h"
 
-// TODO: need to prefix everything with "_app"
-
 /**
  * Apply the given acceleration (in robot coordinates) to the given robot
  *

@@ -5,7 +5,7 @@
  * @author: lynx, seung
  * @version: 1.0
  */
-#include "firmware/main/app/primitives/catch.h"
+#include "firmware/main/app/primitives/catch_primitive.h"
 
 #include <math.h>
 #include <stdio.h>

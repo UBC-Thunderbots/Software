@@ -1,4 +1,4 @@
-#include "shoot.h"
+#include "firmware/main/app/primitives/shoot_primitive.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -24,7 +24,7 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ShootPrimitiveState_t)
 
 /**
  * Scales the major acceleration by the distance from the major axis and the
- * amount required left to rotate. Total roation and the distance vector should
+ * amount required left to rotate. Total rotation and the distance vector should
  * not be zero so as to avoid divide by zero errors.
  *
  * @param pb The PhysBot data container that contains information about the

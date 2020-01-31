@@ -6,7 +6,7 @@
 #include "software/backend/simulation/physics/physics_robot.h"
 extern "C"
 {
-#include "app/world/firmware_robot.h"
+#include "firmware/main/app/world/firmware_robot.h"
 }
 
 // TODO: These are all hardcoded values copied from firmware/main/physics/physics.h

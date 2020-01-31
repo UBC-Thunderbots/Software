@@ -1,7 +1,8 @@
 #include "primitive_manager.h"
 
+// There are different semaphore implementations depending on if we're on a x86 or arm
+// system, and we use typdefs here to switch between them
 #ifdef __arm__
-// TODO: do we need "FreeRTOS.h" here?
 #include <FreeRTOS.h>
 #include <semphr.h>
 #elif __unix__
@@ -14,17 +15,17 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "firmware/main/app/primitives/catch.h"
-#include "firmware/main/app/primitives/direct_velocity.h"
-#include "firmware/main/app/primitives/direct_wheels.h"
-#include "firmware/main/app/primitives/dribble.h"
-#include "firmware/main/app/primitives/imu_test.h"
-#include "firmware/main/app/primitives/move.h"
-#include "firmware/main/app/primitives/pivot.h"
+#include "firmware/main/app/primitives/catch_primitive.h"
+#include "firmware/main/app/primitives/direct_velocity_primitive.h"
+#include "firmware/main/app/primitives/direct_wheels_primitive.h"
+#include "firmware/main/app/primitives/dribble_primitive.h"
+#include "firmware/main/app/primitives/imu_test_primitive.h"
+#include "firmware/main/app/primitives/move_primitive.h"
+#include "firmware/main/app/primitives/pivot_primitive.h"
 #include "firmware/main/app/primitives/primitive.h"
-#include "firmware/main/app/primitives/shoot.h"
-#include "firmware/main/app/primitives/spin.h"
-#include "firmware/main/app/primitives/stop.h"
+#include "firmware/main/app/primitives/shoot_primitive.h"
+#include "firmware/main/app/primitives/spin_primitive.h"
+#include "firmware/main/app/primitives/stop_primitive.h"
 
 struct PrimitiveManager
 {
@@ -111,9 +112,6 @@ PrimitiveManager_t *app_primitive_manager_create(void)
         (PrimitiveManager_t *)malloc(sizeof(PrimitiveManager_t));
 
 #ifdef __arm__
-    // TODO: this could cause issues if we ever have multiple PrimitiveManager's running
-    //       on the robot, but need to change `configSUPPORT_DYNAMIC_ALLOCATION` in the
-    //       `FreeRTOSConfig.h` to allow dynamic mutex creation
     static StaticSemaphore_t primitive_mutex_storage;
     manager->primitive_mutex = xSemaphoreCreateMutexStatic(&primitive_mutex_storage);
 #elif __unix__

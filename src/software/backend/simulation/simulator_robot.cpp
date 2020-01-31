@@ -2,9 +2,9 @@
 
 extern "C"
 {
-#include "app/world/chicker.h"
-#include "app/world/dribbler.h"
-#include "app/world/wheel.h"
+#include "firmware/main/app/world/chicker.h"
+#include "firmware/main/app/world/dribbler.h"
+#include "firmware/main/app/world/wheel.h"
 }
 
 std::optional<unsigned int> SimulatorRobotSingleton::robot_id = std::nullopt;

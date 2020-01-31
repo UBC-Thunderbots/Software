@@ -1,4 +1,4 @@
-#include "firmware/main/app/primitives/spin.h"
+#include "firmware/main/app/primitives/spin_primitive.h"
 
 #include <math.h>
 #include <stdio.h>

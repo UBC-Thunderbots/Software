@@ -1,4 +1,4 @@
-#include "stop.h"
+#include "firmware/main/app/primitives/stop_primitive.h"
 
 typedef struct StopPrimitiveState
 {

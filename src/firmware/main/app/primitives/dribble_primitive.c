@@ -1,4 +1,4 @@
-#include "dribble.h"
+#include "firmware/main/app/primitives/dribble_primitive.h"
 
 #include <stdio.h>
 

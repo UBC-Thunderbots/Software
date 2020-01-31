@@ -1,4 +1,4 @@
-#include "direct_velocity.h"
+#include "firmware/main/app/primitives/direct_velocity_primitive.h"
 
 #include "firmware/main/app/control/control.h"
 

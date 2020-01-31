@@ -1,4 +1,4 @@
-#include "pivot.h"
+#include "firmware/main/app/primitives/pivot_primitive.h"
 
 #include "firmware/main/app/control/bangbang.h"
 #include "firmware/main/app/control/control.h"

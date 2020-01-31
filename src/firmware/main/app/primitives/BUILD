@@ -2,8 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "accurate_shoot",
-    srcs = ["accurate_shoot.c"],
-    hdrs = ["accurate_shoot.h"],
+    srcs = ["accurate_shoot_primitive.c"],
+    hdrs = ["accurate_shoot_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -15,8 +15,8 @@ cc_library(
 
 cc_library(
     name = "catch",
-    srcs = ["catch.c"],
-    hdrs = ["catch.h"],
+    srcs = ["catch_primitive.c"],
+    hdrs = ["catch_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -28,8 +28,8 @@ cc_library(
 
 cc_library(
     name = "direct_velocity",
-    srcs = ["direct_velocity.c"],
-    hdrs = ["direct_velocity.h"],
+    srcs = ["direct_velocity_primitive.c"],
+    hdrs = ["direct_velocity_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -38,8 +38,8 @@ cc_library(
 
 cc_library(
     name = "direct_wheels",
-    srcs = ["direct_wheels.c"],
-    hdrs = ["direct_wheels.h"],
+    srcs = ["direct_wheels_primitive.c"],
+    hdrs = ["direct_wheels_primitive.h"],
     deps = [
         ":primitive",
     ],
@@ -47,8 +47,8 @@ cc_library(
 
 cc_library(
     name = "dribble",
-    srcs = ["dribble.c"],
-    hdrs = ["dribble.h"],
+    srcs = ["dribble_primitive.c"],
+    hdrs = ["dribble_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -59,8 +59,8 @@ cc_library(
 
 cc_library(
     name = "imu_test",
-    srcs = ["imu_test.c"],
-    hdrs = ["imu_test.h"],
+    srcs = ["imu_test_primitive.c"],
+    hdrs = ["imu_test_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -71,8 +71,8 @@ cc_library(
 
 cc_library(
     name = "move",
-    srcs = ["move.c"],
-    hdrs = ["move.h"],
+    srcs = ["move_primitive.c"],
+    hdrs = ["move_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -87,8 +87,8 @@ cc_library(
 
 cc_library(
     name = "pivot",
-    srcs = ["pivot.c"],
-    hdrs = ["pivot.h"],
+    srcs = ["pivot_primitive.c"],
+    hdrs = ["pivot_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -131,8 +131,8 @@ cc_library(
 
 cc_library(
     name = "shoot",
-    srcs = ["shoot.c"],
-    hdrs = ["shoot.h"],
+    srcs = ["shoot_primitive.c"],
+    hdrs = ["shoot_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -145,8 +145,8 @@ cc_library(
 
 cc_library(
     name = "spin",
-    srcs = ["spin.c"],
-    hdrs = ["spin.h"],
+    srcs = ["spin_primitive.c"],
+    hdrs = ["spin_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/main/app/control",
@@ -157,8 +157,8 @@ cc_library(
 
 cc_library(
     name = "stop",
-    srcs = ["stop.c"],
-    hdrs = ["stop.h"],
+    srcs = ["stop_primitive.c"],
+    hdrs = ["stop_primitive.h"],
     deps = [
         ":primitive",
     ],

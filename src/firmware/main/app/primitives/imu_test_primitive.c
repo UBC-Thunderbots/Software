@@ -1,4 +1,4 @@
-#include "imu_test.h"
+#include "firmware/main/app/primitives/imu_test_primitive.h"
 
 #include <math.h>
 #include <stdbool.h>

@@ -1,4 +1,4 @@
-#include "move.h"
+#include "firmware/main/app/primitives/move_primitive.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -10,11 +10,6 @@
 #include "firmware/main/shared/util.h"
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
-
-// TODO: all primitive functions need prefixing
-// TODO: note in firmware docs about not using static in `app`
-// TODO: suffix primitive files with `_primitive`
-
 
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration

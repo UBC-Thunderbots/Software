@@ -3,8 +3,6 @@
 #include "firmware/main/app/control/bangbang.h"
 #include "firmware/main/shared/physics.h"
 
-// TODO: this is redefined in so many places, should be centralized?
-// Used for computing accelerations
 #define TIME_HORIZON 0.05f  // s
 
 PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
