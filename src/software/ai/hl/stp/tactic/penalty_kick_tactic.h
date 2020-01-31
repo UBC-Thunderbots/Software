@@ -20,7 +20,7 @@ class PenaltyKickTactic : public Tactic
      */
     explicit PenaltyKickTactic(const Ball &ball, const Field &field,
                                const std::optional<Robot> &enemy_goalie,
-                               bool loop_forever = false);
+                               bool loop_forever);
 
     std::string getName() const override;
 

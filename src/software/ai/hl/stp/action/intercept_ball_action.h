@@ -17,8 +17,7 @@ class InterceptBallAction : public Action
      * @param loop_forever Continue yielding new Move Intents, even after we have reached
      *                     our goal
      */
-    explicit InterceptBallAction(const Field& field, const Ball& ball,
-                                 bool loop_forever = false);
+    explicit InterceptBallAction(const Field& field, const Ball& ball, bool loop_forever);
 
     /**
      * Updates this action with all the parameters it needs from the world
