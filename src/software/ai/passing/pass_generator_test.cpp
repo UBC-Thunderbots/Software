@@ -61,8 +61,7 @@ class PassGeneratorTest : public testing::Test
                 break;
             }
         }
-        // TODO: uncomment this once we know why this fails
-        // EXPECT_LE(std::abs(curr_score - prev_score), min_score_diff);
+        EXPECT_LE(std::abs(curr_score - prev_score), min_score_diff);
     }
 
     World world;
@@ -123,8 +122,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).length(), 0.3);
-        // TODO: uncomment this once we know why the line below fails
-        // EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
+        EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
         EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).getSeconds()), 0.2);
     }
 }
