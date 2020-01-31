@@ -1,8 +1,9 @@
 #include "imu_test.h"
 
 #include <math.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+
 #include "firmware/main/app/control/bangbang.h"
 #include "firmware/main/app/control/control.h"
 #include "firmware/main/shared/physics.h"
@@ -14,15 +15,17 @@
 #define TIME_HORIZON 0.5f
 
 
-typedef struct ImuTestPrimitiveState {
+typedef struct ImuTestPrimitiveState
+{
     float x_dest;
     float y_dest;
     float avel_final;
     bool slow;
-}ImuTestPrimitiveState_t;
+} ImuTestPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ImuTestPrimitiveState_t)
 
-static void imu_test_start(const primitive_params_t *params, void* void_state_ptr,  FirmwareWorld_t *world)
+static void imu_test_start(const primitive_params_t* params, void* void_state_ptr,
+                           FirmwareWorld_t* world)
 {
     ImuTestPrimitiveState_t* state = (ImuTestPrimitiveState_t*)void_state_ptr;
     // 0th is x (mm), 1st is y (mm), 2nd is angular velocity in centirad/s
@@ -35,9 +38,9 @@ static void imu_test_start(const primitive_params_t *params, void* void_state_pt
     state->slow       = params->slow;
 }
 
-static void imu_test_end(void* void_state_ptr, FirmwareWorld_t *world) {}
+static void imu_test_end(void* void_state_ptr, FirmwareWorld_t* world) {}
 
-static void imu_test_tick(void* void_state_ptr, FirmwareWorld_t *world)
+static void imu_test_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     // TODO: this primitive does nothing. Delete?
 }
@@ -45,11 +48,9 @@ static void imu_test_tick(void* void_state_ptr, FirmwareWorld_t *world)
 /**
  * \brief The spin movement primitive.
  */
-const primitive_t IMU_TEST_PRIMITIVE = {
-    .direct = false,
-    .start  = &imu_test_start,
-    .end    = &imu_test_end,
-    .tick   = &imu_test_tick,
-    .create_state = &createImuTestPrimitiveState_t,
-    .destroy_state = &destroyImuTestPrimitiveState_t
-};
+const primitive_t IMU_TEST_PRIMITIVE = {.direct        = false,
+                                        .start         = &imu_test_start,
+                                        .end           = &imu_test_end,
+                                        .tick          = &imu_test_tick,
+                                        .create_state  = &createImuTestPrimitiveState_t,
+                                        .destroy_state = &destroyImuTestPrimitiveState_t};

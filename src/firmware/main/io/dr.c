@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "firmware/main/shared/physics.h"
 #include "io/dsp.h"
 #include "io/encoder.h"
 #include "io/sensors.h"
-#include "firmware/main/shared/physics.h"
 #include "util/circbuff.h"
 
 static dr_data_t current_state;

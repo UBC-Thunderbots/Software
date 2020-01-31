@@ -33,7 +33,7 @@
 #define WHEELS_HALL_TO_MS                                                                \
     (WHEELS_CIRCUM * WHEELS_GEAR_RATIO / ((float)WHEELS_ENCODER_COUNTS_PER_REV) *        \
      CONTROL_LOOP_HZ)
-#define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f   // ohms—EC45 datasheet
+#define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
 void wheels_init(void);
 void wheels_coast(unsigned int index);

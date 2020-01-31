@@ -125,6 +125,7 @@ cc_library(
         "//firmware/main/app/world:firmware_world",
     ] + select({
         "//cc_toolchain:cpu_stm32f4": ["//firmware:main_freertos"],
+        "//conditions:default": [],
     }),
 )
 

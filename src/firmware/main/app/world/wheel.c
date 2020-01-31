@@ -20,8 +20,8 @@ Wheel_t* app_wheel_create(void (*apply_wheel_force)(float),
     new_wheel->apply_wheel_force   = apply_wheel_force;
     new_wheel->get_motor_speed_rpm = get_motor_speed_rpm;
     new_wheel->wheel_constants     = wheel_constants;
-    new_wheel->brake = brake;
-    new_wheel->coast = coast;
+    new_wheel->brake               = brake;
+    new_wheel->coast               = coast;
 
     return new_wheel;
 }
@@ -47,11 +47,13 @@ float app_wheel_getMotorSpeedRPM(const Wheel_t* wheel)
     return wheel->get_motor_speed_rpm();
 }
 
-void app_wheel_coast(const Wheel_t* wheel){
+void app_wheel_coast(const Wheel_t* wheel)
+{
     wheel->coast();
 }
 
-void app_wheel_brake(const Wheel_t* wheel){
+void app_wheel_brake(const Wheel_t* wheel)
+{
     wheel->brake();
 }
 

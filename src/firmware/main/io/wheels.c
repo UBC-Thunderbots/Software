@@ -212,8 +212,8 @@ void wheels_tick(log_record_t *log)
                 float applied_delta_voltage =
                     wheels[i].power / 255.0f * adc_battery() -
                     encoder_speed(i) * WHEELS_VOLTS_PER_ENCODER_COUNT;
-                float current =
-                    applied_delta_voltage / (WHEEL_MOTOR_PHASE_RESISTANCE + SWITCH_RESISTANCE);
+                float current = applied_delta_voltage /
+                                (WHEEL_MOTOR_PHASE_RESISTANCE + SWITCH_RESISTANCE);
                 float power  = current * current * WHEEL_MOTOR_PHASE_RESISTANCE;
                 added_energy = power / CONTROL_LOOP_HZ;
                 break;
@@ -288,34 +288,42 @@ float wheels_get_back_right_rpm()
     return wheels_get_wheel_rpm(2);
 }
 
-void wheels_coast_front_left(){
+void wheels_coast_front_left()
+{
     wheels_coast(0);
 }
 
-void wheels_coast_front_right(){
+void wheels_coast_front_right()
+{
     wheels_coast(3);
 }
 
-void wheels_coast_back_left(){
+void wheels_coast_back_left()
+{
     wheels_coast(1);
 }
 
-void wheels_coast_back_right(){
+void wheels_coast_back_right()
+{
     wheels_coast(2);
 }
 
-void wheels_brake_front_left(){
+void wheels_brake_front_left()
+{
     wheels_brake(0);
 }
 
-void wheels_brake_front_right(){
+void wheels_brake_front_right()
+{
     wheels_brake(3);
 }
 
-void wheels_brake_back_left(){
+void wheels_brake_back_left()
+{
     wheels_brake(1);
 }
 
-void wheels_brake_back_right(){
+void wheels_brake_back_right()
+{
     wheels_brake(2);
 }

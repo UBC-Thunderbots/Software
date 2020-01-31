@@ -68,7 +68,7 @@ static unsigned int timeout_ticks;
 static uint8_t last_serial        = 0xFF;
 static const size_t HEADER_LENGTH = 2U /* Frame control */ + 1U /* Seq# */ +
                                     2U /* Dest PAN */ + 2U /* Dest */ + 2U /* Src */;
-static const size_t FOOTER_LENGTH = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
+static const size_t FOOTER_LENGTH         = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
 static const int16_t MESSAGE_PURPOSE_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
                                             2U /* Dest PAN */ + 2U /* Dest */ +
                                             2U /* Src */;

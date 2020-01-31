@@ -72,8 +72,8 @@ float app_bangbang_computeProfileDuration(BBProfile *b)
  * \param[in] maximum velocity
  *
  */
-void app_bangbang_prepareTrajectoryMaxV(BBProfile *b, float d, float vi, float vf, float MaxA,
-                             float MaxV)
+void app_bangbang_prepareTrajectoryMaxV(BBProfile *b, float d, float vi, float vf,
+                                        float MaxA, float MaxV)
 {
     if (vf * d < 0)
         vf = 0;  // not allowed- must be in same direction
@@ -305,8 +305,8 @@ void app_bangbang_getState(const BBProfile *b, float time, float *d, float *v)
  * \param[out] Jerk the quantity of jerk to apply
  * \return the initial acceleration
  */
-float app_bangbang_computeInitialAccelerationForConstantJerkProfile(float Vinit, float Vfinal, float Distance, float time,
-                          float *Jerk)
+float app_bangbang_computeInitialAccelerationForConstantJerkProfile(
+    float Vinit, float Vfinal, float Distance, float time, float *Jerk)
 {
     // D = t^3*J/6 + t^2 * A / 2 + Vinit*t
     // Vf = t^2 * J / 2 + A*t + Vinit

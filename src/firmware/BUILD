@@ -22,7 +22,6 @@ cc_binary(
     ],
     includes = [
         "main",
-        "main_freertos",
     ],
     linkopts = [
         "-T$(location //firmware:stm32f405.ld)",
@@ -58,7 +57,6 @@ cc_library(
             "usb/**/*.c",
             "main/**/*.c",
             "cdcacm/**/*.c",
-            "stm32lib/**/*.c",
         ],
         exclude = [
             "main/main.c",
@@ -68,18 +66,13 @@ cc_library(
         [
             "usb/**/*.h",
             "main/**/*.h",
-            "stm32lib/**/*.h",
             "cdcacm/include/*.h",
         ],
     ),
-    defines = [
-        "STM32LIB_USE_FREERTOS",
-    ],
     includes = [
         ".",
         "cdcacm/include",
         "main",
-        "stm32lib/include",
         "usb/include",
     ],
     restricted_to = ["//cc_toolchain:stm32f4"],
@@ -101,35 +94,29 @@ cc_library(
 
 cc_library(
     name = "main_freertos",
-    srcs = glob(["freertos/source/**/*.c"]),
-    hdrs = glob(["freertos/include/*.h"]) + [
+    srcs = glob([
+        "freertos/source/**/*.c",
+        "stm32lib/**/*.c",
+    ]),
+    hdrs = glob([
+        "freertos/include/*.h",
+        "stm32lib/include/**/*.h",
+    ]) + [
         "main/FreeRTOSConfig.h",
         "main/priority.h",
     ],
     copts = [
         # We don't want to mark warnings as errors for 3rd party code
-        # TODO: narrow this to just RTOS/drivers/middleware stuff
         "-Wno-error",
+    ],
+    defines = [
+        "STM32LIB_USE_FREERTOS",
     ],
     includes = [
         "freertos/include",
         "main",
-    ],
-    restricted_to = ["//cc_toolchain:stm32f4"],
-    deps = [
-        ":stm32lib",
-    ],
-)
-
-# TODO: move this down to the `stm32lib` directory
-cc_library(
-    name = "stm32lib",
-    srcs = glob(["stm32lib/*.c"]),
-    hdrs = glob(["stm32lib/include/**/*.h"]),
-    includes = [
         "stm32lib/include",
         "stm32lib/include/registers",
     ],
     restricted_to = ["//cc_toolchain:stm32f4"],
-    deps = [],
 )

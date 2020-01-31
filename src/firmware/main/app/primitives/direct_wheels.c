@@ -1,10 +1,12 @@
 #include "firmware/main/app/primitives/direct_wheels.h"
 
-typedef struct DirectWheelsPrimitiveState {
-}DirectWheelsPrimitiveState_t;
+typedef struct DirectWheelsPrimitiveState
+{
+} DirectWheelsPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DirectWheelsPrimitiveState_t)
 
-static void direct_wheels_start(const primitive_params_t* params, void* void_state_ptr, FirmwareWorld_t* world)
+static void direct_wheels_start(const primitive_params_t* params, void* void_state_ptr,
+                                FirmwareWorld_t* world)
 {
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
@@ -22,24 +24,17 @@ static void direct_wheels_start(const primitive_params_t* params, void* void_sta
     app_dribbler_setSpeed(dribbler, (params->extra) * 300);
 }
 
-static void direct_wheels_end( void* void_state_ptr,FirmwareWorld_t* world) {}
+static void direct_wheels_end(void* void_state_ptr, FirmwareWorld_t* world) {}
 
-static void direct_wheels_tick( void* void_state_ptr,FirmwareWorld_t* world)
-{
-    // TODO: redo this comment
-    // Nothing to do here; the PWM values are sent to the wheels as soon as
-    // they are received from the radio.
-}
+static void direct_wheels_tick(void* void_state_ptr, FirmwareWorld_t* world) {}
 
 /**
  * \brief The direct_wheels movement primitive.
  */
 const primitive_t DIRECT_WHEELS_PRIMITIVE = {
-    .direct = true,
-    .start  = &direct_wheels_start,
-    .end    = &direct_wheels_end,
-    .tick   = &direct_wheels_tick,
-    .create_state = &createDirectWheelsPrimitiveState_t,
-    .destroy_state = &destroyDirectWheelsPrimitiveState_t
-};
-
+    .direct        = true,
+    .start         = &direct_wheels_start,
+    .end           = &direct_wheels_end,
+    .tick          = &direct_wheels_tick,
+    .create_state  = &createDirectWheelsPrimitiveState_t,
+    .destroy_state = &destroyDirectWheelsPrimitiveState_t};

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "firmware/main/app/world/firmware_world.h"
@@ -54,7 +54,8 @@ typedef struct
      *                           created by the `create_state` function
      * \param[in] world The world to perform the primitive in
      */
-    void (*start)(const primitive_params_t *params, void* state_void_ptr, FirmwareWorld_t *world);
+    void (*start)(const primitive_params_t* params, void* state_void_ptr,
+                  FirmwareWorld_t* world);
 
     /**
      * \brief Ends a movement using the primitive.
@@ -66,7 +67,7 @@ typedef struct
      *                           created by the `create_state` function
      * \param[in] world The world to perform the primitive in
      */
-    void (*end)(void* state_void_ptr, FirmwareWorld_t *world);
+    void (*end)(void* state_void_ptr, FirmwareWorld_t* world);
 
     /**
      * \brief Advances time in the primitive.
@@ -78,15 +79,12 @@ typedef struct
      *                           created by the `create_state` function
      * \param[in] world The world to perform the primitive in
      */
-    void (*tick)(void* state_void_ptr, FirmwareWorld_t *world);
-
-    // TODO: better names
-    // TODO: better jdocs
+    void (*tick)(void* state_void_ptr, FirmwareWorld_t* world);
 
     /**
      * Allocate a "state" variable that will be passed into all the primitive functions
      * @return A pointer to a "state" object, ie. whatever this primitive wants to store
-     *         in terms of stateful information
+     *         in terms of stateful information.
      */
     void* (*create_state)();
 
@@ -106,13 +104,15 @@ typedef struct
  *
  * @param STATE_TYPE The type of the state object
  */
-#define DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(STATE_TYPE) \
-void* create##STATE_TYPE(){ \
-    return malloc(sizeof(STATE_TYPE)); \
-} \
-void destroy##STATE_TYPE(void* state){ \
-    free((STATE_TYPE*)state); \
-}
+#define DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(STATE_TYPE)                  \
+    void* create##STATE_TYPE()                                                           \
+    {                                                                                    \
+        return malloc(sizeof(STATE_TYPE));                                               \
+    }                                                                                    \
+    void destroy##STATE_TYPE(void* state)                                                \
+    {                                                                                    \
+        free((STATE_TYPE*)state);                                                        \
+    }
 
 /**
  * Checks if the given parameters are equivalent
@@ -120,4 +120,4 @@ void destroy##STATE_TYPE(void* state){ \
  * @param params2
  * @return True if the params are equivalent, false otherwise
  */
-bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params2);
+bool primitive_params_are_equal(primitive_params_t* params1, primitive_params_t* params2);

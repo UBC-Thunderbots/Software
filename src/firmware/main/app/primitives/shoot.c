@@ -15,9 +15,10 @@
 // so that the axes would never have to compete for resources
 #define TIME_HORIZON 0.05f  // s
 
-typedef struct ShootPrimitiveState {
+typedef struct ShootPrimitiveState
+{
     float destination[3], major_vec[2], minor_vec[2], total_rot;
-}ShootPrimitiveState_t;
+} ShootPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ShootPrimitiveState_t)
 
 
@@ -69,9 +70,10 @@ void plan_shoot_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-static void shoot_start(const primitive_params_t *params, void* void_state_ptr, FirmwareWorld_t *world)
+static void shoot_start(const primitive_params_t *params, void *void_state_ptr,
+                        FirmwareWorld_t *world)
 {
-    ShootPrimitiveState_t* state = (ShootPrimitiveState_t*)void_state_ptr;
+    ShootPrimitiveState_t *state = (ShootPrimitiveState_t *)void_state_ptr;
     /**
      * \param[in] params the movement parameters, which are only valid until this
      * function returns and must be copied into this module if needed
@@ -108,9 +110,10 @@ static void shoot_start(const primitive_params_t *params, void* void_state_ptr, 
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
-    state->total_rot = min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
+    state->total_rot =
+        min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
     float shoot_power = (float)params->params[3] / 1000.0f;
-    bool chip              = params->extra & 1;
+    bool chip         = params->extra & 1;
 
     Chicker_t *chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
@@ -124,7 +127,7 @@ static void shoot_start(const primitive_params_t *params, void* void_state_ptr, 
     }
 }
 
-static void shoot_end(void* void_state_ptr, FirmwareWorld_t *world)
+static void shoot_end(void *void_state_ptr, FirmwareWorld_t *world)
 {
     Chicker_t *chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
@@ -132,12 +135,13 @@ static void shoot_end(void* void_state_ptr, FirmwareWorld_t *world)
     app_chicker_disableAutochip(chicker);
 }
 
-static void shoot_tick(void* void_state_ptr, FirmwareWorld_t *world)
+static void shoot_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-    ShootPrimitiveState_t* state = (ShootPrimitiveState_t*)void_state_ptr;
+    const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    ShootPrimitiveState_t *state = (ShootPrimitiveState_t *)void_state_ptr;
 
-    PhysBot pb = app_physbot_create(robot, state->destination, state->major_vec, state->minor_vec);
+    PhysBot pb =
+        app_physbot_create(robot, state->destination, state->major_vec, state->minor_vec);
     if (pb.maj.disp > 0)
     {
         // tuned constants from testing
@@ -150,8 +154,9 @@ static void shoot_tick(void* void_state_ptr, FirmwareWorld_t *world)
     plan_shoot_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
     float accel[3] = {0, 0, pb.rot.accel};
     scale(&pb);
-    app_physbot_computeAccelInLocalCoordinates(
-        accel, pb, app_firmware_robot_getOrientation(robot), state->major_vec, state->minor_vec);
+    app_physbot_computeAccelInLocalCoordinates(accel, pb,
+                                               app_firmware_robot_getOrientation(robot),
+                                               state->major_vec, state->minor_vec);
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
@@ -160,11 +165,9 @@ static void shoot_tick(void* void_state_ptr, FirmwareWorld_t *world)
 /**
  * \brief The shoot movement primitive.
  */
-const primitive_t SHOOT_PRIMITIVE = {
-    .direct = false,
-    .start  = &shoot_start,
-    .end    = &shoot_end,
-    .tick   = &shoot_tick,
-    .create_state = &createShootPrimitiveState_t,
-    .destroy_state = &destroyShootPrimitiveState_t
-};
+const primitive_t SHOOT_PRIMITIVE = {.direct        = false,
+                                     .start         = &shoot_start,
+                                     .end           = &shoot_end,
+                                     .tick          = &shoot_tick,
+                                     .create_state  = &createShootPrimitiveState_t,
+                                     .destroy_state = &destroyShootPrimitiveState_t};

@@ -168,7 +168,7 @@ void plan_move_rotation(PhysBot* pb, float avel)
 }
 
 void move_start(const primitive_params_t* params, void* void_state_ptr,
-                       FirmwareWorld_t* world)
+                FirmwareWorld_t* world)
 {
     MovePrimitiveState_t* state = (MovePrimitiveState_t*)void_state_ptr;
     // Parameters:     destination_x [mm]

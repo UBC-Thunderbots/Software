@@ -9,14 +9,14 @@ typedef struct PrimitiveManager PrimitiveManager_t;
  * Create a PrimitiveManager
  * @return A PrimitiveManager
  */
-PrimitiveManager_t* app_primitive_manager_create(void);
+PrimitiveManager_t *app_primitive_manager_create(void);
 
 /**
  * Destroy the given PrimitiveManager, freeing any memory allocated for it
  *
  * @param wheel The PrimitiveManager to destroy
  */
-void app_primitive_manager_destroy(PrimitiveManager_t* manager);
+void app_primitive_manager_destroy(PrimitiveManager_t *manager);
 
 /**
  * Sets the current primitive to a new one
@@ -27,9 +27,9 @@ void app_primitive_manager_destroy(PrimitiveManager_t* manager);
  * @param params The parameters for the primitive
  */
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
-                                               FirmwareWorld_t *world,
-                                               unsigned int primitive_index,
-                                               const primitive_params_t *params);
+                                             FirmwareWorld_t *world,
+                                             unsigned int primitive_index,
+                                             const primitive_params_t *params);
 
 /**
  * Runs the current primitive
@@ -38,7 +38,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
  * @param world The world to run the primitive in
  */
 void app_primitive_manager_run_current_primitive(PrimitiveManager_t *manager,
-                                                    FirmwareWorld_t *world);
+                                                 FirmwareWorld_t *world);
 
 /**
  * Gets the index of the currently running primitive
@@ -47,10 +47,8 @@ void app_primitive_manager_run_current_primitive(PrimitiveManager_t *manager,
  * @return The index of the primitive this primitive manager is currently running, 254 if
  *         there is no primitive running
  */
-unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t* manager);
+unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t *manager);
 
-// TODO: does this belong here
-// TODO: new jdoc style
 /**
  * Checks whether a particular primitive is direct.
  *
@@ -58,4 +56,3 @@ unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t* 
  * @return true if the primitive is direct primitive, false otherwise
  */
 bool app_primitive_manager_primitiveIsDirect(unsigned int primitive);
-

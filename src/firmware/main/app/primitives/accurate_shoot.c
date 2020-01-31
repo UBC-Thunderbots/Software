@@ -307,10 +307,9 @@ static void accurate_shoot_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * \brief The accurate shoot movement primitive.
  */
 const primitive_t ACCURATE_SHOOT_PRIMITIVE = {
-    .direct = false,
-    .start  = &accurate_shoot_start,
-    .end    = &accurate_shoot_end,
-    .tick   = &accurate_shoot_tick,
-    .create_state = &createAccurateShootPrimitiveState_t,
-    .destroy_state = &destroyAccurateShootPrimitiveState_t
-};
+    .direct        = false,
+    .start         = &accurate_shoot_start,
+    .end           = &accurate_shoot_end,
+    .tick          = &accurate_shoot_tick,
+    .create_state  = &createAccurateShootPrimitiveState_t,
+    .destroy_state = &destroyAccurateShootPrimitiveState_t};

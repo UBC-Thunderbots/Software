@@ -1,7 +1,5 @@
 #pragma once
 
-// TODO: move physics into `app`
-
 #include "math/tbots_math.h"
 
 // This file contains all the physical constants of the robot

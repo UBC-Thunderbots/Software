@@ -7,8 +7,8 @@
 // Used for computing accelerations
 #define TIME_HORIZON 0.05f  // s
 
-PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination, float *major_vec,
-                  float *minor_vec)
+PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
+                           float *major_vec, float *minor_vec)
 {
     float v[2]            = {app_firmware_robot_getVelocityX(robot),
                   app_firmware_robot_getVelocityY(robot)};
@@ -39,8 +39,8 @@ void app_physbots_planMove(Component *c, float *p)
     c->time  = app_bangbang_computeProfileDuration(&profile);
 }
 
-void app_physbot_computeAccelInLocalCoordinates(float *accel, PhysBot pb, float angle, float *major_vec,
-                     float *minor_vec)
+void app_physbot_computeAccelInLocalCoordinates(float *accel, PhysBot pb, float angle,
+                                                float *major_vec, float *minor_vec)
 {
     float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},
                                   {cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};

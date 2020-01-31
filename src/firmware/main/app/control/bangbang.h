@@ -6,10 +6,10 @@
  * Profile struct to compete. The next stage is to call Plan which will analyze the inputs
  * and complete the trajectory computing things like which way to accelerate, for how long
  * and what speed will be reached. Finally, various pieces of information can be gleaned
- * from the completed trajectory such as the total traversal time(app_bangbang_computeProfileDuration), or the
- * expected stat at a given time in the future(app_bangbang_getState). Finally, users may
- * wish to use the information to compute an acceleration to apply as a form of control
- * law.
+ * from the completed trajectory such as the total traversal
+ * time(app_bangbang_computeProfileDuration), or the expected stat at a given time in the
+ * future(app_bangbang_getState). Finally, users may wish to use the information to
+ * compute an acceleration to apply as a form of control law.
  *
  * There are many control laws which one could apply to a planed trajectory, such as
  * simply taking a1 and using that. However, such simple approaches will tend to oscillate
@@ -87,8 +87,7 @@ void app_bangbang_getState(const BBProfile *b, float time, float *d, float *v);
 // a distance and a time and computes the initial acceleration and jerk to experience over
 // that time such that the velocity and distance constraints are met
 float app_bangbang_computeInitialAccelerationForConstantJerkProfile(
-    float Vinit, float Vfinal, float Distance, float time, float *jjjjjjJerk);
+    float Vinit, float Vfinal, float Distance, float time, float *Jerk);
 
 // Computes how long a movement profile will take
 float app_bangbang_computeProfileDuration(BBProfile *b);
-

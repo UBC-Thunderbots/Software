@@ -195,7 +195,7 @@ static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
 
         // calculate the position along the major axis where we want to catch the ball
         float safetydistance =
-           state->catchmargin * norm2(vel[1] - ballvel[1], vel[0] - ballvel[0]);
+            state->catchmargin * norm2(vel[1] - ballvel[1], vel[0] - ballvel[0]);
         float major_disp_intercept = major_disp_proj + safetydistance;
 
         // desired end interception velocity
@@ -240,11 +240,9 @@ static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
 /**
  * \brief The catch movement primitive.
  */
-const primitive_t CATCH_PRIMITIVE = {
-    .direct = false,
-    .start  = &catch_start,
-    .end    = &catch_end,
-    .tick   = &catch_tick,
-    .create_state = &createCatchPrimitiveState_t,
-    .destroy_state = &destroyCatchPrimitiveState_t
-};
+const primitive_t CATCH_PRIMITIVE = {.direct        = false,
+                                     .start         = &catch_start,
+                                     .end           = &catch_end,
+                                     .tick          = &catch_tick,
+                                     .create_state  = &createCatchPrimitiveState_t,
+                                     .destroy_state = &destroyCatchPrimitiveState_t};
