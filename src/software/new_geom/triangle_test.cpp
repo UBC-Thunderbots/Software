@@ -23,17 +23,17 @@ TEST(TriangleConstructorTests, test_isosceles_triangle)
 TEST(TriangleCenterTests, test_center_right)
 {
     Triangle t = Triangle(Point(0, 0), Point(0, 6), Point(9, 0));
-    EXPECT_EQ(t.center(), Point(3, 2));
+    EXPECT_EQ(t.mean(), Point(3, 2));
 }
 
 TEST(TriangleCenterTests, test_center_scalene)
 {
     Triangle t = Triangle(Point(0, 0), Point(-2, 6), Point(14, 0));
-    EXPECT_EQ(t.center(), Point(4, 2));
+    EXPECT_EQ(t.mean(), Point(4, 2));
 }
 
 TEST(TriangleCenterTests, test_center_isosceles)
 {
     Triangle t = Triangle(Point(0, 0), Point(6, 0), Point(3, 12));
-    EXPECT_EQ(t.center(), Point(3, 4));
+    EXPECT_EQ(t.mean(), Point(3, 4));
 }

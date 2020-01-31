@@ -10,6 +10,7 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/triangle.h"
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
 
@@ -98,29 +99,6 @@ TEST(GeomUtilTest, test_proj_len)
     EXPECT_NEAR(expected_val, calculated_val, 0.00001);
 }
 
-TEST(GeomUtilTest, test_contains_triangle_point)
-{
-    // this triangle lies in the first quatren of the field, we can rota
-    Point p1(0, 0);
-    Point p2((std::rand() % 100) / 100, 0);
-    Point p3((std::rand() % 100) / 100, (std::rand() % 100) / 100);
-    Point p((std::rand() % 100) / 100, (std::rand() % 100) / 100);
-    bool expected_val = true;
-
-    // i don't know what is going on here, this part seems to not work very well
-    // so we'll just abuse cross products to see on which side of each side of
-    // the triangle it's on
-    if (((p2 - p1).cross(p - p1) > 0) != ((p2 - p1).cross(p3 - p1) > 0))
-        expected_val = false;
-    if (((p3 - p2).cross(p - p2) > 0) != ((p3 - p2).cross(p1 - p2) > 0))
-        expected_val = false;
-    if (((p1 - p3).cross(p - p3) > 0) != ((p1 - p3).cross(p2 - p3) > 0))
-        expected_val = false;
-
-    bool calculated_val = contains(triangle(p1, p2, p3), p);
-    EXPECT_EQ(expected_val, calculated_val);
-}
-
 TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
 {
     Segment segment = Segment(Point(0, 0), Point(0, 1));
@@ -161,7 +139,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test1c(0, -1);
     double test1radius = 1;
     EXPECT_TRUE(
-        !intersects(triangle(test1p1, test1p2, test1p3),
+        !intersects(Triangle(test1p1, test1p2, test1p3),
                     Circle(test1c,
                            test1radius)));  // circle is tangent to triangle, no intersect
 
@@ -171,7 +149,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test2c(0, 5);
     double test2radius = 1;
     EXPECT_TRUE(intersects(
-        triangle(test2p1, test2p2, test2p3),
+        Triangle(test2p1, test2p2, test2p3),
         Circle(test2c,
                test2radius)));  // circle is completely inside triangle, intersect
 
@@ -181,7 +159,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test3c(0, 1);
     double test3radius = 1;
     EXPECT_TRUE(
-        !intersects(triangle(test3p1, test3p2, test3p3),
+        !intersects(Triangle(test3p1, test3p2, test3p3),
                     Circle(test3c,
                            test3radius)));  // circle is tangent to vertice, no intersect
 
@@ -191,7 +169,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test4c(5, 5);
     double test4radius = 2;
     EXPECT_TRUE(
-        !intersects(triangle(test4p1, test4p2, test4p3), Circle(test4c, test4radius)));
+        !intersects(Triangle(test4p1, test4p2, test4p3), Circle(test4c, test4radius)));
 
     Point test5p1(-2, -2);
     Point test5p2(2, -2);
@@ -199,7 +177,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test5c(0, -1);
     double test5radius = 1;
     EXPECT_TRUE(
-        intersects(triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
+        intersects(Triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
 }
 
 TEST(GeomUtilTest, test_point_in_rectangle)

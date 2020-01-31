@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/new_geom/convex_polygon.h"
 
 /**
@@ -16,9 +18,9 @@ class Triangle : public ConvexPolygon
     explicit Triangle(const Point &point1, const Point &point2, const Point &point3);
 
     /**
-     * Returns the center point of this Triangle.
+     * Returns the mean of all the points of this Triangle (also known as the center).
      *
-     * @return the center of this Triangle
+     * @return the mean of all the points of this Triangle
      */
-    Point center() const;
+    Point mean() const;
 };

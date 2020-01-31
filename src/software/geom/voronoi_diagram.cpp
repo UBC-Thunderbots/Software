@@ -71,7 +71,7 @@ std::vector<Circle> VoronoiDiagram::voronoiVerticesToOpenCircles(
     for (auto vertex : diagram.vertices())
     {
         // We only want to consider vertices within our rectangle
-        if (bounding_box.containsPoint(Point(vertex.x(), vertex.y())))
+        if (bounding_box.contains(Point(vertex.x(), vertex.y())))
         {
             std::vector<Point> triangle;
             auto edge = vertex.incident_edge();

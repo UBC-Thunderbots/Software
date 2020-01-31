@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/rectangle.h"
+#include "software/new_geom/rectangle.h"
 #include "software/parameter/dynamic_parameters.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
@@ -95,7 +95,7 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
 
     for (const auto &enemy : enemy_team.getAllRobots())
     {
-        if (baller_frontal_area.containsPoint(enemy.position()))
+        if (baller_frontal_area.contains(enemy.position()))
         {
             return true;
         }
