@@ -12,6 +12,13 @@ typedef struct PrimitiveManager PrimitiveManager_t;
 PrimitiveManager_t* app_primitive_manager_create(void);
 
 /**
+ * Destroy the given PrimitiveManager, freeing any memory allocated for it
+ *
+ * @param wheel The PrimitiveManager to destroy
+ */
+void app_primitive_manager_destroy(PrimitiveManager_t* manager);
+
+/**
  * Sets the current primitive to a new one
  *
  * @param manager The primitive manager to set the current primitive on
@@ -19,7 +26,7 @@ PrimitiveManager_t* app_primitive_manager_create(void);
  * @param primitive_index The index of the primitive to run
  * @param params The parameters for the primitive
  */
-void app_primitive_manager_start_new_primitive(PrimitiveManager_t *manager,
+void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                                FirmwareWorld_t *world,
                                                unsigned int primitive_index,
                                                const primitive_params_t *params);
@@ -29,10 +36,18 @@ void app_primitive_manager_start_new_primitive(PrimitiveManager_t *manager,
  *
  * @param manager The primitive manager to set the current primitive on
  * @param world The world to run the primitive in
- * @return ?? TODO ??
  */
 void app_primitive_manager_run_current_primitive(PrimitiveManager_t *manager,
                                                     FirmwareWorld_t *world);
+
+/**
+ * Gets the index of the currently running primitive
+ * @param manager The primitive manager to get the index of the currently running
+ *                primitive from
+ * @return The index of the primitive this primitive manager is currently running, 254 if
+ *         there is no primitive running
+ */
+unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t* manager);
 
 // TODO: does this belong here
 // TODO: new jdoc style

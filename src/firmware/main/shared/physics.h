@@ -35,7 +35,6 @@
 #define INERTIA (ROT_MASS * ROBOT_RADIUS * ROBOT_RADIUS)
 
 #define CURRENT_PER_TORQUE 39.21f  // from motor data sheet (1/25.5 mNm)
-#define PHASE_RESISTANCE 1.6f      // adjust this number as calculated
 #define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
 #define WHEEL_RADIUS 0.0254f
 

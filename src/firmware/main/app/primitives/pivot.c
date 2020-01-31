@@ -90,7 +90,7 @@ static void pivot_tick(void* void_state_ptr, FirmwareWorld_t *world)
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     const PivotPrimitiveState_t* state = (PivotPrimitiveState_t*)void_state_ptr;
 
-    float rel_dest[3], tangential_dir[2], radial_dir[2];
+    float rel_dest[3], tangential_dir[2];
     const float vel[3]     = {app_firmware_robot_getVelocityX(robot),
                               app_firmware_robot_getVelocityY(robot),
                               app_firmware_robot_getVelocityAngular(robot)};
@@ -99,10 +99,6 @@ static void pivot_tick(void* void_state_ptr, FirmwareWorld_t *world)
     rel_dest[0]      = state->center[0] - app_firmware_robot_getPositionX(robot);
     rel_dest[1]      = state->center[1] - app_firmware_robot_getPositionY(robot);
     float cur_radius = compute_magnitude(rel_dest);
-
-    // direction to travel to move into the bot
-    radial_dir[0] = rel_dest[0] / cur_radius;
-    radial_dir[1] = rel_dest[1] / cur_radius;
 
     // direction to travel to rotate around the bot, dir is selected at the start
     tangential_dir[0] = -state->dir * rel_dest[1] / cur_radius;

@@ -11,7 +11,7 @@
 #include "io/hall.h"
 #include "io/motor.h"
 #include "io/receive.h"
-#include "physics/physics.h"
+#include "firmware/main/shared/physics.h"
 
 /**
  * The following constants use values from this datasheet:

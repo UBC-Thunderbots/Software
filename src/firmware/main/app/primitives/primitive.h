@@ -114,5 +114,10 @@ void destroy##STATE_TYPE(void* state){ \
     free((STATE_TYPE*)state); \
 }
 
-// TODO: jdoc
-bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params);
+/**
+ * Checks if the given parameters are equivalent
+ * @param params1
+ * @param params2
+ * @return True if the params are equivalent, false otherwise
+ */
+bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params2);

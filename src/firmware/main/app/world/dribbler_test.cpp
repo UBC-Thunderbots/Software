@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "app/world/dribbler.h"
+#include "firmware/main/app/world/dribbler.h"
 }
 
 #include <gtest/gtest.h>

@@ -3,6 +3,7 @@
 // TODO: need to prefix functions properly here
 
 #ifdef __arm__
+// TODO: do we need "FreeRTOS.h" here?
 #include <FreeRTOS.h>
 #include <semphr.h>
 #elif __unix__
@@ -108,17 +109,29 @@ PrimitiveManager_t* app_primitive_manager_create(void)
     PrimitiveManager_t* manager = (PrimitiveManager_t*)malloc(sizeof(PrimitiveManager_t));
 
 #ifdef __arm__
-    manager->primitive_mutex = xSemaphoreCreateMutex();
+    // TODO: this could cause issues if we ever have multiple PrimitiveManager's running
+    //       on the robot, but need to change `configSUPPORT_DYNAMIC_ALLOCATION` in the
+    //       `FreeRTOSConfig.h` to allow dynamic mutex creation
+    static StaticSemaphore_t primitive_mutex_storage;
+    manager->primitive_mutex = xSemaphoreCreateMutexStatic(&primitive_mutex_storage);
 #elif __unix__
     pthread_mutex_init(&(manager->primitive_mutex), NULL);
 # else
 #error "Could not determine what CPU this is being compiled for."
 #endif
 
+    manager->current_primitive = NULL;
+    manager->current_primitive_index = 254;
+    manager->current_primitive_state = NULL;
+
     return manager;
 }
 
-void app_primitive_manager_start_new_primitive(PrimitiveManager_t *manager,
+void app_primitive_manager_destroy(PrimitiveManager_t* manager){
+    free(manager);
+}
+
+void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                                FirmwareWorld_t *world,
                                                unsigned int primitive_index,
                                                const primitive_params_t *params){
@@ -156,6 +169,10 @@ void app_primitive_manager_run_current_primitive(PrimitiveManager_t *manager,
     }
 
     app_primitive_manager_unlockPrimitiveMutex(manager);
+}
+
+unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t* manager){
+    return manager->current_primitive_index;
 }
 
 bool app_primitive_manager_primitiveIsDirect(unsigned int primitive)

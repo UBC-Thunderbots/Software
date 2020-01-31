@@ -42,9 +42,9 @@ typedef struct WheelConstants
  *
  * @return A pointer to the created wheel, ownership is given to the caller
  */
-Wheel_t* app_wheel_create(void (*apply_wheel_force)(float force_in_newtons),
-                          float (*get_motor_speed_rpm)(),
-                          WheelConstants_t wheel_constants);
+Wheel_t* app_wheel_create(void (*apply_wheel_force)(float),
+                          float (*get_motor_speed_rpm)(), void (*brake)(void),
+                          void (*coast)(void), WheelConstants_t wheel_constants);
 
 /**
  * Destroy the given wheel, freeing any memory allocated for it
@@ -81,14 +81,14 @@ float app_wheel_getMotorSpeedRPM(const Wheel_t* wheel);
  * Allow this wheel to spin freely
  * @param wheel The wheel to allow to spin freely
  */
- // TODO: implement
+ // TODO: test me
 void app_wheel_coast(const Wheel_t* wheel);
 
 /**
  * Brake this wheel
  * @param wheel The wheel to brake
  */
-// TODO: implement
+// TODO: test me
 void app_wheel_brake(const Wheel_t* wheel);
 
 /**
@@ -96,4 +96,4 @@ void app_wheel_brake(const Wheel_t* wheel);
  * @param wheel The wheel to get the constants for
  * @return The constants for the given wheel
  */
-const WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel);
+WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel);

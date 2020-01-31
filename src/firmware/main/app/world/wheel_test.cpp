@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "app/world/wheel.h"
+#include "firmware/main/app/world/wheel.h"
 }
 
 #include <gtest/gtest.h>
@@ -20,7 +20,7 @@ class WheelTest : public testing::Test
                                             .wheel_rotations_per_motor_rotation  = 0.5};
 
         wheel = app_wheel_create(&(this->request_wheel_force), &(this->get_motor_speed),
-                                 wheel_constants);
+                                 NULL, NULL, wheel_constants);
     }
 
     virtual void TearDown()

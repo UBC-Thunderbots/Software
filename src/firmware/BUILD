@@ -21,8 +21,8 @@ cc_binary(
         "-Wpointer-arith",
     ],
     includes = [
-        "freertos",
         "main",
+        "main_freertos",
     ],
     linkopts = [
         "-T$(location //firmware:stm32f405.ld)",
@@ -59,7 +59,6 @@ cc_library(
             "main/**/*.c",
             "cdcacm/**/*.c",
             "stm32lib/**/*.c",
-            "freertos/source/**/*.c",
         ],
         exclude = [
             "main/main.c",
@@ -70,7 +69,6 @@ cc_library(
             "usb/**/*.h",
             "main/**/*.h",
             "stm32lib/**/*.h",
-            "freertos/include/*.h",
             "cdcacm/include/*.h",
         ],
     ),
@@ -80,17 +78,17 @@ cc_library(
     includes = [
         ".",
         "cdcacm/include",
-        "freertos/include",
-        "freertos/vendor/portable/GCC/ARM_CM4F",
         "main",
         "stm32lib/include",
         "usb/include",
     ],
     restricted_to = ["//cc_toolchain:stm32f4"],
     deps = [
-        "//firmware/main/app:control",
+        ":main_freertos",
+        "//firmware/main/app/control",
+        "//firmware/main/app/primitives:primitive_manager",
         "//firmware/main/app/world:firmware_world",
-        "//firmware/main/physics",
+        "//firmware/main/shared:physics",
         "//firmware/main/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
@@ -99,4 +97,39 @@ cc_library(
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
+)
+
+cc_library(
+    name = "main_freertos",
+    srcs = glob(["freertos/source/**/*.c"]),
+    hdrs = glob(["freertos/include/*.h"]) + [
+        "main/FreeRTOSConfig.h",
+        "main/priority.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        # TODO: narrow this to just RTOS/drivers/middleware stuff
+        "-Wno-error",
+    ],
+    includes = [
+        "freertos/include",
+        "main",
+    ],
+    restricted_to = ["//cc_toolchain:stm32f4"],
+    deps = [
+        ":stm32lib",
+    ],
+)
+
+# TODO: move this down to the `stm32lib` directory
+cc_library(
+    name = "stm32lib",
+    srcs = glob(["stm32lib/*.c"]),
+    hdrs = glob(["stm32lib/include/**/*.h"]),
+    includes = [
+        "stm32lib/include",
+        "stm32lib/include/registers",
+    ],
+    restricted_to = ["//cc_toolchain:stm32f4"],
+    deps = [],
 )
