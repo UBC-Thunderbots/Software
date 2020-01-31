@@ -6,10 +6,10 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/segment.h"
 #include "software/parameter/dynamic_parameters.h"
 
 
@@ -61,7 +61,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
 
     // if the goalie restricted area already contains the point, then we are
     // safe to move there.
-    if (goalie_restricted_area.containsPoint(goalie_desired_position))
+    if (goalie_restricted_area.contains(goalie_desired_position))
     {
         return std::make_optional<Point>(goalie_desired_position);
     }
@@ -227,7 +227,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // if the ball is slow but its not safe to chip it out, don't.
             // TODO finesse the ball out of the goal using the dribbler.
             // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
-            if (dont_chip_rectangle.containsPoint(ball.position()) == true)
+            if (dont_chip_rectangle.contains(ball.position()) == true)
             {
                 stop_action->updateControlParams(*robot, false);
                 next_action = stop_action;
