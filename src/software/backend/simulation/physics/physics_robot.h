@@ -6,9 +6,7 @@
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
-// Forward-declare to avoid circular dependencies
-class SimulatorRobot;
-
+// TODO: comment
 class PhysicsRobot
 {
    public:
