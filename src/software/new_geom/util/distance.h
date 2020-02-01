@@ -47,7 +47,8 @@ double distance(const Point &first, const Segment &second);
 double distance(const Segment &first, const Point &second);
 
 /**
- * Finds the shortest distance between a Point and a Polygon
+ * Finds the shortest distance between a Point and a Polygon. If the Point is inside the
+ * Polygon, the shortest distance is 0.
  *
  * @param first
  * @param second
