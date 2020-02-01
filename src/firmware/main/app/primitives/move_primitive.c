@@ -82,15 +82,6 @@ void build_wheel_axes(float (*wheel_axes)[8], float angle)
     (*wheel_axes)[7] = angle - ANGLE_TO_BACK_WHEELS + (3 * PI_2);
 }
 
-// TODO: finish jdoc?
-/**
- * Finds the index of the wheel axes we should rotate onto
- * @param dx
- * @param dy
- * @param current_angle
- * @param final_angle
- * @return The index of the optimal axes to rotate onto array
- */
 unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_angle)
 {
     float wheel_axes[8];

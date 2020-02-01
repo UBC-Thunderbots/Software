@@ -109,7 +109,7 @@ static void normal_task(void *UNUSED(param))
 
         hall_tick();
         encoder_tick();
-        app_primitive_manager_run_current_primitive(primitive_manager, world);
+        app_primitive_manager_runCurrentPrimitive(primitive_manager, world);
         dr_tick(record);
         wheels_tick(record);
         dribbler_tick(record);

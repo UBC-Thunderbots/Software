@@ -37,8 +37,8 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
  * @param manager The primitive manager to set the current primitive on
  * @param world The world to run the primitive in
  */
-void app_primitive_manager_run_current_primitive(PrimitiveManager_t *manager,
-                                                 FirmwareWorld_t *world);
+void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
+                                               FirmwareWorld_t *world);
 
 /**
  * Gets the index of the currently running primitive

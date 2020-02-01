@@ -71,7 +71,7 @@ void app_bangbang_prepareTrajectory(BBProfile *b, float d, float vi, float vf,
 void app_bangbang_planTrajectory(BBProfile *b);
 
 // the default acceleration calculator, a typical horizon would be on
-// the time scale fo the vehicle in question say 1/2 second for our robots.
+// the time scale of the vehicle in question
 float app_bangbang_computeAccel(const BBProfile *b, float horizon);
 
 
