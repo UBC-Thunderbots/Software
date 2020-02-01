@@ -219,6 +219,22 @@ class SimulatorRobotSingleton
     static float getMotorSpeedFrontRight();
 
     /**
+     * Sets the motor to coast (spin freely)
+     */
+    static void coastMotorBackLeft();
+    static void coastMotorBackRight();
+    static void coastMotorFrontLeft();
+    static void coastMotorFrontRight();
+
+    /**
+     * Sets the motor to brake (act against the current direction of rotation)
+     */
+    static void brakeMotorBackLeft();
+    static void brakeMotorBackRight();
+    static void brakeMotorFrontLeft();
+    static void brakeMotorFrontRight();
+
+    /**
      * Returns the PhysicsRobot currently selected from the list of controllable
      * physics_robots by the current robot_id
      *

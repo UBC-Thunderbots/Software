@@ -47,16 +47,24 @@ SimulatorRobotSingleton::createFirmwareRobot()
         .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
     Wheel_t* front_left_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontLeft),
-        &(SimulatorRobotSingleton::getMotorSpeedFrontLeft), wheel_constants);
+        &(SimulatorRobotSingleton::getMotorSpeedFrontLeft),
+        &(SimulatorRobotSingleton::coastMotorFrontLeft),
+        &(SimulatorRobotSingleton::brakeMotorFrontLeft), wheel_constants);
     Wheel_t* front_right_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontRight),
-        &(SimulatorRobotSingleton::getMotorSpeedFrontRight), wheel_constants);
-    Wheel_t* back_left_wheel = app_wheel_create(
-        &(SimulatorRobotSingleton::applyWheelForceBackLeft),
-        &(SimulatorRobotSingleton::getMotorSpeedBackLeft), wheel_constants);
+        &(SimulatorRobotSingleton::getMotorSpeedFrontRight),
+        &(SimulatorRobotSingleton::coastMotorFrontRight),
+        &(SimulatorRobotSingleton::brakeMotorFrontRight), wheel_constants);
+    Wheel_t* back_left_wheel =
+        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackLeft),
+                         &(SimulatorRobotSingleton::getMotorSpeedBackLeft),
+                         &(SimulatorRobotSingleton::coastMotorBackLeft),
+                         &(SimulatorRobotSingleton::brakeMotorBackLeft), wheel_constants);
     Wheel_t* back_right_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceBackRight),
-        &(SimulatorRobotSingleton::getMotorSpeedBackRight), wheel_constants);
+        &(SimulatorRobotSingleton::getMotorSpeedBackRight),
+        &(SimulatorRobotSingleton::coastMotorBackRight),
+        &(SimulatorRobotSingleton::brakeMotorBackRight), wheel_constants);
 
     const RobotConstants_t robot_constants = {
         .mass              = ROBOT_POINT_MASS,
@@ -282,6 +290,70 @@ float SimulatorRobotSingleton::getMotorSpeedFrontRight()
         // TODO: Implement me
     }
     return 0.0;
+}
+
+void SimulatorRobotSingleton::coastMotorBackLeft()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobotSingleton::coastMotorBackRight()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobotSingleton::coastMotorFrontLeft()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobotSingleton::coastMotorFrontRight()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobotSingleton::brakeMotorBackLeft()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobotSingleton::brakeMotorBackRight()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobotSingleton::brakeMotorFrontLeft()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobotSingleton::brakeMotorFrontRight()
+{
+    if (auto robot = getCurrentPhysicsRobot().lock())
+    {
+        // TODO: Implement me
+    }
 }
 
 std::weak_ptr<PhysicsRobot> SimulatorRobotSingleton::getCurrentPhysicsRobot()
