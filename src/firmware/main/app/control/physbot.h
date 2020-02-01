@@ -67,7 +67,7 @@ PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
  * @param p A 3 length array of {final velocity, max acceleration, max_velocity}
  * @return void
  */
-void app_physbots_planMove(Component *c, float *p);
+void app_physbot_planMove(Component *c, float *p);
 
 /**
  * Uses a rotaion matrix to rotate the acceleration vectors of the given

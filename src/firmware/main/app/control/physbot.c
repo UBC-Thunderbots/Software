@@ -28,7 +28,7 @@ PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
     return pb;
 }
 
-void app_physbots_planMove(Component *c, float *p)
+void app_physbot_planMove(Component *c, float *p)
 {
     BBProfile profile;
     app_bangbang_prepareTrajectoryMaxV(&profile, c->disp, c->vel, p[0], p[1], p[2]);

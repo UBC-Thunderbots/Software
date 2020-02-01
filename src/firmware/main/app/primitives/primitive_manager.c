@@ -36,10 +36,8 @@ struct PrimitiveManager
     pthread_mutex_t primitive_mutex;
 #endif
 
-    // TODO: rename, this is really a pointer to the _functions_ of the current
-    //       primitive, we hold it's state
     // The primitive that is currently operating.
-    const primitive_t *current_primitive;
+    const primitive_t *current_primitive_functions;
 
     // The index number of the current primitive.
     unsigned int current_primitive_index;
@@ -120,9 +118,9 @@ PrimitiveManager_t *app_primitive_manager_create(void)
 #error "Could not determine what CPU this is being compiled for."
 #endif
 
-    manager->current_primitive       = NULL;
-    manager->current_primitive_index = 254;
-    manager->current_primitive_state = NULL;
+    manager->current_primitive_functions = NULL;
+    manager->current_primitive_index     = 254;
+    manager->current_primitive_state     = NULL;
 
     return manager;
 }
@@ -140,10 +138,12 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     assert(primitive_index < PRIMITIVE_COUNT);
     app_primitive_manager_lockPrimitiveMutex(manager);
 
-    if (manager->current_primitive)
+    if (manager->current_primitive_functions)
     {
-        manager->current_primitive->end(manager->current_primitive_state, world);
-        manager->current_primitive->destroy_state(manager->current_primitive_state);
+        manager->current_primitive_functions->end(manager->current_primitive_state,
+                                                  world);
+        manager->current_primitive_functions->destroy_state(
+            manager->current_primitive_state);
     }
 
     FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
@@ -153,10 +153,12 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     app_chicker_disableAutochip(chicker);
     app_chicker_disableAutokick(chicker);
     app_dribbler_setSpeed(dribbler, 0);
-    manager->current_primitive       = PRIMITIVES[primitive_index];
-    manager->current_primitive_index = primitive_index;
-    manager->current_primitive_state = manager->current_primitive->create_state();
-    manager->current_primitive->start(params, manager->current_primitive_state, world);
+    manager->current_primitive_functions = PRIMITIVES[primitive_index];
+    manager->current_primitive_index     = primitive_index;
+    manager->current_primitive_state =
+        manager->current_primitive_functions->create_state();
+    manager->current_primitive_functions->start(params, manager->current_primitive_state,
+                                                world);
 
     app_primitive_manager_unlockPrimitiveMutex(manager);
 }
@@ -166,9 +168,10 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
 {
     app_primitive_manager_lockPrimitiveMutex(manager);
 
-    if (manager->current_primitive)
+    if (manager->current_primitive_functions)
     {
-        manager->current_primitive->tick(manager->current_primitive_state, world);
+        manager->current_primitive_functions->tick(manager->current_primitive_state,
+                                                   world);
     }
 
     app_primitive_manager_unlockPrimitiveMutex(manager);

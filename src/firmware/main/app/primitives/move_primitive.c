@@ -70,8 +70,6 @@ void plan_move_rotation(PhysBot* pb, float avel);
  */
 void build_wheel_axes(float (*wheel_axes)[8], float angle)
 {
-    // TODO: we should be accessing the wheel angles from the FirmwareRobot,
-    //       NOT through constants like this
     (*wheel_axes)[0] = angle + ANGLE_TO_FRONT_WHEELS - PI_2;
     (*wheel_axes)[1] = angle + ANGLE_TO_FRONT_WHEELS + PI_2;
     (*wheel_axes)[2] = angle - ANGLE_TO_FRONT_WHEELS - PI_2;
@@ -226,13 +224,13 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
     float max_major_a     = 3.5;
     float max_major_v     = state->slow ? 1.25 : 3.0;
     float major_params[3] = {state->end_speed, max_major_a, max_major_v};
-    app_physbots_planMove(&pb.maj, major_params);
+    app_physbot_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
     float max_minor_a     = 1.5;
     float max_minor_v     = 1.5;
     float minor_params[3] = {0, max_minor_a, max_minor_v};
-    app_physbots_planMove(&pb.min, minor_params);
+    app_physbot_planMove(&pb.min, minor_params);
 
     // plan rotation movement
     plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));

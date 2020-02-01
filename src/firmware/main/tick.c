@@ -120,7 +120,7 @@ static void normal_task(void *UNUSED(param))
         // Submit the log record, if we filled one.
         if (record)
         {
-            int current_primitive_index =
+            unsigned int current_primitive_index =
                 app_primitive_manager_getCurrentPrimitiveIndex(primitive_manager);
 
             // We can only send integer, so set to a really large value if less then zero,

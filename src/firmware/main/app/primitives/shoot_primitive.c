@@ -10,9 +10,6 @@
 #include "firmware/main/shared/physics.h"
 #include "firmware/main/shared/util.h"
 
-// these are set to decouple the 3 axis from each other
-// the idea is to clamp the maximum velocity and acceleration
-// so that the axes would never have to compete for resources
 #define TIME_HORIZON 0.05f  // s
 
 typedef struct ShootPrimitiveState
@@ -146,11 +143,11 @@ static void shoot_tick(void *void_state_ptr, FirmwareWorld_t *world)
     {
         // tuned constants from testing
         float major_par[3] = {1.0f, MAX_X_A * 0.5f, MAX_X_V};
-        app_physbots_planMove(&pb.maj, major_par);
+        app_physbot_planMove(&pb.maj, major_par);
     }
     // tuned constants from testing
     float minor_par[3] = {0, MAX_Y_A * 3, MAX_Y_V / 2};
-    app_physbots_planMove(&pb.min, minor_par);
+    app_physbot_planMove(&pb.min, minor_par);
     plan_shoot_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
     float accel[3] = {0, 0, pb.rot.accel};
     scale(&pb);
