@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The Defense Play tries to grab the ball from the enemy that has it, and all other
@@ -12,7 +13,7 @@ class DefensePlay : public Play
    public:
     static const std::string name;
 
-    DefensePlay() = default;
+    DefensePlay(std::shared_ptr<EnemyCapabilityConfig> enemy_capability_config);
 
     std::string getName() const override;
 
@@ -33,4 +34,5 @@ class DefensePlay : public Play
      */
     std::vector<std::shared_ptr<MoveTactic>> moveRobotsToSwarmEnemyWithBall(
         std::vector<std::shared_ptr<MoveTactic>> move_tactics);
+    std::shared_ptr<EnemyCapabilityConfig> enemy_capability_config;
 };

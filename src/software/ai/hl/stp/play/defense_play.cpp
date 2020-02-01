@@ -13,10 +13,12 @@
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/geom/util.h"
 #include "software/logger/init.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
 
 const std::string DefensePlay::name = "Defense Play";
+
+DefensePlay::DefensePlay(std::shared_ptr<EnemyCapabilityConfig> enemy_capability_config):
+enemy_capability_config(enemy_capability_config){}
 
 std::string DefensePlay::getName() const
 {
@@ -38,7 +40,7 @@ bool DefensePlay::invariantHolds(const World &world) const
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     bool enemy_team_can_pass =
-        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
+        enemy_capability_config->EnemyTeamCanPass()->value();
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
