@@ -4,15 +4,16 @@
 #include <optional>
 #include <queue>
 
-#include "software/backend/input/network/filter/ball_filter.h"
-#include "software/backend/input/network/filter/robot_filter.h"
-#include "software/backend/input/network/filter/robot_team_filter.h"
+#include "shared/constants.h"
+#include "software/parameter/dynamic_parameters.h"
+#include "software/proto/messages_robocup_ssl_detection.pb.h"
+#include "software/proto/messages_robocup_ssl_geometry.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
+#include "software/sensor_fusion/ball_detection.h"
 #include "software/sensor_fusion/refbox_data.h"
-#include "software/time/timestamp.h"
+#include "software/sensor_fusion/robot_detection.h"
 #include "software/world/ball.h"
-#include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
 
@@ -86,27 +87,6 @@ class SSLProtobufReader
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
     Field field_state;
-    BallState ball_state;
-    Team friendly_team_state;
-    Team enemy_team_state;
-
-    BallFilter ball_filter;
-    RobotTeamFilter friendly_team_filter;
-    RobotTeamFilter enemy_team_filter;
-
-    // backend *should* be the only part of the system that is aware of Refbox/Vision
-    // global coordinates. To AI, +x will always be enemy and -x will always be friendly.
-    FieldSide our_field_side;
-    // TODO: the rest of backend should be spitting out coordinates transformed as above
-    // https://github.com/UBC-Thunderbots/Software/issues/163
-
-    /**
-     * Sets which side of the field we are on (global +x or global -x), based on which
-     * colour we are and whether blue team is on the global +x or -x side.
-     *
-     * @param blue_team_on_positive_half Whether blue team is on the +x side of the field.
-     */
-    void setOurFieldSide(bool blue_team_on_positive_half);
 
     /**
      * Converts a protobuf Referee::Command into a RefboxGameState for the

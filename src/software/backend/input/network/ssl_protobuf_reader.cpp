@@ -1,26 +1,10 @@
 #include "software/backend/input/network/ssl_protobuf_reader.h"
 
-#include "shared/constants.h"
-#include "software/constants.h"
-#include "software/parameter/dynamic_parameters.h"
-#include "software/proto/messages_robocup_ssl_detection.pb.h"
-#include "software/proto/messages_robocup_ssl_geometry.pb.h"
-#include "software/sensor_fusion/refbox_data.h"
-
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
 SSLProtobufReader::SSLProtobufReader()
-    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
-      ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
-      friendly_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      enemy_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
-                  BallFilter::DEFAULT_MAX_BUFFER_SIZE),
-      friendly_team_filter(),
-      enemy_team_filter()
+    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0))
 {
 }
 
@@ -386,36 +370,4 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
 RefboxStage SSLProtobufReader::getRefboxStage(const Referee::Stage &stage)
 {
     return refbox_stage_map.at(stage);
-}
-
-void SSLProtobufReader::setOurFieldSide(bool blue_team_on_positive_half)
-{
-    if (blue_team_on_positive_half)
-    {
-        if (!Util::DynamicParameters->getAIControlConfig()
-                 ->getRefboxConfig()
-                 ->FriendlyColorYellow()
-                 ->value())
-        {
-            our_field_side = FieldSide::NEG_X;
-        }
-        else
-        {
-            our_field_side = FieldSide::POS_X;
-        }
-    }
-    else
-    {
-        if (!Util::DynamicParameters->getAIControlConfig()
-                 ->getRefboxConfig()
-                 ->FriendlyColorYellow()
-                 ->value())
-        {
-            our_field_side = FieldSide::POS_X;
-        }
-        else
-        {
-            our_field_side = FieldSide::NEG_X;
-        }
-    }
 }
