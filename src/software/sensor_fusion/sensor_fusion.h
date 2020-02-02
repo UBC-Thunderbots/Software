@@ -45,21 +45,48 @@ class SensorFusion : public Subject<World>,
      *
      * @param refbox_data new refbox data
      */
-    void updateWorld(RefboxData refbox_data);
+    void updateWorld(const RefboxData refbox_data);
 
     /**
      * Updates world based on a new robot status
      *
      * @param robot_status new robot status
      */
-    void updateWorld(RobotStatus robot_status);
+    void updateWorld(const RobotStatus robot_status);
 
     /**
      * Updates world based on a new vision detection
      *
      * @param vision_detection new vision detection
      */
-    void updateWorld(VisionDetection vision_detection);
+    void updateWorld(const VisionDetection vision_detection);
+
+    /**
+     * Get ball from a vision detection
+     *
+     * @param vision_detection
+     *
+     * @return ball if found in vision_detection
+     */
+    std::optional<Ball> getBallFromvisionDetecion(const VisionDetection vision_detection);
+
+    /**
+     * Get friendly team from a vision detection
+     *
+     * @param vision_detection
+     *
+     * @return friendly team from vision_detection
+     */
+    Team getFriendlyTeamFromvisionDetecion(const VisionDetection vision_detection);
+
+    /**
+     * Get enemy team from a vision detection
+     *
+     * @param vision_detection
+     *
+     * @return enemy team from vision_detection
+     */
+    Team getEnemyTeamFromvisionDetecion(const VisionDetection vision_detection);
 
     // Objects used to aggregate and store state. We use these to aggregate the state
     // so that we always publish "complete" data, not just data from a single frame/
