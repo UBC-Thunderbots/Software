@@ -1,7 +1,7 @@
-#include "software/new_geom/segment.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/ray.h"
 #include "software/geom/util.h"
+#include "software/new_geom/ray.h"
+#include "software/new_geom/rectangle.h"
+#include "software/new_geom/segment.h"
 
 /**
  * Computes the intersection of two segments.
@@ -12,8 +12,8 @@
  * @return  one of:
  *          - an empty vector if no intersections
  *          - a vector containing a single point of intersection
- *          - a vector containing two points representing the line segment of the overlap if both segments are collinear
- *          and overlapping
+ *          - a vector containing two points representing the line segment of the overlap
+ * if both segments are collinear and overlapping
  */
 std::vector<Point> intersection(const Segment &first, const Segment &second);
 
@@ -24,7 +24,8 @@ std::vector<Point> intersection(const Segment &first, const Segment &second);
  * @param rectangle
  * @param segment
  *
- * @return a vector containing the points of intersection between a rectangle and a segment
+ * @return a vector containing the points of intersection between a rectangle and a
+ * segment
  */
 std::vector<Point> intersection(const Rectangle &rectangle, const Segment &segment);
 
@@ -37,8 +38,8 @@ std::vector<Point> intersection(const Rectangle &rectangle, const Segment &segme
  * @return  one of:
  *          - an empty vector if no intersections
  *          - a vector containing a single point of intersection
- *          - a vector containing two points representing the line segment of the overlap if the ray and segment are
- *          collinear and overlapping
+ *          - a vector containing two points representing the line segment of the overlap
+ * if the ray and segment are collinear and overlapping
  */
 std::vector<Point> intersection(const Ray &ray, const Segment &segment);
 
@@ -53,7 +54,8 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment);
  *
  * @return the point of intersection, if it exists
  */
-std::optional<Point> intersection(const Point &a, const Point &b, const Point &c, const Point &d);
+std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
+                                  const Point &d);
 
 /**
  * Computes the points of intersection between a rectangle and a ray.
