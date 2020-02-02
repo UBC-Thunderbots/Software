@@ -35,6 +35,9 @@ cc_library(
     hdrs = glob(["*.h"]),
     copts = [
         "-DSTM32H743xx",
+        # We don't want to mark warnings as errors for 3rd party code
+        # TODO: this should not be in this lib, should not include our code
+        "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
@@ -84,6 +87,10 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/event_groups.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM7/r0p1/port.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/timers.c",
     ],
     hdrs = [
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h",
@@ -124,7 +131,25 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h",
+        "FreeRTOSConfig.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/list.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/task.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/timers.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h",
         "stm32h7xx_hal_conf.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
     ],
     defines = [
         "STM32H743xx",
@@ -137,8 +162,9 @@ cc_library(
         "Drivers/CMSIS/RTOS2/Include/",
         "Drivers/CMSIS/RTOS2/Template/",
         "Drivers/STM32H7xx_HAL_Driver/Inc",
+        # TODO: remove lwip stuff fom here?
         "Middlewares/Third_Party/FreeRTOS/Source/include",
-        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1",
         "Middlewares/Third_Party/LwIP/src/include",
         "Middlewares/Third_Party/LwIP/system",
         "Middlewares/Third_Party/LwIP/system/arch",
@@ -257,6 +283,9 @@ cc_library(
     ],
     hdrs = [
         "Drivers/BSP/Components/lan8742/lan8742.h",
+        "FreeRTOSConfig.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h",
         "Middlewares/Third_Party/LwIP/src/apps/httpd/fsdata.c",
         "Middlewares/Third_Party/LwIP/src/apps/httpd/fsdata.h",
         "Middlewares/Third_Party/LwIP/src/apps/httpd/httpd_structs.h",
@@ -405,6 +434,10 @@ cc_library(
         "main.h",
         "stm32h7xx_hal_conf.h",
     ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
     defines = [
         "STM32H743xx",
     ],
@@ -412,10 +445,14 @@ cc_library(
         "./",
         "Drivers/BSP/Components/lan8742",
         "Drivers/STM32H7xx_HAL_Driver/Inc",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/",
         "Middlewares/Third_Party/LwIP/src/include",
         "Middlewares/Third_Party/LwIP/system",
         "Middlewares/Third_Party/LwIP/system/arch",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = ["hal_library"],
+    alwayslink = True,
 )
+
+# TODO: seperate FreeRTOS library?
