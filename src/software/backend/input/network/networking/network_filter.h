@@ -14,14 +14,17 @@
 #include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
+#include "software/parameter/config.hpp"
 
 class NetworkFilter
 {
    public:
+    explicit NetworkFilter() = delete;
     /**
      * Creates a new NetworkFilter for data input and filtering
      */
-    explicit NetworkFilter();
+    explicit NetworkFilter(std::shared_ptr<RefboxConfig> config);
+
 
     /**
      * Filters the ball data contained in the list of DetectionFrames and returns the most
@@ -93,6 +96,8 @@ class NetworkFilter
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    std::shared_ptr<RefboxConfig> config;
 
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.

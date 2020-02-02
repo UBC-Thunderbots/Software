@@ -26,7 +26,7 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
 {
    public:
     STPRefboxGameStatePlaySelectionTestWithPositions()
-        : stp([]() { return std::make_unique<HaltPlay>(); }, 0)
+        : stp([]() { return std::make_unique<HaltPlay>(); }, config, 0)
     {
     }
 

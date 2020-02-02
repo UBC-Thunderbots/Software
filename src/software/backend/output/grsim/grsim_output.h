@@ -9,6 +9,7 @@
 #include "software/proto/grSim_Packet.pb.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
+#include "software/parameter/config.hpp"
 
 
 class GrSimOutput
@@ -20,7 +21,7 @@ class GrSimOutput
      * @param network_address The IP address to publish grSim commands to
      * @param port The port to publish commands to
      */
-    explicit GrSimOutput(std::string network_address, unsigned short port);
+    explicit GrSimOutput(std::string network_address, unsigned short port, std::shared_ptr<RefboxConfig> config);
 
     ~GrSimOutput();
 
@@ -99,6 +100,7 @@ class GrSimOutput
     // Variables for networking
     std::string network_address;
     unsigned short port;
+    std::shared_ptr<RefboxConfig> config;
     boost::asio::io_service io_service;
     boost::asio::ip::udp::socket socket;
     boost::asio::ip::udp::endpoint remote_endpoint;

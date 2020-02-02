@@ -7,6 +7,7 @@
 #include <exception>
 #include <g3log/g3log.hpp>
 #include <random>
+#include <utility>
 
 #include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
 #include "software/ai/hl/stp/play/play.h"
@@ -18,9 +19,11 @@
 #include "software/parameter/dynamic_parameters.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
+         std::shared_ptr<const AIControlConfig> config,
          long random_seed)
     : default_play_constructor(default_play_constructor),
-      random_number_generator(random_seed)
+      random_number_generator(random_seed),
+      config(config)
 {
 }
 
@@ -29,12 +32,12 @@ void STP::updateCurrentPlay(const World& world)
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
     override_play =
-        Util::DynamicParameters->getAIControlConfig()->OverrideAIPlay()->value();
+        config->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
     override_play_name =
-        Util::DynamicParameters->getAIControlConfig()->CurrentAIPlay()->value();
+        config->CurrentAIPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 

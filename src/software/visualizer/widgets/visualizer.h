@@ -40,7 +40,8 @@ class Visualizer : public QMainWindow
         std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
         std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
-        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer);
+        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
+        std::shared_ptr<ThunderbotsConfig> config);
 
    public slots:
     /**

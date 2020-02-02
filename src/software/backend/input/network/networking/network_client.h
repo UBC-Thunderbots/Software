@@ -37,7 +37,8 @@ class NetworkClient
                            int vision_multicast_port,
                            std::string gamecontroller_multicast_address,
                            int gamecontroller_multicast_port,
-                           std::function<void(World)> received_world_callback);
+                           std::function<void(World)> received_world_callback,
+                           std::shared_ptr<const RefboxConfig> config);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and
@@ -148,4 +149,6 @@ class NetworkClient
 
     // The callback function that we pass newly received/filtered worlds to
     std::function<void(World)> received_world_callback;
+
+    std::shared_ptr<RefboxConfig> config;
 };
