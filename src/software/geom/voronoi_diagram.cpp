@@ -4,6 +4,7 @@
 #include <g3log/loglevels.hpp>
 
 #include "software/geom/util.h"
+#include "software/new_geom/util/intersections.h"
 
 std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle bounding_box)
 {
@@ -43,7 +44,7 @@ std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle boundi
                     Point(Vector(endX, endY) * dist(bounding_box.furthestCorner(p2), p2));
 
                 std::vector<Point> edgeIntersects =
-                    lineRectIntersect(bounding_box, Point(start->x(), start->y()), end);
+                    intersection(bounding_box, Segment(Point(start->x(), start->y()), end));
 
                 intersects.insert(intersects.end(), edgeIntersects.begin(),
                                   edgeIntersects.end());
