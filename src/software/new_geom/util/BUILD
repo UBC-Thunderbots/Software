@@ -51,6 +51,8 @@ cc_library(
     ],
     deps = [
         "//software/geom",
+        "//software/new_geom:ray",
+        "//software/new_geom:rectangle",
         "//software/new_geom:segment",
     ],
 )
