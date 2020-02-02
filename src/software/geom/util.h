@@ -389,6 +389,11 @@ double offsetAlongLine(Point x0, Point x1, Point p);
 Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
 
 /**
+ * intersection of two segments?
+ */
+Point intersection(Point a1, Point a2, Point b1, Point b2);
+
+/**
  * Calculates the acute angle formed by the two given vectors
  *
  * @param v1

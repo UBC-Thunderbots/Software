@@ -1242,6 +1242,56 @@ TEST(GeomUtilTest, test_point_polygon_dist_point_far_from_polygon)
     EXPECT_DOUBLE_EQ(std::hypot(-5, -5), result);
 }
 
+TEST(GeomUtilTest, test_ray_rectangle_intersection_no_intersection)
+{
+    Ray ray(Point(5, 5), Vector(1, 1));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
+        std::make_pair(std::nullopt, std::nullopt);
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
+}
+
+TEST(GeomUtilTest,
+     test_ray_rectangle_intersection_ray_start_inside_rectangle_intersects_side)
+{
+    Ray ray(Point(0, 0), Vector(1, 0));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
+        std::make_pair(Point(1, 0), std::nullopt);
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
+}
+
+TEST(GeomUtilTest,
+     test_ray_rectangle_intersection_ray_start_inside_rectangle_intersects_corner)
+{
+    Ray ray(Point(0, 0), Vector(1, 1));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
+        std::make_pair(Point(1, 1), std::nullopt);
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
+}
+
+TEST(GeomUtilTest, test_ray_rectangle_intersection_ray_overlaps_rectangle_segment)
+{
+    Ray ray(Point(-2, -1), Vector(1, 0));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
+        std::make_pair(Point(-1, -1), Point(1, -1));
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
+}
+
 TEST(GeomUtilTest, test_find_closest_point_zero_points)
 {
     std::vector<Point> test_points = {};
@@ -1480,64 +1530,4 @@ TEST(GeomUtilTest, test_get_empty_space_between_segment_2_blocks_3_open)
     EXPECT_EQ(open_segs[0].length(), 2);
     EXPECT_EQ(open_segs[1].length(), 4);
     EXPECT_EQ(open_segs[2].length(), 2);
-}
-
-TEST(GeomUtilTest, lineIntersectionTest1)
-{
-    Ray ray         = Ray(Point(1, 1), Vector(0.3, -0.2));
-
-    Point rayEnd = ray.getStart() + ray.toUnitVector();
-    std::cout << "rayend x: " << rayEnd.x() << " ray end y: " << rayEnd.y() << std::endl;
-    Segment first = Segment(ray.getStart(), ray.getStart() + ray.toUnitVector());
-    Segment second = Segment(Point(-2, -2), Point(10, -2));
-
-    auto intersections = lineIntersection(ray.getStart(), rayEnd, second.getSegStart(), second.getEnd());
-
-    EXPECT_DOUBLE_EQ(intersections.value().x(), 5.5);
-    EXPECT_DOUBLE_EQ(intersections.value().y(), -2);
-}
-
-TEST(GeomUtilTest, lineIntersectionTest2)
-{
-    Ray ray         = Ray(Point(1, 1), Vector(0.3, -0.2));
-
-    Point rayEnd = ray.getStart() + ray.toUnitVector();
-    std::cout << "rayend x: " << rayEnd.x() << " ray end y: " << rayEnd.y() << std::endl;
-    Segment first = Segment(Point(-2, -2), Point(5, -2));
-    Segment second = Segment(Point(-2, -2), Point(10, -2));
-
-    auto intersections = lineIntersection(first.getSegStart(), first.getEnd(), second.getSegStart(), second.getEnd());
-
-    EXPECT_DOUBLE_EQ(intersections.value().x(), -2);
-    EXPECT_DOUBLE_EQ(intersections.value().y(), -2);
-}
-
-TEST(GeomUtilTest, lineIntersectionTest3)
-{
-    Ray ray         = Ray(Point(1, 1), Vector(0.3, -0.2));
-
-    Point rayEnd = ray.getStart() + ray.toUnitVector();
-    std::cout << "rayend x: " << rayEnd.x() << " ray end y: " << rayEnd.y() << std::endl;
-    Segment first = Segment(Point(3, -2), Point(5, -2));
-    Segment second = Segment(Point(-2, -2), Point(10, -2));
-
-    auto intersections = lineIntersection(first.getSegStart(), first.getEnd(), second.getSegStart(), second.getEnd());
-
-    EXPECT_DOUBLE_EQ(intersections.value().x(), 3);
-    EXPECT_DOUBLE_EQ(intersections.value().y(), -2);
-}
-
-TEST(GeomUtilTest, lineIntersectionTest4)
-{
-    Ray ray         = Ray(Point(1, 1), Vector(0.3, -0.2));
-
-    Point rayEnd = ray.getStart() + ray.toUnitVector();
-    std::cout << "rayend x: " << rayEnd.x() << " ray end y: " << rayEnd.y() << std::endl;
-    Segment first = Segment(Point(10, -2), Point(14, -2));
-    Segment second = Segment(Point(-2, -2), Point(10, -2));
-
-    auto intersections = lineIntersection(first.getSegStart(), first.getEnd(), second.getSegStart(), second.getEnd());
-
-    EXPECT_DOUBLE_EQ(intersections.value().x(), 10);
-    EXPECT_DOUBLE_EQ(intersections.value().y(), -2);
 }
