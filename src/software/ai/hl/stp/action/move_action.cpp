@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 
-MoveAction::MoveAction(double close_to_dest_threshold,
-                       Angle close_to_orientation_threshold, bool loop_forever)
+MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
+                       Angle close_to_orientation_threshold)
     : Action(),
       destination(0, 0),
       final_orientation(Angle::zero()),

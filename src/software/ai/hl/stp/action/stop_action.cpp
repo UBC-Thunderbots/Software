@@ -2,10 +2,11 @@
 
 #include "software/ai/intent/stop_intent.h"
 
-StopAction::StopAction(double stopped_speed_threshold, bool loop_forever)
+StopAction::StopAction(bool loop_forever, double stopped_speed_threshold)
     : Action(),
       stopped_speed_threshold(stopped_speed_threshold),
       loop_forever(loop_forever)
+
 {
 }
 
