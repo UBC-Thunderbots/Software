@@ -37,7 +37,8 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
 
     // If there exists a single intersection, and it exists on the ray and within the
     // segment
-    if (point_of_intersection.has_value() && contains(ray, point_of_intersection.value()) &&
+    if (point_of_intersection.has_value() &&
+        contains(ray, point_of_intersection.value()) &&
         contains(segment, point_of_intersection.value()))
     {
         intersections = {point_of_intersection.value()};
@@ -76,8 +77,8 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
 
 std::optional<Point> intersection(const Line &first, const Line &second)
 {
-    return intersection(Point(0, first.y(0)), Point(1, first.y(1)),
-            Point(0, second.y(0)), Point(1, second.y(1)));
+    return intersection(Point(0, first.y(0)), Point(1, first.y(1)), Point(0, second.y(0)),
+                        Point(1, second.y(1)));
 }
 
 // From:
