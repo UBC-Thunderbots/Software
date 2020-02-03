@@ -41,8 +41,8 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        ":hal_library",
-        ":lwip_library",
+        ":hal",
+        ":lwip",
         "//firmware_new/proto:fw_c_proto",
         "@nanopb",
     ],
@@ -58,7 +58,7 @@ stm32h7_hal_library_files_genrule("hal_library_files")
 # (if the project type is set to `MakeFile`) and others by simply attempting compilation,
 # seeing where stuff failed, and finding the correct header in the downloaded files
 cc_library(
-    name = "hal_library",
+    name = "hal",
     srcs = [
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c",
@@ -87,10 +87,6 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.c",
-        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c",
-        "Middlewares/Third_Party/FreeRTOS/Source/event_groups.c",
-        "Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM7/r0p1/port.c",
-        "Middlewares/Third_Party/FreeRTOS/Source/timers.c",
     ],
     hdrs = [
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h",
@@ -131,20 +127,6 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h",
-        "FreeRTOSConfig.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/list.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/task.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/include/timers.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h",
         "stm32h7xx_hal_conf.h",
     ],
     copts = [
@@ -163,17 +145,103 @@ cc_library(
         "Drivers/CMSIS/RTOS2/Template/",
         "Drivers/STM32H7xx_HAL_Driver/Inc",
         # TODO: remove lwip stuff fom here?
-        "Middlewares/Third_Party/FreeRTOS/Source/include",
-        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1",
         "Middlewares/Third_Party/LwIP/src/include",
         "Middlewares/Third_Party/LwIP/system",
         "Middlewares/Third_Party/LwIP/system/arch",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":rtos",
+    ],
 )
 
 cc_library(
-    name = "lwip_library",
+    name = "cmsis",
+    srcs = [
+    ],
+    hdrs = [
+        "Drivers/CMSIS/Include/cmsis_compiler.h",
+        "Drivers/CMSIS/Include/cmsis_gcc.h",
+        "Drivers/CMSIS/Include/cmsis_version.h",
+        "Drivers/CMSIS/Include/core_cm7.h",
+        "Drivers/CMSIS/Include/mpu_armv7.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
+    defines = [
+        "STM32H743xx",
+    ],
+    includes = [
+        "./",
+        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
+        "Drivers/CMSIS/Include/",
+        "Drivers/CMSIS/RTOS2/Include/",
+        "Drivers/CMSIS/RTOS2/Template/",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
+    name = "rtos",
+    srcs = [
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/event_groups.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/list.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/Common/mpu_wrappers.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/queue.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/tasks.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/timers.c",
+    ],
+    hdrs = [
+        "FreeRTOSConfig.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/list.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/mpu_prototypes.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/stack_macros.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/stream_buffer.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/task.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/timers.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h",
+        "stm32h7xx_hal_conf.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
+    defines = [
+        "STM32H743xx",
+    ],
+    includes = [
+        "./",
+        # TODO: remove unused stuff from here
+        "Drivers/BSP/Components/lan8742",
+        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
+        "Drivers/CMSIS/Include/",
+        "Drivers/CMSIS/RTOS2/Include/",
+        "Drivers/CMSIS/RTOS2/Template/",
+        "Drivers/STM32H7xx_HAL_Driver/Inc",
+        "Middlewares/Third_Party/FreeRTOS/Source/include",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [":cmsis"],
+)
+
+cc_library(
+    name = "lwip",
     srcs = [
         "Drivers/BSP/Components/lan8742/lan8742.c",
         "Middlewares/Third_Party/LwIP/src/api/api_lib.c",
@@ -278,7 +346,6 @@ cc_library(
         "Middlewares/Third_Party/LwIP/src/netif/ppp/upap.c",
         "Middlewares/Third_Party/LwIP/src/netif/ppp/utils.c",
         "Middlewares/Third_Party/LwIP/src/netif/ppp/vj.c",
-        "Middlewares/Third_Party/LwIP/src/netif/slipif.c",
         "Middlewares/Third_Party/LwIP/system/OS/sys_arch.c",
     ],
     hdrs = [
@@ -417,7 +484,6 @@ cc_library(
         "Middlewares/Third_Party/LwIP/src/include/netif/ppp/pppos.h",
         "Middlewares/Third_Party/LwIP/src/include/netif/ppp/upap.h",
         "Middlewares/Third_Party/LwIP/src/include/netif/ppp/vj.h",
-        "Middlewares/Third_Party/LwIP/src/include/netif/slipif.h",
         "Middlewares/Third_Party/LwIP/src/include/posix/errno.h",
         "Middlewares/Third_Party/LwIP/src/include/posix/netdb.h",
         "Middlewares/Third_Party/LwIP/src/include/posix/sys/socket.h",
@@ -451,7 +517,10 @@ cc_library(
         "Middlewares/Third_Party/LwIP/system/arch",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = ["hal_library"],
+    deps = [
+        "rtos",
+        ":hal",
+    ],
     alwayslink = True,
 )
 
