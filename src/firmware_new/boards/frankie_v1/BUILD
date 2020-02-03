@@ -35,9 +35,6 @@ cc_library(
     hdrs = glob(["*.h"]),
     copts = [
         "-DSTM32H743xx",
-        # We don't want to mark warnings as errors for 3rd party code
-        # TODO: this should not be in this lib, should not include our code
-        "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
@@ -138,16 +135,7 @@ cc_library(
     ],
     includes = [
         "./",
-        "Drivers/BSP/Components/lan8742",
-        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
-        "Drivers/CMSIS/Include/",
-        "Drivers/CMSIS/RTOS2/Include/",
-        "Drivers/CMSIS/RTOS2/Template/",
         "Drivers/STM32H7xx_HAL_Driver/Inc",
-        # TODO: remove lwip stuff fom here?
-        "Middlewares/Third_Party/LwIP/src/include",
-        "Middlewares/Third_Party/LwIP/system",
-        "Middlewares/Third_Party/LwIP/system/arch",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
@@ -226,13 +214,7 @@ cc_library(
     ],
     includes = [
         "./",
-        # TODO: remove unused stuff from here
-        "Drivers/BSP/Components/lan8742",
-        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
-        "Drivers/CMSIS/Include/",
-        "Drivers/CMSIS/RTOS2/Include/",
-        "Drivers/CMSIS/RTOS2/Template/",
-        "Drivers/STM32H7xx_HAL_Driver/Inc",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/",
         "Middlewares/Third_Party/FreeRTOS/Source/include",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1",
     ],
@@ -510,8 +492,6 @@ cc_library(
     includes = [
         "./",
         "Drivers/BSP/Components/lan8742",
-        "Drivers/STM32H7xx_HAL_Driver/Inc",
-        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/",
         "Middlewares/Third_Party/LwIP/src/include",
         "Middlewares/Third_Party/LwIP/system",
         "Middlewares/Third_Party/LwIP/system/arch",
@@ -523,5 +503,3 @@ cc_library(
     ],
     alwayslink = True,
 )
-
-# TODO: seperate FreeRTOS library?
