@@ -48,6 +48,20 @@ class Line final
      */
     void swapXY();
 
+    /**
+     * Returns the x value corresponding with the given y value
+     * @param y
+     * @return the x value that corresponds with the given y value
+     */
+    double x(double y) const;
+
+    /**
+     * Returns the y value corresponding with the given x value
+     * @param x
+     * @return the y value that corresponds with the given x value
+     */
+    double y(double x) const;
+
    private:
     // Coefficients for a line
     Coeffs coeffs;

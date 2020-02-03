@@ -59,3 +59,19 @@ TEST(LineTest, swapXY)
     EXPECT_DOUBLE_EQ(coeffs.b, expectedCoeffs.b);
     EXPECT_DOUBLE_EQ(coeffs.c, expectedCoeffs.c);
 }
+
+TEST(LineTest, getX)
+{
+    Line l(Point(-1.0, 2.0), Point(3.0, 4.0));  // -0.5x + y - 2.5 = 0
+    EXPECT_DOUBLE_EQ(l.x(2.0), -1.0);
+    EXPECT_DOUBLE_EQ(l.x(4.0), 3.0);
+    EXPECT_DOUBLE_EQ(l.x(10.5), 16);
+}
+
+TEST(LineTest, getY)
+{
+    Line l(Point(-5, -4.5), Point(0, 3));  // -1.5x + y - 3 = 0
+    EXPECT_DOUBLE_EQ(l.y(-5), -4.5);
+    EXPECT_DOUBLE_EQ(l.y(0), 3);
+    EXPECT_DOUBLE_EQ(l.y(4), 9);
+}

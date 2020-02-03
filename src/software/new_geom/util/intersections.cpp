@@ -4,9 +4,9 @@ std::vector<Point> intersection(const Segment &first, const Segment &second)
 {
     std::vector<Point> output;
 
-    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> CD(second.getSegStart(), second.getEnd());
-    boost::geometry::intersection(AB, CD, output);
+    boost::geometry::model::segment<Point> seg_1(first.getSegStart(), first.getEnd());
+    boost::geometry::model::segment<Point> seg_2(second.getSegStart(), second.getEnd());
+    boost::geometry::intersection(seg_1, seg_2, output);
 
     return output;
 }
@@ -15,9 +15,9 @@ std::vector<Point> intersection(const Rectangle &rectangle, const Segment &segme
 {
     std::vector<Point> intersections;
 
-    for (const Segment &recSegment : rectangle.getSegments())
+    for (const Segment &rec_segment : rectangle.getSegments())
     {
-        for (const Point &p : intersection(recSegment, segment))
+        for (const Point &p : intersection(rec_segment, segment))
         {
             intersections.push_back(p);
         }
@@ -32,19 +32,19 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
 
     Point second = ray.getStart() + ray.toUnitVector();
 
-    std::optional<Point> pointOfIntersection =
+    std::optional<Point> point_of_intersection =
         intersection(ray.getStart(), second, segment.getSegStart(), segment.getEnd());
 
     // If there exists a single intersection, and it exists on the ray and within the
     // segment
-    if (pointOfIntersection.has_value() && contains(ray, pointOfIntersection.value()) &&
-        contains(segment, pointOfIntersection.value()))
+    if (point_of_intersection.has_value() && contains(ray, point_of_intersection.value()) &&
+        contains(segment, point_of_intersection.value()))
     {
-        intersections = {pointOfIntersection.value()};
+        intersections = {point_of_intersection.value()};
         return intersections;
     }
     // If no intersection was found and the ray and segment are parallel, and collinear
-    else if (!pointOfIntersection.has_value() &&
+    else if (!point_of_intersection.has_value() &&
              collinear(ray.getStart(), segment.getSegStart(), segment.getEnd()))
     {
         // Check if ray passes through both segment start and end
@@ -58,12 +58,12 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
         // endpoint in the ray's direction
         else
         {
-            Point overlappingSegmentEnd =
+            Point overlapping_segment_end =
                 ray.toUnitVector() ==
                         (segment.getEnd() - segment.getSegStart()).normalize()
                     ? segment.getEnd()
                     : segment.getSegStart();
-            intersections = {ray.getStart(), overlappingSegmentEnd};
+            intersections = {ray.getStart(), overlapping_segment_end};
             return intersections;
         }
     }
@@ -72,6 +72,12 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     {
         return intersections;
     }
+}
+
+std::optional<Point> intersection(const Line &first, const Line &second)
+{
+    return intersection(Point(0, first.y(0)), Point(1, first.y(1)),
+            Point(0, second.y(0)), Point(1, second.y(1)));
 }
 
 // From:
@@ -105,7 +111,6 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     return std::make_optional(intersection);
 }
 
-
 std::vector<Point> intersection(const Rectangle &rectangle, const Ray &ray)
 {
     std::vector<Point> intersections;
@@ -124,27 +129,27 @@ std::vector<Point> intersection(const Rectangle &rectangle, const Ray &ray)
 std::optional<Point> intersection(const Ray &first, const Ray &second)
 {
     // Calculate if an intersection exists between line representations of the rays
-    std::optional<Point> pointOfIntersection =
+    std::optional<Point> point_of_intersection =
         intersection(first.getStart(), first.getStart() + first.toUnitVector(),
                      second.getStart(), second.getStart() + second.toUnitVector());
 
-    if (!pointOfIntersection.has_value())
+    if (!point_of_intersection.has_value())
     {
         return std::nullopt;
     }
 
     // Check if the intersection exits along the direction of both rays
     Vector intersection_first_direction =
-        (pointOfIntersection.value() - first.getStart());
+        (point_of_intersection.value() - first.getStart());
     Vector intersection_second_direction =
-        (pointOfIntersection.value() - second.getStart());
+        (point_of_intersection.value() - second.getStart());
 
     if (sign(intersection_first_direction.x()) == sign(first.toUnitVector().x()) &&
         sign(intersection_first_direction.y()) == sign(first.toUnitVector().y()) &&
         sign(intersection_second_direction.x()) == sign(second.toUnitVector().x()) &&
         sign(intersection_second_direction.y()) == sign(second.toUnitVector().y()))
     {
-        return pointOfIntersection.value();
+        return point_of_intersection.value();
     }
     else
     {

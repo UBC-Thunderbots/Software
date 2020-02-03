@@ -45,6 +45,18 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment);
 
 /**
  * Computes the point of intersection between two lines.
+ *
+ * @pre the lines are not parallel
+ *
+ * @param first
+ * @param second
+ *
+ * @return the point of intersection between the two lines, if it exists
+ */
+std::optional<Point> intersection(const Line &first, const Line &second);
+
+/**
+ * Computes the point of intersection between two lines.
  * Note: this computes the intersection of two lines, not line segments.
  *
  * @pre the lines are not parallel

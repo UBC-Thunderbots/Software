@@ -29,6 +29,22 @@ TEST(SegmentSegmentIntersectionsTest, test_segments_overlapping)
     EXPECT_EQ(intersections[1], Point(4, 3));
 }
 
+TEST(RectangleSegmentIntersectionsTest, test_no_intersections_segment_inside)
+{
+    Rectangle r                      = Rectangle(Point(), Point(5, 5));
+    Segment s                        = Segment(Point(1, 1), Point(3, 4));
+    std::vector<Point> intersections = intersection(r, s);
+    EXPECT_TRUE(intersections.empty());
+}
+
+TEST(RectangleSegmentIntersectionsTest, test_no_intersections_segment_outside)
+{
+    Rectangle r                      = Rectangle(Point(), Point(5, 5));
+    Segment s                        = Segment(Point(-2, 2.5), Point(-4, 4));
+    std::vector<Point> intersections = intersection(r, s);
+    EXPECT_TRUE(intersections.empty());
+}
+
 TEST(RectangleSegmentIntersectionsTest, test_one_intersection)
 {
     Rectangle r                      = Rectangle(Point(), Point(5, 5));
@@ -136,31 +152,49 @@ TEST(RaySegmentIntersectionsTest, test_ray_passes_through_seg_start_and_end)
     EXPECT_EQ(intersections[1], segment.getEnd());
 }
 
+TEST(LineLineIntersectionTest, test_intersection)
+{
+    Line l_1 = Line(Point(0, -3), Point(3, 6));
+    Line l_2 = Line(Point(0, 4), Point(1, 8));
+
+    auto point_of_intersection = intersection(l_1, l_2);
+    EXPECT_EQ(point_of_intersection.value(), Point(-7, -24));
+}
+
+TEST(LineLineIntersectionTest, test_no_intersection)
+{
+    Line l_1 = Line(Point(0, -3), Point(3, 6));
+    Line l_2 = Line(Point(2, -3), Point(5, 6));
+
+    auto point_of_intersection = intersection(l_1, l_2);
+    EXPECT_FALSE(point_of_intersection.has_value());
+}
+
 TEST(LineIntersectionTest, test_vert_horizontal_lines_cross)
 {
-    auto pointOfIntersection = intersection(Point(), Point(5, 0), Point(), Point(0, 5));
-    EXPECT_EQ(pointOfIntersection.value(), Point());
+    auto point_of_intersection = intersection(Point(), Point(5, 0), Point(), Point(0, 5));
+    EXPECT_EQ(point_of_intersection.value(), Point());
 }
 
 TEST(LineIntersectionTest, test_parallel_lines_no_intersection)
 {
-    auto pointOfIntersection =
+    auto point_of_intersection =
         intersection(Point(), Point(5, 0), Point(0, 2), Point(10, 2));
-    EXPECT_FALSE(pointOfIntersection.has_value());
+    EXPECT_FALSE(point_of_intersection.has_value());
 }
 
 TEST(LineIntersectionTest, test_intersection)
 {
-    auto pointOfIntersection =
+    auto point_of_intersection =
         intersection(Point(-1, -1), Point(5, -1), Point(0, 2), Point(10, 8));
-    EXPECT_EQ(pointOfIntersection.value(), Point(-5, -1));
+    EXPECT_EQ(point_of_intersection.value(), Point(-5, -1));
 }
 
 TEST(LineIntersectionTest, test_no_intersection_overlapping_lines)
 {
-    auto pointOfIntersection =
+    auto point_of_intersection =
         intersection(Point(), Point(10, 15), Point(10, 15), Point(20, 30));
-    EXPECT_FALSE(pointOfIntersection.has_value());
+    EXPECT_FALSE(point_of_intersection.has_value());
 }
 
 TEST(RayRectangleIntersectionsTest, test_ray_rectangle_intersection_no_intersection)
@@ -214,9 +248,9 @@ TEST(RayRayIntersectionTest, test_rays_intersect)
     // Ray up and to the right that points right
     Ray ray2 = Ray(Point(-1, 1), Vector(1, 0));
 
-    std::optional<Point> pointOfIntersection = intersection(ray1, ray2);
+    std::optional<Point> point_of_intersection = intersection(ray1, ray2);
 
-    EXPECT_EQ(pointOfIntersection.value(), Point(0, 1));
+    EXPECT_EQ(point_of_intersection.value(), Point(0, 1));
 }
 
 TEST(RayRayIntersectionTest, test_rays_reverse_direction_intersects_no_intersection)
@@ -227,9 +261,9 @@ TEST(RayRayIntersectionTest, test_rays_reverse_direction_intersects_no_intersect
     // Ray positioned NW of ray1 pointing left
     Ray ray2 = Ray(Point(-1, 1), Vector(-1, 0));
 
-    std::optional<Point> pointOfIntersection = intersection(ray1, ray2);
+    std::optional<Point> point_of_intersection = intersection(ray1, ray2);
 
-    EXPECT_EQ(pointOfIntersection, std::nullopt);
+    EXPECT_EQ(point_of_intersection, std::nullopt);
 }
 
 TEST(RayRayIntersectionTest, test_rays_overlapping_no_intersection)
@@ -238,7 +272,7 @@ TEST(RayRayIntersectionTest, test_rays_overlapping_no_intersection)
     Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
     Ray ray2 = Ray(Point(0, 1), Vector(0, 1));
 
-    std::optional<Point> pointOfIntersection = intersection(ray1, ray2);
+    std::optional<Point> point_of_intersection = intersection(ray1, ray2);
 
-    EXPECT_EQ(pointOfIntersection, std::nullopt);
+    EXPECT_EQ(point_of_intersection, std::nullopt);
 }
