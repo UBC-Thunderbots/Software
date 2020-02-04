@@ -83,9 +83,8 @@ class SSLProtobufReader
     std::optional<Field> createFieldFromPacketGeometry(
         const SSL_GeometryFieldSize &packet_geometry) const;
 
-    // Objects used to aggregate and store state. We use these to aggregate the state
-    // so that we always publish "complete" data, not just data from a single frame/
-    // part of the field
+    // field_state used to handle the case where an optional field of
+    // the geometry packet that we rely does not exists
     Field field_state;
 
     /**

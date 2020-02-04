@@ -10,21 +10,18 @@ SSLProtobufReader::SSLProtobufReader()
 
 Field SSLProtobufReader::getFieldData(const SSL_GeometryData &geometry_packet)
 {
-    if (geometry_packet.has_field())
-    {
-        SSL_GeometryFieldSize field_data = geometry_packet.field();
-        std::optional<Field> field_opt   = createFieldFromPacketGeometry(field_data);
+    SSL_GeometryFieldSize field_data = geometry_packet.field();
+    std::optional<Field> field_opt   = createFieldFromPacketGeometry(field_data);
 
-        if (field_opt)
-        {
-            field_state = *field_opt;
-        }
-        else
-        {
-            LOG(WARNING)
-                << "Invalid field packet has been detected, which means field_state may be unreliable "
-                << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
-        }
+    if (field_opt)
+    {
+        field_state = *field_opt;
+    }
+    else
+    {
+        LOG(WARNING)
+            << "Invalid field packet has been detected, which means field_state may be unreliable "
+            << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
     }
 
     return field_state;
