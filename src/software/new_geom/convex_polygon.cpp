@@ -39,7 +39,7 @@ bool ConvexPolygon::isConvex()
         totalAngle += (M_PI - vertexAngle);
     }
 
-    return std::fabs(totalAngle - (2.0 * M_PI)) < (2 * GeomConstants::EPSILON);
+    return std::fabs(totalAngle - (2.0 * M_PI)) < 1e-14;
 }
 
 double ConvexPolygon::area() const
