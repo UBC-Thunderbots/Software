@@ -1,10 +1,11 @@
-#include "software/new_geom/util/intersections.h"
+#include "software/new_geom/util/intersection.h"
 
 /**
  * Computes the point of intersection between two lines.
  * Note: this computes the intersection of two lines, not line segments.
  *
- * See: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+ * See:
+ * https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
  *
  * @pre the lines are not parallel
  *

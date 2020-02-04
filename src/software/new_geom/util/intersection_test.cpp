@@ -1,4 +1,4 @@
-#include "software/new_geom/util/intersections.h"
+#include "software/new_geom/util/intersection.h"
 
 #include <gtest/gtest.h>
 
@@ -161,6 +161,14 @@ TEST(LineLineIntersectionTest, test_intersection)
     EXPECT_EQ(point_of_intersection.value(), Point(-7, -24));
 }
 
+TEST(LineLineIntersectionTest, test_other_intersection)
+{
+    Line l_1 = Line(Point(-1, -1), Point(5, -1));
+    Line l_2 = Line(Point(0, 2), Point(10, 8));
+    auto point_of_intersection = intersection(l_1, l_2);
+    EXPECT_EQ(point_of_intersection.value(), Point(-5, -1));
+}
+
 TEST(LineLineIntersectionTest, test_no_intersection)
 {
     Line l_1 = Line(Point(0, -3), Point(3, 6));
@@ -170,30 +178,27 @@ TEST(LineLineIntersectionTest, test_no_intersection)
     EXPECT_FALSE(point_of_intersection.has_value());
 }
 
-TEST(LineIntersectionTest, test_vert_horizontal_lines_cross)
+TEST(LineLineIntersectionTest, test_vert_horizontal_lines_cross)
 {
-    auto point_of_intersection = intersection(Point(), Point(5, 0), Point(), Point(0, 5));
+    Line l_1 = Line(Point(), Point(5, 0));
+    Line l_2 = Line(Point(), Point(0, 5));
+    auto point_of_intersection = intersection(l_1, l_2);
     EXPECT_EQ(point_of_intersection.value(), Point());
 }
 
-TEST(LineIntersectionTest, test_parallel_lines_no_intersection)
+TEST(LineLineIntersectionTest, test_parallel_lines_no_intersection)
 {
-    auto point_of_intersection =
-        intersection(Point(), Point(5, 0), Point(0, 2), Point(10, 2));
+    Line l_1 = Line(Point(), Point(5, 0));
+    Line l_2 = Line(Point(0, 2), Point(10, 2));
+    auto point_of_intersection = intersection(l_1, l_2);
     EXPECT_FALSE(point_of_intersection.has_value());
 }
 
-TEST(LineIntersectionTest, test_intersection)
+TEST(LineLineIntersectionTest, test_no_intersection_overlapping_lines)
 {
-    auto point_of_intersection =
-        intersection(Point(-1, -1), Point(5, -1), Point(0, 2), Point(10, 8));
-    EXPECT_EQ(point_of_intersection.value(), Point(-5, -1));
-}
-
-TEST(LineIntersectionTest, test_no_intersection_overlapping_lines)
-{
-    auto point_of_intersection =
-        intersection(Point(), Point(10, 15), Point(10, 15), Point(20, 30));
+    Line l_1 = Line(Point(), Point(10, 15));
+    Line l_2 = Line(Point(10, 15), Point(20, 30));
+    auto point_of_intersection = intersection(l_1, l_2);
     EXPECT_FALSE(point_of_intersection.has_value());
 }
 

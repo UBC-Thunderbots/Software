@@ -42,12 +42,12 @@ cc_library(
 )
 
 cc_library(
-    name = "intersections",
+    name = "intersection",
     srcs = [
-        "intersections.cpp",
+        "intersection.cpp",
     ],
     hdrs = [
-        "intersections.h",
+        "intersection.h",
     ],
     deps = [
         "//software/geom",
@@ -60,10 +60,10 @@ cc_library(
 cc_test(
     name = "intersections_test",
     srcs = [
-        "intersections_test.cpp",
+        "intersection_test.cpp",
     ],
     deps = [
-        ":intersections",
+        ":intersection",
         "@gtest//:gtest_main",
     ],
 )
