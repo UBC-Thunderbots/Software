@@ -2,7 +2,7 @@
 
 # Table of Contents
 * [General Principles](#general-principles)
-* [App/IO Split](#app/io-split) 
+* [App/IO Split](#appio-split) 
 * [Design Patterns](#design-patterns)
   * [Pseudo-Class](#pseudo-class)
 
@@ -14,7 +14,7 @@
 # Design Patterns
 
 ## Pseudo-Class
-In order to hide implementations away and enable things like the [App/IO Split](#app/io-split), we require something _similar_ to a class in C++. How we do this is most easily explained with an example:
+In order to hide implementations away and enable things like the [App/IO Split](#appio-split), we require something _similar_ to a class in C++. How we do this is most easily explained with an example:
 
 Let's say I have a dog that has a few functions. I would declare the header like so:
 
@@ -108,7 +108,12 @@ Dog_t* my_dog = dog_create(BROWN, &simulated_dog_attempt_speed);
 assert(dog_getColor(my_dog) == BROWN);
 
 float achieved_speed = dog_attemptToRunAtSpeed(my_dog, 9001);
+
+dog_destroy(my_dog);
 ```
 
 # App/IO Split
-The firmware is divided into `app` and `io` layers. The `app` layer contains anything that is portable between all our robots and our simulator. The `io` layer contains everything below this. The interface between these layers is the `FirmwareWorld` class, which represents an abstraction of the world from the perspective of the robot. **This is the only interface that the app layer should ever be able to use to access the outside world**.
+The firmware is divided into `app` and `io` layers. 
+* The `app` layer contains anything that is portable between all our robots and our simulator. 
+* The `io` layer contains everything below this. 
+* The interface between these layers is the `FirmwareWorld` class, which represents an abstraction of the world from the perspective of the robot. **This is the only interface that the `app` layer should ever be able to use to access the outside world**.

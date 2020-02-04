@@ -19,8 +19,8 @@ Our C++ coding style is based off of [Google's C++ Style Guide](https://google.g
 If you want to know more about our coding style you can take a look at our [clang-format configuration file](https://github.com/UBC-Thunderbots/Software/blob/master/.clang-format).
 
 
-## C-Specific Stuff
-The vast majority of the things noted in this document will apply to `C` code as well, but there are some special cases / exceptions for `C` code. Please also see the Firmware architecture and design document for much of the context needed for these.
+### C-Specific Stuff
+The vast majority of the things noted in this document will apply to `C` code as well, but there are some special cases / exceptions for `C` code. Please also see the [Firmware architecture and design document](docs/firmware-architecture-and-design.md) for much of the context needed for these.
 * If something is in a header, then it is *always* considered public.
 * Public names should always follow the format `PREFIX_FILENAME_NAME`, where:
     * `PREFIX` is one of `app`, `io`, `shared`, depending on the high level folder this is under
@@ -57,10 +57,6 @@ The vast majority of the things noted in this document will apply to `C` code as
   // Correct
   typedef struct MyDog MyDog_t;
   ```
-
-### Pseudo-Classes
-For a full explanation of what these are, please see the Firmware architecture and design document.
-* 
 
 ### Names and Variables
 
