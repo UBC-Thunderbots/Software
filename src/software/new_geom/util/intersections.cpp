@@ -1,5 +1,47 @@
 #include "software/new_geom/util/intersections.h"
 
+/**
+ * Computes the point of intersection between two lines.
+ * Note: this computes the intersection of two lines, not line segments.
+ *
+ * See: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+ *
+ * @pre the lines are not parallel
+ *
+ * @params a, b points that represent the first line
+ * @params c, d points that represent the second line
+ *
+ * @return the point of intersection, if it exists
+ */
+std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
+                                  const Point &d)
+{
+    double x1 = a.x();
+    double y1 = a.y();
+    double x2 = b.x();
+    double y2 = b.y();
+    double x3 = c.x();
+    double y3 = c.y();
+    double x4 = d.x();
+    double y4 = d.y();
+
+    double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (denominator == 0)
+    {
+        return std::nullopt;
+    }
+
+    double determinantA = x1 * y2 - y1 * x2;
+    double determinantB = x3 * y4 - y3 * x4;
+
+    Point intersection;
+
+    intersection.set((determinantA * (x3 - x4) - (x1 - x2) * determinantB) / denominator,
+                     (determinantA * (y3 - y4) - (y1 - y2) * determinantB) / denominator);
+
+    return std::make_optional(intersection);
+}
+
 std::vector<Point> intersection(const Segment &first, const Segment &second)
 {
     std::vector<Point> output;
@@ -79,37 +121,6 @@ std::optional<Point> intersection(const Line &first, const Line &second)
 {
     return intersection(Point(0, first.y(0)), Point(1, first.y(1)), Point(0, second.y(0)),
                         Point(1, second.y(1)));
-}
-
-// From:
-// https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
-std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
-                                  const Point &d)
-{
-    double x1 = a.x();
-    double y1 = a.y();
-    double x2 = b.x();
-    double y2 = b.y();
-    double x3 = c.x();
-    double y3 = c.y();
-    double x4 = d.x();
-    double y4 = d.y();
-
-    double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (denominator == 0)
-    {
-        return std::nullopt;
-    }
-
-    double determinantA = x1 * y2 - y1 * x2;
-    double determinantB = x3 * y4 - y3 * x4;
-
-    Point intersection;
-
-    intersection.set((determinantA * (x3 - x4) - (x1 - x2) * determinantB) / denominator,
-                     (determinantA * (y3 - y4) - (y1 - y2) * determinantB) / denominator);
-
-    return std::make_optional(intersection);
 }
 
 std::vector<Point> intersection(const Rectangle &rectangle, const Ray &ray)
