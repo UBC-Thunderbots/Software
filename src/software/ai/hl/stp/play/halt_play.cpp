@@ -23,12 +23,12 @@ bool HaltPlay::invariantHolds(const World &world) const
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     // Create Stop Tactics that will loop forever
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_3 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_4 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_5 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_6 = std::make_shared<StopTactic>(false, true);
+    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_3 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_4 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_5 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_6 = std::make_shared<StopTactic>(false);
 
     do
     {

@@ -16,7 +16,7 @@ class ChipTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit ChipTactic(const Ball& ball, bool loop_forever = false);
+    explicit ChipTactic(const Ball& ball, bool loop_forever);
 
     std::string getName() const override;
 

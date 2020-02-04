@@ -100,7 +100,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.field().enemyCornerNeg() - neg_y_goalline_x_offset);
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass

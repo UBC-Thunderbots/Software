@@ -1,4 +1,4 @@
-#include "app/world/chicker.h"
+#include "firmware/main/app/world/chicker.h"
 
 #include <stdlib.h>
 

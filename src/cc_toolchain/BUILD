@@ -23,6 +23,21 @@ environment_group(
     ],
 )
 
+config_setting(
+    name = "cpu_k8",
+    values = {"cpu": "k8"},
+)
+
+config_setting(
+    name = "cpu_stm32f4",
+    values = {"cpu": "stm32f4"},
+)
+
+config_setting(
+    name = "cpu_stm32h7",
+    values = {"cpu": "stm32h7"},
+)
+
 # This represents a mapping of CPU -> Compiler To Use
 # The CPU can be chosen by using `--cpu` as a bazel flag (ex. `--cpu=stm32h7`)
 # otherwise it will default to using whatever CPU is in the system doing the compiling

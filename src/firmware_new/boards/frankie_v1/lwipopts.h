@@ -40,8 +40,8 @@ extern "C"
 
 /* STM32CubeMX Specific Parameters (not defined in opt.h) ---------------------*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
-/*----- WITH_RTOS disabled (Since FREERTOS is not set) -----*/
-#define WITH_RTOS 0
+/*----- WITH_RTOS enabled (Since FREERTOS is set) -----*/
+#define WITH_RTOS 1
 /*----- CHECKSUM_BY_HARDWARE enabled -----*/
 #define CHECKSUM_BY_HARDWARE 1
 /*-----------------------------------------------------------------------------*/
@@ -50,16 +50,10 @@ extern "C"
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
 /*----- Value in opt.h for LWIP_DHCP: 0 -----*/
 #define LWIP_DHCP 1
-/*----- Value in opt.h for NO_SYS: 0 -----*/
-#define NO_SYS 1
-/*----- Value in opt.h for SYS_LIGHTWEIGHT_PROT: 1 -----*/
-#define SYS_LIGHTWEIGHT_PROT 0
+/*----- Default Value for LWIP_IGMP: 0 ---*/
+#define LWIP_IGMP 1
 /*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
 #define MEM_ALIGNMENT 4
-/*----- Value in opt.h for MEMP_NUM_SYS_TIMEOUT: (LWIP_TCP + IP_REASSEMBLY + LWIP_ARP +
- * (2*LWIP_DHCP) + LWIP_AUTOIP + LWIP_IGMP + LWIP_DNS + (PPP_SUPPORT*6*MEMP_NUM_PPP_PCB) +
- * (LWIP_IPV6 ? (1 + LWIP_IPV6_REASS + LWIP_IPV6_MLD) : 0)) -*/
-#define MEMP_NUM_SYS_TIMEOUT 5
 /*----- Value supported for H7 devices: 1 -----*/
 #define LWIP_SUPPORT_CUSTOM_PBUF 1
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
@@ -78,10 +72,26 @@ extern "C"
 /*----- Value in opt.h for TCP_WND_UPDATE_THRESHOLD: LWIP_MIN(TCP_WND/4, TCP_MSS*4)
  * -----*/
 #define TCP_WND_UPDATE_THRESHOLD 536
-/*----- Value in opt.h for LWIP_NETCONN: 1 -----*/
-#define LWIP_NETCONN 0
-/*----- Value in opt.h for LWIP_SOCKET: 1 -----*/
-#define LWIP_SOCKET 0
+/*----- Value in opt.h for TCPIP_THREAD_STACKSIZE: 0 -----*/
+#define TCPIP_THREAD_STACKSIZE 1024
+/*----- Value in opt.h for TCPIP_THREAD_PRIO: 1 -----*/
+#define TCPIP_THREAD_PRIO 3
+/*----- Value in opt.h for TCPIP_MBOX_SIZE: 0 -----*/
+#define TCPIP_MBOX_SIZE 6
+/*----- Value in opt.h for SLIPIF_THREAD_STACKSIZE: 0 -----*/
+#define SLIPIF_THREAD_STACKSIZE 1024
+/*----- Value in opt.h for SLIPIF_THREAD_PRIO: 1 -----*/
+#define SLIPIF_THREAD_PRIO 3
+/*----- Value in opt.h for DEFAULT_THREAD_STACKSIZE: 0 -----*/
+#define DEFAULT_THREAD_STACKSIZE 1024
+/*----- Value in opt.h for DEFAULT_THREAD_PRIO: 1 -----*/
+#define DEFAULT_THREAD_PRIO 3
+/*----- Value in opt.h for DEFAULT_UDP_RECVMBOX_SIZE: 0 -----*/
+#define DEFAULT_UDP_RECVMBOX_SIZE 6
+/*----- Value in opt.h for DEFAULT_TCP_RECVMBOX_SIZE: 0 -----*/
+#define DEFAULT_TCP_RECVMBOX_SIZE 6
+/*----- Value in opt.h for DEFAULT_ACCEPTMBOX_SIZE: 0 -----*/
+#define DEFAULT_ACCEPTMBOX_SIZE 6
 /*----- Value in opt.h for RECV_BUFSIZE_DEFAULT: INT_MAX -----*/
 #define RECV_BUFSIZE_DEFAULT 2000000000
 /*----- Value in opt.h for LWIP_STATS: 1 -----*/

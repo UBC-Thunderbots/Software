@@ -37,6 +37,7 @@
 
 #include "app/world/firmware_world.h"
 #include "control/control.h"
+#include "firmware/main/app/primitives/primitive.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
 #include "io/charger.h"
@@ -48,6 +49,7 @@
 #include "io/feedback.h"
 #include "io/icb.h"
 #include "io/leds.h"
+#include "io/lps.h"
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "io/pins.h"
@@ -55,7 +57,6 @@
 #include "io/sdcard.h"
 #include "io/usb_config.h"
 #include "io/wheels.h"
-#include "primitives/primitive.h"
 #include "priority.h"
 #include "tick.h"
 #include "upgrade/dfu.h"
@@ -417,7 +418,6 @@ static void run_normal(void)
     wheels_init();
     encoder_init();
     dr_init();
-    primitive_init();
     lps_init();
 
     // Bring up the data logger.
@@ -464,16 +464,20 @@ static void run_normal(void)
         .wheel_radius                        = WHEEL_RADIUS,
         .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
         .motor_back_emf_per_rpm              = RPM_TO_VOLT,
-        .motor_phase_resistance              = PHASE_RESISTANCE,
+        .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
         .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
     Wheel_t* front_right_wheel = app_wheel_create(
-        apply_wheel_force_front_right, wheels_get_front_right_rpm, wheel_constants);
+        apply_wheel_force_front_right, wheels_get_front_right_rpm,
+        wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
     Wheel_t* front_left_wheel = app_wheel_create(
-        apply_wheel_force_front_left, wheels_get_front_left_rpm, wheel_constants);
+        apply_wheel_force_front_left, wheels_get_front_left_rpm, wheels_brake_front_left,
+        wheels_coast_front_left, wheel_constants);
     Wheel_t* back_right_wheel = app_wheel_create(
-        apply_wheel_force_back_right, wheels_get_back_right_rpm, wheel_constants);
-    Wheel_t* back_left_wheel = app_wheel_create(
-        apply_wheel_force_back_left, wheels_get_back_left_rpm, wheel_constants);
+        apply_wheel_force_back_right, wheels_get_back_right_rpm, wheels_brake_back_right,
+        wheels_coast_back_right, wheel_constants);
+    Wheel_t* back_left_wheel =
+        app_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
+                         wheels_brake_back_left, wheels_coast_back_left, wheel_constants);
     Chicker_t* chicker = app_chicker_create(
         chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
         chicker_auto_disarm, chicker_auto_disarm);
@@ -500,13 +504,15 @@ static void run_normal(void)
                                  dr_get_ball_velocity_x, dr_get_ball_velocity_y);
     FirmwareWorld_t* world = app_firmware_world_create(robot, ball);
 
+    PrimitiveManager_t* primitive_manager = app_primitive_manager_create();
+
     // Receive must be the second-last module initialized, because received
     // packets can cause calls to other modules.
-    receive_init(switches[0U], world);
+    receive_init(switches[0U], primitive_manager, world);
 
     // Ticks must be the last module initialized, because ticks propagate into
     // other modules.
-    tick_init(world);
+    tick_init(primitive_manager, world);
 
     // Done!
     fputs("System online.\r\n", stdout);
@@ -577,6 +583,7 @@ static void run_normal(void)
     charger_shutdown();
     motor_shutdown();
 
+    app_primitive_manager_destroy(primitive_manager);
     app_firmware_world_destroy(world);
     app_firmware_ball_destroy(ball);
     app_firmware_robot_destroy(robot);
@@ -800,6 +807,7 @@ static void main_task(void* UNUSED(param))
         case MAIN_SHUT_MODE_DFU:
             upgrade_dfu_run();
             // Fall through to reboot after DFU is done.
+            __attribute__((fallthrough));
         case MAIN_SHUT_MODE_REBOOT:
             asm volatile("cpsid i");
             asm volatile("dsb");

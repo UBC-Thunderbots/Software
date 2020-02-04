@@ -42,7 +42,6 @@
     ((THERMAL_WARNING_STOP_TEMPERATURE - THERMAL_AMBIENT) *                              \
      THERMAL_CAPACITANCE)  // joules
 
-#define PHASE_RESISTANCE 1.2f   // ohms—EC45 datasheet
 #define SWITCH_RESISTANCE 0.6f  // ohms—L6234 datasheet
 
 /**
@@ -165,7 +164,6 @@ void wheels_tick(log_record_t *log)
     // Fill the log record.
     if (log)
     {
-#warning this should probably be somewhere else
         for (unsigned int i = 0U; i != WHEELS_NUM_WHEELS; ++i)
         {
             log->tick.wheels_encoder_counts[i] = encoder_speed(i);
@@ -214,9 +212,9 @@ void wheels_tick(log_record_t *log)
                 float applied_delta_voltage =
                     wheels[i].power / 255.0f * adc_battery() -
                     encoder_speed(i) * WHEELS_VOLTS_PER_ENCODER_COUNT;
-                float current =
-                    applied_delta_voltage / (PHASE_RESISTANCE + SWITCH_RESISTANCE);
-                float power  = current * current * PHASE_RESISTANCE;
+                float current = applied_delta_voltage /
+                                (WHEEL_MOTOR_PHASE_RESISTANCE + SWITCH_RESISTANCE);
+                float power  = current * current * WHEEL_MOTOR_PHASE_RESISTANCE;
                 added_energy = power / CONTROL_LOOP_HZ;
                 break;
 
@@ -257,6 +255,9 @@ void wheels_tick(log_record_t *log)
 #endif  // FWSIM
 }
 
+// TODO: should really have a function to get the index for each wheel, and should use
+//       that instead of just manually putting them into each function below
+
 /**
  * Gets the RPM of the wheel with the given index
  * @param wheel_index The index of the wheel to get the RPM for
@@ -285,4 +286,44 @@ float wheels_get_back_left_rpm()
 float wheels_get_back_right_rpm()
 {
     return wheels_get_wheel_rpm(2);
+}
+
+void wheels_coast_front_left()
+{
+    wheels_coast(0);
+}
+
+void wheels_coast_front_right()
+{
+    wheels_coast(3);
+}
+
+void wheels_coast_back_left()
+{
+    wheels_coast(1);
+}
+
+void wheels_coast_back_right()
+{
+    wheels_coast(2);
+}
+
+void wheels_brake_front_left()
+{
+    wheels_brake(0);
+}
+
+void wheels_brake_front_right()
+{
+    wheels_brake(3);
+}
+
+void wheels_brake_back_left()
+{
+    wheels_brake(1);
+}
+
+void wheels_brake_back_right()
+{
+    wheels_brake(2);
 }

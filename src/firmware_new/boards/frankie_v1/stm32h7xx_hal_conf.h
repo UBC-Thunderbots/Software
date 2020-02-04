@@ -99,7 +99,7 @@ extern "C"
 #if !defined(HSE_VALUE)
 #define HSE_VALUE                                                                        \
     ((uint32_t)8000000) /*!< Value of the External oscillator in Hz : FPGA case fixed to \
-                           \ \ 60MHZ */
+                           60MHZ */
 #endif                  /* HSE_VALUE */
 
 #if !defined(HSE_STARTUP_TIMEOUT)
@@ -151,8 +151,8 @@ extern "C"
 /**
  * @brief This is the HAL system configuration section
  */
-#define VDD_VALUE ((uint32_t)3300U)      /*!< Value of VDD in mv */
-#define TICK_INT_PRIORITY ((uint32_t)0U) /*!< tick interrupt priority */
+#define VDD_VALUE ((uint32_t)3300U)       /*!< Value of VDD in mv */
+#define TICK_INT_PRIORITY ((uint32_t)15U) /*!< tick interrupt priority */
 #define USE_RTOS 0U
 #define USE_SD_TRANSCEIVER 1U /*!< use uSD Transceiver */
 

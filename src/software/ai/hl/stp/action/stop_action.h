@@ -21,12 +21,9 @@ class StopAction : public Action
      *
      * @param stopped_speed_threshold How slow the robot must be moving before the action
      * is considered done
-     * @param loop_forever Continue yielding new Move Intents, even after we have reached
-     *                     our goal
      */
-    explicit StopAction(
-        double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT,
-        bool loop_forever              = false);
+    explicit StopAction(bool loop_forever, double stopped_speed_threshold =
+                                               ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
 
     /**
      * Updates the params that cannot be derived from the world for this action

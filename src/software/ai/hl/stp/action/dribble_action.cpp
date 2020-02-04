@@ -2,10 +2,8 @@
 
 #include "software/ai/intent/dribble_intent.h"
 
-DribbleAction::DribbleAction(double close_to_dest_threshold, bool loop_forever)
-    : Action(),
-      close_to_dest_threshold(close_to_dest_threshold),
-      loop_forever(loop_forever)
+DribbleAction::DribbleAction(double close_to_dest_threshold)
+    : Action(), close_to_dest_threshold(close_to_dest_threshold)
 {
 }
 
@@ -36,6 +34,5 @@ void DribbleAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<DribbleIntent>(robot->id(), destination, final_orientation,
                                               dribbler_rpm, small_kick_allowed, 0));
-    } while (loop_forever ||
-             (robot->position() - destination).length() > close_to_dest_threshold);
+    } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }

@@ -23,7 +23,7 @@ namespace
     std::vector<std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>>
         test_vector = {
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new MoveTactic(), std::set<MotionConstraint>({})),
+                new MoveTactic(false), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CherryPickTactic(World(), Rectangle({0, 0}, {1, 1})),
                 std::set<MotionConstraint>({})),
@@ -82,7 +82,7 @@ namespace
                 new PasserTactic(pass, world.ball(), false),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new StopTactic(false, false), std::set<MotionConstraint>({}))};
+                new StopTactic(false), std::set<MotionConstraint>({}))};
 
     // sets of motion constraints for each type of gamestate
     auto stoppage_or_them_motion_constraints =

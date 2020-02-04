@@ -96,7 +96,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
@@ -228,7 +228,7 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic)
 {
-    auto chip_tactic = std::make_shared<ChipTactic>(world.ball());
+    auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), false);
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset = Util::DynamicParameters->getAIConfig()
