@@ -35,18 +35,18 @@ void SensorFusion::onValueReceived(VisionDetection vision_detection)
     Subject<World>::sendValueToObservers(world);
 }
 
-void SensorFusion::updateWorld(const RefboxData refbox_data)
+void SensorFusion::updateWorld(const RefboxData &refbox_data)
 {
     world.updateRefboxData(refbox_data);
 }
 
-void SensorFusion::updateWorld(const RobotStatus robot_status)
+void SensorFusion::updateWorld(const RobotStatus &robot_status)
 {
     // TODO: incorporate robot_status into world and update world
     // https://github.com/UBC-Thunderbots/Software/issues/1149
 }
 
-void SensorFusion::updateWorld(const VisionDetection vision_detection)
+void SensorFusion::updateWorld(const VisionDetection &vision_detection)
 {
     world.mutableEnemyTeam()    = getEnemyTeamFromvisionDetecion(vision_detection);
     world.mutableFriendlyTeam() = getFriendlyTeamFromvisionDetecion(vision_detection);
@@ -66,7 +66,7 @@ void SensorFusion::updateWorld(const VisionDetection vision_detection)
 }
 
 std::optional<Ball> SensorFusion::getBallFromvisionDetecion(
-    const VisionDetection vision_detection)
+    const VisionDetection &vision_detection)
 {
     std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
     std::optional<Ball> new_ball =
@@ -75,7 +75,7 @@ std::optional<Ball> SensorFusion::getBallFromvisionDetecion(
 }
 
 Team SensorFusion::getFriendlyTeamFromvisionDetecion(
-    const VisionDetection vision_detection)
+    const VisionDetection &vision_detection)
 {
     std::vector<RobotDetection> friendly_robot_detections =
         vision_detection.getFriendlyTeamDetections();
@@ -89,7 +89,7 @@ Team SensorFusion::getFriendlyTeamFromvisionDetecion(
     return new_friendly_team;
 }
 
-Team SensorFusion::getEnemyTeamFromvisionDetecion(const VisionDetection vision_detection)
+Team SensorFusion::getEnemyTeamFromvisionDetecion(const VisionDetection &vision_detection)
 {
     std::vector<RobotDetection> enemy_robot_detections =
         vision_detection.getEnemyTeamDetections();

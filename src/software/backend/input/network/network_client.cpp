@@ -34,7 +34,7 @@ void NetworkClient::setupVisionClient(std::string vision_address, int vision_por
     {
         ssl_vision_client = std::make_unique<SSLVisionClient>(
             io_service, vision_address, vision_port,
-            boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
+            boost::bind(&NetworkClient::publishVisionDataWrapper, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -53,7 +53,7 @@ void NetworkClient::setupGameControllerClient(std::string gamecontroller_address
     {
         ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
             io_service, gamecontroller_address, gamecontroller_port,
-            boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
+            boost::bind(&NetworkClient::publishGameControllerData, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -84,7 +84,7 @@ NetworkClient::~NetworkClient()
     io_service_thread.join();
 }
 
-void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
+void NetworkClient::publishVisionDataWrapper(SSL_WrapperPacket packet)
 {
     // We analyze the first 60 packets we receive to find the "real" starting time,
     // because GrSim will sometimes give us garbage packets.
@@ -107,17 +107,17 @@ void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
         // are thousands of seconds in the future.
         if (!packet.has_detection())
         {
-            filterAndPublishVisionData(packet);
+            publishVisionData(packet);
         }
         else if (std::fabs(packet.detection().t_capture() - last_valid_t_capture) < 100)
         {
             last_valid_t_capture = packet.detection().t_capture();
-            filterAndPublishVisionData(packet);
+            publishVisionData(packet);
         }
     }
 }
 
-void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
+void NetworkClient::publishVisionData(SSL_WrapperPacket packet)
 {
     std::vector<BallDetection> ball_detections;
     std::vector<RobotDetection> friendly_team_detections;
@@ -172,7 +172,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     received_vision_detection_callback(vision_detection);
 }
 
-void NetworkClient::filterAndPublishGameControllerData(Referee packet)
+void NetworkClient::publishGameControllerData(Referee packet)
 {
     RefboxData refbox_data = ssl_protobuf_reader.getRefboxData(packet);
     received_refbox_data_callback(refbox_data);

@@ -92,17 +92,17 @@ class NetworkClient
     // TODO: Remove this wrapper function once we move to a better simulator
     // https://github.com/UBC-Thunderbots/Software/issues/609
     /**
-     * A wrapper function for the filterAndPublishVisionData function. This wrapper is
+     * A wrapper function for the publishVisionData function. This wrapper is
      * responsible for ignoring any bad packets we get from grSim, because grSim
      * sends garbage packets from very far in the future that causes issues if they
      * get through to our filters and logic.
      *
      * @param packet The vision packet
      */
-    void filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet);
+    void publishVisionDataWrapper(SSL_WrapperPacket packet);
 
     /**
-     * Filters and publishes the new vision data
+     * Publishes the new vision data
      *
      * This function contains all the work that is performed every time a new vision
      * packet is received from the network. We give this function to the SSLVisionClient
@@ -110,10 +110,10 @@ class NetworkClient
      *
      * @param packet The newly received vision packet
      */
-    void filterAndPublishVisionData(SSL_WrapperPacket packet);
+    void publishVisionData(SSL_WrapperPacket packet);
 
     /**
-     * Filters and publishes the new GameController data
+     * Publishes the new GameController data
      *
      * This function contains all the work that is performed every time a new
      * GameController packet is received from the network. We give this function to the
@@ -121,7 +121,7 @@ class NetworkClient
      *
      * @param packet The newly received GameController packet
      */
-    void filterAndPublishGameControllerData(Referee packet);
+    void publishGameControllerData(Referee packet);
 
     /**
      * Inverts all positions and orientations across the x and y axis of the field
@@ -130,12 +130,12 @@ class NetworkClient
      */
     static void invertFieldSide(SSL_DetectionFrame& frame);
 
-    // The backend that handles data filtering and processing
+    // The backend that handles reading and processing protobuf messages
     SSLProtobufReader ssl_protobuf_reader;
 
-    // The client that handles data reception, filtering, and publishing for vision data
+    // The client that handles data reception and publishing for vision data
     std::unique_ptr<SSLVisionClient> ssl_vision_client;
-    // The client that handles data reception, filtering , and publishing for
+    // The client that handles data reception and publishing for
     // gamecontroller data
     std::unique_ptr<SSLGameControllerClient> ssl_gamecontroller_client;
 
@@ -149,7 +149,7 @@ class NetworkClient
     // entire lifetime of the class
     std::thread io_service_thread;
 
-    // Both these values are used for the filterAndPublishVisionDataWrapper function
+    // Both these values are used for the publishVisionDataWrapper function
     // and should be removed when the function is removed
     // The t_capture of the latest SSL_WrapperPacket we received with a valid timestamp
     double last_valid_t_capture;
@@ -157,9 +157,9 @@ class NetworkClient
     // before passing the packets on to the actual logic
     int initial_packet_count;
 
-    // The callback function that we pass newly received/filtered VisionDetection to
+    // The callback function that we pass newly received VisionDetection to
     std::function<void(VisionDetection)> received_vision_detection_callback;
 
-    // The callback function that we pass newly received/filtered RefboxData to
+    // The callback function that we pass newly received RefboxData to
     std::function<void(RefboxData)> received_refbox_data_callback;
 };
