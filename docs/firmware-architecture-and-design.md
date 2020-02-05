@@ -105,7 +105,7 @@ and we would use this class as follows:
 
 Dog_t* my_dog = app_dog_create(BROWN, &simulated_dog_attempt_speed);
 
-assert(dog_getColor(my_dog) == BROWN);
+assert(app_dog_getColor(my_dog) == BROWN);
 
 float achieved_speed = app_dog_attemptToRunAtSpeed(my_dog, 9001);
 
@@ -114,6 +114,6 @@ app_dog_destroy(my_dog);
 
 # App/IO Split
 The firmware is divided into `app` and `io` layers. 
-* The `app` layer contains anything that is portable between all our robots and our simulator. 
-* The `io` layer contains everything below this. 
+* The `app` layer contains anything that is portable between all our robots and our simulator. Ex. the implementation of primitives in firmware, or our controllers for motion execution
+* The `io` layer contains everything above this, down to and including calls to libraries like `HAL` (`HAL` is a library that provides thin wrappers around hardware). Ex. the function that actually applies a wheel force or reads the encoders
 * The interface between these layers is the `FirmwareWorld` class, which represents an abstraction of the world from the perspective of the robot. **This is the only interface that the `app` layer should ever be able to use to access the outside world**.
