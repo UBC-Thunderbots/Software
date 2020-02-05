@@ -105,7 +105,6 @@ new_local_repository(
     path = "/",
 )
 
-
 http_archive(
     name = "arm_developer_gcc",
     build_file = "@//external:arm_gcc.BUILD",

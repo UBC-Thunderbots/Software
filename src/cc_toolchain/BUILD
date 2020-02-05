@@ -78,8 +78,8 @@ filegroup(
     srcs = [
         ":k8_gcc_wrappers",
         "@k8_gcc//:binaries",
-        "@k8_gcc//:k8_gcc_libs",
         "@k8_gcc//:includes",
+        "@k8_gcc//:k8_gcc_libs",
         "@k8_gcc//:runtime_libs",
         "@k8_gcc//:static_libs",
     ],

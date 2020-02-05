@@ -22,8 +22,8 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/proto:ssl_cc_proto",
-        "//software/util/printable_enum_macro:printable_enum_macro",
         "//software/time:timestamp",
+        "//software/util/printable_enum_macro",
     ],
 )
 

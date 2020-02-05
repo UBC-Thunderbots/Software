@@ -5,8 +5,8 @@
 
 #include "software/new_geom/point.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/util/printable_enum_macro/printable_enum_macro.h"
 #include "software/time/timestamp.h"
+#include "software/util/printable_enum_macro/printable_enum_macro.h"
 
 // clang-format off
 MAKE_ENUM(RefboxGameState,
