@@ -30,29 +30,29 @@ enum DogColor {BROWN, BLACK};
  * @param attempt_to_run_at_speed A function that can be called to attempt to 
  *                                set the speed of this dog, returning the max 
  *                                speed achieved, in m/s.
- * @ereturn A pointer to a dog with the given parameters
+ * @return A pointer to a dog with the given parameters
  */
-Dog_t* dog_create(DogColor color, float (*attempt_to_run_at_speed)(float)); 
+Dog_t* app_dog_create(DogColor color, float (*attempt_to_run_at_speed)(float)); 
 
 /**
  * Destroy the given Dog, freeing any memory allocated for it
  * @param dog The Dog to destroy
  */
-void dog_destroy(Dog_t* dog);
+void app_dog_destroy(Dog_t* dog);
 
 /**
  * Get the color of a dog
  * @param dog The dog to get the color of
  * @return The color of the given dog
  */
-DogColor dog_getColor(Dog_t* dog);
+DogColor app_dog_getColor(Dog_t* dog);
 
 /**
  * Attempt to set the speed of a Dog
  * @param desired_speed The speed to attempt, in m/s
  * @return The maximum speed actually achieved, in m/s
  */
-float dog_attemptToRunAtSpeed(Dog_t* dog, float desired_speed);
+float app_dog_attemptToRunAtSpeed(Dog_t* dog, float desired_speed);
 ```
 
 There are a few things to note here: 
@@ -70,7 +70,7 @@ struct Dog {
     float (*attempt_to_run_at_speed)(float);
 };
 
-Dog_t* dog_create(DogColor color, float (*attempt_to_run_at_speed)(float)){
+Dog_t* app_dog_create(DogColor color, float (*attempt_to_run_at_speed)(float)){
     // NOTE: We can't do this outside this `.c` file, because the only place
     //       that we know the size of the `Dog` struct is here.
     Dog_t* dog = (Dog_t*)(malloc(sizeof(Dog_t)));
@@ -81,17 +81,17 @@ Dog_t* dog_create(DogColor color, float (*attempt_to_run_at_speed)(float)){
     return dog;
 }
 
-void dog_destroy(Dog_t* dog){
+void app_dog_destroy(Dog_t* dog){
     // NOTE: We can't do this outside this `.c` file, because the only place
     //       that we know the size of the `Dog` struct is here.
     free(dog);
 }
 
-DogColor dog_getColor(Dog_t* dog){
+DogColor app_dog_getColor(Dog_t* dog){
     return dog->color;
 }
 
-float dog_attemptToRunAtSpeed(Dog_t* dog, float desired_speed){
+float app_dog_attemptToRunAtSpeed(Dog_t* dog, float desired_speed){
     return dog->attempt_to_run_at_speed(desired_speed);
 }
 ```
@@ -103,13 +103,13 @@ and we would use this class as follows:
 // Assume we get our "attempt_to_run_at_speed" method from this header
 #include "dog_simulator.h"
 
-Dog_t* my_dog = dog_create(BROWN, &simulated_dog_attempt_speed);
+Dog_t* my_dog = app_dog_create(BROWN, &simulated_dog_attempt_speed);
 
 assert(dog_getColor(my_dog) == BROWN);
 
-float achieved_speed = dog_attemptToRunAtSpeed(my_dog, 9001);
+float achieved_speed = app_dog_attemptToRunAtSpeed(my_dog, 9001);
 
-dog_destroy(my_dog);
+app_dog_destroy(my_dog);
 ```
 
 # App/IO Split
