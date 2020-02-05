@@ -8,7 +8,7 @@
 
 /**
  * This class represents a ball in a Box2D physics simulation. It provides a convenient
- * way for us to abstract the ball and convert to our own Ball class when data is needed
+ * way for us to abstract the ball and convert to our own Ball class when data is needed.
  */
 class PhysicsBall
 {

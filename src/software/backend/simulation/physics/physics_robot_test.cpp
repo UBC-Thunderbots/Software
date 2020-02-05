@@ -23,17 +23,6 @@ TEST(PhysicsRobotTest, test_get_robot_with_timestamp)
     EXPECT_EQ(Timestamp::fromSeconds(3.3), robot.lastUpdateTimestamp());
 }
 
-TEST(PhysicsRobotTest, test_get_mass) {
-    b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
-
-    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    PhysicsRobot physics_robot(world, robot_parameter, 2.421);
-
-    EXPECT_NEAR(physics_robot.getMassKg(), 2.421, 1e-6);
-}
-
 TEST(PhysicsRobotTest, test_robot_added_to_physics_world_on_creation)
 {
     b2Vec2 gravity(0, 0);
@@ -85,7 +74,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_outside_radius)
     // change direction
     Ball ball_parameter(Point(1, ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS),
                         Vector(-2, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -115,7 +104,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_inside_radius)
     Ball ball_parameter(
         Point(1, ROBOT_MAX_RADIUS_METERS + BALL_MAX_RADIUS_METERS - 0.005), Vector(-2, 0),
         Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -144,7 +133,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_outside_radius)
 
     Ball ball_parameter(Point(1, -ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS),
                         Vector(-2, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -174,7 +163,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_inside_radius)
     Ball ball_parameter(
         Point(1, -ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS + 0.005),
         Vector(-2, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -205,7 +194,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_outside_radius)
     // change direction
     Ball ball_parameter(Point(-ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS, 1),
                         Vector(0, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -238,7 +227,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_inside_radius)
     Ball ball_parameter(
         Point(-ROBOT_MAX_RADIUS_METERS - BALL_MAX_RADIUS_METERS + 0.005, 1),
         Vector(0, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -271,7 +260,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_in_front_of_chic
     Ball ball_parameter(
         Point(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.003, 1),
         Vector(0, -2), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0);
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -304,7 +293,7 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_behind_chicker)
     Ball ball_parameter(
         Point(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS - 0.005, 1),
         Vector(0, -2), Timestamp::fromSeconds(0));
-    PhysicsBall physics_ball(world, ball_parameter, 1.0);
+    PhysicsBall physics_ball(world, ball_parameter, 1.0, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -319,4 +308,48 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_behind_chicker)
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
     EXPECT_GT(ball.velocity().orientation().minDiff(Angle::threeQuarter()).toDegrees(),
               0.1);
+}
+
+TEST(PhysicsRobotTest, test_dribbler_ball_contact_callbacks) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
+
+    EXPECT_TRUE(physics_robot.getDribblerBallContactCallbacks().empty());
+
+    bool callback_called = false;
+    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+        callback_called = true;
+    };
+
+    physics_robot.registerDribblerBallContactCallback(callback);
+
+    ASSERT_EQ(physics_robot.getDribblerBallContactCallbacks().size(), 1);
+    physics_robot.getDribblerBallContactCallbacks().at(0)(nullptr, nullptr);
+    EXPECT_TRUE(callback_called);
+}
+
+TEST(PhysicsRobotTest, test_chicker_ball_contact_callbacks) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
+
+    EXPECT_TRUE(physics_robot.getChickerBallContactCallbacks().empty());
+
+    bool callback_called = false;
+    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+        callback_called = true;
+    };
+
+    physics_robot.registerChickerBallContactCallback(callback);
+
+    ASSERT_EQ(physics_robot.getChickerBallContactCallbacks().size(), 1);
+    physics_robot.getChickerBallContactCallbacks().at(0)(nullptr, nullptr);
+    EXPECT_TRUE(callback_called);
 }

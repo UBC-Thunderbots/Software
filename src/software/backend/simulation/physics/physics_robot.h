@@ -5,8 +5,14 @@
 #include "software/new_geom/point.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 
-// TODO: comment
+/**
+ * This class represent a Robot in a Box2D physics simulation. It provides a convenient
+ * way for us to abstract the robot and convert to our own Robot alss when data is needed.
+ * This class only deals with physics and physics-related interactions, and does NOT include
+ * any logic for robot behavior.
+ */
 class PhysicsRobot
 {
    public:
@@ -36,6 +42,34 @@ class PhysicsRobot
     ~PhysicsRobot();
 
     /**
+     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks
+     *
+     * @param callback The function to register
+     */
+    void registerDribblerBallContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+
+    /**
+     * Adds the given function to this PhysicsRobot's list of chicker-ball contact callbacks
+     *
+     * @param callback The function to register
+     */
+    void registerChickerBallContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+
+    /**
+     * Returns a list of dribbler-ball contact callbacks for this class
+     *
+     * @return a list of dribbler-ball contact callbacks for this class
+     */
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallContactCallbacks() const;
+
+    /**
+     * Returns a list of chicker-ball contact callbacks for this class
+     *
+     * @return a list of chicker-ball contact callbacks for this class
+     */
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getChickerBallContactCallbacks() const;
+
+    /**
      * Returns a Robot object representing the current state of the robot object in the
      * simulated Box2D world the robot was created in. The timestamp is provided as a
      * parameter so that the caller can control the timestamp of the data being returned,
@@ -56,29 +90,6 @@ class PhysicsRobot
      * @return the id of this physics robot
      */
     RobotId getRobotId() const;
-
-    /**
-     * Returns the mass of the robot in kg
-     *
-     * @return the mass of the robot in kg
-     */
-    double getMassKg() const;
-
-    // TODO: test
-    /**
-     * Sets the SimulatorRobot that this PhysicsRobot is associated with
-     *
-     * @param simulator_robot A pointer to the SimulatorRobot that this PhysicsRobot
-     * is associated with
-     */
-    void setSimulatorRobot(SimulatorRobot* simulator_robot);
-
-    /**
-     * Returns a pointer to the SimulatorRobot this PhysicsRobot is associated with
-     *
-     * @return a pointer to the SimulatorRobot this PhysicsRobot is associated with
-     */
-    SimulatorRobot* getSimulatorRobot() const;
 
    private:
     /**
@@ -181,6 +192,6 @@ class PhysicsRobot
     b2Body* robot_body;
     RobotId robot_id;
 
-    // The SimulatorRobot associated with this PhysicsRobot, if any
-    SimulatorRobot* simulator_robot;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_contact_callbacks;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> chicker_ball_contact_callbacks;
 };

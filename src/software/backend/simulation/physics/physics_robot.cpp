@@ -8,7 +8,7 @@
 #include "software/backend/simulation/physics/box2d_util.h"
 
 PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, double mass_kg)
-    : robot_id(robot.id()), simulator_robot(nullptr)
+    : robot_id(robot.id())
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -101,7 +101,7 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double chicker_depth
     b2PolygonShape* dribbler_shape = new b2PolygonShape();
     dribbler_shape->Set(dribbler_shape_vertices, num_vertices);
     robot_dribbler_fixture_def.shape = dribbler_shape;
-    robot_body->CreateFixture(&robot_dribbler_fixture_def);
+//    robot_body->CreateFixture(&robot_dribbler_fixture_def);
 }
 
 void PhysicsRobot::setupChickerFixture(const Robot& robot, double chicker_depth)
@@ -233,6 +233,22 @@ std::vector<Point> PhysicsRobot::getRobotFrontLeftShapePoints(const Robot& robot
     return vertices;
 }
 
+void PhysicsRobot::registerDribblerBallContactCallback(std::function<void(PhysicsRobot *, PhysicsBall *)> callback) {
+    dribbler_ball_contact_callbacks.emplace_back(callback);
+}
+
+void PhysicsRobot::registerChickerBallContactCallback(std::function<void(PhysicsRobot *, PhysicsBall *)> callback) {
+    chicker_ball_contact_callbacks.emplace_back(callback);
+}
+
+std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> PhysicsRobot::getDribblerBallContactCallbacks() const {
+    return dribbler_ball_contact_callbacks;
+}
+
+std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> PhysicsRobot::getChickerBallContactCallbacks() const {
+   return chicker_ball_contact_callbacks;
+}
+
 Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
 {
     Point position(robot_body->GetPosition().x, robot_body->GetPosition().y);
@@ -249,16 +265,4 @@ Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
 RobotId PhysicsRobot::getRobotId() const
 {
     return robot_id;
-}
-
-double PhysicsRobot::getMassKg() const {
-    return static_cast<double>(robot_body->GetMass());
-}
-
-void PhysicsRobot::setSimulatorRobot(SimulatorRobot *simulator_robot) {
-    this->simulator_robot = simulator_robot;
-}
-
-SimulatorRobot* PhysicsRobot::getSimulatorRobot() const {
-    return simulator_robot;
 }

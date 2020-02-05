@@ -65,7 +65,7 @@ void PhysicsBall::kick(Vector kick_vector) {
     // Figure out how much impulse to apply to change the speed of the ball by the magnitude
     // of the kick_vector
     double change_in_momentum = ball_body->GetMass() * kick_vector.length();
-    kick_vector.normalize(change_in_momentum);
+    kick_vector = kick_vector.normalize(change_in_momentum);
     applyImpulse(kick_vector);
 }
 

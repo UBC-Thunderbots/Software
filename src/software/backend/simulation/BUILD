@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["simulator_robot.h"],
     deps = [
         "//software/ai/primitive",
+        "//software/backend/simulation/physics:physics_ball",
         "//software/backend/simulation/physics:physics_robot",
     ],
 )

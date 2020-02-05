@@ -84,6 +84,7 @@ cc_library(
     hdrs = ["physics_robot.h"],
     deps = [
         ":box2d_util",
+        ":physics_ball",
         ":physics_object_user_data",
         "//shared:constants",
         "//software/geom",

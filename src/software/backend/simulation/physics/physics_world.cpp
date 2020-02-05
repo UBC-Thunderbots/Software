@@ -16,7 +16,8 @@ PhysicsWorld::PhysicsWorld(const World& world)
 void PhysicsWorld::initWorld(const World& world)
 {
     physics_field = std::make_shared<PhysicsField>(b2_world, world.field());
-    physics_ball  = std::make_shared<PhysicsBall>(b2_world, world.ball(), BALL_MASS_KG);
+    // TODO: gravity constant
+    physics_ball  = std::make_shared<PhysicsBall>(b2_world, world.ball(), BALL_MASS_KG, 9.8);
     friendly_physics_robots.clear();
     for (const auto& friendly_robot : world.friendlyTeam().getAllRobots())
     {

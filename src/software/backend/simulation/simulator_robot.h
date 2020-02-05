@@ -175,6 +175,10 @@ public:
     float getMotorSpeedFrontRight();
 
 private:
+    // TODO: comment
+    void onChickerBallContact(PhysicsRobot* robot, PhysicsBall* ball);
+    void onDribblerBallContact(PhysicsRobot* robot, PhysicsBall* ball);
+
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<double> kick_speed_m_per_s;
     std::optional<double> chip_distance_m;

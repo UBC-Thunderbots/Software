@@ -1,9 +1,6 @@
 #include "software/backend/simulation/simulator_ball.h"
 
 SimulatorBall::SimulatorBall(std::weak_ptr<PhysicsBall> physics_ball) :physics_ball(physics_ball){
-    if(auto ball = this->physics_ball.lock()) {
-        ball->setSimulatorBall(this);
-    }
 }
 
 float SimulatorBall::getPositionX() const {
@@ -60,10 +57,3 @@ void SimulatorBall::applyImpulse(const Vector &impulse) {
     }
 }
 
-double SimulatorBall::getMassKg() const {
-    if (auto ball = physics_ball.lock())
-    {
-        return ball->getMassKg();
-    }
-    return 0.0;
-}

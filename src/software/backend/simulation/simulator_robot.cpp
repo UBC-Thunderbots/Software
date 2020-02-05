@@ -1,8 +1,15 @@
 #include "software/backend/simulation/simulator_robot.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot) : physics_robot(physics_robot), kick_speed_m_per_s(std::nullopt), chip_distance_m(std::nullopt), dribbler_rpm(0){
     if(auto robot = this->physics_robot.lock()) {
-        robot->setSimulatorRobot(this);
+        auto chicker_ball_contact_callback = [this](PhysicsRobot* robot, PhysicsBall* ball) {
+            this->onChickerBallContact(robot, ball);
+        };
+        robot->registerChickerBallContactCallback(chicker_ball_contact_callback);
+//        robot->registerDribblerBallContactCallback([this](PhysicsBall* ball, PhysicsRobot* robot) {
+//            this->onDribblerBallContact(ball, robot);
+//        });
     }
 }
 
@@ -205,4 +212,20 @@ float SimulatorRobot::getMotorSpeedFrontRight()
         // TODO: Implement me
     }
     return 0.0;
+}
+
+void SimulatorRobot::onChickerBallContact(PhysicsRobot *robot, PhysicsBall *ball) {
+    if(kick_speed_m_per_s) {
+        Vector kick_vector = Vector::createFromAngle(robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+        kick_vector = kick_vector.normalize(kick_speed_m_per_s.value());
+        ball->kick(kick_vector);
+    }else if(chip_distance_m) {
+        Vector chip_vector = Vector::createFromAngle(robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+        chip_vector = chip_vector.normalize(chip_distance_m.value());
+        ball->chip(chip_vector);
+    }
+}
+
+void SimulatorRobot::onDribblerBallContact(PhysicsRobot *robot, PhysicsBall *ball) {
+
 }

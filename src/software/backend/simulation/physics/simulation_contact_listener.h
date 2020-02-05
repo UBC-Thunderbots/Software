@@ -2,8 +2,6 @@
 
 #include <Box2D/Box2D.h>
 #include "software/backend/simulation/physics/physics_ball.h"
-#include "software/backend/simulation/simulator_robot.h"
-#include "software/backend/simulation/simulator_ball.h"
 #include "software/backend/simulation/physics/physics_robot.h"
 #include "software/backend/simulation/physics/physics_object_user_data.h"
 
@@ -16,8 +14,6 @@ public:
     void EndContact(b2Contact* contact) override;
 
 private:
-    std::optional<std::pair<SimulatorBall*, SimulatorRobot*>> isBallChickerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
-    std::optional<std::pair<SimulatorBall*, SimulatorRobot*>> isBallDribblerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
-    void handleBallChickerContact(b2Contact* contact, SimulatorBall* ball, SimulatorRobot* robot);
-    void handleBallDribblerContact(b2Contact* contact, SimulatorBall* ball, SimulatorRobot* robot);
+    std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> isBallChickerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
+    std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> isBallDribblerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
 };

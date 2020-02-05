@@ -11,8 +11,16 @@
 class SimulatorRobotTest : public testing::Test
 {
 protected:
-    std::tuple<std::shared_ptr<PhysicsWorld>, std::shared_ptr<SimulatorRobot>, std::shared_ptr<SimulatorBall>> createWorld(Robot robot, Ball ball) {
+    /**
+     * TODO
+     * @param robot
+     * @param ball
+     * @param enemy_robot_positions
+     * @return
+     */
+    std::tuple<std::shared_ptr<PhysicsWorld>, std::shared_ptr<SimulatorRobot>, std::shared_ptr<SimulatorBall>> createWorldWithEnemyRobots(Robot robot, Ball ball, std::vector<Point> enemy_robot_positions) {
         World world = ::Test::TestUtil::createBlankTestingWorld();
+        world = ::Test::TestUtil::setEnemyRobotPositions(world, enemy_robot_positions, Timestamp::fromSeconds(0));
 
         world.mutableFriendlyTeam().updateRobots({robot});
         world.mutableBall() = ball;
@@ -35,6 +43,10 @@ protected:
         }
 
         return std::make_tuple(physics_world, simulator_robot, simulator_ball);
+    }
+
+    std::tuple<std::shared_ptr<PhysicsWorld>, std::shared_ptr<SimulatorRobot>, std::shared_ptr<SimulatorBall>> createWorld(Robot robot, Ball ball) {
+        return createWorldWithEnemyRobots(robot, ball, {});
     }
 
     const Robot robot_non_zero_state = Robot(7, Point(1.04, -0.8), Vector(-1.5, 0), Angle::fromRadians(2.12), AngularVelocity::fromRadians(-1.0), Timestamp::fromSeconds(0));
@@ -118,6 +130,22 @@ TEST_F(SimulatorRobotTest, test_get_dribbler_temperature) {
     EXPECT_EQ(simulator_robot->getDribblerTemperatureDegC(), 25);
 }
 
+TEST_F(SimulatorRobotTest, test_robot_does_not_kick_ball_when_autokick_disabled) {
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball(Point(0.15, 0), Vector(-0.25, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
+
+    EXPECT_LT((simulator_ball->velocity() - Vector(-0.25, 0)).length(), 0.001);
+
+    // Simulate for 1/2 second
+    for(unsigned int i = 0; i < 30; i++) {
+        world->stepSimulation(Duration::fromSeconds(1.0/60.0));
+    }
+
+    auto v = simulator_ball->velocity();
+    EXPECT_LT(v.length(), 0.25);
+}
+
 TEST_F(SimulatorRobotTest, test_robot_kicks_ball_with_autokick_enabled) {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Ball ball(Point(0.25, 0), Vector(-1, 0), Timestamp::fromSeconds(0));
@@ -125,14 +153,36 @@ TEST_F(SimulatorRobotTest, test_robot_kicks_ball_with_autokick_enabled) {
 
     EXPECT_LT((simulator_ball->velocity() - Vector(-1, 0)).length(), 0.001);
 
-    simulator_robot->enableAutokick(5.0);
+    simulator_robot->enableAutokick(5);
 
-    // Simulate for 1 second
-    for(unsigned int i = 0; i < 60; i++) {
+    // Simulate for 1/2 second
+    for(unsigned int i = 0; i < 30; i++) {
         world->stepSimulation(Duration::fromSeconds(1.0/60.0));
         std::cout << simulator_ball->position() << ", " << simulator_ball->velocity() << std::endl;
     }
 
     auto v = simulator_ball->velocity();
     EXPECT_LT((v - Vector(4, 0)).length(), 0.001);
+}
+
+TEST_F(SimulatorRobotTest, test_robot_chips_ball_with_autochip_enabled_and_ball_does_not_land_in_obstacle) {
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball(Point(0.15, 0), Vector(-0.25, 0), Timestamp::fromSeconds(0));
+    std::vector<Point> enemy_robot_positions = {Point(0.4, 0), Point(1.9, 0)};
+    auto [world, simulator_robot, simulator_ball] = createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
+
+    EXPECT_LT((simulator_ball->velocity() - Vector(-1, 0)).length(), 0.001);
+
+    simulator_robot->enableAutochip(2);
+
+    // Simulate for 2 seconds
+    for(unsigned int i = 0; i < 120; i++) {
+        world->stepSimulation(Duration::fromSeconds(1.0/60.0));
+        std::cout << simulator_ball->position() << ", " << simulator_ball->velocity() << std::endl;
+    }
+
+//    auto v = simulator_ball->velocity();
+    auto p = simulator_ball->position();
+//    EXPECT_LT((v - Vector(4, 0)).length(), 0.001);
+    EXPECT_GT(p.x(), 2);
 }

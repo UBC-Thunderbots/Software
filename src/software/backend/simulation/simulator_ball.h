@@ -65,14 +65,6 @@ public:
      */
     void applyImpulse(const Vector& impulse);
 
-    // TODO: test
-    /**
-     * Returns the mass of the ball, in kg
-     *
-     * @return the mass of the ball, in kg
-     */
-    double getMassKg() const;
-
 private:
     std::weak_ptr<PhysicsBall> physics_ball;
 };
