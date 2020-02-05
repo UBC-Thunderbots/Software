@@ -1,14 +1,14 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/action_visitor.h"
 #include "software/ai/hl/stp/action/all_actions.h"
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/world/world.h"
 
 /**
  * This class can be used to generically update the world parameters of any action,
  * without knowing the type of the action
  */
-class ActionWorldParamsUpdateVisitor : public ActionVisitor
+class ActionWorldParamsUpdateVisitor : public MutableActionVisitor
 {
    public:
     /**

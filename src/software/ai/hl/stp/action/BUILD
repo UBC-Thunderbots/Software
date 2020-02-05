@@ -221,7 +221,7 @@ cc_test(
 
 cc_library(
     name = "action_visitor",
-    hdrs = ["action_visitor.h"],
+    hdrs = ["mutable_action_visitor.h"],
     deps = [":action"],
 )
 

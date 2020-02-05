@@ -2,7 +2,7 @@
 
 // We forward-declare all the actions because if we include them we induce a
 // circular dependency between the individual library for each action and this
-// visitor. Ex. `MoveAction` includes `ActionVisitor`, but `ActionVisitor`
+// visitor. Ex. `MoveAction` includes `MutableActionVisitor`, but `MutableActionVisitor`
 // also includes `MoveAction`
 class ChipAction;
 class DribbleAction;
@@ -17,10 +17,10 @@ class StopAction;
  * This class provides an interface for all Action visitors.
  * (ie. the "Visitor" design pattern)
  */
-class ActionVisitor
+class MutableActionVisitor
 {
    public:
-    virtual ~ActionVisitor() = default;
+    virtual ~MutableActionVisitor() = default;
 
     // The javadoc comment for all methods here can be read as:
     /**
