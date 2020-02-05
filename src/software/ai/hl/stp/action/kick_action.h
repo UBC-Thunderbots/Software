@@ -70,7 +70,7 @@ class KickAction : public Action
      */
     double getKickSpeed();
 
-    void accept(ActionVisitor &visitor) const override;
+    void accept(ActionVisitor &visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;

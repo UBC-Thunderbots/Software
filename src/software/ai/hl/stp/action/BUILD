@@ -224,3 +224,14 @@ cc_library(
     hdrs = ["action_visitor.h"],
     deps = [":action"],
 )
+
+cc_library(
+    name = "action_world_params_update_visitor",
+    srcs = ["action_world_params_update_visitor.cpp"],
+    hdrs = ["action_world_params_update_visitor.h"],
+    deps = [
+        ":action_visitor",
+        ":all_actions",
+        "//software/world",
+    ],
+)

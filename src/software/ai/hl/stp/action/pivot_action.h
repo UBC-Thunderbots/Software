@@ -29,7 +29,7 @@ class PivotAction : public Action
     void updateControlParams(const Robot& robot, Point pivot_point, Angle final_angle,
                              Angle pivot_speed, DribblerEnable enable_dribbler);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(ActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

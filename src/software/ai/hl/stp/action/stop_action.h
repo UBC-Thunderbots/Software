@@ -34,7 +34,7 @@ class StopAction : public Action
      */
     void updateControlParams(const Robot& robot, bool coast);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(ActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -56,7 +56,7 @@ class ChipAction : public Action
     void updateControlParams(const Robot& robot, Point chip_origin, Point chip_target,
                              double chip_distance_meters);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(ActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

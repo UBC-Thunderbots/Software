@@ -29,12 +29,12 @@ class ActionVisitor
      * @param action The action to visit
      */
 
-    virtual void visit(const ChipAction& action)          = 0;
-    virtual void visit(const DribbleAction& action)       = 0;
-    virtual void visit(const InterceptBallAction& action) = 0;
-    virtual void visit(const KickAction& action)          = 0;
-    virtual void visit(const MoveAction& action)          = 0;
-    virtual void visit(const MoveSpinAction& action)      = 0;
-    virtual void visit(const PivotAction& action)         = 0;
-    virtual void visit(const StopAction& action)          = 0;
+    virtual void visit(ChipAction& action)          = 0;
+    virtual void visit(DribbleAction& action)       = 0;
+    virtual void visit(InterceptBallAction& action) = 0;
+    virtual void visit(KickAction& action)          = 0;
+    virtual void visit(MoveAction& action)          = 0;
+    virtual void visit(MoveSpinAction& action)      = 0;
+    virtual void visit(PivotAction& action)         = 0;
+    virtual void visit(StopAction& action)          = 0;
 };

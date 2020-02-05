@@ -37,7 +37,7 @@ class DribbleAction : public Action
                              const Angle& final_angle, double rpm,
                              bool small_kick_allowed);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(ActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

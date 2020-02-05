@@ -61,7 +61,7 @@ class Action
      *
      * @param visitor A Action Visitor
      */
-    virtual void accept(ActionVisitor &visitor) const = 0;
+    virtual void accept(ActionVisitor &visitor) = 0;
 
     virtual ~Action() = default;
 

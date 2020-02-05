@@ -46,7 +46,7 @@ class MoveSpinAction : public Action
      */
     Point getDestination();
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(ActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
