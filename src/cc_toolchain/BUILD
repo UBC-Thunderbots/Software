@@ -86,7 +86,7 @@ filegroup(
 )
 
 cc_toolchain_config_k8(
-    name = "k8_gcc",
+    name = "linux_gcc",
     builtin_include_directories = [
         "/usr/lib/gcc/x86_64-linux-gnu/",
         "/usr/include/",
@@ -118,7 +118,7 @@ cc_toolchain(
     # when possible
     # https://github.com/bazelbuild/intellij/issues/486
     tags = ["no-ide"],
-    toolchain_config = ":k8_gcc",
+    toolchain_config = ":linux_gcc",
     toolchain_identifier = "k8_gcc-x86_64",
 )
 
