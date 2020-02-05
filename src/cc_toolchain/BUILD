@@ -91,7 +91,7 @@ cc_toolchain_config_k8(
         "/usr/lib/gcc/x86_64-linux-gnu/",
         "/usr/include/",
         "/usr/local/include/",
-        "/usr/lib/gcc/c++/7.4.0/include/",
+        "/usr/lib/gcc/c++/*/include/",
     ],
     cpu = "k8",
     host_compiler_path = "wrapper/k8_gcc-k8_gcc",
