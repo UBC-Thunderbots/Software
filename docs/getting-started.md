@@ -21,7 +21,7 @@
       * [Installing CLion](#installing-clion-1)
 * [Building and Running the Code](#building-and-running-the-code)
 * [Debugging](#debugging)
-* [Profiling](#debugging)
+* [Profiling](#profiling)
 * [Flashing and Debugging A STM32 MCU](#flashing-and-debugging-a-stm32-mcu)
 
 ## Introduction
