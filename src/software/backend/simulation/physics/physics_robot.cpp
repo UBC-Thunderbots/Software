@@ -240,6 +240,14 @@ void PhysicsRobot::registerDribblerBallContactCallback(std::function<void(Physic
     dribbler_ball_contact_callbacks.emplace_back(callback);
 }
 
+void PhysicsRobot::registerDribblerBallStartContactCallback(std::function<void(PhysicsRobot *, PhysicsBall *)> callback) {
+    dribbler_ball_start_contact_callbacks.emplace_back(callback);
+}
+
+void PhysicsRobot::registerDribblerBallEndContactCallback(std::function<void(PhysicsRobot *, PhysicsBall *)> callback) {
+    dribbler_ball_end_contact_callbacks.emplace_back(callback);
+}
+
 void PhysicsRobot::registerChickerBallContactCallback(std::function<void(PhysicsRobot *, PhysicsBall *)> callback) {
     chicker_ball_contact_callbacks.emplace_back(callback);
 }
@@ -268,4 +276,34 @@ Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
 RobotId PhysicsRobot::getRobotId() const
 {
     return robot_id;
+}
+
+void PhysicsRobot::applyWheelForceFrontLeft(double force_in_newtons) {
+    Angle angle_to_wheel = Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG);
+    applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
+}
+
+void PhysicsRobot::applyWheelForceBackLeft(double force_in_newtons) {
+    Angle angle_to_wheel = Angle::fromDegrees(ANGLE_TO_ROBOT_BACK_WHEELS_DEG);
+    applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
+}
+
+void PhysicsRobot::applyWheelForceBackRight(double force_in_newtons) {
+    Angle angle_to_wheel = Angle::fromDegrees(-ANGLE_TO_ROBOT_BACK_WHEELS_DEG);
+    applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
+}
+
+void PhysicsRobot::applyWheelForceFrontRight(double force_in_newtons) {
+    Angle angle_to_wheel = Angle::fromDegrees(-ANGLE_TO_ROBOT_FRONT_WHEELS_DEG);
+    applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
+}
+
+void PhysicsRobot::applyWheelForceAtAngle(Angle angle_to_wheel, double force_in_newtons) {
+    Point robot_position = createPoint(robot_body->GetPosition());
+    Point local_force_point = robot_position + Vector::createFromAngle(angle_to_wheel).normalize(ROBOT_MAX_RADIUS_METERS);
+    Vector local_force_vector = (local_force_point - robot_position).perpendicular();
+    local_force_vector = local_force_vector.normalize(force_in_newtons);
+    b2Vec2 force_point = robot_body->GetWorldPoint(createVec2(local_force_point));
+    b2Vec2 force_vector = robot_body->GetWorldVector(createVec2(local_force_vector));
+    robot_body->ApplyForce(force_vector, force_point, true);
 }

@@ -62,3 +62,17 @@ const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
 
 const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
+
+/** absolute angle to each of the front wheels as
+ * measured from the front of the robots in degrees
+ * For 3rd generation robot 2015 CAD model
+ * Last updated: Feb 3, 2018
+ * /----------------\
+ * |57.945 | -57.945|
+ * |                |
+ * |                |
+ * |136.04 | -136.04|
+ * \----------------/
+ */
+const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
+const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG = 136.04;

@@ -47,6 +47,8 @@ class PhysicsRobot
      * @param callback The function to register
      */
     void registerDribblerBallContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+    void registerDribblerBallStartContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+    void registerDribblerBallEndContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
      * Adds the given function to this PhysicsRobot's list of chicker-ball contact callbacks
@@ -61,6 +63,8 @@ class PhysicsRobot
      * @return a list of dribbler-ball contact callbacks for this class
      */
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallContactCallbacks() const;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallStartContactCallbacks() const;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallEndContactCallbacks() const;
 
     /**
      * Returns a list of chicker-ball contact callbacks for this class
@@ -90,6 +94,11 @@ class PhysicsRobot
      * @return the id of this physics robot
      */
     RobotId getRobotId() const;
+
+    void applyWheelForceFrontLeft(double force_in_newtons);
+    void applyWheelForceBackLeft(double force_in_newtons);
+    void applyWheelForceBackRight(double force_in_newtons);
+    void applyWheelForceFrontRight(double force_in_newtons);
 
    private:
     /**
@@ -187,11 +196,15 @@ class PhysicsRobot
     std::vector<Point> getRobotFrontLeftShapePoints(const Robot& robot,
                                                     double chicker_depth);
 
+    void applyWheelForceAtAngle(Angle angle_to_wheel, double force_in_newtons);
+
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
     b2Body* robot_body;
     RobotId robot_id;
 
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_contact_callbacks;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_start_contact_callbacks;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_end_contact_callbacks;
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> chicker_ball_contact_callbacks;
 };

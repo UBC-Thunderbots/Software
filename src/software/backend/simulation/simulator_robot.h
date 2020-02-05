@@ -3,6 +3,7 @@
 #include <cinttypes>
 #include <memory>
 #include "software/backend/simulation/physics/physics_robot.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 #include "software/ai/primitive/primitive.h"
 
 // TODO: comment
@@ -178,9 +179,14 @@ private:
     // TODO: comment
     void onChickerBallContact(PhysicsRobot* robot, PhysicsBall* ball);
     void onDribblerBallContact(PhysicsRobot* robot, PhysicsBall* ball);
+    void onDribblerBallStartContact(PhysicsRobot* robot, PhysicsBall* ball);
+    void onDribblerBallEndContact(PhysicsRobot* robot, PhysicsBall* ball);
 
     std::weak_ptr<PhysicsRobot> physics_robot;
-    std::optional<double> kick_speed_m_per_s;
-    std::optional<double> chip_distance_m;
+    std::optional<double> autokick_speed_m_per_s;
+    std::optional<double> autochip_distance_m;
     uint32_t dribbler_rpm;
+
+    PhysicsBall* ball_in_dribbler_area;
+
 };
