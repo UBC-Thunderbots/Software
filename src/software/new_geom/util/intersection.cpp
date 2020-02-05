@@ -26,7 +26,18 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     double x4 = d.x();
     double y4 = d.y();
 
+    std::cout << "x1: " << x1 << std::endl;
+    std::cout << "y1: " << y1 << std::endl;
+    std::cout << "x2: " << x2 << std::endl;
+    std::cout << "y2: " << y2 << std::endl;
+    std::cout << "x3: " << x3 << std::endl;
+    std::cout << "y3: " << y3 << std::endl;
+    std::cout << "x4: " << x4 << std::endl;
+    std::cout << "y4: " << y4 << std::endl;
+
+
     double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    std::cout << "Denom: " << denominator << std::endl;
     if (denominator == 0)
     {
         return std::nullopt;
