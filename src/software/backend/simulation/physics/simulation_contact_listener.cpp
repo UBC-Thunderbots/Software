@@ -12,15 +12,16 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
         PhysicsObjectUserData *user_data_b =
             static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
-//        std::cout << "some contact started" << std::endl;
         if (auto ball_chicker_pair = isBallChickerContact(user_data_a, user_data_b))
         {
-            std::cout << "ball chicker contact started" << std::endl;
             PhysicsBall* ball = ball_chicker_pair->first;
             PhysicsRobot* robot = ball_chicker_pair->second;
             for(auto contact_callback : robot->getChickerBallContactCallbacks()) {
                 contact_callback(robot, ball);
             }
+        }
+        if(auto ball = isBallContact(user_data_a, user_data_b)) {
+            ball->incrementNumCurrentCollisions();
         }
     }
 }
@@ -28,28 +29,6 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
 void SimulationContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold) {
     if (contact->IsTouching())
     {
-//        auto fixture_a = contact->GetFixtureA();
-//        auto fixture_b = contact->GetFixtureB();
-//
-//        PhysicsObjectUserData *user_data_a =
-//                static_cast<PhysicsObjectUserData *>(fixture_a->GetUserData());
-//        PhysicsObjectUserData *user_data_b =
-//                static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
-//
-//        if(auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
-//        {
-//            // TODO: disable collision
-//            PhysicsBall* ball = ball_dribbler_pair->first;
-//            PhysicsRobot* robot = ball_dribbler_pair->second;
-//            for(auto contact_callback : robot->getDribblerBallContactCallbacks()) {
-//                contact_callback(robot, ball);
-//            }
-//        }
-    }
-}
-
-void SimulationContactListener::EndContact(b2Contact *contact)
-{
         auto fixture_a = contact->GetFixtureA();
         auto fixture_b = contact->GetFixtureB();
 
@@ -58,15 +37,77 @@ void SimulationContactListener::EndContact(b2Contact *contact)
         PhysicsObjectUserData *user_data_b =
                 static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
+        contact->SetRestitution(0.0);
+        if(auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+        {
+            // TODO: comment
+            // Always disable contacts between the ball and dribbler
+            contact->SetEnabled(false);
+//            fixture_a->SetSensor(true);
+//            fixture_b->SetSensor(true);
+//            float r = contact->GetRestitution();
+//            contact->SetRestitution(0.0);
+//            float r2 = contact->GetRestitution();
+//            std::cout << r << r2 << std::endl;
+//            auto r = contact->GetRestitution();
+            PhysicsBall* ball = ball_dribbler_pair->first;
+            PhysicsRobot* robot = ball_dribbler_pair->second;
+            for(auto contact_callback : robot->getDribblerBallContactCallbacks()) {
+                contact_callback(robot, ball);
+            }
+
+//            fixture_a->SetSensor(false);
+//            fixture_b->SetSensor(false);
+        }
         if (auto ball_chicker_pair = isBallChickerContact(user_data_a, user_data_b))
         {
-            std::cout << "ball chicker contact ended" << std::endl;
+        contact->SetRestitution(0.0);
 //            PhysicsBall* ball = ball_chicker_pair->first;
 //            PhysicsRobot* robot = ball_chicker_pair->second;
 //            for(auto contact_callback : robot->getChickerBallContactCallbacks()) {
 //                contact_callback(robot, ball);
 //            }
         }
+        if(auto ball = isBallContact(user_data_a, user_data_b)) {
+            if(ball->isInFlight()) {
+                contact->SetEnabled(false);
+            }
+        }
+    }
+}
+
+void SimulationContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse) {
+//    auto fixture_a = contact->GetFixtureA();
+//    auto fixture_b = contact->GetFixtureB();
+//
+//    PhysicsObjectUserData *user_data_a =
+//            static_cast<PhysicsObjectUserData *>(fixture_a->GetUserData());
+//    PhysicsObjectUserData *user_data_b =
+//            static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
+//
+//    if(auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+//    {
+////        PhysicsBall* ball = ball_dribbler_pair->first;
+//        PhysicsRobot* robot = ball_dribbler_pair->second;
+//        for(auto contact_callback : robot->getDribblerBallContactCallbacks()) {
+////            contact_callback(robot, ball);
+//        }
+//    }
+}
+
+void SimulationContactListener::EndContact(b2Contact *contact)
+{
+    auto fixture_a = contact->GetFixtureA();
+    auto fixture_b = contact->GetFixtureB();
+
+    PhysicsObjectUserData *user_data_a =
+            static_cast<PhysicsObjectUserData *>(fixture_a->GetUserData());
+    PhysicsObjectUserData *user_data_b =
+            static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
+
+    if(auto ball = isBallContact(user_data_a, user_data_b)) {
+        ball->decrementNumCurrentCollisions();
+    }
 }
 
 std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener::isBallChickerContact(PhysicsObjectUserData *user_data_a,
@@ -76,18 +117,19 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
         return std::nullopt;
     }
 
+    // TODO: comment pairwise contact checking, and do everywhere
     PhysicsBall* ball = nullptr;
     if(user_data_a->type == PhysicsObjectType::BALL) {
         ball = static_cast<PhysicsBall*>(user_data_a->physics_object);
     }
-    if(user_data_b->type == PhysicsObjectType::BALL) {
-        ball = static_cast<PhysicsBall*>(user_data_b->physics_object);
-    }
+//    if(user_data_b->type == PhysicsObjectType::BALL) {
+//        ball = static_cast<PhysicsBall*>(user_data_b->physics_object);
+//    }
 
     PhysicsRobot* robot = nullptr;
-    if(user_data_a->type == PhysicsObjectType::ROBOT_CHICKER) {
-        robot = static_cast<PhysicsRobot*>(user_data_a->physics_object);
-    }
+//    if(user_data_a->type == PhysicsObjectType::ROBOT_CHICKER) {
+//        robot = static_cast<PhysicsRobot*>(user_data_a->physics_object);
+//    }
     if(user_data_b->type == PhysicsObjectType::ROBOT_CHICKER) {
         robot = static_cast<PhysicsRobot*>(user_data_b->physics_object);
     }
@@ -105,6 +147,7 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
         return std::nullopt;
     }
 
+    // TODO: comment pairwise contact checking, and do everywhere
     PhysicsBall* ball = nullptr;
     if(user_data_a->type == PhysicsObjectType::BALL) {
         ball = static_cast<PhysicsBall*>(user_data_a->physics_object);
@@ -128,39 +171,15 @@ std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener:
     return std::nullopt;
 }
 
-//void SimulationContactListener::handleBallChickerContact(b2Contact *contact, SimulatorBall *ball, SimulatorRobot *robot) {
-//     if(auto autokick_speed_m_per_s = robot->getAutokickSpeed()) {
-//         Vector kick_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
-//         // Figure out how much impulse to apply to change the speed of the ball by the autokick_speed
-//         double change_in_momentum = ball->getMassKg() * autokick_speed_m_per_s.value();
-//         kick_vector.normalize(change_in_momentum);
-//         ball->applyImpulse(kick_vector);
-//     }else if(auto autochip_distance_m = robot->getAutochipDistance()) {
-//         Vector chip_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
-//         // TODO: chipping logic
-//         ball->applyImpulse(chip_vector);
-//     }
-//}
-//
-//void SimulationContactListener::handleBallDribblerContact(b2Contact *contact, SimulatorBall *ball, SimulatorRobot *robot) {
-//    if(auto autokick_speed_m_per_s = robot->getAutokickSpeed()) {
-//        Vector kick_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
-//        // Figure out how much impulse to apply to change the speed of the ball by the autokick_speed
-//        double change_in_momentum = ball->getMassKg() * autokick_speed_m_per_s.value();
-//        kick_vector.normalize(change_in_momentum);
-//        ball->applyImpulse(kick_vector);
-//    }else if(auto autochip_distance_m = robot->getAutochipDistance()) {
-//        Vector chip_vector = Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
-//        // TODO: chipping logic
-//        ball->applyImpulse(chip_vector);
-//    }
-//
-////    if(robot->getDribblerSpeed() > 0) {
-////        Vector orthogonal_force_vector = -Vector::createFromAngle(Angle::fromRadians(robot->getOrientation()));
-////        orthogonal_force_vector.normalize(100);
-////        ball->applyForce(orthogonal_force_vector);
-////        // TODO: centering force
-////    }
-//}
-//
-//
+PhysicsBall* SimulationContactListener::isBallContact(PhysicsObjectUserData *user_data_a,
+                                                                     PhysicsObjectUserData *user_data_b) {
+    PhysicsBall* ball = nullptr;
+    if(user_data_a && user_data_a->type == PhysicsObjectType::BALL) {
+        ball = static_cast<PhysicsBall*>(user_data_a->physics_object);
+    }
+    if(user_data_b && user_data_b->type == PhysicsObjectType::BALL) {
+        ball = static_cast<PhysicsBall*>(user_data_b->physics_object);
+    }
+
+    return ball;
+}

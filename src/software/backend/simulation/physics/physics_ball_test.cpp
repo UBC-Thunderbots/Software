@@ -235,7 +235,7 @@ TEST(PhysicsBallTest, test_kick_ball) {
     EXPECT_LT((ball.velocity() - Vector(-2, 3)).length(), 0.05);
 }
 
-TEST(PhysicsBallTest, test_chip_ball) {
+TEST(PhysicsBallTest, test_chip_ball_without_collisions) {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -258,5 +258,40 @@ TEST(PhysicsBallTest, test_chip_ball) {
         }
     }
 
+    EXPECT_FALSE(physics_ball.isInFlight());
+}
+
+TEST(PhysicsBallTest, test_chip_ball_with_collisions) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+    Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto physics_ball = PhysicsBall(world, ball_parameter, 1.0, 9.8);
+
+    EXPECT_FALSE(physics_ball.isInFlight());
+    physics_ball.chip(Vector(2, 0));
+    EXPECT_TRUE(physics_ball.isInFlight());
+
+    for(unsigned int i = 0; i < 40; i++) {
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(1.0 / 60.0, 5, 8);
+        EXPECT_TRUE(physics_ball.isInFlight());
+    }
+
+    physics_ball.incrementNumCurrentCollisions();
+
+    for(unsigned int i = 0; i < 50; i++) {
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(1.0 / 60.0, 5, 8);
+        EXPECT_TRUE(physics_ball.isInFlight());
+    }
+
+    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
+    EXPECT_GT(ball.position().x(), 2.0);
+
+    physics_ball.decrementNumCurrentCollisions();
     EXPECT_FALSE(physics_ball.isInFlight());
 }

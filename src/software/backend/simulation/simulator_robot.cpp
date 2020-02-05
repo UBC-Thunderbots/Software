@@ -3,13 +3,12 @@
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot) : physics_robot(physics_robot), kick_speed_m_per_s(std::nullopt), chip_distance_m(std::nullopt), dribbler_rpm(0){
     if(auto robot = this->physics_robot.lock()) {
-        auto chicker_ball_contact_callback = [this](PhysicsRobot* robot, PhysicsBall* ball) {
+        robot->registerChickerBallContactCallback([this](PhysicsRobot* robot, PhysicsBall* ball) {
             this->onChickerBallContact(robot, ball);
-        };
-        robot->registerChickerBallContactCallback(chicker_ball_contact_callback);
-//        robot->registerDribblerBallContactCallback([this](PhysicsBall* ball, PhysicsRobot* robot) {
-//            this->onDribblerBallContact(ball, robot);
-//        });
+        });
+        robot->registerDribblerBallContactCallback([this](PhysicsRobot* robot, PhysicsBall* ball) {
+            this->onDribblerBallContact(robot, ball);
+        });
     }
 }
 
@@ -227,5 +226,11 @@ void SimulatorRobot::onChickerBallContact(PhysicsRobot *robot, PhysicsBall *ball
 }
 
 void SimulatorRobot::onDribblerBallContact(PhysicsRobot *robot, PhysicsBall *ball) {
-
+    std::cout << "dribbler ball contact callback" << std::endl;
+    if(dribbler_rpm > 0) {
+        Vector dribbler_force_vector = -Vector::createFromAngle(robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+        dribbler_force_vector = dribbler_force_vector.normalize(10000);
+        ball->applyForce(dribbler_force_vector);
+        std::cout << "applied force " << dribbler_force_vector << std::endl;
+    }
 }

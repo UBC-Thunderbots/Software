@@ -1,6 +1,12 @@
 #include "software/backend/simulation/simulator_ball.h"
 
 SimulatorBall::SimulatorBall(std::weak_ptr<PhysicsBall> physics_ball) :physics_ball(physics_ball){
+    if(auto ball = this->physics_ball.lock()) {
+        auto ball_contact_callback = [this](PhysicsBall* ball) {
+            this->onBallContact(ball);
+        };
+        ball->registerBallContactCallback(ball_contact_callback);
+    }
 }
 
 float SimulatorBall::getPositionX() const {
@@ -57,3 +63,6 @@ void SimulatorBall::applyImpulse(const Vector &impulse) {
     }
 }
 
+void SimulatorBall::onBallContact(PhysicsBall *ball) {
+//    ball->is
+}

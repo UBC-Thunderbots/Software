@@ -48,7 +48,7 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_dep
     // elastic. However because this is an "ideal" simulation and we generally don't care
     // about the exact behaviour of collisions, getting this value to perfectly match
     // reality isn't too important.
-    robot_body_fixture_def.restitution = 0.5;
+    robot_body_fixture_def.restitution = 0.0; // TODO: change back to 0.5?
     robot_body_fixture_def.friction    = 0.0;
 
     b2PolygonShape* main_body_shape = getMainRobotBodyShape(robot, chicker_depth);
@@ -78,12 +78,15 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_dep
 void PhysicsRobot::setupDribblerFixture(const Robot& robot, double chicker_depth)
 {
     b2FixtureDef robot_dribbler_fixture_def;
-    // Because this fixture is a sensor, the restitution, friction, and density don't
-    // matter
+    // We assume collisions with the dribbler get disabled, so these values
+    // don't matter
     robot_dribbler_fixture_def.restitution = 0.0;
     robot_dribbler_fixture_def.friction    = 0.0;
+    // The dribbler has no mass in simulation. Mass is already accounted for by the robot
+    // body
     robot_dribbler_fixture_def.density     = 0.0;
-    robot_dribbler_fixture_def.isSensor    = true;
+    // TODO: comment
+    robot_dribbler_fixture_def.isSensor = false;
     robot_dribbler_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::ROBOT_DRIBBLER, this});
 
     const unsigned int num_vertices              = 4;
@@ -101,7 +104,7 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double chicker_depth
     b2PolygonShape* dribbler_shape = new b2PolygonShape();
     dribbler_shape->Set(dribbler_shape_vertices, num_vertices);
     robot_dribbler_fixture_def.shape = dribbler_shape;
-//    robot_body->CreateFixture(&robot_dribbler_fixture_def);
+    robot_body->CreateFixture(&robot_dribbler_fixture_def);
 }
 
 void PhysicsRobot::setupChickerFixture(const Robot& robot, double chicker_depth)

@@ -6,7 +6,7 @@
 #include "software/backend/simulation/physics/box2d_util.h"
 #include "software/backend/simulation/physics/physics_object_user_data.h"
 
-PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg, const double gravity) : gravity(gravity), chip_origin(std::nullopt), chip_distance_m(0.0)
+PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg, const double gravity) : gravity(gravity), chip_origin(std::nullopt), chip_distance_m(0.0), num_current_collisions(0)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -35,7 +35,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, doubl
     // collisions and no friction. Because we also do not generally depend on specific
     // behaviour when the ball collides with something, getting these values to perfectly
     // match reality isn't too important.
-    ball_fixture_def.restitution = 1.0;
+    ball_fixture_def.restitution = 0.1;// TODO: change back to 1.0?
     ball_fixture_def.friction    = 0.0;
     ball_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 
@@ -51,6 +51,14 @@ PhysicsBall::~PhysicsBall()
     {
         world->DestroyBody(ball_body);
     }
+}
+
+void PhysicsBall::registerBallContactCallback(std::function<void(PhysicsBall *)> callback) {
+    ball_contact_callbacks.emplace_back(callback);
+}
+
+std::vector<std::function<void(PhysicsBall*)>> PhysicsBall::getBallContactCallbacks() const {
+    return ball_contact_callbacks;
 }
 
 Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
@@ -98,7 +106,12 @@ bool PhysicsBall::isInFlight() {
     bool chip_in_progress = chip_origin.has_value();
     if(chip_in_progress) {
         double current_chip_distance = (getBallWithTimestamp(Timestamp::fromSeconds(0)).position() - chip_origin.value()).length();
-        if(current_chip_distance >= chip_distance_m) {
+        // TODO: better comment
+        // The ball is only not in flight if it has travelled far enough to hit the ground, and
+        // is not overlapping any objects when it lands. Once it "lands" it waits until it is no longer
+        // colliding before reporting not in flight, which simulate the ball landing on top of another
+        // object and rolling off it, such as a robot
+        if(current_chip_distance >= chip_distance_m && num_current_collisions == 0) {
             chip_origin = std::nullopt;
             return false;
         }
@@ -108,4 +121,14 @@ bool PhysicsBall::isInFlight() {
     }
 
     return false;
+}
+
+void PhysicsBall::incrementNumCurrentCollisions() {
+    num_current_collisions++;
+}
+
+void PhysicsBall::decrementNumCurrentCollisions() {
+    if(num_current_collisions > 0) {
+        num_current_collisions--;
+    }
 }

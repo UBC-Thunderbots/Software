@@ -66,5 +66,7 @@ public:
     void applyImpulse(const Vector& impulse);
 
 private:
+    void onBallContact(PhysicsBall* ball);
+
     std::weak_ptr<PhysicsBall> physics_ball;
 };
