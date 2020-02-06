@@ -120,12 +120,12 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
 
 std::optional<Point> intersection(const Line &first, const Line &second)
 {
-    double a1 = first.getCoeffs().a;
-    double b1 = first.getCoeffs().b;
-    double c1 = first.getCoeffs().c;
-    double a2 = second.getCoeffs().a;
-    double b2 = second.getCoeffs().b;
-    double c2 = second.getCoeffs().c;
+    double a1          = first.getCoeffs().a;
+    double b1          = first.getCoeffs().b;
+    double c1          = first.getCoeffs().c;
+    double a2          = second.getCoeffs().a;
+    double b2          = second.getCoeffs().b;
+    double c2          = second.getCoeffs().c;
     double determinant = (a1 * b2) - (a2 * b1);
 
     if (determinant == 0)
