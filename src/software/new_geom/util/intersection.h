@@ -19,15 +19,14 @@ std::vector<Point> intersection(const Segment &first, const Segment &second);
 
 /**
  * Computes the points of intersection between a rectangle and a line segment.
- * Will contain duplicates if segment goes through rectangle corners.
  *
  * @param rectangle
  * @param segment
  *
- * @return a vector containing the points of intersection between a rectangle and a
+ * @return a set containing the points of intersection between a rectangle and a
  * segment
  */
-std::vector<Point> intersection(const Rectangle &rectangle, const Segment &segment);
+std::set<Point> intersection(const Rectangle &rectangle, const Segment &segment);
 
 /**
  * Computes the points of intersection between a ray and a line segment.
@@ -57,14 +56,13 @@ std::optional<Point> intersection(const Line &first, const Line &second);
 
 /**
  * Computes the points of intersection between a rectangle and a ray.
- * Will contain duplicates if ray goes through rectangle corners.
  *
  * @param rectangle
  * @param ray
  *
- * @return a vector containing the points of intersection between a rectangle and a ray
+ * @return a set containing the points of intersection between a rectangle and a ray
  */
-std::vector<Point> intersection(const Rectangle &rectangle, const Ray &ray);
+std::set<Point> intersection(const Rectangle &rectangle, const Ray &ray);
 
 /**
  * Computes the point of intersection between two rays.
