@@ -518,22 +518,56 @@ TEST(PhysicsRobotTest, test_robot_drive_forward) {
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 60; i++)
     {
-//        physics_robot.applyWheelForceFrontLeft(0.5);
+        physics_robot.applyWheelForceFrontLeft(-0.5);
         physics_robot.applyWheelForceBackLeft(-0.5);
         physics_robot.applyWheelForceBackRight(0.5);
-//        physics_robot.applyWheelForceFrontRight(-0.5);
+        physics_robot.applyWheelForceFrontRight(0.5);
 
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
-        auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
-//        std::cout << robot.velocity() << "       " << robot.angularVelocity() << std::endl;
-        std::cout << robot.position() << "       " << robot.orientation() << std::endl;
     }
 
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
-    EXPECT_GT(robot.velocity().x(), 0.1);
+    EXPECT_GT(robot.velocity().x(), 1.0);
     EXPECT_NEAR(robot.velocity().y(), 0, 1e-5);
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0, 1);
+
+    EXPECT_GT(robot.position().x(), 0.5);
+    EXPECT_NEAR(robot.position().y(), 0, 1e-5);
+    EXPECT_NEAR(robot.orientation().toDegrees(), 0, 1);
+}
+
+TEST(PhysicsRobotTest, test_robot_drive_backwards) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
+
+    // We have to take lots of small steps because a significant amount of accuracy
+    // is lost if we take a single step of 1 second
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        physics_robot.applyWheelForceFrontLeft(0.5);
+        physics_robot.applyWheelForceBackLeft(0.5);
+        physics_robot.applyWheelForceBackRight(-0.5);
+        physics_robot.applyWheelForceFrontRight(-0.5);
+
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(1.0 / 60.0, 5, 8);
+    }
+
+    auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
+    EXPECT_LT(robot.velocity().x(), -1.0);
+    EXPECT_NEAR(robot.velocity().y(), 0, 1e-5);
+    EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0, 1);
+
+    EXPECT_LT(robot.position().x(), -0.5);
+    EXPECT_NEAR(robot.position().y(), 0, 1e-5);
+    EXPECT_NEAR(robot.orientation().toDegrees(), 0, 1);
 }
