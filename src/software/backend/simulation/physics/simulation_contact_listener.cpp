@@ -20,6 +20,20 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
                 contact_callback(robot, ball);
             }
         }
+        if(auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+        {
+            std::cout << "ball dribbler contact started" << std::endl;
+            b2Fixture* f = fixture_a->GetBody()->GetFixtureList();
+            while(f != nullptr) {
+                f->SetRestitution(0.0);
+                f = f->GetNext();
+            }
+            f = fixture_b->GetBody()->GetFixtureList();
+            while(f != nullptr) {
+                f->SetRestitution(0.0);
+                f = f->GetNext();
+            }
+        }
         if(auto ball = isBallContact(user_data_a, user_data_b)) {
             ball->incrementNumCurrentCollisions();
         }
@@ -37,36 +51,34 @@ void SimulationContactListener::PreSolve(b2Contact *contact, const b2Manifold *o
         PhysicsObjectUserData *user_data_b =
                 static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
-        contact->SetRestitution(0.0);
+//        contact->SetRestitution(0.0);
         if(auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
         {
+            std::cout << "dribbler contact" << std::endl;
             // TODO: comment
             // Always disable contacts between the ball and dribbler
             contact->SetEnabled(false);
-//            fixture_a->SetSensor(true);
-//            fixture_b->SetSensor(true);
-//            float r = contact->GetRestitution();
-//            contact->SetRestitution(0.0);
-//            float r2 = contact->GetRestitution();
-//            std::cout << r << r2 << std::endl;
-//            auto r = contact->GetRestitution();
+            contact->SetRestitution(0.0);
+            fixture_a->SetRestitution(0.0);
+            fixture_b->SetRestitution(0.0);
             PhysicsBall* ball = ball_dribbler_pair->first;
             PhysicsRobot* robot = ball_dribbler_pair->second;
             for(auto contact_callback : robot->getDribblerBallContactCallbacks()) {
                 contact_callback(robot, ball);
             }
-
-//            fixture_a->SetSensor(false);
-//            fixture_b->SetSensor(false);
         }
         if (auto ball_chicker_pair = isBallChickerContact(user_data_a, user_data_b))
         {
-        contact->SetRestitution(0.0);
-//            PhysicsBall* ball = ball_chicker_pair->first;
-//            PhysicsRobot* robot = ball_chicker_pair->second;
-//            for(auto contact_callback : robot->getChickerBallContactCallbacks()) {
-//                contact_callback(robot, ball);
-//            }
+            std::cout << "chicker contact" << std::endl;
+            contact->SetRestitution(0.0);
+            fixture_a->SetRestitution(0.0);
+            fixture_b->SetRestitution(0.0);
+        }
+        if(auto ball_robot_pair = isBallRobotBodyContact(user_data_a, user_data_b)) {
+            std::cout << "robot body contact" << std::endl;
+            contact->SetRestitution(0.0);
+            fixture_a->SetRestitution(0.0);
+            fixture_b->SetRestitution(0.0);
         }
         if(auto ball = isBallContact(user_data_a, user_data_b)) {
             if(ball->isInFlight()) {
@@ -182,4 +194,34 @@ PhysicsBall* SimulationContactListener::isBallContact(PhysicsObjectUserData *use
     }
 
     return ball;
+}
+
+std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> SimulationContactListener::isBallRobotBodyContact(
+        PhysicsObjectUserData *user_data_a, PhysicsObjectUserData *user_data_b) {
+    if(!user_data_a || !user_data_b) {
+        return std::nullopt;
+    }
+
+    // TODO: comment pairwise contact checking, and do everywhere
+    PhysicsBall* ball = nullptr;
+    if(user_data_a->type == PhysicsObjectType::BALL) {
+        ball = static_cast<PhysicsBall*>(user_data_a->physics_object);
+    }
+    if(user_data_b->type == PhysicsObjectType::BALL) {
+        ball = static_cast<PhysicsBall*>(user_data_b->physics_object);
+    }
+
+    PhysicsRobot* robot = nullptr;
+    if(user_data_a->type == PhysicsObjectType::ROBOT_BODY) {
+        robot = static_cast<PhysicsRobot*>(user_data_a->physics_object);
+    }
+    if(user_data_b->type == PhysicsObjectType::ROBOT_BODY) {
+        robot = static_cast<PhysicsRobot*>(user_data_b->physics_object);
+    }
+
+    if(ball && robot) {
+        return std::make_pair(ball, robot);
+    }
+
+    return std::nullopt;
 }

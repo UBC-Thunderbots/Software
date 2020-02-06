@@ -35,7 +35,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, doubl
     // collisions and no friction. Because we also do not generally depend on specific
     // behaviour when the ball collides with something, getting these values to perfectly
     // match reality isn't too important.
-    ball_fixture_def.restitution = 0.1;// TODO: change back to 1.0?
+    ball_fixture_def.restitution = 0.0;// TODO: change back to 1.0?
     ball_fixture_def.friction    = 0.0;
     ball_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 

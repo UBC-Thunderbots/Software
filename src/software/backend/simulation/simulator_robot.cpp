@@ -234,11 +234,11 @@ void SimulatorRobot::onChickerBallContact(PhysicsRobot *robot, PhysicsBall *ball
 }
 
 void SimulatorRobot::onDribblerBallContact(PhysicsRobot *robot, PhysicsBall *ball) {
-    std::cout << "dribbler ball contact callback" << std::endl;
+//    std::cout << "dribbler ball contact callback" << std::endl;
     if(dribbler_rpm > 0) {
         Vector dribbler_force_vector = -Vector::createFromAngle(robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
-        dribbler_force_vector = dribbler_force_vector.normalize(10000);
-        ball->applyForce(dribbler_force_vector);
+        dribbler_force_vector = dribbler_force_vector.normalize(0.5);
+//        ball->applyForce(dribbler_force_vector);
         std::cout << "applied force " << dribbler_force_vector << std::endl;
     }
 }

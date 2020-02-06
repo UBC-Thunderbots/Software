@@ -18,5 +18,6 @@ private:
     // TODO: comment
     std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> isBallChickerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
     std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> isBallDribblerContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
+    std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> isBallRobotBodyContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
     PhysicsBall* isBallContact(PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
 };

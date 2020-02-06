@@ -50,6 +50,7 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_dep
     // reality isn't too important.
     robot_body_fixture_def.restitution = 0.0; // TODO: change back to 0.5?
     robot_body_fixture_def.friction    = 0.0;
+    robot_body_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
 
     b2PolygonShape* main_body_shape = getMainRobotBodyShape(robot, chicker_depth);
     b2PolygonShape* front_left_body_shape =
