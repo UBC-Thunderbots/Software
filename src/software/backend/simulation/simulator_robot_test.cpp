@@ -63,6 +63,7 @@ TEST_F(SimulatorRobotTest, test_get_position) {
     auto [world, simulator_robot, simulator_ball] = createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_FLOAT_EQ(simulator_robot->getPositionX(), 1.04);
     EXPECT_FLOAT_EQ(simulator_robot->getPositionY(), -0.8);
+    EXPECT_LT((simulator_robot->position() - Point(1.04, -0.8)).length(), 0.001);
 }
 
 TEST_F(SimulatorRobotTest, test_get_orientation) {
@@ -222,7 +223,9 @@ TEST_F(SimulatorRobotTest, test_ball_bounces_off_front_of_robot_when_dribbler_no
     EXPECT_GT(simulator_ball->velocity().x(), 1.0);
 }
 
-TEST_F(SimulatorRobotTest, test_ball_does_not_bounce_off_front_of_robot_when_dribbler_on) {
+
+// TODO: test for bounce when dribbling not enabled
+TEST_F(SimulatorRobotTest, test_ball_does_not_bounce_off_front_of_robot_when_dribbler_offTODO) {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Ball ball(Point(0.25, 0), Vector(-0.5, 0), Timestamp::fromSeconds(0));
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
@@ -230,7 +233,7 @@ TEST_F(SimulatorRobotTest, test_ball_does_not_bounce_off_front_of_robot_when_dri
 //    EXPECT_LT((simulator_ball->velocity() - Vector(-3, 0)).length(), 0.001);
 
     // We use an arbitrarily large number here for speed
-    simulator_robot->setDribblerSpeed(10000);
+//    simulator_robot->setDribblerSpeed(10000);
 
     // Simulate for 1 second
     for(unsigned int i = 0; i < 150; i++) {
@@ -241,4 +244,86 @@ TEST_F(SimulatorRobotTest, test_ball_does_not_bounce_off_front_of_robot_when_dri
     // Check the ball has stuck to the dribbler
     EXPECT_NEAR(simulator_ball->velocity().x(), 0.0, 0.01);
 //    EXPECT_LT((simulator_ball->position() - Point(DIST_TO_FRONT_OF_ROBOT_METERS, 0)).length(), 0.03);
+}
+
+TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_backwards) {
+    Robot robot(0, Point(0, 0), Vector(-0.2, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball(Point(0.15, 0), Vector(-0.5, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
+
+    EXPECT_LT((simulator_ball->velocity() - Vector(-0.5, 0)).length(), 0.001);
+
+    // We use an arbitrarily large number here for speed
+    simulator_robot->setDribblerSpeed(10000);
+
+    // Simulate for 1 second
+    for(unsigned int i = 0; i < 60; i++) {
+        world->stepSimulation(Duration::fromSeconds(1.0/60.0));
+//        std::cout << simulator_ball->position() << "  ,   " << simulator_ball->velocity() << std::endl;
+    }
+
+    // Check the ball has stuck to the dribbler
+    EXPECT_LT((simulator_ball->velocity() - Vector(-0.2, 0)).length(), 0.005);
+    Point dribbling_point = simulator_robot->position() + Vector(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS, 0);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.005);
+}
+
+TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_forwards) {
+    Robot robot(0, Point(0, 0), Vector(0.5, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball(Point(0.15, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
+
+    // We use an arbitrarily large number here for speed
+    simulator_robot->setDribblerSpeed(10000);
+
+    // Simulate for 1 second
+    for(unsigned int i = 0; i < 60; i++) {
+        world->stepSimulation(Duration::fromSeconds(1.0/60.0));
+        std::cout << simulator_ball->position() << "  ,   " << simulator_ball->velocity() << std::endl;
+    }
+
+    // Check the ball has stuck to the dribbler
+    EXPECT_LT((simulator_ball->velocity() - Vector(0.5, 0)).length(), 0.005);
+    Point dribbling_point = simulator_robot->position() + Vector(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS, 0);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.005);
+}
+
+TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_spinning_in_place) {
+    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball(Point(0.15, 0), Vector(-0.5, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
+
+    // We use an arbitrarily large number here for speed
+    simulator_robot->setDribblerSpeed(10000);
+
+    // Simulate for 0.5 second so the ball makes contact with the dribbler
+    for(unsigned int i = 0; i < 30; i++) {
+        world->stepSimulation(Duration::fromSeconds(1.0/60.0));
+        std::cout << simulator_ball->position() << "  ,   " << simulator_ball->velocity() << std::endl;
+    }
+
+    // Check the ball has stuck to the dribbler
+    EXPECT_LT((simulator_ball->velocity() - Vector(0.0, 0)).length(), 0.005);
+    Point dribbling_point = simulator_robot->position() + Vector(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS - 0.007, 0);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.005);
+    EXPECT_LT((simulator_robot->position() - Point(0, 0)).length(), 0.005);
+
+    // Simulate for 0.5 second so the ball makes contact with the dribbler
+    for(unsigned int i = 0; i < 200; i++) {
+        if(i < 200) {
+            simulator_robot->applyWheelForceFrontLeft(0.2);
+            simulator_robot->applyWheelForceBackLeft(0.2);
+            simulator_robot->applyWheelForceBackRight(0.2);
+            simulator_robot->applyWheelForceFrontRight(0.2);
+        }
+
+        world->stepSimulation(Duration::fromSeconds(1.0/60.0));
+        std::cout << simulator_ball->position() << "  ,  " << simulator_ball->velocity() << "   ,   " <<  simulator_robot->getOrientation() << "   ,   " << simulator_robot->getVelocityAngular() << std::endl;
+    }
+
+    // Check the ball has stuck to the dribbler
+//    EXPECT_LT((simulator_ball->velocity() - Vector(0.0, 0)).length(), 0.005);
+    dribbling_point = simulator_robot->position() + Vector::createFromAngle(Angle::fromRadians(simulator_robot->getOrientation())).normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS - 0.007);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
 }

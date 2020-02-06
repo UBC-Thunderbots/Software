@@ -23,7 +23,7 @@ PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, d
     // in real life, so we create an inset since the ball makes contact slightly inside
     // the robot body. We are only allowed to cover a fraction of the ball, so we use this
     // to determine the depth of the inset
-    double chicker_depth = BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
+    double chicker_depth = BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 
     setupRobotBodyFixtures(robot, chicker_depth, mass_kg);
     setupDribblerFixture(robot, chicker_depth);

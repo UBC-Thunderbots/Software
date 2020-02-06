@@ -11,7 +11,7 @@ public:
     void BeginContact(b2Contact* contact) override;
     // Continually called at each physics step for the duration of the contact
     void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
-	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
+    // Called once at the end of a contact
     void EndContact(b2Contact* contact) override;
 
 private:

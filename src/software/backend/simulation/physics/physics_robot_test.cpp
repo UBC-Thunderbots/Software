@@ -59,10 +59,11 @@ TEST(PhysicsRobotTest, test_physics_robot_is_removed_from_world_when_destroyed)
     EXPECT_EQ(0, world->GetBodyCount());
 }
 
-// Roll the ball along the left side of the robot just outside of the robot radius
-// and check it does not collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_outside_radius)
 {
+    // Roll the ball along the left side of the robot just outside of the robot radius
+    // and check it does not collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -90,10 +91,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_outside_radius)
     EXPECT_LT(ball.velocity().orientation().minDiff(Angle::half()).toDegrees(), 0.1);
 }
 
-// Roll the ball along the left side of the robot just inside of the robot radius
-// and check it does collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_inside_radius)
 {
+    // Roll the ball along the left side of the robot just inside of the robot radius
+    // and check it does collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -120,10 +122,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_left_side_inside_radius)
     EXPECT_GT(ball.velocity().orientation().minDiff(Angle::half()).toDegrees(), 0.1);
 }
 
-// Roll the ball along the right side of the robot just outside of the robot radius
-// and check it does not collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_outside_radius)
 {
+    // Roll the ball along the right side of the robot just outside of the robot radius
+    // and check it does not collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -149,10 +152,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_outside_radius)
     EXPECT_LT(ball.velocity().orientation().minDiff(Angle::half()).toDegrees(), 0.1);
 }
 
-// Roll the ball along the right side of the robot just inside of the robot radius
-// and check it does collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_inside_radius)
 {
+    // Roll the ball along the right side of the robot just inside of the robot radius
+    // and check it does collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -179,10 +183,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_right_side_inside_radius)
     EXPECT_GT(ball.velocity().orientation().minDiff(Angle::half()).toDegrees(), 0.1);
 }
 
-// Roll the ball along the back side of the robot just outside of the robot radius
-// and check it does not collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_outside_radius)
 {
+    // Roll the ball along the back side of the robot just outside of the robot radius
+    // and check it does not collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -211,10 +216,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_outside_radius)
               0.1);
 }
 
-// Roll the ball along the back side of the robot just inside of the robot radius
-// and check it does collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_inside_radius)
 {
+    // Roll the ball along the back side of the robot just inside of the robot radius
+    // and check it does collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -244,10 +250,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_back_side_inside_radius)
               0.1);
 }
 
-// Roll the ball along the front side of the robot just in front of the chicker
-// and check it does not collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_in_front_of_chicker)
 {
+    // Roll the ball along the front side of the robot just in front of the chicker
+    // and check it does not collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -277,10 +284,11 @@ TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_in_front_of_chic
               0.1);
 }
 
-// Roll the ball along the front side of the robot just behind the chicker
-// and check it does collide
 TEST(PhysicsRobotTest, test_physics_robot_dimensions_front_side_behind_chicker)
 {
+    // Roll the ball along the front side of the robot just behind the chicker
+    // and check it does collide
+
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -570,4 +578,66 @@ TEST(PhysicsRobotTest, test_robot_drive_backwards) {
     EXPECT_LT(robot.position().x(), -0.5);
     EXPECT_NEAR(robot.position().y(), 0, 1e-5);
     EXPECT_NEAR(robot.orientation().toDegrees(), 0, 1);
+}
+
+TEST(PhysicsRobotTest, test_robot_spin_clockwise) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
+
+    // We have to take lots of small steps because a significant amount of accuracy
+    // is lost if we take a single step of 1 second
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        physics_robot.applyWheelForceFrontLeft(-0.5);
+        physics_robot.applyWheelForceBackLeft(-0.5);
+        physics_robot.applyWheelForceBackRight(-0.5);
+        physics_robot.applyWheelForceFrontRight(-0.5);
+
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(1.0 / 60.0, 5, 8);
+    }
+
+    auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
+    // Because the robot's center of mass is not perfect we expect it to have drifted a little bit
+    // while spinning
+    EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
+    EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
+    EXPECT_LT(robot.angularVelocity(), AngularVelocity::fromRadians(-30));
+}
+
+TEST(PhysicsRobotTest, test_robot_spin_counterclockwise) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
+
+    // We have to take lots of small steps because a significant amount of accuracy
+    // is lost if we take a single step of 1 second
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        physics_robot.applyWheelForceFrontLeft(0.5);
+        physics_robot.applyWheelForceBackLeft(0.5);
+        physics_robot.applyWheelForceBackRight(0.5);
+        physics_robot.applyWheelForceFrontRight(0.5);
+
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(1.0 / 60.0, 5, 8);
+    }
+
+    auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
+    // Because the robot's center of mass is not perfect we expect it to have drifted a little bit
+    // while spinning
+    EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
+    EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
+    EXPECT_GT(robot.angularVelocity(), AngularVelocity::fromRadians(30));
 }

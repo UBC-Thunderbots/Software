@@ -34,6 +34,13 @@ public:
     float getPositionY();
 
     /**
+     * Returns the current position of the robot, in global field coordinates, in meters
+     *
+     * @return the current position of the robot, in global field coordinates, in meters
+     */
+    Point position();
+
+    /**
      * Returns the orientation of the robot, in global field coordinates, in radians
      *
      * @return the orientation of the robot, in global field coordinates, in radians
