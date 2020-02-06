@@ -54,9 +54,9 @@ std::vector<Point> intersection(const Segment &first, const Segment &second)
     return output;
 }
 
-std::set<Point> intersection(const Rectangle &rectangle, const Segment &segment)
+std::unordered_set<Point> intersection(const Rectangle &rectangle, const Segment &segment)
 {
-    std::set<Point> intersections;
+    std::unordered_set<Point> intersections;
 
     for (const Segment &rec_segment : rectangle.getSegments())
     {
@@ -142,9 +142,9 @@ std::optional<Point> intersection(const Line &first, const Line &second)
     }
 }
 
-std::set<Point> intersection(const Rectangle &rectangle, const Ray &ray)
+std::unordered_set<Point> intersection(const Rectangle &rectangle, const Ray &ray)
 {
-    std::set<Point> intersections;
+    std::unordered_set<Point> intersections;
 
     for (const Segment &seg : rectangle.getSegments())
     {
