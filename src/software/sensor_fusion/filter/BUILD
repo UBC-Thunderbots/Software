@@ -1,4 +1,4 @@
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
 cc_library(
     name = "ball_filter",
@@ -53,5 +53,13 @@ cc_library(
         ":robot_filter",
         "//software:constants",
         "//software/world:team",
+    ],
+)
+
+cc_library(
+    name = "sensor_fusion_filters",
+    deps = [
+        ":ball_filter",
+        ":robot_team_filter",
     ],
 )
