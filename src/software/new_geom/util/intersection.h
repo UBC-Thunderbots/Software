@@ -1,4 +1,5 @@
 #include <unordered_set>
+
 #include "software/geom/util.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/rectangle.h"
@@ -27,7 +28,8 @@ std::vector<Point> intersection(const Segment &first, const Segment &second);
  * @return a set containing the points of intersection between a rectangle and a
  * segment
  */
-std::unordered_set<Point> intersection(const Rectangle &rectangle, const Segment &segment);
+std::unordered_set<Point> intersection(const Rectangle &rectangle,
+                                       const Segment &segment);
 
 /**
  * Computes the points of intersection between a ray and a line segment.
