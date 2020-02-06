@@ -50,7 +50,7 @@ TEST(ConvexPolygonConstructorTest, test_construct_from_initializer_list)
 }
 
 // Temporarily disabling the following tests until issue #1140 is completed.
-//TEST(ConvexPolygonConstructorTest, test_not_convex)
+// TEST(ConvexPolygonConstructorTest, test_not_convex)
 //{
 //    /*
 //     *  2            *-------*
@@ -79,7 +79,7 @@ TEST(ConvexPolygonConstructorTest, test_construct_from_initializer_list)
 //                 std::invalid_argument);
 //}
 
-//TEST(ConvexPolygonConstructorTest, test_self_intersecting_loop)
+// TEST(ConvexPolygonConstructorTest, test_self_intersecting_loop)
 //{
 //    /*
 //     *  3    *------------------------------------------------*
