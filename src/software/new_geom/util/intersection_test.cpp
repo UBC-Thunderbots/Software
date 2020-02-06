@@ -169,6 +169,14 @@ TEST(LineLineIntersectionTest, test_other_intersection)
     EXPECT_EQ(point_of_intersection.value(), Point(-5, -1));
 }
 
+TEST(LineLineIntersectionTest, test_vertical_horizontal_lines_cross)
+{
+    Line l_1 = Line(Point(), Point(5, 0));
+    Line l_2 = Line(Point(), Point(0, 5));
+    auto point_of_intersection = intersection(l_1, l_2);
+    EXPECT_EQ(point_of_intersection.value(), Point());
+}
+
 TEST(LineLineIntersectionTest, test_no_intersection)
 {
     Line l_1 = Line(Point(0, -3), Point(3, 6));

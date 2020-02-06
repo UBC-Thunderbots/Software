@@ -27,13 +27,3 @@ void Line::swapXY()
     coeffs.a = coeffs.b;
     coeffs.b = a;
 }
-
-double Line::x(double y) const
-{
-    return (-coeffs.b * y - coeffs.c) / coeffs.a;
-}
-
-double Line::y(double x) const
-{
-    return (-coeffs.a * x - coeffs.c) / coeffs.b;
-}
