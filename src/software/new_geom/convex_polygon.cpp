@@ -20,6 +20,7 @@ ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polyg
 
 bool ConvexPolygon::isConvex()
 {
+    // TODO: Properly implement this (Issue #1140)
     // Temporarily always returning true to avoid errors until Issue #1140 is completed
     return true;
 }
