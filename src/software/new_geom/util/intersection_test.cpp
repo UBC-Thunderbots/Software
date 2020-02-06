@@ -155,6 +155,15 @@ TEST(LineLineIntersectionTest, test_intersection)
     EXPECT_EQ(point_of_intersection.value(), Point(-7, -24));
 }
 
+TEST(LineLineIntersectionTest, test_overlapping_not_intersecting)
+{
+    Line l_1 = Line(Point(0, -3), Point(3, 6));
+    Line l_2 = Line(Point(1, 0), Point(2, 3));
+
+    auto point_of_intersection = intersection(l_1, l_2);
+    EXPECT_FALSE(point_of_intersection.has_value());
+}
+
 TEST(LineLineIntersectionTest, test_other_intersection)
 {
     Line l_1                   = Line(Point(-1, -1), Point(5, -1));
