@@ -179,7 +179,7 @@ void STP::assignRobotsToTactics(const World& world,
         tactics.resize(non_goalie_robots.size());
     }
 
-    size_t num_rows = world.friendlyTeam().numRobots();
+    size_t num_rows = non_goalie_robots.size();
     size_t num_cols = tactics.size();
 
     // The Matrix constructor will assert if the rows and columns of the matrix are

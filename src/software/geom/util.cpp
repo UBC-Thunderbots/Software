@@ -777,18 +777,6 @@ Point segmentNearLine(Point a0, Point a1, Point b0, Point b1)
     return p;
 }
 
-Point intersection(Point a1, Point a2, Point b1, Point b2)
-{
-    Vector a = a2 - a1;
-
-    Vector b1r = (b1 - a1).rotate(-a.orientation());
-    Vector b2r = (b2 - a1).rotate(-a.orientation());
-    Vector br  = (b1r - b2r);
-
-    return Vector(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation()) +
-           a1;
-}
-
 Angle acuteVertexAngle(Vector v1, Vector v2)
 {
     return v1.orientation().minDiff(v2.orientation());

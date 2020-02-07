@@ -16,7 +16,7 @@ typedef enum
 /**
  * \brief Descriptor subtypes used in CDC ACM devices.
  */
-typedef enum
+enum
 {
     CDCACM_DSTYPE_HEADER                      = 0x00U,
     CDCACM_DSTYPE_CALL_MANAGEMENT             = 0x01U,
