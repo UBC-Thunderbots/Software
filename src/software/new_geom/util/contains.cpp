@@ -34,8 +34,12 @@ bool contains(const Segment &segment, const Point &point)
 bool contains(const Ray &ray, const Point &point)
 {
     Point point_in_ray_direction = ray.getStart() + ray.toUnitVector();
-    return (point == ray.getStart()) ||
-           (collinear(point, ray.getStart(), point_in_ray_direction) &&
-            (((point - ray.getStart()).normalize() - ray.toUnitVector()).length() <
-             GeomConstants::EPSILON));
+
+    bool point_is_ray_start = point == ray.getStart();
+    bool point_collinear_with_ray =
+        collinear(point, ray.getStart(), point_in_ray_direction);
+    bool point_is_in_ray_direction =
+        ((point - ray.getStart()).normalize() - ray.toUnitVector()).length() <
+        GeomConstants::EPSILON;
+    return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }

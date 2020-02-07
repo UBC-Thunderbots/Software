@@ -73,9 +73,9 @@ std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &se
 {
     std::unordered_set<Point> intersections;
 
-    for (const Segment &rec_segment : polygon.getSegments())
+    for (const Segment &seg : polygon.getSegments())
     {
-        for (const Point &p : intersection(rec_segment, segment))
+        for (const Point &p : intersection(seg, segment))
         {
             intersections.insert(p);
         }
