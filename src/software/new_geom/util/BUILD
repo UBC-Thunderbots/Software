@@ -35,7 +35,9 @@ cc_library(
         "intersects.h",
     ],
     deps = [
-        "//software/geom",
+        ":contains",
+        ":intersection",
+        "//software/new_geom:line",
         "//software/new_geom:polygon",
         "//software/new_geom:segment",
     ],
@@ -50,7 +52,9 @@ cc_library(
         "intersection.h",
     ],
     deps = [
-        "//software/geom",
+        ":collinear",
+        ":contains",
+        "//software/new_geom:line",
         "//software/new_geom:ray",
         "//software/new_geom:rectangle",
         "//software/new_geom:segment",
@@ -64,6 +68,58 @@ cc_test(
     ],
     deps = [
         ":intersection",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "collinear",
+    srcs = [
+        "collinear.cpp",
+    ],
+    hdrs = [
+        "collinear.h",
+    ],
+    deps = [
+        "//software/new_geom:point",
+        "//software/new_geom:segment",
+    ],
+)
+
+cc_test(
+    name = "collinear_test",
+    srcs = [
+        "collinear_test.cpp",
+    ],
+    deps = [
+        ":collinear",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "contains",
+    srcs = [
+        "contains.cpp",
+    ],
+    hdrs = [
+        "contains.h",
+    ],
+    deps = [
+        ":collinear",
+        "//software/new_geom:point",
+        "//software/new_geom:ray",
+        "//software/new_geom:segment",
+    ],
+)
+
+cc_test(
+    name = "contains_test",
+    srcs = [
+        "contains_test.cpp",
+    ],
+    deps = [
+        ":contains",
         "@gtest//:gtest_main",
     ],
 )

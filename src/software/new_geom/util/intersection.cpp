@@ -1,4 +1,6 @@
 #include "software/new_geom/util/intersection.h"
+#include "software/new_geom/util/contains.h"
+#include "software/new_geom/util/collinear.h"
 
 /**
  * Computes the point of intersection between two lines.
@@ -41,6 +43,18 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
                      (determinantA * (y3 - y4) - (y1 - y2) * determinantB) / denominator);
 
     return std::make_optional(intersection);
+}
+
+/**
+ * Returns the sign of the given double, or zero if is in the range (-EPSILON, EPSILON).
+ *
+ * @param n the given double
+ *
+ * @return the sign of the given double, or zero if is in the range (-EPSILON, EPSILON)
+ */
+constexpr int sign(double n)
+{
+    return n > GeomConstants::EPSILON ? 1 : (n < -GeomConstants::EPSILON ? -1 : 0);
 }
 
 std::vector<Point> intersection(const Segment &first, const Segment &second)

@@ -1,9 +1,9 @@
 #include <unordered_set>
 
-#include "software/geom/util.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/line.h"
 
 /**
  * Computes the intersection of two segments.
