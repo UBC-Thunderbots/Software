@@ -1,7 +1,7 @@
 # Code Style Guide
 
 ## Table of Contents
-* [C-specific Stuff](#c-specific-guidelines)
+* [C-specific Guidelines](#c-specific-guidelines)
 * [Names and Variables](#names-and-variables)
 * [Comments](#comments)
 * [Headers](#headers)
