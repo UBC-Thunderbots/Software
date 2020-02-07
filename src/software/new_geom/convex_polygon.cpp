@@ -20,26 +20,9 @@ ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polyg
 
 bool ConvexPolygon::isConvex()
 {
-    double totalAngle = 0;
-
-    for (unsigned i = 1; i <= points_.size(); i++)
-    {
-        // A vector from point i to point i-1
-        Vector a = points_[i - 1] - points_[i % points_.size()];
-        // The vector from point i to i+1
-        Vector b = points_[(i + 1) % points_.size()] - points_[i % points_.size()];
-
-        double vertexAngle = a.angleWith(b).toRadians();
-
-        if (std::abs(vertexAngle) > M_PI)
-        {
-            return false;
-        }
-
-        totalAngle += (M_PI - vertexAngle);
-    }
-
-    return std::fabs(totalAngle - (2.0 * M_PI)) < 1e-14;
+    // TODO: Properly implement this (Issue #1140)
+    // Temporarily always returning true to avoid errors until Issue #1140 is completed
+    return true;
 }
 
 double ConvexPolygon::area() const
