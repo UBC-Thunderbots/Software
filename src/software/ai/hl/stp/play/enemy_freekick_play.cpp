@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -10,6 +9,7 @@
 #include "software/ai/hl/stp/tactic/shadow_freekicker_tactic.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 
 const std::string EnemyFreekickPlay::name = "Enemy Freekick Play";
@@ -150,5 +150,5 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<EnemyFreekickPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string,Play,EnemyFreekickPlay> factory;

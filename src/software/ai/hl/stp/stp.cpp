@@ -14,6 +14,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          long random_seed)
@@ -45,7 +46,7 @@ void STP::updateCurrentPlay(const World& world)
         {
             try
             {
-                current_play = PlayFactory::createPlay(override_play_name);
+                current_play = GenericFactory<std::string,Play>::create(override_play_name);
             }
             catch (std::invalid_argument)
             {

@@ -4,7 +4,6 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/evaluation/team.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
@@ -15,6 +14,7 @@
 #include "software/logger/init.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string DefensePlay::name = "Defense Play";
 
@@ -179,4 +179,7 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
 }
 
 // Register this play in the PlayFactory
-static TPlayFactory<DefensePlay> factory;
+//static TPlayFactory<DefensePlay> factory;
+
+// Register this play in the genericFactory
+static TGenericFactory<std::string,Play,DefensePlay> factory;

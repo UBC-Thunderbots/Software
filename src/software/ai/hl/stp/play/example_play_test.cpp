@@ -42,3 +42,4 @@ TEST(ExamplePlayTest, test_example_play_returns_correct_tactics)
         EXPECT_NE(dynamic_cast<MoveTactic*>(t.get()), nullptr);
     }
 }
+
