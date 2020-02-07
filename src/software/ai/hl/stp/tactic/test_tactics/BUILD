@@ -7,6 +7,7 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic:mutable_tactic_visitor",
     ],
 )
 
@@ -17,6 +18,7 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic:mutable_tactic_visitor",
     ],
 )
 
@@ -26,5 +28,6 @@ cc_library(
     hdrs = ["goalie_test_tactic.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic:mutable_tactic_visitor",
     ],
 )

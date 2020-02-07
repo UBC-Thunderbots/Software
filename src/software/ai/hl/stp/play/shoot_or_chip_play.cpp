@@ -113,14 +113,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                     crease_defender_tactic->getAssignedRobot()->id());
             }
         }
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         friendly_team_for_goalie, world.enemyTeam());
 
         // Update crease defenders
         for (auto &crease_defender_tactic : crease_defender_tactics)
         {
-            crease_defender_tactic->updateWorldParams(
-                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             result.emplace_back(crease_defender_tactic);
         }
 
@@ -152,8 +148,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             chip_target = chip_targets[0].getOrigin();
         }
-        shoot_or_chip_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball());
         shoot_or_chip_tactic->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie

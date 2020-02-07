@@ -112,8 +112,6 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // keeps track of the next defense position to assign
@@ -132,8 +130,6 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // We shadow assuming the robots do not pass so we do not try block passes
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
-                shadow_enemy_tactics.at(i)->updateWorldParams(
-                    world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
                 shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
                                                                 shadow_dist);
                 result.emplace_back(shadow_enemy_tactics.at(i));

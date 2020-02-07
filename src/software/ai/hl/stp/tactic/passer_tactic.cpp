@@ -75,7 +75,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
-        kick_action->updateWorldParams(ball);
         kick_action->updateControlParams(*robot, ball.position(), pass.receiverPoint(),
                                          pass.speed());
         yield(kick_action);

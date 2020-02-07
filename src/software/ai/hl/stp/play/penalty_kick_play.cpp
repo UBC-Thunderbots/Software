@@ -67,8 +67,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoal().toVector().orientation(), 0);
 
-        penalty_shot_tactic->updateWorldParams(world.ball(), world.enemyTeam().goalie(),
-                                               world.field());
         shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
 
         // If we are setting up for penalty kick, move our robots to position
