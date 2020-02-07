@@ -42,6 +42,33 @@ cc_library(
 )
 
 cc_library(
+    name = "intersection",
+    srcs = [
+        "intersection.cpp",
+    ],
+    hdrs = [
+        "intersection.h",
+    ],
+    deps = [
+        "//software/geom",
+        "//software/new_geom:ray",
+        "//software/new_geom:rectangle",
+        "//software/new_geom:segment",
+    ],
+)
+
+cc_test(
+    name = "intersections_test",
+    srcs = [
+        "intersection_test.cpp",
+    ],
+    deps = [
+        ":intersection",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "distance",
     srcs = [
         "distance.cpp",
