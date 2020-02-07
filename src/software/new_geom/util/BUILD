@@ -35,8 +35,7 @@ cc_library(
         "intersects.h",
     ],
     deps = [
-        ":contains",
-        ":intersection",
+        "//software/geom",
         "//software/new_geom:line",
         "//software/new_geom:polygon",
         "//software/new_geom:segment",
@@ -55,19 +54,20 @@ cc_library(
         ":collinear",
         ":contains",
         "//software/new_geom:line",
+        "//software/new_geom:polygon",
         "//software/new_geom:ray",
-        "//software/new_geom:rectangle",
         "//software/new_geom:segment",
     ],
 )
 
 cc_test(
-    name = "intersections_test",
+    name = "intersection_test",
     srcs = [
         "intersection_test.cpp",
     ],
     deps = [
         ":intersection",
+        "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
     ],
 )

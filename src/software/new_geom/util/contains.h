@@ -1,5 +1,5 @@
-#include "software/new_geom/segment.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/segment.h"
 
 /**
  * Returns true if the given ray contains the given point, false otherwise.

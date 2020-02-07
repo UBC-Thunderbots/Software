@@ -1,6 +1,7 @@
 #include "software/new_geom/util/intersection.h"
-#include "software/new_geom/util/contains.h"
+
 #include "software/new_geom/util/collinear.h"
+#include "software/new_geom/util/contains.h"
 
 /**
  * Computes the point of intersection between two lines.
@@ -68,11 +69,11 @@ std::vector<Point> intersection(const Segment &first, const Segment &second)
     return output;
 }
 
-std::unordered_set<Point> intersection(const Rectangle &rectangle, const Segment &segment)
+std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment)
 {
     std::unordered_set<Point> intersections;
 
-    for (const Segment &rec_segment : rectangle.getSegments())
+    for (const Segment &rec_segment : polygon.getSegments())
     {
         for (const Point &p : intersection(rec_segment, segment))
         {
@@ -156,11 +157,11 @@ std::optional<Point> intersection(const Line &first, const Line &second)
     }
 }
 
-std::unordered_set<Point> intersection(const Rectangle &rectangle, const Ray &ray)
+std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray)
 {
     std::unordered_set<Point> intersections;
 
-    for (const Segment &seg : rectangle.getSegments())
+    for (const Segment &seg : polygon.getSegments())
     {
         for (const Point &p : intersection(ray, seg))
         {

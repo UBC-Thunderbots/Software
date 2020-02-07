@@ -1,9 +1,9 @@
 #include <unordered_set>
 
-#include "software/new_geom/ray.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
 #include "software/new_geom/line.h"
+#include "software/new_geom/polygon.h"
+#include "software/new_geom/ray.h"
+#include "software/new_geom/segment.h"
 
 /**
  * Computes the intersection of two segments.
@@ -20,16 +20,15 @@
 std::vector<Point> intersection(const Segment &first, const Segment &second);
 
 /**
- * Computes the points of intersection between a rectangle and a line segment.
+ * Computes the points of intersection between a polygon and a line segment.
  *
- * @param rectangle
+ * @param polygon
  * @param segment
  *
- * @return a set containing the points of intersection between a rectangle and a
+ * @return a set containing the points of intersection between a polygon and a
  * segment
  */
-std::unordered_set<Point> intersection(const Rectangle &rectangle,
-                                       const Segment &segment);
+std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment);
 
 /**
  * Computes the points of intersection between a ray and a line segment.
@@ -58,14 +57,14 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment);
 std::optional<Point> intersection(const Line &first, const Line &second);
 
 /**
- * Computes the points of intersection between a rectangle and a ray.
+ * Computes the points of intersection between a polygon and a ray.
  *
- * @param rectangle
+ * @param polygon
  * @param ray
  *
- * @return a set containing the points of intersection between a rectangle and a ray
+ * @return a set containing the points of intersection between a polygon and a ray
  */
-std::unordered_set<Point> intersection(const Rectangle &rectangle, const Ray &ray);
+std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray);
 
 /**
  * Computes the point of intersection between two rays.

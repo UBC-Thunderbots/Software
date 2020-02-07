@@ -106,6 +106,12 @@ TEST(ConvexPolygonConstructorTest, test_construct_from_initializer_list)
 //                 std::invalid_argument);
 //}
 
+TEST(ConvexPolygonConstructorTest, test_ribbon_not_convex)
+{
+    EXPECT_THROW(ConvexPolygon({{0, 0}, {0, 5}, {5, 5}, {-5, 0.0f}}),
+                 std::invalid_argument);
+}
+
 TEST(ConvexPolygonAreaTest, test_trapezoid_area)
 {
     ConvexPolygon trapezoid = ConvexPolygon{{0, 0}, {1, 4}, {5, 4}, {6, 0}};
@@ -120,7 +126,5 @@ TEST(ConvexPolygonAreaTest, test_rhombus_area)
 
 TEST(ConvexPolygonIsConvexTest, test_barely_convex_polygon)
 {
-    // This triangle is barely convex. Doesn't pass isConvex(...) if using
-    // GeomConstants::EPSILON but does pass it with a little more tolerance.
     ConvexPolygon triangle = ConvexPolygon{{0, 0}, {4.5, 0.5}, {4.5, -0.5}};
 }

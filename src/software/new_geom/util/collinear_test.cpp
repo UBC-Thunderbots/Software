@@ -32,14 +32,14 @@ TEST(CollinearPointsTest, test_points_collinear_all_identical)
 
 TEST(CollinearSegmentsTest, test_segments_collinear)
 {
-    Segment first = Segment(Point(2, 3), Point(0, 0));
+    Segment first  = Segment(Point(2, 3), Point(0, 0));
     Segment second = Segment(Point(-2, -3), Point(0, 0));
     EXPECT_TRUE(collinear(first, second));
 }
 
 TEST(CollinearSegmentsTest, test_segments_not_collinear)
 {
-    Segment first = Segment(Point(2, 3), Point(0, 0));
+    Segment first  = Segment(Point(2, 3), Point(0, 0));
     Segment second = Segment(Point(-9, 4), Point(7, 8));
     EXPECT_FALSE(collinear(first, second));
 }
