@@ -84,7 +84,7 @@ If you do rebase or merge and get conflicts, you'll need to resolve them manuall
 ### Formatting Your Code
 We use [clang-format](https://electronjs.org/docs/development/clang-format) to automatically format our code. Using an automatic tool helps keep things consistent across the codebase without developers having to change their personal style as they write. See the [code style guide](code-style-guide.md) for more information on exactly what it does.
 
-To format the code, from the `Software` directory run `./clang_format/fix_formatting.sh -b upstream/master`. This will take the difference between your current branch and the `upstream/master` branch, and run `clang-format` on those changes. The only reason we use the `-b upstream/master` option is because it's faster and only formats code you have modified. There is also a `-a` option that will try format the entire codebase, but it is slow and not recommended.
+To format the code, from the `Software` directory run `./formatting_scripts/fix_formatting.sh`.
 
 We recommend running the formatting script and then committing all your changes, so that your commits can more easily pass CI.
 ### Pull Requests
