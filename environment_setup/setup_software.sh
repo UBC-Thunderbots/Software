@@ -54,6 +54,7 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have 
                       # to manually install it ourselves
+    kcachegrind # This lets us view the profiles output by callgrind
 )
 sudo apt-get install ${host_software_packages[@]} -y
 

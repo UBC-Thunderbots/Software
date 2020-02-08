@@ -74,4 +74,5 @@ void TacticWorldParamsUpdateVisitor::visit(DefenseShadowEnemyTactic &tactic)
 }
 void TacticWorldParamsUpdateVisitor::visit(MoveTestTactic &tactic) {}
 void TacticWorldParamsUpdateVisitor::visit(StopTestTactic &tactic) {}
+void TacticWorldParamsUpdateVisitor::visit(GoalieTestTactic &tactic) {}
 // clang-format on

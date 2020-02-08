@@ -163,7 +163,6 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         {
             if (evaluate_penalty_shot())
             {
-                kick_action->updateWorldParams(ball);
                 kick_action->updateControlParams(*robot, ball.position(),
                                                  robot.value().orientation(),
                                                  PENALTY_KICK_SHOT_SPEED);

@@ -22,6 +22,7 @@ class PasserTactic;
 class DefenseShadowEnemyTactic;
 class MoveTestTactic;
 class StopTestTactic;
+class GoalieTestTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -56,4 +57,5 @@ class MutableTacticVisitor
     virtual void visit(DefenseShadowEnemyTactic &tactic) = 0;
     virtual void visit(MoveTestTactic &tactic)           = 0;
     virtual void visit(StopTestTactic &tactic)           = 0;
+    virtual void visit(GoalieTestTactic &tactic)         = 0;
 };

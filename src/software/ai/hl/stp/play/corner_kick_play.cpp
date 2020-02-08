@@ -143,10 +143,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -163,10 +160,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -182,10 +176,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -217,27 +208,13 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                          world.enemyTeam(), pass, world.ball(), false);
     do
     {
-        passer->updateWorldParams(world.ball());
         passer->updateControlParams(pass);
-        receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
-                                    world.ball());
         receiver->updateControlParams(pass);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
     } while (!receiver->done());
 
     LOG(DEBUG) << "Finished";
-}
-
-void CornerKickPlay::updateCherryPickTactics(
-    std::vector<std::shared_ptr<CherryPickTactic>> tactics)
-{
-    for (auto &tactic : tactics)
-    {
-        tactic->updateWorldParams(world);
-    }
 }
 
 void CornerKickPlay::updateAlignToBallTactic(

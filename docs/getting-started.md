@@ -20,9 +20,8 @@
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
 * [Building and Running the Code](#building-and-running-the-code)
-   * [With CLion](#with-clion)
-   * [From the command-line](#from-the-command-line)
 * [Debugging](#debugging)
+* [Profiling](#profiling)
 * [Flashing and Debugging A STM32 MCU](#flashing-and-debugging-a-stm32-mcu)
 
 ## Introduction
@@ -146,7 +145,24 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
 
 ## Debugging
-Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow! Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). If you insist on using the command line for everything, or if you have CLion issues, see [here](https://stackoverflow.com/questions/45812725/c-debugging-with-gdb-bazel-emacs).
+Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
+
+### With CLion
+Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
+
+### From The Command line
+`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see (here)[https://www.cs.cmu.edu/~gilpin/tutorial/] for a tutorial on how to use `gdb` if you're not familiar with it.
+
+
+## Profiling 
+Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
+```
+bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/ABSOLUTE/PATH/TO/profile.callgrind" //target/to:run
+
+// Example
+bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/tmp/profile.callgrind" //software/geom:angle_test
+```
+This will output the file at the _absolute_ path given via the `--callgrind-out-file` argument. This file can then be viewed using `kcachegrind` (example: `kcachegrind /tmp/profile.callgrind`), giving lots of useful information about where time is being spent in the code.
 
 ## Flashing And Debugging A STM32 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.

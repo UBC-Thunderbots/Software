@@ -135,10 +135,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                ->value();
     do
     {
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        updateGoalie(goalie_tactic);
-        updateShootGoalTactic(shoot_tactic);
-        updateCherryPickTactics(cherry_pick_tactics);
         updatePassGenerator(pass_generator);
 
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
@@ -198,12 +194,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
             false);
         do
         {
-            updateCreaseDefenderTactics(crease_defender_tactics);
-            updateGoalie(goalie_tactic);
-            passer->updateWorldParams(world.ball());
             passer->updateControlParams(pass);
-            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
-                                        world.ball());
             receiver->updateControlParams(pass);
             yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
                    std::get<1>(crease_defender_tactics)});
@@ -217,41 +208,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished";
 }
 
-void ShootOrPassPlay::updateCherryPickTactics(
-    std::array<std::shared_ptr<CherryPickTactic>, 2> tactics)
-{
-    for (auto &tactic : tactics)
-    {
-        tactic->updateWorldParams(world);
-    }
-}
-
-void ShootOrPassPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
-{
-    shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                    world.enemyTeam(), world.ball());
-}
-
 void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());
-}
-
-void ShootOrPassPlay::updateCreaseDefenderTactics(
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders)
-{
-    for (auto &crease_defender : crease_defenders)
-    {
-        crease_defender->updateWorldParams(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
-    }
-}
-
-void ShootOrPassPlay::updateGoalie(std::shared_ptr<GoalieTactic> goalie)
-{
-    goalie->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(),
-                              world.enemyTeam());
 }
 
 // Register this play in the PlayFactory
