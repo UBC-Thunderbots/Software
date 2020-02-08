@@ -57,7 +57,7 @@ DribblerEnable MoveAction::getDribblerEnabled()
     return enable_dribbler;
 }
 
-void MoveAction::accept(ActionVisitor& visitor) const
+void MoveAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }

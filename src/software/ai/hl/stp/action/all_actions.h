@@ -1,10 +1,10 @@
 #pragma once
 
-#include "software/ai/hl/stp/actions/chip_action.h"
-#include "software/ai/hl/stp/actions/dribble_action.h"
-#include "software/ai/hl/stp/actions/intercept_ball_action.h"
-#include "software/ai/hl/stp/actions/kick_action.h"
-#include "software/ai/hl/stp/actions/move_action.h"
-#include "software/ai/hl/stp/actions/movespin_action.h"
-#include "software/ai/hl/stp/actions/pivot_action.h"
-#include "software/ai/hl/stp/actions/stop_action.h"
+#include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/dribble_action.h"
+#include "software/ai/hl/stp/action/intercept_ball_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/movespin_action.h"
+#include "software/ai/hl/stp/action/pivot_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"

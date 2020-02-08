@@ -234,7 +234,6 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // to do so, chip it out
             else
             {
-                chip_action->updateWorldParams(ball);
                 chip_action->updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - field.friendlyGoal()).orientation(), 2);

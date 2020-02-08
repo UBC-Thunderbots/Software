@@ -6,9 +6,11 @@ cc_library(
     hdrs = ["stp.h"],
     deps = [
         "//software/ai/hl",
+        "//software/ai/hl/stp/action:action_world_params_update_visitor",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic:tactic_world_params_update_visitor",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_manager",
         "//software/parameter:dynamic_parameters",

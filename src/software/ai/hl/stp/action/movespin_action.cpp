@@ -22,7 +22,7 @@ Point MoveSpinAction::getDestination()
     return destination;
 }
 
-void MoveSpinAction::accept(ActionVisitor& visitor) const
+void MoveSpinAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }
