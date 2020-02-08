@@ -45,8 +45,8 @@ cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
         # k8 is any x86 system
-        "k8": "cc_toolchain_linux_gcc",
-        "k8|compiler": "cc_toolchain_linux_gcc",
+        "k8": "cc_toolchain_linux_gcc_7_4_0",
+        "k8|compiler": "cc_toolchain_linux_gcc_7_4_0",
         # stm32f4 MCU
         "stm32f4": "cc_toolchain_stm32f4",
         "stm32f4|compiler": "cc_toolchain_stm32f4",
@@ -74,14 +74,14 @@ filegroup(
 )
 
 filegroup(
-    name = "k8_gcc_all",
+    name = "linux_gcc_7_4_0_all",
     srcs = [
         ":k8_gcc_wrappers",
-        "@k8_gcc//:binaries",
-        "@k8_gcc//:includes",
-        "@k8_gcc//:k8_gcc_libs",
-        "@k8_gcc//:runtime_libs",
-        "@k8_gcc//:static_libs",
+        "@linux_gcc_7_4_0//:binaries",
+        "@linux_gcc_7_4_0//:includes",
+        "@linux_gcc_7_4_0//:libs",
+        "@linux_gcc_7_4_0//:runtime_libs",
+        "@linux_gcc_7_4_0//:static_libs",
     ],
 )
 
@@ -102,17 +102,17 @@ cc_toolchain_config_k8(
 )
 
 cc_toolchain(
-    name = "cc_toolchain_linux_gcc",
-    all_files = ":k8_gcc_all",
-    ar_files = ":k8_gcc_all",
-    as_files = ":k8_gcc_all",
-    compiler_files = ":k8_gcc_all",
-    dwp_files = ":k8_gcc_all",
-    dynamic_runtime_lib = "@k8_gcc//:runtime_libs",
-    linker_files = ":k8_gcc_all",
-    objcopy_files = ":k8_gcc_all",
-    static_runtime_lib = "@k8_gcc//:static_libs",
-    strip_files = ":k8_gcc_all",
+    name = "cc_toolchain_linux_gcc_7_4_0",
+    all_files = ":linux_gcc_7_4_0_all",
+    ar_files = ":linux_gcc_7_4_0_all",
+    as_files = ":linux_gcc_7_4_0_all",
+    compiler_files = ":linux_gcc_7_4_0_all",
+    dwp_files = ":linux_gcc_7_4_0_all",
+    dynamic_runtime_lib = "@linux_gcc_7_4_0//:runtime_libs",
+    linker_files = ":linux_gcc_7_4_0_all",
+    objcopy_files = ":linux_gcc_7_4_0_all",
+    static_runtime_lib = "@linux_gcc_7_4_0//:static_libs",
+    strip_files = ":linux_gcc_7_4_0_all",
     supports_param_files = True,
     # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
     # when possible

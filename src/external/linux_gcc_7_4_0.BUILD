@@ -34,7 +34,7 @@ filegroup(
 )
 
 filegroup(
-    name = "k8_gcc_libs",
+    name = "libs",
     srcs = glob(["usr/lib/gcc/x86_64-linux-gnu/7.4.0/*.a"]),
 )
 
