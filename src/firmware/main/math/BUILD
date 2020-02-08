@@ -23,14 +23,26 @@ cc_library(
 )
 
 cc_test(
-    name = "polynomial1d_test",
-    srcs = ["polynomial1d_test.cpp"],
-    deps = [":polynomial_1d"],
+    name = "polynomial_1d_test",
+    srcs = ["polynomial_1d_test.cpp"],
+    deps = [
+        ":polynomial_1d",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(
     name = "polynomial_2d",
     srcs = ["polynomial_2d.c"],
     hdrs = ["polynomial_2d.h"],
-    deps = [],
+    deps = [":polynomial_1d"],
+)
+
+cc_test(
+    name = "polynomial_2d_test",
+    srcs = ["polynomial_2d_test.cpp"],
+    deps = [
+        ":polynomial_2d",
+        "@gtest//:gtest_main",
+    ],
 )

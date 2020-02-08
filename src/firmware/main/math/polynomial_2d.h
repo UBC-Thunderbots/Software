@@ -78,20 +78,22 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DECLARATION(3, 2);
  * This will use Simpsons rule to numerically integrate the arc length formula.
  * https://en.wikipedia.org/wiki/Simpson%27s_rule
  *
+ * TODO: do we need this pre? remove and add test if not
  * @pre t_min <= t_max
  *
  * @param p [in] The 2D polynomial to get the arc length parametrization of
  * @param t_min [in] The minimum t value
  * @param t_max [in] The maximum t value
- * @param num_divisions [in] The number of divisions to split the range [t_min, t_max]
- *                           into. Must be >0
+ * TODO: better jdoc here
  * @param parametrization [out] The arc-length parametrization of the given curve. The
  *                              members of this must be allocated to be of at least
- *                              size "num_divisions".
+ *                              size "num_divisions". The "num_divisions" member will be
+ *                              used as the number of segments in the numerical
+ *                              integration scheme.
  */
 #define GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_DECLARATION(N)             \
-    void shared_polynomial_getArcLengthParametrization(                                  \
-        Polynomial2dOrder##N##_t p, float t_min, float t_max, size_t num_division,       \
+    void shared_polynomial_getArcLengthParametrizationOrder##N(                          \
+        Polynomial2dOrder##N##_t p, float t_min, float t_max,                            \
         ArcLengthParametrization_t parametrization)
 
 GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_DECLARATION(0);

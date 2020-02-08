@@ -29,16 +29,17 @@ GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(0);
 
 #define GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(         \
     N, N_minus_1)                                                                          \
-    void shared_polynomial_getArcLengthParametrization(                                    \
-        Polynomial2dOrder##N##_t p, float t_min, float t_max, size_t num_division,         \
+    void shared_polynomial_getArcLengthParametrizationOrder##N(                            \
+        Polynomial2dOrder##N##_t p, float t_min, float t_max,                              \
         ArcLengthParametrization_t parametrization)                                        \
     {                                                                                      \
+        /* TODO: do we need this? remove and add test if not */                            \
         assert(t_min < t_max);                                                             \
                                                                                            \
         Polynomial2dOrder##N_minus_1##_t deriv =                                           \
             shared_polynomial2d_differentiateOrder##N(p);                                  \
                                                                                            \
-        float dt = (t_max - t_min) / num_division;                                         \
+        float dt = (t_max - t_min) / parametrization.num_values;                           \
                                                                                            \
         /* Populate the entries of the parametrization by numerically integrating the */   \
         /* derivative with Simpson's rule: */                                              \
@@ -46,7 +47,7 @@ GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(0);
         float initial_value        = calculateL2NormAtValueOrder##N_minus_1(deriv, t_min); \
         float sum_of_odd_s_values  = 0;                                                    \
         float sum_of_even_s_values = 0;                                                    \
-        for (size_t i = 0; i < num_division; i++)                                          \
+        for (size_t i = 0; i < parametrization.num_values; i++)                            \
         {                                                                                  \
             const float t_i     = 2 * i * dt;                                              \
             const float value_i = calculateL2NormAtValueOrder##N_minus_1(deriv, t_i);      \

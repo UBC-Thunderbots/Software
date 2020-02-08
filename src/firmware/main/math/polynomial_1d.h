@@ -13,7 +13,7 @@
 #define GENERATE_1D_POLYNOMIAL_STRUCT_OF_ORDER(N)                                        \
     typedef struct Polynomial1dOrder##N                                                  \
     {                                                                                    \
-        float coefficients[N];                                                           \
+        float coefficients[N + 1];                                                       \
     } Polynomial1dOrder##N##_t
 
 GENERATE_1D_POLYNOMIAL_STRUCT_OF_ORDER(0);
