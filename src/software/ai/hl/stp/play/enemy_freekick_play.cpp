@@ -13,8 +13,11 @@
 
 const std::string EnemyFreekickPlay::name = "Enemy Freekick Play";
 
-EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<EnemyCapabilityConfig> enemy_capability_config):
-enemy_capability_config(enemy_capability_config) {}
+EnemyFreekickPlay::EnemyFreekickPlay(
+    std::shared_ptr<EnemyCapabilityConfig> enemy_capability_config)
+    : enemy_capability_config(enemy_capability_config)
+{
+}
 
 std::string EnemyFreekickPlay::getName() const
 {
@@ -58,16 +61,14 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
             ->value(),
-        enemy_capability_config->EnemyTeamCanPass()->value(),
-        true);
+        enemy_capability_config->EnemyTeamCanPass()->value(), true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
         Util::DynamicParameters->getAIConfig()
             ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
             ->value(),
-        enemy_capability_config->EnemyTeamCanPass()->value(),
-        true);
+        enemy_capability_config->EnemyTeamCanPass()->value(), true);
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)

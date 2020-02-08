@@ -21,7 +21,6 @@ class EnemyFreekickPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield) override;
 
-private:
-    std::shared_ptr<EnemyCapabilityConfig> enemy_capability_config ;
-
+   private:
+    std::shared_ptr<EnemyCapabilityConfig> enemy_capability_config;
 };
