@@ -376,7 +376,7 @@ def _make_common_features(ctx):
 
     return result
 
-def _k8_gcc_impl(ctx):
+def _linux_gcc_impl(ctx):
     host_system_name = "k8"
 
     action_configs = []
@@ -564,18 +564,18 @@ def _k8_gcc_impl(ctx):
 
     tool_paths = [
         tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
-        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/k8_gcc-ar"),
-        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/k8_gcc-lld"),
-        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/k8_gcc-cpp"),
-        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/k8_gcc-dwp"),
+        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/linux_gcc-ar"),
+        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/linux_gcc-lld"),
+        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/linux_gcc-cpp"),
+        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/linux_gcc-dwp"),
         # TODO: note about executable we're using here (ie. not 'llvm-profdata')
         #tool_path(name = "gcov", path = "/usr/bin/gcov"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/k8_gcc-profdata"),
-        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/k8_gcc-lld"),
-        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/k8_gcc-nm"),
-        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/k8_gcc-objcopy"),
-        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/k8_gcc-objdump"),
-        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/k8_gcc-strip"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/linux_gcc-profdata"),
+        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/linux_gcc-lld"),
+        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/linux_gcc-nm"),
+        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/linux_gcc-objcopy"),
+        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/linux_gcc-objdump"),
+        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/linux_gcc-strip"),
     ]
 
     out = ctx.actions.declare_file(ctx.label.name)
@@ -607,7 +607,7 @@ def _k8_gcc_impl(ctx):
     ]
 
 cc_toolchain_config_k8 = rule(
-    implementation = _k8_gcc_impl,
+    implementation = _linux_gcc_impl,
     attrs = {
         "cpu": attr.string(mandatory = True, values = ["k8"]),
         "builtin_include_directories": attr.string_list(),

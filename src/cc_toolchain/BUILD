@@ -69,14 +69,14 @@ filegroup(
 )
 
 filegroup(
-    name = "k8_gcc_wrappers",
-    srcs = glob(["wrapper/k8_gcc-*"]),
+    name = "linux_gcc_wrappers",
+    srcs = glob(["wrapper/linux_gcc-*"]),
 )
 
 filegroup(
     name = "linux_gcc_7_4_0_all",
     srcs = [
-        ":k8_gcc_wrappers",
+        ":linux_gcc_wrappers",
         "@linux_gcc_7_4_0//:binaries",
         "@linux_gcc_7_4_0//:includes",
         "@linux_gcc_7_4_0//:libs",
@@ -94,11 +94,11 @@ cc_toolchain_config_k8(
         "/usr/lib/gcc/c++/*/include/",
     ],
     cpu = "k8",
-    host_compiler_path = "wrapper/k8_gcc-k8_gcc",
+    host_compiler_path = "wrapper/linux_gcc-gcc",
     host_compiler_prefix = "wrapper",
     target_cpu = "k8",
     target_system_name = "k8",
-    toolchain_identifier = "k8_gcc-k8",
+    toolchain_identifier = "linux_gcc-k8",
 )
 
 cc_toolchain(
