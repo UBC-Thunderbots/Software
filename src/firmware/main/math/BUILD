@@ -14,3 +14,23 @@ cc_library(
     hdrs = ["matrix.h"],
     strip_include_prefix = "/firmware/main",
 )
+
+cc_library(
+    name = "polynomial_1d",
+    srcs = ["polynomial_1d.c"],
+    hdrs = ["polynomial_1d.h"],
+    deps = [],
+)
+
+cc_test(
+    name = "polynomial1d_test",
+    srcs = ["polynomial1d_test.cpp"],
+    deps = [":polynomial_1d"],
+)
+
+cc_library(
+    name = "polynomial_2d",
+    srcs = ["polynomial_2d.c"],
+    hdrs = ["polynomial_2d.h"],
+    deps = [],
+)
