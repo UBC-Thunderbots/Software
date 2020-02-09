@@ -4,6 +4,7 @@
 
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/rectangle.h"
 
 TEST(DistanceTest, point_on_line)
 {
