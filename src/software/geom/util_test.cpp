@@ -594,21 +594,6 @@ TEST(GeomUtilTest, test_segment_near_line)
                 0.001);
 }
 
-TEST(GeomUtilTest, test_intersection)
-{
-    Point a1(-1, 0);
-    Point a2(4, 1);
-    Point b1(0, -1);
-    Point b2(1, 4);
-
-    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.25, 0.25)).length() < 0.0001);
-
-    a2 = Point(4, 2);
-
-    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).length() <
-                0.0001);
-}
-
 // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point
 // along the ray (Should be ray.getStart() + ray.GetDirection())
 TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction)

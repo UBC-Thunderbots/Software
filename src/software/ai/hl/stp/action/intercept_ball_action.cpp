@@ -28,7 +28,7 @@ void InterceptBallAction::updateControlParams(const Robot& robot)
     this->robot = robot;
 }
 
-void InterceptBallAction::accept(ActionVisitor& visitor) const
+void InterceptBallAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }

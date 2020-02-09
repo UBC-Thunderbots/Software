@@ -13,12 +13,12 @@ protected:
         world = std::make_shared<b2World>(gravity);
 
         Ball non_zero_state_ball_parameter(Point(1.01, -0.4), Vector(0.02, -4.5), Timestamp::fromSeconds(0));
-        physics_ball_non_zero_state = std::make_shared<PhysicsBall>(world, non_zero_state_ball_parameter, 1.0);
+        physics_ball_non_zero_state = std::make_shared<PhysicsBall>(world, non_zero_state_ball_parameter, 1.0, 9.8);
         physics_ball_non_zero_state_weak_ptr = std::weak_ptr<PhysicsBall>(physics_ball_non_zero_state);
         simulator_ball_non_zero_state = SimulatorBall(physics_ball_non_zero_state_weak_ptr);
 
         Ball zero_state_ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-        physics_ball_zero_state = std::make_shared<PhysicsBall>(world, zero_state_ball_parameter, 1.0);
+        physics_ball_zero_state = std::make_shared<PhysicsBall>(world, zero_state_ball_parameter, 1.0, 9.8);
         physics_ball_zero_state_weak_ptr = std::weak_ptr<PhysicsBall>(physics_ball_zero_state);
         simulator_ball_zero_state = SimulatorBall(physics_ball_zero_state_weak_ptr);
     }

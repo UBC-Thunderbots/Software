@@ -2,9 +2,9 @@
 
 extern "C"
 {
-#include "app/world/chicker.h"
-#include "app/world/dribbler.h"
-#include "app/world/wheel.h"
+#include "firmware/main/app/world/chicker.h"
+#include "firmware/main/app/world/dribbler.h"
+#include "firmware/main/app/world/wheel.h"
 }
 
 std::shared_ptr<SimulatorRobot> SimulatorRobotSingleton::simulator_robot = nullptr;
@@ -40,16 +40,16 @@ SimulatorRobotSingleton::createFirmwareRobot()
         .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
     Wheel_t* front_left_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontLeft),
-        &(SimulatorRobotSingleton::getMotorSpeedFrontLeft), wheel_constants);
+        &(SimulatorRobotSingleton::getMotorSpeedFrontLeft), &(SimulatorRobotSingleton::brakeMotorFrontLeft), &(SimulatorRobotSingleton::coastMotorFrontLeft), wheel_constants);
     Wheel_t* front_right_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontRight),
-        &(SimulatorRobotSingleton::getMotorSpeedFrontRight), wheel_constants);
+        &(SimulatorRobotSingleton::getMotorSpeedFrontRight), &(SimulatorRobotSingleton::brakeMotorFrontRight), &(SimulatorRobotSingleton::coastMotorFrontRight), wheel_constants);
     Wheel_t* back_left_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceBackLeft),
-        &(SimulatorRobotSingleton::getMotorSpeedBackLeft), wheel_constants);
+        &(SimulatorRobotSingleton::getMotorSpeedBackLeft), &(SimulatorRobotSingleton::brakeMotorBackLeft), &(SimulatorRobotSingleton::coastMotorBackLeft), wheel_constants);
     Wheel_t* back_right_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceBackRight),
-        &(SimulatorRobotSingleton::getMotorSpeedBackRight), wheel_constants);
+        &(SimulatorRobotSingleton::getMotorSpeedBackRight), &(SimulatorRobotSingleton::brakeMotorBackRight), &(SimulatorRobotSingleton::coastMotorBackRight), wheel_constants);
 
     const RobotConstants_t robot_constants = {
         .mass              = ROBOT_POINT_MASS,
@@ -195,4 +195,36 @@ float SimulatorRobotSingleton::getMotorSpeedBackRight()
 float SimulatorRobotSingleton::getMotorSpeedFrontRight()
 {
     return simulator_robot->getMotorSpeedFrontRight();
+}
+
+void SimulatorRobotSingleton::coastMotorFrontLeft() {
+    simulator_robot->coastMotorFrontLeft();
+}
+
+void SimulatorRobotSingleton::coastMotorBackLeft() {
+    simulator_robot->coastMotorBackLeft();
+}
+
+void SimulatorRobotSingleton::coastMotorBackRight() {
+    simulator_robot->coastMotorBackRight();
+}
+
+void SimulatorRobotSingleton::coastMotorFrontRight() {
+    simulator_robot->coastMotorFrontRight();
+}
+
+void SimulatorRobotSingleton::brakeMotorFrontLeft() {
+    simulator_robot->brakeMotorFrontLeft();
+}
+
+void SimulatorRobotSingleton::brakeMotorBackLeft() {
+    simulator_robot->brakeMotorBackLeft();
+}
+
+void SimulatorRobotSingleton::brakeMotorBackRight() {
+    simulator_robot->brakeMotorBackRight();
+}
+
+void SimulatorRobotSingleton::brakeMotorFrontRight() {
+    simulator_robot->brakeMotorFrontRight();
 }

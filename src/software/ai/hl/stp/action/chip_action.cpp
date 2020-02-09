@@ -29,7 +29,7 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
                         chip_distance_meters);
 }
 
-void ChipAction::accept(ActionVisitor& visitor) const
+void ChipAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }

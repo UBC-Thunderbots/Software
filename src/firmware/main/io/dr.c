@@ -4,11 +4,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "firmware/main/shared/physics.h"
 #include "io/dsp.h"
 #include "io/encoder.h"
 #include "io/sensors.h"
-#include "physics/physics.h"
-#include "primitives/primitive.h"
 #include "util/circbuff.h"
 
 static dr_data_t current_state;
@@ -23,7 +22,9 @@ static wheel_speeds_t past_wheel_speeds[SPEED_SIZE];
 
 // Variables for hard coded drive pattern (testing)
 static uint16_t tick_count = 0;
-static int maneuver_stage  = 0;
+
+// Function pre-declarations
+void dr_log(log_record_t *log);
 
 /**
  * \brief called a system boot to configure deadreckoning system
@@ -343,17 +344,14 @@ void dr_log(log_record_t *log)
 {
     sensors_gyro_data_t gyrodata;
     sensors_accel_data_t acceldata;
-    float gyro_speed;
-    int16_t accel_out[3] = {0};
-    float encoder_speeds[4];
     float wheel_speeds[3];
 
     gyrodata  = sensors_get_gyro();
     acceldata = sensors_get_accel();
 
-    for (unsigned int i = 0; i < 4; i++)
+    for (unsigned int i = 0; i < 3; i++)
     {
-        encoder_speeds[i] = (float)encoder_speed(i) * QUARTERDEGREE_TO_MS;
+        wheel_speeds[i] = (float)encoder_speed(i) * QUARTERDEGREE_TO_RPM;
     }
 
     log->tick.dr_x     = current_state.x;

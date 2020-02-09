@@ -75,6 +75,13 @@ class World final
      */
     void updateRefboxGameState(const RefboxGameState& game_state);
 
+    /**
+     * Updates the refbox data
+     *
+     * @param refbox_data the data sent by refbox
+     */
+    void updateRefboxData(const RefboxData& refbox_data);
+
 
     /**
      * Returns a const reference to the Field in the world

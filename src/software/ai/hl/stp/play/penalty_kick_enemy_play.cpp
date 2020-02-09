@@ -37,9 +37,6 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         // goalie
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
-
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // Move all non-shooter robots to the center of the field

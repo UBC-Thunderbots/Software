@@ -224,6 +224,63 @@ float SimulatorRobot::getMotorSpeedFrontRight()
     return 0.0;
 }
 
+
+void SimulatorRobot::coastMotorFrontLeft() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobot::coastMotorBackLeft() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobot::coastMotorBackRight() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobot::coastMotorFrontRight() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobot::brakeMotorFrontLeft() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobot::brakeMotorBackLeft() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobot::brakeMotorBackRight() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
+void SimulatorRobot::brakeMotorFrontRight() {
+    if (auto robot = physics_robot.lock())
+    {
+        // TODO: Implement me
+    }
+}
+
 void SimulatorRobot::onChickerBallContact(PhysicsRobot *robot, PhysicsBall *ball) {
     if(autokick_speed_m_per_s) {
         Vector kick_vector = Vector::createFromAngle(robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());

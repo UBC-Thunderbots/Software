@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "app/world/firmware_robot.h"
+#include "firmware/main/app/world/firmware_robot.h"
 }
 
 #include <gtest/gtest.h>

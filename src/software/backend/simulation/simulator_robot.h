@@ -171,6 +171,22 @@ public:
     float getMotorSpeedBackRight();
     float getMotorSpeedFrontRight();
 
+    /**
+     * Sets the motor to coast (spin freely)
+     */
+    void coastMotorBackLeft();
+    void coastMotorBackRight();
+    void coastMotorFrontLeft();
+    void coastMotorFrontRight();
+
+    /**
+     * Sets the motor to brake (act against the current direction of rotation)
+     */
+    void brakeMotorBackLeft();
+    void brakeMotorBackRight();
+    void brakeMotorFrontLeft();
+    void brakeMotorFrontRight();
+
 private:
     // TODO: comment
     void onChickerBallContact(PhysicsRobot* robot, PhysicsBall* ball);

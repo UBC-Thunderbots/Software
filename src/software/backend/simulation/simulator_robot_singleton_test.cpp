@@ -7,7 +7,7 @@
 
 extern "C"
 {
-#include "app/world/firmware_robot.h"
+#include "firmware/main/app/world/firmware_robot.h"
 }
 #include "shared/constants.h"
 #include "software/backend/simulation/physics/physics_robot.h"

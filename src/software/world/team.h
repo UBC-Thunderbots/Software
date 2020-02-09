@@ -248,3 +248,9 @@ class Team
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
 };
+
+enum class TeamType
+{
+    FRIENDLY,
+    ENEMY,
+};

@@ -6,7 +6,7 @@
 #include "software/backend/simulation/simulator_robot.h"
 extern "C"
 {
-#include "app/world/firmware_robot.h"
+#include "firmware/main/app/world/firmware_robot.h"
 }
 
 // TODO: These are all hardcoded values copied from firmware/main/physics/physics.h
@@ -203,6 +203,22 @@ class SimulatorRobotSingleton
     static float getMotorSpeedBackLeft();
     static float getMotorSpeedBackRight();
     static float getMotorSpeedFrontRight();
+
+    /**
+     * Sets the motor to coast (spin freely)
+     */
+    static void coastMotorBackLeft();
+    static void coastMotorBackRight();
+    static void coastMotorFrontLeft();
+    static void coastMotorFrontRight();
+
+    /**
+     * Sets the motor to brake (act against the current direction of rotation)
+     */
+    static void brakeMotorBackLeft();
+    static void brakeMotorBackRight();
+    static void brakeMotorFrontLeft();
+    static void brakeMotorFrontRight();
 
     static std::shared_ptr<SimulatorRobot> simulator_robot;
 };

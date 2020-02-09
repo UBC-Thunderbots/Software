@@ -4,7 +4,7 @@
 
 #include <math.h>
 
-#include "physics/physics.h"
+#include "firmware/main/shared/physics.h"
 #include "util/log.h"
 
 /**
@@ -33,6 +33,7 @@
 #define WHEELS_HALL_TO_MS                                                                \
     (WHEELS_CIRCUM * WHEELS_GEAR_RATIO / ((float)WHEELS_ENCODER_COUNTS_PER_REV) *        \
      CONTROL_LOOP_HZ)
+#define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
 void wheels_init(void);
 void wheels_coast(unsigned int index);
@@ -48,5 +49,21 @@ float wheels_get_front_left_rpm();
 float wheels_get_front_right_rpm();
 float wheels_get_back_left_rpm();
 float wheels_get_back_right_rpm();
+
+/**
+ * Coast each wheel
+ */
+void wheels_coast_front_left();
+void wheels_coast_front_right();
+void wheels_coast_back_left();
+void wheels_coast_back_right();
+
+/**
+ * Brake each wheel
+ */
+void wheels_brake_front_left();
+void wheels_brake_front_right();
+void wheels_brake_back_left();
+void wheels_brake_back_right();
 
 #endif
