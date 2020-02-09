@@ -20,7 +20,7 @@ If you want to know more about our coding style you can take a look at our [clan
 
 
 ### C-Specific Guidelines
-The vast majority of the things noted in this document will apply to `C` code as well, but there are some special cases / exceptions for `C` code. Please also see the [Firmware architecture and design document](docs/firmware-architecture-and-design.md) for much of the context needed for these.
+The vast majority of the things noted in this document will apply to `C` code as well, but there are some special cases / exceptions for `C` code. Please also see the [Firmware architecture and design document](firmware-architecture-and-design.md) for much of the context needed for these.
 * If something is in a header, then it is *always* considered public.
 * Public names should always follow the format `PREFIX_FILENAME_NAME`, where:
     * `PREFIX` is one of `app`, `io`, `shared`, depending on the high level folder this is under
