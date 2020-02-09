@@ -10,6 +10,12 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot) : phys
         robot->registerDribblerBallContactCallback([this](PhysicsRobot* robot, PhysicsBall* ball) {
             this->onDribblerBallContact(robot, ball);
         });
+        robot->registerDribblerBallStartContactCallback([this](PhysicsRobot* robot, PhysicsBall* ball) {
+            this->onDribblerBallStartContact(robot, ball);
+        });
+        robot->registerDribblerBallEndContactCallback([this](PhysicsRobot* robot, PhysicsBall* ball) {
+            this->onDribblerBallEndContact(robot, ball);
+        });
     }
 }
 
@@ -70,6 +76,10 @@ float SimulatorRobot::getVelocityY()
     return 0.0;
 }
 
+Vector SimulatorRobot::velocity() {
+   return Vector(getVelocityX(), getVelocityY());
+}
+
 float SimulatorRobot::getVelocityAngular()
 {
     if (auto robot = physics_robot.lock())
@@ -119,14 +129,6 @@ void SimulatorRobot::enableAutochip(float distance_m)
     autochip_distance_m = distance_m;
 }
 
-std::optional<double> SimulatorRobot::getAutokickSpeed() const {
-    return autokick_speed_m_per_s;
-}
-
-std::optional<double> SimulatorRobot::getAutochipDistance() const {
-    return autochip_distance_m;
-}
-
 void SimulatorRobot::disableAutokick()
 {
     autokick_speed_m_per_s = std::nullopt;
@@ -140,10 +142,6 @@ void SimulatorRobot::disableAutochip()
 void SimulatorRobot::setDribblerSpeed(uint32_t rpm)
 {
     dribbler_rpm = rpm;
-}
-
-uint32_t SimulatorRobot::getDribblerSpeed() const {
-    return dribbler_rpm;
 }
 
 unsigned int SimulatorRobot::getDribblerTemperatureDegC()
@@ -257,7 +255,8 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *robot, PhysicsBall *bal
         Point dribble_point = r.position() + Vector::createFromAngle(r.orientation()).normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS - chicker_depth);
         Vector force_vector = dribble_point - b.position();
         double dist = force_vector.length() * 100; // cm
-        double magnitude = 0.1 * std::pow(dist, 8);
+//        double magnitude = 0.01 * std::pow(dist, 8);
+        double magnitude = 0.1 * std::pow(dist, 4) + ((1.0/50.0)*(dist - 1));
 //        double magnitude = force_vector.length();
         force_vector = force_vector.normalize(magnitude);
 
@@ -275,6 +274,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *robot, PhysicsBall *bal
 void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *robot, PhysicsBall *ball) {
     ball_in_dribbler_area = ball;
 }
+
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *robot, PhysicsBall *ball) {
     ball_in_dribbler_area = nullptr;
 }

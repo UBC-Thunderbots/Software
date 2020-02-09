@@ -20,6 +20,14 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
                 contact_callback(robot, ball);
             }
         }
+        if (auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+        {
+            PhysicsBall* ball = ball_dribbler_pair->first;
+            PhysicsRobot* robot = ball_dribbler_pair->second;
+            for(auto contact_callback : robot->getDribblerBallStartContactCallbacks()) {
+                contact_callback(robot, ball);
+            }
+        }
         if(auto ball = isBallContact(user_data_a, user_data_b)) {
             ball->incrementNumCurrentCollisions();
         }
@@ -76,6 +84,14 @@ void SimulationContactListener::EndContact(b2Contact *contact)
     PhysicsObjectUserData *user_data_b =
             static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
+    if (auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+    {
+        PhysicsBall* ball = ball_dribbler_pair->first;
+        PhysicsRobot* robot = ball_dribbler_pair->second;
+        for(auto contact_callback : robot->getDribblerBallEndContactCallbacks()) {
+            contact_callback(robot, ball);
+        }
+    }
     if(auto ball = isBallContact(user_data_a, user_data_b)) {
         ball->decrementNumCurrentCollisions();
     }

@@ -257,6 +257,14 @@ std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> PhysicsRobot::getD
     return dribbler_ball_contact_callbacks;
 }
 
+std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> PhysicsRobot::getDribblerBallStartContactCallbacks() const {
+    return dribbler_ball_start_contact_callbacks;
+}
+
+std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> PhysicsRobot::getDribblerBallEndContactCallbacks() const {
+    return dribbler_ball_end_contact_callbacks;
+}
+
 std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> PhysicsRobot::getChickerBallContactCallbacks() const {
    return chicker_ball_contact_callbacks;
 }

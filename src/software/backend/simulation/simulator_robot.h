@@ -62,6 +62,13 @@ public:
     float getVelocityY();
 
     /**
+     * Returns the current linear velocity of the robot, in global field coordinates, in m / s
+     *
+     * @return the current linear velocity of the robot, in global field coordinates, in m / s
+     */
+    Vector velocity();
+
+    /**
      * Returns the angular velocity of the robot, in rad/s
      *
      * @return the angular of the robot, in rad/s
@@ -109,24 +116,6 @@ public:
      * when the chipper is fired
      */
     void enableAutochip(float distance_m);
-
-    /**
-     * Returns the current autokick speed (in m/s) if autokick is enabled, otherwise
-     * returns std::nullopt
-     *
-     * @return the current autokick speed (in m/s) if autokick is enabled, otherwise
-     * returns std::nullopt
-     */
-    std::optional<double> getAutokickSpeed() const;
-
-    /**
-     * Returns the current autochip distance (in m) if autochip is enabled, otherwise
-     * returns std::nullopt
-     *
-     * @return the current autochip distance (in m) if autochip is enabled, otherwise
-     * returns std::nullopt
-     */
-    std::optional<double> getAutochipDistance() const;
 
     /**
      * Disables autokick
