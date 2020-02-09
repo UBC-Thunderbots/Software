@@ -14,4 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# we put the `-Wl,--no-as-needed` flag here because it needs to be put before
+# the -l[target] dependencies for correct linking
 exec /usr/bin/x86_64-linux-gnu-gcc -Wl,--no-as-needed "$@"
