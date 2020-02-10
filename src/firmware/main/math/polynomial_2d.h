@@ -28,8 +28,9 @@ typedef struct ArcLengthParametrization
 #define CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(NAME, NUM_VALUES)                       \
     static float ___##NAME##_t_values_storage[4];                                        \
     static float ___##NAME##_s_values_storage[4];                                        \
-    ArcLengthParametrization_t NAME = {.t_values = ___##NAME##_t_values_storage,         \
-                                       .s_values = ___##NAME##_s_values_storage}
+    ArcLengthParametrization_t NAME = {.t_values   = ___##NAME##_t_values_storage,       \
+                                       .s_values   = ___##NAME##_s_values_storage,       \
+                                       .num_values = NUM_VALUES}
 
 /**
  * A 2d polynomial is represented as f(t) = <x(t), y(t)> where x(t) and y(t) are

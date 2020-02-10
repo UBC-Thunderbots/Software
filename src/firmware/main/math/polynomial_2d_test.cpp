@@ -20,7 +20,7 @@ class Polynomial2dTest : public testing::Test
         for (size_t i = 0; i < num_elements; i++)
         {
             EXPECT_EQ(expected[i], actual[i])
-                << "expected[" << i << "] is " << expected[i] << "but actual[" << i
+                << "expected[" << i << "] is " << expected[i] << " but actual[" << i
                 << "] is " << actual[i];
         }
     }
@@ -95,8 +95,9 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_vertical_line_0_division
 
     static float expected_t_values_storage[2] = {-2, 2};
     static float expected_s_values_storage[2] = {0, 4};
-    ArcLengthParametrization_t expected       = {.t_values = expected_t_values_storage,
-                                           .s_values = expected_s_values_storage};
+    ArcLengthParametrization_t expected       = {.t_values   = expected_t_values_storage,
+                                           .s_values   = expected_s_values_storage,
+                                           .num_values = 2};
 
     expectArcLengthParametrizationsEqual(expected, parametrization);
 }
@@ -114,8 +115,9 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_diagonal_line_2_division
 
     static float expected_t_values_storage[4] = {-3, -1, 1, 3};
     static float expected_s_values_storage[4] = {0, 2, 4, 6};
-    ArcLengthParametrization_t expected       = {.t_values = expected_t_values_storage,
-                                           .s_values = expected_s_values_storage};
+    ArcLengthParametrization_t expected       = {.t_values   = expected_t_values_storage,
+                                           .s_values   = expected_s_values_storage,
+                                           .num_values = 4};
 
     expectArcLengthParametrizationsEqual(expected, parametrization);
 }
@@ -149,8 +151,8 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_for_complex_function)
     static float expected_s_values[17]  = {0,      168.5,  314.3,  437.58, 538.49, 617.19,
                                           673.86, 708.65, 721.73, 730.46, 760.33, 811.43,
                                           883.60, 976.68, 1090.5, 1224.9, 1379.8};
-    ArcLengthParametrization_t expected = {.t_values = expected_t_values,
-                                           .s_values = expected_s_values};
+    ArcLengthParametrization_t expected = {
+        .t_values = expected_t_values, .s_values = expected_s_values, .num_values = 17};
 
     expectArcLengthParametrizationsEqual(expected, parametrization);
 }
@@ -215,7 +217,8 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_div
                                  673.86, 708.65, 721.73, 730.46, 760.33, 811.43,
                                  883.60, 976.68, 1090.5, 1224.9, 1379.8};
     ArcLengthParametrization_t arc_length_parametrization = {.t_values = t_values,
-                                                             .s_values = s_values};
+                                                             .s_values = s_values,
+                                                             .num_values = 17};
 
     // Check some arc length points that require no interpolation
     expectVector2dEqual({.x = 159.5, .y = 1433.40},
