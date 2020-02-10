@@ -27,6 +27,35 @@ GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(1);
 GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(0);
 
 
+#define GENERATE_2D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(N)                          \
+    Vector2d_t shared_polynomial2d_getValueOrder##N(Polynomial2dOrder##N##_t p, float t) \
+    {                                                                                    \
+        Vector2d_t result = {                                                            \
+            .x = shared_polynomial1d_getValueOrder##N(p.x, t),                           \
+            .y = shared_polynomial1d_getValueOrder##N(p.y, t),                           \
+        };                                                                               \
+        return result;                                                                   \
+    }
+GENERATE_2D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(3)
+GENERATE_2D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(2)
+GENERATE_2D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(1)
+GENERATE_2D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(0)
+
+#define GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(FROM_ORDER, TO_ORDER)   \
+    Polynomial2dOrder##TO_ORDER##_t shared_polynomial2d_differentiateOrder##FROM_ORDER(  \
+        Polynomial2dOrder##FROM_ORDER##_t p)                                             \
+    {                                                                                    \
+        Polynomial2dOrder##TO_ORDER##_t derivative = {                                   \
+            .x = shared_polynomial1d_differentiateOrder##FROM_ORDER(p.x),                \
+            .y = shared_polynomial1d_differentiateOrder##FROM_ORDER(p.y),                \
+        };                                                                               \
+        return derivative;                                                               \
+    }
+GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(3, 2)
+GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(2, 1)
+GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
+
+
 #define GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(         \
     N, N_minus_1)                                                                          \
     void shared_polynomial_getArcLengthParametrizationOrder##N(                            \
