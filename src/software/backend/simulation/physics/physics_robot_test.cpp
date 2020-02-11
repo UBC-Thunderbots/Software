@@ -340,7 +340,7 @@ TEST(PhysicsRobotTest, test_dribbler_ball_contact_callbacks) {
     EXPECT_TRUE(callback_called);
 }
 
-TEST(PhysicsRobotTest, test_chicker_ball_contact_callbacks) {
+TEST(PhysicsRobotTest, test_dribbler_ball_start_contact_callbacks) {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -348,17 +348,61 @@ TEST(PhysicsRobotTest, test_chicker_ball_contact_callbacks) {
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
-    EXPECT_TRUE(physics_robot.getChickerBallContactCallbacks().empty());
+    EXPECT_TRUE(physics_robot.getDribblerBallStartContactCallbacks().empty());
 
     bool callback_called = false;
     auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
         callback_called = true;
     };
 
-    physics_robot.registerChickerBallContactCallback(callback);
+    physics_robot.registerDribblerBallStartContactCallback(callback);
 
-    ASSERT_EQ(physics_robot.getChickerBallContactCallbacks().size(), 1);
-    physics_robot.getChickerBallContactCallbacks().at(0)(nullptr, nullptr);
+    ASSERT_EQ(physics_robot.getDribblerBallStartContactCallbacks().size(), 1);
+    physics_robot.getDribblerBallStartContactCallbacks().at(0)(nullptr, nullptr);
+    EXPECT_TRUE(callback_called);
+}
+
+TEST(PhysicsRobotTest, test_dribbler_ball_end_contact_callbacks) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
+
+    EXPECT_TRUE(physics_robot.getDribblerBallEndContactCallbacks().empty());
+
+    bool callback_called = false;
+    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+        callback_called = true;
+    };
+
+    physics_robot.registerDribblerBallEndContactCallback(callback);
+
+    ASSERT_EQ(physics_robot.getDribblerBallEndContactCallbacks().size(), 1);
+    physics_robot.getDribblerBallEndContactCallbacks().at(0)(nullptr, nullptr);
+    EXPECT_TRUE(callback_called);
+}
+
+TEST(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks) {
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    PhysicsRobot physics_robot(world, robot_parameter, 1.0);
+
+    EXPECT_TRUE(physics_robot.getChickerBallStartContactCallbacks().empty());
+
+    bool callback_called = false;
+    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+        callback_called = true;
+    };
+
+    physics_robot.registerChickerBallStartContactCallback(callback);
+
+    ASSERT_EQ(physics_robot.getChickerBallStartContactCallbacks().size(), 1);
+    physics_robot.getChickerBallStartContactCallbacks().at(0)(nullptr, nullptr);
     EXPECT_TRUE(callback_called);
 }
 

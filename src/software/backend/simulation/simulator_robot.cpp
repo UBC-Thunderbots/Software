@@ -4,7 +4,7 @@
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot) : physics_robot(physics_robot), autokick_speed_m_per_s(std::nullopt), autochip_distance_m(std::nullopt), dribbler_rpm(0), ball_in_dribbler_area(nullptr){
     if(auto robot = this->physics_robot.lock()) {
-        robot->registerChickerBallContactCallback([this](PhysicsRobot* robot, PhysicsBall* ball) {
+        robot->registerChickerBallStartContactCallback([this](PhysicsRobot *robot, PhysicsBall *ball) {
             this->onChickerBallContact(robot, ball);
         });
         robot->registerDribblerBallContactCallback([this](PhysicsRobot* robot, PhysicsBall* ball) {

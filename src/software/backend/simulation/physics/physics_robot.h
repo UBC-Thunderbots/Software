@@ -67,11 +67,11 @@ class PhysicsRobot
 
     /**
      * Adds the given function to this PhysicsRobot's list of chicker-ball contact callbacks. These
-     * callbacks will be called during every physics step for the duration of the contact.
+     * callbacks will be called once at the start of the contact.
      *
      * @param callback The function to register
      */
-    void registerChickerBallContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+    void registerChickerBallStartContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
      * Returns a list of contact callbacks for this class
@@ -81,7 +81,7 @@ class PhysicsRobot
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallContactCallbacks() const;
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallStartContactCallbacks() const;
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallEndContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getChickerBallContactCallbacks() const;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getChickerBallStartContactCallbacks() const;
 
     /**
      * Returns a Robot object representing the current state of the robot object in the
