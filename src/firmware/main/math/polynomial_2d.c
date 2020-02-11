@@ -27,6 +27,15 @@ GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(2);
 GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(1);
 GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(0);
 
+// TODO: delete me
+// float calculateL2NormAtValueOrder0(Polynomial2dOrder0_t p, float t)
+//{
+//    const float x_value = shared_polynomial1d_getValueOrder0(p.x, t);
+//    const float y_value = shared_polynomial1d_getValueOrder0(p.y, t);
+//
+//    return sqrt(pow(x_value, 2.0) + pow(y_value, 2.0));
+//}
+
 #define GENERATE_2D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(N)                          \
     Vector2d_t shared_polynomial2d_getValueOrder##N(Polynomial2dOrder##N##_t p, float t) \
     {                                                                                    \
@@ -56,53 +65,55 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(2, 1)
 GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
 
 
-#define GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(         \
-    N, N_minus_1)                                                                          \
-    void shared_polynomial_getArcLengthParametrizationOrder##N(                            \
-        Polynomial2dOrder##N##_t p, float t_min, float t_max,                              \
-        ArcLengthParametrization_t parametrization)                                        \
-    {                                                                                      \
-        /* TODO: do we need this? remove and add test if not */                            \
-        assert(t_min < t_max);                                                             \
-                                                                                           \
-        Polynomial2dOrder##N_minus_1##_t deriv =                                           \
-            shared_polynomial2d_differentiateOrder##N(p);                                  \
-                                                                                           \
-        float dt = (t_max - t_min) / ((parametrization.num_values-1) * 2);                     \
-        printf("dt: %f \n ", dt);                                                              \
-                                                                                           \
-        /* Populate the entries of the parametrization by numerically integrating the */   \
-        /* derivative with Simpson's rule: */                                              \
-        /* https://www.intmath.com/integration/6-simpsons-rule.php */                      \
-        float initial_value        = calculateL2NormAtValueOrder##N_minus_1(deriv, t_min); \
-        float sum_of_odd_s_values  = 0;                                                    \
-        float sum_of_even_s_values = initial_value;                                        \
-        parametrization.s_values[0] = 0;                                                   \
-        parametrization.t_values[0] = t_min;                                               \
-        for (size_t i = 1; i < parametrization.num_values; i++)                            \
-        {                                                                                  \
-            const float t_i = t_min + 2 * i * dt;                                          \
-            printf("t_%d: %f \n", (int)i, t_i);                                            \
-            const float value_i = calculateL2NormAtValueOrder##N_minus_1(deriv, t_i);      \
-            printf("value_%d: %f \n", (int)i, value_i);                                            \
-                                                                                           \
-            const float t_i_minus_1 = t_min + (2 * i - 1) * dt;                            \
-            const float value_i_minus_1 =                                                  \
-                calculateL2NormAtValueOrder##N_minus_1(deriv, t_i_minus_1);                \
-            sum_of_odd_s_values += value_i_minus_1;                                        \
-                                                                                           \
-            const float s_i = initial_value + 4 * sum_of_odd_s_values +                    \
-                              2 * sum_of_even_s_values + value_i;                          \
-                                                                                           \
-            parametrization.s_values[i] = s_i;                                             \
-            parametrization.t_values[i] = t_i;                                             \
-                                                                                           \
-            sum_of_even_s_values += value_i;                                               \
-        }                                                                                  \
-        for (size_t i = 0; i < parametrization.num_values; i++)                            \
-        {                                                                                  \
-            parametrization.s_values[i] *= dt / 3;                                         \
-        }                                                                                  \
+#define GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(       \
+    N, N_minus_1)                                                                        \
+    void shared_polynomial_getArcLengthParametrizationOrder##N(                          \
+        Polynomial2dOrder##N##_t p, float t_min, float t_max,                            \
+        ArcLengthParametrization_t parametrization)                                      \
+    {                                                                                    \
+        /* TODO: do we need this? remove and add test if not */                          \
+        assert(t_min < t_max);                                                           \
+                                                                                         \
+        Polynomial2dOrder##N_minus_1##_t deriv =                                         \
+            shared_polynomial2d_differentiateOrder##N(p);                                \
+                                                                                         \
+        float dt = (t_max - t_min) / ((parametrization.num_values - 1) * 2);             \
+        printf("dt: %f \n ", dt);                                                        \
+                                                                                         \
+        /* Populate the entries of the parametrization by numerically integrating the */ \
+        /* derivative with Simpson's rule: */                                            \
+        /* https://www.intmath.com/integration/6-simpsons-rule.php */                    \
+        float initial_value = calculateL2NormAtValueOrder##N_minus_1(deriv, t_min);      \
+        printf("initial_value: %f \n", initial_value);                                   \
+        float sum_of_odd_s_values   = 0;                                                 \
+        float sum_of_even_s_values  = 0;                                                 \
+        parametrization.s_values[0] = 0;                                                 \
+        parametrization.t_values[0] = t_min;                                             \
+        for (size_t i = 1; i < parametrization.num_values; i++)                          \
+        {                                                                                \
+            const float t_i = t_min + 2 * i * dt;                                        \
+            printf("t_%d: %f \n", (int)i, t_i);                                          \
+            const float value_i = calculateL2NormAtValueOrder##N_minus_1(deriv, t_i);    \
+            printf("value_%d: %f \n", (int)i, value_i);                                  \
+                                                                                         \
+            const float t_i_minus_1 = t_min + (2 * i - 1) * dt;                          \
+            const float value_i_minus_1 =                                                \
+                calculateL2NormAtValueOrder##N_minus_1(deriv, t_i_minus_1);              \
+            printf("value_%d_minus_1: %f \n", (int)i, value_i_minus_1);                  \
+            sum_of_odd_s_values += value_i_minus_1;                                      \
+                                                                                         \
+            const float s_i = initial_value + 4 * sum_of_odd_s_values +                  \
+                              2 * sum_of_even_s_values + value_i;                        \
+                                                                                         \
+            parametrization.s_values[i] = s_i;                                           \
+            parametrization.t_values[i] = t_i;                                           \
+                                                                                         \
+            sum_of_even_s_values += value_i;                                             \
+        }                                                                                \
+        for (size_t i = 0; i < parametrization.num_values; i++)                          \
+        {                                                                                \
+            parametrization.s_values[i] *= dt / 3;                                       \
+        }                                                                                \
     }
 GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(3, 2)
 GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(2, 1)
@@ -120,11 +131,16 @@ GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(1, 0)
         assert(s <= arc_length_parametrization                                           \
                         .s_values[arc_length_parametrization.num_values - 1]);           \
                                                                                          \
-        /* TODO: perform binary search and linear interpolation to get a t value */      \
-        float t = 0;                                                                     \
+        /* Binary search to find between which two t-values in the */                    \
+        /* table the given t value is */                                                 \
+        size_t upper = arc_length_parametrization.num_values-2; \
+        size_t lower = 0; \
+        size_t pivot = floor(arc_length_parametrization.num_values/2.0);                \
+        while (pivot < arc_length_parametrization.t_values[0] || )                                                                         \
                                                                                          \
-        Vector2d_t result = {.x = shared_polynomial1d_getValueOrder##N(p.x, t),          \
-                             .y = shared_polynomial1d_getValueOrder##N(p.y, t)};         \
+                                                                                         \
+            Vector2d_t result = {.x = shared_polynomial1d_getValueOrder##N(p.x, t),      \
+                                 .y = shared_polynomial1d_getValueOrder##N(p.y, t)};     \
                                                                                          \
         return result;                                                                   \
     }

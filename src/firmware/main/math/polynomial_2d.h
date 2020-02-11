@@ -5,6 +5,8 @@
 
 #include "firmware/main/math/polynomial_1d.h"
 
+// TODO: big jdoc explaining usage of these functions
+
 // TODO: put this somewhere else
 /**
  * A 2D Vector
@@ -26,8 +28,8 @@ typedef struct ArcLengthParametrization
 } ArcLengthParametrization_t;
 
 #define CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(NAME, NUM_VALUES)                       \
-    static float ___##NAME##_t_values_storage[4];                                        \
-    static float ___##NAME##_s_values_storage[4];                                        \
+    static float ___##NAME##_t_values_storage[NUM_VALUES];                               \
+    static float ___##NAME##_s_values_storage[NUM_VALUES];                               \
     ArcLengthParametrization_t NAME = {.t_values   = ___##NAME##_t_values_storage,       \
                                        .s_values   = ___##NAME##_s_values_storage,       \
                                        .num_values = NUM_VALUES}
