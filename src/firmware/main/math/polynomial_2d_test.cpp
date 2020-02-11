@@ -86,6 +86,23 @@ TEST_F(Polynomial2dTest, get_value_2rd_order_polynomial)
                         shared_polynomial2d_getValueOrder2(poly, -10));
 }
 
+TEST_F(Polynomial2dTest, get_derivative_3rd_order_polynomial){
+    Polynomial2dOrder3_t poly = {
+        .x = {.coefficients = {-2, 0.5, 6, 99}},
+        .y = {.coefficients = {.2, 7, 2, 38}},
+    };
+
+    Polynomial2dOrder2_t derivative = shared_polynomial2d_differentiateOrder3(poly);
+
+    EXPECT_DOUBLE_EQ(-6, derivative.x.coefficients[0]);
+    EXPECT_DOUBLE_EQ(1, derivative.x.coefficients[1]);
+    EXPECT_DOUBLE_EQ(6, derivative.x.coefficients[2]);
+
+    EXPECT_NEAR(0.6, derivative.y.coefficients[0], 10e-7);
+    EXPECT_DOUBLE_EQ(14, derivative.y.coefficients[1]);
+    EXPECT_DOUBLE_EQ(2, derivative.y.coefficients[2]);
+}
+
 TEST_F(Polynomial2dTest, get_arc_length_parametrization_num_values_0)
 {
     // This function should probably never be used like this, but this checks that
@@ -172,8 +189,8 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_diagonal_line_2_division
 TEST_F(Polynomial2dTest, get_arc_length_parametrization_for_complex_function)
 {
     Polynomial2dOrder3_t poly = {
-        .x = {.coefficients = {0.1, 3, -0.5, 70.1}},
-        .y = {.coefficients = {-0.2, 38.2, -3, -3}},
+        .x = {.coefficients = {0.1/3, 1.5, -0.5, 70.1}},
+        .y = {.coefficients = {-0.2/3, 19.1, -3, -3}},
     };
 
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(parametrization, 17);
@@ -291,27 +308,14 @@ TEST_F(Polynomial2dTest, get_position_on_arc_length_below_arc_lengths_in_paramet
 TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_divisions)
 {
     Polynomial2dOrder3_t poly = {
-        .x = {.coefficients = {0.1, 3, -0.5, 70.1}},
-        .y = {.coefficients = {-0.2, 38.2, -3, -3}},
+        .x = {.coefficients = {0.1/3, 1.5, -0.5, 70.1}},
+        .y = {.coefficients = {-0.2/3, 19.1, -3, -3}},
     };
 
-    // These values were calculated via numerical integration in GNU Octave with the
-    // following program:
-    //
-    // clang-format off
-    // ```
-    // f=@(t) sqrt((0.1* t.^2 + 3*t.^1 - 0.5).^2 + (-0.2*t.^2 + 38.2*t.^1 - 3).^2)
-    // for t = linspace(-6, 6, 17)
-    //     disp(quadcc(f, -6, t));
-    //     disp(",")
-    // end
-    // ```
-    // clang-format on
-    //
-    // However for the purposes of this test it really doesn't matter if they're
-    // accurate or not, since what we're testing is that we perform the lookup correctly
-    // in *whatever* the given arc length parametrization is.
-
+    // Note that for the purposes of this test it does not matter what the t and s
+    // values here actually are, as long as they're both in ascending order, as this
+    // function's job is merely to interpolate over the given set of values, whatever
+    // those values might be.
     static float t_values[17] = {-6,   -5.25, -4.5, -3.75, -3.0, -2.25, -1.5, -0.75, 0,
                                  0.75, 1.5,   2.25, 3,     3.75, 4.5,   5.25, 6};
     static float s_values[17] = {0,      168.5,  314.3,  437.58, 538.49, 617.19,
@@ -321,11 +325,11 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_div
         .t_values = t_values, .s_values = s_values, .num_values = 17};
 
     // Check some arc length points that require no interpolation
-    expectVector2dEqual({.x = 159.5, .y = 1433.40},
+    expectVector2dEqual({.x = 119.9, .y = 717.00},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
                             poly, 0, arc_length_parametrization),
                         0.01);
-    expectVector2dEqual({.x = 196.7, .y = 1311.0},
+    expectVector2dEqual({.x = 128.3, .y = 652.2},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
                             poly, 1379.8, arc_length_parametrization),
                         0.01);
@@ -335,11 +339,11 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_div
                         0.01);
 
     // Check some arc length points that should be determined via interpolation
-    expectVector2dEqual({.x = 145.44, .y = 1174.9},
+    expectVector2dEqual({.x = 111.81, .y = 588.75},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
                             poly, 126.38, arc_length_parametrization),
                         0.01);
-    expectVector2dEqual({.x = 120.03, .y = 736.41},
+    expectVector2dEqual({.x = 97.479, .y = 370.5},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
                             poly, 345.12, arc_length_parametrization),
                         0.01);
