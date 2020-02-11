@@ -22,15 +22,18 @@ PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, d
 
     robot_body = world->CreateBody(&robot_body_def);
 
-    // The depth of the inset area at the front of the robot. This is where the chicker is
-    // in real life, so we create an inset since the ball makes contact slightly inside
-    // the robot body. We are only allowed to cover a fraction of the ball, so we use this
-    // to determine the depth of the inset
-    double chicker_depth = BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
+    // The depth of the dribbling area at the front of the robot. We are only allowed to cover
+    // a fraction of the ball according to the rules, so we use this to calculate the depth.
+    // We assume the ball can be dribbled as long as it is anywhere within this small area.
+    double dribbler_depth = BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
+    // The thickness of the chicker fixture shape. We can use a very small value since the
+    // chicker just needs to be large enough to collide with the ball and detect collisions
+    double chicker_thickness = 0.002;
+    double total_chicker_depth = dribbler_depth + chicker_thickness;
 
-    setupRobotBodyFixtures(robot, chicker_depth, mass_kg);
-    setupDribblerFixture(robot, chicker_depth);
-    setupChickerFixture(robot, chicker_depth);
+    setupRobotBodyFixtures(robot, total_chicker_depth, mass_kg);
+    setupDribblerFixture(robot, dribbler_depth);
+    setupChickerFixture(robot, total_chicker_depth, chicker_thickness);
 }
 
 PhysicsRobot::~PhysicsRobot()
@@ -44,25 +47,24 @@ PhysicsRobot::~PhysicsRobot()
     }
 }
 
-void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_depth, double mass_kg)
+void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double total_chicker_depth, double mass_kg)
 {
     b2FixtureDef robot_body_fixture_def;
     // This is a somewhat arbitrary value. Collisions with robots are not perfectly
     // elastic. However because this is an "ideal" simulation and we generally don't care
     // about the exact behaviour of collisions, getting this value to perfectly match
     // reality isn't too important.
-    robot_body_fixture_def.restitution = 0.0; // TODO: change back to 0.5?
+    robot_body_fixture_def.restitution = 0.5;
     robot_body_fixture_def.friction    = 0.0;
     robot_body_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
 
-    b2PolygonShape* main_body_shape = getMainRobotBodyShape(robot, chicker_depth);
+    b2PolygonShape* main_body_shape = getMainRobotBodyShape(robot, total_chicker_depth);
     b2PolygonShape* front_left_body_shape =
-        getRobotBodyShapeFrontLeft(robot, chicker_depth);
+        getRobotBodyShapeFrontLeft(robot, total_chicker_depth);
     b2PolygonShape* front_right_body_shape =
-        getRobotBodyShapeFrontRight(robot, chicker_depth);
+        getRobotBodyShapeFrontRight(robot, total_chicker_depth);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
-//    body_shapes = {main_body_shape};
     double total_shape_area = 0.0;
     for (const auto* shape : body_shapes)
     {
@@ -77,28 +79,31 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_dep
     }
 }
 
-void PhysicsRobot::setupDribblerFixture(const Robot& robot, double chicker_depth)
+void PhysicsRobot::setupDribblerFixture(const Robot& robot, double dribbler_depth)
 {
     b2FixtureDef robot_dribbler_fixture_def;
-    // We assume collisions with the dribbler get disabled, so these values
-    // don't matter
-    robot_dribbler_fixture_def.restitution = 0.0;
-    robot_dribbler_fixture_def.friction    = 0.0;
     // The dribbler has no mass in simulation. Mass is already accounted for by the robot
     // body
     robot_dribbler_fixture_def.density     = 0.0;
-    // TODO: comment
+    // We explicitly choose to make the dribbler NOT a sensor, because sensor fixtures do not
+    // trigger PreSolve contact callbacks, which we rely on to apply dribbling force at every
+    // physics step
     robot_dribbler_fixture_def.isSensor = false;
+    // We assume the ContactListener for the world will disable collisions with the dribbler
+    // so the restitution and friction don't matter
+    robot_dribbler_fixture_def.restitution = 0.0;
+    robot_dribbler_fixture_def.friction    = 0.0;
     robot_dribbler_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::ROBOT_DRIBBLER, this});
 
+    // Box2D requires that polygon vertices are specified in counter-clockwise order
     const unsigned int num_vertices              = 4;
     b2Vec2 dribbler_shape_vertices[num_vertices] = {
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0)
                        .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
                          DRIBBLER_WIDTH_METERS / 2.0)
                        .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
                          -DRIBBLER_WIDTH_METERS / 2.0)
                        .rotate(robot.orientation())),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0)
@@ -109,7 +114,7 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double chicker_depth
     robot_body->CreateFixture(&robot_dribbler_fixture_def);
 }
 
-void PhysicsRobot::setupChickerFixture(const Robot& robot, double chicker_depth)
+void PhysicsRobot::setupChickerFixture(const Robot& robot, double total_chicker_depth, double chicker_thickness)
 {
     b2FixtureDef robot_chicker_fixture_def;
     // We want perfect damping to help us keep the ball when dribbling
@@ -121,18 +126,19 @@ void PhysicsRobot::setupChickerFixture(const Robot& robot, double chicker_depth)
     robot_chicker_fixture_def.density = 0.0;
     robot_chicker_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::ROBOT_CHICKER, this});
 
+    // Box2D requires that polygon vertices are specified in counter-clockwise order
     const unsigned int num_vertices             = 4;
     b2Vec2 chicker_shape_vertices[num_vertices] = {
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth / 2.0,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth + chicker_thickness,
                          DRIBBLER_WIDTH_METERS / 2.0)
                        .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth,
                          DRIBBLER_WIDTH_METERS / 2.0)
                        .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth,
                          -DRIBBLER_WIDTH_METERS / 2.0)
                        .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth / 2.0,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth + chicker_thickness,
                          -DRIBBLER_WIDTH_METERS / 2.0)
                        .rotate(robot.orientation()))};
     b2PolygonShape* chicker_shape = new b2PolygonShape();
@@ -142,20 +148,22 @@ void PhysicsRobot::setupChickerFixture(const Robot& robot, double chicker_depth)
 }
 
 b2PolygonShape* PhysicsRobot::getMainRobotBodyShape(const Robot& robot,
-                                                    double chicker_depth)
+                                                    double total_chicker_depth)
 {
     const unsigned int num_shape_vertices = b2_maxPolygonVertices;
     b2Vec2 robot_body_vertices[num_shape_vertices];
 
-    // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of
-    // 0) First find the y-coordinate of the front-left edge of the body by solving x^2 +
+    // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of 0)
+    // First find the y-coordinate of the front-left edge of the body by solving x^2 +
     // y^2 = ROBOT_RADIUS^2
     double y = std::sqrt(std::pow(ROBOT_MAX_RADIUS_METERS, 2) -
-                         std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth, 2));
+                         std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth, 2));
 
-    Vector starting_vector(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth, y);
+    Vector starting_vector(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth, y);
     Angle starting_angle        = starting_vector.orientation();
     Angle angle_to_sweep_across = Angle::full() - (2 * starting_angle);
+    // The angle increment is positive, so we rotate counter-clockwise and add points
+    // to the polygon in counter-clockwise order, which is required by Box2D
     Angle angle_increment       = angle_to_sweep_across / (num_shape_vertices - 1);
     for (unsigned int i = 0; i < num_shape_vertices; i++)
     {
@@ -174,9 +182,11 @@ b2PolygonShape* PhysicsRobot::getMainRobotBodyShape(const Robot& robot,
 }
 
 b2PolygonShape* PhysicsRobot::getRobotBodyShapeFrontLeft(const Robot& robot,
-                                                         double chicker_depth)
+                                                         double total_chicker_depth)
 {
-    auto shape_points = getRobotFrontLeftShapePoints(robot, chicker_depth);
+    // These points are already give in counter-clockwise order, so we can directly create
+    // a polygon (Box2D requires that polygon vertices are given in counter-clockwise order)
+    auto shape_points = getRobotFrontLeftShapePoints(robot, total_chicker_depth);
 
     // The shape is added relative to the body, so we do not need to rotate these points
     // to match the robot's orientation
@@ -194,13 +204,18 @@ b2PolygonShape* PhysicsRobot::getRobotBodyShapeFrontLeft(const Robot& robot,
 }
 
 b2PolygonShape* PhysicsRobot::getRobotBodyShapeFrontRight(const Robot& robot,
-                                                          double chicker_depth)
+                                                          double total_chicker_depth)
 {
-    auto shape_points = getRobotFrontLeftShapePoints(robot, chicker_depth);
+    auto shape_points = getRobotFrontLeftShapePoints(robot, total_chicker_depth);
 
     // Mirror the points over the x-axis to get the points for the front-right shape
     std::transform(shape_points.begin(), shape_points.end(), shape_points.begin(),
                    [](const Point& p) { return Point(p.x(), -(p.y())); });
+
+    // shape_points are initially given in counter-clockwise order, but since we
+    // mirrored the points they are now in clockwise order, so we need to reverse them
+    // again. Box2D requires that polygon vertices are given in counter-clockwise order
+    std::reverse(shape_points.begin(), shape_points.end());
 
     // The shape is added relative to the body, so we do not need to rotate these points
     // to match the robot's orientation

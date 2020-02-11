@@ -37,40 +37,50 @@ class PhysicsRobot
 
     /**
      * Destroys the PhysicsRobot object and removes any corresponding bodies
-     * from the physics world if the robot is part of one
+     * from the physics world if the robot is part of one.
      */
     ~PhysicsRobot();
 
     /**
-     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks
+     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks. These
+     * callbacks will be called during every physics step, for the duration of the contact.
      *
      * @param callback The function to register
      */
     void registerDribblerBallContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+
+    /**
+     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks. These
+     * callbacks will be called once at the start of the contact.
+     *
+     * @param callback The function to register
+     */
     void registerDribblerBallStartContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+
+    /**
+     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks. These
+     * callbacks will be called once at the end of the contact.
+     *
+     * @param callback The function to register
+     */
     void registerDribblerBallEndContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
-     * Adds the given function to this PhysicsRobot's list of chicker-ball contact callbacks
+     * Adds the given function to this PhysicsRobot's list of chicker-ball contact callbacks. These
+     * callbacks will be called during every physics step for the duration of the contact.
      *
      * @param callback The function to register
      */
     void registerChickerBallContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
-     * Returns a list of dribbler-ball contact callbacks for this class
+     * Returns a list of contact callbacks for this class
      *
-     * @return a list of dribbler-ball contact callbacks for this class
+     * @return a list of contact callbacks for this class
      */
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallContactCallbacks() const;
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallStartContactCallbacks() const;
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallEndContactCallbacks() const;
-
-    /**
-     * Returns a list of chicker-ball contact callbacks for this class
-     *
-     * @return a list of chicker-ball contact callbacks for this class
-     */
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getChickerBallContactCallbacks() const;
 
     /**
@@ -95,6 +105,14 @@ class PhysicsRobot
      */
     RobotId getRobotId() const;
 
+    /**
+     * Applies the given force to the wheel. Positive force spins the wheel
+     * counter-clockwise, as viewed from inside the robot looking out
+     * (ie. induces positive angular velocity and rotation to the robot).
+     * Negative force does the opposite.
+     *
+     * @param force_in_newtons the force to apply to the wheel
+     */
     void applyWheelForceFrontLeft(double force_in_newtons);
     void applyWheelForceBackLeft(double force_in_newtons);
     void applyWheelForceBackRight(double force_in_newtons);
@@ -122,19 +140,22 @@ class PhysicsRobot
      * adds them to the robot's b2Body
      *
      * @param robot The robot to create fixtures for
-     * @param chicker_depth How far inset into the front of the robot the chicker is
+     * @param total_chicker_depth The distance from the front face of the robot to the back of the
+     * chicker, ie. how far inset into the front of the robot the chicker is
      * @param mass_kg The mass of the robot in kg
      */
-    void setupRobotBodyFixtures(const Robot& robot, double chicker_depth, double mass_kg);
+    void setupRobotBodyFixtures(const Robot& robot, double total_chicker_depth, double mass_kg);
 
     /**
      * Creates a fixture to represent the chicker of the robot. It is partially inset into
      * the front of the robot.
      *
      * @param robot The robot to create the fixture for
-     * @param chicker_depth How far inset into the front of the robot the chicker is
+     * @param total_chicker_depth The distance from the front face of the robot to the back of the
+     * chicker, ie. how far inset into the front of the robot the chicker is
+     * @param chicker_thickness How thick the chicker fixture shape is
      */
-    void setupChickerFixture(const Robot& robot, double chicker_depth);
+    void setupChickerFixture(const Robot& robot, double total_chicker_depth, double chicker_thickness);
 
     /**
      * Creates a fixture to represent the dribbler of the robot. It does not interact
@@ -143,9 +164,9 @@ class PhysicsRobot
      * robot.
      *
      * @param robot The robot to create the fixture for
-     * @param chicker_depth How far inset into the front of the robot the chicker is
+     * @param dribbler_depth How far inset into the front of the robot the chicker is
      */
-    void setupDribblerFixture(const Robot& robot, double chicker_depth);
+    void setupDribblerFixture(const Robot& robot, double dribbler_depth);
 
     /**
      * Together these functions return 3 polygons that together make up the shape of the
@@ -191,18 +212,20 @@ class PhysicsRobot
      *
      *
      * @param robot The robot to create
-     * @param chicker_depth How far inset into the front of the robot the chicker is
+     * @param total_chicker_depth The distance from the front face of the robot to the back of the
+     * chicker, ie. how far inset into the front of the robot the chicker is
      *
      * @return A b2PolygonShape for the corresponding part of the robot body
      */
-    b2PolygonShape* getMainRobotBodyShape(const Robot& robot, double chicker_depth);
-    b2PolygonShape* getRobotBodyShapeFrontLeft(const Robot& robot, double chicker_depth);
-    b2PolygonShape* getRobotBodyShapeFrontRight(const Robot& robot, double chicker_depth);
+    b2PolygonShape* getMainRobotBodyShape(const Robot& robot, double total_chicker_depth);
+    b2PolygonShape* getRobotBodyShapeFrontLeft(const Robot& robot, double total_chicker_depth);
+    b2PolygonShape* getRobotBodyShapeFrontRight(const Robot& robot, double total_chicker_depth);
 
     /**
      * A helper function that returns the points that make up the front-left shape
      * for the robot body. The points that are returned assume the robot is at (0, 0)
-     * and is facing the +x axis (aka has an orientation of 0)
+     * and is facing the +x axis (aka has an orientation of 0). The points are returned
+     * in counter-clockwise order.
      *
      * @param robot The robot to create
      * @param chicker_depth How far inset into the front of the robot the chicker is
@@ -212,15 +235,35 @@ class PhysicsRobot
     std::vector<Point> getRobotFrontLeftShapePoints(const Robot& robot,
                                                     double chicker_depth);
 
+    /**
+     * A helper function that applies force to the robot body as if there was a wheel
+     * at the given angle, relative to the front of the robot
+     *
+     * @param angle_to_wheel The angle to the wheel axis, relative to the front of the robot
+     * @param force_in_newtons The force to apply
+     */
     void applyWheelForceAtAngle(Angle angle_to_wheel, double force_in_newtons);
 
+    /**
+     * Returns the motor speeds for all motors on the robot. Units are in rpm
+     *
+     * @return the motor speeds for all motors on the robot. Units are in rpm
+     */
     std::array<float, 4> getMotorSpeeds() const;
 
+    /**
+     * Returns how much force should be applied to a wheel when the motor is braking.
+     *
+     * @param motor_speed The current speed of the motor, in rpm
+     *
+     * @return How much force (in Newtons) to apply to the wheel to simulate a braking effect
+     */
     float getMotorBrakeForce(float motor_speed) const;
 
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
     b2Body* robot_body;
+
     RobotId robot_id;
 
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_contact_callbacks;
