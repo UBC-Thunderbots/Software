@@ -86,7 +86,8 @@ TEST_F(Polynomial2dTest, get_value_2rd_order_polynomial)
                         shared_polynomial2d_getValueOrder2(poly, -10));
 }
 
-TEST_F(Polynomial2dTest, get_derivative_3rd_order_polynomial){
+TEST_F(Polynomial2dTest, get_derivative_3rd_order_polynomial)
+{
     Polynomial2dOrder3_t poly = {
         .x = {.coefficients = {-2, 0.5, 6, 99}},
         .y = {.coefficients = {.2, 7, 2, 38}},
@@ -189,8 +190,8 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_diagonal_line_2_division
 TEST_F(Polynomial2dTest, get_arc_length_parametrization_for_complex_function)
 {
     Polynomial2dOrder3_t poly = {
-        .x = {.coefficients = {0.1/3, 1.5, -0.5, 70.1}},
-        .y = {.coefficients = {-0.2/3, 19.1, -3, -3}},
+        .x = {.coefficients = {0.1 / 3, 1.5, -0.5, 70.1}},
+        .y = {.coefficients = {-0.2 / 3, 19.1, -3, -3}},
     };
 
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(parametrization, 17);
@@ -308,8 +309,8 @@ TEST_F(Polynomial2dTest, get_position_on_arc_length_below_arc_lengths_in_paramet
 TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_divisions)
 {
     Polynomial2dOrder3_t poly = {
-        .x = {.coefficients = {0.1/3, 1.5, -0.5, 70.1}},
-        .y = {.coefficients = {-0.2/3, 19.1, -3, -3}},
+        .x = {.coefficients = {0.1 / 3, 1.5, -0.5, 70.1}},
+        .y = {.coefficients = {-0.2 / 3, 19.1, -3, -3}},
     };
 
     // Note that for the purposes of this test it does not matter what the t and s

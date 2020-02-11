@@ -36,7 +36,7 @@ void shared_polynomial1d_differentiate(const float* coefficients, size_t num_coe
 {
     for (size_t i = 0; i < num_coefficients - 1; i++)
     {
-        derivative_coefficients[i] = coefficients[i]*(num_coefficients - i - 1);
+        derivative_coefficients[i] = coefficients[i] * (num_coefficients - i - 1);
     }
 }
 

@@ -72,6 +72,9 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
         Polynomial2dOrder##N_minus_1##_t deriv =                                           \
             shared_polynomial2d_differentiateOrder##N(p);                                  \
                                                                                            \
+        /* We divide dt by two here because we want to ensure we get the number of */      \
+        /* values that the user requested, but simpsons rule requires that we use */       \
+        /* an even number of points */                                                     \
         float dt = (t_max - t_min) / ((parametrization.num_values - 1) * 2);               \
                                                                                            \
         /* Populate the entries of the parametrization by numerically integrating the */   \
