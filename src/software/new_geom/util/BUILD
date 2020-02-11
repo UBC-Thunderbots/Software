@@ -36,8 +36,21 @@ cc_library(
     ],
     deps = [
         "//software/geom",
+        "//software/new_geom:circle",
         "//software/new_geom:polygon",
         "//software/new_geom:segment",
+        "//software/new_geom/util:distance",
+    ],
+)
+
+cc_test(
+    name = "intersects_test",
+    srcs = [
+        "intersects_test.cpp",
+    ],
+    deps = [
+        ":intersects",
+        "@gtest//:gtest_main",
     ],
 )
 

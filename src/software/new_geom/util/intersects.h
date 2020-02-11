@@ -1,23 +1,76 @@
 #pragma once
 
 #include "software/geom/util.h"
+#include "software/new_geom/circle.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
 
 /**
  * Returns true if the segment intersects the polygon, false otherwise.
  *
- * @param poly The polygon to see if the segment intersects it
- * @param segment The segment to see if it intersects the polygon
+ * @param first
+ * @param second
  * @return true if the segment intersects the polygon, false otherwise
  */
-bool intersects(const Polygon& poly, const Segment& segment);
+bool intersects(const Polygon &first, const Segment &second);
+bool intersects(const Segment &first, const Polygon &second);
 
 /**
  * Returns true if the ray intersects the polygon, false otherwise.
  *
- * @param poly The polygon to see if the ray intersects it
- * @param ray The ray to see if it intersects the polygon
+ * @param first
+ * @param second
  * @return true if the ray intersects the polygon, false otherwise
  */
-bool intersects(const Polygon& poly, const Ray& ray);
+bool intersects(const Polygon &first, const Ray &second);
+bool intersects(const Ray &first, const Polygon &second);
+
+/**
+ * Returns true if the polygon intersects the circle, false otherwise.
+ *
+ * @param first
+ * @param second
+ * @return true if the polygon intersects the circle, false otherwise
+ */
+bool intersects(const Polygon &first, const Circle &second);
+bool intersects(const Circle &first, const Polygon &second);
+
+/**
+ * Returns true if the circles intersect each other, false otherwise
+ *
+ * @param first
+ * @param second
+ * @return true if the circles intersect each other, false otherwise
+ */
+bool intersects(const Circle &first, const Circle &second);
+
+/**
+ * Returns true if the segment intersects the circle, false otherwise.
+ * A segment is considered to intersect the circle iff it has one point
+ * inside the circle, and one point outside the circle.
+ *
+ * @param first
+ * @param second
+ * @return true if the segment inersects the circle, false otherwise
+ */
+bool intersects(const Segment &first, const Circle &second);
+bool intersects(const Circle &first, const Segment &second);
+
+/**
+ * Returns true if the segments intersect each other, false otherwise
+ *
+ * @param first
+ * @param second
+ * @return true if the segments intersect each other, false otherwise
+ */
+bool intersects(const Segment &first, const Segment &second);
+
+/**
+ * Returns true if the ray intersects the segment, false otherwise
+ *
+ * @param first
+ * @param second
+ * @return true if the ray intersects the segment, false otherwise
+ */
+bool intersects(const Ray &first, const Segment &second);
+bool intersects(const Segment &first, const Ray &second);
