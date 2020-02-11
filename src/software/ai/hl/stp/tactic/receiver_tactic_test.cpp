@@ -304,7 +304,7 @@ TEST_P(OneTimeShotDirectionTest, test_shot_towards_enemy_net)
     EXPECT_LT(robot_angle.toDegrees(), max_angle_degrees);
 }
 // Since the exact direction for one time shots is highly variable and depends a lot on
-// physical tests, we check the exact angles, but we can at least test that they're in
+// physical tests, we can't check the exact angles, but we can at least test that they're in
 // the right range
 INSTANTIATE_TEST_CASE_P(
     All, OneTimeShotDirectionTest,

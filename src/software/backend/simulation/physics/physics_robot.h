@@ -100,6 +100,22 @@ class PhysicsRobot
     void applyWheelForceBackRight(double force_in_newtons);
     void applyWheelForceFrontRight(double force_in_newtons);
 
+    /**
+     * Gets the motor speed for the wheel, in RPM
+     */
+    float getMotorSpeedFrontLeft();
+    float getMotorSpeedBackLeft();
+    float getMotorSpeedBackRight();
+    float getMotorSpeedFrontRight();
+
+    /**
+     * Sets the motor to brake (act against the current direction of rotation)
+     */
+    void brakeMotorBackLeft();
+    void brakeMotorBackRight();
+    void brakeMotorFrontLeft();
+    void brakeMotorFrontRight();
+
    private:
     /**
      * Creates as many fixtures as necessary to represent the shape of the robot body, and
@@ -197,6 +213,10 @@ class PhysicsRobot
                                                     double chicker_depth);
 
     void applyWheelForceAtAngle(Angle angle_to_wheel, double force_in_newtons);
+
+    std::array<float, 4> getMotorSpeeds() const;
+
+    float getMotorBrakeForce(float motor_speed) const;
 
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures

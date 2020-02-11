@@ -86,6 +86,7 @@ cc_library(
         ":box2d_util",
         ":physics_ball",
         ":physics_object_user_data",
+        "//firmware/main/shared:physics",
         "//shared:constants",
         "//software/geom",
         "//software/time:timestamp",

@@ -6,6 +6,9 @@
 
 #include "shared/constants.h"
 #include "software/backend/simulation/physics/box2d_util.h"
+extern "C" {
+#include "firmware/main/shared/physics.h"
+}
 
 PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, double mass_kg)
     : robot_id(robot.id())
@@ -59,19 +62,17 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double chicker_dep
         getRobotBodyShapeFrontRight(robot, chicker_depth);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
-
+//    body_shapes = {main_body_shape};
     double total_shape_area = 0.0;
     for (const auto* shape : body_shapes)
     {
         total_shape_area += polygonArea(*shape);
     }
+    robot_body_fixture_def.density = mass_kg / total_shape_area;
 
     for (const auto shape : body_shapes)
     {
         robot_body_fixture_def.shape = shape;
-        double shape_area            = polygonArea(*shape);
-        double mass_of_shape = shape_area / total_shape_area * mass_kg;
-        robot_body_fixture_def.density = mass_of_shape / shape_area;
         robot_body->CreateFixture(&robot_body_fixture_def);
     }
 }
@@ -162,8 +163,8 @@ b2PolygonShape* PhysicsRobot::getMainRobotBodyShape(const Robot& robot,
         Point vertex =
             Point(0, 0) +
             Vector::createFromAngle(angle_to_vertex).normalize(ROBOT_MAX_RADIUS_METERS);
-        // rotate to match the robot's orientation
-        vertex                 = vertex.rotate(robot.orientation());
+        // The shape is added relative to the body, so we do not need to rotate these points
+        // to match the robot's orientation
         robot_body_vertices[i] = createVec2(vertex);
     }
 
@@ -177,9 +178,8 @@ b2PolygonShape* PhysicsRobot::getRobotBodyShapeFrontLeft(const Robot& robot,
 {
     auto shape_points = getRobotFrontLeftShapePoints(robot, chicker_depth);
 
-    // Rotate all points to match the orientation of the robot
-    std::transform(shape_points.begin(), shape_points.end(), shape_points.begin(),
-                   [robot](Point p) { return p.rotate(robot.orientation()); });
+    // The shape is added relative to the body, so we do not need to rotate these points
+    // to match the robot's orientation
 
     b2Vec2 vertices[shape_points.size()];
     for (unsigned int i = 0; i < shape_points.size(); i++)
@@ -202,9 +202,8 @@ b2PolygonShape* PhysicsRobot::getRobotBodyShapeFrontRight(const Robot& robot,
     std::transform(shape_points.begin(), shape_points.end(), shape_points.begin(),
                    [](const Point& p) { return Point(p.x(), -(p.y())); });
 
-    // Rotate all points to match the orientation of the robot
-    std::transform(shape_points.begin(), shape_points.end(), shape_points.begin(),
-                   [robot](const Point& p) { return p.rotate(robot.orientation()); });
+    // The shape is added relative to the body, so we do not need to rotate these points
+    // to match the robot's orientation
 
     b2Vec2 vertices[shape_points.size()];
     for (unsigned int i = 0; i < shape_points.size(); i++)
@@ -232,7 +231,8 @@ std::vector<Point> PhysicsRobot::getRobotFrontLeftShapePoints(const Robot& robot
         Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth, y),
         Point(DIST_TO_FRONT_OF_ROBOT_METERS - chicker_depth, DRIBBLER_WIDTH_METERS / 2.0),
         Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0),
-        Point(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0)};
+        Point(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0)
+    };
 
     return vertices;
 }
@@ -308,11 +308,77 @@ void PhysicsRobot::applyWheelForceFrontRight(double force_in_newtons) {
 }
 
 void PhysicsRobot::applyWheelForceAtAngle(Angle angle_to_wheel, double force_in_newtons) {
-    Point robot_position = createPoint(robot_body->GetPosition());
-    Point local_force_point = robot_position + Vector::createFromAngle(angle_to_wheel).normalize(ROBOT_MAX_RADIUS_METERS);
-    Vector local_force_vector = (local_force_point - robot_position).perpendicular();
+    // The center of the robot is always at (0, 0) in its own coordinate frame
+    Point local_robot_position = Point(0, 0);
+    Point local_force_point = local_robot_position + Vector::createFromAngle(angle_to_wheel).normalize(ROBOT_MAX_RADIUS_METERS);
+    Vector local_force_vector = (local_force_point - local_robot_position).perpendicular();
     local_force_vector = local_force_vector.normalize(force_in_newtons);
     b2Vec2 force_point = robot_body->GetWorldPoint(createVec2(local_force_point));
     b2Vec2 force_vector = robot_body->GetWorldVector(createVec2(local_force_vector));
     robot_body->ApplyForce(force_vector, force_point, true);
+}
+
+std::array<float, 4> PhysicsRobot::getMotorSpeeds() const {
+    float robot_local_speed[3] {
+            robot_body->GetLocalVector(robot_body->GetLinearVelocity()).x,
+            robot_body->GetLocalVector(robot_body->GetLinearVelocity()).y,
+            robot_body->GetAngularVelocity()
+    };
+    float wheel_speeds[4] {0.0, 0.0, 0.0, 0.0};
+    speed3_to_speed4(robot_local_speed, wheel_speeds);
+    std::array<float, 4> motor_speeds = {0.0, 0.0, 0.0, 0.0};
+    for(unsigned int i = 0; i < 4; i++) {
+        motor_speeds[i] = wheel_speeds[i] / GEAR_RATIO;
+    }
+    return motor_speeds;
+}
+
+float PhysicsRobot::getMotorSpeedFrontLeft() {
+    return getMotorSpeeds()[0];
+}
+
+float PhysicsRobot::getMotorSpeedBackLeft() {
+    return getMotorSpeeds()[1];
+}
+
+float PhysicsRobot::getMotorSpeedBackRight() {
+    return getMotorSpeeds()[2];
+}
+
+float PhysicsRobot::getMotorSpeedFrontRight() {
+    return getMotorSpeeds()[3];
+}
+
+void PhysicsRobot::brakeMotorFrontLeft() {
+    float motor_speed = getMotorSpeedFrontLeft();
+    float wheel_force = getMotorBrakeForce(motor_speed);
+    applyWheelForceFrontLeft(wheel_force);
+}
+
+void PhysicsRobot::brakeMotorBackLeft() {
+    float motor_speed = getMotorSpeedBackLeft();
+    float wheel_force = getMotorBrakeForce(motor_speed);
+    applyWheelForceBackLeft(wheel_force);
+}
+
+void PhysicsRobot::brakeMotorBackRight() {
+    float motor_speed = getMotorSpeedBackRight();
+    float wheel_force = getMotorBrakeForce(motor_speed);
+    applyWheelForceBackRight(wheel_force);
+}
+
+void PhysicsRobot::brakeMotorFrontRight() {
+    float motor_speed = getMotorSpeedFrontRight();
+    float wheel_force = getMotorBrakeForce(motor_speed);
+    applyWheelForceFrontRight(wheel_force);
+}
+
+float PhysicsRobot::getMotorBrakeForce(float motor_speed) const {
+    // We approximate the braking force of the motor with a linear relationship
+    // to the current motor speed and the mass of the robot. The force is applied
+    // opposite the motor's current rotation / speed.
+    //
+    // The scaling factor has been tuned to stop the robot in a reasonable
+    // amount of time via the unit tests
+    return -0.5*robot_body->GetMass()*motor_speed;
 }
