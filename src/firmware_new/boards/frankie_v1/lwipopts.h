@@ -52,8 +52,14 @@ extern "C"
 #define LWIP_DHCP 1
 /*----- Default Value for LWIP_IGMP: 0 ---*/
 #define LWIP_IGMP 1
+/*----- Default Value for MEM_LIBC_MALLOC: 0 ---*/
+#define MEM_LIBC_MALLOC 1
+/*----- Default Value for MEMP_MEM_MALLOC: 0 ---*/
+#define MEMP_MEM_MALLOC 1
 /*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
 #define MEM_ALIGNMENT 4
+/*----- Default Value for MEM_SIZE: 1600 ---*/
+#define MEM_SIZE 32768
 /*----- Value supported for H7 devices: 1 -----*/
 #define LWIP_SUPPORT_CUSTOM_PBUF 1
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
