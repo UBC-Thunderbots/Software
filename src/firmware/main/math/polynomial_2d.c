@@ -3,9 +3,6 @@
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
-#include <stdio.h>
-
-// TODO: consider combining all (or almost all) macros here
 
 /**
  * Calculate the L2 norm of the vector at the given t-value
@@ -74,17 +71,22 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
         /* TODO: do we need this? remove and add test if not */                          \
         assert(t_min < t_max);                                                           \
                                                                                          \
+        if (parametrization.num_values == 1)                                             \
+        {                                                                                \
+            parametrization.s_values[0] = 0;                                             \
+            parametrization.t_values[0] = (t_max + t_min) / 2.0;                         \
+            return;                                                                      \
+        }                                                                                \
+                                                                                         \
         Polynomial2dOrder##N_minus_1##_t deriv =                                         \
             shared_polynomial2d_differentiateOrder##N(p);                                \
                                                                                          \
         float dt = (t_max - t_min) / ((parametrization.num_values - 1) * 2);             \
-        printf("dt: %f \n ", dt);                                                        \
                                                                                          \
         /* Populate the entries of the parametrization by numerically integrating the */ \
         /* derivative with Simpson's rule: */                                            \
         /* https://www.intmath.com/integration/6-simpsons-rule.php */                    \
         float initial_value = calculateL2NormAtValueOrder##N_minus_1(deriv, t_min);      \
-        printf("initial_value: %f \n", initial_value);                                   \
         float sum_of_odd_s_values   = 0;                                                 \
         float sum_of_even_s_values  = 0;                                                 \
         parametrization.s_values[0] = 0;                                                 \
@@ -92,14 +94,11 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
         for (size_t i = 1; i < parametrization.num_values; i++)                          \
         {                                                                                \
             const float t_i = t_min + 2 * i * dt;                                        \
-            printf("t_%d: %f \n", (int)i, t_i);                                          \
             const float value_i = calculateL2NormAtValueOrder##N_minus_1(deriv, t_i);    \
-            printf("value_%d: %f \n", (int)i, value_i);                                  \
                                                                                          \
             const float t_i_minus_1 = t_min + (2 * i - 1) * dt;                          \
             const float value_i_minus_1 =                                                \
                 calculateL2NormAtValueOrder##N_minus_1(deriv, t_i_minus_1);              \
-            printf("value_%d_minus_1: %f \n", (int)i, value_i_minus_1);                  \
             sum_of_odd_s_values += value_i_minus_1;                                      \
                                                                                          \
             const float s_i = initial_value + 4 * sum_of_odd_s_values +                  \
@@ -127,20 +126,58 @@ GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(1, 0)
         /* Check that we have at least one s-value in the parametrization, and the s */  \
         /* value we're looking for is within the parametrization */                      \
         assert(arc_length_parametrization.num_values > 0);                               \
-        assert(s >= arc_length_parametrization.s_values[0]);                             \
-        assert(s <= arc_length_parametrization                                           \
-                        .s_values[arc_length_parametrization.num_values - 1]);           \
                                                                                          \
-        /* Binary search to find between which two t-values in the */                    \
-        /* table the given t value is */                                                 \
-        size_t upper = arc_length_parametrization.num_values-2; \
-        size_t lower = 0; \
-        size_t pivot = floor(arc_length_parametrization.num_values/2.0);                \
-        while (pivot < arc_length_parametrization.t_values[0] || )                                                                         \
+        const float max_arc_length_value =                                               \
+            arc_length_parametrization                                                   \
+                .s_values[arc_length_parametrization.num_values - 1];                    \
+        const float min_arc_length_value = arc_length_parametrization.s_values[0];       \
+        if (s > max_arc_length_value)                                                    \
+        {                                                                                \
+            s = max_arc_length_value;                                                    \
+        }                                                                                \
+        else if (s < min_arc_length_value)                                               \
+        {                                                                                \
+            s = min_arc_length_value;                                                    \
+        }                                                                                \
                                                                                          \
                                                                                          \
-            Vector2d_t result = {.x = shared_polynomial1d_getValueOrder##N(p.x, t),      \
-                                 .y = shared_polynomial1d_getValueOrder##N(p.y, t)};     \
+        /* Binary search to find between which two s-values in the */                    \
+        /* table the given s value is */                                                 \
+                                                                                         \
+        size_t upper                 = arc_length_parametrization.num_values - 1;        \
+        size_t lower                 = 0;                                                \
+        size_t pivot                 = lower + (int)floor((upper - lower) / 2);          \
+        float arc_length_below_pivot = arc_length_parametrization.s_values[pivot];       \
+        float arc_length_above_pivot = arc_length_parametrization.s_values[pivot + 1];   \
+        /* TODO: delete me */                                                            \
+        int i = 0;                                                                       \
+        while (i < 20 && !(s >= arc_length_below_pivot && s <= arc_length_above_pivot))  \
+        {                                                                                \
+                   (int)upper);                                                          \
+            if (s > arc_length_above_pivot)                                              \
+            {                                                                            \
+                lower = pivot;                                                           \
+            }                                                                            \
+            else                                                                         \
+            {                                                                            \
+                upper = pivot;                                                           \
+            }                                                                            \
+            pivot                  = lower + floor((upper - lower) / 2);                 \
+            arc_length_below_pivot = arc_length_parametrization.s_values[pivot];         \
+            arc_length_above_pivot = arc_length_parametrization.s_values[pivot + 1];     \
+            i++;                                                                         \
+        }                                                                                \
+                                                                                         \
+        /* Linearly interpolate between the two t-values above and below the s-value */  \
+        /* we found */                                                                   \
+        const float t_below_pivot = arc_length_parametrization.t_values[pivot];          \
+        const float t_above_pivot = arc_length_parametrization.t_values[pivot + 1];      \
+        const float s_ratio       = (s - arc_length_below_pivot) /                       \
+                              (arc_length_above_pivot - arc_length_below_pivot);         \
+        const float t = t_below_pivot + (t_above_pivot - t_below_pivot) * s_ratio;       \
+                                                                                         \
+        Vector2d_t result = {.x = shared_polynomial1d_getValueOrder##N(p.x, t),          \
+                             .y = shared_polynomial1d_getValueOrder##N(p.y, t)};         \
                                                                                          \
         return result;                                                                   \
     }

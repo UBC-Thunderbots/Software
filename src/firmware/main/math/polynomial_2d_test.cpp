@@ -44,10 +44,11 @@ class Polynomial2dTest : public testing::Test
                           tolerance);
     }
 
-    static void expectVector2dEqual(Vector2d_t expected, Vector2d_t actual)
+    static void expectVector2dEqual(Vector2d_t expected, Vector2d_t actual,
+                                    double tolerance = 10e-6)
     {
-        EXPECT_NEAR(expected.x, actual.x, 10e-6);
-        EXPECT_NEAR(expected.y, actual.y, 10e-6);
+        EXPECT_NEAR(expected.x, actual.x, tolerance);
+        EXPECT_NEAR(expected.y, actual.y, tolerance);
     }
 };
 
@@ -85,6 +86,47 @@ TEST_F(Polynomial2dTest, get_value_2rd_order_polynomial)
                         shared_polynomial2d_getValueOrder2(poly, -10));
 }
 
+TEST_F(Polynomial2dTest, get_arc_length_parametrization_num_values_0)
+{
+    // This function should probably never be used like this, but this checks that
+    // we're at least executing defined behavior
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {0, 0}},
+        .y = {.coefficients = {1, 0.1}},
+    };
+
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(parametrization, 0);
+
+    shared_polynomial_getArcLengthParametrizationOrder1(poly, -2, 2, parametrization);
+
+    static float expected_t_values[0]   = {};
+    static float expected_s_values[0]   = {};
+    ArcLengthParametrization_t expected = {
+        .t_values = expected_t_values, .s_values = expected_s_values, .num_values = 0};
+
+    expectArcLengthParametrizationsEqual(expected, parametrization);
+}
+
+TEST_F(Polynomial2dTest, get_arc_length_parametrization_num_values_1)
+{
+    // This function should probably never be used like this, but this checks that
+    // we're at least executing defined behavior
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.1}},
+    };
+
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(parametrization, 1);
+
+    shared_polynomial_getArcLengthParametrizationOrder1(poly, -1, 2, parametrization);
+
+    static float expected_t_values[1]   = {0.5};
+    static float expected_s_values[1]   = {0};
+    ArcLengthParametrization_t expected = {
+        .t_values = expected_t_values, .s_values = expected_s_values, .num_values = 1};
+
+    expectArcLengthParametrizationsEqual(expected, parametrization);
+}
 
 TEST_F(Polynomial2dTest, get_arc_length_parametrization_vertical_line_0_divisions)
 {
@@ -97,11 +139,10 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_vertical_line_0_division
 
     shared_polynomial_getArcLengthParametrizationOrder1(poly, -2, 2, parametrization);
 
-    static float expected_t_values_storage[2] = {-2, 2};
-    static float expected_s_values_storage[2] = {0, 4};
-    ArcLengthParametrization_t expected       = {.t_values   = expected_t_values_storage,
-                                           .s_values   = expected_s_values_storage,
-                                           .num_values = 2};
+    static float expected_t_values[2]   = {-2, 2};
+    static float expected_s_values[2]   = {0, 4};
+    ArcLengthParametrization_t expected = {
+        .t_values = expected_t_values, .s_values = expected_s_values, .num_values = 2};
 
     expectArcLengthParametrizationsEqual(expected, parametrization);
 }
@@ -126,6 +167,7 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_diagonal_line_2_division
 
     expectArcLengthParametrizationsEqual(expected, parametrization);
 }
+
 
 TEST_F(Polynomial2dTest, get_arc_length_parametrization_for_complex_function)
 {
@@ -162,6 +204,25 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_for_complex_function)
     expectArcLengthParametrizationsEqual(expected, parametrization, 1);
 }
 
+TEST_F(Polynomial2dTest, get_position_at_arc_length_on_straight_1_values)
+{
+    // This function should probably never be used like this, but this checks that
+    // we're at least executing defined behavior
+
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.2}},
+    };
+
+    static float t_values[1] = {0.5};
+    static float s_values[1] = {99};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .s_values = s_values, .num_values = 1};
+
+    expectVector2dEqual({.x = 0.6, .y = 0.7},
+                        shared_polynomial2d_getPositionAtArcLengthOrder1(
+                            poly, 99, arc_length_parametrization));
+}
 
 TEST_F(Polynomial2dTest, get_position_at_arc_length_on_straight_line_single_division)
 {
@@ -191,6 +252,39 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_straight_line_single_divi
                         shared_polynomial2d_getPositionAtArcLengthOrder1(
                             poly, 4, arc_length_parametrization));
 }
+
+TEST_F(Polynomial2dTest, get_position_on_arc_length_above_arc_lengths_in_parametrization){
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.1}},
+    };
+
+    static float t_values[2]                              = {-2, 2};
+    static float s_values[2]                              = {0, 4};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .s_values = s_values, .num_values = 2};
+
+    expectVector2dEqual({.x = 2.1, .y = 2.1},
+                        shared_polynomial2d_getPositionAtArcLengthOrder1(
+                            poly, 5, arc_length_parametrization));
+}
+
+TEST_F(Polynomial2dTest, get_position_on_arc_length_below_arc_lengths_in_parametrization){
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.1}},
+    };
+
+    static float t_values[2]                              = {-2, 2};
+    static float s_values[2]                              = {0, 4};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .s_values = s_values, .num_values = 2};
+
+    expectVector2dEqual({.x = -1.9, .y = -1.9},
+                        shared_polynomial2d_getPositionAtArcLengthOrder1(
+                            poly, -5, arc_length_parametrization));
+}
+
 
 TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_divisions)
 {
@@ -227,19 +321,24 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_div
     // Check some arc length points that require no interpolation
     expectVector2dEqual({.x = 159.5, .y = 1433.40},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
-                            poly, 0, arc_length_parametrization));
-    expectVector2dEqual({.x = 70.1, .y = -3.0},
-                        shared_polynomial2d_getPositionAtArcLengthOrder3(
-                            poly, 1379.8, arc_length_parametrization));
+                            poly, 0, arc_length_parametrization),
+                        0.01);
     expectVector2dEqual({.x = 196.7, .y = 1311.0},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
-                            poly, 721.73, arc_length_parametrization));
+                            poly, 1379.8, arc_length_parametrization),
+                        0.01);
+    expectVector2dEqual({.x = 70.1, .y = -3.0},
+                        shared_polynomial2d_getPositionAtArcLengthOrder3(
+                            poly, 721.73, arc_length_parametrization),
+                        0.01);
 
     // Check some arc length points that should be determined via interpolation
-    expectVector2dEqual({.x = 128.06, .y = 871.02},
+    expectVector2dEqual({.x = 145.44, .y = 1174.9},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
-                            poly, 126.38, arc_length_parametrization));
+                            poly, 126.38, arc_length_parametrization),
+                        0.01);
     expectVector2dEqual({.x = 120.03, .y = 736.41},
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
-                            poly, 345.12, arc_length_parametrization));
+                            poly, 345.12, arc_length_parametrization),
+                        0.01);
 }

@@ -116,9 +116,14 @@ GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_DECLARATION(3);
  * @pre s is between the minimum and maximum s value in the given parametrization
  *
  * @param p [in] The polynomial from which to get the position at the given arc length
- * @param s [in] The arc length to get the position at
+ * @param s [in] The arc length to get the position at. If this is above or below the
+ *               min/max arc length in the given parametrization, it will be set to the
+ *               closest arc length in the parametrization.
  * @param arc_length_parametrization [in] A re-parametrization of "p" in terms of arc
- *                                        length. This must have at least one entry
+ *                                        length. *THIS MUST HAVE AT LEAST ONE ENTRY*
+ *
+ * @return An approximation of the position at the given arc length on the given
+ *         polynomial
  */
 #define GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(N)        \
     Vector2d_t shared_polynomial2d_getPositionAtArcLengthOrder##N(                       \
