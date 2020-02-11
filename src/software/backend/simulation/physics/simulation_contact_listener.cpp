@@ -59,12 +59,7 @@ void SimulationContactListener::PreSolve(b2Contact *contact, const b2Manifold *o
         }
         if (auto ball_chicker_pair = isBallChickerContact(user_data_a, user_data_b))
         {
-//            std::cout << "chicker contact" << std::endl;
             contact->SetRestitution(0.0);
-        }
-        if(auto ball_robot_pair = isBallRobotBodyContact(user_data_a, user_data_b)) {
-//            std::cout << "robot body contact" << std::endl;
-//            contact->SetRestitution(0.0);
         }
         if(auto ball = isBallContact(user_data_a, user_data_b)) {
             if(ball->isInFlight()) {

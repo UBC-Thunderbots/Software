@@ -6,7 +6,7 @@
 #include "software/backend/simulation/physics/box2d_util.h"
 #include "software/backend/simulation/physics/physics_object_user_data.h"
 
-PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg, const double gravity) : gravity(gravity), chip_origin(std::nullopt), chip_distance_m(0.0), num_current_collisions(0)
+PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg, const double gravity) : gravity(gravity), chip_origin(std::nullopt), chip_distance_m(0.0)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -82,6 +82,7 @@ void PhysicsBall::chip(const Vector &chip_vector) {
     Angle chip_angle = Angle::fromDegrees(45);
     // Use the formula for the Range of a parabolic projectile
     // Rearrange to solve for the initial velocity
+    // See https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
     double range = chip_vector.length();
     double numerator = range * gravity;
     double denominator = 2 * (chip_angle * 2).sin();
@@ -102,16 +103,31 @@ void PhysicsBall::applyImpulse(const Vector& impulse) {
     ball_body->ApplyLinearImpulseToCenter(impulse_vector, true);
 }
 
+bool PhysicsBall::isTouchingOtherObject() const {
+    b2ContactEdge* contact_edge = ball_body->GetContactList();
+    while (contact_edge != nullptr)
+    {
+        if (contact_edge->contact->IsTouching())
+        {
+            return true;
+        }
+        contact_edge = contact_edge->next;
+    }
+    return false;
+}
+
 bool PhysicsBall::isInFlight() {
     bool chip_in_progress = chip_origin.has_value();
     if(chip_in_progress) {
         double current_chip_distance = (getBallWithTimestamp(Timestamp::fromSeconds(0)).position() - chip_origin.value()).length();
-        // TODO: better comment
-        // The ball is only not in flight if it has travelled far enough to hit the ground, and
-        // is not overlapping any objects when it lands. Once it "lands" it waits until it is no longer
-        // colliding before reporting not in flight, which simulate the ball landing on top of another
-        // object and rolling off it, such as a robot
-        if(current_chip_distance >= chip_distance_m && num_current_collisions == 0) {
+        // Once the ball is in flight, is can only stop being in flight once it has travelled
+        // at least the current chip_distance and is simultaneously not touching another object.
+        // This prevents the ball from "landing" in another object, and instead pretends
+        // the ball hit the top and rolled off.
+        //
+        // We assume the ball does not collide while it is in flight, which gives us the "guarantee"
+        // the ball will travel far enough from the chip_origin in order to "land"
+        if(current_chip_distance >= chip_distance_m && !isTouchingOtherObject()) {
             chip_origin = std::nullopt;
             return false;
         }
@@ -121,14 +137,4 @@ bool PhysicsBall::isInFlight() {
     }
 
     return false;
-}
-
-void PhysicsBall::incrementNumCurrentCollisions() {
-    num_current_collisions++;
-}
-
-void PhysicsBall::decrementNumCurrentCollisions() {
-    if(num_current_collisions > 0) {
-        num_current_collisions--;
-    }
 }

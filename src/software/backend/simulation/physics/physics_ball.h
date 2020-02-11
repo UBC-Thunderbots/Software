@@ -21,7 +21,7 @@ class PhysicsBall
      * @param world A shared_ptr to a Box2D World
      * @param ball The Ball to be created in the Box2D world
      * @param mass_kg The mass of the ball in kg
-     * @param gravity The force due to gravity on the ball
+     * @param gravity The acceleration due to gravity on the ball, in m/s^2
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball, const double mass_kg, const double gravity);
 
@@ -40,7 +40,8 @@ class PhysicsBall
     ~PhysicsBall();
 
     /**
-     * Adds the given function to this PhysicsBall's list of ball contact callbacks
+     * Adds the given function to this PhysicsBall's list of ball contact callbacks.
+     * These callbacks will be called during every physics step for the duration of the contact.
      *
      * @param callback The function to register
      */
@@ -108,11 +109,15 @@ class PhysicsBall
      */
     void applyImpulse(const Vector& impulse);
 
-    // TODO: comment
-    void incrementNumCurrentCollisions();
-    void decrementNumCurrentCollisions();
-
    private:
+    /**
+     * Returns true if this ball is touching another object in the physics world
+     *
+     * @return true if the ball is touching another object in the physics world,
+     * and false otherwise
+     */
+    bool isTouchingOtherObject() const;
+
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
     b2Body* ball_body;
@@ -124,7 +129,6 @@ class PhysicsBall
     std::optional<Point> chip_origin;
     // The distance of the most recent chip
     double chip_distance_m;
-    unsigned int num_current_collisions;
 
     std::vector<std::function<void(PhysicsBall*)>> ball_contact_callbacks;
 };
