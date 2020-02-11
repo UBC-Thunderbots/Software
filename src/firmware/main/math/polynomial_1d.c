@@ -10,11 +10,12 @@
  * @param x The point to get the polynomial value at
  * @return The polynomial value at the given point
  */
-float shared_polynomial1d_getValue(const float* coefficients, const size_t num_coefficients,
-                                   float x)
+float shared_polynomial1d_getValue(const float* coefficients,
+                                   const size_t num_coefficients, float x)
 {
     float result = 0;
-    for (size_t order = 0; order < num_coefficients; order++){
+    for (size_t order = 0; order < num_coefficients; order++)
+    {
         result += coefficients[num_coefficients - 1 - order] * pow(x, order);
     }
     return result;
@@ -26,16 +27,15 @@ float shared_polynomial1d_getValue(const float* coefficients, const size_t num_c
  * @param coefficients [in] The coefficients representing the polynomial to differentiate,
  *                          with the highest order ones first.
  * @param num_coefficients [in] The number of coefficients
- * @param derivative_coefficients [out] This will be populated with the coefficients representing the
- *                         derivative of the polynomial represented by the given
- *                         coefficients. Must be allocated to be at least
- *                         num_coefficients-1 long
+ * @param derivative_coefficients [out] This will be populated with the coefficients
+ * representing the derivative of the polynomial represented by the given coefficients.
+ * Must be allocated to be at least num_coefficients-1 long
  */
-void shared_polynomial1d_differentiate(const float* coefficients,
-                                       size_t num_coefficients,
+void shared_polynomial1d_differentiate(const float* coefficients, size_t num_coefficients,
                                        float* derivative_coefficients)
 {
-    for (size_t i = 0; i < num_coefficients-1; i++){
+    for (size_t i = 0; i < num_coefficients - 1; i++)
+    {
         derivative_coefficients[i] = coefficients[i];
     }
 }
@@ -56,8 +56,8 @@ GENERATE_1D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(3)
         Polynomial1dOrder##FROM_ORDER##_t p)                                             \
     {                                                                                    \
         Polynomial1dOrder##TO_ORDER##_t derivative;                                      \
-        shared_polynomial1d_differentiate(p.coefficients,                                \
-                                          FROM_ORDER+1, derivative.coefficients);       \
+        shared_polynomial1d_differentiate(p.coefficients, FROM_ORDER + 1,                \
+                                          derivative.coefficients);                      \
         return derivative;                                                               \
     }
 

@@ -35,7 +35,10 @@ cc_library(
     name = "polynomial_2d",
     srcs = ["polynomial_2d.c"],
     hdrs = ["polynomial_2d.h"],
-    deps = [":polynomial_1d"],
+    deps = [
+        ":polynomial_1d",
+        ":vector_2d",
+    ],
 )
 
 cc_test(
@@ -45,4 +48,9 @@ cc_test(
         ":polynomial_2d",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "vector_2d",
+    hdrs = ["vector_2d.h"],
 )

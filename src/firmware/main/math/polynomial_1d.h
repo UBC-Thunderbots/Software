@@ -4,12 +4,10 @@
 #include <stddef.h>
 
 /**
- * A polynomial is a list of floats
- * s.t. n = coeffs.size() == the degree of the polynomial
- * and of the form
- * p[0]*x^(n-1) + p[1]*x^(n-2) + ... + p[n-1]
+ * A polynomial with a list of coefficients, with the highest order coefficients at
+ * the start of the list, ie:
+ * coefficients[0]*x^(order-1) + coefficients[1]*x^(order-2) + ... + coefficients[order-1]
  */
-// TODO: better jdoc
 #define GENERATE_1D_POLYNOMIAL_STRUCT_OF_ORDER(N)                                        \
     typedef struct Polynomial1dOrder##N                                                  \
     {                                                                                    \
@@ -43,7 +41,7 @@ GENERATE_1D_POLYNOMIAL_GET_VALUE_FUNCTION_DECLARATION(3);
  * @param p The polynomial to differentiate.
  * @return The derivative of the given polynomial
  */
-#define GENERATE_1D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DECLARATION(FROM_ORDER, TO_ORDER)              \
+#define GENERATE_1D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DECLARATION(FROM_ORDER, TO_ORDER)  \
     Polynomial1dOrder##TO_ORDER##_t shared_polynomial1d_differentiateOrder##FROM_ORDER(  \
         Polynomial1dOrder##FROM_ORDER##_t p)
 

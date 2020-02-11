@@ -4,26 +4,22 @@
 #include <stddef.h>
 
 #include "firmware/main/math/polynomial_1d.h"
+#include "firmware/main/math/vector_2d.h"
 
-// TODO: big jdoc explaining usage of these functions
-
-// TODO: put this somewhere else
 /**
- * A 2D Vector
+ * This represents an arc length parametrization of a 2D polynomial via a list of t values
+ * and s values, where a value at the same index in both lists indicates they are
+ * equivalent.
+ *
+ * https://math.stackexchange.com/questions/751781/how-to-parametrize-a-curve-by-its-arc-length
  */
-typedef struct Vector2d
-{
-    float x;
-    float y;
-} Vector2d_t;
-
-// TODO: better name? This is specific to 2d polynomials
-// TODO: jdoc
 typedef struct ArcLengthParametrization
 {
-    // TODO: comemnts for each member
+    // A list of t values that can be given to a 2D polynomial
     float* t_values;
+    // A list of corresponding arc lengths along a 2D polynomial
     float* s_values;
+    // The size of both the t_values and s_values lists
     size_t num_values;
 } ArcLengthParametrization_t;
 
@@ -35,10 +31,9 @@ typedef struct ArcLengthParametrization
                                        .num_values = NUM_VALUES}
 
 /**
- * A 2d polynomial is represented as f(t) = <x(t), y(t)> where x(t) and y(t) are
+ * A 2d polynomial of order N represented as f(t) = <x(t), y(t)> where x(t) and y(t) are
  * 1d polynomials of order N.
  */
-// TODO: better jdoc
 #define GENERATE_2D_POLYNOMIAL_STRUCT_OF_ORDER(N)                                        \
     typedef struct Polynomial2dOrder##N                                                  \
     {                                                                                    \
@@ -87,13 +82,11 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DECLARATION(3, 2);
  * This will use Simpsons rule to numerically integrate the arc length formula.
  * https://en.wikipedia.org/wiki/Simpson%27s_rule
  *
- * TODO: do we need this pre? remove and add test if not
  * @pre t_min <= t_max
  *
  * @param p [in] The 2D polynomial to get the arc length parametrization of
  * @param t_min [in] The minimum t value
  * @param t_max [in] The maximum t value
- * TODO: better jdoc here
  * @param parametrization [out] The arc-length parametrization of the given curve. The
  *                              members of this must be allocated to be of at least
  *                              size "num_divisions". The "num_divisions" member will be

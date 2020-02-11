@@ -214,8 +214,8 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_straight_1_values)
         .y = {.coefficients = {1, 0.2}},
     };
 
-    static float t_values[1] = {0.5};
-    static float s_values[1] = {99};
+    static float t_values[1]                              = {0.5};
+    static float s_values[1]                              = {99};
     ArcLengthParametrization_t arc_length_parametrization = {
         .t_values = t_values, .s_values = s_values, .num_values = 1};
 
@@ -253,7 +253,8 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_straight_line_single_divi
                             poly, 4, arc_length_parametrization));
 }
 
-TEST_F(Polynomial2dTest, get_position_on_arc_length_above_arc_lengths_in_parametrization){
+TEST_F(Polynomial2dTest, get_position_on_arc_length_above_arc_lengths_in_parametrization)
+{
     Polynomial2dOrder1_t poly = {
         .x = {.coefficients = {1, 0.1}},
         .y = {.coefficients = {1, 0.1}},
@@ -269,7 +270,8 @@ TEST_F(Polynomial2dTest, get_position_on_arc_length_above_arc_lengths_in_paramet
                             poly, 5, arc_length_parametrization));
 }
 
-TEST_F(Polynomial2dTest, get_position_on_arc_length_below_arc_lengths_in_parametrization){
+TEST_F(Polynomial2dTest, get_position_on_arc_length_below_arc_lengths_in_parametrization)
+{
     Polynomial2dOrder1_t poly = {
         .x = {.coefficients = {1, 0.1}},
         .y = {.coefficients = {1, 0.1}},
