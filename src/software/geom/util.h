@@ -57,29 +57,6 @@ bool intersects(const Segment &first, const Segment &second);
 bool intersects(const Ray &first, const Segment &second);
 bool intersects(const Segment &first, const Ray &second);
 
-/*
- * The family of `dist` functions calculates the unsigned distance
- * between one object and another.
- */
-
-double dist(const Point &first, const Point &second);
-double dist(const Segment &first, const Segment &second);
-
-double dist(const Point &first, const Segment &second);
-double dist(const Segment &first, const Point &second);
-
-double dist(const Point &first, const Polygon &second);
-
-/**
- * NOTE: the distance from a point to a rectangle is the closest distance from the point
- * to the edge of the rectangle, or 0 if the point is within the rectangle
- */
-double dist(const Point &first, const Rectangle &second);
-
-double distsq(const Point &first, const Segment &second);
-double distsq(const Segment &first, const Point &second);
-double distsq(const Point &first, const Point &second);
-
 bool isDegenerate(const Segment &segment);
 bool isDegenerate(const Ray &segment);
 

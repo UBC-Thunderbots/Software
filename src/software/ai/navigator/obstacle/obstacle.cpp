@@ -1,6 +1,8 @@
 
 #include "software/ai/navigator/obstacle/obstacle.h"
 
+#include "software/new_geom/util/distance.h"
+
 const std::optional<Polygon> Obstacle::getBoundaryPolygon() const
 {
     return _polygon;
@@ -202,7 +204,7 @@ bool Obstacle::intersects(const Segment& segment) const
     }
     else
     {
-        return (dist((*_circle).getOrigin(), segment) <= (*_circle).getRadius());
+        return (distance((*_circle).getOrigin(), segment) <= (*_circle).getRadius());
     }
 }
 
