@@ -37,7 +37,8 @@ class NetworkClient
                            int vision_multicast_port,
                            std::string gamecontroller_multicast_address,
                            int gamecontroller_multicast_port,
-                           std::function<void(World)> received_world_callback);
+                           std::function<void(World)> received_world_callback,
+                           std::shared_ptr<const AIConfig> config);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and
@@ -50,6 +51,7 @@ class NetworkClient
     // threading this class uses
     NetworkClient& operator=(const NetworkClient&) = delete;
     NetworkClient(const NetworkClient&)            = delete;
+    NetworkClient() = delete;
 
    private:
     /**

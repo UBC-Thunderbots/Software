@@ -11,13 +11,16 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              int vision_multicast_port,
                              std::string gamecontroller_multicast_address,
                              int gamecontroller_multicast_port,
-                             std::function<void(World)> received_world_callback)
+                             std::function<void(World)> received_world_callback,
+                             std::shared_ptr<const CameraConfig> config)
     : network_filter(),
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
       received_world_callback(received_world_callback)
 {
+    std::shared_ptr<const CameraConfig> config = config;
+
     setupVisionClient(vision_multicast_address, vision_multicast_port);
 
     setupGameControllerClient(gamecontroller_multicast_address,
@@ -149,15 +152,16 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         {
             case 0:
                 camera_disabled =
-                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
+                    //Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
+                    config->IgnoreCamera_0()->value();
                 break;
             case 1:
                 camera_disabled =
-                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
+                    config->IgnoreCamera_1()->value();
                 break;
             case 2:
                 camera_disabled =
-                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
+                    config->IgnoreCamera_2()->value();
                 break;
             case 3:
                 camera_disabled =
