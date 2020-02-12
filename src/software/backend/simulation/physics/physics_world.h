@@ -80,6 +80,8 @@ class PhysicsWorld
     const unsigned int velocity_iterations = 8;
     const unsigned int position_iterations = 3;
 
+    const double acceleration_due_to_gravity = 9.8;
+
     std::unique_ptr<SimulationContactListener> contact_listener;
 
     // Abstractions of objects in the world

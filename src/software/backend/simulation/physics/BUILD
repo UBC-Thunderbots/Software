@@ -126,6 +126,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "physics_world_test",
+    srcs = ["physics_world_test.cpp"],
+    deps = [
+        ":physics_world",
+        "//software/test_util",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "simulation_contact_listener",
     srcs = ["simulation_contact_listener.cpp"],
@@ -137,32 +148,5 @@ cc_library(
         "//software/backend/simulation:simulator_ball",
         "//software/backend/simulation:simulator_robot",
         "@box2d",
-    ],
-)
-
-cc_library(
-    name = "physics_simulator",
-    srcs = ["physics_simulator.cpp"],
-    hdrs = ["physics_simulator.h"],
-    deps = [
-        ":physics_ball",
-        ":physics_field",
-        ":physics_robot",
-        "//software/time:duration",
-        "//software/time:timestamp",
-        "//software/world",
-        "//software/world:robot",
-        "@box2d",
-    ],
-)
-
-cc_test(
-    name = "physics_simulator_test",
-    srcs = ["physics_simulator_test.cpp"],
-    deps = [
-        ":physics_simulator",
-        "//software/test_util",
-        "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
