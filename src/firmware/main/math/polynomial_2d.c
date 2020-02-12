@@ -12,7 +12,7 @@
  * @param t The t-value to get the vector at
  * @return The L2 norm of the polynomial at the given t-value
  */
-#define GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(N)                          \
+#define GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITION(N)                           \
     float calculateL2NormAtValueOrder##N(Polynomial2dOrder##N##_t p, float t)            \
     {                                                                                    \
         const float x_value = shared_polynomial1d_getValueOrder##N(p.x, t);              \
@@ -20,10 +20,10 @@
                                                                                          \
         return sqrt(pow(x_value, 2.0) + pow(y_value, 2.0));                              \
     }
-GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(3);
-GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(2);
-GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(1);
-GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITIION(0);
+GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITION(3);
+GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITION(2);
+GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITION(1);
+GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITION(0);
 
 #define GENERATE_2D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(N)                          \
     Vector2d_t shared_polynomial2d_getValueOrder##N(Polynomial2dOrder##N##_t p, float t) \
