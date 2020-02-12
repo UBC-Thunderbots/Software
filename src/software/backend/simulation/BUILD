@@ -32,6 +32,7 @@ cc_library(
     hdrs = ["simulator_ball.h"],
     deps = [
         "//software/backend/simulation/physics:physics_ball",
+        "//software/logger",
     ],
 )
 
@@ -82,7 +83,25 @@ cc_library(
     deps = [
         ":simulator_ball",
         "//firmware/main/app/world:firmware_ball",
+        "//software/logger",
         "@box2d",
+    ],
+)
+
+cc_test(
+    name = "simulator_ball_singleton_test",
+    srcs = ["simulator_ball_singleton_test.cpp"],
+    deps = [
+        ":simulator_ball",
+        ":simulator_ball_singleton",
+        "//firmware/main/app/world:firmware_ball",
+        "//software/backend/simulation/physics:physics_world",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/test_util",
+        "//software/time:timestamp",
+        "//software/world",
+        "@gtest//:gtest_main",
     ],
 )
 

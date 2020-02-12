@@ -40,21 +40,6 @@ class PhysicsBall
     ~PhysicsBall();
 
     /**
-     * Adds the given function to this PhysicsBall's list of ball contact callbacks.
-     * These callbacks will be called during every physics step for the duration of the contact.
-     *
-     * @param callback The function to register
-     */
-    void registerBallContactCallback(std::function<void(PhysicsBall*)> callback);
-
-    /**
-     * Returns a list of ball contact callbacks for this class
-     *
-     * @return a list of ball contact callbacks for this class
-     */
-    std::vector<std::function<void(PhysicsBall*)>> getBallContactCallbacks() const;
-
-    /**
      * Returns a Ball object representing the current state of the ball object in the
      * simulated Box2D world the ball was created in. The timestamp is provided as a
      * parameter so that the caller can control the timestamp of the data being returned,
@@ -129,6 +114,4 @@ class PhysicsBall
     std::optional<Point> chip_origin;
     // The distance of the most recent chip
     double chip_distance_m;
-
-    std::vector<std::function<void(PhysicsBall*)>> ball_contact_callbacks;
 };

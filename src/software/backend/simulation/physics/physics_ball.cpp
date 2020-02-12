@@ -53,14 +53,6 @@ PhysicsBall::~PhysicsBall()
     }
 }
 
-void PhysicsBall::registerBallContactCallback(std::function<void(PhysicsBall *)> callback) {
-    ball_contact_callbacks.emplace_back(callback);
-}
-
-std::vector<std::function<void(PhysicsBall*)>> PhysicsBall::getBallContactCallbacks() const {
-    return ball_contact_callbacks;
-}
-
 Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
 {
     auto position = Point(ball_body->GetPosition().x, ball_body->GetPosition().y);
