@@ -10,6 +10,7 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/world/world.h"
+#include "software/parameter/config.hpp"
 
 /**
  * This class encapsulates our SSLVisionClient and SSLGameController clients to abstract
@@ -38,7 +39,7 @@ class NetworkClient
                            std::string gamecontroller_multicast_address,
                            int gamecontroller_multicast_port,
                            std::function<void(World)> received_world_callback,
-                           std::shared_ptr<const AIConfig> config);
+                           std::shared_ptr<const CameraConfig> config);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and
@@ -150,4 +151,6 @@ class NetworkClient
 
     // The callback function that we pass newly received/filtered worlds to
     std::function<void(World)> received_world_callback;
+
+    std::shared_ptr<const CameraConfig> sharedConfig;
 };
