@@ -28,8 +28,8 @@ float shared_polynomial1d_getValue(const float* coefficients,
  *                          with the highest order ones first.
  * @param num_coefficients [in] The number of coefficients
  * @param derivative_coefficients [out] This will be populated with the coefficients
- * representing the derivative of the polynomial represented by the given coefficients.
- * Must be allocated to be at least num_coefficients-1 long
+ *      representing the derivative of the polynomial represented by the given
+ *      coefficients. Must be allocated to be at least num_coefficients-1 long
  */
 void shared_polynomial1d_differentiate(const float* coefficients, size_t num_coefficients,
                                        float* derivative_coefficients)
@@ -55,6 +55,7 @@ GENERATE_1D_POLYNOMIAL_GET_VALUE_FUNCTION_DEFINITION(3)
     Polynomial1dOrder##TO_ORDER##_t shared_polynomial1d_differentiateOrder##FROM_ORDER(  \
         Polynomial1dOrder##FROM_ORDER##_t p)                                             \
     {                                                                                    \
+        _Static_assert(TO_ORDER == FROM_ORDER - 1, "TO_ORDER != FROM_ORDER-1");          \
         Polynomial1dOrder##TO_ORDER##_t derivative;                                      \
         shared_polynomial1d_differentiate(p.coefficients, FROM_ORDER + 1,                \
                                           derivative.coefficients);                      \

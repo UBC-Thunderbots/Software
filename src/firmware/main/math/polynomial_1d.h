@@ -3,7 +3,7 @@
 /**
  * A polynomial with a list of coefficients, with the highest order coefficients at
  * the start of the list, ie:
- * coefficients[0]*x^(order-1) + coefficients[1]*x^(order-2) + ... + coefficients[order-1]
+ * coefficients[0]*x^(order) + coefficients[1]*x^(order-1) + ... + coefficients[order-1]
  */
 #define GENERATE_1D_POLYNOMIAL_STRUCT_OF_ORDER(N)                                        \
     typedef struct Polynomial1dOrder##N                                                  \

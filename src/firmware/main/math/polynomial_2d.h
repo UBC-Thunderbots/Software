@@ -18,17 +18,18 @@ typedef struct ArcLengthParametrization
     // A list of t values that can be given to a 2D polynomial
     float* t_values;
     // A list of corresponding arc lengths along a 2D polynomial
-    float* s_values;
-    // The size of both the t_values and s_values lists
+    float* arc_length_values;
+    // The size of both the t_values and arc_length_values lists
     size_t num_values;
 } ArcLengthParametrization_t;
 
 #define CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(NAME, NUM_VALUES)                       \
     static float ___##NAME##_t_values_storage[NUM_VALUES];                               \
-    static float ___##NAME##_s_values_storage[NUM_VALUES];                               \
-    ArcLengthParametrization_t NAME = {.t_values   = ___##NAME##_t_values_storage,       \
-                                       .s_values   = ___##NAME##_s_values_storage,       \
-                                       .num_values = NUM_VALUES}
+    static float ___##NAME##_arc_length_values_storage[NUM_VALUES];                      \
+    ArcLengthParametrization_t NAME = {                                                  \
+        .t_values          = ___##NAME##_t_values_storage,                               \
+        .arc_length_values = ___##NAME##_arc_length_values_storage,                      \
+        .num_values        = NUM_VALUES}
 
 /**
  * A 2d polynomial of order N represented as f(t) = <x(t), y(t)> where x(t) and y(t) are
