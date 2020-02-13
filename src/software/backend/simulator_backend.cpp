@@ -6,6 +6,7 @@
 
 #include "software/backend/backend_factory.h"
 #include "software/logger/init.h"
+#include "software/backend/simulation/simulator.h"
 
 const std::string SimulatorBackend::name = "simulator";
 
@@ -77,7 +78,7 @@ void SimulatorBackend::runSimulationLoop(World world)
     unsigned int num_physics_steps_per_world_published = static_cast<unsigned int>(
         std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
 
-    PhysicsSimulator physics_simulator(world);
+    Simulator simulator(world);
 
     auto world_publish_timestamp = std::chrono::steady_clock::now();
 
@@ -92,10 +93,10 @@ void SimulatorBackend::runSimulationLoop(World world)
 
         for (unsigned int i = 0; i < num_physics_steps_per_world_published; i++)
         {
-            physics_simulator.stepSimulation(physics_time_step);
+            simulator.stepSimulation(physics_time_step);
         }
 
-        world = physics_simulator.getWorld();
+        world = simulator.getWorld();
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {
@@ -125,13 +126,12 @@ void SimulatorBackend::runSimulationLoop(World world)
         // have this thread and another running on one core
         std::this_thread::yield();
 
-        // TODO: Simulate the primitives
-        // https://github.com/UBC-Thunderbots/Software/issues/768
         auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
         if (!primitives)
         {
             LOG(WARNING) << "Simulator Backend timed out waiting for primitives";
         }
+        simulator.setPrimitives(primitives.value());
 
         // Take ownership of the `in_destructor` flag so we can use it for the conditional
         // check

@@ -112,7 +112,13 @@ cc_library(
     srcs = ["simulator.cpp"],
     hdrs = ["simulator.h"],
     deps = [
+        ":simulator_ball",
+        ":simulator_ball_singleton",
+        ":simulator_robot",
+        ":simulator_robot_singleton",
+        "//firmware/main/app/world:firmware_world",
         "//software/ai/primitive",
+        "//software/backend/simulation/physics:physics_world",
         "//software/world",
     ],
 )
