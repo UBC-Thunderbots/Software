@@ -12,13 +12,6 @@
 class SimulatorRobotTest : public testing::Test
 {
 protected:
-    /**
-     * TODO
-     * @param robot
-     * @param ball
-     * @param enemy_robot_positions
-     * @return
-     */
     std::tuple<std::shared_ptr<PhysicsWorld>, std::shared_ptr<SimulatorRobot>, std::shared_ptr<SimulatorBall>> createWorldWithEnemyRobots(Robot robot, Ball ball, std::vector<Point> enemy_robot_positions) {
         World world = ::Test::TestUtil::createBlankTestingWorld();
         world = ::Test::TestUtil::setEnemyRobotPositions(world, enemy_robot_positions, Timestamp::fromSeconds(0));
