@@ -41,6 +41,10 @@ PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, d
     setupRobotBodyFixtures(robot, PhysicsRobot::total_chicker_depth, mass_kg);
     setupDribblerFixture(robot, PhysicsRobot::dribbler_depth);
     setupChickerFixture(robot, PhysicsRobot::total_chicker_depth, PhysicsRobot::chicker_thickness);
+
+    // For some reason adding fixtures with mass slightly changes the linear velocity
+    // of the body, so we make sure to reset it to the desired value at the end
+    robot_body->SetLinearVelocity(createVec2(robot.velocity()));
 }
 
 PhysicsRobot::~PhysicsRobot()

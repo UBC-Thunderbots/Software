@@ -50,9 +50,13 @@ class SimulatorBallSingleton
     static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball);
 
     /**
-     * Creates a FirmwareBall corresponding to the current SimulatorBall
+     * Creates a FirmwareBall_t with functions bound to the static functions in this
+     * class. Only one FirmwareBall_t needs to be created to control all balls, since
+     * calling setSimulatorBall will simply change the implementations of the bound
+     * functions to act as if the new ball was being controlled.
      *
-     * @return a FirmwareBall corresponding to the current SimulatorBall
+     * @return a FirmwareBall_t corresponding to the whatever SimulatorBall this
+     * Singleton is controlling
      */
     static std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter> createFirmwareBall();
 

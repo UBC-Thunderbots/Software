@@ -67,13 +67,13 @@ cc_test(
     srcs = ["simulator_robot_singleton_test.cpp"],
     deps = [
         ":simulator_robot",
+        ":simulator_robot_singleton",
         "//firmware/main/app/world:firmware_robot",
         "//software/backend/simulation/physics:physics_robot",
-        "//software/backend/simulation/physics:physics_simulator",
+        "//software/backend/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
         "//software/world:robot",
-        "@box2d",
         "@gtest//:gtest_main",
     ],
 )

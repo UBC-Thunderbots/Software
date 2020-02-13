@@ -25,7 +25,6 @@ extern "C"
 #define INERTIA (ROT_MASS * ROBOT_RADIUS * ROBOT_RADIUS)
 #define JERK_LIMIT 40.0f  //(m/s^3)
 
-
 /**
  * Because the FirmwareRobot_t struct is defined in the .c file (rather than the .h file),
  * C++ considers it an incomplete type and is unable to use it with smart pointers
@@ -63,13 +62,21 @@ struct FirmwareRobotDeleter
 class SimulatorRobotSingleton
 {
    public:
+    /**
+     * Sets the SimulatorRobot being controlled by this class
+     *
+     * @param robot The SimulatorRobot being controlled by this class
+     */
     static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot);
 
-// TODO: update comment
     /**
-     * Creates a FirmwareRobot corresponding to the current SimulatorRobot
+     * Creates a FirmwareRobot_t with functions bound to the static functions in this
+     * class. Only one FirmwareRobot_t needs to be created to control all robots, since
+     * calling setSimulatorRobot will simply change the implementations of the bound
+     * functions to act as if the new robot was being controlled.
      *
-     * @return a FirmwareRobot corresponding to the current SimulatorRobot
+     * @return a FirmwareRobot_t that is bound to whatever SimulatorRobot this Singleton
+     * is controlling
      */
     static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
 
@@ -220,5 +227,6 @@ class SimulatorRobotSingleton
     static void brakeMotorFrontLeft();
     static void brakeMotorFrontRight();
 
+    // The simulator robot being controlled by this class
     static std::shared_ptr<SimulatorRobot> simulator_robot;
 };
