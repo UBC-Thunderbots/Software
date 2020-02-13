@@ -5,10 +5,10 @@
 #include "software/backend/simulation/physics/physics_ball.h"
 #include "software/backend/simulation/physics/physics_field.h"
 #include "software/backend/simulation/physics/physics_robot.h"
-#include "software/world/world.h"
+#include "software/backend/simulation/physics/simulation_contact_listener.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
-#include "software/backend/simulation/physics/simulation_contact_listener.h"
+#include "software/world/world.h"
 
 /**
  * This class represents a World in a Box2D physics simulation. It provides a convenient
@@ -61,8 +61,8 @@ class PhysicsWorld
     std::weak_ptr<PhysicsBall> getPhysicsBall() const;
 
    private:
-    // Note: we declare the b2World first so it is destroyed last. If it is destroyed before the
-    // physics objects, segfaults will occur due to pointers internal to Box2D
+    // Note: we declare the b2World first so it is destroyed last. If it is destroyed
+    // before the physics objects, segfaults will occur due to pointers internal to Box2D
     // https://stackoverflow.com/questions/2254263/order-of-member-constructor-and-destructor-calls
     std::shared_ptr<b2World> b2_world;
     // The timestamp of the simulated physics world

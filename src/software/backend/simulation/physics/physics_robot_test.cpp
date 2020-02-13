@@ -5,19 +5,22 @@
 #include <math.h>
 
 #include "shared/constants.h"
-#include "software/backend/simulation/physics/physics_ball.h"
 #include "software/backend/simulation/physics/box2d_util.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 
-class PhysicsRobotTest : public testing::Test {
-protected:
-    virtual void SetUp() {
+class PhysicsRobotTest : public testing::Test
+{
+   protected:
+    virtual void SetUp()
+    {
         b2Vec2 gravity(0, 0);
         world = std::make_shared<b2World>(gravity);
     }
 
-    b2Body* createBallBody(Point position, double radius) {
+    b2Body* createBallBody(Point position, double radius)
+    {
         b2BodyDef ball_body_def;
         ball_body_def.type = b2_dynamicBody;
         ball_body_def.position.Set(position.x(), position.y());
@@ -32,9 +35,11 @@ protected:
         return body;
     }
 
-    void simulateForDuration(const Duration& duration) {
+    void simulateForDuration(const Duration& duration)
+    {
         double step_size_seconds = 1.0 / 60.0;
-        unsigned int num_steps = static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
+        unsigned int num_steps =
+            static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
 
         // We have to take lots of small steps because a significant amount of accuracy
         // is lost if we take a single step of 1 second
@@ -60,8 +65,10 @@ TEST_F(PhysicsRobotTest, test_get_state)
     EXPECT_EQ(7, physics_robot.getRobotId());
     EXPECT_LT((Point(-1.3, 2) - physics_robot.position()).length(), 1e-6);
     EXPECT_LT((Vector(0, 0.15) - physics_robot.velocity()).length(), 0.02);
-    EXPECT_LT(Angle::fromDegrees(45).minDiff(physics_robot.orientation()), Angle::fromDegrees(0.1));
-    EXPECT_LT(AngularVelocity::fromDegrees(-170).minDiff(physics_robot.angularVelocity()), AngularVelocity::fromDegrees(0.1));
+    EXPECT_LT(Angle::fromDegrees(45).minDiff(physics_robot.orientation()),
+              Angle::fromDegrees(0.1));
+    EXPECT_LT(AngularVelocity::fromDegrees(-170).minDiff(physics_robot.angularVelocity()),
+              AngularVelocity::fromDegrees(0.1));
 }
 
 TEST_F(PhysicsRobotTest, test_get_robot_with_timestamp)
@@ -75,8 +82,10 @@ TEST_F(PhysicsRobotTest, test_get_robot_with_timestamp)
     EXPECT_EQ(Timestamp::fromSeconds(3.3), robot.lastUpdateTimestamp());
     EXPECT_LT((Point(-1.3, 2) - robot.position()).length(), 1e-6);
     EXPECT_LT((Vector(0, 0.15) - robot.velocity()).length(), 0.02);
-    EXPECT_LT(Angle::fromDegrees(45).minDiff(robot.orientation()), Angle::fromDegrees(0.1));
-    EXPECT_LT(AngularVelocity::fromDegrees(-170).minDiff(robot.angularVelocity()), AngularVelocity::fromDegrees(0.1));
+    EXPECT_LT(Angle::fromDegrees(45).minDiff(robot.orientation()),
+              Angle::fromDegrees(0.1));
+    EXPECT_LT(AngularVelocity::fromDegrees(-170).minDiff(robot.angularVelocity()),
+              AngularVelocity::fromDegrees(0.1));
 }
 
 TEST_F(PhysicsRobotTest, test_robot_added_to_physics_world_on_creation)
@@ -117,7 +126,7 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_left_side_outside_radius)
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
-    double radius = 0.1;
+    double radius  = 0.1;
     auto ball_body = createBallBody(Point(1, ROBOT_MAX_RADIUS_METERS + radius), radius);
     ball_body->SetLinearVelocity({-2, 0});
 
@@ -135,7 +144,8 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_left_side_inside_radius)
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     double radius = 0.1;
-    auto ball_body = createBallBody(Point(1, ROBOT_MAX_RADIUS_METERS + radius - 0.005), radius);
+    auto ball_body =
+        createBallBody(Point(1, ROBOT_MAX_RADIUS_METERS + radius - 0.005), radius);
     ball_body->SetLinearVelocity({-2, 0});
 
     simulateForDuration(Duration::fromSeconds(1));
@@ -151,7 +161,7 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_right_side_outside_radius
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
-    double radius = 0.1;
+    double radius  = 0.1;
     auto ball_body = createBallBody(Point(1, -ROBOT_MAX_RADIUS_METERS - radius), radius);
     ball_body->SetLinearVelocity({-2, 0});
 
@@ -169,7 +179,8 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_right_side_inside_radius)
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     double radius = 0.1;
-    auto ball_body = createBallBody(Point(1, -ROBOT_MAX_RADIUS_METERS - radius + 0.005), radius);
+    auto ball_body =
+        createBallBody(Point(1, -ROBOT_MAX_RADIUS_METERS - radius + 0.005), radius);
     ball_body->SetLinearVelocity({-2, 0});
 
     simulateForDuration(Duration::fromSeconds(1));
@@ -185,7 +196,7 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_back_side_outside_radius)
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
-    double radius = 0.1;
+    double radius  = 0.1;
     auto ball_body = createBallBody(Point(-ROBOT_MAX_RADIUS_METERS - radius, 1), radius);
     ball_body->SetLinearVelocity({0, -2});
 
@@ -203,7 +214,8 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_back_side_inside_radius)
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     double radius = 0.1;
-    auto ball_body = createBallBody(Point(-ROBOT_MAX_RADIUS_METERS - radius + 0.005, 1), radius);
+    auto ball_body =
+        createBallBody(Point(-ROBOT_MAX_RADIUS_METERS - radius + 0.005, 1), radius);
     ball_body->SetLinearVelocity({0, -2});
 
     simulateForDuration(Duration::fromSeconds(1));
@@ -220,7 +232,8 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_front_side_outside_robot_
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     double radius = 0.1;
-    auto ball_body = createBallBody(Point(DIST_TO_FRONT_OF_ROBOT_METERS + radius + 0.005, 1), radius);
+    auto ball_body =
+        createBallBody(Point(DIST_TO_FRONT_OF_ROBOT_METERS + radius + 0.005, 1), radius);
     ball_body->SetLinearVelocity({0, -2});
 
     simulateForDuration(Duration::fromSeconds(1));
@@ -228,7 +241,8 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_front_side_outside_robot_
     EXPECT_EQ(b2Vec2(0, -2), ball_body->GetLinearVelocity());
 }
 
-TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_front_side_slightly_inside_robot_body)
+TEST_F(PhysicsRobotTest,
+       test_physics_robot_dimensions_front_side_slightly_inside_robot_body)
 {
     // Roll an object along the front side of the robot just inside of the body
     // and check it does collide
@@ -236,8 +250,9 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_front_side_slightly_insid
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
-    double radius = 0.1;
-    auto ball_body = createBallBody(Point(DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005, 0.5), radius);
+    double radius  = 0.1;
+    auto ball_body = createBallBody(
+        Point(DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005, 0.5), radius);
     ball_body->SetLinearVelocity({0, -2});
 
     // We have to take lots of small steps because a significant amount of accuracy
@@ -249,18 +264,22 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_front_side_slightly_insid
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
 
-        // Once the ball has passed y=0 we expect it to have collided with the front of the robot
-        if(ball_body->GetPosition().y <= 0) {
-            EXPECT_NE(ball_body->GetPosition().x, DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005);
+        // Once the ball has passed y=0 we expect it to have collided with the front of
+        // the robot
+        if (ball_body->GetPosition().y <= 0)
+        {
+            EXPECT_NE(ball_body->GetPosition().x,
+                      DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005);
         }
     }
 
     EXPECT_NE(b2Vec2(-2, 0), ball_body->GetLinearVelocity());
 
-    // Create a new body and roll it the opposite way to check we collide with the front of the robot
-    // from both directions, since it's made of 2 separate pieces with a bap in between, and we need to
-    // make sure we can collide with both pieces
-    auto ball_body_2 = createBallBody(Point(DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005, -0.5), radius);
+    // Create a new body and roll it the opposite way to check we collide with the front
+    // of the robot from both directions, since it's made of 2 separate pieces with a bap
+    // in between, and we need to make sure we can collide with both pieces
+    auto ball_body_2 = createBallBody(
+        Point(DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005, -0.5), radius);
     ball_body_2->SetLinearVelocity({0, 2});
 
     // We have to take lots of small steps because a significant amount of accuracy
@@ -272,16 +291,20 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_front_side_slightly_insid
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
 
-        // Once the ball has passed y=0 we expect it to have collided with the front of the robot
-        if(ball_body->GetPosition().y >= 0) {
-            EXPECT_NE(ball_body->GetPosition().x, DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005);
+        // Once the ball has passed y=0 we expect it to have collided with the front of
+        // the robot
+        if (ball_body->GetPosition().y >= 0)
+        {
+            EXPECT_NE(ball_body->GetPosition().x,
+                      DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005);
         }
     }
 
     EXPECT_EQ(b2Vec2(0, 2), ball_body_2->GetLinearVelocity());
 }
 
-TEST_F(PhysicsRobotTest, test_dribbler_ball_contact_callbacks) {
+TEST_F(PhysicsRobotTest, test_dribbler_ball_contact_callbacks)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -292,7 +315,7 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_contact_callbacks) {
     EXPECT_TRUE(physics_robot.getDribblerBallContactCallbacks().empty());
 
     bool callback_called = false;
-    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+    auto callback        = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
         callback_called = true;
     };
 
@@ -303,7 +326,8 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_contact_callbacks) {
     EXPECT_TRUE(callback_called);
 }
 
-TEST_F(PhysicsRobotTest, test_dribbler_ball_start_contact_callbacks) {
+TEST_F(PhysicsRobotTest, test_dribbler_ball_start_contact_callbacks)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -314,7 +338,7 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_start_contact_callbacks) {
     EXPECT_TRUE(physics_robot.getDribblerBallStartContactCallbacks().empty());
 
     bool callback_called = false;
-    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+    auto callback        = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
         callback_called = true;
     };
 
@@ -325,7 +349,8 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_start_contact_callbacks) {
     EXPECT_TRUE(callback_called);
 }
 
-TEST_F(PhysicsRobotTest, test_dribbler_ball_end_contact_callbacks) {
+TEST_F(PhysicsRobotTest, test_dribbler_ball_end_contact_callbacks)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -336,7 +361,7 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_end_contact_callbacks) {
     EXPECT_TRUE(physics_robot.getDribblerBallEndContactCallbacks().empty());
 
     bool callback_called = false;
-    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+    auto callback        = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
         callback_called = true;
     };
 
@@ -347,7 +372,8 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_end_contact_callbacks) {
     EXPECT_TRUE(callback_called);
 }
 
-TEST_F(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks) {
+TEST_F(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -358,7 +384,7 @@ TEST_F(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks) {
     EXPECT_TRUE(physics_robot.getChickerBallStartContactCallbacks().empty());
 
     bool callback_called = false;
-    auto callback = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
+    auto callback        = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
         callback_called = true;
     };
 
@@ -369,23 +395,27 @@ TEST_F(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks) {
     EXPECT_TRUE(callback_called);
 }
 
-enum RobotWheel {
+enum RobotWheel
+{
     FRONT_LEFT,
     BACK_LEFT,
     BACK_RIGHT,
     FRONT_RIGHT
 };
 
-class PhysicsRobotWheelForceTest :
-public ::testing::TestWithParam<std::tuple<double, double, double, RobotWheel, double>> {
+class PhysicsRobotWheelForceTest
+    : public ::testing::TestWithParam<
+          std::tuple<double, double, double, RobotWheel, double>>
+{
 };
 
-TEST_P(PhysicsRobotWheelForceTest, test_wheel_force_creates_angular_velocity) {
+TEST_P(PhysicsRobotWheelForceTest, test_wheel_force_creates_angular_velocity)
+{
     auto params = GetParam();
     Point robot_position(std::get<0>(params), std::get<1>(params));
     Angle robot_orientation = Angle::fromDegrees(std::get<2>(params));
-    RobotWheel wheel = std::get<3>(params);
-    double wheel_force = std::get<4>(params);
+    RobotWheel wheel        = std::get<3>(params);
+    double wheel_force      = std::get<4>(params);
 
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
@@ -394,7 +424,8 @@ TEST_P(PhysicsRobotWheelForceTest, test_wheel_force_creates_angular_velocity) {
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
-    switch(wheel) {
+    switch (wheel)
+    {
         case RobotWheel::FRONT_LEFT:
             physics_robot.applyWheelForceFrontLeft(wheel_force);
             break;
@@ -419,36 +450,38 @@ TEST_P(PhysicsRobotWheelForceTest, test_wheel_force_creates_angular_velocity) {
 
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
 
-    if(wheel_force > 0) {
+    if (wheel_force > 0)
+    {
         EXPECT_GT(robot.angularVelocity(), Angle::zero());
-    }else if(wheel_force < 0) {
+    }
+    else if (wheel_force < 0)
+    {
         EXPECT_LT(robot.angularVelocity(), Angle::zero());
-    }else {
+    }
+    else
+    {
         EXPECT_EQ(robot.angularVelocity(), Angle::zero());
     }
 }
 
-INSTANTIATE_TEST_CASE_P(All,
-        PhysicsRobotWheelForceTest,
-        ::testing::Combine(
-                testing::Values(-5.0, 0.0, 5.0),                 // Robot x coordinate
-                testing::Values(-5.0, 0.0, 5.0),                 // Robot y coordinate
-                testing::Values(0.0, 50.0, 166.0, 201.0, 315.0), // Robot orientation degrees
-                testing::Values(
-                        RobotWheel::FRONT_LEFT,
-                        RobotWheel::BACK_LEFT,
+INSTANTIATE_TEST_CASE_P(
+    All, PhysicsRobotWheelForceTest,
+    ::testing::Combine(
+        testing::Values(-5.0, 0.0, 5.0),                  // Robot x coordinate
+        testing::Values(-5.0, 0.0, 5.0),                  // Robot y coordinate
+        testing::Values(0.0, 50.0, 166.0, 201.0, 315.0),  // Robot orientation degrees
+        testing::Values(RobotWheel::FRONT_LEFT, RobotWheel::BACK_LEFT,
                         RobotWheel::BACK_RIGHT,
-                        RobotWheel::FRONT_RIGHT
-                        ),                                       // The wheel to apply force to
-                testing::Values(-0.5, 0.5)                       // Wheel force
-                ));
+                        RobotWheel::FRONT_RIGHT),  // The wheel to apply force to
+        testing::Values(-0.5, 0.5)                 // Wheel force
+        ));
 
-TEST_F(PhysicsRobotTest, test_robot_drive_forward_at_angle) {
+TEST_F(PhysicsRobotTest, test_robot_drive_forward_at_angle)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Robot robot_parameter(0, Point(0, 0), Vector(0, 0),
-            Angle::fromDegrees(45),
+    Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::fromDegrees(45),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
@@ -477,7 +510,8 @@ TEST_F(PhysicsRobotTest, test_robot_drive_forward_at_angle) {
     EXPECT_NEAR(robot.orientation().toDegrees(), 45, 1);
 }
 
-TEST_F(PhysicsRobotTest, test_robot_drive_forward) {
+TEST_F(PhysicsRobotTest, test_robot_drive_forward)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -510,7 +544,8 @@ TEST_F(PhysicsRobotTest, test_robot_drive_forward) {
     EXPECT_NEAR(robot.orientation().toDegrees(), 0, 1);
 }
 
-TEST_F(PhysicsRobotTest, test_robot_drive_backwards) {
+TEST_F(PhysicsRobotTest, test_robot_drive_backwards)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -543,7 +578,8 @@ TEST_F(PhysicsRobotTest, test_robot_drive_backwards) {
     EXPECT_NEAR(robot.orientation().toDegrees(), 0, 1);
 }
 
-TEST_F(PhysicsRobotTest, test_robot_spin_clockwise) {
+TEST_F(PhysicsRobotTest, test_robot_spin_clockwise)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -567,14 +603,15 @@ TEST_F(PhysicsRobotTest, test_robot_spin_clockwise) {
     }
 
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
-    // Because the robot's center of mass is not perfect we expect it to have drifted a little bit
-    // while spinning
+    // Because the robot's center of mass is not perfect we expect it to have drifted a
+    // little bit while spinning
     EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
     EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
     EXPECT_LT(robot.angularVelocity(), AngularVelocity::fromRadians(-30));
 }
 
-TEST_F(PhysicsRobotTest, test_robot_spin_counterclockwise) {
+TEST_F(PhysicsRobotTest, test_robot_spin_counterclockwise)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -598,14 +635,15 @@ TEST_F(PhysicsRobotTest, test_robot_spin_counterclockwise) {
     }
 
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
-    // Because the robot's center of mass is not perfect we expect it to have drifted a little bit
-    // while spinning
+    // Because the robot's center of mass is not perfect we expect it to have drifted a
+    // little bit while spinning
     EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
     EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
     EXPECT_GT(robot.angularVelocity(), AngularVelocity::fromRadians(30));
 }
 
-TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_not_moving) {
+TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_not_moving)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -619,7 +657,8 @@ TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_not_moving) {
     EXPECT_EQ(physics_robot.getMotorSpeedFrontRight(), 0.0);
 }
 
-TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_moving_forwards) {
+TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_moving_forwards)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -631,19 +670,25 @@ TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_moving_forwards) {
     EXPECT_LT(physics_robot.getMotorSpeedBackLeft(), -1.0);
     EXPECT_GT(physics_robot.getMotorSpeedBackRight(), 1.0);
     EXPECT_GT(physics_robot.getMotorSpeedFrontRight(), 1.0);
-    EXPECT_LT(physics_robot.getMotorSpeedFrontLeft(), physics_robot.getMotorSpeedBackLeft());
-    EXPECT_GT(physics_robot.getMotorSpeedFrontRight(), physics_robot.getMotorSpeedBackRight());
-    EXPECT_EQ(physics_robot.getMotorSpeedFrontLeft(), -physics_robot.getMotorSpeedFrontRight());
-    EXPECT_EQ(physics_robot.getMotorSpeedBackLeft(), -physics_robot.getMotorSpeedBackRight());
+    EXPECT_LT(physics_robot.getMotorSpeedFrontLeft(),
+              physics_robot.getMotorSpeedBackLeft());
+    EXPECT_GT(physics_robot.getMotorSpeedFrontRight(),
+              physics_robot.getMotorSpeedBackRight());
+    EXPECT_EQ(physics_robot.getMotorSpeedFrontLeft(),
+              -physics_robot.getMotorSpeedFrontRight());
+    EXPECT_EQ(physics_robot.getMotorSpeedBackLeft(),
+              -physics_robot.getMotorSpeedBackRight());
 }
 
-TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_moving_along_wheel_axis) {
+TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_moving_along_wheel_axis)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    // Move along the axis of the front-left wheel. This means the front-left wheel is perpendicular
-    // to the direction of motion, and we don't expect it to be spinning
-    Vector robot_velocity = Vector::createFromAngle(Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG));
+    // Move along the axis of the front-left wheel. This means the front-left wheel is
+    // perpendicular to the direction of motion, and we don't expect it to be spinning
+    Vector robot_velocity =
+        Vector::createFromAngle(Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG));
     Robot robot_parameter(0, Point(0, 0), robot_velocity, Angle::zero(),
                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
@@ -654,12 +699,13 @@ TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_moving_along_wheel_axi
     EXPECT_GT(physics_robot.getMotorSpeedFrontRight(), 1.0);
 }
 
-TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_spinning) {
+TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_spinning)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    // Move along the axis of the front-left wheel. This means the front-left wheel is perpendicular
-    // to the direction of motion, and we don't expect it to be spinning
+    // Move along the axis of the front-left wheel. This means the front-left wheel is
+    // perpendicular to the direction of motion, and we don't expect it to be spinning
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                           AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
@@ -670,7 +716,9 @@ TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_spinning) {
     EXPECT_GT(physics_robot.getMotorSpeedFrontRight(), 1.0);
 }
 
-TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_spinning_with_positive_angular_velocity) {
+TEST_F(PhysicsRobotTest,
+       test_brake_motors_when_robot_spinning_with_positive_angular_velocity)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -697,12 +745,15 @@ TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_spinning_with_positive_ang
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0.0, 1);
 }
 
-TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_spinning_with_negative_angular_velocity) {
+TEST_F(PhysicsRobotTest,
+       test_brake_motors_when_robot_spinning_with_negative_angular_velocity)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
     Robot robot_parameter(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                          AngularVelocity::fromDegrees(-2 * 360), Timestamp::fromSeconds(0));
+                          AngularVelocity::fromDegrees(-2 * 360),
+                          Timestamp::fromSeconds(0));
     PhysicsRobot physics_robot(world, robot_parameter, 1.0);
 
     // We have to take lots of small steps because a significant amount of accuracy
@@ -724,7 +775,8 @@ TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_spinning_with_negative_ang
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0.0, 1);
 }
 
-TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_linearly) {
+TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_linearly)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -752,7 +804,8 @@ TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_linearly) {
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0.0, 1);
 }
 
-TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_and_spinning) {
+TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_and_spinning)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 

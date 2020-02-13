@@ -2,16 +2,18 @@
 
 #include <cinttypes>
 #include <memory>
-#include "software/backend/simulation/physics/physics_robot.h"
-#include "software/backend/simulation/physics/physics_ball.h"
+
 #include "software/ai/primitive/primitive.h"
+#include "software/backend/simulation/physics/physics_ball.h"
+#include "software/backend/simulation/physics/physics_robot.h"
 
 /**
  * The SimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with more
  * logic-focused elements for simulation, such as whether or not autokick is enabled.
  */
-class SimulatorRobot {
-public:
+class SimulatorRobot
+{
+   public:
     /**
      * Create a new SimulatorRobot given a PhysicsRobot
      *
@@ -70,9 +72,11 @@ public:
     float getVelocityY();
 
     /**
-     * Returns the current linear velocity of the robot, in global field coordinates, in m / s
+     * Returns the current linear velocity of the robot, in global field coordinates, in m
+     * / s
      *
-     * @return the current linear velocity of the robot, in global field coordinates, in m / s
+     * @return the current linear velocity of the robot, in global field coordinates, in m
+     * / s
      */
     Vector velocity();
 
@@ -188,7 +192,7 @@ public:
     void brakeMotorFrontLeft();
     void brakeMotorFrontRight();
 
-private:
+   private:
     /**
      * A function that is called during every physics step for as long as the ball
      * is touching this robot's chicker
@@ -214,7 +218,8 @@ private:
      * @param physics_robot The robot involved in the contact
      * @param physics_ball The ball invovled in the contact
      */
-    void onDribblerBallStartContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+    void onDribblerBallStartContact(PhysicsRobot* physics_robot,
+                                    PhysicsBall* physics_ball);
 
     /**
      * A function that is called during once when the ball stops touching

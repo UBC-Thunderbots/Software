@@ -1,4 +1,5 @@
 #include "software/backend/simulation/simulator_ball_singleton.h"
+
 #include "software/logger/init.h"
 
 std::shared_ptr<SimulatorBall> SimulatorBallSingleton::simulator_ball = nullptr;
@@ -25,36 +26,48 @@ SimulatorBallSingleton::createFirmwareBall()
 
 float SimulatorBallSingleton::getBallPositionX()
 {
-    if(simulator_ball) {
+    if (simulator_ball)
+    {
         return simulator_ball->position().x();
     }
-    LOG(WARNING) << "SimulatorBallSingleton called without setting the SimulatorBall first" << std::endl;
+    LOG(WARNING)
+        << "SimulatorBallSingleton called without setting the SimulatorBall first"
+        << std::endl;
     return 0.0f;
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    if(simulator_ball) {
+    if (simulator_ball)
+    {
         return simulator_ball->position().y();
     }
-    LOG(WARNING) << "SimulatorBallSingleton called without setting the SimulatorBall first" << std::endl;
+    LOG(WARNING)
+        << "SimulatorBallSingleton called without setting the SimulatorBall first"
+        << std::endl;
     return 0.0f;
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    if(simulator_ball) {
+    if (simulator_ball)
+    {
         return simulator_ball->velocity().x();
     }
-    LOG(WARNING) << "SimulatorBallSingleton called without setting the SimulatorBall first" << std::endl;
+    LOG(WARNING)
+        << "SimulatorBallSingleton called without setting the SimulatorBall first"
+        << std::endl;
     return 0.0f;
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    if(simulator_ball) {
+    if (simulator_ball)
+    {
         return simulator_ball->velocity().y();
     }
-    LOG(WARNING) << "SimulatorBallSingleton called without setting the SimulatorBall first" << std::endl;
+    LOG(WARNING)
+        << "SimulatorBallSingleton called without setting the SimulatorBall first"
+        << std::endl;
     return 0.0f;
 }

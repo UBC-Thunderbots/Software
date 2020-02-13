@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 #include <math.h>
 
-#include "software/world/ball.h"
 #include "shared/constants.h"
+#include "software/world/ball.h"
 
 TEST(PhysicsBallTest, test_get_ball_with_timestamp)
 {
@@ -185,7 +185,8 @@ TEST(PhysicsBallTest, test_ball_changes_direction_after_object_deflection)
     EXPECT_LT((Vector(0.0, -1.0) - ball.velocity()).length(), 1e-5);
 }
 
-TEST(PhysicsBallTest, test_apply_force_to_ball) {
+TEST(PhysicsBallTest, test_apply_force_to_ball)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -194,7 +195,8 @@ TEST(PhysicsBallTest, test_apply_force_to_ball) {
     // Apply force for 1 second
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
-    for(unsigned int i = 0; i < 60; i++) {
+    for (unsigned int i = 0; i < 60; i++)
+    {
         physics_ball.applyForce(Vector(1, 2));
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
@@ -206,7 +208,8 @@ TEST(PhysicsBallTest, test_apply_force_to_ball) {
     EXPECT_LT((ball.velocity() - Vector(1, 2)).length(), 0.05);
 }
 
-TEST(PhysicsBallTest, test_apply_impulse_to_ball) {
+TEST(PhysicsBallTest, test_apply_impulse_to_ball)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -221,7 +224,8 @@ TEST(PhysicsBallTest, test_apply_impulse_to_ball) {
     EXPECT_LT((ball.velocity() - Vector(1, 2)).length(), 0.05);
 }
 
-TEST(PhysicsBallTest, test_kick_ball) {
+TEST(PhysicsBallTest, test_kick_ball)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -236,7 +240,8 @@ TEST(PhysicsBallTest, test_kick_ball) {
     EXPECT_LT((ball.velocity() - Vector(-2, 3)).length(), 0.05);
 }
 
-TEST(PhysicsBallTest, test_chip_ball_without_collisions) {
+TEST(PhysicsBallTest, test_chip_ball_without_collisions)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -246,15 +251,19 @@ TEST(PhysicsBallTest, test_chip_ball_without_collisions) {
     physics_ball.chip(Vector(1, 0));
     EXPECT_TRUE(physics_ball.isInFlight());
 
-    for(unsigned int i = 0; i < 120; i++) {
+    for (unsigned int i = 0; i < 120; i++)
+    {
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
         auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
-        if(ball.position().x() < 1.0) {
+        if (ball.position().x() < 1.0)
+        {
             EXPECT_TRUE(physics_ball.isInFlight());
-        }else {
+        }
+        else
+        {
             EXPECT_FALSE(physics_ball.isInFlight());
         }
     }
@@ -262,7 +271,8 @@ TEST(PhysicsBallTest, test_chip_ball_without_collisions) {
     EXPECT_FALSE(physics_ball.isInFlight());
 }
 
-TEST(PhysicsBallTest, test_chip_ball_with_collisions) {
+TEST(PhysicsBallTest, test_chip_ball_with_collisions)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     Ball ball_parameter(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -274,7 +284,7 @@ TEST(PhysicsBallTest, test_chip_ball_with_collisions) {
     obstacle_body_def.position.Set(2, 0);
     b2Body* obstacle_body = world->CreateBody(&obstacle_body_def);
     b2PolygonShape obstacle_shape;
-    obstacle_shape.SetAsBox(0.5, 0.5); // A 1x1 box
+    obstacle_shape.SetAsBox(0.5, 0.5);  // A 1x1 box
     b2FixtureDef obstacle_fixture_def;
     obstacle_fixture_def.shape = &obstacle_shape;
     // Make the obstacle a sensor so it does not physically block the ball
@@ -285,7 +295,8 @@ TEST(PhysicsBallTest, test_chip_ball_with_collisions) {
     physics_ball.chip(Vector(2, 0));
     EXPECT_TRUE(physics_ball.isInFlight());
 
-    for(unsigned int i = 0; i < 100; i++) {
+    for (unsigned int i = 0; i < 100; i++)
+    {
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
@@ -293,13 +304,16 @@ TEST(PhysicsBallTest, test_chip_ball_with_collisions) {
 
         // The ball should be in flight until it has passed the obstacle box
         auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0));
-        // Polygons have a "skin" and some slop in Box2D so the ball may move a bit further
-        // than expected before the collision stops and isInFlight() returns false, but
-        // because chipping isn't perfect in the real world we only need this to be
-        // close enough
-        if(ball.position().x() - BALL_MAX_RADIUS_METERS <= 2.53) {
+        // Polygons have a "skin" and some slop in Box2D so the ball may move a bit
+        // further than expected before the collision stops and isInFlight() returns
+        // false, but because chipping isn't perfect in the real world we only need this
+        // to be close enough
+        if (ball.position().x() - BALL_MAX_RADIUS_METERS <= 2.53)
+        {
             EXPECT_TRUE(physics_ball.isInFlight());
-        }else {
+        }
+        else
+        {
             EXPECT_FALSE(physics_ball.isInFlight());
         }
     }

@@ -1,14 +1,16 @@
 #pragma once
 
-#include "software/backend/simulation/physics/physics_ball.h"
 #include <memory>
+
+#include "software/backend/simulation/physics/physics_ball.h"
 
 /**
  * The SimulatorBall class acts as a wrapper for a PhysicsBall that deals with more
  * logic-focused elements for simulation.
  */
-class SimulatorBall {
-public:
+class SimulatorBall
+{
+   public:
     /**
      * Create a new SimulatorBall given a PhysicsBall
      *
@@ -31,6 +33,6 @@ public:
      */
     Vector velocity() const;
 
-private:
+   private:
     std::weak_ptr<PhysicsBall> physics_ball;
 };

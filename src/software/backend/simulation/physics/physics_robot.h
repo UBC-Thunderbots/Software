@@ -2,23 +2,24 @@
 
 #include <Box2D/Box2D.h>
 
+#include "shared/constants.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 #include "software/new_geom/point.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
-#include "software/backend/simulation/physics/physics_ball.h"
-#include "shared/constants.h"
 
 /**
  * This class represent a Robot in a Box2D physics simulation. It provides a convenient
  * way for us to abstract the robot and convert to our own Robot alss when data is needed.
- * This class only deals with physics and physics-related interactions, and does NOT include
- * any logic for robot behavior.
+ * This class only deals with physics and physics-related interactions, and does NOT
+ * include any logic for robot behavior.
  */
 class PhysicsRobot
 {
    public:
     // The depth of the dribbling area at the front of the robot.
-    // We assume the ball can be dribbled as long as it is anywhere within this small area.
+    // We assume the ball can be dribbled as long as it is anywhere within this small
+    // area.
     static double const dribbler_depth;
     // The thickness of the chicker fixture shape.
     static double const chicker_thickness;
@@ -33,7 +34,8 @@ class PhysicsRobot
      * @param robot The Robot to be created in the Box2D world
      * @param mass_kg The mass of the robot in kg
      */
-    explicit PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, double mass_kg);
+    explicit PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot,
+                          double mass_kg);
 
     PhysicsRobot() = delete;
 
@@ -50,46 +52,55 @@ class PhysicsRobot
     ~PhysicsRobot();
 
     /**
-     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks. These
-     * callbacks will be called during every physics step, for the duration of the contact.
+     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact
+     * callbacks. These callbacks will be called during every physics step, for the
+     * duration of the contact.
      *
      * @param callback The function to register
      */
-    void registerDribblerBallContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+    void registerDribblerBallContactCallback(
+        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
-     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks. These
-     * callbacks will be called once at the start of the contact.
+     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact
+     * callbacks. These callbacks will be called once at the start of the contact.
      *
      * @param callback The function to register
      */
-    void registerDribblerBallStartContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+    void registerDribblerBallStartContactCallback(
+        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
-     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact callbacks. These
-     * callbacks will be called once at the end of the contact.
+     * Adds the given function to this PhysicsRobot's list of dribbler-ball contact
+     * callbacks. These callbacks will be called once at the end of the contact.
      *
      * @param callback The function to register
      */
-    void registerDribblerBallEndContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+    void registerDribblerBallEndContactCallback(
+        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
-     * Adds the given function to this PhysicsRobot's list of chicker-ball contact callbacks. These
-     * callbacks will be called once at the start of the contact.
+     * Adds the given function to this PhysicsRobot's list of chicker-ball contact
+     * callbacks. These callbacks will be called once at the start of the contact.
      *
      * @param callback The function to register
      */
-    void registerChickerBallStartContactCallback(std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+    void registerChickerBallStartContactCallback(
+        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
 
     /**
      * Returns a list of contact callbacks for this class
      *
      * @return a list of contact callbacks for this class
      */
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallStartContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getDribblerBallEndContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> getChickerBallStartContactCallbacks() const;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    getDribblerBallContactCallbacks() const;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    getDribblerBallStartContactCallbacks() const;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    getDribblerBallEndContactCallbacks() const;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    getChickerBallStartContactCallbacks() const;
 
     /**
      * Returns a Robot object representing the current state of the robot object in the
@@ -176,22 +187,24 @@ class PhysicsRobot
      * adds them to the robot's b2Body
      *
      * @param robot The robot to create fixtures for
-     * @param total_chicker_depth The distance from the front face of the robot to the back of the
-     * chicker, ie. how far inset into the front of the robot the chicker is
+     * @param total_chicker_depth The distance from the front face of the robot to the
+     * back of the chicker, ie. how far inset into the front of the robot the chicker is
      * @param mass_kg The mass of the robot in kg
      */
-    void setupRobotBodyFixtures(const Robot& robot, double total_chicker_depth, double mass_kg);
+    void setupRobotBodyFixtures(const Robot& robot, double total_chicker_depth,
+                                double mass_kg);
 
     /**
      * Creates a fixture to represent the chicker of the robot. It is partially inset into
      * the front of the robot.
      *
      * @param robot The robot to create the fixture for
-     * @param total_chicker_depth The distance from the front face of the robot to the back of the
-     * chicker, ie. how far inset into the front of the robot the chicker is
+     * @param total_chicker_depth The distance from the front face of the robot to the
+     * back of the chicker, ie. how far inset into the front of the robot the chicker is
      * @param chicker_thickness How thick the chicker fixture shape is
      */
-    void setupChickerFixture(const Robot& robot, double total_chicker_depth, double chicker_thickness);
+    void setupChickerFixture(const Robot& robot, double total_chicker_depth,
+                             double chicker_thickness);
 
     /**
      * Creates a fixture to represent the dribbler of the robot. It does not interact
@@ -248,14 +261,16 @@ class PhysicsRobot
      *
      *
      * @param robot The robot to create
-     * @param total_chicker_depth The distance from the front face of the robot to the back of the
-     * chicker, ie. how far inset into the front of the robot the chicker is
+     * @param total_chicker_depth The distance from the front face of the robot to the
+     * back of the chicker, ie. how far inset into the front of the robot the chicker is
      *
      * @return A b2PolygonShape for the corresponding part of the robot body
      */
     b2PolygonShape* getMainRobotBodyShape(const Robot& robot, double total_chicker_depth);
-    b2PolygonShape* getRobotBodyShapeFrontLeft(const Robot& robot, double total_chicker_depth);
-    b2PolygonShape* getRobotBodyShapeFrontRight(const Robot& robot, double total_chicker_depth);
+    b2PolygonShape* getRobotBodyShapeFrontLeft(const Robot& robot,
+                                               double total_chicker_depth);
+    b2PolygonShape* getRobotBodyShapeFrontRight(const Robot& robot,
+                                                double total_chicker_depth);
 
     /**
      * A helper function that returns the points that make up the front-left shape
@@ -275,7 +290,8 @@ class PhysicsRobot
      * A helper function that applies force to the robot body as if there was a wheel
      * at the given angle, relative to the front of the robot
      *
-     * @param angle_to_wheel The angle to the wheel axis, relative to the front of the robot
+     * @param angle_to_wheel The angle to the wheel axis, relative to the front of the
+     * robot
      * @param force_in_newtons The force to apply
      */
     void applyWheelForceAtAngle(Angle angle_to_wheel, double force_in_newtons);
@@ -292,7 +308,8 @@ class PhysicsRobot
      *
      * @param motor_speed The current speed of the motor, in rpm
      *
-     * @return How much force (in Newtons) to apply to the wheel to simulate a braking effect
+     * @return How much force (in Newtons) to apply to the wheel to simulate a braking
+     * effect
      */
     float getMotorBrakeForce(float motor_speed) const;
 
@@ -302,8 +319,12 @@ class PhysicsRobot
 
     RobotId robot_id;
 
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_contact_callbacks;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_start_contact_callbacks;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> dribbler_ball_end_contact_callbacks;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> chicker_ball_contact_callbacks;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+        dribbler_ball_contact_callbacks;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+        dribbler_ball_start_contact_callbacks;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+        dribbler_ball_end_contact_callbacks;
+    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+        chicker_ball_contact_callbacks;
 };

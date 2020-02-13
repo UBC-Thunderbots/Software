@@ -1,4 +1,5 @@
 #include "software/backend/simulation/physics/physics_world.h"
+
 #include "shared/constants.h"
 
 PhysicsWorld::PhysicsWorld(const World& world)
@@ -16,18 +17,19 @@ PhysicsWorld::PhysicsWorld(const World& world)
 void PhysicsWorld::initWorld(const World& world)
 {
     physics_field = std::make_shared<PhysicsField>(b2_world, world.field());
-    physics_ball  = std::make_shared<PhysicsBall>(b2_world, world.ball(), BALL_MASS_KG, acceleration_due_to_gravity);
+    physics_ball  = std::make_shared<PhysicsBall>(b2_world, world.ball(), BALL_MASS_KG,
+                                                 acceleration_due_to_gravity);
     friendly_physics_robots.clear();
     for (const auto& friendly_robot : world.friendlyTeam().getAllRobots())
     {
-        friendly_physics_robots.emplace_back(
-            std::make_shared<PhysicsRobot>(b2_world, friendly_robot, ROBOT_WITH_BATTERY_MASS_KG));
+        friendly_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
+            b2_world, friendly_robot, ROBOT_WITH_BATTERY_MASS_KG));
     }
     enemy_physics_robots.clear();
     for (const auto& enemy_robot : world.enemyTeam().getAllRobots())
     {
-        enemy_physics_robots.emplace_back(
-            std::make_shared<PhysicsRobot>(b2_world, enemy_robot, ROBOT_WITH_BATTERY_MASS_KG));
+        enemy_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
+            b2_world, enemy_robot, ROBOT_WITH_BATTERY_MASS_KG));
     }
     current_timestamp = world.getMostRecentTimestamp();
 }

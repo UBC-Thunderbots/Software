@@ -23,7 +23,8 @@ class PhysicsBall
      * @param mass_kg The mass of the ball in kg
      * @param gravity The acceleration due to gravity on the ball, in m/s^2
      */
-    explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball, const double mass_kg, const double gravity);
+    explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball,
+                         const double mass_kg, const double gravity);
 
     PhysicsBall() = delete;
 
@@ -55,17 +56,17 @@ class PhysicsBall
     Ball getBallWithTimestamp(const Timestamp& timestamp) const;
 
     /**
-     * Kicks the ball in the direction of the given vector, and applies a change in velocity
-     * equal to the magnitude of the vector.
+     * Kicks the ball in the direction of the given vector, and applies a change in
+     * velocity equal to the magnitude of the vector.
      *
      * @param kick_vector The kick vector to apply
      */
     void kick(Vector kick_vector);
 
     /**
-     * Chips the ball in the direction of the given vector. The isInFlight() function will return
-     * true until the ball has travelled a distance equal to the magnitude of the vector from its
-     * current location when this function is called.
+     * Chips the ball in the direction of the given vector. The isInFlight() function will
+     * return true until the ball has travelled a distance equal to the magnitude of the
+     * vector from its current location when this function is called.
      *
      * @param chip_vector The chip_vector to apply
      */
