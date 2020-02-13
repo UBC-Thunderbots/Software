@@ -50,9 +50,15 @@ protected:
         return createWorldWithEnemyRobots(robot, ball, {});
     }
 
+    Point getDribblingPoint(std::shared_ptr<SimulatorRobot> simulator_robot) {
+        Point robot_position = simulator_robot->position();
+        Angle robot_orientation = Angle::fromRadians(simulator_robot->getOrientation());
+        return getDribblingPoint(robot_position, robot_orientation);
+    }
+
     Point getDribblingPoint(const Point& robot_position, const Angle& robot_orientation) {
-        double chicker_depth = 2 * BALL_MAX_RADIUS_METERS / 5;
-        Point dribbling_point = robot_position + Vector::createFromAngle(robot_orientation).normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS - chicker_depth);
+        double dribbler_depth = PhysicsRobot::dribbler_depth;
+        Point dribbling_point = robot_position + Vector::createFromAngle(robot_orientation).normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS - dribbler_depth);
         return dribbling_point;
     }
 
@@ -235,14 +241,16 @@ TEST_F(SimulatorRobotTest, test_ball_does_not_bounce_off_front_of_robot_when_dri
     // We use an arbitrarily large number here for speed
     simulator_robot->setDribblerSpeed(10000);
 
-    // Simulate for 1 second
-    for(unsigned int i = 0; i < 150; i++) {
+    // Simulate for 2 seconds
+    for(unsigned int i = 0; i < 120; i++) {
         world->stepSimulation(Duration::fromSeconds(1.0/60.0));
     }
 
+    // Make sure we haven't caused the robot to move significantly by dribbling
+    EXPECT_LT((simulator_robot->position() - Point(0, 0)).length(), 0.003);
     // Check the ball has stuck to the dribbler
     EXPECT_LT((simulator_ball->velocity() - Vector(0, 0)).length(), 0.001);
-    Point dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
+    Point dribbling_point = getDribblingPoint(simulator_robot);
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 }
 
@@ -256,14 +264,14 @@ TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_backwards) {
     // We use an arbitrarily large number here for speed
     simulator_robot->setDribblerSpeed(10000);
 
-    // Simulate for 1 second
-    for(unsigned int i = 0; i < 60; i++) {
+    // Simulate for 2 seconds
+    for(unsigned int i = 0; i < 120; i++) {
         world->stepSimulation(Duration::fromSeconds(1.0/60.0));
     }
 
     // Check the ball has stuck to the dribbler
-    EXPECT_LT((simulator_ball->velocity() - Vector(-0.5, 0)).length(), 0.01);
-    Point dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
+    EXPECT_LT((simulator_ball->velocity() - simulator_robot->velocity()).length(), 0.001);
+    Point dribbling_point = getDribblingPoint(simulator_robot);
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 }
 
@@ -281,8 +289,8 @@ TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_forwards) {
     }
 
     // Check the ball has stuck to the dribbler
-    EXPECT_LT((simulator_ball->velocity() - Vector(0.5, 0)).length(), 0.005);
-    Point dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
+    EXPECT_LT((simulator_ball->velocity() - simulator_robot->velocity()).length(), 0.02);
+    Point dribbling_point = getDribblingPoint(simulator_robot);
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 }
 
@@ -301,10 +309,10 @@ TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_spinning_in_place) {
 
     // Check the ball has stuck to the dribbler
     EXPECT_LT((simulator_ball->velocity() - Vector(0.0, 0)).length(), 0.005);
-    Point dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
+    Point dribbling_point = getDribblingPoint(simulator_robot);
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 
-    // Accelerate the robot up to an angular velcity of 4*pi rad/s (ie. 2 rpm)
+    // Accelerate the robot up to an angular velocity of 4*pi rad/s (ie. 2 rpm)
     // The iteration limit is a safety so we don't loop forever if applyForce is broken
     for(unsigned int i = 0; i < 120 && simulator_robot->getVelocityAngular() < 4 * M_PI; i++) {
         simulator_robot->applyWheelForceFrontLeft(0.3);
@@ -313,31 +321,44 @@ TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_spinning_in_place) {
         simulator_robot->applyWheelForceFrontRight(0.3);
 
         world->stepSimulation(Duration::fromSeconds(1.0/60.0));
-
-        // Check the ball has stuck to the dribbler
-        dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
-        EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+        std::cout << simulator_robot->getVelocityAngular() << std::endl;
     }
 
     // Check the ball has stuck to the dribbler
-    dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
+    dribbling_point = getDribblingPoint(simulator_robot);
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 
     for(unsigned int i = 0; i < 120; i++) {
         world->stepSimulation(Duration::fromSeconds(1.0/60.0));
-
-        // Check the ball has stuck to the dribbler
-        dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
-        EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.015);
     }
 
     // Check the ball has stuck to the dribbler
-    dribbling_point = getDribblingPoint(simulator_robot->position(), Angle::fromRadians(simulator_robot->getOrientation()));
+    dribbling_point = getDribblingPoint(simulator_robot);
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.015);
 }
 
+TEST_F(SimulatorRobotTest, test_dribbler_coast) {
+    Point robot_position = Point(0, 0);
+    Angle robot_orientation = Angle::zero();
+    Point dribbling_point = getDribblingPoint(robot_position, robot_orientation);
+    Robot robot(0, robot_position, Vector(-0.5, 0), robot_orientation, AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball(dribbling_point, Vector(-0.1, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
+
+    simulator_robot->dribblerCoast();
+
+    // Simulate for 1 second
+    for(unsigned int i = 0; i < 60; i++) {
+        world->stepSimulation(Duration::fromSeconds(1.0/60.0));
+    }
+
+    // Check the ball has not stuck to the dribbler
+    dribbling_point = getDribblingPoint(simulator_robot);
+    EXPECT_GT((simulator_ball->position() - dribbling_point).length(), 0.1);
+}
+
 TEST_F(SimulatorRobotTest, test_robot_drive_forward) {
-    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::quarter(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
     // Put the ball very far away so it does not interfere
     Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, simulator_robot, _] = createWorld(robot, ball);
@@ -352,13 +373,13 @@ TEST_F(SimulatorRobotTest, test_robot_drive_forward) {
         world->stepSimulation(Duration::fromSeconds(1.0/60.0));
     }
 
-    EXPECT_GT(simulator_robot->getVelocityX(), 0.5);
-    EXPECT_NEAR(simulator_robot->getVelocityY(), 0, 1e-5);
+    EXPECT_NEAR(simulator_robot->getVelocityX(), 0, 1e-5);
+    EXPECT_GT(simulator_robot->getVelocityY(), 0.5);
     EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0, 1 * M_PI / 180.0);
 
-    EXPECT_GT(simulator_robot->getPositionX(), 0.25);
-    EXPECT_NEAR(simulator_robot->getPositionY(), 0, 1e-5);
-    EXPECT_NEAR(simulator_robot->getOrientation(), 0, 1 * M_PI / 180.0);
+    EXPECT_NEAR(simulator_robot->getPositionX(), 0, 1e-5);
+    EXPECT_GT(simulator_robot->getPositionY(), 0.25);
+    EXPECT_NEAR(simulator_robot->getOrientation(), M_PI_2, 1 * M_PI / 180.0);
 }
 
 TEST_F(SimulatorRobotTest, test_robot_drive_backwards) {
@@ -426,4 +447,137 @@ TEST_F(SimulatorRobotTest, test_robot_spin_counterclockwise) {
     EXPECT_LT((simulator_robot->position() - Point(0, 0)).length(), 0.05);
     EXPECT_LT((simulator_robot->velocity() - Vector(0, 0)).length(), 0.05);
     EXPECT_GT(simulator_robot->getVelocityAngular(), 10);
+}
+
+TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_not_moving) {
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    EXPECT_EQ(simulator_robot->getMotorSpeedFrontLeft(), 0.0);
+    EXPECT_EQ(simulator_robot->getMotorSpeedBackLeft(), 0.0);
+    EXPECT_EQ(simulator_robot->getMotorSpeedBackRight(), 0.0);
+    EXPECT_EQ(simulator_robot->getMotorSpeedFrontRight(), 0.0);
+}
+
+TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_moving_forwards) {
+    Robot robot(0, Point(0, 0), Vector(1, 0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    EXPECT_LT(simulator_robot->getMotorSpeedFrontLeft(), -1.0);
+    EXPECT_LT(simulator_robot->getMotorSpeedBackLeft(), -1.0);
+    EXPECT_GT(simulator_robot->getMotorSpeedBackRight(), 1.0);
+    EXPECT_GT(simulator_robot->getMotorSpeedFrontRight(), 1.0);
+    EXPECT_LT(simulator_robot->getMotorSpeedFrontLeft(), simulator_robot->getMotorSpeedBackLeft());
+    EXPECT_GT(simulator_robot->getMotorSpeedFrontRight(), simulator_robot->getMotorSpeedBackRight());
+    EXPECT_EQ(simulator_robot->getMotorSpeedFrontLeft(), -simulator_robot->getMotorSpeedFrontRight());
+    EXPECT_EQ(simulator_robot->getMotorSpeedBackLeft(), -simulator_robot->getMotorSpeedBackRight());
+}
+
+TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_moving_along_wheel_axis) {
+    // Move along the axis of the front-left wheel. This means the front-left wheel is perpendicular
+    // to the direction of motion, and we don't expect it to be spinning
+    Vector robot_velocity = Vector::createFromAngle(Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG));
+    Robot robot(0, Point(0, 0), robot_velocity, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    EXPECT_NEAR(simulator_robot->getMotorSpeedFrontLeft(), 0.0, 0.1);
+    EXPECT_LT(simulator_robot->getMotorSpeedBackLeft(), -1.0);
+    EXPECT_LT(simulator_robot->getMotorSpeedBackRight(), -0.1);
+    EXPECT_GT(simulator_robot->getMotorSpeedFrontRight(), 1.0);
+}
+
+TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_spinning) {
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    EXPECT_GT(simulator_robot->getMotorSpeedFrontLeft(), 1.0);
+    EXPECT_GT(simulator_robot->getMotorSpeedBackLeft(), 1.0);
+    EXPECT_GT(simulator_robot->getMotorSpeedBackRight(), 1.0);
+    EXPECT_GT(simulator_robot->getMotorSpeedFrontRight(), 1.0);
+}
+
+TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_spinning_with_positive_angular_velocity) {
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        simulator_robot->brakeMotorFrontLeft();
+        simulator_robot->brakeMotorBackLeft();
+        simulator_robot->brakeMotorBackRight();
+        simulator_robot->brakeMotorFrontRight();
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
+}
+
+TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_spinning_with_negative_angular_velocity) {
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::fromDegrees(-2 * 360), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        simulator_robot->brakeMotorFrontLeft();
+        simulator_robot->brakeMotorBackLeft();
+        simulator_robot->brakeMotorBackRight();
+        simulator_robot->brakeMotorFrontRight();
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
+}
+
+TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_moving_linearly) {
+    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        simulator_robot->brakeMotorFrontLeft();
+        simulator_robot->brakeMotorBackLeft();
+        simulator_robot->brakeMotorBackRight();
+        simulator_robot->brakeMotorFrontRight();
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_LT((simulator_robot->velocity() - Vector(0, 0)).length(), 0.01);
+    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
+}
+
+TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_moving_and_spinning) {
+    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(), AngularVelocity::full(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, _] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        simulator_robot->brakeMotorFrontLeft();
+        simulator_robot->brakeMotorBackLeft();
+        simulator_robot->brakeMotorBackRight();
+        simulator_robot->brakeMotorFrontRight();
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_LT((simulator_robot->velocity() - Vector(0, 0)).length(), 0.01);
+    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
 }

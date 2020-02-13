@@ -8,6 +8,7 @@ cc_library(
         "//software/ai/primitive",
         "//software/backend/simulation/physics:physics_ball",
         "//software/backend/simulation/physics:physics_robot",
+        "//software/logger",
     ],
 )
 
@@ -57,6 +58,7 @@ cc_library(
         "//firmware/main/app/world:dribbler",
         "//firmware/main/app/world:firmware_robot",
         "//firmware/main/app/world:wheel",
+        "//software/logger",
     ],
 )
 

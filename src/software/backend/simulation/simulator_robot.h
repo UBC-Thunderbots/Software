@@ -6,11 +6,19 @@
 #include "software/backend/simulation/physics/physics_ball.h"
 #include "software/ai/primitive/primitive.h"
 
-// TODO: comment
+/**
+ * The SimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with more
+ * logic-focused elements for simulation, such as whether or not autokick is enabled.
+ */
 class SimulatorRobot {
 public:
+    /**
+     * Create a new SimulatorRobot given a PhysicsRobot
+     *
+     * @param physics_robot the PhysicsRobot to simulate and control
+     */
     explicit SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot);
-    explicit SimulatorRobot() = default;
+    explicit SimulatorRobot() = delete;
 
     /**
      * Returns the ID of this robot
@@ -135,13 +143,6 @@ public:
     void setDribblerSpeed(uint32_t rpm);
 
     /**
-     * Returns the dribbler speed in rpm
-     *
-     * @return the dribbler speed in rpm
-     */
-    uint32_t getDribblerSpeed() const;
-
-    /**
      * Makes the dribbler coast until another operation is applied to it
      */
     void dribblerCoast();
@@ -188,17 +189,47 @@ public:
     void brakeMotorFrontRight();
 
 private:
-    // TODO: comment
-    void onChickerBallContact(PhysicsRobot* robot, PhysicsBall* ball);
-    void onDribblerBallContact(PhysicsRobot* robot, PhysicsBall* ball);
-    void onDribblerBallStartContact(PhysicsRobot* robot, PhysicsBall* ball);
-    void onDribblerBallEndContact(PhysicsRobot* robot, PhysicsBall* ball);
+    /**
+     * A function that is called during every physics step for as long as the ball
+     * is touching this robot's chicker
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onChickerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
+    /**
+     * A function that is called during every physics step for as long as the ball
+     * is touching this robot's dribbler
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onDribblerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
+    /**
+     * A function that is called during once when the ball starts touching
+     * this robot's dribbler.
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onDribblerBallStartContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
+    /**
+     * A function that is called during once when the ball stops touching
+     * this robot's dribbler.
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onDribblerBallEndContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
 
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<double> autokick_speed_m_per_s;
     std::optional<double> autochip_distance_m;
     uint32_t dribbler_rpm;
 
+    // A pointer to the ball currently being dribbled
     PhysicsBall* ball_in_dribbler_area;
-
 };

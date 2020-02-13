@@ -4,11 +4,20 @@
 #include <algorithm>
 #include <numeric>
 
-#include "shared/constants.h"
 #include "software/backend/simulation/physics/box2d_util.h"
 extern "C" {
 #include "firmware/main/shared/physics.h"
 }
+
+// We are only allowed to cover a fraction of the ball according to the rules, so we use
+// this to calculate the depth. We assume the ball can be dribbled as long as it is
+// anywhere within this small area.
+const double PhysicsRobot::dribbler_depth = BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
+// We can use a very small value for the chicker thickness since the
+// chicker just needs to be large enough to collide with the ball and detect collisions
+// without letting the ball tunnel and collide with the robot body
+const double PhysicsRobot::chicker_thickness = 0.005;
+const double PhysicsRobot::total_chicker_depth = PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
 PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, double mass_kg)
     : robot_id(robot.id())
@@ -19,21 +28,19 @@ PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot, d
     robot_body_def.linearVelocity.Set(robot.velocity().x(), robot.velocity().y());
     robot_body_def.angle           = robot.orientation().toRadians();
     robot_body_def.angularVelocity = robot.angularVelocity().toRadians();
+    // This is a somewhat arbitrary value for damping. We keep it relatively low
+    // so that robots still coast a ways before stopping, but non-zero so that robots
+    // do come to a halt if no force is applied.
+    // Damping is roughly calculated as v_new = v * exp(damping * t)
+    // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
+    robot_body_def.linearDamping = 0.2;
+    robot_body_def.angularDamping = 0.2;
 
     robot_body = world->CreateBody(&robot_body_def);
 
-    // The depth of the dribbling area at the front of the robot. We are only allowed to cover
-    // a fraction of the ball according to the rules, so we use this to calculate the depth.
-    // We assume the ball can be dribbled as long as it is anywhere within this small area.
-    double dribbler_depth = BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
-    // The thickness of the chicker fixture shape. We can use a very small value since the
-    // chicker just needs to be large enough to collide with the ball and detect collisions
-    double chicker_thickness = 0.002;
-    double total_chicker_depth = dribbler_depth + chicker_thickness;
-
-    setupRobotBodyFixtures(robot, total_chicker_depth, mass_kg);
-    setupDribblerFixture(robot, dribbler_depth);
-    setupChickerFixture(robot, total_chicker_depth, chicker_thickness);
+    setupRobotBodyFixtures(robot, PhysicsRobot::total_chicker_depth, mass_kg);
+    setupDribblerFixture(robot, PhysicsRobot::dribbler_depth);
+    setupChickerFixture(robot, PhysicsRobot::total_chicker_depth, PhysicsRobot::chicker_thickness);
 }
 
 PhysicsRobot::~PhysicsRobot()
@@ -286,20 +293,30 @@ std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>> PhysicsRobot::getC
 
 Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
 {
-    Point position(robot_body->GetPosition().x, robot_body->GetPosition().y);
-    Vector velocity(robot_body->GetLinearVelocity().x, robot_body->GetLinearVelocity().y);
-    Angle orientation = Angle::fromRadians(robot_body->GetAngle());
-    Angle angular_velocity =
-        AngularVelocity::fromRadians(robot_body->GetAngularVelocity());
-
     Robot robot =
-        Robot(robot_id, position, velocity, orientation, angular_velocity, timestamp);
+        Robot(robot_id, position(), velocity(), orientation(), angularVelocity(), timestamp);
     return robot;
 }
 
 RobotId PhysicsRobot::getRobotId() const
 {
     return robot_id;
+}
+
+Point PhysicsRobot::position() const {
+    return Point(robot_body->GetPosition().x, robot_body->GetPosition().y);
+}
+
+Vector PhysicsRobot::velocity() const {
+    return Vector(robot_body->GetLinearVelocity().x, robot_body->GetLinearVelocity().y);
+}
+
+Angle PhysicsRobot::orientation() const {
+    return Angle::fromRadians(robot_body->GetAngle());
+}
+
+AngularVelocity PhysicsRobot::angularVelocity() const {
+    return AngularVelocity::fromRadians(robot_body->GetAngularVelocity());
 }
 
 void PhysicsRobot::applyWheelForceFrontLeft(double force_in_newtons) {

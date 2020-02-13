@@ -6,6 +6,7 @@
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
 #include "software/backend/simulation/physics/physics_ball.h"
+#include "shared/constants.h"
 
 /**
  * This class represent a Robot in a Box2D physics simulation. It provides a convenient
@@ -16,6 +17,13 @@
 class PhysicsRobot
 {
    public:
+    // The depth of the dribbling area at the front of the robot.
+    // We assume the ball can be dribbled as long as it is anywhere within this small area.
+    static double const dribbler_depth;
+    // The thickness of the chicker fixture shape.
+    static double const chicker_thickness;
+    static double const total_chicker_depth;
+
     /**
      * Creates a new PhysicsRobot given a Box2D world and a Robot object. A Box2D body
      * will be automatically added to the Box2D world and updated during world update
@@ -104,6 +112,34 @@ class PhysicsRobot
      * @return the id of this physics robot
      */
     RobotId getRobotId() const;
+
+    /**
+     * Returns the current position of the robot, in global field coordinates, in meters
+     *
+     * @return the current position of the robot, in global field coordinates, in meters
+     */
+    Point position() const;
+
+    /**
+     * Returns the current velocity of the robot, in global field coordinates, in m/s
+     *
+     * @return the current velocity of the robot, in global field coordinates, in m/s
+     */
+    Vector velocity() const;
+
+    /**
+     * Returns the current orientation of the robot, in global field coordinates
+     *
+     * @return the current orientation of the robot, in global field coordinates
+     */
+    Angle orientation() const;
+
+    /**
+     * Returns the current angular velocity of the robot, in global field coordinates
+     *
+     * @return the current angular velocity of the robot, in global field coordinates
+     */
+    AngularVelocity angularVelocity() const;
 
     /**
      * Applies the given force to the wheel. Positive force spins the wheel
