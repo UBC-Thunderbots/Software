@@ -14,55 +14,6 @@
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
 
-
-TEST(GeomUtilTest, dist_point_rectangle_point_within)
-{
-    Point p(1, 2.1);
-    Rectangle rect({0, 2}, {2, 4});
-    EXPECT_DOUBLE_EQ(0, dist(p, rect));
-}
-
-
-TEST(GeomUtilTest, dist_point_rectangle_point_below_rectangle)
-{
-    Point p(1, 1);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_above_rectangle)
-{
-    Point p(1, 5);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_to_left_of_rectangle)
-{
-    Point p(-1, 3);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_right_of_rectangle)
-{
-    Point p(3, 3);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle)
-{
-    Point p(-2.0, 0);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(std::sqrt(8.0), dist(p, rect));
-}
-
 TEST(GeomUtilTest, test_proj_len)
 {
     double calculated_val, expected_val;
@@ -695,23 +646,6 @@ TEST(GeomUtilTest, test_closest_point_time)
     EXPECT_DOUBLE_EQ(1.8, closestPointTime(x1, v1, x2, v2));
 }
 
-TEST(GeomUtilTest, test_dist_point_seg)
-{
-    Point a1(0, 0);
-    Point b1(1, 0);
-
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(0, 1), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(2, 0), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(1, -1), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(-1, 0), Segment(a1, b1)));
-
-    Point a2(5, 2);
-    Point b2(2, 7);
-    Point c2(6.5369, 7.2131);
-
-    EXPECT_NEAR(4.0, dist(c2, Segment(a2, b2)), 1e-5);
-}
-
 // Test to see if raySegmentIntersection() returns the correct parameters when the ray and
 // segment intersect once
 TEST(GeomUtilTest, test_ray_segment_intersecting)
@@ -1195,36 +1129,6 @@ TEST(GeomUtilTest, test_find_open_circle_points_outside_of_box)
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
     ASSERT_EQ(0, empty_circles.size());
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_contained_in_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(0.5, 0.5);
-
-    double result = dist(point, polygon);
-
-    EXPECT_DOUBLE_EQ(0.0, result);
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_close_to_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(0.5, 1.1);
-
-    double result = dist(point, polygon);
-
-    EXPECT_NEAR(0.1, result, 1e-9);
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_far_from_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(-5, -5);
-
-    double result = dist(point, polygon);
-
-    EXPECT_DOUBLE_EQ(std::hypot(-5, -5), result);
 }
 
 TEST(GeomUtilTest, test_ray_rectangle_intersection_no_intersection)
