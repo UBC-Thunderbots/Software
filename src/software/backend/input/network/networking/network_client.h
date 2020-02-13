@@ -152,5 +152,5 @@ class NetworkClient
     // The callback function that we pass newly received/filtered worlds to
     std::function<void(World)> received_world_callback;
 
-    std::shared_ptr<const CameraConfig> sharedConfig;
+    std::shared_ptr<const CameraConfig> config;
 };

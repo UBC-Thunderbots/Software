@@ -18,7 +18,8 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
-      received_world_callback(received_world_callback)
+      received_world_callback(received_world_callback),
+      config(config)
 {
     setupVisionClient(vision_multicast_address, vision_multicast_port);
 
@@ -26,8 +27,6 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                               gamecontroller_multicast_port);
 
     startIoServiceThreadInBackground();
-
-    sharedConfig = config;
 }
 
 void NetworkClient::setupVisionClient(std::string vision_address, int vision_port)
@@ -153,20 +152,19 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         {
             case 0:
                 camera_disabled =
-                    //Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
-                        sharedConfig->IgnoreCamera_0()->value();
+                        config->IgnoreCamera_0()->value();
                 break;
             case 1:
                 camera_disabled =
-                        sharedConfig->IgnoreCamera_1()->value();
+                        config->IgnoreCamera_1()->value();
                 break;
             case 2:
                 camera_disabled =
-                        sharedConfig->IgnoreCamera_2()->value();
+                        config->IgnoreCamera_2()->value();
                 break;
             case 3:
                 camera_disabled =
-                        sharedConfig->IgnoreCamera_3()->value();
+                        config->IgnoreCamera_3()->value();
                 break;
             default:
                 LOG(WARNING) << "An unkown camera id was detected, disabled by default "
