@@ -7,10 +7,10 @@
 #include "software/backend/input/network/networking/network_filter.h"
 #include "software/backend/input/network/networking/ssl_gamecontroller_client.h"
 #include "software/backend/input/network/networking/ssl_vision_client.h"
+#include "software/parameter/config.hpp"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/world/world.h"
-#include "software/parameter/config.hpp"
 
 /**
  * This class encapsulates our SSLVisionClient and SSLGameController clients to abstract
@@ -52,7 +52,7 @@ class NetworkClient
     // threading this class uses
     NetworkClient& operator=(const NetworkClient&) = delete;
     NetworkClient(const NetworkClient&)            = delete;
-    NetworkClient() = delete;
+    NetworkClient()                                = delete;
 
    private:
     /**
