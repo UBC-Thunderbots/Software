@@ -124,5 +124,19 @@ TEST(ConvexPolygonAreaTest, test_rhombus_area)
 
 TEST(ConvexPolygonIsConvexTest, test_barely_convex_polygon)
 {
-    ConvexPolygon triangle = ConvexPolygon{{0, 0}, {4.5, 0.5}, {4.5, -0.5}};
+    EXPECT_NO_THROW(ConvexPolygon({{0, 0}, {4.5, 0.5}, {4.5, -0.5}}));
+}
+
+TEST(ConvexPolygonIsConvexTest, test_degenerate_polygon)
+{
+    EXPECT_THROW(
+        ConvexPolygon({Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3)}),
+        std::invalid_argument);
+}
+
+TEST(ConvexPolygonIsConvexTest, test_degenerate_polygon_linear_points)
+{
+    EXPECT_THROW(
+        ConvexPolygon({Point(0, 3), Point(1, 3), Point(2, 3), Point(3, 3), Point(4, 3)}),
+        std::invalid_argument);
 }
