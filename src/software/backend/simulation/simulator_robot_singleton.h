@@ -7,23 +7,8 @@
 extern "C"
 {
 #include "firmware/main/app/world/firmware_robot.h"
+#include "firmware/main/shared/physics.h"
 }
-
-// TODO: These are all hardcoded values copied from firmware/main/physics/physics.h
-// and firmware/main/control/control.h
-// They should be replaced with the proper constants once firmware cleanup is done
-#define GEAR_RATIO 0.5143f  // define as speed multiplication from motor to wheel
-#define WHEEL_RADIUS 0.0254f
-#define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
-#define RPM_TO_VOLT (1.0f / 374.0f)     // motor RPM to back EMF
-#define PHASE_RESISTANCE 1.6f           // adjust this number as calculated
-#define CURRENT_PER_TORQUE 39.21f       // from motor data sheet (1/25.5 mNm)
-#define ROBOT_POINT_MASS 2.48f
-#define ROBOT_RADIUS 0.085f
-#define INERTIAL_FACTOR 0.37f
-#define ROT_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)
-#define INERTIA (ROT_MASS * ROBOT_RADIUS * ROBOT_RADIUS)
-#define JERK_LIMIT 40.0f  //(m/s^3)
 
 /**
  * Because the FirmwareRobot_t struct is defined in the .c file (rather than the .h file),
@@ -38,6 +23,8 @@ struct FirmwareRobotDeleter
 {
     void operator()(FirmwareRobot_t* firmware_robot) const
     {
+        // TODO: Make sure all objects de-allocated properly
+        // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
         app_firmware_robot_destroy(firmware_robot);
     };
 };

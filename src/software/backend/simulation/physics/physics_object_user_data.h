@@ -3,7 +3,7 @@
 /**
  * Different types of physics objects that exist in the simulation world
  */
-enum PhysicsObjectType
+enum class PhysicsObjectType
 {
     ROBOT_CHICKER,
     ROBOT_DRIBBLER,

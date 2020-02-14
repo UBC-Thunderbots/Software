@@ -150,7 +150,10 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_left_side_inside_radius)
 
     simulateForDuration(Duration::fromSeconds(1));
 
-    EXPECT_NE(b2Vec2(-2, 0), ball_body->GetLinearVelocity());
+    // Use the cross-product to check if the new velocity vector is rotated
+    // clockwise of the old vector
+    EXPECT_LT(b2Cross(b2Vec2(-2, 0), ball_body->GetLinearVelocity()), 0);
+    EXPECT_NEAR(b2Vec2(-2, 0).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
 }
 
 TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_right_side_outside_radius)
@@ -185,7 +188,10 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_right_side_inside_radius)
 
     simulateForDuration(Duration::fromSeconds(1));
 
-    EXPECT_NE(b2Vec2(-2, 0), ball_body->GetLinearVelocity());
+    // Use the cross-product to check if the new velocity vector is rotated
+    // counter-clockwise of the old vector
+    EXPECT_GT(b2Cross(b2Vec2(-2, 0), ball_body->GetLinearVelocity()), 0);
+    EXPECT_NEAR(b2Vec2(-2, 0).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
 }
 
 TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_back_side_outside_radius)
@@ -220,7 +226,10 @@ TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_back_side_inside_radius)
 
     simulateForDuration(Duration::fromSeconds(1));
 
-    EXPECT_NE(b2Vec2(-2, 0), ball_body->GetLinearVelocity());
+    // Use the cross-product to check if the new velocity vector is rotated
+    // clockwise of the old vector
+    EXPECT_LT(b2Cross(b2Vec2(0, -2), ball_body->GetLinearVelocity()), 0);
+    EXPECT_NEAR(b2Vec2(0, -2).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
 }
 
 TEST_F(PhysicsRobotTest, test_physics_robot_dimensions_front_side_outside_robot_body)
@@ -268,12 +277,17 @@ TEST_F(PhysicsRobotTest,
         // the robot
         if (ball_body->GetPosition().y <= 0)
         {
-            EXPECT_NE(ball_body->GetPosition().x,
-                      DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005);
+            // Use the cross-product to check if the new velocity vector is rotated
+            // counter-clockwise of the old vector
+            EXPECT_GT(b2Cross(b2Vec2(0, -2), ball_body->GetLinearVelocity()), 0);
+            EXPECT_NEAR(b2Vec2(0, -2).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
         }
     }
 
-    EXPECT_NE(b2Vec2(-2, 0), ball_body->GetLinearVelocity());
+    // Use the cross-product to check if the new velocity vector is rotated
+    // counter-clockwise of the old vector
+    EXPECT_GT(b2Cross(b2Vec2(0, -2), ball_body->GetLinearVelocity()), 0);
+    EXPECT_NEAR(b2Vec2(0, -2).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
 
     // Create a new body and roll it the opposite way to check we collide with the front
     // of the robot from both directions, since it's made of 2 separate pieces with a bap
@@ -295,12 +309,17 @@ TEST_F(PhysicsRobotTest,
         // the robot
         if (ball_body->GetPosition().y >= 0)
         {
-            EXPECT_NE(ball_body->GetPosition().x,
-                      DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005);
+            // Use the cross-product to check if the new velocity vector is rotated
+            // clockwise of the old vector
+            EXPECT_LT(b2Cross(b2Vec2(0, 2), ball_body->GetLinearVelocity()), 0);
+            EXPECT_NEAR(b2Vec2(0, 2).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
         }
     }
 
-    EXPECT_EQ(b2Vec2(0, 2), ball_body_2->GetLinearVelocity());
+    // Use the cross-product to check if the new velocity vector is rotated
+    // clockwise of the old vector
+    EXPECT_LT(b2Cross(b2Vec2(0, 2), ball_body->GetLinearVelocity()), 0);
+    EXPECT_NEAR(b2Vec2(0, 2).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
 }
 
 TEST_F(PhysicsRobotTest, test_dribbler_ball_contact_callbacks)
@@ -395,7 +414,7 @@ TEST_F(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks)
     EXPECT_TRUE(callback_called);
 }
 
-enum RobotWheel
+enum class RobotWheel
 {
     FRONT_LEFT,
     BACK_LEFT,

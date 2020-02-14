@@ -58,6 +58,7 @@ cc_library(
         "//firmware/main/app/world:dribbler",
         "//firmware/main/app/world:firmware_robot",
         "//firmware/main/app/world:wheel",
+        "//firmware/main/shared:physics",
         "//software/logger",
     ],
 )

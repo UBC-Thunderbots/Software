@@ -116,6 +116,7 @@ float SimulatorRobot::getBatteryVoltage()
     // We currently have 4s batteries on the robot that charge up to a little over
     // 16V, so we use 16 here to approxiamte a fully-charged battery
     // TODO: Should max battery voltage be a constant / injected robot param?
+    // See https://github.com/UBC-Thunderbots/Software/issues/1173
     return 16.0;
 }
 
@@ -160,11 +161,13 @@ void SimulatorRobot::chip(float distance_m)
 void SimulatorRobot::enableAutokick(float speed_m_per_s)
 {
     autokick_speed_m_per_s = speed_m_per_s;
+    autochip_distance_m = std::nullopt;
 }
 
 void SimulatorRobot::enableAutochip(float distance_m)
 {
     autochip_distance_m = distance_m;
+    autokick_speed_m_per_s = std::nullopt;
 }
 
 void SimulatorRobot::disableAutokick()
@@ -391,7 +394,8 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
         // closest to the chicker. We vary the magnitude of the foce by how far the ball
         // is from this "dribbling point". This more-or-less acts like a tiny gravity well
         // that sucks the ball into place, except with more force the further away the
-        // ball is
+        // ball is. Once the ball is no longer in the dribbler area this force is not
+        // applied (it is only applied as long as the ball is in the dribbler area).
 
         Point dribble_point =
             robot.position() +

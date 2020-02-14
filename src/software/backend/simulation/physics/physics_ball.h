@@ -56,6 +56,20 @@ class PhysicsBall
     Ball getBallWithTimestamp(const Timestamp& timestamp) const;
 
     /**
+     * Returns the current position of the ball, in global field coordinates, in meters
+     *
+     * @return the current position of the ball, in global field coordinates, in meters
+     */
+    Point position() const;
+
+    /**
+     * Returns the current velocity of the ball, in global field coordinates, in m/s
+     *
+     * @return the current velocity of the ball, in global field coordinates, in m/s
+     */
+    Vector velocity() const;
+
+    /**
      * Kicks the ball in the direction of the given vector, and applies a change in
      * velocity equal to the magnitude of the vector.
      *
@@ -114,5 +128,5 @@ class PhysicsBall
     // where the chip was started from
     std::optional<Point> chip_origin;
     // The distance of the most recent chip
-    double chip_distance_m;
+    double chip_distance_meters;
 };

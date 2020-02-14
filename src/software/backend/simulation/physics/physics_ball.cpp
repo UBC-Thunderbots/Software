@@ -8,7 +8,7 @@
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg,
                          const double gravity)
-    : gravity(gravity), chip_origin(std::nullopt), chip_distance_m(0.0)
+    : gravity(gravity), chip_origin(std::nullopt), chip_distance_meters(0.0)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -58,10 +58,15 @@ PhysicsBall::~PhysicsBall()
 
 Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
 {
-    auto position = Point(ball_body->GetPosition().x, ball_body->GetPosition().y);
-    auto velocity =
-        Vector(ball_body->GetLinearVelocity().x, ball_body->GetLinearVelocity().y);
-    return Ball(position, velocity, timestamp);
+    return Ball(position(), velocity(), timestamp);
+}
+
+Point PhysicsBall::position() const {
+    return Point(ball_body->GetPosition().x, ball_body->GetPosition().y);
+}
+
+Vector PhysicsBall::velocity() const {
+    return Vector(ball_body->GetLinearVelocity().x, ball_body->GetLinearVelocity().y);
 }
 
 void PhysicsBall::kick(Vector kick_vector)
@@ -87,7 +92,7 @@ void PhysicsBall::chip(const Vector &chip_vector)
     double ground_velocity  = initial_velocity * chip_angle.cos();
     kick(chip_vector.normalize(ground_velocity));
     chip_origin     = getBallWithTimestamp(Timestamp::fromSeconds(0)).position();
-    chip_distance_m = chip_vector.length();
+    chip_distance_meters = chip_vector.length();
 }
 
 void PhysicsBall::applyForce(const Vector &force)
@@ -121,7 +126,7 @@ bool PhysicsBall::isInFlight()
     bool chip_in_progress = chip_origin.has_value();
     if (chip_in_progress)
     {
-        double current_chip_distance =
+        double current_chip_distance_meters =
             (getBallWithTimestamp(Timestamp::fromSeconds(0)).position() -
              chip_origin.value())
                 .length();
@@ -133,7 +138,7 @@ bool PhysicsBall::isInFlight()
         // We assume the ball does not collide while it is in flight, which gives us the
         // "guarantee" the ball will travel far enough from the chip_origin in order to
         // "land"
-        if (current_chip_distance >= chip_distance_m && !isTouchingOtherObject())
+        if (current_chip_distance_meters >= chip_distance_meters && !isTouchingOtherObject())
         {
             chip_origin = std::nullopt;
             return false;

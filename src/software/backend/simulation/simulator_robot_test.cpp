@@ -139,7 +139,7 @@ TEST_F(SimulatorRobotTest, test_get_dribbler_temperature)
     EXPECT_EQ(simulator_robot->getDribblerTemperatureDegC(), 25);
 }
 
-TEST_F(SimulatorRobotTest, test_kick)
+TEST_F(SimulatorRobotTest, test_kick_orientation_zero)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -166,6 +166,35 @@ TEST_F(SimulatorRobotTest, test_kick)
     }
 
     EXPECT_LT((simulator_ball->velocity() - Vector(5, 0)).length(), 0.005);
+}
+
+TEST_F(SimulatorRobotTest, test_kick_orientation_100_deg)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::fromDegrees(100), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
+
+    // Simulate for 1/2 second without kicking
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // Make sure we didn't kick
+    EXPECT_LT(simulator_ball->velocity().length(), 0.001);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    simulator_robot->kick(5.0);
+
+    // Simulate for 1/2 second after kicking
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_LT((simulator_ball->velocity() - Vector::createFromAngle(robot.orientation()).normalize(5)).length(), 0.005);
 }
 
 TEST_F(SimulatorRobotTest, test_chip)
@@ -281,11 +310,14 @@ TEST_F(SimulatorRobotTest,
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    // Check the ball's velocity is very roughly within a reasonable range. We don't care
-    // exactly what it is, just that it hasn't changed an impossible amount by
-    // getting caught inside the robot it landed in and then squeezed out
+    // Check the ball's velocity is in a reasonable range, and still heading in the
+    // same direction is was chipped. Because the ball "lands" in an object we want to
+    // make sure we are simulating the ball "landing on" the object and rolling off it,
+    // rather than having collisions enabled inside a solid object and then getting
+    // ejected in a random direction at high speed.
     EXPECT_GT(simulator_ball->velocity().x(), 1);
     EXPECT_LT(simulator_ball->velocity().x(), 3);
+    EXPECT_FLOAT_EQ(simulator_ball->velocity().y(), 0.0);
     EXPECT_GT(simulator_ball->position().x(), 2.0);
 }
 

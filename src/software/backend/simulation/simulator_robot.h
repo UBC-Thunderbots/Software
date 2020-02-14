@@ -72,11 +72,11 @@ class SimulatorRobot
     float getVelocityY();
 
     /**
-     * Returns the current linear velocity of the robot, in global field coordinates, in m
-     * / s
+     * Returns the current linear velocity of the robot, in global field coordinates,
+     * in m / s
      *
-     * @return the current linear velocity of the robot, in global field coordinates, in m
-     * / s
+     * @return the current linear velocity of the robot, in global field coordinates,
+     * in m / s
      */
     Vector velocity();
 

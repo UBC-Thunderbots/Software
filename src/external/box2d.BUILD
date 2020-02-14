@@ -8,9 +8,9 @@ cc_library(
     srcs = glob(["Box2D/**/*.cpp"]),
     hdrs = glob(["Box2D/**/*.h"]),
     defines = [
-        # Decrease the linear stop to 0.001 (1mm) for more accuracy
+        # Decrease the linear slop to 0.001 (1mm) for more accuracy
         "b2_linearSlop=0.001f",
-        # Decrease the angular stop to for more accuracy. This value is in radians
+        # Decrease the angular slop for more accuracy. This value is in radians
         # and is equal to 0.1 degrees
         "b2_angularSlop=0.00174532f",
         # Decrease the velocity threshold so that have normal collisions at or above

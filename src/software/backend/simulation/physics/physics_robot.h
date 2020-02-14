@@ -13,6 +13,8 @@
  * way for us to abstract the robot and convert to our own Robot alss when data is needed.
  * This class only deals with physics and physics-related interactions, and does NOT
  * include any logic for robot behavior.
+ *
+ * This class returns floats in some cases because Box2D works with floats
  */
 class PhysicsRobot
 {
@@ -183,8 +185,8 @@ class PhysicsRobot
 
    private:
     /**
-     * Creates as many fixtures as necessary to represent the shape of the robot body, and
-     * adds them to the robot's b2Body
+     * Creates as many fixtures as necessary to represent the body shape of the given
+     * robot and them to this class' b2Body
      *
      * @param robot The robot to create fixtures for
      * @param total_chicker_depth The distance from the front face of the robot to the
@@ -238,7 +240,7 @@ class PhysicsRobot
      *                          x                                       X
      *                       x                                          x+++
      *                    x                                             x+  ++
-     *                 x                                                x+   +
+     *                 x                                                x+   +  <--- Front left part (indicated by '+')
      *                 x                                                x+   +
      *                 x                                                x+++++
      *                 x                                                x|c|d|
@@ -250,7 +252,7 @@ class PhysicsRobot
      *                 x                                                x|r|e|
      *                 x                                                x+++++
      *                 x                                                x+   +
-     *                 x                                                x+   +
+     *                 x                                                x+   +  <--- Front right part (indicated by '+')
      *                    x                                             x+  ++
      *                       x                                          x+++
      *                          x                                       x

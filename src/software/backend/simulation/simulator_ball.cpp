@@ -11,7 +11,7 @@ Point SimulatorBall::position() const
 {
     if (auto ball = physics_ball.lock())
     {
-        return ball->getBallWithTimestamp(Timestamp::fromSeconds(0)).position();
+        return ball->position();
     }
     LOG(WARNING) << "SimulatorBall being used with invalid PhysicsBall" << std::endl;
     return Point(0, 0);
@@ -23,7 +23,7 @@ Vector SimulatorBall::velocity() const
 {
     if (auto ball = physics_ball.lock())
     {
-        return ball->getBallWithTimestamp(Timestamp::fromSeconds(0)).velocity();
+        return ball->velocity();
     }
     LOG(WARNING) << "SimulatorBall being used with invalid PhysicsBall" << std::endl;
     return Vector(0, 0);
