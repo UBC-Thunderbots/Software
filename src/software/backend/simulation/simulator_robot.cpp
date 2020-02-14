@@ -114,7 +114,7 @@ float SimulatorRobot::getVelocityAngular()
 float SimulatorRobot::getBatteryVoltage()
 {
     // We currently have 4s batteries on the robot that charge up to a little over
-    // 16V, so we use 16 here to approxiamte a fully-charged battery
+    // 16V, so we use 16 here to approximate a fully-charged battery
     // TODO: Should max battery voltage be a constant / injected robot param?
     // See https://github.com/UBC-Thunderbots/Software/issues/1173
     return 16.0;
