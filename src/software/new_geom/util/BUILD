@@ -52,7 +52,6 @@ cc_library(
     ],
     deps = [
         ":collinear",
-        ":contains",
         "//software/new_geom:line",
         "//software/new_geom:polygon",
         "//software/new_geom:ray",
@@ -82,7 +81,6 @@ cc_library(
     ],
     deps = [
         "//software/new_geom:point",
-        "//software/new_geom:segment",
     ],
 )
 
@@ -93,33 +91,6 @@ cc_test(
     ],
     deps = [
         ":collinear",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "contains",
-    srcs = [
-        "contains.cpp",
-    ],
-    hdrs = [
-        "contains.h",
-    ],
-    deps = [
-        ":collinear",
-        "//software/new_geom:point",
-        "//software/new_geom:ray",
-        "//software/new_geom:segment",
-    ],
-)
-
-cc_test(
-    name = "contains_test",
-    srcs = [
-        "contains_test.cpp",
-    ],
-    deps = [
-        ":contains",
         "@gtest//:gtest_main",
     ],
 )

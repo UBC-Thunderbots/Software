@@ -9,7 +9,10 @@ cc_library(
 cc_library(
     name = "segment",
     hdrs = ["segment.h"],
-    deps = [":point"],
+    deps = [
+        ":point",
+        "//software/new_geom/util:collinear",
+    ],
 )
 
 cc_library(
@@ -118,7 +121,10 @@ cc_library(
     name = "ray",
     srcs = ["ray.cpp"],
     hdrs = ["ray.h"],
-    deps = [":point"],
+    deps = [
+        ":point",
+        "//software/new_geom/util:collinear",
+    ],
 )
 
 cc_library(
@@ -183,6 +189,17 @@ cc_test(
     ],
     deps = [
         ":ray",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "segment_test",
+    srcs = [
+        "segment_test.cpp",
+    ],
+    deps = [
+        ":segment",
         "@gtest//:gtest_main",
     ],
 )
