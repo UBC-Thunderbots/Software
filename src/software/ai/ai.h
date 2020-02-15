@@ -20,7 +20,7 @@ class AI final
      * Create an AI with given configuration
      * @param config The AI configuration
      */
-    explicit AI(std::shared_ptr<const AIConfig> config,
+    explicit AI(std::shared_ptr<const AIConfig> ai_config,
                 std::shared_ptr<const AIControlConfig> control_config);
 
     /**

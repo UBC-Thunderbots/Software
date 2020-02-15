@@ -5,9 +5,9 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/visualizer/drawing/navigator.h"
 
-AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> config,
+AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> ai_config,
                      std::shared_ptr<const AIControlConfig> control_config)
-    : ai(config, control_config), control_config(control_config)
+    : ai(ai_config, control_config), control_config(control_config)
 {
 }
 

@@ -25,7 +25,7 @@ class AIWrapper : public ThreadedObserver<World>,
      *
      * @param config The AI configuration
      */
-    explicit AIWrapper(std::shared_ptr<const AIConfig> config,
+    explicit AIWrapper(std::shared_ptr<const AIConfig> ai_config,
                        std::shared_ptr<const AIControlConfig> control_config);
 
    private:
