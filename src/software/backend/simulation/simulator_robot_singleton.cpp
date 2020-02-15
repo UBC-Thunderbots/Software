@@ -96,426 +96,189 @@ SimulatorRobotSingleton::createFirmwareRobot()
                                                                   FirmwareRobotDeleter());
 }
 
-float SimulatorRobotSingleton::getPositionX()
-{
+void SimulatorRobotSingleton::checkValidAndExecuteVoid(std::function<void(std::shared_ptr<SimulatorRobot>)> func) {
+    if (simulator_robot) {
+        func(simulator_robot);
+    }else {
+        LOG(WARNING) << "SimulatorRobotSingleton called without setting the SimulatorRobot first" << std::endl;
+    }
+}
+
+float SimulatorRobotSingleton::checkValidAndReturnFloat(std::function<float(std::shared_ptr<SimulatorRobot>)> func) {
     if (simulator_robot)
     {
-        return simulator_robot->getPositionX();
+        return func(simulator_robot);
     }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
+    LOG(WARNING) << "SimulatorRobotSingleton called without setting the SimulatorRobot first" << std::endl;
     return 0.0f;
+}
+
+unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func) {
+    if (simulator_robot)
+    {
+        return func(simulator_robot);
+    }
+    LOG(WARNING) << "SimulatorRobotSingleton called without setting the SimulatorRobot first" << std::endl;
+    return 0;
+}
+
+
+float SimulatorRobotSingleton::getPositionX()
+{
+    return checkValidAndReturnFloat([](auto robot) {return robot->getPositionX();});
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getPositionY();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getPositionY();});
 }
 
 float SimulatorRobotSingleton::getOrientation()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getOrientation();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getOrientation();});
 }
 
 float SimulatorRobotSingleton::getVelocityX()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getVelocityX();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getVelocityX();});
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getVelocityY();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getVelocityY();});
 }
 
 float SimulatorRobotSingleton::getVelocityAngular()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getVelocityAngular();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getVelocityAngular();});
 }
 
 float SimulatorRobotSingleton::getBatteryVoltage()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getBatteryVoltage();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getBatteryVoltage();});
 }
 
 void SimulatorRobotSingleton::kick(float speed_m_per_s)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->kick(speed_m_per_s);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([speed_m_per_s](auto robot) {robot->kick(speed_m_per_s);});
 }
 
 void SimulatorRobotSingleton::chip(float distance_m)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->chip(distance_m);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([distance_m](auto robot) {robot->chip(distance_m);});
 }
 
 void SimulatorRobotSingleton::enableAutokick(float speed_m_per_s)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->enableAutokick(speed_m_per_s);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([speed_m_per_s](auto robot) {robot->enableAutokick(speed_m_per_s);});
 }
 
 void SimulatorRobotSingleton::enableAutochip(float distance_m)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->enableAutochip(distance_m);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([distance_m](auto robot) {robot->enableAutochip(distance_m);});
 }
 
 void SimulatorRobotSingleton::disableAutokick()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->disableAutokick();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->disableAutokick();});
 }
 
 void SimulatorRobotSingleton::disableAutochip()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->disableAutochip();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->disableAutochip();});
 }
 
 void SimulatorRobotSingleton::setDribblerSpeed(uint32_t rpm)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->setDribblerSpeed(rpm);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([rpm](auto robot) {robot->setDribblerSpeed(rpm);});
 }
 
 unsigned int SimulatorRobotSingleton::getDribblerTemperatureDegC()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getDribblerTemperatureDegC();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0;
+    return checkValidAndReturnUint([](auto robot) {return robot->getDribblerTemperatureDegC();});
 }
 
 void SimulatorRobotSingleton::dribblerCoast()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->dribblerCoast();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->dribblerCoast();});
 }
 
 void SimulatorRobotSingleton::applyWheelForceFrontLeft(float force_in_newtons)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->applyWheelForceFrontLeft(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontLeft(force_in_newtons);});
 }
 
 void SimulatorRobotSingleton::applyWheelForceBackLeft(float force_in_newtons)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->applyWheelForceBackLeft(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackLeft(force_in_newtons);});
 }
 
 void SimulatorRobotSingleton::applyWheelForceBackRight(float force_in_newtons)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->applyWheelForceBackRight(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackRight(force_in_newtons);});
 }
 
 void SimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
 {
-    if (simulator_robot)
-    {
-        simulator_robot->applyWheelForceFrontRight(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontRight(force_in_newtons);});
 }
 
 float SimulatorRobotSingleton::getMotorSpeedFrontLeft()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getMotorSpeedFrontLeft();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontLeft();});
 }
 
 float SimulatorRobotSingleton::getMotorSpeedBackLeft()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getMotorSpeedBackLeft();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackLeft();});
 }
 
 float SimulatorRobotSingleton::getMotorSpeedBackRight()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getMotorSpeedBackRight();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackRight();});
 }
 
 float SimulatorRobotSingleton::getMotorSpeedFrontRight()
 {
-    if (simulator_robot)
-    {
-        return simulator_robot->getMotorSpeedFrontRight();
-    }
-    LOG(WARNING)
-        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-        << std::endl;
-    return 0.0f;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontRight();});
 }
 
 void SimulatorRobotSingleton::coastMotorFrontLeft()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->coastMotorFrontLeft();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorFrontLeft();});
 }
 
 void SimulatorRobotSingleton::coastMotorBackLeft()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->coastMotorBackLeft();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorBackLeft();});
 }
 
 void SimulatorRobotSingleton::coastMotorBackRight()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->coastMotorBackRight();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorBackRight();});
 }
 
 void SimulatorRobotSingleton::coastMotorFrontRight()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->coastMotorFrontRight();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorFrontRight();});
 }
 
 void SimulatorRobotSingleton::brakeMotorFrontLeft()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->brakeMotorFrontLeft();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontLeft();});
 }
 
 void SimulatorRobotSingleton::brakeMotorBackLeft()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->brakeMotorBackLeft();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackLeft();});
 }
 
 void SimulatorRobotSingleton::brakeMotorBackRight()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->brakeMotorBackRight();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackRight();});
 }
 
 void SimulatorRobotSingleton::brakeMotorFrontRight()
 {
-    if (simulator_robot)
-    {
-        simulator_robot->brakeMotorFrontRight();
-    }
-    else
-    {
-        LOG(WARNING)
-            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
-            << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontRight();});
 }

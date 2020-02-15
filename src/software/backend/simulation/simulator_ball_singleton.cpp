@@ -24,50 +24,32 @@ SimulatorBallSingleton::createFirmwareBall()
                                                                 FirmwareBallDeleter());
 }
 
-float SimulatorBallSingleton::getBallPositionX()
-{
-    if (simulator_ball)
-    {
-        return simulator_ball->position().x();
+float SimulatorBallSingleton::checkValidAndReturnFloat(std::function<float(std::shared_ptr<SimulatorBall>)> func) {
+    if(simulator_ball) {
+        return func(simulator_ball);
     }
     LOG(WARNING)
         << "SimulatorBallSingleton called without setting the SimulatorBall first"
         << std::endl;
     return 0.0f;
+}
+
+float SimulatorBallSingleton::getBallPositionX()
+{
+    checkValidAndReturnFloat([](auto ball) {return ball->position().x();});
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    if (simulator_ball)
-    {
-        return simulator_ball->position().y();
-    }
-    LOG(WARNING)
-        << "SimulatorBallSingleton called without setting the SimulatorBall first"
-        << std::endl;
-    return 0.0f;
+    checkValidAndReturnFloat([](auto ball) {return ball->position().y();});
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    if (simulator_ball)
-    {
-        return simulator_ball->velocity().x();
-    }
-    LOG(WARNING)
-        << "SimulatorBallSingleton called without setting the SimulatorBall first"
-        << std::endl;
-    return 0.0f;
+    checkValidAndReturnFloat([](auto ball) {return ball->velocity().x();});
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    if (simulator_ball)
-    {
-        return simulator_ball->velocity().y();
-    }
-    LOG(WARNING)
-        << "SimulatorBallSingleton called without setting the SimulatorBall first"
-        << std::endl;
-    return 0.0f;
+    checkValidAndReturnFloat([](auto ball) {return ball->velocity().y();});
 }

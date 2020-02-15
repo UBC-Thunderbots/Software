@@ -7,8 +7,7 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
       autokick_speed_m_per_s(std::nullopt),
       autochip_distance_m(std::nullopt),
-      dribbler_rpm(0),
-      ball_in_dribbler_area(nullptr)
+      dribbler_rpm(0)
 {
     if (auto robot = this->physics_robot.lock())
     {
@@ -31,34 +30,45 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     }
 }
 
-unsigned int SimulatorRobot::getRobotId()
-{
+void SimulatorRobot::checkValidAndExecuteVoid(std::function<void(std::shared_ptr<PhysicsRobot>)> func) {
+    if (auto robot = physics_robot.lock()) {
+        func(robot);
+    }else {
+        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
+    }
+}
+
+float SimulatorRobot::checkValidAndReturnFloat(std::function<float(std::shared_ptr<PhysicsRobot>)> func) {
     if (auto robot = physics_robot.lock())
     {
-        return robot->getRobotId();
+        return func(robot);
+    }
+    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
+    return 0.0f;
+}
+
+unsigned int SimulatorRobot::checkValidAndReturnUint(std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func) {
+    if (auto robot = physics_robot.lock())
+    {
+        return func(robot);
     }
     LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
     return 0;
 }
 
+unsigned int SimulatorRobot::getRobotId()
+{
+    return checkValidAndReturnUint([](auto robot) { return robot->getRobotId(); });
+}
+
 float SimulatorRobot::getPositionX()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->position().x();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->position().x();});
 }
 
 float SimulatorRobot::getPositionY()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->position().y();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->position().y();});
 }
 
 Point SimulatorRobot::position()
@@ -68,32 +78,17 @@ Point SimulatorRobot::position()
 
 float SimulatorRobot::getOrientation()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->orientation().toRadians();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->orientation().toRadians();});
 }
 
 float SimulatorRobot::getVelocityX()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->velocity().x();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->velocity().x();});
 }
 
 float SimulatorRobot::getVelocityY()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->velocity().y();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->velocity().y();});
 }
 
 Vector SimulatorRobot::velocity()
@@ -103,12 +98,7 @@ Vector SimulatorRobot::velocity()
 
 float SimulatorRobot::getVelocityAngular()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->angularVelocity().toRadians();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->angularVelocity().toRadians();});
 }
 
 float SimulatorRobot::getBatteryVoltage()
@@ -122,52 +112,40 @@ float SimulatorRobot::getBatteryVoltage()
 
 void SimulatorRobot::kick(float speed_m_per_s)
 {
-    if (auto robot = physics_robot.lock())
-    {
-        if (ball_in_dribbler_area)
+    checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
+        for(auto ball : this->balls_in_dribbler_area)
         {
             Vector kick_vector = Vector::createFromAngle(
-                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+                    robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
             kick_vector = kick_vector.normalize(speed_m_per_s);
-            ball_in_dribbler_area->kick(kick_vector);
+            ball->kick(kick_vector);
         }
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    });
 }
 
 void SimulatorRobot::chip(float distance_m)
 {
-    if (auto robot = physics_robot.lock())
-    {
-        if (ball_in_dribbler_area)
+    checkValidAndExecuteVoid([this, distance_m](auto robot) {
+        for(auto ball : this->balls_in_dribbler_area)
         {
             Vector chip_vector = Vector::createFromAngle(
-                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+                    robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
             chip_vector = chip_vector.normalize(distance_m);
-            ball_in_dribbler_area->chip(chip_vector);
+            ball->chip(chip_vector);
         }
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    });
 }
 
 void SimulatorRobot::enableAutokick(float speed_m_per_s)
 {
     autokick_speed_m_per_s = speed_m_per_s;
-    autochip_distance_m = std::nullopt;
+    disableAutochip();
 }
 
 void SimulatorRobot::enableAutochip(float distance_m)
 {
     autochip_distance_m = distance_m;
-    autokick_speed_m_per_s = std::nullopt;
+    disableAutokick();
 }
 
 void SimulatorRobot::disableAutokick()
@@ -199,94 +177,42 @@ void SimulatorRobot::dribblerCoast()
 
 void SimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons)
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->applyWheelForceFrontLeft(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontLeft(force_in_newtons);});
 }
 
 void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons)
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->applyWheelForceBackLeft(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackLeft(force_in_newtons);});
 }
 
 void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons)
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->applyWheelForceBackRight(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackRight(force_in_newtons);});
 }
 
 void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons)
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->applyWheelForceFrontRight(force_in_newtons);
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontRight(force_in_newtons);});
 }
 
 float SimulatorRobot::getMotorSpeedFrontLeft()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->getMotorSpeedFrontLeft();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontLeft();});
 }
 
 float SimulatorRobot::getMotorSpeedBackLeft()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->getMotorSpeedBackLeft();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackLeft();});
 }
 
 float SimulatorRobot::getMotorSpeedBackRight()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->getMotorSpeedBackRight();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackRight();});
 }
 
 float SimulatorRobot::getMotorSpeedFrontRight()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        return robot->getMotorSpeedFrontRight();
-    }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
-    return 0.0;
+    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontRight();});
 }
 
 void SimulatorRobot::coastMotorFrontLeft()
@@ -311,54 +237,22 @@ void SimulatorRobot::coastMotorFrontRight()
 
 void SimulatorRobot::brakeMotorFrontLeft()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->brakeMotorFrontLeft();
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontLeft();});
 }
 
 void SimulatorRobot::brakeMotorBackLeft()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->brakeMotorBackLeft();
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackLeft();});
 }
 
 void SimulatorRobot::brakeMotorBackRight()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->brakeMotorBackRight();
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackRight();});
 }
 
 void SimulatorRobot::brakeMotorFrontRight()
 {
-    if (auto robot = physics_robot.lock())
-    {
-        robot->brakeMotorFrontRight();
-    }
-    else
-    {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
+    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontRight();});
 }
 
 void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
@@ -423,19 +317,21 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
         dribble_force_vector = dribble_force_vector.normalize(dribble_force_magnitude);
 
         physics_ball->applyForce(dribble_force_vector);
-
-        std::cout << "applied force " << dribble_force_vector << std::endl;
     }
 }
 
 void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
                                                 PhysicsBall *physics_ball)
 {
-    ball_in_dribbler_area = physics_ball;
+    balls_in_dribbler_area.emplace_back(physics_ball);
 }
 
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
                                               PhysicsBall *physics_ball)
 {
-    ball_in_dribbler_area = nullptr;
+    auto iter = std::find(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(), physics_ball);
+
+    if(iter != balls_in_dribbler_area.end()) {
+        balls_in_dribbler_area.erase(iter);
+    }
 }

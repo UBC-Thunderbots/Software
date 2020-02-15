@@ -89,6 +89,15 @@ class SimulatorBallSingleton
      */
     static float getBallVelocityY();
 
+    /**
+     * Helper functions that check if the pointer to the simulator_ball is valid before
+     * calling the given function. If the simulator_ball is invalid, a warning is logged
+     * and a default value is returned.
+     *
+     * @param func The function to perform on the simulator ball
+     */
+    static float checkValidAndReturnFloat(std::function<float(std::shared_ptr<SimulatorBall>)> func);
+
     // The simulator ball being controlled by this class
     static std::shared_ptr<SimulatorBall> simulator_ball;
 };

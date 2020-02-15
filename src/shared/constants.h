@@ -67,12 +67,16 @@ const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
  * measured from the front of the robots in degrees
  * For 3rd generation robot 2015 CAD model
  * Last updated: Feb 3, 2018
- * /--------------------------------------------------------------------\
- * | ANGLE_TO_ROBOT_FRONT_WHEELS_DEG | -ANGLE_TO_ROBOT_FRONT_WHEELS_DEG |
- * |                                                                    |
- * |                                                                    |
- * | ANGLE_TO_ROBOT_BACK_WHEELS_DEG  | -ANGLE_TO_ROBOT_BACK_WHEELS_DEG  |
- * \--------------------------------------------------------------------/
+ *
+ * FW = ANGLE_TO_ROBOT_FRONT_WHEELS_DEG
+ * BW = ANGLE_TO_ROBOT_BACK_WHEELS_DEG
+ *
+ * /-------------\
+ * |FW    |   -FW|
+ * |             |
+ * |             |
+ * |BW    |   -BW|
+ * \-------------/
  */
 const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
 const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;

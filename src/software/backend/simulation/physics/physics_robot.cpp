@@ -114,19 +114,16 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double dribbler_dept
     robot_dribbler_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_DRIBBLER, this});
 
-    // Box2D requires that polygon vertices are specified in counter-clockwise order
+    // Box2D requires that polygon vertices are specified in counter-clockwise order.
+    // The fixture shape is added relative to the body in its local coordinate frame,
+    // so we do not need to rotate the points to match the orientation of the robot.
     const unsigned int num_vertices              = 4;
     b2Vec2 dribbler_shape_vertices[num_vertices] = {
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0)
-                       .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
-                         DRIBBLER_WIDTH_METERS / 2.0)
-                       .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
-                         -DRIBBLER_WIDTH_METERS / 2.0)
-                       .rotate(robot.orientation())),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0)
-                       .rotate(robot.orientation()))};
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,-DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0))
+    };
     b2PolygonShape* dribbler_shape = new b2PolygonShape();
     dribbler_shape->Set(dribbler_shape_vertices, num_vertices);
     robot_dribbler_fixture_def.shape = dribbler_shape;
@@ -147,23 +144,23 @@ void PhysicsRobot::setupChickerFixture(const Robot& robot, double total_chicker_
     robot_chicker_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_CHICKER, this});
 
-    // Box2D requires that polygon vertices are specified in counter-clockwise order
+    // Box2D requires that polygon vertices are specified in counter-clockwise order.
+    // The fixture shape is added relative to the body in its local coordinate frame,
+    // so we do not need to rotate the points to match the orientation of the robot.
     const unsigned int num_vertices             = 4;
     b2Vec2 chicker_shape_vertices[num_vertices] = {
         createVec2(
             Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth + chicker_thickness,
-                  DRIBBLER_WIDTH_METERS / 2.0)
-                .rotate(robot.orientation())),
+                  DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth,
-                         DRIBBLER_WIDTH_METERS / 2.0)
-                       .rotate(robot.orientation())),
+                         DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth,
-                         -DRIBBLER_WIDTH_METERS / 2.0)
-                       .rotate(robot.orientation())),
+                         -DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(
             Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth + chicker_thickness,
-                  -DRIBBLER_WIDTH_METERS / 2.0)
-                .rotate(robot.orientation()))};
+                  -DRIBBLER_WIDTH_METERS / 2.0))
+    };
+
     b2PolygonShape* chicker_shape = new b2PolygonShape();
     chicker_shape->Set(chicker_shape_vertices, num_vertices);
     robot_chicker_fixture_def.shape = chicker_shape;

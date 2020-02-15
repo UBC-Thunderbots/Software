@@ -7,6 +7,9 @@
 extern "C"
 {
 #include "firmware/main/app/world/firmware_robot.h"
+#include "firmware/main/app/world/wheel.h"
+#include "firmware/main/app/world/chicker.h"
+#include "firmware/main/app/world/dribbler.h"
 #include "firmware/main/shared/physics.h"
 }
 
@@ -23,8 +26,27 @@ struct FirmwareRobotDeleter
 {
     void operator()(FirmwareRobot_t* firmware_robot) const
     {
-        // TODO: Make sure all objects de-allocated properly
-        // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
+        Wheel_t* front_left_wheel = app_firmware_robot_getFrontLeftWheel(firmware_robot);
+        app_wheel_destroy(front_left_wheel);
+
+        Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot);
+        app_wheel_destroy(back_left_wheel);
+
+        Wheel_t* back_right_wheel = app_firmware_robot_getBackRightWheel(firmware_robot);
+        app_wheel_destroy(back_right_wheel);
+
+        Wheel_t* front_right_wheel = app_firmware_robot_getFrontRightWheel(firmware_robot);
+        app_wheel_destroy(front_right_wheel);
+
+        Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot);
+        app_chicker_destroy(chicker);
+
+        Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot);
+        app_dribbler_destroy(dribbler);
+
+        ControllerState_t* controller_state = app_firmware_robot_getControllerState(firmware_robot);
+        delete controller_state;
+
         app_firmware_robot_destroy(firmware_robot);
     };
 };
@@ -213,6 +235,17 @@ class SimulatorRobotSingleton
     static void brakeMotorBackRight();
     static void brakeMotorFrontLeft();
     static void brakeMotorFrontRight();
+
+    /**
+     * Helper functions that check if the pointer to the simulator_robot is valid before
+     * calling the given function. If the simulator_robot is invalid, a warning is logged and
+     * a default value is returned.
+     *
+     * @param func The function to perform on the simulator robot
+     */
+    static void checkValidAndExecuteVoid(std::function<void(std::shared_ptr<SimulatorRobot>)> func);
+    static float checkValidAndReturnFloat(std::function<float(std::shared_ptr<SimulatorRobot>)> func);
+    static unsigned int checkValidAndReturnUint(std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func);
 
     // The simulator robot being controlled by this class
     static std::shared_ptr<SimulatorRobot> simulator_robot;
