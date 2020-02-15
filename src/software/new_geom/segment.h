@@ -83,7 +83,7 @@ class Segment final
      *
      * @return true if this segment contains the given point, false otherwise
      */
-    bool contains(const Point& point)
+    bool contains(const Point& point) const
     {
         if (collinear(point, getSegStart(), getEnd()))
         {

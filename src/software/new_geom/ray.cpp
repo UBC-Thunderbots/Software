@@ -49,7 +49,7 @@ Vector Ray::toUnitVector() const
     return Vector::createFromAngle(direction_);
 }
 
-bool Ray::contains(const Point& point)
+bool Ray::contains(const Point& point) const
 {
     Point point_in_ray_direction = getStart() + toUnitVector();
 

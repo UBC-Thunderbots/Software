@@ -82,7 +82,7 @@ class Ray final
      *
      * @return true if this ray contains the given point, false otherwise
      */
-    bool contains(const Point& point);
+    bool contains(const Point& point) const;
 
    private:
     /**

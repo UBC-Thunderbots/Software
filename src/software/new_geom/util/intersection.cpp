@@ -1,7 +1,6 @@
 #include "software/new_geom/util/intersection.h"
 
 #include "software/new_geom/util/collinear.h"
-#include "software/new_geom/util/contains.h"
 
 /**
  * Computes the point of intersection between two lines.
@@ -96,8 +95,8 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     // If there exists a single intersection, and it exists on the ray and within the
     // segment
     if (point_of_intersection.has_value() &&
-        contains(ray, point_of_intersection.value()) &&
-        contains(segment, point_of_intersection.value()))
+        ray.contains(point_of_intersection.value()) &&
+        segment.contains(point_of_intersection.value()))
     {
         intersections = {point_of_intersection.value()};
         return intersections;
