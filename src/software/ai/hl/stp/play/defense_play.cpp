@@ -88,10 +88,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
                     crease_defender_tactic->getAssignedRobot()->id());
             }
         }
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         friendly_team_for_goalie, world.enemyTeam());
-        shoot_goal_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                             world.enemyTeam(), world.ball());
         shoot_goal_tactic->updateControlParams(std::nullopt);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, shoot_goal_tactic};
@@ -99,8 +95,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Update crease defenders
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
-            crease_defender_tactic->updateWorldParams(
-                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             result.emplace_back(crease_defender_tactic);
         }
 
@@ -108,8 +102,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         // extra friendly robots, have them perform a reasonable default defensive tactic
         if (enemy_threats.size() > 0)
         {
-            defense_shadow_enemy_tactic->updateWorldParams(
-                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
             defense_shadow_enemy_tactic->updateControlParams(enemy_threats.at(1));
             result.emplace_back(defense_shadow_enemy_tactic);
         }
@@ -122,8 +114,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         if (enemy_threats.size() > 1)
         {
-            shadow_enemy_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                                   world.enemyTeam(), world.ball());
             shadow_enemy_tactic->updateControlParams(enemy_threats.at(0),
                                                      ROBOT_MAX_RADIUS_METERS * 3);
             result.emplace_back(shadow_enemy_tactic);

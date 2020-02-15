@@ -108,11 +108,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -130,11 +126,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -180,15 +172,6 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished";
 }
 
-void FreeKickPlay::updateCherryPickTactics(
-    std::vector<std::shared_ptr<CherryPickTactic>> tactics)
-{
-    for (auto &tactic : tactics)
-    {
-        tactic->updateWorldParams(world);
-    }
-}
-
 void FreeKickPlay::updateAlignToBallTactic(
     std::shared_ptr<MoveTactic> align_to_ball_tactic)
 {
@@ -205,22 +188,6 @@ void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());
-}
-
-void FreeKickPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
-{
-    shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                    world.enemyTeam(), world.ball());
-}
-
-void FreeKickPlay::updateCreaseDefenderTactics(
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders)
-{
-    for (auto &crease_defender : crease_defenders)
-    {
-        crease_defender->updateWorldParams(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
-    }
 }
 
 void FreeKickPlay::chipAtGoalStage(
@@ -242,11 +209,7 @@ void FreeKickPlay::chipAtGoalStage(
     {
         double chip_dist = (chip_target - world.ball().position()).length();
 
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        chip_tactic->updateWorldParams(world.ball());
         chip_tactic->updateControlParams(world.ball().position(), chip_target, chip_dist);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
@@ -276,14 +239,8 @@ void FreeKickPlay::performPassStage(
                                          world.enemyTeam(), pass, world.ball(), false);
     do
     {
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        passer->updateWorldParams(world.ball());
         passer->updateControlParams(pass);
-        receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
-                                    world.ball());
         receiver->updateControlParams(pass);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
@@ -307,12 +264,7 @@ void FreeKickPlay::shootOrFindPassStage(
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
-        updateShootGoalTactic(shoot_tactic);
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),

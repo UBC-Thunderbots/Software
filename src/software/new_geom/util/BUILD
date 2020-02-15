@@ -77,7 +77,6 @@ cc_library(
         "distance.h",
     ],
     deps = [
-        "//software/geom",
         "//software/new_geom:angle",
         "//software/new_geom:geom_constants",
         "//software/new_geom:line",
@@ -106,6 +105,7 @@ cc_test(
     ],
     deps = [
         ":distance",
+        "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
     ],
 )

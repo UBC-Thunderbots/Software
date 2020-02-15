@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/action_visitor.h"
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
@@ -29,7 +29,7 @@ class PivotAction : public Action
     void updateControlParams(const Robot& robot, Point pivot_point, Angle final_angle,
                              Angle pivot_speed, DribblerEnable enable_dribbler);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -47,7 +47,7 @@ double KickAction::getKickSpeed()
     return kick_speed_meters_per_second;
 }
 
-void KickAction::accept(ActionVisitor &visitor) const
+void KickAction::accept(MutableActionVisitor &visitor)
 {
     visitor.visit(*this);
 }
