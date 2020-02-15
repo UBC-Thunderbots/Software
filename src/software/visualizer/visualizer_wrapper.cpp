@@ -50,8 +50,7 @@ void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv)
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    std::shared_ptr<ThunderbotsConfig> config =
-            std::make_shared<ThunderbotsConfig>();
+    std::shared_ptr<ThunderbotsConfig> config = std::make_shared<ThunderbotsConfig>();
     Visualizer* visualizer =
         new Visualizer(world_draw_functions_buffer, ai_draw_functions_buffer,
                        play_info_buffer, robot_status_buffer, view_area_buffer, config);

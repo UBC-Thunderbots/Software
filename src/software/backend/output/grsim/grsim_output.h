@@ -6,10 +6,10 @@
 #include "software/ai/primitive/primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/parameter/config.hpp"
 #include "software/proto/grSim_Packet.pb.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
-#include "software/parameter/config.hpp"
 
 
 class GrSimOutput
@@ -21,7 +21,8 @@ class GrSimOutput
      * @param network_address The IP address to publish grSim commands to
      * @param port The port to publish commands to
      */
-    explicit GrSimOutput(std::string network_address, unsigned short port, std::shared_ptr<const RefboxConfig> config);
+    explicit GrSimOutput(std::string network_address, unsigned short port,
+                         std::shared_ptr<const RefboxConfig> config);
 
     ~GrSimOutput();
 

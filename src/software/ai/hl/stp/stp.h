@@ -26,8 +26,7 @@ class STP : public HL
      * The default value is 0
      */
     explicit STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-                 std::shared_ptr<const AIControlConfig> config,
-                 long random_seed = 0);
+                 std::shared_ptr<const AIControlConfig> config, long random_seed = 0);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 

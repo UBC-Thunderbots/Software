@@ -5,7 +5,11 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/visualizer/drawing/navigator.h"
 
-AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> config, std::shared_ptr<const AIControlConfig> control_config) : ai(config, control_config), control_config(control_config) {}
+AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> config,
+                     std::shared_ptr<const AIControlConfig> control_config)
+    : ai(config, control_config), control_config(control_config)
+{
+}
 
 void AIWrapper::onValueReceived(World world)
 {

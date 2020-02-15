@@ -10,7 +10,9 @@ void SimulatedTest::SetUp()
         Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
         SimulatorBackend::SimulationSpeed::FAST_SIMULATION);
     world_state_validator = std::make_shared<WorldStateValidator>();
-    ai_wrapper = std::make_shared<AIWrapper>(Util::DynamicParameters->getAIConfig(), Util::DynamicParameters->getAIControlConfig());
+    ai_wrapper =
+        std::make_shared<AIWrapper>(Util::DynamicParameters->getAIConfig(),
+                                    Util::DynamicParameters->getAIControlConfig());
 
     // The world_state_observer observes the World from the backend, and then the ai
     // observes the World from the WorldStateObserver. Because we know the AI will not
