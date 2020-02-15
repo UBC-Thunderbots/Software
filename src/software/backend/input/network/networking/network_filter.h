@@ -23,7 +23,7 @@ class NetworkFilter
     /**
      * Creates a new NetworkFilter for data input and filtering
      */
-    explicit NetworkFilter(std::shared_ptr<RefboxConfig> config);
+    explicit NetworkFilter(std::shared_ptr<const RefboxConfig> config);
 
 
     /**
@@ -97,7 +97,7 @@ class NetworkFilter
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
 
-    std::shared_ptr<RefboxConfig> config;
+    std::shared_ptr<const RefboxConfig> config;
 
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.

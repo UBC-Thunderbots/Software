@@ -28,7 +28,7 @@ struct overload : Ts...
 template <class... Ts>
 overload(Ts...)->overload<Ts...>;
 
-GrSimOutput::GrSimOutput(std::string network_address, unsigned short port, std::shared_ptr<RefboxConfig> config)
+GrSimOutput::GrSimOutput(std::string network_address, unsigned short port, std::shared_ptr<const RefboxConfig> config)
     : network_address(network_address), port(port), config(config), socket(io_service)
 {
     socket.open(ip::udp::v4());

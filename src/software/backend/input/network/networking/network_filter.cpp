@@ -10,7 +10,7 @@
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
-NetworkFilter::NetworkFilter(std::shared_ptr<RefboxConfig> config)
+NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> config)
     : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
       friendly_team_state(Duration::fromMilliseconds(

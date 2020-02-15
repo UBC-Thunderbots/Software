@@ -26,7 +26,7 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
 {
    public:
     STPRefboxGameStatePlaySelectionTestWithPositions()
-        : stp([]() { return std::make_unique<HaltPlay>(); }, config, 0)
+        : stp([]() { return std::make_unique<HaltPlay>(); }, std::make_shared<const AIControlConfig>(), 0)
     {
     }
 
@@ -190,7 +190,7 @@ class STPRefboxGameStatePlaySelectionTest
       public ::testing::WithParamInterface<RefboxGameState>
 {
    public:
-    STPRefboxGameStatePlaySelectionTest() : stp([]() { return nullptr; }) {}
+    STPRefboxGameStatePlaySelectionTest() : stp([]() { return nullptr; }, std::make_shared<const AIControlConfig>(), 0) {}
 
    protected:
     void SetUp() override
