@@ -9,7 +9,6 @@
 #include <random>
 
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
@@ -255,7 +254,7 @@ void STP::assignRobotsToTactics(const World& world,
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 {
     std::vector<std::unique_ptr<Play>> applicable_plays;
-    for (const auto& play_constructor : PlayFactory::getRegisteredPlayConstructors())
+    for (const auto& play_constructor : GenericFactory<std::string,Play>::getRegisteredConstructors())
     {
         auto play = play_constructor();
         if (play->isApplicable(world))

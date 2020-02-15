@@ -7,11 +7,11 @@ cc_library(
     deps = [
         "//software/ai/hl",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_manager",
         "//software/parameter:dynamic_parameters",
+        "//software/util/design_patterns:generic_factory",
         "@munkres_cpp",
     ],
 )
@@ -29,6 +29,7 @@ cc_test(
         ":stp",
         "//software/ai/hl/stp/play:halt_play",
         "//software/test_util",
+        "//software/util/design_patterns:generic_factory",
         "//software/world",
         "@gtest//:gtest_main",
     ],
@@ -44,6 +45,7 @@ cc_test(
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
         "//software/test_util",
+        "//software/util/design_patterns:generic_factory",
         "@gtest//:gtest_main",
     ],
 )
@@ -53,10 +55,10 @@ cc_test(
     srcs = ["stp_test.cpp"],
     deps = [
         ":stp",
-        "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/play/test_plays:move_test_play",
         "//software/test_util",
+        "//software/util/design_patterns:generic_factory",
         "@gtest//:gtest_main",
     ],
 )

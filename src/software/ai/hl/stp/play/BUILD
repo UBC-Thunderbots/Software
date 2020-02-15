@@ -10,7 +10,6 @@ cc_library(
     hdrs = ["corner_kick_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/evaluation:ball",
         "//software/ai/evaluation:possession",
@@ -32,7 +31,6 @@ cc_library(
     hdrs = ["defense_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
@@ -60,7 +58,6 @@ cc_library(
     hdrs = ["enemy_freekick_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
@@ -83,7 +80,6 @@ cc_library(
     hdrs = ["example_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/util/design_patterns:generic_factory",
@@ -111,10 +107,8 @@ cc_library(
     hdrs = ["halt_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:stop_tactic",
-        "//software/util/design_patterns:generic_factory",
         "@g3log",
     ],
     alwayslink = True,
@@ -125,6 +119,7 @@ cc_test(
     srcs = ["halt_play_test.cpp"],
     deps = [
         ":halt_play",
+        ":play",
         "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
@@ -138,7 +133,6 @@ cc_library(
     deps = [
         ":corner_kick_play",
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/evaluation:ball",
         "//software/ai/evaluation:enemy_threat",
@@ -165,7 +159,6 @@ cc_library(
     hdrs = ["kickoff_enemy_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
@@ -185,7 +178,6 @@ cc_library(
     hdrs = ["kickoff_friendly_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
@@ -202,7 +194,6 @@ cc_library(
     hdrs = ["penalty_kick_enemy_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
@@ -218,7 +209,6 @@ cc_library(
     hdrs = ["penalty_kick_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
@@ -235,7 +225,6 @@ cc_library(
     hdrs = ["shoot_or_chip_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
@@ -262,7 +251,6 @@ cc_library(
     hdrs = ["shoot_or_pass_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:possession",
@@ -288,7 +276,6 @@ cc_library(
     hdrs = ["stop_play.h"],
     deps = [
         ":play",
-        ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
@@ -308,23 +295,23 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "play_factory",
-    srcs = ["play_factory.cpp"],
-    hdrs = ["play_factory.h"],
-    deps = [":play"],
-)
+#cc_library(
+#    name = "play_factory",
+#    srcs = ["play_factory.cpp"],
+#    hdrs = ["play_factory.h"],
+#    deps = [":play"],
+#)
 
-cc_test(
-    name = "play_factory_test",
-    srcs = ["play_factory_test.cpp"],
-    deps = [
-        ":play_factory",
-        "//software/ai/hl/stp/play/test_plays:halt_test_play",
-        "//software/ai/hl/stp/play/test_plays:move_test_play",
-        "@gtest//:gtest_main",
-    ],
-)
+#cc_test(
+#    name = "play_factory_test",
+#    srcs = ["play_factory_test.cpp"],
+#    deps = [
+#        ":play_factory",
+#        "//software/ai/hl/stp/play/test_plays:halt_test_play",
+#        "//software/ai/hl/stp/play/test_plays:move_test_play",
+#        "@gtest//:gtest_main",
+#    ],
+#)
 
 cc_library(
     name = "all_plays",

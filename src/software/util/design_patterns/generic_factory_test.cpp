@@ -1,9 +1,9 @@
-#include "software/util/design_patterns/generic_factory.cpp"
 
 #include <gtest/gtest.h>
 
 #include <exception>
 #include <iostream>
+#include "software/util/design_patterns/generic_factory.h"
 
 // Create and register two test generics with the factory here
 class testGeneric

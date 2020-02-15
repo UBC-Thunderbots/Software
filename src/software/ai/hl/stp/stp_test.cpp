@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <exception>
 
-#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/util/design_patterns/generic_factory.h"
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
 #include "software/test_util/test_util.h"
@@ -32,7 +32,7 @@ class STPTest : public ::testing::Test
 
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
-    auto play_names = PlayFactory::getRegisteredPlayNames();
+    auto play_names = GenericFactory<std::string,Play>::getRegisteredNames();
     EXPECT_EQ(2, play_names.size());
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), MoveTestPlay::name), 1);
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), HaltTestPlay::name), 1);
