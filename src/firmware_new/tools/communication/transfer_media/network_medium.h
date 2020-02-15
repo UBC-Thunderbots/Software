@@ -30,7 +30,7 @@ class NetworkMedium : public TransferMedium
      * @param local_ipaddr The local ip to connect to
      * @param port The port to bind to
      */
-    NetworkMedium(const std::string& local_ipaddr, unsigned port);
+    NetworkMedium(const std::string& multicast_address, unsigned multicast_port);
 
     /*
      * Packages the data and sends it through the medium
@@ -68,7 +68,7 @@ class NetworkMedium : public TransferMedium
     udp::endpoint local_endpoint;
 
     // remote endpoint w/ broadcast ip and given port
-    udp::endpoint broadcast_endpoint;
+    udp::endpoint multicast_endpoint;
 
     // socket to send/recv
     std::unique_ptr<udp::socket> socket;

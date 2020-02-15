@@ -11,19 +11,20 @@ using boost::asio::socket_base;
 using boost::asio::ip::address_v4;
 using boost::asio::ip::udp;
 
-NetworkMedium::NetworkMedium(const std::string& local_ipaddr, unsigned port)
+NetworkMedium::NetworkMedium(const std::string& multicast_address, unsigned multicast_port)
 {
     socket.reset(new udp::socket(io_service));
 
-    // TODO change to multicast after firmware is on RTOS
-    local_endpoint     = udp::endpoint(address_v4::any(), port);
-    broadcast_endpoint = udp::endpoint(address_v4::from_string(local_ipaddr), port);
+    local_endpoint     = udp::endpoint(address_v4::from_string("192.168.0.100"), multicast_port);
+    multicast_endpoint = udp::endpoint(address_v4::from_string(multicast_address), multicast_port);
 
     socket->open(local_endpoint.protocol());
+    socket->set_option(boost::asio::ip::multicast::outbound_interface(address_v4::from_string("192.168.0.100")));
+    socket->set_option(boost::asio::ip::multicast::join_group(address_v4::from_string(multicast_address)));
 
     try
     {
-        socket->bind(local_endpoint);
+        socket->bind(multicast_endpoint);
     }
     catch (const boost::exception& ex)
     {
@@ -57,7 +58,7 @@ NetworkMedium::~NetworkMedium()
 
 void NetworkMedium::send_data(const std::string& data)
 {
-    socket->send_to(boost::asio::buffer(data), broadcast_endpoint);
+    socket->send_to(boost::asio::buffer(data), multicast_endpoint);
 }
 
 void NetworkMedium::receive_data_async(std::function<void(std::string)> receive_callback)
@@ -65,7 +66,7 @@ void NetworkMedium::receive_data_async(std::function<void(std::string)> receive_
     this->receive_callback = receive_callback;
 
     socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
-                               broadcast_endpoint,
+                               multicast_endpoint,
                                boost::bind(&NetworkMedium::handle_data_reception, this,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
@@ -89,7 +90,7 @@ void NetworkMedium::handle_data_reception(const boost::system::error_code& error
     }
 
     socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
-                               broadcast_endpoint,
+                               multicast_endpoint,
                                boost::bind(&NetworkMedium::handle_data_reception, this,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
