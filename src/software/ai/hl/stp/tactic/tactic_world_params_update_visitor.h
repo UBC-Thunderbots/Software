@@ -36,6 +36,7 @@ class TacticWorldParamsUpdateVisitor : public MutableTacticVisitor
     void visit(DefenseShadowEnemyTactic &tactic) override;
     void visit(MoveTestTactic &tactic) override;
     void visit(StopTestTactic &tactic) override;
+    void visit(GoalieTestTactic &tactic) override;
 
    private:
     World world;

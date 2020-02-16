@@ -19,9 +19,9 @@
 #include <random>
 
 #include "shared/constants.h"
+#include "software/math/math_functions.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
-#include "software/util/math/math_functions.h"
-#include "software/util/parameter/dynamic_parameters.h"
 
 using namespace Passing;
 
@@ -159,7 +159,8 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
 
     std::chrono::duration<double> duration = end_time - start_time;
 
-    std::chrono::duration<double> avg = duration / (double)num_passes_to_gen;
+    std::chrono::duration<double> avg;
+    avg = duration / static_cast<double>(num_passes_to_gen);
 
     // At the time of this tests creation, ratePass ran at an average 0.105ms
     // in debug on an i7

@@ -5,6 +5,7 @@ cc_library(
     deps = [
         ":closest_point",
         ":distance",
+        ":intersects",
     ],
 )
 
@@ -26,6 +27,48 @@ cc_library(
 )
 
 cc_library(
+    name = "intersects",
+    srcs = [
+        "intersects.cpp",
+    ],
+    hdrs = [
+        "intersects.h",
+    ],
+    deps = [
+        "//software/geom",
+        "//software/new_geom:polygon",
+        "//software/new_geom:segment",
+    ],
+)
+
+cc_library(
+    name = "intersection",
+    srcs = [
+        "intersection.cpp",
+    ],
+    hdrs = [
+        "intersection.h",
+    ],
+    deps = [
+        "//software/geom",
+        "//software/new_geom:ray",
+        "//software/new_geom:rectangle",
+        "//software/new_geom:segment",
+    ],
+)
+
+cc_test(
+    name = "intersections_test",
+    srcs = [
+        "intersection_test.cpp",
+    ],
+    deps = [
+        ":intersection",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "distance",
     srcs = [
         "distance.cpp",
@@ -38,6 +81,8 @@ cc_library(
         "//software/new_geom:geom_constants",
         "//software/new_geom:line",
         "//software/new_geom:point",
+        "//software/new_geom:polygon",
+        "//software/new_geom:segment",
         "//software/new_geom:vector",
     ],
 )
@@ -60,6 +105,7 @@ cc_test(
     ],
     deps = [
         ":distance",
+        "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
     ],
 )

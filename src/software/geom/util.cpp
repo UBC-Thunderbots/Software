@@ -11,10 +11,12 @@
 #include <limits>
 #include <tuple>
 
-#include "software/geom/rectangle.h"
-#include "software/geom/segment.h"
 #include "software/geom/voronoi_diagram.h"
 #include "software/new_geom/angle.h"
+#include "software/new_geom/rectangle.h"
+#include "software/new_geom/segment.h"
+#include "software/new_geom/triangle.h"
+#include "software/new_geom/util/distance.h"
 
 double proj_length(const Segment &first, const Vector &second)
 {
@@ -26,129 +28,33 @@ double proj_length(const Vector &first, const Vector &second)
     return first.dot(second) / first.length();
 }
 
-double dist(const Point &first, const Point &second)
-{
-    return (first - second).length();
-}
-
-double dist(const Segment &first, const Segment &second)
-{
-    if (intersects(first, second))
-    {
-        return 0.0;
-    }
-    return std::sqrt(std::min(
-        std::min(distsq(first, second.getSegStart()), distsq(first, second.getEnd())),
-        std::min(distsq(second, first.getSegStart()), distsq(second, first.getEnd()))));
-}
-
-double dist(const Point &first, const Segment &second)
-{
-    return std::sqrt(distsq(first, second));
-}
-
-double dist(const Segment &first, const Point &second)
-{
-    return dist(second, first);
-}
-
-double dist(const Point &first, const Polygon &second)
-{
-    if (second.containsPoint(first))
-    {
-        return 0;
-    }
-
-    double min_dist = DBL_MAX;
-
-    // Calculate the distance from the point to each edge
-    for (auto &segment : second.getSegments())
-    {
-        double current_dist = dist(first, segment);
-        if (current_dist < min_dist)
-        {
-            min_dist = current_dist;
-        }
-    }
-    return min_dist;
-}
-
-double dist(const Point &first, const Rectangle &second)
-{
-    if (second.containsPoint(first))
-    {
-        return 0;
-    }
-
-    // Calculate the distance from the point to each edge of the rectangle
-    std::array<double, 4> distances = {
-        dist(first, Segment(second.posXPosYCorner(), second.posXNegYCorner())),
-        dist(first, Segment(second.posXNegYCorner(), second.negXNegYCorner())),
-        dist(first, Segment(second.negXNegYCorner(), second.negXPosYCorner())),
-        dist(first, Segment(second.negXPosYCorner(), second.posXPosYCorner()))};
-    return *std::min_element(distances.begin(), distances.end());
-}
-
-double distsq(const Point &first, const Segment &second)
-{
-    double seglensq    = lengthSquared(second);
-    Vector relsecond_s = first - second.getSegStart();
-    Vector relsecond_e = first - second.getEnd();
-
-    Vector s_vec2 = second.toVector();
-
-    if (s_vec2.dot(relsecond_s) > 0 && second.reverse().toVector().dot(relsecond_e) > 0)
-    {
-        if (isDegenerate(second))
-        {
-            return relsecond_s.length();
-        }
-        double cross = relsecond_s.cross(s_vec2);
-        return std::fabs(cross * cross / seglensq);
-    }
-
-    double lensq_s = distsq(second.getSegStart(), first),
-           lensq_e = distsq(second.getEnd(), first);
-
-    return std::min(lensq_s, lensq_e);
-}
-
-double distsq(const Segment &first, const Point &second)
-{
-    return distsq(second, first);
-}
-
-double distsq(const Point &first, const Point &second)
-{
-    return (first - second).lengthSquared();
-}
-
 bool isDegenerate(const Segment &segment)
 {
-    return distsq(segment.getSegStart(), segment.getEnd()) < EPS2;
+    return distanceSquared(segment.getSegStart(), segment.getEnd()) < EPS2;
 }
 
 double length(const Segment &segment)
 {
-    return dist(segment.getSegStart(), segment.getEnd());
+    return distance(segment.getSegStart(), segment.getEnd());
 }
 
 double lengthSquared(const Segment &segment)
 {
-    return distsq(segment.getSegStart(), segment.getEnd());
+    return distanceSquared(segment.getSegStart(), segment.getEnd());
 }
 
-bool contains(const LegacyTriangle &out, const Point &in)
+bool contains(const Triangle &out, const Point &in)
 {
-    double angle = 0;
+    double angle                 = 0;
+    std::vector<Point> outPoints = out.getPoints();
     for (int i = 0, j = 2; i < 3; j = i++)
     {
-        if ((in - out[i]).length() < EPS)
+        if ((in - outPoints[i]).length() < EPS)
         {
             return true;  // SPECIAL CASE
         }
-        double a =
-            atan2((out[i] - in).cross(out[j] - in), (out[i] - in).dot(out[j] - in));
+        double a = atan2((outPoints[i] - in).cross(outPoints[j] - in),
+                         (outPoints[i] - in).dot(outPoints[j] - in));
         angle += a;
     }
     return std::fabs(angle) > 6;
@@ -156,12 +62,12 @@ bool contains(const LegacyTriangle &out, const Point &in)
 
 bool contains(const Circle &out, const Point &in)
 {
-    return distsq(out.getOrigin(), in) <= out.getRadius() * out.getRadius();
+    return distanceSquared(out.getOrigin(), in) <= out.getRadius() * out.getRadius();
 }
 
 bool contains(const Circle &out, const Segment &in)
 {
-    return dist(in, out.getOrigin()) < out.getRadius();
+    return distance(in, out.getOrigin()) < out.getRadius();
 }
 
 bool contains(const Segment &out, const Point &in)
@@ -201,17 +107,19 @@ bool contains(const Ray &out, const Point &in)
 
 bool contains(const Rectangle &out, const Point &in)
 {
-    return out.containsPoint(in);
+    return out.contains(in);
 }
 
-bool intersects(const LegacyTriangle &first, const Circle &second)
+bool intersects(const Triangle &first, const Circle &second)
 {
+    std::vector<Segment> firstSegments = first.getSegments();
+
     return contains(first, second.getOrigin()) ||
-           dist(getSide(first, 0), second.getOrigin()) < second.getRadius() ||
-           dist(getSide(first, 1), second.getOrigin()) < second.getRadius() ||
-           dist(getSide(first, 2), second.getOrigin()) < second.getRadius();
+           distance(firstSegments[0], second.getOrigin()) < second.getRadius() ||
+           distance(firstSegments[1], second.getOrigin()) < second.getRadius() ||
+           distance(firstSegments[2], second.getOrigin()) < second.getRadius();
 }
-bool intersects(const Circle &first, const LegacyTriangle &second)
+bool intersects(const Circle &first, const Triangle &second)
 {
     return intersects(second, first);
 }
@@ -246,10 +154,11 @@ bool intersects(const Segment &first, const Circle &second)
 {
     // if the segment is inside the circle AND at least one of the points is
     // outside the circle
-    return contains(second, first) && (distsq(first.getSegStart(), second.getOrigin()) >
-                                           second.getRadius() * second.getRadius() ||
-                                       distsq(first.getEnd(), second.getOrigin()) >
-                                           second.getRadius() * second.getRadius());
+    return contains(second, first) &&
+           (distanceSquared(first.getSegStart(), second.getOrigin()) >
+                second.getRadius() * second.getRadius() ||
+            distanceSquared(first.getEnd(), second.getOrigin()) >
+                second.getRadius() * second.getRadius());
 }
 bool intersects(const Circle &first, const Segment &second)
 {
@@ -263,30 +172,6 @@ bool intersects(const Segment &first, const Segment &second)
                                               second.getEnd());  // similar code
 
     return boost::geometry::intersects(AB, CD);
-}
-
-template <size_t N>
-Point getVertex(const LegacyPolygon<N> &poly, unsigned int i)
-{
-    if (i > N)
-        throw std::out_of_range("poly does not have that many sides!!!");
-    else
-        return poly[i];
-}
-
-template <size_t N>
-void setVertex(LegacyPolygon<N> &poly, unsigned int i, const Vector &v)
-{
-    if (i > N)
-        throw std::out_of_range("poly does not have that many sides!!!");
-    else
-        poly[i] = v;
-}
-
-template <size_t N>
-Segment getSide(const LegacyPolygon<N> &poly, unsigned int i)
-{
-    return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
 
 std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points)
@@ -418,13 +303,14 @@ std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
     std::vector<Point> ans;
     for (unsigned int i = 0; i < 4; i++)
     {
-        const Point &a = r[i];
-        // to draw a line segment from point 3 to point 0
-        const Point &b = r[(i + 1) % 4];
-        if (intersects(Segment(a, b), Segment(segA, segB)) &&
-            uniqueLineIntersects(a, b, segA, segB))
+        Segment recSegment = r.getSegments()[i];
+        if (intersects(recSegment, Segment(segA, segB)) &&
+            uniqueLineIntersects(recSegment.getSegStart(), recSegment.getEnd(), segA,
+                                 segB))
         {
-            ans.push_back(lineIntersection(a, b, segA, segB).value());
+            ans.push_back(lineIntersection(recSegment.getSegStart(), recSegment.getEnd(),
+                                           segA, segB)
+                              .value());
         }
     }
     return ans;
@@ -794,18 +680,6 @@ Point segmentNearLine(Point a0, Point a1, Point b0, Point b1)
     p = a0 + v * t;
 
     return p;
-}
-
-Point intersection(Point a1, Point a2, Point b1, Point b2)
-{
-    Vector a = a2 - a1;
-
-    Vector b1r = (b1 - a1).rotate(-a.orientation());
-    Vector b2r = (b2 - a1).rotate(-a.orientation());
-    Vector br  = (b1r - b2r);
-
-    return Vector(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation()) +
-           a1;
 }
 
 Angle acuteVertexAngle(Vector v1, Vector v2)
@@ -1263,7 +1137,7 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
 
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
 {
-    if (rectangle.containsPoint(point))
+    if (rectangle.contains(point))
     {
         return 1;
     }
@@ -1294,7 +1168,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     // Filters out points that are outside of the bounding box
     points.erase(std::remove_if(points.begin(), points.end(),
                                 [&bounding_box](const Point &p) {
-                                    return !bounding_box.containsPoint(p);
+                                    return !bounding_box.contains(p);
                                 }),
                  points.end());
 
@@ -1312,9 +1186,9 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     {
         // If there is only 1 point, return circles centered at all four corners of the
         // bounding bounding_box.
-        for (Point &corner : bounding_box.corners())
+        for (const Point &corner : bounding_box.getPoints())
         {
-            empty_circles.emplace_back(Circle(corner, dist(points.front(), corner)));
+            empty_circles.emplace_back(Circle(corner, distance(points.front(), corner)));
         }
         return empty_circles;
     }
@@ -1330,14 +1204,15 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         std::vector<Point> intersects = lineRectIntersect(
             bounding_box,
             halfPoint +
-                (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)),
+                (perpVec * distance(bounding_box.furthestCorner(halfPoint), halfPoint)),
             halfPoint -
-                (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)));
-        std::vector<Point> corners = bounding_box.corners();
+                (perpVec * distance(bounding_box.furthestCorner(halfPoint), halfPoint)));
+        std::vector<Point> corners = bounding_box.getPoints();
         intersects.insert(intersects.end(), corners.begin(), corners.end());
         for (const Point &intersect : intersects)
         {
-            double radius = dist(findClosestPoint(intersect, points).value(), intersect);
+            double radius =
+                distance(findClosestPoint(intersect, points).value(), intersect);
             empty_circles.emplace_back(intersect, radius);
         }
         return empty_circles;
@@ -1348,10 +1223,10 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
 
     // The corners of the rectangles are locations for the centre of circles with their
     // radius being the distance to the corner's closest point.
-    for (const Point &corner : bounding_box.corners())
+    for (const Point &corner : bounding_box.getPoints())
     {
         Point closest = findClosestPoint(corner, points).value();
-        empty_circles.emplace_back(Circle(corner, dist(corner, closest)));
+        empty_circles.emplace_back(Circle(corner, distance(corner, closest)));
     }
 
     std::vector<Point> intersects = vd.findVoronoiEdgeRecIntersects(bounding_box);
@@ -1400,11 +1275,12 @@ std::optional<Point> findClosestPoint(const Point &origin_point,
 
     if (!test_points.empty())
     {
-        closest_point = *std::min_element(
-            test_points.begin(), test_points.end(),
-            [&](const Point &test_point1, const Point &test_point2) {
-                return dist(origin_point, test_point1) < dist(origin_point, test_point2);
-            });
+        closest_point =
+            *std::min_element(test_points.begin(), test_points.end(),
+                              [&](const Point &test_point1, const Point &test_point2) {
+                                  return distance(origin_point, test_point1) <
+                                         distance(origin_point, test_point2);
+                              });
     }
 
     return closest_point;

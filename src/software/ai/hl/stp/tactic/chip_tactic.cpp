@@ -44,7 +44,6 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     do
     {
-        chip_action->updateWorldParams(ball);
         chip_action->updateControlParams(*robot, chip_origin, chip_target,
                                          chip_distance_meters);
         yield(chip_action);

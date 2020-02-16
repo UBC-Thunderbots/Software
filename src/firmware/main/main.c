@@ -35,16 +35,21 @@
 #include <unused.h>
 #include <usb.h>
 
+#include "app/world/firmware_world.h"
+#include "control/control.h"
+#include "firmware/main/app/primitives/primitive.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
 #include "io/charger.h"
 #include "io/chicker.h"
 #include "io/dma.h"
 #include "io/dr.h"
+#include "io/dribbler.h"
 #include "io/encoder.h"
 #include "io/feedback.h"
 #include "io/icb.h"
 #include "io/leds.h"
+#include "io/lps.h"
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "io/pins.h"
@@ -52,7 +57,6 @@
 #include "io/sdcard.h"
 #include "io/usb_config.h"
 #include "io/wheels.h"
-#include "primitives/primitive.h"
 #include "priority.h"
 #include "tick.h"
 #include "upgrade/dfu.h"
@@ -182,7 +186,7 @@ static const usb_string_descriptor_t STRING_EN_CA_DFU_FW =
     USB_STRING_DESCRIPTOR_INITIALIZER(u"Firmware");
 static const usb_string_descriptor_t STRING_EN_CA_DFU_FPGA =
     USB_STRING_DESCRIPTOR_INITIALIZER(u"FPGA Bitstream");
-static const usb_string_descriptor_t *const STRINGS_EN_CA[] = {
+static const usb_string_descriptor_t* const STRINGS_EN_CA[] = {
     [STRING_INDEX_MANUFACTURER - 1U] = &STRING_EN_CA_MANUFACTURER,
     [STRING_INDEX_PRODUCT - 1U]      = &STRING_EN_CA_PRODUCT,
     [STRING_INDEX_PRODUCT_DFU - 1U]  = &STRING_EN_CA_PRODUCT_DFU,
@@ -203,7 +207,7 @@ const usb_string_zero_descriptor_t MAIN_STRING_ZERO = {
         },
 };
 
-static bool usb_control_handler(const usb_setup_packet_t *pkt)
+static bool usb_control_handler(const usb_setup_packet_t* pkt)
 {
     if (pkt->bmRequestType.recipient == USB_RECIPIENT_DEVICE &&
         pkt->bmRequestType.type == USB_CTYPE_VENDOR &&
@@ -334,7 +338,7 @@ void vApplicationIdleHook(void)
     asm volatile("isb");
 }
 
-static void main_task(void *param) __attribute__((noreturn));
+static void main_task(void* param) __attribute__((noreturn));
 
 static void stm32_main(void)
 {
@@ -414,7 +418,6 @@ static void run_normal(void)
     wheels_init();
     encoder_init();
     dr_init();
-    primitive_init();
     lps_init();
 
     // Bring up the data logger.
@@ -454,13 +457,62 @@ static void run_normal(void)
         exception_reboot_without_core = false;
     }
 
+    // Setup the world that acts as the interface for the higher level firmware
+    // (like primitives or the controller) to interface with the outside world
+    WheelConstants_t wheel_constants = {
+        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+        .wheel_radius                        = WHEEL_RADIUS,
+        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+        .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
+        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+    Wheel_t* front_right_wheel = app_wheel_create(
+        apply_wheel_force_front_right, wheels_get_front_right_rpm,
+        wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
+    Wheel_t* front_left_wheel = app_wheel_create(
+        apply_wheel_force_front_left, wheels_get_front_left_rpm, wheels_brake_front_left,
+        wheels_coast_front_left, wheel_constants);
+    Wheel_t* back_right_wheel = app_wheel_create(
+        apply_wheel_force_back_right, wheels_get_back_right_rpm, wheels_brake_back_right,
+        wheels_coast_back_right, wheel_constants);
+    Wheel_t* back_left_wheel =
+        app_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
+                         wheels_brake_back_left, wheels_coast_back_left, wheel_constants);
+    Chicker_t* chicker = app_chicker_create(
+        chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
+        chicker_auto_disarm, chicker_auto_disarm);
+    Dribbler_t* dribbler =
+        app_dribbler_create(dribbler_set_speed, dribbler_coast, dribbler_temperature);
+    const RobotConstants_t robot_constants = {
+        .mass              = ROBOT_POINT_MASS,
+        .moment_of_inertia = INERTIA,
+        .robot_radius      = ROBOT_RADIUS,
+        .jerk_limit        = JERK_LIMIT,
+    };
+    ControllerState_t controller_state = {
+        .last_applied_acceleration_x       = 0,
+        .last_applied_acceleration_y       = 0,
+        .last_applied_acceleration_angular = 0,
+    };
+    FirmwareRobot_t* robot = app_firmware_robot_create(
+        chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
+        dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
+        dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
+        back_right_wheel, back_left_wheel, &controller_state, robot_constants);
+    FirmwareBall_t* ball =
+        app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
+                                 dr_get_ball_velocity_x, dr_get_ball_velocity_y);
+    FirmwareWorld_t* world = app_firmware_world_create(robot, ball);
+
+    PrimitiveManager_t* primitive_manager = app_primitive_manager_create();
+
     // Receive must be the second-last module initialized, because received
     // packets can cause calls to other modules.
-    receive_init(switches[0U]);
+    receive_init(switches[0U], primitive_manager, world);
 
     // Ticks must be the last module initialized, because ticks propagate into
     // other modules.
-    tick_init();
+    tick_init(primitive_manager, world);
 
     // Done!
     fputs("System online.\r\n", stdout);
@@ -531,6 +583,17 @@ static void run_normal(void)
     charger_shutdown();
     motor_shutdown();
 
+    app_primitive_manager_destroy(primitive_manager);
+    app_firmware_world_destroy(world);
+    app_firmware_ball_destroy(ball);
+    app_firmware_robot_destroy(robot);
+    app_dribbler_destroy(dribbler);
+    app_chicker_destroy(chicker);
+    app_wheel_destroy(back_left_wheel);
+    app_wheel_destroy(back_right_wheel);
+    app_wheel_destroy(front_left_wheel);
+    app_wheel_destroy(front_right_wheel);
+
     // Kick the hardware watchdog to avoid timeouts. Chicker shutdown sometimes
     // takes up to three seconds, particularly if the board is not plugged in,
     // so that eats most of the timeout period.
@@ -579,7 +642,7 @@ static void run_safe_mode(void)
     fputs("System shutdown.\r\n", stdout);
 }
 
-static void main_task(void *UNUSED(param))
+static void main_task(void* UNUSED(param))
 {
     // Initialize DMA engines.
     // These are needed for a lot of other things so must come first.
@@ -744,6 +807,7 @@ static void main_task(void *UNUSED(param))
         case MAIN_SHUT_MODE_DFU:
             upgrade_dfu_run();
             // Fall through to reboot after DFU is done.
+            __attribute__((fallthrough));
         case MAIN_SHUT_MODE_REBOOT:
             asm volatile("cpsid i");
             asm volatile("dsb");
@@ -805,8 +869,8 @@ uint32_t main_read_clear_idle_cycles(void)
     return __atomic_exchange_n(&idle_cycles, 0, __ATOMIC_RELAXED);
 }
 
-void vApplicationGetIdleTaskMemory(StaticTask_t **tcb, StackType_t **stack,
-                                   uint32_t *stack_size)
+void vApplicationGetIdleTaskMemory(StaticTask_t** tcb, StackType_t** stack,
+                                   uint32_t* stack_size)
 {
     static StaticTask_t tcb_storage;
     *tcb = &tcb_storage;

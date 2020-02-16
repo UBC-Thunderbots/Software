@@ -16,7 +16,7 @@
 #include "adc.h"
 #include "breakbeam.h"
 #include "charger.h"
-#include "util/util.h"
+#include "shared/util.h"
 
 /**
  *  \brief Defines max limits for kicking and chipping.
@@ -473,11 +473,24 @@ static void chicker_fire_impl(chicker_device_t device, unsigned int width)
  * \param[in] device which device to fire
  * \param[in] width the width of the pulse, in kicking units
  */
-void chicker_fire(chicker_device_t device, unsigned int width)
+void chicker_fire_with_pulsewidth(chicker_device_t device, unsigned int width)
 {
     taskENTER_CRITICAL();
     chicker_fire_impl(device, width);
     taskEXIT_CRITICAL();
+}
+
+/**
+ * \brief Fires a device with the given power
+ * \param device The device to fire
+ * \param power The power to fire with. For the kicker this is the speed, in meters per
+ *              second. For the chipper this is the distance to the first bounce of the
+ *              ball
+ */
+void chicker_fire_with_power(chicker_device_t device, float power)
+{
+    unsigned int width = chicker_power_to_pulse_width(power, device == CHICKER_CHIP);
+    chicker_fire_with_pulsewidth(device, width);
 }
 
 /**
@@ -535,6 +548,44 @@ bool chicker_auto_fired_test_clear(void)
     bool ret;
     __atomic_exchange(&auto_fired, &NEW_VALUE, &ret, __ATOMIC_RELAXED);
     return ret;
+}
+
+/**
+ * \brief Fires the kicker with force required to move the ball at the given speed
+ * \param speed_m_per_s The speed that the ball would be kicked at, if it were right
+ *                      in front of the kicker
+ */
+void chicker_kick(float speed_m_per_s)
+{
+    chicker_fire_with_power(CHICKER_KICK, speed_m_per_s);
+}
+
+/**
+ * \brief Fires the chipper with force required to chip the ball the given distance
+ * \param distance_m The distance to the first bounce the ball would be chipped, if it
+ *                   were right in front of the chipper when the chipper fired
+ */
+void chicker_chip(float distance_m)
+{
+    chicker_fire_with_power(CHICKER_KICK, distance_m);
+}
+
+/**
+ * \brief Enables autokick, so the kicker will fire if the ball comes in front of it
+ * \param speed_m_per_s The speed to kick the ball at
+ */
+void chicker_enable_auto_kick(float speed_m_per_s)
+{
+    chicker_auto_arm(CHICKER_KICK, speed_m_per_s);
+}
+
+/**
+ * \brief Enables autochip, so the chipper will fire if the ball comes in front of it
+ * \param distance_m The distance to chip the ball (to the first bounce)
+ */
+void chicker_enable_auto_chip(float distance_m)
+{
+    chicker_auto_arm(CHICKER_CHIP, distance_m);
 }
 
 /**

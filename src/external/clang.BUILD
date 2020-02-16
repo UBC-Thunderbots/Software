@@ -26,9 +26,9 @@ filegroup(
         "bin/llvm-cov",
         "bin/llvm-dwp",
         "bin/llvm-nm",
-        "bin/llvm-profdata",
         "bin/llvm-objcopy",
         "bin/llvm-objdump",
+        "bin/llvm-profdata",
     ],
 )
 
@@ -62,4 +62,9 @@ filegroup(
         "lib/libc++abi.a",
         "lib/libunwind.a",
     ],
+)
+
+sh_binary(
+    name = "clang-format",
+    srcs = ["bin/clang-format"],
 )

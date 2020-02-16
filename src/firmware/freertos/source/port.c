@@ -154,7 +154,6 @@ static const struct {
 static const MPU_RASR_t ZERO_RASR = { .ENABLE = 0 };
 
 
-
 unsigned long *pxPortInitialiseStack(unsigned long *tos, TaskFunction_t code, void *params) {
 	// xTaskGenericCreate subtracts one word from TOS, then rounds down to
 	// alignment. In our case, this means it subtracts 32 bytes. ARM CPUs in

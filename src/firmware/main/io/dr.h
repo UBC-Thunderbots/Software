@@ -56,6 +56,7 @@ typedef struct
      * \brief The robot’s angular velocity.
      */
     float avel;
+
 } dr_data_t;
 
 typedef struct
@@ -138,12 +139,21 @@ bool dr_calibrated(void);
 void dr_reset(void);
 void dr_tick(log_record_t *log);
 void dr_get(dr_data_t *ret);
+void dr_get_ball(dr_ball_data_t *ret);
+float dr_get_robot_position_x();
+float dr_get_robot_position_y();
+float dr_get_robot_orientation();
+float dr_get_robot_velocity_x();
+float dr_get_robot_velocity_y();
+float dr_get_robot_angular_velocity();
+float dr_get_ball_position_x();
+float dr_get_ball_position_y();
+float dr_get_ball_velocity_x();
+float dr_get_ball_velocity_y();
 void dr_set_robot_frame(int16_t x, int16_t y, int16_t angle);
 void dr_apply_cam();
 void dr_set_ball_frame(int16_t x, int16_t y);
 void dr_set_ball_frame_timestamp(int16_t x, int16_t y, uint64_t timestamp);
 void dr_set_robot_timestamp(uint64_t timestamp);
 void dr_set_ball_timestamp(uint64_t timestamp);
-void dr_do_maneuver();
-void dr_follow_ball();
 #endif

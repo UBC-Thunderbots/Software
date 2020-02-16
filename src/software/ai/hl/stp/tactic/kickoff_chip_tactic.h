@@ -17,7 +17,7 @@ class KickoffChipTactic : public ChipTactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit KickoffChipTactic(const Ball& ball, bool loop_forever = false);
+    explicit KickoffChipTactic(const Ball& ball, bool loop_forever);
 
     std::string getName() const override;
 

@@ -54,9 +54,9 @@ cc_library(
         "//software/ai/evaluation:robot",
         "//software/ai/intent:move_intent",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util:closest_point",
         "//software/new_geom/util:distance",
-        "//software/util/logger",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -147,7 +147,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/intent:move_intent",
         "//software/ai/intent:pivot_intent",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "@g3log",
     ],
 )
@@ -221,6 +221,17 @@ cc_test(
 
 cc_library(
     name = "action_visitor",
-    hdrs = ["action_visitor.h"],
+    hdrs = ["mutable_action_visitor.h"],
     deps = [":action"],
+)
+
+cc_library(
+    name = "action_world_params_update_visitor",
+    srcs = ["action_world_params_update_visitor.cpp"],
+    hdrs = ["action_world_params_update_visitor.h"],
+    deps = [
+        ":action_visitor",
+        ":all_actions",
+        "//software/world",
+    ],
 )

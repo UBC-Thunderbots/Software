@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/polygon.h"
 #include "software/geom/util.h"
+#include "software/new_geom/polygon.h"
 
 ChipAction::ChipAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 
@@ -29,7 +29,7 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
                         chip_distance_meters);
 }
 
-void ChipAction::accept(ActionVisitor& visitor) const
+void ChipAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }
@@ -85,10 +85,10 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
             behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
-        Polygon behind_ball_region =
-            Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
+        Triangle behind_ball_region =
+            Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
-        bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
+        bool robot_behind_ball = behind_ball_region.contains(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
             chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);

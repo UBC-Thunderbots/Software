@@ -20,7 +20,7 @@ class PenaltyKickTactic : public Tactic
      */
     explicit PenaltyKickTactic(const Ball &ball, const Field &field,
                                const std::optional<Robot> &enemy_goalie,
-                               bool loop_forever = false);
+                               bool loop_forever);
 
     std::string getName() const override;
 
@@ -63,8 +63,6 @@ class PenaltyKickTactic : public Tactic
     Ball ball;
     Field field;
     std::optional<Robot> enemy_goalie;
-
-    const bool ENABLE_DRIBBLER = true;
 
     static constexpr double PENALTY_KICK_SHOT_SPEED     = 5.0;
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;

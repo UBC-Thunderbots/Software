@@ -12,7 +12,7 @@ void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
 {
     for (auto const& path_point : path_points)
     {
-        EXPECT_TRUE(bounding_box.containsPoint(path_point))
+        EXPECT_TRUE(bounding_box.contains(path_point))
             << "Path point " << path_point << " not in bounding box {"
             << bounding_box.negXNegYCorner() << "," << bounding_box.posXPosYCorner()
             << "}";
@@ -232,13 +232,14 @@ TEST(TestThetaStarPathPlanner, no_navigable_area)
     Point start{-1.0, -1.0}, dest{1.0, 1.0};
 
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-    Rectangle navigable_area({0, 0}, {0, 0});
+    Rectangle navigable_area({0, 0}, {1, 1});
     auto path = ThetaStarPathPlanner().findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_EQ(std::nullopt, path);
 }
 
-TEST(TestThetaStarPathPlanner, performance)
+// This test is disabled, it can be enabled by removing "DISABLED_" from the test name
+TEST(TestThetaStarPathPlanner, DISABLED_performance)
 {
     // This test can be used to guage performance, and profiled to find areas for
     // improvement
@@ -288,11 +289,13 @@ TEST(TestThetaStarPathPlanner, performance)
     std::chrono::duration<double> duration = end_time - start_time;
 
     std::chrono::duration<double> avg =
-        duration / ((double)num_iterations * obstacle_sets.size() - 1);
+        duration / (static_cast<double>(num_iterations) * obstacle_sets.size() - 1);
 
-    //    std::cout << "Took " <<
-    //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
-    //    << "ms to run, average time of " <<
-    //    std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0 <<
-    //    "ms";
+    std::cout << "Took "
+              << std::chrono::duration_cast<std::chrono::microseconds>(duration).count() /
+                     1000.0
+              << "ms to run, average time of "
+              << std::chrono::duration_cast<std::chrono::microseconds>(avg).count() /
+                     1000.0
+              << "ms";
 }

@@ -35,38 +35,9 @@ class ShootOrPassPlay : public Play
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
 
     /**
-     * Updates the given cherry-pick tactics
-     * @param tactics
-     */
-    void updateCherryPickTactics(
-        std::array<std::shared_ptr<CherryPickTactic>, 2> tactics);
-
-    /**
-     * Update the given shoot goal tactic
-     *
-     * @param shoot_tactic
-     */
-    void updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic);
-
-    /**
      * Updates the pass generator
      *
      * @param pass_generator
      */
     void updatePassGenerator(Passing::PassGenerator &pass_generator);
-
-    /**
-     * Updates the given crease defender tactics
-     *
-     * @param crease_defenders The defenders to update
-     */
-    void updateCreaseDefenderTactics(
-        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders);
-
-    /**
-     * Updates the given goalie tactics
-     *
-     * @param goalie
-     */
-    void updateGoalie(std::shared_ptr<GoalieTactic> goalie);
 };

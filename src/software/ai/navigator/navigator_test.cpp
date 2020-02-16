@@ -21,10 +21,10 @@ class NoPathNavigatorTest : public testing::Test
                     ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                     std::make_shared<NavigatorConfig>()),
           current_time(Timestamp::fromSeconds(123)),
+          field(::Test::TestUtil::createSSLDivBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
           friendly_team(Team(Duration::fromMilliseconds(1000))),
-          enemy_team(Team(Duration::fromMilliseconds(1000))),
-          field(::Test::TestUtil::createSSLDivBField())
+          enemy_team(Team(Duration::fromMilliseconds(1000)))
     {
     }
 
@@ -244,14 +244,13 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 {
     Point poi = Point(2, -3);
     Timestamp current_time(Timestamp::fromSeconds(123));
-    Field field(0, 0, 0, 0, 0, 0, 0, current_time);
     Ball ball(Point(1, 2), Vector(-0.3, 0), current_time);
     Team friendly_team(Duration::fromMilliseconds(1000));
     Team enemy_team(Duration::fromMilliseconds(1000));
 
     // An arbitrary fixed point in time
     // We use this fixed point in time to make the tests deterministic.
-    field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::Test::TestUtil::createSSLDivBField();
 
     Robot friendly_robot_0 = Robot(0, poi, Vector(-1, -2), Angle::half(),
                                    AngularVelocity::threeQuarter(), current_time);

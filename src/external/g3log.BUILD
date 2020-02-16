@@ -7,8 +7,8 @@
 # before we build
 genrule(
     name = "g3log_cmake",
-    outs = ["include/g3log/generated_definitions.hpp"],
     srcs = glob(["**/*"]),
+    outs = ["include/g3log/generated_definitions.hpp"],
     cmd = "\n".join([
         # Run cmake, silencing both stdout (">") and stderr ("2>")
         "cmake external/g3log > /dev/null 2> /dev/null",
@@ -20,7 +20,10 @@ genrule(
 cc_library(
     name = "g3log",
     srcs = glob(
-        ["src/*.cpp", "src/*.ipp"],
+        [
+            "src/*.cpp",
+            "src/*.ipp",
+        ],
         exclude = [
             "src/crashhandler_windows.cpp",
             "src/stacktrace_win.cpp",
@@ -28,12 +31,17 @@ cc_library(
         ],
     ),
     hdrs = glob(
-               ["src/g3log/*.hpp"],
-               exclude = ["src/g3log/stacktrace_windows.hpp"],
-           ) +
-           # We explicitly require this header so that bazel knows to run the genrule
-           # above to create it
-           ["include/g3log/generated_definitions.hpp"],
-    includes = ["./src", "./include"],
+        ["src/g3log/*.hpp"],
+        exclude = ["src/g3log/stacktrace_windows.hpp"],
+    ) +
+    # We explicitly require this header so that bazel knows to run the genrule
+    # above to create it
+    [
+        "include/g3log/generated_definitions.hpp",
+    ],
+    includes = [
+        "./include",
+        "./src",
+    ],
     visibility = ["//visibility:public"],
 )

@@ -25,8 +25,7 @@ class DefenseShadowEnemyTactic : public Tactic
      */
     explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team,
                                       const Team &enemy_team, const Ball &ball,
-                                      bool ignore_goalie, double shadow_distance,
-                                      bool loop_forever = true);
+                                      bool ignore_goalie, double shadow_distance);
 
     std::string getName() const override;
 

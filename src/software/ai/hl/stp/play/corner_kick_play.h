@@ -31,12 +31,6 @@ class CornerKickPlay : public Play
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
     /**
-     * Updates the given cherry-pick tactics
-     * @param tactics
-     */
-    void updateCherryPickTactics(std::vector<std::shared_ptr<CherryPickTactic>> tactics);
-
-    /**
      * Update the tactic that aligns the robot to the ball in preperation to pass
      *
      * @param align_to_ball_tactic

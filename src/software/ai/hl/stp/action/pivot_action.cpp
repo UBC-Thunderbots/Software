@@ -7,7 +7,7 @@
 #include "software/ai/intent/pivot_intent.h"
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 PivotAction::PivotAction() : Action() {}
 
@@ -22,7 +22,7 @@ void PivotAction::updateControlParams(const Robot& robot, Point pivot_point,
     this->enable_dribbler = enable_dribbler;
 }
 
-void PivotAction::accept(ActionVisitor& visitor) const
+void PivotAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }
