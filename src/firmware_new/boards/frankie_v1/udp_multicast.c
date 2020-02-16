@@ -40,10 +40,11 @@ struct netconn *udp_multicast_join_group(const char *multicast_ip, int multicast
     err_t test = netconn_bind(conn, &multicast_address, multicast_port);
 
     err_t err =
-        netconn_join_leave_group(conn, &multicast_address, IP_ADDR_ANY, NETCONN_JOIN);
+        netconn_join_leave_group(conn, &multicast_address, NULL, NETCONN_JOIN);
 
-    if (test == ERR_OK)
+    if (test != ERR_OK)
     {
+        return NULL;
     }
 
     if (err == ERR_OK)
@@ -72,6 +73,7 @@ static void udp_multicast_thread(void *arg)
             // Create a stream that reads from the buffer
             pb_istream_t in_stream =
                 pb_istream_from_buffer((uint8_t *)buf->p->payload, buf->p->tot_len);
+
             if (pb_decode(&in_stream, control_msg_fields, &control))
             {
                 // update proto
@@ -96,6 +98,5 @@ void udp_multicast_init(const char *multicast_address, int multicast_port)
     // create a connection to the multicast group
     struct netconn *conn = udp_multicast_join_group(multicast_address, multicast_port);
 
-    sys_thread_new("multicast_thread", udp_multicast_thread, conn, 1024,
-                   (osPriority_t)osPriorityNormal);
+    sys_thread_new("multicast_thread", udp_multicast_thread, conn, 1024, (osPriority_t)osPriorityNormal);
 }

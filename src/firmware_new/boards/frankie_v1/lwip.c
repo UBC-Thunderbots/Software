@@ -82,8 +82,13 @@ void MX_LWIP_Init(void)
     dhcp_start(&gnetif);
 
     /* USER CODE BEGIN 3 */
-    udp_multicast_init("239.255.60.60", 5000);
+    uint8_t bob = 0;
+    while(!bob){
+        bob = dhcp_supplied_address(&gnetif);
+        osDelay(1);
+    }
 
+    udp_multicast_init("239.255.60.60", 5000);
     /* USER CODE END 3 */
 }
 
