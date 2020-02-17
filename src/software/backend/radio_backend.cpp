@@ -12,7 +12,8 @@ RadioBackend::RadioBackend()
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&RadioBackend::receiveWorld, this, _1),
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig()),
+                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
+                    Util::DynamicParameters->getCameraConfig()),
       radio_output(DEFAULT_RADIO_CONFIG, [this](RobotStatus status) {
           Subject<RobotStatus>::sendValueToObservers(status);
       })

@@ -5,6 +5,7 @@
 #include <limits>
 
 #include "software/constants.h"
+#include "software/parameter/config.hpp"
 #include "software/parameter/dynamic_parameters.h"
 
 NetworkClient::NetworkClient(std::string vision_multicast_address,
@@ -12,13 +13,15 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              std::string gamecontroller_multicast_address,
                              int gamecontroller_multicast_port,
                              std::function<void(World)> received_world_callback,
-                             std::shared_ptr<const RefboxConfig> refbox_config)
+                             std::shared_ptr<const RefboxConfig> refbox_config,
+                             std::shared_ptr<const CameraConfig> camera_config)
     : network_filter(refbox_config),
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
       received_world_callback(received_world_callback),
-      refbox_config(refbox_config)
+      refbox_config(refbox_config),
+      camera_config(camera_config)
 {
     setupVisionClient(vision_multicast_address, vision_multicast_port);
 
@@ -143,20 +146,16 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         switch (detection.camera_id())
         {
             case 0:
-                camera_disabled =
-                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
+                camera_disabled = camera_config->IgnoreCamera_0()->value();
                 break;
             case 1:
-                camera_disabled =
-                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
+                camera_disabled = camera_config->IgnoreCamera_1()->value();
                 break;
             case 2:
-                camera_disabled =
-                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
+                camera_disabled = camera_config->IgnoreCamera_2()->value();
                 break;
             case 3:
-                camera_disabled =
-                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
+                camera_disabled = camera_config->IgnoreCamera_3()->value();
                 break;
             default:
                 LOG(WARNING) << "An unkown camera id was detected, disabled by default "

@@ -7,6 +7,7 @@
 #include "software/backend/input/network/networking/network_filter.h"
 #include "software/backend/input/network/networking/ssl_gamecontroller_client.h"
 #include "software/backend/input/network/networking/ssl_vision_client.h"
+#include "software/parameter/config.hpp"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/world/world.h"
@@ -38,7 +39,8 @@ class NetworkClient
                            std::string gamecontroller_multicast_address,
                            int gamecontroller_multicast_port,
                            std::function<void(World)> received_world_callback,
-                           std::shared_ptr<const RefboxConfig> refbox_config);
+                           std::shared_ptr<const RefboxConfig> refbox_config,
+                           std::shared_ptr<const CameraConfig> camera_config);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and
@@ -51,6 +53,7 @@ class NetworkClient
     // threading this class uses
     NetworkClient& operator=(const NetworkClient&) = delete;
     NetworkClient(const NetworkClient&)            = delete;
+    NetworkClient()                                = delete;
 
    private:
     /**
@@ -151,4 +154,5 @@ class NetworkClient
     std::function<void(World)> received_world_callback;
 
     std::shared_ptr<const RefboxConfig> refbox_config;
+    std::shared_ptr<const CameraConfig> camera_config;
 };
