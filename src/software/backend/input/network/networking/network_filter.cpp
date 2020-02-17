@@ -10,7 +10,7 @@
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
-NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> config)
+NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config)
     : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
       friendly_team_state(Duration::fromMilliseconds(
@@ -21,7 +21,7 @@ NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> config)
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
       enemy_team_filter(),
-      config(config)
+      refbox_config(refbox_config)
 {
 }
 
@@ -134,10 +134,10 @@ BallState NetworkFilter::getFilteredBallData(
             ball_detection.timestamp = Timestamp::fromSeconds(detection.t_capture());
 
             bool ball_position_invalid =
-                config->MinValidX()->value() > ball_detection.position.x() ||
-                config->MaxValidX()->value() < ball_detection.position.x();
+                refbox_config->MinValidX()->value() > ball_detection.position.x() ||
+                refbox_config->MaxValidX()->value() < ball_detection.position.x();
             bool ignore_ball =
-                config->IgnoreInvalidCameraData()->value() && ball_position_invalid;
+                refbox_config->IgnoreInvalidCameraData()->value() && ball_position_invalid;
             if (!ignore_ball)
             {
                 ball_detections.push_back(ball_detection);
@@ -164,7 +164,7 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
     for (const auto &detection : detections)
     {
         auto ssl_robots = detection.robots_yellow();
-        if (config->FriendlyColorYellow()->value())
+        if (refbox_config->FriendlyColorYellow()->value())
         {
             ssl_robots = detection.robots_blue();
         }
@@ -184,10 +184,10 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
 
 
             bool robot_position_invalid =
-                config->MinValidX()->value() > robot_detection.position.x() ||
-                config->MaxValidX()->value() < robot_detection.position.x();
+                refbox_config->MinValidX()->value() > robot_detection.position.x() ||
+                refbox_config->MaxValidX()->value() < robot_detection.position.x();
             bool ignore_robot =
-                config->IgnoreInvalidCameraData()->value() && robot_position_invalid;
+                refbox_config->IgnoreInvalidCameraData()->value() && robot_position_invalid;
             if (!ignore_robot)
             {
                 friendly_robot_detections.push_back(robot_detection);
@@ -211,7 +211,7 @@ Team NetworkFilter::getFilteredEnemyTeamData(
     for (const auto &detection : detections)
     {
         auto ssl_robots = detection.robots_blue();
-        if (!config->FriendlyColorYellow()->value())
+        if (!refbox_config->FriendlyColorYellow()->value())
         {
             ssl_robots = detection.robots_yellow();
         }
@@ -230,10 +230,10 @@ Team NetworkFilter::getFilteredEnemyTeamData(
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
             bool robot_position_invalid =
-                config->MinValidX()->value() > robot_detection.position.x() ||
-                config->MaxValidX()->value() < robot_detection.position.x();
+                refbox_config->MinValidX()->value() > robot_detection.position.x() ||
+                refbox_config->MaxValidX()->value() < robot_detection.position.x();
             bool ignore_robot =
-                config->IgnoreInvalidCameraData()->value() && robot_position_invalid;
+                refbox_config->IgnoreInvalidCameraData()->value() && robot_position_invalid;
             if (!ignore_robot)
             {
                 enemy_robot_detections.push_back(robot_detection);
@@ -300,7 +300,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
 
 RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
 {
-    if (!config->FriendlyColorYellow()->value())
+    if (!refbox_config->FriendlyColorYellow()->value())
     {
         return blue_team_command_map.at(command);
     }
@@ -314,7 +314,7 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
 {
     if (blue_team_on_positive_half)
     {
-        if (!config->FriendlyColorYellow()->value())
+        if (!refbox_config->FriendlyColorYellow()->value())
         {
             our_field_side = FieldSide::NEG_X;
         }
@@ -325,7 +325,7 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
     }
     else
     {
-        if (!config->FriendlyColorYellow()->value())
+        if (!refbox_config->FriendlyColorYellow()->value())
         {
             our_field_side = FieldSide::POS_X;
         }
