@@ -89,6 +89,7 @@ void MX_LWIP_Init(void)
     }
 
     udp_multicast_init("239.255.60.60", 5000);
+
     /* USER CODE END 3 */
 }
 

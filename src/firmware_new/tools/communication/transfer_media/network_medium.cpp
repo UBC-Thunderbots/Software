@@ -23,8 +23,8 @@ NetworkMedium::NetworkMedium(const std::string& multicast_address,
     multicast_endpoint = udp::endpoint(multicast_addr, multicast_port);
 
     socket->open(multicast_endpoint.protocol());
-    socket->set_option(boost::asio::ip::multicast::join_group(multicast_addr));
     socket->set_option(boost::asio::ip::multicast::hops(2));
+    socket->set_option(boost::asio::ip::multicast::join_group(multicast_addr));
     socket->set_option(boost::asio::ip::multicast::enable_loopback(false));
 
     try
@@ -71,7 +71,7 @@ void NetworkMedium::receive_data_async(std::function<void(std::string)> receive_
     this->receive_callback = receive_callback;
 
     socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
-                               local_endpoint,
+                               multicast_endpoint,
                                boost::bind(&NetworkMedium::handle_data_reception, this,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
