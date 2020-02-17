@@ -15,18 +15,20 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 
+uint8_t recv_buffer[robot_ack_size];
+uint8_t send_buffer[control_msg_size];
 
-uint8_t buffer[5000];
 int msg_count       = 0;
 robot_ack ack       = robot_ack_init_zero;
 control_msg control = control_msg_init_zero;
+const char* multicast_ip;
 
-int udp_multicast_join_group(const char *multicast_ip, int multicast_port);
+unsigned udp_multicast_join_group(const char *multicast_ip, int multicast_port);
 static void udp_multicast_thread(void *arg);
 
-int udp_multicast_join_group(const char *multicast_ip, int multicast_port)
+unsigned udp_multicast_join_group(const char *multicast_ip, int multicast_port)
 {
-    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    unsigned sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
     struct sockaddr_in serv_addr;
     serv_addr.sin_family      = AF_INET;
@@ -38,7 +40,7 @@ int udp_multicast_join_group(const char *multicast_ip, int multicast_port)
 
     ip_mreq mreq;
     mreq.imr_multiaddr.s_addr = inet_addr(multicast_ip);
-    mreq.imr_interface.s_addr = INADDR_ANY;
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 
     if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&mreq, sizeof(mreq)) < 0)
         return -1;
@@ -47,21 +49,37 @@ int udp_multicast_join_group(const char *multicast_ip, int multicast_port)
 
 static void udp_multicast_thread(void *arg)
 {
-    int socket  = *(int *)arg;
-    int counter = 0;
+    unsigned socket = *((unsigned*)(arg));
 
     while (1)
     {
-        recv(socket, &buffer, 5000, 0);
-        counter++;
+        int length = recv(socket, &recv_buffer, robot_ack_size, 0);
+
+        // Create a stream that reads from the buffer
+        pb_istream_t in_stream =
+            pb_istream_from_buffer(recv_buffer, length);
+
+        if (pb_decode(&in_stream, control_msg_fields, &control))
+        {
+            // update proto
+            ack.msg_count = msg_count++;
+
+            // serialize proto
+            pb_ostream_t stream = pb_ostream_from_buffer(send_buffer, sizeof(send_buffer));
+            pb_encode(&stream, robot_ack_fields, &ack);
+
+            // package payload and send over udp
+            send(socket, send_buffer, stream.bytes_written, 0);
+        }
     }
 }
 
 void udp_multicast_init(const char *multicast_address, int multicast_port)
 {
     // create a connection to the multicast group
-    int socket = udp_multicast_join_group(multicast_address, multicast_port);
+    unsigned* socket = malloc(sizeof(int));
+    *socket = udp_multicast_join_group(multicast_address, multicast_port);
 
-    sys_thread_new("multicast_thread", udp_multicast_thread, &socket, 1024,
-                   (osPriority_t)osPriorityNormal);
+    sys_thread_new("multicast_thread", udp_multicast_thread, socket, 1024,
+                    (osPriority_t)osPriorityNormal);
 }

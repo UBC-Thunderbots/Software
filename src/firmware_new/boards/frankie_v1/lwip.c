@@ -82,7 +82,6 @@ void MX_LWIP_Init(void)
     dhcp_start(&gnetif);
 
     /* USER CODE BEGIN 3 */
-    uint8_t bob = 0;
 
     while (!dhcp_supplied_address(&gnetif))
     {
