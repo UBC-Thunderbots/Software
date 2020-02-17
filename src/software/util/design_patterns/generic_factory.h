@@ -119,3 +119,6 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
                                                                  generic_creator);
     }
 };
+#include "software/util/design_patterns/generic_factory.cpp"
+
+

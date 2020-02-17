@@ -109,6 +109,7 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:stop_tactic",
+        "//software/util/design_patterns:generic_factory",
         "@g3log",
     ],
     alwayslink = True,
@@ -120,7 +121,6 @@ cc_test(
     deps = [
         ":halt_play",
         ":play",
-        "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -291,27 +291,8 @@ cc_library(
     hdrs = ["play.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
-        "//software/util/design_patterns:generic_factory",
     ],
 )
-
-#cc_library(
-#    name = "play_factory",
-#    srcs = ["play_factory.cpp"],
-#    hdrs = ["play_factory.h"],
-#    deps = [":play"],
-#)
-
-#cc_test(
-#    name = "play_factory_test",
-#    srcs = ["play_factory_test.cpp"],
-#    deps = [
-#        ":play_factory",
-#        "//software/ai/hl/stp/play/test_plays:halt_test_play",
-#        "//software/ai/hl/stp/play/test_plays:move_test_play",
-#        "@gtest//:gtest_main",
-#    ],
-#)
 
 cc_library(
     name = "all_plays",
