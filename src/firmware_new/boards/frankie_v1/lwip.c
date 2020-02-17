@@ -83,8 +83,9 @@ void MX_LWIP_Init(void)
 
     /* USER CODE BEGIN 3 */
     uint8_t bob = 0;
-    while(!bob){
-        bob = dhcp_supplied_address(&gnetif);
+
+    while (!dhcp_supplied_address(&gnetif))
+    {
         osDelay(1);
     }
 

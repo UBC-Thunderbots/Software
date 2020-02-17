@@ -44,7 +44,6 @@ int main(int argc, char* argv[])
             std::cout << "STM32 Rxed " << msg.msg_count() << " msgs " << std::endl;
         });
 
-
     while (1)
     {
         communicator.send_proto(control_req);

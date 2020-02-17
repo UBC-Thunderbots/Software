@@ -11,16 +11,21 @@ using boost::asio::socket_base;
 using boost::asio::ip::address_v4;
 using boost::asio::ip::udp;
 
-NetworkMedium::NetworkMedium(const std::string& multicast_address, unsigned multicast_port)
+NetworkMedium::NetworkMedium(const std::string& multicast_address,
+                             unsigned multicast_port)
 {
     socket.reset(new udp::socket(io_service));
 
-    local_endpoint     = udp::endpoint(address_v4::from_string("192.168.0.100"), multicast_port);
-    multicast_endpoint = udp::endpoint(address_v4::from_string(multicast_address), multicast_port);
+    boost::asio::ip::address_v4 multicast_addr =
+        boost::asio::ip::address_v4::from_string(multicast_address);
 
-    socket->open(local_endpoint.protocol());
-    socket->set_option(boost::asio::ip::multicast::outbound_interface(address_v4::from_string("192.168.0.100")));
-    socket->set_option(boost::asio::ip::multicast::join_group(address_v4::from_string(multicast_address)));
+    local_endpoint = udp::endpoint(boost::asio::ip::address_v4::any(), multicast_port);
+    multicast_endpoint = udp::endpoint(multicast_addr, multicast_port);
+
+    socket->open(multicast_endpoint.protocol());
+    socket->set_option(boost::asio::ip::multicast::join_group(multicast_addr));
+    socket->set_option(boost::asio::ip::multicast::hops(2));
+    socket->set_option(boost::asio::ip::multicast::enable_loopback(false));
 
     try
     {
@@ -66,7 +71,7 @@ void NetworkMedium::receive_data_async(std::function<void(std::string)> receive_
     this->receive_callback = receive_callback;
 
     socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
-                               multicast_endpoint,
+                               local_endpoint,
                                boost::bind(&NetworkMedium::handle_data_reception, this,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
