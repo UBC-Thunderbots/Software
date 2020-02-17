@@ -2,6 +2,7 @@
 
 #include "software/backend/backend_factory.h"
 #include "software/constants.h"
+#include "software/parameter/dynamic_parameters.h"
 
 const std::string RadioBackend::name = "radio";
 
@@ -10,7 +11,8 @@ RadioBackend::RadioBackend()
                     Util::Constants::SSL_VISION_MULTICAST_PORT,
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
-                    boost::bind(&RadioBackend::receiveWorld, this, _1)),
+                    boost::bind(&RadioBackend::receiveWorld, this, _1),
+                    Util::DynamicParameters->getCameraConfig()),
       radio_output(DEFAULT_RADIO_CONFIG, [this](RobotStatus status) {
           Subject<RobotStatus>::sendValueToObservers(status);
       })
