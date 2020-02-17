@@ -280,7 +280,8 @@ TEST_F(PhysicsRobotTest,
             // Use the cross-product to check if the new velocity vector is rotated
             // counter-clockwise of the old vector
             EXPECT_GT(b2Cross(b2Vec2(0, -2), ball_body->GetLinearVelocity()), 0);
-            EXPECT_NEAR(b2Vec2(0, -2).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
+            EXPECT_NEAR(b2Vec2(0, -2).Length(), ball_body->GetLinearVelocity().Length(),
+                        0.1);
         }
     }
 
@@ -312,7 +313,8 @@ TEST_F(PhysicsRobotTest,
             // Use the cross-product to check if the new velocity vector is rotated
             // clockwise of the old vector
             EXPECT_LT(b2Cross(b2Vec2(0, 2), ball_body->GetLinearVelocity()), 0);
-            EXPECT_NEAR(b2Vec2(0, 2).Length(), ball_body->GetLinearVelocity().Length(), 0.1);
+            EXPECT_NEAR(b2Vec2(0, 2).Length(), ball_body->GetLinearVelocity().Length(),
+                        0.1);
         }
     }
 

@@ -96,189 +96,221 @@ SimulatorRobotSingleton::createFirmwareRobot()
                                                                   FirmwareRobotDeleter());
 }
 
-void SimulatorRobotSingleton::checkValidAndExecuteVoid(std::function<void(std::shared_ptr<SimulatorRobot>)> func) {
-    if (simulator_robot) {
+void SimulatorRobotSingleton::checkValidAndExecuteVoid(
+    std::function<void(std::shared_ptr<SimulatorRobot>)> func)
+{
+    if (simulator_robot)
+    {
         func(simulator_robot);
-    }else {
-        LOG(WARNING) << "SimulatorRobotSingleton called without setting the SimulatorRobot first" << std::endl;
+    }
+    else
+    {
+        LOG(WARNING)
+            << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
+            << std::endl;
     }
 }
 
-float SimulatorRobotSingleton::checkValidAndReturnFloat(std::function<float(std::shared_ptr<SimulatorRobot>)> func) {
+float SimulatorRobotSingleton::checkValidAndReturnFloat(
+    std::function<float(std::shared_ptr<SimulatorRobot>)> func)
+{
     if (simulator_robot)
     {
         return func(simulator_robot);
     }
-    LOG(WARNING) << "SimulatorRobotSingleton called without setting the SimulatorRobot first" << std::endl;
+    LOG(WARNING)
+        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
+        << std::endl;
     return 0.0f;
 }
 
-unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func) {
+unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
+    std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func)
+{
     if (simulator_robot)
     {
         return func(simulator_robot);
     }
-    LOG(WARNING) << "SimulatorRobotSingleton called without setting the SimulatorRobot first" << std::endl;
+    LOG(WARNING)
+        << "SimulatorRobotSingleton called without setting the SimulatorRobot first"
+        << std::endl;
     return 0;
 }
 
 
 float SimulatorRobotSingleton::getPositionX()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getPositionX();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->getPositionX(); });
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getPositionY();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->getPositionY(); });
 }
 
 float SimulatorRobotSingleton::getOrientation()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getOrientation();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->getOrientation(); });
 }
 
 float SimulatorRobotSingleton::getVelocityX()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getVelocityX();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityX(); });
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getVelocityY();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityY(); });
 }
 
 float SimulatorRobotSingleton::getVelocityAngular()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getVelocityAngular();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getVelocityAngular(); });
 }
 
 float SimulatorRobotSingleton::getBatteryVoltage()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getBatteryVoltage();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getBatteryVoltage(); });
 }
 
 void SimulatorRobotSingleton::kick(float speed_m_per_s)
 {
-    checkValidAndExecuteVoid([speed_m_per_s](auto robot) {robot->kick(speed_m_per_s);});
+    checkValidAndExecuteVoid([speed_m_per_s](auto robot) { robot->kick(speed_m_per_s); });
 }
 
 void SimulatorRobotSingleton::chip(float distance_m)
 {
-    checkValidAndExecuteVoid([distance_m](auto robot) {robot->chip(distance_m);});
+    checkValidAndExecuteVoid([distance_m](auto robot) { robot->chip(distance_m); });
 }
 
 void SimulatorRobotSingleton::enableAutokick(float speed_m_per_s)
 {
-    checkValidAndExecuteVoid([speed_m_per_s](auto robot) {robot->enableAutokick(speed_m_per_s);});
+    checkValidAndExecuteVoid(
+        [speed_m_per_s](auto robot) { robot->enableAutokick(speed_m_per_s); });
 }
 
 void SimulatorRobotSingleton::enableAutochip(float distance_m)
 {
-    checkValidAndExecuteVoid([distance_m](auto robot) {robot->enableAutochip(distance_m);});
+    checkValidAndExecuteVoid(
+        [distance_m](auto robot) { robot->enableAutochip(distance_m); });
 }
 
 void SimulatorRobotSingleton::disableAutokick()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->disableAutokick();});
+    checkValidAndExecuteVoid([](auto robot) { robot->disableAutokick(); });
 }
 
 void SimulatorRobotSingleton::disableAutochip()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->disableAutochip();});
+    checkValidAndExecuteVoid([](auto robot) { robot->disableAutochip(); });
 }
 
 void SimulatorRobotSingleton::setDribblerSpeed(uint32_t rpm)
 {
-    checkValidAndExecuteVoid([rpm](auto robot) {robot->setDribblerSpeed(rpm);});
+    checkValidAndExecuteVoid([rpm](auto robot) { robot->setDribblerSpeed(rpm); });
 }
 
 unsigned int SimulatorRobotSingleton::getDribblerTemperatureDegC()
 {
-    return checkValidAndReturnUint([](auto robot) {return robot->getDribblerTemperatureDegC();});
+    return checkValidAndReturnUint(
+        [](auto robot) { return robot->getDribblerTemperatureDegC(); });
 }
 
 void SimulatorRobotSingleton::dribblerCoast()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->dribblerCoast();});
+    checkValidAndExecuteVoid([](auto robot) { robot->dribblerCoast(); });
 }
 
 void SimulatorRobotSingleton::applyWheelForceFrontLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontLeft(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceFrontLeft(force_in_newtons);
+    });
 }
 
 void SimulatorRobotSingleton::applyWheelForceBackLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackLeft(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceBackLeft(force_in_newtons);
+    });
 }
 
 void SimulatorRobotSingleton::applyWheelForceBackRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackRight(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceBackRight(force_in_newtons);
+    });
 }
 
 void SimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontRight(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceFrontRight(force_in_newtons);
+    });
 }
 
 float SimulatorRobotSingleton::getMotorSpeedFrontLeft()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontLeft();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedFrontLeft(); });
 }
 
 float SimulatorRobotSingleton::getMotorSpeedBackLeft()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackLeft();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedBackLeft(); });
 }
 
 float SimulatorRobotSingleton::getMotorSpeedBackRight()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackRight();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedBackRight(); });
 }
 
 float SimulatorRobotSingleton::getMotorSpeedFrontRight()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontRight();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedFrontRight(); });
 }
 
 void SimulatorRobotSingleton::coastMotorFrontLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorFrontLeft();});
+    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorFrontLeft(); });
 }
 
 void SimulatorRobotSingleton::coastMotorBackLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorBackLeft();});
+    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorBackLeft(); });
 }
 
 void SimulatorRobotSingleton::coastMotorBackRight()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorBackRight();});
+    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorBackRight(); });
 }
 
 void SimulatorRobotSingleton::coastMotorFrontRight()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->coastMotorFrontRight();});
+    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorFrontRight(); });
 }
 
 void SimulatorRobotSingleton::brakeMotorFrontLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontLeft();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontLeft(); });
 }
 
 void SimulatorRobotSingleton::brakeMotorBackLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackLeft();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackLeft(); });
 }
 
 void SimulatorRobotSingleton::brakeMotorBackRight()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackRight();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackRight(); });
 }
 
 void SimulatorRobotSingleton::brakeMotorFrontRight()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontRight();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
 }

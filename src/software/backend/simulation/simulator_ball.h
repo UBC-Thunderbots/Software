@@ -35,14 +35,16 @@ class SimulatorBall
 
    private:
     /**
-     * Helper functions that check if the current pointer to the physics_ball is valid before
-     * calling the given function. If the physics_ball is invalid, a warning is logged and a
-     * default value is returned;
+     * Helper functions that check if the current pointer to the physics_ball is valid
+     * before calling the given function. If the physics_ball is invalid, a warning is
+     * logged and a default value is returned;
      *
      * @param func The function to perform on the physics ball
      */
-    Point checkValidAndReturnPoint(std::function<Point(const std::shared_ptr<PhysicsBall>)> func) const;
-    Vector checkValidAndReturnVector(std::function<Vector(const std::shared_ptr<PhysicsBall>)> func) const;
+    Point checkValidAndReturnPoint(
+        std::function<Point(const std::shared_ptr<PhysicsBall>)> func) const;
+    Vector checkValidAndReturnVector(
+        std::function<Vector(const std::shared_ptr<PhysicsBall>)> func) const;
 
     std::weak_ptr<PhysicsBall> physics_ball;
 };

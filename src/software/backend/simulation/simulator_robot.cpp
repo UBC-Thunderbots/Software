@@ -30,15 +30,23 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     }
 }
 
-void SimulatorRobot::checkValidAndExecuteVoid(std::function<void(std::shared_ptr<PhysicsRobot>)> func) {
-    if (auto robot = physics_robot.lock()) {
+void SimulatorRobot::checkValidAndExecuteVoid(
+    std::function<void(std::shared_ptr<PhysicsRobot>)> func)
+{
+    if (auto robot = physics_robot.lock())
+    {
         func(robot);
-    }else {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
+    }
+    else
+    {
+        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
+                     << std::endl;
     }
 }
 
-float SimulatorRobot::checkValidAndReturnFloat(std::function<float(std::shared_ptr<PhysicsRobot>)> func) {
+float SimulatorRobot::checkValidAndReturnFloat(
+    std::function<float(std::shared_ptr<PhysicsRobot>)> func)
+{
     if (auto robot = physics_robot.lock())
     {
         return func(robot);
@@ -47,7 +55,9 @@ float SimulatorRobot::checkValidAndReturnFloat(std::function<float(std::shared_p
     return 0.0f;
 }
 
-unsigned int SimulatorRobot::checkValidAndReturnUint(std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func) {
+unsigned int SimulatorRobot::checkValidAndReturnUint(
+    std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func)
+{
     if (auto robot = physics_robot.lock())
     {
         return func(robot);
@@ -63,12 +73,12 @@ unsigned int SimulatorRobot::getRobotId()
 
 float SimulatorRobot::getPositionX()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->position().x();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->position().x(); });
 }
 
 float SimulatorRobot::getPositionY()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->position().y();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->position().y(); });
 }
 
 Point SimulatorRobot::position()
@@ -78,17 +88,18 @@ Point SimulatorRobot::position()
 
 float SimulatorRobot::getOrientation()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->orientation().toRadians();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->orientation().toRadians(); });
 }
 
 float SimulatorRobot::getVelocityX()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->velocity().x();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->velocity().x(); });
 }
 
 float SimulatorRobot::getVelocityY()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->velocity().y();});
+    return checkValidAndReturnFloat([](auto robot) { return robot->velocity().y(); });
 }
 
 Vector SimulatorRobot::velocity()
@@ -98,7 +109,8 @@ Vector SimulatorRobot::velocity()
 
 float SimulatorRobot::getVelocityAngular()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->angularVelocity().toRadians();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->angularVelocity().toRadians(); });
 }
 
 float SimulatorRobot::getBatteryVoltage()
@@ -113,10 +125,10 @@ float SimulatorRobot::getBatteryVoltage()
 void SimulatorRobot::kick(float speed_m_per_s)
 {
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
-        for(auto ball : this->balls_in_dribbler_area)
+        for (auto ball : this->balls_in_dribbler_area)
         {
             Vector kick_vector = Vector::createFromAngle(
-                    robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
             kick_vector = kick_vector.normalize(speed_m_per_s);
             ball->kick(kick_vector);
         }
@@ -126,10 +138,10 @@ void SimulatorRobot::kick(float speed_m_per_s)
 void SimulatorRobot::chip(float distance_m)
 {
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
-        for(auto ball : this->balls_in_dribbler_area)
+        for (auto ball : this->balls_in_dribbler_area)
         {
             Vector chip_vector = Vector::createFromAngle(
-                    robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
             chip_vector = chip_vector.normalize(distance_m);
             ball->chip(chip_vector);
         }
@@ -177,42 +189,54 @@ void SimulatorRobot::dribblerCoast()
 
 void SimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontLeft(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceFrontLeft(force_in_newtons);
+    });
 }
 
 void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackLeft(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceBackLeft(force_in_newtons);
+    });
 }
 
 void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceBackRight(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceBackRight(force_in_newtons);
+    });
 }
 
 void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {robot->applyWheelForceFrontRight(force_in_newtons);});
+    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+        robot->applyWheelForceFrontRight(force_in_newtons);
+    });
 }
 
 float SimulatorRobot::getMotorSpeedFrontLeft()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontLeft();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedFrontLeft(); });
 }
 
 float SimulatorRobot::getMotorSpeedBackLeft()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackLeft();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedBackLeft(); });
 }
 
 float SimulatorRobot::getMotorSpeedBackRight()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedBackRight();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedBackRight(); });
 }
 
 float SimulatorRobot::getMotorSpeedFrontRight()
 {
-    return checkValidAndReturnFloat([](auto robot) {return robot->getMotorSpeedFrontRight();});
+    return checkValidAndReturnFloat(
+        [](auto robot) { return robot->getMotorSpeedFrontRight(); });
 }
 
 void SimulatorRobot::coastMotorFrontLeft()
@@ -237,22 +261,22 @@ void SimulatorRobot::coastMotorFrontRight()
 
 void SimulatorRobot::brakeMotorFrontLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontLeft();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontLeft(); });
 }
 
 void SimulatorRobot::brakeMotorBackLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackLeft();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackLeft(); });
 }
 
 void SimulatorRobot::brakeMotorBackRight()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorBackRight();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackRight(); });
 }
 
 void SimulatorRobot::brakeMotorFrontRight()
 {
-    checkValidAndExecuteVoid([](auto robot) {robot->brakeMotorFrontRight();});
+    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
 }
 
 void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
@@ -329,9 +353,11 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
                                               PhysicsBall *physics_ball)
 {
-    auto iter = std::find(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(), physics_ball);
+    auto iter = std::find(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
+                          physics_ball);
 
-    if(iter != balls_in_dribbler_area.end()) {
+    if (iter != balls_in_dribbler_area.end())
+    {
         balls_in_dribbler_area.erase(iter);
     }
 }

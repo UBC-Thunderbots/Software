@@ -120,10 +120,11 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double dribbler_dept
     const unsigned int num_vertices              = 4;
     b2Vec2 dribbler_shape_vertices[num_vertices] = {
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,-DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0))
-    };
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
+                         DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
+                         -DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0))};
     b2PolygonShape* dribbler_shape = new b2PolygonShape();
     dribbler_shape->Set(dribbler_shape_vertices, num_vertices);
     robot_dribbler_fixture_def.shape = dribbler_shape;
@@ -158,8 +159,7 @@ void PhysicsRobot::setupChickerFixture(const Robot& robot, double total_chicker_
                          -DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(
             Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth + chicker_thickness,
-                  -DRIBBLER_WIDTH_METERS / 2.0))
-    };
+                  -DRIBBLER_WIDTH_METERS / 2.0))};
 
     b2PolygonShape* chicker_shape = new b2PolygonShape();
     chicker_shape->Set(chicker_shape_vertices, num_vertices);

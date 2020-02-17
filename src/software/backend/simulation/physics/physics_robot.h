@@ -240,8 +240,8 @@ class PhysicsRobot
      *                          x                                       X
      *                       x                                          x+++
      *                    x                                             x+  ++
-     *                 x                                                x+   +  <--- Front left part (indicated by '+')
-     *                 x                                                x+   +
+     *                 x                                                x+   +  <--- Front
+     * left part (indicated by '+') x                                                x+ +
      *                 x                                                x+++++
      *                 x                                                x|c|d|
      *                 x                                                x|h|r|
@@ -252,8 +252,8 @@ class PhysicsRobot
      *                 x                                                x|r|e|
      *                 x                                                x+++++
      *                 x                                                x+   +
-     *                 x                                                x+   +  <--- Front right part (indicated by '+')
-     *                    x                                             x+  ++
+     *                 x                                                x+   +  <--- Front
+     * right part (indicated by '+') x                                             x+  ++
      *                       x                                          x+++
      *                          x                                       x
      *                             x                                  x

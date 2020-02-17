@@ -24,8 +24,11 @@ SimulatorBallSingleton::createFirmwareBall()
                                                                 FirmwareBallDeleter());
 }
 
-float SimulatorBallSingleton::checkValidAndReturnFloat(std::function<float(std::shared_ptr<SimulatorBall>)> func) {
-    if(simulator_ball) {
+float SimulatorBallSingleton::checkValidAndReturnFloat(
+    std::function<float(std::shared_ptr<SimulatorBall>)> func)
+{
+    if (simulator_ball)
+    {
         return func(simulator_ball);
     }
     LOG(WARNING)
@@ -36,20 +39,20 @@ float SimulatorBallSingleton::checkValidAndReturnFloat(std::function<float(std::
 
 float SimulatorBallSingleton::getBallPositionX()
 {
-    checkValidAndReturnFloat([](auto ball) {return ball->position().x();});
+    checkValidAndReturnFloat([](auto ball) { return ball->position().x(); });
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    checkValidAndReturnFloat([](auto ball) {return ball->position().y();});
+    checkValidAndReturnFloat([](auto ball) { return ball->position().y(); });
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    checkValidAndReturnFloat([](auto ball) {return ball->velocity().x();});
+    checkValidAndReturnFloat([](auto ball) { return ball->velocity().x(); });
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    checkValidAndReturnFloat([](auto ball) {return ball->velocity().y();});
+    checkValidAndReturnFloat([](auto ball) { return ball->velocity().y(); });
 }

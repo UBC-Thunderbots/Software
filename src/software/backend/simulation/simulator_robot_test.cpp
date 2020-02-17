@@ -139,10 +139,13 @@ TEST_F(SimulatorRobotTest, test_get_dribbler_temperature)
     EXPECT_EQ(simulator_robot->getDribblerTemperatureDegC(), 25);
 }
 
-class SimulatorRobotKickTest : public SimulatorRobotTest, public ::testing::WithParamInterface<Angle> {
+class SimulatorRobotKickTest : public SimulatorRobotTest,
+                               public ::testing::WithParamInterface<Angle>
+{
 };
 
-TEST_P(SimulatorRobotKickTest, test_kick_ball_at_angle) {
+TEST_P(SimulatorRobotKickTest, test_kick_ball_at_angle)
+{
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -168,25 +171,26 @@ TEST_P(SimulatorRobotKickTest, test_kick_ball_at_angle) {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    EXPECT_LT((simulator_ball->velocity() - Vector::createFromAngle(robot.orientation()).normalize(5)).length(), 0.005);
+    EXPECT_LT((simulator_ball->velocity() -
+               Vector::createFromAngle(robot.orientation()).normalize(5))
+                  .length(),
+              0.005);
 }
 
-INSTANTIATE_TEST_CASE_P(
-        All, SimulatorRobotKickTest,
-        ::testing::Values(
-                Angle::fromDegrees(0),
-                Angle::fromDegrees(58),
-                Angle::fromDegrees(110),
-                Angle::fromDegrees(200),
-                Angle::fromDegrees(331)
-                )
-        );
+INSTANTIATE_TEST_CASE_P(All, SimulatorRobotKickTest,
+                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
+                                          Angle::fromDegrees(110),
+                                          Angle::fromDegrees(200),
+                                          Angle::fromDegrees(331)));
 
 
-class SimulatorRobotChipTest : public SimulatorRobotTest, public ::testing::WithParamInterface<Angle> {
+class SimulatorRobotChipTest : public SimulatorRobotTest,
+                               public ::testing::WithParamInterface<Angle>
+{
 };
 
-TEST_P(SimulatorRobotChipTest, test_chip_ball_at_angle) {
+TEST_P(SimulatorRobotChipTest, test_chip_ball_at_angle)
+{
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -212,32 +216,33 @@ TEST_P(SimulatorRobotChipTest, test_chip_ball_at_angle) {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot_orientation), Angle::fromDegrees(1));
+    EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot_orientation),
+              Angle::fromDegrees(1));
     EXPECT_GT(simulator_ball->velocity().length(), 3);
     EXPECT_LT(simulator_ball->velocity().length(), 5);
 }
 
-INSTANTIATE_TEST_CASE_P(
-        All, SimulatorRobotChipTest,
-        ::testing::Values(
-                Angle::fromDegrees(0),
-                Angle::fromDegrees(58),
-                Angle::fromDegrees(110),
-                Angle::fromDegrees(200),
-                Angle::fromDegrees(331)
-        )
-);
+INSTANTIATE_TEST_CASE_P(All, SimulatorRobotChipTest,
+                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
+                                          Angle::fromDegrees(110),
+                                          Angle::fromDegrees(200),
+                                          Angle::fromDegrees(331)));
 
 
-class SimulatorRobotAutokickTest : public SimulatorRobotTest, public ::testing::WithParamInterface<Angle> {
+class SimulatorRobotAutokickTest : public SimulatorRobotTest,
+                                   public ::testing::WithParamInterface<Angle>
+{
 };
 
-TEST_P(SimulatorRobotAutokickTest, test_autokick_ball_at_angle) {
+TEST_P(SimulatorRobotAutokickTest, test_autokick_ball_at_angle)
+{
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Point initial_ball_position = robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
-    Vector initial_ball_velocity = (robot.position() - initial_ball_position).normalize(1.0);
+    Point initial_ball_position =
+        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
+    Vector initial_ball_velocity =
+        (robot.position() - initial_ball_position).normalize(1.0);
     Ball ball(initial_ball_position, initial_ball_velocity, Timestamp::fromSeconds(0));
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
 
@@ -253,26 +258,26 @@ TEST_P(SimulatorRobotAutokickTest, test_autokick_ball_at_angle) {
     EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.001);
 }
 
-INSTANTIATE_TEST_CASE_P(
-        All, SimulatorRobotAutokickTest,
-        ::testing::Values(
-                Angle::fromDegrees(0),
-                Angle::fromDegrees(58),
-                Angle::fromDegrees(110),
-                Angle::fromDegrees(200),
-                Angle::fromDegrees(331)
-        )
-);
+INSTANTIATE_TEST_CASE_P(All, SimulatorRobotAutokickTest,
+                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
+                                          Angle::fromDegrees(110),
+                                          Angle::fromDegrees(200),
+                                          Angle::fromDegrees(331)));
 
-class SimulatorRobotAutochipTest : public SimulatorRobotTest, public ::testing::WithParamInterface<Angle> {
+class SimulatorRobotAutochipTest : public SimulatorRobotTest,
+                                   public ::testing::WithParamInterface<Angle>
+{
 };
 
-TEST_P(SimulatorRobotAutochipTest, test_autochip_ball_at_angle_with_no_obstacle) {
+TEST_P(SimulatorRobotAutochipTest, test_autochip_ball_at_angle_with_no_obstacle)
+{
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Point initial_ball_position = robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
-    Vector initial_ball_velocity = (robot.position() - initial_ball_position).normalize(1.0);
+    Point initial_ball_position =
+        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
+    Vector initial_ball_velocity =
+        (robot.position() - initial_ball_position).normalize(1.0);
     Ball ball(initial_ball_position, initial_ball_velocity, Timestamp::fromSeconds(0));
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
 
@@ -284,21 +289,17 @@ TEST_P(SimulatorRobotAutochipTest, test_autochip_ball_at_angle_with_no_obstacle)
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot_orientation), Angle::fromDegrees(1));
+    EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot_orientation),
+              Angle::fromDegrees(1));
     EXPECT_GT(simulator_ball->velocity().length(), 2);
     EXPECT_LT(simulator_ball->velocity().length(), 4);
 }
 
-INSTANTIATE_TEST_CASE_P(
-        All, SimulatorRobotAutochipTest,
-        ::testing::Values(
-                Angle::fromDegrees(0),
-                Angle::fromDegrees(58),
-                Angle::fromDegrees(110),
-                Angle::fromDegrees(200),
-                Angle::fromDegrees(331)
-        )
-);
+INSTANTIATE_TEST_CASE_P(All, SimulatorRobotAutochipTest,
+                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
+                                          Angle::fromDegrees(110),
+                                          Angle::fromDegrees(200),
+                                          Angle::fromDegrees(331)));
 
 TEST_F(SimulatorRobotTest,
        test_robot_chips_ball_with_autochip_enabled_and_ball_lands_on_obstacle)
@@ -309,7 +310,7 @@ TEST_F(SimulatorRobotTest,
     // Add an enemy robot right where the ball will land
     std::vector<Point> enemy_robot_positions = {Point(2.0, 0)};
     auto [world, simulator_robot, simulator_ball] =
-    createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
+        createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
 
     EXPECT_LT((simulator_ball->velocity() - Vector(-0.25, 0)).length(), 0.001);
 
@@ -335,7 +336,8 @@ TEST_F(SimulatorRobotTest,
     EXPECT_GT(simulator_ball->position().x(), 2.0);
 }
 
-TEST_F(SimulatorRobotTest, test_robot_does_not_kick_or_chip_ball_when_autokick_and_autochip_disabled)
+TEST_F(SimulatorRobotTest,
+       test_robot_does_not_kick_or_chip_ball_when_autokick_and_autochip_disabled)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -371,7 +373,8 @@ TEST_F(SimulatorRobotTest, test_disable_autokick)
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    EXPECT_LT((getDribblingPoint(simulator_robot) - simulator_ball->position()).length(), 0.1);
+    EXPECT_LT((getDribblingPoint(simulator_robot) - simulator_ball->position()).length(),
+              0.1);
 }
 
 TEST_F(SimulatorRobotTest, test_disable_autochip)
@@ -392,7 +395,8 @@ TEST_F(SimulatorRobotTest, test_disable_autochip)
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    EXPECT_LT((getDribblingPoint(simulator_robot) - simulator_ball->position()).length(), 0.1);
+    EXPECT_LT((getDribblingPoint(simulator_robot) - simulator_ball->position()).length(),
+              0.1);
 }
 
 TEST_F(SimulatorRobotTest, test_enabling_autokick_disables_autochip)

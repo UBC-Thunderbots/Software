@@ -231,15 +231,18 @@ class SimulatorRobot
     void onDribblerBallEndContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
 
     /**
-     * Helper functions that check if the current pointer to the physics_robot is valid before
-     * calling the given function. If the physics_robot is invalid, a warning is logged and
-     * a default value is returned.
+     * Helper functions that check if the current pointer to the physics_robot is valid
+     * before calling the given function. If the physics_robot is invalid, a warning is
+     * logged and a default value is returned.
      *
      * @param func The function to perform on the physics robot
      */
-    void checkValidAndExecuteVoid(std::function<void(std::shared_ptr<PhysicsRobot>)> func);
-    float checkValidAndReturnFloat(std::function<float(std::shared_ptr<PhysicsRobot>)> func);
-    unsigned int checkValidAndReturnUint(std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
+    void checkValidAndExecuteVoid(
+        std::function<void(std::shared_ptr<PhysicsRobot>)> func);
+    float checkValidAndReturnFloat(
+        std::function<float(std::shared_ptr<PhysicsRobot>)> func);
+    unsigned int checkValidAndReturnUint(
+        std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<double> autokick_speed_m_per_s;

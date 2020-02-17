@@ -61,11 +61,13 @@ Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
     return Ball(position(), velocity(), timestamp);
 }
 
-Point PhysicsBall::position() const {
+Point PhysicsBall::position() const
+{
     return Point(ball_body->GetPosition().x, ball_body->GetPosition().y);
 }
 
-Vector PhysicsBall::velocity() const {
+Vector PhysicsBall::velocity() const
+{
     return Vector(ball_body->GetLinearVelocity().x, ball_body->GetLinearVelocity().y);
 }
 
@@ -91,7 +93,7 @@ void PhysicsBall::chip(const Vector &chip_vector)
     double initial_velocity = std::sqrt(numerator / denominator);
     double ground_velocity  = initial_velocity * chip_angle.cos();
     kick(chip_vector.normalize(ground_velocity));
-    chip_origin     = getBallWithTimestamp(Timestamp::fromSeconds(0)).position();
+    chip_origin          = getBallWithTimestamp(Timestamp::fromSeconds(0)).position();
     chip_distance_meters = chip_vector.length();
 }
 
@@ -138,7 +140,8 @@ bool PhysicsBall::isInFlight()
         // We assume the ball does not collide while it is in flight, which gives us the
         // "guarantee" the ball will travel far enough from the chip_origin in order to
         // "land"
-        if (current_chip_distance_meters >= chip_distance_meters && !isTouchingOtherObject())
+        if (current_chip_distance_meters >= chip_distance_meters &&
+            !isTouchingOtherObject())
         {
             chip_origin = std::nullopt;
             return false;
