@@ -136,8 +136,8 @@ BallState NetworkFilter::getFilteredBallData(
             bool ball_position_invalid =
                 refbox_config->MinValidX()->value() > ball_detection.position.x() ||
                 refbox_config->MaxValidX()->value() < ball_detection.position.x();
-            bool ignore_ball =
-                refbox_config->IgnoreInvalidCameraData()->value() && ball_position_invalid;
+            bool ignore_ball = refbox_config->IgnoreInvalidCameraData()->value() &&
+                               ball_position_invalid;
             if (!ignore_ball)
             {
                 ball_detections.push_back(ball_detection);
@@ -186,8 +186,8 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
             bool robot_position_invalid =
                 refbox_config->MinValidX()->value() > robot_detection.position.x() ||
                 refbox_config->MaxValidX()->value() < robot_detection.position.x();
-            bool ignore_robot =
-                refbox_config->IgnoreInvalidCameraData()->value() && robot_position_invalid;
+            bool ignore_robot = refbox_config->IgnoreInvalidCameraData()->value() &&
+                                robot_position_invalid;
             if (!ignore_robot)
             {
                 friendly_robot_detections.push_back(robot_detection);
@@ -232,8 +232,8 @@ Team NetworkFilter::getFilteredEnemyTeamData(
             bool robot_position_invalid =
                 refbox_config->MinValidX()->value() > robot_detection.position.x() ||
                 refbox_config->MaxValidX()->value() < robot_detection.position.x();
-            bool ignore_robot =
-                refbox_config->IgnoreInvalidCameraData()->value() && robot_position_invalid;
+            bool ignore_robot = refbox_config->IgnoreInvalidCameraData()->value() &&
+                                robot_position_invalid;
             if (!ignore_robot)
             {
                 enemy_robot_detections.push_back(robot_detection);
