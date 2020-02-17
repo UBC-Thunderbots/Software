@@ -13,7 +13,7 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              std::string gamecontroller_multicast_address,
                              int gamecontroller_multicast_port,
                              std::function<void(World)> received_world_callback,
-                             std::shared_ptr<const CameraConfig> config)
+                             std::shared_ptr<const CameraConfig> camera_config)
     : network_filter(),
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
