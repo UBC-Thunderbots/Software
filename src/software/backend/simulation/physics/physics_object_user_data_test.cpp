@@ -4,7 +4,7 @@
 
 TEST(PhysicsObjectUserDataTest, test_get_member_variables)
 {
-    PhysicsObjectUserData data {PhysicsObjectType::BALL, nullptr};
+    PhysicsObjectUserData data{PhysicsObjectType::BALL, nullptr};
     EXPECT_EQ(data.type, PhysicsObjectType ::BALL);
     EXPECT_EQ(data.physics_object, nullptr);
 }
