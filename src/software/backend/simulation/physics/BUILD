@@ -27,6 +27,15 @@ cc_library(
     deps = [],
 )
 
+cc_test(
+    name = "physics_object_user_data_test",
+    srcs = ["physics_object_user_data_test.cpp"],
+    deps = [
+        ":physics_object_user_data",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "physics_ball",
     srcs = ["physics_ball.cpp"],
@@ -148,5 +157,18 @@ cc_library(
         "//software/backend/simulation:simulator_ball",
         "//software/backend/simulation:simulator_robot",
         "@box2d",
+    ],
+)
+
+cc_test(
+    name = "simulation_contact_listener_test",
+    srcs = ["simulation_contact_listener_test.cpp"],
+    deps = [
+        ":physics_object_user_data",
+        ":simulation_contact_listener",
+        "//software/world:ball",
+        "//software/world:robot",
+        "@box2d",
+        "@gtest//:gtest_main",
     ],
 )

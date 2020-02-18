@@ -22,7 +22,6 @@ class SimulationContactListener : public b2ContactListener
     // Called once at the end of a contact
     void EndContact(b2Contact* contact) override;
 
-   private:
     /**
      * Given the user data of 2 objects involved in a collision, returns a pair of
      * pointers to the physics objects involved in the collision if this was a collision
