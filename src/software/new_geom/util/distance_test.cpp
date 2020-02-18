@@ -4,6 +4,7 @@
 
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/rectangle.h"
 
 TEST(DistanceTest, point_on_line)
 {
@@ -216,9 +217,36 @@ TEST(DistanceTest, point_in_rectangle)
 }
 
 
-TEST(DistanceTest, point_near_rectangle)
+TEST(DistanceTest, point_below_rectangle)
 {
     Point p(1, 1);
+    Rectangle r({0, 2}, {2, 4});
+    double expected = 1.0;
+    EXPECT_DOUBLE_EQ(distance(p, r), expected);
+    EXPECT_DOUBLE_EQ(distance(r, p), expected);
+}
+
+TEST(DistanceTest, point_above_rectangle)
+{
+    Point p(1, 5);
+    Rectangle r({0, 2}, {2, 4});
+    double expected = 1.0;
+    EXPECT_DOUBLE_EQ(distance(p, r), expected);
+    EXPECT_DOUBLE_EQ(distance(r, p), expected);
+}
+
+TEST(DistanceTest, point_left_rectangle)
+{
+    Point p(-1, 3);
+    Rectangle r({0, 2}, {2, 4});
+    double expected = 1.0;
+    EXPECT_DOUBLE_EQ(distance(p, r), expected);
+    EXPECT_DOUBLE_EQ(distance(r, p), expected);
+}
+
+TEST(DistanceTest, point_right_rectangle)
+{
+    Point p(3, 3);
     Rectangle r({0, 2}, {2, 4});
     double expected = 1.0;
     EXPECT_DOUBLE_EQ(distance(p, r), expected);

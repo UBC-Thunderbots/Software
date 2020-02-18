@@ -19,7 +19,11 @@ double distance(const Point &first, const Point &second)
 
 double distance(const Segment &first, const Segment &second)
 {
-    if (intersects(first, second))
+    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
+    boost::geometry::model::segment<Point> CD(second.getSegStart(),
+                                              second.getEnd());  // similar code
+    bool intersects = boost::geometry::intersects(AB, CD);
+    if (intersects)
     {
         return 0.0;
     }
@@ -70,7 +74,7 @@ double distance(const Polygon &first, const Point &second)
 
 double distanceSquared(const Point &first, const Segment &second)
 {
-    double seg_lensq          = lengthSquared(second);
+    double seg_lensq          = distanceSquared(second.getSegStart(), second.getEnd());
     Vector seg_start_to_point = first - second.getSegStart();
     Vector seg_end_to_point   = first - second.getEnd();
 
@@ -79,7 +83,9 @@ double distanceSquared(const Point &first, const Segment &second)
     if (seg_vec.dot(seg_start_to_point) > 0 &&
         second.reverse().toVector().dot(seg_end_to_point) > 0)
     {
-        if (isDegenerate(second))
+        bool is_degenerate = distanceSquared(second.getSegStart(), second.getEnd()) <
+                             GeomConstants::EPSILON;
+        if (is_degenerate)
         {
             return seg_start_to_point.length();
         }

@@ -11,6 +11,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
         "//software/geom",
+        "//software/new_geom/util:distance",
         "//software/world",
         "@g3log",
     ],
