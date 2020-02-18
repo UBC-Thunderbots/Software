@@ -31,7 +31,6 @@ cc_test(
         ":stp",
         "//software/ai/hl/stp/play:halt_play",
         "//software/test_util",
-        "//software/util/design_patterns:generic_factory",
         "//software/world",
         "@gtest//:gtest_main",
     ],
@@ -47,7 +46,6 @@ cc_test(
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
         "//software/test_util",
-        "//software/util/design_patterns:generic_factory",
         "@gtest//:gtest_main",
     ],
 )

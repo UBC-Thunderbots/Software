@@ -120,7 +120,7 @@ cc_test(
     srcs = ["halt_play_test.cpp"],
     deps = [
         ":halt_play",
-        ":play",
+        "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

@@ -168,8 +168,5 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
     }
 }
 
-// Register this play in the PlayFactory
-//static TPlayFactory<DefensePlay> factory;
-
 // Register this play in the genericFactory
 static TGenericFactory<std::string,Play,DefensePlay> factory;

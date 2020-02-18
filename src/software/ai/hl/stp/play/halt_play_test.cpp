@@ -19,7 +19,7 @@ TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     HaltPlay halt_play;
-    auto tactics = (halt_play).getTactics(world);
+    auto tactics = halt_play.getTactics(world);
 
     // Make sure something was returned
     EXPECT_TRUE(tactics);
