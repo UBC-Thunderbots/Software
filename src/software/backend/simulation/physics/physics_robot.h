@@ -266,7 +266,7 @@ class PhysicsRobot
     // do come to a halt if no force is applied.
     // Damping is roughly calculated as v_new = v * exp(damping * t)
     // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
-    const double robot_linear_damping = 0.2;
+    const double robot_linear_damping  = 0.2;
     const double robot_angular_damping = 0.2;
 
     // This is a somewhat arbitrary value. Collisions with robots are not perfectly

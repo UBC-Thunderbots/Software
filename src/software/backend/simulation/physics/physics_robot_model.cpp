@@ -6,7 +6,7 @@
 #include "software/backend/simulation/physics/box2d_util.h"
 
 b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(const Robot& robot,
-                                                    double total_chicker_depth)
+                                                         double total_chicker_depth)
 {
     const unsigned int num_shape_vertices = b2_maxPolygonVertices;
     b2Vec2 robot_body_vertices[num_shape_vertices];
@@ -41,7 +41,7 @@ b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(const Robot& robot,
 }
 
 b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(const Robot& robot,
-                                                         double total_chicker_depth)
+                                                              double total_chicker_depth)
 {
     // These points are already give in counter-clockwise order, so we can directly create
     // a polygon (Box2D requires that polygon vertices are given in counter-clockwise
@@ -64,7 +64,7 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(const Robot& robot
 }
 
 b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(const Robot& robot,
-                                                          double total_chicker_depth)
+                                                               double total_chicker_depth)
 {
     auto shape_points = getRobotFrontLeftShapePoints(robot, total_chicker_depth);
 
@@ -93,7 +93,7 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(const Robot& robo
 }
 
 std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(const Robot& robot,
-                                                              double chicker_depth)
+                                                                   double chicker_depth)
 {
     // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of
     // 0) First find the y-coordinate of the front-left edge of the body by solving x^2 +

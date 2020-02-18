@@ -30,8 +30,8 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, doubl
     ball_fixture_def.shape = &ball_shape;
     // Calculate the density the fixture / ball must have in order for it to have the
     // desired mass. The density is uniform across the shape.
-    float ball_area          = M_PI * ball_shape.m_radius * ball_shape.m_radius;
-    ball_fixture_def.density = mass_kg / ball_area;
+    float ball_area              = M_PI * ball_shape.m_radius * ball_shape.m_radius;
+    ball_fixture_def.density     = mass_kg / ball_area;
     ball_fixture_def.restitution = ball_restitution;
     ball_fixture_def.friction    = ball_friction;
     ball_fixture_def.userData =

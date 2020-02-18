@@ -1,11 +1,11 @@
 #include "software/backend/simulation/physics/physics_robot.h"
-#include "software/backend/simulation/physics/physics_robot_model.h"
 
 #include <algorithm>
 #include <numeric>
 
 #include "software/backend/simulation/physics/box2d_util.h"
 #include "software/backend/simulation/physics/physics_object_user_data.h"
+#include "software/backend/simulation/physics/physics_robot_model.h"
 extern "C"
 {
 #include "firmware/main/shared/physics.h"
@@ -15,13 +15,13 @@ extern "C"
 // this to calculate the depth. We assume the ball can be dribbled as long as it is
 // anywhere within this small area.
 const double PhysicsRobot::dribbler_depth =
-        BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
+    BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 // We can use a very small value for the chicker thickness since the
 // chicker just needs to be large enough to collide with the ball and detect collisions
 // without letting the ball tunnel and collide with the robot body
 const double PhysicsRobot::chicker_thickness = 0.005;
 const double PhysicsRobot::total_chicker_depth =
-        PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
+    PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
 PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot,
                            double mass_kg)
@@ -33,8 +33,8 @@ PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot,
     robot_body_def.linearVelocity.Set(robot.velocity().x(), robot.velocity().y());
     robot_body_def.angle           = robot.orientation().toRadians();
     robot_body_def.angularVelocity = robot.angularVelocity().toRadians();
-    robot_body_def.linearDamping  = robot_linear_damping;
-    robot_body_def.angularDamping = robot_angular_damping;
+    robot_body_def.linearDamping   = robot_linear_damping;
+    robot_body_def.angularDamping  = robot_angular_damping;
 
     robot_body = world->CreateBody(&robot_body_def);
 
@@ -68,7 +68,8 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double total_chick
     robot_body_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
 
-    b2PolygonShape* main_body_shape = PhysicsRobotModel::getMainRobotBodyShape(robot, total_chicker_depth);
+    b2PolygonShape* main_body_shape =
+        PhysicsRobotModel::getMainRobotBodyShape(robot, total_chicker_depth);
     b2PolygonShape* front_left_body_shape =
         PhysicsRobotModel::getRobotBodyShapeFrontLeft(robot, total_chicker_depth);
     b2PolygonShape* front_right_body_shape =
@@ -96,7 +97,7 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double dribbler_dept
     // We explicitly choose to make the dribbler NOT a sensor, because sensor fixtures do
     // not trigger PreSolve contact callbacks, which we rely on to apply dribbling force
     // at every physics step
-    robot_dribbler_fixture_def.isSensor = false;
+    robot_dribbler_fixture_def.isSensor    = false;
     robot_dribbler_fixture_def.restitution = robot_dribbler_restitution;
     robot_dribbler_fixture_def.friction    = robot_dribbler_friction;
     robot_dribbler_fixture_def.userData =
@@ -124,8 +125,8 @@ void PhysicsRobot::setupChickerFixture(const Robot& robot, double total_chicker_
 {
     b2FixtureDef robot_chicker_fixture_def;
     robot_chicker_fixture_def.restitution = robot_chicker_restitution;
-    robot_chicker_fixture_def.friction = robot_chicker_friction;
-    robot_chicker_fixture_def.density = robot_chicker_density;
+    robot_chicker_fixture_def.friction    = robot_chicker_friction;
+    robot_chicker_fixture_def.density     = robot_chicker_density;
     robot_chicker_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_CHICKER, this});
 

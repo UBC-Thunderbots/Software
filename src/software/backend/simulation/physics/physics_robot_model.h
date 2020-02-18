@@ -25,7 +25,9 @@ class PhysicsRobotModel
      * See the ASCII diagram below for a rough view of how the robot is created.
      * - The regions made with the '+' symbol are the front left and right bodies
      * - The region made with the 'x' symbol is the main body
-     *
+     */
+    /* clang-format off */
+    /*
      *                            xxxxxxxxxxxxxxxxxx
      *                         x                      x
      *                      x                            x
@@ -53,21 +55,23 @@ class PhysicsRobotModel
      *                      x                            x
      *                         x                      x
      *                            xxxxxxxxxxxxxxxxxx
-     *
-     *
+     */
+    /* clang-format on */
+    /**
      * @param robot The robot to create
      * @param total_chicker_depth The distance from the front face of the robot to the
      * back of the chicker, ie. how far inset into the front of the robot the chicker is
      *
      * @return A b2PolygonShape for the corresponding part of the robot body
      */
-    static b2PolygonShape* getMainRobotBodyShape(const Robot& robot, double total_chicker_depth);
+    static b2PolygonShape* getMainRobotBodyShape(const Robot& robot,
+                                                 double total_chicker_depth);
     static b2PolygonShape* getRobotBodyShapeFrontLeft(const Robot& robot,
-                                               double total_chicker_depth);
+                                                      double total_chicker_depth);
     static b2PolygonShape* getRobotBodyShapeFrontRight(const Robot& robot,
-                                                double total_chicker_depth);
+                                                       double total_chicker_depth);
 
-private:
+   private:
     /**
      * A helper function that returns the points that make up the front-left shape
      * for the robot body. The points that are returned assume the robot is at (0, 0)
@@ -80,5 +84,5 @@ private:
      * @return The points that make up the front-left shape for the robot body
      */
     static std::vector<Point> getRobotFrontLeftShapePoints(const Robot& robot,
-                                                    double chicker_depth);
+                                                           double chicker_depth);
 };
