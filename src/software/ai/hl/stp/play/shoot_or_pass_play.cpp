@@ -12,8 +12,8 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "src/g3log/loglevels.hpp"
 #include "software/util/design_patterns/generic_factory.h"
+#include "src/g3log/loglevels.hpp"
 
 
 using namespace Passing;
@@ -217,4 +217,4 @@ void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,ShootOrPassPlay> factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay> factory;

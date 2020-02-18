@@ -136,4 +136,4 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,StopPlay> factory;
+static TGenericFactory<std::string, Play, StopPlay> factory;

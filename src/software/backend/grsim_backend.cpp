@@ -1,7 +1,7 @@
 #include "software/backend/grsim_backend.h"
 
-#include "software/util/design_patterns/generic_factory.h"
 #include "software/constants.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string GrSimBackend::name = "grsim";
 
@@ -56,4 +56,4 @@ void GrSimBackend::updateGrSim()
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Backend,GrSimBackend> factory;
+static TGenericFactory<std::string, Backend, GrSimBackend> factory;

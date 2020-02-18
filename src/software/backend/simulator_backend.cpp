@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include <algorithm>
+
 #include "software/logger/init.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -139,4 +140,4 @@ void SimulatorBackend::runSimulationLoop(World world)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Backend,SimulatorBackend> factory;
+static TGenericFactory<std::string, Backend, SimulatorBackend> factory;

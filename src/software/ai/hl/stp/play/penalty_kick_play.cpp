@@ -93,4 +93,4 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,PenaltyKickPlay> factory;
+static TGenericFactory<std::string, Play, PenaltyKickPlay> factory;

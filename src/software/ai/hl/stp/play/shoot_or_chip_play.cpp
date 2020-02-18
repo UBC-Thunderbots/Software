@@ -15,8 +15,8 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/world/game_state.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/world/game_state.h"
 
 
 using namespace Evaluation;
@@ -167,4 +167,4 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,ShootOrChipPlay> factory;
+static TGenericFactory<std::string, Play, ShootOrChipPlay> factory;

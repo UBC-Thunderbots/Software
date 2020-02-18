@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 
-#include "software/util/design_patterns/generic_factory.h"
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
 #include "software/geom/util.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string HaltTestPlay::name = "Halt Test Play";
 
@@ -36,4 +36,4 @@ void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,HaltTestPlay> factory;
+static TGenericFactory<std::string, Play, HaltTestPlay> factory;

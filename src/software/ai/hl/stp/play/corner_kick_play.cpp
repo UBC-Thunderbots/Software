@@ -236,4 +236,4 @@ void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,CornerKickPlay> factory;
+static TGenericFactory<std::string, Play, CornerKickPlay> factory;

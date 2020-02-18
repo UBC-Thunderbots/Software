@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
 
-#include "software/util/design_patterns/generic_factory.h"
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string MoveTestPlay::name = "Move Test Play";
 
@@ -38,4 +38,4 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,MoveTestPlay> factory;
+static TGenericFactory<std::string, Play, MoveTestPlay> factory;

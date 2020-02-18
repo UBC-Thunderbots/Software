@@ -47,7 +47,8 @@ void STP::updateCurrentPlay(const World& world)
         {
             try
             {
-                current_play = GenericFactory<std::string,Play>::create(override_play_name);
+                current_play =
+                    GenericFactory<std::string, Play>::create(override_play_name);
             }
             catch (std::invalid_argument)
             {
@@ -262,7 +263,8 @@ void STP::assignRobotsToTactics(const World& world,
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 {
     std::vector<std::unique_ptr<Play>> applicable_plays;
-    for (const auto& play_constructor : GenericFactory<std::string,Play>::getRegisteredConstructors())
+    for (const auto& play_constructor :
+         GenericFactory<std::string, Play>::getRegisteredConstructors())
     {
         auto play = play_constructor();
         if (play->isApplicable(world))

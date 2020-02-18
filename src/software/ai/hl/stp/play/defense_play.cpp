@@ -13,8 +13,8 @@
 #include "software/geom/util.h"
 #include "software/logger/init.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/world/game_state.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/world/game_state.h"
 
 const std::string DefensePlay::name = "Defense Play";
 
@@ -169,4 +169,4 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,DefensePlay> factory;
+static TGenericFactory<std::string, Play, DefensePlay> factory;

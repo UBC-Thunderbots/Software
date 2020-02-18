@@ -120,5 +120,3 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
     }
 };
 #include "software/util/design_patterns/generic_factory.tpp"
-
-

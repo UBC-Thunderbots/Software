@@ -284,4 +284,4 @@ void FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string,Play,FreeKickPlay> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay> factory;
