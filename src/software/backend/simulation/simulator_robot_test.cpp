@@ -546,7 +546,6 @@ TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_spinning_in_place)
         simulator_robot->applyWheelForceFrontRight(0.3);
 
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-        std::cout << simulator_robot->getVelocityAngular() << std::endl;
     }
 
     // Check the ball has stuck to the dribbler

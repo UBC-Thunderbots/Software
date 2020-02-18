@@ -39,20 +39,20 @@ float SimulatorBallSingleton::checkValidAndReturnFloat(
 
 float SimulatorBallSingleton::getBallPositionX()
 {
-    checkValidAndReturnFloat([](auto ball) { return ball->position().x(); });
+    return checkValidAndReturnFloat([](auto ball) { return ball->position().x(); });
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    checkValidAndReturnFloat([](auto ball) { return ball->position().y(); });
+    return checkValidAndReturnFloat([](auto ball) { return ball->position().y(); });
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    checkValidAndReturnFloat([](auto ball) { return ball->velocity().x(); });
+    return checkValidAndReturnFloat([](auto ball) { return ball->velocity().x(); });
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    checkValidAndReturnFloat([](auto ball) { return ball->velocity().y(); });
+    return checkValidAndReturnFloat([](auto ball) { return ball->velocity().y(); });
 }

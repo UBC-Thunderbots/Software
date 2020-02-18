@@ -127,11 +127,14 @@ void SimulatorBackend::runSimulationLoop(World world)
         std::this_thread::yield();
 
         auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
-        if (!primitives)
+        if (primitives)
+        {
+            simulator.setPrimitives(primitives.value());
+        }
+        else
         {
             LOG(WARNING) << "Simulator Backend timed out waiting for primitives";
         }
-        simulator.setPrimitives(primitives.value());
 
         // Take ownership of the `in_destructor` flag so we can use it for the conditional
         // check
