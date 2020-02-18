@@ -3,9 +3,8 @@
 #include <math.h>
 
 #include <algorithm>
-
-#include "software/backend/backend_factory.h"
 #include "software/logger/init.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string SimulatorBackend::name = "simulator";
 
@@ -139,5 +138,5 @@ void SimulatorBackend::runSimulationLoop(World world)
     }
 }
 
-// Register this backend in the BackendFactory
-static TBackendFactory<SimulatorBackend> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string,Backend,SimulatorBackend> factory;

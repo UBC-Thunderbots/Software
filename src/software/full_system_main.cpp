@@ -5,10 +5,12 @@
 
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
-#include "software/backend/backend_factory.h"
 #include "software/constants.h"
 #include "software/logger/init.h"
 #include "software/visualizer/visualizer_wrapper.h"
+#include "software/util/design_patterns/generic_factory.h"
+#include "software/backend/backend.h"
+
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -46,7 +48,8 @@ void setBackendFromString(std::string backend_name)
 {
     try
     {
-        backend = BackendFactory::createBackend(backend_name);
+        backend = GenericFactory<std::string,Backend>::create(backend_name);
+
     }
     catch (const std::invalid_argument &e)
     {
@@ -66,7 +69,8 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
 {
     commandLineArgs args;
     // Build one string with all the backend_names
-    std::vector<std::string> backend_names = BackendFactory::getRegisteredBackendNames();
+    std::vector<std::string> backend_names = GenericFactory<std::string, Backend>::getRegisteredNames();
+
     std::string all_backend_names =
         std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
                         [](std::string &ss, std::string &s) { return ss + s + ", "; });
