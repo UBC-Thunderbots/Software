@@ -32,13 +32,8 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, doubl
     // desired mass. The density is uniform across the shape.
     float ball_area          = M_PI * ball_shape.m_radius * ball_shape.m_radius;
     ball_fixture_def.density = mass_kg / ball_area;
-    // These restitution and friction values are somewhat arbitrary. Because this is an
-    // "ideal" simulation, we can approximate the ball as having perfectly elastic
-    // collisions and no friction. Because we also do not generally depend on specific
-    // behaviour when the ball collides with something, getting these values to perfectly
-    // match reality isn't too important.
-    ball_fixture_def.restitution = 1.0;
-    ball_fixture_def.friction    = 0.0;
+    ball_fixture_def.restitution = ball_restitution;
+    ball_fixture_def.friction    = ball_friction;
     ball_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 

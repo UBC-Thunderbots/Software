@@ -129,4 +129,12 @@ class PhysicsBall
     std::optional<Point> chip_origin;
     // The distance of the most recent chip
     double chip_distance_meters;
+
+    // These restitution and friction values are somewhat arbitrary. Because this is an
+    // "ideal" simulation, we can approximate the ball as having perfectly elastic
+    // collisions and no friction. Because we also do not generally depend on specific
+    // behaviour when the ball collides with something, getting these values to perfectly
+    // match reality isn't too important.
+    const double ball_restitution = 1.0;
+    const double ball_friction    = 0.0;
 };

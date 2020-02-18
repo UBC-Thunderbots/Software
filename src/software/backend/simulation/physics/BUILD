@@ -88,6 +88,18 @@ cc_test(
 )
 
 cc_library(
+    name = "physics_robot_model",
+    srcs = ["physics_robot_model.cpp"],
+    hdrs = ["physics_robot_model.h"],
+    deps = [
+        ":box2d_util",
+        "//software/new_geom:point",
+        "//software/world:robot",
+        "@box2d",
+    ],
+)
+
+cc_library(
     name = "physics_robot",
     srcs = ["physics_robot.cpp"],
     hdrs = ["physics_robot.h"],
@@ -95,6 +107,7 @@ cc_library(
         ":box2d_util",
         ":physics_ball",
         ":physics_object_user_data",
+        ":physics_robot_model",
         "//firmware/main/shared:physics",
         "//shared:constants",
         "//software/geom",

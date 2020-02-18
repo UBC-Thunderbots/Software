@@ -220,75 +220,6 @@ class PhysicsRobot
     void setupDribblerFixture(const Robot& robot, double dribbler_depth);
 
     /**
-     * Together these functions return 3 polygons that together make up the shape of the
-     * robot. It is broken up this way because Box2D can only have convex polygons. We
-     * split the body into 3 parts:
-     * - The main body, which is everything behind the chicker
-     * - The front-left part, which is the bit that is to the front-left of the chicker,
-     * partially enclosing it
-     * - The front-right part, which is the bit that is to the front-right of the chicker,
-     * partially enclosing it
-     *
-     * See the ASCII diagram below for a rough view of how the robot is created.
-     * - The regions made with the '+' symbol are the front left and right bodies
-     * - The region made with the 'x' symbol is the main body
-     *
-     *                                      xxxxxxxxxxxxxxxxxx
-     *                                   x                      x
-     *                                x                            x
-     *                             x                                  x
-     *                          x                                       X
-     *                       x                                          x+++
-     *                    x                                             x+  ++
-     *                 x                                                x+   +  <--- Front
-     * left part (indicated by '+') x                                                x+ +
-     *                 x                                                x+++++
-     *                 x                                                x|c|d|
-     *                 x                                                x|h|r|
-     *                 x                                                x|i|i|
-     *                 x                                                x|c|b|
-     *                 x                                                x|k|b|
-     *                 x                                                x|e|l|
-     *                 x                                                x|r|e|
-     *                 x                                                x+++++
-     *                 x                                                x+   +
-     *                 x                                                x+   +  <--- Front
-     * right part (indicated by '+') x                                             x+  ++
-     *                       x                                          x+++
-     *                          x                                       x
-     *                             x                                  x
-     *                                x                            x
-     *                                   x                      x
-     *                                      xxxxxxxxxxxxxxxxxx
-     *
-     *
-     * @param robot The robot to create
-     * @param total_chicker_depth The distance from the front face of the robot to the
-     * back of the chicker, ie. how far inset into the front of the robot the chicker is
-     *
-     * @return A b2PolygonShape for the corresponding part of the robot body
-     */
-    b2PolygonShape* getMainRobotBodyShape(const Robot& robot, double total_chicker_depth);
-    b2PolygonShape* getRobotBodyShapeFrontLeft(const Robot& robot,
-                                               double total_chicker_depth);
-    b2PolygonShape* getRobotBodyShapeFrontRight(const Robot& robot,
-                                                double total_chicker_depth);
-
-    /**
-     * A helper function that returns the points that make up the front-left shape
-     * for the robot body. The points that are returned assume the robot is at (0, 0)
-     * and is facing the +x axis (aka has an orientation of 0). The points are returned
-     * in counter-clockwise order.
-     *
-     * @param robot The robot to create
-     * @param chicker_depth How far inset into the front of the robot the chicker is
-     *
-     * @return The points that make up the front-left shape for the robot body
-     */
-    std::vector<Point> getRobotFrontLeftShapePoints(const Robot& robot,
-                                                    double chicker_depth);
-
-    /**
      * A helper function that applies force to the robot body as if there was a wheel
      * at the given angle, relative to the front of the robot
      *
@@ -329,4 +260,35 @@ class PhysicsRobot
         dribbler_ball_end_contact_callbacks;
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
         chicker_ball_contact_callbacks;
+
+    // This is a somewhat arbitrary value for damping. We keep it relatively low
+    // so that robots still coast a ways before stopping, but non-zero so that robots
+    // do come to a halt if no force is applied.
+    // Damping is roughly calculated as v_new = v * exp(damping * t)
+    // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
+    const double robot_linear_damping = 0.2;
+    const double robot_angular_damping = 0.2;
+
+    // This is a somewhat arbitrary value. Collisions with robots are not perfectly
+    // elastic. However because this is an "ideal" simulation and we generally don't care
+    // about the exact behaviour of collisions, getting this value to perfectly match
+    // reality isn't too important.
+    const double robot_body_restitution = 0.5;
+    const double robot_body_friction    = 0.0;
+
+    // The dribbler has no mass in simulation. Mass is already accounted for by the robot
+    // body
+    const double robot_dribbler_density = 0.0;
+    // We assume the ContactListener for the world will disable collisions with the
+    // dribbler so the restitution and friction don't matter
+    const double robot_dribbler_restitution = 0.0;
+    const double robot_dribbler_friction    = 0.0;
+
+    // We want perfect damping to help us keep the ball when dribbling
+    const double robot_chicker_restitution = 0.0;
+    // We want lots of friction for when the ball is being dribbled so it stays controlled
+    const double robot_chicker_friction = 1.0;
+    // The chicker has no mass in simulation. Mass is already accounted for by the robot
+    // body
+    const double robot_chicker_density = 0.0;
 };
