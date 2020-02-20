@@ -2,6 +2,7 @@
 
 #include "software/backend/backend_factory.h"
 #include "software/constants.h"
+#include "software/parameter/dynamic_parameters.h"
 
 const std::string GrSimBackend::name = "grsim";
 
@@ -10,7 +11,8 @@ GrSimBackend::GrSimBackend()
                     Util::Constants::SSL_VISION_MULTICAST_PORT,
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
-                    boost::bind(&GrSimBackend::receiveWorld, this, _1)),
+                    boost::bind(&GrSimBackend::receiveWorld, this, _1),
+                    Util::DynamicParameters->getCameraConfig()),
       grsim_output(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
                    Util::Constants::GRSIM_COMMAND_NETWORK_PORT)
 {

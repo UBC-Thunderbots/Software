@@ -1,5 +1,7 @@
 #include "software/new_geom/util/intersection.h"
 
+#include "software/new_geom/util/collinear.h"
+
 /**
  * Computes the point of intersection between two lines.
  * Note: this computes the intersection of two lines, not line segments.
@@ -43,6 +45,18 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     return std::make_optional(intersection);
 }
 
+/**
+ * Returns the sign of the given double, or zero if is in the range (-EPSILON, EPSILON).
+ *
+ * @param n the given double
+ *
+ * @return the sign of the given double, or zero if is in the range (-EPSILON, EPSILON)
+ */
+constexpr int sign(double n)
+{
+    return n > GeomConstants::EPSILON ? 1 : (n < -GeomConstants::EPSILON ? -1 : 0);
+}
+
 std::vector<Point> intersection(const Segment &first, const Segment &second)
 {
     std::vector<Point> output;
@@ -54,13 +68,13 @@ std::vector<Point> intersection(const Segment &first, const Segment &second)
     return output;
 }
 
-std::unordered_set<Point> intersection(const Rectangle &rectangle, const Segment &segment)
+std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment)
 {
     std::unordered_set<Point> intersections;
 
-    for (const Segment &rec_segment : rectangle.getSegments())
+    for (const Segment &seg : polygon.getSegments())
     {
-        for (const Point &p : intersection(rec_segment, segment))
+        for (const Point &p : intersection(seg, segment))
         {
             intersections.insert(p);
         }
@@ -81,8 +95,8 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     // If there exists a single intersection, and it exists on the ray and within the
     // segment
     if (point_of_intersection.has_value() &&
-        contains(ray, point_of_intersection.value()) &&
-        contains(segment, point_of_intersection.value()))
+        ray.contains(point_of_intersection.value()) &&
+        segment.contains(point_of_intersection.value()))
     {
         intersections = {point_of_intersection.value()};
         return intersections;
@@ -142,11 +156,11 @@ std::optional<Point> intersection(const Line &first, const Line &second)
     }
 }
 
-std::unordered_set<Point> intersection(const Rectangle &rectangle, const Ray &ray)
+std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray)
 {
     std::unordered_set<Point> intersections;
 
-    for (const Segment &seg : rectangle.getSegments())
+    for (const Segment &seg : polygon.getSegments())
     {
         for (const Point &p : intersection(ray, seg))
         {

@@ -36,6 +36,7 @@ cc_library(
     ],
     deps = [
         "//software/geom",
+        "//software/new_geom:line",
         "//software/new_geom:polygon",
         "//software/new_geom:segment",
     ],
@@ -50,20 +51,46 @@ cc_library(
         "intersection.h",
     ],
     deps = [
-        "//software/geom",
+        ":collinear",
+        "//software/new_geom:line",
+        "//software/new_geom:polygon",
         "//software/new_geom:ray",
-        "//software/new_geom:rectangle",
         "//software/new_geom:segment",
     ],
 )
 
 cc_test(
-    name = "intersections_test",
+    name = "intersection_test",
     srcs = [
         "intersection_test.cpp",
     ],
     deps = [
         ":intersection",
+        "//software/new_geom:rectangle",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "collinear",
+    srcs = [
+        "collinear.cpp",
+    ],
+    hdrs = [
+        "collinear.h",
+    ],
+    deps = [
+        "//software/new_geom:point",
+    ],
+)
+
+cc_test(
+    name = "collinear_test",
+    srcs = [
+        "collinear_test.cpp",
+    ],
+    deps = [
+        ":collinear",
         "@gtest//:gtest_main",
     ],
 )
@@ -77,7 +104,6 @@ cc_library(
         "distance.h",
     ],
     deps = [
-        "//software/geom",
         "//software/new_geom:angle",
         "//software/new_geom:geom_constants",
         "//software/new_geom:line",
@@ -106,6 +132,7 @@ cc_test(
     ],
     deps = [
         ":distance",
+        "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
     ],
 )

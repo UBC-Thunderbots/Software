@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "software/new_geom/rectangle.h"
+
 TEST(SegmentSegmentIntersectionsTest, test_segments_single_point_intersection)
 {
     Segment a                        = Segment(Point(2, 2), Point(-2, -2));

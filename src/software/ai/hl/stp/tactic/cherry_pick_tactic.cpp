@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
+#include "software/new_geom/util/distance.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
     : Tactic(true),
@@ -30,7 +31,7 @@ void CherryPickTactic::updateWorldParams(const World& world)
 double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& world)
 {
     // Prefer robots closer to the target region
-    return dist(robot.position(), target_region);
+    return distance(robot.position(), target_region);
 }
 
 void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
