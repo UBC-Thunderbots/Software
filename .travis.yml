@@ -10,7 +10,7 @@ jobs:
     - name: "Build, Test, and Run Coverage"
       script:
         - cd src
-        # Build, test, run coverage
+        # Build, test, and run coverage
         - >
           bazel coverage //software/...
           --compilation_mode=fastbuild 
