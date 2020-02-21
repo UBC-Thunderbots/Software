@@ -321,7 +321,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
                            PhysicsRobot::dribbler_depth);
         Vector dribble_force_vector = dribble_point - ball.position();
-        // concvert to cm so we operate on a small scale
+        // convert to cm so we operate on a small scale
         double dist_from_dribble_point_cm = dribble_force_vector.length() * 100;
         // Combine a polynomial with a slightly offset linear function. This shifts the
         // intercept with the x-axis to a small positive x-value, so that there is a small
