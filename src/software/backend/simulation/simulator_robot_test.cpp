@@ -323,7 +323,7 @@ TEST_F(SimulatorRobotTest,
     }
 
     // If the ball lands in an obstacle, collisions should be disabled until the ball
-    // is outsie the obstacle
+    // is outside the obstacle
     //
     // Check the ball's velocity is in a reasonable range, and still heading in the
     // same direction is was chipped. Because the ball "lands" in an object we want to

@@ -8,7 +8,7 @@
 
 /**
  * This class implements a custom ContactListener for a Box2D world so that we
- * can have custom behavior when objects collid.
+ * can have custom behaviour when objects collide.
  *
  * See https://www.iforce2d.net/b2dtut/collision-callbacks for more info
  */

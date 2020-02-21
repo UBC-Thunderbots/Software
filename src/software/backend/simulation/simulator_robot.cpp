@@ -309,7 +309,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
         auto ball  = physics_ball->getBallWithTimestamp(Timestamp::fromSeconds(0));
 
         // To dribble, we apply a force towards the center and back of the dribbling area,
-        // closest to the chicker. We vary the magnitude of the foce by how far the ball
+        // closest to the chicker. We vary the magnitude of the force by how far the ball
         // is from this "dribbling point". This more-or-less acts like a tiny gravity well
         // that sucks the ball into place, except with more force the further away the
         // ball is. Once the ball is no longer in the dribbler area this force is not
@@ -321,7 +321,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
                            PhysicsRobot::dribbler_depth);
         Vector dribble_force_vector = dribble_point - ball.position();
-        // concvert to cm so we operate on a small scale
+        // convert to cm so we operate on a small scale
         double dist_from_dribble_point_cm = dribble_force_vector.length() * 100;
         // Combine a polynomial with a slightly offset linear function. This shifts the
         // intercept with the x-axis to a small positive x-value, so that there is a small
@@ -332,7 +332,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
         //
         // The constants in this equation have been tuned manually so that the dribbling
         // scenarios in the unit tests pass, which represent reasonable dribbling
-        // behavior.
+        // behaviour.
         double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 4);
         double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm - 0.5));
         double dribble_force_magnitude = polynomial_component + linear_component;

@@ -11,11 +11,11 @@ extern "C"
 
 // TODO: The JERK_LIMIT is copied from firmware/main/control/control.h
 // which we currently can't include directly because it relies on firmware IO.
-// We should inject is as a robot or control param instead.
+// We should inject it as a robot or control param instead.
 #define JERK_LIMIT 40.0f  //(m/s^3)
 // TODO: The WHEEL_MOTOR_PHASE_RESISTANCE is copied from firmware/main/io/wheels.h
 // which we currently can't include directly because it is in firmware IO.
-// We should inject is as a robot or control param instead.
+// We should inject it as a robot or control param instead.
 #define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
 std::shared_ptr<SimulatorRobot> SimulatorRobotSingleton::simulator_robot = nullptr;
