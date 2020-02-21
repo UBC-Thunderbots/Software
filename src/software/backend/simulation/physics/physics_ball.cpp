@@ -58,12 +58,12 @@ Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
 
 Point PhysicsBall::position() const
 {
-    return Point(ball_body->GetPosition().x, ball_body->GetPosition().y);
+    return createPoint(ball_body->GetPosition());
 }
 
 Vector PhysicsBall::velocity() const
 {
-    return Vector(ball_body->GetLinearVelocity().x, ball_body->GetLinearVelocity().y);
+    return createVector(ball_body->GetLinearVelocity());
 }
 
 void PhysicsBall::kick(Vector kick_vector)
@@ -78,6 +78,8 @@ void PhysicsBall::kick(Vector kick_vector)
 void PhysicsBall::chip(const Vector &chip_vector)
 {
     // Assume the ball is chipped at at a 45 degree angle
+    // TODO: Use a robot-specific constant
+    // https://github.com/UBC-Thunderbots/Software/issues/1179
     Angle chip_angle = Angle::fromDegrees(45);
     // Use the formula for the Range of a parabolic projectile
     // Rearrange to solve for the initial velocity
