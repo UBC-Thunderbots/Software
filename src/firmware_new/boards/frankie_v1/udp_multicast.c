@@ -1,4 +1,3 @@
-#include "ai_communicator.h"
 #include "firmware_new/proto/control_fw.pb.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
