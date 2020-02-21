@@ -309,7 +309,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
         auto ball  = physics_ball->getBallWithTimestamp(Timestamp::fromSeconds(0));
 
         // To dribble, we apply a force towards the center and back of the dribbling area,
-        // closest to the chicker. We vary the magnitude of the foce by how far the ball
+        // closest to the chicker. We vary the magnitude of the force by how far the ball
         // is from this "dribbling point". This more-or-less acts like a tiny gravity well
         // that sucks the ball into place, except with more force the further away the
         // ball is. Once the ball is no longer in the dribbler area this force is not
