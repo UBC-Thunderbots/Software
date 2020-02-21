@@ -332,7 +332,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
         //
         // The constants in this equation have been tuned manually so that the dribbling
         // scenarios in the unit tests pass, which represent reasonable dribbling
-        // behavior.
+        // behaviour.
         double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 4);
         double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm - 0.5));
         double dribble_force_magnitude = polynomial_component + linear_component;
