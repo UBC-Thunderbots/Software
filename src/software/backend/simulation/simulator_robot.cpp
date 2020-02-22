@@ -170,11 +170,13 @@ void SimulatorRobot::disableAutochip()
     autochip_distance_m = std::nullopt;
 }
 
-bool SimulatorRobot::isAutokickEnabled() {
+bool SimulatorRobot::isAutokickEnabled()
+{
     return autokick_speed_m_per_s.has_value();
 }
 
-bool SimulatorRobot::isAutochipEnabled() {
+bool SimulatorRobot::isAutochipEnabled()
+{
     return autochip_distance_m.has_value();
 }
 
