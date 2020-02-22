@@ -1,9 +1,11 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/util/design_patterns/generic_factory.h"
+
+
 
 const std::string StopPlay::name = "Stop Play";
 
@@ -133,5 +135,5 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<StopPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, StopPlay> factory;
