@@ -404,10 +404,10 @@ static void low_level_init(struct netif *netif)
             HAL_ETH_SetMACConfig(&heth, &MACConf);
 
             /* USER CODE BEGIN PHY_POST_CONFIG */
-            HAL_ETH_GetMACFilterConfig(&heth, &test);
-            test.PassAllMulticast = ENABLE;
-            test.PromiscuousMode  = ENABLE;
-            HAL_ETH_SetMACFilterConfig(&heth, &test);
+            /*HAL_ETH_GetMACFilterConfig(&heth, &test);*/
+            /*test.PassAllMulticast = ENABLE;*/
+            /*test.PromiscuousMode  = ENABLE;*/
+            /*HAL_ETH_SetMACFilterConfig(&heth, &test);*/
             /* USER CODE END PHY_POST_CONFIG */
         }
         HAL_ETH_Start_IT(&heth);

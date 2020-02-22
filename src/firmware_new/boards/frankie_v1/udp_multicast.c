@@ -5,7 +5,6 @@
 #include "lwip/memp.h"
 #include "lwip/opt.h"
 #include "lwip/pbuf.h"
-#include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
@@ -14,87 +13,88 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 
-// TODO remove
-int msg_count = 0;
 
-
-// these buffers are used to serialize and deserialize protobuf
-uint8_t recv_buffer[robot_ack_size];
-uint8_t send_buffer[control_msg_size];
-
-// global proto msgs updated by the udp_multicast_thread
+uint8_t buffer[robot_ack_size];
+int msg_count       = 0;
 robot_ack ack       = robot_ack_init_zero;
 control_msg control = control_msg_init_zero;
 
-struct multicst_config
-{
-    struct sockaddr_in serv_addr;  // the address of the server
-    ip_mreq mreq;                  // multicast request socket option
-    int ttl;                       // the number of hops allowed for the multicast packet
-} typedef multicast_config_t;
-
+struct netconn *udp_multicast_join_group(const char *multicast_ip, int multicast_port);
 static void udp_multicast_thread(void *arg);
 
-/*
- * Joins the multicast group on the given port from the ethernet interface
- * If either socket call was unsuccessfull, the array will have a -1 instead
- * of the socket descriptor
- *
- * @param multicast_ip The IP to join
- * @param multicast_port The port to bind to
- *
- */
+struct netconn *udp_multicast_join_group(const char *multicast_ip, int multicast_port)
+{
+    // create a new UDP connection on the heap
+    struct netconn *conn = netconn_new(NETCONN_UDP_IPV6);
+
+    // create multicast address and port from arguments
+    // htons swaps bytes to correct the endianness of the port,
+    // due to netconns requirements
+    ip_addr_t multicast_address;
+    ip6addr_aton(multicast_ip, &multicast_address);
+
+    // bind the socket to the multicast address and port
+    // we then use that connection profile to join the specified
+    // multicast group
+    err_t test = netconn_bind(conn, &multicast_address, multicast_port);
+
+    err_t err =
+        netconn_join_leave_group(conn, &multicast_address, NULL, NETCONN_JOIN);
+
+    if (test == ERR_OK)
+    {
+    }
+
+    if (err == ERR_OK)
+    {
+        return conn;
+    }
+
+    return NULL;
+}
+
 static void udp_multicast_thread(void *arg)
 {
-    multicast_config_t config = *(multicast_config_t *)arg;
-
-    unsigned sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    bind(sock, (struct sockaddr *)&config.serv_addr, (socklen_t)sizeof(config.serv_addr));
-    setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&config.mreq,
-               sizeof(config.mreq));
-    setsockopt(sock, IPPROTO_IP, IP_TTL, &config.ttl, sizeof(config.ttl));
+    struct netconn *conn = (struct netconn *)arg;
+    struct netbuf *buf, *tx_buf;
+    err_t err;
 
     while (1)
     {
-        int length = recv(sock, &recv_buffer, robot_ack_size, 0);
+        err = netconn_recv(conn, &buf);
 
-        // Create a stream that reads from the buffer
-        pb_istream_t in_stream = pb_istream_from_buffer(recv_buffer, length);
-
-        if (pb_decode(&in_stream, control_msg_fields, &control))
+        if (err == ERR_OK)
         {
-            // update proto
-            ack.msg_count = msg_count++;
+            tx_buf = netbuf_new();
+            netbuf_alloc(tx_buf, robot_ack_size);
 
-            // serialize proto
-            pb_ostream_t stream =
-                pb_ostream_from_buffer(send_buffer, sizeof(send_buffer));
-            pb_encode(&stream, robot_ack_fields, &ack);
+            // Create a stream that reads from the buffer
+            pb_istream_t in_stream =
+                pb_istream_from_buffer((uint8_t *)buf->p->payload, buf->p->tot_len);
+            if (pb_decode(&in_stream, control_msg_fields, &control))
+            {
+                // update proto
+                ack.msg_count = msg_count++;
 
-            // package payload and send over udp
-            sendto(sock, send_buffer, stream.bytes_written, 0,
-                   (struct sockaddr *)&config.serv_addr,
-                   (socklen_t)sizeof(config.serv_addr));
+                // serialize proto
+                pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+                pb_encode(&stream, robot_ack_fields, &ack);
+
+                // package payload and send over udp
+                tx_buf->p->payload = buffer;
+                netconn_sendto(conn, tx_buf, (const ip_addr_t *)&(buf->addr), buf->port);
+            }
+            netbuf_delete(tx_buf);
         }
+        netbuf_delete(buf);
     }
 }
 
 void udp_multicast_init(const char *multicast_address, int multicast_port)
 {
-    multicast_config_t *config = malloc(sizeof(multicast_config_t));
+    // create a connection to the multicast group
+    struct netconn *conn = udp_multicast_join_group(multicast_address, multicast_port);
 
-    *config = (multicast_config_t){
-        .serv_addr =
-            {
-                .sin_family      = AF_INET,
-                .sin_addr.s_addr = inet_addr(multicast_address),
-                .sin_port        = htons(multicast_port),
-            },
-        .mreq.imr_multiaddr.s_addr = inet_addr(multicast_address),
-        .mreq.imr_interface.s_addr = INADDR_ANY,
-        .ttl                       = 2,
-    };
-
-    sys_thread_new("multicast_thread", udp_multicast_thread, config, 1024,
+    sys_thread_new("multicast_thread", udp_multicast_thread, conn, 1024,
                    (osPriority_t)osPriorityNormal);
 }

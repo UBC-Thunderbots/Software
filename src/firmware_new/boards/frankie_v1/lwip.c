@@ -77,14 +77,7 @@ void MX_LWIP_Init(void)
     }
 
     /* USER CODE BEGIN 3 */
-
-    while (!dhcp_supplied_address(&gnetif))
-    {
-        osDelay(1);
-    }
-
-    udp_multicast_init("224.5.60.60", 42069);
-
+    udp_multicast_init("ff02::c3d0:42d2:bb8", 42000);
     /* USER CODE END 3 */
 }
 
