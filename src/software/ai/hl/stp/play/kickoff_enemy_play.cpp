@@ -3,11 +3,12 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
+
 
 const std::string KickoffEnemyPlay::name = "KickoffEnemy Play";
 
@@ -152,5 +153,5 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<KickoffEnemyPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, KickoffEnemyPlay> factory;

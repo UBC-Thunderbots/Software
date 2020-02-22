@@ -6,9 +6,9 @@ cc_library(
     hdrs = ["halt_test_play.h"],
     deps = [
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
         "//software/geom",
+        "//software/util/design_patterns:generic_factory",
     ],
     alwayslink = True,
 )
@@ -19,8 +19,8 @@ cc_library(
     hdrs = ["move_test_play.h"],
     deps = [
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
+        "//software/util/design_patterns:generic_factory",
     ],
     alwayslink = True,
 )

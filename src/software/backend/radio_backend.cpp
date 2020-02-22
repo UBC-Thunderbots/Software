@@ -1,8 +1,8 @@
 #include "software/backend/radio_backend.h"
 
-#include "software/backend/backend_factory.h"
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string RadioBackend::name = "radio";
 
@@ -32,5 +32,5 @@ void RadioBackend::receiveWorld(World world)
     Subject<World>::sendValueToObservers(world);
 }
 
-// Register this backend in the BackendFactory
-static TBackendFactory<RadioBackend> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Backend, RadioBackend> factory;

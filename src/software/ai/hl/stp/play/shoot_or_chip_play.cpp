@@ -7,7 +7,6 @@
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/indirect_chip.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -16,7 +15,9 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
+
 
 using namespace Evaluation;
 
@@ -165,4 +166,5 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (!shoot_or_chip_tactic->done());
 }
 
-static TPlayFactory<ShootOrChipPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, ShootOrChipPlay> factory;

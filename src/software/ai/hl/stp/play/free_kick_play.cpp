@@ -6,13 +6,13 @@
 #include "software/ai/evaluation/ball.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/logger/custom_logging_levels.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 using namespace Passing;
 
@@ -283,5 +283,5 @@ void FreeKickPlay::shootOrFindPassStage(
              shoot_tactic->hasShotAvailable());
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<FreeKickPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, FreeKickPlay> factory;
