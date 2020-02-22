@@ -8,7 +8,7 @@
 #include "boost/bind.hpp"
 
 using boost::asio::socket_base;
-using boost::asio::ip::address_v4;
+// using boost::asio::ip::address_v6;
 using boost::asio::ip::udp;
 
 NetworkMedium::NetworkMedium(const std::string& multicast_address,
@@ -16,14 +16,12 @@ NetworkMedium::NetworkMedium(const std::string& multicast_address,
 {
     socket.reset(new udp::socket(io_service));
 
-    boost::asio::ip::address_v4 multicast_addr =
-        boost::asio::ip::address_v4::from_string(multicast_address);
+    boost::asio::ip::address multicast_addr =
+        boost::asio::ip::address_v6::from_string(multicast_address);
 
-    local_endpoint = udp::endpoint(boost::asio::ip::address_v4::any(), multicast_port);
+    local_endpoint = udp::endpoint(boost::asio::ip::address_v6::any(), multicast_port);
     multicast_endpoint = udp::endpoint(multicast_addr, multicast_port);
-
     socket->open(multicast_endpoint.protocol());
-    socket->set_option(boost::asio::ip::multicast::hops(2));
     socket->set_option(boost::asio::ip::multicast::join_group(multicast_addr));
     socket->set_option(boost::asio::ip::multicast::enable_loopback(false));
 

@@ -30,6 +30,7 @@ struct multicst_config
 {
     struct sockaddr_in serv_addr;  // the address of the server
     ip_mreq mreq;                  // multicast request socket option
+    int ttl;                       // the number of hops allowed for the multicast packet
 } typedef multicast_config_t;
 
 static void udp_multicast_thread(void *arg);
@@ -51,6 +52,7 @@ static void udp_multicast_thread(void *arg)
     bind(sock, (struct sockaddr *)&config.serv_addr, (socklen_t)sizeof(config.serv_addr));
     setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&config.mreq,
                sizeof(config.mreq));
+    setsockopt(sock, IPPROTO_IP, IP_TTL, &config.ttl, sizeof(config.ttl));
 
     while (1)
     {
@@ -89,7 +91,8 @@ void udp_multicast_init(const char *multicast_address, int multicast_port)
                 .sin_port        = htons(multicast_port),
             },
         .mreq.imr_multiaddr.s_addr = inet_addr(multicast_address),
-        .mreq.imr_interface.s_addr = htonl(INADDR_ANY),
+        .mreq.imr_interface.s_addr = INADDR_ANY,
+        .ttl                       = 2,
     };
 
     sys_thread_new("multicast_thread", udp_multicast_thread, config, 1024,

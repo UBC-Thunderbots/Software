@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
     // create a RobotCommunicator with a NetworkMedium
     RobotCommunicator<control_msg, robot_ack> communicator(
-        std::make_unique<NetworkMedium>("239.255.60.60", 5000),
+        std::make_unique<NetworkMedium>("ff02::c3d0:42d2:bb8", 42000),
         [&](const control_msg& msg) {
             std::cout << "COMP Txed " << count++ << " msgs " << std::endl;
         },
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
         communicator.send_proto(control_req);
 
         // 4000 hz test
-        std::this_thread::sleep_for(std::chrono::nanoseconds(250000));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     google::protobuf::ShutdownProtobufLibrary();

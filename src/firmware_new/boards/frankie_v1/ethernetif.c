@@ -310,6 +310,10 @@ static void low_level_init(struct netif *netif)
     /* Initialize the RX POOL */
     LWIP_MEMPOOL_INIT(RX_POOL);
 
+    /* Pass all multicast frames: needed for IPv6 protocol*/
+    heth.Instance->MACPFR |= ETH_MACPFR_PM;
+
+
 #if LWIP_ARP || LWIP_ETHERNET
 
     /* set MAC hardware address length */
@@ -329,7 +333,7 @@ static void low_level_init(struct netif *netif)
 /* Accept broadcast address and ARP traffic */
 /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
 #if LWIP_ARP
-    netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP;
+    netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
 #else
     netif->flags |= NETIF_FLAG_BROADCAST;
 #endif /* LWIP_ARP */
