@@ -1,4 +1,3 @@
-
 #include "software/util/design_patterns/generic_factory.h"
 
 #include <gtest/gtest.h>
