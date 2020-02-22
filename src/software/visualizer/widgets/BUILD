@@ -79,8 +79,9 @@ qt_cc_library(
     deps = [
         ":robot_status_table",
         ":zoomable_qgraphics_view",
-        "//software/ai/hl/stp/play:play_factory",
+        "//software/ai/hl/stp/play",
         "//software/parameter:dynamic_parameters",
+        "//software/util/design_patterns:generic_factory",
         "//software/visualizer/ui:main_widget",
         "@qt//:qt_widgets",
     ],

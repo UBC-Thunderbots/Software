@@ -10,12 +10,12 @@
 
 #include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          long random_seed)
@@ -47,7 +47,8 @@ void STP::updateCurrentPlay(const World& world)
         {
             try
             {
-                current_play = PlayFactory::createPlay(override_play_name);
+                current_play =
+                    GenericFactory<std::string, Play>::create(override_play_name);
             }
             catch (std::invalid_argument)
             {
@@ -262,7 +263,8 @@ void STP::assignRobotsToTactics(const World& world,
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 {
     std::vector<std::unique_ptr<Play>> applicable_plays;
-    for (const auto& play_constructor : PlayFactory::getRegisteredPlayConstructors())
+    for (const auto& play_constructor :
+         GenericFactory<std::string, Play>::getRegisteredConstructors())
     {
         auto play = play_constructor();
         if (play->isApplicable(world))

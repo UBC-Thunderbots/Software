@@ -5,7 +5,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
@@ -13,7 +12,9 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 #include "src/g3log/loglevels.hpp"
+
 
 using namespace Passing;
 
@@ -214,5 +215,6 @@ void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
     pass_generator.setPasserPoint(world.ball().position());
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<ShootOrPassPlay> factory;
+
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, ShootOrPassPlay> factory;
