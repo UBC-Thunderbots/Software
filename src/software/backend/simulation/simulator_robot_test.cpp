@@ -248,6 +248,8 @@ TEST_P(SimulatorRobotAutokickTest, test_autokick_ball_at_angle)
 
     simulator_robot->enableAutokick(5);
 
+    EXPECT_TRUE(simulator_robot->isAutokickEnabled());
+
     // Simulate for 1/2 second
     for (unsigned int i = 0; i < 30; i++)
     {
@@ -283,6 +285,8 @@ TEST_P(SimulatorRobotAutochipTest, test_autochip_ball_at_angle_with_no_obstacle)
 
     simulator_robot->enableAutochip(5);
 
+    EXPECT_TRUE(simulator_robot->isAutochipEnabled());
+
     // Simulate for 1/2 second
     for (unsigned int i = 0; i < 30; i++)
     {
@@ -316,6 +320,8 @@ TEST_F(SimulatorRobotTest,
 
     simulator_robot->enableAutochip(2);
 
+    EXPECT_TRUE(simulator_robot->isAutochipEnabled());
+
     // Simulate for 1.5 seconds
     for (unsigned int i = 0; i < 90; i++)
     {
@@ -345,6 +351,8 @@ TEST_F(SimulatorRobotTest,
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
 
     EXPECT_LT((simulator_ball->velocity() - Vector(-0.25, 0)).length(), 0.001);
+    EXPECT_FALSE(simulator_robot->isAutokickEnabled());
+    EXPECT_FALSE(simulator_robot->isAutochipEnabled());
 
     // Simulate for 1/2 second
     for (unsigned int i = 0; i < 30; i++)
@@ -362,19 +370,9 @@ TEST_F(SimulatorRobotTest, test_disable_autokick)
     Ball ball(Point(0.25, 0), Vector(-1, 0), Timestamp::fromSeconds(0));
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
 
-    EXPECT_LT((simulator_ball->velocity() - Vector(-1, 0)).length(), 0.001);
-
     simulator_robot->enableAutokick(5);
     simulator_robot->disableAutokick();
-
-    // Simulate for 1/2 second
-    for (unsigned int i = 0; i < 30; i++)
-    {
-        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-    }
-
-    EXPECT_LT((getDribblingPoint(simulator_robot) - simulator_ball->position()).length(),
-              0.1);
+    EXPECT_FALSE(simulator_robot->isAutokickEnabled());
 }
 
 TEST_F(SimulatorRobotTest, test_disable_autochip)
@@ -384,19 +382,9 @@ TEST_F(SimulatorRobotTest, test_disable_autochip)
     Ball ball(Point(0.25, 0), Vector(-1, 0), Timestamp::fromSeconds(0));
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
 
-    EXPECT_LT((simulator_ball->velocity() - Vector(-1, 0)).length(), 0.001);
-
     simulator_robot->enableAutochip(5);
     simulator_robot->disableAutochip();
-
-    // Simulate for 1/2 second
-    for (unsigned int i = 0; i < 30; i++)
-    {
-        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-    }
-
-    EXPECT_LT((getDribblingPoint(simulator_robot) - simulator_ball->position()).length(),
-              0.1);
+    EXPECT_FALSE(simulator_robot->isAutochipEnabled());
 }
 
 TEST_F(SimulatorRobotTest, test_enabling_autokick_disables_autochip)
@@ -406,18 +394,11 @@ TEST_F(SimulatorRobotTest, test_enabling_autokick_disables_autochip)
     Ball ball(Point(0.25, 0), Vector(-1, 0), Timestamp::fromSeconds(0));
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
 
-    EXPECT_LT((simulator_ball->velocity() - Vector(-1, 0)).length(), 0.001);
-
     simulator_robot->enableAutochip(1);
     simulator_robot->enableAutokick(5);
 
-    // Simulate for 1/2 second
-    for (unsigned int i = 0; i < 30; i++)
-    {
-        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-    }
-
-    EXPECT_LT((simulator_ball->velocity() - Vector(4, 0)).length(), 0.001);
+    EXPECT_TRUE(simulator_robot->isAutokickEnabled());
+    EXPECT_FALSE(simulator_robot->isAutochipEnabled());
 }
 
 TEST_F(SimulatorRobotTest, test_enabling_autochip_disables_autokick)
@@ -427,19 +408,11 @@ TEST_F(SimulatorRobotTest, test_enabling_autochip_disables_autokick)
     Ball ball(Point(0.25, 0), Vector(-1, 0), Timestamp::fromSeconds(0));
     auto [world, simulator_robot, simulator_ball] = createWorld(robot, ball);
 
-    EXPECT_LT((simulator_ball->velocity() - Vector(-1, 0)).length(), 0.001);
-
     simulator_robot->enableAutokick(5);
     simulator_robot->enableAutochip(2);
 
-    // Simulate for 1/2 second
-    for (unsigned int i = 0; i < 30; i++)
-    {
-        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-    }
-
-    EXPECT_GT(simulator_ball->velocity().x(), 1);
-    EXPECT_LT(simulator_ball->velocity().x(), 2);
+    EXPECT_FALSE(simulator_robot->isAutokickEnabled());
+    EXPECT_TRUE(simulator_robot->isAutochipEnabled());
 }
 
 TEST_F(SimulatorRobotTest, test_ball_does_not_bounce_off_front_of_robot_when_dribbler_on)

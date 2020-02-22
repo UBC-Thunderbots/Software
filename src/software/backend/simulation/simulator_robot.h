@@ -140,6 +140,20 @@ class SimulatorRobot
     void disableAutochip();
 
     /**
+     * Returns true if autokick is enabled and false otherwise
+     *
+     * @return true if autokick is enabled and false otherwise
+     */
+    bool isAutokickEnabled();
+
+    /**
+     * Returns true if autochip is enabled and false otherwise
+     *
+     * @return true if autochip is enabled and false otherwise
+     */
+    bool isAutochipEnabled();
+
+    /**
      * Sets the speed of the dribbler
      *
      * @param rpm The rpm to set for the dribbler

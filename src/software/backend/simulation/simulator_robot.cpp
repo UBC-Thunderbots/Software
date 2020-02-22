@@ -170,6 +170,14 @@ void SimulatorRobot::disableAutochip()
     autochip_distance_m = std::nullopt;
 }
 
+bool SimulatorRobot::isAutokickEnabled() {
+    return autokick_speed_m_per_s.has_value();
+}
+
+bool SimulatorRobot::isAutochipEnabled() {
+    return autochip_distance_m.has_value();
+}
+
 void SimulatorRobot::setDribblerSpeed(uint32_t rpm)
 {
     dribbler_rpm = rpm;
@@ -282,7 +290,7 @@ void SimulatorRobot::brakeMotorFrontRight()
 void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
                                           PhysicsBall *physics_ball)
 {
-    if (autokick_speed_m_per_s)
+    if (isAutokickEnabled())
     {
         Vector kick_vector = Vector::createFromAngle(
             physics_robot->getRobotWithTimestamp(Timestamp::fromSeconds(0))
@@ -290,7 +298,7 @@ void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
         kick_vector = kick_vector.normalize(autokick_speed_m_per_s.value());
         physics_ball->kick(kick_vector);
     }
-    else if (autochip_distance_m)
+    else if (isAutochipEnabled())
     {
         Vector chip_vector = Vector::createFromAngle(
             physics_robot->getRobotWithTimestamp(Timestamp::fromSeconds(0))
