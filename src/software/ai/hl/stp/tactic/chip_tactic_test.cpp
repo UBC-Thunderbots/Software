@@ -12,7 +12,7 @@ TEST(ChipTacticTest, getChipDirection)
         ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     ChipTactic tactic = ChipTactic(world.ball(), true);
 
@@ -32,7 +32,7 @@ TEST(ChipTacticTest, getChipOrigin)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world =
-            ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -55,7 +55,7 @@ TEST(ChipTacticTest, getChipDistanceMeters)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world =
-            ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -78,7 +78,7 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world =
-            ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(-0.3, 0), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -103,7 +103,7 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world =
-            ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -128,9 +128,9 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world =
-            ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
-    Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
+    Robot robot = Robot(0, Point(-0.5, 1.3), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     ChipTactic tactic = ChipTactic(world.ball(), true);
@@ -153,9 +153,109 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world =
-            ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
-    Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
+    Robot robot = Robot(0, Point(-1.2, 2.1), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    ChipTactic tactic = ChipTactic(world.ball(), true);
+
+    tactic.updateRobot(robot);
+    tactic.updateControlParams(Point(0, 0), Point(1, -1), 2.0);
+    auto action_ptr = tactic.getNextAction();
+
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
+
+    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
+    ASSERT_NE(chip_action, nullptr);
+    EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());
+    EXPECT_EQ(Angle::fromDegrees(315.0), chip_action->getChipDirection());
+    EXPECT_EQ(2.0, chip_action->getChipDistanceMeters());
+}
+
+TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_positive_y)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    world =
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+
+    Robot robot = Robot(0, Point(0.3, 0), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    ChipTactic tactic = ChipTactic(world.ball(), true);
+
+    tactic.updateRobot(robot);
+    tactic.updateControlParams(Point(0, 0), Point(1, 1), 2.0);
+    auto action_ptr = tactic.getNextAction();
+
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
+
+    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
+    ASSERT_NE(chip_action, nullptr);
+    EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());
+    EXPECT_EQ(Angle::fromDegrees(45.0), chip_action->getChipDirection());
+    EXPECT_EQ(2.0, chip_action->getChipDistanceMeters());
+}
+
+TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_positive_y)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    world =
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+
+    Robot robot = Robot(0, Point(1.1, 0.2), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    ChipTactic tactic = ChipTactic(world.ball(), true);
+
+    tactic.updateRobot(robot);
+    tactic.updateControlParams(Point(0, 0), Point(-1, 1), 2.0);
+    auto action_ptr = tactic.getNextAction();
+
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
+
+    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
+    ASSERT_NE(chip_action, nullptr);
+    EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());
+    EXPECT_EQ(Angle::fromDegrees(135.0), chip_action->getChipDirection());
+    EXPECT_EQ(2.0, chip_action->getChipDistanceMeters());
+}
+
+TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_negative_y)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    world =
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+
+    Robot robot = Robot(0, Point(0.7, 2), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    ChipTactic tactic = ChipTactic(world.ball(), true);
+
+    tactic.updateRobot(robot);
+    tactic.updateControlParams(Point(0, 0), Point(-1, -1), 2.0);
+    auto action_ptr = tactic.getNextAction();
+
+    // Check an action was returned (the pointer is not null)
+    EXPECT_TRUE(action_ptr);
+
+    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
+    ASSERT_NE(chip_action, nullptr);
+    EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());
+    EXPECT_EQ(Angle::fromDegrees(225.0), chip_action->getChipDirection());
+    EXPECT_EQ(2.0, chip_action->getChipDistanceMeters());
+}
+
+TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_negative_y)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    world =
+        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+
+    Robot robot = Robot(0, Point(1.3, 1.2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     ChipTactic tactic = ChipTactic(world.ball(), true);
