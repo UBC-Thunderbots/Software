@@ -29,6 +29,26 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
                         chip_distance_meters);
 }
 
+Ball ChipAction::getBall()
+{
+    return ball;
+}
+
+Point ChipAction::getChipOrigin()
+{
+    return chip_origin;
+}
+
+Angle ChipAction::getChipDirection()
+{
+    return chip_direction;
+}
+
+double ChipAction::getChipDistanceMeters()
+{
+    return chip_distance_meters;
+}
+
 void ChipAction::accept(ActionVisitor& visitor) const
 {
     visitor.visit(*this);
