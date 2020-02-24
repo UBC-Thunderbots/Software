@@ -13,12 +13,14 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              std::string gamecontroller_multicast_address,
                              int gamecontroller_multicast_port,
                              std::function<void(World)> received_world_callback,
+                             std::shared_ptr<const RefboxConfig> refbox_config,
                              std::shared_ptr<const CameraConfig> camera_config)
-    : network_filter(),
+    : network_filter(refbox_config),
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
       received_world_callback(received_world_callback),
+      refbox_config(refbox_config),
       camera_config(camera_config)
 {
     setupVisionClient(vision_multicast_address, vision_multicast_port);
@@ -135,19 +137,12 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         // We invert the field side if we explicitly choose to override the values
         // provided by refbox. The 'defending_positive_side' parameter dictates the side
         // we are defending if we are overriding the value
-        // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-        if (Util::DynamicParameters->getAIControlConfig()
-                ->getRefboxConfig()
-                ->OverrideRefboxDefendingSide()
-                ->value() &&
-            Util::DynamicParameters->getAIControlConfig()
-                ->getRefboxConfig()
-                ->DefendingPositiveSide()
-                ->value())
+        if (refbox_config->OverrideRefboxDefendingSide()->value() &&
+            refbox_config->DefendingPositiveSide()->value())
         {
             invertFieldSide(detection);
         }
-
+        // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
         switch (detection.camera_id())
         {
             case 0:
@@ -175,18 +170,12 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             world.updateBallState(ball_state);
 
             Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
-            int friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
-                                         ->getRefboxConfig()
-                                         ->FriendlyGoalieId()
-                                         ->value();
+            int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
             friendly_team.assignGoalie(friendly_goalie_id);
             world.mutableFriendlyTeam() = friendly_team;
 
             Team enemy_team     = network_filter.getFilteredEnemyTeamData({detection});
-            int enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
-                                      ->getRefboxConfig()
-                                      ->EnemyGoalieId()
-                                      ->value();
+            int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
             enemy_team.assignGoalie(enemy_goalie_id);
             world.mutableEnemyTeam() = enemy_team;
         }
