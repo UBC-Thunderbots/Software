@@ -33,6 +33,16 @@ b2Vec2 createVec2(const Vector& vector)
     return ret;
 }
 
+Point createPoint(const b2Vec2& vec)
+{
+    return Point(vec.x, vec.y);
+}
+
+Vector createVector(const b2Vec2& vec)
+{
+    return Vector(vec.x, vec.y);
+}
+
 float polygonArea(const b2PolygonShape& polygon)
 {
     // Box2D already asserts that Polygons are not degenerate (have < 3 vertices) when
