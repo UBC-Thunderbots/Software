@@ -59,6 +59,7 @@ cc_library(
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
+        "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
         "//software/world",
         "@g3log",

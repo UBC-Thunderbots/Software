@@ -2,7 +2,6 @@
 
 #include <limits>
 
-#include "software/geom/util.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"

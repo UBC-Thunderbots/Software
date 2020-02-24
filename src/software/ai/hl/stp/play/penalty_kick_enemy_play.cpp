@@ -1,9 +1,10 @@
 #include "software/ai/hl/stp/play/penalty_kick_enemy_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/util/design_patterns/generic_factory.h"
+
 
 const std::string PenaltyKickEnemyPlay::name = "Penalty Kick Enemy Play";
 
@@ -61,5 +62,5 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<PenaltyKickEnemyPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay> factory;

@@ -5,6 +5,9 @@
 #include "software/backend/simulation/physics/physics_ball.h"
 #include "software/backend/simulation/physics/physics_field.h"
 #include "software/backend/simulation/physics/physics_robot.h"
+#include "software/backend/simulation/physics/simulation_contact_listener.h"
+#include "software/time/duration.h"
+#include "software/time/timestamp.h"
 #include "software/world/world.h"
 
 /**
@@ -16,8 +19,9 @@ class PhysicsWorld
 {
    public:
     /**
-     * Creates a new PhysicsWorld given a Box2D world.
-     * @param world
+     * Creates a new PhysicsWorld given a World.
+     *
+     * @param world the world to create
      */
     explicit PhysicsWorld(const World& world);
 
@@ -37,35 +41,29 @@ class PhysicsWorld
 
     /**
      * Advances the Box2D world physics by the given time step
+     *
      * @param time_step how much to advance the world physics by
      */
-    void step(const Duration& time_step);
+    void stepSimulation(const Duration& time_step);
 
     /**
      * Returns the friendly PhysicsRobots currently in the world
+     *
      * @return the friendly PhysicsRobots in the world
      */
-    std::vector<std::shared_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
-
-    /**
-     * Returns the enemy PhysicsRobots currently in the world
-     * @return the enemy PhysicsRobots in the world
-     */
-    std::vector<std::shared_ptr<PhysicsRobot>> getEnemyPhysicsRobots() const;
+    std::vector<std::weak_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
 
     /**
      * Returns the PhysicsBall currently in the world
+     *
      * @return the PhysicsBall in the world
      */
-    std::shared_ptr<PhysicsBall> getPhysicsBall() const;
-
-    /**
-     * Returns the PhysicsBall currently in the world
-     * @return the PhysicsBall in the world
-     */
-    std::shared_ptr<PhysicsField> getPhysicsField() const;
+    std::weak_ptr<PhysicsBall> getPhysicsBall() const;
 
    private:
+    // Note: we declare the b2World first so it is destroyed last. If it is destroyed
+    // before the physics objects, segfaults will occur due to pointers internal to Box2D
+    // https://stackoverflow.com/questions/2254263/order-of-member-constructor-and-destructor-calls
     std::shared_ptr<b2World> b2_world;
     // The timestamp of the simulated physics world
     Timestamp current_timestamp;
@@ -81,6 +79,10 @@ class PhysicsWorld
     // https://www.iforce2d.net/b2dtut/worlds
     const unsigned int velocity_iterations = 8;
     const unsigned int position_iterations = 3;
+
+    const double acceleration_due_to_gravity = 9.8;
+
+    std::unique_ptr<SimulationContactListener> contact_listener;
 
     // Abstractions of objects in the world
     std::shared_ptr<PhysicsBall> physics_ball;
