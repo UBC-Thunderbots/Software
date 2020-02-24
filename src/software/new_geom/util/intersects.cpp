@@ -6,7 +6,7 @@ bool intersects(const Polygon &first, const Segment &second)
 {
     for (const auto &seg : first.getSegments())
     {
-        if (::intersects(seg, second))
+        if (intersects(seg, second))
         {
             return true;
         }
@@ -23,7 +23,7 @@ bool intersects(const Polygon &first, const Ray &second)
 {
     for (const auto &seg : first.getSegments())
     {
-        if (::intersects(seg, second))
+        if (intersects(seg, second))
         {
             return true;
         }

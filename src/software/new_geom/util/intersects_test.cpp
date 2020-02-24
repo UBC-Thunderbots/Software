@@ -209,16 +209,16 @@ TEST(IntersectsTest, segment_circle_intersecting)
 
 TEST(IntersectsTest, segments_overlapping)
 {
-    Segment s({-8, 2}, {-10, 6});
-    Circle c({-6, 2}, 4);
-    EXPECT_TRUE(intersects(s, c));
-    EXPECT_TRUE(intersects(c, s));
+    Segment s1({-8, 2}, {-10, 6});
+    Segment s2({-9, 4}, {-8.5, 3});
+    EXPECT_TRUE(intersects(s1, s2));
+    EXPECT_TRUE(intersects(s1, s2));
 }
 
 TEST(IntersectsTest, segments_end_points_overlapping)
 {
     Segment s1({-8, 2}, {-10, 6});
-    Segment s2({-9, 4}, {-8.5, 3});
+    Segment s2({-10, 6}, {10, 3});
     EXPECT_TRUE(intersects(s1, s2));
     EXPECT_TRUE(intersects(s2, s1));
 }
@@ -360,4 +360,41 @@ TEST(IntersectsTest,
 
     EXPECT_EQ(intersects(position_and_direction, segment), false);
     EXPECT_EQ(intersects(just_direction, segment), true);
+}
+
+//TEST(IntersectsTest, ray_starting_from_segment_edge)
+//{
+//    // TODO: change this to expect_true
+//    Ray r({6, -2}, Angle::fromDegrees(30));
+//    Segment s({5, -5},{8, 4});
+//    EXPECT_FALSE(intersects(r, s));
+//    EXPECT_FALSE(intersects(s, r));
+//}
+//
+//TEST(IntersectsTest, ray_overlapping_segment)
+//{
+//    Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
+//    Segment s({5, -5},{8, 4});
+//    EXPECT_TRUE(intersects(r, s));
+//    EXPECT_TRUE(intersects(s, r));
+//}
+
+TEST(IntersectsTest, ray_starting_from_segment_end)
+{
+
+}
+
+TEST(IntersectsTest, ray_parallel_to_segment)
+{
+
+}
+
+TEST(IntersectsTest, ray_far_from_segment)
+{
+
+}
+
+TEST(IntersectsTest, ray_intersects_segment)
+{
+
 }
