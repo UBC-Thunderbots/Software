@@ -568,9 +568,7 @@ def _linux_gcc_impl(ctx):
         tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/linux_gcc-lld"),
         tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/linux_gcc-cpp"),
         tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/linux_gcc-dwp"),
-        # TODO: note about executable we're using here (ie. not 'llvm-profdata')
-        #tool_path(name = "gcov", path = "/usr/bin/gcov"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/linux_gcc-profdata"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/linux_gcc-gcov"),
         tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/linux_gcc-lld"),
         tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/linux_gcc-nm"),
         tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/linux_gcc-objcopy"),
