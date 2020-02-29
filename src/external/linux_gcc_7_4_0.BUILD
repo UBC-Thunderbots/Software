@@ -21,7 +21,6 @@ filegroup(
     name = "binaries",
     srcs = [
         "usr/bin/x86_64-linux-gnu-dwp",
-        "usr/bin/x86_64-linux-gnu-g++",
         "usr/bin/x86_64-linux-gnu-gcc",
         "usr/bin/x86_64-linux-gnu-gcc-ar",
         "usr/bin/x86_64-linux-gnu-gcc-nm",
