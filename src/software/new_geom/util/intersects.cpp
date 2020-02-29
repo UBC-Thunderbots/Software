@@ -101,11 +101,12 @@ bool intersects(const Ray &first, const Segment &second)
     // intersection is within their definitions
     if (intersection.has_value())
     {
-        return first.contains(intersection.value()) && second.contains(intersection.value());
+        return first.contains(intersection.value()) &&
+               second.contains(intersection.value());
     }
     // If there is no intersection, the ray and segment may be parallel, check if they are
     // overlapped
-    return contains(second, first.getStart());
+    return first.contains(second.getSegStart()) || first.contains(second.getEnd());
 }
 
 bool intersects(const Segment &first, const Ray &second)

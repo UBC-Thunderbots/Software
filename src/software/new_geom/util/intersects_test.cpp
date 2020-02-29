@@ -364,39 +364,51 @@ TEST(IntersectsTest,
     EXPECT_EQ(intersects(just_direction, segment), true);
 }
 
-TEST(IntersectsTest, ray_starting_from_segment_edge)
+TEST(IntersectsTest, ray_intersects_segment_edge)
 {
-    // TODO: change this to expect_true
-    Ray r({6, -2}, Angle::fromDegrees(30));
-    Segment s({5, -5},{8, 4});
-    EXPECT_FALSE(intersects(r, s));
-    EXPECT_FALSE(intersects(s, r));
-}
-
-TEST(IntersectsTest, ray_overlapping_segment)
-{
-    Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
-    Segment s({5, -5},{8, 4});
+    Ray r({5, 2}, Angle::zero());
+    Segment s({5, -5}, {8, 4});
     EXPECT_TRUE(intersects(r, s));
     EXPECT_TRUE(intersects(s, r));
 }
 
-TEST(IntersectsTest, ray_starting_from_segment_end)
+TEST(IntersectsTest, ray_starting_from_segment_edge)
 {
-
+    Ray r({6, -2}, Angle::fromDegrees(30));
+    Segment s({5, -5}, {8, 4});
+    EXPECT_TRUE(intersects(r, s));
+    EXPECT_TRUE(intersects(s, r));
 }
 
-TEST(IntersectsTest, ray_parallel_to_segment)
-{
+// TODO (Issue #1183): Uncomment once intersection uses EPSILON comparison
+// TEST(IntersectsTest, ray_overlapping_segment)
+//{
+//    Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
+//    Segment s({5, -5},{8, 4});
+//    EXPECT_TRUE(intersects(r, s));
+//    EXPECT_TRUE(intersects(s, r));
+//}
 
+TEST(IntersectsTest, ray_starting_from_segment_end)
+{
+    Ray r({8, 4}, Angle::fromDegrees(30));
+    Segment s({5, -5}, {8, 4});
+    EXPECT_TRUE(intersects(r, s));
+    EXPECT_TRUE(intersects(s, r));
+}
+
+TEST(IntersectsTest, ray_parallel_to_segment_not_intersecting)
+{
+    Ray r({-2, -2}, Angle::fromRadians(std::atan2(3, 1)));
+    Segment s({5, -5}, {8, 4});
+    EXPECT_FALSE(intersects(r, s));
+    EXPECT_FALSE(intersects(s, r));
 }
 
 TEST(IntersectsTest, ray_far_from_segment)
 {
-
-}
-
-TEST(IntersectsTest, ray_intersects_segment)
-{
-
+    Ray r({-150000, 500000}, Angle::fromRadians(std::atan2(-4, -2)));
+    Segment s({5, -5}, {8, 4});
+    EXPECT_FALSE(intersects(r, s));
+    EXPECT_FALSE(intersects(s, r));
 }

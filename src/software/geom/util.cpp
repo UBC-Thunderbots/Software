@@ -97,8 +97,6 @@ bool contains(const Segment &out, const Point &in)
 bool contains(const Ray &out, const Point &in)
 {
     Point point_in_ray_direction = out.getStart() + out.toUnitVector();
-    std::cout << collinear(in, out.getStart(), point_in_ray_direction) << std::endl;
-    std::cout << (((in - out.getStart()).normalize() - out.toUnitVector()).length() < EPS) << std::endl;
     if (collinear(in, out.getStart(), point_in_ray_direction) &&
         (((in - out.getStart()).normalize() - out.toUnitVector()).length() < EPS))
     {
@@ -475,7 +473,9 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
     double y4 = line2.getEnd().y();
 
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (denom == 0)
+
+    // TODO (Issue #1183): Change this to EPSILON comparison when porting
+    if (std::abs(denom) < GeomConstants::EPSILON)
     {
         // log the parallel lines when we actually implement logging?
         return std::nullopt;
