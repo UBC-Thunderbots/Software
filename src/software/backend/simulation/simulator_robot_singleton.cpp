@@ -42,13 +42,13 @@ SimulatorRobotSingleton::createFirmwareRobot()
                             &(SimulatorRobotSingleton::dribblerCoast),
                             &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
-    WheelConstants_t wheel_constants = {
-        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
-        .wheel_radius                        = WHEEL_RADIUS,
-        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
-        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
-        .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
-        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+    WheelConstants_t wheel_constants;
+        wheel_constants.wheel_rotations_per_motor_rotation  = GEAR_RATIO;
+        wheel_constants.wheel_radius                        = WHEEL_RADIUS;
+        wheel_constants.motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT;
+        wheel_constants.motor_back_emf_per_rpm              = RPM_TO_VOLT;
+        wheel_constants.motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE;
+        wheel_constants.motor_current_per_unit_torque       = CURRENT_PER_TORQUE;
     Wheel_t* front_left_wheel = app_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontLeft),
         &(SimulatorRobotSingleton::getMotorSpeedFrontLeft),
