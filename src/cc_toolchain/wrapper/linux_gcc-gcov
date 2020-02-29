@@ -1,9 +1,0 @@
-#!/bin/bash --norc
-
-if [[ "$@" == "@"* ]]; then
-    # need to parse location following @
-    INPUT=$@
-    exec /usr/bin/gcov $(cat ${INPUT:1})
-else
-    exec /usr/bin/gcov "$@"
-fi

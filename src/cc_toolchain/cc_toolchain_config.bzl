@@ -381,6 +381,11 @@ def _linux_gcc_impl(ctx):
 
     action_configs = []
 
+    tool_paths = [
+        tool_path(name = name, path = path)
+        for name, path in ctx.attr.tool_paths.items()
+    ]
+
     common = _make_common_features(ctx)
 
     runtime_library_search_directories = feature(
@@ -562,20 +567,6 @@ def _linux_gcc_impl(ctx):
         runtime_library_search_directories,
     ]
 
-    tool_paths = [
-        tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
-        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/linux_gcc-ar"),
-        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/linux_gcc-lld"),
-        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/linux_gcc-cpp"),
-        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/linux_gcc-dwp"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/linux_gcc-gcov"),
-        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/linux_gcc-lld"),
-        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/linux_gcc-nm"),
-        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/linux_gcc-objcopy"),
-        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/linux_gcc-objdump"),
-        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/linux_gcc-strip"),
-    ]
-
     out = ctx.actions.declare_file(ctx.label.name)
     ctx.actions.write(out, "Fake executable")
 
@@ -607,17 +598,16 @@ def _linux_gcc_impl(ctx):
 cc_toolchain_config_k8 = rule(
     implementation = _linux_gcc_impl,
     attrs = {
-        "cpu": attr.string(mandatory = True, values = ["k8"]),
         "builtin_include_directories": attr.string_list(),
+        "cpu": attr.string(mandatory = True, values = ["k8"]),
+        "extra_features": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
-        "host_compiler_path": attr.string(),
-        "host_compiler_prefix": attr.string(),
         "host_compiler_warnings": attr.string_list(),
         "host_unfiltered_compile_flags": attr.string_list(),
         "target_cpu": attr.string(),
         "target_system_name": attr.string(),
+        "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
-        "extra_features": attr.string_list(),
     },
     provides = [CcToolchainConfigInfo],
     executable = True,

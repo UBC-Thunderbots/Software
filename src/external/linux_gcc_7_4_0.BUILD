@@ -18,21 +18,6 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "binaries",
-    srcs = [
-        "usr/bin/x86_64-linux-gnu-dwp",
-        "usr/bin/x86_64-linux-gnu-gcc",
-        "usr/bin/x86_64-linux-gnu-gcc-ar",
-        "usr/bin/x86_64-linux-gnu-gcc-nm",
-        "usr/bin/x86_64-linux-gnu-gcov",
-        "usr/bin/x86_64-linux-gnu-gprof",
-        "usr/bin/x86_64-linux-gnu-ld",
-        "usr/bin/x86_64-linux-gnu-objcopy",
-        "usr/bin/x86_64-linux-gnu-objdump",
-    ],
-)
-
-filegroup(
     name = "libs",
     srcs = glob(["usr/lib/gcc/x86_64-linux-gnu/7.4.0/*.a"]),
 )
