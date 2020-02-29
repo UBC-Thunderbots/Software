@@ -95,14 +95,13 @@ bool intersects(const Segment &first, const Segment &second)
 bool intersects(const Ray &first, const Segment &second)
 {
     auto intersection =
-        ::lineIntersection(first.getStart(), first.getStart() + first.toUnitVector(),
+        intersection(first.getStart(), first.getStart() + first.toUnitVector(),
                            second.getSegStart(), second.getEnd());
     // If the infinitely long vectors defined by ray and segment intersect, check that the
     // intersection is within their definitions
     if (intersection.has_value())
     {
-        return ::contains(first, intersection.value()) &&
-               ::contains(second, intersection.value());
+        return first.contains(intersection.value()) && second.contains(intersection.value());
     }
     // If there is no intersection, the ray and segment may be parallel, check if they are
     // overlapped

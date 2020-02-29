@@ -97,7 +97,6 @@ bool contains(const Segment &out, const Point &in)
 bool contains(const Ray &out, const Point &in)
 {
     Point point_in_ray_direction = out.getStart() + out.toUnitVector();
-    std::cout << "here" << std::endl;
     std::cout << collinear(in, out.getStart(), point_in_ray_direction) << std::endl;
     std::cout << (((in - out.getStart()).normalize() - out.toUnitVector()).length() < EPS) << std::endl;
     if (collinear(in, out.getStart(), point_in_ray_direction) &&

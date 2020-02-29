@@ -35,10 +35,10 @@ cc_library(
         "intersects.h",
     ],
     deps = [
-        "//software/geom",
         "//software/new_geom:circle",
         "//software/new_geom:line",
         "//software/new_geom:polygon",
+        "//software/new_geom:ray",
         "//software/new_geom:segment",
         "//software/new_geom/util:distance",
     ],
@@ -50,7 +50,10 @@ cc_test(
         "intersects_test.cpp",
     ],
     deps = [
+        ":contains",
         ":intersects",
+        "//software/new_geom:rectangle",
+        "//software/new_geom:triangle",
         "@gtest//:gtest_main",
     ],
 )
@@ -104,6 +107,32 @@ cc_test(
     ],
     deps = [
         ":collinear",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "contains",
+    srcs = [
+        "contains.cpp",
+    ],
+    hdrs = [
+        "contains.h",
+    ],
+    deps = [
+        ":distance",
+        "//software/new_geom:circle",
+        "//software/new_geom:segment",
+    ],
+)
+
+cc_test(
+    name = "contains_test",
+    srcs = [
+        "contains_test.cpp",
+    ],
+    deps = [
+        ":contains",
         "@gtest//:gtest_main",
     ],
 )

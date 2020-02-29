@@ -1,4 +1,6 @@
 #include "software/new_geom/util/intersects.h"
+#include "software/new_geom/rectangle.h"
+#include "software/new_geom/triangle.h"
 
 #include <gtest/gtest.h>
 
@@ -362,22 +364,22 @@ TEST(IntersectsTest,
     EXPECT_EQ(intersects(just_direction, segment), true);
 }
 
-//TEST(IntersectsTest, ray_starting_from_segment_edge)
-//{
-//    // TODO: change this to expect_true
-//    Ray r({6, -2}, Angle::fromDegrees(30));
-//    Segment s({5, -5},{8, 4});
-//    EXPECT_FALSE(intersects(r, s));
-//    EXPECT_FALSE(intersects(s, r));
-//}
-//
-//TEST(IntersectsTest, ray_overlapping_segment)
-//{
-//    Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
-//    Segment s({5, -5},{8, 4});
-//    EXPECT_TRUE(intersects(r, s));
-//    EXPECT_TRUE(intersects(s, r));
-//}
+TEST(IntersectsTest, ray_starting_from_segment_edge)
+{
+    // TODO: change this to expect_true
+    Ray r({6, -2}, Angle::fromDegrees(30));
+    Segment s({5, -5},{8, 4});
+    EXPECT_FALSE(intersects(r, s));
+    EXPECT_FALSE(intersects(s, r));
+}
+
+TEST(IntersectsTest, ray_overlapping_segment)
+{
+    Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
+    Segment s({5, -5},{8, 4});
+    EXPECT_TRUE(intersects(r, s));
+    EXPECT_TRUE(intersects(s, r));
+}
 
 TEST(IntersectsTest, ray_starting_from_segment_end)
 {
