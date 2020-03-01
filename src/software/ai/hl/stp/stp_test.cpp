@@ -7,13 +7,17 @@
 
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest() : stp([]() { return nullptr; }, 0) {}
+    STPTest()
+        : stp([]() { return nullptr; }, Util::DynamicParameters->getAIControlConfig(), 0)
+    {
+    }
 
    protected:
     void SetUp() override
@@ -22,7 +26,8 @@ class STPTest : public ::testing::Test
             return std::make_unique<HaltTestPlay>();
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, 0);
+        stp = STP(default_play_constructor, Util::DynamicParameters->getAIControlConfig(),
+                  0);
         world = ::Test::TestUtil::createBlankTestingWorld();
     }
 
