@@ -100,8 +100,8 @@ new_local_repository(
 )
 
 new_local_repository(
-    name = "linux_gcc_7_4_0",
-    build_file = "@//external:linux_gcc_7_4_0.BUILD",
+    name = "linux_gcc",
+    build_file = "@//external:linux_gcc.BUILD",
     path = "/",
 )
 
