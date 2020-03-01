@@ -94,6 +94,10 @@ ALL_LINK_ACTIONS = [
     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
 ]
 
+ALL_C_ACTIONS = [
+    ACTION_NAMES.c_compile,
+]
+
 ALL_CPP_ACTIONS = [
     ACTION_NAMES.cpp_compile,
     ACTION_NAMES.cpp_module_codegen,
@@ -192,7 +196,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion"] +
+                        flags = ["-Wall", "-Wextra", "-Wconversion"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -340,6 +344,16 @@ def _make_common_features(ctx):
             flag_set(
                 actions = ALL_CPP_ACTIONS,
                 flag_groups = [flag_group(flags = ["-std=c++17"])],
+            ),
+        ],
+    )
+
+    result["c11"] = feature(
+        name = "c11",
+        flag_sets = [
+            flag_set(
+                actions = ALL_C_ACTIONS,
+                flag_groups = [flag_group(flags = ["-std=c11"])],
             ),
         ],
     )
@@ -543,6 +557,7 @@ def _linux_gcc_impl(ctx):
         implies = [
             "builtin_include_directories",
             "c++17",
+            "c11",
             "determinism",
             "hardening",
             "build-id",
@@ -718,6 +733,7 @@ def _stm32_impl(ctx):
         implies = [
             "stdlib",
             "c++17",
+            "c11",
             "determinism",
             "warnings",
             "no-canonical-prefixes",
