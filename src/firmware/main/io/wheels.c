@@ -14,7 +14,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "control/control.h"
 #include "io/adc.h"
 #include "io/encoder.h"
 #include "io/hall.h"
