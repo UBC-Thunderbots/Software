@@ -130,7 +130,6 @@ lan8742_IOCtx_t LAN8742_IOCtx = {ETH_PHY_IO_Init, ETH_PHY_IO_DeInit, ETH_PHY_IO_
                                  ETH_PHY_IO_ReadReg, ETH_PHY_IO_GetTick};
 
 /* USER CODE BEGIN 3 */
-ETH_MACFilterConfigTypeDef test;
 /* USER CODE END 3 */
 
 /* Private functions ---------------------------------------------------------*/
@@ -404,10 +403,6 @@ static void low_level_init(struct netif *netif)
             HAL_ETH_SetMACConfig(&heth, &MACConf);
 
             /* USER CODE BEGIN PHY_POST_CONFIG */
-            /*HAL_ETH_GetMACFilterConfig(&heth, &test);*/
-            /*test.PassAllMulticast = ENABLE;*/
-            /*test.PromiscuousMode  = ENABLE;*/
-            /*HAL_ETH_SetMACFilterConfig(&heth, &test);*/
             /* USER CODE END PHY_POST_CONFIG */
         }
         HAL_ETH_Start_IT(&heth);
