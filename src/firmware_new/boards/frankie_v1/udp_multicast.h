@@ -1,6 +1,12 @@
 #pragma once
-#include "cmsis_os.h"
-/**
+
+/*
+ * Join the multicast group to receive packets from AI.
+ *
+ * @param multicast_address The IPV6 address to join
+ * @param multicast_port The port to bind to listen for multicast packets from AI
+ * @param send_port The port to bind to to send unicast packets to AI
  *
  */
-void udp_multicast_init(const char* multicast_address, int mutlicast_port);
+void udp_multicast_init(const char* multicast_address, unsigned mutlicast_port,
+                        unsigned send_port);

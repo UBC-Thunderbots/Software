@@ -8,11 +8,10 @@
 #include "boost/bind.hpp"
 
 using boost::asio::socket_base;
-// using boost::asio::ip::address_v6;
 using boost::asio::ip::udp;
 
 NetworkMedium::NetworkMedium(const std::string& multicast_address,
-                             unsigned multicast_port)
+                             unsigned multicast_port, unsigned receive_port)
 {
     send_socket.reset(new udp::socket(io_service));
     recv_socket.reset(new udp::socket(io_service));
@@ -20,18 +19,19 @@ NetworkMedium::NetworkMedium(const std::string& multicast_address,
     boost::asio::ip::address multicast_addr =
         boost::asio::ip::address_v6::from_string(multicast_address);
 
-    local_endpoint = udp::endpoint(boost::asio::ip::address_v6::any(), 42001);
+    local_endpoint     = udp::endpoint(boost::asio::ip::address_v6::any(), receive_port);
     multicast_endpoint = udp::endpoint(multicast_addr, multicast_port);
 
     recv_socket->open(local_endpoint.protocol());
     send_socket->open(multicast_endpoint.protocol());
+
     send_socket->set_option(boost::asio::ip::multicast::join_group(multicast_addr));
     send_socket->set_option(boost::asio::ip::multicast::enable_loopback(false));
 
     try
     {
-        send_socket->bind(local_endpoint);
-        recv_socket->bind(multicast_endpoint);
+        send_socket->bind(multicast_endpoint);
+        recv_socket->bind(local_endpoint);
     }
     catch (const boost::exception& ex)
     {
@@ -74,11 +74,11 @@ void NetworkMedium::receive_data_async(std::function<void(std::string)> receive_
 {
     this->receive_callback = receive_callback;
 
-    recv_socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
-                               local_endpoint,
-                               boost::bind(&NetworkMedium::handle_data_reception, this,
-                                           boost::asio::placeholders::error,
-                                           boost::asio::placeholders::bytes_transferred));
+    recv_socket->async_receive_from(
+        boost::asio::buffer(data_buffer, max_buffer_length), local_endpoint,
+        boost::bind(&NetworkMedium::handle_data_reception, this,
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred));
 
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
@@ -98,9 +98,9 @@ void NetworkMedium::handle_data_reception(const boost::system::error_code& error
                      << error << std::endl;
     }
 
-    recv_socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
-                               local_endpoint,
-                               boost::bind(&NetworkMedium::handle_data_reception, this,
-                                           boost::asio::placeholders::error,
-                                           boost::asio::placeholders::bytes_transferred));
+    recv_socket->async_receive_from(
+        boost::asio::buffer(data_buffer, max_buffer_length), local_endpoint,
+        boost::bind(&NetworkMedium::handle_data_reception, this,
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred));
 }

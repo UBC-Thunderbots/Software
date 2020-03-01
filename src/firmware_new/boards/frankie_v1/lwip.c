@@ -77,7 +77,7 @@ void MX_LWIP_Init(void)
     }
 
     /* USER CODE BEGIN 3 */
-    udp_multicast_init("ff02::c3d0:42d2:bb8", 42000);
+    udp_multicast_init("ff02::c3d0:42d2:bb8", 42000, 42001);
     /* USER CODE END 3 */
 }
 
