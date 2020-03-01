@@ -67,3 +67,15 @@ cc_library(
     hdrs = ["robot_status.h"],
     deps = [],
 )
+
+cc_library(
+    name = "all_backends",
+    hdrs = [
+        "all_backends.h",
+    ],
+    deps = [
+        ":grsim_backend",
+        ":radio_backend",
+        ":simulator_backend",
+    ],
+)
