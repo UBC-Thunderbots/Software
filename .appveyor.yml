@@ -7,8 +7,8 @@ install:
 
 environment:
   matrix:
-    - JOB_TYPE: BUILD_TEST_COVERAGE
     - JOB_TYPE: FORMATTING_CHECK
+    - JOB_TYPE: BUILD_TEST_COVERAGE
 
 build_script:
   - |
