@@ -21,11 +21,13 @@ control_msg control = control_msg_init_zero;
 
 struct netconn *udp_multicast_join_group(const char *multicast_ip, int multicast_port);
 static void udp_multicast_thread(void *arg);
+static struct netconn *sendconn;
 
 struct netconn *udp_multicast_join_group(const char *multicast_ip, int multicast_port)
 {
     // create a new UDP connection on the heap
-    struct netconn *conn = netconn_new(NETCONN_UDP_IPV6);
+    struct netconn *recvconn = netconn_new(NETCONN_UDP_IPV6);
+    sendconn = netconn_new(NETCONN_UDP_IPV6);
 
     // create multicast address and port from arguments
     // htons swaps bytes to correct the endianness of the port,
@@ -36,18 +38,15 @@ struct netconn *udp_multicast_join_group(const char *multicast_ip, int multicast
     // bind the socket to the multicast address and port
     // we then use that connection profile to join the specified
     // multicast group
-    err_t test = netconn_bind(conn, &multicast_address, multicast_port);
+    netconn_bind(recvconn, &multicast_address, multicast_port);
+    netconn_bind(sendconn, IP6_ADDR_ANY, multicast_port+1);
 
     err_t err =
-        netconn_join_leave_group(conn, &multicast_address, NULL, NETCONN_JOIN);
-
-    if (test == ERR_OK)
-    {
-    }
+        netconn_join_leave_group(recvconn, &multicast_address, NULL, NETCONN_JOIN);
 
     if (err == ERR_OK)
     {
-        return conn;
+        return recvconn;
     }
 
     return NULL;
@@ -82,7 +81,7 @@ static void udp_multicast_thread(void *arg)
 
                 // package payload and send over udp
                 tx_buf->p->payload = buffer;
-                netconn_sendto(conn, tx_buf, (const ip_addr_t *)&(buf->addr), buf->port);
+                netconn_sendto(sendconn, tx_buf, (const ip_addr_t *)&(buf->addr), buf->port);
             }
             netbuf_delete(tx_buf);
         }
