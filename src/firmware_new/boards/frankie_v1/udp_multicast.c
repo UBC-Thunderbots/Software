@@ -81,7 +81,7 @@ static void udp_multicast_thread(void *arg)
 
                 // package payload and send over udp
                 tx_buf->p->payload = buffer;
-                netconn_sendto(sendconn, tx_buf, (const ip_addr_t *)&(buf->addr), buf->port);
+                netconn_sendto(sendconn, tx_buf, (const ip_addr_t *)&(buf->addr), buf->port+1);
             }
             netbuf_delete(tx_buf);
         }

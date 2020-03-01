@@ -70,8 +70,11 @@ class NetworkMedium : public TransferMedium
     // remote endpoint w/ broadcast ip and given port
     udp::endpoint multicast_endpoint;
 
-    // socket to send/recv
-    std::unique_ptr<udp::socket> socket;
+    // socket to send
+    std::unique_ptr<udp::socket> send_socket;
+
+    // socket to recv
+    std::unique_ptr<udp::socket> recv_socket;
 
     // thread that runs all io_service related operations
     std::thread io_service_thread;

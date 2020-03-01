@@ -14,21 +14,24 @@ using boost::asio::ip::udp;
 NetworkMedium::NetworkMedium(const std::string& multicast_address,
                              unsigned multicast_port)
 {
-    socket.reset(new udp::socket(io_service));
+    send_socket.reset(new udp::socket(io_service));
+    recv_socket.reset(new udp::socket(io_service));
 
     boost::asio::ip::address multicast_addr =
         boost::asio::ip::address_v6::from_string(multicast_address);
 
-    local_endpoint = udp::endpoint(boost::asio::ip::address_v6::any(), multicast_port+1);
+    local_endpoint = udp::endpoint(boost::asio::ip::address_v6::any(), 42001);
     multicast_endpoint = udp::endpoint(multicast_addr, multicast_port);
 
-    socket->open(multicast_endpoint.protocol());
-    socket->set_option(boost::asio::ip::multicast::join_group(multicast_addr));
-    socket->set_option(boost::asio::ip::multicast::enable_loopback(false));
+    recv_socket->open(local_endpoint.protocol());
+    send_socket->open(multicast_endpoint.protocol());
+    send_socket->set_option(boost::asio::ip::multicast::join_group(multicast_addr));
+    send_socket->set_option(boost::asio::ip::multicast::enable_loopback(false));
 
     try
     {
-        socket->bind(multicast_endpoint);
+        send_socket->bind(local_endpoint);
+        recv_socket->bind(multicast_endpoint);
     }
     catch (const boost::exception& ex)
     {
@@ -56,20 +59,22 @@ NetworkMedium::~NetworkMedium()
     // `std::terminate` when we deallocate the thread object and kill our whole program
     io_service_thread.join();
 
-    socket->close();
-    socket.reset();
+    recv_socket->close();
+    recv_socket.reset();
+    send_socket->close();
+    send_socket.reset();
 }
 
 void NetworkMedium::send_data(const std::string& data)
 {
-    socket->send_to(boost::asio::buffer(data), multicast_endpoint);
+    send_socket->send_to(boost::asio::buffer(data), multicast_endpoint);
 }
 
 void NetworkMedium::receive_data_async(std::function<void(std::string)> receive_callback)
 {
     this->receive_callback = receive_callback;
 
-    socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
+    recv_socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
                                local_endpoint,
                                boost::bind(&NetworkMedium::handle_data_reception, this,
                                            boost::asio::placeholders::error,
@@ -93,7 +98,7 @@ void NetworkMedium::handle_data_reception(const boost::system::error_code& error
                      << error << std::endl;
     }
 
-    socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
+    recv_socket->async_receive_from(boost::asio::buffer(data_buffer, max_buffer_length),
                                local_endpoint,
                                boost::bind(&NetworkMedium::handle_data_reception, this,
                                            boost::asio::placeholders::error,
