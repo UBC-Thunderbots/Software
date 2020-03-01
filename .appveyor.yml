@@ -1,0 +1,29 @@
+version: '{build}'
+
+image: Ubuntu1804 
+
+install:
+  - ./environment_setup/setup_software.sh
+
+environment:
+  matrix:
+    - JOB_TYPE: BUILD_TEST_COVERAGE
+    - JOB_TYPE: FORMATTING_CHECK
+
+test_script:
+  - |
+    if [[ "$JOB_TYPE" == BUILD_TEST_COVERAGE ]]; then
+      cd src
+      # Build, test, run coverage
+      bazel coverage //software/... 
+      --compilation_mode=fastbuild 
+      --verbose_test_summary 
+      --instrumentation_filter=//... 
+      --test_output=errors
+      # Upload coverage results
+      bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
+      # Build our CPU-specific targets
+      bazel build //firmware_new/... --cpu=stm32h7
+    elif [[ "$JOB_TYPE" == FORMATTING_CHECK ]]; then
+      ./formatting_scripts/check_formatting_ci.sh
+    fi
