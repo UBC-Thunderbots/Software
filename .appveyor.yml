@@ -10,7 +10,7 @@ environment:
     - JOB_TYPE: BUILD_TEST_COVERAGE
     - JOB_TYPE: FORMATTING_CHECK
 
-test_script:
+build_script:
   - |
     if [[ "$JOB_TYPE" == BUILD_TEST_COVERAGE ]]; then
       cd src
