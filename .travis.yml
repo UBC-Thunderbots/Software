@@ -8,22 +8,22 @@ install:
 jobs:
   include:
     - name: "Build, Test, and Run Coverage"
-      script: >
+      script:
         - cd src
         # Test Software
         - >
           bazel coverage //software/...     \
-          --compilation_mode=fastbuild      \
-          --verbose_test_summary            \
-          --instrumentation_filter=//...    \
-          --test_output=errors
+            --compilation_mode=fastbuild    \
+            --verbose_test_summary          \
+            --instrumentation_filter=//...  \
+            --test_output=errors
         # Test Firmware
         - >
           bazel coverage //firmware/main/app/...    \
-          --compilation_mode=fastbuild              \
-          --verbose_test_summary                    \
-          --instrumentation_filter=//...            \
-          --test_output=errors
+            --compilation_mode=fastbuild            \
+            --verbose_test_summary                  \
+            --instrumentation_filter=//...          \
+            --test_output=errors
         # Collect Code Coverage Results
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
         # Build ARM Targets For Firmware
