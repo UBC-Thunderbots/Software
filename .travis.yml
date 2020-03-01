@@ -9,16 +9,17 @@ jobs:
   include:
     - name: "Build, Test, and Run Coverage"
       script: >
-        cd src
-        &&
-        bazel coverage //software/... 
-        --compilation_mode=fastbuild 
-        --verbose_test_summary 
-        --instrumentation_filter=//... 
-        --test_output=errors
-        &&
-        bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
-        # Build our CPU-specific targets
+        - cd src
+        # Test Our Software
+        - >
+          bazel coverage //software/... 
+          --compilation_mode=fastbuild 
+          --verbose_test_summary 
+          --instrumentation_filter=//... 
+          --test_output=errors
+        # Collect Code Coverage Results
+        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
+        # Build Our Firmware
         - bazel build //firmware_new/... --cpu=stm32h7
     - name: "Check Formatting"
       script:
