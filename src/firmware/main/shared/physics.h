@@ -20,6 +20,8 @@
 #define ROBOT_POINT_MASS 2.48f
 #define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
 
+// Maximum safe jerk for the robot
+#define JERK_LIMIT 40.0f  //(m/s^3)
 
 // all the interial components of the robot
 // This one is a little strange as it is the effective rotational mass
