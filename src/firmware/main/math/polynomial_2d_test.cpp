@@ -89,13 +89,13 @@ TEST_F(Polynomial2dTest, get_derivative_3rd_order_polynomial)
 
     Polynomial2dOrder2_t derivative = shared_polynomial2d_differentiateOrder3(poly);
 
-    EXPECT_DOUBLE_EQ(-6, derivative.x.coefficients[0]);
-    EXPECT_DOUBLE_EQ(1, derivative.x.coefficients[1]);
-    EXPECT_DOUBLE_EQ(6, derivative.x.coefficients[2]);
+    EXPECT_FLOAT_EQ(-6, derivative.x.coefficients[0]);
+    EXPECT_FLOAT_EQ(1, derivative.x.coefficients[1]);
+    EXPECT_FLOAT_EQ(6, derivative.x.coefficients[2]);
 
     EXPECT_NEAR(0.6, derivative.y.coefficients[0], 10e-7);
-    EXPECT_DOUBLE_EQ(14, derivative.y.coefficients[1]);
-    EXPECT_DOUBLE_EQ(2, derivative.y.coefficients[2]);
+    EXPECT_FLOAT_EQ(14, derivative.y.coefficients[1]);
+    EXPECT_FLOAT_EQ(2, derivative.y.coefficients[2]);
 }
 
 TEST_F(Polynomial2dTest, get_arc_length_parametrization_num_values_0)
@@ -225,7 +225,7 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_for_complex_function)
     expectArcLengthParametrizationsEqual(expected, parametrization, 1);
 }
 
-TEST_F(Polynomial2dTest, get_position_at_arc_length_on_straight_1_values)
+TEST_F(Polynomial2dTest, get_position_at_arc_length_on_straight_line_1_values)
 {
     // This function should probably never be used like this, but this checks that
     // we're at least executing defined behavior
@@ -308,7 +308,6 @@ TEST_F(Polynomial2dTest, get_position_on_arc_length_below_arc_lengths_in_paramet
                             poly, -5, arc_length_parametrization));
 }
 
-
 TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_divisions)
 {
     Polynomial2dOrder3_t poly = {
@@ -351,4 +350,113 @@ TEST_F(Polynomial2dTest, get_position_at_arc_length_on_complex_line_multiple_div
                         shared_polynomial2d_getPositionAtArcLengthOrder3(
                             poly, 345.12, arc_length_parametrization),
                         0.01);
+}
+
+TEST_F(Polynomial2dTest, get_t_value_at_arc_length_on_straight_line_1_values)
+{
+    // This function should probably never be used like this, but this checks that
+    // we're at least executing defined behavior
+
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.2}},
+    };
+
+    static float t_values[1]                              = {0.5};
+    static float arc_length_values[1]                     = {99};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .arc_length_values = arc_length_values, .num_values = 1};
+
+    EXPECT_FLOAT_EQ(0.5, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                             poly, 99, arc_length_parametrization));
+}
+
+TEST_F(Polynomial2dTest, get_t_value_at_arc_length_on_straight_line_single_division)
+{
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.1}},
+    };
+
+    static float t_values[2]                              = {-2, 2};
+    static float arc_length_values[2]                     = {0, 4};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .arc_length_values = arc_length_values, .num_values = 2};
+
+    EXPECT_FLOAT_EQ(-2, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                            poly, 0, arc_length_parametrization));
+    EXPECT_FLOAT_EQ(-1, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                            poly, 1, arc_length_parametrization));
+    EXPECT_FLOAT_EQ(0, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                           poly, 2, arc_length_parametrization));
+    EXPECT_FLOAT_EQ(1, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                           poly, 3, arc_length_parametrization));
+    EXPECT_FLOAT_EQ(2, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                           poly, 4, arc_length_parametrization));
+}
+
+TEST_F(Polynomial2dTest, get_t_value_on_arc_length_above_arc_lengths_in_parametrization)
+{
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.1}},
+    };
+
+    static float t_values[2]                              = {-2, 2};
+    static float arc_length_values[2]                     = {0, 4};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .arc_length_values = arc_length_values, .num_values = 2};
+
+    EXPECT_FLOAT_EQ(2, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                           poly, 5, arc_length_parametrization));
+}
+
+TEST_F(Polynomial2dTest, get_t_value_on_arc_length_below_arc_lengths_in_parametrization)
+{
+    Polynomial2dOrder1_t poly = {
+        .x = {.coefficients = {1, 0.1}},
+        .y = {.coefficients = {1, 0.1}},
+    };
+
+    static float t_values[2]                              = {-2, 2};
+    static float arc_length_values[2]                     = {0, 4};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .arc_length_values = arc_length_values, .num_values = 2};
+
+    EXPECT_FLOAT_EQ(-2, shared_polynomial2d_getTValueAtArcLengthOrder1(
+                            poly, -5, arc_length_parametrization));
+}
+
+TEST_F(Polynomial2dTest, get_t_value_at_arc_length_on_complex_line_multiple_divisions)
+{
+    Polynomial2dOrder3_t poly = {
+        .x = {.coefficients = {0.1 / 3, 1.5, -0.5, 70.1}},
+        .y = {.coefficients = {-0.2 / 3, 19.1, -3, -3}},
+    };
+
+    // Note that for the purposes of this test it does not matter what the t and s
+    // values here actually are, as long as they're both in ascending order, as this
+    // function's job is merely to interpolate over the given set of values, whatever
+    // those values might be.
+    static float t_values[17] = {-6,   -5.25, -4.5, -3.75, -3.0, -2.25, -1.5, -0.75, 0,
+                                 0.75, 1.5,   2.25, 3,     3.75, 4.5,   5.25, 6};
+    static float arc_length_values[17] = {0,      168.5,  314.3,  437.58, 538.49, 617.19,
+                                          673.86, 708.65, 721.73, 730.46, 760.33, 811.43,
+                                          883.60, 976.68, 1090.5, 1224.9, 1379.8};
+    ArcLengthParametrization_t arc_length_parametrization = {
+        .t_values = t_values, .arc_length_values = arc_length_values, .num_values = 17};
+
+    // Check some arc length points that require no interpolation
+    EXPECT_FLOAT_EQ(-6, shared_polynomial2d_getTValueAtArcLengthOrder3(
+                            poly, 0, arc_length_parametrization));
+    EXPECT_FLOAT_EQ(6, shared_polynomial2d_getTValueAtArcLengthOrder3(
+                           poly, 1379.8, arc_length_parametrization));
+    EXPECT_FLOAT_EQ(0, shared_polynomial2d_getTValueAtArcLengthOrder3(
+                           poly, 721.73, arc_length_parametrization));
+
+    // Check some arc length points that should be determined via interpolation
+    EXPECT_FLOAT_EQ(-5.4374776, shared_polynomial2d_getTValueAtArcLengthOrder3(
+                                    poly, 126.38, arc_length_parametrization));
+    EXPECT_FLOAT_EQ(-4.3125, shared_polynomial2d_getTValueAtArcLengthOrder3(
+                                 poly, 345.12, arc_length_parametrization));
 }
