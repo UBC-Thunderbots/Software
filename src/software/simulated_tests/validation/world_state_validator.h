@@ -57,7 +57,7 @@ class WorldStateValidator : public ThreadedObserver<World>, public Subject<World
     void onValueReceived(World world) override;
 
     // How long to wait to receive a world, in wall-clock time
-    const Duration world_buffer_timeout = Duration::fromSeconds(1);
+    const Duration world_buffer_timeout = Duration::fromSeconds(10);
     // This class makes the assumption that it will finish processing the World before
     // it is re-published to the rest of the system. We know that the AI will wait for a
     // new world before running, and that the SimulatorBackend will wait for new
