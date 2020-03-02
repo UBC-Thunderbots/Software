@@ -39,7 +39,7 @@ void SimulatedTest::enableVisualizer()
     // The XDG_RUNTIME_DIR environment variable must be set in order for the
     // Visualizer to work properly. If it's not set, the Visualizer initialization
     // will fail with an error like "qt.qpa.screen: QXcbConnection: Could not
-    // connect to display" In order for this environment variable to be set
+    // connect to display". In order for this environment variable to be set
     // correctly these test targets MUST be run with 'bazel run' rather than
     // 'bazel test'
     auto xdg_runtime_dir = std::getenv("XDG_RUNTIME_DIR");
