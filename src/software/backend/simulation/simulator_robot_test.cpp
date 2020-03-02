@@ -577,11 +577,11 @@ TEST_F(SimulatorRobotTest, test_robot_drive_forward)
     }
 
     EXPECT_NEAR(simulator_robot->getVelocityX(), 0, 1e-5);
-    EXPECT_GT(simulator_robot->getVelocityY(), 0.5);
+    EXPECT_GT(simulator_robot->getVelocityY(), 0.25);
     EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0, 1 * M_PI / 180.0);
 
     EXPECT_NEAR(simulator_robot->getPositionX(), 0, 1e-5);
-    EXPECT_GT(simulator_robot->getPositionY(), 0.25);
+    EXPECT_GT(simulator_robot->getPositionY(), 0.15);
     EXPECT_NEAR(simulator_robot->getOrientation(), M_PI_2, 1 * M_PI / 180.0);
 }
 
@@ -603,11 +603,11 @@ TEST_F(SimulatorRobotTest, test_robot_drive_backwards)
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    EXPECT_LT(simulator_robot->getVelocityX(), -0.5);
+    EXPECT_LT(simulator_robot->getVelocityX(), -0.25);
     EXPECT_NEAR(simulator_robot->getVelocityY(), 0, 1e-5);
     EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0, 1 * M_PI / 180.0);
 
-    EXPECT_LT(simulator_robot->getPositionX(), -0.25);
+    EXPECT_LT(simulator_robot->getPositionX(), -0.15);
     EXPECT_NEAR(simulator_robot->getPositionY(), 0, 1e-5);
     EXPECT_NEAR(simulator_robot->getOrientation(), 0, 1 * M_PI / 180.0);
 }
@@ -632,7 +632,7 @@ TEST_F(SimulatorRobotTest, test_robot_spin_clockwise)
 
     EXPECT_LT((simulator_robot->position() - Point(0, 0)).length(), 0.05);
     EXPECT_LT((simulator_robot->velocity() - Vector(0, 0)).length(), 0.05);
-    EXPECT_LT(simulator_robot->getVelocityAngular(), -10);
+    EXPECT_LT(simulator_robot->getVelocityAngular(), -8);
 }
 
 TEST_F(SimulatorRobotTest, test_robot_spin_counterclockwise)
@@ -655,7 +655,7 @@ TEST_F(SimulatorRobotTest, test_robot_spin_counterclockwise)
 
     EXPECT_LT((simulator_robot->position() - Point(0, 0)).length(), 0.05);
     EXPECT_LT((simulator_robot->velocity() - Vector(0, 0)).length(), 0.05);
-    EXPECT_GT(simulator_robot->getVelocityAngular(), 10);
+    EXPECT_GT(simulator_robot->getVelocityAngular(), 8);
 }
 
 TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_not_moving)

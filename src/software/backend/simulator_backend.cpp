@@ -76,7 +76,7 @@ void SimulatorBackend::stopSimulation()
 void SimulatorBackend::runSimulationLoop(World world)
 {
     unsigned int num_physics_steps_per_world_published = static_cast<unsigned int>(
-        std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
+            std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
 
     Simulator simulator(world);
 
@@ -106,10 +106,10 @@ void SimulatorBackend::runSimulationLoop(World world)
             // published.
             auto timestamp_now = std::chrono::steady_clock::now();
             auto milliseconds_since_world_publish =
-                std::chrono::duration_cast<std::chrono::milliseconds>(
-                    timestamp_now - world_publish_timestamp);
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                            timestamp_now - world_publish_timestamp);
             auto remaining_milliseconds = std::chrono::milliseconds(std::lrint(
-                                              world_time_increment.getMilliseconds())) -
+                    world_time_increment.getMilliseconds())) -
                                           milliseconds_since_world_publish;
 
             if (remaining_milliseconds > std::chrono::milliseconds(0))

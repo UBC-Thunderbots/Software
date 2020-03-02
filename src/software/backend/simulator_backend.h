@@ -26,7 +26,7 @@ class SimulatorBackend : public Backend
      *   'n' seconds apart in real "wall-clock" time. This is useful
      *   if you want to visualize the simulation.
      */
-    enum SimulationSpeed
+    enum class SimulationSpeed
     {
         FAST_SIMULATION,
         REALTIME_SIMULATION
@@ -124,5 +124,5 @@ class SimulatorBackend : public Backend
     const unsigned int primitive_buffer_size = 1;
     ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
     // How long to wait for primitives, in wall-clock time
-    const Duration primitive_timeout = Duration::fromSeconds(1);
+    const Duration primitive_timeout = Duration::fromSeconds(10);
 };

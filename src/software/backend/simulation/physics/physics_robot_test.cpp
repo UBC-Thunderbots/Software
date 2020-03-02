@@ -522,8 +522,8 @@ TEST_F(PhysicsRobotTest, test_robot_drive_forward_at_angle)
     }
 
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
-    EXPECT_GT(robot.velocity().x(), 0.5);
-    EXPECT_GT(robot.velocity().y(), 0.5);
+    EXPECT_GT(robot.velocity().x(), 0.4);
+    EXPECT_GT(robot.velocity().y(), 0.4);
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0, 1);
 
     EXPECT_GT(robot.position().x(), 0.3);
@@ -556,11 +556,11 @@ TEST_F(PhysicsRobotTest, test_robot_drive_forward)
     }
 
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
-    EXPECT_GT(robot.velocity().x(), 1.0);
+    EXPECT_GT(robot.velocity().x(), 0.5);
     EXPECT_NEAR(robot.velocity().y(), 0, 1e-5);
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0, 1);
 
-    EXPECT_GT(robot.position().x(), 0.5);
+    EXPECT_GT(robot.position().x(), 0.4);
     EXPECT_NEAR(robot.position().y(), 0, 1e-5);
     EXPECT_NEAR(robot.orientation().toDegrees(), 0, 1);
 }
@@ -590,11 +590,11 @@ TEST_F(PhysicsRobotTest, test_robot_drive_backwards)
     }
 
     auto robot = physics_robot.getRobotWithTimestamp(Timestamp::fromSeconds(0));
-    EXPECT_LT(robot.velocity().x(), -1.0);
+    EXPECT_LT(robot.velocity().x(), -0.5);
     EXPECT_NEAR(robot.velocity().y(), 0, 1e-5);
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0, 1);
 
-    EXPECT_LT(robot.position().x(), -0.5);
+    EXPECT_LT(robot.position().x(), -0.4);
     EXPECT_NEAR(robot.position().y(), 0, 1e-5);
     EXPECT_NEAR(robot.orientation().toDegrees(), 0, 1);
 }
@@ -628,7 +628,7 @@ TEST_F(PhysicsRobotTest, test_robot_spin_clockwise)
     // little bit while spinning
     EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
     EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
-    EXPECT_LT(robot.angularVelocity(), AngularVelocity::fromRadians(-30));
+    EXPECT_LT(robot.angularVelocity(), AngularVelocity::fromRadians(-20));
 }
 
 TEST_F(PhysicsRobotTest, test_robot_spin_counterclockwise)
@@ -660,7 +660,7 @@ TEST_F(PhysicsRobotTest, test_robot_spin_counterclockwise)
     // little bit while spinning
     EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
     EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
-    EXPECT_GT(robot.angularVelocity(), AngularVelocity::fromRadians(30));
+    EXPECT_GT(robot.angularVelocity(), AngularVelocity::fromRadians(20));
 }
 
 TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_not_moving)
