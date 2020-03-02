@@ -117,9 +117,22 @@ cc_library(
         ":simulator_ball_singleton",
         ":simulator_robot",
         ":simulator_robot_singleton",
+        "//firmware/main/app/primitives:primitive_manager",
         "//firmware/main/app/world:firmware_world",
         "//software/ai/primitive",
+        "//software/backend/output/radio/mrf:mrf_primitive_visitor",
         "//software/backend/simulation/physics:physics_world",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "simulator_test",
+    srcs = ["simulator_test.cpp"],
+    deps = [
+        ":simulator",
+        "//software/test_util",
+        "//software/world",
+        "@gtest//:gtest_main",
     ],
 )

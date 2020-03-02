@@ -6,6 +6,50 @@
 #include "software/backend/simulation/simulator_robot.h"
 #include "software/world/world.h"
 
+extern "C"
+{
+#include "firmware/main/app/primitives/primitive_manager.h"
+}
+
+/**
+ * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
+ * C++ considers it an incomplete type and is unable to use it with smart pointers
+ * because it doesn't know the size of the object. Therefore we need to create our own
+ * "Deleter" class we can provide to the smart pointers to handle that instead.
+ *
+ * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
+ * examples
+ */
+struct FirmwareWorldDeleter
+{
+    void operator()(FirmwareWorld_t* firmware_world) const
+    {
+        FirmwareRobot_t* firmware_robot = app_firmware_world_getRobot(firmware_world);
+        app_firmware_robot_destroy(firmware_robot);
+
+        FirmwareBall_t* firmware_ball = app_firmware_world_getBall(firmware_world);
+        app_firmware_ball_destroy(firmware_ball);
+
+        app_firmware_world_destroy(firmware_world);
+    };
+};
+
+/**
+ * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h file),
+ * C++ considers it an incomplete type and is unable to use it with smart pointers
+ * because it doesn't know the size of the object. Therefore we need to create our own
+ * "Deleter" class we can provide to the smart pointers to handle that instead.
+ *
+ * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
+ * examples
+ */
+struct PrimitiveManagerDeleter {
+    void operator()(PrimitiveManager_t* primitive_manager) const
+    {
+        app_primitive_manager_destroy(primitive_manager);
+    };
+};
+
 /**
  * The Simulator abstracts away the physics simulation of all objects in the world,
  * as well as the firmware simulation for the robots. This provides a simple interface
@@ -47,6 +91,10 @@ class Simulator
 
    private:
     PhysicsWorld physics_world;
-    std::vector<std::shared_ptr<SimulatorRobot>> friendly_simulator_robots;
     std::shared_ptr<SimulatorBall> simulator_ball;
+    std::map<std::shared_ptr<SimulatorRobot>, std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>> simulator_robots;
+    // The firmware_world pointer that is used by all simulated robots. It is
+    // controlled by the SimulatorRobotSingleton in order to work with multiple
+    // robots and primitives simultaneously
+    std::unique_ptr<FirmwareWorld_t, FirmwareWorldDeleter> firmware_world;
 };
