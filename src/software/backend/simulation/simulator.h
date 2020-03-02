@@ -35,15 +35,16 @@ struct FirmwareWorldDeleter
 };
 
 /**
- * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h file),
- * C++ considers it an incomplete type and is unable to use it with smart pointers
+ * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h
+ * file), C++ considers it an incomplete type and is unable to use it with smart pointers
  * because it doesn't know the size of the object. Therefore we need to create our own
  * "Deleter" class we can provide to the smart pointers to handle that instead.
  *
  * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
  * examples
  */
-struct PrimitiveManagerDeleter {
+struct PrimitiveManagerDeleter
+{
     void operator()(PrimitiveManager_t* primitive_manager) const
     {
         app_primitive_manager_destroy(primitive_manager);
@@ -92,7 +93,9 @@ class Simulator
    private:
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
-    std::map<std::shared_ptr<SimulatorRobot>, std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>> simulator_robots;
+    std::map<std::shared_ptr<SimulatorRobot>,
+             std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>>
+        simulator_robots;
     // The firmware_world pointer that is used by all simulated robots. It is
     // controlled by the SimulatorRobotSingleton in order to work with multiple
     // robots and primitives simultaneously

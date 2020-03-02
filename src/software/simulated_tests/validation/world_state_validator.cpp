@@ -64,8 +64,7 @@ bool WorldStateValidator::waitForValidationToPass(
             break;
         }
 
-        world =
-            world_buffer.popLeastRecentlyAddedValue(world_buffer_timeout);
+        world = world_buffer.popLeastRecentlyAddedValue(world_buffer_timeout);
         if (!world)
         {
             LOG(WARNING)
