@@ -21,10 +21,6 @@
 robot_ack ack       = robot_ack_init_zero;
 control_msg control = control_msg_init_zero;
 
-// this buffer is used to hold serialized proto. Allocated
-// on the data segment to avoid mallocing on every packet received
-static uint8_t buffer[robot_ack_size];
-
 /*
  * Thread that creates a send and recv socket, joins the specified
  * multicast group and start listening for packets. Increments a counter
@@ -73,6 +69,9 @@ static void blocking_udp_multicast_loop(void *arg)
     netconn_bind(recvconn, &config->multicast_address, config->multicast_port);
     netconn_bind(sendconn, IP6_ADDR_ANY, config->send_port);
     netconn_join_leave_group(recvconn, &config->multicast_address, NULL, NETCONN_JOIN);
+
+    // this buffer is used to hold serialized proto
+    uint8_t buffer[robot_ack_size];
 
     while (1)
     {
