@@ -1,3 +1,5 @@
+#include "udp_multicast.h"
+
 #include "firmware_new/proto/control_fw.pb.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
@@ -16,6 +18,8 @@
 // TODO the messages are global for now, will need to be moved
 // when this file is properly integrated. This file only serves
 // as a reference implementation of reliable multicast with IPv6
+// Properly implement thread-safety and setup some form of global access
+// as part of https://github.com/UBC-Thunderbots/Software/issues/1191
 robot_ack ack       = robot_ack_init_zero;
 control_msg control = control_msg_init_zero;
 
@@ -47,6 +51,7 @@ static void blocking_udp_multicast_loop(void *arg)
     int msg_count              = 0;
 
     // TODO proper err handling, for now all errs are ignored
+    // https://github.com/UBC-Thunderbots/Software/issues/1190
     err_t err;
 
     // create two new UDP connections on the heap
@@ -57,10 +62,15 @@ static void blocking_udp_multicast_loop(void *arg)
     struct netconn *recvconn = netconn_new(NETCONN_UDP_IPV6);
     struct netconn *sendconn = netconn_new(NETCONN_UDP_IPV6);
 
-    // bind the socket to the multicast address and port
+    // Bind the socket to the multicast address and port
     // we then use that connection profile to join the specified
-    // multicast group. For the send socket, we use IP6_ADDR_ANY
-    // which will default to the ETH interface.
+    // multicast group.
+    //
+    // For the send socket, we use IP6_ADDR_ANY
+    // which will default to the ethernet interface on the STM32H7
+    //
+    // This will remain the same regardless of communicating over ethernet
+    // or WiFi because both of those media use the ETH interface
     netconn_bind(recvconn, &config->multicast_address, config->multicast_port);
     netconn_bind(sendconn, IP6_ADDR_ANY, config->send_port);
     netconn_join_leave_group(recvconn, &config->multicast_address, NULL, NETCONN_JOIN);
