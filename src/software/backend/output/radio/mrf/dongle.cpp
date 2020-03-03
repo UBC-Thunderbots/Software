@@ -474,7 +474,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
     // Visit the primitive.
     prim->accept(visitor);
-    RadioPrimitive r_prim = visitor.getSerializedRadioPacket();
+    std::string r_prim = visitor.getSerializedRadioPacket();
 
     // Encode the parameter words.
     for (std::size_t i = 0; i < r_prim.param_array.size(); ++i)

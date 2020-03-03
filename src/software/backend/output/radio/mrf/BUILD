@@ -4,7 +4,7 @@ cc_library(
     hdrs = ["mrf_primitive_visitor.h"],
     deps = [
         "//shared:constants",
-        "//shared:firmware_primitive_type",
+        "//shared/proto:fw_cc_proto",
         "//software/ai/primitive:all_primitives",
         "//software/ai/primitive:primitive_visitor",
     ],

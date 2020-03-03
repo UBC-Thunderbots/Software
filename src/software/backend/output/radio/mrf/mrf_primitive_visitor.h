@@ -3,32 +3,8 @@
 #include <array>
 #include <optional>
 
-#include "shared/firmware_primitive_type.h"
+#include "shared/proto/primitive.pb.h"
 #include "software/ai/primitive/primitive_visitor.h"
-
-/**
- * This struct stores the components of a translated primitive to be sent over radio.
- */
-typedef struct RadioPrimitive_t
-{
-    // A numeric ID representing the primitive for firmware
-    FirmwarePrimitiveType prim_type;
-
-    // The parameter array to be encoded into the radio packet
-    std::array<double, 4> param_array;
-
-    // Extra bits used for flags and/or additional information
-    uint8_t extra_bits;
-
-    // Indicates whether the robot should move slowly (<1.5 m/s)
-    bool slow;
-} RadioPrimitive;
-
-inline bool operator==(const RadioPrimitive &lhs, const RadioPrimitive &rhs)
-{
-    return lhs.prim_type == rhs.prim_type && lhs.param_array == rhs.param_array &&
-           lhs.extra_bits == rhs.extra_bits;
-}
 
 /**
  * This class implements a Visitor that serializes the Primitive classes into packets
@@ -119,8 +95,10 @@ class MRFPrimitiveVisitor : public PrimitiveVisitor
      *
      * @return The most recent serialized packet created by this
      * MRFPrimitiveVisitor
+     *
+     * TODO update comment
      */
-    RadioPrimitive getSerializedRadioPacket();
+    std::string getSerializedRadioPacket();
 
    private:
     std::optional<RadioPrimitive> radio_prim;
