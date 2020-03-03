@@ -20,6 +20,7 @@
 #include <unused.h>
 #include <usb.h>
 
+#include "FreeRTOSConfig.h"
 #include "buzzer.h"
 #include "constants.h"
 #include "enabled.h"
