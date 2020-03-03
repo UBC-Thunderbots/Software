@@ -1,4 +1,4 @@
-Package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "firmware_old_radio_dongle_main",
@@ -42,7 +42,7 @@ genrule(
         ":firmware_old_radio_dongle_main",
         "@arm_developer_gcc//:objcopy",
     ],
-    outs = ["firmware_old_radio_dongble.bin"],
+    outs = ["firmware_old_radio_dongle.bin"],
     cmd = "\n".join([
         "$(location @arm_developer_gcc//:objcopy) -Obinary $(location :firmware_old_radio_dongle_main) $@",
     ]),
