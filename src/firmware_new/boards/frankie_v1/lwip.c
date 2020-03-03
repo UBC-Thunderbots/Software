@@ -27,6 +27,7 @@
 #endif /* MDK ARM Compiler */
 
 /* USER CODE BEGIN 0 */
+#include "constants.h"
 #include "udp_multicast.h"
 
 /* USER CODE END 0 */
@@ -77,7 +78,7 @@ void MX_LWIP_Init(void)
     }
 
     /* USER CODE BEGIN 3 */
-    udp_multicast_init("ff02::c3d0:42d2:bb8", 42000, 42001);
+    udp_multicast_init(AI_MULTICAST_ADDRESS, RECEIVE_PORT, SEND_PORT);
     /* USER CODE END 3 */
 }
 

@@ -21,7 +21,7 @@ control_msg control = control_msg_init_zero;
 
 // this buffer is used to hold serialized proto. Allocated
 // on the heap to avoid mallocing on every packet received
-uint8_t buffer[robot_ack_size];
+static uint8_t buffer[robot_ack_size];
 
 // the thread that handles multicast recv/send
 static void udp_multicast_thread(void *arg);

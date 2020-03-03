@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
         communicator.send_proto(control_req);
 
         // 4000 hz test
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::nanoseconds(250000));
     }
 
     google::protobuf::ShutdownProtobufLibrary();
