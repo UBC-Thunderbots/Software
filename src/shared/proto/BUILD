@@ -7,6 +7,7 @@ proto_files = [
         "camera.proto",
         "drive.proto",
         "geom.proto",
+        "control.proto",
         "primitive.proto",
 ]
 
@@ -22,7 +23,8 @@ proto_library(
 c_proto_library(
     name = "fw_c_proto",
     srcs = proto_files,
-    restricted_to = ["//cc_toolchain:stm32f4"],
+    restricted_to = ["//cc_toolchain:stm32f4", 
+                     "//cc_toolchain:stm32h7"],
 )
 
 cc_proto_library(

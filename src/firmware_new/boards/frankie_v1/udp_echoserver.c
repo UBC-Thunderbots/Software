@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "firmware_new/proto/control_fw.pb.h"
+#include "shared/proto/control_fw.pb.h"
 #include "lwip/pbuf.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
