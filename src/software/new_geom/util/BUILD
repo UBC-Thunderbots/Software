@@ -35,12 +35,14 @@ cc_library(
         "intersects.h",
     ],
     deps = [
+        ":contains",
+        ":distance",
+        ":intersection",
         "//software/new_geom:circle",
         "//software/new_geom:line",
         "//software/new_geom:polygon",
         "//software/new_geom:ray",
         "//software/new_geom:segment",
-        "//software/new_geom/util:distance",
     ],
 )
 
@@ -50,7 +52,6 @@ cc_test(
         "intersects_test.cpp",
     ],
     deps = [
-        ":contains",
         ":intersects",
         "//software/new_geom:rectangle",
         "//software/new_geom:triangle",

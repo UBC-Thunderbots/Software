@@ -1,6 +1,8 @@
 #include "software/new_geom/util/intersects.h"
 
 #include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/contains.h"
+#include "software/new_geom/util/intersection.h"
 
 bool intersects(const Polygon &first, const Segment &second)
 {
@@ -65,7 +67,7 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Segment &first, const Circle &second)
 {
-    bool segment_inside_circle = ::contains(second, first);
+    bool segment_inside_circle = contains(second, first);
     double segment_start_circle_origin_distsq =
         distanceSquared(first.getSegStart(), second.getOrigin());
     double segment_end_circle_origin_distsq =
@@ -94,9 +96,8 @@ bool intersects(const Segment &first, const Segment &second)
 
 bool intersects(const Ray &first, const Segment &second)
 {
-    auto intersection =
-        intersection(first.getStart(), first.getStart() + first.toUnitVector(),
-                           second.getSegStart(), second.getEnd());
+    Point intersection =
+        intersection(Segment(first.getStart(), first.getStart() + first.toUnitVector()), Segment(second.getSegStart(), second.getEnd()));
     // If the infinitely long vectors defined by ray and segment intersect, check that the
     // intersection is within their definitions
     if (intersection.has_value())

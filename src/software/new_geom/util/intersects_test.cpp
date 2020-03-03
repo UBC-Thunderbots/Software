@@ -380,14 +380,13 @@ TEST(IntersectsTest, ray_starting_from_segment_edge)
     EXPECT_TRUE(intersects(s, r));
 }
 
-// TODO (Issue #1183): Uncomment once intersection uses EPSILON comparison
-// TEST(IntersectsTest, ray_overlapping_segment)
-//{
-//    Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
-//    Segment s({5, -5},{8, 4});
-//    EXPECT_TRUE(intersects(r, s));
-//    EXPECT_TRUE(intersects(s, r));
-//}
+ TEST(IntersectsTest, ray_overlapping_segment)
+{
+    Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
+    Segment s({5, -5},{8, 4});
+    EXPECT_TRUE(intersects(r, s));
+    EXPECT_TRUE(intersects(s, r));
+}
 
 TEST(IntersectsTest, ray_starting_from_segment_end)
 {
