@@ -25,7 +25,14 @@ control_msg control = control_msg_init_zero;
 // on the data segment to avoid mallocing on every packet received
 static uint8_t buffer[robot_ack_size];
 
-// the thread that handles multicast recv/send
+/*
+ * Thread that creates a send and recv socket, joins the specified
+ * multicast group and start listening for packets. Increments a counter
+ * on every multicast packet and sends a unicast packet back to the sender.
+ * @param arg A void ptr to a multicast_config_t
+ * @returns nothing *runs forever*
+ *
+ */
 static void blocking_udp_multicast_loop(void *arg);
 
 struct multicast_config
@@ -35,12 +42,6 @@ struct multicast_config
     unsigned send_port;
 } typedef multicast_config_t;
 
-/*
- * Thread that creates a send and recv socket, joins the specified
- * multicast group and start listening for packets. Increments a counter
- * on every multicast packet and sends a unicast packet back to the sender.
- *
- */
 static void blocking_udp_multicast_loop(void *arg)
 {
     multicast_config_t *config = (multicast_config_t *)arg;

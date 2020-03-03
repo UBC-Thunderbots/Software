@@ -9,5 +9,5 @@
  * @param send_port The port to bind to to send unicast packets to AI
  *
  */
-void udp_multicast_init(const char* multicast_address, unsigned mutlicast_port,
+void udp_multicast_init(const char* multicast_address, unsigned multicast_port,
                         unsigned send_port);
