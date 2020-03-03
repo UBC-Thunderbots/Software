@@ -18,8 +18,6 @@
 // TODO the messages are global for now, will need to be moved
 // when this file is properly integrated. This file only serves
 // as a reference implementation of reliable multicast with IPv6
-// Properly implement thread-safety and setup some form of global access
-// as part of https://github.com/UBC-Thunderbots/Software/issues/1191
 robot_ack ack       = robot_ack_init_zero;
 control_msg control = control_msg_init_zero;
 
