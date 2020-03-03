@@ -4,6 +4,7 @@
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
+#include "firmware_new/boards/frankie_v1/constants.h"
 #include "firmware_new/proto/control.pb.h"
 #include "firmware_new/tools/communication/robot_communicator.h"
 #include "firmware_new/tools/communication/transfer_media/network_medium.h"
@@ -36,7 +37,8 @@ int main(int argc, char* argv[])
 
     // create a RobotCommunicator with a NetworkMedium
     RobotCommunicator<control_msg, robot_ack> communicator(
-        std::make_unique<NetworkMedium>("ff02::c3d0:42d2:bb8%eth0", 42000, 42001),
+        std::make_unique<NetworkMedium>(std::string(AI_MULTICAST_ADDRESS) + "%eth0",
+                                        AI_MULTICAST_SEND_PORT, AI_UNICAST_LISTEN_PORT),
         [&](const control_msg& msg) {
             std::cout << "COMP Txed " << count++ << " msgs " << std::endl;
         },

@@ -24,7 +24,7 @@ control_msg control = control_msg_init_zero;
 static uint8_t buffer[robot_ack_size];
 
 // the thread that handles multicast recv/send
-static void udp_multicast_thread(void *arg);
+static void blocking_udp_multicast_loop(void *arg);
 
 struct multicast_config
 {
@@ -39,11 +39,12 @@ struct multicast_config
  * on every multicast packet and sends a unicast packet back to the sender.
  *
  */
-static void udp_multicast_thread(void *arg)
+static void blocking_udp_multicast_loop(void *arg)
 {
     multicast_config_t *config = (multicast_config_t *)arg;
-    struct netbuf *rx_buf, *tx_buf;
-    int msg_count = 0;
+    struct netbuf *rx_buf      = NULL;
+    struct netbuf *tx_buf      = NULL;
+    int msg_count              = 0;
 
     // TODO proper err handling, for now all errs are ignored
     err_t err;
@@ -107,11 +108,8 @@ void udp_multicast_init(const char *multicast_address, unsigned multicast_port,
         .send_port      = send_port,
     };
 
-    // create multicast address and port from arguments
-    // htons swaps bytes to correct the endianness of the port,
-    // due to netconns requirements
     ip6addr_aton(multicast_address, &config->multicast_address);
 
-    sys_thread_new("multicast_thread", udp_multicast_thread, config, 1024,
+    sys_thread_new("multicast_thread", blocking_udp_multicast_loop, config, 1024,
                    (osPriority_t)osPriorityNormal);
 }
