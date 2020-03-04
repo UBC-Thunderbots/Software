@@ -264,7 +264,7 @@ class PhysicsRobot
     // This is a somewhat arbitrary value for damping. We keep it relatively low
     // so that robots still coast a ways before stopping, but non-zero so that robots
     // do come to a halt if no force is applied.
-    // Damping is roughly calculated as v_new = v * exp(damping * t)
+    // Damping is roughly calculated as v_new = v * exp(-damping * t)
     // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
     // TODO: These values are currently increased in order for the bang-bang controller
     // simulated in the robot firmware to behave reasonably. These values should be

@@ -50,12 +50,12 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
 {
     if (primitives)
     {
-        auto& primitive_vector = *primitives;
-        for (auto iter = simulator_robots.begin(); iter != simulator_robots.end(); iter++)
+        for (auto& iter : simulator_robots)
         {
-            auto simulator_robot                        = iter->first;
-            PrimitiveManager* primitive_manager_raw_ptr = iter->second.get();
+            auto simulator_robot                        = iter.first;
+            PrimitiveManager* primitive_manager_raw_ptr = iter.second.get();
 
+            auto& primitive_vector = *primitives;
             auto primitive_iter =
                 std::find_if(primitive_vector.begin(), primitive_vector.end(),
                              [&simulator_robot](const auto& p) {
