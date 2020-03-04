@@ -5,13 +5,18 @@ message RadioPrimitive {
     required FirmwarePrimitiveType prim_type = 1;
 
     // the parameters to be encoded into the radio packet
-    repeated double parameter = 2;
+    // we use required and have 4 parameters so that we know
+    // the max size of the packet before hand
+    required double parameter1 = 2;
+    required double parameter2 = 3;
+    required double parameter3 = 4;
+    required double parameter4 = 5;
 
     // Extra bits used for flags and/or additional information
-    required uint32 extra_bits = 3;
+    required uint32 extra_bits = 6;
 
     // Indicates whether the robot should move slowly (<1.5 m/s)
-    required bool slow = 4;
+    required bool slow = 7;
 }
 
 enum FirmwarePrimitiveType

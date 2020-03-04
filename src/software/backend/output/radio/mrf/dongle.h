@@ -24,11 +24,6 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 
-// TODO update this once final msg has been decided
-// for now this is set to a really high value that the proto
-// will definetly not reach
-#define MAX_PACKET_LENGTH 1000
-
 /**
  * An operation to send a reliable message.
  */

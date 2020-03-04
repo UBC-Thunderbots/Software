@@ -46,7 +46,7 @@ namespace
     struct
     {
         bool operator()(std::tuple<uint8_t, Point, Angle> a,
-                        std::tuple<uint8_t, Point, Angle> b) const
+                std::tuple<uint8_t, Point, Angle> b) const
         {
             return std::get<0>(a) < std::get<0>(b);
         }
@@ -56,14 +56,14 @@ namespace
 
 MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     : estop_state(EStopState::STOP),
-      context(),
-      device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
-      radio_interface(-1),
-      configuration_altsetting(-1),
-      normal_altsetting(-1),
-      status_transfer(device, 3, 1, true, 0),
-      pending_beep_length(0),
-      annunciator(annunciator)
+    context(),
+    device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
+    radio_interface(-1),
+    configuration_altsetting(-1),
+    normal_altsetting(-1),
+    status_transfer(device, 3, 1, true, 0),
+    pending_beep_length(0),
+    annunciator(annunciator)
 {
     // Sanity-check the dongle by looking for an interface with the appropriate
     // subclass and alternate settings with the appropriate protocols.
@@ -76,14 +76,14 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
         {
             const libusb_interface &intf = desc.interface[i];
             if (intf.num_altsetting && intf.altsetting[0].bInterfaceClass == 0xFF &&
-                intf.altsetting[1].bInterfaceSubClass == MRF::SUBCLASS)
+                    intf.altsetting[1].bInterfaceSubClass == MRF::SUBCLASS)
             {
                 radio_interface = i;
                 for (int j = 0; j < intf.num_altsetting; ++j)
                 {
                     const libusb_interface_descriptor &as = intf.altsetting[j];
                     if (as.bInterfaceClass == 0xFF &&
-                        as.bInterfaceSubClass == MRF::SUBCLASS)
+                            as.bInterfaceSubClass == MRF::SUBCLASS)
                     {
                         if (as.bInterfaceProtocol == MRF::PROTOCOL_OFF)
                         {
@@ -101,8 +101,8 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
         if (radio_interface < 0 || configuration_altsetting < 0 || normal_altsetting < 0)
         {
             throw std::runtime_error(
-                "Wrong USB descriptors (is your dongle firmware or your "
-                "software out of date or mismatched across branches?).");
+                    "Wrong USB descriptors (is your dongle firmware or your "
+                    "software out of date or mismatched across branches?).");
         }
     }
 
@@ -120,10 +120,10 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     device.set_interface_alt_setting(radio_interface, configuration_altsetting);
     {
         if (config < 0 || static_cast<std::size_t>(config) >=
-                              sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
+                sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
         {
             throw std::out_of_range("Config index must be between 0 and " +
-                                    std::to_string(NUM_DEFAULT_CONFIGS - 1));
+                    std::to_string(NUM_DEFAULT_CONFIGS - 1));
         }
 
         channel_ = DEFAULT_CONFIGS[config].channel;
@@ -135,8 +135,8 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
                 if (i < 0x0B || i > 0x1A)
                 {
                     throw std::out_of_range(
-                        "Channel number must be between 0x0B (11) and 0x1A "
-                        "(26).");
+                            "Channel number must be between 0x0B (11) and 0x1A "
+                            "(26).");
                 }
                 channel_ = static_cast<uint8_t>(i);
             }
@@ -163,24 +163,24 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
                 if (i < 0 || i > 0xFFFE)
                 {
                     throw std::out_of_range(
-                        "PAN must be between 0x0000 (0) and 0xFFFE (65,534).");
+                            "PAN must be between 0x0000 (0) and 0xFFFE (65,534).");
                 }
                 pan_ = static_cast<uint16_t>(i);
             }
         }
         device.control_no_data(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
-                               MRF::CONTROL_REQUEST_SET_CHANNEL, channel_,
-                               static_cast<uint16_t>(radio_interface), 0);
+                MRF::CONTROL_REQUEST_SET_CHANNEL, channel_,
+                static_cast<uint16_t>(radio_interface), 0);
         device.control_no_data(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
-                               MRF::CONTROL_REQUEST_SET_SYMBOL_RATE,
-                               symbol_rate == 625 ? 1 : 0,
-                               static_cast<uint16_t>(radio_interface), 0);
+                MRF::CONTROL_REQUEST_SET_SYMBOL_RATE,
+                symbol_rate == 625 ? 1 : 0,
+                static_cast<uint16_t>(radio_interface), 0);
         device.control_no_data(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
-                               MRF::CONTROL_REQUEST_SET_PAN_ID, pan_,
-                               static_cast<uint16_t>(radio_interface), 0);
+                MRF::CONTROL_REQUEST_SET_PAN_ID, pan_,
+                static_cast<uint16_t>(radio_interface), 0);
         device.control_out(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
-                           MRF::CONTROL_REQUEST_SET_MAC_ADDRESS, 0,
-                           static_cast<uint16_t>(radio_interface), &MAC, sizeof(MAC), 0);
+                MRF::CONTROL_REQUEST_SET_MAC_ADDRESS, 0,
+                static_cast<uint16_t>(radio_interface), &MAC, sizeof(MAC), 0);
 
         {
             std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -191,8 +191,8 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
                 std::chrono::duration_cast<std::chrono::microseconds>(diff);
             uint64_t stamp = static_cast<uint64_t>(micros.count());
             device.control_out(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-                               MRF::CONTROL_REQUEST_SET_TIME, 0, 0, &stamp, sizeof(stamp),
-                               0);
+                    MRF::CONTROL_REQUEST_SET_TIME, 0, 0, &stamp, sizeof(stamp),
+                    0);
         }
     }
 
@@ -220,7 +220,7 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
         // Attempt to receive at most 105 bytes from endpoint 2
         i.reset(new USB::BulkInTransfer(device, 2, 105, false, 0));
         i->signal_done.connect(
-            boost::bind(&MRFDongle::handle_message, this, _1, boost::ref(*i.get())));
+                boost::bind(&MRFDongle::handle_message, this, _1, boost::ref(*i.get())));
         i->submit();
     }
 
@@ -241,11 +241,11 @@ void MRFDongle::beep(unsigned int length)
     if (!beep_transfer && pending_beep_length)
     {
         beep_transfer.reset(new USB::ControlNoDataTransfer(
-            device, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
-            MRF::CONTROL_REQUEST_BEEP, static_cast<uint16_t>(pending_beep_length),
-            static_cast<uint16_t>(radio_interface), 0));
+                    device, LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
+                    MRF::CONTROL_REQUEST_BEEP, static_cast<uint16_t>(pending_beep_length),
+                    static_cast<uint16_t>(radio_interface), 0));
         beep_transfer->signal_done.connect(
-            boost::bind(&MRFDongle::handle_beep_done, this, _1));
+                boost::bind(&MRFDongle::handle_beep_done, this, _1));
         beep_transfer->submit();
         pending_beep_length = 0;
     }
@@ -278,7 +278,7 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
     for (unsigned int i = 0; i < mdr_transfer.size(); i += 2)
     {
         signal_message_delivery_report(mdr_transfer.data()[i],
-                                       mdr_transfer.data()[i + 1]);
+                mdr_transfer.data()[i + 1]);
     }
     mdr_transfer.submit();
 }
@@ -289,7 +289,7 @@ void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &tran
     {
         // Connect signal to beep dongle when annunciator requests it.
         this->annunciator.beep_dongle.connect(
-            boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
+                boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
     }
     transfer.result();
 
@@ -298,8 +298,8 @@ void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &tran
     {
         unsigned int robot = transfer.data()[0];
         annunciator.handle_robot_message(robot, transfer.data() + 1, transfer.size() - 3,
-                                         transfer.data()[transfer.size() - 2],
-                                         transfer.data()[transfer.size() - 1]);
+                transfer.data()[transfer.size() - 2],
+                transfer.data()[transfer.size() - 1]);
     }
     transfer.submit();
 }
@@ -321,7 +321,7 @@ void MRFDongle::handle_status(AsyncOperation<void> &)
 
 
 void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>> detbots,
-                                   Point ball, uint64_t timestamp)
+        Point ball, uint64_t timestamp)
 {
     int8_t camera_packet[55] = {0};
     int8_t mask_vec = 0;  // Assume all robots don't have valid position at the start
@@ -380,7 +380,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     if (camera_transfers.size() >= 8)
     {
         LOG(WARNING) << "Camera transfer queue is full, ignoring camera packet"
-                     << std::endl;
+            << std::endl;
         return;
     }
 
@@ -394,13 +394,13 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 
     // Create and submit USB transfer with camera packet
     std::unique_ptr<USB::BulkOutTransfer> elt(
-        new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
+            new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
     auto i = camera_transfers.insert(
-        camera_transfers.end(),
-        std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
-                                                                   stamp));
+            camera_transfers.end(),
+            std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
+                stamp));
     (*i).first->signal_done.connect(
-        boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
+            boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
     (*i).first->submit();
 
     // Update annunciator with detected bots for dead bot detection
@@ -408,7 +408,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     {
         // Connect signal to beep dongle when annunciator requests it.
         this->annunciator.beep_dongle.connect(
-            boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
+                boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
     }
     annunciator.update_vision_detections(robot_ids);
 };
@@ -424,8 +424,7 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
             throw std::invalid_argument("Too many primitives in vector.");
         }
 
-        // Only some robots are present. Build a reduced-size packet
-        // with robot indices prefixed.
+        // Dynamically create drive packet
         drive_packet = "";
 
         for (std::size_t i = 0; i != num_prims; ++i)
@@ -444,9 +443,9 @@ bool MRFDongle::submit_drive_transfer()
     if (!drive_transfer)
     {
         drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
-                                                      drive_packet.length(), MAX_PACKET_LENGTH, 0));
+                    drive_packet.length(), 64, 0));
         drive_transfer->signal_done.connect(
-            boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
+                boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
         drive_transfer->submit();
     }
 
@@ -468,11 +467,11 @@ std::string MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
         case EStopState::BROKEN:
         case EStopState::STOP:
             // Discharge`
-            r_prim += "S";
+            r_prim += "0";
             break;
         case EStopState::RUN:
             // Charge
-            r_prim += "R";
+            r_prim += "1";
             break;
     }
 
@@ -486,8 +485,8 @@ void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 }
 
 void MRFDongle::handle_camera_transfer_done(
-    AsyncOperation<void> &op,
-    std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
+        AsyncOperation<void> &op,
+        std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
     std::lock_guard<std::mutex> lock(cam_mtx);
     op.result();
