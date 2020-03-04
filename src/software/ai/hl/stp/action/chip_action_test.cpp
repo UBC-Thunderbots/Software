@@ -13,7 +13,8 @@ TEST(ChipTacticTest, getChipOrigin)
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
 
     std::shared_ptr<ChipAction> chip_action = std::make_shared<ChipAction>();
-    chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(45.0), 2.0);
+    chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(45.0),
+                                     2.0);
 
     ASSERT_NE(chip_action, nullptr);
     EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());

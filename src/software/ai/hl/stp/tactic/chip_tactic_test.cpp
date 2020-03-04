@@ -5,10 +5,13 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/test_util/test_util.h"
 
-void compareChipActions(std::shared_ptr<ChipAction> chip_action, std::shared_ptr<ChipAction> expected_chip_action) {
+void compareChipActions(std::shared_ptr<ChipAction> chip_action,
+                        std::shared_ptr<ChipAction> expected_chip_action)
+{
     EXPECT_EQ(expected_chip_action->getChipOrigin(), chip_action->getChipOrigin());
     EXPECT_EQ(expected_chip_action->getChipDirection(), chip_action->getChipDirection());
-    EXPECT_EQ(expected_chip_action->getChipDistanceMeters(), chip_action->getChipDistanceMeters());
+    EXPECT_EQ(expected_chip_action->getChipDistanceMeters(),
+              chip_action->getChipDistanceMeters());
 }
 
 TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
@@ -34,7 +37,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(45.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(45.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
@@ -63,7 +67,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(135.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(135.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
@@ -92,7 +97,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(225.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(225.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
@@ -121,7 +127,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(315.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(315.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
@@ -150,7 +157,8 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(45.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(45.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
@@ -179,7 +187,8 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(135.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(135.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
@@ -208,7 +217,8 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(225.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(225.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
@@ -237,7 +247,8 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
     auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
 
     std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(315.0), 2.0);
+    expected_chip_action->updateControlParams(robot, ball.position(),
+                                              Angle::fromDegrees(315.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     compareChipActions(chip_action, expected_chip_action);
