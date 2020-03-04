@@ -4,11 +4,11 @@ load(":nanopb.bzl", "c_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 proto_files = [
-        "camera.proto",
-        "drive.proto",
-        "geom.proto",
-        "control.proto",
-        "primitive.proto",
+    "camera.proto",
+    "drive.proto",
+    "geom.proto",
+    "control.proto",
+    "primitive.proto",
 ]
 
 # proto files
@@ -23,8 +23,10 @@ proto_library(
 c_proto_library(
     name = "fw_c_proto",
     srcs = proto_files,
-    restricted_to = ["//cc_toolchain:stm32f4", 
-                     "//cc_toolchain:stm32h7"],
+    restricted_to = [
+        "//cc_toolchain:stm32f4",
+        "//cc_toolchain:stm32h7",
+    ],
 )
 
 cc_proto_library(

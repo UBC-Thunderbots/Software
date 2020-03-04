@@ -424,28 +424,14 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
             throw std::invalid_argument("Too many primitives in vector.");
         }
 
-        if (num_prims == MAX_ROBOTS_OVER_RADIO)
+        // Only some robots are present. Build a reduced-size packet
+        // with robot indices prefixed.
+        drive_packet = "";
+
+        for (std::size_t i = 0; i != num_prims; ++i)
         {
-            // All robots are present. Build a full-size packet with all the
-            // robots’ data in index order.
-            for (std::size_t i = 0; i != num_prims; ++i)
-            {
-                encode_primitive(prims[i], &drive_packet[i * 8]);
-            }
-            drive_packet_length = 64;
-        }
-        else if (num_prims < MAX_ROBOTS_OVER_RADIO)
-        {
-            // Only some robots are present. Build a reduced-size packet
-            // with robot indices prefixed.
-            drive_packet_length = 0;
-            for (std::size_t i = 0; i != num_prims; ++i)
-            {
-                drive_packet[drive_packet_length++] =
-                    static_cast<uint8_t>(prims[i]->getRobotId());
-                encode_primitive(prims[i], &drive_packet[drive_packet_length]);
-                drive_packet_length += 8;
-            }
+            drive_packet += static_cast<uint8_t>(prims[i]->getRobotId());
+            drive_packet += encode_primitive(prims[i]);
         }
 
         submit_drive_transfer();
@@ -457,8 +443,8 @@ bool MRFDongle::submit_drive_transfer()
     // Submit drive_packet when possible.
     if (!drive_transfer)
     {
-        drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet,
-                                                      drive_packet_length, 64, 0));
+        drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
+                                                      drive_packet.length(), MAX_PACKET_LENGTH, 0));
         drive_transfer->signal_done.connect(
             boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
         drive_transfer->submit();
@@ -467,56 +453,13 @@ bool MRFDongle::submit_drive_transfer()
     return false;
 }
 
-void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *out)
+std::string MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
 {
-    uint16_t words[4];
     MRFPrimitiveVisitor visitor = MRFPrimitiveVisitor();
 
     // Visit the primitive.
     prim->accept(visitor);
     std::string r_prim = visitor.getSerializedRadioPacket();
-
-    // Encode the parameter words.
-    for (std::size_t i = 0; i < r_prim.param_array.size(); ++i)
-    {
-        double value = r_prim.param_array[i];
-        switch (std::fpclassify(value))
-        {
-            case FP_NAN:
-                value = 0.0;
-                break;
-            case FP_INFINITE:
-                if (value > 0.0)
-                {
-                    value = 10000.0;
-                }
-                else
-                {
-                    value = -10000.0;
-                }
-                break;
-        }
-        words[i] = 0;
-        if (value < 0.0)
-        {
-            words[i] |= 1 << 10;
-            value = -value;
-        }
-        if (value > 1000.0)
-        {
-            words[i] |= 1 << 11;
-            value *= 0.1;
-        }
-        if (value > 1000.0)
-        {
-            value = 1000.0;
-        }
-        words[i] |= static_cast<uint16_t>(value);
-    }
-
-    // Encode the movement primitive number.
-    words[0] = static_cast<uint16_t>(words[0] |
-                                     static_cast<unsigned int>(r_prim.prim_type) << 12);
 
     // Encode charge state
     // Robots are always charged if the estop is in RUN state; otherwise discharge them.
@@ -525,35 +468,15 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
         case EStopState::BROKEN:
         case EStopState::STOP:
             // Discharge`
-            words[1] |= 1 << 14;
+            r_prim += "S";
             break;
         case EStopState::RUN:
             // Charge
-            words[1] |= 2 << 14;
+            r_prim += "R";
             break;
     }
 
-    // Encode extra data plus the slow flag.
-    uint8_t extra = r_prim.extra_bits;
-    bool slow     = r_prim.slow;
-    if (extra > 127)
-    {
-        throw std::invalid_argument("extra greater than 127");
-    }
-    uint8_t extra_encoded = static_cast<uint8_t>(extra | (slow ? 0x80 : 0x00));
-
-    words[2] = static_cast<uint16_t>(words[2] |
-                                     static_cast<uint16_t>((extra_encoded & 0xF) << 12));
-    words[3] = static_cast<uint16_t>(words[3] |
-                                     static_cast<uint16_t>((extra_encoded >> 4) << 12));
-
-    // Convert the words to bytes.
-    uint8_t *wptr = static_cast<uint8_t *>(out);
-    for (std::size_t i = 0; i != 4; ++i)
-    {
-        *wptr++ = static_cast<uint8_t>(words[i]);
-        *wptr++ = static_cast<uint8_t>(words[i] / 256);
-    }
+    return r_prim;
 }
 
 void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
@@ -569,39 +492,6 @@ void MRFDongle::handle_camera_transfer_done(
     std::lock_guard<std::mutex> lock(cam_mtx);
     op.result();
     camera_transfers.erase(iter);
-}
-
-void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const void *data,
-                                std::size_t len)
-{
-    if (robot >= MAX_ROBOTS_OVER_RADIO)
-    {
-        throw std::out_of_range("Robot ID must be below 8");
-    }
-
-    if ((tries < 1) || (tries > 256))
-    {
-        throw std::out_of_range("Number of tries must be between 1 and 256 (inclusive)");
-    }
-
-    uint8_t buffer[len + 2];
-    buffer[0] = static_cast<uint8_t>(robot);
-    buffer[1] = static_cast<uint8_t>(tries & 0xFF);
-    std::memcpy(buffer + 2, data, len);
-    std::unique_ptr<USB::BulkOutTransfer> elt(
-        new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
-    auto i = unreliable_messages.insert(unreliable_messages.end(), std::move(elt));
-    (*i)->signal_done.connect(
-        boost::bind(&MRFDongle::check_unreliable_transfer, this, _1, i));
-    (*i)->submit();
-}
-
-void MRFDongle::check_unreliable_transfer(
-    AsyncOperation<void> &,
-    std::list<std::unique_ptr<USB::BulkOutTransfer>>::iterator iter)
-{
-    (*iter)->result();
-    unreliable_messages.erase(iter);
 }
 
 void MRFDongle::handle_beep_done(AsyncOperation<void> &)

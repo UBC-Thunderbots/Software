@@ -24,6 +24,11 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 
+// TODO update this once final msg has been decided
+// for now this is set to a really high value that the proto
+// will definetly not reach
+#define MAX_PACKET_LENGTH 1000
+
 /**
  * An operation to send a reliable message.
  */
@@ -121,11 +126,10 @@ class MRFDongle final
     uint16_t pan_;
 
     /* Functions that handle encoding and sending drive packets. */
-    void encode_primitive(const std::unique_ptr<Primitive> &prim, void *out);
+    std::string encode_primitive(const std::unique_ptr<Primitive> &prim);
     bool submit_drive_transfer();
     void handle_drive_transfer_done(AsyncOperation<void> &);
-    uint8_t drive_packet[64];
-    std::size_t drive_packet_length;
+    std::string drive_packet;
     std::unique_ptr<USB::BulkOutTransfer> drive_transfer;
 
     /* Camera (vision) packet stuff */
@@ -151,13 +155,6 @@ class MRFDongle final
     void handle_mdrs(AsyncOperation<void> &);
     void handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer);
     void handle_status(AsyncOperation<void> &);
-
-    /* Sending of unreliable messages (delivery status unchecked) */
-    void send_unreliable(unsigned int robot, unsigned int tries, const void *data,
-                         std::size_t len);
-    void check_unreliable_transfer(
-        AsyncOperation<void> &,
-        std::list<std::unique_ptr<USB::BulkOutTransfer>>::iterator iter);
 
     /* Functions that make annoying dongle beeps. */
     void submit_beep();

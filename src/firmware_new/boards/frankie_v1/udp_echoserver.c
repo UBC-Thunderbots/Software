@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "shared/proto/control_fw.pb.h"
 #include "lwip/pbuf.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
@@ -32,6 +31,7 @@
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+#include "shared/proto/control_fw.pb.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
