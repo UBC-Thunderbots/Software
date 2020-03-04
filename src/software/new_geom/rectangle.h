@@ -108,3 +108,5 @@ class Rectangle : public ConvexPolygon
 
     bool operator==(const Rectangle &p) const;
 };
+
+std::ostream &operator<<(std::ostream &os, const Rectangle &rect);

@@ -89,3 +89,9 @@ bool Rectangle::operator==(const Rectangle &p) const
 {
     return negXNegYCorner() == p.negXNegYCorner() && diagonal() == p.diagonal();
 }
+
+std::ostream &operator<<(std::ostream &os, const Rectangle &rect)
+{
+    os << "{" << rect.negXNegYCorner() << ", " << rect.posXPosYCorner() << "}";
+    return os;
+}

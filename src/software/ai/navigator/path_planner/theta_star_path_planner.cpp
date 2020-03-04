@@ -7,6 +7,7 @@
 
 #include <g3log/g3log.hpp>
 
+#include "software/ai/navigator/path_planner/path_planner_factory.h"
 #include "software/new_geom/util/distance.h"
 
 ThetaStarPathPlanner::ThetaStarPathPlanner()
@@ -516,3 +517,5 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
         num_grid_rows,
         std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
 }
+
+static TPathPlannerFactory<ThetaStarPathPlanner> factory;
