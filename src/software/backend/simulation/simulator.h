@@ -25,13 +25,17 @@ struct FirmwareWorldDeleter
     void operator()(FirmwareWorld_t* firmware_world) const
     {
         FirmwareRobot_t* firmware_robot = app_firmware_world_getRobot(firmware_world);
-        Wheel_t* firmware_robot_front_left_wheel = app_firmware_robot_getFrontLeftWheel(firmware_robot);
+        Wheel_t* firmware_robot_front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot);
         app_wheel_destroy(firmware_robot_front_left_wheel);
-        Wheel_t* firmware_robot_back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot);
+        Wheel_t* firmware_robot_back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot);
         app_wheel_destroy(firmware_robot_back_left_wheel);
-        Wheel_t* firmware_robot_back_right_wheel = app_firmware_robot_getBackRightWheel(firmware_robot);
+        Wheel_t* firmware_robot_back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot);
         app_wheel_destroy(firmware_robot_back_right_wheel);
-        Wheel_t* firmware_robot_front_right_wheel = app_firmware_robot_getFrontRightWheel(firmware_robot);
+        Wheel_t* firmware_robot_front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot);
         app_wheel_destroy(firmware_robot_front_right_wheel);
         app_firmware_robot_destroy(firmware_robot);
 

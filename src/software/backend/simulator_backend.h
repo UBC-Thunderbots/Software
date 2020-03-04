@@ -124,7 +124,7 @@ class SimulatorBackend : public Backend
     const unsigned int primitive_buffer_size = 1;
     ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
     // How long to wait for primitives, in wall-clock time.
-    // This is a somewhat arbitrary value that was chosen to be long enough such that tests
-    // won't time-out on slow machines like CI.
+    // This is a somewhat arbitrary value that was chosen to be long enough such that
+    // tests won't time-out on slow machines like CI.
     const Duration primitive_timeout = Duration::fromSeconds(10);
 };
