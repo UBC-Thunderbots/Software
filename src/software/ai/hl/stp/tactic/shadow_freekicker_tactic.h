@@ -32,7 +32,7 @@ class ShadowFreekickerTactic : public Tactic
      * tactic will be restarted every time it completes
      */
     explicit ShadowFreekickerTactic(FreekickShadower free_kick_shadower, Team enemy_team,
-                                    Ball ball, Field field, bool loop_forever = false);
+                                    Ball ball, Field field, bool loop_forever);
 
     std::string getName() const override;
 

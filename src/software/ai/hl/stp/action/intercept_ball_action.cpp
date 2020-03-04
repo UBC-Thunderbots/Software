@@ -28,7 +28,7 @@ void InterceptBallAction::updateControlParams(const Robot& robot)
     this->robot = robot;
 }
 
-void InterceptBallAction::accept(ActionVisitor& visitor) const
+void InterceptBallAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }
@@ -71,7 +71,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         // We add 1e-6 to avoid division by 0 without affecting the result significantly
         Duration ball_time_to_position = Duration::fromSeconds(
-            dist(closest_point, ball.position()) / (ball.velocity().length() + 1e-6));
+            distance(closest_point, ball.position()) / (ball.velocity().length() + 1e-6));
         Duration robot_time_to_pos = AI::Evaluation::getTimeToPositionForRobot(
             *robot, closest_point, ROBOT_MAX_SPEED_METERS_PER_SECOND,
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -141,7 +141,7 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
     else if (robot_on_ball_line)
     {
         Vector ball_to_robot = robot->position() - ball.position();
-        double dist_to_ball  = dist(robot->position(), ball.position());
+        double dist_to_ball  = distance(robot->position(), ball.position());
         double dist_in_front_of_ball_to_intercept =
             std::max<double>(dist_to_ball - 1.0, 0.0);
         Point point_to_meet_ball =

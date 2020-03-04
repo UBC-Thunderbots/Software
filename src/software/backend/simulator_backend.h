@@ -5,7 +5,6 @@
 #include <thread>
 
 #include "software/backend/backend.h"
-#include "software/backend/simulation/physics/physics_simulator.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/world/world.h"
 

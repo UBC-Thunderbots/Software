@@ -8,31 +8,32 @@
 #include <g3log/g3log.hpp>
 #include <random>
 
+#include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         long random_seed)
+         std::shared_ptr<const AIControlConfig> control_config, long random_seed)
     : default_play_constructor(default_play_constructor),
-      random_number_generator(random_seed)
+      random_number_generator(random_seed),
+      control_config(control_config)
 {
 }
 
 void STP::updateCurrentPlay(const World& world)
 {
-    current_game_state     = world.gameState().game_state;
-    previous_override_play = override_play;
-    override_play =
-        Util::DynamicParameters->getAIControlConfig()->OverrideAIPlay()->value();
+    current_game_state               = world.gameState().game_state;
+    previous_override_play           = override_play;
+    override_play                    = control_config->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name =
-        Util::DynamicParameters->getAIControlConfig()->CurrentAIPlay()->value();
+    override_play_name          = control_config->CurrentAIPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
@@ -45,7 +46,8 @@ void STP::updateCurrentPlay(const World& world)
         {
             try
             {
-                current_play = PlayFactory::createPlay(override_play_name);
+                current_play =
+                    GenericFactory<std::string, Play>::create(override_play_name);
             }
             catch (std::invalid_argument)
             {
@@ -88,13 +90,19 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     {
         assignRobotsToTactics(world, *current_tactics);
 
+        ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
+        TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
+
         for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
         {
+            tactic->accept(tactic_world_params_update_visitor);
+
             // Try to get an intent from the tactic
             std::shared_ptr<Action> action = tactic->getNextAction();
             std::unique_ptr<Intent> intent;
             if (action)
             {
+                action->accept(action_world_params_update_visitor);
                 intent = action->getNextIntent();
             }
 
@@ -178,7 +186,7 @@ void STP::assignRobotsToTactics(const World& world,
         tactics.resize(non_goalie_robots.size());
     }
 
-    size_t num_rows = world.friendlyTeam().numRobots();
+    size_t num_rows = non_goalie_robots.size();
     size_t num_cols = tactics.size();
 
     // The Matrix constructor will assert if the rows and columns of the matrix are
@@ -254,7 +262,8 @@ void STP::assignRobotsToTactics(const World& world,
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 {
     std::vector<std::unique_ptr<Play>> applicable_plays;
-    for (const auto& play_constructor : PlayFactory::getRegisteredPlayConstructors())
+    for (const auto& play_constructor :
+         GenericFactory<std::string, Play>::getRegisteredConstructors())
     {
         auto play = play_constructor();
         if (play->isApplicable(world))

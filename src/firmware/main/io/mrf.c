@@ -268,7 +268,7 @@ static void write_short(uint8_t reg, uint8_t value)
     xSemaphoreTake(da_irq_sem, portMAX_DELAY);
 }
 
-static uint8_t read_long(uint16_t reg)
+static __attribute__((unused)) uint8_t read_long(uint16_t reg)
 {
     static uint8_t param[2U];
     param[0U] = reg >> 8U;

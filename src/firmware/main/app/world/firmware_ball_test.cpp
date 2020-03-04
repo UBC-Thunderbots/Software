@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "app/world/firmware_ball.h"
+#include "firmware/main/app/world/firmware_ball.h"
 }
 
 #include <gtest/gtest.h>

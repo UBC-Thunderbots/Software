@@ -18,28 +18,128 @@ ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polyg
     }
 }
 
+// From:
+// https://math.stackexchange.com/questions/1743995/determine-whether-a-polygon-is-convex-based-on-its-vertices
 bool ConvexPolygon::isConvex()
 {
-    double totalAngle = 0;
-
-    for (unsigned i = 1; i <= points_.size(); i++)
+    if (points_.size() < 3)
     {
-        // A vector from point i to point i-1
-        Vector a = points_[i - 1] - points_[i % points_.size()];
-        // The vector from point i to i+1
-        Vector b = points_[(i + 1) % points_.size()] - points_[i % points_.size()];
-        // The angle of this vertex, in degrees
-        double vertexAngleInDegrees = a.angleWith(b).toDegrees();
+        return false;
+    }
 
-        if (vertexAngleInDegrees > 180)
+    double w_sign       = 0;
+    double x_sign       = 0;
+    double x_first_sign = 0;
+    double x_flips      = 0;
+    double y_sign       = 0;
+    double y_first_sign = 0;
+    double y_flips      = 0;
+
+    Point prev = Point();
+    Point curr = points_[points_.size() - 2];
+    Point next = points_[points_.size() - 1];
+
+    for (const Point& p : points_)
+    {
+        prev = curr;
+        curr = next;
+        next = p;
+
+        Vector curr_to_prev = curr - prev;
+        Vector next_to_curr = next - curr;
+
+        // Calculate sign flips using the next edge vector ("next_to_curr"),
+        // recording the first sign
+        if (next_to_curr.x() > GeomConstants::EPSILON)
+        {
+            if (x_sign == 0)
+            {
+                x_first_sign = 1;
+            }
+            else if (x_sign < -GeomConstants::EPSILON)
+            {
+                x_flips = x_flips + 1;
+            }
+            x_sign = 1;
+        }
+        else if (next_to_curr.x() < -GeomConstants::EPSILON)
+        {
+            if (x_sign == 0)
+            {
+                x_first_sign = -1;
+            }
+            else if (x_sign > GeomConstants::EPSILON)
+            {
+                x_flips = x_flips + 1;
+            }
+            x_sign = -1;
+        }
+
+        if (x_flips > 2)
         {
             return false;
         }
 
-        totalAngle += (180 - vertexAngleInDegrees);
+        if (next_to_curr.y() > GeomConstants::EPSILON)
+        {
+            if (y_sign == 0)
+            {
+                y_first_sign = 1;
+            }
+            else if (y_sign < -GeomConstants::EPSILON)
+            {
+                y_flips = y_flips + 1;
+            }
+            y_sign = 1;
+        }
+        else if (next_to_curr.y() < -GeomConstants::EPSILON)
+        {
+            if (y_sign == 0)
+            {
+                y_first_sign = -1;
+            }
+            else if (y_sign > GeomConstants::EPSILON)
+            {
+                y_flips = y_flips + 1;
+            }
+            y_sign = -1;
+        }
+
+        if (y_flips > 2)
+        {
+            return false;
+        }
+
+        // Find out the orientation of this pair of edges and ensure it does not differ
+        // from previous ones
+        double w =
+            curr_to_prev.x() * next_to_curr.y() - curr_to_prev.y() * next_to_curr.x();
+        if (w_sign == 0 && w != 0)
+        {
+            w_sign = w;
+        }
+        else if (w_sign > GeomConstants::EPSILON && w < -GeomConstants::EPSILON)
+        {
+            return false;
+        }
+        else if (w_sign < -GeomConstants::EPSILON && w > GeomConstants::EPSILON)
+        {
+            return false;
+        }
     }
 
-    return std::abs(totalAngle - 360) < GeomConstants::EPSILON;
+    // Final sign flips
+    if (x_sign != 0 && x_first_sign != 0 && x_sign != x_first_sign)
+    {
+        x_flips = x_flips + 1;
+    }
+    if (y_sign != 0 && y_first_sign != 0 && y_sign != y_first_sign)
+    {
+        y_flips = y_flips + 1;
+    }
+
+    // Concave polygons have two sign flips along each axis
+    return (x_flips == 2 && y_flips == 2);
 }
 
 double ConvexPolygon::area() const

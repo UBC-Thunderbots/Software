@@ -117,6 +117,24 @@ TEST(Box2DUtilTest, test_create_b2Vec2_from_vector)
     EXPECT_EQ(expected, createVec2(Vector(0.0, 100.100)));
 }
 
+TEST(Box2DUtilTest, test_create_point_from_b2Vec2)
+{
+    Point expected(-1.02, 5.4);
+    EXPECT_LT((expected - createPoint(b2Vec2({-1.02, 5.4}))).length(), 0.001);
+
+    expected = Point(0.0, 100.100);
+    EXPECT_LT((expected - createPoint(b2Vec2({0.0, 100.100}))).length(), 0.001);
+}
+
+TEST(Box2DUtilTest, test_create_vector_from_b2Vec2)
+{
+    Vector expected(-1.02, 5.4);
+    EXPECT_LT((expected - createVector(b2Vec2({-1.02, 5.4}))).length(), 0.001);
+
+    expected = Vector(0.0, 100.100);
+    EXPECT_LT((expected - createVector(b2Vec2({0.0, 100.100}))).length(), 0.001);
+}
+
 TEST(Box2DUtilTest, test_polygon_area_with_triangle)
 {
     const unsigned int num_vertices       = 3;

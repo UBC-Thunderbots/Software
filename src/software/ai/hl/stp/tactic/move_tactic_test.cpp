@@ -10,7 +10,7 @@ TEST(MoveTacticTest, robot_far_from_destination)
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    MoveTactic tactic = MoveTactic();
+    MoveTactic tactic = MoveTactic(false);
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(1, 0), Angle::quarter(), 1.0);
     auto action_ptr = tactic.getNextAction();
@@ -32,7 +32,7 @@ TEST(MoveTacticTest, robot_at_destination)
     Robot robot = Robot(0, Point(), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    MoveTactic tactic = MoveTactic();
+    MoveTactic tactic = MoveTactic(false);
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Angle::zero(), 0.0);
 
@@ -58,7 +58,7 @@ TEST(MoveTacticTest, test_calculate_robot_cost)
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    MoveTactic tactic = MoveTactic();
+    MoveTactic tactic = MoveTactic(false);
     tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0);
 
     EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));

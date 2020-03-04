@@ -1,10 +1,11 @@
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/util/design_patterns/generic_factory.h"
+
 
 const std::string KickoffFriendlyPlay::name = "KickoffFriendly Play";
 
@@ -97,8 +98,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // set the requirement that Robot 1 must be able to kick and chip
@@ -123,13 +122,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
-        kickoff_chip_tactic->updateWorldParams(world.ball());
         kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
             world.field().centerPoint() + Vector(world.field().xLength() / 6, 0),
@@ -150,5 +146,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     }
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<KickoffFriendlyPlay> factory;
+
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay> factory;

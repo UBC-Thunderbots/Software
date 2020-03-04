@@ -10,7 +10,7 @@ TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving)
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    StopTactic tactic = StopTactic(false, false);
+    StopTactic tactic = StopTactic(false);
     tactic.updateRobot(robot);
 
     auto action_ptr = tactic.getNextAction();
@@ -29,7 +29,7 @@ TEST(StopTacticTest, robot_stopping_while_already_stopped)
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    StopTactic tactic = StopTactic(false, false);
+    StopTactic tactic = StopTactic(false);
     tactic.updateRobot(robot);
 
     auto action_ptr = tactic.getNextAction();
@@ -52,7 +52,7 @@ TEST(StopTacticTest, test_calculate_robot_cost)
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    StopTactic tactic = StopTactic(false, false);
+    StopTactic tactic = StopTactic(false);
 
     // We always expect the cost to be 0.5, because the StopTactic prefers all robots
     // equally
