@@ -81,7 +81,7 @@ float min_angle_delta(float angle1, float angle2)
  * \param[in] matrix the matrix to multiply
  */
 void matrix_mult(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                 const float matrix[lhs_len][rhs_len])
+                 const float** matrix)
 {
     for (int j = 0; j < lhs_len; ++j)
     {
@@ -103,7 +103,7 @@ void matrix_mult(float* lhs, int lhs_len, const float* rhs, int rhs_len,
  * \param[in] matrix the matrix to multiply
  */
 void matrix_mult_t(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                   const float matrix[rhs_len][lhs_len])
+                   const float** matrix)
 {
     for (int j = 0; j < lhs_len; ++j)
     {
@@ -126,8 +126,8 @@ void matrix_mult_t(float* lhs, int lhs_len, const float* rhs, int rhs_len,
  * \param[in] lmatrix left matrix to multiply
  * \param[in] rmatrix right matrix to multiply
  */
-void mm_mult(int lm_rows, int rm_rows, int rm_cols, const float lmatrix[lm_rows][rm_rows],
-             const float rmatrix[rm_rows][rm_cols], float matrix_out[lm_rows][rm_cols])
+void mm_mult(int lm_rows, int rm_rows, int rm_cols, const float** lmatrix,
+             const float** rmatrix, float** matrix_out)
 {
     int i;
     int j;
@@ -159,9 +159,8 @@ void mm_mult(int lm_rows, int rm_rows, int rm_cols, const float lmatrix[lm_rows]
  * \param[in] lmatrix left matrix to multiply
  * \param[in] rmatrix right matrix to transpose multiply
  */
-void mm_mult_t(int lm_rows, int rm_rows, int rm_cols,
-               const float lmatrix[lm_rows][rm_cols],
-               const float rmatrix[rm_rows][rm_cols], float matrix_out[lm_rows][rm_rows])
+void mm_mult_t(int lm_rows, int rm_rows, int rm_cols, const float** lmatrix,
+               const float** rmatrix, float** matrix_out)
 {
     int i;
     int j;
@@ -193,7 +192,7 @@ void mm_mult_t(int lm_rows, int rm_rows, int rm_cols,
  * \param[in] B source matrix
  *
  */
-void mm_copy(int nrows, int ncols, float A[nrows][ncols], float B[nrows][ncols])
+void mm_copy(int nrows, int ncols, float** A, float** B)
 {
     int i;
     int j;
@@ -216,7 +215,7 @@ void mm_copy(int nrows, int ncols, float A[nrows][ncols], float B[nrows][ncols])
  * \param[in] b source matrix
  */
 
-void mm_add(int nrows, int ncols, float a[nrows][ncols], const float b[nrows][ncols])
+void mm_add(int nrows, int ncols, float** a, const float** b)
 {
     int i, j;
     for (i = 0; i < nrows; i++)
@@ -237,8 +236,7 @@ void mm_add(int nrows, int ncols, float a[nrows][ncols], const float b[nrows][nc
  * \param[in] b source matrix 2
  */
 
-void mm_sub(int nrows, int ncols, const float a[nrows][ncols],
-            const float b[nrows][ncols], float c[nrows][ncols])
+void mm_sub(int nrows, int ncols, const float** a, const float** b, float** c)
 {
     int i, j;
     for (i = 0; i < nrows; i++)
@@ -257,7 +255,7 @@ void mm_sub(int nrows, int ncols, const float a[nrows][ncols],
  * \param[in] n number of rows and columns
  */
 
-void mm_inv(int n, float a[n][n])
+void mm_inv(int n, float** a)
 {
     float det, temp;
     float temp_m[n][n];

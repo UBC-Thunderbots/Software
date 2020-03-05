@@ -102,11 +102,11 @@ float norm2(float a1, float a2);
 void rotate(float speed3[2], float angle);
 
 // Vector addition
-void vectorSub(float* a, const float* b, int len);
+void vectorSub(float *a, const float *b, int len);
 // Vector addition
-void vectorAdd(float* a, const float* b, int len);
+void vectorAdd(float *a, const float *b, int len);
 // Vector copy
-void vectorCopy(float* a, const float* b, int len);
+void vectorCopy(float *a, const float *b, int len);
 
 // polar cartesian transforms
 void Cart2Pol(float vec[2]);
@@ -119,28 +119,6 @@ void PolAcc2Cart(float const loc[2], float const vel[2], float const Pacc[2],
 // C++ does not allow variable length arguments, but we would still like to
 // enforce them when possible, so we compile this differently depending
 // on what language this header is being used in
-#ifndef __cplusplus
-void matrix_mult(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                 const float matrix[lhs_len][rhs_len]);
-void matrix_mult_t(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                   const float matrix[lhs_len][rhs_len]);
-
-void mm_mult(int lm_rows, int rm_rows, int rm_cols, const float lmatrix[lm_rows][rm_rows],
-             const float rmatrix[rm_rows][rm_cols], float matrix_out[lm_rows][rm_cols]);
-
-void mm_mult_t(int lm_rows, int rm_rows, int rm_cols,
-               const float lmatrix[lm_rows][rm_rows],
-               const float rmatrix[rm_rows][rm_cols], float matrix_out[lm_rows][rm_cols]);
-
-void mm_copy(int nrows, int ncols, float A[nrows][ncols], float B[nrows][ncols]);
-
-void mm_add(int nrows, int ncols, float a[nrows][ncols], const float b[nrows][ncols]);
-
-void mm_sub(int nrows, int ncols, const float a[nrows][ncols],
-            const float b[nrows][ncols], float c[nrows][ncols]);
-
-void mm_inv(int n, float a[n][n]);
-#else
 void matrix_mult(float *lhs, int lhs_len, const float *rhs, int rhs_len,
                  const float **matrix);
 void matrix_mult_t(float *lhs, int lhs_len, const float *rhs, int rhs_len,
@@ -159,10 +137,9 @@ void mm_add(int nrows, int ncols, float **a, const float **b);
 void mm_sub(int nrows, int ncols, const float **a, const float **b, float **c);
 
 void mm_inv(int n, float **a);
-#endif
 
-void decompose_radial(const float speed, float* vf, const float* init_pos,
-                      const float* final_pos);
+void decompose_radial(const float speed, float *vf, const float *init_pos,
+                      const float *final_pos);
 
 float dot_product(const float vec1[], const float vec2[], const int size);
 
