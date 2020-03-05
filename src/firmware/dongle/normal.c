@@ -34,7 +34,7 @@
 /**
  * \brief The number of bytes in the drive data block for each robot.
  */
-#define DRIVE_BYTES_PER_ROBOT 46
+#define DRIVE_BYTES_PER_ROBOT 42
 
 /**
  * \brief The number of bytes in the camera data block for each robot.

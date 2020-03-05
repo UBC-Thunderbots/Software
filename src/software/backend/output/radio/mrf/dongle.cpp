@@ -439,6 +439,7 @@ bool MRFDongle::submit_drive_transfer()
     // Submit drive_packet when possible.
     if (!drive_transfer)
     {
+        std::cerr<<drive_packet.length()<<std::endl;
         drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
                                                       drive_packet.length(), 64, 0));
         drive_transfer->signal_done.connect(

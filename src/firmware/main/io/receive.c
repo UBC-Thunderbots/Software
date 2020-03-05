@@ -110,6 +110,7 @@ static void receive_task(void *UNUSED(param))
                     // Note that camera packets have a variable length.
                     if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x0FU)
                     {
+                        print("handling drive packet!\n");
                         handle_drive_packet(dma_buffer);
                     }
                     else if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x10U)
@@ -390,9 +391,9 @@ void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)
 
 void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
 {
-    // printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_ADDR]);
-    // printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 1]);
-    // printf("value: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 2]);
+     printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_ADDR]);
+     printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 1]);
+     printf("value: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 2]);
     switch (dma_buffer[MESSAGE_PURPOSE_ADDR])
     {
         case 0x00:
