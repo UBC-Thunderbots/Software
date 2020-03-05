@@ -16,7 +16,7 @@ message RadioPrimitive {
     required uint32 extra_bits = 6;
 
     // Indicates whether the robot should move slowly (<1.5 m/s)
-    required bool slow = 7;
+    optional bool slow = 7;
 }
 
 enum FirmwarePrimitiveType

@@ -26,6 +26,9 @@
 
 #include "firmware/main/app/primitives/primitive.h"
 #include "firmware/main/shared/physics.h"
+#include "shared/proto/primitive.h"
+#include "pb.h"
+#include "pb_decode.h"
 #include "io/charger.h"
 #include "io/chicker.h"
 #include "io/dma.h"
@@ -40,12 +43,12 @@
 /**
  * \brief The number of robots in the drive packet.
  */
-#define NUM_ROBOTS 8
+#define NUM_ROBOTS 1
 
 /**
  * \brief The number of bytes of drive packet data per robot.
  */
-#define RECEIVE_DRIVE_BYTES_PER_ROBOT 9
+#define RECEIVE_DRIVE_BYTES_PER_ROBOT 47
 
 /**
  * \brief The number of bytes of camera data per robot.

@@ -3,7 +3,6 @@
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
-
 const std::string RadioBackend::name = "radio";
 
 RadioBackend::RadioBackend()

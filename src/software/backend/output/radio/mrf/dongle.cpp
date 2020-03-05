@@ -419,19 +419,16 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
     if (!prims.empty())
     {
         std::size_t num_prims = prims.size();
+
         if (num_prims > MAX_ROBOTS_OVER_RADIO)
         {
             throw std::invalid_argument("Too many primitives in vector.");
         }
 
-        // Dynamically create drive packet
+        // dynamically create drive packet for the fist robot
         drive_packet = "";
-
-        for (std::size_t i = 0; i != num_prims; ++i)
-        {
-            drive_packet += static_cast<uint8_t>(prims[i]->getRobotId());
-            drive_packet += encode_primitive(prims[i]);
-        }
+        drive_packet += static_cast<uint8_t>(prims[0]->getRobotId());
+        drive_packet += encode_primitive(prims[0]);
 
         submit_drive_transfer();
     }

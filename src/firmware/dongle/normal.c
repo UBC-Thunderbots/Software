@@ -29,12 +29,12 @@
 /**
  * \brief The number of robots.
  */
-#define NUM_ROBOTS 8
+#define NUM_ROBOTS 1
 
 /**
  * \brief The number of bytes in the drive data block for each robot.
  */
-#define DRIVE_BYTES_PER_ROBOT 8
+#define DRIVE_BYTES_PER_ROBOT 46
 
 /**
  * \brief The number of bytes in the camera data block for each robot.

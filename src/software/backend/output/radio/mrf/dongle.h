@@ -124,6 +124,8 @@ class MRFDongle final
     std::string encode_primitive(const std::unique_ptr<Primitive> &prim);
     bool submit_drive_transfer();
     void handle_drive_transfer_done(AsyncOperation<void> &);
+
+    // drive packet
     std::string drive_packet;
     std::unique_ptr<USB::BulkOutTransfer> drive_transfer;
 

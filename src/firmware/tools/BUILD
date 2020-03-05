@@ -17,3 +17,17 @@ sh_binary(
     restricted_to = ["//cc_toolchain:stm32f4"],
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )
+
+cc_binary(
+    name = "send_proto_over_radio",
+    srcs = ["send_proto_over_radio.cpp"],
+    restricted_to = ["//cc_toolchain:k8"],
+    deps = [
+        "//shared/proto:fw_cc_proto",
+        "@boost//:asio",
+        "@com_google_protobuf//:protobuf",
+        "//software:constants",
+        "//software/backend/output/radio:radio_output",
+        "//software/backend:radio_backend"
+    ],
+)
