@@ -25,6 +25,7 @@ struct FirmwareWorldDeleter
     void operator()(FirmwareWorld_t* firmware_world) const
     {
         FirmwareRobot_t* firmware_robot = app_firmware_world_getRobot(firmware_world);
+
         Wheel_t* firmware_robot_front_left_wheel =
             app_firmware_robot_getFrontLeftWheel(firmware_robot);
         app_wheel_destroy(firmware_robot_front_left_wheel);
@@ -37,6 +38,13 @@ struct FirmwareWorldDeleter
         Wheel_t* firmware_robot_front_right_wheel =
             app_firmware_robot_getFrontRightWheel(firmware_robot);
         app_wheel_destroy(firmware_robot_front_right_wheel);
+
+        Chicker_t* firmware_robot_chicker = app_firmware_robot_getChicker(firmware_robot);
+        app_chicker_destroy(firmware_robot_chicker):
+
+        Dribbler_t* firmware_robot_dribbler = app_firmware_robot_getDribbler(firmware_robot);
+        app_dribbler_destroy(firmware_robot_dribbler);
+
         app_firmware_robot_destroy(firmware_robot);
 
         FirmwareBall_t* firmware_ball = app_firmware_world_getBall(firmware_world);
