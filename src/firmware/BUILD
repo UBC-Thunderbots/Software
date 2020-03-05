@@ -85,6 +85,8 @@ cc_library(
         "//firmware/main/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
+        "//shared/proto:fw_c_proto",
+        "@nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
