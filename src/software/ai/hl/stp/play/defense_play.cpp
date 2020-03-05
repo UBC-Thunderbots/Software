@@ -4,7 +4,6 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/evaluation/team.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
@@ -14,6 +13,7 @@
 #include "software/geom/util.h"
 #include "software/logger/init.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
 const std::string DefensePlay::name = "Defense Play";
@@ -53,7 +53,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(), 0.5,
-                                            enemy_team_can_pass);
+                                            enemy_team_can_pass, false);
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -69,8 +69,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
     std::vector<std::shared_ptr<StopTactic>> stop_tactics = {
-        std::make_shared<StopTactic>(false, true),
-        std::make_shared<StopTactic>(false, true)};
+        std::make_shared<StopTactic>(false), std::make_shared<StopTactic>(false)};
 
     do
     {
@@ -89,10 +88,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
                     crease_defender_tactic->getAssignedRobot()->id());
             }
         }
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         friendly_team_for_goalie, world.enemyTeam());
-        shoot_goal_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                             world.enemyTeam(), world.ball());
         shoot_goal_tactic->updateControlParams(std::nullopt);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, shoot_goal_tactic};
@@ -100,8 +95,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Update crease defenders
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
-            crease_defender_tactic->updateWorldParams(
-                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             result.emplace_back(crease_defender_tactic);
         }
 
@@ -109,8 +102,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         // extra friendly robots, have them perform a reasonable default defensive tactic
         if (enemy_threats.size() > 0)
         {
-            defense_shadow_enemy_tactic->updateWorldParams(
-                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
             defense_shadow_enemy_tactic->updateControlParams(enemy_threats.at(1));
             result.emplace_back(defense_shadow_enemy_tactic);
         }
@@ -123,8 +114,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         if (enemy_threats.size() > 1)
         {
-            shadow_enemy_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                                   world.enemyTeam(), world.ball());
             shadow_enemy_tactic->updateControlParams(enemy_threats.at(0),
                                                      ROBOT_MAX_RADIUS_METERS * 3);
             result.emplace_back(shadow_enemy_tactic);
@@ -179,5 +168,5 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
     }
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<DefensePlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, DefensePlay> factory;

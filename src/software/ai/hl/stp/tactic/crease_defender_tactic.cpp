@@ -7,10 +7,10 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/segment.h"
 #include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
@@ -178,8 +178,8 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
 
 void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(0, Angle(), false);
-    auto stop_action = std::make_shared<StopAction>();
+    auto move_action = std::make_shared<MoveAction>(false, 0, Angle());
+    auto stop_action = std::make_shared<StopAction>(false);
     do
     {
         std::optional<std::pair<Point, Angle>> desired_robot_state_opt =

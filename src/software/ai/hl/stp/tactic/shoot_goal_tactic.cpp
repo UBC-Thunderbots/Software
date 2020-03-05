@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/rectangle.h"
+#include "software/new_geom/rectangle.h"
 #include "software/parameter/dynamic_parameters.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
@@ -95,7 +95,7 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
 
     for (const auto &enemy : enemy_team.getAllRobots())
     {
-        if (baller_frontal_area.containsPoint(enemy.position()))
+        if (baller_frontal_area.contains(enemy.position()))
         {
             return true;
         }
@@ -116,7 +116,6 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
     {
         if (!isEnemyAboutToStealBall())
         {
-            kick_action->updateWorldParams(ball);
             kick_action->updateControlParams(*robot, ball.position(),
                                              shot_target->getPointToShootAt(),
                                              BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
@@ -128,7 +127,6 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            chip_action->updateWorldParams(ball);
             chip_action->updateControlParams(*robot, ball.position(),
                                              shot_target->getPointToShootAt(), CHIP_DIST);
             yield(chip_action);
@@ -145,7 +143,7 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto kick_action = std::make_shared<KickAction>();
     auto chip_action = std::make_shared<ChipAction>();
     auto move_action = std::make_shared<MoveAction>(
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     std::optional<Shot> shot_target;
     do
     {
@@ -167,7 +165,6 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
             Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
-            chip_action->updateWorldParams(ball);
             chip_action->updateControlParams(*robot, ball.position(),
                                              fallback_chip_target, CHIP_DIST);
             yield(chip_action);

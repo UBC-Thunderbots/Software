@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/new_geom/shape.h"
 
 /**

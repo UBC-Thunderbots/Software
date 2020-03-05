@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/action_visitor.h"
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/primitive/move_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
@@ -17,8 +17,7 @@ class InterceptBallAction : public Action
      * @param loop_forever Continue yielding new Move Intents, even after we have reached
      *                     our goal
      */
-    explicit InterceptBallAction(const Field& field, const Ball& ball,
-                                 bool loop_forever = false);
+    explicit InterceptBallAction(const Field& field, const Ball& ball, bool loop_forever);
 
     /**
      * Updates this action with all the parameters it needs from the world
@@ -35,7 +34,7 @@ class InterceptBallAction : public Action
      */
     void updateControlParams(const Robot& robot);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -1,4 +1,3 @@
-#warning Most of the documentation here ought to be in the wiki; reorganize the elec pages of the wiki and move this there! Consider also categorizing methods by ideal mode of use.
 /**
  * \addtogroup UPGRADE Firmware Upgrade Functions
  *

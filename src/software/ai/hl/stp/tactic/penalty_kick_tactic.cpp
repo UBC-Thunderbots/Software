@@ -138,9 +138,9 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
 
     auto approach_ball_move_act = std::make_shared<MoveAction>(
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
+        false, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     auto rotate_with_ball_move_act = std::make_shared<MoveAction>(
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
+        false, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     auto kick_action = std::make_shared<KickAction>();
 
     do
@@ -163,7 +163,6 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         {
             if (evaluate_penalty_shot())
             {
-                kick_action->updateWorldParams(ball);
                 kick_action->updateControlParams(*robot, ball.position(),
                                                  robot.value().orientation(),
                                                  PENALTY_KICK_SHOT_SPEED);

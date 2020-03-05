@@ -1,4 +1,4 @@
-#include "app/world/firmware_ball.h"
+#include "firmware/main/app/world/firmware_ball.h"
 
 #include <stdlib.h>
 
@@ -30,22 +30,22 @@ void app_firmware_ball_destroy(FirmwareBall_t* ball)
     free(ball);
 }
 
-float app_firmware_ball_getPositionX(FirmwareBall_t* ball)
+float app_firmware_ball_getPositionX(const FirmwareBall_t* ball)
 {
     return ball->get_ball_position_x();
 }
 
-float app_firmware_ball_getPositionY(FirmwareBall_t* ball)
+float app_firmware_ball_getPositionY(const FirmwareBall_t* ball)
 {
     return ball->get_ball_position_y();
 }
 
-float app_firmware_ball_getVelocityX(FirmwareBall_t* ball)
+float app_firmware_ball_getVelocityX(const FirmwareBall_t* ball)
 {
     return ball->get_ball_velocity_x();
 }
 
-float app_firmware_ball_getVelocityY(FirmwareBall_t* ball)
+float app_firmware_ball_getVelocityY(const FirmwareBall_t* ball)
 {
     return ball->get_ball_velocity_y();
 }

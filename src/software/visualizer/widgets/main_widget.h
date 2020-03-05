@@ -9,7 +9,7 @@
 // The generated version will be names 'ui_<filename>.h'
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
-#include "software/geom/rectangle.h"
+#include "software/new_geom/rectangle.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/ui/ui_main_widget.h"
 #include "software/visualizer/widgets/ai_control.h"
@@ -32,7 +32,8 @@ class MainWidget : public QWidget
     Q_OBJECT
 
    public:
-    explicit MainWidget(QWidget* parent = nullptr);
+    explicit MainWidget(std::shared_ptr<ThunderbotsConfig> config,
+                        QWidget* parent = nullptr);
 
    public slots:
 

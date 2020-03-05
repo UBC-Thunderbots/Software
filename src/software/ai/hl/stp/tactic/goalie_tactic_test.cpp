@@ -51,8 +51,8 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
     // scaling the restrained position by a slight bit as containsPoint does not count
     // the points right on the edge of the rectangle. For the purposes of the goalie
     // we are okay if the point is right on the edge, or close enough.
-    EXPECT_TRUE(small_rectangle.containsPoint((*restrained_position)));
-    EXPECT_FALSE(small_rectangle.containsPoint(requested_position));
+    EXPECT_TRUE(small_rectangle.contains((*restrained_position)));
+    EXPECT_FALSE(small_rectangle.contains(requested_position));
 
     // test to make sure that points given inside of the rectangle
     // are not altered and are the same points
@@ -64,8 +64,8 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
     restrained_position =
         tactic.restrainGoalieInRectangle(requested_position, big_rectangle);
 
-    EXPECT_TRUE(big_rectangle.containsPoint(requested_position));
-    EXPECT_TRUE(big_rectangle.containsPoint(*restrained_position));
+    EXPECT_TRUE(big_rectangle.contains(requested_position));
+    EXPECT_TRUE(big_rectangle.contains(*restrained_position));
 }
 
 INSTANTIATE_TEST_CASE_P(Positions, GoalieRestrainTest,

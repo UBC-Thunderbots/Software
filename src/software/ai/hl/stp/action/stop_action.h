@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/action_visitor.h"
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 
@@ -21,12 +21,9 @@ class StopAction : public Action
      *
      * @param stopped_speed_threshold How slow the robot must be moving before the action
      * is considered done
-     * @param loop_forever Continue yielding new Move Intents, even after we have reached
-     *                     our goal
      */
-    explicit StopAction(
-        double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT,
-        bool loop_forever              = false);
+    explicit StopAction(bool loop_forever, double stopped_speed_threshold =
+                                               ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -37,7 +34,7 @@ class StopAction : public Action
      */
     void updateControlParams(const Robot& robot, bool coast);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -84,12 +84,6 @@ class FreeKickPlay : public Play
         PassWithRating &best_pass_and_score_so_far);
 
     /**
-     * Updates the given cherry-pick tactics
-     * @param tactics
-     */
-    void updateCherryPickTactics(std::vector<std::shared_ptr<CherryPickTactic>> tactics);
-
-    /**
      * Update the tactic that aligns the robot to the ball in preperation to pass
      *
      * @param align_to_ball_tactic
@@ -102,19 +96,4 @@ class FreeKickPlay : public Play
      * @param pass_generator
      */
     void updatePassGenerator(Passing::PassGenerator &pass_generator);
-
-    /**
-     * Update the given shoot goal tactic
-     *
-     * @param shoot_tactic
-     */
-    void updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic);
-
-    /**
-     * Updates the given crease defender tactics
-     *
-     * @param crease_defenders The defenders to update
-     */
-    void updateCreaseDefenderTactics(
-        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders);
 };

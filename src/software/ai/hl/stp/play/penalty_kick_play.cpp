@@ -1,10 +1,11 @@
 #include "software/ai/hl/stp/play/penalty_kick_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
+#include "software/util/design_patterns/generic_factory.h"
+
 
 const std::string PenaltyKickPlay::name = "Penalty Kick Play";
 
@@ -67,8 +68,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoal().toVector().orientation(), 0);
 
-        penalty_shot_tactic->updateWorldParams(world.ball(), world.enemyTeam().goalie(),
-                                               world.field());
         shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
 
         // If we are setting up for penalty kick, move our robots to position
@@ -93,5 +92,5 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<PenaltyKickPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, PenaltyKickPlay> factory;

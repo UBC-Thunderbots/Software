@@ -53,9 +53,7 @@ extern "C"
     void MemManage_Handler(void);
     void BusFault_Handler(void);
     void UsageFault_Handler(void);
-    void SVC_Handler(void);
     void DebugMon_Handler(void);
-    void PendSV_Handler(void);
     void SysTick_Handler(void);
     void ETH_IRQHandler(void);
     void ETH_WKUP_IRQHandler(void);

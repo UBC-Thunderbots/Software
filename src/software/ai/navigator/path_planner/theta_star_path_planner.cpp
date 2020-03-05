@@ -7,6 +7,8 @@
 
 #include <g3log/g3log.hpp>
 
+#include "software/new_geom/util/distance.h"
+
 ThetaStarPathPlanner::ThetaStarPathPlanner()
     : num_grid_rows(0),
       num_grid_cols(0),
@@ -55,7 +57,7 @@ double ThetaStarPathPlanner::calculateHValue(Coordinate test_coord, Coordinate d
     // Leverage point class
     Point p1(test_coord.row(), test_coord.col());
     Point p2(dest.row(), dest.col());
-    return dist(p1, p2);
+    return distance(p1, p2);
 }
 
 bool ThetaStarPathPlanner::hasLineOfSight(Coordinate current_parent, Coordinate new_coord)

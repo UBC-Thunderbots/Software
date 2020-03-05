@@ -22,7 +22,7 @@ void PivotAction::updateControlParams(const Robot& robot, Point pivot_point,
     this->enable_dribbler = enable_dribbler;
 }
 
-void PivotAction::accept(ActionVisitor& visitor) const
+void PivotAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }
