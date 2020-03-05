@@ -5,7 +5,7 @@
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
 
-TEST(ChipTacticTest, getChipOrigin)
+TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
 {
     Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -19,7 +19,7 @@ TEST(ChipTacticTest, getChipOrigin)
     ASSERT_NE(chip_action, nullptr);
     EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());
     EXPECT_EQ(Angle::fromDegrees(45.0), chip_action->getChipDirection());
-    EXPECT_EQ(2.0, chip_action->getChipDistanceMeters());
+    EXPECT_DOUBLE_EQ(2.0, chip_action->getChipDistanceMeters());
 }
 
 TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)

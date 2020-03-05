@@ -10,8 +10,8 @@ void compareChipActions(std::shared_ptr<ChipAction> chip_action,
 {
     EXPECT_EQ(expected_chip_action->getChipOrigin(), chip_action->getChipOrigin());
     EXPECT_EQ(expected_chip_action->getChipDirection(), chip_action->getChipDirection());
-    EXPECT_EQ(expected_chip_action->getChipDistanceMeters(),
-              chip_action->getChipDistanceMeters());
+    EXPECT_DOUBLE_EQ(expected_chip_action->getChipDistanceMeters(),
+                     chip_action->getChipDistanceMeters());
 }
 
 TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
