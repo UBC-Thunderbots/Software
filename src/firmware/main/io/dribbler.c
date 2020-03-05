@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 
-#include "control/control.h"
 #include "firmware/main/shared/physics.h"
 #include "io/adc.h"
 #include "io/hall.h"

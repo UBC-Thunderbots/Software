@@ -4,33 +4,37 @@
 #include <gtest/gtest.h>
 
 #include "software/backend/simulation/physics/physics_ball.h"
+#include "software/backend/simulation/physics/physics_world.h"
+#include "software/test_util/test_util.h"
 
 class SimulatorBallTest : public testing::Test
 {
    protected:
     virtual void SetUp()
     {
-        b2Vec2 gravity(0, 0);
-        world = std::make_shared<b2World>(gravity);
-
+        World world = ::Test::TestUtil::createBlankTestingWorld();
         Ball non_zero_state_ball_parameter(Point(1.01, -0.4), Vector(0.02, -4.5),
                                            Timestamp::fromSeconds(0));
-        physics_ball =
-            std::make_shared<PhysicsBall>(world, non_zero_state_ball_parameter, 1.0, 9.8);
-        physics_ball_weak_ptr = std::weak_ptr<PhysicsBall>(physics_ball);
-        simulator_ball        = std::make_unique<SimulatorBall>(physics_ball_weak_ptr);
+        world.mutableBall() = non_zero_state_ball_parameter;
+
+        physics_world     = std::make_unique<PhysicsWorld>(world);
+        auto physics_ball = physics_world->getPhysicsBall();
+        if (physics_ball.lock())
+        {
+            simulator_ball = std::make_unique<SimulatorBall>(physics_ball);
+        }
+        else
+        {
+            ADD_FAILURE()
+                << "Failed to create a SimulatorRobot because a PhysicsRobot was invalid"
+                << std::endl;
+        }
     }
 
     std::unique_ptr<SimulatorBall> simulator_ball;
 
-    // Note: we declare the b2World before the physics objects so it is destroyed last.
-    // If it is destroyed before the physics robots, segfaults will occur due to how Box2D
-    // manages pointers internally
-    std::shared_ptr<b2World> world;
-
    private:
-    std::shared_ptr<PhysicsBall> physics_ball;
-    std::weak_ptr<PhysicsBall> physics_ball_weak_ptr;
+    std::unique_ptr<PhysicsWorld> physics_world;
 };
 
 TEST_F(SimulatorBallTest, test_get_position)

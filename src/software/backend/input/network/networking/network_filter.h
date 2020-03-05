@@ -6,6 +6,7 @@
 #include "software/backend/input/network/filter/ball_filter.h"
 #include "software/backend/input/network/filter/robot_filter.h"
 #include "software/backend/input/network/filter/robot_team_filter.h"
+#include "software/parameter/config.hpp"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/sensor_fusion/refbox_data.h"
@@ -18,10 +19,12 @@
 class NetworkFilter
 {
    public:
+    explicit NetworkFilter() = delete;
     /**
      * Creates a new NetworkFilter for data input and filtering
      */
-    explicit NetworkFilter();
+    explicit NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config);
+
 
     /**
      * Filters the ball data contained in the list of DetectionFrames and returns the most
@@ -93,6 +96,8 @@ class NetworkFilter
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    std::shared_ptr<const RefboxConfig> refbox_config;
 
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.

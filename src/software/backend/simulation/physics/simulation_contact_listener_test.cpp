@@ -18,23 +18,27 @@ class SimulationContactListenerTest : public testing::Test
     createWorld(const Robot& robot, const Ball& ball)
     {
         b2Vec2 gravity(0, 0);
-        auto physics_world = std::make_shared<b2World>(gravity);
-
-        auto physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball, 1.0, 9.8);
-        auto physics_robot = std::make_shared<PhysicsRobot>(physics_world, robot, 1.0);
+        physics_world = std::make_shared<b2World>(gravity);
+        physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball, 1.0, 9.8);
+        physics_robot = std::make_shared<PhysicsRobot>(physics_world, robot, 1.0);
 
         return std::make_tuple(physics_world, physics_robot, physics_ball);
     }
 
-    Point getDribblingPoint(const Point& robot_position, const Angle& robot_orientation)
+    void TearDown() override
     {
-        double dribbler_depth = PhysicsRobot::dribbler_depth;
-        Point dribbling_point =
-            robot_position + Vector::createFromAngle(robot_orientation)
-                                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                            BALL_MAX_RADIUS_METERS - dribbler_depth);
-        return dribbling_point;
+        // All PhysicsObject that were added to the physics_world must be destroyed first,
+        // otherwise the PhysicsObjects will attempt to access the world when they are
+        // destroyed and cause a segfault
+        physics_ball.reset();
+        physics_robot.reset();
+        physics_world.reset();
     }
+
+   private:
+    std::shared_ptr<b2World> physics_world;
+    std::shared_ptr<PhysicsBall> physics_ball;
+    std::shared_ptr<PhysicsRobot> physics_robot;
 };
 
 TEST_F(SimulationContactListenerTest, test_is_ball_contact)

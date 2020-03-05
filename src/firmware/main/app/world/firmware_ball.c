@@ -15,7 +15,7 @@ FirmwareBall_t* app_firmware_ball_create(float (*get_ball_position_x)(),
                                          float (*get_ball_velocity_x)(),
                                          float (*get_ball_velocity_y)())
 {
-    FirmwareBall_t* new_ball = malloc(sizeof(FirmwareBall_t));
+    FirmwareBall_t* new_ball = (FirmwareBall_t*)malloc(sizeof(FirmwareBall_t));
 
     new_ball->get_ball_position_x = get_ball_position_x;
     new_ball->get_ball_position_y = get_ball_position_y;
