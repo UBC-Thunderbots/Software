@@ -116,9 +116,6 @@ void PolVel2Cart(float const loc[2], float vel[2]);
 void PolAcc2Cart(float const loc[2], float const vel[2], float const Pacc[2],
                  float Cacc[2]);
 
-// C++ does not allow variable length arguments, but we would still like to
-// enforce them when possible, so we compile this differently depending
-// on what language this header is being used in
 void matrix_mult(float *lhs, int lhs_len, const float *rhs, int rhs_len,
                  const float **matrix);
 void matrix_mult_t(float *lhs, int lhs_len, const float *rhs, int rhs_len,
