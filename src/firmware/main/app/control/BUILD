@@ -8,6 +8,26 @@ cc_library(
 )
 
 cc_library(
+    name = "trajectory_planner",
+    srcs = ["trajectory_planner.c"],
+    hdrs = ["trajectory_planner.h"],
+    deps = [
+        "//firmware/main/math:polynomial_1d",
+        "//firmware/main/math:polynomial_2d",
+        "//firmware/main/math:vector_2d",
+    ],
+)
+
+cc_test(
+    name = "trajectory_planner_test",
+    srcs = ["trajectory_planner_test.cpp"],
+    deps = [
+        ":trajectory_planner",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "control",
     srcs = ["control.c"],
     hdrs = ["control.h"],

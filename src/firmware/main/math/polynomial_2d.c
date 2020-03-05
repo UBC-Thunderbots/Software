@@ -176,7 +176,8 @@ GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(1, 0)
             t_below_pivot + (t_above_pivot - t_below_pivot) * arc_length_ratio;          \
                                                                                          \
         Vector2d_t result = {.x = shared_polynomial1d_getValueOrder##N(p.x, t),          \
-                             .y = shared_polynomial1d_getValueOrder##N(p.y, t)};         \
+                             .y = shared_polynomial1d_getValueOrder##N(p.y, t),          \
+                             .t = t};                                                    \
                                                                                          \
         return result;                                                                   \
     }

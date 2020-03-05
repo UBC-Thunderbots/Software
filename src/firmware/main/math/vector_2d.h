@@ -7,4 +7,5 @@ typedef struct Vector2d
 {
     float x;
     float y;
+    float t;
 } Vector2d_t;
