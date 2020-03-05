@@ -26,7 +26,7 @@
 
 #include "firmware/main/app/primitives/primitive.h"
 #include "firmware/main/shared/physics.h"
-#include "shared/proto/primitive.h"
+#include "shared/proto/primitive_fw.pb.h"
 #include "pb.h"
 #include "pb_decode.h"
 #include "io/charger.h"
@@ -110,7 +110,7 @@ static void receive_task(void *UNUSED(param))
                     // Note that camera packets have a variable length.
                     if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x0FU)
                     {
-                        print("handling drive packet!\n");
+                        printf("handling drive packet!\n");
                         handle_drive_packet(dma_buffer);
                     }
                     else if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x10U)
@@ -222,100 +222,100 @@ void handle_drive_packet(uint8_t *dma_buffer)
     const uint8_t *robot_data =
         dma_buffer + MESSAGE_PAYLOAD_ADDR + RECEIVE_DRIVE_BYTES_PER_ROBOT * robot_index;
 
-    // Check if feedback should be sent.
-    if (robot_data[0] & 0x80)
-    {
-        feedback_pend_normal();
-    }
+    /*// Check if feedback should be sent.*/
+    /*if (robot_data[0] & 0x80)*/
+    /*{*/
+        /*feedback_pend_normal();*/
+    /*}*/
 
-    // Extract the serial number.
-    uint8_t serial = *robot_data++ & 0x0F;
+    /*// Extract the serial number.*/
+    /*uint8_t serial = *robot_data++ & 0x0F;*/
 
-    // Construct the individual 16-bit words sent from the host.
-    uint16_t words[4U];
-    for (unsigned int i = 0U; i < 4U; ++i)
-    {
-        words[i] = *robot_data++;
-        words[i] |= (uint16_t)*robot_data++ << 8;
-    }
+    /*// Construct the individual 16-bit words sent from the host.*/
+    /*uint16_t words[4U];*/
+    /*for (unsigned int i = 0U; i < 4U; ++i)*/
+    /*{*/
+        /*words[i] = *robot_data++;*/
+        /*words[i] |= (uint16_t)*robot_data++ << 8;*/
+    /*}*/
 
-    // In case of emergency stop, treat everything as zero
-    // except the chicker discharge bit (that can keep its
-    // status).
-    if (!estop_run)
-    {
-        static const uint16_t MASK[4] = {0x0000, 0x4000, 0x0000, 0x0000};
-        for (unsigned int i = 0; i != 4; ++i)
-        {
-            words[i] &= MASK[i];
-        }
-    }
+    /*// In case of emergency stop, treat everything as zero*/
+    /*// except the chicker discharge bit (that can keep its*/
+    /*// status).*/
+    /*if (!estop_run)*/
+    /*{*/
+        /*static const uint16_t MASK[4] = {0x0000, 0x4000, 0x0000, 0x0000};*/
+        /*for (unsigned int i = 0; i != 4; ++i)*/
+        /*{*/
+            /*words[i] &= MASK[i];*/
+        /*}*/
+    /*}*/
 
-    // Take the drive mutex.
-    xSemaphoreTake(drive_mtx, portMAX_DELAY);
+    /*// Take the drive mutex.*/
+    /*xSemaphoreTake(drive_mtx, portMAX_DELAY);*/
 
-    // Reset timeout.
-    timeout_ticks = 1000U / portTICK_PERIOD_MS;
+    /*// Reset timeout.*/
+    /*timeout_ticks = 1000U / portTICK_PERIOD_MS;*/
 
-    // Apply the charge and discharge mode.
-    charger_enable(words[1] & 0x8000);
-    chicker_discharge(words[1] & 0x4000);
+    /*// Apply the charge and discharge mode.*/
+    /*charger_enable(words[1] & 0x8000);*/
+    /*chicker_discharge(words[1] & 0x4000);*/
 
-    // If the serial number, the emergency stop has just
-    // been switched to stop, or the current primitive is
-    // direct, a new movement primitive needs to start. Do
-    // not start a movement primitive if the emergency stop
-    // has just been switched to run and the current
-    // primitive is not direct, because we can’t usefully
-    // restart the stopped prior primitive—instead, wait
-    // for the host to send new data. Strictly speaking, we
-    // only need to start direct primitives when the estop
-    // is switched from stop to run, but this is
-    // unnecessary as direct primitives shouldn’t care
-    // about being started more often than necessary.
-    unsigned int primitive;
-    primitive_params_t pparams;
-    for (unsigned int i = 0; i != 4; ++i)
-    {
-        int16_t value = words[i] & 0x3FF;
-        if (words[i] & 0x400)
-        {
-            value = -value;
-        }
-        if (words[i] & 0x800)
-        {
-            value *= 10;
-        }
-        pparams.params[i] = value;
-    }
-    primitive     = words[0] >> 12;
-    pparams.extra = (words[2] >> 12) | ((words[3] >> 12) << 4);
-    pparams.slow  = !!(pparams.extra & 0x80);
-    pparams.extra &= 0x7F;
-    if ((serial != last_serial /* Non-atomic because we are only writer */) ||
-        !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
-    {
-        if (!primitive_params_are_equal(&pparams, &pparams_previous) ||
-            !(primitive == primitive_previous))
-        {
-            primitive_previous = primitive;
-            for (unsigned int i = 0; i < 4; i++)
-            {
-                pparams_previous.params[i] = pparams.params[i];
-            }
-            pparams_previous.slow  = pparams.slow;
-            pparams_previous.extra = pparams.extra;
-            // Apply the movement primitive.
-            app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
-                                                    &pparams);
-        }
-    }
+    /*// If the serial number, the emergency stop has just*/
+    /*// been switched to stop, or the current primitive is*/
+    /*// direct, a new movement primitive needs to start. Do*/
+    /*// not start a movement primitive if the emergency stop*/
+    /*// has just been switched to run and the current*/
+    /*// primitive is not direct, because we can’t usefully*/
+    /*// restart the stopped prior primitive—instead, wait*/
+    /*// for the host to send new data. Strictly speaking, we*/
+    /*// only need to start direct primitives when the estop*/
+    /*// is switched from stop to run, but this is*/
+    /*// unnecessary as direct primitives shouldn’t care*/
+    /*// about being started more often than necessary.*/
+    /*unsigned int primitive;*/
+    /*primitive_params_t pparams;*/
+    /*for (unsigned int i = 0; i != 4; ++i)*/
+    /*{*/
+        /*int16_t value = words[i] & 0x3FF;*/
+        /*if (words[i] & 0x400)*/
+        /*{*/
+            /*value = -value;*/
+        /*}*/
+        /*if (words[i] & 0x800)*/
+        /*{*/
+            /*value *= 10;*/
+        /*}*/
+        /*pparams.params[i] = value;*/
+    /*}*/
+    /*primitive     = words[0] >> 12;*/
+    /*pparams.extra = (words[2] >> 12) | ((words[3] >> 12) << 4);*/
+    /*pparams.slow  = !!(pparams.extra & 0x80);*/
+    /*pparams.extra &= 0x7F;*/
+    /*if ((serial != last_serial [> Non-atomic because we are only writer <]) ||*/
+        /*!estop_run || app_primitive_manager_primitiveIsDirect(primitive))*/
+    /*{*/
+        /*if (!primitive_params_are_equal(&pparams, &pparams_previous) ||*/
+            /*!(primitive == primitive_previous))*/
+        /*{*/
+            /*primitive_previous = primitive;*/
+            /*for (unsigned int i = 0; i < 4; i++)*/
+            /*{*/
+                /*pparams_previous.params[i] = pparams.params[i];*/
+            /*}*/
+            /*pparams_previous.slow  = pparams.slow;*/
+            /*pparams_previous.extra = pparams.extra;*/
+            /*// Apply the movement primitive.*/
+            /*app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,*/
+                                                    /*&pparams);*/
+        /*}*/
+    /*}*/
 
-    // Release the drive mutex.
-    xSemaphoreGive(drive_mtx);
+    /*// Release the drive mutex.*/
+    /*xSemaphoreGive(drive_mtx);*/
 
-    // Update the last values.
-    __atomic_store_n(&last_serial, serial, __ATOMIC_RELAXED);
+    /*// Update the last values.*/
+    /*__atomic_store_n(&last_serial, serial, __ATOMIC_RELAXED);*/
 }
 
 void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)
