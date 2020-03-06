@@ -7,12 +7,39 @@
 #include "software/backend/simulation/physics/physics_ball.h"
 #include "software/backend/simulation/physics/physics_robot.h"
 
+extern "C"
+{
+#include "firmware/main/app/primitives/primitive_manager.h"
+}
+
+/**
+ * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h
+ * file), C++ considers it an incomplete type and is unable to use it with smart pointers
+ * because it doesn't know the size of the object. Therefore we need to create our own
+ * "Deleter" class we can provide to the smart pointers to handle that instead.
+ *
+ * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
+ * examples
+ */
+struct PrimitiveManagerDeleter
+{
+    void operator()(PrimitiveManager_t* primitive_manager) const
+    {
+        app_primitive_manager_destroy(primitive_manager);
+    };
+};
+
 /**
  * The SimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with more
  * logic-focused elements for simulation, such as whether or not autokick is enabled.
+ *
+ * All members of this class are intentionally protected or private to force this class
+ * to only be controlled by the SimulatorRobotSingleton.
  */
 class SimulatorRobot
 {
+    friend class SimulatorRobotSingleton;
+
    public:
     /**
      * Create a new SimulatorRobot given a PhysicsRobot
@@ -29,6 +56,7 @@ class SimulatorRobot
      */
     unsigned int getRobotId();
 
+protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
      *
@@ -206,6 +234,22 @@ class SimulatorRobot
     void brakeMotorFrontLeft();
     void brakeMotorFrontRight();
 
+    /**
+     * Sets the current primitive this robot is running to a new one
+     *
+     * @param firmware_world The world to run the primitive in
+     * @param primitive_index The index of the primitive to run
+     * @param params The parameters for the primitive
+     */
+    void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world, unsigned int primitive_index, const primitive_params_t& params);
+
+    /**
+     * Runs the current primitive
+     *
+     * @param world The world to run the primitive in
+     */
+    void runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world);
+
    private:
     /**
      * A function that is called during every physics step for as long as the ball
@@ -258,6 +302,18 @@ class SimulatorRobot
     unsigned int checkValidAndReturnUint(
         std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
+    /**
+     * Returns true if the given primitive or parameters are different than the primitive this
+     * robot is currently running
+     *
+     * @param primitive_index The index of the primitive
+     * @param primitive_params The params for the primitive
+     *
+     * @return True if the given index or params are different than what the robot is currently
+     * running, and false otherwise
+     */
+    bool isPrimitiveDifferentThanCurrent(unsigned int primitive_index, const primitive_params_t& primitive_params);
+
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<double> autokick_speed_m_per_s;
     std::optional<double> autochip_distance_m;
@@ -265,4 +321,8 @@ class SimulatorRobot
 
     // A pointer to all the balls currently being dribbled
     std::vector<PhysicsBall*> balls_in_dribbler_area;
+
+    std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter> primitive_manager;
+    std::optional<unsigned int> current_primitive_index;
+    std::optional<primitive_params_t> current_primitive_params;
 };

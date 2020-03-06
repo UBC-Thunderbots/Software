@@ -6,11 +6,6 @@
 #include "software/backend/simulation/simulator_robot.h"
 #include "software/world/world.h"
 
-extern "C"
-{
-#include "firmware/main/app/primitives/primitive_manager.h"
-}
-
 /**
  * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
  * C++ considers it an incomplete type and is unable to use it with smart pointers
@@ -40,7 +35,7 @@ struct FirmwareWorldDeleter
         app_wheel_destroy(firmware_robot_front_right_wheel);
 
         Chicker_t* firmware_robot_chicker = app_firmware_robot_getChicker(firmware_robot);
-        app_chicker_destroy(firmware_robot_chicker):
+        app_chicker_destroy(firmware_robot_chicker);
 
         Dribbler_t* firmware_robot_dribbler = app_firmware_robot_getDribbler(firmware_robot);
         app_dribbler_destroy(firmware_robot_dribbler);
@@ -51,23 +46,6 @@ struct FirmwareWorldDeleter
         app_firmware_ball_destroy(firmware_ball);
 
         app_firmware_world_destroy(firmware_world);
-    };
-};
-
-/**
- * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h
- * file), C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
- */
-struct PrimitiveManagerDeleter
-{
-    void operator()(PrimitiveManager_t* primitive_manager) const
-    {
-        app_primitive_manager_destroy(primitive_manager);
     };
 };
 
@@ -111,13 +89,29 @@ class Simulator
     World getWorld();
 
    private:
+    /**
+     * Returns the encoded primitive parameters for the given Primitive
+     *
+     * @param primitive The Primitive to get the parameters for
+     *
+     * @return The encoded primitive parameters for the given Primitive
+     */
+    primitive_params_t getPrimitiveParams(const std::unique_ptr<Primitive>& primitive);
+
+    /**
+     * Returns the primitive index for the given Primitive
+     *
+     * @param primitive The Primitive to get the index for
+     *
+     * @return The index for the given Primitive
+     */
+    unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
+
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
-    std::map<std::shared_ptr<SimulatorRobot>,
-             std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>>
-        simulator_robots;
+    std::vector<std::shared_ptr<SimulatorRobot>> simulator_robots;
     // The firmware_world pointer that is used by all simulated robots. It is
     // controlled by the SimulatorRobotSingleton in order to work with multiple
     // robots and primitives simultaneously
-    std::unique_ptr<FirmwareWorld_t, FirmwareWorldDeleter> firmware_world;
+    std::shared_ptr<FirmwareWorld_t> firmware_world;
 };

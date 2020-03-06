@@ -5,6 +5,8 @@ cc_library(
     srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
     deps = [
+        "//firmware/main/app/primitives:primitive_manager",
+        "//firmware/main/app/world:firmware_world",
         "//software/ai/primitive",
         "//software/backend/simulation/physics:physics_ball",
         "//software/backend/simulation/physics:physics_robot",
@@ -67,6 +69,7 @@ cc_test(
     name = "simulator_robot_singleton_test",
     srcs = ["simulator_robot_singleton_test.cpp"],
     deps = [
+        ":simulator_ball",
         ":simulator_robot",
         ":simulator_robot_singleton",
         "//firmware/main/app/world:firmware_robot",

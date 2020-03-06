@@ -96,6 +96,18 @@ SimulatorRobotSingleton::createFirmwareRobot()
                                                                   FirmwareRobotDeleter());
 }
 
+void SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(std::shared_ptr<FirmwareWorld_t> firmware_world,
+                                                                       unsigned int primitive_index,
+                                                                       const primitive_params_t &primitive_params) {
+    checkValidAndExecuteVoid(
+            [firmware_world, primitive_index, primitive_params](auto robot) { robot->startNewPrimitive(firmware_world, primitive_index, primitive_params); });
+}
+
+void SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(std::shared_ptr<FirmwareWorld_t> firmware_world) {
+    checkValidAndExecuteVoid(
+            [firmware_world](auto robot) { robot->runCurrentPrimitive(firmware_world); });
+}
+
 void SimulatorRobotSingleton::checkValidAndExecuteVoid(
     std::function<void(std::shared_ptr<SimulatorRobot>)> func)
 {

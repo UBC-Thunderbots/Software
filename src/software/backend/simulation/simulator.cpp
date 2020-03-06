@@ -14,10 +14,7 @@ Simulator::Simulator(const World& world) : physics_world(world)
 {
     for (auto physics_robot : physics_world.getFriendlyPhysicsRobots())
     {
-        auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-        std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter> primitive_manager(
-            app_primitive_manager_create(), PrimitiveManagerDeleter());
-        this->simulator_robots.emplace(simulator_robot, std::move(primitive_manager));
+        simulator_robots.emplace_back(std::make_shared<SimulatorRobot>(physics_robot));
     }
     simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
 
@@ -27,20 +24,16 @@ Simulator::Simulator(const World& world) : physics_world(world)
     // can take ownership
     FirmwareWorld_t* firmware_world_raw =
         app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
-    firmware_world = std::unique_ptr<FirmwareWorld_t, FirmwareWorldDeleter>(
-        firmware_world_raw, FirmwareWorldDeleter());
+    firmware_world = std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 }
 
 void Simulator::stepSimulation(const Duration& time_step)
 {
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
-    for (auto iter = simulator_robots.begin(); iter != simulator_robots.end(); iter++)
+    for (const auto& simulator_robot : simulator_robots)
     {
-        auto simulator_robot    = iter->first;
-        auto& primitive_manager = iter->second;
         SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
-                                                  firmware_world.get());
+        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
     }
 
     physics_world.stepSimulation(time_step);
@@ -50,45 +43,19 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
 {
     if (primitives)
     {
-        for (auto& iter : simulator_robots)
-        {
-            auto simulator_robot                        = iter.first;
-            PrimitiveManager* primitive_manager_raw_ptr = iter.second.get();
+        for(const auto& primitive_ptr : *primitives) {
+            primitive_params_t primitive_params = getPrimitiveParams(primitive_ptr);
+            unsigned int primitive_index = getPrimitiveIndex(primitive_ptr);
 
-            auto& primitive_vector = *primitives;
-            auto primitive_iter =
-                std::find_if(primitive_vector.begin(), primitive_vector.end(),
-                             [&simulator_robot](const auto& p) {
-                                 return simulator_robot->getRobotId() == p->getRobotId();
-                             });
-            if (primitive_iter != primitive_vector.end())
-            {
-                // Get params and start primitive
+            auto simulator_robots_iter =
+                    std::find_if(simulator_robots.begin(), simulator_robots.end(),
+                                 [&primitive_ptr](const auto& simulator_robot) {
+                                     return simulator_robot->getRobotId() == primitive_ptr->getRobotId();
+                                 });
 
-                // The MRFPrimitiveVisitor handles most of the encoding for us
-                MRFPrimitiveVisitor mrf_pv;
-                (*primitive_iter)->accept(mrf_pv);
-                RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
-                unsigned int primitive_index =
-                    static_cast<unsigned int>(radio_primitive.prim_type);
-                primitive_params_t primitive_params;
-                std::array<double, 4> param_array = radio_primitive.param_array;
-                for (unsigned int i = 0; i < param_array.size(); i++)
-                {
-                    // The data is already scaled appropriately for us from the
-                    // getSerializedRadioPacket function. We just need to pack it
-                    // into an int16_t
-                    double data                = param_array[i];
-                    primitive_params.params[i] = static_cast<int16_t>(std::round(data));
-                }
-
-                primitive_params.slow  = radio_primitive.slow;
-                primitive_params.extra = radio_primitive.extra_bits;
-
-                SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-                app_primitive_manager_startNewPrimitive(
-                    primitive_manager_raw_ptr, firmware_world.get(), primitive_index,
-                    &primitive_params);
+            if(simulator_robots_iter != simulator_robots.end()) {
+                SimulatorRobotSingleton::setSimulatorRobot(*simulator_robots_iter);
+                SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world, primitive_index, primitive_params);
             }
         }
     }
@@ -97,4 +64,34 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
 World Simulator::getWorld()
 {
     return physics_world.getWorld();
+}
+
+primitive_params_t Simulator::getPrimitiveParams(const std::unique_ptr<Primitive> &primitive) {
+    // The MRFPrimitiveVisitor handles most of the encoding for us
+    MRFPrimitiveVisitor mrf_pv;
+    primitive->accept(mrf_pv);
+    RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
+    primitive_params_t primitive_params;
+    std::array<double, 4> param_array = radio_primitive.param_array;
+    for (unsigned int i = 0; i < param_array.size(); i++) {
+        // The data is already scaled appropriately for us from the
+        // getSerializedRadioPacket function. We just need to pack it
+        // into an int16_t
+        double data = param_array[i];
+        primitive_params.params[i] = static_cast<int16_t>(std::round(data));
+    }
+
+    primitive_params.slow = radio_primitive.slow;
+    primitive_params.extra = radio_primitive.extra_bits;
+
+    return primitive_params;
+}
+
+unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive> &primitive) {
+    MRFPrimitiveVisitor mrf_pv;
+    primitive->accept(mrf_pv);
+    RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
+    auto primitive_index = static_cast<unsigned int>(radio_primitive.prim_type);
+
+    return primitive_index;
 }
