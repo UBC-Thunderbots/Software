@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/motion_constraint/motion_constraint_manager.h"
+#include "software/parameter/config.hpp"
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that
@@ -25,6 +26,7 @@ class STP : public HL
      * The default value is 0
      */
     explicit STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
+                 std::shared_ptr<const AIControlConfig> control_config,
                  long random_seed = 0);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
@@ -104,6 +106,7 @@ class STP : public HL
     std::optional<std::vector<std::shared_ptr<Tactic>>> current_tactics;
     // The random number generator
     std::mt19937 random_number_generator;
+    std::shared_ptr<const AIControlConfig> control_config;
     std::string override_play_name;
     std::string previous_override_play_name;
     bool override_play;
