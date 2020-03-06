@@ -56,7 +56,7 @@ class SimulatorRobot
      */
     unsigned int getRobotId();
 
-protected:
+   protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
      *
@@ -241,7 +241,9 @@ protected:
      * @param primitive_index The index of the primitive to run
      * @param params The parameters for the primitive
      */
-    void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world, unsigned int primitive_index, const primitive_params_t& params);
+    void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
+                           unsigned int primitive_index,
+                           const primitive_params_t& params);
 
     /**
      * Runs the current primitive
@@ -303,16 +305,17 @@ protected:
         std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
     /**
-     * Returns true if the given primitive or parameters are different than the primitive this
-     * robot is currently running
+     * Returns true if the given primitive or parameters are different than the primitive
+     * this robot is currently running
      *
      * @param primitive_index The index of the primitive
      * @param primitive_params The params for the primitive
      *
-     * @return True if the given index or params are different than what the robot is currently
-     * running, and false otherwise
+     * @return True if the given index or params are different than what the robot is
+     * currently running, and false otherwise
      */
-    bool isPrimitiveDifferentThanCurrent(unsigned int primitive_index, const primitive_params_t& primitive_params);
+    bool isPrimitiveDifferentThanCurrent(unsigned int primitive_index,
+                                         const primitive_params_t& primitive_params);
 
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<double> autokick_speed_m_per_s;

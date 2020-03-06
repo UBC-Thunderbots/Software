@@ -24,7 +24,8 @@ Simulator::Simulator(const World& world) : physics_world(world)
     // can take ownership
     FirmwareWorld_t* firmware_world_raw =
         app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
-    firmware_world = std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
+    firmware_world =
+        std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 }
 
 void Simulator::stepSimulation(const Duration& time_step)
@@ -43,19 +44,22 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
 {
     if (primitives)
     {
-        for(const auto& primitive_ptr : *primitives) {
+        for (const auto& primitive_ptr : *primitives)
+        {
             primitive_params_t primitive_params = getPrimitiveParams(primitive_ptr);
-            unsigned int primitive_index = getPrimitiveIndex(primitive_ptr);
+            unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
 
-            auto simulator_robots_iter =
-                    std::find_if(simulator_robots.begin(), simulator_robots.end(),
-                                 [&primitive_ptr](const auto& simulator_robot) {
-                                     return simulator_robot->getRobotId() == primitive_ptr->getRobotId();
-                                 });
+            auto simulator_robots_iter = std::find_if(
+                simulator_robots.begin(), simulator_robots.end(),
+                [&primitive_ptr](const auto& simulator_robot) {
+                    return simulator_robot->getRobotId() == primitive_ptr->getRobotId();
+                });
 
-            if(simulator_robots_iter != simulator_robots.end()) {
+            if (simulator_robots_iter != simulator_robots.end())
+            {
                 SimulatorRobotSingleton::setSimulatorRobot(*simulator_robots_iter);
-                SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world, primitive_index, primitive_params);
+                SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
+                    firmware_world, primitive_index, primitive_params);
             }
         }
     }
@@ -66,28 +70,32 @@ World Simulator::getWorld()
     return physics_world.getWorld();
 }
 
-primitive_params_t Simulator::getPrimitiveParams(const std::unique_ptr<Primitive> &primitive) {
+primitive_params_t Simulator::getPrimitiveParams(
+    const std::unique_ptr<Primitive>& primitive)
+{
     // The MRFPrimitiveVisitor handles most of the encoding for us
     MRFPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
     RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
     primitive_params_t primitive_params;
     std::array<double, 4> param_array = radio_primitive.param_array;
-    for (unsigned int i = 0; i < param_array.size(); i++) {
+    for (unsigned int i = 0; i < param_array.size(); i++)
+    {
         // The data is already scaled appropriately for us from the
         // getSerializedRadioPacket function. We just need to pack it
         // into an int16_t
-        double data = param_array[i];
+        double data                = param_array[i];
         primitive_params.params[i] = static_cast<int16_t>(std::round(data));
     }
 
-    primitive_params.slow = radio_primitive.slow;
+    primitive_params.slow  = radio_primitive.slow;
     primitive_params.extra = radio_primitive.extra_bits;
 
     return primitive_params;
 }
 
-unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive> &primitive) {
+unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive)
+{
     MRFPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
     RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();

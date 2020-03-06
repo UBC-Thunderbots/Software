@@ -5,8 +5,8 @@
 #include <cmath>
 
 #include "software/backend/simulation/physics/physics_world.h"
-#include "software/backend/simulation/simulator_robot.h"
 #include "software/backend/simulation/simulator_ball.h"
+#include "software/backend/simulation/simulator_robot.h"
 
 extern "C"
 {
@@ -18,7 +18,7 @@ extern "C"
 #include "software/world/world.h"
 
 
-//class SimulatorRobotSingletonTest : public testing::Test
+// class SimulatorRobotSingletonTest : public testing::Test
 //{
 //   protected:
 //    std::tuple<std::shared_ptr<PhysicsWorld>, std::shared_ptr<SimulatorRobot>,
@@ -43,7 +43,8 @@ extern "C"
 //        else
 //        {
 //            ADD_FAILURE()
-//                << "Failed to create a SimulatorRobot because a PhysicsRobot was invalid"
+//                << "Failed to create a SimulatorRobot because a PhysicsRobot was
+//                invalid"
 //                << std::endl;
 //        }
 //
@@ -56,7 +57,8 @@ extern "C"
 //        else
 //        {
 //            ADD_FAILURE()
-//                << "Failed to create a SimulatorRobot because a PhysicsRobot was invalid"
+//                << "Failed to create a SimulatorRobot because a PhysicsRobot was
+//                invalid"
 //                << std::endl;
 //        }
 //
@@ -95,14 +97,14 @@ extern "C"
 //};
 //
 //
-//TEST_F(SimulatorRobotSingletonTest, test_robot_id)
+// TEST_F(SimulatorRobotSingletonTest, test_robot_id)
 //{
 //    auto [world, simulator_robot, simulator_ball] =
 //    createWorld(robot_non_zero_state, ball_zero_state);
 //    EXPECT_EQ(simulator_robot->getRobotId(), 7);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_position)
+// TEST_F(SimulatorRobotTest, test_get_position)
 //{
 //    auto [world, simulator_robot, simulator_ball] =
 //        createWorld(robot_non_zero_state, ball_zero_state);
@@ -111,14 +113,14 @@ extern "C"
 //    EXPECT_LT((simulator_robot->position() - Point(1.04, -0.8)).length(), 0.001);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_orientation)
+// TEST_F(SimulatorRobotTest, test_get_orientation)
 //{
 //    auto [world, simulator_robot, simulator_ball] =
 //        createWorld(robot_non_zero_state, ball_zero_state);
 //    EXPECT_FLOAT_EQ(simulator_robot->getOrientation(), 2.12);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_linear_velocity)
+// TEST_F(SimulatorRobotTest, test_get_linear_velocity)
 //{
 //    auto [world, simulator_robot, simulator_ball] =
 //        createWorld(robot_non_zero_state, ball_zero_state);
@@ -127,36 +129,37 @@ extern "C"
 //    EXPECT_LT((simulator_robot->velocity() - Vector(-1.5, 0)).length(), 0.01);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_angular_velocity)
+// TEST_F(SimulatorRobotTest, test_get_angular_velocity)
 //{
 //    auto [world, simulator_robot, simulator_ball] =
 //        createWorld(robot_non_zero_state, ball_zero_state);
 //    EXPECT_FLOAT_EQ(simulator_robot->getVelocityAngular(), -1.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_battery_voltage)
+// TEST_F(SimulatorRobotTest, test_get_battery_voltage)
 //{
 //    auto [world, simulator_robot, simulator_ball] =
 //        createWorld(robot_non_zero_state, ball_zero_state);
 //    EXPECT_FLOAT_EQ(simulator_robot->getBatteryVoltage(), 16.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_dribbler_temperature)
+// TEST_F(SimulatorRobotTest, test_get_dribbler_temperature)
 //{
 //    auto [world, simulator_robot, simulator_ball] =
 //        createWorld(robot_non_zero_state, ball_zero_state);
 //    EXPECT_EQ(simulator_robot->getDribblerTemperatureDegC(), 25);
 //}
 //
-//class SimulatorRobotKickTest : public SimulatorRobotTest,
+// class SimulatorRobotKickTest : public SimulatorRobotTest,
 //                               public ::testing::WithParamInterface<Angle>
 //{
 //};
 //
-//TEST_P(SimulatorRobotKickTest, test_kick_ball_at_angle)
+// TEST_P(SimulatorRobotKickTest, test_kick_ball_at_angle)
 //{
 //    Angle robot_orientation = GetParam();
-//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
+//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation,
+//    AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
 //    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
 //    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
@@ -186,22 +189,23 @@ extern "C"
 //              0.005);
 //}
 //
-//INSTANTIATE_TEST_CASE_P(All, SimulatorRobotKickTest,
+// INSTANTIATE_TEST_CASE_P(All, SimulatorRobotKickTest,
 //                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
 //                                          Angle::fromDegrees(110),
 //                                          Angle::fromDegrees(200),
 //                                          Angle::fromDegrees(331)));
 //
 //
-//class SimulatorRobotChipTest : public SimulatorRobotTest,
+// class SimulatorRobotChipTest : public SimulatorRobotTest,
 //                               public ::testing::WithParamInterface<Angle>
 //{
 //};
 //
-//TEST_P(SimulatorRobotChipTest, test_chip_ball_at_angle)
+// TEST_P(SimulatorRobotChipTest, test_chip_ball_at_angle)
 //{
 //    Angle robot_orientation = GetParam();
-//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
+//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation,
+//    AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
 //    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
 //    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
@@ -231,22 +235,23 @@ extern "C"
 //    EXPECT_LT(simulator_ball->velocity().length(), 5);
 //}
 //
-//INSTANTIATE_TEST_CASE_P(All, SimulatorRobotChipTest,
+// INSTANTIATE_TEST_CASE_P(All, SimulatorRobotChipTest,
 //                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
 //                                          Angle::fromDegrees(110),
 //                                          Angle::fromDegrees(200),
 //                                          Angle::fromDegrees(331)));
 //
 //
-//class SimulatorRobotAutokickTest : public SimulatorRobotTest,
+// class SimulatorRobotAutokickTest : public SimulatorRobotTest,
 //                                   public ::testing::WithParamInterface<Angle>
 //{
 //};
 //
-//TEST_P(SimulatorRobotAutokickTest, test_autokick_ball_at_angle)
+// TEST_P(SimulatorRobotAutokickTest, test_autokick_ball_at_angle)
 //{
 //    Angle robot_orientation = GetParam();
-//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
+//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation,
+//    AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
 //    Point initial_ball_position =
 //        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
@@ -265,25 +270,27 @@ extern "C"
 //        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
 //    }
 //
-//    Vector expected_velocity = Vector::createFromAngle(robot_orientation).normalize(4.0);
+//    Vector expected_velocity =
+//    Vector::createFromAngle(robot_orientation).normalize(4.0);
 //    EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.001);
 //}
 //
-//INSTANTIATE_TEST_CASE_P(All, SimulatorRobotAutokickTest,
+// INSTANTIATE_TEST_CASE_P(All, SimulatorRobotAutokickTest,
 //                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
 //                                          Angle::fromDegrees(110),
 //                                          Angle::fromDegrees(200),
 //                                          Angle::fromDegrees(331)));
 //
-//class SimulatorRobotAutochipTest : public SimulatorRobotTest,
+// class SimulatorRobotAutochipTest : public SimulatorRobotTest,
 //                                   public ::testing::WithParamInterface<Angle>
 //{
 //};
 //
-//TEST_P(SimulatorRobotAutochipTest, test_autochip_ball_at_angle_with_no_obstacle)
+// TEST_P(SimulatorRobotAutochipTest, test_autochip_ball_at_angle_with_no_obstacle)
 //{
 //    Angle robot_orientation = GetParam();
-//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
+//    Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation,
+//    AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
 //    Point initial_ball_position =
 //        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
@@ -308,13 +315,13 @@ extern "C"
 //    EXPECT_LT(simulator_ball->velocity().length(), 4);
 //}
 //
-//INSTANTIATE_TEST_CASE_P(All, SimulatorRobotAutochipTest,
+// INSTANTIATE_TEST_CASE_P(All, SimulatorRobotAutochipTest,
 //                        ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
 //                                          Angle::fromDegrees(110),
 //                                          Angle::fromDegrees(200),
 //                                          Angle::fromDegrees(331)));
 //
-//TEST_F(SimulatorRobotTest,
+// TEST_F(SimulatorRobotTest,
 //       test_robot_chips_ball_with_autochip_enabled_and_ball_lands_on_obstacle)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -351,7 +358,7 @@ extern "C"
 //    EXPECT_GT(simulator_ball->position().x(), 2.0);
 //}
 //
-//TEST_F(SimulatorRobotTest,
+// TEST_F(SimulatorRobotTest,
 //       test_robot_does_not_kick_or_chip_ball_when_autokick_and_autochip_disabled)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -372,7 +379,7 @@ extern "C"
 //    EXPECT_LT(simulator_ball->velocity().length(), 0.25);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_disable_autokick)
+// TEST_F(SimulatorRobotTest, test_disable_autokick)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -384,7 +391,7 @@ extern "C"
 //    EXPECT_FALSE(simulator_robot->isAutokickEnabled());
 //}
 //
-//TEST_F(SimulatorRobotTest, test_disable_autochip)
+// TEST_F(SimulatorRobotTest, test_disable_autochip)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -396,7 +403,7 @@ extern "C"
 //    EXPECT_FALSE(simulator_robot->isAutochipEnabled());
 //}
 //
-//TEST_F(SimulatorRobotTest, test_enabling_autokick_disables_autochip)
+// TEST_F(SimulatorRobotTest, test_enabling_autokick_disables_autochip)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -410,7 +417,7 @@ extern "C"
 //    EXPECT_FALSE(simulator_robot->isAutochipEnabled());
 //}
 //
-//TEST_F(SimulatorRobotTest, test_enabling_autochip_disables_autokick)
+// TEST_F(SimulatorRobotTest, test_enabling_autochip_disables_autokick)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -424,7 +431,8 @@ extern "C"
 //    EXPECT_TRUE(simulator_robot->isAutochipEnabled());
 //}
 //
-//TEST_F(SimulatorRobotTest, test_ball_does_not_bounce_off_front_of_robot_when_dribbler_on)
+// TEST_F(SimulatorRobotTest,
+// test_ball_does_not_bounce_off_front_of_robot_when_dribbler_on)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -450,7 +458,7 @@ extern "C"
 //    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_backwards)
+// TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_backwards)
 //{
 //    Robot robot(0, Point(0, 0), Vector(-0.5, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -469,12 +477,12 @@ extern "C"
 //    }
 //
 //    // Check the ball has stuck to the dribbler
-//    EXPECT_LT((simulator_ball->velocity() - simulator_robot->velocity()).length(), 0.001);
-//    Point dribbling_point = getDribblingPoint(simulator_robot);
+//    EXPECT_LT((simulator_ball->velocity() - simulator_robot->velocity()).length(),
+//    0.001); Point dribbling_point = getDribblingPoint(simulator_robot);
 //    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_forwards)
+// TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_forwards)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0.5, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -491,12 +499,12 @@ extern "C"
 //    }
 //
 //    // Check the ball has stuck to the dribbler
-//    EXPECT_LT((simulator_ball->velocity() - simulator_robot->velocity()).length(), 0.02);
-//    Point dribbling_point = getDribblingPoint(simulator_robot);
+//    EXPECT_LT((simulator_ball->velocity() - simulator_robot->velocity()).length(),
+//    0.02); Point dribbling_point = getDribblingPoint(simulator_robot);
 //    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_spinning_in_place)
+// TEST_F(SimulatorRobotTest, test_dribble_ball_while_moving_spinning_in_place)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -519,7 +527,8 @@ extern "C"
 //
 //    // Accelerate the robot up to an angular velocity of 4*pi rad/s (ie. 2 rpm)
 //    // The iteration limit is a safety so we don't loop forever if applyForce is broken
-//    for (unsigned int i = 0; i < 120 && simulator_robot->getVelocityAngular() < 4 * M_PI;
+//    for (unsigned int i = 0; i < 120 && simulator_robot->getVelocityAngular() < 4 *
+//    M_PI;
 //         i++)
 //    {
 //        simulator_robot->applyWheelForceFrontLeft(0.3);
@@ -544,7 +553,7 @@ extern "C"
 //    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.015);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_dribbler_coast)
+// TEST_F(SimulatorRobotTest, test_dribbler_coast)
 //{
 //    Point robot_position    = Point(0, 0);
 //    Angle robot_orientation = Angle::zero();
@@ -567,9 +576,10 @@ extern "C"
 //    EXPECT_GT((simulator_ball->position() - dribbling_point).length(), 0.1);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_robot_drive_forward)
+// TEST_F(SimulatorRobotTest, test_robot_drive_forward)
 //{
-//    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::quarter(), AngularVelocity::zero(),
+//    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::quarter(),
+//    AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
 //    // Put the ball very far away so it does not interfere
 //    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -594,7 +604,7 @@ extern "C"
 //    EXPECT_NEAR(simulator_robot->getOrientation(), M_PI_2, 1 * M_PI / 180.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_robot_drive_backwards)
+// TEST_F(SimulatorRobotTest, test_robot_drive_backwards)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -621,7 +631,7 @@ extern "C"
 //    EXPECT_NEAR(simulator_robot->getOrientation(), 0, 1 * M_PI / 180.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_robot_spin_clockwise)
+// TEST_F(SimulatorRobotTest, test_robot_spin_clockwise)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -644,7 +654,7 @@ extern "C"
 //    EXPECT_LT(simulator_robot->getVelocityAngular(), -8);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_robot_spin_counterclockwise)
+// TEST_F(SimulatorRobotTest, test_robot_spin_counterclockwise)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -667,7 +677,7 @@ extern "C"
 //    EXPECT_GT(simulator_robot->getVelocityAngular(), 8);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_not_moving)
+// TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_not_moving)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -681,7 +691,7 @@ extern "C"
 //    EXPECT_EQ(simulator_robot->getMotorSpeedFrontRight(), 0.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_moving_forwards)
+// TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_moving_forwards)
 //{
 //    Robot robot(0, Point(0, 0), Vector(1, 0), Angle::zero(), AngularVelocity::zero(),
 //                Timestamp::fromSeconds(0));
@@ -703,7 +713,7 @@ extern "C"
 //              -simulator_robot->getMotorSpeedBackRight());
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_moving_along_wheel_axis)
+// TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_moving_along_wheel_axis)
 //{
 //    // Move along the axis of the front-left wheel. This means the front-left wheel is
 //    // perpendicular to the direction of motion, and we don't expect it to be spinning
@@ -721,7 +731,7 @@ extern "C"
 //    EXPECT_GT(simulator_robot->getMotorSpeedFrontRight(), 1.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_spinning)
+// TEST_F(SimulatorRobotTest, test_get_motor_speeds_when_robot_spinning)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
 //                AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
@@ -735,7 +745,7 @@ extern "C"
 //    EXPECT_GT(simulator_robot->getMotorSpeedFrontRight(), 1.0);
 //}
 //
-//TEST_F(SimulatorRobotTest,
+// TEST_F(SimulatorRobotTest,
 //       test_brake_motors_when_robot_spinning_with_positive_angular_velocity)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -757,7 +767,7 @@ extern "C"
 //    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
 //}
 //
-//TEST_F(SimulatorRobotTest,
+// TEST_F(SimulatorRobotTest,
 //       test_brake_motors_when_robot_spinning_with_negative_angular_velocity)
 //{
 //    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -779,7 +789,7 @@ extern "C"
 //    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_moving_linearly)
+// TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_moving_linearly)
 //{
 //    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
 //                AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -801,7 +811,7 @@ extern "C"
 //    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
 //}
 //
-//TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_moving_and_spinning)
+// TEST_F(SimulatorRobotTest, test_brake_motors_when_robot_moving_and_spinning)
 //{
 //    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
 //                AngularVelocity::full(), Timestamp::fromSeconds(0));
@@ -822,37 +832,6 @@ extern "C"
 //    EXPECT_LT((simulator_robot->velocity() - Vector(0, 0)).length(), 0.01);
 //    EXPECT_NEAR(simulator_robot->getVelocityAngular(), 0.0, 1.0 * M_PI / 180.0);
 //}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

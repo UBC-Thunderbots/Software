@@ -37,7 +37,8 @@ struct FirmwareWorldDeleter
         Chicker_t* firmware_robot_chicker = app_firmware_robot_getChicker(firmware_robot);
         app_chicker_destroy(firmware_robot_chicker);
 
-        Dribbler_t* firmware_robot_dribbler = app_firmware_robot_getDribbler(firmware_robot);
+        Dribbler_t* firmware_robot_dribbler =
+            app_firmware_robot_getDribbler(firmware_robot);
         app_dribbler_destroy(firmware_robot_dribbler);
 
         app_firmware_robot_destroy(firmware_robot);

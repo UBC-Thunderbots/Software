@@ -30,7 +30,7 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     }
 
     primitive_manager = std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>(
-            app_primitive_manager_create(), PrimitiveManagerDeleter());
+        app_primitive_manager_create(), PrimitiveManagerDeleter());
 }
 
 void SimulatorRobot::checkValidAndExecuteVoid(
@@ -375,36 +375,44 @@ void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
     }
 }
 
-bool SimulatorRobot::isPrimitiveDifferentThanCurrent(unsigned int primitive_index,
-                                                     const primitive_params_t &primitive_params) {
-    if(!current_primitive_index || !current_primitive_params) {
+bool SimulatorRobot::isPrimitiveDifferentThanCurrent(
+    unsigned int primitive_index, const primitive_params_t &primitive_params)
+{
+    if (!current_primitive_index || !current_primitive_params)
+    {
         return true;
     }
 
-    bool index_equal = current_primitive_index.value() == primitive_index;
-    bool params_equal = current_primitive_params->extra == primitive_params.extra
-            && current_primitive_params->slow == primitive_params.slow;
+    bool index_equal  = current_primitive_index.value() == primitive_index;
+    bool params_equal = current_primitive_params->extra == primitive_params.extra &&
+                        current_primitive_params->slow == primitive_params.slow;
     const size_t size_of_params = 4;
-    for(size_t i = 0; i < size_of_params; i++) {
-        bool param_index_equal = current_primitive_params->params[i] == primitive_params.params[i];
+    for (size_t i = 0; i < size_of_params; i++)
+    {
+        bool param_index_equal =
+            current_primitive_params->params[i] == primitive_params.params[i];
         params_equal = params_equal || param_index_equal;
     }
 
     return !index_equal || !params_equal;
 }
 
-void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world, unsigned int primitive_index,
-                                       const primitive_params_t& params) {
-    if(isPrimitiveDifferentThanCurrent(primitive_index, params)) {
-        app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(), primitive_index, &params);
+void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
+                                       unsigned int primitive_index,
+                                       const primitive_params_t &params)
+{
+    if (isPrimitiveDifferentThanCurrent(primitive_index, params))
+    {
+        app_primitive_manager_startNewPrimitive(
+            primitive_manager.get(), firmware_world.get(), primitive_index, &params);
 
-        current_primitive_index = primitive_index;
+        current_primitive_index  = primitive_index;
         current_primitive_params = params;
     }
 }
 
-void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world) {
-    app_primitive_manager_runCurrentPrimitive(primitive_manager.get(), firmware_world.get());
+void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world)
+{
+    app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
+                                              firmware_world.get());
 }
-
-
