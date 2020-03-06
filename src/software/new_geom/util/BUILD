@@ -27,6 +27,30 @@ cc_library(
 )
 
 cc_library(
+    name = "almost_equal",
+    srcs = [
+        "almost_equal.cpp",
+    ],
+    hdrs = [
+        "almost_equal.h",
+    ],
+    deps = [
+        "//software/new_geom:geom_constants",
+    ],
+)
+
+cc_test(
+    name = "almost_equal_test",
+    srcs = [
+        "almost_equal_test.cpp",
+    ],
+    deps = [
+        ":almost_equal",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "intersects",
     srcs = [
         "intersects.cpp",
@@ -97,6 +121,7 @@ cc_library(
         "collinear.h",
     ],
     deps = [
+        ":almost_equal",
         "//software/new_geom:point",
     ],
 )

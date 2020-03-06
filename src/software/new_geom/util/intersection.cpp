@@ -15,7 +15,7 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     double y4 = d.y();
 
     double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (std::abs(denominator) < GeomConstants::EPSILON)
+    if (std::fabs(denominator) < GeomConstants::EPSILON)
     {
         return std::nullopt;
     }

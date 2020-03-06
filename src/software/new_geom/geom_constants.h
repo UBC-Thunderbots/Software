@@ -11,6 +11,4 @@ namespace GeomConstants
     // small buffer while remaining as accurate as possible.
     // http://www.cplusplus.com/forum/beginner/95128/
     static constexpr double EPSILON = 1e-15;
-
-
 }  // namespace GeomConstants

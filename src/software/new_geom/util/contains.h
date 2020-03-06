@@ -10,4 +10,4 @@
  * @param in
  * @return true if the Circle contains the Segment, false otherwise
  */
-bool contains(const Circle &out, const Segment &in);
+bool containsNew(const Circle &out, const Segment &in);
