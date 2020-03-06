@@ -473,7 +473,6 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
     double y4 = line2.getEnd().y();
 
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-
     if (denom == 0)
     {
         // log the parallel lines when we actually implement logging?

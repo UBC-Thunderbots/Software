@@ -9,23 +9,13 @@ TEST(ContainsTest, segment_in_circle)
     EXPECT_TRUE(containsNew(c, s));
 }
 
-TEST(ContainsTest, segment_one_point_in_circle_other_point_on_circle_edge)
-{
-}
+TEST(ContainsTest, segment_one_point_in_circle_other_point_on_circle_edge) {}
 
-TEST(ContainsTest, segment_one_point_in_circle_other_point_out)
-{
-}
+TEST(ContainsTest, segment_one_point_in_circle_other_point_out) {}
 
 
-TEST(ContainsTest, segment_both_points_on_circle_edge)
-{
-}
+TEST(ContainsTest, segment_both_points_on_circle_edge) {}
 
-TEST(ContainsTest, segment_one_point_on_circle_edge_other_point_out)
-{
-}
+TEST(ContainsTest, segment_one_point_on_circle_edge_other_point_out) {}
 
-TEST(ContainsTest, segment_out_of_circle)
-{
-}
+TEST(ContainsTest, segment_out_of_circle) {}

@@ -1,4 +1,5 @@
 #include "software/new_geom/util/collinear.h"
+
 #include "software/new_geom/util/almost_equal.h"
 
 bool collinear(const Point &a, const Point &b, const Point &c)

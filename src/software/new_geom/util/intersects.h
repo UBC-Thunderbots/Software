@@ -2,8 +2,8 @@
 
 #include "software/new_geom/circle.h"
 #include "software/new_geom/polygon.h"
-#include "software/new_geom/segment.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/segment.h"
 
 /**
  * Returns true if the segment intersects the polygon, false otherwise.

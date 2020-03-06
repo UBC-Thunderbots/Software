@@ -1,9 +1,10 @@
 #include "software/new_geom/util/intersects.h"
 
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/intersection.h"
 #include <limits>
+
+#include "software/new_geom/util/contains.h"
+#include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/intersection.h"
 
 bool intersectsNew(const Polygon &first, const Segment &second)
 {
@@ -98,7 +99,8 @@ bool intersectsNew(const Segment &first, const Segment &second)
 bool intersectsNew(const Ray &first, const Segment &second)
 {
     auto intersectionValue =
-        intersection(first.getStart(), first.getStart() + first.toUnitVector(), second.getSegStart(), second.getEnd());
+        intersection(first.getStart(), first.getStart() + first.toUnitVector(),
+                     second.getSegStart(), second.getEnd());
     // If the infinitely long vectors defined by ray and segment intersect, check that the
     // intersection is within their definitions
     if (intersectionValue.has_value())

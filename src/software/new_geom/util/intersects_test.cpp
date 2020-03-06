@@ -1,8 +1,9 @@
 #include "software/new_geom/util/intersects.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/triangle.h"
 
 #include <gtest/gtest.h>
+
+#include "software/new_geom/rectangle.h"
+#include "software/new_geom/triangle.h"
 
 TEST(IntersectsTest, polygon_segment_intersecting_on_edge)
 {
@@ -353,8 +354,8 @@ TEST(IntersectsTest, test_vector_crosses_seg)
 TEST(IntersectsTest,
      test_ray_intersect_position_and_direction_intersect_not_just_direction)
 {
-    // Test to ensure that intersectsNew(Ray, Segment) does not use ray.getDirection() as a
-    // point along the ray (Should be ray.getStart() + ray.GetDirection())
+    // Test to ensure that intersectsNew(Ray, Segment) does not use ray.getDirection() as
+    // a point along the ray (Should be ray.getStart() + ray.GetDirection())
     Segment segment = Segment(Point(-1, 1), Point(1, 1));
 
     Ray position_and_direction = Ray(Point(-2, 0), Vector(0, 1));
@@ -380,10 +381,10 @@ TEST(IntersectsTest, ray_starting_from_segment_edge)
     EXPECT_TRUE(intersectsNew(s, r));
 }
 
- TEST(IntersectsTest, ray_overlapping_segment)
+TEST(IntersectsTest, ray_overlapping_segment)
 {
     Ray r({6, -2}, Angle::fromRadians(std::atan2(3, 1)));
-    Segment s({5, -5},{8, 4});
+    Segment s({5, -5}, {8, 4});
     EXPECT_TRUE(intersectsNew(r, s));
     EXPECT_TRUE(intersectsNew(s, r));
 }
