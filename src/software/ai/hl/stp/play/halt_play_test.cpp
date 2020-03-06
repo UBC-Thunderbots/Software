@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/test_util/test_util.h"
 
+
 TEST(StopPlayTest, test_example_play_invariant_always_holds)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
@@ -27,11 +28,12 @@ TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
     EXPECT_EQ((*tactics).size(), 6);
 
     // Make sure each tactic is an ExampleTactic
-    for (const auto& t : *tactics)
+    for (const auto &t : *tactics)
     {
         try
         {
-            auto unused = dynamic_cast<StopTactic*>(t.get());
+            StopTactic *unused;
+            unused = dynamic_cast<StopTactic *>(t.get());
         }
         catch (...)
         {

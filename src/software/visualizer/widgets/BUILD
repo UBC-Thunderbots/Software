@@ -31,7 +31,7 @@ qt_cc_library(
         "//software/ai/hl/stp:play_info",
         "//software/backend:robot_status",
         "//software/multithreading:thread_safe_buffer",
-        "//software/util/time:duration",
+        "//software/time:duration",
         "//software/visualizer/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],
@@ -65,7 +65,7 @@ qt_cc_library(
     deps = [
         ":robot_status_table",
         ":zoomable_qgraphics_view",
-        "//software/util/parameter",
+        "//software/parameter",
         "//software/visualizer/ui:main_widget",
         "@g3log",
         "@qt//:qt_widgets",
@@ -79,8 +79,9 @@ qt_cc_library(
     deps = [
         ":robot_status_table",
         ":zoomable_qgraphics_view",
-        "//software/ai/hl/stp/play:play_factory",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/ai/hl/stp/play",
+        "//software/parameter:dynamic_parameters",
+        "//software/util/design_patterns:generic_factory",
         "//software/visualizer/ui:main_widget",
         "@qt//:qt_widgets",
     ],
@@ -102,7 +103,7 @@ qt_cc_library(
     hdr = "robot_status_table.h",
     deps = [
         "//software/backend:robot_status",
-        "//software/util/time:duration",
+        "//software/time:duration",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],

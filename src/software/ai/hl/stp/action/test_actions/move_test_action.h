@@ -25,7 +25,7 @@ class MoveTestAction : public Action
      */
     void updateControlParams(const Robot& robot, Point destination);
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -18,12 +18,17 @@ const double FRONT_OF_ROBOT_WIDTH_METERS = 0.11;
 const double DRIBBLER_WIDTH_METERS = 0.088;
 // The approximate radius of the ball according to the SSL rulebook
 const double BALL_MAX_RADIUS_METERS = 0.0215;
+// According to the rules, 80% of the ball must be seen at all times. Robots may not
+// cover more than 20% of the ball
+const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
 const double BALL_MASS_KG = 0.004593;
 // The maximum number of robots we can communicate with over radio.
 const unsigned MAX_ROBOTS_OVER_RADIO = 8;
-// TODO: Determine a more realistic value. See Issue #178.
 /* Robot Attributes */
+// The mass of a robot with a battery, in kg. Determined experimentally
+// by weighing the robot and battery
+const double ROBOT_WITH_BATTERY_MASS_KG = 2.465;
 // The maximum speed achievable by our robots, in metres per second.
 const double ROBOT_MAX_SPEED_METERS_PER_SECOND = 2.0;
 // The maximum angular speed achievable by our robots, in rad/sec
@@ -57,3 +62,21 @@ const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
 
 const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
+
+/** absolute angle to each of the front wheels as
+ * measured from the front of the robots in degrees
+ * For 3rd generation robot 2015 CAD model
+ * Last updated: Feb 3, 2018
+ *
+ * FW = ANGLE_TO_ROBOT_FRONT_WHEELS_DEG
+ * BW = ANGLE_TO_ROBOT_BACK_WHEELS_DEG
+ *
+ * /-------------\
+ * |FW    |   -FW|
+ * |             |
+ * |             |
+ * |BW    |   -BW|
+ * \-------------/
+ */
+const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
+const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;

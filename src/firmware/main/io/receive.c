@@ -24,6 +24,8 @@
 #include <task.h>
 #include <unused.h>
 
+#include "firmware/main/app/primitives/primitive.h"
+#include "firmware/main/shared/physics.h"
 #include "io/charger.h"
 #include "io/chicker.h"
 #include "io/dma.h"
@@ -33,8 +35,6 @@
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "main.h"
-#include "physics/physics.h"
-#include "primitives/primitive.h"
 #include "priority.h"
 
 /**
@@ -60,15 +60,15 @@
         1 /*Status*/
 
 static unsigned int robot_index;
+static FirmwareWorld_t *world;
+static PrimitiveManager_t *primitive_manager;
 static uint8_t *dma_buffer;
 static SemaphoreHandle_t drive_mtx;
 static unsigned int timeout_ticks;
 static uint8_t last_serial        = 0xFF;
 static const size_t HEADER_LENGTH = 2U /* Frame control */ + 1U /* Seq# */ +
                                     2U /* Dest PAN */ + 2U /* Dest */ + 2U /* Src */;
-static const size_t FOOTER_LENGTH = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
-static const size_t DRIVE_BODY_LENGTH =
-    1 /*msg purpose*/ + NUM_ROBOTS * RECEIVE_DRIVE_BYTES_PER_ROBOT + 1 /*estop */;
+static const size_t FOOTER_LENGTH         = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
 static const int16_t MESSAGE_PURPOSE_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
                                             2U /* Dest PAN */ + 2U /* Dest */ +
                                             2U /* Src */;
@@ -132,14 +132,20 @@ static void receive_task(void *UNUSED(param))
 /**
  * \brief Initializes the receive task.
  *
- * \param[in] index the robot index
+ * \param[in] index The robot index
+ * \param[in] _primitive_manager The primitive manager used to run primitives
+ * \param[in] _world The world the "high level" firmware can use to interact with the
+ *                   outside world
  */
-void receive_init(unsigned int index)
+void receive_init(unsigned int index, PrimitiveManager_t *_primitive_manager,
+                  FirmwareWorld_t *_world)
 {
     static StaticSemaphore_t drive_mtx_storage;
     drive_mtx = xSemaphoreCreateMutexStatic(&drive_mtx_storage);
 
-    robot_index = index;
+    robot_index       = index;
+    world             = _world;
+    primitive_manager = _primitive_manager;
 
     dma_memory_handle_t dma_buffer_handle = dma_alloc(128U);
     assert(dma_buffer_handle);
@@ -175,7 +181,8 @@ void receive_tick(log_record_t *record)
 
         primitive_params_t stop_params;
         xSemaphoreTake(drive_mtx, portMAX_DELAY);
-        primitive_start(0, &stop_params);
+        app_primitive_manager_startNewPrimitive(primitive_manager, world, 0,
+                                                &stop_params);
         xSemaphoreGive(drive_mtx);
     }
     else if (timeout_ticks > 1)
@@ -282,7 +289,7 @@ void handle_drive_packet(uint8_t *dma_buffer)
     pparams.slow  = !!(pparams.extra & 0x80);
     pparams.extra &= 0x7F;
     if ((serial != last_serial /* Non-atomic because we are only writer */) ||
-        !estop_run || primitive_is_direct(primitive))
+        !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
     {
         if (!primitive_params_are_equal(&pparams, &pparams_previous) ||
             !(primitive == primitive_previous))
@@ -295,7 +302,8 @@ void handle_drive_packet(uint8_t *dma_buffer)
             pparams_previous.slow  = pparams.slow;
             pparams_previous.extra = pparams.extra;
             // Apply the movement primitive.
-            primitive_start(primitive, &pparams);
+            app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
+                                                    &pparams);
         }
     }
 
@@ -391,7 +399,7 @@ void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
                 uint16_t width = dma_buffer[MESSAGE_PAYLOAD_ADDR + 2U];
                 width <<= 8U;
                 width |= dma_buffer[MESSAGE_PAYLOAD_ADDR + 1U];
-                chicker_fire(which ? CHICKER_CHIP : CHICKER_KICK, width);
+                chicker_fire_with_pulsewidth(which ? CHICKER_CHIP : CHICKER_KICK, width);
             }
             break;
         case 0x01U:  // Arm autokick

@@ -6,10 +6,11 @@ cc_library(
     hdrs = ["ball_filter.h"],
     deps = [
         "//software/geom",
-        "//software/util/math:math_functions",
+        "//software/math:math_functions",
+        "//software/new_geom/util",
+        "//software/sensor_fusion:vision_detection",
         "//software/world:ball",
         "//software/world:field",
-        "//software/sensor_fusion:detection",
         "@eigen",
     ],
 )
@@ -30,8 +31,8 @@ cc_library(
     hdrs = ["robot_filter.h"],
     deps = [
         "//software/geom",
+        "//software/sensor_fusion:vision_detection",
         "//software/world:robot",
-        "//software/sensor_fusion:detection",
     ],
 )
 
@@ -50,7 +51,7 @@ cc_library(
     hdrs = ["robot_team_filter.h"],
     deps = [
         ":robot_filter",
-        "//software/util:constants",
+        "//software:constants",
         "//software/world:team",
     ],
 )

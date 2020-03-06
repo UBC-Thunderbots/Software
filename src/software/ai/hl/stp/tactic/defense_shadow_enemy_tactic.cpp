@@ -5,13 +5,15 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/util/logger/init.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/logger/init.h"
+#include "software/parameter/dynamic_parameters.h"
 
-DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(
-    const Field &field, const Team &friendly_team, const Team &enemy_team,
-    const Ball &ball, bool ignore_goalie, double shadow_distance, bool loop_forever)
-    : Tactic(loop_forever),
+DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
+                                                   const Team &friendly_team,
+                                                   const Team &enemy_team,
+                                                   const Ball &ball, bool ignore_goalie,
+                                                   double shadow_distance)
+    : Tactic(true),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -59,9 +61,9 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
 
 void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>();
-    auto stop_action = std::make_shared<StopAction>(
-        StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
+    auto move_action = std::make_shared<MoveAction>(false);
+    auto stop_action = std::make_shared<StopAction>(true);
+
     do
     {
         if (!enemy_threat)
@@ -97,10 +99,10 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
         if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
-            ball.velocity().length() <
-                Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-                    ->BallStealSpeed()
-                    ->value())
+            ball.velocity().length() < Util::DynamicParameters->getAIConfig()
+                                           ->getDefenseShadowEnemyTacticConfig()
+                                           ->BallStealSpeed()
+                                           ->value())
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),

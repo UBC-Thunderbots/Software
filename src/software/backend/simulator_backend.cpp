@@ -4,20 +4,21 @@
 
 #include <algorithm>
 
-#include "software/backend/backend_factory.h"
-#include "software/util/logger/init.h"
+#include "software/backend/simulation/simulator.h"
+#include "software/logger/init.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string SimulatorBackend::name = "simulator";
 
 SimulatorBackend::SimulatorBackend(
     const Duration &physics_time_step, const Duration &world_time_increment,
     SimulatorBackend::SimulationSpeed simulation_speed_mode)
-    : physics_time_step(physics_time_step),
+    : simulation_thread_started(false),
+      in_destructor(false),
+      physics_time_step(physics_time_step),
       world_time_increment(world_time_increment),
       simulation_speed_mode(simulation_speed_mode),
-      primitive_buffer(primitive_buffer_size),
-      in_destructor(false),
-      simulation_thread_started(false)
+      primitive_buffer(primitive_buffer_size)
 {
 }
 
@@ -77,7 +78,7 @@ void SimulatorBackend::runSimulationLoop(World world)
     unsigned int num_physics_steps_per_world_published = static_cast<unsigned int>(
         std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
 
-    PhysicsSimulator physics_simulator(world);
+    Simulator simulator(world);
 
     auto world_publish_timestamp = std::chrono::steady_clock::now();
 
@@ -92,8 +93,10 @@ void SimulatorBackend::runSimulationLoop(World world)
 
         for (unsigned int i = 0; i < num_physics_steps_per_world_published; i++)
         {
-            world = physics_simulator.stepSimulation(physics_time_step);
+            simulator.stepSimulation(physics_time_step);
         }
+
+        world = simulator.getWorld();
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {
@@ -123,10 +126,12 @@ void SimulatorBackend::runSimulationLoop(World world)
         // have this thread and another running on one core
         std::this_thread::yield();
 
-        // TODO: Simulate the primitives
-        // https://github.com/UBC-Thunderbots/Software/issues/768
         auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
-        if (!primitives)
+        if (primitives)
+        {
+            simulator.setPrimitives(primitives.value());
+        }
+        else
         {
             LOG(WARNING) << "Simulator Backend timed out waiting for primitives";
         }
@@ -137,5 +142,5 @@ void SimulatorBackend::runSimulationLoop(World world)
     }
 }
 
-// Register this backend in the BackendFactory
-static TBackendFactory<SimulatorBackend> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Backend, SimulatorBackend> factory;

@@ -121,3 +121,7 @@ cscope*
 
 #kcachegrind
 src/callgrind*
+src/core*
+
+# CubeMX
+*.mxproject

@@ -48,6 +48,7 @@ class MotionConstraintManager : public MutableTacticVisitor
     void visit(DefenseShadowEnemyTactic &tactic) override;
     void visit(MoveTestTactic &tactic) override;
     void visit(StopTestTactic &tactic) override;
+    void visit(GoalieTestTactic &tactic) override;
 
    private:
     std::set<MotionConstraint> current_whitelisted_constraints;

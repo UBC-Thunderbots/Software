@@ -1,6 +1,8 @@
 
 #include "software/ai/navigator/obstacle/obstacle.h"
 
+#include "software/new_geom/util/distance.h"
+
 const std::optional<Polygon> Obstacle::getBoundaryPolygon() const
 {
     return _polygon;
@@ -14,8 +16,8 @@ const std::optional<Circle> Obstacle::getBoundaryCircle() const
 Obstacle::Obstacle(Polygon polygon) : _polygon(std::make_optional<Polygon>(polygon)) {}
 
 Obstacle::Obstacle(Rectangle rectangle)
-    : Obstacle({rectangle.negXNegYCorner(), rectangle.negXPosYCorner(),
-                rectangle.posXPosYCorner(), rectangle.posXNegYCorner()})
+    : Obstacle(Polygon{rectangle.negXNegYCorner(), rectangle.negXPosYCorner(),
+                       rectangle.posXPosYCorner(), rectangle.posXNegYCorner()})
 {
 }
 
@@ -175,19 +177,6 @@ double Obstacle::getRadiusCushionForHexagon(double radius)
     return radius * 4.0 / std::sqrt(3);
 }
 
-Obstacle Obstacle::createBallObstacle(const Ball& ball,
-                                      double additional_radius_cushion_buffer,
-                                      double additional_velocity_cushion_buffer)
-{
-    // TODO: handle `additional_velocity_cushion_buffer` here
-
-    double radius_cushion = getRadiusCushionForHexagon(BALL_MAX_RADIUS_METERS +
-                                                       additional_radius_cushion_buffer);
-
-    return createRobotObstacleFromPositionAndRadiusAndVelocity(
-        ball.position(), radius_cushion, ball.velocity(), false);
-}
-
 Obstacle Obstacle::createCircularBallObstacle(const Ball& ball,
                                               double additional_radius_cushion_buffer)
 {
@@ -199,7 +188,7 @@ bool Obstacle::containsPoint(const Point& point) const
 {
     if (isPolygon())
     {
-        return (*_polygon).containsPoint(point);
+        return (*_polygon).contains(point);
     }
     else
     {
@@ -211,11 +200,11 @@ bool Obstacle::intersects(const Segment& segment) const
 {
     if (isPolygon())
     {
-        return (*_polygon).intersects(segment);
+        return ::intersects((*_polygon), segment);
     }
     else
     {
-        return (dist((*_circle).getOrigin(), segment) <= (*_circle).getRadius());
+        return (distance((*_circle).getOrigin(), segment) <= (*_circle).getRadius());
     }
 }
 

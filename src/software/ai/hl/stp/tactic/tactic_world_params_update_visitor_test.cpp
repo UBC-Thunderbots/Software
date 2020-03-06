@@ -28,7 +28,7 @@ TEST(TacticUpdateVisitorTest, update_chip_tactic)
                                                      Timestamp::fromSeconds(0));
     update_world.updateFieldGeometry(
         Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
-    ChipTactic tactic = ChipTactic(initial_world.ball());
+    ChipTactic tactic = ChipTactic(initial_world.ball(), false);
     EXPECT_EQ(tactic.getBall(), initial_world.ball());
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
     tactic.accept(visitor);
@@ -172,7 +172,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
         Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
     ShadowEnemyTactic tactic = ShadowEnemyTactic(
         initial_world.field(), initial_world.friendlyTeam(), initial_world.enemyTeam(),
-        true, initial_world.ball(), 10.0, false);
+        true, initial_world.ball(), 10.0, false, false);
     EXPECT_EQ(tactic.getField(), initial_world.field());
     EXPECT_EQ(tactic.getEnemyTeam(), initial_world.enemyTeam());
     EXPECT_EQ(tactic.getFriendlyTeam(), initial_world.friendlyTeam());

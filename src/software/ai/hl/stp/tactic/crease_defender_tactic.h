@@ -2,7 +2,7 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 
 /**
  * A crease defender moves around the exterior of our defense box to help shadow
@@ -106,7 +106,4 @@ class CreaseDefenderTactic : public Tactic
     Team friendly_team;
     Team enemy_team;
     LeftOrRight left_or_right;
-
-    // How slow the ball must be moving for us to clear it from the defense area
-    double BALL_SLOW_SPEED_THRESHOLD = 0.2;
 };

@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "detection",
+    name = "vision_detection",
     srcs = [
         "vision_detection.cpp",
     ],
@@ -12,19 +12,19 @@ cc_library(
     ],
     deps = [
         "//software/geom",
-        "//software/util/time:timestamp",
+        "//software/time:timestamp",
+        "//software/world",
     ],
 )
 
 cc_library(
     name = "refbox_data",
-    srcs = ["refbox_data.cpp"],
     hdrs = ["refbox_data.h"],
     deps = [
         "//software/geom",
-        "//software/util/time:timestamp",
         "//software/proto:ssl_cc_proto",
-        "@magic_enum",
+        "//software/time:timestamp",
+        "//software/util/printable_enum_macro",
     ],
 )
 
@@ -37,3 +37,19 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "sensor_fusion",
+    srcs = ["sensor_fusion.cpp"],
+    hdrs = ["sensor_fusion.h"],
+    deps = [
+        ":refbox_data",
+        ":vision_detection",
+        "//software/ai/primitive",
+        "//software/backend:robot_status",
+        "//software/multithreading:subject",
+        "//software/multithreading:threaded_observer",
+        "//software/parameter:dynamic_parameters",
+        "//software/sensor_fusion/filter:sensor_fusion_filters",
+        "//software/world",
+    ],
+)

@@ -10,57 +10,9 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/triangle.h"
 #include "software/test_util/test_util.h"
-#include "software/util/time/timestamp.h"
-
-
-TEST(GeomUtilTest, dist_point_rectangle_point_within)
-{
-    Point p(1, 2.1);
-    Rectangle rect({0, 2}, {2, 4});
-    EXPECT_DOUBLE_EQ(0, dist(p, rect));
-}
-
-
-TEST(GeomUtilTest, dist_point_rectangle_point_below_rectangle)
-{
-    Point p(1, 1);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_above_rectangle)
-{
-    Point p(1, 5);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_to_left_of_rectangle)
-{
-    Point p(-1, 3);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_right_of_rectangle)
-{
-    Point p(3, 3);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle)
-{
-    Point p(-2.0, 0);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(std::sqrt(8.0), dist(p, rect));
-}
+#include "software/time/timestamp.h"
 
 TEST(GeomUtilTest, test_proj_len)
 {
@@ -96,29 +48,6 @@ TEST(GeomUtilTest, test_proj_len)
     calculated_val = proj_length(Segment(test4p1, test4p2), test4p3);
     expected_val   = -sqrt(32) * (cos((M_PI / 4.0f) - atan(1.0f / 4.0f)));
     EXPECT_NEAR(expected_val, calculated_val, 0.00001);
-}
-
-TEST(GeomUtilTest, test_contains_triangle_point)
-{
-    // this triangle lies in the first quatren of the field, we can rota
-    Point p1(0, 0);
-    Point p2((std::rand() % 100) / 100, 0);
-    Point p3((std::rand() % 100) / 100, (std::rand() % 100) / 100);
-    Point p((std::rand() % 100) / 100, (std::rand() % 100) / 100);
-    bool expected_val = true;
-
-    // i don't know what is going on here, this part seems to not work very well
-    // so we'll just abuse cross products to see on which side of each side of
-    // the triangle it's on
-    if (((p2 - p1).cross(p - p1) > 0) != ((p2 - p1).cross(p3 - p1) > 0))
-        expected_val = false;
-    if (((p3 - p2).cross(p - p2) > 0) != ((p3 - p2).cross(p1 - p2) > 0))
-        expected_val = false;
-    if (((p1 - p3).cross(p - p3) > 0) != ((p1 - p3).cross(p2 - p3) > 0))
-        expected_val = false;
-
-    bool calculated_val = contains(triangle(p1, p2, p3), p);
-    EXPECT_EQ(expected_val, calculated_val);
 }
 
 TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
@@ -161,7 +90,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test1c(0, -1);
     double test1radius = 1;
     EXPECT_TRUE(
-        !intersects(triangle(test1p1, test1p2, test1p3),
+        !intersects(Triangle(test1p1, test1p2, test1p3),
                     Circle(test1c,
                            test1radius)));  // circle is tangent to triangle, no intersect
 
@@ -171,7 +100,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test2c(0, 5);
     double test2radius = 1;
     EXPECT_TRUE(intersects(
-        triangle(test2p1, test2p2, test2p3),
+        Triangle(test2p1, test2p2, test2p3),
         Circle(test2c,
                test2radius)));  // circle is completely inside triangle, intersect
 
@@ -181,7 +110,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test3c(0, 1);
     double test3radius = 1;
     EXPECT_TRUE(
-        !intersects(triangle(test3p1, test3p2, test3p3),
+        !intersects(Triangle(test3p1, test3p2, test3p3),
                     Circle(test3c,
                            test3radius)));  // circle is tangent to vertice, no intersect
 
@@ -191,7 +120,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test4c(5, 5);
     double test4radius = 2;
     EXPECT_TRUE(
-        !intersects(triangle(test4p1, test4p2, test4p3), Circle(test4c, test4radius)));
+        !intersects(Triangle(test4p1, test4p2, test4p3), Circle(test4c, test4radius)));
 
     Point test5p1(-2, -2);
     Point test5p2(2, -2);
@@ -199,187 +128,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test5c(0, -1);
     double test5radius = 1;
     EXPECT_TRUE(
-        intersects(triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles)
-{
-    std::vector<Point> obs;
-    obs.clear();
-    obs.push_back(Point(-9, 10));
-    obs.push_back(Point(9, 10));
-
-    std::optional<Shot> testshot_opt =
-        angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
-
-    // We expect to get a result
-    ASSERT_TRUE(testshot_opt);
-
-    Shot testshot = *testshot_opt;
-
-    EXPECT_TRUE(
-        (testshot.getPointToShootAt().toVector().normalize() - Vector(0, 1)).length() <
-        0.0001);
-    EXPECT_NEAR(75.449, testshot.getOpenAngle().toDegrees(), 1e-4);
-
-    obs.clear();
-    obs.push_back(Point(-4, 6));
-    obs.push_back(Point(6, 8));
-    obs.push_back(Point(4, 10));
-
-    testshot_opt =
-        angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
-
-    // We expect to get a result
-    ASSERT_TRUE(testshot_opt);
-
-    testshot = *testshot_opt;
-
-    EXPECT_TRUE((testshot.getPointToShootAt().toVector().normalize() -
-                 Vector(-0.0805897, 0.996747))
-                    .length() < 0.0001);
-    EXPECT_NEAR(42.1928, testshot.getOpenAngle().toDegrees(), 1e-4);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_no_obstacles)
-{
-    std::vector<Shot> result = angleSweepCirclesAll({0, 0}, {1, 1}, {-1, 1}, {}, 0.1);
-
-    ASSERT_EQ(1, result.size());
-    EXPECT_EQ(Point(0, 1), result[0].getPointToShootAt());
-    EXPECT_EQ(90, result[0].getOpenAngle().toDegrees());
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_pos_y_to_neg_y)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {1, -1}, {1, 1}, {{1, 0}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(1, result[0].getPointToShootAt().x());
-    EXPECT_NEAR(-0.40, result[0].getPointToShootAt().y(), 0.05);
-    EXPECT_EQ(1, result[1].getPointToShootAt().x());
-    EXPECT_NEAR(0.40, result[1].getPointToShootAt().y(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_neg_y_to_pos_y)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {1, 1}, {1, -1}, {{1, 0}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(1, result[0].getPointToShootAt().x());
-    EXPECT_NEAR(-0.40, result[0].getPointToShootAt().y(), 0.05);
-    EXPECT_EQ(1, result[1].getPointToShootAt().x());
-    EXPECT_NEAR(0.40, result[1].getPointToShootAt().y(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_x_axis)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {-1, 1}, {-1, -1}, {{-1, 0}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(-1, result[0].getPointToShootAt().x());
-    EXPECT_NEAR(0.40, result[0].getPointToShootAt().y(), 0.05);
-    EXPECT_EQ(-1, result[1].getPointToShootAt().x());
-    EXPECT_NEAR(-0.40, result[1].getPointToShootAt().y(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_pos_y_axis)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {-1, 1}, {1, 1}, {{0, 1}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(1, result[0].getPointToShootAt().y());
-    EXPECT_NEAR(0.40, result[0].getPointToShootAt().x(), 0.05);
-    EXPECT_EQ(1, result[1].getPointToShootAt().y());
-    EXPECT_NEAR(-0.40, result[1].getPointToShootAt().x(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_y_axis)
-{
-    // Test with a single obstacle the is centered on the line segment that we are
-    // sweeping over
-
-    std::vector<Shot> result =
-        angleSweepCirclesAll({0, 0}, {-1, -1}, {1, -1}, {{0, -1}}, 0.01);
-
-    ASSERT_EQ(2, result.size());
-
-    std::sort(result.begin(), result.end(), [](auto shot1, auto shot2) {
-        return shot1.getOpenAngle() < shot2.getOpenAngle();
-    });
-
-    EXPECT_EQ(-1, result[0].getPointToShootAt().y());
-    EXPECT_NEAR(-0.40, result[0].getPointToShootAt().x(), 0.05);
-    EXPECT_EQ(-1, result[1].getPointToShootAt().y());
-    EXPECT_NEAR(0.40, result[1].getPointToShootAt().x(), 0.05);
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacle_blocks_whole_range)
-{
-    // Test where there is no way to draw a line from the start point to the
-    // target line segment that we are sweeping over because there is one obstacle in the
-    // way
-    std::vector<Shot> result =
-        angleSweepCirclesAll({-1, -0.5}, {-4.5, 0.5}, {-4.5, -0.5}, {{-1.2, -0.5}}, 0.09);
-
-    ASSERT_EQ(0, result.size());
-}
-
-TEST(GeomUtilTest, test_angle_sweep_circles_all)
-{
-    std::vector<Point> obs;
-    obs.clear();
-    obs.push_back(Point(-9, 10));
-    obs.push_back(Point(9, 10));
-
-    std::vector<Shot> testshots =
-        angleSweepCirclesAll(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
-
-    obs.clear();
-    obs.push_back(Point(-4, 6));
-    obs.push_back(Point(6, 8));
-    obs.push_back(Point(4, 10));
-
-    testshots =
-        angleSweepCirclesAll(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
-
-    // TODO: Add assert statement
+        intersects(Triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
 }
 
 TEST(GeomUtilTest, test_point_in_rectangle)
@@ -796,21 +545,6 @@ TEST(GeomUtilTest, test_segment_near_line)
                 0.001);
 }
 
-TEST(GeomUtilTest, test_intersection)
-{
-    Point a1(-1, 0);
-    Point a2(4, 1);
-    Point b1(0, -1);
-    Point b2(1, 4);
-
-    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.25, 0.25)).length() < 0.0001);
-
-    a2 = Point(4, 2);
-
-    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).length() <
-                0.0001);
-}
-
 // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point
 // along the ray (Should be ray.getStart() + ray.GetDirection())
 TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction)
@@ -910,23 +644,6 @@ TEST(GeomUtilTest, test_closest_point_time)
     v2 = Vector(-2, 2);
 
     EXPECT_DOUBLE_EQ(1.8, closestPointTime(x1, v1, x2, v2));
-}
-
-TEST(GeomUtilTest, test_dist_point_seg)
-{
-    Point a1(0, 0);
-    Point b1(1, 0);
-
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(0, 1), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(2, 0), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(1, -1), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(-1, 0), Segment(a1, b1)));
-
-    Point a2(5, 2);
-    Point b2(2, 7);
-    Point c2(6.5369, 7.2131);
-
-    EXPECT_NEAR(4.0, dist(c2, Segment(a2, b2)), 1e-5);
 }
 
 // Test to see if raySegmentIntersection() returns the correct parameters when the ray and
@@ -1414,36 +1131,6 @@ TEST(GeomUtilTest, test_find_open_circle_points_outside_of_box)
     ASSERT_EQ(0, empty_circles.size());
 }
 
-TEST(GeomUtilTest, test_point_polygon_dist_point_contained_in_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(0.5, 0.5);
-
-    double result = dist(point, polygon);
-
-    EXPECT_DOUBLE_EQ(0.0, result);
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_close_to_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(0.5, 1.1);
-
-    double result = dist(point, polygon);
-
-    EXPECT_NEAR(0.1, result, 1e-9);
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_far_from_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(-5, -5);
-
-    double result = dist(point, polygon);
-
-    EXPECT_DOUBLE_EQ(std::hypot(-5, -5), result);
-}
-
 TEST(GeomUtilTest, test_ray_rectangle_intersection_no_intersection)
 {
     Ray ray(Point(5, 5), Vector(1, 1));
@@ -1528,4 +1215,208 @@ TEST(GeomUtilTest, test_find_closest_point_many_points)
                                       Point(0.1, 0.2), Point(-1, -3.4)};
     Point reference_point(0.9, 0.9);
     EXPECT_EQ(test_points[1], findClosestPoint(reference_point, test_points));
+}
+
+TEST(GeomUtilTest, test_reduce_segments_collinear)
+{
+    Segment seg1 = Segment(Point(0, 1), Point(0, 2));
+    Segment seg2 = Segment(Point(0, 1.5), Point(0, 2.5));
+    Segment seg3 = Segment(Point(0, 3), Point(0, 4));
+    Segment seg4 = Segment(Point(0, 1.2), Point(0, 1.5));
+
+    Segment seg5 = Segment(Point(0, 6), Point(0, 9));
+    Segment seg6 = Segment(Point(0, 6), Point(0, 12));
+
+    Segment seg7 = Segment(Point(0, -2), Point(0, -5));
+
+    std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5, seg6, seg7};
+
+    std::optional<std::vector<Segment>> reduced_segs =
+        combineToParallelSegments(segs, segs.front().toVector());
+
+    EXPECT_EQ(Segment(Point(0, 1), Point(0, 2.5)), reduced_segs.value()[0]);
+}
+
+TEST(GeomUtilTest, test_reduce_segments_perpendicular)
+{
+    Segment seg1 = Segment(Point(0, 0), Point(0, 10));
+    Segment seg2 = Segment(Point(0, 1), Point(1, 1));
+    Segment seg3 = Segment(Point(-5, -5), Point(5, -5));
+
+
+    std::vector<Segment> segs = {seg1, seg2, seg3};
+
+    std::optional<std::vector<Segment>> reduced_segs =
+        combineToParallelSegments(segs, segs.front().toVector());
+
+    EXPECT_EQ(reduced_segs->size(), 1);
+    EXPECT_EQ(reduced_segs->front().length(), 10);
+}
+
+
+TEST(GeomUtilTest, test_reduce_segments_perpendicular_and_parallel)
+{
+    Segment seg1 = Segment(Point(0, 0), Point(0, 10));
+    Segment seg2 = Segment(Point(0, 1), Point(1, 1));
+    Segment seg3 = Segment(Point(-5, -5), Point(5, -5));
+    Segment seg4 = Segment(Point(0, 2), Point(0, 15));
+    Segment seg5 = Segment(Point(0, 7), Point(9, 7));
+
+
+    std::vector<Segment> segs = {seg1, seg2, seg3, seg4, seg5};
+
+    std::optional<std::vector<Segment>> reduced_segs =
+        combineToParallelSegments(segs, seg1.toVector());
+
+    EXPECT_EQ(reduced_segs->size(), 1);
+    EXPECT_EQ(reduced_segs->front().length(), 15);
+    EXPECT_EQ(reduced_segs->front().getEnd().y(), 15);
+}
+
+TEST(GeomUtilTest, test_circle_tangent_rays)
+{
+    Point reference          = Point(0, 0);
+    Circle circle            = Circle(Point(0, 1), 0.5);
+    std::pair<Ray, Ray> test = getCircleTangentRaysWithReferenceOrigin(reference, circle);
+
+    EXPECT_EQ(test.second.getStart(), reference);
+
+    EXPECT_LT((test.first.toUnitVector() - Vector(0.5, 0.866025)).length(), 0.001);
+    EXPECT_LT((test.second.toUnitVector() - Vector(-0.5, 0.866025)).length(), 0.001);
+}
+
+TEST(GeomUtilTest, test_project_circles_origin_inside_circle)
+{
+    Point reference = Point(0, 0);
+    Circle circle   = Circle(Point(0, 0), 0.5);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
+
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle}, reference);
+
+    EXPECT_EQ(proj_segments.size(), 1);
+    EXPECT_EQ(proj_segments.front().length(), 10);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().x(), 5.0);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().x(), -5.0);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
+}
+
+TEST(GeomUtilTest, test_project_circles_one_circle)
+{
+    Point reference = Point(0, 0);
+    Circle circle   = Circle(Point(0, 4), 0.5);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
+
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle}, reference);
+
+    EXPECT_EQ(proj_segments.size(), 1);
+    EXPECT_NEAR(proj_segments.front().length(), 1.26, 0.01);
+    EXPECT_NEAR(proj_segments.front().getSegStart().x(), 0.63, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getEnd().x(), -0.63, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
+}
+
+TEST(GeomUtilTest, test_project_circles_multiple_circles)
+{
+    Point reference = Point(0, 0);
+    Circle circle1  = Circle(Point(-1, 4), 0.5);
+    Circle circle2  = Circle(Point(1, 4), 0.5);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
+
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle1, circle2}, reference);
+
+    EXPECT_EQ(proj_segments.size(), 2);
+    EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
+
+    // Circle 1
+    EXPECT_NEAR(proj_segments.front().getSegStart().x(), -0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getEnd().x(), -1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
+
+
+    // Circle 2
+    EXPECT_NEAR(proj_segments.back().getSegStart().x(), 1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.back().getEnd().x(), 0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getEnd().y(), 5.0);
+}
+
+TEST(GeomUtilTest, test_project_circles_multiple_circles_one_has_zero_projection)
+{
+    Point reference = Point(0, 0);
+    Circle circle1  = Circle(Point(-1, 4), 0.5);
+    Circle circle2  = Circle(Point(1, 4), 0.5);
+    Circle circle3  = Circle(Point(5, -5), 1);
+    Segment segment = Segment(Point(5, 5), Point(-5, 5));
+
+    std::vector<Segment> proj_segments =
+        projectCirclesOntoSegment(segment, {circle1, circle2, circle3}, reference);
+
+    EXPECT_EQ(proj_segments.size(), 2);
+    EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
+
+    // Circle 1
+    EXPECT_NEAR(proj_segments.front().getSegStart().x(), -0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getEnd().x(), -1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
+
+
+    // Circle 2
+    EXPECT_NEAR(proj_segments.back().getSegStart().x(), 1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.back().getEnd().x(), 0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getEnd().y(), 5.0);
+}
+
+TEST(GeomUtilTest, test_get_empty_space_between_segment_no_space)
+{
+    Segment reference = Segment(Point(-10, 0), Point(10, 0));
+
+    Segment seg1 = Segment(Point(-10, 0), Point(0, 0));
+    Segment seg2 = Segment(Point(0, 0), Point(10, 0));
+
+    std::vector<Segment> segs = {seg1, seg2};
+
+    std::vector<Segment> open_segs = getEmptySpaceWithinParentSegment(segs, reference);
+
+    EXPECT_EQ(open_segs.size(), 0);
+}
+TEST(GeomUtilTest, test_get_empty_space_between_segment_2_blocks)
+{
+    Segment reference = Segment(Point(-10, 0), Point(10, 0));
+
+    Segment seg1 = Segment(Point(-8, 0), Point(0, 0));
+    Segment seg2 = Segment(Point(0, 0), Point(8, 0));
+
+    std::vector<Segment> segs = {seg1, seg2};
+
+    std::vector<Segment> open_segs = getEmptySpaceWithinParentSegment(segs, reference);
+
+    EXPECT_EQ(open_segs.size(), 2);
+
+    EXPECT_EQ(open_segs[0].length(), 2);
+    EXPECT_EQ(open_segs[1].length(), 2);
+}
+TEST(GeomUtilTest, test_get_empty_space_between_segment_2_blocks_3_open)
+{
+    Segment reference = Segment(Point(-10, 0), Point(10, 0));
+
+    Segment seg1 = Segment(Point(-8, 0), Point(-2, 0));
+    Segment seg2 = Segment(Point(2, 0), Point(8, 0));
+
+    std::vector<Segment> segs = {seg1, seg2};
+
+    std::vector<Segment> open_segs = getEmptySpaceWithinParentSegment(segs, reference);
+
+    EXPECT_EQ(open_segs.size(), 3);
+
+    EXPECT_EQ(open_segs[0].length(), 2);
+    EXPECT_EQ(open_segs[1].length(), 4);
+    EXPECT_EQ(open_segs[2].length(), 2);
 }

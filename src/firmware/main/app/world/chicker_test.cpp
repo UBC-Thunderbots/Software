@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "app/world/chicker.h"
+#include "firmware/main/app/world/chicker.h"
 }
 
 #include <gtest/gtest.h>
@@ -105,7 +105,7 @@ TEST_F(ChickerTest, enableAutoKick)
 
 TEST_F(ChickerTest, enableAutoChip)
 {
-    app_chicker_enableAutoChip(chicker, 13);
+    app_chicker_enableAutochip(chicker, 13);
 
     EXPECT_EQ(0, requested_kick_speed);
     EXPECT_EQ(0, requested_chip_distance);

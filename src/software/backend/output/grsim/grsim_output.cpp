@@ -8,9 +8,9 @@
 #include "software/ai/primitive/primitive.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
-#include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/team.h"
 
 
@@ -28,11 +28,13 @@ struct overload : Ts...
 template <class... Ts>
 overload(Ts...)->overload<Ts...>;
 
-GrSimOutput::GrSimOutput(std::string network_address, unsigned short port)
-    : network_address(network_address), port(port), socket(io_service)
+GrSimOutput::GrSimOutput(std::string network_address, unsigned short port,
+                         std::shared_ptr<const RefboxConfig> config)
+    : network_address(network_address), port(port), config(config), socket(io_service)
 {
     socket.open(ip::udp::v4());
-    remote_endpoint = ip::udp::endpoint(ip::address::from_string(network_address), port);
+    remote_endpoint =
+        ip::udp::endpoint(ip::address::from_string(network_address), this->port);
 }
 
 GrSimOutput::~GrSimOutput()
@@ -103,11 +105,7 @@ void GrSimOutput::sendPrimitives(
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
-                prim->getRobotId(),
-                Util::DynamicParameters->getAIConfig()
-                    ->getRefboxConfig()
-                    ->FriendlyColorYellow()
-                    ->value(),
+                prim->getRobotId(), config->FriendlyColorYellow()->value(),
                 robot_velocities.linear_velocity, robot_velocities.angular_velocity,
                 kick_speed_meters_per_second, chip_instead_of_kick, dribbler_on);
 

@@ -48,6 +48,21 @@ http_archive(
     url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
 )
 
+# nanopb: lightweight protobuf library used on the STM32. The build file in the
+# repo does not build the proto compiler (protoc) as a target, and is really compilicated
+# to set it up as a protobuf plugin due to lack of bazel support. So we use the archive
+# which has both the headers and compiled protoc w/ the c support baked in.
+
+http_archive(
+    name = "nanopb",
+    build_file = "@//external:nanopb.BUILD",
+    sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
+    strip_prefix = "nanopb-0.3.9.4-linux-x86",
+    urls = [
+        "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9.4-linux-x86.tar.gz",
+    ],
+)
+
 new_local_repository(
     name = "libusb",
     build_file = "@//external:libusb.BUILD",
@@ -84,14 +99,10 @@ new_local_repository(
     path = "external/qt",  # This directory is symlinked in the setup script
 )
 
-http_archive(
-    name = "llvm_clang",
-    build_file = "@//external:clang.BUILD",
-    sha256 = "a23b082b30c128c9831dbdd96edad26b43f56624d0ad0ea9edec506f5385038d",
-    strip_prefix = "clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04",
-    urls = [
-        "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
-    ],
+new_local_repository(
+    name = "linux_gcc",
+    build_file = "@//external:linux_gcc.BUILD",
+    path = "/",
 )
 
 http_archive(
@@ -114,10 +125,47 @@ new_git_repository(
     shallow_since = "1571445859 -0700",
 )
 
-# Magic enum library from https://github.com/Neargye/magic_enum
-new_git_repository(
-    name = "magic_enum",
-    build_file = "@//external:magic_enum.BUILD",
-    commit = "49d2429cf110f804048bc459b1d2c126d43b0a9a",
-    remote = "https://github.com/Neargye/magic_enum.git",
+# Developer tools for working with bazel
+git_repository(
+    name = "bazel_buildtools",
+    commit = "41a45edb9184de83dd29e2791bd995fbb73ea141",
+    remote = "git@github.com:bazelbuild/buildtools.git",
+)
+
+# Needed for bazel buildifier: it is written in Go and hence needs rules_go to
+# be built.
+http_archive(
+    name = "io_bazel_rules_go",
+    sha256 = "b27e55d2dcc9e6020e17614ae6e0374818a3e3ce6f2024036e688ada24110444",
+    urls = [
+        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.21.0/rules_go-v0.21.0.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.21.0/rules_go-v0.21.0.tar.gz",
+    ],
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains()
+
+# Needed for bazel buildifier
+http_archive(
+    name = "bazel_gazelle",
+    sha256 = "be9296bfd64882e3c08e3283c58fcb461fa6dd3c171764fcc4cf322f60615a9b",
+    urls = [
+        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
+    ],
+)
+
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+
+gazelle_dependencies()
+
+# Bazel buildtools, provide us with the bazel formatter ("buildifier")
+http_archive(
+    name = "com_github_bazelbuild_buildtools",
+    strip_prefix = "buildtools-9e63c6f02e63adaab63e21a3a8feb75f4f7503cb",
+    url = "https://github.com/bazelbuild/buildtools/archive/9e63c6f02e63adaab63e21a3a8feb75f4f7503cb.zip",
 )

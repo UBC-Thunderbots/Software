@@ -21,7 +21,6 @@ cc_binary(
         "-Wpointer-arith",
     ],
     includes = [
-        "freertos",
         "main",
     ],
     linkopts = [
@@ -58,8 +57,6 @@ cc_library(
             "usb/**/*.c",
             "main/**/*.c",
             "cdcacm/**/*.c",
-            "stm32lib/**/*.c",
-            "freertos/source/**/*.c",
         ],
         exclude = [
             "main/main.c",
@@ -69,29 +66,59 @@ cc_library(
         [
             "usb/**/*.h",
             "main/**/*.h",
-            "stm32lib/**/*.h",
-            "freertos/include/*.h",
             "cdcacm/include/*.h",
         ],
     ),
-    defines = [
-        "STM32LIB_USE_FREERTOS",
-    ],
     includes = [
         ".",
         "cdcacm/include",
-        "freertos/include",
-        "freertos/vendor/portable/GCC/ARM_CM4F",
         "main",
-        "stm32lib/include",
         "usb/include",
     ],
     restricted_to = ["//cc_toolchain:stm32f4"],
     deps = [
+        ":main_freertos",
+        "//firmware/main/app/control",
+        "//firmware/main/app/primitives:primitive_manager",
         "//firmware/main/app/world:firmware_world",
+        "//firmware/main/shared:physics",
+        "//firmware/main/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
     ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "main_freertos",
+    srcs = glob([
+        "freertos/source/**/*.c",
+        "stm32lib/**/*.c",
+    ]),
+    hdrs = glob([
+        "freertos/include/*.h",
+        "stm32lib/include/**/*.h",
+    ]) + [
+        "main/FreeRTOSConfig.h",
+        "main/priority.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
+    defines = [
+        "STM32LIB_USE_FREERTOS",
+    ],
+    includes = [
+        "freertos/include",
+        "main",
+        "stm32lib/include",
+        "stm32lib/include/registers",
+    ],
+    restricted_to = ["//cc_toolchain:stm32f4"],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working

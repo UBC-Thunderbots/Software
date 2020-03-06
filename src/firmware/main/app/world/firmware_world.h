@@ -1,7 +1,7 @@
 #pragma once
 
-#include "app/world/firmware_ball.h"
-#include "app/world/firmware_robot.h"
+#include "firmware/main/app/world/firmware_ball.h"
+#include "firmware/main/app/world/firmware_robot.h"
 
 /**
  * This struct represents the world from the perspective of the firmware

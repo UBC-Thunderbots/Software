@@ -7,7 +7,6 @@
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/indirect_chip.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -15,8 +14,10 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
+
 
 using namespace Evaluation;
 
@@ -86,10 +87,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
     // Figure out where the fallback chip target is
-    double fallback_chip_target_x_offset =
-        Util::DynamicParameters->getShootOrChipPlayConfig()
-            ->FallbackChipTargetEnemyGoalOffset()
-            ->value();
+    double fallback_chip_target_x_offset = Util::DynamicParameters->getAIConfig()
+                                               ->getShootOrChipPlayConfig()
+                                               ->FallbackChipTargetEnemyGoalOffset()
+                                               ->value();
 
     Point fallback_chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
@@ -113,14 +114,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                     crease_defender_tactic->getAssignedRobot()->id());
             }
         }
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         friendly_team_for_goalie, world.enemyTeam());
 
         // Update crease defenders
         for (auto &crease_defender_tactic : crease_defender_tactics)
         {
-            crease_defender_tactic->updateWorldParams(
-                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             result.emplace_back(crease_defender_tactic);
         }
 
@@ -152,8 +149,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             chip_target = chip_targets[0].getOrigin();
         }
-        shoot_or_chip_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball());
         shoot_or_chip_tactic->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie
@@ -171,4 +166,5 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (!shoot_or_chip_tactic->done());
 }
 
-static TPlayFactory<ShootOrChipPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, ShootOrChipPlay> factory;

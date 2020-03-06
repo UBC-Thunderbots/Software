@@ -5,7 +5,7 @@
  *
  * \{
  */
-#include "error.h"
+#include "util/error.h"
 
 #include <FreeRTOS.h>
 #include <string.h>

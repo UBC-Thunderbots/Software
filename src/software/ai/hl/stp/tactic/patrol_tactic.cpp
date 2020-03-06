@@ -57,7 +57,8 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     if (patrol_points.empty())
     {
-        auto stop_action = std::make_shared<StopAction>(false, true);
+        auto stop_action = std::make_shared<StopAction>(false);
+
         do
         {
             LOG(WARNING) << "Running a Patrol Tactic with no patrol points" << std::endl;
@@ -67,7 +68,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     }
 
     auto move_action =
-        std::make_shared<MoveAction>(this->at_patrol_point_tolerance, Angle(), false);
+        std::make_shared<MoveAction>(false, this->at_patrol_point_tolerance, Angle());
     do
     {
         move_action->updateControlParams(

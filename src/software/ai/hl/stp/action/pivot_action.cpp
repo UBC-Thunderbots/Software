@@ -7,7 +7,7 @@
 #include "software/ai/intent/pivot_intent.h"
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 PivotAction::PivotAction() : Action() {}
 
@@ -22,7 +22,7 @@ void PivotAction::updateControlParams(const Robot& robot, Point pivot_point,
     this->enable_dribbler = enable_dribbler;
 }
 
-void PivotAction::accept(ActionVisitor& visitor) const
+void PivotAction::accept(MutableActionVisitor& visitor)
 {
     visitor.visit(*this);
 }
@@ -44,7 +44,8 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             // if the robot is close enough to the final position, call it a day
             Angle threshold_angle =
-                Angle::fromDegrees(Util::DynamicParameters->getPivotActionConfig()
+                Angle::fromDegrees(Util::DynamicParameters->getAIConfig()
+                                       ->getPivotActionConfig()
                                        ->FinishAngleThreshold()
                                        ->value() /
                                    2);

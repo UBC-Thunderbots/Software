@@ -1,4 +1,4 @@
-#include "app/world/firmware_world.h"
+#include "firmware/main/app/world/firmware_world.h"
 
 #include <stdlib.h>
 

@@ -11,6 +11,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
         "//software/geom",
+        "//software/new_geom/util:distance",
         "//software/world",
         "@g3log",
     ],
@@ -125,8 +126,8 @@ cc_library(
         "//software/ai/evaluation:robot",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/util/logger",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/logger",
+        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -279,6 +280,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
+        "//software/new_geom/util",
         "@g3log",
     ],
 )
@@ -331,7 +333,8 @@ cc_library(
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/new_geom/util:distance",
+        "//software/parameter:dynamic_parameters",
         "@g3log",
     ],
 )
@@ -361,7 +364,7 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/parameter:dynamic_parameters",
         "@g3log",
     ],
 )

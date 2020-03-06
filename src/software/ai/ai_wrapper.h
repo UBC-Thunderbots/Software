@@ -18,7 +18,15 @@ class AIWrapper : public ThreadedObserver<World>,
                   public Subject<PlayInfo>
 {
    public:
-    AIWrapper() = default;
+    AIWrapper() = delete;
+
+    /**
+     * Create an AI with the given config
+     *
+     * @param config The AI configuration
+     */
+    explicit AIWrapper(std::shared_ptr<const AIConfig> ai_config,
+                       std::shared_ptr<const AIControlConfig> control_config);
 
    private:
     void onValueReceived(World world) override;
@@ -31,5 +39,6 @@ class AIWrapper : public ThreadedObserver<World>,
     void drawAI();
 
     AI ai;
+    std::shared_ptr<const AIControlConfig> control_config;
     World most_recent_world;
 };

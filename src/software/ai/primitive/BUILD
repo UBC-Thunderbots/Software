@@ -148,6 +148,7 @@ cc_library(
         ":primitive",
         ":primitive_visitor",
         "//software/geom",
+        "//software/new_geom:angular_velocity",
     ],
 )
 

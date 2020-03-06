@@ -1,6 +1,7 @@
 #pragma once
+#include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * VelocityObstaclePathManager uses obstacles to arbitrate between paths.
@@ -14,10 +15,12 @@ class VelocityObstaclePathManager : public PathManager
 {
    public:
     const std::map<RobotId, std::optional<Path>> getManagedPaths(
-        const std::unordered_set<PathObjective> &objectives,
-        const Rectangle &navigable_area) override;
+        const std::unordered_set<PathObjective>& objectives,
+        const Rectangle& navigable_area) override;
 
-    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner);
+    explicit VelocityObstaclePathManager(
+        std::unique_ptr<PathPlanner> path_planner, ObstacleFactory obstacle_factory,
+        std::shared_ptr<const VelocityObstaclePathManagerConfig> config);
 
    private:
     /**
@@ -26,14 +29,14 @@ class VelocityObstaclePathManager : public PathManager
      *
      * @param objectives objectives to make obstacles
      * @param current_objective objective to skip
-     * @param inflation_factor how much to inflate obstacle
      *
      * @return list of obstacles that around other objectives' starts
      */
     const std::vector<Obstacle> getObstaclesAroundStartOfOtherObjectives(
-        const std::unordered_set<PathObjective> &objectives,
-        const PathObjective &current_objective, double inflation_factor);
+        const std::unordered_set<PathObjective>& objectives,
+        const PathObjective& current_objective);
 
-    // Path planner used to get paths
     std::unique_ptr<PathPlanner> path_planner;
+    ObstacleFactory obstacle_factory;
+    std::shared_ptr<const VelocityObstaclePathManagerConfig> config;
 };

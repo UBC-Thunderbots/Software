@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/action_visitor.h"
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/primitive/move_primitive.h"
 #include "software/new_geom/angle.h"
@@ -24,9 +24,8 @@ class MoveAction : public Action
      *                     our goal
      */
     explicit MoveAction(
-        double close_to_dest_threshold       = ROBOT_CLOSE_TO_DEST_THRESHOLD,
-        Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD,
-        bool loop_forever                    = false);
+        bool loop_forever, double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
+        Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -85,7 +84,7 @@ class MoveAction : public Action
      */
     DribblerEnable getDribblerEnabled();
 
-    void accept(ActionVisitor& visitor) const override;
+    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

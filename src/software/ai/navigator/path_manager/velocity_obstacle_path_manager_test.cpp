@@ -5,14 +5,16 @@
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 #include "software/new_geom/point.h"
 
-TEST(TestVelocityObstaclePathManager, test_no_obostacles)
+TEST(TestVelocityObstaclePathManager, test_no_obstacles)
 {
     Point start{0, 0}, dest{1, 1};
     auto path_manager = std::make_unique<VelocityObstaclePathManager>(
-        std::make_unique<StraightLinePathPlanner>());
+        std::make_unique<StraightLinePathPlanner>(),
+        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
+        std::make_shared<VelocityObstaclePathManagerConfig>());
     std::vector<Obstacle> obstacles;
 
-    Rectangle navigable_area = Rectangle(Point(0, 0), 0, 0);
+    Rectangle navigable_area = Rectangle(Point(0, 0), Point(1, 1));
     std::unordered_set<PathObjective> path_objectives;
     PathObjective po1(Point(1, 3), Point(2, 3), 2.0, obstacles, 1);
     PathObjective po2(Point(2, 4), Point(2, 5), 1.0, obstacles, 2);

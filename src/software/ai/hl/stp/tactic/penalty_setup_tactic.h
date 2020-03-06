@@ -16,7 +16,7 @@ class PenaltySetupTactic : public MoveTactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PenaltySetupTactic(bool loop_forever = false);
+    explicit PenaltySetupTactic(bool loop_forever);
 
     std::string getName() const override;
 

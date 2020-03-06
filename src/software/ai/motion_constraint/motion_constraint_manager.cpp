@@ -98,6 +98,9 @@ void MotionConstraintManager::visit(DefenseShadowEnemyTactic &tactic) {}
 void MotionConstraintManager::visit(MoveTestTactic &tactic) {}
 
 void MotionConstraintManager::visit(StopTestTactic &tactic) {}
+
+void MotionConstraintManager::visit(GoalieTestTactic &tactic) {}
+
 // clang-format on
 
 std::set<MotionConstraint> MotionConstraintManager::getMotionConstraintsFromGameState(

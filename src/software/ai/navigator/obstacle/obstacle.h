@@ -5,11 +5,12 @@
 
 
 #include "shared/constants.h"
-#include "software/geom/circle.h"
-#include "software/geom/polygon.h"
 #include "software/geom/util.h"
 #include "software/new_geom/angle.h"
+#include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/polygon.h"
+#include "software/new_geom/util/intersects.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 
@@ -122,11 +123,6 @@ class Obstacle
         const Robot& robot, bool enable_velocity_cushion,
         double additional_radius_cushion_buffer,
         double additional_velocity_cushion_buffer);
-
-    // TODO: @jonl112: plz add javadoc and unit test this
-    static Obstacle createBallObstacle(const Ball& ball,
-                                       double additional_radius_cushion_buffer,
-                                       double additional_velocity_cushion_buffer);
 
     /**
      * Circle obstacle around ball with additional_radius_cushion_buffer

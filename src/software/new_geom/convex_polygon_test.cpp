@@ -104,6 +104,12 @@ TEST(ConvexPolygonConstructorTest, test_self_intersecting_loop)
                  std::invalid_argument);
 }
 
+TEST(ConvexPolygonConstructorTest, test_ribbon_not_convex)
+{
+    EXPECT_THROW(ConvexPolygon({{0, 0}, {0, 5}, {5, 5}, {-5, 0.0f}}),
+                 std::invalid_argument);
+}
+
 TEST(ConvexPolygonAreaTest, test_trapezoid_area)
 {
     ConvexPolygon trapezoid = ConvexPolygon{{0, 0}, {1, 4}, {5, 4}, {6, 0}};
@@ -114,4 +120,23 @@ TEST(ConvexPolygonAreaTest, test_rhombus_area)
 {
     ConvexPolygon rhombus = ConvexPolygon{{0, 0}, {5, 3}, {10, 0}, {5, -7}};
     EXPECT_EQ(rhombus.area(), 50);
+}
+
+TEST(ConvexPolygonIsConvexTest, test_barely_convex_polygon)
+{
+    EXPECT_NO_THROW(ConvexPolygon({{0, 0}, {4.5, 0.5}, {4.5, -0.5}}));
+}
+
+TEST(ConvexPolygonIsConvexTest, test_degenerate_polygon)
+{
+    EXPECT_THROW(
+        ConvexPolygon({Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3)}),
+        std::invalid_argument);
+}
+
+TEST(ConvexPolygonIsConvexTest, test_degenerate_polygon_linear_points)
+{
+    EXPECT_THROW(
+        ConvexPolygon({Point(0, 3), Point(1, 3), Point(2, 3), Point(3, 3), Point(4, 3)}),
+        std::invalid_argument);
 }

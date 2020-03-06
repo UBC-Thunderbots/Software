@@ -1,7 +1,7 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/util/logger/init.h"
-#include "software/util/time/duration.h"
+#include "software/logger/init.h"
+#include "software/time/duration.h"
 
 void SimulatedTest::SetUp()
 {
@@ -10,7 +10,9 @@ void SimulatedTest::SetUp()
         Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
         SimulatorBackend::SimulationSpeed::FAST_SIMULATION);
     world_state_validator = std::make_shared<WorldStateValidator>();
-    ai_wrapper            = std::make_shared<AIWrapper>();
+    ai_wrapper =
+        std::make_shared<AIWrapper>(Util::DynamicParameters->getAIConfig(),
+                                    Util::DynamicParameters->getAIControlConfig());
 
     // The world_state_observer observes the World from the backend, and then the ai
     // observes the World from the WorldStateObserver. Because we know the AI will not

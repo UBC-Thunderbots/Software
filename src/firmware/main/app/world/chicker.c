@@ -1,4 +1,4 @@
-#include "app/world/chicker.h"
+#include "firmware/main/app/world/chicker.h"
 
 #include <stdlib.h>
 
@@ -19,7 +19,7 @@ Chicker_t* app_chicker_create(void (*kick)(float speed_m_per_s),
                               void (*disable_autokick)(void),
                               void (*disable_autochip)(void))
 {
-    Chicker_t* new_chicker = malloc(sizeof(Chicker_t));
+    Chicker_t* new_chicker = (Chicker_t*)malloc(sizeof(Chicker_t));
 
     new_chicker->kick             = kick;
     new_chicker->chip             = chip;
@@ -51,7 +51,7 @@ void app_chicker_enableAutokick(Chicker_t* chicker, float speed_m_per_s)
     chicker->enable_autokick(speed_m_per_s);
 }
 
-void app_chicker_enableAutoChip(Chicker_t* chicker, float distance_m)
+void app_chicker_enableAutochip(Chicker_t* chicker, float distance_m)
 {
     chicker->enable_autochip(distance_m);
 }

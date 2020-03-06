@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/util/time/duration.h"
+#include "software/time/duration.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/widgets/main_widget.h"
 
@@ -39,7 +39,8 @@ class Visualizer : public QMainWindow
         std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
         std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
-        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer);
+        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
+        std::shared_ptr<ThunderbotsConfig> config);
 
    public slots:
     /**

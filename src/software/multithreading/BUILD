@@ -18,7 +18,7 @@ cc_library(
     name = "thread_safe_buffer",
     hdrs = ["thread_safe_buffer.h"],
     deps = [
-        "//software/util/time:duration",
+        "//software/time:duration",
         "@boost//:circular_buffer",
     ],
 )
@@ -29,7 +29,7 @@ cc_library(
     deps = [
         ":observer",
         ":thread_safe_buffer",
-        "//software/util/time:duration",
+        "//software/time:duration",
         "@boost//:bind",
     ],
 )

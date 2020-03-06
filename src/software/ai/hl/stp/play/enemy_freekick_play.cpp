@@ -2,13 +2,13 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_freekicker_tactic.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
 
@@ -52,14 +52,16 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+        Util::DynamicParameters->getAIConfig()
+            ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
             ->value(),
         Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
         true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+        Util::DynamicParameters->getAIConfig()
+            ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
             ->value(),
         Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
@@ -78,18 +80,6 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Get all enemy threats
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
-
-        // Update goalie tactic
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
-
-        // Update free kicke shadowers
-        shadow_freekicker_1->updateWorldParams(world.enemyTeam(), world.ball());
-        shadow_freekicker_2->updateWorldParams(world.enemyTeam(), world.ball());
-
-        // Update crease defenders
-        crease_defender_tactic->updateWorldParams(
-            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
         // Add Freekick shadower tactics
         tactics_to_run.emplace_back(shadow_freekicker_1);
@@ -116,8 +106,6 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         if (enemy_threats.size() == 1)
         {
-            shadow_tactic_main->updateWorldParams(world.field(), world.friendlyTeam(),
-                                                  world.enemyTeam(), world.ball());
             shadow_tactic_main->updateControlParams(enemy_threats.at(1),
                                                     ROBOT_MAX_RADIUS_METERS * 3);
             move_tactic_main->updateControlParams(
@@ -130,12 +118,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         if (enemy_threats.size() >= 2)
         {
-            shadow_tactic_main->updateWorldParams(world.field(), world.friendlyTeam(),
-                                                  world.enemyTeam(), world.ball());
             shadow_tactic_main->updateControlParams(enemy_threats.at(1),
                                                     ROBOT_MAX_RADIUS_METERS * 3);
-            shadow_tactic_secondary->updateWorldParams(
-                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
             shadow_tactic_secondary->updateControlParams(enemy_threats.at(2),
                                                          ROBOT_MAX_RADIUS_METERS * 3);
 
@@ -148,5 +132,5 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<EnemyFreekickPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, EnemyFreekickPlay> factory;

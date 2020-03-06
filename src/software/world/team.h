@@ -6,7 +6,7 @@
 #include <optional>
 #include <vector>
 
-#include "software/util/time/timestamp.h"
+#include "software/time/timestamp.h"
 #include "software/world/robot.h"
 
 /**
@@ -247,4 +247,10 @@ class Team
     // All previous timestamps of when the field was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
+};
+
+enum class TeamType
+{
+    FRIENDLY,
+    ENEMY,
 };

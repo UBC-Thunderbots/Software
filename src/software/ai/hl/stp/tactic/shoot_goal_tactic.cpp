@@ -4,8 +4,8 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/rectangle.h"
-#include "software/util/parameter/dynamic_parameters.h"
+#include "software/new_geom/rectangle.h"
+#include "software/parameter/dynamic_parameters.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
@@ -79,10 +79,12 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = Util::DynamicParameters->getShootGoalTacticConfig()
+    auto steal_ball_rect_width = Util::DynamicParameters->getAIConfig()
+                                     ->getShootGoalTacticConfig()
                                      ->EnemyAboutToStealBallRectangleWidth()
                                      ->value();
-    auto steal_ball_rect_length = Util::DynamicParameters->getShootGoalTacticConfig()
+    auto steal_ball_rect_length = Util::DynamicParameters->getAIConfig()
+                                      ->getShootGoalTacticConfig()
                                       ->EnemyAboutToStealBallRectangleExtensionLength()
                                       ->value();
     Rectangle baller_frontal_area = Rectangle(
@@ -93,7 +95,7 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
 
     for (const auto &enemy : enemy_team.getAllRobots())
     {
-        if (baller_frontal_area.containsPoint(enemy.position()))
+        if (baller_frontal_area.contains(enemy.position()))
         {
             return true;
         }
@@ -106,13 +108,14 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                             std::shared_ptr<ChipAction> chip_action,
                                             ActionCoroutine::push_type &yield) const
 {
-    auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                           enemy_team, ball.position());
-    while (shot_target)
+    std::optional<Shot> shot_target = Evaluation::calcBestShotOnEnemyGoal(
+        field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+        {*this->getAssignedRobot()});
+
+    while (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
     {
         if (!isEnemyAboutToStealBall())
         {
-            kick_action->updateWorldParams(ball);
             kick_action->updateControlParams(*robot, ball.position(),
                                              shot_target->getPointToShootAt(),
                                              BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
@@ -124,14 +127,14 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            chip_action->updateWorldParams(ball);
             chip_action->updateControlParams(*robot, ball.position(),
                                              shot_target->getPointToShootAt(), CHIP_DIST);
             yield(chip_action);
         }
 
-        shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                          enemy_team, ball.position());
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+            {*this->getAssignedRobot()});
     }
 }
 
@@ -140,12 +143,14 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto kick_action = std::make_shared<KickAction>();
     auto chip_action = std::make_shared<ChipAction>();
     auto move_action = std::make_shared<MoveAction>(
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
-
+        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
+    std::optional<Shot> shot_target;
     do
     {
-        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(
-            field, friendly_team, enemy_team, ball.position());
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+            {*this->getAssignedRobot()});
+
         if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the
@@ -160,7 +165,6 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
             Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
-            chip_action->updateWorldParams(ball);
             chip_action->updateControlParams(*robot, ball.position(),
                                              fallback_chip_target, CHIP_DIST);
             yield(chip_action);

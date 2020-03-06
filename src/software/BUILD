@@ -4,16 +4,21 @@ cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
+        "//software:constants",
         "//software/ai:ai_wrapper",
         "//software/ai/hl/stp:play_info",
-        "//software/backend:backend_factory",
-        "//software/backend:grsim_backend",
-        "//software/backend:radio_backend",
-        "//software/util:constants",
-        "//software/util/logger",
-        "//software/util/parameter:dynamic_parameters",
+        "//software/backend",
+        "//software/backend:all_backends",
+        "//software/logger",
+        "//software/parameter:dynamic_parameters",
+        "//software/util/design_patterns:generic_factory",
         "//software/visualizer:visualizer_wrapper",
         "@boost//:program_options",
         "@g3log",
     ],
+)
+
+cc_library(
+    name = "constants",
+    hdrs = ["constants.h"],
 )

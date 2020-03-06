@@ -110,7 +110,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     pass_generator->setWorld(world);
     pass_generator->setPasserPoint(world.ball().position());
 
-    waitForConvergence(pass_generator, 0.001, 30);
+    waitForConvergence(pass_generator, 0.0015, 30);
 
     // Find what pass we converged to
     auto [converged_pass, converged_score] = pass_generator->getBestPassSoFar();
@@ -325,5 +325,5 @@ TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_regio
     // With a target region set, we expect the receiver point to be within the
     // target region instead.
     auto [converged_pass, score] = pass_generator->getBestPassSoFar();
-    EXPECT_TRUE(target_region.containsPoint(converged_pass.receiverPoint()));
+    EXPECT_TRUE(target_region.contains(converged_pass.receiverPoint()));
 }

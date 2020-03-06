@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string HaltPlay::name = "Halt Play";
 
@@ -23,12 +23,12 @@ bool HaltPlay::invariantHolds(const World &world) const
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     // Create Stop Tactics that will loop forever
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_3 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_4 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_5 = std::make_shared<StopTactic>(false, true);
-    auto stop_tactic_6 = std::make_shared<StopTactic>(false, true);
+    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_3 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_4 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_5 = std::make_shared<StopTactic>(false);
+    auto stop_tactic_6 = std::make_shared<StopTactic>(false);
 
     do
     {
@@ -38,5 +38,5 @@ void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<HaltPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, HaltPlay> factory;
