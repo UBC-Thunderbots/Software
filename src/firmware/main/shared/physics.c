@@ -1,8 +1,9 @@
 #include "firmware/main/shared/physics.h"
-#include "firmware/main/shared/physics_linear_algebra.h"
 
 #include <math.h>
 #include <stdint.h>
+
+#include "firmware/main/shared/physics_linear_algebra.h"
 
 // Wheel angles for these matricies are (55, 135, 225, 305) degrees
 // these matrices may be derived as per omnidrive_kiart paper

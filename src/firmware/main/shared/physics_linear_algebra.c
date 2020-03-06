@@ -25,4 +25,3 @@ void matrix_mult_t(float* lhs, int lhs_len, const float* rhs, int rhs_len,
         }
     }
 }
-
