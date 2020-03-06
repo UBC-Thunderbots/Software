@@ -15,8 +15,14 @@ message RadioPrimitive {
     // Extra bits used for flags and/or additional information
     required uint32 extra_bits = 6;
 
+    // estop, if true nothing should run!
+    required bool estop = 7;
+
+    // the id of the robot
+    required uint32 robot_id = 8;
+
     // Indicates whether the robot should move slowly (<1.5 m/s)
-    optional bool slow = 7;
+    optional bool slow = 9;
 }
 
 enum FirmwarePrimitiveType

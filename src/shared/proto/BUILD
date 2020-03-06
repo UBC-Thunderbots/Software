@@ -6,7 +6,6 @@ package(default_visibility = ["//visibility:public"])
 proto_files = [
     "camera.proto",
     "drive.proto",
-    "geom.proto",
     "control.proto",
     "primitive.proto",
 ]

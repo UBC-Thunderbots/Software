@@ -98,7 +98,7 @@ class MRFPrimitiveVisitor : public PrimitiveVisitor
      *
      * TODO update comment
      */
-    std::string getSerializedRadioPacket();
+    RadioPrimitive getRadioPacket();
 
    private:
     std::optional<RadioPrimitive> radio_prim;

@@ -1,1 +1,18 @@
 syntax = "proto2";
+
+message point{
+  required double x = 1;
+  required double y = 2;
+}
+
+message angle{
+  required double rad = 1;
+}
+
+message DetectedRobot{
+  required uint32 robot_id = 1;
+  required angle robot_orientation = 2;
+  required point robot_position = 3;
+  required point ball_position = 4;
+  required uint32 timestamp = 5;
+}
