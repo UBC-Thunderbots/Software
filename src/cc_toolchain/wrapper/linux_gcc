@@ -1,0 +1,9 @@
+#!/bin/bash --norc
+
+# We need to wrap gcc because we need to insert the following flag:
+# we put the `-Wl,--no-as-needed` flag here because it needs to be put before
+# the -l[target] dependencies for correct linking. Without it, gcc will 
+# only link in the direct dependencies for each shared lib, but because 
+# bazel delays linking to the end of the build, this means some (non-direct) 
+# dependencies of the final target will not be linked in
+exec /usr/bin/gcc -Wl,--no-as-needed "$@"

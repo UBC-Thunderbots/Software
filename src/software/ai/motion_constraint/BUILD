@@ -2,9 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "motion_constraint",
-    srcs = ["motion_constraint.cpp"],
     hdrs = ["motion_constraint.h"],
-    deps = ["@magic_enum"],
+    deps = ["//software/util/printable_enum_macro"],
 )
 
 cc_library(
