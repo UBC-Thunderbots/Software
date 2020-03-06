@@ -24,10 +24,10 @@ cc_binary(
     restricted_to = ["//cc_toolchain:k8"],
     deps = [
         "//shared/proto:fw_cc_proto",
+        "//software:constants",
+        "//software/backend:radio_backend",
+        "//software/backend/output/radio:radio_output",
         "@boost//:asio",
         "@com_google_protobuf//:protobuf",
-        "//software:constants",
-        "//software/backend/output/radio:radio_output",
-        "//software/backend:radio_backend"
     ],
 )

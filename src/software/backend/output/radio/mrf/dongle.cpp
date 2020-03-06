@@ -15,6 +15,8 @@
 #include <unordered_map>
 
 #include "shared/constants.h"
+#include "shared/proto/camera.pb.h"
+#include "shared/proto/primitive.pb.h"
 #include "software/backend/output/radio/mrf/messages.h"
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 
@@ -63,7 +65,11 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
       normal_altsetting(-1),
       status_transfer(device, 3, 1, true, 0),
       pending_beep_length(0),
-      annunciator(annunciator)
+      annunciator(annunciator),
+      drive_buffer(
+          std::make_shared<ThreadSafeBuffer<RadioPrimitive>>(MAX_ROBOTS_OVER_RADIO)),
+      camera_buffer(
+          std::make_shared<ThreadSafeBuffer<DetectedRobot>>(MAX_ROBOTS_OVER_RADIO));
 {
     // Sanity-check the dongle by looking for an interface with the appropriate
     // subclass and alternate settings with the appropriate protocols.
@@ -323,85 +329,27 @@ void MRFDongle::handle_status(AsyncOperation<void> &)
 void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>> detbots,
                                    Point ball, uint64_t timestamp)
 {
-    int8_t camera_packet[55] = {0};
-    int8_t mask_vec = 0;  // Assume all robots don't have valid position at the start
-    uint8_t numbots = static_cast<uint8_t>(detbots.size());
-    std::vector<uint8_t> robot_ids;
-
-    // Initialize pointer to start at location of storing ball data. First 2
-    // bytes are for mask and flag vector
-    int8_t *rptr = &camera_packet[1];
-
-    int16_t ballX = static_cast<int16_t>(ball.x() * 1000.0);
-    int16_t ballY = static_cast<int16_t>(ball.y() * 1000.0);
-
-    *rptr++ = static_cast<int8_t>(ballX);  // Add Ball x position
-    *rptr++ = static_cast<int8_t>(ballX >> 8);
-
-    *rptr++ = static_cast<int8_t>(ballY);  // Add Ball Y position
-    *rptr++ = static_cast<int8_t>(ballY >> 8);
-
-    // Sort robots in ascending order by ID
-    std::sort(detbots.begin(), detbots.end(), customLess);
-
-    // For the number of robot for which data was passed in, assign robot ids to
-    // mask vector and position/angle data to camera packet
-    for (std::size_t i = 0; i < numbots; i++)
+    // more than 1 prim
+    if (!detbots.empty())
     {
-        uint8_t robotID = std::get<0>(detbots[i]);
-        robot_ids.push_back(robotID);
+        std::size_t numbots = detbots.size();
 
-        int16_t robotX = static_cast<int16_t>((std::get<1>(detbots[i])).x() * 1000);
-        int16_t robotY = static_cast<int16_t>((std::get<1>(detbots[i])).y() * 1000);
-        int16_t robotT =
-            static_cast<int16_t>((std::get<2>(detbots[i])).toRadians() * 1000);
+        for (std::size_t i = 0; i < numbots; i++)
+        {
+            DetectedRobot detbot = DetectedRobot();
 
-        mask_vec |= int8_t(0x01 << (robotID));
-        *rptr++ = static_cast<int8_t>(robotX);
-        *rptr++ = static_cast<int8_t>(robotX >> 8);
-        *rptr++ = static_cast<int8_t>(robotY);
-        *rptr++ = static_cast<int8_t>(robotY >> 8);
-        *rptr++ = static_cast<int8_t>(robotT);
-        *rptr++ = static_cast<int8_t>(robotT >> 8);
+            detbot.set_timestamp(timestamp);
+            detbot.set_ball_position(point(ball.x(), ball.y()));
+
+            detbot.set_robot_id(std::get<0>(detbots[i]));
+            detbot.set_robot_position(
+                point(std::get<1>(detbots).x(), std::get<1>(detbots[i]).y()));
+            detbot.set_robot_orientation(std::get<2>(detbots[i]).toRadians());
+            camera_buffer->push(detbot);
+        }
+
+        submit_drive_transfer();
     }
-
-    // Write out the timestamp
-    for (std::size_t i = 0; i < 8; i++)
-    {
-        *rptr++ = static_cast<int8_t>(timestamp >> 8 * i);
-    }
-
-    // Mask and Flag Vectors should be fully initialized by now. Assign them to
-    // the packet
-    camera_packet[0] = mask_vec;
-
-    std::lock_guard<std::mutex> lock(cam_mtx);
-
-    if (camera_transfers.size() >= 8)
-    {
-        LOG(WARNING) << "Camera transfer queue is full, ignoring camera packet"
-                     << std::endl;
-        return;
-    }
-
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    std::chrono::system_clock::time_point epoch =
-        std::chrono::system_clock::from_time_t(0);
-    std::chrono::system_clock::duration diff = now - epoch;
-    std::chrono::microseconds micros =
-        std::chrono::duration_cast<std::chrono::microseconds>(diff);
-    uint64_t stamp = static_cast<uint64_t>(micros.count());
-
-    // Create and submit USB transfer with camera packet
-    std::unique_ptr<USB::BulkOutTransfer> elt(
-        new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
-    auto i = camera_transfers.insert(
-        camera_transfers.end(),
-        std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
-                                                                   stamp));
-    (*i).first->signal_done.connect(
-        boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
-    (*i).first->submit();
 
     // Update annunciator with detected bots for dead bot detection
     if (!annunciator.beep_dongle.num_slots())
@@ -413,9 +361,46 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     annunciator.update_vision_detections(robot_ids);
 };
 
+bool MRF::submit_camera_transfer()
+{
+    if (camera_transfers.size() >= 8)
+    {
+        LOG(WARNING) << "Camera transfer queue is full, ignoring camera packet"
+                     << std::endl;
+        return;
+    }
+
+    // Create and submit USB transfer with camera packet
+    std::unique_ptr<USB::BulkOutTransfer> elt(
+        new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
+    auto i = camera_transfers.insert(
+        camera_transfers.end(),
+        std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
+                                                                   stamp));
+    (*i).first->signal_done.connect(
+        boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
+    (*i).first->submit();
+}
+
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
 {
-    // More than 1 prim.
+    // if there is exisiting transfer, we are currently sending a primitive to each
+    // robot, round-robin style. Each robot will receive a primtivie ID,
+    // followed by num_robots - 1 primitives.
+    //
+    // So even though the buffer has a size MAX_ROBOTS_OVER_RADIO, we are full when
+    // all the primitives for the existing robots are in the buffer, and stays "full"
+    // until all of those msgs are transfered. This is to avoid sending primitives at
+    // unkown rates, with this method, we are limitied by the dongles receiving rate (rate
+    // from computer to dongle over USB, NOT over dongel to robot radio)
+    if (!drive_transfer)
+    {
+        LOG(WARNING) << "Drive transfer que is full, ignoring new primitives"
+                     << std::endl;
+        return;
+    }
+
+    // more than 1 prim
     if (!prims.empty())
     {
         std::size_t num_prims = prims.size();
@@ -425,10 +410,11 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
             throw std::invalid_argument("Too many primitives in vector.");
         }
 
-        // dynamically create drive packet for the fist robot
-        drive_packet = "";
-        drive_packet += static_cast<uint8_t>(prims[0]->getRobotId());
-        drive_packet += encode_primitive(prims[0]);
+        // push all drive packets onto buffer and start the transfer
+        for (std::size_t i = 0; i != num_prims; ++i)
+        {
+            drive_buffer->push(encode_primitive(prims[i]));
+        }
 
         submit_drive_transfer();
     }
@@ -436,27 +422,40 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
 
 bool MRFDongle::submit_drive_transfer()
 {
-    // Submit drive_packet when possible.
+    // submit drive_packet when possible.
     if (!drive_transfer)
     {
-        std::cerr<<drive_packet.length()<<std::endl;
-        drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
-                                                      drive_packet.length(), 64, 0));
-        drive_transfer->signal_done.connect(
-            boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
-        drive_transfer->submit();
+        std::optional<RadioPrimitive> prim = drive_buffer->popLeastRecentlyAddedValue();
+
+        if (!prim)
+        {
+            std::string drive_packet;
+            prim->SerializeToString(&drive_packet);
+
+            drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
+                                                          drive_packet.length(), 64, 0));
+
+            drive_transfer->signal_done.connect(
+                boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
+
+            drive_transfer->submit();
+        }
+        else
+        {
+            drive_transfer.reset();
+        }
     }
 
     return false;
 }
 
-std::string MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
+RadioPrimitive MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
 {
     MRFPrimitiveVisitor visitor = MRFPrimitiveVisitor();
 
     // Visit the primitive.
     prim->accept(visitor);
-    std::string r_prim = visitor.getSerializedRadioPacket();
+    RadioPrimitive r_prim = visitor.getRadioPacket();
 
     // Encode charge state
     // Robots are always charged if the estop is in RUN state; otherwise discharge them.
@@ -465,11 +464,11 @@ std::string MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
         case EStopState::BROKEN:
         case EStopState::STOP:
             // Discharge`
-            r_prim += "0";
+            r_prim.set_estop(true);
             break;
         case EStopState::RUN:
             // Charge
-            r_prim += "1";
+            r_prim.set_estop(false);
             break;
     }
 
@@ -478,17 +477,16 @@ std::string MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
 
 void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 {
+    // start the next transfer, the transfers will stop if the buffer becomes empty
     op.result();
-    drive_transfer.reset();
+    submit_drive_transfer();
 }
 
-void MRFDongle::handle_camera_transfer_done(
-    AsyncOperation<void> &op,
-    std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
+void MRFDongle::handle_camera_transfer_done(AsyncOperation<void> &op)
 {
-    std::lock_guard<std::mutex> lock(cam_mtx);
+    // start the next transfer, the transfers will stop if the buffer becomes empty
     op.result();
-    camera_transfers.erase(iter);
+    submit_camera_transfer();
 }
 
 void MRFDongle::handle_beep_done(AsyncOperation<void> &)

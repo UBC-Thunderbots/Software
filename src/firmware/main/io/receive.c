@@ -26,9 +26,6 @@
 
 #include "firmware/main/app/primitives/primitive.h"
 #include "firmware/main/shared/physics.h"
-#include "shared/proto/primitive_fw.pb.h"
-#include "pb.h"
-#include "pb_decode.h"
 #include "io/charger.h"
 #include "io/chicker.h"
 #include "io/dma.h"
@@ -38,7 +35,10 @@
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "main.h"
+#include "pb.h"
+#include "pb_decode.h"
 #include "priority.h"
+#include "shared/proto/primitive_fw.pb.h"
 
 /**
  * \brief The number of robots in the drive packet.
@@ -225,7 +225,7 @@ void handle_drive_packet(uint8_t *dma_buffer)
     /*// Check if feedback should be sent.*/
     /*if (robot_data[0] & 0x80)*/
     /*{*/
-        /*feedback_pend_normal();*/
+    /*feedback_pend_normal();*/
     /*}*/
 
     /*// Extract the serial number.*/
@@ -235,8 +235,8 @@ void handle_drive_packet(uint8_t *dma_buffer)
     /*uint16_t words[4U];*/
     /*for (unsigned int i = 0U; i < 4U; ++i)*/
     /*{*/
-        /*words[i] = *robot_data++;*/
-        /*words[i] |= (uint16_t)*robot_data++ << 8;*/
+    /*words[i] = *robot_data++;*/
+    /*words[i] |= (uint16_t)*robot_data++ << 8;*/
     /*}*/
 
     /*// In case of emergency stop, treat everything as zero*/
@@ -244,11 +244,11 @@ void handle_drive_packet(uint8_t *dma_buffer)
     /*// status).*/
     /*if (!estop_run)*/
     /*{*/
-        /*static const uint16_t MASK[4] = {0x0000, 0x4000, 0x0000, 0x0000};*/
-        /*for (unsigned int i = 0; i != 4; ++i)*/
-        /*{*/
-            /*words[i] &= MASK[i];*/
-        /*}*/
+    /*static const uint16_t MASK[4] = {0x0000, 0x4000, 0x0000, 0x0000};*/
+    /*for (unsigned int i = 0; i != 4; ++i)*/
+    /*{*/
+    /*words[i] &= MASK[i];*/
+    /*}*/
     /*}*/
 
     /*// Take the drive mutex.*/
@@ -277,38 +277,38 @@ void handle_drive_packet(uint8_t *dma_buffer)
     /*primitive_params_t pparams;*/
     /*for (unsigned int i = 0; i != 4; ++i)*/
     /*{*/
-        /*int16_t value = words[i] & 0x3FF;*/
-        /*if (words[i] & 0x400)*/
-        /*{*/
-            /*value = -value;*/
-        /*}*/
-        /*if (words[i] & 0x800)*/
-        /*{*/
-            /*value *= 10;*/
-        /*}*/
-        /*pparams.params[i] = value;*/
+    /*int16_t value = words[i] & 0x3FF;*/
+    /*if (words[i] & 0x400)*/
+    /*{*/
+    /*value = -value;*/
+    /*}*/
+    /*if (words[i] & 0x800)*/
+    /*{*/
+    /*value *= 10;*/
+    /*}*/
+    /*pparams.params[i] = value;*/
     /*}*/
     /*primitive     = words[0] >> 12;*/
     /*pparams.extra = (words[2] >> 12) | ((words[3] >> 12) << 4);*/
     /*pparams.slow  = !!(pparams.extra & 0x80);*/
     /*pparams.extra &= 0x7F;*/
     /*if ((serial != last_serial [> Non-atomic because we are only writer <]) ||*/
-        /*!estop_run || app_primitive_manager_primitiveIsDirect(primitive))*/
+    /*!estop_run || app_primitive_manager_primitiveIsDirect(primitive))*/
     /*{*/
-        /*if (!primitive_params_are_equal(&pparams, &pparams_previous) ||*/
-            /*!(primitive == primitive_previous))*/
-        /*{*/
-            /*primitive_previous = primitive;*/
-            /*for (unsigned int i = 0; i < 4; i++)*/
-            /*{*/
-                /*pparams_previous.params[i] = pparams.params[i];*/
-            /*}*/
-            /*pparams_previous.slow  = pparams.slow;*/
-            /*pparams_previous.extra = pparams.extra;*/
-            /*// Apply the movement primitive.*/
-            /*app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,*/
-                                                    /*&pparams);*/
-        /*}*/
+    /*if (!primitive_params_are_equal(&pparams, &pparams_previous) ||*/
+    /*!(primitive == primitive_previous))*/
+    /*{*/
+    /*primitive_previous = primitive;*/
+    /*for (unsigned int i = 0; i < 4; i++)*/
+    /*{*/
+    /*pparams_previous.params[i] = pparams.params[i];*/
+    /*}*/
+    /*pparams_previous.slow  = pparams.slow;*/
+    /*pparams_previous.extra = pparams.extra;*/
+    /*// Apply the movement primitive.*/
+    /*app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,*/
+    /*&pparams);*/
+    /*}*/
     /*}*/
 
     /*// Release the drive mutex.*/
@@ -391,9 +391,9 @@ void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)
 
 void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
 {
-     printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_ADDR]);
-     printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 1]);
-     printf("value: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 2]);
+    printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_ADDR]);
+    printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 1]);
+    printf("value: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 2]);
     switch (dma_buffer[MESSAGE_PURPOSE_ADDR])
     {
         case 0x00:

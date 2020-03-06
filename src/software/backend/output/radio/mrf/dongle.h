@@ -15,6 +15,8 @@
 #include <utility>
 #include <vector>
 
+#include "shared/proto/camera.pb.h"
+#include "shared/proto/primitive.pb.h"
 #include "software/ai/primitive/primitive.h"
 #include "software/backend/output/radio/mrf/annunciator.h"
 #include "software/backend/output/radio/mrf/send_reliable_message_operation.h"
@@ -121,23 +123,21 @@ class MRFDongle final
     uint16_t pan_;
 
     /* Functions that handle encoding and sending drive packets. */
-    std::string encode_primitive(const std::unique_ptr<Primitive> &prim);
+    RadioPrimitive encode_primitive(const std::unique_ptr<Primitive> &prim);
     bool submit_drive_transfer();
     void handle_drive_transfer_done(AsyncOperation<void> &);
 
-    // drive packet
-    std::string drive_packet;
-    std::unique_ptr<USB::BulkOutTransfer> drive_transfer;
+    /* Functions that handle encoding and sending camera packets */
+    bool submit_camera_transfer();
+    void handle_camera_transfer_done(AsyncOperation<void> &);
 
-    /* Camera (vision) packet stuff */
-    void handle_camera_transfer_done(
-        AsyncOperation<void> &,
-        std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator
-            iter);
-    std::mutex cam_mtx;
+    // drive transfers
+    std::unique_ptr<USB::BulkOutTransfer> drive_transfer;
+    std::shared_ptr<ThreadSafeBuffer<RadioPrimitive>> drive_buffer;
+
+    // camera transfers
     std::unique_ptr<USB::BulkOutTransfer> camera_transfer;
-    std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>
-        camera_transfers;
+    std::shared_ptr<ThreadSafeBuffer<DetectedRobot>> camera_buffer;
 
     /* Handling of messages from the robots. */
     std::array<std::unique_ptr<USB::BulkInTransfer>, 32> mdr_transfers;

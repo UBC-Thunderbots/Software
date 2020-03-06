@@ -4,7 +4,7 @@
 #include "shared/proto/primitive.pb.h"
 #include "software/ai/primitive/all_primitives.h"
 
-std::string MRFPrimitiveVisitor::getSerializedRadioPacket()
+RadioPrimitive MRFPrimitiveVisitor::getRadioPacket()
 {
     // If we've never visited a primitive (and so have never populated the
     // `radio_prim`) then throw an exception
@@ -15,9 +15,7 @@ std::string MRFPrimitiveVisitor::getSerializedRadioPacket()
         throw std::runtime_error(err_msg);
     }
 
-    std::string data;
-    radio_prim->SerializeToString(&data);
-    return data;
+    return *radio_prim;
 }
 
 void MRFPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
