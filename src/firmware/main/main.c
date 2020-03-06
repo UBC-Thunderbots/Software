@@ -36,7 +36,6 @@
 #include <usb.h>
 
 #include "app/world/firmware_world.h"
-#include "control/control.h"
 #include "firmware/main/app/primitives/primitive.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"

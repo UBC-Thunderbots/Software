@@ -49,6 +49,11 @@ cc_library(
     alwayslink = True,
 )
 
+cc_library(
+    name = "constants",
+    hdrs = ["constants.h"],
+)
+
 stm32h7_hal_library_files_genrule("hal_library_files")
 
 # We got some of this list of hdrs/srcs by looking at the Makefile STM32CubeMX generates,
