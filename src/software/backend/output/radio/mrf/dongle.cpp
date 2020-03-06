@@ -44,16 +44,6 @@ namespace
     // The dongle's MAC address
     static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
 
-    // Used for sorting by robot ID
-    struct
-    {
-        bool operator()(std::tuple<uint8_t, Point, Angle> a,
-                        std::tuple<uint8_t, Point, Angle> b) const
-        {
-            return std::get<0>(a) < std::get<0>(b);
-        }
-    } customLess;
-
 }  // namespace
 
 MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
@@ -69,7 +59,7 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
       drive_buffer(
           std::make_shared<ThreadSafeBuffer<RadioPrimitive>>(MAX_ROBOTS_OVER_RADIO)),
       camera_buffer(
-          std::make_shared<ThreadSafeBuffer<DetectedRobot>>(MAX_ROBOTS_OVER_RADIO));
+          std::make_shared<ThreadSafeBuffer<DetectedRobot>>(MAX_ROBOTS_OVER_RADIO))
 {
     // Sanity-check the dongle by looking for an interface with the appropriate
     // subclass and alternate settings with the appropriate protocols.
@@ -329,6 +319,16 @@ void MRFDongle::handle_status(AsyncOperation<void> &)
 void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>> detbots,
                                    Point ball, uint64_t timestamp)
 {
+    if (!camera_transfer)
+    {
+        LOG(WARNING) << "Camera transfer queue is full, ignoring new camera packets"
+                     << std::endl;
+        return;
+    }
+
+    // for annunciator
+    std::vector<uint8_t> robot_ids;
+
     // more than 1 prim
     if (!detbots.empty())
     {
@@ -339,16 +339,26 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
             DetectedRobot detbot = DetectedRobot();
 
             detbot.set_timestamp(timestamp);
-            detbot.set_ball_position(point(ball.x(), ball.y()));
-
             detbot.set_robot_id(std::get<0>(detbots[i]));
-            detbot.set_robot_position(
-                point(std::get<1>(detbots).x(), std::get<1>(detbots[i]).y()));
-            detbot.set_robot_orientation(std::get<2>(detbots[i]).toRadians());
+            robot_ids.push_back(std::get<0>(detbots[i]));
+
+            point *ball_pos = new point();
+            ball_pos->set_x(ball.x());
+            ball_pos->set_y(ball.y());
+            detbot.set_allocated_ball_position(ball_pos);
+
+            point *robot_pos = new point();
+            robot_pos->set_x(std::get<1>(detbots[i]).x());
+            robot_pos->set_y(std::get<1>(detbots[i]).y());
+            detbot.set_allocated_robot_position(robot_pos);
+
+            angle *robot_orientation = new angle();
+            robot_orientation->set_rad(std::get<2>(detbots[i]).toRadians());
+            detbot.set_allocated_robot_orientation(robot_orientation);
             camera_buffer->push(detbot);
         }
 
-        submit_drive_transfer();
+        submit_camera_transfer();
     }
 
     // Update annunciator with detected bots for dead bot detection
@@ -358,28 +368,31 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         this->annunciator.beep_dongle.connect(
             boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
     }
+
     annunciator.update_vision_detections(robot_ids);
 };
 
-bool MRF::submit_camera_transfer()
+bool MRFDongle::submit_camera_transfer()
 {
-    if (camera_transfers.size() >= 8)
-    {
-        LOG(WARNING) << "Camera transfer queue is full, ignoring camera packet"
-                     << std::endl;
-        return;
-    }
+    std::optional<DetectedRobot> detbot = camera_buffer->popLeastRecentlyAddedValue();
 
-    // Create and submit USB transfer with camera packet
-    std::unique_ptr<USB::BulkOutTransfer> elt(
-        new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
-    auto i = camera_transfers.insert(
-        camera_transfers.end(),
-        std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
-                                                                   stamp));
-    (*i).first->signal_done.connect(
-        boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
-    (*i).first->submit();
+    if (!detbot)
+    {
+        std::string camera_packet;
+        detbot->SerializeToString(&camera_packet);
+
+        // Create and submit USB transfer with camera packet
+        camera_transfer.reset(new USB::BulkOutTransfer(device, 2, camera_packet.c_str(),
+                                                       camera_packet.length(), 64, 0));
+        camera_transfer->signal_done.connect(
+            boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1));
+        camera_transfer->submit();
+    }
+    else
+    {
+        camera_transfer.reset();
+    }
+    return false;
 }
 
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
@@ -423,27 +436,24 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
 bool MRFDongle::submit_drive_transfer()
 {
     // submit drive_packet when possible.
-    if (!drive_transfer)
+    std::optional<RadioPrimitive> prim = drive_buffer->popLeastRecentlyAddedValue();
+
+    if (!prim)
     {
-        std::optional<RadioPrimitive> prim = drive_buffer->popLeastRecentlyAddedValue();
+        std::string drive_packet;
+        prim->SerializeToString(&drive_packet);
 
-        if (!prim)
-        {
-            std::string drive_packet;
-            prim->SerializeToString(&drive_packet);
+        drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
+                                                      drive_packet.length(), 64, 0));
 
-            drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
-                                                          drive_packet.length(), 64, 0));
+        drive_transfer->signal_done.connect(
+            boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
 
-            drive_transfer->signal_done.connect(
-                boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
-
-            drive_transfer->submit();
-        }
-        else
-        {
-            drive_transfer.reset();
-        }
+        drive_transfer->submit();
+    }
+    else
+    {
+        drive_transfer.reset();
     }
 
     return false;

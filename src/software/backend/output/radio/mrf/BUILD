@@ -47,5 +47,6 @@ cc_library(
         "//software/backend:robot_status",
         "//software/backend/output/radio/mrf/usb:libusb",
         "//software/geom",
+        "//software/multithreading:thread_safe_buffer",
     ],
 )

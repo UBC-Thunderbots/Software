@@ -23,6 +23,7 @@
 #include "software/backend/output/radio/mrf/usb/libusb.h"
 #include "software/backend/output/radio/mrf/util/async_operation.h"
 #include "software/backend/output/radio/mrf/util/noncopyable.h"
+#include "software/multithreading/thread_safe_buffer.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 
@@ -133,11 +134,9 @@ class MRFDongle final
 
     // drive transfers
     std::unique_ptr<USB::BulkOutTransfer> drive_transfer;
-    std::shared_ptr<ThreadSafeBuffer<RadioPrimitive>> drive_buffer;
 
     // camera transfers
     std::unique_ptr<USB::BulkOutTransfer> camera_transfer;
-    std::shared_ptr<ThreadSafeBuffer<DetectedRobot>> camera_buffer;
 
     /* Handling of messages from the robots. */
     std::array<std::unique_ptr<USB::BulkInTransfer>, 32> mdr_transfers;
@@ -160,6 +159,9 @@ class MRFDongle final
     unsigned int pending_beep_length;
 
     Annunciator &annunciator;
+
+    std::shared_ptr<ThreadSafeBuffer<RadioPrimitive>> drive_buffer;
+    std::shared_ptr<ThreadSafeBuffer<DetectedRobot>> camera_buffer;
 };
 
 inline uint8_t MRFDongle::channel() const
