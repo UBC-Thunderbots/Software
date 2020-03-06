@@ -91,7 +91,6 @@ void speed3_to_speed4(const float speed3[3], float speed4[4]);
 // force4 which is the listing of wheel forces
 // and force3 which is a force in x,y,rotation in
 // robot relative coordinates
-void force4_to_force3(const float force4[4], float force3[3]);
 void force3_to_force4(float force3[3], float force4[4]);
 
 float min_angle_delta(float, float);
@@ -101,45 +100,6 @@ float norm2(float a1, float a2);
 // rotate a velocity vector through angle
 void rotate(float speed3[2], float angle);
 
-// Vector addition
-void vectorSub(float *a, const float *b, int len);
-// Vector addition
-void vectorAdd(float *a, const float *b, int len);
-// Vector copy
-void vectorCopy(float *a, const float *b, int len);
-
-// polar cartesian transforms
-void Cart2Pol(float vec[2]);
-void Pol2Cart(float vec[2]);
-void CartVel2Pol(float const loc[2], float vel[2]);
-void PolVel2Cart(float const loc[2], float vel[2]);
-void PolAcc2Cart(float const loc[2], float const vel[2], float const Pacc[2],
-                 float Cacc[2]);
-
-void matrix_mult(float *lhs, int lhs_len, const float *rhs, int rhs_len,
-                 const float **matrix);
-void matrix_mult_t(float *lhs, int lhs_len, const float *rhs, int rhs_len,
-                   const float **matrix);
-
-void mm_mult(int lm_rows, int rm_rows, int rm_cols, const float **lmatrix,
-             const float **rmatrix, float **matrix_out);
-
-void mm_mult_t(int lm_rows, int rm_rows, int rm_cols, const float **lmatrix,
-               const float **rmatrix, float **matrix_out);
-
-void mm_copy(int nrows, int ncols, float **A, float **B);
-
-void mm_add(int nrows, int ncols, float **a, const float **b);
-
-void mm_sub(int nrows, int ncols, const float **a, const float **b, float **c);
-
-void mm_inv(int n, float **a);
-
-void decompose_radial(const float speed, float *vf, const float *init_pos,
-                      const float *final_pos);
-
 float dot_product(const float vec1[], const float vec2[], const int size);
 
 float dot2D(float vec1[2], float vec2[2]);
-
-float dot3D(float vec1[3], float vec2[3]);
