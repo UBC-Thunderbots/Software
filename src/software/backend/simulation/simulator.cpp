@@ -77,7 +77,7 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
                 {
                     // The data is already scaled appropriately for us from the
                     // getSerializedRadioPacket function. We just need to pack it
-                    // into an in16_t
+                    // into an int16_t
                     double data                = param_array[i];
                     primitive_params.params[i] = static_cast<int16_t>(std::round(data));
                 }
