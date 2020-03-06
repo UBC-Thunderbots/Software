@@ -3,6 +3,7 @@
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
+#include <limits>
 
 bool intersects(const Polygon &first, const Segment &second)
 {
@@ -96,17 +97,22 @@ bool intersects(const Segment &first, const Segment &second)
 
 bool intersects(const Ray &first, const Segment &second)
 {
-    Point intersection =
-        intersection(Segment(first.getStart(), first.getStart() + first.toUnitVector()), Segment(second.getSegStart(), second.getEnd()));
+    auto intersectionValue =
+        intersection(first.getStart(), first.getStart() + first.toUnitVector(), second.getSegStart(), second.getEnd());
     // If the infinitely long vectors defined by ray and segment intersect, check that the
     // intersection is within their definitions
-    if (intersection.has_value())
+    if (intersectionValue.has_value())
     {
-        return first.contains(intersection.value()) &&
-               second.contains(intersection.value());
+        std::cout.precision(std::numeric_limits< double >::max_digits10);
+        std::cout << "Here: " << intersectionValue.value() << std::endl;
+//        std::cout << intersectionValue.value() << std::endl;
+//        std::cout << "Calling the functions..." << std::endl;
+        return first.contains(intersectionValue.value()) &&
+               second.contains(intersectionValue.value());
     }
     // If there is no intersection, the ray and segment may be parallel, check if they are
     // overlapped
+    std::cout << "Parallel!!!" << std::endl;
     return first.contains(second.getSegStart()) || first.contains(second.getEnd());
 }
 

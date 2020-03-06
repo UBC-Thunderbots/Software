@@ -87,6 +87,7 @@ class Segment final
     {
         if (collinear(point, getSegStart(), getEnd()))
         {
+            std::cout << "in colinear" << std::endl;
             // If the segment and point are in a perfect vertical line, we must use Y
             // coordinate centric logic
             if ((std::abs(point.x() - getEnd().x()) < GeomConstants::EPSILON) &&
@@ -103,6 +104,7 @@ class Segment final
             return (point.x() <= getSegStart().x() && point.x() >= getEnd().x()) ||
                    (point.x() <= getEnd().x() && point.x() >= getSegStart().x());
         }
+        std::cout << "not in colinear" << std::endl;
 
         return false;
     }
