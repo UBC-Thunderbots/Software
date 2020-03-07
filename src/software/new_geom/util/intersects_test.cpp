@@ -365,7 +365,7 @@ TEST(IntersectsTest,
     EXPECT_EQ(intersectsNew(just_direction, segment), true);
 }
 
-TEST(IntersectsTest, ray_intersectsNew_segment_edge)
+TEST(IntersectsTest, ray_intersects_segment_edge)
 {
     Ray r({5, 2}, Angle::zero());
     Segment s({5, -5}, {8, 4});
