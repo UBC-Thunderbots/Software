@@ -1,6 +1,7 @@
 #include "software/new_geom/util/intersection.h"
 
 #include "software/new_geom/util/collinear.h"
+#include "software/new_geom/util/almost_equal.h"
 
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
                                   const Point &d)
@@ -14,8 +15,11 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     double x4 = d.x();
     double y4 = d.y();
 
-    double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (std::fabs(denominator) < GeomConstants::EPSILON)
+    double denominatorTermA = (x1 - x2) * (y3 - y4);
+    double denominatorTermB = (y1 - y2) * (x3 - x4);
+    double denominator = denominatorTermA - denominatorTermB;
+
+    if (almostEqual(denominatorTermA, denominatorTermB))
     {
         return std::nullopt;
     }

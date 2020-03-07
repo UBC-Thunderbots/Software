@@ -27,7 +27,7 @@ TEST(AlmostEqualTest, compare_almost_equal_doubles_max_10)
 
 TEST(AlmostEqualTest, compare_not_almost_equal_doubles_max_10)
 {
-    double a = 1.0;
+    double a = 10.0;
     double b =
         10.0 -
         2e-14;  // For comparing doubles near 10.0, 2e-14 is too big to consider equal

@@ -92,6 +92,7 @@ cc_library(
         "intersection.h",
     ],
     deps = [
+        ":almost_equal",
         ":collinear",
         "//software/new_geom:line",
         "//software/new_geom:polygon",
