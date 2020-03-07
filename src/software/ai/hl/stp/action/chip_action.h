@@ -56,6 +56,34 @@ class ChipAction : public Action
     void updateControlParams(const Robot& robot, Point chip_origin, Point chip_target,
                              double chip_distance_meters);
 
+    /**
+     * Get the state of the ball
+     *
+     * @return the state of the ball
+     */
+    Ball getBall();
+
+    /**
+     * Get the point this ChipAction will chip from
+     *
+     * @return the point this ChipAction will chip from
+     */
+    Point getChipOrigin();
+
+    /**
+     * Get the angle this ChipAction will chip with
+     *
+     * @return the angle this ChipAction will chip with
+     */
+    Angle getChipDirection();
+
+    /**
+     * Get the distance this ChipAction will chip to
+     *
+     * @return the distance this ChipAction will chip to
+     */
+    double getChipDistanceMeters();
+
     void accept(MutableActionVisitor& visitor) override;
 
    private:
