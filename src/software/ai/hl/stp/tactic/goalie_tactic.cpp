@@ -152,14 +152,13 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         //
         std::shared_ptr<Action> next_action;
 
-        // Create a segment along the goal line, slightly shortened to account for the
-        // robot radius so as we move along the segment we don't try run into the goal
-        // posts. This will be used in case3 as a fallback when we don't have an
-        // intersection with the crease lines
-
         // compute intersection points from ball position and velocity
         Ray ball_ray = Ray(ball.position(), ball.velocity());
 
+        // Create a segment along the goal line, slightly shortened to account for the
+        // robot radius so as we move along the segment we don't try to run into the goal
+        // posts. This will be used in case 3 as a fallback when we don't have an
+        // intersection with the crease lines
         const Point neg_goal_line_inflated =
             field.friendlyGoalpostNeg() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
         const Point pos_goal_line_inflated =
@@ -186,7 +185,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                                      ->getGoalieTacticConfig()
                                      ->BlockConeRadius()
                                      ->value();
-        // by how much should the defense are be decreased so the goalie stays close
+        // by how much should the defense area be decreased so the goalie stays close
         // towards the net
         auto defense_area_deflation = Util::DynamicParameters->getAIConfig()
                                           ->getGoalieTacticConfig()
