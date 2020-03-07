@@ -35,8 +35,12 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
     // parameterization
     for (unsigned int i = 0; i < num_segments; i++)
     {
-        trajectory[i].position = shared_polynomial2d_getPositionAtArcLengthOrder3(
-            path, i * arc_segment_length, arc_length_param);
+        // Get the 't' value corresponding to the current arc length (to be used for further computing)
+        double t = shared_polynomial2d_getTValueAtArcLengthOrder3(path, i*arc_segment_length, arc_length_param);
+
+        // Get the X and Y position at the 't' value defined by the arc length
+        trajectory[i].position = shared_polynomial2d_getValueOrder3(
+            path, t);
 
 
         // Create the polynomial representing path curvature
@@ -45,20 +49,20 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
         //                                     abs(x'y'' - y'x'')
         //        radius of curvature =      ----------------------
         //                                     (x'^2 + y'^2)^(3/2)
-        //
+        //        
         const double numerator = fabs(
-            shared_polynomial1d_getValueOrder2(first_deriv.x, trajectory[i].position.t) *
+            shared_polynomial1d_getValueOrder2(first_deriv.x, t) *
                 shared_polynomial1d_getValueOrder1(second_deriv.y,
-                                                   trajectory[i].position.t) -
-            shared_polynomial1d_getValueOrder2(first_deriv.y, trajectory[i].position.t) *
+                                                   t) -
+            shared_polynomial1d_getValueOrder2(first_deriv.y, t) *
                 shared_polynomial1d_getValueOrder1(second_deriv.x,
-                                                   trajectory[i].position.t));
+                                                   t));
         const double denominator =
             pow(pow(shared_polynomial1d_getValueOrder2(first_deriv.x,
-                                                       trajectory[i].position.t),
+                                                       t),
                     2) +
                     pow(shared_polynomial1d_getValueOrder2(first_deriv.y,
-                                                           trajectory[i].position.t),
+                                                           t),
                         2),
                 3.0 / 2.0);
         const double radius_of_curvature = 1 / (numerator / denominator);

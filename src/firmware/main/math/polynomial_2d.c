@@ -118,6 +118,21 @@ GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(1, 0)
         Polynomial2dOrder##N##_t p, float arc_length,                                    \
         ArcLengthParametrization_t arc_length_parametrization)                           \
     {                                                                                    \
+        float t = shared_polynomial2d_getTValueAtArcLengthOrder##N(                      \
+            p, arc_length, arc_length_parametrization);                                  \
+        Vector2d_t result = {.x = shared_polynomial1d_getValueOrder##N(p.x, t),          \
+                             .y = shared_polynomial1d_getValueOrder##N(p.y, t)};         \
+        return result;                                                                   \
+    }
+GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(3)
+GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(2)
+GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
+
+#define GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(N)          \
+    float shared_polynomial2d_getTValueAtArcLengthOrder##N(                              \
+        Polynomial2dOrder##N##_t p, float arc_length,                                    \
+        ArcLengthParametrization_t arc_length_parametrization)                           \
+    {                                                                                    \
         /* Check that we have at least one s-value in the parametrization, and the s */  \
         /* value we're looking for is within the parametrization */                      \
         assert(arc_length_parametrization.num_values > 0);                               \
@@ -174,14 +189,8 @@ GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_FUNCTION_DEFINITION(1, 0)
             (arc_length_above_pivot - arc_length_below_pivot);                           \
         const float t =                                                                  \
             t_below_pivot + (t_above_pivot - t_below_pivot) * arc_length_ratio;          \
-                                                                                         \
-        Vector2d_t result = {.x = shared_polynomial1d_getValueOrder##N(p.x, t),          \
-                             .y = shared_polynomial1d_getValueOrder##N(p.y, t),          \
-                             .t = t};                                                    \
-                                                                                         \
-        return result;                                                                   \
+        return t;                                                                        \
     }
-GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(3)
-GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(2)
-GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
-GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(0)
+GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(3)
+GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(2)
+GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)

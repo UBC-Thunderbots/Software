@@ -21,7 +21,7 @@ TEST(TrajectoryPlannerTest, generate_constant_arc_length_segments)
 
     const double t_start = 0;
     const double t_end = 1;
-    const unsigned int num_segments = 4999;
+    const unsigned int num_segments = 5999;
     const double max_acc = 3;
     const double max_speed = 3;
     const double initial_speed = 0;

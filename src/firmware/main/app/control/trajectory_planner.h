@@ -3,7 +3,8 @@
 #include "firmware/main/math/polynomial_2d.h"
 #include "firmware/main/math/vector_2d.h"
 
-#define __TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__ 5000 // The maximum size of the array containing trajectory elements
+#define __TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__ 6000 // The maximum size of the array containing trajectory elements
+#define __TRAJECTORY_PLANNER_MAX_PATH_LENGTH__ 18 // [meters]
 
 // Struct that defines a single point on a trajectory
 // Includes the Position,and Timedata corresponding to that point 
@@ -13,7 +14,7 @@ typedef struct TrajectoryElement{
 } TrajectoryElement_t;
 
 /**
- * Returns a planned planned trajectory as a list of TrajectoryElement's.
+ * Returns a planned pla         nned trajectory as a list of TrajectoryElement's.
  * 
  * Key assumptions of this planner are:
  *  - Trajectories are time-optimal assuming INFINITE JERK capability of the robot
