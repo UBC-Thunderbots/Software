@@ -105,7 +105,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
 
     Angle open_angle_to_goal = Angle::zero();
     Point shot_target        = field.enemyGoal();
-    if (shot_opt->getOpenAngle().abs() > Angle::fromDegrees(0))
+    if (shot_opt && shot_opt->getOpenAngle().abs() > Angle::fromDegrees(0))
     {
         open_angle_to_goal = shot_opt->getOpenAngle();
     }

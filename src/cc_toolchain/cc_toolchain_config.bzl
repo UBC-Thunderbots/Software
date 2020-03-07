@@ -192,7 +192,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Werror"] +
+                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -376,10 +376,15 @@ def _make_common_features(ctx):
 
     return result
 
-def _clang_impl(ctx):
+def _linux_gcc_impl(ctx):
     host_system_name = "k8"
 
     action_configs = []
+
+    tool_paths = [
+        tool_path(name = name, path = path)
+        for name, path in ctx.attr.tool_paths.items()
+    ]
 
     common = _make_common_features(ctx)
 
@@ -437,12 +442,6 @@ def _clang_impl(ctx):
         name = "stdlib",
         flag_sets = [
             flag_set(
-                actions = ALL_COMPILE_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-stdlib=libc++",
-                ])],
-            ),
-            flag_set(
                 actions = ALL_LINK_ACTIONS,
                 flag_groups = [flag_group(flags = [
                     "-lm",
@@ -460,8 +459,7 @@ def _clang_impl(ctx):
             flag_set(
                 actions = ALL_LINK_ACTIONS,
                 flag_groups = [flag_group(flags = [
-                    "-fuse-ld=lld",
-                    "-rtlib=compiler-rt",
+                    "-fuse-ld=gold",
                 ])],
             ),
         ],
@@ -494,20 +492,6 @@ def _clang_impl(ctx):
         ],
         implies = ["common"],
     )
-    clang_warnings_feature = feature(
-        name = "clang_warnings",
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(
-                        flags = ["-Wno-overloaded-virtual"] +
-                                ctx.attr.host_compiler_warnings,
-                    ),
-                ],
-            ),
-        ],
-    )
 
     coverage_feature = feature(
         name = "coverage",
@@ -516,16 +500,7 @@ def _clang_impl(ctx):
                 actions = ALL_COMPILE_ACTIONS,
                 flag_groups = [
                     flag_group(
-                        # We're using clang's built-in coverage here instead
-                        # of `gcov` here because
-                        # 1) It's faster
-                        # 2) We couldn't get gcov to play nice with `bazel coverage`
-                        # Please see:
-                        #   Clang docs: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
-                        #   Ticket tracking an issue that could solve this: https://github.com/bazelbuild/bazel/issues/9406
-                        # To switch to `gcov` just remove these flags and add
-                        # `--coverage`, similairly for the linker flags below
-                        flags = ["-fprofile-instr-generate", "-fcoverage-mapping"],
+                        flags = ["--coverage"],
                     ),
                 ],
             ),
@@ -533,7 +508,7 @@ def _clang_impl(ctx):
                 actions = ALL_LINK_ACTIONS,
                 flag_groups = [
                     flag_group(
-                        flags = ["-fprofile-instr-generate"],
+                        flags = ["--coverage"],
                     ),
                 ],
             ),
@@ -555,7 +530,7 @@ def _clang_impl(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [flag_group(
                     flags = [
-                        "-isystem{}".format(dir)
+                        "-I{}".format(dir)
                         for dir in ctx.attr.builtin_include_directories
                     ],
                 )],
@@ -567,14 +542,12 @@ def _clang_impl(ctx):
         name = "common",
         implies = [
             "builtin_include_directories",
-            "stdlib",
             "c++17",
             "determinism",
             "hardening",
-            "warnings",
-            "clang_warnings",
             "build-id",
             "no-canonical-prefixes",
+            "stdlib",
             "lld",
             "frame-pointer",
             "static_link_cpp_runtimes",
@@ -585,30 +558,13 @@ def _clang_impl(ctx):
         static_libgcc,
         pic_feature,
         supports_pic_feature,
-        stdlib_feature,
         builtin_include_directories_feature,
         common_feature,
+        stdlib_feature,
         lld_feature,
-        clang_warnings_feature,
         coverage_feature,
         opt_feature,
         runtime_library_search_directories,
-    ]
-
-    tool_paths = [
-        tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
-        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/clang-ar"),
-        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
-        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/clang-cpp"),
-        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/clang-dwp"),
-        # TODO: note about executable we're using here (ie. not 'llvm-profdata')
-        #tool_path(name = "gcov", path = "/usr/bin/gcov"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/clang-profdata"),
-        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
-        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/clang-nm"),
-        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/clang-objcopy"),
-        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/clang-objdump"),
-        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/clang-strip"),
     ]
 
     out = ctx.actions.declare_file(ctx.label.name)
@@ -626,7 +582,7 @@ def _clang_impl(ctx):
             target_system_name = ctx.attr.target_system_name,
             target_cpu = ctx.attr.target_cpu,
             target_libc = "libc",
-            compiler = "clang",
+            compiler = "gcc",
             abi_version = "local",
             abi_libc_version = "local",
             tool_paths = tool_paths,
@@ -639,20 +595,19 @@ def _clang_impl(ctx):
         ),
     ]
 
-cc_toolchain_config = rule(
-    implementation = _clang_impl,
+cc_toolchain_config_k8 = rule(
+    implementation = _linux_gcc_impl,
     attrs = {
-        "cpu": attr.string(mandatory = True, values = ["k8"]),
         "builtin_include_directories": attr.string_list(),
+        "cpu": attr.string(mandatory = True, values = ["k8"]),
+        "extra_features": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
-        "host_compiler_path": attr.string(),
-        "host_compiler_prefix": attr.string(),
         "host_compiler_warnings": attr.string_list(),
         "host_unfiltered_compile_flags": attr.string_list(),
         "target_cpu": attr.string(),
         "target_system_name": attr.string(),
+        "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
-        "extra_features": attr.string_list(),
     },
     provides = [CcToolchainConfigInfo],
     executable = True,

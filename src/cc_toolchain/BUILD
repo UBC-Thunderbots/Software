@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config", "cc_toolchain_config_stm32")
+load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config_stm32")
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
@@ -45,8 +45,8 @@ cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
         # k8 is any x86 system
-        "k8": "cc_toolchain_linux",
-        "k8|compiler": "cc_toolchain_linux",
+        "k8": "cc_toolchain_linux_gcc",
+        "k8|compiler": "cc_toolchain_linux_gcc",
         # stm32f4 MCU
         "stm32f4": "cc_toolchain_stm32f4",
         "stm32f4|compiler": "cc_toolchain_stm32f4",
@@ -69,56 +69,66 @@ filegroup(
 )
 
 filegroup(
-    name = "clang_wrappers",
-    srcs = glob(["wrapper/clang-*"]),
+    name = "linux_gcc_wrapper",
+    srcs = ["wrapper/linux_gcc"],
 )
 
 filegroup(
-    name = "clang_all",
+    name = "linux_gcc_all",
     srcs = [
-        ":clang_wrappers",
-        "@llvm_clang//:binaries",
-        "@llvm_clang//:clang_libs",
-        "@llvm_clang//:includes",
-        "@llvm_clang//:runtime_libs",
-        "@llvm_clang//:static_libs",
+        ":linux_gcc_wrapper",
+        "@linux_gcc//:includes",
+        "@linux_gcc//:libs",
+        "@linux_gcc//:runtime_libs",
+        "@linux_gcc//:static_libs",
     ],
 )
 
-cc_toolchain_config(
-    name = "clang-k8",
+cc_toolchain_config_k8(
+    name = "linux_gcc",
     builtin_include_directories = [
-        "external/llvm_clang/include/c++/v1/",
+        "/usr/lib/gcc/x86_64-linux-gnu/",
         "/usr/include/",
         "/usr/local/include/",
+        "/usr/lib/gcc/c++/*/include/",
     ],
     cpu = "k8",
-    host_compiler_path = "wrapper/clang-clang",
-    host_compiler_prefix = "wrapper",
     target_cpu = "k8",
     target_system_name = "k8",
-    toolchain_identifier = "clang-k8",
+    tool_paths = {
+        "ar": "/usr/bin/ar",
+        "cpp": "/usr/bin/cpp",
+        "dwp": "/usr/bin/dwp",
+        "gcc": "wrapper/linux_gcc",
+        "gcov": "/usr/bin/gcov",
+        "ld": "/usr/bin/ld",
+        "nm": "/usr/bin/nm",
+        "objcopy": "/usr/bin/objcopy",
+        "objdump": "/usr/bin/objdump",
+        "strip": "/usr/bin/strip",
+    },
+    toolchain_identifier = "linux_gcc-k8",
 )
 
 cc_toolchain(
-    name = "cc_toolchain_linux",
-    all_files = ":clang_all",
-    ar_files = ":clang_all",
-    as_files = ":clang_all",
-    compiler_files = ":clang_all",
-    dwp_files = ":clang_all",
-    dynamic_runtime_lib = "@llvm_clang//:runtime_libs",
-    linker_files = ":clang_all",
-    objcopy_files = ":clang_all",
-    static_runtime_lib = "@llvm_clang//:static_libs",
-    strip_files = ":clang_all",
+    name = "cc_toolchain_linux_gcc",
+    all_files = ":linux_gcc_all",
+    ar_files = ":linux_gcc_all",
+    as_files = ":linux_gcc_all",
+    compiler_files = ":linux_gcc_all",
+    dwp_files = ":linux_gcc_all",
+    dynamic_runtime_lib = "@linux_gcc//:runtime_libs",
+    linker_files = ":linux_gcc_all",
+    objcopy_files = ":linux_gcc_all",
+    static_runtime_lib = "@linux_gcc//:static_libs",
+    strip_files = ":linux_gcc_all",
     supports_param_files = True,
     # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
     # when possible
     # https://github.com/bazelbuild/intellij/issues/486
     tags = ["no-ide"],
-    toolchain_config = ":clang-k8",
-    toolchain_identifier = "clang-x86_64",
+    toolchain_config = ":linux_gcc",
+    toolchain_identifier = "k8_gcc-x86_64",
 )
 
 cc_toolchain_config_stm32(

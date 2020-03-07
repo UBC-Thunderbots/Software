@@ -46,7 +46,6 @@
 #include <task.h>
 #include <unused.h>
 
-#include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
 #include "io/charger.h"
