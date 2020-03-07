@@ -1,6 +1,8 @@
 version: '{build}'
 
-image: Ubuntu1804 
+# Build Using Our Hardware And Image
+build_cloud: "unwitting-accomplice Docker"
+image: "Ubuntu 18.04 Full Image"
 
 install:
   - ./environment_setup/setup_software.sh
