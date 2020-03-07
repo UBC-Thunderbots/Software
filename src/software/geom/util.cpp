@@ -473,9 +473,7 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
     double y4 = line2.getEnd().y();
 
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-
-    // TODO (Issue #1183): Change this to EPSILON comparison when porting
-    if (std::abs(denom) < GeomConstants::EPSILON)
+    if (denom == 0)
     {
         // log the parallel lines when we actually implement logging?
         return std::nullopt;
