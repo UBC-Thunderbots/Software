@@ -250,52 +250,52 @@ TEST(TestThetaStarPathPlanner, DISABLED_performance)
             Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
             Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
         },
-        {Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
-         Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
-         Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
-         Obstacle::create std::stringstream error_ss;
-    CircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({-0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({-0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({-0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({-0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
-        Obstacle::createCircleObstacle({0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
-}
-}
-;
-Field field = ::Test::TestUtil::createSSLDivBField();
+        {
+            Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+        }};
+    Field field = ::Test::TestUtil::createSSLDivBField();
 
-int num_iterations = 10;
+    int num_iterations = 10;
 
-Point start(0, 0), dest(4.5, 0);
+    Point start(0, 0), dest(4.5, 0);
 
-auto start_time = std::chrono::system_clock::now();
-for (int i = 0; i < num_iterations; i++)
-{
-    for (auto obstacles : obstacle_sets)
+    auto start_time = std::chrono::system_clock::now();
+    for (int i = 0; i < num_iterations; i++)
     {
-        std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+        for (auto obstacles : obstacle_sets)
+        {
+            std::unique_ptr<PathPlanner> planner =
+                std::make_unique<ThetaStarPathPlanner>();
 
-        Rectangle navigable_area = field.fieldBoundary();
+            Rectangle navigable_area = field.fieldBoundary();
 
-        planner->findPath(start, dest, navigable_area, obstacles);
+            planner->findPath(start, dest, navigable_area, obstacles);
+        }
     }
-}
 
-auto end_time = std::chrono::system_clock::now();
+    auto end_time = std::chrono::system_clock::now();
 
-std::chrono::duration<double> duration = end_time - start_time;
+    std::chrono::duration<double> duration = end_time - start_time;
 
-std::chrono::duration<double> avg =
-    duration / (static_cast<double>(num_iterations) * obstacle_sets.size() - 1);
+    std::chrono::duration<double> avg =
+        duration / (static_cast<double>(num_iterations) * obstacle_sets.size() - 1);
 
-std::cout << "Took "
-          << std::chrono::duration_cast<std::chrono::microseconds>(duration).count() /
-                 1000.0
-          << "ms to run, average time of "
-          << std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0
-          << "ms";
+    std::cout << "Took "
+              << std::chrono::duration_cast<std::chrono::microseconds>(duration).count() /
+                     1000.0
+              << "ms to run, average time of "
+              << std::chrono::duration_cast<std::chrono::microseconds>(avg).count() /
+                     1000.0
+              << "ms";
 }
