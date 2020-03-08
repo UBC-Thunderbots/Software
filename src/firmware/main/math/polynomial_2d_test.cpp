@@ -7,6 +7,7 @@ extern "C"
 
 #include "polynomial_1d.h"
 #include "polynomial_2d.h"
+#include "math.h"
 
 class Polynomial2dTest : public testing::Test
 {

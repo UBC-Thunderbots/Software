@@ -1,6 +1,7 @@
 #include "firmware/main/math/polynomial_1d.h"
 
 #include <math.h>
+#include <stddef.h>
 
 /**
  * Compute the value at the given point for the polynomial formed by the given coeffs

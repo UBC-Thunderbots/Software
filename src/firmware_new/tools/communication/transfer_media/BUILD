@@ -14,5 +14,7 @@ cc_library(
         ":transfer_medium",
         "//software/multithreading:thread_safe_buffer",
         "@g3log",
+        "@boost//:array",
+	"@boost//:asio",
     ],
 )
