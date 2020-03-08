@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../../test_util/test_util.h"
 #include "shared/constants.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/util.h"
