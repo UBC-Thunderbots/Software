@@ -21,7 +21,7 @@ TEST(AlmostEqualTest, compare_not_almost_equal_doubles_max_1)
 TEST(AlmostEqualTest, compare_almost_equal_doubles_max_10)
 {
     double a = 10.0;
-    double b = 10.0 - 5e-15;  // For comparing doubles near 10.0, 5e-16 is small enough
+    double b = 10.0 - 5e-15;  // For comparing doubles near 10.0, 5e-15 is small enough
     EXPECT_TRUE(almostEqual(a, b));
 }
 
