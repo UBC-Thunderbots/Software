@@ -89,6 +89,8 @@ namespace Test
          */
         static std::vector<RefboxGameState> getAllRefboxGameStates();
 
+        static Robot createRobotAtPos(const Point& pt);
+
        private:
         /**
          * Returns a new team with robots placed at the given positions. Robots in the

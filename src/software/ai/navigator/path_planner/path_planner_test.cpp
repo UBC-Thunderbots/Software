@@ -1,6 +1,7 @@
 #include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
+#include "software/test_util/test_util.h"
 
 #include <gtest/gtest.h>
 
@@ -15,6 +16,7 @@
 // if it intersects an obstacle
 static constexpr double PATH_CHECK_INTERVAL = 0.05;
 
+using namespace Test;
 
 using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
 
@@ -27,12 +29,29 @@ struct PlannerTestCase
     bool should_return_path;
 };
 
-std::vector<PlannerTestCase> test_cases = {{.name           = "Trivial test case",
-                                            .start          = Point(0, 0),
-                                            .dest           = Point(1, 0),
-                                            .navigable_area = Rectangle({-1, -1}, {1, 1}),
-                                            .obstacles      = {},
-                                            .should_return_path = true}};
+std::vector<PlannerTestCase> test_cases = {
+        {.name           = "Empty field straight line",
+        .start          = Point(0, 0),
+        .dest           = Point(1, 0),
+        .navigable_area = Rectangle({-1, -1}, {1, 1}),
+        .obstacles      = {},
+        .should_return_path = true},
+
+       {.name           = "Single stationary robot in path",
+       .start          = Point(0, 0),
+       .dest           = Point(2, 0),
+       .navigable_area = Rectangle({-1, -1}, {1, 1}),
+       .obstacles      = {
+               Obstacle::createRobotObstacle(TestUtil::createRobotAtPos({1, 0}), false)},
+       .should_return_path = true},
+
+        {.name           = "Large rectangle in path",
+        .start          = Point(0, 0),
+        .dest           = Point(2, 0),
+        .navigable_area = Rectangle({-1, -1}, {1, 1}),
+        .obstacles      = {
+        Obstacle::createRobotObstacle(TestUtil::createRobotAtPos({1, 0}), false)},
+        .should_return_path = true},};
 
 template <typename PlannerT>
 std::pair<std::string, PathPlannerConstructor> name_and_constructor() {
@@ -59,7 +78,7 @@ void validatePath(const Path &path, const Rectangle &navigable_area,
             if (obs.containsPoint(pt))
             {
                 std::stringstream fail_ss;
-                fail_ss << "Point " << pt << " intersects obstacle {" << obs << "}";
+                fail_ss << "Point " << pt << "at s=" << i * PATH_CHECK_N<< " intersects obstacle {" << obs << "}";
                 throw fail_ss.str();
             }
         }
@@ -70,6 +89,15 @@ void validatePath(const Path &path, const Rectangle &navigable_area,
             fail_ss << "Point " << pt << " is not in navigable area " << navigable_area;
             throw fail_ss.str();
         }
+    }
+
+    // check that the path reaches the destination if the destination is not in an obstacle
+    // otherwise check that the path makes progress toward the destination
+    bool dest_in_obstacle = std::any_of(obstacles.begin(), obstacles.end(), [&path](const auto& obs){
+        return obs.containsPoint(path.valueAt(1.0));
+    });
+    if (dest_in_obstacle) {
+
     }
 }
 
