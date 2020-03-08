@@ -89,7 +89,7 @@ namespace Test
          */
         static std::vector<RefboxGameState> getAllRefboxGameStates();
 
-        static Robot createRobotAtPos(const Point& pt);
+        static Robot createRobotAtPos(const Point &pt);
 
        private:
         /**

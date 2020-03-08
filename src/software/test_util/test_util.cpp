@@ -96,7 +96,8 @@ namespace Test
         return game_states;
     }
 
-    Robot TestUtil::createRobotAtPos(const Point & pt) {
+    Robot TestUtil::createRobotAtPos(const Point &pt)
+    {
         static RobotId robot_id_counter = 0;
         return Robot(robot_id_counter++, pt, Vector(), Angle(), Angle(), Timestamp());
     }
