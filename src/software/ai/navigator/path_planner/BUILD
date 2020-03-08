@@ -32,7 +32,6 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        ":path_planner_factory",
     ],
 )
 
@@ -54,15 +53,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "path_planner_factory",
-    srcs = ["path_planner_factory.cpp"],
-    hdrs = ["path_planner_factory.h"],
-    deps = [
-        ":path_planner",
-    ],
-)
-
 cc_test(
     name = "theta_star_path_planner_test",
     srcs = ["theta_star_path_planner_test.cpp"],
@@ -79,10 +69,9 @@ cc_test(
     srcs = ["path_planner_test.cpp"],
     deps = [
         ":path_planner",
-        ":path_planner_factory",
+        ":straight_line_path_planner",
         ":theta_star_path_planner",
         "//software/test_util",
-        "//software/world:field",
         "@gtest//:gtest_main",
     ],
 )

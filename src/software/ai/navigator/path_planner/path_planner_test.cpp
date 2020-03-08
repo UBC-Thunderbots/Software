@@ -1,11 +1,12 @@
 #include "software/ai/navigator/path_planner/path_planner.h"
+#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
+#include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 
 #include <gtest/gtest.h>
 
 #include <typeinfo>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/path_planner/path_planner_factory.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
 #include "software/world/world.h"
@@ -13,6 +14,9 @@
 // interval at which to evaluate the spline value and check
 // if it intersects an obstacle
 static constexpr double PATH_CHECK_INTERVAL = 0.05;
+
+
+using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
 
 struct PlannerTestCase
 {
@@ -29,6 +33,18 @@ std::vector<PlannerTestCase> test_cases = {{.name           = "Trivial test case
                                             .navigable_area = Rectangle({-1, -1}, {1, 1}),
                                             .obstacles      = {},
                                             .should_return_path = true}};
+
+template <typename PlannerT>
+std::pair<std::string, PathPlannerConstructor> name_and_constructor() {
+    return std::pair<std::string, PathPlannerConstructor>(typeid(PlannerT).name(),
+                                                   []() { return std::make_unique<PlannerT>(); });
+}
+
+std::vector<std::pair<std::string, PathPlannerConstructor>> path_planner_names_and_constructors = {
+        // add path planner constructors here
+        name_and_constructor<ThetaStarPathPlanner>(),
+        name_and_constructor<StraightLinePathPlanner>()
+};
 
 
 void validatePath(const Path &path, const Rectangle &navigable_area,
@@ -59,7 +75,7 @@ void validatePath(const Path &path, const Rectangle &navigable_area,
 
 class PlannerTest
     : public testing::TestWithParam<
-          std::tuple<std::pair<std::string, PathPlannerFactory::PathPlannerConstructor>,
+          std::tuple<std::pair<std::string, PathPlannerConstructor>,
                      PlannerTestCase>>
 {
 };
@@ -104,5 +120,5 @@ TEST_P(PlannerTest, test_path_planner)
 INSTANTIATE_TEST_CASE_P(
     All, PlannerTest,
     ::testing::Combine(
-        testing::ValuesIn(PathPlannerFactory::getPathPlannerConstructors()),
-        testing::ValuesIn(::test_cases)));
+        testing::ValuesIn(path_planner_names_and_constructors),
+        testing::ValuesIn(test_cases)));
