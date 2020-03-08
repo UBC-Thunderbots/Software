@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "udp_echoserver.h"
+#include "udp_multicast.h"
 
 /* USER CODE END Includes */
 
@@ -117,7 +117,6 @@ int main(void)
     MX_USB_OTG_FS_PCD_Init();
     MX_CRC_Init();
     /* USER CODE BEGIN 2 */
-    udp_echoserver_init();
 
     /* USER CODE END 2 */
 

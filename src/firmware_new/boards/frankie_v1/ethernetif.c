@@ -130,7 +130,6 @@ lan8742_IOCtx_t LAN8742_IOCtx = {ETH_PHY_IO_Init, ETH_PHY_IO_DeInit, ETH_PHY_IO_
                                  ETH_PHY_IO_ReadReg, ETH_PHY_IO_GetTick};
 
 /* USER CODE BEGIN 3 */
-
 /* USER CODE END 3 */
 
 /* Private functions ---------------------------------------------------------*/
@@ -310,6 +309,10 @@ static void low_level_init(struct netif *netif)
     /* Initialize the RX POOL */
     LWIP_MEMPOOL_INIT(RX_POOL);
 
+    /* Pass all multicast frames: needed for IPv6 protocol*/
+    heth.Instance->MACPFR |= ETH_MACPFR_PM;
+
+
 #if LWIP_ARP || LWIP_ETHERNET
 
     /* set MAC hardware address length */
@@ -400,7 +403,6 @@ static void low_level_init(struct netif *netif)
             HAL_ETH_SetMACConfig(&heth, &MACConf);
 
             /* USER CODE BEGIN PHY_POST_CONFIG */
-
             /* USER CODE END PHY_POST_CONFIG */
         }
         HAL_ETH_Start_IT(&heth);

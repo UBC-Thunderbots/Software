@@ -28,9 +28,11 @@ class NetworkMedium : public TransferMedium
      * Creates a NetworkMedium provided the ip and port
      *
      * @param local_ipaddr The local ip to connect to
-     * @param port The port to bind to
+     * @param multicast_port The port to bind to to send multicast packets to robots
+     * @param recieve_port The port to bind to to receive unicast packets from robots
      */
-    NetworkMedium(const std::string& local_ipaddr, unsigned port);
+    NetworkMedium(const std::string& multicast_address, unsigned multicast_port,
+                  unsigned receive_port);
 
     /*
      * Packages the data and sends it through the medium
@@ -68,10 +70,13 @@ class NetworkMedium : public TransferMedium
     udp::endpoint local_endpoint;
 
     // remote endpoint w/ broadcast ip and given port
-    udp::endpoint broadcast_endpoint;
+    udp::endpoint multicast_endpoint;
 
-    // socket to send/recv
-    std::unique_ptr<udp::socket> socket;
+    // socket to send
+    std::unique_ptr<udp::socket> send_socket;
+
+    // socket to recv
+    std::unique_ptr<udp::socket> recv_socket;
 
     // thread that runs all io_service related operations
     std::thread io_service_thread;
