@@ -4,8 +4,8 @@ extern "C"
 }
 
 #include <gtest/gtest.h>
+#include <math.h>
 
-#include "polynomial_1d.h"
 #include "polynomial_2d.h"
 
 class Polynomial2dTest : public testing::Test
