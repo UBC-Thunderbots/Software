@@ -69,18 +69,17 @@ bool intersectsNew(const Circle &first, const Circle &second)
 
 bool intersectsNew(const Segment &first, const Circle &second)
 {
-    bool segment_inside_circle = containsNew(second, first);
     double segment_start_circle_origin_distsq =
         distanceSquared(first.getSegStart(), second.getOrigin());
     double segment_end_circle_origin_distsq =
         distanceSquared(first.getEnd(), second.getOrigin());
 
-    // if the segment is inside the circle AND at least one of the points is
-    // outside the circle
-    return segment_inside_circle &&
-           (segment_start_circle_origin_distsq >
-                second.getRadius() * second.getRadius() ||
-            segment_end_circle_origin_distsq > second.getRadius() * second.getRadius());
+    bool segment_inside_circle = containsNew(second, first);
+    double segment_outside_circle =
+        (segment_start_circle_origin_distsq > second.getRadius() * second.getRadius() ||
+         segment_end_circle_origin_distsq > second.getRadius() * second.getRadius());
+
+    return segment_inside_circle && segment_outside_circle;
 }
 
 bool intersectsNew(const Circle &first, const Segment &second)

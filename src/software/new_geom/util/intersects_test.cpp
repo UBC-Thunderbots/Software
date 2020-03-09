@@ -45,6 +45,14 @@ TEST(IntersectsTest, segment_overlapping_polygon_edge)
     EXPECT_TRUE(intersectsNew(s, p));
 }
 
+TEST(IntersectsTest, segment_contained_in_polygon)
+{
+    Polygon p({{-6, 2}, {-1, 1}, {10, 7}, {5, -6}, {-5, -3}});
+    Segment s({0, -2}, {4, 1});
+    EXPECT_FALSE(intersectsNew(p, s));
+    EXPECT_FALSE(intersectsNew(s, p));
+}
+
 TEST(IntersectsTest, ray_inside_polygon)
 {
     Polygon p({{-6, 2}, {-1, 1}, {10, 7}, {5, -6}, {-5, -3}});
