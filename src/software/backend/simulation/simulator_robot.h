@@ -72,13 +72,6 @@ class SimulatorRobot
     float getPositionY();
 
     /**
-     * Returns the current position of the robot, in global field coordinates, in meters
-     *
-     * @return the current position of the robot, in global field coordinates, in meters
-     */
-    Point position();
-
-    /**
      * Returns the orientation of the robot, in global field coordinates, in radians
      *
      * @return the orientation of the robot, in global field coordinates, in radians
@@ -98,15 +91,6 @@ class SimulatorRobot
      * @return the y-velocity of the robot, in global field coordinates, in m/s
      */
     float getVelocityY();
-
-    /**
-     * Returns the current linear velocity of the robot, in global field coordinates,
-     * in m / s
-     *
-     * @return the current linear velocity of the robot, in global field coordinates,
-     * in m / s
-     */
-    Vector velocity();
 
     /**
      * Returns the angular velocity of the robot, in rad/s

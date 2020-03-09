@@ -84,11 +84,6 @@ float SimulatorRobot::getPositionY()
     return checkValidAndReturnFloat([](auto robot) { return robot->position().y(); });
 }
 
-Point SimulatorRobot::position()
-{
-    return Point(getPositionX(), getPositionY());
-}
-
 float SimulatorRobot::getOrientation()
 {
     return checkValidAndReturnFloat(
@@ -103,11 +98,6 @@ float SimulatorRobot::getVelocityX()
 float SimulatorRobot::getVelocityY()
 {
     return checkValidAndReturnFloat([](auto robot) { return robot->velocity().y(); });
-}
-
-Vector SimulatorRobot::velocity()
-{
-    return Vector(getVelocityX(), getVelocityY());
 }
 
 float SimulatorRobot::getVelocityAngular()

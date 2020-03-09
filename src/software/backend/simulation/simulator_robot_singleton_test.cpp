@@ -81,10 +81,6 @@ extern "C"
         return getDribblingPoint(robot_position, robot_orientation);
     }
 
-// TODO: Remove SimulatorRobot.position() functions?
-// TODO: Remove SimulatorRobot.isAutokickenabled functions?
-
-
     Point getDribblingPoint(const Point& robot_position, const Angle& robot_orientation)
     {
         double dribbler_depth = PhysicsRobot::dribbler_depth;
