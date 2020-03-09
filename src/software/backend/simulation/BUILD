@@ -45,6 +45,8 @@ cc_test(
     deps = [
         ":simulator_ball",
         "//software/backend/simulation/physics:physics_ball",
+        "//software/backend/simulation/physics:physics_world",
+        "//software/test_util",
         "@box2d",
         "@gtest//:gtest_main",
     ],

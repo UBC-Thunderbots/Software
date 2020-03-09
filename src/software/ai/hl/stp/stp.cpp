@@ -300,7 +300,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    info.play_type = name(current_game_state);
+    info.play_type = to_string(current_game_state);
     info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report
