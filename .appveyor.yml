@@ -3,7 +3,7 @@ version: '{build}'
 # Build Using Our Hardware And Image
 # 'unwitting-accomplice' is the server in our space in EDC 101
 build_cloud: "unwitting-accomplice Docker"
-image: "Ubuntu 18.04 Minimal Image"
+image: "Ubuntu 18.04 Minimal"
 
 install:
   - ./environment_setup/setup_software.sh
