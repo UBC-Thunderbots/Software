@@ -105,9 +105,38 @@ GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_DECLARATION(2);
 GENERATE_2D_POLYNOMIAL_GET_ARC_LENGTH_PARAMETRIZATION_DECLARATION(3);
 
 /**
+ * Get an approximation of the `t` value from a given arclength
+ *
+ * This can be used to get the position at a given arclength
+ * (ie. `p(t)` = (x_at_arclength, y_at_arclength)
+ *
+ * @pre s is between the minimum and maximum s value in the given parametrization
+ * @pre arc_length_parametrization has at least one entry
+ *
+ * @param p [in] The polynomial from which to get the t-value at the given arc length
+ * @param s [in] The arc length to get the t-value at. If this is above or below the
+ *               min/max arc length in the given parametrization, it will be set to the
+ *               closest arc length in the parametrization.
+ * @param arc_length_parametrization [in] A re-parametrization of "p" in terms of arc
+ *                                        length. *THIS MUST HAVE AT LEAST ONE ENTRY*
+ *
+ * @return An approximation of the t-value at the given arc length on the given
+ *         polynomial
+ */
+#define GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DECLARATION(N)         \
+    float shared_polynomial2d_getTValueAtArcLengthOrder##N(                              \
+        Polynomial2dOrder##N##_t p, float s,                                             \
+        ArcLengthParametrization_t arc_length_parametrization)
+
+GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DECLARATION(1);
+GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DECLARATION(2);
+GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DECLARATION(3);
+
+/**
  * Get an approximation of the position along the given polynomial at the given arc length
  *
  * @pre s is between the minimum and maximum s value in the given parametrization
+ * @pre arc_length_parametrization has at least one entry
  *
  * @param p [in] The polynomial from which to get the position at the given arc length
  * @param s [in] The arc length to get the position at. If this is above or below the

@@ -7,9 +7,10 @@ Visualizer::Visualizer(
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
     std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
-    std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer)
+    std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
+    std::shared_ptr<ThunderbotsConfig> config)
     : QMainWindow(),
-      main_widget(new MainWidget(this)),
+      main_widget(new MainWidget(config, this)),
       update_timer(new QTimer(this)),
       world_draw_functions_buffer(world_draw_functions_buffer),
       ai_draw_functions_buffer(ai_draw_functions_buffer),

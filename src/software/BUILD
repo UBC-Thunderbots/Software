@@ -8,6 +8,7 @@ cc_binary(
         "//software/ai:ai_wrapper",
         "//software/ai/hl/stp:play_info",
         "//software/backend",
+        "//software/backend:all_backends",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",

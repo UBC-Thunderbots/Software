@@ -19,7 +19,7 @@ Chicker_t* app_chicker_create(void (*kick)(float speed_m_per_s),
                               void (*disable_autokick)(void),
                               void (*disable_autochip)(void))
 {
-    Chicker_t* new_chicker = malloc(sizeof(Chicker_t));
+    Chicker_t* new_chicker = (Chicker_t*)malloc(sizeof(Chicker_t));
 
     new_chicker->kick             = kick;
     new_chicker->chip             = chip;
