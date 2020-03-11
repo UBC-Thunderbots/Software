@@ -22,7 +22,8 @@
 * [Building and Running the Code](#building-and-running-the-code)
 * [Debugging](#debugging)
 * [Profiling](#profiling)
-* [Flashing and Debugging A STM32 MCU](#flashing-and-debugging-a-stm32-mcu)
+* [Flashing and Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
+* [Flashing and Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
 
 ## Introduction
 These instructions assume that you have the following accounts setup:
