@@ -166,11 +166,12 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 
 ## Flashing And Debugging A STM32F4 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a STM32F4 based main board or radio dongle plugged into your computer. Do not plug both the dongle and the robot at the same time!
-2. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:flash_firmware radio_dongle`. Replace `radio_dongle`, with `robot` to flash the robot.
-3. For the robot, make sure the robot is in bootloader mode (BL switch on the piano keys is down), and push the power switch away from the dribbler (i.e towards the back of the robot) and hold it there before running the command. The dongle can be simply be plugged in with no additional action.
-4. There should be a progress bar indicating the flashing progress, hold the switch until the process finishes.
-5. When the process finished, release the power switch, revert the BL switch back to up 0, and the robot now has been flashed!
-6. To see print outs from the robot, run `sudo cat /dev/ttyACM0`. If `ttyACM0` isn't the right device, run `ls /dev/tty*` with the robot disconnected, and again with the robot connected, and replace `ttyACM0` with the new device that has been added. The radio dongle does not have this feature.
+2. Make sure the robot is elevated, with the wheels not touching any surface to avoid experimental firmware causing accidental damage.
+3. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:flash_firmware radio_dongle`. Replace `radio_dongle`, with `robot` to flash the robot.
+4. For the robot, make sure the robot is in bootloader mode (BL switch on the piano keys is down), and push the power switch away from the dribbler (i.e towards the back of the robot) and hold it there before running the command. The dongle can be simply be plugged in with no additional action.
+5. There should be a progress bar indicating the flashing progress, hold the switch back until the process finishes.
+6. When the process is finished, release the power switch, push the BL switch back up, and the robot now has been flashed!
+7. To see print outs from the robot, run `sudo cat /dev/ttyACM0`. If `ttyACM0` isn't the right device, run `ls /dev/tty*` with the robot disconnected, and again with the robot connected, and replace `ttyACM0` with the new device that has been added. The radio dongle does not have this feature.
 
 ## Flashing And Debugging A STM32H7 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
