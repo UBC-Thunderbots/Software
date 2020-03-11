@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>882</width>
-    <height>555</height>
+    <height>590</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>390</x>
       <y>20</y>
       <width>491</width>
-      <height>301</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -39,6 +39,9 @@
         <height>20</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>-99</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -51,6 +54,9 @@
         <width>241</width>
         <height>16</height>
        </rect>
+      </property>
+      <property name="minimum">
+       <number>-99</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -65,6 +71,9 @@
         <height>16</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>-99</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -77,6 +86,9 @@
         <width>241</width>
         <height>16</height>
        </rect>
+      </property>
+      <property name="minimum">
+       <number>-99</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -180,61 +192,6 @@
       <string>Matrix</string>
      </attribute>
     </widget>
-    <widget class="QWidget" name="dribble">
-     <attribute name="title">
-      <string>Dribble</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="shoot_kick">
-     <attribute name="title">
-      <string>Shoot Kick</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="shoot_chip">
-     <attribute name="title">
-      <string>Shoot Chip</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="coast">
-     <attribute name="title">
-      <string>Coast</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="brake">
-     <attribute name="title">
-      <string>Brake</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="z_axis">
-     <attribute name="title">
-      <string>Z-Axis</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="move_point">
-     <attribute name="title">
-      <string>Move(Point)</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="move_point_angle">
-     <attribute name="title">
-      <string>Move(Point, Angle)</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="catch">
-     <attribute name="title">
-      <string>Catch</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="pivot">
-     <attribute name="title">
-      <string>Pivot</string>
-     </attribute>
-    </widget>
-    <widget class="QWidget" name="spin">
-     <attribute name="title">
-      <string>Spin</string>
-     </attribute>
-    </widget>
    </widget>
    <widget class="QLabel" name="label_drive">
     <property name="geometry">
@@ -301,74 +258,89 @@
    <widget class="QProgressBar" name="progressBar_battery">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>70</y>
-      <width>241</width>
+      <x>140</x>
+      <y>100</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>50</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar_capacitor">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>100</y>
-      <width>241</width>
+      <x>140</x>
+      <y>130</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>50</number>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar_dribbler_1">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>130</y>
-      <width>241</width>
+      <x>140</x>
+      <y>160</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>6000</number>
+    </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
+    </property>
+    <property name="format">
+     <string>%v RPM</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar_dribbler_2">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>160</y>
-      <width>241</width>
+      <x>140</x>
+      <y>250</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
     <property name="value">
-     <number>24</number>
+     <number>20</number>
+    </property>
+    <property name="format">
+     <string>%v °C</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar_board">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>190</y>
-      <width>241</width>
+      <x>140</x>
+      <y>280</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>20</number>
+    </property>
+    <property name="format">
+     <string>%v °C</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar_break_beam">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>220</y>
-      <width>241</width>
+      <x>140</x>
+      <y>190</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
@@ -379,9 +351,9 @@
    <widget class="QProgressBar" name="progressBar_lqi">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>250</y>
-      <width>241</width>
+      <x>140</x>
+      <y>340</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
@@ -392,20 +364,26 @@
    <widget class="QProgressBar" name="progressBar_rsii">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>280</y>
-      <width>241</width>
+      <x>140</x>
+      <y>370</y>
+      <width>231</width>
       <height>23</height>
      </rect>
     </property>
+    <property name="minimum">
+     <number>-100</number>
+    </property>
     <property name="value">
-     <number>24</number>
+     <number>-90</number>
+    </property>
+    <property name="format">
+     <string>%vdB</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_battery">
+   <widget class="QLabel" name="label_status">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>30</x>
       <y>70</y>
       <width>100</width>
       <height>17</height>
@@ -417,10 +395,10 @@
      </font>
     </property>
     <property name="text">
-     <string>Battery:</string>
+     <string>Status</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_capacitor">
+   <widget class="QLabel" name="label_battery">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -431,14 +409,14 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>12</pointsize>
+      <pointsize>11</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>Capacitor:</string>
+     <string>Battery:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_dribbler">
+   <widget class="QLabel" name="label_capacitor">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -449,68 +427,68 @@
     </property>
     <property name="font">
      <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Capacitor:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_dribbler_speed">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>160</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Dribbler Speed:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_temperature">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>220</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
       <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Temperature</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_dribbler_temp">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>250</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
      </font>
     </property>
     <property name="text">
      <string>Dribbler:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_board">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>190</y>
-      <width>100</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Board:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_break_beam">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>220</y>
-      <width>100</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Break Beam:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_lqi">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>250</y>
-      <width>100</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>LQI:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_rssi">
+   <widget class="QLabel" name="label_board_temp">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -521,11 +499,83 @@
     </property>
     <property name="font">
      <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Board:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_break_beam">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>190</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Break Beam:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_radio">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>310</y>
+      <width>131</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
       <pointsize>12</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>RSSI:</string>
+     <string>Radio</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_lqi">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>340</y>
+      <width>131</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Link Quality (LQI):</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_rssi">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>370</y>
+      <width>131</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Rx Signal Strength:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_robot_selection">
@@ -640,7 +690,7 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>310</y>
+      <y>400</y>
       <width>321</width>
       <height>21</height>
      </rect>
@@ -653,7 +703,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>310</y>
+      <y>400</y>
       <width>51</width>
       <height>17</height>
      </rect>
@@ -671,7 +721,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>330</y>
+      <y>430</y>
       <width>331</width>
       <height>31</height>
      </rect>
@@ -686,12 +736,62 @@
       <string>Normal Operation</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>Lamp Test</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 0 Hall Sensors</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 1 Hall Sensors</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 2 Hall Sensors</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 3 Hall Sensors</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dribbler Hall Sensors</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 0 Encoders</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 1 Encoders</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 2 Encoders</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Wheel 3 Encoders</string>
+     </property>
+    </item>
    </widget>
    <widget class="Line" name="line_4">
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>325</y>
+      <y>220</y>
       <width>421</width>
       <height>31</height>
      </rect>
@@ -704,7 +804,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>330</y>
+      <y>225</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -722,7 +822,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>425</y>
+      <y>320</y>
       <width>411</width>
       <height>31</height>
      </rect>
@@ -735,7 +835,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>430</y>
+      <y>325</y>
       <width>81</width>
       <height>17</height>
      </rect>
@@ -753,7 +853,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>350</y>
+      <y>245</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -766,7 +866,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>350</y>
+      <y>245</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -779,7 +879,7 @@
     <property name="geometry">
      <rect>
       <x>630</x>
-      <y>350</y>
+      <y>245</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -792,7 +892,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>370</y>
+      <y>265</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -805,7 +905,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>370</y>
+      <y>265</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -818,7 +918,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>400</y>
+      <y>295</y>
       <width>241</width>
       <height>20</height>
      </rect>
@@ -831,7 +931,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>400</y>
+      <y>295</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -849,7 +949,7 @@
     <property name="geometry">
      <rect>
       <x>720</x>
-      <y>400</y>
+      <y>295</y>
       <width>51</width>
       <height>25</height>
      </rect>
@@ -859,7 +959,7 @@
     <property name="geometry">
      <rect>
       <x>788</x>
-      <y>350</y>
+      <y>245</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -872,7 +972,7 @@
     <property name="geometry">
      <rect>
       <x>788</x>
-      <y>395</y>
+      <y>290</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -885,7 +985,7 @@
     <property name="geometry">
      <rect>
       <x>720</x>
-      <y>460</y>
+      <y>355</y>
       <width>51</width>
       <height>25</height>
      </rect>
@@ -895,7 +995,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>460</y>
+      <y>355</y>
       <width>241</width>
       <height>20</height>
      </rect>
@@ -908,7 +1008,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>460</y>
+      <y>355</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -926,13 +1026,52 @@
     <property name="geometry">
      <rect>
       <x>790</x>
-      <y>455</y>
+      <y>350</y>
       <width>81</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
      <string>Run</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line_6">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>70</y>
+      <width>291</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_7">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>220</y>
+      <width>241</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_8">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>310</y>
+      <width>291</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
     </property>
    </widget>
   </widget>
