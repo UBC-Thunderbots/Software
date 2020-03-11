@@ -428,7 +428,7 @@ def _linux_gcc_impl(ctx):
                 flag_groups = [
                     flag_group(flags = ["-fPIC"], expand_if_available = "pic"),
                     flag_group(
-                        flags = ["-fPIE"],
+                        flags = ["-fPIC"],
                         expand_if_not_available = "pic",
                     ),
                 ],
