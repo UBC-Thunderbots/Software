@@ -34,7 +34,7 @@ set +e
 THIS_SCRIPT_FILENAME=$(basename "$0")
 
 # Enable bazel runtime debugging
-#RUNFILES_LIB_DEBUG=1
+# RUNFILES_LIB_DEBUG=1
 
 bin_files=(
   "$(rlocation "__main__/firmware/firmware_old_main.bin")"
