@@ -52,7 +52,7 @@ if [ $NUM_ARGS -ne 1 ]; then
   exit 1
 fi
 
-if [[ "$1" != "radio_dongle" ]] || [[ "$1" != "robot" ]]; then
+if [[ "$1" != "radio_dongle" ]] && [[ "$1" != "robot" ]]; then
   echo "Targets is chosen from:"
   echo "robot"
   echo "radio_dongle"
@@ -61,10 +61,10 @@ fi
 
 bin_file=$1
 
-if [[ $1 == "radio_dongle" ]]; then
+if [[ "$1" == "radio_dongle" ]]; then
     echo "Flashing radio dongle!"
     bin_file=${bin_files[1]}
-elif [[ $1 == "robot" ]]; then
+elif [[ "$1" == "robot" ]]; then
     echo "Flashing robot!"
     bin_file=${bin_files[0]}
 fi
