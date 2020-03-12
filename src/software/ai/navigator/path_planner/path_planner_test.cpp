@@ -12,10 +12,12 @@
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 
-// interval at which to evaluate the spline value and check
+// length at which to evaluate the spline value and check
 // if it intersects an obstacle
-static constexpr double PATH_CHECK_INTERVAL = 0.05;
-static constexpr double DEST_CHECK_EPSILON  = 1e-3;
+static constexpr double PATH_CHECK_INTERVAL_M = 0.05;
+// distance to destination before the path is considered to
+// have reached the destination
+static constexpr double DEST_CHECK_EPSILON_M = 1e-3;
 
 using namespace Test;
 
@@ -135,17 +137,30 @@ std::vector<std::pair<std::string, PathPlannerConstructor>>
 void validatePath(const Path &path, const Point &start, const Point &dest,
                   const Rectangle &navigable_area, const std::vector<Obstacle> &obstacles)
 {
-    for (long i = 0; i < std::lround(1.0 / PATH_CHECK_INTERVAL); i++)
+    // check for zero length path
+    if (path.valueAt(0.f) == path.valueAt(1.f))
     {
-        Point pt = path.valueAt(i * PATH_CHECK_INTERVAL);
+        throw std::string("zero length path!");
+    }
+
+    // compute an s value interval that roughly corresponds to length
+    // PATH_CHECK_INTERVAL_M assuming that the path is locally linear
+    double s_per_meter_ratio   = 0.05 / (path.valueAt(0.05) - path.valueAt(0.0)).length();
+    double path_check_interval = s_per_meter_ratio * PATH_CHECK_INTERVAL_M;
+
+    std::cout << "Evaluating path at intervals of s=" << path_check_interval << std::endl;
+
+    for (double s = 0.0; s <= 1.0; s += path_check_interval)
+    {
+        Point pt = path.valueAt(s);
         for (const Obstacle &obs : obstacles)
         {
             if (obs.containsPoint(pt))
             {
                 // fail because path intersects obstacle
                 std::stringstream fail_ss;
-                fail_ss << "Point " << pt << "at s=" << i * PATH_CHECK_INTERVAL
-                        << " intersects obstacle {" << obs << "}";
+                fail_ss << "Point " << pt << "at s=" << s << " intersects obstacle {"
+                        << obs << "}";
                 throw fail_ss.str();
             }
         }
@@ -153,8 +168,8 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
         {
             // fail because path exited navigable area
             std::stringstream fail_ss;
-            fail_ss << "Point " << pt << "at s=" << i * PATH_CHECK_INTERVAL
-                    << " is not in navigable area " << navigable_area;
+            fail_ss << "Point " << pt << "at s=" << s << " is not in navigable area "
+                    << navigable_area;
             throw fail_ss.str();
         }
     }
@@ -176,7 +191,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
         throw fail_ss.str();
     }
 
-    if ((path.valueAt(1.0) - dest).length() <= DEST_CHECK_EPSILON)
+    if ((path.valueAt(1.0) - dest).length() <= DEST_CHECK_EPSILON_M)
     {
         // fail because didn't reach destination
         std::stringstream fail_ss;
@@ -232,8 +247,9 @@ TEST_P(PlannerTest, test_path_planner)
 
 // uncomment this to run tests
 // cases still fail because theta* will intersect obstacles' bounding boxes at knots
+// TODO: #1207 differentiate between Theta* pathfinding bounding boxes and the actual
+// extent of obstacles
 // INSTANTIATE_TEST_CASE_P(
 //    All, PlannerTest,
-//    ::testing::Combine(
-//        testing::ValuesIn(path_planner_names_and_constructors),
-//        testing::ValuesIn(test_cases)));
+//    ::testing::Combine(testing::ValuesIn(path_planner_names_and_constructors),
+//                       testing::ValuesIn(test_cases)));
