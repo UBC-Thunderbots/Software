@@ -46,13 +46,13 @@ bin_files=(
 NUM_ARGS=$#
 NUM_BIN_FILES="${#bin_files[@]}"
 
-if [[ $NUM_ARGS -ne 1 ]] || [[ "$1" != "radio_dongle" ]] && [[ "$1" != "robot" ]]; then
-  if [ $NUM_ARGS -ne 1 ]; then
-    echo "Error: Incorrect number of arguments to script"
-    echo "Usage: $THIS_SCRIPT_FILENAME radio_dongle or robot"
-  else
-    echo "Error: Invalid target for bin file given: $1"
-  fi
+if [ $NUM_ARGS -ne 1 ]; then
+  echo "Error: Incorrect number of arguments to script"
+  echo "Usage: $THIS_SCRIPT_FILENAME radio_dongle or robot"
+  exit 1
+fi
+
+if [[ "$1" != "radio_dongle" ]] || [[ "$1" != "robot" ]]; then
   echo "Targets is chosen from:"
   echo "robot"
   echo "radio_dongle"
