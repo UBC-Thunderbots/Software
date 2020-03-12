@@ -34,30 +34,40 @@ set +e
 THIS_SCRIPT_FILENAME=$(basename "$0")
 
 # Enable bazel runtime debugging
-#RUNFILES_LIB_DEBUG=1
+# RUNFILES_LIB_DEBUG=1
 
 bin_files=(
   "$(rlocation "__main__/firmware/firmware_old_main.bin")"
+  "$(rlocation "__main__/firmware/dongle/firmware_old_radio_dongle.bin")"
 )
 
 # Check that the user selected an bin file, and let them know what their options
 # are if they have not
 NUM_ARGS=$#
 NUM_BIN_FILES="${#bin_files[@]}"
-if [[ $NUM_ARGS -ne 1 ]] || [[ $1 =~ [^[:digit:]] ]] || [[ "$1" -ge "$NUM_BIN_FILES" ]]; then
-  if [ $NUM_ARGS -ne 1 ]; then
-    echo "Error: Incorrect number of arguments to script"
-    echo "Usage: $THIS_SCRIPT_FILENAME INDEX_FOR_bin_FILE"
-  else
-    echo "Error: Invalid index for bin file given: $1"
-  fi
-  echo "INDEX_FOR_bin_FILE is chosen from:"
-  for i in "${!bin_files[@]}"; do
-    printf "%s)  %s\n" "$i" "${bin_files[$i]}"
-  done
+
+if [ $NUM_ARGS -ne 1 ]; then
+  echo "Error: Incorrect number of arguments to script"
+  echo "Usage: $THIS_SCRIPT_FILENAME radio_dongle or robot"
   exit 1
 fi
-bin_file=${bin_files[$1]}
+
+if [[ "$1" != "radio_dongle" ]] || [[ "$1" != "robot" ]]; then
+  echo "Targets is chosen from:"
+  echo "robot"
+  echo "radio_dongle"
+  exit 1
+fi
+
+bin_file=$1
+
+if [[ $1 == "radio_dongle" ]]; then
+    echo "Flashing radio dongle!"
+    bin_file=${bin_files[1]}
+elif [[ $1 == "robot" ]]; then
+    echo "Flashing robot!"
+    bin_file=${bin_files[0]}
+fi
 
 # Try to flash the given binary
 dfu-util -d 0483 -a "@Internal Flash  /0x08000000/04*016Kg,01*064Kg,07*128Kg" -D $bin_file  -s 0x08000000:leave
