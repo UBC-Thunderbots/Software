@@ -13,6 +13,8 @@ cc_library(
     deps = [
         ":transfer_medium",
         "//software/multithreading:thread_safe_buffer",
+        "@boost//:array",
+        "@boost//:asio",
         "@g3log",
     ],
 )
