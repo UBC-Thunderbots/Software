@@ -89,6 +89,14 @@ namespace Test
          */
         static std::vector<RefboxGameState> getAllRefboxGameStates();
 
+        /**
+         * Returns a robot at the given position with zero velocity,
+         * facing zero radians, with zero rad/s of angular velocity,
+         * and an id monotonically increasing at each call of this
+         * function
+         * @param pt the point
+         * @return a robot at the point
+         */
         static Robot createRobotAtPos(const Point &pt);
 
        private:

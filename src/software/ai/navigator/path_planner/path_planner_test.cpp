@@ -44,7 +44,7 @@ std::vector<PlannerTestCase>
          {.name           = "Single stationary robot in path",
           .start          = Point(0, 0),
           .dest           = Point(2, 0),
-          .navigable_area = Rectangle({-1, -1}, {1, 1}),
+          .navigable_area = Rectangle({-2, -2}, {2, 2}),
           .obstacles = {Obstacle::createRobotObstacle(TestUtil::createRobotAtPos({1, 0}),
                                                       false)},
           .should_return_path = true},
@@ -56,7 +56,7 @@ std::vector<PlannerTestCase>
           .obstacles          = {Obstacle(Rectangle({1, 4}, {2, -4}))},
           .should_return_path = true},
 
-         {.name           = "Circle of robots surrounding ego at distance 1",
+         {.name           = "Circle of robots surrounding friendly robot at distance 1",
           .start          = Point(0, 0),
           .dest           = Point(4, 0),
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
@@ -87,7 +87,7 @@ std::vector<PlannerTestCase>
               },
           .should_return_path = true},
 
-         {.name           = "Circle of robots surrounding ego at distance 0.2",
+         {.name           = "Circle of robots surrounding friendly robot at distance 0.2",
           .start          = Point(0, 0),
           .dest           = Point(4, 0),
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
@@ -249,7 +249,7 @@ TEST_P(PlannerTest, test_path_planner)
 // cases still fail because theta* will intersect obstacles' bounding boxes at knots
 // TODO: #1207 differentiate between Theta* pathfinding bounding boxes and the actual
 // extent of obstacles
-// INSTANTIATE_TEST_CASE_P(
-//    All, PlannerTest,
-//    ::testing::Combine(testing::ValuesIn(path_planner_names_and_constructors),
-//                       testing::ValuesIn(test_cases)));
+INSTANTIATE_TEST_CASE_P(
+    All, PlannerTest,
+    ::testing::Combine(testing::ValuesIn(path_planner_names_and_constructors),
+                       testing::ValuesIn(test_cases)));
