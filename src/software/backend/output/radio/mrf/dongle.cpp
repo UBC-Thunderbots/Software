@@ -406,7 +406,7 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
     // until all of those msgs are transfered. This is to avoid sending primitives at
     // unkown rates, with this method, we are limitied by the dongles receiving rate (rate
     // from computer to dongle over USB, NOT over dongel to robot radio)
-    if (!drive_transfer)
+    if (drive_transfer)
     {
         LOG(WARNING) << "Drive transfer que is full, ignoring new primitives"
                      << std::endl;
@@ -436,13 +436,15 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
 bool MRFDongle::submit_drive_transfer()
 {
     // submit drive_packet when possible.
+        std::cerr<<"GETTING HERE"<<std::endl;
     std::optional<RadioPrimitive> prim = drive_buffer->popLeastRecentlyAddedValue();
 
-    if (!prim)
+    if (prim)
     {
-        std::string drive_packet;
+        std::cerr<<prim->robot_id()<<std::endl;
         prim->SerializeToString(&drive_packet);
-
+        drive_packet = std::to_string(prim->robot_id()) + drive_packet;
+        std::cerr<<drive_packet.length()<<std::endl;
         drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet.c_str(),
                                                       drive_packet.length(), 64, 0));
 
@@ -466,6 +468,7 @@ RadioPrimitive MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &pri
     // Visit the primitive.
     prim->accept(visitor);
     RadioPrimitive r_prim = visitor.getRadioPacket();
+    r_prim.set_robot_id(prim->getRobotId());
 
     // Encode charge state
     // Robots are always charged if the estop is in RUN state; otherwise discharge them.

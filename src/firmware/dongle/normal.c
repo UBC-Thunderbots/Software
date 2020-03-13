@@ -34,12 +34,12 @@
 /**
  * \brief The number of bytes in the drive data block for each robot.
  */
-#define DRIVE_BYTES_PER_ROBOT 42
+#define DRIVE_BYTES_PER_ROBOT 64
 
 /**
  * \brief The number of bytes in the camera data block for each robot.
  */
-#define CAMERA_BYTES_PER_ROBOT 6
+#define CAMERA_BYTES_PER_ROBOT 64
 
 /**
  * \brief The number of packet buffers to allocate at system startup.

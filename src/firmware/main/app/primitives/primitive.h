@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "firmware/main/app/world/firmware_world.h"
+#include "shared/proto/primitive_fw.pb.h"
 
 /**
  * \brief The information about a movement sent from the host computer.
@@ -115,9 +116,9 @@ typedef struct
     }
 
 /**
- * Checks if the given parameters are equivalent
- * @param params1
- * @param params2
+ * Checks if the given primitives are equivalent
+ * @param prim1
+ * @param prim2
  * @return True if the params are equivalent, false otherwise
  */
-bool primitive_params_are_equal(primitive_params_t* params1, primitive_params_t* params2);
+bool primitives_are_equal(RadioPrimitive* prim1, RadioPrimitive* prim2);

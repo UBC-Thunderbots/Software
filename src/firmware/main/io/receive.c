@@ -39,6 +39,9 @@
 #include "pb_decode.h"
 #include "priority.h"
 #include "shared/proto/primitive_fw.pb.h"
+#include "pb.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
 
 /**
  * \brief The number of robots in the drive packet.
@@ -60,7 +63,7 @@
  */
 #define CAMERA_MIN_BYTES                                                                 \
     1 /*Mask*/ + 1 /*Flag*/ + 0 /*Ball Data*/ + 0 /*Robot Data*/ + 8 /*Timestamp*/ +     \
-        1 /*Status*/
+    1 /*Status*/
 
 static unsigned int robot_index;
 static FirmwareWorld_t *world;
@@ -70,14 +73,14 @@ static SemaphoreHandle_t drive_mtx;
 static unsigned int timeout_ticks;
 static uint8_t last_serial        = 0xFF;
 static const size_t HEADER_LENGTH = 2U /* Frame control */ + 1U /* Seq# */ +
-                                    2U /* Dest PAN */ + 2U /* Dest */ + 2U /* Src */;
+2U /* Dest PAN */ + 2U /* Dest */ + 2U /* Src */;
 static const size_t FOOTER_LENGTH         = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
 static const int16_t MESSAGE_PURPOSE_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
-                                            2U /* Dest PAN */ + 2U /* Dest */ +
-                                            2U /* Src */;
+2U /* Dest PAN */ + 2U /* Dest */ +
+2U /* Src */;
 static const uint16_t MESSAGE_PAYLOAD_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
-                                             2U /* Dest PAN */ + 2U /* Dest */ +
-                                             2U /* Src */ + 1U /* Msg Purpose*/;
+2U /* Dest PAN */ + 2U /* Dest */ +
+2U /* Src */ + 1U /* Msg Purpose*/;
 
 static void receive_task(void *UNUSED(param))
 {
@@ -89,10 +92,10 @@ static void receive_task(void *UNUSED(param))
         uint16_t frame_control = dma_buffer[0U] | (dma_buffer[1U] << 8U);
         // Sanity-check the frame control word
         if (((frame_control >> 0U) & 7U) == 1U /* Data packet */ &&
-            ((frame_control >> 3U) & 1U) == 0U /* No security */ &&
-            ((frame_control >> 6U) & 1U) == 1U /* Intra-PAN */ &&
-            ((frame_control >> 10U) & 3U) == 2U /* 16-bit destination address */ &&
-            ((frame_control >> 14U) & 3U) == 2U /* 16-bit source address */)
+                ((frame_control >> 3U) & 1U) == 0U /* No security */ &&
+                ((frame_control >> 6U) & 1U) == 1U /* Intra-PAN */ &&
+                ((frame_control >> 10U) & 3U) == 2U /* 16-bit destination address */ &&
+                ((frame_control >> 14U) & 3U) == 2U /* 16-bit source address */)
         {
             // Read out and check the source address and sequence number
             uint16_t source_address = dma_buffer[7U] | (dma_buffer[8U] << 8U);
@@ -110,7 +113,6 @@ static void receive_task(void *UNUSED(param))
                     // Note that camera packets have a variable length.
                     if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x0FU)
                     {
-                        printf("handling drive packet!\n");
                         handle_drive_packet(dma_buffer);
                     }
                     else if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x10U)
@@ -142,7 +144,7 @@ static void receive_task(void *UNUSED(param))
  *                   outside world
  */
 void receive_init(unsigned int index, PrimitiveManager_t *_primitive_manager,
-                  FirmwareWorld_t *_world)
+        FirmwareWorld_t *_world)
 {
     static StaticSemaphore_t drive_mtx_storage;
     drive_mtx = xSemaphoreCreateMutexStatic(&drive_mtx_storage);
@@ -158,8 +160,8 @@ void receive_init(unsigned int index, PrimitiveManager_t *_primitive_manager,
     static StaticTask_t receive_task_tcb;
     STACK_ALLOCATE(receive_task_stack, 4096);
     xTaskCreateStatic(&receive_task, "rx",
-                      sizeof(receive_task_stack) / sizeof(*receive_task_stack), 0,
-                      PRIO_TASK_RX, receive_task_stack, &receive_task_tcb);
+            sizeof(receive_task_stack) / sizeof(*receive_task_stack), 0,
+            PRIO_TASK_RX, receive_task_stack, &receive_task_tcb);
 }
 
 /**
@@ -186,7 +188,7 @@ void receive_tick(log_record_t *record)
         primitive_params_t stop_params;
         xSemaphoreTake(drive_mtx, portMAX_DELAY);
         app_primitive_manager_startNewPrimitive(primitive_manager, world, 0,
-                                                &stop_params);
+                &stop_params);
         xSemaphoreGive(drive_mtx);
     }
     else if (timeout_ticks > 1)
@@ -205,51 +207,41 @@ uint8_t receive_last_serial(void)
 }
 
 /**
- * The previous primitive values to compare against to check if the
- * new primitive should be taken, or if it is a copy of the previous one.
+ * Store both current and previous primitives to avoid restarting the
+ * same primitive
  */
-static primitive_params_t pparams_previous = {
-    .params = {0, 0, 0, 0}, .slow = false, .extra = 0};
-static unsigned int primitive_previous = 0;
+static RadioPrimitive current_prim = RadioPrimitive_init_zero;
+static RadioPrimitive previous_prim = RadioPrimitive_init_zero;
 
 void handle_drive_packet(uint8_t *dma_buffer)
 {
-    // Grab emergency stop status from the end of the frame.
-    bool estop_run =
-        !!dma_buffer[MESSAGE_PAYLOAD_ADDR + NUM_ROBOTS * RECEIVE_DRIVE_BYTES_PER_ROBOT];
-
     // Grab a pointer to the robot’s own data block.
     const uint8_t *robot_data =
-        dma_buffer + MESSAGE_PAYLOAD_ADDR + RECEIVE_DRIVE_BYTES_PER_ROBOT * robot_index;
+        dma_buffer + MESSAGE_PAYLOAD_ADDR;
 
-    /*// Check if feedback should be sent.*/
-    /*if (robot_data[0] & 0x80)*/
-    /*{*/
-    /*feedback_pend_normal();*/
-    /*}*/
+    for(int i = 0; i < RECEIVE_DRIVE_BYTES_PER_ROBOT; i++){
+        printf("ROOBOT DATA: %d\n", robot_data[i]);
+    }
 
-    /*// Extract the serial number.*/
-    /*uint8_t serial = *robot_data++ & 0x0F;*/
+    // Check if feedback should be sent
+    if (robot_data[0] & 0x80)
+    {
+        feedback_pend_normal();
+    }
 
-    /*// Construct the individual 16-bit words sent from the host.*/
-    /*uint16_t words[4U];*/
-    /*for (unsigned int i = 0U; i < 4U; ++i)*/
-    /*{*/
-    /*words[i] = *robot_data++;*/
-    /*words[i] |= (uint16_t)*robot_data++ << 8;*/
-    /*}*/
+    // Create a stream that reads from the buffer
+    pb_istream_t in_stream =
+        pb_istream_from_buffer(robot_data, RECEIVE_DRIVE_BYTES_PER_ROBOT);
 
-    /*// In case of emergency stop, treat everything as zero*/
-    /*// except the chicker discharge bit (that can keep its*/
-    /*// status).*/
-    /*if (!estop_run)*/
-    /*{*/
-    /*static const uint16_t MASK[4] = {0x0000, 0x4000, 0x0000, 0x0000};*/
-    /*for (unsigned int i = 0; i != 4; ++i)*/
-    /*{*/
-    /*words[i] &= MASK[i];*/
-    /*}*/
-    /*}*/
+    printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_ADDR]);
+    printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 1]);
+    printf("value: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 2]);
+
+    printf("handling drive packet!\n");
+    if (pb_decode(&in_stream, RadioPrimitive_fields, &current_prim))
+    {
+        printf("Decoded proto\n");
+    }
 
     /*// Take the drive mutex.*/
     /*xSemaphoreTake(drive_mtx, portMAX_DELAY);*/
@@ -261,54 +253,45 @@ void handle_drive_packet(uint8_t *dma_buffer)
     /*charger_enable(words[1] & 0x8000);*/
     /*chicker_discharge(words[1] & 0x4000);*/
 
-    /*// If the serial number, the emergency stop has just*/
-    /*// been switched to stop, or the current primitive is*/
-    /*// direct, a new movement primitive needs to start. Do*/
-    /*// not start a movement primitive if the emergency stop*/
-    /*// has just been switched to run and the current*/
-    /*// primitive is not direct, because we can’t usefully*/
-    /*// restart the stopped prior primitive—instead, wait*/
-    /*// for the host to send new data. Strictly speaking, we*/
-    /*// only need to start direct primitives when the estop*/
-    /*// is switched from stop to run, but this is*/
-    /*// unnecessary as direct primitives shouldn’t care*/
-    /*// about being started more often than necessary.*/
     /*unsigned int primitive;*/
     /*primitive_params_t pparams;*/
     /*for (unsigned int i = 0; i != 4; ++i)*/
     /*{*/
-    /*int16_t value = words[i] & 0x3FF;*/
-    /*if (words[i] & 0x400)*/
-    /*{*/
-    /*value = -value;*/
-    /*}*/
-    /*if (words[i] & 0x800)*/
-    /*{*/
-    /*value *= 10;*/
-    /*}*/
-    /*pparams.params[i] = value;*/
+        /*int16_t value = words[i] & 0x3FF;*/
+        /*if (words[i] & 0x400)*/
+        /*{*/
+            /*value = -value;*/
+        /*}*/
+        /*if (words[i] & 0x800)*/
+        /*{*/
+            /*value *= 10;*/
+        /*}*/
+        /*pparams.params[i] = value;*/
     /*}*/
     /*primitive     = words[0] >> 12;*/
     /*pparams.extra = (words[2] >> 12) | ((words[3] >> 12) << 4);*/
     /*pparams.slow  = !!(pparams.extra & 0x80);*/
     /*pparams.extra &= 0x7F;*/
     /*if ((serial != last_serial [> Non-atomic because we are only writer <]) ||*/
-    /*!estop_run || app_primitive_manager_primitiveIsDirect(primitive))*/
+            /*!estop_run || app_primitive_manager_primitiveIsDirect(primitive))*/
     /*{*/
-    /*if (!primitive_params_are_equal(&pparams, &pparams_previous) ||*/
-    /*!(primitive == primitive_previous))*/
-    /*{*/
-    /*primitive_previous = primitive;*/
-    /*for (unsigned int i = 0; i < 4; i++)*/
-    /*{*/
-    /*pparams_previous.params[i] = pparams.params[i];*/
-    /*}*/
-    /*pparams_previous.slow  = pparams.slow;*/
-    /*pparams_previous.extra = pparams.extra;*/
-    /*// Apply the movement primitive.*/
-    /*app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,*/
-    /*&pparams);*/
-    /*}*/
+        /*if (!primitive_params_are_equal(&pparams, &pparams_previous) ||*/
+                /*!(primitive == primitive_previous))*/
+        /*{*/
+            /*primitive_previous = primitive;*/
+
+            /*for (unsigned int i = 0; i < 4; i++)*/
+            /*{*/
+                /*pparams_previous.params[i] = pparams.params[i];*/
+            /*}*/
+
+            /*pparams_previous.slow  = pparams.slow;*/
+            /*pparams_previous.extra = pparams.extra;*/
+
+            /*// apply the movement primitive.*/
+            /*app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,*/
+                    /*&pparams);*/
+        /*}*/
     /*}*/
 
     /*// Release the drive mutex.*/

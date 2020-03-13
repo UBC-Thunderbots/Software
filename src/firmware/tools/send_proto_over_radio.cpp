@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     while (1)
     {
         std::cout << "SETING STOP PRIMITIVE" << std::endl;
-        auto stopprim = std::make_unique<StopPrimitive>(0, false);
+        auto stopprim = std::make_unique<StopPrimitive>(9, false);
 
         std::vector<std::unique_ptr<Primitive>> primitives;
         primitives.push_back(std::move(stopprim));

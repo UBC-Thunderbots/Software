@@ -103,6 +103,7 @@ cc_library(
     hdrs = ["primitive.h"],
     deps = [
         "//firmware/main/app/world:firmware_world",
+        "//shared/proto:fw_c_proto",
     ],
 )
 

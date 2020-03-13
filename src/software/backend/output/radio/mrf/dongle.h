@@ -162,6 +162,7 @@ class MRFDongle final
 
     std::shared_ptr<ThreadSafeBuffer<RadioPrimitive>> drive_buffer;
     std::shared_ptr<ThreadSafeBuffer<DetectedRobot>> camera_buffer;
+    std::string drive_packet;
 };
 
 inline uint8_t MRFDongle::channel() const

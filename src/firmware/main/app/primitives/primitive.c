@@ -1,28 +1,38 @@
 #include "firmware/main/app/primitives/primitive.h"
+#include "shared/proto/primitive_fw.pb.h"
 
-bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params2)
+bool primitives_are_equal(RadioPrimitive* prim1, RadioPrimitive* prim2)
 {
     bool equal = true;
 
-    if (params1->slow != params2->slow)
+    if (prim1->slow != prim2->slow)
     {
         equal = false;
     }
 
-    if (equal && params1->extra != params2->extra)
+    if (equal && prim1->extra_bits != prim2->extra_bits)
     {
         equal = false;
     }
 
     if (equal)
     {
-        for (int i = 0; i < 4; i++)
-        {
-            if (params1->params[i] != params2->params[i])
+            if (prim1->parameter1 != prim2->parameter2)
             {
                 equal = false;
             }
-        }
+            if (prim1->parameter2 != prim2->parameter2)
+            {
+                equal = false;
+            }
+            if (prim1->parameter3 != prim2->parameter2)
+            {
+                equal = false;
+            }
+            if (prim1->parameter4 != prim2->parameter2)
+            {
+                equal = false;
+            }
     }
 
     return equal;
