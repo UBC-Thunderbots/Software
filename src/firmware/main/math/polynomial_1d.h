@@ -1,4 +1,5 @@
 #pragma once
+#include <stddef.h>
 
 /**
  * A polynomial with a list of coefficients, with the highest order coefficients at
