@@ -1,5 +1,5 @@
 # Software
-[![Build Status](https://ci.appveyor.com/api/projects/status/a7106hhbcal8kqi8/branch/master?svg=true)
+[![Build Status](https://ci.appveyor.com/api/projects/status/a7106hhbcal8kqi8/branch/master?svg=true)](https://ci.appveyor.com/project/GarethEllis/software)
 
 Our main software repository, for both software and firmware. To get started, please see [getting started](docs/getting-started.md). Before making *any* contributions, please read over our [style guide](docs/code-style-guide.md), and [workflow](docs/workflow.md).
 
