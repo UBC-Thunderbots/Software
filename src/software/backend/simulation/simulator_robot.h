@@ -288,19 +288,6 @@ class SimulatorRobot
     unsigned int checkValidAndReturnUint(
         std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
-    /**
-     * Returns true if the given primitive or parameters are different than the primitive
-     * this robot is currently running
-     *
-     * @param primitive_index The index of the primitive
-     * @param primitive_params The params for the primitive
-     *
-     * @return True if the given index or params are different than what the robot is
-     * currently running, and false otherwise
-     */
-    bool isPrimitiveDifferentThanCurrent(unsigned int primitive_index,
-                                         const primitive_params_t& primitive_params);
-
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<double> autokick_speed_m_per_s;
     std::optional<double> autochip_distance_m;

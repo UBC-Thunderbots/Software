@@ -200,14 +200,6 @@ uint8_t receive_last_serial(void)
     return __atomic_load_n(&last_serial, __ATOMIC_RELAXED);
 }
 
-/**
- * The previous primitive values to compare against to check if the
- * new primitive should be taken, or if it is a copy of the previous one.
- */
-static primitive_params_t pparams_previous = {
-    .params = {0, 0, 0, 0}, .slow = false, .extra = 0};
-static unsigned int primitive_previous = 0;
-
 void handle_drive_packet(uint8_t *dma_buffer)
 {
     // Grab emergency stop status from the end of the frame.
@@ -291,20 +283,8 @@ void handle_drive_packet(uint8_t *dma_buffer)
     if ((serial != last_serial /* Non-atomic because we are only writer */) ||
         !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
     {
-        if (!primitive_params_are_equal(&pparams, &pparams_previous) ||
-            !(primitive == primitive_previous))
-        {
-            primitive_previous = primitive;
-            for (unsigned int i = 0; i < 4; i++)
-            {
-                pparams_previous.params[i] = pparams.params[i];
-            }
-            pparams_previous.slow  = pparams.slow;
-            pparams_previous.extra = pparams.extra;
-            // Apply the movement primitive.
-            app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
+        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
                                                     &pparams);
-        }
     }
 
     // Release the drive mutex.

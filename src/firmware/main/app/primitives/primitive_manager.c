@@ -44,6 +44,9 @@ struct PrimitiveManager
 
     // A pointer to the state of the current primitive
     void *current_primitive_state;
+
+    // The most recent primitive params used to start a primitive
+    primitive_params_t *previous_primitive_params;
 };
 
 /**
@@ -121,6 +124,7 @@ PrimitiveManager_t *app_primitive_manager_create(void)
     manager->current_primitive_functions = NULL;
     manager->current_primitive_index     = 254;
     manager->current_primitive_state     = NULL;
+    manager->previous_primitive_params = NULL;
 
     return manager;
 }
@@ -138,27 +142,29 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     assert(primitive_index < PRIMITIVE_COUNT);
     app_primitive_manager_lockPrimitiveMutex(manager);
 
-    if (manager->current_primitive_functions)
-    {
-        manager->current_primitive_functions->end(manager->current_primitive_state,
-                                                  world);
-        manager->current_primitive_functions->destroy_state(
-            manager->current_primitive_state);
+    if(primitive_params_are_equal(manager->previous_primitive_params, params) || manager->current_primitive_index != primitive_index) {
+        if (manager->current_primitive_functions)
+        {
+            manager->current_primitive_functions->end(manager->current_primitive_state,
+                                                      world);
+            manager->current_primitive_functions->destroy_state(
+                    manager->current_primitive_state);
+        }
+
+        FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+        Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
+        Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
+
+        app_chicker_disableAutochip(chicker);
+        app_chicker_disableAutokick(chicker);
+        app_dribbler_setSpeed(dribbler, 0);
+        manager->current_primitive_functions = PRIMITIVES[primitive_index];
+        manager->current_primitive_index     = primitive_index;
+        manager->current_primitive_state =
+                manager->current_primitive_functions->create_state();
+        manager->current_primitive_functions->start(params, manager->current_primitive_state,
+                                                    world);
     }
-
-    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
-    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
-
-    app_chicker_disableAutochip(chicker);
-    app_chicker_disableAutokick(chicker);
-    app_dribbler_setSpeed(dribbler, 0);
-    manager->current_primitive_functions = PRIMITIVES[primitive_index];
-    manager->current_primitive_index     = primitive_index;
-    manager->current_primitive_state =
-        manager->current_primitive_functions->create_state();
-    manager->current_primitive_functions->start(params, manager->current_primitive_state,
-                                                world);
 
     app_primitive_manager_unlockPrimitiveMutex(manager);
 }

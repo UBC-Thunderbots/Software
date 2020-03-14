@@ -4,6 +4,10 @@ bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t 
 {
     bool equal = true;
 
+    if(!params1 || !params2) {
+        return false;
+    }
+
     if (params1->slow != params2->slow)
     {
         equal = false;
