@@ -7,7 +7,12 @@ qt_cc_library(
     src = "main_widget.cpp",
     hdr = "main_widget.h",
     deps = [
+        ":chicker",
+        ":dribbler",
+        ":drive",
         ":feedback",
+        ":leds",
+        ":robot_selection",
         "//software/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
     ],
@@ -17,6 +22,56 @@ qt_cc_library(
     name = "feedback",
     src = "feedback.cpp",
     hdr = "feedback.h",
+    deps = [
+        "//software/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "drive",
+    src = "drive.cpp",
+    hdr = "drive.h",
+    deps = [
+        "//software/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "dribbler",
+    src = "dribbler.cpp",
+    hdr = "dribbler.h",
+    deps = [
+        "//software/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "chicker",
+    src = "chicker.cpp",
+    hdr = "chicker.h",
+    deps = [
+        "//software/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "leds",
+    src = "leds.cpp",
+    hdr = "leds.h",
+    deps = [
+        "//software/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "robot_selection",
+    src = "robot_selection.cpp",
+    hdr = "robot_selection.h",
     deps = [
         "//software/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",

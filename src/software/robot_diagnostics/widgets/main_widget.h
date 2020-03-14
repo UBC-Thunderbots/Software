@@ -3,7 +3,12 @@
 #include <QtWidgets/QMainWindow>
 
 #include "software/robot_diagnostics/ui/ui_main_widget.h"
+#include "software/robot_diagnostics/widgets/chicker.h"
+#include "software/robot_diagnostics/widgets/dribbler.h"
+#include "software/robot_diagnostics/widgets/drive.h"
 #include "software/robot_diagnostics/widgets/feedback.h"
+#include "software/robot_diagnostics/widgets/leds.h"
+#include "software/robot_diagnostics/widgets/robot_selection.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui

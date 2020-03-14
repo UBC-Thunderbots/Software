@@ -14,4 +14,12 @@ MainWidget::MainWidget(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
 
     setupFeedback(main_widget);
+    setupFeedback(main_widget);
+    setupDrive(main_widget);
+    setupDribbler(main_widget);
+    setupChicker(main_widget);
+    setupLEDs(main_widget);
+    setupRobotSelection(main_widget);
+
+    update();
 }
