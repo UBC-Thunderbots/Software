@@ -284,7 +284,7 @@ void handle_drive_packet(uint8_t *dma_buffer)
         !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
     {
         app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
-                                                    &pparams);
+                                                &pparams);
     }
 
     // Release the drive mutex.
