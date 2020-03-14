@@ -47,13 +47,7 @@ void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv)
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and Visualizer on the stack does
     // not work, despite theoretically having the same order of destruction
-    int dummy_argc = 2;
-    char **dummy_argv = new char*[2];
-    for (int i = 0; i<2; i++)
-    {
-        dummy_argv[i] = (char *) "dummy";
-    }
-    QApplication* application = new QApplication(dummy_argc, dummy_argv);
+    QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
     std::shared_ptr<ThunderbotsConfig> config = std::make_shared<ThunderbotsConfig>();

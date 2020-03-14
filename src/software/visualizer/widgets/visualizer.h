@@ -3,6 +3,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QTimer>
 #include <QtWidgets/QMainWindow>
+
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/multithreading/thread_safe_buffer.h"

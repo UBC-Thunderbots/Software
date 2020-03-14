@@ -7,4 +7,3 @@ qt_ui_library(
     ui = "main_widget.ui",
     deps = ["@qt//:qt_widgets"],
 )
-

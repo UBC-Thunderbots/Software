@@ -92,7 +92,4 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     std::atomic_bool application_shutting_down;
     bool initial_view_area_set;
-
-//    int dummy_argc;
-//    char** dummy_argv;
 };

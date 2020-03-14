@@ -11,4 +11,3 @@ qt_cc_library(
         "@qt//:qt_widgets",
     ],
 )
-
