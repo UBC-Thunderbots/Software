@@ -14,25 +14,29 @@ Simulator::Simulator(const World& world) : physics_world(world)
 {
     for (auto physics_robot : physics_world.getFriendlyPhysicsRobots())
     {
-        simulator_robots.emplace_back(std::make_shared<SimulatorRobot>(physics_robot));
-    }
-    simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
+        auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
 
-    auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
-    auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
-    // Make sure to release ownership from the local variables so the firmware_world
-    // can take ownership
-    FirmwareWorld_t* firmware_world_raw =
+        auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+        // Release ownership of the pointers so the firmware_world can take ownership
+        FirmwareWorld_t* firmware_world_raw =
         app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
-    firmware_world =
-        std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
+        auto firmware_world =
+            std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
+
+        simulator_robots.insert(std::make_pair(simulator_robot, firmware_world));
+    }
+
+    simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
 }
 
 void Simulator::stepSimulation(const Duration& time_step)
 {
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
-    for (const auto& simulator_robot : simulator_robots)
+    for (auto& iter : simulator_robots)
     {
+        auto simulator_robot = iter.first;
+        auto firmware_world = iter.second;
         SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
         SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
     }
@@ -42,25 +46,29 @@ void Simulator::stepSimulation(const Duration& time_step)
 
 void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    if (primitives)
+    if (!primitives) {
+        return;
+    }
+
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+    for (const auto& primitive_ptr : *primitives)
     {
-        for (const auto& primitive_ptr : *primitives)
+        primitive_params_t primitive_params = getPrimitiveParams(primitive_ptr);
+        unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
+
+        auto simulator_robots_iter = std::find_if(
+            simulator_robots.begin(), simulator_robots.end(),
+            [&primitive_ptr](const auto& robot_world_pair) {
+                return robot_world_pair.first->getRobotId() == primitive_ptr->getRobotId();
+            });
+
+        if (simulator_robots_iter != simulator_robots.end())
         {
-            primitive_params_t primitive_params = getPrimitiveParams(primitive_ptr);
-            unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
-
-            auto simulator_robots_iter = std::find_if(
-                simulator_robots.begin(), simulator_robots.end(),
-                [&primitive_ptr](const auto& simulator_robot) {
-                    return simulator_robot->getRobotId() == primitive_ptr->getRobotId();
-                });
-
-            if (simulator_robots_iter != simulator_robots.end())
-            {
-                SimulatorRobotSingleton::setSimulatorRobot(*simulator_robots_iter);
-                SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-                    firmware_world, primitive_index, primitive_params);
-            }
+            auto simulator_robot = (*simulator_robots_iter).first;
+            auto firmware_world = (*simulator_robots_iter).second;
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
+                firmware_world, primitive_index, primitive_params);
         }
     }
 }

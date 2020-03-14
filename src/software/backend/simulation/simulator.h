@@ -110,9 +110,5 @@ class Simulator
 
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
-    std::vector<std::shared_ptr<SimulatorRobot>> simulator_robots;
-    // The firmware_world pointer that is used by all simulated robots. It is
-    // controlled by the SimulatorRobotSingleton in order to work with multiple
-    // robots and primitives simultaneously
-    std::shared_ptr<FirmwareWorld_t> firmware_world;
+    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>> simulator_robots;
 };
