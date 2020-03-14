@@ -164,7 +164,7 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
     for (const auto &detection : detections)
     {
         auto ssl_robots = detection.robots_yellow();
-        if (refbox_config->FriendlyColorYellow()->value())
+        if (!refbox_config->FriendlyColorYellow()->value())
         {
             ssl_robots = detection.robots_blue();
         }
