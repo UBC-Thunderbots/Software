@@ -7,6 +7,17 @@ qt_cc_library(
     src = "main_widget.cpp",
     hdr = "main_widget.h",
     deps = [
+        ":feedback",
+        "//software/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "feedback",
+    src = "feedback.cpp",
+    hdr = "feedback.h",
+    deps = [
         "//software/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
     ],

@@ -6,4 +6,12 @@ MainWidget::MainWidget(QWidget *parent)
     // Handles all the setup of the generated UI components and adds the components
     // to this widget
     main_widget->setupUi(this);
+
+    // StrongFocus means that the MainWidget will more aggressively capture focus when
+    // clicked. Specifically, we do this so that when the user clicks outside of the
+    // QLineEdits used for Parameters, the QLineEdit will lose focus.
+    // https://www.qtcentre.org/threads/41128-Need-to-implement-in-place-line-edit-unable-to-get-lose-focus-of-QLineEdit
+    setFocusPolicy(Qt::StrongFocus);
+
+    setupFeedback(main_widget);
 }
