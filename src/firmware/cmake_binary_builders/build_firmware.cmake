@@ -21,23 +21,23 @@ function(build_firmware FIRMWARE_SOURCE_DIR SRC_FILES BINARY_NAME OUT_DIR)
 
     # a list of the c flags we are going to use
     set(CFLAGS
-"        -std=gnu99",
-"        -O2",
-"        -mfloat-abi=hard",
-"        -mlittle-endian",
-"        -mcpu=cortex-m4",
-"        -mfpu=fpv4-sp-d16",
-"        -mthumb",
-"        -ggdb3",
-"        -fno-common",
-"        -ffunction-sections",
-"        -static",
-"        -Wall",
-"        -Wextra",
-"        -Wdouble-promotion",
-"        -Wpointer-arith",
+        "-std=gnu99"
+        "-O2"
+        "-mfloat-abi=hard"
+        "-mlittle-endian"
+        "-mcpu=cortex-m4"
+        "-mfpu=fpv4-sp-d16"
+        "-mthumb"
+        "-ggdb3"
+        "-fno-common"
+        "-ffunction-sections"
+        "-static"
+        "-Wall"
+        "-Wextra"
+        "-Wdouble-promotion"
+        "-Wpointer-arith"
         )
-        
+
     # specify all of the compiler flags
     target_compile_options(${BINARY_NAME}.elf PUBLIC ${CFLAGS})
 
@@ -51,16 +51,19 @@ function(build_firmware FIRMWARE_SOURCE_DIR SRC_FILES BINARY_NAME OUT_DIR)
         set(LINKER_FLAGS "${LINKER_FLAGS} ${flag}")
     endforeach(flag)
     # set our linker script
-    set(LINKER_SCRIPT "${FIRMWARE_SOURCE_DIR}/stm32lib/stm32f405.ld")
+    set(LINKER_SCRIPT "${FIRMWARE_SOURCE_DIR}/stm32f405.ld")
     # add the linker script and the map option to our linker flags
     # the map options tells the linker where to put the bulit .map file
     set(LINKER_FLAGS "${LINKER_FLAGS} -Wl,-T${LINKER_SCRIPT} -Wl,-Map=${FIRMWARE_SOURCE_DIR}/${OUT_DIR}/${BINARY_NAME}.map")
 
+    message("LINKER FLAGS: ${LINKER_FLAGS}")
+    message("CLAGS: ${CFLAGS}")
+
     # add the linker flags and tell cmake to put our ${BINARY_NAME}.elf file in the specifed RUNTIME_OUTPUT_DIRECTORY
     set_target_properties(${BINARY_NAME}.elf
-            PROPERTIES
-            LINK_FLAGS ${LINKER_FLAGS}
-            RUNTIME_OUTPUT_DIRECTORY ${FIRMWARE_SOURCE_DIR}/${OUT_DIR})
+        PROPERTIES
+        LINK_FLAGS ${LINKER_FLAGS}
+        RUNTIME_OUTPUT_DIRECTORY ${FIRMWARE_SOURCE_DIR}/${OUT_DIR})
 
 
     # link against libraries
@@ -70,9 +73,9 @@ function(build_firmware FIRMWARE_SOURCE_DIR SRC_FILES BINARY_NAME OUT_DIR)
     # tell cmake to copy the .elf file to the specified .bin file after compilation has finished
     set(BIN_FILE "${FIRMWARE_SOURCE_DIR}/${OUT_DIR}/${BINARY_NAME}.bin")
     add_custom_command(
-            TARGET ${BINARY_NAME}.elf
-            POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${BINARY_NAME}.elf> ${BIN_FILE}
-            COMMENT "Building ${BIN_FILE}")
+        TARGET ${BINARY_NAME}.elf
+        POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${BINARY_NAME}.elf> ${BIN_FILE}
+        COMMENT "Building ${BIN_FILE}")
 
 endfunction(build_firmware)

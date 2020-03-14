@@ -124,3 +124,66 @@ cc_library(
     # interrupts to stop working
     alwayslink = True,
 )
+
+#######################################################################
+#                            Radio Dongle                             #
+#######################################################################
+
+# the files needed for the dongle
+cc_library(
+    name = "firmware_old_radio_dongle_usb_lib",
+    srcs = glob(
+        [
+            "usb/**/*.c",
+        ],
+    ),
+    hdrs = glob(
+        [
+            "usb/**/*.h",
+        ],
+    ),
+    includes = [
+        "usb/include",
+    ],
+    restricted_to = ["//cc_toolchain:stm32f4"],
+    deps = [
+        ":dongle_freertos",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "dongle_freertos",
+    srcs = glob([
+        "freertos/source/**/*.c",
+        "stm32lib/**/*.c",
+    ]),
+    hdrs = glob([
+        "freertos/include/*.h",
+        "stm32lib/include/**/*.h",
+    ]),
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
+    defines = [
+        "STM32LIB_USE_FREERTOS",
+    ],
+    includes = [
+        "dongle",
+        "freertos/include",
+        "stm32lib/include",
+        "stm32lib/include/registers",
+    ],
+    restricted_to = ["//cc_toolchain:stm32f4"],
+    deps = [
+        "//firmware/dongle:firmware_old_radio_dongle_freertos_config",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
