@@ -20,11 +20,11 @@
       <x>390</x>
       <y>20</y>
       <width>491</width>
-      <height>191</height>
+      <height>221</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="per_motor">
      <attribute name="title">
@@ -186,11 +186,154 @@
        </rect>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_per_motor_execute">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>150</y>
+        <width>181</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Execute</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="matrix">
      <attribute name="title">
       <string>Matrix</string>
      </attribute>
+     <widget class="QSlider" name="slider_matrix_x">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>30</y>
+        <width>241</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-99</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="slider_matrix_y">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>60</y>
+        <width>241</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-99</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="slider_matrix_theta">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>90</y>
+        <width>241</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-99</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_matrix_x">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>30</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>X (m/s)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_matrix_y">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>60</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Y (m/s)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_matrix_theta">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>90</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>theta (°/s)</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_matrix_x">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>30</y>
+        <width>51</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_matrix_y">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>60</y>
+        <width>51</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_matrix_theta">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>90</y>
+        <width>51</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_matrix_execute">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>150</y>
+        <width>181</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Execute</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QLabel" name="label_drive">
@@ -264,8 +407,14 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>20</number>
+    </property>
     <property name="value">
-     <number>50</number>
+     <number>0</number>
+    </property>
+    <property name="format">
+     <string>%v V</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar_capacitor">
@@ -277,8 +426,14 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>200</number>
+    </property>
     <property name="value">
-     <number>50</number>
+     <number>0</number>
+    </property>
+    <property name="format">
+     <string>%v V</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar_dribbler_1">
@@ -313,7 +468,7 @@
      <number>100</number>
     </property>
     <property name="value">
-     <number>20</number>
+     <number>0</number>
     </property>
     <property name="format">
      <string>%v °C</string>
@@ -329,7 +484,7 @@
      </rect>
     </property>
     <property name="value">
-     <number>20</number>
+     <number>0</number>
     </property>
     <property name="format">
      <string>%v °C</string>
@@ -371,13 +526,16 @@
      </rect>
     </property>
     <property name="minimum">
-     <number>-100</number>
+     <number>-90</number>
+    </property>
+    <property name="maximum">
+     <number>-30</number>
     </property>
     <property name="value">
      <number>-90</number>
     </property>
     <property name="format">
-     <string>%vdB</string>
+     <string>%v dB</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_status">
@@ -791,7 +949,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>220</y>
+      <y>250</y>
       <width>421</width>
       <height>31</height>
      </rect>
@@ -804,7 +962,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>225</y>
+      <y>255</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -822,7 +980,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>320</y>
+      <y>350</y>
       <width>411</width>
       <height>31</height>
      </rect>
@@ -835,7 +993,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>325</y>
+      <y>355</y>
       <width>81</width>
       <height>17</height>
      </rect>
@@ -853,7 +1011,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>245</y>
+      <y>275</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -866,7 +1024,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>245</y>
+      <y>275</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -879,7 +1037,7 @@
     <property name="geometry">
      <rect>
       <x>630</x>
-      <y>245</y>
+      <y>275</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -892,7 +1050,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>265</y>
+      <y>295</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -905,7 +1063,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>265</y>
+      <y>295</y>
       <width>112</width>
       <height>23</height>
      </rect>
@@ -918,7 +1076,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>295</y>
+      <y>325</y>
       <width>241</width>
       <height>20</height>
      </rect>
@@ -931,7 +1089,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>295</y>
+      <y>325</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -949,7 +1107,7 @@
     <property name="geometry">
      <rect>
       <x>720</x>
-      <y>295</y>
+      <y>325</y>
       <width>51</width>
       <height>25</height>
      </rect>
@@ -959,7 +1117,7 @@
     <property name="geometry">
      <rect>
       <x>788</x>
-      <y>245</y>
+      <y>275</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -972,7 +1130,7 @@
     <property name="geometry">
      <rect>
       <x>788</x>
-      <y>290</y>
+      <y>320</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -985,7 +1143,7 @@
     <property name="geometry">
      <rect>
       <x>720</x>
-      <y>355</y>
+      <y>385</y>
       <width>51</width>
       <height>25</height>
      </rect>
@@ -995,7 +1153,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>355</y>
+      <y>385</y>
       <width>241</width>
       <height>20</height>
      </rect>
@@ -1008,7 +1166,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>355</y>
+      <y>385</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -1026,7 +1184,7 @@
     <property name="geometry">
      <rect>
       <x>790</x>
-      <y>350</y>
+      <y>380</y>
       <width>81</width>
       <height>31</height>
      </rect>
