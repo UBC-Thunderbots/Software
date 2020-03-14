@@ -142,7 +142,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     assert(primitive_index < PRIMITIVE_COUNT);
     app_primitive_manager_lockPrimitiveMutex(manager);
 
-    if(primitive_params_are_equal(manager->previous_primitive_params, params) || manager->current_primitive_index != primitive_index) {
+    if(!primitive_params_are_equal(manager->previous_primitive_params, params) || manager->current_primitive_index != primitive_index) {
         if (manager->current_primitive_functions)
         {
             manager->current_primitive_functions->end(manager->current_primitive_state,
@@ -162,6 +162,10 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
         manager->current_primitive_index     = primitive_index;
         manager->current_primitive_state =
                 manager->current_primitive_functions->create_state();
+        if(!manager->previous_primitive_params) {
+            manager->previous_primitive_params = (primitive_params_t*)malloc(sizeof(primitive_params_t));
+        }
+        *(manager->previous_primitive_params) = *params;
         manager->current_primitive_functions->start(params, manager->current_primitive_state,
                                                     world);
     }

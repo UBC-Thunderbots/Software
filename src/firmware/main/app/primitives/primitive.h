@@ -120,4 +120,4 @@ typedef struct
  * @param params2
  * @return True if the params are equivalent, false otherwise
  */
-bool primitive_params_are_equal(primitive_params_t* params1, primitive_params_t* params2);
+bool primitive_params_are_equal(const primitive_params_t* params1, const primitive_params_t* params2);
