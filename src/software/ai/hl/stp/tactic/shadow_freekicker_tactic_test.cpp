@@ -111,25 +111,62 @@ class ShadowFreekickerTacticTest : public testing::Test
     }
 
     World world;
+//clang-format off
+    /**                                                                                       ..                                               +
+      *
+      *                                      +
+      *                                     + +
+      *                                      +
+      *
+      *                                         Friendly robot
+      *
+      *       Enemy
+      *                       ball
+      *              X
+      *             X X   - -   O - - - - - - - - -  - - - - - - - - - +-----+
+      *              X            .          |
+      *                             .
+      *                             ^ .      |
+      *                             |   .                               Middle line to friendly distance
+      *                +------------+     .  |                            0.09*1.1
+      *   ball to friendly robot distance    +
+      *                                     + +                        +-----+
+      *                         +            +
+      *                         |            | Friendly robot
+      *                         |            |
+      *                         +            +
+      *
+      *                           0.5*1.05+0.09
+      */
+//clang-format on
 
     double ball_to_friendly_robot_distance;
     double ball_to_friendly_robot_distance_abs_error = 0.05;
     // To make the edge of the robot to be slightly more than 0.5m from the ball, the
     // center of the robot should be 0.62 m away from the ball
-    double expected_all_to_friendly_robot_distance = 0.62;
+    double expected_ball_to_friendly_robot_distance = 0.62;
 
     double middle_line_to_friendly_robot_distance;
     double middle_line_to_friendly_robot_distance__abs_error = 0.01;
     //The distance between robot and the middle line is 1.1 times of the robot radius(0.09m)
     double expected_middle_line_to_friendly_robot_distance   = 0.09 * 1.1;
 
+    // used when there are enemy robots
+    // angle calculated from the vector connecting enemy robot position and ball position
     Angle enemy_to_ball_angle;
+    // angle calculated from the vector connecting enemy robot position and move action
+    // destination (friendly robot position)
     Angle enemy_to_dest_angle;
 
+    // used when there is no enemy robot
+    // angle calculated from the vector connecting friendly goal and ball position
     Angle goal_to_ball_angle;
+    // angle calculated from the vector connecting friendly goal and move action
+    // destination
     Angle goal_to_dest_angle;
 };
 
+//clang-format off
 /**
  * The two tests immediate below has the scene shown in the graph below
  *                                                                      Enemy
@@ -168,6 +205,7 @@ class ShadowFreekickerTacticTest : public testing::Test
  *     +-------------------------------------------------------------------------------------------------------------------------------------+
  *
  */
+ //clang-format on
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_middle_left_on_field)
@@ -180,7 +218,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the right of the line between the enemy robot and
@@ -204,7 +242,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the left of the line between the enemy robot and
@@ -216,6 +254,7 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
+//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
@@ -254,6 +293,7 @@ TEST_F(ShadowFreekickerTacticTest,
  *     +----------------------------------------------------------------+X+X+----------------------------------------------------------------+
  *                                                                        X  Enemy
  */
+//clang-format on
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_middle_right_on_field)
@@ -266,7 +306,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the right of the line between the enemy robot and
@@ -289,7 +329,7 @@ TEST_F(ShadowFreekickerTacticTest,
 
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
 
@@ -302,31 +342,7 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-TEST_F(ShadowFreekickerTacticTest,
-       test_shadow_free_kicker_left_side_with_enemy_robot_at_top_left_on_field)
-{
-    std::vector<Point> enemy_robot_positions = {Point(
-        world.field().friendlyCornerPos().x(), world.field().friendlyCornerPos().y())};
-    Point ball_position(world.field().friendlyCornerPos().x() - 0.09,
-                        world.field().friendlyCornerPos().y() - 0.09);
-    ShadowFreekickerTactic::FreekickShadower left_or_right = ShadowFreekickerTactic::LEFT;
-
-    CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
-
-    // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
-                ball_to_friendly_robot_distance_abs_error);
-
-
-    // The robot should be just to the right of the line between the enemy robot and
-    // the ball (from the POV of the enemy robot)
-    EXPECT_NEAR(middle_line_to_friendly_robot_distance,
-                expected_middle_line_to_friendly_robot_distance,
-                middle_line_to_friendly_robot_distance__abs_error);
-
-    EXPECT_LT(enemy_to_dest_angle, enemy_to_ball_angle);
-}
-
+//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *                                                                                                                                         Enemy
@@ -365,6 +381,34 @@ TEST_F(ShadowFreekickerTacticTest,
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
+//clang-format on
+
+TEST_F(ShadowFreekickerTacticTest,
+       test_shadow_free_kicker_left_side_with_enemy_robot_at_top_left_on_field)
+{
+    std::vector<Point> enemy_robot_positions = {Point(
+        world.field().friendlyCornerPos().x(), world.field().friendlyCornerPos().y())};
+    Point ball_position(world.field().friendlyCornerPos().x() - 0.09,
+                        world.field().friendlyCornerPos().y() - 0.09);
+    ShadowFreekickerTactic::FreekickShadower left_or_right = ShadowFreekickerTactic::LEFT;
+
+    CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
+
+    // The edge of the robot should be slightly more than 0.5m from the ball
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
+                ball_to_friendly_robot_distance_abs_error);
+
+
+    // The robot should be just to the right of the line between the enemy robot and
+    // the ball (from the POV of the enemy robot)
+    EXPECT_NEAR(middle_line_to_friendly_robot_distance,
+                expected_middle_line_to_friendly_robot_distance,
+                middle_line_to_friendly_robot_distance__abs_error);
+
+    EXPECT_LT(enemy_to_dest_angle, enemy_to_ball_angle);
+}
+
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_right_side_with_enemy_robot_at_top_left_on_field)
@@ -379,7 +423,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the left of the line between the enemy robot and
@@ -391,31 +435,7 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-TEST_F(ShadowFreekickerTacticTest,
-       test_shadow_free_kicker_left_side_with_enemy_robot_at_top_right_on_field)
-{
-    std::vector<Point> enemy_robot_positions = {Point(
-        world.field().friendlyCornerNeg().x(), world.field().friendlyCornerPos().y())};
-    Point ball_position(world.field().friendlyCornerNeg().x() + 0.09,
-                        world.field().friendlyCornerPos().y() - 0.09);
-    ShadowFreekickerTactic::FreekickShadower left_or_right = ShadowFreekickerTactic::LEFT;
-
-    CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
-
-    // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
-                ball_to_friendly_robot_distance_abs_error);
-
-
-    // The robot should be just to the right of the line between the enemy robot and
-    // the ball (from the POV of the enemy robot)
-    EXPECT_NEAR(middle_line_to_friendly_robot_distance,
-                expected_middle_line_to_friendly_robot_distance,
-                middle_line_to_friendly_robot_distance__abs_error);
-
-    EXPECT_LT(enemy_to_dest_angle, enemy_to_ball_angle);
-}
-
+//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
@@ -454,6 +474,34 @@ TEST_F(ShadowFreekickerTacticTest,
  *     +------------------------------------------------------------------+-----------------------------------------------------------------X+X
  *                                                                                                                                           X
  */
+//clang-format on
+
+TEST_F(ShadowFreekickerTacticTest,
+       test_shadow_free_kicker_left_side_with_enemy_robot_at_top_right_on_field)
+{
+    std::vector<Point> enemy_robot_positions = {Point(
+        world.field().friendlyCornerNeg().x(), world.field().friendlyCornerPos().y())};
+    Point ball_position(world.field().friendlyCornerNeg().x() + 0.09,
+                        world.field().friendlyCornerPos().y() - 0.09);
+    ShadowFreekickerTactic::FreekickShadower left_or_right = ShadowFreekickerTactic::LEFT;
+
+    CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
+
+    // The edge of the robot should be slightly more than 0.5m from the ball
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
+                ball_to_friendly_robot_distance_abs_error);
+
+
+    // The robot should be just to the right of the line between the enemy robot and
+    // the ball (from the POV of the enemy robot)
+    EXPECT_NEAR(middle_line_to_friendly_robot_distance,
+                expected_middle_line_to_friendly_robot_distance,
+                middle_line_to_friendly_robot_distance__abs_error);
+
+    EXPECT_LT(enemy_to_dest_angle, enemy_to_ball_angle);
+}
+
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_right_side_with_enemy_robot_at_top_right_on_field)
@@ -467,7 +515,7 @@ TEST_F(ShadowFreekickerTacticTest,
 
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the left of the line between the enemy robot and
@@ -479,30 +527,7 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-TEST_F(ShadowFreekickerTacticTest,
-       test_shadow_free_kicker_left_side_with_enemy_robot_at_bottom_left_on_field)
-{
-    std::vector<Point> enemy_robot_positions = {Point(
-        world.field().friendlyCornerPos().x(), world.field().friendlyCornerNeg().y())};
-    Point ball_position(world.field().friendlyCornerPos().x() - 0.09,
-                        world.field().friendlyCornerNeg().y() + 0.09);
-    ShadowFreekickerTactic::FreekickShadower left_or_right = ShadowFreekickerTactic::LEFT;
-
-    CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
-
-    // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
-                ball_to_friendly_robot_distance_abs_error);
-
-    // The robot should be just to the right of the line between the enemy robot and
-    // the ball (from the POV of the enemy robot)
-    EXPECT_NEAR(middle_line_to_friendly_robot_distance,
-                expected_middle_line_to_friendly_robot_distance,
-                middle_line_to_friendly_robot_distance__abs_error);
-
-    EXPECT_LT(enemy_to_dest_angle, enemy_to_ball_angle);
-}
-
+//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
@@ -541,6 +566,33 @@ TEST_F(ShadowFreekickerTacticTest,
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
+//clang-format on
+
+TEST_F(ShadowFreekickerTacticTest,
+       test_shadow_free_kicker_left_side_with_enemy_robot_at_bottom_left_on_field)
+{
+    std::vector<Point> enemy_robot_positions = {Point(
+        world.field().friendlyCornerPos().x(), world.field().friendlyCornerNeg().y())};
+    Point ball_position(world.field().friendlyCornerPos().x() - 0.09,
+                        world.field().friendlyCornerNeg().y() + 0.09);
+    ShadowFreekickerTactic::FreekickShadower left_or_right = ShadowFreekickerTactic::LEFT;
+
+    CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
+
+    // The edge of the robot should be slightly more than 0.5m from the ball
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
+                ball_to_friendly_robot_distance_abs_error);
+
+    // The robot should be just to the right of the line between the enemy robot and
+    // the ball (from the POV of the enemy robot)
+    EXPECT_NEAR(middle_line_to_friendly_robot_distance,
+                expected_middle_line_to_friendly_robot_distance,
+                middle_line_to_friendly_robot_distance__abs_error);
+
+    EXPECT_LT(enemy_to_dest_angle, enemy_to_ball_angle);
+}
+
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_right_side_with_enemy_robot_at_bottom_left_on_field)
@@ -555,7 +607,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the left of the line between the enemy robot and
@@ -567,6 +619,7 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
+//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
@@ -605,6 +658,7 @@ TEST_F(ShadowFreekickerTacticTest,
  *    X+X-----------------------------------------------------------------+------------------------------------------------------------------+
  *     X  Enemy
  */
+//clang-format on
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_botom_right_on_field)
@@ -618,7 +672,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the right of the line between the enemy robot and
@@ -643,7 +697,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the left of the line between the enemy robot and
@@ -655,6 +709,7 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
+//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below                                                                               |
  *                                                                                                                                                     X
@@ -693,6 +748,7 @@ TEST_F(ShadowFreekickerTacticTest,
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
+//clang-format on
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_origin_on_field)
@@ -704,7 +760,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the right of the line between the enemy robot and
@@ -727,7 +783,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithEnemyRobot(ball_position, enemy_robot_positions, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the left of the line between the enemy robot and
@@ -738,7 +794,7 @@ TEST_F(ShadowFreekickerTacticTest,
 
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
-
+//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
@@ -777,6 +833,7 @@ TEST_F(ShadowFreekickerTacticTest,
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
+//clang-format on
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_without_robot_in_enemy_team)
@@ -787,7 +844,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithoutEnemyRobot(ball_position, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the left of the line between the friendly net and
@@ -809,7 +866,7 @@ TEST_F(ShadowFreekickerTacticTest,
     CreateSceneWithoutEnemyRobot(ball_position, left_or_right);
 
     // The edge of the robot should be slightly more than 0.5m from the ball
-    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_all_to_friendly_robot_distance,
+    EXPECT_NEAR(ball_to_friendly_robot_distance, expected_ball_to_friendly_robot_distance,
                 ball_to_friendly_robot_distance_abs_error);
 
     // The robot should be just to the right of the line between the friendly net and
