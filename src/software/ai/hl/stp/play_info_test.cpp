@@ -19,9 +19,8 @@ TEST(PlayInfoTest, get_play_type_works)
 
 TEST(PlayInfoTest, get_play_name_works)
 {
-    std::string s, empty;
-    s                            = "new name";
-    empty                        = "";
+    std::string s                = "new name";
+    std::string empty            = "";
     PlayInfo test_play_info      = PlayInfo();
     PlayInfo custom_play_info    = PlayInfo(empty, s, {});
     std::string test_play_name   = test_play_info.getPlayName();
@@ -42,9 +41,9 @@ TEST(PlayInfoTest, get_play_robot_tactic_assignment_works)
     PlayInfo test_play_info   = PlayInfo();
     PlayInfo custom_play_info = PlayInfo(emptyString, emptyString, v);
     std::unordered_set<std::string> test_play_rta =
-            test_play_info.getRobotTacticAssignment();
+        test_play_info.getRobotTacticAssignment();
     std::unordered_set<std::string> custom_play_rta =
-            custom_play_info.getRobotTacticAssignment();
+        custom_play_info.getRobotTacticAssignment();
     EXPECT_EQ(test_play_rta, emptySet);
     EXPECT_EQ(custom_play_rta, v);
 }
@@ -62,11 +61,11 @@ TEST(PlayInfoTest, add_assignment_test)
     v2 = {s1, s2};
     v3 = {s1, s2, s3};
     EXPECT_EQ(test_play_info.getRobotTacticAssignment(), v);
-    test_play_info.addAssignment(s1);
+    test_play_info.addRobotTacticAssignment(s1);
     EXPECT_EQ(test_play_info.getRobotTacticAssignment(), v1);
-    test_play_info.addAssignment(s2);
+    test_play_info.addRobotTacticAssignment(s2);
     EXPECT_EQ(test_play_info.getRobotTacticAssignment(), v2);
-    test_play_info.addAssignment(s3);
+    test_play_info.addRobotTacticAssignment(s3);
     EXPECT_EQ(test_play_info.getRobotTacticAssignment(), v3);
 }
 
