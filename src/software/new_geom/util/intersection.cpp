@@ -20,7 +20,7 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     double denominator      = denominatorTermA - denominatorTermB;
 
     if (almostEqual(denominatorTermA, denominatorTermB, GeomConstants::FIXED_EPSILON_ONE,
-                    GeomConstants::MAX_ULPS_TEN))
+                    GeomConstants::ULPS_EPSILON_TEN))
     {
         return std::nullopt;
     }
