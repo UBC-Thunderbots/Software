@@ -1,7 +1,7 @@
 #include "software/new_geom/convex_polygon.h"
 
-#include <iostream>
 #include <string>
+
 ConvexPolygon::ConvexPolygon(const std::vector<Point>& points) : Polygon(points)
 {
     if (!isConvex())
