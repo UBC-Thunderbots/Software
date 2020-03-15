@@ -84,7 +84,7 @@ double distanceSquared(const Point &first, const Segment &second)
         second.reverse().toVector().dot(seg_end_to_point) > 0)
     {
         bool is_degenerate = distanceSquared(second.getSegStart(), second.getEnd()) <
-                             GeomConstants::EPSILON;
+                             GeomConstants::FIXED_EPSILON_ONE;
         if (is_degenerate)
         {
             return seg_start_to_point.length();

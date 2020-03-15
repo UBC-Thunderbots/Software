@@ -22,11 +22,6 @@ ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polyg
 // https://math.stackexchange.com/questions/1743995/determine-whether-a-polygon-is-convex-based-on-its-vertices
 bool ConvexPolygon::isConvex()
 {
-    std::cout << "Checking points:" << std::endl;
-    for (int i = 0; i < points_.size(); i++)
-    {
-        std::cout << "(" << points_[i].x() << ", " << points_[i].y() << ")" << std::endl;
-    }
     if (points_.size() < 3)
     {
         return false;
@@ -55,25 +50,25 @@ bool ConvexPolygon::isConvex()
 
         // Calculate sign flips using the next edge vector ("next_to_curr"),
         // recording the first sign
-        if (next_to_curr.x() > GeomConstants::EPSILON)
+        if (next_to_curr.x() > GeomConstants::FIXED_EPSILON_ONE)
         {
             if (x_sign == 0)
             {
                 x_first_sign = 1;
             }
-            else if (x_sign < -GeomConstants::EPSILON)
+            else if (x_sign < -GeomConstants::FIXED_EPSILON_ONE)
             {
                 x_flips = x_flips + 1;
             }
             x_sign = 1;
         }
-        else if (next_to_curr.x() < -GeomConstants::EPSILON)
+        else if (next_to_curr.x() < -GeomConstants::FIXED_EPSILON_ONE)
         {
             if (x_sign == 0)
             {
                 x_first_sign = -1;
             }
-            else if (x_sign > GeomConstants::EPSILON)
+            else if (x_sign > GeomConstants::FIXED_EPSILON_ONE)
             {
                 x_flips = x_flips + 1;
             }
@@ -85,25 +80,25 @@ bool ConvexPolygon::isConvex()
             return false;
         }
 
-        if (next_to_curr.y() > GeomConstants::EPSILON)
+        if (next_to_curr.y() > GeomConstants::FIXED_EPSILON_ONE)
         {
             if (y_sign == 0)
             {
                 y_first_sign = 1;
             }
-            else if (y_sign < -GeomConstants::EPSILON)
+            else if (y_sign < -GeomConstants::FIXED_EPSILON_ONE)
             {
                 y_flips = y_flips + 1;
             }
             y_sign = 1;
         }
-        else if (next_to_curr.y() < -GeomConstants::EPSILON)
+        else if (next_to_curr.y() < -GeomConstants::FIXED_EPSILON_ONE)
         {
             if (y_sign == 0)
             {
                 y_first_sign = -1;
             }
-            else if (y_sign > GeomConstants::EPSILON)
+            else if (y_sign > GeomConstants::FIXED_EPSILON_ONE)
             {
                 y_flips = y_flips + 1;
             }
@@ -123,11 +118,11 @@ bool ConvexPolygon::isConvex()
         {
             w_sign = w;
         }
-        else if (w_sign > GeomConstants::EPSILON && w < -GeomConstants::EPSILON)
+        else if (w_sign > GeomConstants::FIXED_EPSILON_ONE && w < -GeomConstants::FIXED_EPSILON_ONE)
         {
             return false;
         }
-        else if (w_sign < -GeomConstants::EPSILON && w > GeomConstants::EPSILON)
+        else if (w_sign < -GeomConstants::FIXED_EPSILON_ONE && w > GeomConstants::FIXED_EPSILON_ONE)
         {
             return false;
         }

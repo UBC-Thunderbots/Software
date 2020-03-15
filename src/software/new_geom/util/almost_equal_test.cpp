@@ -1,35 +1,73 @@
 #include "software/new_geom/util/almost_equal.h"
+#include "software/new_geom/geom_constants.h"
 
 #include <gtest/gtest.h>
+#include <limits>
+#include <cmath>
 
-TEST(AlmostEqualTest, compare_almost_equal_doubles_max_1)
+// Increments number towards direction by distance times
+double ulpsIncrement(double number, double direction, int increment)
+{
+    double result = number;
+    for (int i = 0; i < increment; i++)
+    {
+        result = std::nextafter(result, direction);
+    }
+    return result;
+}
+
+TEST(AlmostEqualTest, ten_ulps_greater_than_zero)
+{
+    double a = 0.0;
+    double b = ulpsIncrement(a, std::numeric_limits<double>::max(), 10);
+    // Although a and b are 10 ulps apart, their difference is less than the fixed epsilon
+    EXPECT_TRUE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 5));
+}
+
+TEST(AlmostEqualTest, ten_ulps_less_than_zero)
+{
+    double a = 0.0;
+    double b = ulpsIncrement(a, std::numeric_limits<double>::lowest(), 10);
+    // Although a and b are 10 ulps apart, their difference is less than the fixed epsilon
+    EXPECT_TRUE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 5));
+}
+
+TEST(AlmostEqualTest, twenty_ulps_greater_than_one)
 {
     double a = 1.0;
-    double b = 1.0 - 5e-16;  // For comparing doubles near 1.0, 5e-16 is small enough
-    EXPECT_TRUE(almostEqual(a, b));
+    double b = ulpsIncrement(a, std::numeric_limits<double>::max(), 20);
+    EXPECT_TRUE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 20));
+    EXPECT_FALSE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 19));
 }
 
-TEST(AlmostEqualTest, compare_not_almost_equal_doubles_max_1)
+TEST(AlmostEqualTest, twenty_ulps_less_than_one)
 {
     double a = 1.0;
-    double b =
-        1.0 -
-        2e-15;  // For comparing doubles near 1.0, 2e-15 is too big to consider equal
-    EXPECT_FALSE(almostEqual(a, b));
+    double b = ulpsIncrement(a, std::numeric_limits<double>::lowest(), 20);
+    EXPECT_TRUE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 20));
+    EXPECT_FALSE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 19));
 }
 
-TEST(AlmostEqualTest, compare_almost_equal_doubles_max_10)
+TEST(AlmostEqualTest, twenty_ulps_greater_than_ten)
 {
     double a = 10.0;
-    double b = 10.0 - 5e-15;  // For comparing doubles near 10.0, 5e-15 is small enough
-    EXPECT_TRUE(almostEqual(a, b));
+    double b = ulpsIncrement(a, std::numeric_limits<double>::max(), 20);
+    EXPECT_TRUE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 20));
+    EXPECT_FALSE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 19));
 }
 
-TEST(AlmostEqualTest, compare_not_almost_equal_doubles_max_10)
+TEST(AlmostEqualTest, twenty_ulps_less_than_ten)
 {
     double a = 10.0;
-    double b =
-        10.0 -
-        2e-14;  // For comparing doubles near 10.0, 2e-14 is too big to consider equal
-    EXPECT_FALSE(almostEqual(a, b));
+    double b = ulpsIncrement(a, std::numeric_limits<double>::lowest(), 20);
+    EXPECT_TRUE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 20));
+    EXPECT_FALSE(almostEqual(a, b, GeomConstants::FIXED_EPSILON_ONE, 19));
+}
+
+TEST(AlmostEqualTest, compare_across_zero)
+{
+    double a = ulpsIncrement(0.0, std::numeric_limits<double>::max(), 10);
+    double b = ulpsIncrement(0.0, std::numeric_limits<double>::lowest(), 10);
+// Return false for comparing values across zero when difference is greater than fixed epsilon
+    EXPECT_FALSE(almostEqual(a, b, 0.0, 10));
 }

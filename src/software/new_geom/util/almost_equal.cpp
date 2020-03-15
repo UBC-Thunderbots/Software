@@ -3,19 +3,16 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <limits>
+#include <cstring>
 
 #include "software/new_geom/geom_constants.h"
 
 int64_t ulpsDistance(const double a, const double b);
 
-// See
-// https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
-// for detailed explanation
 bool almostEqual(double a, double b, double fixedEpsilon, int ulpsEpsilon)
 {
     // Handle the near-zero case
-    const float difference = fabs(a - b);
+    const double difference = fabs(a - b);
     if (difference <= fixedEpsilon) return true;
 
     return ulpsDistance(a, b) <= ulpsEpsilon;
@@ -37,8 +34,8 @@ int64_t ulpsDistance(const double a, const double b)
     if (std::isinf(a) || std::isinf(b)) return max;
 
     int64_t ia, ib;
-    memcpy(&ia, &a, sizeof(double));
-    memcpy(&ib, &b, sizeof(double));
+    std::memcpy(&ia, &a, sizeof(double));
+    std::memcpy(&ib, &b, sizeof(double));
 
     // Don't compare differently-signed doubles
     if ((ia < 0) != (ib < 0)) return max;
