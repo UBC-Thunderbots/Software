@@ -138,9 +138,10 @@ int main(void)
         io_gpio_pin_create(motor_0_brake_GPIO_Port, motor_0_brake_Pin, ACTIVE_LOW);
     GpioPin_t *esf_pin =
         io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
+    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
 
-    motor_0 = io_motor_create(&htim4, TIM_CHANNEL_1, reset_pin, coast_pin, mode_pin,
-                              direction_pin, brake_pin, esf_pin);
+    motor_0 = io_motor_create(pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin,
+                              brake_pin, esf_pin);
 
     io_motor_set_direction(motor_0, CLOCKWISE);
     io_motor_set_pwm(motor_0, 0.1);
