@@ -1,7 +1,7 @@
 #include "software/new_geom/convex_polygon.h"
 
 #include <string>
-
+#include <iostream>
 ConvexPolygon::ConvexPolygon(const std::vector<Point>& points) : Polygon(points)
 {
     if (!isConvex())
@@ -22,6 +22,11 @@ ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polyg
 // https://math.stackexchange.com/questions/1743995/determine-whether-a-polygon-is-convex-based-on-its-vertices
 bool ConvexPolygon::isConvex()
 {
+    std::cout << "Checking points:" << std::endl;
+    for (int i = 0; i < points_.size(); i++)
+    {
+        std::cout << "(" << points_[i].x() << ", " << points_[i].y() << ")" << std::endl;
+    }
     if (points_.size() < 3)
     {
         return false;
