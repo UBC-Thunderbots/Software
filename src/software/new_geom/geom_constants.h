@@ -3,7 +3,7 @@
 namespace GeomConstants
 {
     // Due to the internal representation of doubles, comparing them to zero using ULPs
-    // do not make sense; instead, we have to pick some fixed epsilon to compare doubles
+    // does not make sense. Instead, we have to pick some fixed epsilon to compare doubles
     // to zero. We pick 1e-15, which is approximately 10 ULPs near 1.0, and should fit the
     // needs of operations near such scale. This is not meant to cover all usage case, and
     // other epsilon values may need to be chosen for specific use cases. Further reading
