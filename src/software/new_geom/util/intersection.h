@@ -6,6 +6,10 @@
 #include "software/new_geom/segment.h"
 
 /**
+ * A set of functions that calculate the intersecting points between two geometric objects
+ */
+
+/**
  * Computes the point of intersection between two lines.
  * Note: this computes the intersection of two lines, not line segments.
  *

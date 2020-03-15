@@ -6,6 +6,13 @@
 #include "software/new_geom/segment.h"
 
 /**
+ * Set of functions that determines if two geometric objects intersect,
+ * where intersects is defined as having at least a common point
+ *
+ * https://en.wikipedia.org/wiki/Spatial_relation/#Topological_relations
+ */
+
+/**
  * Returns true if the segment intersects the polygon, false otherwise.
  *
  * @param first
