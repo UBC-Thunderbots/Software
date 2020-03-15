@@ -1,9 +1,11 @@
 #include "software/new_geom/util/almost_equal.h"
-#include "software/new_geom/geom_constants.h"
 
 #include <gtest/gtest.h>
-#include <limits>
+
 #include <cmath>
+#include <limits>
+
+#include "software/new_geom/geom_constants.h"
 
 // Increments number towards direction by distance times
 double ulpsIncrement(double number, double direction, int increment)
@@ -68,6 +70,7 @@ TEST(AlmostEqualTest, compare_across_zero)
 {
     double a = ulpsIncrement(0.0, std::numeric_limits<double>::max(), 10);
     double b = ulpsIncrement(0.0, std::numeric_limits<double>::lowest(), 10);
-// Return false for comparing values across zero when difference is greater than fixed epsilon
+    // Return false for comparing values across zero when difference is greater than fixed
+    // epsilon
     EXPECT_FALSE(almostEqual(a, b, 0.0, 10));
 }

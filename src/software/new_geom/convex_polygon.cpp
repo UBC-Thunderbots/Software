@@ -1,7 +1,7 @@
 #include "software/new_geom/convex_polygon.h"
 
-#include <string>
 #include <iostream>
+#include <string>
 ConvexPolygon::ConvexPolygon(const std::vector<Point>& points) : Polygon(points)
 {
     if (!isConvex())
@@ -118,11 +118,13 @@ bool ConvexPolygon::isConvex()
         {
             w_sign = w;
         }
-        else if (w_sign > GeomConstants::FIXED_EPSILON_ONE && w < -GeomConstants::FIXED_EPSILON_ONE)
+        else if (w_sign > GeomConstants::FIXED_EPSILON_ONE &&
+                 w < -GeomConstants::FIXED_EPSILON_ONE)
         {
             return false;
         }
-        else if (w_sign < -GeomConstants::FIXED_EPSILON_ONE && w > GeomConstants::FIXED_EPSILON_ONE)
+        else if (w_sign < -GeomConstants::FIXED_EPSILON_ONE &&
+                 w > GeomConstants::FIXED_EPSILON_ONE)
         {
             return false;
         }

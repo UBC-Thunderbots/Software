@@ -19,7 +19,8 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     double denominatorTermB = (y1 - y2) * (x3 - x4);
     double denominator      = denominatorTermA - denominatorTermB;
 
-    if (almostEqual(denominatorTermA, denominatorTermB, GeomConstants::FIXED_EPSILON_ONE, GeomConstants::MAX_ULPS_TEN))
+    if (almostEqual(denominatorTermA, denominatorTermB, GeomConstants::FIXED_EPSILON_ONE,
+                    GeomConstants::MAX_ULPS_TEN))
     {
         return std::nullopt;
     }
@@ -44,7 +45,9 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
  */
 constexpr int sign(double n)
 {
-    return n > GeomConstants::FIXED_EPSILON_ONE ? 1 : (n < -GeomConstants::FIXED_EPSILON_ONE ? -1 : 0);
+    return n > GeomConstants::FIXED_EPSILON_ONE
+               ? 1
+               : (n < -GeomConstants::FIXED_EPSILON_ONE ? -1 : 0);
 }
 
 std::vector<Point> intersection(const Segment &first, const Segment &second)
