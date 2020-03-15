@@ -8,10 +8,10 @@
 #include "software/new_geom/geom_constants.h"
 
 // Increments number towards direction by distance times
-double ulpsIncrement(double number, double direction, int increment)
+double ulpsIncrement(double number, double direction, int distance)
 {
     double result = number;
-    for (int i = 0; i < increment; i++)
+    for (int i = 0; i < distance; i++)
     {
         result = std::nextafter(result, direction);
     }
