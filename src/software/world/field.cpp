@@ -130,6 +130,15 @@ Rectangle Field::fieldBoundary() const
     return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 }
 
+bool Field::isFieldValid() const
+{
+    if (totalXLength() < 1e-15 || totalYLength() < 1e-15)
+    {
+        return false;
+    }
+    return true;
+}
+
 double Field::centerCircleRadius() const
 {
     return center_circle_radius_;
@@ -256,9 +265,17 @@ void Field::updateTimestamp(Timestamp time_stamp)
 
 bool Field::pointInEntireField(const Point &p) const
 {
-    Rectangle entire_field = Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
-                                       Point(totalXLength() / 2, totalYLength() / 2));
-    return entire_field.contains(p);
+    {
+        Rectangle entire_field =
+            Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
+                      Point(totalXLength() / 2, totalYLength() / 2));
+        return entire_field.contains(p);
+    }
+    catch (const std::invalid_argument &e)
+    {
+        // If the field does not represent a valid rectangle, return false
+        return false;
+    }
 }
 
 bool Field::operator==(const Field &other) const

@@ -207,6 +207,11 @@ class Field
     Rectangle fieldBoundary() const;
 
     /**
+     * TODO: write this
+     */
+    bool isFieldValid() const;
+
+    /**
      * Gets the position of the centre of the friendly goal.
      *
      * @return the position of the friendly goal.
