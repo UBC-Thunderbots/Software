@@ -132,7 +132,8 @@ Rectangle Field::fieldBoundary() const
 
 bool Field::isFieldValid() const
 {
-    if (totalXLength() < 1e-15 || totalYLength() < 1e-15)
+    if (totalXLength() < GeomConstants::EPSILON ||
+        totalYLength() < GeomConstants::EPSILON)
     {
         return false;
     }
