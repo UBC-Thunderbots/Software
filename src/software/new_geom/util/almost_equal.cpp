@@ -7,18 +7,6 @@
 
 #include "software/new_geom/geom_constants.h"
 
-int64_t ulpsDistance(double a, double b);
-
-bool almostEqual(double a, double b, double fixedEpsilon, int ulpsEpsilon)
-{
-    // Handle the near-zero case
-    const double difference = fabs(a - b);
-    if (difference <= fixedEpsilon)
-        return true;
-
-    return ulpsDistance(a, b) <= ulpsEpsilon;
-}
-
 int64_t ulpsDistance(double a, double b)
 {
     // Save work if the doubles are equal
@@ -49,4 +37,14 @@ int64_t ulpsDistance(double a, double b)
     if (distance < 0)
         distance = -distance;
     return distance;
+}
+
+bool almostEqual(double a, double b, double fixedEpsilon, int ulpsEpsilon)
+{
+    // Handle the near-zero case
+    const double difference = fabs(a - b);
+    if (difference <= fixedEpsilon)
+        return true;
+
+    return ulpsDistance(a, b) <= ulpsEpsilon;
 }

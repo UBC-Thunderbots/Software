@@ -8,7 +8,7 @@ namespace GeomConstants
     // needs of operations near such scale. This is not meant to cover all use cases, and
     // other epsilon values may need to be chosen for specific use cases.
     // Further reading: https://bitbashing.io/comparing-floats.html
-    static constexpr double FIXED_EPSILON_ONE = 1e-15;
+    static constexpr double FIXED_EPSILON = 1e-15;
 
     // A single double arithmetic operation with accurate inputs can have a maximum error
     // of 0.5 ULP. These errors accumulate with successive operations, and the appropriate
