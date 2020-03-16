@@ -1,138 +1,98 @@
 #pragma once
 
 #include <cinttypes>
-#include <optional>
+#include <memory>
 
+#include "software/ai/primitive/primitive.h"
+#include "software/backend/simulation/physics/physics_ball.h"
 #include "software/backend/simulation/physics/physics_robot.h"
-extern "C"
-{
-#include "app/world/firmware_robot.h"
-}
-
-// TODO: These are all hardcoded values copied from firmware/main/physics/physics.h
-// and firmware/main/control/control.h
-// They should be replaced with the proper constants once firmware cleanup is done
-#define GEAR_RATIO 0.5143f  // define as speed multiplication from motor to wheel
-#define WHEEL_RADIUS 0.0254f
-#define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
-#define RPM_TO_VOLT (1.0f / 374.0f)     // motor RPM to back EMF
-#define PHASE_RESISTANCE 1.6f           // adjust this number as calculated
-#define CURRENT_PER_TORQUE 39.21f       // from motor data sheet (1/25.5 mNm)
-#define ROBOT_POINT_MASS 2.48f
-#define ROBOT_RADIUS 0.085f
-#define INERTIAL_FACTOR 0.37f
-#define ROT_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)
-#define INERTIA (ROT_MASS * ROBOT_RADIUS * ROBOT_RADIUS)
-#define JERK_LIMIT 40.0f  //(m/s^3)
-
 
 /**
- * Because the FirmwareRobot_t struct is defined in the .c file (rather than the .h file),
- * C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
+ * The SimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with more
+ * logic-focused elements for simulation, such as whether or not autokick is enabled.
  */
-struct FirmwareRobotDeleter
-{
-    void operator()(FirmwareRobot_t* firmware_robot) const
-    {
-        app_firmware_robot_destroy(firmware_robot);
-    };
-};
-
-
-/**
- * This class acts as a wrapper around a PhysicsRobot so that the PhysicsRobot
- * can provide the interface of a FirmwareRobot.
- *
- * Because our firmware structs rely on C-style function pointers, we
- * cannot use C++ constructs like std::function to provide to the structs.
- * Therefore we use this class's static functions to provide the function
- * pointers, since static functions work as C-style function pointers
- * (because there is no instance associated with them).
- *
- * Whenever a caller needs to get a firmware struct or perform an operation, they
- * need to set which robot they want to control so that all the static functions
- * that have been provided to the firmware struct operate on the correct
- * instantiated object. This is our workaround to maintain and simulate multiple
- * "instances" of robot firmware at once.
- */
-class SimulatorRobotSingleton
+class SimulatorRobot
 {
    public:
     /**
-     * Sets the ID of the robot being controlled by this class
+     * Create a new SimulatorRobot given a PhysicsRobot
      *
-     * @param id The ID of the robot to control
+     * @param physics_robot the PhysicsRobot to simulate and control
      */
-    static void setRobotId(unsigned int id);
+    explicit SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot);
+    explicit SimulatorRobot() = delete;
 
     /**
-     * Sets the PhysicsRobots that can be controlled by this class
+     * Returns the ID of this robot
      *
-     * @param robots the PhysicsRobots that can be controlled by this class
+     * @return the ID of this robot
      */
-    static void setPhysicsRobots(const std::vector<std::weak_ptr<PhysicsRobot>>& robots);
+    unsigned int getRobotId();
 
-    /**
-     * Creates a FirmwareRobot corresponding to the current PhysicsRobot
-     *
-     * @return a FirmwareRobot corresponding to the current PhysicsRobot
-     */
-    static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
-
-   private:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
      *
      * @return the x-position of the robot, in global field coordinates, in meters
      */
-    static float getPositionX();
+    float getPositionX();
 
     /**
      * Returns the y-position of the robot, in global field coordinates, in meters
      *
      * @return the y-position of the robot, in global field coordinates, in meters
      */
-    static float getPositionY();
+    float getPositionY();
+
+    /**
+     * Returns the current position of the robot, in global field coordinates, in meters
+     *
+     * @return the current position of the robot, in global field coordinates, in meters
+     */
+    Point position();
 
     /**
      * Returns the orientation of the robot, in global field coordinates, in radians
      *
      * @return the orientation of the robot, in global field coordinates, in radians
      */
-    static float getOrientation();
+    float getOrientation();
 
     /**
      * Returns the x-velocity of the robot, in global field coordinates, in m/s
      *
      * @return the x-velocity of the robot, in global field coordinates, in m/s
      */
-    static float getVelocityX();
+    float getVelocityX();
 
     /**
      * Returns the y-velocity of the robot, in global field coordinates, in m/s
      *
      * @return the y-velocity of the robot, in global field coordinates, in m/s
      */
-    static float getVelocityY();
+    float getVelocityY();
+
+    /**
+     * Returns the current linear velocity of the robot, in global field coordinates,
+     * in m / s
+     *
+     * @return the current linear velocity of the robot, in global field coordinates,
+     * in m / s
+     */
+    Vector velocity();
 
     /**
      * Returns the angular velocity of the robot, in rad/s
      *
      * @return the angular of the robot, in rad/s
      */
-    static float getVelocityAngular();
+    float getVelocityAngular();
 
     /**
      * Returns the battery voltage, in volts
      *
      * @return the battery voltage, in volts
      */
-    static float getBatteryVoltage();
+    float getBatteryVoltage();
 
     /**
      * Fires the kicker, kicking the ball in the direction the robot is facing
@@ -140,7 +100,7 @@ class SimulatorRobotSingleton
      *
      * @param speed_m_per_s How fast to kick the ball, in meters per second
      */
-    static void kick(float speed_m_per_s);
+    void kick(float speed_m_per_s);
 
     /**
      * Fires the chipper, chipping the ball in the direction the robot is facing
@@ -149,7 +109,7 @@ class SimulatorRobotSingleton
      * @param speed_m_per_s How far to chip the ball (the distance to the first bounce)
      * in meters
      */
-    static void chip(float distance_m);
+    void chip(float distance_m);
 
     /**
      * Enables autokick on the robot. If the ball touches the kicker, the robot will
@@ -158,7 +118,7 @@ class SimulatorRobotSingleton
      * @param speed_m_per_s How fast to kick the ball in meters per second when
      * the kicker is fired
      */
-    static void enableAutokick(float speed_m_per_s);
+    void enableAutokick(float speed_m_per_s);
 
     /**
      * Enables autochip on the robot. If the ball touches the chipper, the robot will
@@ -167,69 +127,142 @@ class SimulatorRobotSingleton
      * @param speed_m_per_s How far to chip the ball (distance to the first bounce)
      * when the chipper is fired
      */
-    static void enableAutochip(float distance_m);
+    void enableAutochip(float distance_m);
 
     /**
      * Disables autokick
      */
-    static void disableAutokick();
+    void disableAutokick();
 
     /**
      * Disables autochip
      */
-    static void disableAutochip();
+    void disableAutochip();
 
-    /* Dribbler functions */
+    /**
+     * Returns true if autokick is enabled and false otherwise
+     *
+     * @return true if autokick is enabled and false otherwise
+     */
+    bool isAutokickEnabled();
+
+    /**
+     * Returns true if autochip is enabled and false otherwise
+     *
+     * @return true if autochip is enabled and false otherwise
+     */
+    bool isAutochipEnabled();
+
     /**
      * Sets the speed of the dribbler
      *
      * @param rpm The rpm to set for the dribbler
      */
-    static void setDribblerSpeed(uint32_t rpm);
+    void setDribblerSpeed(uint32_t rpm);
 
     /**
      * Makes the dribbler coast until another operation is applied to it
      */
-    static void dribblerCoast();
+    void dribblerCoast();
 
     /**
      * Returns the temperature of the dribbler, in degrees C
      *
      * @return the temperature of the dribbler, in degrees C
      */
-    static unsigned int getDribblerTemperatureDegC();
+    unsigned int getDribblerTemperatureDegC();
 
-    /* Wheel functions */
     /**
      * Applies the given force to the wheel
      *
      * @param force_in_newtons the force to apply to the wheel
      */
-    static void applyWheelForceFrontLeft(float force_in_newtons);
-    static void applyWheelForceBackLeft(float force_in_newtons);
-    static void applyWheelForceBackRight(float force_in_newtons);
-    static void applyWheelForceFrontRight(float force_in_newtons);
+    void applyWheelForceFrontLeft(float force_in_newtons);
+    void applyWheelForceBackLeft(float force_in_newtons);
+    void applyWheelForceBackRight(float force_in_newtons);
+    void applyWheelForceFrontRight(float force_in_newtons);
 
     /**
      * Gets the motor speed for the wheel, in RPM
      */
-    static float getMotorSpeedFrontLeft();
-    static float getMotorSpeedBackLeft();
-    static float getMotorSpeedBackRight();
-    static float getMotorSpeedFrontRight();
+    float getMotorSpeedFrontLeft();
+    float getMotorSpeedBackLeft();
+    float getMotorSpeedBackRight();
+    float getMotorSpeedFrontRight();
 
     /**
-     * Returns the PhysicsRobot currently selected from the list of controllable
-     * physics_robots by the current robot_id
-     *
-     * @return the PhysicsRobot currently selected to be controlled. Returns an empty
-     * weak_ptr if the robot_id is not set, or a physics robot with a matching ID
-     * cannot be found.
+     * Sets the motor to coast (spin freely)
      */
-    static std::weak_ptr<PhysicsRobot> getCurrentPhysicsRobot();
+    void coastMotorBackLeft();
+    void coastMotorBackRight();
+    void coastMotorFrontLeft();
+    void coastMotorFrontRight();
 
-    // The id of the robot currently being controlled by this class
-    static std::optional<unsigned int> robot_id;
-    // All the physics robots this class can control
-    static std::vector<std::weak_ptr<PhysicsRobot>> physics_robots;
+    /**
+     * Sets the motor to brake (act against the current direction of rotation)
+     */
+    void brakeMotorBackLeft();
+    void brakeMotorBackRight();
+    void brakeMotorFrontLeft();
+    void brakeMotorFrontRight();
+
+   private:
+    /**
+     * A function that is called during every physics step for as long as the ball
+     * is touching this robot's chicker
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onChickerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
+    /**
+     * A function that is called during every physics step for as long as the ball
+     * is touching this robot's dribbler
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onDribblerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
+    /**
+     * A function that is called during once when the ball starts touching
+     * this robot's dribbler.
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onDribblerBallStartContact(PhysicsRobot* physics_robot,
+                                    PhysicsBall* physics_ball);
+
+    /**
+     * A function that is called during once when the ball stops touching
+     * this robot's dribbler.
+     *
+     * @param physics_robot The robot involved in the contact
+     * @param physics_ball The ball invovled in the contact
+     */
+    void onDribblerBallEndContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
+    /**
+     * Helper functions that check if the current pointer to the physics_robot is valid
+     * before calling the given function. If the physics_robot is invalid, a warning is
+     * logged and a default value is returned.
+     *
+     * @param func The function to perform on the physics robot
+     */
+    void checkValidAndExecuteVoid(
+        std::function<void(std::shared_ptr<PhysicsRobot>)> func);
+    float checkValidAndReturnFloat(
+        std::function<float(std::shared_ptr<PhysicsRobot>)> func);
+    unsigned int checkValidAndReturnUint(
+        std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
+
+    std::weak_ptr<PhysicsRobot> physics_robot;
+    std::optional<double> autokick_speed_m_per_s;
+    std::optional<double> autochip_distance_m;
+    uint32_t dribbler_rpm;
+
+    // A pointer to all the balls currently being dribbled
+    std::vector<PhysicsBall*> balls_in_dribbler_area;
 };

@@ -27,24 +27,21 @@
 #endif /* MDK ARM Compiler */
 
 /* USER CODE BEGIN 0 */
+#include "firmware_new/boards/frankie_v1/constants.h"
+#include "firmware_new/boards/frankie_v1/udp_multicast.h"
 
 /* USER CODE END 0 */
 /* Private function prototypes -----------------------------------------------*/
 /* ETH Variables initialization ----------------------------------------------*/
 void Error_Handler(void);
 
-/* DHCP Variables initialization ---------------------------------------------*/
-uint32_t DHCPfineTimer   = 0;
-uint32_t DHCPcoarseTimer = 0;
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
 
 /* Variables Initialization */
 struct netif gnetif;
-ip4_addr_t ipaddr;
-ip4_addr_t netmask;
-ip4_addr_t gw;
+ip6_addr_t ip6addr;
 
 /* USER CODE BEGIN 2 */
 
@@ -55,16 +52,16 @@ ip4_addr_t gw;
  */
 void MX_LWIP_Init(void)
 {
-    /* Initilialize the LwIP stack without RTOS */
-    lwip_init();
+    /* Initilialize the LwIP stack with RTOS */
+    tcpip_init(NULL, NULL);
 
-    /* IP addresses initialization with DHCP (IPv4) */
-    ipaddr.addr  = 0;
-    netmask.addr = 0;
-    gw.addr      = 0;
+    /* add the network interface (IPv6) with RTOS */
+    netif_add(&gnetif, NULL, &ethernetif_init, &tcpip_input);
 
-    /* add the network interface (IPv4/IPv6) without RTOS */
-    netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
+    /* Create IPv6 local address */
+    netif_create_ip6_linklocal_address(&gnetif, 0);
+    netif_ip6_addr_set_state(&gnetif, 0, IP6_ADDR_VALID);
+    gnetif.ip6_autoconfig_enabled = 1;
 
     /* Registers the default network interface */
     netif_set_default(&gnetif);
@@ -80,11 +77,9 @@ void MX_LWIP_Init(void)
         netif_set_down(&gnetif);
     }
 
-    /* Start DHCP negotiation for a network interface (IPv4) */
-    dhcp_start(&gnetif);
-
     /* USER CODE BEGIN 3 */
-
+    udp_multicast_init(AI_MULTICAST_ADDRESS, ROBOT_MULTICAST_LISTEN_PORT,
+                       ROBOT_UNICAST_SEND_PORT);
     /* USER CODE END 3 */
 }
 
@@ -94,32 +89,6 @@ void MX_LWIP_Init(void)
 /* USER CODE BEGIN 4 */
 /* USER CODE END 4 */
 #endif
-
-/**
- * ----------------------------------------------------------------------
- * Function given to help user to continue LwIP Initialization
- * Up to user to complete or change this function ...
- * Up to user to call this function in main.c in while (1) of main(void)
- *-----------------------------------------------------------------------
- * Read a received packet from the Ethernet buffers
- * Send it to the lwIP stack for handling
- * Handle timeouts if LWIP_TIMERS is set and without RTOS
- * Handle the llink status if LWIP_NETIF_LINK_CALLBACK is set and without RTOS
- */
-void MX_LWIP_Process(void)
-{
-    /* USER CODE BEGIN 4_1 */
-    /* USER CODE END 4_1 */
-    ethernetif_input(&gnetif);
-
-    /* USER CODE BEGIN 4_2 */
-    /* USER CODE END 4_2 */
-    /* Handle timeouts */
-    sys_check_timeouts();
-
-    /* USER CODE BEGIN 4_3 */
-    /* USER CODE END 4_3 */
-}
 
 #if defined(__CC_ARM) /* MDK ARM Compiler */
 /**

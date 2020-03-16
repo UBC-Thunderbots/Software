@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 #include "software/visualizer/drawing/colors.h"
 #include "software/visualizer/geom/geometry_conversion.h"
 

@@ -10,57 +10,9 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/triangle.h"
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
-
-
-TEST(GeomUtilTest, dist_point_rectangle_point_within)
-{
-    Point p(1, 2.1);
-    Rectangle rect({0, 2}, {2, 4});
-    EXPECT_DOUBLE_EQ(0, dist(p, rect));
-}
-
-
-TEST(GeomUtilTest, dist_point_rectangle_point_below_rectangle)
-{
-    Point p(1, 1);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_above_rectangle)
-{
-    Point p(1, 5);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_to_left_of_rectangle)
-{
-    Point p(-1, 3);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_right_of_rectangle)
-{
-    Point p(3, 3);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
-}
-
-TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle)
-{
-    Point p(-2.0, 0);
-    Rectangle rect({0, 2}, {2, 4});
-
-    EXPECT_DOUBLE_EQ(std::sqrt(8.0), dist(p, rect));
-}
 
 TEST(GeomUtilTest, test_proj_len)
 {
@@ -96,29 +48,6 @@ TEST(GeomUtilTest, test_proj_len)
     calculated_val = proj_length(Segment(test4p1, test4p2), test4p3);
     expected_val   = -sqrt(32) * (cos((M_PI / 4.0f) - atan(1.0f / 4.0f)));
     EXPECT_NEAR(expected_val, calculated_val, 0.00001);
-}
-
-TEST(GeomUtilTest, test_contains_triangle_point)
-{
-    // this triangle lies in the first quatren of the field, we can rota
-    Point p1(0, 0);
-    Point p2((std::rand() % 100) / 100, 0);
-    Point p3((std::rand() % 100) / 100, (std::rand() % 100) / 100);
-    Point p((std::rand() % 100) / 100, (std::rand() % 100) / 100);
-    bool expected_val = true;
-
-    // i don't know what is going on here, this part seems to not work very well
-    // so we'll just abuse cross products to see on which side of each side of
-    // the triangle it's on
-    if (((p2 - p1).cross(p - p1) > 0) != ((p2 - p1).cross(p3 - p1) > 0))
-        expected_val = false;
-    if (((p3 - p2).cross(p - p2) > 0) != ((p3 - p2).cross(p1 - p2) > 0))
-        expected_val = false;
-    if (((p1 - p3).cross(p - p3) > 0) != ((p1 - p3).cross(p2 - p3) > 0))
-        expected_val = false;
-
-    bool calculated_val = contains(triangle(p1, p2, p3), p);
-    EXPECT_EQ(expected_val, calculated_val);
 }
 
 TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
@@ -161,7 +90,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test1c(0, -1);
     double test1radius = 1;
     EXPECT_TRUE(
-        !intersects(triangle(test1p1, test1p2, test1p3),
+        !intersects(Triangle(test1p1, test1p2, test1p3),
                     Circle(test1c,
                            test1radius)));  // circle is tangent to triangle, no intersect
 
@@ -171,7 +100,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test2c(0, 5);
     double test2radius = 1;
     EXPECT_TRUE(intersects(
-        triangle(test2p1, test2p2, test2p3),
+        Triangle(test2p1, test2p2, test2p3),
         Circle(test2c,
                test2radius)));  // circle is completely inside triangle, intersect
 
@@ -181,7 +110,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test3c(0, 1);
     double test3radius = 1;
     EXPECT_TRUE(
-        !intersects(triangle(test3p1, test3p2, test3p3),
+        !intersects(Triangle(test3p1, test3p2, test3p3),
                     Circle(test3c,
                            test3radius)));  // circle is tangent to vertice, no intersect
 
@@ -191,7 +120,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test4c(5, 5);
     double test4radius = 2;
     EXPECT_TRUE(
-        !intersects(triangle(test4p1, test4p2, test4p3), Circle(test4c, test4radius)));
+        !intersects(Triangle(test4p1, test4p2, test4p3), Circle(test4c, test4radius)));
 
     Point test5p1(-2, -2);
     Point test5p2(2, -2);
@@ -199,7 +128,7 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test5c(0, -1);
     double test5radius = 1;
     EXPECT_TRUE(
-        intersects(triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
+        intersects(Triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
 }
 
 TEST(GeomUtilTest, test_point_in_rectangle)
@@ -616,21 +545,6 @@ TEST(GeomUtilTest, test_segment_near_line)
                 0.001);
 }
 
-TEST(GeomUtilTest, test_intersection)
-{
-    Point a1(-1, 0);
-    Point a2(4, 1);
-    Point b1(0, -1);
-    Point b2(1, 4);
-
-    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.25, 0.25)).length() < 0.0001);
-
-    a2 = Point(4, 2);
-
-    EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).length() <
-                0.0001);
-}
-
 // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point
 // along the ray (Should be ray.getStart() + ray.GetDirection())
 TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction)
@@ -730,23 +644,6 @@ TEST(GeomUtilTest, test_closest_point_time)
     v2 = Vector(-2, 2);
 
     EXPECT_DOUBLE_EQ(1.8, closestPointTime(x1, v1, x2, v2));
-}
-
-TEST(GeomUtilTest, test_dist_point_seg)
-{
-    Point a1(0, 0);
-    Point b1(1, 0);
-
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(0, 1), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(2, 0), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(1, -1), Segment(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(-1, 0), Segment(a1, b1)));
-
-    Point a2(5, 2);
-    Point b2(2, 7);
-    Point c2(6.5369, 7.2131);
-
-    EXPECT_NEAR(4.0, dist(c2, Segment(a2, b2)), 1e-5);
 }
 
 // Test to see if raySegmentIntersection() returns the correct parameters when the ray and
@@ -1232,36 +1129,6 @@ TEST(GeomUtilTest, test_find_open_circle_points_outside_of_box)
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
     ASSERT_EQ(0, empty_circles.size());
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_contained_in_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(0.5, 0.5);
-
-    double result = dist(point, polygon);
-
-    EXPECT_DOUBLE_EQ(0.0, result);
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_close_to_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(0.5, 1.1);
-
-    double result = dist(point, polygon);
-
-    EXPECT_NEAR(0.1, result, 1e-9);
-}
-
-TEST(GeomUtilTest, test_point_polygon_dist_point_far_from_polygon)
-{
-    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
-    Point point     = Point(-5, -5);
-
-    double result = dist(point, polygon);
-
-    EXPECT_DOUBLE_EQ(std::hypot(-5, -5), result);
 }
 
 TEST(GeomUtilTest, test_ray_rectangle_intersection_no_intersection)

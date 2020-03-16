@@ -9,7 +9,7 @@ TEST(RefboxData, test_get_name_of_refbox_constants)
         try
         {
             RefboxGameState state = static_cast<RefboxGameState>(i);
-            name(state);
+            to_string(state);
         }
         catch (std::invalid_argument &)
         {

@@ -99,14 +99,10 @@ new_local_repository(
     path = "external/qt",  # This directory is symlinked in the setup script
 )
 
-http_archive(
-    name = "llvm_clang",
-    build_file = "@//external:clang.BUILD",
-    sha256 = "a23b082b30c128c9831dbdd96edad26b43f56624d0ad0ea9edec506f5385038d",
-    strip_prefix = "clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04",
-    urls = [
-        "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
-    ],
+new_local_repository(
+    name = "linux_gcc",
+    build_file = "@//external:linux_gcc.BUILD",
+    path = "/",
 )
 
 http_archive(
@@ -127,14 +123,6 @@ new_git_repository(
     commit = "bddb4ec7efc8a6630fcbe7ef913017d88fb9b4b1",
     remote = "https://github.com/UBC-Thunderbots/Box2D",
     shallow_since = "1571445859 -0700",
-)
-
-# Magic enum library from https://github.com/Neargye/magic_enum
-new_git_repository(
-    name = "magic_enum",
-    build_file = "@//external:magic_enum.BUILD",
-    commit = "49d2429cf110f804048bc459b1d2c126d43b0a9a",
-    remote = "https://github.com/Neargye/magic_enum.git",
 )
 
 # Developer tools for working with bazel
@@ -178,6 +166,6 @@ gazelle_dependencies()
 # Bazel buildtools, provide us with the bazel formatter ("buildifier")
 http_archive(
     name = "com_github_bazelbuild_buildtools",
-    strip_prefix = "buildtools-master",
-    url = "https://github.com/bazelbuild/buildtools/archive/master.zip",
+    strip_prefix = "buildtools-9e63c6f02e63adaab63e21a3a8feb75f4f7503cb",
+    url = "https://github.com/bazelbuild/buildtools/archive/9e63c6f02e63adaab63e21a3a8feb75f4f7503cb.zip",
 )

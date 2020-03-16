@@ -1,6 +1,7 @@
 # Code Style Guide
 
 ## Table of Contents
+* [C-specific Guidelines](#c-specific-guidelines)
 * [Names and Variables](#names-and-variables)
 * [Comments](#comments)
 * [Headers](#headers)
@@ -17,6 +18,45 @@ Our C++ coding style is based off of [Google's C++ Style Guide](https://google.g
 
 If you want to know more about our coding style you can take a look at our [clang-format configuration file](https://github.com/UBC-Thunderbots/Software/blob/master/.clang-format).
 
+
+### C-Specific Guidelines
+The vast majority of the things noted in this document will apply to `C` code as well, but there are some special cases / exceptions for `C` code. Please also see the [Firmware architecture and design document](firmware-architecture-and-design.md) for much of the context needed for these.
+* If something is in a header, then it is *always* considered public.
+* Public names should always follow the format `PREFIX_FILENAME_NAME`, where:
+    * `PREFIX` is one of `app`, `io`, `shared`, depending on the high level folder this is under
+    * `FILENAME` is the name of the file (Example: `firmware_robot` for `firmware_robot.h`)
+    * `NAME` is the name of whatever the function/variable is, following standard naming rules indicated below for functions/variables.
+  
+  ```C 
+  // Incorrect (missing prefix)
+  float firmware_robot_getRobotPositionX(Robot* robot);
+
+  // Incorrect (missing filename)
+  float app_getRobotPositionX(Robot* robot);
+
+  // Incorrect (incorrect function name style)
+  float app_firmware_robot_get_robot_position_x(Robot* robot);
+
+  // Correct
+  float app_firmware_robot_getRobotPositionX(Robot* robot);
+
+  // Correct
+  float shared_util_boundValue(float upper, float lower, float value);
+
+  ```
+
+* Structs are `CamelCaseUpperFirst`, and struct typedefs are `CamelCaseUpperFirst_t`
+
+  ``` C
+  // Incorrect
+  struct myDog;
+
+  // Incorrect
+  typedef struct MyDog MyDog_typedef; 
+
+  // Correct
+  typedef struct MyDog MyDog_t;
+  ```
 
 ### Names and Variables
 

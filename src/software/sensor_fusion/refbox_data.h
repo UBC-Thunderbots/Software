@@ -6,74 +6,185 @@
 #include "software/new_geom/point.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/time/timestamp.h"
+#include "software/util/printable_enum_macro/printable_enum_macro.h"
 
-enum class RefboxGameState
-{
-    // these enum items map to the constants in RefboxCommand.msg
-    HALT                 = 0,
-    STOP                 = 1,
-    NORMAL_START         = 2,
-    FORCE_START          = 3,
-    PREPARE_KICKOFF_US   = 4,
-    PREPARE_KICKOFF_THEM = 5,
-    PREPARE_PENALTY_US   = 6,
-    PREPARE_PENALTY_THEM = 7,
-    DIRECT_FREE_US       = 8,
-    DIRECT_FREE_THEM     = 9,
-    INDIRECT_FREE_US     = 10,
-    INDIRECT_FREE_THEM   = 11,
-    TIMEOUT_US           = 12,
-    TIMEOUT_THEM         = 13,
-    GOAL_US              = 14,
-    GOAL_THEM            = 15,
-    BALL_PLACEMENT_US    = 16,
-    BALL_PLACEMENT_THEM  = 17,
-    REFBOX_GAME_STATE_COUNT
-};
+// clang-format off
+MAKE_ENUM(RefboxGameState,
+          // these enum items map to the constants in RefboxCommand.msg
+          HALT,
+          STOP,
+          NORMAL_START,
+          FORCE_START,
+          PREPARE_KICKOFF_US,
+          PREPARE_KICKOFF_THEM,
+          PREPARE_PENALTY_US,
+          PREPARE_PENALTY_THEM,
+          DIRECT_FREE_US,
+          DIRECT_FREE_THEM,
+          INDIRECT_FREE_US,
+          INDIRECT_FREE_THEM,
+          TIMEOUT_US,
+          TIMEOUT_THEM,
+          GOAL_US,
+          GOAL_THEM,
+          BALL_PLACEMENT_US,
+          BALL_PLACEMENT_THEM,
+          REFBOX_GAME_STATE_COUNT);
+// clang-format on
 
-enum class RefboxStage
-{
-    // The first half is about to start.
-    // A kickoff is called within this stage.
-    // This stage ends with the NORMAL_START.
-    NORMAL_FIRST_HALF_PRE = 0,
-    // The first half of the normal game, before half time.
-    NORMAL_FIRST_HALF = 1,
-    // Half time between first and second halves.
-    NORMAL_HALF_TIME = 2,
-    // The second half is about to start.
-    // A kickoff is called within this stage.
-    // This stage ends with the NORMAL_START.
-    NORMAL_SECOND_HALF_PRE = 3,
-    // The second half of the normal game, after half time.
-    NORMAL_SECOND_HALF = 4,
-    // The break before extra time.
-    EXTRA_TIME_BREAK = 5,
-    // The first half of extra time is about to start.
-    // A kickoff is called within this stage.
-    // This stage ends with the NORMAL_START.
-    EXTRA_FIRST_HALF_PRE = 6,
-    // The first half of extra time.
-    EXTRA_FIRST_HALF = 7,
-    // Half time between first and second extra halves.
-    EXTRA_HALF_TIME = 8,
-    // The second half of extra time is about to start.
-    // A kickoff is called within this stage.
-    // This stage ends with the NORMAL_START.
-    EXTRA_SECOND_HALF_PRE = 9,
-    // The second half of extra time.
-    EXTRA_SECOND_HALF = 10,
-    // The break before penalty shootout.
-    PENALTY_SHOOTOUT_BREAK = 11,
-    // The penalty shootout.
-    PENALTY_SHOOTOUT = 12,
-    // The game is over.
-    POST_GAME = 13,
-    REFBOX_STAGE_COUNT
-};
+MAKE_ENUM(RefboxStage,
+          // The first half is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          NORMAL_FIRST_HALF_PRE,
+          // The first half of the normal game, before half time.
+          NORMAL_FIRST_HALF,
+          // Half time between first and second halves.
+          NORMAL_HALF_TIME,
+          // The second half is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          NORMAL_SECOND_HALF_PRE,
+          // The second half of the normal game, after half time.
+          NORMAL_SECOND_HALF,
+          // The break before extra time.
+          EXTRA_TIME_BREAK,
+          // The first half of extra time is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          EXTRA_FIRST_HALF_PRE,
+          // The first half of extra time.
+          EXTRA_FIRST_HALF,
+          // Half time between first and second extra halves.
+          EXTRA_HALF_TIME,
+          // The second half of extra time is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          EXTRA_SECOND_HALF_PRE,
+          // The second half of extra time.
+          EXTRA_SECOND_HALF,
+          // The break before penalty shootout.
+          PENALTY_SHOOTOUT_BREAK,
+          // The penalty shootout.
+          PENALTY_SHOOTOUT,
+          // The game is over.
+          POST_GAME, REFBOX_STAGE_COUNT);
 
-struct TeamInfo
+class TeamInfo
 {
+   public:
+    /**
+     * Default constructor
+     */
+    TeamInfo();
+
+    /**
+     * Constructor that initializes all fields
+     *
+     * @param
+     * @param name name
+     * @param score score
+     * @param red_cards red_cards
+     * @param yellow_card_times yellow_card_times
+     * @param yellow_cards yellow_cards
+     * @param timeouts timeouts
+     * @param timeout_time timeout_time
+     * @param goalkeeper goalkeeper
+     * @param foul_counter foul_counter
+     * @param ball_placement_failures ball_placement_failures
+     * @param can_place_ball can_place_ball
+     * @param max_allowed_bots max_allowed_bots
+     */
+    TeamInfo(std::string name, int score, int red_cards,
+             std::vector<int> yellow_card_times, int yellow_cards, int timeouts,
+             int timeout_time, int goalkeeper, int foul_counter,
+             int ball_placement_failures, bool can_place_ball, int max_allowed_bots);
+
+    /**
+     * Return name
+     *
+     * @return name
+     */
+    std::string getName(void) const;
+
+    /**
+     * Return score
+     *
+     * @return score
+     */
+    int getScore(void) const;
+
+    /**
+     * Return number of red cards
+     *
+     * @return number of red cards
+     */
+    int getRedCards(void) const;
+
+    /**
+     * Return yellow card times
+     *
+     * @return yellow card times
+     */
+    std::vector<int> getYellowCardTimes(void) const;
+
+    /**
+     * Return number of red cards
+     *
+     * @return number of red cards
+     */
+    int getYellowCards(void) const;
+
+    /**
+     * Return number of timeouts
+     *
+     * @return number of timeouts
+     */
+    int getTimeouts(void) const;
+
+    /**
+     * Return timeout time
+     *
+     * @return timeout time
+     */
+    int getTimeoutTime(void) const;
+
+    /**
+     * Return goalkeeper
+     *
+     * @return goalkeeper
+     */
+    int getGoalkeeper(void) const;
+
+    /**
+     * Return foul counter
+     *
+     * @return foul counter
+     */
+    int getFoulCounter(void) const;
+
+    /**
+     * Return ball placement failures
+     *
+     * @return ball placement failures
+     */
+    int getBallPlacementFailures(void) const;
+
+    /**
+     * Return can place ball
+     *
+     * @return can place ball
+     */
+    bool getCanPlaceBall(void) const;
+
+    /**
+     * Return max allowed bots
+     *
+     * @return max allowed bots
+     */
+    int getMaxAllowedBots(void) const;
+
+   private:
     // The team's name (empty string if operator has not typed anything).
     std::string name;
     // The number of goals scored by the team during normal play and overtime.
@@ -228,21 +339,3 @@ class RefboxData
     // All non-finished proposed game events that may be processed next.
     std::vector<ProposedGameEvent> proposed_game_events;
 };
-
-/**
- * Returns the name of the given refbox gamestate
- *
- * @param state The refbox gamestate to get the name of
- * @return The name of the given refbox gamestate
- */
-std::string name(const RefboxGameState& state);
-std::ostream& operator<<(std::ostream& os, const RefboxGameState& state);
-
-/**
- * Returns the name of the given refbox gamestage
- *
- * @param stage The refbox gamestage to get the name of
- * @return The name of the given refbox gamestage
- */
-std::string name(const RefboxStage& stage);
-std::ostream& operator<<(std::ostream& os, const RefboxStage& stage);

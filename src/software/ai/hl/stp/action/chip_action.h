@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/action_visitor.h"
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/world/ball.h"
@@ -56,7 +56,35 @@ class ChipAction : public Action
     void updateControlParams(const Robot& robot, Point chip_origin, Point chip_target,
                              double chip_distance_meters);
 
-    void accept(ActionVisitor& visitor) const override;
+    /**
+     * Get the state of the ball
+     *
+     * @return the state of the ball
+     */
+    Ball getBall();
+
+    /**
+     * Get the point this ChipAction will chip from
+     *
+     * @return the point this ChipAction will chip from
+     */
+    Point getChipOrigin();
+
+    /**
+     * Get the angle this ChipAction will chip with
+     *
+     * @return the angle this ChipAction will chip with
+     */
+    Angle getChipDirection();
+
+    /**
+     * Get the distance this ChipAction will chip to
+     *
+     * @return the distance this ChipAction will chip to
+     */
+    double getChipDistanceMeters();
+
+    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

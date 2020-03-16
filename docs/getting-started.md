@@ -20,10 +20,10 @@
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
 * [Building and Running the Code](#building-and-running-the-code)
-   * [With CLion](#with-clion)
-   * [From the command-line](#from-the-command-line)
 * [Debugging](#debugging)
-* [Flashing and Debugging A STM32 MCU](#flashing-and-debugging-a-stm32-mcu)
+* [Profiling](#profiling)
+* [Flashing and Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
+* [Flashing and Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
 
 ## Introduction
 These instructions assume that you have the following accounts setup:
@@ -146,9 +146,35 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
 
 ## Debugging
-Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow! Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). If you insist on using the command line for everything, or if you have CLion issues, see [here](https://stackoverflow.com/questions/45812725/c-debugging-with-gdb-bazel-emacs).
+Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
 
-## Flashing And Debugging A STM32 MCU
+### With CLion
+Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
+
+### From The Command line
+`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see (here)[https://www.cs.cmu.edu/~gilpin/tutorial/] for a tutorial on how to use `gdb` if you're not familiar with it.
+
+
+## Profiling 
+Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
+```
+bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/ABSOLUTE/PATH/TO/profile.callgrind" //target/to:run
+
+// Example
+bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/tmp/profile.callgrind" //software/geom:angle_test
+```
+This will output the file at the _absolute_ path given via the `--callgrind-out-file` argument. This file can then be viewed using `kcachegrind` (example: `kcachegrind /tmp/profile.callgrind`), giving lots of useful information about where time is being spent in the code.
+
+## Flashing And Debugging A STM32F4 MCU
+1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a STM32F4 based main board or radio dongle plugged into your computer. Do not plug both the dongle and the robot at the same time!
+2. Make sure the robot is elevated, with the wheels not touching any surface to avoid experimental firmware causing accidental damage.
+3. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:flash_firmware radio_dongle`. Replace `radio_dongle`, with `robot` to flash the robot.
+4. For the robot, make sure the robot is in bootloader mode (BL switch on the piano keys is down), and push the power switch away from the dribbler (i.e towards the back of the robot) and hold it there before running the command. The dongle can be simply be plugged in with no additional action.
+5. There should be a progress bar indicating the flashing progress, hold the switch back until the process finishes.
+6. When the process is finished, release the power switch, push the BL switch back up, and the robot now has been flashed!
+7. To see print outs from the robot, run `sudo cat /dev/ttyACM0`. If `ttyACM0` isn't the right device, run `ls /dev/tty*` with the robot disconnected, and again with the robot connected, and replace `ttyACM0` with the new device that has been added. The radio dongle does not have this feature.
+
+## Flashing And Debugging A STM32H7 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
 2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
 3. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. This will load the `.elf` file associated with (0) to the the nucleo and put you into a gdb prompt.

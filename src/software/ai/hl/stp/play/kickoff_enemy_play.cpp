@@ -3,11 +3,12 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
+
 
 const std::string KickoffEnemyPlay::name = "KickoffEnemy Play";
 
@@ -112,8 +113,6 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // keeps track of the next defense position to assign
@@ -132,8 +131,6 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // We shadow assuming the robots do not pass so we do not try block passes
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
-                shadow_enemy_tactics.at(i)->updateWorldParams(
-                    world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
                 shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
                                                                 shadow_dist);
                 result.emplace_back(shadow_enemy_tactics.at(i));
@@ -156,5 +153,5 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     } while (true);
 }
 
-// Register this play in the PlayFactory
-static TPlayFactory<KickoffEnemyPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, KickoffEnemyPlay> factory;

@@ -46,22 +46,21 @@
 #include <task.h>
 #include <unused.h>
 
-#include "app/world/firmware_world.h"
-#include "control/control.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
 #include "io/charger.h"
 #include "io/chicker.h"
+#include "io/dr.h"
 #include "io/dribbler.h"
 #include "io/encoder.h"
 #include "io/feedback.h"
 #include "io/hall.h"
 #include "io/leds.h"
+#include "io/lps.h"
 #include "io/motor.h"
 #include "io/receive.h"
 #include "io/wheels.h"
 #include "main.h"
-#include "primitives/primitive.h"
 #include "priority.h"
 
 // Verify that all the timing requirements are set up properly.
@@ -70,6 +69,7 @@ _Static_assert(portTICK_PERIOD_MS *CONTROL_LOOP_HZ == 1000U,
 
 static bool shutdown = false;
 static FirmwareWorld_t *world;
+static PrimitiveManager_t *primitive_manager;
 
 static void normal_task(void *UNUSED(param))
 {
@@ -105,10 +105,11 @@ static void normal_task(void *UNUSED(param))
         {
             feedback_pend_autokick();
         }
+
         hall_tick();
         encoder_tick();
-
-        primitive_tick(record, world);
+        app_primitive_manager_runCurrentPrimitive(primitive_manager, world);
+        dr_tick(record);
         wheels_tick(record);
         dribbler_tick(record);
         charger_tick();
@@ -118,6 +119,18 @@ static void normal_task(void *UNUSED(param))
         // Submit the log record, if we filled one.
         if (record)
         {
+            unsigned int current_primitive_index =
+                app_primitive_manager_getCurrentPrimitiveIndex(primitive_manager);
+
+            // We can only send integer, so set to a really large value if less then zero,
+            // so we can at least indicate that _something_ is wrong
+            if (current_primitive_index < 0)
+            {
+                current_primitive_index = 99;
+            }
+
+            record->tick.drive_serial    = receive_last_serial();
+            record->tick.primitive       = (uint8_t)current_primitive_index;
             record->tick.idle_cpu_cycles = main_read_clear_idle_cycles();
             log_queue(record);
         }
@@ -136,10 +149,12 @@ static void normal_task(void *UNUSED(param))
  *
  * \param[in] _world The world the "high level" firmware can use to interact with the
  *                   outside world
+ * \param[in] _primitive_manager The primitive manager, used for running primitives
  */
-void tick_init(FirmwareWorld_t *_world)
+void tick_init(PrimitiveManager_t *_primitive_manager, FirmwareWorld_t *_world)
 {
-    world = _world;
+    primitive_manager = _primitive_manager;
+    world             = _world;
 
     // Configure timer 6 to run the fast ticks.
     rcc_enable_reset(APB1, TIM6);

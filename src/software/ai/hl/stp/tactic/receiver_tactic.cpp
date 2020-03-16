@@ -55,9 +55,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action = std::make_shared<MoveAction>(
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
-        MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, true);
+    auto move_action = std::make_shared<MoveAction>(true);
 
     // Setup for the pass. We want to use any free time before the pass starts putting
     // ourselves in the best position possible to take the pass

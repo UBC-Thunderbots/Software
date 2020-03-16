@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/action_visitor.h"
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/world/ball.h"
@@ -70,7 +70,7 @@ class KickAction : public Action
      */
     double getKickSpeed();
 
-    void accept(ActionVisitor &visitor) const override;
+    void accept(MutableActionVisitor &visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;

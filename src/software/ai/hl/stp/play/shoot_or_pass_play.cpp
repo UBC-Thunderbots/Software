@@ -5,7 +5,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
@@ -13,7 +12,9 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 #include "src/g3log/loglevels.hpp"
+
 
 using namespace Passing;
 
@@ -135,10 +136,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                ->value();
     do
     {
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        updateGoalie(goalie_tactic);
-        updateShootGoalTactic(shoot_tactic);
-        updateCherryPickTactics(cherry_pick_tactics);
         updatePassGenerator(pass_generator);
 
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
@@ -198,12 +195,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
             false);
         do
         {
-            updateCreaseDefenderTactics(crease_defender_tactics);
-            updateGoalie(goalie_tactic);
-            passer->updateWorldParams(world.ball());
             passer->updateControlParams(pass);
-            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
-                                        world.ball());
             receiver->updateControlParams(pass);
             yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
                    std::get<1>(crease_defender_tactics)});
@@ -217,42 +209,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished";
 }
 
-void ShootOrPassPlay::updateCherryPickTactics(
-    std::array<std::shared_ptr<CherryPickTactic>, 2> tactics)
-{
-    for (auto &tactic : tactics)
-    {
-        tactic->updateWorldParams(world);
-    }
-}
-
-void ShootOrPassPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
-{
-    shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                    world.enemyTeam(), world.ball());
-}
-
 void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());
 }
 
-void ShootOrPassPlay::updateCreaseDefenderTactics(
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders)
-{
-    for (auto &crease_defender : crease_defenders)
-    {
-        crease_defender->updateWorldParams(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
-    }
-}
 
-void ShootOrPassPlay::updateGoalie(std::shared_ptr<GoalieTactic> goalie)
-{
-    goalie->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(),
-                              world.enemyTeam());
-}
-
-// Register this play in the PlayFactory
-static TPlayFactory<ShootOrPassPlay> factory;
+// Register this play in the genericFactory
+static TGenericFactory<std::string, Play, ShootOrPassPlay> factory;

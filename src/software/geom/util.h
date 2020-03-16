@@ -3,19 +3,15 @@
 #include <cstddef>
 #include <vector>
 
-#include "software/geom/circle.h"
-#include "software/geom/polygon.h"
-#include "software/geom/rectangle.h"
-#include "software/geom/segment.h"
 #include "software/geom/shot.h"
+#include "software/new_geom/circle.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/polygon.h"
 #include "software/new_geom/ray.h"
-
-template <size_t N>
-using LegacyPolygon       = std::array<Point, N>;
-using LegacyTriangle      = LegacyPolygon<3>;
-using LegacyQuadrilateral = LegacyPolygon<4>;
+#include "software/new_geom/rectangle.h"
+#include "software/new_geom/segment.h"
+#include "software/new_geom/triangle.h"
 
 constexpr double EPS = 1e-9;
 
@@ -24,16 +20,6 @@ constexpr double EPS2 = EPS * EPS;
 constexpr int sign(double n)
 {
     return n > EPS ? 1 : (n < -EPS ? -1 : 0);
-}
-
-inline LegacyTriangle triangle(const Point &a, const Point &b, const Point &c)
-{
-    return {a, b, c};
-}
-inline LegacyQuadrilateral quad(const Point &a, const Point &b, const Point &c,
-                                const Point &d)
-{
-    return {a, b, c, d};
 }
 
 /**
@@ -51,8 +37,7 @@ double proj_length(const Segment &first, const Vector &second);
  * the second parameter is contained, even if partially,
  * inside the first parameter.
  */
-
-bool contains(const LegacyTriangle &out, const Point &in);
+bool contains(const Triangle &out, const Point &in);
 bool contains(const Circle &out, const Point &in);
 bool contains(const Circle &out, const Segment &in);
 bool contains(const Ray &out, const Point &in);
@@ -63,9 +48,8 @@ bool contains(const Rectangle &out, const Point &in);
  * The family of `intersects` functions determines whether there
  * exists an intersection between one object and another.
  */
-
-bool intersects(const LegacyTriangle &first, const Circle &second);
-bool intersects(const Circle &first, const LegacyTriangle &second);
+bool intersects(const Triangle &first, const Circle &second);
+bool intersects(const Circle &first, const Triangle &second);
 bool intersects(const Circle &first, const Circle &second);
 bool intersects(const Segment &first, const Circle &second);
 bool intersects(const Circle &first, const Segment &second);
@@ -73,47 +57,12 @@ bool intersects(const Segment &first, const Segment &second);
 bool intersects(const Ray &first, const Segment &second);
 bool intersects(const Segment &first, const Ray &second);
 
-/*
- * The family of `dist` functions calculates the unsigned distance
- * between one object and another.
- */
-
-double dist(const Point &first, const Point &second);
-double dist(const Segment &first, const Segment &second);
-
-double dist(const Point &first, const Segment &second);
-double dist(const Segment &first, const Point &second);
-
-double dist(const Point &first, const Polygon &second);
-
-/**
- * NOTE: the distance from a point to a rectangle is the closest distance from the point
- * to the edge of the rectangle, or 0 if the point is within the rectangle
- */
-double dist(const Point &first, const Rectangle &second);
-
-double distsq(const Point &first, const Segment &second);
-double distsq(const Segment &first, const Point &second);
-double distsq(const Point &first, const Point &second);
-
 bool isDegenerate(const Segment &segment);
 bool isDegenerate(const Ray &segment);
 
 double length(const Segment &segment);
 
 double lengthSquared(const Segment &segment);
-
-template <size_t N>
-Point getVertex(const LegacyPolygon<N> &poly, unsigned int i);
-template <size_t N>
-void setVertex(LegacyPolygon<N> &poly, unsigned int i, Vector &v);
-
-/**
- * Gets the side that is connected to the vertex with index provided
- * and also connected to the vertex with the next index.
- */
-template <size_t N>
-Segment getSide(const LegacyPolygon<N> &poly, unsigned int i);
 
 /**
  * Checks if 3 points are collinear.
@@ -415,11 +364,6 @@ double offsetAlongLine(Point x0, Point x1, Point p);
  * returns nearest point on segment a0-a1 to line b0-b1
  */
 Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
-
-/**
- * intersection of two segments?
- */
-Point intersection(Point a1, Point a2, Point b1, Point b2);
 
 /**
  * Calculates the acute angle formed by the two given vectors

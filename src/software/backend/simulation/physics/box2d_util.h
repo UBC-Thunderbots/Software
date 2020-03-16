@@ -43,6 +43,24 @@ b2Vec2 createVec2(const Point& point);
 b2Vec2 createVec2(const Vector& vector);
 
 /**
+ * Converts the given b2Vec2 into a Point
+ *
+ * @param vec The b2Vec2 to convert to a Point
+ *
+ * @return A Point equivalent to the given b2Vec2
+ */
+Point createPoint(const b2Vec2& vec);
+
+/**
+ * Converts the given b2Vec2 into a Vector
+ *
+ * @param vec The b2Vec2 to convert to a Vector
+ *
+ * @return A Vector equivalent to the given b2Vec2
+ */
+Vector createVector(const b2Vec2& vec);
+
+/**
  * Calculates and returns the area of the given polygon. The polygon must be convex.
  *
  * @param polygon The polygon to calculate the area of
