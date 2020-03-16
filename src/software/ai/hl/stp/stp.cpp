@@ -300,7 +300,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    std::string info_play_type = name(current_game_state);
+    std::string info_play_type = to_string(current_game_state);
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     std::unordered_set<std::string> info_robot_tactic_assignment = {};
     info = PlayInfo(info_play_type, info_play_name, info_robot_tactic_assignment);
@@ -340,7 +340,7 @@ PlayInfo STP::getPlayInfo()
             }
             std::string s = "Robot " + std::to_string(tactic->getAssignedRobot()->id()) +
                             "  -  " + tactic->getName();
-            info.addAssignment(s);
+            info.addRobotTacticAssignment(s);
         }
     }
 
