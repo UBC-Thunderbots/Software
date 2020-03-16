@@ -164,7 +164,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                 break;
         }
 
-        if (!camera_disabled && world.field().isFieldValid())
+        if (!camera_disabled)
         {
             BallState ball_state = network_filter.getFilteredBallData({detection});
             world.updateBallState(ball_state);

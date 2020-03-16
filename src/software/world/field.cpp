@@ -265,17 +265,9 @@ void Field::updateTimestamp(Timestamp time_stamp)
 
 bool Field::pointInEntireField(const Point &p) const
 {
-    {
-        Rectangle entire_field =
-            Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
-                      Point(totalXLength() / 2, totalYLength() / 2));
-        return entire_field.contains(p);
-    }
-    catch (const std::invalid_argument &e)
-    {
-        // If the field does not represent a valid rectangle, return false
-        return false;
-    }
+    Rectangle entire_field = Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
+                                       Point(totalXLength() / 2, totalYLength() / 2));
+    return entire_field.contains(p);
 }
 
 bool Field::operator==(const Field &other) const
