@@ -28,12 +28,9 @@ void GrSimBackend::onValueReceived(ConstPrimitiveVectorPtr primitives)
 
 void GrSimBackend::receiveWorld(World world)
 {
-    if (world.field().isFieldValid())
-    {
-        setMostRecentlyReceivedWorld(world);
-        Subject<World>::sendValueToObservers(world);
-        updateGrSim();
-    }
+    setMostRecentlyReceivedWorld(world);
+    Subject<World>::sendValueToObservers(world);
+    updateGrSim();
 }
 
 void GrSimBackend::setMostRecentlyReceivedWorld(World world)
