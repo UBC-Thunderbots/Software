@@ -1,8 +1,14 @@
 #include "firmware/main/app/primitives/primitive.h"
 
-bool primitive_params_are_equal(primitive_params_t *params1, primitive_params_t *params2)
+bool primitive_params_are_equal(const primitive_params_t *params1,
+                                const primitive_params_t *params2)
 {
     bool equal = true;
+
+    if (!params1 || !params2)
+    {
+        return false;
+    }
 
     if (params1->slow != params2->slow)
     {
