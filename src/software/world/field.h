@@ -207,7 +207,9 @@ class Field
     Rectangle fieldBoundary() const;
 
     /**
-     * TODO: write this
+     * Returns true if field x and y total lengths are valid, false otherwise
+     *
+     * @return true if field x and y total lengths are valid, false otherwise
      */
     bool isFieldValid() const;
 
