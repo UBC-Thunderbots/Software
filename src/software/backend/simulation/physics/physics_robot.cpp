@@ -8,7 +8,7 @@
 #include "software/backend/simulation/physics/physics_robot_model.h"
 extern "C"
 {
-#include "firmware/main/shared/physics.h"
+#include "firmware/shared/physics.h"
 }
 
 // We are only allowed to cover a fraction of the ball according to the rules, so we use

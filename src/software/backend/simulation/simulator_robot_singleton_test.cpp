@@ -9,7 +9,7 @@
 
 extern "C"
 {
-#include "firmware/main/app/world/firmware_robot.h"
+#include "firmware/app/world/firmware_robot.h"
 }
 
 #include "software/test_util/test_util.h"

@@ -4,7 +4,7 @@
 #include "software/backend/simulation/simulator_robot_singleton.h"
 extern "C"
 {
-#include "firmware/main/app/world/firmware_world.h"
+#include "firmware/app/world/firmware_world.h"
 }
 
 /**
