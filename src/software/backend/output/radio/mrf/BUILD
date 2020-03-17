@@ -2,6 +2,7 @@ cc_library(
     name = "mrf_primitive_visitor",
     srcs = ["mrf_primitive_visitor.cpp"],
     hdrs = ["mrf_primitive_visitor.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "//shared:constants",
         "//shared:firmware_primitive_type",
