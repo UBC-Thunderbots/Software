@@ -28,6 +28,9 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
                 this->onDribblerBallEndContact(robot, ball);
             });
     }
+
+    primitive_manager = std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>(
+        app_primitive_manager_create(), PrimitiveManagerDeleter());
 }
 
 void SimulatorRobot::checkValidAndExecuteVoid(
@@ -81,11 +84,6 @@ float SimulatorRobot::getPositionY()
     return checkValidAndReturnFloat([](auto robot) { return robot->position().y(); });
 }
 
-Point SimulatorRobot::position()
-{
-    return Point(getPositionX(), getPositionY());
-}
-
 float SimulatorRobot::getOrientation()
 {
     return checkValidAndReturnFloat(
@@ -100,11 +98,6 @@ float SimulatorRobot::getVelocityX()
 float SimulatorRobot::getVelocityY()
 {
     return checkValidAndReturnFloat([](auto robot) { return robot->velocity().y(); });
-}
-
-Vector SimulatorRobot::velocity()
-{
-    return Vector(getVelocityX(), getVelocityY());
 }
 
 float SimulatorRobot::getVelocityAngular()
@@ -370,4 +363,18 @@ void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
     {
         balls_in_dribbler_area.erase(iter);
     }
+}
+
+void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
+                                       unsigned int primitive_index,
+                                       const primitive_params_t &params)
+{
+    app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
+                                            primitive_index, &params);
+}
+
+void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world)
+{
+    app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
+                                              firmware_world.get());
 }
