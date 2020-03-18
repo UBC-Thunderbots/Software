@@ -64,12 +64,11 @@ bool WorldStateValidator::waitForValidationToPass(
             break;
         }
 
-        std::optional<World> world =
-            world_buffer.popLeastRecentlyAddedValue(world_buffer_timeout);
+        world = world_buffer.popLeastRecentlyAddedValue(world_buffer_timeout);
         if (!world)
         {
             LOG(WARNING)
-                << "WorldStateValidator timed out waiting for the initial World to be received";
+                << "WorldStateValidator timed out waiting for the World to be received";
             return false;
         }
         // We update the value of the existing pointer rather than making a new pointer
