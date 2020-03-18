@@ -930,9 +930,9 @@ void udev_init(const udev_info_t *info)
             }
             static StaticTask_t task_storage;
             udev_task_handle = xTaskCreateStatic(
-                &udev_task, "legacy_usb", info->internal_task_stack_size / sizeof(unsigned long),
-                0, info->internal_task_priority, info->internal_task_stack,
-                &task_storage);
+                &udev_task, "legacy_usb",
+                info->internal_task_stack_size / sizeof(unsigned long), 0,
+                info->internal_task_priority, info->internal_task_stack, &task_storage);
             break;
 
         case UDEV_STATE_DETACHED:

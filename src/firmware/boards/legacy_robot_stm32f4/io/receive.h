@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "firmware/app/world/firmware_world.h"
 #include "firmware/app/primitives/primitive_manager.h"
+#include "firmware/app/world/firmware_world.h"
 #include "util/log.h"
 
 void receive_init(unsigned int index, PrimitiveManager_t *_primitive_manager,

@@ -1,11 +1,12 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "firmware/boards/shared/legacy_freertos/include/FreeRTOS.h"
 #include <semphr.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <usb.h>
+
+#include "firmware/boards/shared/legacy_freertos/include/FreeRTOS.h"
 
 /**
  * \ingroup MAIN

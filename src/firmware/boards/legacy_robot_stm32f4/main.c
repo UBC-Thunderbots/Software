@@ -35,8 +35,8 @@
 #include <unused.h>
 #include <usb.h>
 
-#include "firmware/app/world/firmware_world.h"
 #include "firmware/app/primitives/primitive.h"
+#include "firmware/app/world/firmware_world.h"
 #include "io/adc.h"
 #include "io/breakbeam.h"
 #include "io/charger.h"

@@ -22,7 +22,6 @@
  * @{
  */
 
-#include "firmware/boards/shared/legacy_freertos/include/FreeRTOS.h"
 #include <cdcacm.h>
 #include <errno.h>
 #include <minmax.h>
@@ -33,6 +32,8 @@
 #include <string.h>
 #include <task.h>
 #include <unused.h>
+
+#include "firmware/boards/shared/legacy_freertos/include/FreeRTOS.h"
 
 /**
  * \cond INTERNAL
