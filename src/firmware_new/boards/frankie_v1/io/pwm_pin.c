@@ -34,7 +34,7 @@ void io_pwm_pin_setPwm(PwmPin_t* pwm_pin, float pwm_value)
     TIM_OC_InitTypeDef timer_config;
 
     timer_config.OCMode     = TIM_OCMODE_PWM1;
-    timer_cofig.Pulse      = scaled_pwm;
+    timer_config.Pulse      = scaled_pwm;
     timer_config.OCPolarity = TIM_OCPOLARITY_HIGH;
     timer_config.OCFastMode = TIM_OCFAST_DISABLE;
 
