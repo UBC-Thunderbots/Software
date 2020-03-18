@@ -28,13 +28,13 @@ void io_pwm_pin_setPwm(PwmPin_t* pwm_pin, float pwm_value)
     // TODO: assert pwm value in [0,1]
     // TODO: not the appropriate way to get the max value of a uint16_t
     // Rescale PWM
-    uint16_t scaled_pwm = (uint16_t)round(pwm_value * pow(2.0, 16.0));
+    uint16_t scaled_pwm = (uint16_t)round(pwm_value * 0xFFFF);
 
     // TODO: better name for this
     TIM_OC_InitTypeDef timer_config;
 
     timer_config.OCMode     = TIM_OCMODE_PWM1;
-    timer_config.Pulse      = scaled_pwm;
+    timer_cofig.Pulse      = scaled_pwm;
     timer_config.OCPolarity = TIM_OCPOLARITY_HIGH;
     timer_config.OCFastMode = TIM_OCFAST_DISABLE;
 
