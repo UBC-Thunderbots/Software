@@ -28,7 +28,7 @@ void io_pwm_pin_setPwm(PwmPin_t* pwm_pin, float pwm_value)
     // TODO: assert pwm value in [0,1]
     // TODO: not the appropriate way to get the max value of a uint16_t
     // Rescale PWM
-    float pulse_max  = (float)pwm_pin->timer.Init.Period;
+    float pulse_max  = (float)pwm_pin->timer->Init.Period;
     uint16_t scaled_pwm = (uint16_t)round(pwm_value * pulse_max);
 
     // TODO: better name for this
