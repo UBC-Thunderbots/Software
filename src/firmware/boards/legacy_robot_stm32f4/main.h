@@ -1,8 +1,13 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+// We disable formatting here because we need to include `FreeRTOS.h` before
+// `semphr.h`, and clang-format can re-order includes
+// clang-format off
 #include "FreeRTOS.h"
 #include <semphr.h>
+// clang-format on
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <usb.h>
