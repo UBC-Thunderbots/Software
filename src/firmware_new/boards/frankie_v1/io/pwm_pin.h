@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stm32h7xx_hal.h"
+#include "firmware_new/boards/frankie_v1/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
 
 typedef struct PwmPin PwmPin_t;
 

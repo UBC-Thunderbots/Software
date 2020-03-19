@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["gpio_pin.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:frankie_v1_main_lib",
+        "//firmware_new/boards/frankie_v1:hal",
     ],
 )
 
@@ -16,7 +16,7 @@ cc_library(
     hdrs = ["pwm_pin.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:frankie_v1_main_lib",
+        "//firmware_new/boards/frankie_v1:hal",
     ],
 )
 
