@@ -1,7 +1,7 @@
 #include "firmware_new/boards/frankie_v1/io/pwm_pin.h"
 
 #include <assert.h>
-#include <stddef.h>
+#include <stdlib.h>
 
 typedef struct PwmPin
 {
@@ -15,6 +15,8 @@ PwmPin_t* io_pwm_pin_create(TIM_HandleTypeDef* timer, uint16_t timer_channel)
 
     pwm_pin->timer         = timer;
     pwm_pin->timer_channel = timer_channel;
+
+    io_pwm_pin_setPwm(pwm_pin, 0);
 
     return pwm_pin;
 }

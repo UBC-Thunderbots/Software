@@ -38,6 +38,8 @@ AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(
     //       around the fact that the motor boards have a ton of shorts
     io_gpio_pin_setInactive(motor->esf_pin);
 
+    io_allegro_a3931_motor_setPwmPercentage(motor, 0);
+
     return motor;
 }
 

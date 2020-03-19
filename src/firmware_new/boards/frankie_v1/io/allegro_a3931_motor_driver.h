@@ -3,9 +3,9 @@
  * This file is an abstraction around the Allegro A3931 Motor Driver
  */
 
+#include "firmware_new/boards/frankie_v1/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
 #include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
 #include "firmware_new/boards/frankie_v1/io/pwm_pin.h"
-#include "stm32h7xx_hal.h"
 
 typedef enum
 {
@@ -27,7 +27,7 @@ typedef struct AllegroA3931MotorDriver AllegroA3931MotorDriver_t;
  * @param brake_pin A GPIO pin connected to the "brake" pin on the motor driver.
  * @param esf_pin A GPIO pin connected to the "ESF" pin on the motor driver.
  *
- * @return A motor driver.
+ * @return A motor driver with the pwm percentage set to zero.
  */
 AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(
     PwmPin_t* pwm_pin, GpioPin_t* reset_pin, GpioPin_t* coast_pin, GpioPin_t* mode_pin,

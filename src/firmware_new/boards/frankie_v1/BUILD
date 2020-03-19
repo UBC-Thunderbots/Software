@@ -5,6 +5,10 @@ load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 cc_binary(
     name = "frankie_v1_main",
     srcs = ["main.c"],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
     defines = [
         "USE_HAL_DRIVER",
         "STM32H743xx",
@@ -38,6 +42,8 @@ cc_library(
     hdrs = glob(["*.h"]),
     copts = [
         "-DSTM32H743xx",
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [

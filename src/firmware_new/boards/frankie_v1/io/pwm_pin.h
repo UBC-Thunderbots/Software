@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stm32h7xx_hal.h"
+#include "firmware_new/boards/frankie_v1/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
 
 typedef struct PwmPin PwmPin_t;
 
@@ -11,10 +11,11 @@ typedef struct PwmPin PwmPin_t;
  * up in CubeMX should be sufficient.
  * See https://www.waveshare.com/wiki/STM32CubeMX_Tutorial_Series:_PWM for details.
  *
- * @param timer The timer for the PWM pin
+ * @param timer The timer for the PWM pin. This must be kept alive for the lifetime of
+ *              the create PWM pin.
  * @param timer_channel The channel within the timer for the PWM pin
  *
- * @return A PWM pin
+ * @return A PWM pin with the current pwm percentage set to zero
  */
 PwmPin_t* io_pwm_pin_create(TIM_HandleTypeDef* timer, uint16_t timer_channel);
 

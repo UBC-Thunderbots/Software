@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stm32h7xx_hal.h"
+#include "firmware_new/boards/frankie_v1/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
 
 typedef struct GpioPin GpioPin_t;
 
@@ -21,11 +21,12 @@ typedef enum
  * Please note, the GPIO handler/pin must be configured before being passed to this
  * function. Setting it up in CubeMX should be sufficient.
  *
- * @param gpio_handler A GPIO handler which this pin is contained in.
+ * @param gpio_handler A GPIO handler which this pin is contained in. This must be kept
+ *                     alive for the duration of the created GPIO pin object.
  * @param gpio_pin_index The index within the GPIO handler for this pin
  * @param active_state The active state of this pin
  *
- * @return A initialized GPIO pin, initially set to be inactive (0). Ownership of the
+ * @return An initialized GPIO pin, initially set to be inactive (0). Ownership of the
  *         returned pointer is taken by the caller.
  */
 GpioPin_t* io_gpio_pin_create(GPIO_TypeDef* gpio_handler, uint16_t gpio_pin_index,
