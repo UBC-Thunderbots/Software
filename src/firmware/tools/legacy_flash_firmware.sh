@@ -33,6 +33,9 @@ set +e
 # The name of this script
 THIS_SCRIPT_FILENAME=$(basename "$0")
 
+# The number of arguments passed to this script
+NUM_ARGS=$#
+
 # Enable bazel runtime debugging
 # RUNFILES_LIB_DEBUG=1
 
@@ -42,14 +45,12 @@ if [ $NUM_ARGS -ne 1 ]; then
   exit 1
 fi
 
-bin_file=$1
-
 if [[ "$1" == "radio_dongle" ]]; then
     echo "Flashing radio dongle!"
-    bin_file="$(rlocation "__main__/firmware/boards/legacy_dongle_stm32f4.bin")"
+    bin_file="$(rlocation "__main__/firmware/boards/legacy_dongle_stm32f4/legacy_dongle_stm32f4.bin")"
 elif [[ "$1" == "robot" ]]; then
     echo "Flashing robot!"
-    bin_file="$(rlocation "__main__/firmware/boards/legacy_robot_stm32f4.bin")"
+    bin_file="$(rlocation "__main__/firmware/boards/legacy_robot_stm32f4/legacy_robot_stm32f4.bin")"
 else
   echo "Targets is chosen from:"
   echo "robot"
