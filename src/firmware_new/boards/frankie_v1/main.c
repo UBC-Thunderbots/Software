@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/motor.h"
+#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
 #include "udp_multicast.h"
 
 /* USER CODE END Includes */
@@ -59,7 +59,7 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 osThreadId_t defaultTaskHandle;
 /* USER CODE BEGIN PV */
 
-static Motor_t *motor_0;
+static AllegroA3931MotorDriver_t *motor_0;
 
 /* USER CODE END PV */
 
@@ -140,11 +140,11 @@ int main(void)
         io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
     PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
 
-    motor_0 = io_motor_create(pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin,
-                              brake_pin, esf_pin);
+    motor_0 = io_allegro_a3931_motor_driver_create(
+        pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin);
 
-    io_motor_set_direction(motor_0, CLOCKWISE);
-    io_motor_set_pwm(motor_0, 0.1);
+    io_allegro_a3931_motor_driver_setDirection(motor_0, CLOCKWISE);
+    io_allegro_a3931_motor_setPwmPercentage(motor_0, 0.1);
 
     /* USER CODE END 2 */
 
