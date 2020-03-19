@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/motor.h"
+#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
 #include "udp_multicast.h"
 
 /* USER CODE END Includes */
@@ -59,7 +59,7 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 osThreadId_t defaultTaskHandle;
 /* USER CODE BEGIN PV */
 
-static Motor_t *motor_0;
+static AllegroA3931MotorDriver_t *motor_0;
 
 /* USER CODE END PV */
 
@@ -75,10 +75,35 @@ void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
+static void initWheelMotors(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static void initWheelMotors(void)
+{
+    GpioPin_t *reset_pin =
+        io_gpio_pin_create(motor_0_reset_GPIO_Port, motor_0_reset_Pin, ACTIVE_LOW);
+    GpioPin_t *coast_pin =
+        io_gpio_pin_create(motor_0_coast_GPIO_Port, motor_0_coast_Pin, ACTIVE_LOW);
+    GpioPin_t *mode_pin =
+        io_gpio_pin_create(motor_0_mode_GPIO_Port, motor_0_mode_Pin, ACTIVE_HIGH);
+    GpioPin_t *direction_pin = io_gpio_pin_create(motor_0_direction_GPIO_Port,
+                                                  motor_0_direction_Pin, ACTIVE_HIGH);
+    GpioPin_t *brake_pin =
+        io_gpio_pin_create(motor_0_brake_GPIO_Port, motor_0_brake_Pin, ACTIVE_LOW);
+    GpioPin_t *esf_pin =
+        io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
+    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
+
+    motor_0 = io_allegro_a3931_motor_driver_create(
+        pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin);
+
+    io_allegro_a3931_motor_driver_setDirection(motor_0, CLOCKWISE);
+    io_allegro_a3931_motor_setPwmPercentage(motor_0, 0.0);
+}
 
 /* USER CODE END 0 */
 
@@ -125,26 +150,7 @@ int main(void)
     MX_TIM4_Init();
     /* USER CODE BEGIN 2 */
 
-    // TODO: move into it's own function
-    GpioPin_t *reset_pin =
-        io_gpio_pin_create(motor_0_reset_GPIO_Port, motor_0_reset_Pin, ACTIVE_LOW);
-    GpioPin_t *coast_pin =
-        io_gpio_pin_create(motor_0_coast_GPIO_Port, motor_0_coast_Pin, ACTIVE_LOW);
-    GpioPin_t *mode_pin =
-        io_gpio_pin_create(motor_0_mode_GPIO_Port, motor_0_mode_Pin, ACTIVE_HIGH);
-    GpioPin_t *direction_pin = io_gpio_pin_create(motor_0_direction_GPIO_Port,
-                                                  motor_0_direction_Pin, ACTIVE_HIGH);
-    GpioPin_t *brake_pin =
-        io_gpio_pin_create(motor_0_brake_GPIO_Port, motor_0_brake_Pin, ACTIVE_LOW);
-    GpioPin_t *esf_pin =
-        io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
-    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
-
-    motor_0 = io_motor_create(pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin,
-                              brake_pin, esf_pin);
-
-    io_motor_set_direction(motor_0, CLOCKWISE);
-    io_motor_set_pwm(motor_0, 0.1);
+    initWheelMotors();
 
     /* USER CODE END 2 */
 
@@ -311,9 +317,9 @@ static void MX_TIM4_Init(void)
 
     /* USER CODE END TIM4_Init 1 */
     htim4.Instance               = TIM4;
-    htim4.Init.Prescaler         = 96 - 1;
+    htim4.Init.Prescaler         = 9 - 1;
     htim4.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    htim4.Init.Period            = 45 - 1;
+    htim4.Init.Period            = 400 - 1;
     htim4.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)

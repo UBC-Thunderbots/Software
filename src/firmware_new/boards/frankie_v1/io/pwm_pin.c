@@ -1,5 +1,6 @@
 #include "firmware_new/boards/frankie_v1/io/pwm_pin.h"
 
+#include <assert.h>
 #include <stddef.h>
 
 typedef struct PwmPin
@@ -23,18 +24,16 @@ void io_pwm_pin_destroy(PwmPin_t* pwm_pin)
     free(pwm_pin);
 }
 
-void io_pwm_pin_setPwm(PwmPin_t* pwm_pin, float pwm_value)
+void io_pwm_pin_setPwm(PwmPin_t* pwm_pin, float pwm_percentage)
 {
-    // TODO: assert pwm value in [0,1]
-    // TODO: not the appropriate way to get the max value of a uint16_t
-    // Rescale PWM
-    uint16_t scaled_pwm = (uint16_t)round(pwm_value * pow(2.0, 16.0));
+    assert(pwm_percentage >= 0 && pwm_percentage <= 1);
 
-    // TODO: better name for this
+    float pulse_max = (float)pwm_pin->timer->Init.Period;
+    uint16_t pulse  = (uint16_t)round(pwm_percentage * pulse_max);
+
     TIM_OC_InitTypeDef timer_config;
-
     timer_config.OCMode     = TIM_OCMODE_PWM1;
-    timer_config.Pulse      = scaled_pwm;
+    timer_config.Pulse      = pulse;
     timer_config.OCPolarity = TIM_OCPOLARITY_HIGH;
     timer_config.OCFastMode = TIM_OCFAST_DISABLE;
 
