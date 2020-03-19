@@ -101,7 +101,7 @@ static void initWheelMotors(void)
     motor_0 = io_allegro_a3931_motor_driver_create(
         pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin);
 
-    io_allegro_a3931_motor_driver_setDirection(motor_0, CLOCKWISE);
+    io_allegro_a3931_motor_driver_setDirection(motor_0, COUNTERCLOCKWISE);
     io_allegro_a3931_motor_setPwmPercentage(motor_0, 0.0);
 }
 

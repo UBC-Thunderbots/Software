@@ -56,7 +56,7 @@ void io_allegro_a3931_motor_driver_setDirection(
             io_gpio_pin_setActive(motor_driver->direction_pin);
             return;
         case CLOCKWISE:
-            io_gpio_pin_setActive(motor_driver->direction_pin);
+            io_gpio_pin_setInactive(motor_driver->direction_pin);
             return;
     }
 }
