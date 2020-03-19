@@ -503,8 +503,8 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        ":rtos",
         ":hal",
+        ":rtos",
     ],
     alwayslink = True,
 )
