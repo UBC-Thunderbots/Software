@@ -26,6 +26,8 @@ typedef struct AllegroA3931MotorDriver AllegroA3931MotorDriver_t;
  * @param direction_pin A GPIO pin connected to the "direction" pin on the motor driver.
  * @param brake_pin A GPIO pin connected to the "brake" pin on the motor driver.
  * @param esf_pin A GPIO pin connected to the "ESF" pin on the motor driver.
+ *                The "ESF" pin, when active, causes the motor driver to stop the
+ *                motor if a short is detected.
  *
  * @return A motor driver with the pwm percentage set to zero.
  */
