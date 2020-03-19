@@ -31,7 +31,6 @@ AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(
     io_gpio_pin_setInactive(motor->reset_pin);
     io_gpio_pin_setInactive(motor->coast_pin);
     io_gpio_pin_setActive(motor->mode_pin);
-    // TODO: what direction is CW and CCW???
     io_gpio_pin_setActive(motor->direction_pin);
     io_gpio_pin_setInactive(motor->brake_pin);
     // TODO: this should _really_ be active, but we have it inactive for now to get
