@@ -1,6 +1,7 @@
 #include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
 
 #include <stdlib.h>
+
 #include "firmware_new/boards/frankie_v1/stm32h7xx_hal_conf.h"
 
 typedef struct GpioPin

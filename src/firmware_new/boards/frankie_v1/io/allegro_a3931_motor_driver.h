@@ -58,4 +58,4 @@ void io_allegro_a3931_motor_driver_setDirection(
  * @param pwm_percentage A value in [0,1] indicating the PWM percentage
  */
 void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_driver,
-                                    float pwm_percentage);
+                                             float pwm_percentage);

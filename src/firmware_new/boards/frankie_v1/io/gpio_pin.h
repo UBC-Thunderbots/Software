@@ -4,10 +4,6 @@
 
 typedef struct GpioPin GpioPin_t;
 
-// TODO: jdoc here, assume people do not know what "active high" and "active low"
-//       mean (see, software ppl)
-// TODO: should prefix enum values with something to avoid conflicts
-
 /**
  * A GPIO pin being "Active High" or "Active Low" simply determines whether high or low
  * voltage corresponds to 1. So for example, "Active High" means that a high voltage

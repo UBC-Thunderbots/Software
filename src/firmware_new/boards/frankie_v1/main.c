@@ -75,10 +75,35 @@ void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
+static void initWheelMotors(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static void initWheelMotors(void)
+{
+    GpioPin_t *reset_pin =
+        io_gpio_pin_create(motor_0_reset_GPIO_Port, motor_0_reset_Pin, ACTIVE_LOW);
+    GpioPin_t *coast_pin =
+        io_gpio_pin_create(motor_0_coast_GPIO_Port, motor_0_coast_Pin, ACTIVE_LOW);
+    GpioPin_t *mode_pin =
+        io_gpio_pin_create(motor_0_mode_GPIO_Port, motor_0_mode_Pin, ACTIVE_HIGH);
+    GpioPin_t *direction_pin = io_gpio_pin_create(motor_0_direction_GPIO_Port,
+                                                  motor_0_direction_Pin, ACTIVE_HIGH);
+    GpioPin_t *brake_pin =
+        io_gpio_pin_create(motor_0_brake_GPIO_Port, motor_0_brake_Pin, ACTIVE_LOW);
+    GpioPin_t *esf_pin =
+        io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
+    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
+
+    motor_0 = io_allegro_a3931_motor_driver_create(
+        pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin);
+
+    io_allegro_a3931_motor_driver_setDirection(motor_0, CLOCKWISE);
+    io_allegro_a3931_motor_setPwmPercentage(motor_0, 0.0);
+}
 
 /* USER CODE END 0 */
 
@@ -125,26 +150,7 @@ int main(void)
     MX_TIM4_Init();
     /* USER CODE BEGIN 2 */
 
-    // TODO: move into it's own function
-    GpioPin_t *reset_pin =
-        io_gpio_pin_create(motor_0_reset_GPIO_Port, motor_0_reset_Pin, ACTIVE_LOW);
-    GpioPin_t *coast_pin =
-        io_gpio_pin_create(motor_0_coast_GPIO_Port, motor_0_coast_Pin, ACTIVE_LOW);
-    GpioPin_t *mode_pin =
-        io_gpio_pin_create(motor_0_mode_GPIO_Port, motor_0_mode_Pin, ACTIVE_HIGH);
-    GpioPin_t *direction_pin = io_gpio_pin_create(motor_0_direction_GPIO_Port,
-                                                  motor_0_direction_Pin, ACTIVE_HIGH);
-    GpioPin_t *brake_pin =
-        io_gpio_pin_create(motor_0_brake_GPIO_Port, motor_0_brake_Pin, ACTIVE_LOW);
-    GpioPin_t *esf_pin =
-        io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
-    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
-
-    motor_0 = io_allegro_a3931_motor_driver_create(
-        pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin);
-
-    io_allegro_a3931_motor_driver_setDirection(motor_0, CLOCKWISE);
-    io_allegro_a3931_motor_setPwmPercentage(motor_0, 0.0);
+    initWheelMotors();
 
     /* USER CODE END 2 */
 

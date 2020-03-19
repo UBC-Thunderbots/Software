@@ -1,7 +1,7 @@
 #include "firmware_new/boards/frankie_v1/io/pwm_pin.h"
 
-#include <stddef.h>
 #include <assert.h>
+#include <stddef.h>
 
 typedef struct PwmPin
 {
@@ -28,8 +28,8 @@ void io_pwm_pin_setPwm(PwmPin_t* pwm_pin, float pwm_percentage)
 {
     assert(pwm_percentage >= 0 && pwm_percentage <= 1);
 
-    float pulse_max  = (float)pwm_pin->timer->Init.Period;
-    uint16_t pulse = (uint16_t)round(pwm_percentage * pulse_max);
+    float pulse_max = (float)pwm_pin->timer->Init.Period;
+    uint16_t pulse  = (uint16_t)round(pwm_percentage * pulse_max);
 
     TIM_OC_InitTypeDef timer_config;
     timer_config.OCMode     = TIM_OCMODE_PWM1;

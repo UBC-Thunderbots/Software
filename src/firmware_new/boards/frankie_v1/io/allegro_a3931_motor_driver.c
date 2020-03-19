@@ -13,11 +13,12 @@ typedef struct AllegroA3931MotorDriver
     GpioPin_t* esf_pin;
 } AllegroA3931MotorDriver_t;
 
-AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pin, GpioPin_t* reset_pin, GpioPin_t* coast_pin,
-                         GpioPin_t* mode_pin, GpioPin_t* direction_pin,
-                         GpioPin_t* brake_pin, GpioPin_t* esf_pin)
+AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(
+    PwmPin_t* pwm_pin, GpioPin_t* reset_pin, GpioPin_t* coast_pin, GpioPin_t* mode_pin,
+    GpioPin_t* direction_pin, GpioPin_t* brake_pin, GpioPin_t* esf_pin)
 {
-    AllegroA3931MotorDriver_t* motor = (AllegroA3931MotorDriver_t*)malloc(sizeof(AllegroA3931MotorDriver_t));
+    AllegroA3931MotorDriver_t* motor =
+        (AllegroA3931MotorDriver_t*)malloc(sizeof(AllegroA3931MotorDriver_t));
 
     motor->pwm_pin       = pwm_pin;
     motor->reset_pin     = reset_pin;
@@ -45,7 +46,9 @@ void io_allegro_a3931_motor_driver_destroy(AllegroA3931MotorDriver_t* motor_driv
     free(motor_driver);
 }
 
-void io_allegro_a3931_motor_driver_setDirection(AllegroA3931MotorDriver_t* motor_driver, AllegroA3931MotorDriverDriveDirection direction)
+void io_allegro_a3931_motor_driver_setDirection(
+    AllegroA3931MotorDriver_t* motor_driver,
+    AllegroA3931MotorDriverDriveDirection direction)
 {
     switch (direction)
     {
@@ -58,7 +61,8 @@ void io_allegro_a3931_motor_driver_setDirection(AllegroA3931MotorDriver_t* motor
     }
 }
 
-void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_driver, float pwm_percentage)
+void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_driver,
+                                             float pwm_percentage)
 {
     io_pwm_pin_setPwm(motor_driver->pwm_pin, pwm_percentage);
 }
