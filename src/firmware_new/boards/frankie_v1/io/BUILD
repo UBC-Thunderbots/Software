@@ -21,7 +21,7 @@ cc_library(
 )
 
 cc_library(
-    name = "motor",
+    name = "allegro_a3931_motor_driver",
     srcs = ["allegro_a3931_motor_driver.c"],
     hdrs = ["allegro_a3931_motor_driver.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
