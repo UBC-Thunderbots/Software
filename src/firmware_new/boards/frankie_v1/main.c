@@ -193,7 +193,8 @@ int main(void)
     /* USER CODE BEGIN WHILE */
     while (1)
     {
-        // TODO: Confirm with akhil if this should still compile with freertos enabled
+        // TODO: Confirm with akhil if this should still compile with legacy_freertos
+        // enabled
         //       (we should never get here anyhow)
         // MX_LWIP_Process();
         /* USER CODE END WHILE */
