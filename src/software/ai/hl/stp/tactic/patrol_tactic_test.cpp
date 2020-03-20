@@ -23,6 +23,32 @@ void PrintMoveActions(std::shared_ptr<MoveAction> move_action)
     std::cout << "final speed: " << move_action->getFinalSpeed() << std::endl << std::endl;
 
 }
+
+void simulateActionToCompletion(RobotState newRobotState, std::shared_ptr<Action> action_ptr, PatrolTactic tactic) {
+    //    //complete action
+
+    //make new state and call updatestate
+    Robot robot = *(tactic.getAssignedRobot());
+    (robot).updateState(RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
+                                   AngularVelocity::zero(),
+
+                                   Timestamp::fromSeconds(3)));
+    tactic.updateRobot(robot);
+
+    //   action_ptr = tactic.getNextAction();
+
+    //complete the action
+
+    //need to call getnextintent at least once for it to set done in action later
+    action_ptr->getNextIntent();
+
+    //will update the action with latest robot status
+    action_ptr = tactic.getNextAction();
+
+    //sets action to complete
+    action_ptr->getNextIntent();
+
+}
 TEST(MoveTacticTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(0,0), Vector(0,0), Angle::zero(), AngularVelocity::zero(),
@@ -40,30 +66,15 @@ TEST(MoveTacticTest, robot_far_from_destination)
 
     PrintMoveActions(move_action);
 
-//    //complete action
-//    action_ptr->getNextIntent();
-//    action_ptr = tactic.getNextAction();
+    //complete action
+    RobotState newRobotState = RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
+                                     AngularVelocity::zero(),
+                                     Timestamp::fromSeconds(3));
 
-    //make new state and call updatestate
-
-    (robot).updateState(RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
-                                             AngularVelocity::zero(),
-
-                                             Timestamp::fromSeconds(3)));
-    move_action->updateControlParams(
-            robot, Point(3,3),
-            Angle::zero(), 1.0,
-            DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-            BallCollisionType::AVOID);
-
- //   action_ptr = tactic.getNextAction();
-
-    //complete the action
-    action_ptr->getNextIntent();
-    std::cout<<"first intent done"<<std::endl;
-    action_ptr->getNextIntent();
+    simulateActionToCompletion(newRobotState, action_ptr, tactic);
 
     action_ptr = tactic.getNextAction();
+
     move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
 
     PrintMoveActions(move_action);
@@ -73,3 +84,4 @@ TEST(MoveTacticTest, robot_far_from_destination)
 //    PrintMoveActions(move_action2);
 
 }
+
