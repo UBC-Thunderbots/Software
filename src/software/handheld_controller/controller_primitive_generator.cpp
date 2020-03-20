@@ -19,7 +19,8 @@ void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_in
     Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(primitives_ptr);
 }
 
-std::unique_ptr<Primitive> ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
+std::unique_ptr<Primitive>
+ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
     const ControllerInput &controller_input)
 {
     unsigned int robot_id = controller_input_config->RobotId()->value();

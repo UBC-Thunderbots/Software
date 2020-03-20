@@ -10,8 +10,9 @@ int main(int argc, char **argv)
 {
     auto controller_config = Util::DynamicParameters->getHandheldControllerInputConfig();
 
-    auto controller          = std::make_shared<Xbox360Controller>(controller_config);
-    auto primitive_generator = std::make_shared<ControllerPrimitiveGenerator>(controller_config);
+    auto controller = std::make_shared<Xbox360Controller>(controller_config);
+    auto primitive_generator =
+        std::make_shared<ControllerPrimitiveGenerator>(controller_config);
     auto backend = std::make_shared<HandheldControllerBackend>(controller_config);
 
     controller->Subject<ControllerInput>::registerObserver(primitive_generator);

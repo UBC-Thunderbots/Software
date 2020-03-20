@@ -90,10 +90,13 @@ double sigmoid(const double& v, const double& offset, const double& sig_width);
  * @return The value normalized to the range [range_min, range_max]
  */
 template <typename T>
-T normalizeValueToRange(T value, const T& value_min, const T& value_max, const T& range_min, const T& range_max) {
-    static_assert(std::is_integral<T>::value || std::is_floating_point<T>::value, "Integral of float point type required.");
-    value = std::clamp<T>(value, value_min, value_max);
+T normalizeValueToRange(T value, const T& value_min, const T& value_max,
+                        const T& range_min, const T& range_max)
+{
+    static_assert(std::is_integral<T>::value || std::is_floating_point<T>::value,
+                  "Integral of float point type required.");
+    value         = std::clamp<T>(value, value_min, value_max);
     T value_range = value_max - value_min;
-    T new_range = range_max - range_min;
+    T new_range   = range_max - range_min;
     return new_range / value_range * (value - value_max) + range_max;
 }
