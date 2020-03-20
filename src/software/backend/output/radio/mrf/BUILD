@@ -5,7 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//shared:constants",
-        "//shared:firmware_primitive_type",
+        "//shared/proto:fw_cc_proto",
         "//software/ai/primitive:all_primitives",
         "//software/ai/primitive:primitive_visitor",
     ],

@@ -2,13 +2,17 @@
 
 #include <limits>
 
-#include "software/backend/output/radio/mrf/dongle.h"
+#include "shared/proto/primitive.pb.h"
+#include "shared/proto/status.pb.h"
+#include "shared/proto/vision.pb.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/backend/output/wifi/communication/robot_communicator.h"
 #include "software/backend/robot_status.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
 
-using RobotPrimitiveCommunicator = RobotCommunicator<primitive_msg, status_msg>;
-using RobotVisionCommunicator = RobotCommunicator<vision_msg, status_msg>;
+using RobotPrimitiveCommunicator = RobotCommunicator<PrimitiveMsg, StatusMsg>;
+using RobotVisionCommunicator    = RobotCommunicator<VisionMsg, StatusMsg>;
 
 class WifiOutput
 {
@@ -23,8 +27,8 @@ class WifiOutput
      * @param vision_coms The RobotCommunicator used to send vision data
      *
      */
-    explicit WifiOutput(RobotPrimitiveCommunicator primitive_comms,
-                            RobotVisionCommunicator vision_comms);
+    explicit WifiOutput(std::unique_ptr<RobotPrimitiveCommunicator> primitive_comms,
+                        std::unique_ptr<RobotVisionCommunicator> vision_coms);
 
     /**
      * Sends the given primitives to the backend to control the robots
@@ -52,6 +56,6 @@ class WifiOutput
     void sendVisionPacket(const Team& friendly_team, Ball ball);
 
    private:
-    RobotPrimitiveCommunicator primitive_comms;
-    RobotVisionCommunicator vision_comms;
+    std::unique_ptr<RobotPrimitiveCommunicator> primitive_comms;
+    std::unique_ptr<RobotVisionCommunicator> vision_comms;
 };

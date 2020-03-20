@@ -1,11 +1,12 @@
+#include "software/backend/output/wifi/communication/robot_communicator.h"
+
 #include <iostream>
 
 #include "shared/proto/primitive.pb.h"
 #include "shared/proto/status.pb.h"
 #include "shared/proto/vision.pb.h"
-#include "software/multithreading/thread_safe_buffer.h"
-#include "software/backend/output/wifi/communication/robot_communicator.h"
 #include "software/backend/output/wifi/communication/transfer_media/transfer_medium.h"
+#include "software/multithreading/thread_safe_buffer.h"
 
 using boost::asio::ip::udp;
 using google::protobuf::Message;
@@ -47,6 +48,17 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_proto(const SendProto& pro
 {
     send_buffer->push(proto);
 }
+
+template <class SendProto, class ReceiveProto>
+void RobotCommunicator<SendProto, ReceiveProto>::send_proto_vector(
+    const std::vector<SendProto>& protos)
+{
+    for (auto proto : protos)
+    {
+        send_buffer->push(proto);
+    }
+}
+
 
 template <class SendProto, class ReceiveProto>
 void RobotCommunicator<SendProto, ReceiveProto>::send_loop(

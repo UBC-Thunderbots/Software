@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+// TODO remove this file when radio moves to protobuf
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.
 struct RobotStatus
