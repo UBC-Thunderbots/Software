@@ -6,11 +6,11 @@
 #include "software/backend/simulation/simulator_robot.h"
 extern "C"
 {
-#include "firmware/main/app/world/chicker.h"
-#include "firmware/main/app/world/dribbler.h"
-#include "firmware/main/app/world/firmware_robot.h"
-#include "firmware/main/app/world/wheel.h"
-#include "firmware/main/shared/physics.h"
+#include "firmware/app/world/chicker.h"
+#include "firmware/app/world/dribbler.h"
+#include "firmware/app/world/firmware_robot.h"
+#include "firmware/app/world/wheel.h"
+#include "firmware/shared/physics.h"
 }
 
 /**

@@ -4,9 +4,9 @@
 
 extern "C"
 {
-#include "firmware/main/app/world/chicker.h"
-#include "firmware/main/app/world/dribbler.h"
-#include "firmware/main/app/world/wheel.h"
+#include "firmware/app/world/chicker.h"
+#include "firmware/app/world/dribbler.h"
+#include "firmware/app/world/wheel.h"
 }
 
 // TODO: The JERK_LIMIT is copied from firmware/main/control/control.h

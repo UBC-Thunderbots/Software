@@ -2,7 +2,7 @@
 
 extern "C"
 {
-#include "firmware/main/app/world/firmware_ball.h"
+#include "firmware/app/world/firmware_ball.h"
 }
 #include "software/backend/simulation/simulator_ball.h"
 

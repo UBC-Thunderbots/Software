@@ -5,9 +5,9 @@
 #include "software/backend/simulation/simulator_robot_singleton.h"
 extern "C"
 {
-#include "firmware/main/app/world/firmware_ball.h"
-#include "firmware/main/app/world/firmware_robot.h"
-#include "firmware/main/app/world/firmware_world.h"
+#include "firmware/app/world/firmware_ball.h"
+#include "firmware/app/world/firmware_robot.h"
+#include "firmware/app/world/firmware_world.h"
 }
 
 Simulator::Simulator(const World& world) : physics_world(world)
