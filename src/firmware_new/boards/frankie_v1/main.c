@@ -26,6 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
 #include "udp_multicast.h"
 
 /* USER CODE END Includes */
@@ -49,12 +50,16 @@
 
 CRC_HandleTypeDef hcrc;
 
+TIM_HandleTypeDef htim4;
+
 UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 osThreadId_t defaultTaskHandle;
 /* USER CODE BEGIN PV */
+
+static AllegroA3931MotorDriver_t *motor_0;
 
 /* USER CODE END PV */
 
@@ -65,14 +70,40 @@ static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
+static void MX_TIM4_Init(void);
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
+
+static void initWheelMotors(void);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static void initWheelMotors(void)
+{
+    GpioPin_t *reset_pin =
+        io_gpio_pin_create(motor_0_reset_GPIO_Port, motor_0_reset_Pin, ACTIVE_LOW);
+    GpioPin_t *coast_pin =
+        io_gpio_pin_create(motor_0_coast_GPIO_Port, motor_0_coast_Pin, ACTIVE_LOW);
+    GpioPin_t *mode_pin =
+        io_gpio_pin_create(motor_0_mode_GPIO_Port, motor_0_mode_Pin, ACTIVE_HIGH);
+    GpioPin_t *direction_pin = io_gpio_pin_create(motor_0_direction_GPIO_Port,
+                                                  motor_0_direction_Pin, ACTIVE_HIGH);
+    GpioPin_t *brake_pin =
+        io_gpio_pin_create(motor_0_brake_GPIO_Port, motor_0_brake_Pin, ACTIVE_LOW);
+    GpioPin_t *esf_pin =
+        io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
+    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
+
+    motor_0 = io_allegro_a3931_motor_driver_create(
+        pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin);
+
+    io_allegro_a3931_motor_driver_setDirection(motor_0, COUNTERCLOCKWISE);
+    io_allegro_a3931_motor_setPwmPercentage(motor_0, 0.0);
+}
 
 /* USER CODE END 0 */
 
@@ -116,7 +147,10 @@ int main(void)
     MX_USART3_UART_Init();
     MX_USB_OTG_FS_PCD_Init();
     MX_CRC_Init();
+    MX_TIM4_Init();
     /* USER CODE BEGIN 2 */
+
+    initWheelMotors();
 
     /* USER CODE END 2 */
 
@@ -266,6 +300,53 @@ static void MX_CRC_Init(void)
 }
 
 /**
+ * @brief TIM4 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_TIM4_Init(void)
+{
+    /* USER CODE BEGIN TIM4_Init 0 */
+
+    /* USER CODE END TIM4_Init 0 */
+
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC          = {0};
+
+    /* USER CODE BEGIN TIM4_Init 1 */
+
+    /* USER CODE END TIM4_Init 1 */
+    htim4.Instance               = TIM4;
+    htim4.Init.Prescaler         = 9 - 1;
+    htim4.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    htim4.Init.Period            = 400 - 1;
+    htim4.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sConfigOC.OCMode     = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse      = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN TIM4_Init 2 */
+
+    /* USER CODE END TIM4_Init 2 */
+    HAL_TIM_MspPostInit(&htim4);
+}
+
+/**
  * @brief USART3 Initialization Function
  * @param None
  * @retval None
@@ -363,7 +444,11 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOG_CLK_ENABLE();
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOB, LD3_Pin | LD2_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB,
+                      motor_0_esf_Pin | LD3_Pin | motor_0_reset_Pin | motor_0_coast_Pin |
+                          motor_0_mode_Pin | LD2_Pin | motor_0_direction_Pin |
+                          motor_0_brake_Pin,
+                      GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
@@ -374,8 +459,12 @@ static void MX_GPIO_Init(void)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
-    /*Configure GPIO pins : LD3_Pin LD2_Pin */
-    GPIO_InitStruct.Pin   = LD3_Pin | LD2_Pin;
+    /*Configure GPIO pins : motor_0_esf_Pin LD3_Pin motor_0_reset_Pin motor_0_coast_Pin
+                             motor_0_mode_Pin LD2_Pin motor_0_direction_Pin
+       motor_0_brake_Pin */
+    GPIO_InitStruct.Pin = motor_0_esf_Pin | LD3_Pin | motor_0_reset_Pin |
+                          motor_0_coast_Pin | motor_0_mode_Pin | LD2_Pin |
+                          motor_0_direction_Pin | motor_0_brake_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
