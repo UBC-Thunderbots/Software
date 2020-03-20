@@ -1,13 +1,15 @@
 #pragma once
 
+#include <fcntl.h>
+#include <linux/joystick.h>
+#include <unistd.h>
+
+#include <atomic>
+#include <thread>
+
+#include "software/handheld_controller/controller_input.h"
 #include "software/multithreading/subject.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/handheld_controller/controller_input.h"
-#include <linux/joystick.h>
-#include <thread>
-#include <atomic>
-#include <fcntl.h>
-#include <unistd.h>
 
 /**
  * Abstracts any handheld game controller, like an XBox or Playstation controller.
@@ -15,17 +17,19 @@
  * Adapted from:
  * https://gist.github.com/jasonwhite/c5b2048c15993d285130#file-joystick-c-L112
  */
-class Controller : public Subject<ControllerInput>{
-public:
+class Controller : public Subject<ControllerInput>
+{
+   public:
     /**
      * Creates a new Controller
      *
      * @param controller_input_config The config for this controller
      */
-    explicit Controller(std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
+    explicit Controller(
+        std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
     ~Controller() override;
 
-protected:
+   protected:
     /**
      * Updates the given ControllerInput based on the button event and returns a
      * new ControllerInput
@@ -36,7 +40,9 @@ protected:
      *
      * @return A new ControllerInput updated by the button event
      */
-    virtual ControllerInput handleButtonEvent(ControllerInput controller_input, const unsigned int button_id, const bool button_pressed) = 0;
+    virtual ControllerInput handleButtonEvent(ControllerInput controller_input,
+                                              const unsigned int button_id,
+                                              const bool button_pressed) = 0;
 
     /**
      * Updates the given ControllerInput based on the axis event and returns a
@@ -48,9 +54,11 @@ protected:
      *
      * @return A new ControllerInput updated by the axis event
      */
-    virtual ControllerInput handleAxisEvent(ControllerInput controller_input, const unsigned int axis_id, const double axis_value) = 0;
+    virtual ControllerInput handleAxisEvent(ControllerInput controller_input,
+                                            const unsigned int axis_id,
+                                            const double axis_value) = 0;
 
-private:
+   private:
     /**
      * Updates the given ControllerInput based on the controller event and
      * returns a new ControllerInput
@@ -60,7 +68,8 @@ private:
      *
      * @return A new ControllerInput updated by the controller event
      */
-    ControllerInput handleControllerEvent(ControllerInput controller_input, const struct js_event& controller_event);
+    ControllerInput handleControllerEvent(ControllerInput controller_input,
+                                          const struct js_event& controller_event);
 
     /**
      * Reads controller events from the file descriptor and stores them in the
@@ -72,12 +81,12 @@ private:
      *
      * @return 0 if the read was successful, and -1 if an error occurred
      */
-    int read_event(int fd, struct js_event *event);
+    int read_event(int fd, struct js_event* event);
 
     /**
      * Returns the number axes that exist on the controller. An axis is a single axis of
-     * a joystick or trigger. For example, a traditional thumb joystick has 2 axes (x and y),
-     * and a trigger has a single axis.
+     * a joystick or trigger. For example, a traditional thumb joystick has 2 axes (x and
+     * y), and a trigger has a single axis.
      *
      * @param fd The file descriptor for the controller
      *

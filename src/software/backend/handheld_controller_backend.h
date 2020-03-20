@@ -16,7 +16,8 @@ class HandheldControllerBackend : public Backend
      *
      * @param controller_input_config The config for the HandheldControllerBackend
      */
-    HandheldControllerBackend(std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
+    HandheldControllerBackend(
+        std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
 
    private:
     static constexpr int DEFAULT_RADIO_CONFIG = 0;

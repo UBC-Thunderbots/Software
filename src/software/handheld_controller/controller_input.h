@@ -4,8 +4,9 @@
  * This class represents the input from a generic handheld game controller
  * (like an Xbox of Playstation controller) used to control a robot
  */
-class ControllerInput {
-public:
+class ControllerInput
+{
+   public:
     explicit ControllerInput();
 
     /**
@@ -101,7 +102,7 @@ public:
      */
     void setDribblerButtonPressed(bool pressed);
 
-private:
+   private:
     double linear_motion_x;
     double linear_motion_y;
     double angular_motion;

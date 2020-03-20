@@ -2,15 +2,21 @@
 
 #include "software/handheld_controller/controller.h"
 
-class Xbox360Controller : public Controller {
-public:
+class Xbox360Controller : public Controller
+{
+   public:
     /**
      * Creates a new Xbox360Controller
      *
      * @param controller_input_config The config for this controller
      */
-    explicit Xbox360Controller(std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
+    explicit Xbox360Controller(
+        std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
 
-    ControllerInput handleButtonEvent(ControllerInput controller_input, const unsigned int button_id, const bool is_button_pressed) override;
-    ControllerInput handleAxisEvent(ControllerInput controller_input, const unsigned int axis_id, const double axis_value) override;
+    ControllerInput handleButtonEvent(ControllerInput controller_input,
+                                      const unsigned int button_id,
+                                      const bool is_button_pressed) override;
+    ControllerInput handleAxisEvent(ControllerInput controller_input,
+                                    const unsigned int axis_id,
+                                    const double axis_value) override;
 };
