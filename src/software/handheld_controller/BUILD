@@ -37,9 +37,9 @@ cc_library(
 )
 
 cc_library(
-    name = "primitive_generator",
-    srcs = ["primitive_generator.cpp"],
-    hdrs = ["primitive_generator.h"],
+    name = "controller_primitive_generator",
+    srcs = ["controller_primitive_generator.cpp"],
+    hdrs = ["controller_primitive_generator.h"],
     deps = [
         ":controller",
         "//software/ai/primitive",
@@ -55,7 +55,7 @@ cc_binary(
     name = "handheld_control",
     srcs = ["handheld_control_main.cpp"],
     deps = [
-        ":primitive_generator",
+        ":controller_primitive_generator",
         ":xbox_360_controller",
         "//software/backend:handheld_controller_backend",
         "//software/parameter:dynamic_parameters",

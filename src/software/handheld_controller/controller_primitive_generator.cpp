@@ -1,25 +1,25 @@
-#include "software/handheld_controller/primitive_generator.h"
+#include "software/handheld_controller/controller_primitive_generator.h"
 
 #include "software/ai/primitive/chip_primitive.h"
 #include "software/ai/primitive/direct_velocity_primitive.h"
 #include "software/ai/primitive/kick_primitive.h"
 
-PrimitiveGenerator::PrimitiveGenerator(
+ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
     : controller_input_config(controller_input_config)
 {
 }
 
-void PrimitiveGenerator::onValueReceived(ControllerInput controller_input)
+void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_input)
 {
     std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(createPrimitveFromControllerInput(controller_input));
+    primitives.emplace_back(createPrimitiveFromControllerInput(controller_input));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
         std::move(primitives));
     Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(primitives_ptr);
 }
 
-std::unique_ptr<Primitive> PrimitiveGenerator::createPrimitveFromControllerInput(
+std::unique_ptr<Primitive> ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
     const ControllerInput &controller_input)
 {
     unsigned int robot_id = controller_input_config->RobotId()->value();

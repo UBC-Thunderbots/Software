@@ -6,11 +6,10 @@
 #include "software/multithreading/threaded_observer.h"
 
 /**
- * An observer that converts ControllerInputs into Primitives to implement the desired
- * behavior
+ * An observer that converts ControllerInputs into Primitives
  */
-class PrimitiveGenerator : public ThreadedObserver<ControllerInput>,
-                           public Subject<ConstPrimitiveVectorPtr>
+class ControllerPrimitiveGenerator : public ThreadedObserver<ControllerInput>,
+                                     public Subject<ConstPrimitiveVectorPtr>
 {
    public:
     /**
@@ -18,7 +17,7 @@ class PrimitiveGenerator : public ThreadedObserver<ControllerInput>,
      *
      * @param controller_input_config The config for the PrimitiveGenerator
      */
-    explicit PrimitiveGenerator(
+    explicit ControllerPrimitiveGenerator(
         std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
 
     void onValueReceived(ControllerInput world) override;
@@ -31,7 +30,7 @@ class PrimitiveGenerator : public ThreadedObserver<ControllerInput>,
      *
      * @return A Primitive that will implement the behavior of the given ControllerInput
      */
-    std::unique_ptr<Primitive> createPrimitveFromControllerInput(
+    std::unique_ptr<Primitive> createPrimitiveFromControllerInput(
         const ControllerInput& controller_input);
 
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config;
