@@ -1,8 +1,7 @@
-#include "software/backend/output/wifi/protobuf_primitive_visitor.h"
-
 #include "shared/constants.h"
 #include "shared/proto/primitive.pb.h"
 #include "software/ai/primitive/all_primitives.h"
+#include "software/backend/output/wifi/communication/protobuf_primitive_visitor.h"
 
 PrimitiveMsg ProtobufPrimitiveVisitor::getPrimitiveMsg()
 {

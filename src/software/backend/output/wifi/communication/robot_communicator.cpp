@@ -1,10 +1,11 @@
-#include "firmware_new/tools/communication/robot_communicator.h"
-
 #include <iostream>
 
-#include "firmware_new/proto/control.pb.h"
-#include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
+#include "shared/proto/primitive.pb.h"
+#include "shared/proto/status.pb.h"
+#include "shared/proto/vision.pb.h"
 #include "software/multithreading/thread_safe_buffer.h"
+#include "software/backend/output/wifi/communication/robot_communicator.h"
+#include "software/backend/output/wifi/communication/transfer_media/transfer_medium.h"
 
 using boost::asio::ip::udp;
 using google::protobuf::Message;
@@ -77,5 +78,4 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
 }
 
 // place all templated communcation msg send/receive pair initializations here
-template class RobotCommunicator<primtive_msg, status_msg>;
-template class RobotCommunicator<vision_msg, status_msg>;
+template class RobotCommunicator<PrimitiveMsg, StatusMsg>;

@@ -1,5 +1,5 @@
 syntax = "proto2";
 
-message vision_msg {
+message VisionMsg {
     required double test = 1;
 }

@@ -1,6 +1,5 @@
 #pragma once
-#include "software/multithreading/thread_safe_buffer.h"
-
+#include <functional>
 /*
  * A TransferMedium is an abstraction around the medium used to communicate
  * between computers and robots. Any medium such as UART, SPI, Ethernet/WiFi
