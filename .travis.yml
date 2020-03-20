@@ -19,7 +19,7 @@ jobs:
             --test_output=errors
         # Test Firmware
         - >
-          bazel coverage //firmware/main/app/...    \
+          bazel coverage //firmware/app/...    \
             --compilation_mode=fastbuild            \
             --verbose_test_summary                  \
             --instrumentation_filter=//...          \
