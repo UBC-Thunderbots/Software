@@ -44,8 +44,8 @@ void io_allegro_a3931_motor_driver_destroy(AllegroA3931MotorDriver_t* motor_driv
 /**
  * Set the rotation direction for the given motor driver
  *
- * Note that the rotation is from the perspective of rear of the motor, looking out
- * along the motor shaft
+ * Note that the rotation is from the perspective of rear of the motor, looking down
+ * the shaft starting from the motor body
  *
  * @param motor_driver
  * @param direction
