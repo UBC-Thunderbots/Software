@@ -1,0 +1,5 @@
+syntax = "proto2";
+
+message status_msg {
+    required double test = 1;
+}

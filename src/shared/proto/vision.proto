@@ -1,0 +1,5 @@
+syntax = "proto2";
+
+message vision_msg {
+    required double test = 1;
+}

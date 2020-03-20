@@ -1,9 +1,36 @@
-#pragma once
+syntax = "proto2";
+
+message PrimitiveMsg {
+    
+        // A numeric ID representing the primitive for firmware
+        required FirmwarePrimitiveType prim_type = 1;
+
+        // the parameters to be encoded into the radio packet
+        // we use required and have 4 parameters so that we know
+        // the max size of the packet before hand
+        required double parameter1 = 2;
+        required double parameter2 = 3;
+        required double parameter3 = 4;
+        required double parameter4 = 5;
+
+        // Extra bits used for flags and/or additional information
+        required uint32 extra_bits = 6;
+
+        // estop, if true nothing should run!
+        required bool estop = 7;
+
+        // the id of the robot
+        required uint32 robot_id = 8;
+
+        // Indicates whether the robot should move slowly (<1.5 m/s)
+        optional bool slow = 9;
+
+}
 
 /**
  * This enum represents the IDs of the primitives implemented in firmware.
  */
-enum class FirmwarePrimitiveType
+enum FirmwarePrimitiveType
 {
     /**
      * Stop Primitive
@@ -12,7 +39,7 @@ enum class FirmwarePrimitiveType
      *
      * The extra field is 0 for coasting or 1 for braking.
      */
-    STOP = 0,
+    STOP = 0;
 
     /**
      * Move Primitive
@@ -23,7 +50,7 @@ enum class FirmwarePrimitiveType
      * The extra field is 0 if the caller doesn’t care about orientation,
      * or 1 if it does.
      */
-    MOVE = 1,
+    MOVE = 1;
 
     /**
      * Dribble Primitive
@@ -33,7 +60,7 @@ enum class FirmwarePrimitiveType
      * The extra field is 0 if small kicks are prohibited or 1 if they are
      * allowed.
      */
-    DRIBBLE = 2,
+    DRIBBLE = 2;
 
     /**
      * Shoot Primitive
@@ -46,14 +73,14 @@ enum class FirmwarePrimitiveType
      * The extra field has bit 0 clear to kick or set to chip, and bit 1
      * set if the caller cares about orientation.
      */
-    SHOOT = 3,
+    SHOOT = 3;
 
     /**
      * Catch Primitive
      *
      * The parameters are the velocity, dribble speed, and margin.
      */
-    CATCH = 4,
+    CATCH = 4;
 
     /**
      * Pivot Primitive
@@ -61,24 +88,24 @@ enum class FirmwarePrimitiveType
      * The parameters are the relative centre point, the swing, and the
      * orientation.
      */
-    PIVOT = 5,
+    PIVOT = 5;
 
     /**
      * Spin Primitive
      *
      * The parameters are the relative position and angular velocity.
      */
-    SPIN = 6,
+    SPIN = 6;
 
     /**
      * Specifies that direct control is in use and wheels are being
      * driven with individual power levels.
      */
-    DIRECT_WHEELS = 7,
+    DIRECT_WHEELS = 7;
 
     /**
      * Specifies that direct control is in use and robot-relative
      * linear and angular velocities are being sent.
      */
-    DIRECT_VELOCITY = 8,
+    DIRECT_VELOCITY = 8;
 };

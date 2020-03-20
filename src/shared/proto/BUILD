@@ -6,7 +6,9 @@ package(default_visibility = ["//visibility:public"])
 
 # add more proto here
 proto_files = [
-    "control.proto",
+    "primitive.proto",
+    "status.proto",
+    "vision.proto",
 ]
 
 # proto files
@@ -25,6 +27,5 @@ c_proto_library(
 
 cc_proto_library(
     name = "fw_cc_proto",
-    restricted_to = ["//cc_toolchain:k8"],
     deps = [":fw_proto"],
 )
