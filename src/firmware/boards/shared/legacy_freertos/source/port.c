@@ -262,7 +262,7 @@ void portRELAX_CRITICAL_ISR_CHECK(void) {
 
 void vPortEndScheduler( void ) {
   // So. This should really have been defined as a function under
-  // `legacy_freertos/vendor/portable`. However, some _genius_ decided that it was OK
+  // `freertos/vendor/portable`. However, some _genius_ decided that it was OK
   // to write their *OWN* implementation of `portable.h` and `port.c`. We have
   // no idea why they did this or how it works. When we tried to build this
   // with bazel it complained about this function not being defined. We tried

@@ -1136,5 +1136,5 @@ BaseType_t xRunningPrivileged = xPortRaisePrivilege();
 */
 
 #if configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS == 1
-	#include "firmware/application_defined_privileged_functions.h"
+	#include "application_defined_privileged_functions.h"
 #endif
