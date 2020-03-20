@@ -138,8 +138,9 @@ static void radio_task(void *UNUSED(param))
                     rxfifo_frame_length = MIN(rxfifo_frame_length,
                                               128U /* RX FIFO size */ - 1U /* Length */ -
                                                   1U /* LQI */ - 1U /* RSSI */);
-
-#warning proper packet filtering when radio filters do not match capture flags exactly
+                    // Commented out because -Werror is on
+                    // #warning proper packet filtering when radio filters do not match
+                    // capture flags exactly
 
                     // Allocate a packet.
                     packet_t *packet;

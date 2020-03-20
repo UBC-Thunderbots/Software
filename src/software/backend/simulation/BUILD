@@ -5,6 +5,8 @@ cc_library(
     srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
     deps = [
+        "//firmware/main/app/primitives:primitive_manager",
+        "//firmware/main/app/world:firmware_world",
         "//software/ai/primitive",
         "//software/backend/simulation/physics:physics_ball",
         "//software/backend/simulation/physics:physics_robot",
@@ -43,6 +45,8 @@ cc_test(
     deps = [
         ":simulator_ball",
         "//software/backend/simulation/physics:physics_ball",
+        "//software/backend/simulation/physics:physics_world",
+        "//software/test_util",
         "@box2d",
         "@gtest//:gtest_main",
     ],
@@ -67,6 +71,7 @@ cc_test(
     name = "simulator_robot_singleton_test",
     srcs = ["simulator_robot_singleton_test.cpp"],
     deps = [
+        ":simulator_ball",
         ":simulator_robot",
         ":simulator_robot_singleton",
         "//firmware/main/app/world:firmware_robot",
@@ -117,9 +122,22 @@ cc_library(
         ":simulator_ball_singleton",
         ":simulator_robot",
         ":simulator_robot_singleton",
+        "//firmware/main/app/primitives:primitive_manager",
         "//firmware/main/app/world:firmware_world",
         "//software/ai/primitive",
+        "//software/backend/output/radio/mrf:mrf_primitive_visitor",
         "//software/backend/simulation/physics:physics_world",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "simulator_test",
+    srcs = ["simulator_test.cpp"],
+    deps = [
+        ":simulator",
+        "//software/test_util",
+        "//software/world",
+        "@gtest//:gtest_main",
     ],
 )

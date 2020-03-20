@@ -5,6 +5,23 @@
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
 
+TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
+{
+    Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+
+    std::shared_ptr<ChipAction> chip_action = std::make_shared<ChipAction>();
+    chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(45.0),
+                                     2.0);
+
+    ASSERT_NE(chip_action, nullptr);
+    EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());
+    EXPECT_EQ(Angle::fromDegrees(45.0), chip_action->getChipDirection());
+    EXPECT_DOUBLE_EQ(2.0, chip_action->getChipDistanceMeters());
+}
+
 TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {
     Robot robot(0, Point(-0.3, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
