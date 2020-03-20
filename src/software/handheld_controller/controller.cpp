@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <limits>
+#include "software/math/math_functions.h"
 
 #include "software/logger/init.h"
 
@@ -9,14 +10,14 @@ Controller::Controller(
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
     : controller_input_config(controller_input_config), in_destructor(false)
 {
-    event_thread = std::thread([this]() { this->eventLoop(); });
+    event_loop_thread = std::thread([this]() { this->eventLoop(); });
 }
 
 Controller::~Controller()
 {
     in_destructor = true;
 
-    event_thread.join();
+    event_loop_thread.join();
 }
 
 void Controller::eventLoop()
@@ -41,7 +42,7 @@ void Controller::eventLoop()
     ControllerInput controller_input;
 
     while (!in_destructor.load() &&
-           read_event(controller_file_descriptor, &controller_event) == 0)
+            readControllerEvent(controller_file_descriptor, &controller_event) == 0)
     {
         controller_input = handleControllerEvent(controller_input, controller_event);
         Subject<ControllerInput>::sendValueToObservers(controller_input);
@@ -49,7 +50,7 @@ void Controller::eventLoop()
 }
 
 ControllerInput Controller::handleControllerEvent(ControllerInput controller_input,
-                                                  const struct js_event &controller_event)
+                                                  const struct js_event &controller_event) const
 {
     switch (controller_event.type)
     {
@@ -68,6 +69,7 @@ ControllerInput Controller::handleControllerEvent(ControllerInput controller_inp
                 static_cast<double>(std::numeric_limits<short>::max());
             double axis_value =
                 static_cast<double>(controller_event.value) / max_axis_value;
+            axis_value = applyDeadzone(axis_value);
             controller_input = handleAxisEvent(controller_input, axis_id, axis_value);
             break;
         }
@@ -79,7 +81,19 @@ ControllerInput Controller::handleControllerEvent(ControllerInput controller_inp
     return controller_input;
 }
 
-int Controller::read_event(int fd, struct js_event *event)
+double Controller::applyDeadzone(double axis_value) const {
+    if(axis_value > 0) {
+        axis_value = std::max<double>(axis_value - axis_deadzone, 0);
+        axis_value = normalizeValueToRange<double>(axis_value, 0, 1 - axis_deadzone, 0, 1);
+    }else {
+        axis_value = std::min<double>(axis_value + axis_deadzone, 0);
+        axis_value = normalizeValueToRange<double>(axis_value, -1 + axis_deadzone, 0, -1, 0);
+    }
+
+    return axis_value;
+}
+
+int Controller::readControllerEvent(int fd, struct js_event *event) const
 {
     ssize_t bytes;
 
@@ -92,7 +106,7 @@ int Controller::read_event(int fd, struct js_event *event)
     return -1;
 }
 
-size_t Controller::getNumAxes(int fd)
+size_t Controller::getNumAxes(int fd) const
 {
     __u8 axes;
     if (ioctl(fd, JSIOCGAXES, &axes) == -1)
@@ -101,7 +115,7 @@ size_t Controller::getNumAxes(int fd)
     return axes;
 }
 
-size_t Controller::getNumButtons(int fd)
+size_t Controller::getNumButtons(int fd) const
 {
     __u8 buttons;
     if (ioctl(fd, JSIOCGBUTTONS, &buttons) == -1)
@@ -109,17 +123,3 @@ size_t Controller::getNumButtons(int fd)
 
     return buttons;
 }
-
-
-//
-// double Controller::foo(short val) {
-//    double denom = static_cast<double>(std::numeric_limits<short>::max() - DEADZONE);
-//    if(val >= 0) {
-//        val = std::clamp<short>(val - DEADZONE, 0, val);
-//    }else if(val < 0) {
-//        val = std::clamp<short>(val + DEADZONE, val, 0);
-//    }
-//
-//    double result = static_cast<double>(val / denom);
-//    return result;
-//}

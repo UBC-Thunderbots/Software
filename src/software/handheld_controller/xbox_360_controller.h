@@ -15,8 +15,8 @@ class Xbox360Controller : public Controller
 
     ControllerInput handleButtonEvent(ControllerInput controller_input,
                                       const unsigned int button_id,
-                                      const bool is_button_pressed) override;
+                                      const bool is_button_pressed) const override;
     ControllerInput handleAxisEvent(ControllerInput controller_input,
                                     const unsigned int axis_id,
-                                    const double axis_value) override;
+                                    const double axis_value) const override;
 };

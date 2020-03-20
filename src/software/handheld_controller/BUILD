@@ -23,6 +23,7 @@ cc_library(
     deps = [
         ":controller_input",
         "//software/logger",
+        "//software/math:math_functions",
         "//software/multithreading:subject",
         "//software/parameter:dynamic_parameters",
     ],

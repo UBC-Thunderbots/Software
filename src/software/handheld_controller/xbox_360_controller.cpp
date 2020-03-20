@@ -8,7 +8,7 @@ Xbox360Controller::Xbox360Controller(
 
 ControllerInput Xbox360Controller::handleButtonEvent(ControllerInput controller_input,
                                                      const unsigned int button_id,
-                                                     const bool is_button_pressed)
+                                                     const bool is_button_pressed) const
 {
     switch (button_id)
     {
@@ -54,7 +54,7 @@ ControllerInput Xbox360Controller::handleButtonEvent(ControllerInput controller_
 
 ControllerInput Xbox360Controller::handleAxisEvent(ControllerInput controller_input,
                                                    const unsigned int axis_id,
-                                                   const double axis_value)
+                                                   const double axis_value) const
 {
     switch (axis_id)
     {

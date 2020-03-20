@@ -42,7 +42,7 @@ class Controller : public Subject<ControllerInput>
      */
     virtual ControllerInput handleButtonEvent(ControllerInput controller_input,
                                               const unsigned int button_id,
-                                              const bool button_pressed) = 0;
+                                              const bool button_pressed) const = 0;
 
     /**
      * Updates the given ControllerInput based on the axis event and returns a
@@ -56,9 +56,14 @@ class Controller : public Subject<ControllerInput>
      */
     virtual ControllerInput handleAxisEvent(ControllerInput controller_input,
                                             const unsigned int axis_id,
-                                            const double axis_value) = 0;
+                                            const double axis_value) const = 0;
 
    private:
+    /**
+     * The main function that reads controller events and handles input
+     */
+    void eventLoop();
+
     /**
      * Updates the given ControllerInput based on the controller event and
      * returns a new ControllerInput
@@ -69,7 +74,19 @@ class Controller : public Subject<ControllerInput>
      * @return A new ControllerInput updated by the controller event
      */
     ControllerInput handleControllerEvent(ControllerInput controller_input,
-                                          const struct js_event& controller_event);
+                                          const struct js_event& controller_event) const;
+
+    /**
+     * Applies a deadzone to the given axis value.
+     *
+     * If the absolute value of the axis value is less than the deadzone, the value
+     * becomes zero.
+     *
+     * @param axis_value The value to apply the deadzone to
+     *
+     * @return The new axis value accounting for the deadzone
+     */
+    double applyDeadzone(double axis_value) const;
 
     /**
      * Reads controller events from the file descriptor and stores them in the
@@ -81,7 +98,7 @@ class Controller : public Subject<ControllerInput>
      *
      * @return 0 if the read was successful, and -1 if an error occurred
      */
-    int read_event(int fd, struct js_event* event);
+    int readControllerEvent(int fd, struct js_event* event) const;
 
     /**
      * Returns the number axes that exist on the controller. An axis is a single axis of
@@ -92,7 +109,7 @@ class Controller : public Subject<ControllerInput>
      *
      * @return the number of axes that exist on the controller
      */
-    size_t getNumAxes(int fd);
+    size_t getNumAxes(int fd) const;
 
     /**
      * Returns the number of buttons that exist on the controller
@@ -101,12 +118,10 @@ class Controller : public Subject<ControllerInput>
      *
      * @return the number of buttons that exist on the controller
      */
-    size_t getNumButtons(int fd);
+    size_t getNumButtons(int fd) const;
 
-    void eventLoop();
-    std::thread event_thread;
-
+    std::thread event_loop_thread;
     std::atomic_bool in_destructor;
-
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config;
+    static constexpr double axis_deadzone = 0.05;
 };
