@@ -73,3 +73,27 @@ double circleSigmoid(const Circle& circle, const Point& point, const double& sig
  * @return A value in [0,1] that is the value of the sigmoid at the value v
  */
 double sigmoid(const double& v, const double& offset, const double& sig_width);
+
+/**
+ * Normalizes the given value in the range [value_min, value max] to the new
+ * range [range_min, range_max]
+ *
+ * See: https://stats.stackexchange.com/questions/70801/how-to-normalize-data-to-0-1-range
+ *
+ * @tparam T The type of the data to normalize. Must be an integral or floating point type
+ * @param value The value to normalize. Must be in the range [value_min, value_max]
+ * @param value_min The minimum possible value of the input value
+ * @param value_max The maximum possible value of the intput value
+ * @param range_min The minimum end of the range to normalize to
+ * @param range_max The maximum end of the range to normalize to
+ *
+ * @return The value normalized to the range [range_min, range_max]
+ */
+template <typename T>
+T normalizeValueToRange(T value, const T& value_min, const T& value_max, const T& range_min, const T& range_max) {
+    static_assert(std::is_integral<T>::value || std::is_floating_point<T>::value, "Integral of float point type required.");
+    value = std::clamp<T>(value, value_min, value_max);
+    T value_range = value_max - value_min;
+    T new_range = range_max - range_min;
+    return new_range / value_range * (value - value_max) + range_max;
+}
