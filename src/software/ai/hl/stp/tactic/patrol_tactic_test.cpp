@@ -24,32 +24,28 @@ void PrintMoveActions(std::shared_ptr<MoveAction> move_action)
 
 }
 
-void simulateActionToCompletion(RobotState newRobotState, std::shared_ptr<Action> action_ptr, PatrolTactic tactic) {
-    //    //complete action
+void simulateActionToCompletion(Robot robot, RobotState newRobotState, std::shared_ptr<Action> action_ptr, PatrolTactic &tactic) {
 
-    //make new state and call updatestate
-    Robot robot = *(tactic.getAssignedRobot());
-    (robot).updateState(RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
-                                   AngularVelocity::zero(),
-
-                                   Timestamp::fromSeconds(3)));
-    tactic.updateRobot(robot);
-
-    //   action_ptr = tactic.getNextAction();
-
-    //complete the action
-
-    //need to call getnextintent at least once for it to set done in action later
+    //actions need to yield at least once before being able to complete
     action_ptr->getNextIntent();
 
+    //update state of the robot and tactic
+    (robot).updateState(RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
+                                   AngularVelocity::zero(),
+                                   Timestamp::fromSeconds(3)));
+
+    tactic.updateRobot(robot);
+
+    //complete the action
     //will update the action with latest robot status
     action_ptr = tactic.getNextAction();
 
-    //sets action to complete
+    //Now that the action has the latest robot status, it is able to set the action to complete
     action_ptr->getNextIntent();
 
 }
-TEST(MoveTacticTest, robot_far_from_destination)
+
+TEST(MoveTacticTest, patrol_one_point)
 {
     Robot robot = Robot(0, Point(0,0), Vector(0,0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
@@ -71,7 +67,7 @@ TEST(MoveTacticTest, robot_far_from_destination)
                                      AngularVelocity::zero(),
                                      Timestamp::fromSeconds(3));
 
-    simulateActionToCompletion(newRobotState, action_ptr, tactic);
+    simulateActionToCompletion(robot, newRobotState, action_ptr, tactic);
 
     action_ptr = tactic.getNextAction();
 
@@ -79,9 +75,38 @@ TEST(MoveTacticTest, robot_far_from_destination)
 
     PrintMoveActions(move_action);
 
-//    std::shared_ptr<Action> action_ptr2 = tactic.getNextAction();
-//    std::shared_ptr<MoveAction> move_action2 = std::dynamic_pointer_cast<MoveAction>(action_ptr2);
-//    PrintMoveActions(move_action2);
+}
+
+
+TEST(MoveTacticTest, patrol_multiple_points)
+{
+    Robot robot = Robot(0, Point(0,0), Vector(0,0), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+
+    PatrolTactic tactic = PatrolTactic(std::vector<Point>({Point(3,3), Point(0,1), Point(0,2)}), 1.0, Angle::zero(), 1.0);
+
+    tactic.updateRobot(robot);
+
+    std::shared_ptr<Action> action_ptr = tactic.getNextAction();
+
+    ASSERT_NE(nullptr, action_ptr);
+
+    std::shared_ptr<MoveAction> move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+
+    PrintMoveActions(move_action);
+
+    //complete action
+    RobotState newRobotState = RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
+                                          AngularVelocity::zero(),
+                                          Timestamp::fromSeconds(3));
+
+    simulateActionToCompletion(robot, newRobotState, action_ptr, tactic);
+
+    action_ptr = tactic.getNextAction();
+
+    move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+
+    PrintMoveActions(move_action);
 
 }
 
