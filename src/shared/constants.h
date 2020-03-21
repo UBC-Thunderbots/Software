@@ -83,7 +83,7 @@ const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
 
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
-const char* const AI_VISION_MULTICAST_ADDRESS = "ff02::c3d0:42d2:bb8";
+const char* const AI_VISION_MULTICAST_ADDRESS    = "ff02::c3d0:42d2:bb8";
 const char* const AI_PRIMITIVE_MULTICAST_ADDRESS = "ff02::c3d0:43d3:dd8";
 
 // Vision Group

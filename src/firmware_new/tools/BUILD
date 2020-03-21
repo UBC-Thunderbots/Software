@@ -22,9 +22,9 @@ cc_binary(
     deps = [
         "//shared:constants",
         "//shared/proto:fw_cc_proto",
+        "//software/backend/output/wifi:wifi_output",
         "//software/backend/output/wifi/communication:robot_communicator",
         "//software/backend/output/wifi/communication/transfer_media:network_medium",
-        "//software/backend/output/wifi:wifi_output",
         "@boost//:asio",
         "@com_google_protobuf//:protobuf",
     ],

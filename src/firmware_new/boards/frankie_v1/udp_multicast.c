@@ -1,7 +1,5 @@
 #include "udp_multicast.h"
 
-#include "shared/proto/primitive_fw.pb.h"
-#include "shared/proto/status_fw.pb.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
 #include "lwip/ip_addr.h"
@@ -15,12 +13,14 @@
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+#include "shared/proto/primitive_fw.pb.h"
+#include "shared/proto/status_fw.pb.h"
 
 // TODO the messages are global for now, will need to be moved
 // when this file is properly integrated. This file only serves
 // as a reference implementation of reliable multicast with IPv6
 PrimitiveMsg primitive = PrimitiveMsg_init_zero;
-StatusMsg status = StatusMsg_init_zero;
+StatusMsg status       = StatusMsg_init_zero;
 
 /*
  * Thread that creates a send and recv socket, joins the specified

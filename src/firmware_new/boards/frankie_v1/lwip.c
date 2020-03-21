@@ -27,8 +27,8 @@
 #endif /* MDK ARM Compiler */
 
 /* USER CODE BEGIN 0 */
-#include "shared/constants.h"
 #include "firmware_new/boards/frankie_v1/udp_multicast.h"
+#include "shared/constants.h"
 
 /* USER CODE END 0 */
 /* Private function prototypes -----------------------------------------------*/
