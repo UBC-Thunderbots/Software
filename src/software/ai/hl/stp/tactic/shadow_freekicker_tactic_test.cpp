@@ -13,16 +13,19 @@ class ShadowFreekickerTacticTest : public testing::Test
 {
    protected:
     /**
-     * The fixture function to help to create world with enemy robots and calculate distances needed for unit tests
+     * The fixture function to help to create world with enemy robots and calculate
+     * distances needed for unit tests
      * @param ball_position: the position of the ball in Point format
-     * @param enemy_robot_positions: a vector of Points to represent the position fo robots
-     * @param left_or_right: a enum argument in the shadowFreekickerTactic to represent whether the robot is  blocking the freekick from left or right
+     * @param enemy_robot_positions: a vector of Points to represent the position fo
+     * robots
+     * @param left_or_right: a enum argument in the shadowFreekickerTactic to represent
+     * whether the robot is  blocking the freekick from left or right
      */
     void CreateSceneWithEnemyRobot(Point ball_position,
                                    std::vector<Point> enemy_robot_positions,
                                    ShadowFreekickerTactic::FreekickShadower left_or_right)
     {
-        //set up world, robots, balls
+        // set up world, robots, balls
         world = ::Test::TestUtil::createBlankTestingWorld();
         world = ::Test::TestUtil::setEnemyRobotPositions(world, enemy_robot_positions,
                                                          Timestamp::fromSeconds(0));
@@ -36,7 +39,7 @@ class ShadowFreekickerTacticTest : public testing::Test
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
         world.mutableFriendlyTeam().updateRobots({friendly_robot});
 
-        //setup tactic and acquire move action from it
+        // setup tactic and acquire move action from it
         ShadowFreekickerTactic tactic = ShadowFreekickerTactic(
             left_or_right, world.enemyTeam(), world.ball(), world.field(), false);
         tactic.updateRobot(friendly_robot);
@@ -67,14 +70,16 @@ class ShadowFreekickerTacticTest : public testing::Test
     }
 
     /**
-     * The fixture function to help to create world without enemy robots and calculate distances needed for unit tests
+     * The fixture function to help to create world without enemy robots and calculate
+     * distances needed for unit tests
      * @param ball_position: the position of the ball in Point format
-     * @param left_or_right: a enum argument in the shadowFreekickerTactic to represent whether the robot is  blocking the freekick from left or right
+     * @param left_or_right: a enum argument in the shadowFreekickerTactic to represent
+     * whether the robot is  blocking the freekick from left or right
      */
     void CreateSceneWithoutEnemyRobot(
         Point ball_position, ShadowFreekickerTactic::FreekickShadower left_or_right)
     {
-        //set up world, robot, balls
+        // set up world, robot, balls
         World world = ::Test::TestUtil::createBlankTestingWorld();
 
         world = ::Test::TestUtil::setBallPosition(world, ball_position,
@@ -85,7 +90,7 @@ class ShadowFreekickerTacticTest : public testing::Test
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
         world.mutableFriendlyTeam().updateRobots({friendly_robot});
 
-        //setup tactic and acquire move action from it
+        // setup tactic and acquire move action from it
         ShadowFreekickerTactic tactic = ShadowFreekickerTactic(
             left_or_right, world.enemyTeam(), world.ball(), world.field(), false);
         tactic.updateRobot(friendly_robot);
@@ -148,8 +153,9 @@ class ShadowFreekickerTacticTest : public testing::Test
 
     double middle_line_to_friendly_robot_distance;
     double middle_line_to_friendly_robot_distance__abs_error = 0.01;
-    //The distance between robot and the middle line is 1.1 times of the robot radius(0.09m)
-    double expected_middle_line_to_friendly_robot_distance   = 0.09 * 1.1;
+    // The distance between robot and the middle line is 1.1 times of the robot
+    // radius(0.09m)
+    double expected_middle_line_to_friendly_robot_distance = 0.09 * 1.1;
 
     // used when there are enemy robots
     // angle calculated from the vector connecting enemy robot position and ball position
@@ -172,36 +178,29 @@ class ShadowFreekickerTacticTest : public testing::Test
  *                                                                      Enemy
  *                                                                        X
  *     +-----------------------------------------------------------------X+X-----------------------------------------------------------------+
- *     |                                                                  X                                                                  |
- *     |                                                         ball     |                                                                  |
- *     |                                           Left    +         O    |                                                                  |
- *     |                                                  + +             |                                                                  |
- *     |                                                   +              |                                                                  |
- *     |                                                           +      |                                                                  |
- *     |                                                          + +     |                                                                  |
- *     +--------------+                                  Right     +      |                                                   +--------------+
- *     |              |                                                   +                                                   |              |
- *     |              |                                                    y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |       x                                           |              |
- *     |              |                                              (0,0)+-------->                                          |              |
- *     |              |                                                                                                       |              |
- *     |              |                                                   +                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                                   |                                                   +--------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
+ *     |                                                                  X | | ball     |
+ * | |                                           Left    +         O    | | | + + | | | +
+ * |                                                                  | | +      | | | + +
+ * |                                                                  |
+ *     +--------------+                                  Right     +      |
+ * +--------------+ |              |                                                   +
+ * |              | |              |                                                    y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * x                                           |              | |              |
+ * (0,0)+-------->                                          |              | | | | | | |
+ * +                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              |
+ *     +--------------+                                                   |
+ * +--------------+ |                                                                  | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
  *     +-------------------------------------------------------------------------------------------------------------------------------------+
  *
  */
@@ -260,36 +259,29 @@ TEST_F(ShadowFreekickerTacticTest,
  *
  *
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     +--------------+                                                   |                                                   +--------------+
- *     |              |                                                   +                                                   |              |
- *     |              |                                                    y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |       x                                           |              |
- *     |              |                                              (0,0)+-------->                                          |              |
- *     |              |                                                                                                       |              |
- *     |              |                                                   +                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                    Left    +      |                                                   +--------------+
- *     |                                                          + +     |                                                                  |
- *     |                                                           +      |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                    +             |                                                                  |
- *     |                                                   + +   ball     |                                                                  |
- *     |                                          Right     +        O    +                                                                  |
- *     |                                                                  X                                                                  |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
+ *     +--------------+                                                   |
+ * +--------------+ |              |                                                   +
+ * |              | |              |                                                    y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * x                                           |              | |              |
+ * (0,0)+-------->                                          |              | | | | | | |
+ * +                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              |
+ *     +--------------+                                    Left    +      |
+ * +--------------+ |                                                          + +     | |
+ *     |                                                           +      | | | | | | | |
+ *     |                                                    +             | | | + +   ball
+ * |                                                                  | | Right     + O +
+ * | |                                                                  X |
  *     +----------------------------------------------------------------+X+X+----------------------------------------------------------------+
  *                                                                        X  Enemy
  */
@@ -342,42 +334,36 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-//clang-format off
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *                                                                                                                                         Enemy
  *                                                                                                                                           X
  *     +------------------------------------------------------------------+-----------------------------------------------------------------X+X
- *     |                                                                  |                                                       ball       X
- *     |                                                                  |                                       Left    +           O      |
- *     |                                                                  |                                              + +                 |
- *     |                                                                  |                                               +      +           |
- *     |                                                                  |                                                     + +          |
- *     |                                                                  |                                                      +           |
- *     |                                                                  |                                                Right             |
- *     +--------------+                                                   |                                                   +--------------+
- *     |              |                                                   +                                                   |              |
- *     |              |                                                    y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |       x                                           |              |
- *     |              |                                              (0,0)+-------->                                          |              |
- *     |              |                                                                                                       |              |
- *     |              |                                                   +                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                                   |                                                   +--------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
+ *     |                                                                  | ball       X
+ *     |                                                                  | Left    + O |
+ *     |                                                                  | + + | | | + +
+ * | |                                                                  | + +          |
+ *     |                                                                  | +           |
+ *     |                                                                  | Right |
+ *     +--------------+                                                   |
+ * +--------------+ |              |                                                   +
+ * |              | |              |                                                    y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * x                                           |              | |              |
+ * (0,0)+-------->                                          |              | | | | | | |
+ * +                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              |
+ *     +--------------+                                                   |
+ * +--------------+ |                                                                  | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
@@ -441,36 +427,30 @@ TEST_F(ShadowFreekickerTacticTest,
  *
  *
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     +--------------+                                                   |                                                   +--------------+
- *     |              |                                                   +                                                   |              |
- *     |              |                                                    y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |       x                                           |              |
- *     |              |                                              (0,0)+-------->                                          |              |
- *     |              |                                                                                                       |              |
- *     |              |                                                   +                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                                   |                                       Left    +   +--------------+
- *     |                                                                  |                                              + +                 |
- *     |                                                                  |                                               +                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                             +         ball       |
- *     |                                                                  |                                   Right    + +            O      |
- *     |                                                                  |                                             +                    |
- *     |                                                                  |                                                                  X   Enemy
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
+ *     +--------------+                                                   |
+ * +--------------+ |              |                                                   +
+ * |              | |              |                                                    y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * x                                           |              | |              |
+ * (0,0)+-------->                                          |              | | | | | | |
+ * +                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              |
+ *     +--------------+                                                   | Left    +
+ * +--------------+ |                                                                  |
+ * + +                 | | |                                               + | | | | | | |
+ *     |                                                                  | +         ball
+ * | |                                                                  | Right    + + O |
+ *     |                                                                  | + | | | X
+ * Enemy
  *     +------------------------------------------------------------------+-----------------------------------------------------------------X+X
  *                                                                                                                                           X
  */
@@ -533,36 +513,29 @@ TEST_F(ShadowFreekickerTacticTest,
  *
  *     X Enemy
  *    X+X-----------------------------------------------------------------+------------------------------------------------------------------+
- *     X       ball                                                       |                                                                  |
- *     |      O              +                                            |                                                                  |
- *     |                    + +   Right                                   |                                                                  |
- *     |                     +                                            |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                  +                                               |                                                                  |
- *     |                 + +                                              |                                                                  |
- *     +--------------+   +  Left                                         |                                                   +--------------+
- *     |              |                                                   +                                                   |              |
- *     |              |                                                    y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |       x                                           |              |
- *     |              |                                              (0,0)+-------->                                          |              |
- *     |              |                                                                                                       |              |
- *     |              |                                                   +                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                                   |                                                   +--------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
+ *     X       ball                                                       | | |      O +
+ * |                                                                  | | + +   Right | |
+ *     |                     +                                            | | | | | | + |
+ * | |                 + +                                              | |
+ *     +--------------+   +  Left                                         |
+ * +--------------+ |              |                                                   +
+ * |              | |              |                                                    y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * x                                           |              | |              |
+ * (0,0)+-------->                                          |              | | | | | | |
+ * +                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              |
+ *     +--------------+                                                   |
+ * +--------------+ |                                                                  | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
@@ -625,36 +598,28 @@ TEST_F(ShadowFreekickerTacticTest,
  *
  *
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     +--------------+                                                   |                                                   +--------------+
- *     |              |                                                   +                                                   |              |
- *     |              |                                                    y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |       x                                           |              |
- *     |              |                                              (0,0)+-------->                                          |              |
- *     |              |                                                                                                       |              |
- *     |              |                                                   +                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                                   |                                                   +--------------+
- *     |                +                                                 |                                                                  |
- *     |               + +   Right                                        |                                                                  |
- *     |                +                                                 |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                    +                                             |                                                                  |
- *     |  ball             + +                                            |                                                                  |
- *     |         O          +  Left                                       |                                                                  |
- *     X                                                                  |                                                                  |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
+ *     +--------------+                                                   |
+ * +--------------+ |              |                                                   +
+ * |              | |              |                                                    y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * x                                           |              | |              |
+ * (0,0)+-------->                                          |              | | | | | | |
+ * +                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              | |              |
+ * |                                                   |              |
+ *     +--------------+                                                   |
+ * +--------------+ |                +                                                 | |
+ *     |               + +   Right                                        | | | + | | | |
+ * | |                    +                                             | | |  ball + + |
+ * | |         O          +  Left                                       | | X | |
  *    X+X-----------------------------------------------------------------+------------------------------------------------------------------+
  *     X  Enemy
  */
@@ -711,40 +676,32 @@ TEST_F(ShadowFreekickerTacticTest,
 
 //clang-format off
 /**
- *  The two tests immediate below has the scene shown in the graph below                                                                               |
+ *  The two tests immediate below has the scene shown in the graph below |
  *                                                                                                                                                     X
  *                                                                                                                                                    X+X-------
- *     +------------------------------------------------------------------+------------------------------------------------------------------+         X  Enemy
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     +--------------+                                                   |                                                   +--------------+
- *     |              |                                                   +                                                   |              |
- *     |              |                                                    y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                      Left      +          ball    |                                                   |              |
- *     |              |                               + +                 |  Enemy                                            |              |
- *     |              |                                +                  X       x                                           |              |
- *     |              |                                           O      X+X------->                                          |              |
- *     |              |                                +                  X (0,0)                                             |              |
- *     |              |                               + +                 +                                                   |              |
- *     |              |                   Right        +                  |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                                   |                                                   +--------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
+ *     +------------------------------------------------------------------+------------------------------------------------------------------+
+ * X  Enemy |                                                                  | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | |
+ *     +--------------+                                                   |
+ * +--------------+ |              |                                                   +
+ * |              | |              |                                                    y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                      Left      +          ball    |
+ * |              | |              |                               + +                 |
+ * Enemy                                            |              | |              | + X
+ * x                                           |              | |              | O
+ * X+X------->                                          |              | |              |
+ * +                  X (0,0)                                             |              |
+ *     |              |                               + +                 + | | | | Right
+ * +                  |                                                   |              |
+ *     |              |                                                   | | | | | | | |
+ *     +--------------+                                                   |
+ * +--------------+ |                                                                  | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
@@ -800,36 +757,30 @@ TEST_F(ShadowFreekickerTacticTest,
  *
  *
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
- *     |                                                                  |                                                                  |
- *     |                                               +                  |                                                                  |
- *     |                                              + +           O     |                                                                  |
- *     |                                    Left       +                  |                                                                  |
- *     |                                                           ball   |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                  +               |                                                                  |
- *     +--------------+                                  + +              |                                                   +--------------+
- *     |              |                                   +               +                                                   |              |
- *     |              |                         Right                      y                                                  |              |
- *     |              |                                                   ^                                                   |              |
- *     |  Friendly    |                                                   |                                                   |   Enemy      |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |       x                                           |              |
- *     |              |                                                   +-------->                                          |              |
- *     |              |                                                     (0,0)                                             |              |
- *     |              |                                                   +                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     |              |                                                   |                                                   |              |
- *     +--------------+                                                   |                                                   +--------------+
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
- *     |                                                                  |                                                                  |
+ *     |                                                                  | | | + | | | +
+ * +           O     |                                                                  |
+ *     |                                    Left       +                  | | | ball   | |
+ *     |                                                                  | | | + | |
+ *     +--------------+                                  + +              |
+ * +--------------+ |              |                                   +               +
+ * |              | |              |                         Right                      y
+ * |              | |              |                                                   ^
+ * |              | |  Friendly    |                                                   |
+ * |   Enemy      | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * x                                           |              | |              |
+ * +-------->                                          |              | |              |
+ * (0,0)                                             |              | |              | +
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              | |              |                                                   |
+ * |              |
+ *     +--------------+                                                   |
+ * +--------------+ |                                                                  | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | | | | | | | |
+ *     |                                                                  | |
  *     +------------------------------------------------------------------+------------------------------------------------------------------+
  *
  */
