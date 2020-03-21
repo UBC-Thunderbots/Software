@@ -116,7 +116,7 @@ class ShadowFreekickerTacticTest : public testing::Test
     }
 
     World world;
-    //clang-format off
+
     /**
      *
      *                                      +
@@ -132,8 +132,7 @@ class ShadowFreekickerTacticTest : public testing::Test
      *              X            .          |
      *                             .
      *                             ^ .      |
-     *                             |   .                               Middle line to
-     * friendly distance
+     *                             |   .         Middle line to friendly distance
      *                +------------+     .  |                            0.09*1.1
      *   ball to friendly robot distance    +
      *                                     + +                        +-----+
@@ -144,7 +143,7 @@ class ShadowFreekickerTacticTest : public testing::Test
      *
      *                           0.5*1.05+0.09
      */
-    //clang-format on
+
 
     double ball_to_friendly_robot_distance;
     const double BALL_TO_FRIENDLY_ROBOT_DISTANCE_ABS_ERROR = 0.05;
@@ -173,7 +172,7 @@ class ShadowFreekickerTacticTest : public testing::Test
     Angle goal_to_dest_angle;
 };
 
-//clang-format off
+
 /**
  * The two tests immediate below has the scene shown in the graph below
  *            +-----------+-------------+-----------+
@@ -208,7 +207,7 @@ class ShadowFreekickerTacticTest : public testing::Test
  *            |           |             |           |
  *            +-----------+-------------+-----------+
  */
-//clang-format on
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_middle_left_on_field)
@@ -257,7 +256,7 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-//clang-format off
+
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *            +-----------+-------------+-----------+
@@ -292,7 +291,7 @@ TEST_F(ShadowFreekickerTacticTest,
  *            |           |             |           |
  *            +-----------+-------------+-----------+
  */
-//clang-format on
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_middle_right_on_field)
@@ -343,43 +342,43 @@ TEST_F(ShadowFreekickerTacticTest,
 
 /**
  *  The two tests immediate below has the scene shown in the graph below
-*
+ *
  *
  *           enemy
-*
-*            x-----------+-------------+-----------+
-*            |           |             |           |
-*            | o ball    |             |           |
-*            |           |             |           |
-*            |    +      +-------------+           |
-*            | +    friendly                       |
-*            |                                     |
-*            | friendly                            |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                  ^                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |           <------+                  |
-*            |                   (0,0)             |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |           +-------------+           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            +-----------+-------------+-----------+
+ *
+ *            x-----------+-------------+-----------+
+ *            |           |             |           |
+ *            | o ball    |             |           |
+ *            |           |             |           |
+ *            |    +      +-------------+           |
+ *            | +    friendly                       |
+ *            |                                     |
+ *            | friendly                            |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                  ^                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |           <------+                  |
+ *            |                   (0,0)             |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |           +-------------+           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            +-----------+-------------+-----------+
  */
-//clang-format on
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_top_left_on_field)
@@ -433,46 +432,46 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-//clang-format off
+
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
  *
  *                                              enemy
-*
-*            +-----------+-------------+-----------x
-*            |           |             |           |
-*            |           |             |    ball o |
-*            |           |             |           |
-*            |           +-------------+    +      |
-*            |                      friendly     + |
-*            |                                     |
-*            |                           friendly  |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                  ^                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |           <------+                  |
-*            |                   (0,0)             |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |           +-------------+           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            +-----------+-------------+-----------+                                                                                                                      X
+ *
+ *            +-----------+-------------+-----------x
+ *            |           |             |           |
+ *            |           |             |    ball o |
+ *            |           |             |           |
+ *            |           +-------------+    +      |
+ *            |                      friendly     + |
+ *            |                                     |
+ *            |                           friendly  |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                  ^                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |           <------+                  |
+ *            |                   (0,0)             |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |           +-------------+           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            +-----------+-------------+-----------+
  */
-//clang-format on
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_top_right_on_field)
@@ -525,43 +524,43 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-//clang-format off
+
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
-*            +-----------+-------------+-----------+
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           +-------------+           |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                  ^                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |           <------+                  |
-*            |                   (0,0)             |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            | friendly                            |
-*            |  +    friendly                      |
-*            |      +    +-------------+           |
-*            |           |             |           |
-*            |  o  ball  |             |           |
-*            |           |             |           |
-*    enemy   x-----------+-------------+-----------+
+ *            +-----------+-------------+-----------+
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           +-------------+           |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                  ^                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |           <------+                  |
+ *            |                   (0,0)             |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            | friendly                            |
+ *            |  +    friendly                      |
+ *            |      +    +-------------+           |
+ *            |           |             |           |
+ *            |  o  ball  |             |           |
+ *            |           |             |           |
+ *    enemy   x-----------+-------------+-----------+
  */
-//clang-format on
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_bottom_left_on_field)
@@ -614,44 +613,44 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-//clang-format off
+
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
  *
-*            +-----------+-------------+-----------+
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           +-------------+           |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                  ^                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |           <------+                  |
-*            |                   (0,0)             |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                           friendly  |
-*            |                      friendly   +   |
-*            |           +-------------+   +       |
-*            |           |             |           |
-*            |           |             | ball  o   |
-*            |           |             |           |
-*            +-----------+-------------+-----------x enemy
+ *            +-----------+-------------+-----------+
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           +-------------+           |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                  ^                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |           <------+                  |
+ *            |                   (0,0)             |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                           friendly  |
+ *            |                      friendly   +   |
+ *            |           +-------------+   +       |
+ *            |           |             |           |
+ *            |           |             | ball  o   |
+ *            |           |             |           |
+ *            +-----------+-------------+-----------x enemy
  */
-//clang-format on
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_botom_right_on_field)
@@ -702,44 +701,44 @@ TEST_F(ShadowFreekickerTacticTest,
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
 
-//clang-format off
+
 /**
- *  The two tests immediate below has the scene shown in the graph below |
+ *  The two tests immediate below has the scene shown in the graph below
  *                                                                                                                                                     X
  *                                                                                                                                                    X+X-------
-*            +-----------+-------------+-----------+
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           +-------------+           |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                  ^                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |             (0,0)| enemy            |
-*            |           <------x                  |
-*            |                                     |
-*            |            ball  o                  |
-*            |                                     |
-*            |                +   +                |
-*            |         friendly    friendly        |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |           +-------------+           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            +-----------+-------------+-----------+
+ *            +-----------+-------------+-----------+
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           +-------------+           |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                  ^                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |             (0,0)| enemy            |
+ *            |           <------x                  |
+ *            |                                     |
+ *            |            ball  o                  |
+ *            |                                     |
+ *            |                +   +                |
+ *            |         friendly    friendly        |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |           +-------------+           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            +-----------+-------------+-----------+
  */
-//clang-format on
+
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_with_enemy_robot_at_origin_on_field)
@@ -785,44 +784,43 @@ TEST_F(ShadowFreekickerTacticTest,
 
     EXPECT_GT(enemy_to_dest_angle, enemy_to_ball_angle);
 }
-//clang-format off
+
 /**
  *  The two tests immediate below has the scene shown in the graph below
  *
  *
-*            +-----------+-------------+-----------+
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           +-------------+           |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                  ^                  |
-*            |                  |                  |
-*            |                  |                  |
-*            |             (0,0)|                  |
-*            |           <------+                  |
-*            |                                     |
-*            |            ball  o                  |
-*            |                                     |
-*            |                +   +                |
-*            |         friendly    friendly        |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |                                     |
-*            |           +-------------+           |
-*            |           |             |           |
-*            |           |             |           |
-*            |           |             |           |
-*            +-----------+-------------+-----------+
+ *            +-----------+-------------+-----------+
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           +-------------+           |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                  ^                  |
+ *            |                  |                  |
+ *            |                  |                  |
+ *            |             (0,0)|                  |
+ *            |           <------+                  |
+ *            |                                     |
+ *            |            ball  o                  |
+ *            |                                     |
+ *            |                +   +                |
+ *            |         friendly    friendly        |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |                                     |
+ *            |           +-------------+           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            |           |             |           |
+ *            +-----------+-------------+-----------+
  */
-//clang-format on
 
 TEST_F(ShadowFreekickerTacticTest,
        test_shadow_free_kicker_left_side_without_robot_in_enemy_team)
