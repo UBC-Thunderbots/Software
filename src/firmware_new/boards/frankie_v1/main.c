@@ -483,24 +483,31 @@ static void MX_GPIO_Init(void)
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOA,
-                      wheel_motor_2_brake_Pin | wheel_motor_2_reset_Pin |
-                          wheel_motor_2_coast_Pin | wheel_motor_2_mode_Pin |
-                          wheel_motor_2_direction_Pin,
+    HAL_GPIO_WritePin(GPIOC, wheel_motor_2_coast_Pin | wheel_motor_1_direction_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(
+        GPIOA,
+        wheel_motor_2_brake_Pin | wheel_motor_2_reset_Pin | wheel_motor_2_direction_Pin,
+        GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOB,
-                      wheel_motor_1_direction_Pin | wheel_motor_1_brake_Pin |
-                          wheel_motor_1_esf_Pin | wheel_motor_0_esf_Pin |
-                          wheel_motor_1_reset_Pin | wheel_motor_1_coast_Pin | LD3_Pin |
-                          wheel_motor_1_mode_Pin | wheel_motor_0_reset_Pin |
-                          wheel_motor_0_coast_Pin | wheel_motor_0_mode_Pin | LD2_Pin |
-                          wheel_motor_0_direction_Pin | wheel_motor_0_brake_Pin,
+                      wheel_motor_1_brake_Pin | wheel_motor_1_esf_Pin |
+                          wheel_motor_0_esf_Pin | wheel_motor_1_reset_Pin |
+                          wheel_motor_1_coast_Pin | LD3_Pin | wheel_motor_1_mode_Pin |
+                          wheel_motor_0_reset_Pin | wheel_motor_0_coast_Pin |
+                          wheel_motor_0_mode_Pin | LD2_Pin | wheel_motor_0_direction_Pin |
+                          wheel_motor_0_brake_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(wheel_motor_2_mode_GPIO_Port, wheel_motor_2_mode_Pin,
+                      GPIO_PIN_RESET);
 
     /*Configure GPIO pin : USER_Btn_Pin */
     GPIO_InitStruct.Pin  = USER_Btn_Pin;
@@ -520,27 +527,33 @@ static void MX_GPIO_Init(void)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
+    /*Configure GPIO pins : wheel_motor_2_coast_Pin wheel_motor_1_direction_Pin */
+    GPIO_InitStruct.Pin   = wheel_motor_2_coast_Pin | wheel_motor_1_direction_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
     /*Configure GPIO pins : wheel_motor_2_brake_Pin wheel_motor_2_reset_Pin
-       wheel_motor_2_coast_Pin wheel_motor_2_mode_Pin wheel_motor_2_direction_Pin */
-    GPIO_InitStruct.Pin = wheel_motor_2_brake_Pin | wheel_motor_2_reset_Pin |
-                          wheel_motor_2_coast_Pin | wheel_motor_2_mode_Pin |
-                          wheel_motor_2_direction_Pin;
+     * wheel_motor_2_direction_Pin */
+    GPIO_InitStruct.Pin =
+        wheel_motor_2_brake_Pin | wheel_motor_2_reset_Pin | wheel_motor_2_direction_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /*Configure GPIO pins : wheel_motor_1_direction_Pin wheel_motor_1_brake_Pin
-       wheel_motor_1_esf_Pin wheel_motor_0_esf_Pin wheel_motor_1_reset_Pin
-       wheel_motor_1_coast_Pin LD3_Pin wheel_motor_1_mode_Pin wheel_motor_0_reset_Pin
-       wheel_motor_0_coast_Pin wheel_motor_0_mode_Pin LD2_Pin
-                             wheel_motor_0_direction_Pin wheel_motor_0_brake_Pin */
-    GPIO_InitStruct.Pin = wheel_motor_1_direction_Pin | wheel_motor_1_brake_Pin |
-                          wheel_motor_1_esf_Pin | wheel_motor_0_esf_Pin |
-                          wheel_motor_1_reset_Pin | wheel_motor_1_coast_Pin | LD3_Pin |
-                          wheel_motor_1_mode_Pin | wheel_motor_0_reset_Pin |
-                          wheel_motor_0_coast_Pin | wheel_motor_0_mode_Pin | LD2_Pin |
-                          wheel_motor_0_direction_Pin | wheel_motor_0_brake_Pin;
+    /*Configure GPIO pins : wheel_motor_1_brake_Pin wheel_motor_1_esf_Pin
+       wheel_motor_0_esf_Pin wheel_motor_1_reset_Pin wheel_motor_1_coast_Pin LD3_Pin
+       wheel_motor_1_mode_Pin wheel_motor_0_reset_Pin wheel_motor_0_coast_Pin
+       wheel_motor_0_mode_Pin LD2_Pin wheel_motor_0_direction_Pin
+                             wheel_motor_0_brake_Pin */
+    GPIO_InitStruct.Pin = wheel_motor_1_brake_Pin | wheel_motor_1_esf_Pin |
+                          wheel_motor_0_esf_Pin | wheel_motor_1_reset_Pin |
+                          wheel_motor_1_coast_Pin | LD3_Pin | wheel_motor_1_mode_Pin |
+                          wheel_motor_0_reset_Pin | wheel_motor_0_coast_Pin |
+                          wheel_motor_0_mode_Pin | LD2_Pin | wheel_motor_0_direction_Pin |
+                          wheel_motor_0_brake_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -558,6 +571,13 @@ static void MX_GPIO_Init(void)
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : wheel_motor_2_mode_Pin */
+    GPIO_InitStruct.Pin   = wheel_motor_2_mode_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(wheel_motor_2_mode_GPIO_Port, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 4 */

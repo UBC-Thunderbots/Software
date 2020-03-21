@@ -79,6 +79,8 @@ extern "C"
 #define wheel_motor_3_esf_GPIO_Port GPIOF
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOH
+#define wheel_motor_2_coast_Pin GPIO_PIN_0
+#define wheel_motor_2_coast_GPIO_Port GPIOC
 #define RMII_MDC_Pin GPIO_PIN_1
 #define RMII_MDC_GPIO_Port GPIOC
 #define wheel_motor_2_brake_Pin GPIO_PIN_0
@@ -87,18 +89,12 @@ extern "C"
 #define RMII_MDIO_GPIO_Port GPIOA
 #define wheel_motor_2_reset_Pin GPIO_PIN_3
 #define wheel_motor_2_reset_GPIO_Port GPIOA
-#define wheel_motor_2_coast_Pin GPIO_PIN_4
-#define wheel_motor_2_coast_GPIO_Port GPIOA
-#define wheel_motor_2_mode_Pin GPIO_PIN_5
-#define wheel_motor_2_mode_GPIO_Port GPIOA
 #define wheel_motor_2_direction_Pin GPIO_PIN_6
 #define wheel_motor_2_direction_GPIO_Port GPIOA
 #define RMII_RXD0_Pin GPIO_PIN_4
 #define RMII_RXD0_GPIO_Port GPIOC
 #define RMII_RXD1_Pin GPIO_PIN_5
 #define RMII_RXD1_GPIO_Port GPIOC
-#define wheel_motor_1_direction_Pin GPIO_PIN_0
-#define wheel_motor_1_direction_GPIO_Port GPIOB
 #define wheel_motor_1_brake_Pin GPIO_PIN_1
 #define wheel_motor_1_brake_GPIO_Port GPIOB
 #define wheel_motor_1_esf_Pin GPIO_PIN_2
@@ -129,6 +125,8 @@ extern "C"
 #define USB_PowerSwitchOn_GPIO_Port GPIOG
 #define USB_OverCurrent_Pin GPIO_PIN_7
 #define USB_OverCurrent_GPIO_Port GPIOG
+#define wheel_motor_1_direction_Pin GPIO_PIN_9
+#define wheel_motor_1_direction_GPIO_Port GPIOC
 #define USB_SOF_Pin GPIO_PIN_8
 #define USB_SOF_GPIO_Port GPIOA
 #define USB_VBUS_Pin GPIO_PIN_9
@@ -139,6 +137,8 @@ extern "C"
 #define USB_DM_GPIO_Port GPIOA
 #define USB_DP_Pin GPIO_PIN_12
 #define USB_DP_GPIO_Port GPIOA
+#define wheel_motor_2_mode_Pin GPIO_PIN_3
+#define wheel_motor_2_mode_GPIO_Port GPIOD
 #define RMII_TX_EN_Pin GPIO_PIN_11
 #define RMII_TX_EN_GPIO_Port GPIOG
 #define RMII_TXD0_Pin GPIO_PIN_13
