@@ -510,6 +510,7 @@ cc_library(
     deps = [
         ":hal",
         ":rtos",
+        "//shared:constants",
     ],
     alwayslink = True,
 )

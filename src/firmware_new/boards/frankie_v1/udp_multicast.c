@@ -21,6 +21,7 @@
 // as a reference implementation of reliable multicast with IPv6
 PrimitiveMsg primitive = PrimitiveMsg_init_zero;
 StatusMsg status       = StatusMsg_init_zero;
+primitive_callback_t prim_callback;
 
 /*
  * Thread that creates a send and recv socket, joins the specified
@@ -89,6 +90,8 @@ static void blocking_udp_multicast_loop(void *arg)
 
             if (pb_decode(&in_stream, PrimitiveMsg_fields, &primitive))
             {
+                prim_callback(primitive);
+
                 // update proto
                 status.test = msg_count++;
 
@@ -108,9 +111,11 @@ static void blocking_udp_multicast_loop(void *arg)
 }
 
 void udp_multicast_init(const char *multicast_address, unsigned multicast_port,
-                        unsigned send_port)
+                        unsigned send_port, primitive_callback_t callback)
 {
     multicast_config_t *config = malloc(sizeof(multicast_config_t));
+
+    prim_callback = callback;
 
     *config = (multicast_config_t){
         .multicast_port = multicast_port,

@@ -28,6 +28,7 @@
 
 /* USER CODE BEGIN 0 */
 #include "firmware_new/boards/frankie_v1/udp_multicast.h"
+#include "shared/proto/primitive_fw.pb.h"
 #include "shared/constants.h"
 
 /* USER CODE END 0 */
@@ -44,7 +45,9 @@ struct netif gnetif;
 ip6_addr_t ip6addr;
 
 /* USER CODE BEGIN 2 */
-
+void sample_callback(PrimitiveMsg prim){
+    // TODO
+}
 /* USER CODE END 2 */
 
 /**
@@ -77,10 +80,12 @@ void MX_LWIP_Init(void)
         netif_set_down(&gnetif);
     }
 
+
     /* USER CODE BEGIN 3 */
     udp_multicast_init(AI_PRIMITIVE_MULTICAST_ADDRESS,
                        ROBOT_PRIMITIVE_MULTICAST_LISTEN_PORT,
-                       ROBOT_PRIMITIVE_UNICAST_SEND_PORT);
+                       ROBOT_PRIMITIVE_UNICAST_SEND_PORT,
+                       &sample_callback);
     /* USER CODE END 3 */
 }
 

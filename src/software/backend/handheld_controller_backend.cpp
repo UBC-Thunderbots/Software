@@ -5,6 +5,11 @@
 
 const std::string HandheldControllerBackend::name = "handheld_controller";
 
+
+// MAT CHANGE THIS to match your computer
+// TODO remove!
+const std::string INTERFACE = "eth0";
+
 HandheldControllerBackend::HandheldControllerBackend()
     : HandheldControllerBackend(std::make_shared<const HandheldControllerInputConfig>())
 {
@@ -12,10 +17,18 @@ HandheldControllerBackend::HandheldControllerBackend()
 
 HandheldControllerBackend::HandheldControllerBackend(
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
-    : radio_output(DEFAULT_RADIO_CONFIG,
-                   [this](RobotStatus status) {
-                       Subject<RobotStatus>::sendValueToObservers(status);
-                   }),
+    : wifi_output(
+        std::move(std::make_unique<RobotPrimitiveCommunicator>(
+            std::make_unique<NetworkMedium>(
+                std::string(AI_PRIMITIVE_MULTICAST_ADDRESS) + INTERFACE,
+                AI_PRIMITIVE_MULTICAST_SEND_PORT, AI_PRIMITIVE_UNICAST_LISTEN_PORT),
+            nullptr, nullptr)),
+        std::move(std::make_unique<RobotVisionCommunicator>(
+            std::make_unique<NetworkMedium>(
+                std::string(AI_VISION_MULTICAST_ADDRESS) + INTERFACE,
+                AI_VISION_MULTICAST_SEND_PORT, AI_VISION_UNICAST_LISTEN_PORT),
+            nullptr, nullptr))),
+
       controller_input_config(controller_input_config)
 {
 }
