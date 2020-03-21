@@ -51,6 +51,8 @@ extern "C"
 
     /* USER CODE END EM */
 
+    void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
     /* Exported functions prototypes ---------------------------------------------*/
     void Error_Handler(void);
 
@@ -71,6 +73,8 @@ extern "C"
 #define RMII_RXD0_GPIO_Port GPIOC
 #define RMII_RXD1_Pin GPIO_PIN_5
 #define RMII_RXD1_GPIO_Port GPIOC
+#define motor_0_esf_Pin GPIO_PIN_10
+#define motor_0_esf_GPIO_Port GPIOB
 #define RMII_TXD1_Pin GPIO_PIN_13
 #define RMII_TXD1_GPIO_Port GPIOB
 #define LD3_Pin GPIO_PIN_14
@@ -97,8 +101,20 @@ extern "C"
 #define RMII_TX_EN_GPIO_Port GPIOG
 #define RMII_TXD0_Pin GPIO_PIN_13
 #define RMII_TXD0_GPIO_Port GPIOG
+#define motor_0_reset_Pin GPIO_PIN_3
+#define motor_0_reset_GPIO_Port GPIOB
+#define motor_0_coast_Pin GPIO_PIN_4
+#define motor_0_coast_GPIO_Port GPIOB
+#define motor_0_mode_Pin GPIO_PIN_5
+#define motor_0_mode_GPIO_Port GPIOB
+#define motor_0_pwm_Pin GPIO_PIN_6
+#define motor_0_pwm_GPIO_Port GPIOB
 #define LD2_Pin GPIO_PIN_7
 #define LD2_GPIO_Port GPIOB
+#define motor_0_direction_Pin GPIO_PIN_8
+#define motor_0_direction_GPIO_Port GPIOB
+#define motor_0_brake_Pin GPIO_PIN_9
+#define motor_0_brake_GPIO_Port GPIOB
     /* USER CODE BEGIN Private defines */
 
     /* USER CODE END Private defines */
