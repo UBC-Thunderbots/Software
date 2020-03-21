@@ -2,6 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <utility>
+
+#include "shared/constants.h"
 #include "software/test_util/test_util.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
@@ -75,152 +78,125 @@ INSTANTIATE_TEST_CASE_P(Positions, GoalieRestrainTest,
                         ::testing::Values(Point(0, 0), Point(1, 2), Point(0, 2),
                                           Point(1, 1), Point(0.5, 1), Point(1, 0.5)));
 
-//coords friendly side is -x
-//+y is up, -y is down
-//fast is > 0.2
-// deflation of goal is 0.2
-// move equality is destination, orientation, dribbler_enable, ball_collsion, autochip, movetype, final speed
-TEST(GoalieTacticTest, ball_very_fast_in_straight_line)
+
+class GoalieTacticTest : public testing::Test
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world.mutableBall() = Ball(Point(4,0), Vector(-4,0),
+    protected:
+        void expectMoveAction(Ball ball, const Point& destination)
+        {
+            World world = ::Test::TestUtil::createBlankTestingWorld();
+            world.mutableBall() = std::move(ball);
+
+            Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0),
+                                 Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+            world.mutableFriendlyTeam().updateRobots({goalie});
+            world.mutableFriendlyTeam().assignGoalie(0);
+
+            GoalieTactic tactic =
+                    GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
+                                 world.enemyTeam());
+            tactic.updateRobot(goalie);
+            auto action_ptr = tactic.getNextAction();
+
+            EXPECT_TRUE(action_ptr);
+
+            auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+            ASSERT_NE(move_action, nullptr);
+            EXPECT_TRUE(move_action->getDestination().isClose(destination, 0.03));
+            EXPECT_NEAR(move_action->getFinalSpeed(), 0, 0.001);
+        }
+        void expectStopAction(Ball ball) {
+            World world = ::Test::TestUtil::createBlankTestingWorld();
+            world.mutableBall() = std::move(ball);
+
+            Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0),
+                                 Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+            world.mutableFriendlyTeam().updateRobots({goalie});
+            world.mutableFriendlyTeam().assignGoalie(0);
+
+            GoalieTactic tactic =
+                    GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
+                                 world.enemyTeam());
+            tactic.updateRobot(goalie);
+            auto action_ptr = tactic.getNextAction();
+
+            EXPECT_TRUE(action_ptr);
+
+            auto stop_action = std::dynamic_pointer_cast<StopAction>(action_ptr);
+            ASSERT_NE(stop_action, nullptr);
+        }
+        void expectChipAction(Ball ball) {
+            World world = ::Test::TestUtil::createBlankTestingWorld();
+            world.mutableBall() = std::move(ball);
+
+            Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0),
+                                 Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+            world.mutableFriendlyTeam().updateRobots({goalie});
+            world.mutableFriendlyTeam().assignGoalie(0);
+
+            GoalieTactic tactic =
+                    GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
+                                 world.enemyTeam());
+            tactic.updateRobot(goalie);
+            auto action_ptr = tactic.getNextAction();
+
+            EXPECT_TRUE(action_ptr);
+
+            auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
+            ASSERT_NE(chip_action, nullptr);
+            EXPECT_TRUE(chip_action->getChipOrigin().isClose(world.ball().position(), 0.001));
+            EXPECT_EQ(chip_action->getChipDirection(),(world.ball().position() - world.field().friendlyGoal()).orientation());
+            EXPECT_NEAR(chip_action->getChipDistanceMeters(), 2, 0.001);
+        }
+
+};
+
+TEST_F(GoalieTacticTest, ball_very_fast_in_straight_line)
+{
+    Ball ball = Ball(Point(0,0), Vector(-4,0),
+                     Timestamp::fromSeconds(0));
+    expectMoveAction(ball, Point(-4.5,0));
+}
+
+TEST_F(GoalieTacticTest, ball_very_fast_in_diagonal_line)
+{
+    Ball ball = Ball(Point(0,0), Vector(-4.5,0.25),
+                               Timestamp::fromSeconds(0));
+    expectMoveAction(ball, Point(-4.5, 0.25));
+}
+
+TEST_F(GoalieTacticTest, ball_very_fast_miss)
+{
+    Ball ball = Ball(Point(0,0), Vector(-4.5,1),
+                     Timestamp::fromSeconds(0));
+    //Goalie is expected to default to centre of goal
+    expectMoveAction(ball, Point(-3.7, 0));
+}
+
+TEST_F(GoalieTacticTest, ball_slow_inside_dont_chip_rectangle)
+{
+    Ball ball = Ball(Point(-4.5 + ROBOT_MAX_RADIUS_METERS,0), Vector(-0.1,0.1),
+                               Timestamp::fromSeconds(0));
+    expectStopAction(ball);
+}
+
+TEST_F(GoalieTacticTest, ball_slow_outside_dont_chip_rectangle)
+{
+    Ball ball = Ball(Point(-3.5, 0.5), Vector(-0.1, -0.1), Timestamp::fromSeconds(0));
+
+    expectChipAction(ball);
+}
+
+TEST_F(GoalieTacticTest, ball_behind_net_and_moving_toward_net) //snap to closer goal post
+{
+    Ball ball = Ball(Point(-5.8,0.3), Vector(0.5, 0.5),
             Timestamp::fromSeconds(0));
-
-    Robot goalie = Robot(0, Point(-4, -1), Vector(0, 0),
-            Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().assignGoalie(0);
-
-    GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam());
-    tactic.updateRobot(goalie);
-    auto action_ptr = tactic.getNextAction();
-
-    EXPECT_TRUE(action_ptr);
-
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(move_action, nullptr);
-    std::cout << move_action->getDestination() << std::endl;
-    EXPECT_TRUE(move_action->getDestination().isClose(Point(0, 0), 0.05));
+    expectMoveAction(ball, Point(-4.5, 0.5 - ROBOT_MAX_RADIUS_METERS));
 }
 
-TEST(GoalieTacticTest, ball_very_fast_in_diagonal_line)
+TEST_F(GoalieTacticTest, ball_angle_very_sharp_and_low_velocity) // snap to closer goal post
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    ::Test::TestUtil::setBallPosition(world, Point(0,0), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setBallVelocity(world, Vector(4, -0.5), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)}, Timestamp::fromSeconds(0));
-
-    Robot goalie = Robot(0, Point(-4, -0.5), Vector(0, 0), Angle::zero(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({goalie});
-    world.mutableFriendlyTeam().assignGoalie(0);
-
-    GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam());
-    auto action_ptr = tactic.getNextAction();
-
-    EXPECT_TRUE(action_ptr);
-
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(move_action->getDestination().isClose(Point(-4,0.5), 0.05));
-}
-
-TEST(GoalieTacticTest, ball_slow_inside_restrained_area)
-{
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world.mutableBall() = Ball(Point(-4,0), Vector(-0.01,1), Timestamp::fromSeconds(0));
-
-    Robot goalie = Robot(0, Point(-4, -1), Vector(0, 0), Angle::zero(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().assignGoalie(0);
-
-    GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam());
-    tactic.updateRobot(goalie);
-    auto action_ptr = tactic.getNextAction();
-
-    EXPECT_TRUE(action_ptr);
-
-    auto stop_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-    ASSERT_NE(stop_action, nullptr);
-}
-
-TEST(GoalieTacticTest, ball_slow_outside_restrained_area)
-{
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world.mutableBall() = Ball(Point(-3.5, 0.5), Vector(-0.01, -0.5), Timestamp::fromSeconds(0));
-
-    Robot goalie = Robot(0, Point(-4, -1), Vector(0, 0), Angle::zero(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().assignGoalie(0);
-
-    GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam());
-    tactic.updateRobot(goalie);
-    auto action_ptr = tactic.getNextAction();
-
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-    //ASSERT_NE(chip_action, nullptr);
-    // check chip equality
-}
-
-TEST(GoalieTacticTest, ball_miss)
-{
-    //expect move_action to close point
-
-    // cases:
-    // restrict to semicircle inside defense area
-    // restrict to inside defense area
-    // normal
-}
-
-TEST(GoalieTacticTest, ball_behind_net) //snap to closer goal post
-{
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world.mutableBall() = Ball(Point(-5.8,0.3), Vector(0.5, 0.5), Timestamp::fromSeconds(0));
-
-    Robot goalie = Robot(0, Point(-4, -1), Vector(0, 0), Angle::zero(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().assignGoalie(0);
-
-    GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam());
-    tactic.updateRobot(goalie);
-    auto action_ptr = tactic.getNextAction();
-
-    EXPECT_TRUE(action_ptr);
-
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(move_action->getDestination().isClose(Point(-4.59, 0.5), 0.01));
-}
-
-TEST(GoalieTacticTest, ball_angle_very_sharp_and_below_panic) // snap to closer goal post
-{
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world.mutableBall() = Ball(Point(-4.5, -3), Vector(0, 0.1), Timestamp::fromSeconds(0));
-
-    Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().assignGoalie(0);
-
-    GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam());
-    tactic.updateRobot(goalie);
-    auto action_ptr = tactic.getNextAction();
-
-    EXPECT_TRUE(action_ptr);
-
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(move_action->getDestination().isClose(Point(-4.59, -0.5), 0.01));
+    Ball ball = Ball(Point(-4.5, -3), Vector(0, 0.1),
+            Timestamp::fromSeconds(0));
+    expectMoveAction(ball, Point(-4.5, -0.5 + ROBOT_MAX_RADIUS_METERS));
 }

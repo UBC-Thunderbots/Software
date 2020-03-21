@@ -278,12 +278,12 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 if (ball.position().y() > 0)
                 {
                     goalie_pos =
-                            field.friendlyGoalpostPos() + Vector(-ROBOT_MAX_RADIUS_METERS, 0);
+                            field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
                 }
                 else
                 {
                     goalie_pos =
-                            field.friendlyGoalpostNeg() + Vector(ROBOT_MAX_RADIUS_METERS, 0);
+                            field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
                 }
             }
             else
