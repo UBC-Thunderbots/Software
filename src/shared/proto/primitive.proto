@@ -9,9 +9,9 @@ message PrimitiveMsg {
         // we use required and have 4 parameters so that we know
         // the max size of the packet before hand
         required double parameter1 = 2;
-        required double parameter2 = 3;
-        required double parameter3 = 4;
-        required double parameter4 = 5;
+        optional double parameter2 = 3;
+        optional double parameter3 = 4;
+        optional double parameter4 = 5;
 
         // Extra bits used for flags and/or additional information
         required uint32 extra_bits = 6;

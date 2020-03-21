@@ -26,9 +26,6 @@ void ProtobufPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
     prim_msg->set_parameter2(catch_primitive.getDribblerSpeed());
     prim_msg->set_parameter3(catch_primitive.getMargin());
     prim_msg->set_extra_bits(0);
-
-    // unused
-    prim_msg->set_parameter4(-1);
 }
 
 void ProtobufPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
@@ -87,9 +84,6 @@ void ProtobufPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
     // For this primitive, we don't divide the RPM
     prim_msg->set_parameter4(dribble_primitive.getRpm());
     prim_msg->set_extra_bits(dribble_primitive.isSmallKickAllowed());
-
-    // unused
-    prim_msg->set_parameter4(-1);
 }
 
 void ProtobufPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
@@ -154,10 +148,4 @@ void ProtobufPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
     prim_msg = PrimitiveMsg();
     prim_msg->set_prim_type(FirmwarePrimitiveType::STOP);
     prim_msg->set_extra_bits((uint32_t)stop_primitive.robotShouldCoast());
-
-    // unused
-    prim_msg->set_parameter1(-1);
-    prim_msg->set_parameter2(-1);
-    prim_msg->set_parameter3(-1);
-    prim_msg->set_parameter4(-1);
 }

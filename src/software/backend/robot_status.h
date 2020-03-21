@@ -4,6 +4,7 @@
 #include <vector>
 
 // TODO remove this file when radio moves to protobuf
+// https://github.com/UBC-Thunderbots/Software/issues/1216
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.
 struct RobotStatus

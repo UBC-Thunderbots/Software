@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     if (argc != 2)
     {
         throw std::invalid_argument(
-            "Please provide the interface you with to multicast over");
+            "Please provide the interface you wish to multicast over");
     }
 
     GOOGLE_PROTOBUF_VERIFY_VERSION;
