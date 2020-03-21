@@ -49,18 +49,14 @@ cc_library(
     deps = [
         ":hal",
         ":lwip",
-        "//firmware_new/proto:fw_c_proto",
+        "//shared:constants",
+        "//shared/proto:fw_c_proto",
         "@nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
-)
-
-cc_library(
-    name = "constants",
-    hdrs = ["constants.h"],
 )
 
 stm32h7_hal_library_files_genrule("hal_library_files")

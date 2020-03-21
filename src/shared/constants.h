@@ -80,3 +80,28 @@ const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
  */
 const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
 const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
+
+// the IPv6 multicast address, only ff02 is important, the rest is random
+// see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
+const char* const AI_VISION_MULTICAST_ADDRESS = "ff02::c3d0:42d2:bb8";
+const char* const AI_PRIMITIVE_MULTICAST_ADDRESS = "ff02::c3d0:43d3:dd8";
+
+// Vision Group
+// the port to send multicast packets for the AI (multicast)
+const unsigned ROBOT_VISION_MULTICAST_LISTEN_PORT = 42000;
+// the port that the AI is listening on for robot msgs (unicast)
+const unsigned ROBOT_VISION_UNICAST_SEND_PORT = 42001;
+// the port to listen to the multicast packets for the robot (multicast)
+const unsigned AI_VISION_MULTICAST_SEND_PORT = ROBOT_VISION_MULTICAST_LISTEN_PORT;
+// the port to send unicast packets to for robot msgs (unicast)
+const unsigned AI_VISION_UNICAST_LISTEN_PORT = ROBOT_VISION_UNICAST_SEND_PORT;
+
+// Primitive Group
+// the port to send multicast packets for the AI (multicast)
+const unsigned ROBOT_PRIMITIVE_MULTICAST_LISTEN_PORT = 42003;
+// the port that the AI is listening on for robot msgs (unicast)
+const unsigned ROBOT_PRIMITIVE_UNICAST_SEND_PORT = 42004;
+// the port to listen to the multicast packets for the robot (multicast)
+const unsigned AI_PRIMITIVE_MULTICAST_SEND_PORT = ROBOT_PRIMITIVE_MULTICAST_LISTEN_PORT;
+// the port to send unicast packets to for robot msgs (unicast)
+const unsigned AI_PRIMITIVE_UNICAST_LISTEN_PORT = ROBOT_PRIMITIVE_UNICAST_SEND_PORT;

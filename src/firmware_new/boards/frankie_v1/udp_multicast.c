@@ -1,6 +1,7 @@
 #include "udp_multicast.h"
 
-#include "firmware_new/proto/control_fw.pb.h"
+#include "shared/proto/primitive_fw.pb.h"
+#include "shared/proto/status_fw.pb.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
 #include "lwip/ip_addr.h"
@@ -18,8 +19,8 @@
 // TODO the messages are global for now, will need to be moved
 // when this file is properly integrated. This file only serves
 // as a reference implementation of reliable multicast with IPv6
-robot_ack ack       = robot_ack_init_zero;
-control_msg control = control_msg_init_zero;
+PrimitiveMsg primitive = PrimitiveMsg_init_zero;
+StatusMsg status = StatusMsg_init_zero;
 
 /*
  * Thread that creates a send and recv socket, joins the specified
@@ -71,7 +72,7 @@ static void blocking_udp_multicast_loop(void *arg)
     netconn_join_leave_group(recvconn, &config->multicast_address, NULL, NETCONN_JOIN);
 
     // this buffer is used to hold serialized proto
-    uint8_t buffer[robot_ack_size];
+    uint8_t buffer[StatusMsg_size];
 
     while (1)
     {
@@ -80,20 +81,20 @@ static void blocking_udp_multicast_loop(void *arg)
         if (err == ERR_OK)
         {
             tx_buf = netbuf_new();
-            netbuf_alloc(tx_buf, robot_ack_size);
+            netbuf_alloc(tx_buf, StatusMsg_size);
 
             // Create a stream that reads from the buffer
             pb_istream_t in_stream =
                 pb_istream_from_buffer((uint8_t *)rx_buf->p->payload, rx_buf->p->tot_len);
 
-            if (pb_decode(&in_stream, control_msg_fields, &control))
+            if (pb_decode(&in_stream, PrimitiveMsg_fields, &primitive))
             {
                 // update proto
-                ack.msg_count = msg_count++;
+                status.test = msg_count++;
 
                 // serialize proto
                 pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-                pb_encode(&stream, robot_ack_fields, &ack);
+                pb_encode(&stream, StatusMsg_fields, &status);
 
                 // package payload and send over udp
                 tx_buf->p->payload = buffer;
