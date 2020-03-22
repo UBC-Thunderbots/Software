@@ -87,7 +87,7 @@ static void initWheelMotors(void);
 
 static void initWheelMotors(void)
 {
-#define INIT_WHEEL_MOTOR(MOTOR_NUMBER)                                                   \
+#define INIT_WHEEL_MOTOR(MOTOR_NUMBER, TIMER_CHANNEL)                                    \
     {                                                                                    \
         GpioPin_t *reset_pin =                                                           \
             io_gpio_pin_create(wheel_motor_##MOTOR_NUMBER##_reset_GPIO_Port,             \
@@ -107,7 +107,7 @@ static void initWheelMotors(void)
         GpioPin_t *esf_pin =                                                             \
             io_gpio_pin_create(wheel_motor_##MOTOR_NUMBER##_esf_GPIO_Port,               \
                                wheel_motor_##MOTOR_NUMBER##_esf_Pin, ACTIVE_HIGH);       \
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, MOTOR_NUMBER + 1);                 \
+        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIMER_CHANNEL);                    \
                                                                                          \
         wheel_motor_0 = io_allegro_a3931_motor_driver_create(                            \
             pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin); \
@@ -116,10 +116,10 @@ static void initWheelMotors(void)
         io_allegro_a3931_motor_setPwmPercentage(wheel_motor_0, 0.0);                     \
     }
 
-    INIT_WHEEL_MOTOR(0);
-    INIT_WHEEL_MOTOR(1);
-    INIT_WHEEL_MOTOR(2);
-    INIT_WHEEL_MOTOR(3);
+    INIT_WHEEL_MOTOR(0, TIM_CHANNEL_1);
+    INIT_WHEEL_MOTOR(1, TIM_CHANNEL_2);
+    INIT_WHEEL_MOTOR(2, TIM_CHANNEL_3);
+    INIT_WHEEL_MOTOR(3, TIM_CHANNEL_4);
 }
 
 /* USER CODE END 0 */
