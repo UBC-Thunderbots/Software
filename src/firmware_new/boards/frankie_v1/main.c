@@ -107,7 +107,7 @@ static void initWheelMotors(void)
         GpioPin_t *esf_pin =                                                             \
             io_gpio_pin_create(wheel_motor_##MOTOR_NUMBER##_esf_GPIO_Port,               \
                                wheel_motor_##MOTOR_NUMBER##_esf_Pin, ACTIVE_HIGH);       \
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, MOTOR_NUMBER - 1);                 \
+        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, MOTOR_NUMBER + 1);                 \
                                                                                          \
         wheel_motor_0 = io_allegro_a3931_motor_driver_create(                            \
             pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin); \
