@@ -248,15 +248,16 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // compute angle between two vectors, negative goal post to ball and positive
             // goal post to ball
             Angle block_cone_angle =
-                    (ball.position() - field.friendlyGoalpostNeg())
-                            .orientation()
-                            .minDiff((ball.position() - field.friendlyGoalpostPos()).orientation());
+                (ball.position() - field.friendlyGoalpostNeg())
+                    .orientation()
+                    .minDiff(
+                        (ball.position() - field.friendlyGoalpostPos()).orientation());
 
             // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
             // either side
             Point goalie_pos = calcBlockCone(
-                    field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
-                    block_cone_radius * block_cone_angle.toRadians());
+                field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
+                block_cone_radius * block_cone_angle.toRadians());
 
             // we want to restrict the block cone to the friendly crease, also potentially
             // scaled by a defense_area_deflation_parameter
@@ -267,7 +268,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // restrained or if there is no proper intersection, then we safely default to
             // center of the goal
             auto clamped_goalie_pos =
-                    restrainGoalieInRectangle(goalie_pos, deflated_defense_area);
+                restrainGoalieInRectangle(goalie_pos, deflated_defense_area);
 
             // if the goalie could not be restrained in the deflated defense area,
             // then the ball must be either on a really sharp angle to the net where
@@ -278,12 +279,12 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 if (ball.position().y() > 0)
                 {
                     goalie_pos =
-                            field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
+                        field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
                 }
                 else
                 {
                     goalie_pos =
-                            field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
+                        field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
                 }
             }
             else
@@ -292,9 +293,10 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             }
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-            move_action->updateControlParams(
-                    *robot, goalie_pos, goalie_orientation, goalie_final_speed,
-                    DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP, BallCollisionType::ALLOW);
+            move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
+                                             goalie_final_speed, DribblerEnable::OFF,
+                                             MoveType::NORMAL, AUTOCHIP,
+                                             BallCollisionType::ALLOW);
             next_action = move_action;
         }
 
