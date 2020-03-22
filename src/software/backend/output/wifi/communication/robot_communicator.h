@@ -2,9 +2,9 @@
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
-#include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
 #include "g3log/g3log.hpp"
 #include "google/protobuf/message.h"
+#include "software/backend/output/wifi/communication/transfer_media/transfer_medium.h"
 #include "software/multithreading/thread_safe_buffer.h"
 
 using boost::asio::ip::udp;
@@ -69,6 +69,7 @@ class RobotCommunicator
      * @param proto The msg to send over medium
      */
     void send_proto(const SendProto& proto);
+    void send_proto_vector(const std::vector<SendProto>& protos);
 
 
    private:

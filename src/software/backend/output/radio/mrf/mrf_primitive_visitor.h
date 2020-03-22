@@ -3,7 +3,7 @@
 #include <array>
 #include <optional>
 
-#include "shared/firmware_primitive_type.h"
+#include "shared/proto/primitive.pb.h"
 #include "software/ai/primitive/primitive_visitor.h"
 
 /**

@@ -1,4 +1,5 @@
-#include "firmware_new/tools/communication/transfer_media/network_medium.h"
+
+#include "software/backend/output/wifi/communication/transfer_media/network_medium.h"
 
 #include <g3log/g3log.hpp>
 

@@ -1,9 +1,11 @@
-#include "firmware_new/tools/communication/robot_communicator.h"
+#include "software/backend/output/wifi/communication/robot_communicator.h"
 
 #include <iostream>
 
-#include "firmware_new/proto/control.pb.h"
-#include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
+#include "shared/proto/primitive.pb.h"
+#include "shared/proto/status.pb.h"
+#include "shared/proto/vision.pb.h"
+#include "software/backend/output/wifi/communication/transfer_media/transfer_medium.h"
 #include "software/multithreading/thread_safe_buffer.h"
 
 using boost::asio::ip::udp;
@@ -48,6 +50,17 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_proto(const SendProto& pro
 }
 
 template <class SendProto, class ReceiveProto>
+void RobotCommunicator<SendProto, ReceiveProto>::send_proto_vector(
+    const std::vector<SendProto>& protos)
+{
+    for (auto proto : protos)
+    {
+        send_buffer->push(proto);
+    }
+}
+
+
+template <class SendProto, class ReceiveProto>
 void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
     std::shared_ptr<ThreadSafeBuffer<SendProto>> buffer)
 {
@@ -77,4 +90,5 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
 }
 
 // place all templated communcation msg send/receive pair initializations here
-template class RobotCommunicator<control_msg, robot_ack>;
+template class RobotCommunicator<PrimitiveMsg, StatusMsg>;
+template class RobotCommunicator<VisionMsg, StatusMsg>;
