@@ -16,7 +16,7 @@ class ShadowFreekickerTacticTest : public testing::Test
      * The fixture function to help to create world with enemy robots and calculate
      * distances needed for unit tests
      * @param ball_position: the position of the ball in Point format
-     * @param enemy_robot_positions: a vector of Points to represent the position fo
+     * @param enemy_robot_positions: a vector of Points to represent the position of
      * robots
      * @param left_or_right: a enum argument in the shadowFreekickerTactic to represent
      * whether the robot is  blocking the freekick from left or right
@@ -864,3 +864,4 @@ TEST_F(ShadowFreekickerTacticTest,
 
     EXPECT_LT(goal_to_dest_angle, goal_to_ball_angle);
 }
+
