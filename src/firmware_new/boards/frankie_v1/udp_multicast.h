@@ -16,4 +16,3 @@ typedef void (*primitive_callback_t)(PrimitiveMsg primitive);
 
 void udp_multicast_init(const char* multicast_address, unsigned multicast_port,
                         unsigned send_port, primitive_callback_t callback);
-

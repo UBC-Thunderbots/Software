@@ -56,7 +56,7 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-osThreadId_t defaultTaskHandle;
+osThreadId_t PrimitiveTickTaskHandle;
 /* USER CODE BEGIN PV */
 
 static AllegroA3931MotorDriver_t *wheel_motor_0;
@@ -74,7 +74,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM4_Init(void);
-void StartDefaultTask(void *argument);
+void StartPrimitiveTickTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -190,12 +190,13 @@ int main(void)
     /* USER CODE END RTOS_QUEUES */
 
     /* Create the thread(s) */
-    /* definition and creation of defaultTask */
-    const osThreadAttr_t defaultTask_attributes = {
-        .name       = "defaultTask",
+    /* definition and creation of PrimitiveTickTask */
+    const osThreadAttr_t PrimitiveTickTask_attributes = {
+        .name       = "PrimitiveTickTask",
         .priority   = (osPriority_t)osPriorityNormal,
-        .stack_size = 1024};
-    defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+        .stack_size = 2048};
+    PrimitiveTickTaskHandle =
+        osThreadNew(StartPrimitiveTickTask, NULL, &PrimitiveTickTask_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
@@ -583,14 +584,14 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_StartPrimitiveTickTask */
 /**
- * @brief  Function implementing the defaultTask thread.
+ * @brief  Function implementing the PrimitiveTickTask thread.
  * @param  argument: Not used
  * @retval None
  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_StartPrimitiveTickTask */
+void StartPrimitiveTickTask(void *argument)
 {
     /* init code for LWIP */
     MX_LWIP_Init();
