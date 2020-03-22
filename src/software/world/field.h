@@ -207,6 +207,13 @@ class Field
     Rectangle fieldBoundary() const;
 
     /**
+     * Returns true if field x and y total lengths are valid, false otherwise
+     *
+     * @return true if field x and y total lengths are valid, false otherwise
+     */
+    bool isFieldValid() const;
+
+    /**
      * Gets the position of the centre of the friendly goal.
      *
      * @return the position of the friendly goal.

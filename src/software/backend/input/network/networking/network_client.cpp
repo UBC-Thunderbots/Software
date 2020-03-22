@@ -129,59 +129,65 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         world.updateFieldGeometry(field);
     }
 
-    if (packet.has_detection())
+    if (world.field().isFieldValid())
     {
-        SSL_DetectionFrame detection = *packet.mutable_detection();
-        bool camera_disabled         = false;
-
-        // We invert the field side if we explicitly choose to override the values
-        // provided by refbox. The 'defending_positive_side' parameter dictates the side
-        // we are defending if we are overriding the value
-        if (refbox_config->OverrideRefboxDefendingSide()->value() &&
-            refbox_config->DefendingPositiveSide()->value())
+        if (packet.has_detection())
         {
-            invertFieldSide(detection);
-        }
-        // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-        switch (detection.camera_id())
-        {
-            case 0:
-                camera_disabled = camera_config->IgnoreCamera_0()->value();
-                break;
-            case 1:
-                camera_disabled = camera_config->IgnoreCamera_1()->value();
-                break;
-            case 2:
-                camera_disabled = camera_config->IgnoreCamera_2()->value();
-                break;
-            case 3:
-                camera_disabled = camera_config->IgnoreCamera_3()->value();
-                break;
-            default:
-                LOG(WARNING) << "An unkown camera id was detected, disabled by default "
-                             << "id: " << detection.camera_id() << std::endl;
-                camera_disabled = true;
-                break;
+            SSL_DetectionFrame detection = *packet.mutable_detection();
+            bool camera_disabled         = false;
+
+            // We invert the field side if we explicitly choose to override the values
+            // provided by refbox. The 'defending_positive_side' parameter dictates the
+            // side we are defending if we are overriding the value
+            if (refbox_config->OverrideRefboxDefendingSide()->value() &&
+                refbox_config->DefendingPositiveSide()->value())
+            {
+                invertFieldSide(detection);
+            }
+            // TODO remove as part of
+            // https://github.com/UBC-Thunderbots/Software/issues/960
+            switch (detection.camera_id())
+            {
+                case 0:
+                    camera_disabled = camera_config->IgnoreCamera_0()->value();
+                    break;
+                case 1:
+                    camera_disabled = camera_config->IgnoreCamera_1()->value();
+                    break;
+                case 2:
+                    camera_disabled = camera_config->IgnoreCamera_2()->value();
+                    break;
+                case 3:
+                    camera_disabled = camera_config->IgnoreCamera_3()->value();
+                    break;
+                default:
+                    LOG(WARNING)
+                        << "An unkown camera id was detected, disabled by default "
+                        << "id: " << detection.camera_id() << std::endl;
+                    camera_disabled = true;
+                    break;
+            }
+
+            if (!camera_disabled)
+            {
+                BallState ball_state = network_filter.getFilteredBallData({detection});
+                world.updateBallState(ball_state);
+
+                Team friendly_team =
+                    network_filter.getFilteredFriendlyTeamData({detection});
+                int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
+                friendly_team.assignGoalie(friendly_goalie_id);
+                world.mutableFriendlyTeam() = friendly_team;
+
+                Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
+                int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
+                enemy_team.assignGoalie(enemy_goalie_id);
+                world.mutableEnemyTeam() = enemy_team;
+            }
         }
 
-        if (!camera_disabled)
-        {
-            BallState ball_state = network_filter.getFilteredBallData({detection});
-            world.updateBallState(ball_state);
-
-            Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
-            int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
-            friendly_team.assignGoalie(friendly_goalie_id);
-            world.mutableFriendlyTeam() = friendly_team;
-
-            Team enemy_team     = network_filter.getFilteredEnemyTeamData({detection});
-            int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
-            enemy_team.assignGoalie(enemy_goalie_id);
-            world.mutableEnemyTeam() = enemy_team;
-        }
+        received_world_callback(world);
     }
-
-    received_world_callback(world);
 }
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)

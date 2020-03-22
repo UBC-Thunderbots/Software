@@ -11,7 +11,7 @@ cc_library(
     name = "robot_constants",
     hdrs = ["robot_constants.h"],
     deps = [
-        "//firmware/main/math:tbots_math",
+        "//firmware/shared:tbots_math",
     ],
 )
 

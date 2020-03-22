@@ -426,11 +426,7 @@ def _linux_gcc_impl(ctx):
             flag_set(
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
-                    flag_group(flags = ["-fPIC"], expand_if_available = "pic"),
-                    flag_group(
-                        flags = ["-fPIE"],
-                        expand_if_not_available = "pic",
-                    ),
+                    flag_group(flags = ["-fPIC"]),
                 ],
             ),
         ],
