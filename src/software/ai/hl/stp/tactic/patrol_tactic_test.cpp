@@ -5,8 +5,9 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
 
-void compareMoveActions(std::shared_ptr<MoveAction> move_action,
-                        std::shared_ptr<MoveAction> expected_move_action) {
+void compareMoveActions(std::shared_ptr<MoveAction> expected_move_action,
+                        std::shared_ptr<MoveAction> move_action)
+{
 
     EXPECT_EQ(expected_move_action->getDestination(),  move_action->getDestination());
     EXPECT_EQ(expected_move_action->getFinalOrientation(),  move_action->getFinalOrientation());
@@ -21,92 +22,128 @@ void PrintMoveActions(std::shared_ptr<MoveAction> move_action)
     std::cout << "destination: " << move_action->getDestination() << std::endl;
     std::cout << "final orientation: " << move_action->getFinalOrientation() << std::endl;
     std::cout << "final speed: " << move_action->getFinalSpeed() << std::endl << std::endl;
-
 }
 
-void simulateActionToCompletion(Robot robot, RobotState newRobotState, std::shared_ptr<Action> action_ptr, PatrolTactic &tactic) {
+void simulateActionToCompletion(Robot &robot, RobotState newRobotState, std::shared_ptr<Action> action_ptr, PatrolTactic &tactic) {
 
     //actions need to yield at least once before being able to complete
-    action_ptr->getNextIntent();
+    std::unique_ptr<Intent> intent = action_ptr->getNextIntent();
+    //ASSERT_FALSE(action_ptr->done());
 
     //update state of the robot and tactic
-    (robot).updateState(RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
-                                   AngularVelocity::zero(),
-                                   Timestamp::fromSeconds(3)));
-
+    robot.updateState(newRobotState);
     tactic.updateRobot(robot);
 
     //complete the action
-    //will update the action with latest robot status
+    //tactic will update the action with latest robot status
     action_ptr = tactic.getNextAction();
 
     //Now that the action has the latest robot status, it is able to set the action to complete
-    action_ptr->getNextIntent();
-
+    intent = action_ptr->getNextIntent();
+    ASSERT_TRUE(action_ptr->done());
 }
 
-TEST(MoveTacticTest, patrol_one_point)
+TEST(MoveTacticTest, patrol_one_point_should_return_one_acion)
 {
-    Robot robot = Robot(0, Point(0,0), Vector(0,0), Angle::zero(), AngularVelocity::zero(),
+    //Setup
+    int robotId = 0;
+    Point robotStartingPoint = Point(0,0);
+    Vector initialVelocity = Vector(1,0);
+
+    Point patrolPoint1 = Point(3,5);
+    double atPatrolPointTolerance = 1.0;
+    double speedAtPatrolPoints = 1.0;
+
+    Robot robot = Robot(robotId, robotStartingPoint, initialVelocity, Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    PatrolTactic tactic = PatrolTactic(std::vector<Point>({Point(3,3), Point(0,1), Point(0,2)}), 1.0, Angle::zero(), 1.0);
+    PatrolTactic tactic = PatrolTactic(std::vector<Point>({patrolPoint1}), atPatrolPointTolerance, Angle::zero(), speedAtPatrolPoints);
 
     tactic.updateRobot(robot);
 
+    auto expected_action = std::make_shared<MoveAction>(false);
+    expected_action->updateControlParams(robot, patrolPoint1, Angle::zero(),speedAtPatrolPoints, DribblerEnable::OFF, MoveType::NORMAL,
+                                        AutokickType::NONE, BallCollisionType::AVOID);
+    //Act
     std::shared_ptr<Action> action_ptr = tactic.getNextAction();
-
     ASSERT_NE(nullptr, action_ptr);
-
     std::shared_ptr<MoveAction> move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
 
+    //Assert
+    compareMoveActions(expected_action, move_action);
     PrintMoveActions(move_action);
-
-    //complete action
-    RobotState newRobotState = RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
-                                     AngularVelocity::zero(),
-                                     Timestamp::fromSeconds(3));
-
-    simulateActionToCompletion(robot, newRobotState, action_ptr, tactic);
-
-    action_ptr = tactic.getNextAction();
-
-    move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-
-    PrintMoveActions(move_action);
-
 }
 
-
-TEST(MoveTacticTest, patrol_multiple_points)
+TEST(MoveTacticTest, patrol_multiple_points_should_return_multiple_actions)
 {
-    Robot robot = Robot(0, Point(0,0), Vector(0,0), Angle::zero(), AngularVelocity::zero(),
+    //setup
+    int robotId = 0;
+    Point robotStartingPoint = Point(3,3);
+    Vector initialVelocity = Vector(3,1);
+
+    Point patrolPoint1 = Point(3,-3);
+    Point patrolPoint2 = Point(-3,-3);
+    Point patrolPoint3 = Point(3,3);
+    std::vector<Point> patrolPoints{patrolPoint1, patrolPoint2, patrolPoint3};
+
+
+    double atPatrolPointTolerance = 1.0;
+    double speedAtPatrolPoints = 1.0;
+
+    Robot robot = Robot(robotId, robotStartingPoint, initialVelocity, Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    PatrolTactic tactic = PatrolTactic(std::vector<Point>({Point(3,3), Point(0,1), Point(0,2)}), 1.0, Angle::zero(), 1.0);
+    PatrolTactic tactic = PatrolTactic(patrolPoints, atPatrolPointTolerance, Angle::zero(), speedAtPatrolPoints);
 
     tactic.updateRobot(robot);
 
+    auto expected_action1 = std::make_shared<MoveAction>(false);
+    expected_action1->updateControlParams(robot, patrolPoint1, Angle::zero(),speedAtPatrolPoints, DribblerEnable::OFF, MoveType::NORMAL,
+                                         AutokickType::NONE, BallCollisionType::AVOID);
+
+    auto expected_action2 = std::make_shared<MoveAction>(false);
+    expected_action2->updateControlParams(robot, patrolPoint2, Angle::zero(),speedAtPatrolPoints, DribblerEnable::OFF, MoveType::NORMAL,
+                                         AutokickType::NONE, BallCollisionType::AVOID);
+
+    auto expected_action3 = std::make_shared<MoveAction>(false);
+    expected_action3->updateControlParams(robot, patrolPoint3, Angle::zero(),speedAtPatrolPoints, DribblerEnable::OFF, MoveType::NORMAL,
+                                         AutokickType::NONE, BallCollisionType::AVOID);
+
+    RobotState robotStateToCompleteFirstAction  = RobotState(patrolPoint1, initialVelocity, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(1));
+    RobotState robotStateToCompleteSecondAction = RobotState(patrolPoint2, initialVelocity, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(2));
+
+    //Act and Assert
+
+    //first patrol point
     std::shared_ptr<Action> action_ptr = tactic.getNextAction();
-
     ASSERT_NE(nullptr, action_ptr);
-
     std::shared_ptr<MoveAction> move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
 
-    PrintMoveActions(move_action);
+    compareMoveActions(expected_action1, move_action);
 
-    //complete action
-    RobotState newRobotState = RobotState(Point(3, 3), Vector(0, 1), Angle::zero(),
-                                          AngularVelocity::zero(),
-                                          Timestamp::fromSeconds(3));
+    simulateActionToCompletion(robot, robotStateToCompleteFirstAction, action_ptr, tactic);
 
-    simulateActionToCompletion(robot, newRobotState, action_ptr, tactic);
-
+    //second patrol point
     action_ptr = tactic.getNextAction();
+    ASSERT_NE(nullptr, action_ptr);
+    compareMoveActions(expected_action2, move_action);
 
-    move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+//    THIS COMMENT IS ADDED FOR DEBUGGING
+//    ASSERT_TRUE(action_ptr->done());
+//
+//    //issue is once action_ptr is done, you can not run it again??
+//    action_ptr->getNextIntent();
+//    ASSERT_FALSE(action_ptr->done());
 
-    PrintMoveActions(move_action);
+    simulateActionToCompletion(robot, robotStateToCompleteSecondAction, action_ptr, tactic);
+
+    //third patrol point
+    action_ptr = tactic.getNextAction();
+    ASSERT_NE(nullptr, action_ptr);
+
+    compareMoveActions(expected_action3, move_action);
 
 }
+
+
 
