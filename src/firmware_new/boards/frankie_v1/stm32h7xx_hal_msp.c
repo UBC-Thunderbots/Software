@@ -160,20 +160,21 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
         PD15     ------> TIM4_CH4
         PB6     ------> TIM4_CH1
         */
-        GPIO_InitStruct.Pin =
-            wheel_motor_1_pwm_Pin | wheel_motor_2_pwm_Pin | wheel_motor_3_pwm_Pin;
+        GPIO_InitStruct.Pin = wheel_motor_back_left_pwm_Pin |
+                              wheel_motor_back_right_pwm_Pin |
+                              wheel_motor_front_right_pwm_Pin;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull      = GPIO_NOPULL;
         GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
         GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
         HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin       = wheel_motor_0_pwm_Pin;
+        GPIO_InitStruct.Pin       = wheel_motor_front_left_pwm_Pin;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull      = GPIO_NOPULL;
         GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
         GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
-        HAL_GPIO_Init(wheel_motor_0_pwm_GPIO_Port, &GPIO_InitStruct);
+        HAL_GPIO_Init(wheel_motor_front_left_pwm_GPIO_Port, &GPIO_InitStruct);
 
         /* USER CODE BEGIN TIM4_MspPostInit 1 */
 
