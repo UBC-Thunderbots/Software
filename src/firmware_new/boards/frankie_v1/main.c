@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "udp_multicast.h"
 
 /* USER CODE END Includes */
@@ -59,11 +59,6 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 osThreadId_t defaultTaskHandle;
 /* USER CODE BEGIN PV */
 
-static AllegroA3931MotorDriver_t *wheel_motor_0;
-static AllegroA3931MotorDriver_t *wheel_motor_1;
-static AllegroA3931MotorDriver_t *wheel_motor_2;
-static AllegroA3931MotorDriver_t *wheel_motor_3;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,16 +73,16 @@ void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
-static void initWheelMotors(void);
+static void initIoLayer(void);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void initWheelMotors(void)
+static void initIoLayer(void)
 {
-#define INIT_WHEEL_MOTOR(MOTOR_NUMBER, TIMER_CHANNEL)                                    \
+#define INIT_DRIVETRAIN_UNIT(MOTOR_NUMBER, TIMER_CHANNEL)                                \
     {                                                                                    \
         GpioPin_t *reset_pin =                                                           \
             io_gpio_pin_create(wheel_motor_##MOTOR_NUMBER##_reset_GPIO_Port,             \
@@ -109,17 +104,24 @@ static void initWheelMotors(void)
                                wheel_motor_##MOTOR_NUMBER##_esf_Pin, ACTIVE_HIGH);       \
         PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIMER_CHANNEL);                    \
                                                                                          \
-        wheel_motor_0 = io_allegro_a3931_motor_driver_create(                            \
+        AllegroA3931MotorDriver_t *motor_driver = io_allegro_a3931_motor_driver_create(  \
             pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin); \
-                                                                                         \
-        io_allegro_a3931_motor_driver_setDirection(wheel_motor_0, COUNTERCLOCKWISE);     \
-        io_allegro_a3931_motor_setPwmPercentage(wheel_motor_0, 0.0);                     \
+        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);                      \
+        drivetrain_unit_##MOTOR_NUMBER = io_drivetrain_unit_create(motor_driver);        \
     }
 
-    INIT_WHEEL_MOTOR(0, TIM_CHANNEL_1);
-    INIT_WHEEL_MOTOR(1, TIM_CHANNEL_2);
-    INIT_WHEEL_MOTOR(2, TIM_CHANNEL_3);
-    INIT_WHEEL_MOTOR(3, TIM_CHANNEL_4);
+    // TODO: stop using numbers for wheels, use names instead
+    DriveTrainUnit_t *drivetrain_unit_0;
+    DriveTrainUnit_t *drivetrain_unit_1;
+    DriveTrainUnit_t *drivetrain_unit_2;
+    DriveTrainUnit_t *drivetrain_unit_3;
+    INIT_DRIVETRAIN_UNIT(0, TIM_CHANNEL_1);
+    INIT_DRIVETRAIN_UNIT(1, TIM_CHANNEL_2);
+    INIT_DRIVETRAIN_UNIT(2, TIM_CHANNEL_3);
+    INIT_DRIVETRAIN_UNIT(3, TIM_CHANNEL_4);
+
+    io_drivetrain_init(drivetrain_unit_0, drivetrain_unit_3, drivetrain_unit_1,
+                       drivetrain_unit_2);
 }
 
 /* USER CODE END 0 */
@@ -167,7 +169,7 @@ int main(void)
     MX_TIM4_Init();
     /* USER CODE BEGIN 2 */
 
-    initWheelMotors();
+    initIoLayer();
 
     /* USER CODE END 2 */
 

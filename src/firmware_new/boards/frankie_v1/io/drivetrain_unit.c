@@ -1,6 +1,7 @@
 #include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
 
 #include <stdlib.h>
+#include <math.h>
 
 typedef struct DrivetrainUnit
 {
@@ -22,7 +23,7 @@ void io_drivetrain_unit_applyForce(DriveTrainUnit_t* drive_train_unit,
 {
     // TODO: proper implementation for this
 
-    float pwm_percentage = min(1.0f, abs(force_newtons) / 255.0f);
+    float pwm_percentage = fmin(1.0f, fabs(force_newtons) / 255.0f);
 
     if (force_newtons > 0)
     {

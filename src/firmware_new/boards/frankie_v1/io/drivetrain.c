@@ -10,7 +10,7 @@ static DriveTrainUnit_t *_back_right_drive_unit;
 
 static bool initialized = false;
 
-static void io_drivetrain_init(DriveTrainUnit_t *front_left_drive_unit,
+void io_drivetrain_init(DriveTrainUnit_t *front_left_drive_unit,
                                DriveTrainUnit_t *front_right_drive_unit,
                                DriveTrainUnit_t *back_left_drive_unit,
                                DriveTrainUnit_t *back_right_drive_unit)
