@@ -1,7 +1,7 @@
 #include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
 
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
 
 typedef struct DrivetrainUnit
 {
