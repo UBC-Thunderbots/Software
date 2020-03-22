@@ -30,3 +30,17 @@ cc_library(
         ":pwm_pin",
     ],
 )
+
+cc_library(
+    name = "drivetrain",
+    srcs = ["drivetrain.c"],
+    hdrs = ["drivetrain.h"],
+    deps = [":drivetrain_unit"],
+)
+
+cc_library(
+    name = "drivetrain_unit",
+    srcs = ["drivetrain_unit.c"],
+    hdrs = ["drivetrain_unit.h"],
+    deps = [],
+)
