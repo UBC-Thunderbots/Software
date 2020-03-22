@@ -27,6 +27,8 @@
 #endif /* MDK ARM Compiler */
 
 /* USER CODE BEGIN 0 */
+#include "firmware_new/boards/frankie_v1/io/firmware_world_wrapper.h"
+#include "firmware_new/boards/frankie_v1/io/primitive_manager_wrapper.h"
 #include "firmware_new/boards/frankie_v1/udp_multicast.h"
 #include "shared/constants.h"
 #include "shared/proto/primitive_fw.pb.h"
@@ -45,9 +47,29 @@ struct netif gnetif;
 ip6_addr_t ip6addr;
 
 /* USER CODE BEGIN 2 */
+
 void sample_callback(PrimitiveMsg prim)
 {
-    // TODO
+    PrimitiveManager_t* primitive_manager =
+        io_primitive_manager_wrapper_getPrimitiveManager();
+    FirmwareWorld_t* world = io_firmware_world_wrapper_getFirmwareWorld();
+
+    // TODO: do this struct creation elsewhere
+    const primitive_params_t params = {
+        .params =
+            {
+                prim.parameter1,
+                prim.parameter2,
+                prim.parameter3,
+                prim.parameter4,
+            },
+        .slow  = prim.slow,
+        .extra = prim.extra_bits,
+    };
+
+    // TODO: do not just case the type like this
+    app_primitive_manager_startNewPrimitive(primitive_manager, world,
+                                            (unsigned int)prim.prim_type, &params);
 }
 /* USER CODE END 2 */
 
@@ -138,7 +160,7 @@ void sio_send(u8_t c, sio_fd_t fd)
  * @note This function will block until data can be received. The blocking
  * can be cancelled by calling sio_read_abort().
  */
-u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
+u32_t sio_read(sio_fd_t fd, u8_t* data, u32_t len)
 {
     u32_t recved_bytes;
 
@@ -157,7 +179,7 @@ u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
  * @param len maximum length (in bytes) of data to receive
  * @return number of bytes actually received
  */
-u32_t sio_tryread(sio_fd_t fd, u8_t *data, u32_t len)
+u32_t sio_tryread(sio_fd_t fd, u8_t* data, u32_t len)
 {
     u32_t recved_bytes;
 

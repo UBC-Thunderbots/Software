@@ -26,13 +26,16 @@ cc_binary(
         ":frankie_v1_main_lib",
         "//firmware_new/boards/frankie_v1/io:drivetrain",
         "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
+        "//firmware_new/boards/frankie_v1/io:firmware_world_wrapper",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
+        "//firmware_new/boards/frankie_v1/io:primitive_manager_wrapper",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
     ],
 )
 
 cc_library(
     name = "frankie_v1_main_lib",
+    # TODO: we _really_ should not glob like this
     srcs = glob(
         [
             "*.c",
@@ -53,6 +56,10 @@ cc_library(
         "//shared:constants",
         "//shared/proto:fw_c_proto",
         "@nanopb",
+        # TODO: This dep should not be here, only `lwip.c` depends on it, we should split
+        #       out `lwip.c` with this dep
+        "//firmware_new/boards/frankie_v1/io:firmware_world_wrapper",
+        "//firmware_new/boards/frankie_v1/io:primitive_manager_wrapper",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause

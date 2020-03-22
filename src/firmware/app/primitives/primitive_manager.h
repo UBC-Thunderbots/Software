@@ -18,6 +18,7 @@ PrimitiveManager_t *app_primitive_manager_create(void);
  */
 void app_primitive_manager_destroy(PrimitiveManager_t *manager);
 
+// Why the heck do we tack params by pointer here??
 /**
  * Sets the current primitive to a new one
  *

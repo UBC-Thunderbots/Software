@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+# TODO: libraries in this build file should be alphabetical
+
 cc_library(
     name = "gpio_pin",
     srcs = ["gpio_pin.c"],
@@ -45,4 +47,26 @@ cc_library(
     hdrs = ["drivetrain_unit.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":allegro_a3931_motor_driver"],
+)
+
+cc_library(
+    name = "firmware_world_wrapper",
+    srcs = ["firmware_world_wrapper.c"],
+    hdrs = ["firmware_world_wrapper.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":drivetrain",
+        "//firmware/app/world:firmware_world",
+        "//firmware/shared:physics",
+    ],
+)
+
+cc_library(
+    name = "primitive_manager_wrapper",
+    srcs = ["primitive_manager_wrapper.c"],
+    hdrs = ["primitive_manager_wrapper.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware/app/primitives:primitive_manager",
+    ],
 )

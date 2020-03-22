@@ -134,6 +134,7 @@ cc_library(
     ] + select({
         # TODO: this should not be dependent on freertos at all
         "//cc_toolchain:cpu_stm32f4": ["//firmware/boards/legacy_robot_stm32f4:freertos"],
+        "//cc_toolchain:cpu_stm32h7": ["//firmware_new/boards/frankie_v1:rtos"],
         "//conditions:default": [],
     }),
 )

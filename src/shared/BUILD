@@ -2,9 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "constants",
-    srcs = [],
+    srcs = ["constants.c"],
     hdrs = ["constants.h"],
-    deps = [],
 )
 
 cc_library(

@@ -26,8 +26,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "firmware/app/world/firmware_world.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware_new/boards/frankie_v1/io/primitive_manager_wrapper.h"
+#include "firmware_new/boards/frankie_v1/io/firmware_world_wrapper.h"
 #include "udp_multicast.h"
+
 
 /* USER CODE END Includes */
 
@@ -73,14 +77,17 @@ void StartPrimitiveTickTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
-static void initIoLayer(void);
+void initIoLayer(void);
+
+// TODO: better place for this function?
+FirmwareWorld_t *createWorld(void);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void initIoLayer(void)
+void initIoLayer(void)
 {
     // Initialize a motor driver with the given suffix, on the given
     // timer channel
@@ -123,7 +130,12 @@ static void initIoLayer(void)
 
     io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
+
+    io_primitive_manager_wrapper_init();
+
+    io_firmware_world_wrapper_init();
 }
+
 
 /* USER CODE END 0 */
 
@@ -214,10 +226,6 @@ int main(void)
     /* USER CODE BEGIN WHILE */
     while (1)
     {
-        // TODO: Confirm with akhil if this should still compile with legacy_freertos
-        // enabled
-        //       (we should never get here anyhow)
-        // MX_LWIP_Process();
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
@@ -611,10 +619,22 @@ void StartPrimitiveTickTask(void *argument)
     /* init code for LWIP */
     MX_LWIP_Init();
     /* USER CODE BEGIN 5 */
+
+    // TODO: initialize io stuff here as well?
+    // TODO: Hmm, could we initi primitive manager stuff here? Might have issues because
+    //       callbacks access it as well... So primitive manager needs to be initialized
+    //       before callbacks start, so it can't be in an RTOS task.
+    // TODO: Wellll, maybe world initialization doesn't belong here either then......
+    //
+
+    FirmwareWorld_t *world = io_firmware_world_wrapper_getFirmwareWorld();
+    PrimitiveManager_t *primitive_manager =
+        io_primitive_manager_wrapper_getPrimitiveManager();
+
     /* Infinite loop */
     for (;;)
     {
-        osDelay(1);
+        app_primitive_manager_runCurrentPrimitive(primitive_manager, world);
     }
     /* USER CODE END 5 */
 }
