@@ -821,61 +821,6 @@
       <pointsize>11</pointsize>
      </font>
     </property>
-    <item>
-     <property name="text">
-      <string>Normal Operation</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Lamp Test</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 0 Hall Sensors</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 1 Hall Sensors</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 2 Hall Sensors</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 3 Hall Sensors</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Dribbler Hall Sensors</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 0 Encoders</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 1 Encoders</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 2 Encoders</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Wheel 3 Encoders</string>
-     </property>
-    </item>
    </widget>
    <widget class="Line" name="line_4">
     <property name="geometry">

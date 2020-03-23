@@ -5,6 +5,7 @@ void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider, double &value, d
 {
     slider->setMinimum(min * scaling);
     slider->setMaximum(max * scaling);
+    line_edit->setText(QString::number(0));
 
     auto on_slider_changed = [&value, line_edit, scaling](const int slider_value) {
         value = slider_value / scaling;

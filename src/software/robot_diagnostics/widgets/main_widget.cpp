@@ -18,7 +18,7 @@ MainWidget::MainWidget(QWidget *parent)
                motor_power_br, matrix_x_vel, matrix_y_vel, matrix_angular_vel);
     setupDribbler(main_widget, dribbler_power);
     setupChicker(main_widget, chicker_power, charge_mode, chicker_mode);
-    setupLEDs(main_widget);
+    setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);
 
     update();
