@@ -1072,7 +1072,7 @@
      <string>Power</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_chick_2">
+   <widget class="QPushButton" name="pushButton_dribbler_run">
     <property name="geometry">
      <rect>
       <x>790</x>

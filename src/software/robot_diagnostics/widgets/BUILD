@@ -36,7 +36,6 @@ qt_cc_library(
     deps = [
         ":slider",
         "//software/robot_diagnostics/ui:main_widget",
-        "@g3log",
         "@qt//:qt_widgets",
     ],
 )
