@@ -715,18 +715,20 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         // vector connecting the two points. Return 2 circles that are centered at the
         // points where the splitting vector intercepts the bounding_box. We should also
         // include circles centered at each of the corners.
-        Vector connectedVec           = points[1] - points[0];
-        Point halfPoint               = points[0] + (connectedVec * 0.5);
-        Vector perpVec                = connectedVec.perpendicular();
+        Vector connectedVec              = points[1] - points[0];
+        Point halfPoint                  = points[0] + (connectedVec * 0.5);
+        Vector perpVec                   = connectedVec.perpendicular();
         std::vector<Point> intersections = intersection(
             bounding_box,
-            Segment(halfPoint +
-                (perpVec * distance(bounding_box.furthestCorner(halfPoint), halfPoint)),
-            halfPoint -
-                (perpVec * distance(bounding_box.furthestCorner(halfPoint), halfPoint))));
+            Segment(
+                halfPoint + (perpVec *
+                             distance(bounding_box.furthestCorner(halfPoint), halfPoint)),
+                halfPoint - (perpVec * distance(bounding_box.furthestCorner(halfPoint),
+                                                halfPoint))));
         std::vector<Point> corners = bounding_box.getPoints();
-        std::copy(corners.begin(), corners.end(), std::inserter(intersections, intersections.end()));
-        //intersects.insert(intersects.end(), corners.begin(), corners.end());
+        std::copy(corners.begin(), corners.end(),
+                  std::inserter(intersections, intersections.end()));
+        // intersects.insert(intersects.end(), corners.begin(), corners.end());
         for (const Point &intersect : intersections)
         {
             double radius =

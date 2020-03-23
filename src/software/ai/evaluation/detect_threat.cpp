@@ -8,8 +8,8 @@
 #include <optional>
 
 #include "shared/constants.h"
-#include "software/world/field.h"
 #include "software/new_geom/util/intersection.h"
+#include "software/world/field.h"
 
 namespace Evaluation
 {

@@ -68,7 +68,8 @@ std::vector<Point> intersection(const Polygon &polygon, const Segment &segment)
     {
         for (const Point &p : intersection(seg, segment))
         {
-            if (std::find(intersections.begin(), intersections.end(), p) == intersections.end())
+            if (std::find(intersections.begin(), intersections.end(), p) ==
+                intersections.end())
             {
                 intersections.push_back(p);
             }
@@ -159,7 +160,8 @@ std::vector<Point> intersection(const Polygon &polygon, const Ray &ray)
     {
         for (const Point &p : intersection(ray, seg))
         {
-            if (std::find(intersections.begin(), intersections.end(), p) == intersections.end())
+            if (std::find(intersections.begin(), intersections.end(), p) ==
+                intersections.end())
             {
                 intersections.push_back(p);
             }

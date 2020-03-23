@@ -7,10 +7,10 @@
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
+#include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/segment.h"
-#include "software/new_geom/line.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
 
@@ -51,12 +51,17 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // first find the 3 intersections with each side of the restricted area
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
-    auto width_x_goal    = intersection(Line(goalie_desired_position, field.friendlyGoal()),
-                                         Line(goalie_restricted_area.posXPosYCorner(), goalie_restricted_area.posXNegYCorner()));
-    auto pos_side_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoal()),
-                                            Line(goalie_restricted_area.posXPosYCorner(), goalie_restricted_area.negXPosYCorner()));
-    auto neg_side_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoal()),
-                                            Line(goalie_restricted_area.posXNegYCorner(), goalie_restricted_area.negXNegYCorner()));
+    auto width_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoal()),
+                                     Line(goalie_restricted_area.posXPosYCorner(),
+                                          goalie_restricted_area.posXNegYCorner()));
+    auto pos_side_x_goal =
+        intersection(Line(goalie_desired_position, field.friendlyGoal()),
+                     Line(goalie_restricted_area.posXPosYCorner(),
+                          goalie_restricted_area.negXPosYCorner()));
+    auto neg_side_x_goal =
+        intersection(Line(goalie_desired_position, field.friendlyGoal()),
+                     Line(goalie_restricted_area.posXNegYCorner(),
+                          goalie_restricted_area.negXNegYCorner()));
 
     // if the goalie restricted area already contains the point, then we are
     // safe to move there.

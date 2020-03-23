@@ -452,19 +452,19 @@ TEST(GeomUtilTest, test_find_open_circles_two_points_in_rectangle)
 
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
-    std::vector<std::pair<Point, double>> expected_origin_and_radii =
-            {std::make_pair(Point(0, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.9, 2))),
-             std::make_pair(Point(0, -1), std::sqrt(std::pow(1.9, 2) + std::pow(0.9, 2))),
-             std::make_pair(Point(-1, -1), std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2))),
-             std::make_pair(Point(-1, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2))),
-             std::make_pair(Point(1, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2))),
-             std::make_pair(Point(1, -1), std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2)))};
+    std::vector<std::pair<Point, double>> expected_origin_and_radii = {
+        std::make_pair(Point(0, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.9, 2))),
+        std::make_pair(Point(0, -1), std::sqrt(std::pow(1.9, 2) + std::pow(0.9, 2))),
+        std::make_pair(Point(-1, -1), std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2))),
+        std::make_pair(Point(-1, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2))),
+        std::make_pair(Point(1, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2))),
+        std::make_pair(Point(1, -1), std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2)))};
 
     ASSERT_EQ(6, empty_circles.size());
     for (auto expected_origin_and_radius : expected_origin_and_radii)
     {
-        bool found = false;
-        Point expected_origin = expected_origin_and_radius.first;
+        bool found             = false;
+        Point expected_origin  = expected_origin_and_radius.first;
         double expected_radius = expected_origin_and_radius.second;
 
         for (const Circle &empty_circle : empty_circles)
