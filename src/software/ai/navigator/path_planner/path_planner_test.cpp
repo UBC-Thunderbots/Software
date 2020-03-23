@@ -37,7 +37,7 @@ std::vector<PlannerTestCase>
         {{.name               = "Empty field straight line",
           .start              = Point(0, 0),
           .dest               = Point(1, 0),
-          .navigable_area     = Rectangle({-1, -1}, {1, 1}),
+          .navigable_area     = Rectangle({-1, -1}, {2, 2}),
           .obstacles          = {},
           .should_return_path = true},
 
@@ -116,7 +116,21 @@ std::vector<PlannerTestCase>
                           {std::cos(5 * M_PI / 3) * 0.2, std::sin(5 * M_PI / 3) * 0.2}),
                       false),
               },
-          .should_return_path = false}};
+          .should_return_path = false},
+         {.name  = "Start inside a rectangular obstacle, dest is outside of obstacle",
+          .start = Point(0, 0),
+          .dest  = Point(4, 0),
+          .navigable_area     = Rectangle({-5, -5}, {5, 5}),
+          .obstacles          = {Obstacle(Rectangle({-1, -1}, {1, 1}))},
+          .should_return_path = true},
+         {.name = "Start and dest inside same obstacle",
+          // NOTE: this test is designed specifically to pass the progress check
+          .start              = Point(0, 0),
+          .dest               = Point(1.5, 0),
+          .navigable_area     = Rectangle({-5, -5}, {5, 5}),
+          .obstacles          = {Obstacle(Rectangle({-1, -1}, {2, 1}))},
+          .should_return_path = true}};
+
 
 template <typename PlannerT>
 std::pair<std::string, PathPlannerConstructor> name_and_constructor()
@@ -135,7 +149,7 @@ std::vector<std::pair<std::string, PathPlannerConstructor>>
 
 
 void validatePath(const Path &path, const Point &start, const Point &dest,
-                  const Rectangle &navigable_area, const std::vector<Obstacle> &obstacles)
+                  const Rectangle &navigable_area, std::vector<Obstacle> &obstacles)
 {
     // check for zero length path
     if (path.valueAt(0.f) == path.valueAt(1.f))
@@ -150,9 +164,31 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
 
     std::cout << "Evaluating path at intervals of s=" << path_check_interval << std::endl;
 
-    for (double s = 0.0; s <= 1.0; s += path_check_interval)
+    // special case stuff for if the path starts in an obstacle
+    std::optional<Obstacle> start_obstacle_or_null = std::nullopt;
+    // check if the path starts inside an obstacle
+    auto start_obstacle_or_end_it = std::find_if(
+        obstacles.begin(), obstacles.end(),
+        [&path](const auto &obs) { return obs.containsPoint(path.valueAt(0.f)); });
+    // remove the obstacle from obstacles *temporarily* until we exit the obstacle
+    if (start_obstacle_or_end_it != obstacles.end())
+    {
+        start_obstacle_or_null = *start_obstacle_or_end_it;
+        obstacles.erase(start_obstacle_or_end_it);
+    }
+
+
+    for (double s = 0.0; s <= 1.0;
+         s = (s != 1.0 && s + path_check_interval > 1.0) ? 1.0 : s + path_check_interval)
     {
         Point pt = path.valueAt(s);
+        // check if we exited the first obstacle, and add it back to obstacles
+        if (start_obstacle_or_null && !start_obstacle_or_null->containsPoint(pt))
+        {
+            obstacles.emplace_back(*start_obstacle_or_null);
+            start_obstacle_or_null = std::nullopt;
+        }
+
         for (const Obstacle &obs : obstacles)
         {
             if (obs.containsPoint(pt))
@@ -164,6 +200,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
                 throw fail_ss.str();
             }
         }
+
         if (!navigable_area.contains(pt))
         {
             // fail because path exited navigable area
@@ -174,30 +211,35 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
         }
     }
 
-    // check that the path reaches the destination if the destination is not in an
-    // obstacle otherwise check that the path makes progress toward the destination i.e.
-    // the distance to dest is less at the end of the path than at the start of the path
-    bool dest_in_obstacle = std::any_of(
-        obstacles.begin(), obstacles.end(),
-        [&path](const auto &obs) { return obs.containsPoint(path.valueAt(1.0)); });
+    bool dest_in_obstacle =
+        std::any_of(obstacles.begin(), obstacles.end(),
+                    [&dest](const auto &obs) { return obs.containsPoint(dest); });
 
-    if (dest_in_obstacle &&
-        (path.valueAt(1.0) - dest).length() >= (path.valueAt(0.0) - dest).length())
+    // check if the specified destination is in an obstacle, and if so, check that the
+    // robot made progress toward the destination we also check for start_obstacle_or_null
+    // because it will only be true at this stage in the case where we start in an
+    // obstacle and never exit it
+    if (dest_in_obstacle || start_obstacle_or_null)
     {
-        // fail because no progress to destination
-        std::stringstream fail_ss;
-        fail_ss
-            << "Destination is in obstacle, but path does not make progress toward the destination!";
-        throw fail_ss.str();
+        if ((path.valueAt(1.0) - dest).length() >= (path.valueAt(0.0) - dest).length())
+        {
+            // fail because no progress to destination
+            std::stringstream fail_ss;
+            fail_ss
+                << "Destination is in obstacle, but path does not make progress toward the destination!";
+            throw fail_ss.str();
+        }
     }
-
-    if ((path.valueAt(1.0) - dest).length() <= DEST_CHECK_EPSILON_M)
+    else if ((path.valueAt(1.0) - dest).length() >= DEST_CHECK_EPSILON_M)
     {
         // fail because didn't reach destination
         std::stringstream fail_ss;
         fail_ss << "Path ends at " << path.valueAt(1.0) << " but dest is " << dest;
         throw fail_ss.str();
     }
+
+    // check that the actual destination of the path
+
     // we passed, yay!
 }
 
