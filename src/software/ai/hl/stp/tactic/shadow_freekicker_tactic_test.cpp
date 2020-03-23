@@ -864,4 +864,3 @@ TEST_F(ShadowFreekickerTacticTest,
 
     EXPECT_LT(goal_to_dest_angle, goal_to_ball_angle);
 }
-
