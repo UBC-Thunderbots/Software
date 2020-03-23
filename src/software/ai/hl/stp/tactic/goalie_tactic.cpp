@@ -10,6 +10,8 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/line.h"
+#include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
 
 
@@ -49,15 +51,12 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // first find the 3 intersections with each side of the restricted area
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
-    auto width_x_goal    = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                         goalie_restricted_area.posXPosYCorner(),
-                                         goalie_restricted_area.posXNegYCorner());
-    auto pos_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                            goalie_restricted_area.posXPosYCorner(),
-                                            goalie_restricted_area.negXPosYCorner());
-    auto neg_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                            goalie_restricted_area.posXNegYCorner(),
-                                            goalie_restricted_area.negXNegYCorner());
+    auto width_x_goal    = intersection(Line(goalie_desired_position, field.friendlyGoal()),
+                                         Line(goalie_restricted_area.posXPosYCorner(), goalie_restricted_area.posXNegYCorner()));
+    auto pos_side_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoal()),
+                                            Line(goalie_restricted_area.posXPosYCorner(), goalie_restricted_area.negXPosYCorner()));
+    auto neg_side_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoal()),
+                                            Line(goalie_restricted_area.posXNegYCorner(), goalie_restricted_area.negXNegYCorner()));
 
     // if the goalie restricted area already contains the point, then we are
     // safe to move there.
@@ -167,8 +166,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         Segment full_goal_segment =
             Segment(neg_goal_line_inflated, pos_goal_line_inflated);
 
-        std::optional<Point> intersection1 =
-            raySegmentIntersection(ball_ray, full_goal_segment).first;
+        std::vector<Point> intersections = intersection(ball_ray, full_goal_segment);
 
         // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
@@ -202,14 +200,14 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
         // case 1: goalie should panic and stop the ball, its moving too fast towards the
         // net
-        if (intersection1.has_value() && ball.velocity().length() > ball_speed_panic)
+        if (!intersections.empty() && ball.velocity().length() > ball_speed_panic)
         {
             // the ball is heading towards the net, move to intercept the shot
             // the final speed is a dynamic parameter so that if the goalie needs
             // to dive for the shot instead of stop when reaching the intersection
             // point it can do so.
             Point goalie_pos = closestPointOnSeg(
-                (*robot).position(), Segment(ball.position(), *intersection1));
+                (*robot).position(), Segment(ball.position(), intersections[0]));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             move_action->updateControlParams(
