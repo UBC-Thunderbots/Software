@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="per_motor">
      <attribute name="title">
@@ -264,8 +264,11 @@
         <height>17</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>X Velocity in m/s</string>
+      </property>
       <property name="text">
-       <string>X (cm/s)</string>
+       <string>X (m/s)</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_matrix_y">
@@ -277,8 +280,11 @@
         <height>17</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>X Velocity in m/s</string>
+      </property>
       <property name="text">
-       <string>Y (cm/s)</string>
+       <string>Y (m/s)</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_matrix_theta">
@@ -289,6 +295,9 @@
         <width>67</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Angular Velocity in °/s</string>
       </property>
       <property name="text">
        <string>θ (°/s)</string>

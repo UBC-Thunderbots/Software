@@ -11,5 +11,5 @@
  * Implements input checking and clamping behaviour
  *
  */
-void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider, int &value, int min,
-                         int max);
+void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider, double &value, double min,
+                         double max, double scaling);
