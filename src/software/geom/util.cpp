@@ -728,7 +728,6 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         std::vector<Point> corners = bounding_box.getPoints();
         std::copy(corners.begin(), corners.end(),
                   std::inserter(intersections, intersections.end()));
-        // intersects.insert(intersects.end(), corners.begin(), corners.end());
         for (const Point &intersect : intersections)
         {
             double radius =
