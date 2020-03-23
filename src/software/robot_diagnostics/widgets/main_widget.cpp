@@ -14,12 +14,12 @@ MainWidget::MainWidget(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
 
     setupFeedback(main_widget);
-    setupFeedback(main_widget);
-    setupDrive(main_widget);
-    setupDribbler(main_widget);
-    setupChicker(main_widget);
+    setupDrive(main_widget, motor_power_fl, motor_power_fr, motor_power_bl,
+               motor_power_br, matrix_x, matrix_y, matrix_theta);
+    setupDribbler(main_widget, dribbler_power);
+    setupChicker(main_widget, chicker_power);
     setupLEDs(main_widget);
-    setupRobotSelection(main_widget);
+    setupRobotSelection(main_widget, robot_selection);
 
     update();
 }
