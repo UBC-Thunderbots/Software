@@ -19,6 +19,12 @@
 #include "software/new_geom/util/collinear.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
+#include "software/new_geom/util/intersection.h"
+
+bool isDegenerate(const Segment &segment)
+{
+    return distanceSquared(segment.getSegStart(), segment.getEnd()) < EPS2;
+}
 
 double length(const Segment &segment)
 {
@@ -139,39 +145,6 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     return ans;
 }
 
-std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
-                                     const Point &segB)
-{
-    std::vector<Point> ans;
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        Segment recSegment = r.getSegments()[i];
-        if (intersects(recSegment, Segment(segA, segB)) &&
-            uniqueLineIntersects(recSegment.getSegStart(), recSegment.getEnd(), segA,
-                                 segB))
-        {
-            ans.push_back(lineIntersection(recSegment.getSegStart(), recSegment.getEnd(),
-                                           segA, segB)
-                              .value());
-        }
-    }
-    return ans;
-}
-
-Point vectorRectIntersect(const Rectangle &r, const Point &pointA, const Point &pointB)
-{
-    std::vector<Point> points =
-        lineRectIntersect(r, pointA, pointA + ((pointB - pointA) * 100));
-    for (Point i : points)
-    {
-        if (contains(Ray(pointA, (pointB - pointA)), i))
-        {
-            return i;
-        }
-    }
-    return Point(1.0 / 0.0, 1.0 / 0.0);  // no solution found, propagate infinity
-}
-
 
 Point closestPointOnSeg(const Point &p, const Segment &segment)
 {
@@ -227,205 +200,6 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
 bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d)
 {
     return std::abs((d - c).cross(b - a)) > EPS;
-}
-
-std::vector<Point> lineIntersection(const Segment &a, const Segment &b)
-{
-    if (std::fabs((b.getEnd() - b.getSegStart()).cross(a.getEnd() - a.getSegStart())) <
-        EPS)
-    {
-        // parallel line segments, find if they're collinear and return the 2 points
-        // on the line they both lay on if they are collinear and intersecting
-        // shamelessly copypasted from
-        // https://stackoverflow.com/questions/22456517/algorithm-for-finding-the-segment-overlapping-two-collinear-segments
-        if (collinear(a.getSegStart(), b.getSegStart(), b.getEnd()) &&
-            collinear(a.getEnd(), b.getSegStart(), b.getEnd()))
-        {
-            double slope = (a.getEnd().y() - a.getSegStart().y()) /
-                           (a.getEnd().x() - a.getSegStart().x());
-            bool isHorizontal = slope < EPS;
-            bool isDescending = slope < 0 && !isHorizontal;
-            double invertY    = isDescending || isHorizontal ? -1 : 1;
-
-            Point min1 =
-                Point(std::min(a.getSegStart().x(), a.getEnd().x()),
-                      std::min(a.getSegStart().y() * invertY, a.getEnd().y() * invertY));
-            Point max1 =
-                Point(std::max(a.getSegStart().x(), a.getEnd().x()),
-                      std::max(a.getSegStart().y() * invertY, a.getEnd().y() * invertY));
-
-            Point min2 =
-                Point(std::min(b.getSegStart().x(), b.getEnd().x()),
-                      std::min(b.getSegStart().y() * invertY, b.getEnd().y() * invertY));
-            Point max2 =
-                Point(std::max(b.getSegStart().x(), b.getEnd().x()),
-                      std::max(b.getSegStart().y() * invertY, b.getEnd().y() * invertY));
-
-            Point minIntersection;
-            if (isDescending)
-                minIntersection = Point(std::max(min1.x(), min2.x()),
-                                        std::min(min1.y() * invertY, min2.y() * invertY));
-            else
-                minIntersection = Point(std::max(min1.x(), min2.x()),
-                                        std::max(min1.y() * invertY, min2.y() * invertY));
-
-            Point maxIntersection;
-            if (isDescending)
-                maxIntersection = Point(std::min(max1.x(), max2.x()),
-                                        std::max(max1.y() * invertY, max2.y() * invertY));
-            else
-                maxIntersection = Point(std::min(max1.x(), max2.x()),
-                                        std::min(max1.y() * invertY, max2.y() * invertY));
-
-            bool intersect =
-                minIntersection.x() <= maxIntersection.x() &&
-                ((!isDescending && minIntersection.y() <= maxIntersection.y()) ||
-                 (isDescending && minIntersection.y() >= maxIntersection.y()));
-
-            if (intersect)
-            {
-                return std::vector<Point>{minIntersection, maxIntersection};
-            }
-            else
-                return std::vector<Point>();
-        }
-        else
-            return std::vector<Point>();
-    }
-
-    return std::vector<Point>{
-        a.getSegStart() +
-        (a.getSegStart() - b.getSegStart()).cross(b.getEnd() - b.getSegStart()) /
-            (b.getEnd() - b.getSegStart()).cross(a.getEnd() - a.getSegStart()) *
-            (a.getEnd() - a.getSegStart())};
-}
-
-// shamelessly copy-pasted from RoboJackets
-std::optional<Point> lineIntersection(const Point &a, const Point &b, const Point &c,
-                                      const Point &d)
-{
-    Segment line1(a, b), line2(c, d);
-    double x1 = line1.getSegStart().x();
-    double y1 = line1.getSegStart().y();
-    double x2 = line1.getEnd().x();
-    double y2 = line1.getEnd().y();
-    double x3 = line2.getSegStart().x();
-    double y3 = line2.getSegStart().y();
-    double x4 = line2.getEnd().x();
-    double y4 = line2.getEnd().y();
-
-    double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (denom == 0)
-    {
-        // log the parallel lines when we actually implement logging?
-        return std::nullopt;
-    }
-
-    double deta = x1 * y2 - y1 * x2;
-    double detb = x3 * y4 - y3 * x4;
-
-    Point intersection;
-
-    intersection.set((deta * (x3 - x4) - (x1 - x2) * detb) / denom,
-                     (deta * (y3 - y4) - (y1 - y2) * detb) / denom);
-
-    return std::make_optional(intersection);
-}
-
-std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
-    const Ray &ray, const Segment &segment)
-{
-    Point ray2 = ray.getStart() + ray.toUnitVector();
-
-    std::optional<Point> intersection =
-        lineIntersection(ray.getStart(), ray2, segment.getSegStart(), segment.getEnd());
-
-    // If there exists a single intersection, and it exists on the ray and within the
-    // segment
-    if (intersection.has_value() && contains(ray, intersection.value()) &&
-        contains(segment, intersection.value()))
-    {
-        return std::make_pair(intersection, std::nullopt);
-    }
-    // The ray and segment are parallel, and collinear
-    else if (!intersection.has_value() &&
-             collinear(ray.getStart(), segment.getSegStart(), segment.getEnd()))
-    {
-        // Check if ray passes through both segment start and end
-        if (ray.toUnitVector() == (segment.getSegStart() - ray.getStart()).normalize() &&
-            ray.toUnitVector() == (segment.getEnd() - ray.getStart()).normalize())
-        {
-            return std::make_pair(segment.getSegStart(), segment.getEnd());
-        }
-
-        // Since we know the ray and segment are overlapping (with ray origin within the
-        // segment), return the ray start position, and the end of the segment that is in
-        // the direction of the ray
-        ray.toUnitVector() == (segment.getEnd() - segment.getSegStart()).normalize()
-            ? intersection = std::make_optional(segment.getEnd())
-            : intersection = std::make_optional(segment.getSegStart());
-        return std::make_pair(ray.getStart(), intersection.value());
-    }
-    // The ray and segment do not intersect at all
-    else
-    {
-        return std::make_pair(std::nullopt, std::nullopt);
-    }
-}
-
-std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
-    const Ray &ray, const Rectangle &rectangle)
-{
-    std::vector<Segment> rectangle_segments = {
-        Segment(rectangle.posXPosYCorner(), rectangle.negXPosYCorner()),
-        Segment(rectangle.negXPosYCorner(), rectangle.negXNegYCorner()),
-        Segment(rectangle.negXNegYCorner(), rectangle.posXNegYCorner()),
-        Segment(rectangle.posXNegYCorner(), rectangle.posXPosYCorner()),
-    };
-    std::pair<std::optional<Point>, std::optional<Point>> result =
-        std::make_pair(std::nullopt, std::nullopt);
-    for (const auto &seg : rectangle_segments)
-    {
-        auto intersection = raySegmentIntersection(ray, seg);
-        // Always take the result with more non-nullopt values
-        if ((intersection.first && !result.first) ||
-            (intersection.second && !result.second))
-        {
-            result = intersection;
-        }
-    }
-
-    return result;
-}
-
-std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
-{
-    // Calculate if the intersection exists along segments of infinite length
-    std::optional<Point> intersection =
-        lineIntersection(ray1.getStart(), ray1.getStart() + ray1.toUnitVector(),
-                         ray2.getStart(), ray2.getStart() + ray2.toUnitVector());
-
-    // Return if no intersection exists
-    if (!intersection.has_value())
-    {
-        return std::nullopt;
-    }
-
-    // Check of the intersection exits along the direction of both rays
-    const Vector intersection_ray1_direction = (intersection.value() - ray1.getStart());
-    const Vector intersection_ray2_direction = (intersection.value() - ray2.getStart());
-
-    if (sign(intersection_ray1_direction.x()) == sign(ray1.toUnitVector().x()) &&
-        sign(intersection_ray1_direction.y()) == sign(ray1.toUnitVector().y()) &&
-        sign(intersection_ray2_direction.x()) == sign(ray2.toUnitVector().x()) &&
-        sign(intersection_ray2_direction.y()) == sign(ray2.toUnitVector().y()))
-    {
-        return intersection.value();
-    }
-    else
-    {
-        return std::nullopt;
-    }
 }
 
 Point calcBlockCone(const Vector &a, const Vector &b, const double &radius)
@@ -537,10 +311,10 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
     const Ray extremes2 =
         Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
 
-    const std::optional<Point> extreme_intersect11 = getRayIntersection(extremes1, ray1);
-    const std::optional<Point> extreme_intersect12 = getRayIntersection(extremes2, ray1);
-    const std::optional<Point> extreme_intersect21 = getRayIntersection(extremes1, ray2);
-    const std::optional<Point> extreme_intersect22 = getRayIntersection(extremes2, ray2);
+    const std::optional<Point> extreme_intersect11 = intersection(extremes1, ray1);
+    const std::optional<Point> extreme_intersect12 = intersection(extremes2, ray1);
+    const std::optional<Point> extreme_intersect21 = intersection(extremes1, ray2);
+    const std::optional<Point> extreme_intersect22 = intersection(extremes2, ray2);
 
     // Check for the cases that the rays intersect the same segment projection
     if ((extreme_intersect11.has_value() && extreme_intersect21.has_value()) ||
@@ -574,8 +348,33 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
     }
 
     // Calculate intersections of each individual ray and the segment
-    auto [intersect11, intersect12] = raySegmentIntersection(ray1, segment);
-    auto [intersect21, intersect22] = raySegmentIntersection(ray2, segment);
+    std::vector<Point> intersection1 = intersection(ray1, segment);
+    std::vector<Point> intersection2 = intersection(ray2, segment);
+
+    std::optional<Point> intersect11;
+    std::optional<Point> intersect12;
+    std::optional<Point> intersect21;
+    std::optional<Point> intersect22;
+
+    if (!intersection1.empty())
+    {
+        intersect11 = intersection1[0];
+
+        if (intersection1.size() > 1)
+        {
+            intersect12 = intersection1[1];
+        }
+    }
+
+    if (!intersection2.empty())
+    {
+        intersect21 = intersection2[0];
+
+        if (intersection2.size() > 1)
+        {
+            intersect22 = intersection2[1];
+        }
+    }
 
     // Check if there are any real intersections
     if (!intersect11.has_value() && !intersect21.has_value())
@@ -606,8 +405,8 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
             Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
         ;
 
-        std::optional<Point> extreme_intersect1 = getRayIntersection(extremes1, ray2);
-        std::optional<Point> extreme_intersect2 = getRayIntersection(extremes2, ray2);
+        std::optional<Point> extreme_intersect1 = intersection(extremes1, ray2);
+        std::optional<Point> extreme_intersect2 = intersection(extremes2, ray2);
 
         if (extreme_intersect1.has_value())
         {
@@ -629,8 +428,8 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
             Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
         ;
 
-        std::optional<Point> extreme_intersect1 = getRayIntersection(extremes1, ray1);
-        std::optional<Point> extreme_intersect2 = getRayIntersection(extremes2, ray1);
+        std::optional<Point> extreme_intersect1 = intersection(extremes1, ray1);
+        std::optional<Point> extreme_intersect2 = intersection(extremes2, ray1);
 
         if (extreme_intersect1.has_value())
         {
@@ -919,15 +718,16 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         Vector connectedVec           = points[1] - points[0];
         Point halfPoint               = points[0] + (connectedVec * 0.5);
         Vector perpVec                = connectedVec.perpendicular();
-        std::vector<Point> intersects = lineRectIntersect(
+        std::vector<Point> intersections = intersection(
             bounding_box,
-            halfPoint +
+            Segment(halfPoint +
                 (perpVec * distance(bounding_box.furthestCorner(halfPoint), halfPoint)),
             halfPoint -
-                (perpVec * distance(bounding_box.furthestCorner(halfPoint), halfPoint)));
+                (perpVec * distance(bounding_box.furthestCorner(halfPoint), halfPoint))));
         std::vector<Point> corners = bounding_box.getPoints();
-        intersects.insert(intersects.end(), corners.begin(), corners.end());
-        for (const Point &intersect : intersects)
+        std::copy(corners.begin(), corners.end(), std::inserter(intersections, intersections.end()));
+        //intersects.insert(intersects.end(), corners.begin(), corners.end());
+        for (const Point &intersect : intersections)
         {
             double radius =
                 distance(findClosestPoint(intersect, points).value(), intersect);

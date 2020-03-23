@@ -60,15 +60,18 @@ std::vector<Point> intersection(const Segment &first, const Segment &second)
     return output;
 }
 
-std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment)
+std::vector<Point> intersection(const Polygon &polygon, const Segment &segment)
 {
-    std::unordered_set<Point> intersections;
+    std::vector<Point> intersections;
 
     for (const Segment &seg : polygon.getSegments())
     {
         for (const Point &p : intersection(seg, segment))
         {
-            intersections.insert(p);
+            if (std::find(intersections.begin(), intersections.end(), p) == intersections.end())
+            {
+                intersections.push_back(p);
+            }
         }
     }
 
@@ -148,15 +151,18 @@ std::optional<Point> intersection(const Line &first, const Line &second)
     }
 }
 
-std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray)
+std::vector<Point> intersection(const Polygon &polygon, const Ray &ray)
 {
-    std::unordered_set<Point> intersections;
+    std::vector<Point> intersections;
 
     for (const Segment &seg : polygon.getSegments())
     {
         for (const Point &p : intersection(ray, seg))
         {
-            intersections.insert(p);
+            if (std::find(intersections.begin(), intersections.end(), p) == intersections.end())
+            {
+                intersections.push_back(p);
+            }
         }
     }
 

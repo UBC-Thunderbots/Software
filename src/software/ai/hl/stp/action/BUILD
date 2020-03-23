@@ -57,6 +57,7 @@ cc_library(
         "//software/logger",
         "//software/new_geom/util:closest_point",
         "//software/new_geom/util:distance",
+        "//software/new_geom/util:intersection",
         "//software/world:ball",
         "//software/world:field",
     ],
