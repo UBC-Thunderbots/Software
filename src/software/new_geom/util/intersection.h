@@ -6,6 +6,27 @@
 #include "software/new_geom/segment.h"
 
 /**
+ * A set of functions that calculate the intersecting points between two geometric objects
+ */
+
+/**
+ * Computes the point of intersection between two lines.
+ * Note: this computes the intersection of two lines, not line segments.
+ *
+ * Overlapping lines are considered parallel and not intersecting.
+ *
+ * See:
+ * https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+ *
+ * @params a, b points that represent the first line
+ * @params c, d points that represent the second line
+ *
+ * @return the point of intersection, if it exists
+ */
+std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
+                                  const Point &d);
+
+/**
  * Computes the intersection of two segments.
  *
  * @param first
