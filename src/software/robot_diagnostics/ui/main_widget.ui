@@ -951,6 +951,9 @@
     <property name="text">
      <string>Discharge</string>
     </property>
+    <attribute name="buttonGroup">
+     <string notr="true">buttonGroup_charge_mode</string>
+    </attribute>
    </widget>
    <widget class="QRadioButton" name="radioButton_float">
     <property name="geometry">
@@ -964,6 +967,9 @@
     <property name="text">
      <string>Float</string>
     </property>
+    <attribute name="buttonGroup">
+     <string notr="true">buttonGroup_charge_mode</string>
+    </attribute>
    </widget>
    <widget class="QRadioButton" name="radioButton_charge">
     <property name="geometry">
@@ -977,6 +983,9 @@
     <property name="text">
      <string>Charge</string>
     </property>
+    <attribute name="buttonGroup">
+     <string notr="true">buttonGroup_charge_mode</string>
+    </attribute>
    </widget>
    <widget class="QRadioButton" name="radioButton_kicker">
     <property name="geometry">
@@ -990,6 +999,9 @@
     <property name="text">
      <string>Kicker</string>
     </property>
+    <attribute name="buttonGroup">
+     <string notr="true">buttonGroup_chicker_mode</string>
+    </attribute>
    </widget>
    <widget class="QRadioButton" name="radioButton_chipper">
     <property name="geometry">
@@ -1003,6 +1015,9 @@
     <property name="text">
      <string>Chipper</string>
     </property>
+    <attribute name="buttonGroup">
+     <string notr="true">buttonGroup_chicker_mode</string>
+    </attribute>
    </widget>
    <widget class="QSlider" name="slider_chicker_power">
     <property name="geometry">
@@ -1186,4 +1201,8 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+ </buttongroups>
 </ui>

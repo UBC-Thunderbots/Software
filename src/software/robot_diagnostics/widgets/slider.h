@@ -10,6 +10,12 @@
  * Sets up slider and line edit linkage and modifies the value as input changes
  * Implements input checking and clamping behaviour
  *
+ * @param line_edit QLineEdit to read and modify
+ * @param slider QSlider to read and modify
+ * @param value value to read inputs into
+ * @param min min value for value
+ * @param max max value for value
+ * @param scaling how much value should be scaled up to display on slider
  */
 void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider, double &value, double min,
                          double max, double scaling);
