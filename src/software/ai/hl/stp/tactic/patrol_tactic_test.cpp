@@ -17,18 +17,10 @@ void compareMoveActions(std::shared_ptr<MoveAction> expected_move_action,
 
 }
 
-void PrintMoveActions(std::shared_ptr<MoveAction> move_action)
-{
-    std::cout << "destination: " << move_action->getDestination() << std::endl;
-    std::cout << "final orientation: " << move_action->getFinalOrientation() << std::endl;
-    std::cout << "final speed: " << move_action->getFinalSpeed() << std::endl << std::endl;
-}
-
 void simulateActionToCompletion(Robot &robot, RobotState newRobotState, std::shared_ptr<Action> action_ptr, PatrolTactic &tactic) {
 
     //actions need to yield at least once before being able to complete
     std::unique_ptr<Intent> intent = action_ptr->getNextIntent();
-    //ASSERT_FALSE(action_ptr->done());
 
     //update state of the robot and tactic
     robot.updateState(newRobotState);
@@ -71,7 +63,6 @@ TEST(MoveTacticTest, patrol_one_point_should_return_one_acion)
 
     //Assert
     compareMoveActions(expected_action, move_action);
-    PrintMoveActions(move_action);
 }
 
 TEST(MoveTacticTest, patrol_multiple_points_should_return_multiple_actions)
@@ -85,7 +76,6 @@ TEST(MoveTacticTest, patrol_multiple_points_should_return_multiple_actions)
     Point patrolPoint2 = Point(-3,-3);
     Point patrolPoint3 = Point(3,3);
     std::vector<Point> patrolPoints{patrolPoint1, patrolPoint2, patrolPoint3};
-
 
     double atPatrolPointTolerance = 1.0;
     double speedAtPatrolPoints = 1.0;
@@ -115,33 +105,27 @@ TEST(MoveTacticTest, patrol_multiple_points_should_return_multiple_actions)
     //Act and Assert
 
     //first patrol point
-    std::shared_ptr<Action> action_ptr = tactic.getNextAction();
-    ASSERT_NE(nullptr, action_ptr);
-    std::shared_ptr<MoveAction> move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    std::shared_ptr<Action> action_ptr1 = tactic.getNextAction();
+    ASSERT_NE(nullptr, action_ptr1);
+    std::shared_ptr<MoveAction> move_action1 = std::dynamic_pointer_cast<MoveAction>(action_ptr1);
+    compareMoveActions(expected_action1, move_action1);
 
-    compareMoveActions(expected_action1, move_action);
-
-    simulateActionToCompletion(robot, robotStateToCompleteFirstAction, action_ptr, tactic);
+    simulateActionToCompletion(robot, robotStateToCompleteFirstAction, action_ptr1, tactic);
 
     //second patrol point
-    action_ptr = tactic.getNextAction();
-    ASSERT_NE(nullptr, action_ptr);
-    compareMoveActions(expected_action2, move_action);
+    std::shared_ptr<Action> action_ptr2 = tactic.getNextAction();
+    ASSERT_NE(nullptr, action_ptr2);
+    std::shared_ptr<MoveAction> move_action2 = std::dynamic_pointer_cast<MoveAction>(action_ptr2);
 
-//    THIS COMMENT IS ADDED FOR DEBUGGING
-//    ASSERT_TRUE(action_ptr->done());
-//
-//    //issue is once action_ptr is done, you can not run it again??
-//    action_ptr->getNextIntent();
-//    ASSERT_FALSE(action_ptr->done());
+    compareMoveActions(expected_action2, move_action2);
 
-    simulateActionToCompletion(robot, robotStateToCompleteSecondAction, action_ptr, tactic);
+    simulateActionToCompletion(robot, robotStateToCompleteSecondAction, action_ptr2, tactic);
 
     //third patrol point
-    action_ptr = tactic.getNextAction();
-    ASSERT_NE(nullptr, action_ptr);
-
-    compareMoveActions(expected_action3, move_action);
+    std::shared_ptr<Action> action_ptr3 = tactic.getNextAction();
+    ASSERT_NE(nullptr, action_ptr3);
+    std::shared_ptr<MoveAction> move_action3 = std::dynamic_pointer_cast<MoveAction>(action_ptr3);
+    compareMoveActions(expected_action3, move_action3);
 
 }
 
