@@ -11,7 +11,12 @@ protected:
 
     std::vector<RobotState> robotStateToCompleteActions;
     std::vector<std::shared_ptr<MoveAction>> expectedActions;
+    const double COST_OF_ASSIGNED_ROBOT = 0.0;
+    const double COST_OF_NONASSIGNED_ROBOT_UNASSIGNED_TACTIC = 1.0;
 
+    /*
+     * populates the expectedActions test variable in the order of the patrol points
+     */
     void GenerateExpectedActions(Robot robot, std::vector<Point> patrolPoints, Angle angle, double speedAtPatrolPoints) {
         for(int i = 0; i < patrolPoints.size(); i++) {
 
@@ -24,6 +29,9 @@ protected:
         }
     }
 
+    /*
+     *  populates the robotStateToCompleteActions test variable in the order of patrol points
+     */
     void GenerateRobotStatesToCompleteAction(std::vector<Point> patrolPoints, Vector velocity ) {
         for (int i = 0; i < patrolPoints.size(); i++ ) {
             RobotState robotState = RobotState(patrolPoints[i], velocity, Angle::zero(),
@@ -43,8 +51,14 @@ protected:
 
     }
 
-    /*
-     * given a RobotState that would cause robot to patrol next point,
+    /**
+     * Simulates the running of an action until it is done, allowing the patrol tactic
+     * to move on to the next point
+     * @param robot: robot that is assigned the tactic
+     * @param newRobotState: A state that satisfies the patrol tactics's conditions of moving on on to
+     * the next point
+     * @param action_ptr: the last action returned by the tactic
+     * @param tactic: the patrol tactic
      */
     void simulateActionToCompletion(Robot &robot, RobotState newRobotState, std::shared_ptr<Action> action_ptr,
                                     PatrolTactic &tactic) {
@@ -66,6 +80,18 @@ protected:
     }
 
 };
+
+    TEST_F(PatrolTacticTest, patrol_tactic_constructor) {
+
+        Point patrolPoint1 = Point(3, 5);
+        double atPatrolPointTolerance = 1.0;
+        double speedAtPatrolPoints = 1.0;
+
+        PatrolTactic tactic = PatrolTactic(std::vector<Point>({patrolPoint1}), atPatrolPointTolerance, Angle::zero(),
+                                       speedAtPatrolPoints);
+        ASSERT_NE(nullptr, &tactic);
+        ASSERT_EQ("Patrol Tactic", tactic.getName());
+    }
 
     TEST_F(PatrolTacticTest, patrol_one_point) {
         //Setup
@@ -134,6 +160,7 @@ protected:
     }
 
     TEST_F(PatrolTacticTest, patrol_two_points_and_restart) {
+
         //setup
         int robotId = 0;
         Point robotStartingPoint = Point(-9, 5);
@@ -157,7 +184,6 @@ protected:
         GenerateRobotStatesToCompleteAction(patrolPoints, initialVelocity);
 
         //Act and Assert
-
 
         for(int j = 0; j < 2; j++) {
             for (int i = 0; i < patrolPoints.size(); i++) {
@@ -193,7 +219,7 @@ protected:
 
         double cost = tactic.calculateRobotCost(non_assigned_robot, world);
 
-        EXPECT_EQ(1.0, cost);
+        EXPECT_EQ(COST_OF_NONASSIGNED_ROBOT_UNASSIGNED_TACTIC, cost);
 
     }
 
@@ -234,9 +260,8 @@ protected:
 
         double cost = tactic.calculateRobotCost(assigned_robot, world);
 
-        EXPECT_EQ(0.0, cost);
+        EXPECT_EQ(COST_OF_ASSIGNED_ROBOT, cost);
 
     }
-
 
 
