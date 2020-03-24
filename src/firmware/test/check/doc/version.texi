@@ -1,4 +1,0 @@
-@set UPDATED 20 October 2017
-@set UPDATED-MONTH October 2017
-@set EDITION 0.12.0
-@set VERSION 0.12.0

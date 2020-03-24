@@ -81,7 +81,8 @@ TEST(VectorLogicTests, norm_vector_from_vector_with_length_test)
 
 TEST(VectorLogicTests, norm_near_zero_vector_test)
 {
-    Vector u = Vector(GeomConstants::EPSILON * 0.99, GeomConstants::EPSILON * 0.99);
+    Vector u =
+        Vector(GeomConstants::FIXED_EPSILON * 0.99, GeomConstants::FIXED_EPSILON * 0.99);
     Vector v = u.normalize();
     EXPECT_EQ(Vector(), v);
 }

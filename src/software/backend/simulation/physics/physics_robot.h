@@ -264,10 +264,14 @@ class PhysicsRobot
     // This is a somewhat arbitrary value for damping. We keep it relatively low
     // so that robots still coast a ways before stopping, but non-zero so that robots
     // do come to a halt if no force is applied.
-    // Damping is roughly calculated as v_new = v * exp(damping * t)
+    // Damping is roughly calculated as v_new = v * exp(-damping * t)
     // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
-    const double robot_linear_damping  = 0.2;
-    const double robot_angular_damping = 0.2;
+    // TODO: These values are currently increased in order for the bang-bang controller
+    // simulated in the robot firmware to behave reasonably. These values should be
+    // changed back to something around 0.2
+    // https://github.com/UBC-Thunderbots/Software/issues/1187
+    const double robot_linear_damping  = 2.0;
+    const double robot_angular_damping = 2.0;
 
     // This is a somewhat arbitrary value. Collisions with robots are not perfectly
     // elastic. However because this is an "ideal" simulation and we generally don't care
