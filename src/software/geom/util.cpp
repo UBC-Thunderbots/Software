@@ -692,25 +692,6 @@ Angle acuteVertexAngle(Point p1, Point p2, Point p3)
     return acuteVertexAngle(p1 - p2, p3 - p2);
 }
 
-double closestPointTime(Point x1, Vector v1, Point x2, Vector v2)
-{
-    Vector v  = v1 - v2;
-    double sl = v.lengthSquared();
-    double t;
-
-    if (sl < EPS)
-    {
-        return 0.0;  // parallel tracks, any time is ok.
-    }
-    t = -v.dot(x1 - x2) / sl;
-    if (t < 0.0)
-    {
-        return 0.0;  // nearest time was in the past, now is closest point from
-                     // now on.
-    }
-    return t;
-}
-
 bool pointInFrontVector(Point offset, Vector direction, Point p)
 {
     // compare angle different
@@ -760,15 +741,6 @@ std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point referenc
                           Ray(reference, (tangent_point2 - reference)));
 }
 
-bool pointIsRightOfLine(const Segment &line, const Point &point)
-{
-    return (line.getEnd().x() - line.getSegStart().x()) *
-                   (point.y() - line.getSegStart().y()) -
-               (line.getEnd().y() - line.getSegStart().y()) *
-                   (point.x() - line.getSegStart().x()) <
-           0.0;
-}
-
 Point getPointsMean(const std::vector<Point> &points)
 {
     Point average = Point(0, 0);
@@ -781,20 +753,6 @@ Point getPointsMean(const std::vector<Point> &points)
 
     averageVector /= static_cast<double>(points.size());
     return Point(averageVector);
-}
-
-double getPointsVariance(const std::vector<Point> &points)
-{
-    Point mean = getPointsMean(points);
-
-    double sum = 0.0;
-    for (unsigned int i = 0; i < points.size(); i++)
-    {
-        sum += (points[i] - mean).lengthSquared();
-    }
-
-    sum /= static_cast<double>(points.size());
-    return sqrt(sum);
 }
 
 std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2)
@@ -1135,19 +1093,6 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
     return unique_segments;
 }
 
-int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
-{
-    if (rectangle.contains(point))
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-
 std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points)
 {
     // We use a Voronoi Diagram and it's Delaunay triangulation to find the largest
@@ -1253,19 +1198,6 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
               [](auto c1, auto c2) { return c1.getRadius() > c2.getRadius(); });
 
     return empty_circles;
-}
-
-Polygon circleToPolygon(const Circle &circle, size_t num_points)
-{
-    std::vector<Point> points;
-    for (unsigned i = 0; i < num_points; i++)
-    {
-        Point p = circle.getOrigin() +
-                  Vector(circle.getRadius(), 0)
-                      .rotate(Angle::fromDegrees((360.0 / num_points) * i));
-        points.emplace_back(p);
-    }
-    return Polygon(points);
 }
 
 std::optional<Point> findClosestPoint(const Point &origin_point,

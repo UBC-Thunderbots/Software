@@ -385,6 +385,7 @@ Angle acuteVertexAngle(Vector v1, Vector v2);
  * @return the acute angle formed by the vector p2->p1 and p2->p3
  */
 Angle acuteVertexAngle(Point p1, Point p2, Point p3);
+Angle acuteVertexAngleNew(Point p1, Point p2, Point p3);
 
 Angle minAngleBetweenVectors(Vector v1, Vector v2);
 
@@ -425,8 +426,6 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
 std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point reference,
                                                             const Circle circle);
 
-bool pointIsRightOfLine(const Segment &line, const Point &point);
-
 /**
  * Returns the mean of a list of points
  *
@@ -434,14 +433,6 @@ bool pointIsRightOfLine(const Segment &line, const Point &point);
  * @return the mean point of points
  */
 Point getPointsMean(const std::vector<Point> &points);
-
-/**
- * Returns the variance of a list of Points
- *
- * @param points the vector of points
- * @return the variance of the list of points
- */
-double getPointsVariance(const std::vector<Point> &points);
 
 /**
  * Function returns the segment defined by the segment between the intersections of two
@@ -586,16 +577,6 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
                                                Vector direction);
 
 /**
- * Returns the binary trespass score of a point and rectangle
- *
- * @param point The point to check for trespassing
- * @param rectangle The rectangle to check for trespassing by the Point parameter
- * @return 1 if the point exists within the rectangle, or on the boundry of the rectangle
- *         0 if the point exists outside of the rectangle
- */
-int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
-
-/**
  * Finds all circles which do not contain a point in them within the given rectangle.
  *
  * NOTE: this only guarantees that the center of each circle is within the
@@ -608,8 +589,6 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
  * provided, returns an empty list. Any points outside the bounding_box are ommitted.
  */
 std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
-
-Polygon circleToPolygon(const Circle &circle, size_t num_points);
 
 /**
  *

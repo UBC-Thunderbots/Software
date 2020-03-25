@@ -622,30 +622,6 @@ TEST(GeomUtilTest, test_acuteVertex_angle_between_points)
     EXPECT_DOUBLE_EQ(45, acuteVertexAngle(p1, p2, p3).toDegrees());
 }
 
-TEST(GeomUtilTest, test_closest_point_time)
-{
-    Point x1(0, 0);
-    Vector v1(1, 1);
-    Point x2(2, 0);
-    Vector v2(-1, 1);
-
-    EXPECT_DOUBLE_EQ(1.0, closestPointTime(x1, v1, x2, v2));
-
-    x1 = Point(0, 0);
-    v1 = Vector(0, 0);
-    x2 = Point(-1, 1);
-    v2 = Vector(1, 0);
-
-    EXPECT_DOUBLE_EQ(1.0, closestPointTime(x1, v1, x2, v2));
-
-    x1 = Point(0, 0);
-    v1 = Vector(1, 1);
-    x2 = Point(6, 0);
-    v2 = Vector(-2, 2);
-
-    EXPECT_DOUBLE_EQ(1.8, closestPointTime(x1, v1, x2, v2));
-}
-
 // Test to see if raySegmentIntersection() returns the correct parameters when the ray and
 // segment intersect once
 TEST(GeomUtilTest, test_ray_segment_intersecting)
@@ -943,43 +919,6 @@ TEST(GeomUtilTest, test_merge_segment_redundant_segments)
     std::optional<Segment> merged_segment =
         mergeOverlappingParallelSegments(segment1, segment2);
     EXPECT_EQ(merged_segment.value(), segment1);
-}
-
-// Test to see if the 1 is returned when the point exists within the rectangle
-TEST(GeomUtilTest, test_binary_trespass_point_is_trespassing_in_rectangle)
-{
-    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
-
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(0, 0)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(0.5, 0.5)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-0.5, -0.5)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(0.5, -0.5)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-0.5, 0.5)));
-}
-
-// Test to see if the 1 is returned when the point exists on the boundries of the
-// rectangle
-TEST(GeomUtilTest, test_binary_trespass_point_is_on_rectangle_boundry)
-{
-    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
-
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-1, -1)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(1, 1)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-1, 1)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(1, -1)));
-    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-1, 0.5)));
-}
-
-// Test to see if the 0 is returned when the point exists outside of the rectangle
-TEST(GeomUtilTest, test_binary_trespass_point_is_outside_rectangle)
-{
-    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
-
-    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(-1, -2)));
-    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(2, 1)));
-    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(-1, 3)));
-    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(5, -0.2)));
-    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(-4, 5)));
 }
 
 TEST(GeomUtilTest, test_find_open_circles_no_points_in_rectangle)
