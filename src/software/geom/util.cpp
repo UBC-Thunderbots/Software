@@ -609,6 +609,8 @@ std::vector<Segment> projectCirclesOntoSegment(Segment segment,
 
         if (intersect_segment.has_value())
         {
+            std::cout << "Intersecting Segment start: " << intersect_segment.value().getSegStart() << std::endl;
+            std::cout << "Intersecting Segment end: " << intersect_segment.value().getEnd() << std::endl;
             obstacle_segment_projections.push_back(intersect_segment.value());
         }
     }
