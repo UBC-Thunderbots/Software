@@ -44,3 +44,8 @@ cc_library(
     name = "vector_2d",
     hdrs = ["vector_2d.h"],
 )
+
+cc_library(
+    name = "tbots_math",
+    hdrs = ["tbots_math.h"],
+)
