@@ -1,6 +1,6 @@
 #pragma once
 
-#include "firmware/shared/tbots_math.h"
+#include "firmware/shared/math/tbots_math.h"
 
 // This file contains all the physical constants of the robot
 // Dimensions and the like as well as
