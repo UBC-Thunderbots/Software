@@ -12,7 +12,7 @@
 
 extern "C"
 {
-#include "firmware/main/app/world/firmware_ball.h"
+#include "firmware/app/world/firmware_ball.h"
 }
 
 TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator_ball)

@@ -1,8 +1,9 @@
 sh_binary(
-    name = "flash_firmware",
-    srcs = ["flash_firmware.sh"],
+    name = "legacy_flash_firmware",
+    srcs = ["legacy_flash_firmware.sh"],
     data = [
-        "//firmware:firmware_old_main_bin",
+        "//firmware/boards/legacy_dongle_stm32f4:bin",
+        "//firmware/boards/legacy_robot_stm32f4:bin",
     ],
     restricted_to = ["//cc_toolchain:stm32f4"],
     deps = ["@bazel_tools//tools/bash/runfiles"],

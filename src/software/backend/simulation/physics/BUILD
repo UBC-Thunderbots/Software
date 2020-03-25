@@ -108,7 +108,7 @@ cc_library(
         ":physics_ball",
         ":physics_object_user_data",
         ":physics_robot_model",
-        "//firmware/main/shared:physics",
+        "//firmware/shared:physics",
         "//shared:constants",
         "//software/geom",
         "//software/time:timestamp",

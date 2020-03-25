@@ -4,9 +4,9 @@
 
 extern "C"
 {
-#include "firmware/main/app/world/chicker.h"
-#include "firmware/main/app/world/dribbler.h"
-#include "firmware/main/app/world/wheel.h"
+#include "firmware/app/world/chicker.h"
+#include "firmware/app/world/dribbler.h"
+#include "firmware/app/world/wheel.h"
 }
 
 // TODO: The JERK_LIMIT is copied from firmware/main/control/control.h
@@ -94,6 +94,23 @@ SimulatorRobotSingleton::createFirmwareRobot()
 
     return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot,
                                                                   FirmwareRobotDeleter());
+}
+
+void SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
+    std::shared_ptr<FirmwareWorld_t> firmware_world, unsigned int primitive_index,
+    const primitive_params_t& primitive_params)
+{
+    checkValidAndExecuteVoid(
+        [firmware_world, primitive_index, primitive_params](auto robot) {
+            robot->startNewPrimitive(firmware_world, primitive_index, primitive_params);
+        });
+}
+
+void SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+    std::shared_ptr<FirmwareWorld_t> firmware_world)
+{
+    checkValidAndExecuteVoid(
+        [firmware_world](auto robot) { robot->runCurrentPrimitive(firmware_world); });
 }
 
 void SimulatorRobotSingleton::checkValidAndExecuteVoid(

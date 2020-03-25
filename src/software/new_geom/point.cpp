@@ -111,7 +111,7 @@ std::ostream &operator<<(std::ostream &os, const Point &p)
 
 bool operator==(const Point &p, const Point &q)
 {
-    return p.isClose(q, GeomConstants::EPSILON);
+    return p.isClose(q, GeomConstants::FIXED_EPSILON);
 }
 
 bool operator!=(const Point &p, const Point &q)
