@@ -17,6 +17,7 @@
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
 #include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/intersects.h"
 
 double proj_length(const Segment &first, const Vector &second)
 {
@@ -65,11 +66,6 @@ bool contains(const Circle &out, const Point &in)
     return distanceSquared(out.getOrigin(), in) <= out.getRadius() * out.getRadius();
 }
 
-bool contains(const Circle &out, const Segment &in)
-{
-    return distance(in, out.getOrigin()) < out.getRadius();
-}
-
 bool contains(const Segment &out, const Point &in)
 {
     if (collinear(in, out.getSegStart(), out.getEnd()))
@@ -108,70 +104,6 @@ bool contains(const Ray &out, const Point &in)
 bool contains(const Rectangle &out, const Point &in)
 {
     return out.contains(in);
-}
-
-bool intersects(const Triangle &first, const Circle &second)
-{
-    std::vector<Segment> firstSegments = first.getSegments();
-
-    return contains(first, second.getOrigin()) ||
-           distance(firstSegments[0], second.getOrigin()) < second.getRadius() ||
-           distance(firstSegments[1], second.getOrigin()) < second.getRadius() ||
-           distance(firstSegments[2], second.getOrigin()) < second.getRadius();
-}
-bool intersects(const Circle &first, const Triangle &second)
-{
-    return intersects(second, first);
-}
-
-bool intersects(const Circle &first, const Circle &second)
-{
-    return (first.getOrigin() - second.getOrigin()).length() <
-           (first.getRadius() + second.getRadius());
-}
-
-bool intersects(const Ray &first, const Segment &second)
-{
-    auto isect =
-        lineIntersection(first.getStart(), first.getStart() + first.toUnitVector(),
-                         second.getSegStart(), second.getEnd());
-    // If the infinitely long vectors defined by ray and segment intersect, check that the
-    // intersection is within their definitions
-    if (isect.has_value())
-    {
-        return contains(first, isect.value()) && contains(second, isect.value());
-    }
-    // If there is no intersection, the ray and segment may be parallel, check if they are
-    // overlapped
-    return contains(second, first.getStart());
-}
-bool intersects(const Segment &first, const Ray &second)
-{
-    return intersects(second, first);
-}
-
-bool intersects(const Segment &first, const Circle &second)
-{
-    // if the segment is inside the circle AND at least one of the points is
-    // outside the circle
-    return contains(second, first) &&
-           (distanceSquared(first.getSegStart(), second.getOrigin()) >
-                second.getRadius() * second.getRadius() ||
-            distanceSquared(first.getEnd(), second.getOrigin()) >
-                second.getRadius() * second.getRadius());
-}
-bool intersects(const Circle &first, const Segment &second)
-{
-    return intersects(second, first);
-}
-
-bool intersects(const Segment &first, const Segment &second)
-{
-    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> CD(second.getSegStart(),
-                                              second.getEnd());  // similar code
-
-    return boost::geometry::intersects(AB, CD);
 }
 
 std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points)

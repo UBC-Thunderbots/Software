@@ -39,23 +39,9 @@ double proj_length(const Segment &first, const Vector &second);
  */
 bool contains(const Triangle &out, const Point &in);
 bool contains(const Circle &out, const Point &in);
-bool contains(const Circle &out, const Segment &in);
 bool contains(const Ray &out, const Point &in);
 bool contains(const Segment &out, const Point &in);
 bool contains(const Rectangle &out, const Point &in);
-
-/*
- * The family of `intersects` functions determines whether there
- * exists an intersection between one object and another.
- */
-bool intersects(const Triangle &first, const Circle &second);
-bool intersects(const Circle &first, const Triangle &second);
-bool intersects(const Circle &first, const Circle &second);
-bool intersects(const Segment &first, const Circle &second);
-bool intersects(const Circle &first, const Segment &second);
-bool intersects(const Segment &first, const Segment &second);
-bool intersects(const Ray &first, const Segment &second);
-bool intersects(const Segment &first, const Ray &second);
 
 bool isDegenerate(const Segment &segment);
 bool isDegenerate(const Ray &segment);

@@ -9,6 +9,7 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/evaluation/team.h"
 #include "software/geom/util.h"
+#include "software/new_geom/util/intersects.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID>
 Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passers,
@@ -39,8 +40,8 @@ Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passer
                 std::any_of(obstacles.begin(), obstacles.end(),
                             [passer, receiver](const Robot &obstacle) {
                                 return intersects(
-                                    Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
-                                    Segment(passer.position(), receiver.position()));
+                                        Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
+                                        Segment(passer.position(), receiver.position()));
                             });
 
             if (!pass_blocked)
