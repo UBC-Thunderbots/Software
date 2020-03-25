@@ -14,7 +14,7 @@ typedef struct TrajectoryElement{
 } TrajectoryElement_t;
 
 /**
- * Returns a planned pla         nned trajectory as a list of TrajectoryElement's.
+ * Returns a planned trajectory as a list of TrajectoryElement's.
  * 
  * Key assumptions of this planner are:
  *  - Trajectories are time-optimal assuming INFINITE JERK capability of the robot
@@ -48,3 +48,15 @@ typedef struct TrajectoryElement{
 TrajectoryElement_t* generate_constant_arc_length_segmentation(Polynomial2dOrder3_t path, double t_start, double t_end, 
                                                     unsigned int num_segments, double max_allowable_acceleration, double max_allowable_speed, double initial_speed, 
                                                     double final_speed);
+
+/**
+ * Returns a constant interpolation period (time) trajectory based on an input constant arclength trajectory
+ * 
+ * @pre constant_arc_length_
+ * 
+ * @param constant_arclength_trajectory [in] The constant arclength trajectory used as reference for a constant interpolation period trajectory
+ * @param num_segments [in] The number of segments in the constant_arclength_trajectory input parameter
+ * @param interpolation_period [in] The constant change in time that corresponds to each trajectory segment
+ * 
+*/
+TrajectoryElement_t* interpolate_constant_time_trajectory_segmentation(TrajectoryElement_t constant_arclength_trajectory, unsigned int num_segments, const double interpolation_period);
