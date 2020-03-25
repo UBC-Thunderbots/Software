@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "firmware/main/app/control/trajectory_planner.h"
+#include "firmware/app/control/trajectory_planner.h"
 }
 
 #include <gtest/gtest.h>
