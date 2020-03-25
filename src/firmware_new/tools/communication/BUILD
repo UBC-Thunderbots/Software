@@ -10,6 +10,6 @@ cc_library(
         "//firmware_new/tools/communication/transfer_media:network_medium",
         "//firmware_new/tools/communication/transfer_media:transfer_medium",
         "//software/multithreading:thread_safe_buffer",
-    	"@boost//:asio",
-	],
+        "@boost//:asio",
+    ],
 )
