@@ -40,8 +40,8 @@ Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passer
                 std::any_of(obstacles.begin(), obstacles.end(),
                             [passer, receiver](const Robot &obstacle) {
                                 return intersects(
-                                        Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
-                                        Segment(passer.position(), receiver.position()));
+                                    Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
+                                    Segment(passer.position(), receiver.position()));
                             });
 
             if (!pass_blocked)
