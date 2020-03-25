@@ -12,8 +12,29 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
     double final_speed)
 {
     static TrajectoryElement_t trajectory[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
+    static TrajectoryElement_t reverse_trajectory[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
     static double max_allowable_speed_profile[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
     static double velocity_profile[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
+    
+    // Variable used to flag if the path is moving "backwards" along the input path
+    unsigned int reverse_parameterization = 0;
+
+
+    // Check for the parameterization direction
+    // If the path is traversed in reverse, then flip all components to forwards (to be reversed again in the end)
+    if(t_end < t_start){
+        reverse_parameterization = 1;
+        
+        // Reverse the direction (Polynomial library can only handle forwards direction)
+        double temp = t_start;
+        t_start = t_end;
+        t_end = temp;
+
+        // Reverse the final and initial speeds
+        temp = initial_speed;
+        initial_speed = final_speed;
+        final_speed = temp;
+    }
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param, __TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__);
@@ -65,6 +86,7 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
                                                            t),
                         2),
                 3.0 / 2.0);
+
         const double radius_of_curvature = 1 / (numerator / denominator);
 
         max_allowable_speed_profile[i] =
@@ -79,38 +101,38 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
     // Loop through the path forwards to ensure that the maximum velocity limit defined by
     // the curvature is not breached by constant max acceleration of the robot (if it is,
     // pull down the acceleration)
-    for (unsigned int j = 0; j < num_segments; j++)
+    for (unsigned int j = 1; j < num_segments; j++)
     {
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
-        temp_vel = sqrt(pow(velocity_profile[j], 2) +
+        temp_vel = sqrt(pow(velocity_profile[j-1], 2) +
                         2 * arc_segment_length * max_allowable_acceleration);
 
         // If the new speed is greater than the max allowable, reduce it to the max
-        if (temp_vel > max_allowable_speed_profile[j + 1])
+        if (temp_vel > max_allowable_speed_profile[j])
         {
-            velocity_profile[j + 1] = max_allowable_speed_profile[j + 1];
+            velocity_profile[j] = max_allowable_speed_profile[j];
         }
 
         else
         {
             // If the new speed is greater than the maximum limit of the robot, reduce it
             // to the limit
-            if (temp_vel > max_allowable_speed)
+            if (temp_vel >= max_allowable_speed)
             {
-                velocity_profile[j + 1] = max_allowable_speed;
+                velocity_profile[j] = max_allowable_speed;
             }
             else
             {
-                velocity_profile[j + 1] = temp_vel;
+                velocity_profile[j] = temp_vel;
             }
         }
     }
 
     // Now check backwards continuity. This is done to guarantee the robot can deccelerate
     // in time to not breach the maximum allowable speed defined by the path curvature
-    velocity_profile[num_segments] = final_speed;
+    velocity_profile[num_segments-1] = final_speed;
 
-    for (unsigned int j = num_segments; j > 0; j--)
+    for (unsigned int j = num_segments-1; j > 0; j--)
     {
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
         temp_vel = sqrt(pow(velocity_profile[j], 2) +
@@ -125,11 +147,24 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
     // Now that the velocity profile has been defined we can calcuate the time profile of
     // the trajectory
     trajectory[0].time = 0.0;
-    for (unsigned int j = 0; j < num_segments - 1; j++)
+    for (unsigned int j = 0; j < num_segments-1; j++)
     {
         trajectory[j + 1].time =
             trajectory[j].time +
             (2 * arc_segment_length) / (velocity_profile[j] + velocity_profile[j + 1]);
+    }
+    
+    // If the parameterization ended up being reversed, we need to flip all the values back
+    if(reverse_parameterization == 1) {
+        const double path_duration = trajectory[num_segments-1].time;
+
+        for(unsigned int j = 0; j < num_segments; j++){
+            // Reverse the positions
+            reverse_trajectory[(num_segments-1)-j].position = trajectory[j].position;
+            reverse_trajectory[(num_segments-1)-j].time = fabs(path_duration - trajectory[j].time);
+        }
+
+        return reverse_trajectory;
     }
 
     return trajectory;
