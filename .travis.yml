@@ -10,25 +10,26 @@ jobs:
     - name: "Build, Test, and Run Coverage"
       script:
         - cd src
-        # Build, test, run coverage
+        # Test Software
         - >
-          bazel coverage //software/...
-          --compilation_mode=fastbuild 
-          --verbose_test_summary 
-          --instrumentation_filter=//... 
-          --test_output=errors
-          --experimental_use_llvm_covmap
-          --collect_code_coverage
-        # Convert profdata results to lcov. We have to do this because of the
-        # current state of support for clang compiler coverage results in
-        # bazel. Once https://github.com/bazelbuild/bazel/issues/9406 is 
-        # addressed, we can probably change the `coverage_feature` flags in
-        # `cc_toolchain_config.bzl` to just `--coverage` and remove this script
-        - ./convert_profdata_to_lcov.sh
-        # Upload coverage results
-        - bash <(curl -s https://codecov.io/bash)
-        # Build our CPU-specific targets
-        - bazel build //firmware_new/... --cpu=stm32h7
+          bazel coverage //software/...     \
+            --compilation_mode=fastbuild    \
+            --verbose_test_summary          \
+            --instrumentation_filter=//...  \
+            --test_output=errors
+        # Test Firmware
+        - >
+          bazel coverage //firmware/app/...    \
+            --compilation_mode=fastbuild            \
+            --verbose_test_summary                  \
+            --instrumentation_filter=//...          \
+            --test_output=errors
+        # Collect Code Coverage Results
+        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
+        # Build ARM Targets For Firmware
+        - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
+        - bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
+        - bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin 
     - name: "Check Formatting"
       script:
         - ./formatting_scripts/check_formatting_ci.sh

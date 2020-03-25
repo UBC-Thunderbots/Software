@@ -3,39 +3,64 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
-#include <cmath>
-
-extern "C"
-{
-#include "firmware/main/app/world/firmware_robot.h"
-}
 #include "shared/constants.h"
-#include "software/backend/simulation/physics/physics_robot.h"
-#include "software/backend/simulation/physics/physics_simulator.h"
+#include "software/backend/simulation/physics/physics_world.h"
+#include "software/backend/simulation/simulator_ball.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
+#include "software/world/world.h"
 
-// This is a temporary tests to validate that the SimulatorRobotSingleton works as
-// expected when binding and switching robots behind the scenes. It will be replaced with
-// a better test once its functions are implemented properly
-TEST(PhysicsRobotTest, test_simulator_robot_manages_multiple_robots_correctly)
+class SimulatorRobotTest : public testing::Test
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world = ::Test::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 2)},
-                                                        Timestamp::fromSeconds(0));
-
-    PhysicsSimulator physics_simulator(world);
-    auto friendly_physics_robots = physics_simulator.getFriendlyPhysicsRobots();
-
-    SimulatorRobotSingleton::setPhysicsRobots(friendly_physics_robots);
-    for (const auto &physics_robot : friendly_physics_robots)
+   protected:
+    std::tuple<std::shared_ptr<PhysicsWorld>, std::shared_ptr<SimulatorRobot>,
+               std::shared_ptr<SimulatorBall>>
+    createWorld(Robot robot, Ball ball)
     {
-        if (auto physics_robot_lock = physics_robot.lock())
+        World world = ::Test::TestUtil::createBlankTestingWorld();
+        world.mutableFriendlyTeam().updateRobots({robot});
+        world.mutableBall() = ball;
+        auto physics_world  = std::make_shared<PhysicsWorld>(world);
+
+        std::shared_ptr<SimulatorRobot> simulator_robot;
+        auto physics_robot = physics_world->getFriendlyPhysicsRobots().at(0);
+        if (physics_robot.lock())
         {
-            SimulatorRobotSingleton::setRobotId(physics_robot_lock->getRobotId());
-            auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
-            std::cout << app_firmware_robot_getPositionX(firmware_robot.get())
-                      << std::endl;
+            simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
         }
+        else
+        {
+            ADD_FAILURE()
+                << "Failed to create a SimulatorRobot because a PhysicsRobot was invalid"
+                << std::endl;
+        }
+
+        std::shared_ptr<SimulatorBall> simulator_ball;
+        auto physics_ball = physics_world->getPhysicsBall();
+        if (physics_ball.lock())
+        {
+            simulator_ball = std::make_shared<SimulatorBall>(physics_ball);
+        }
+        else
+        {
+            ADD_FAILURE()
+                << "Failed to create a SimulatorRobot because a PhysicsRobot was invalid"
+                << std::endl;
+        }
+
+        return std::make_tuple(physics_world, simulator_robot, simulator_ball);
     }
+
+    const Robot robot_non_zero_state =
+        Robot(7, Point(1.04, -0.8), Vector(-1.5, 0), Angle::fromRadians(2.12),
+              AngularVelocity::fromRadians(-1.0), Timestamp::fromSeconds(0));
+    const Ball ball_zero_state =
+        Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+};
+
+TEST_F(SimulatorRobotTest, test_robot_id)
+{
+    auto [world, simulator_robot, simulator_ball] =
+        createWorld(robot_non_zero_state, ball_zero_state);
+    EXPECT_EQ(simulator_robot->getRobotId(), 7);
 }

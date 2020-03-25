@@ -130,6 +130,16 @@ Rectangle Field::fieldBoundary() const
     return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 }
 
+bool Field::isFieldValid() const
+{
+    if (totalXLength() < GeomConstants::EPSILON ||
+        totalYLength() < GeomConstants::EPSILON)
+    {
+        return false;
+    }
+    return true;
+}
+
 double Field::centerCircleRadius() const
 {
     return center_circle_radius_;

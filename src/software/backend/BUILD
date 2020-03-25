@@ -45,12 +45,28 @@ cc_library(
 )
 
 cc_library(
+    name = "handheld_controller_backend",
+    srcs = ["handheld_controller_backend.cpp"],
+    hdrs = ["handheld_controller_backend.h"],
+    deps = [
+        ":backend",
+        "//software/backend/output/radio:radio_output",
+        "//software/time:timestamp",
+        "//software/util/design_patterns:generic_factory",
+    ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+    alwayslink = True,
+)
+
+cc_library(
     name = "simulator_backend",
     srcs = ["simulator_backend.cpp"],
     hdrs = ["simulator_backend.h"],
     deps = [
         ":backend",
-        "//software/backend/simulation/physics:physics_simulator",
+        "//software/backend/simulation:simulator",
         "//software/logger",
         "//software/multithreading:thread_safe_buffer",
         "//software/util/design_patterns:generic_factory",
@@ -66,4 +82,17 @@ cc_library(
     name = "robot_status",
     hdrs = ["robot_status.h"],
     deps = [],
+)
+
+cc_library(
+    name = "all_backends",
+    hdrs = [
+        "all_backends.h",
+    ],
+    deps = [
+        ":grsim_backend",
+        ":handheld_controller_backend",
+        ":radio_backend",
+        ":simulator_backend",
+    ],
 )

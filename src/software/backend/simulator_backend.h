@@ -5,7 +5,6 @@
 #include <thread>
 
 #include "software/backend/backend.h"
-#include "software/backend/simulation/physics/physics_simulator.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/world/world.h"
 
@@ -27,7 +26,7 @@ class SimulatorBackend : public Backend
      *   'n' seconds apart in real "wall-clock" time. This is useful
      *   if you want to visualize the simulation.
      */
-    enum SimulationSpeed
+    enum class SimulationSpeed
     {
         FAST_SIMULATION,
         REALTIME_SIMULATION
@@ -124,6 +123,8 @@ class SimulatorBackend : public Backend
     // to buffer more than 1 value
     const unsigned int primitive_buffer_size = 1;
     ThreadSafeBuffer<ConstPrimitiveVectorPtr> primitive_buffer;
-    // How long to wait for primitives, in wall-clock time
-    const Duration primitive_timeout = Duration::fromSeconds(1);
+    // How long to wait for primitives, in wall-clock time.
+    // This is a somewhat arbitrary value that was chosen to be long enough such that
+    // tests won't time-out on slow machines like CI.
+    const Duration primitive_timeout = Duration::fromSeconds(10);
 };

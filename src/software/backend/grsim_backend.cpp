@@ -12,9 +12,11 @@ GrSimBackend::GrSimBackend()
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&GrSimBackend::receiveWorld, this, _1),
+                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
                     Util::DynamicParameters->getCameraConfig()),
       grsim_output(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
-                   Util::Constants::GRSIM_COMMAND_NETWORK_PORT)
+                   Util::Constants::GRSIM_COMMAND_NETWORK_PORT,
+                   Util::DynamicParameters->getAIControlConfig()->getRefboxConfig())
 {
 }
 

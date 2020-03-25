@@ -29,3 +29,12 @@ TEST(CollinearPointsTest, test_points_collinear_all_identical)
 {
     EXPECT_TRUE(collinear(Point(-4, 3), Point(-4, 3), Point(-4, 3)));
 }
+
+TEST(CollinearPointsTest, small_double_precision_error_collinear)
+{
+    // Make sure small double precision error does not affect collinear
+    Point p(7.0 + 1.0 / 3.0, 2);
+    Point q(5, -5);
+    Point r(8, 4);
+    EXPECT_TRUE(collinear(p, q, r));
+}

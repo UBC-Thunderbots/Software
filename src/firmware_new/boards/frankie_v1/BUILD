@@ -5,6 +5,10 @@ load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 cc_binary(
     name = "frankie_v1_main",
     srcs = ["main.c"],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
     defines = [
         "USE_HAL_DRIVER",
         "STM32H743xx",
@@ -20,6 +24,9 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":frankie_v1_main_lib",
+        "//firmware_new/boards/frankie_v1/io:allegro_a3931_motor_driver",
+        "//firmware_new/boards/frankie_v1/io:gpio_pin",
+        "//firmware_new/boards/frankie_v1/io:pwm_pin",
     ],
 )
 
@@ -35,6 +42,8 @@ cc_library(
     hdrs = glob(["*.h"]),
     copts = [
         "-DSTM32H743xx",
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
@@ -47,6 +56,11 @@ cc_library(
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
+)
+
+cc_library(
+    name = "constants",
+    hdrs = ["constants.h"],
 )
 
 stm32h7_hal_library_files_genrule("hal_library_files")
@@ -498,8 +512,8 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "rtos",
         ":hal",
+        ":rtos",
     ],
     alwayslink = True,
 )

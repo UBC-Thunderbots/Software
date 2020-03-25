@@ -17,10 +17,12 @@ class AI final
     AI() = delete;
 
     /**
-     * Create an AI with given configuration
-     * @param config The AI configuration
+     * Create an AI with given configurations
+     * @param ai_config The AI configuration
+     * @param control_config The AI Control configuration
      */
-    explicit AI(std::shared_ptr<const AIConfig> config);
+    explicit AI(std::shared_ptr<const AIConfig> ai_config,
+                std::shared_ptr<const AIControlConfig> control_config);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current

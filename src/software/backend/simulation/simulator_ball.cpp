@@ -1,60 +1,40 @@
 #include "software/backend/simulation/simulator_ball.h"
 
-std::weak_ptr<PhysicsBall> SimulatorBallSingleton::physics_ball_weak_ptr =
-    std::weak_ptr<PhysicsBall>();
+#include "software/logger/init.h"
 
-void SimulatorBallSingleton::setPhysicsBall(std::weak_ptr<PhysicsBall> ball)
+SimulatorBall::SimulatorBall(std::weak_ptr<PhysicsBall> physics_ball)
+    : physics_ball(physics_ball)
 {
-    physics_ball_weak_ptr = ball;
 }
 
-std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>
-SimulatorBallSingleton::createFirmwareBall()
+Point SimulatorBall::checkValidAndReturnPoint(
+    std::function<Point(const std::shared_ptr<PhysicsBall>)> func) const
 {
-    // TODO: Make sure all objects de-allocated properly
-    // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
-    FirmwareBall_t* firmware_ball =
-        app_firmware_ball_create(&(SimulatorBallSingleton::getBallPositionX),
-                                 &(SimulatorBallSingleton::getBallPositionY),
-                                 &(SimulatorBallSingleton::getBallVelocityX),
-                                 &(SimulatorBallSingleton::getBallVelocityY));
-
-    return std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>(firmware_ball,
-                                                                FirmwareBallDeleter());
-}
-
-float SimulatorBallSingleton::getBallPositionX()
-{
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
+    if (auto ball = physics_ball.lock())
     {
-        // TODO: implement me
+        return func(ball);
     }
-    return 0.0;
+    LOG(WARNING) << "SimulatorBall being used with invalid PhysicsBall" << std::endl;
+    return Point(0, 0);
 }
 
-float SimulatorBallSingleton::getBallPositionY()
+Vector SimulatorBall::checkValidAndReturnVector(
+    std::function<Vector(const std::shared_ptr<PhysicsBall>)> func) const
 {
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
+    if (auto ball = physics_ball.lock())
     {
-        // TODO: implement me
+        return func(ball);
     }
-    return 0.0;
+    LOG(WARNING) << "SimulatorBall being used with invalid PhysicsBall" << std::endl;
+    return Vector(0, 0);
 }
 
-float SimulatorBallSingleton::getBallVelocityX()
+Point SimulatorBall::position() const
 {
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
-    {
-        // TODO: implement me
-    }
-    return 0.0;
+    return checkValidAndReturnPoint([](auto ball) { return ball->position(); });
 }
 
-float SimulatorBallSingleton::getBallVelocityY()
+Vector SimulatorBall::velocity() const
 {
-    if (auto physics_ball = physics_ball_weak_ptr.lock())
-    {
-        // TODO: implement me
-    }
-    return 0.0;
+    return checkValidAndReturnVector([](auto ball) { return ball->velocity(); });
 }

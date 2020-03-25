@@ -18,23 +18,22 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         long random_seed)
+         std::shared_ptr<const AIControlConfig> control_config, long random_seed)
     : default_play_constructor(default_play_constructor),
-      random_number_generator(random_seed)
+      random_number_generator(random_seed),
+      control_config(control_config)
 {
 }
 
 void STP::updateCurrentPlay(const World& world)
 {
-    current_game_state     = world.gameState().game_state;
-    previous_override_play = override_play;
-    override_play =
-        Util::DynamicParameters->getAIControlConfig()->OverrideAIPlay()->value();
+    current_game_state               = world.gameState().game_state;
+    previous_override_play           = override_play;
+    override_play                    = control_config->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name =
-        Util::DynamicParameters->getAIControlConfig()->CurrentAIPlay()->value();
+    override_play_name          = control_config->CurrentAIPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
@@ -301,8 +300,10 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    info.play_type = name(current_game_state);
-    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
+    std::string info_play_type = to_string(current_game_state);
+    std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
+    std::unordered_set<std::string> info_robot_tactic_assignment = {};
+    info = PlayInfo(info_play_type, info_play_name, info_robot_tactic_assignment);
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report
     // the tactics in order or robot id. This makes it much easier to read if tactics
@@ -339,7 +340,7 @@ PlayInfo STP::getPlayInfo()
             }
             std::string s = "Robot " + std::to_string(tactic->getAssignedRobot()->id()) +
                             "  -  " + tactic->getName();
-            info.robot_tactic_assignment.emplace_back(s);
+            info.addRobotTacticAssignment(s);
         }
     }
 
