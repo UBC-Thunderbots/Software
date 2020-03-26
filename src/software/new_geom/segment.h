@@ -89,8 +89,9 @@ class Segment final
         {
             // If the segment and point are in a perfect vertical line, we must use Y
             // coordinate centric logic
-            if ((std::abs(point.x() - getEnd().x()) < GeomConstants::EPSILON) &&
-                (std::abs(getEnd().x() - getSegStart().x()) < GeomConstants::EPSILON))
+            if ((std::abs(point.x() - getEnd().x()) < GeomConstants::FIXED_EPSILON) &&
+                (std::abs(getEnd().x() - getSegStart().x()) <
+                 GeomConstants::FIXED_EPSILON))
             {
                 // Since segment and point are collinear we only need to check one of the
                 // coordinates, in this case we select Y because all X values are equal

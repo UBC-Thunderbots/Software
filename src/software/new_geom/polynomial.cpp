@@ -35,7 +35,7 @@ unsigned int Polynomial::getOrder() const
     {
         for (size_t i = coeffs.size() - 1; i >= 0; i--)
         {
-            if (std::abs(coeffs[i]) >= GeomConstants::EPSILON)
+            if (std::abs(coeffs[i]) >= GeomConstants::FIXED_EPSILON)
             {
                 return i;
             }
@@ -121,7 +121,7 @@ bool operator==(const Polynomial &p1, const Polynomial &p2)
     }
     for (unsigned int i = 0; i < p1_order; i++)
     {
-        if (std::abs(p1.getCoeff(i) - p2.getCoeff(i)) >= GeomConstants::EPSILON)
+        if (std::abs(p1.getCoeff(i) - p2.getCoeff(i)) >= GeomConstants::FIXED_EPSILON)
         {
             return false;
         }
