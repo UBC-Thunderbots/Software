@@ -3,8 +3,8 @@
 // Need this for size_t
 #include <stddef.h>
 
-#include "firmware/main/math/polynomial_1d.h"
-#include "firmware/main/math/vector_2d.h"
+#include "firmware/shared/math/polynomial_1d.h"
+#include "firmware/shared/math/vector_2d.h"
 
 /**
  * This represents an arc length parametrization of a 2D polynomial via a list of t values

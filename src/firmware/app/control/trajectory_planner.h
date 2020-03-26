@@ -1,7 +1,7 @@
 #pragma once
 
-#include "firmware/main/math/polynomial_2d.h"
-#include "firmware/main/math/vector_2d.h"
+#include "firmware/shared/math/polynomial_2d.h"
+#include "firmware/shared/math/vector_2d.h"
 
 #define __TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__ 6000 // The maximum size of the array containing trajectory elements
 #define __TRAJECTORY_PLANNER_MAX_PATH_LENGTH__ 18 // [meters]
@@ -12,6 +12,11 @@ typedef struct TrajectoryElement{
     Vector2d_t position;
     double time;
 } TrajectoryElement_t;
+
+typedef struct Trajectory{
+    TrajectoryElement_t* trajectory_elements;
+    unsigned int num_elements;
+} Trajectory_t;
 
 /**
  * Returns a planned trajectory as a list of TrajectoryElement's.
@@ -59,4 +64,4 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(Polynomial2dOrder
  * @param interpolation_period [in] The constant change in time that corresponds to each trajectory segment
  * 
 */
-TrajectoryElement_t* interpolate_constant_time_trajectory_segmentation(TrajectoryElement_t constant_arclength_trajectory, unsigned int num_segments, const double interpolation_period);
+Trajectory_t interpolate_constant_time_trajectory_segmentation(TrajectoryElement_t* constant_arclength_trajectory, unsigned int num_segments, const double interpolation_period);

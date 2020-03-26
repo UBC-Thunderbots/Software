@@ -12,9 +12,9 @@ cc_library(
     srcs = ["trajectory_planner.c"],
     hdrs = ["trajectory_planner.h"],
     deps = [
-        "//firmware/main/math:polynomial_1d",
-        "//firmware/main/math:polynomial_2d",
-        "//firmware/main/math:vector_2d",
+        "//firmware/shared/math:polynomial_1d",
+        "//firmware/shared/math:polynomial_2d",
+        "//firmware/shared/math:vector_2d",
     ],
 )
 

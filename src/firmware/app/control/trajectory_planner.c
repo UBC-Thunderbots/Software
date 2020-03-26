@@ -1,8 +1,8 @@
-#include "trajectory_planner.h"
+#include "firmware/app/control/trajectory_planner.h"
 
-#include "firmware/main/math/polynomial_1d.h"
-#include "firmware/main/math/polynomial_2d.h"
-#include "firmware/main/math/vector_2d.h"
+#include "firmware/shared/math/polynomial_1d.h"
+#include "firmware/shared/math/polynomial_2d.h"
+#include "firmware/shared/math/vector_2d.h"
 #include "math.h"
 #include "stdio.h"
 
@@ -168,4 +168,55 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
     }
 
     return trajectory;
+}
+
+
+Trajectory_t interpolate_constant_time_trajectory_segmentation(TrajectoryElement_t* constant_arclength_trajectory, unsigned int num_segments, const double interpolation_period) {
+
+    static TrajectoryElement_t constant_period_trajectory[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
+
+    // The first point is the same for each trajectory
+    constant_period_trajectory[0].time = constant_arclength_trajectory[0].time;
+    constant_period_trajectory[0].position = constant_arclength_trajectory[0].position;
+
+    // Keep track of the current time we are searching for in the constant arclength trajectory
+    unsigned int time_periods = 1;
+    double trajectory_time = interpolation_period*time_periods;
+    
+    // We want to loop through the entire trajectory
+    
+    // Loop until we find a value JUST larger than the expected
+    // Check the element prior and perform linear interpolation
+    
+    for(unsigned int i = 1; i < num_segments; i++){
+        
+        while(constant_arclength_trajectory[i].time >= trajectory_time){
+            
+            // Perform a linear interpolation
+            const double delta_time = constant_arclength_trajectory[i].time - constant_arclength_trajectory[i-1].time;
+            const double delta_x = constant_arclength_trajectory[i].position.x - constant_arclength_trajectory[i-1].position.x;
+            const double delta_y = constant_arclength_trajectory[i].position.y - constant_arclength_trajectory[i-1].position.y;
+            
+            const double slope_x = delta_x/delta_time;
+            const double slope_y = delta_y/delta_time;
+
+            const double interpolated_x = slope_x*(trajectory_time - constant_arclength_trajectory[i-1].time) + constant_arclength_trajectory[i-1].position.x;
+            const double interpolated_y = slope_y*(trajectory_time - constant_arclength_trajectory[i-1].time) + constant_arclength_trajectory[i-1].position.y;
+
+            constant_period_trajectory[time_periods].position.x = interpolated_x;
+            constant_period_trajectory[time_periods].position.y = interpolated_y;
+            constant_period_trajectory[time_periods].time = trajectory_time;
+
+            time_periods++;
+            trajectory_time = interpolation_period*time_periods;
+
+        }
+    }
+    
+    static Trajectory_t ret;
+
+    ret.trajectory_elements = constant_period_trajectory;
+    ret.num_elements = time_periods;
+
+    return ret;
 }
