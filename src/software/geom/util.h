@@ -65,24 +65,6 @@ double length(const Segment &segment);
 double lengthSquared(const Segment &segment);
 
 /**
- * Checks if 3 points are collinear.
- *
- * @param a a point
- *
- * @param b a point
- *
- * @param c a point
- *
- * @return true if any two points are within EPS distance to each other. (If
- * any two of three points are within EPS distance of each other, they are
- * essentially the same point and the two points will form the same line.)
- *
- * @return true if the cross product of the two lines formed by the three
- * points are smaller than EPS
- */
-// bool collinear(const Point &a, const Point &b, const Point &c);
-
-/**
  * Checks if 2 Segments are collinear.
  *
  * @param segment1 : The first Segment
