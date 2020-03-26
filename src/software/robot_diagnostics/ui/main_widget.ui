@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>882</width>
-    <height>590</height>
+    <width>874</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,9 +26,9 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="per_motor">
+    <widget class="QWidget" name="direct_per_wheel">
      <attribute name="title">
-      <string>Per-motor</string>
+      <string>Direct Per-Wheel Control</string>
      </attribute>
      <widget class="QSlider" name="slider_motor_fl">
       <property name="geometry">
@@ -40,7 +40,7 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>-99</number>
+       <number>0</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -56,7 +56,7 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>-99</number>
+       <number>0</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -72,7 +72,7 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>-99</number>
+       <number>0</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -88,7 +88,7 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>-99</number>
+       <number>0</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -198,25 +198,44 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_per_motor_execute">
+     <widget class="QPushButton" name="pushButton_direct_per_wheel_go_stop">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>290</x>
         <y>150</y>
-        <width>181</width>
+        <width>141</width>
         <height>31</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Toggles whether or not to send drive commands to the robot</string>
+      </property>
       <property name="text">
-       <string>Execute</string>
+       <string>Go</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_direct_per_wheel_stop_and_reset">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>150</y>
+        <width>131</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Stop sending drive commands and reset sliders</string>
+      </property>
+      <property name="text">
+       <string>Stop and Reset</string>
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="matrix">
+    <widget class="QWidget" name="direct_velocity">
      <attribute name="title">
-      <string>Matrix</string>
+      <string>DIrect Velocity Control</string>
      </attribute>
-     <widget class="QSlider" name="slider_matrix_x">
+     <widget class="QSlider" name="slider_direct_velocity_x">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -229,7 +248,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="slider_matrix_y">
+     <widget class="QSlider" name="slider_direct_velocity_y">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -242,7 +261,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="slider_matrix_theta">
+     <widget class="QSlider" name="slider_direct_velocity_theta">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -255,7 +274,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_matrix_x">
+     <widget class="QLabel" name="label_direct_velocity_x">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -271,7 +290,7 @@
        <string>X (m/s)</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_matrix_y">
+     <widget class="QLabel" name="label_direct_velocity_y">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -287,7 +306,7 @@
        <string>Y (m/s)</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_matrix_theta">
+     <widget class="QLabel" name="label_direct_velocity_theta">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -303,7 +322,7 @@
        <string>θ (°/s)</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_matrix_x">
+     <widget class="QLineEdit" name="lineEdit_direct_velocity_x">
       <property name="geometry">
        <rect>
         <x>380</x>
@@ -313,7 +332,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_matrix_y">
+     <widget class="QLineEdit" name="lineEdit_direct_velocity_y">
       <property name="geometry">
        <rect>
         <x>380</x>
@@ -323,7 +342,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_matrix_theta">
+     <widget class="QLineEdit" name="lineEdit_direct_velocity_theta">
       <property name="geometry">
        <rect>
         <x>380</x>
@@ -333,17 +352,36 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_matrix_execute">
+     <widget class="QPushButton" name="pushButton_direct_velocity_go_stop">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>290</x>
         <y>150</y>
-        <width>181</width>
+        <width>141</width>
         <height>31</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Toggles whether or not to send drive commands to the robot</string>
+      </property>
       <property name="text">
-       <string>Execute</string>
+       <string>Go</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_direct_velocity_stop_and_reset">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>150</y>
+        <width>131</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Stop sending drive commands and reset sliders</string>
+      </property>
+      <property name="text">
+       <string>Stop and Reset</string>
       </property>
      </widget>
     </widget>
@@ -744,6 +782,9 @@
       <pointsize>11</pointsize>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Receive Signal Strength</string>
+    </property>
     <property name="text">
      <string>Rx Signal Strength:</string>
     </property>
@@ -857,7 +898,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>350</y>
+      <y>360</y>
       <width>411</width>
       <height>31</height>
      </rect>
@@ -870,7 +911,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>355</y>
+      <y>365</y>
       <width>81</width>
       <height>17</height>
      </rect>
@@ -887,90 +928,49 @@
    <widget class="QRadioButton" name="radioButton_discharge">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>275</y>
-      <width>112</width>
+      <x>410</x>
+      <y>280</y>
+      <width>91</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Discharge</string>
     </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup_charge_mode</string>
-    </attribute>
    </widget>
    <widget class="QRadioButton" name="radioButton_float">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>275</y>
-      <width>112</width>
+      <x>520</x>
+      <y>280</y>
+      <width>81</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Float</string>
     </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup_charge_mode</string>
-    </attribute>
    </widget>
    <widget class="QRadioButton" name="radioButton_charge">
     <property name="geometry">
      <rect>
-      <x>630</x>
-      <y>275</y>
-      <width>112</width>
+      <x>610</x>
+      <y>280</y>
+      <width>71</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Charge</string>
     </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup_charge_mode</string>
-    </attribute>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_kicker">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>295</y>
-      <width>112</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Kicker</string>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup_chicker_mode</string>
-    </attribute>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_chipper">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>295</y>
-      <width>112</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Chipper</string>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup_chicker_mode</string>
-    </attribute>
    </widget>
    <widget class="QSlider" name="slider_chicker_power">
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>325</y>
+      <y>310</y>
       <width>241</width>
-      <height>20</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="orientation">
@@ -981,7 +981,7 @@
     <property name="geometry">
      <rect>
       <x>406</x>
-      <y>325</y>
+      <y>310</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -999,43 +999,30 @@
     <property name="geometry">
      <rect>
       <x>720</x>
-      <y>325</y>
+      <y>310</y>
       <width>51</width>
       <height>25</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_chick">
+   <widget class="QPushButton" name="pushButton_chicker_chip">
     <property name="geometry">
      <rect>
-      <x>788</x>
-      <y>275</y>
+      <x>790</x>
+      <y>310</y>
       <width>81</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Chick</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_autochick">
-    <property name="geometry">
-     <rect>
-      <x>788</x>
-      <y>320</y>
-      <width>81</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Autochick</string>
+     <string>Chip</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_dribbler_power">
     <property name="geometry">
      <rect>
       <x>720</x>
-      <y>385</y>
+      <y>395</y>
       <width>51</width>
       <height>25</height>
      </rect>
@@ -1045,9 +1032,9 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>385</y>
+      <y>395</y>
       <width>241</width>
-      <height>20</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="orientation">
@@ -1058,7 +1045,7 @@
     <property name="geometry">
      <rect>
       <x>406</x>
-      <y>385</y>
+      <y>395</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -1076,13 +1063,13 @@
     <property name="geometry">
      <rect>
       <x>790</x>
-      <y>380</y>
+      <y>390</y>
       <width>81</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Run</string>
+     <string>Go</string>
     </property>
    </widget>
    <widget class="Line" name="line_6">
@@ -1124,13 +1111,42 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
+   <widget class="QCheckBox" name="checkBox_chicker_auto">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>280</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Automatically kick or chip when the breakbeam triggered</string>
+    </property>
+    <property name="text">
+     <string>Auto</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_chicker_kick">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>270</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Kick</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>882</width>
+     <width>874</width>
      <height>22</height>
     </rect>
    </property>
@@ -1146,8 +1162,4 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_2"/>
- </buttongroups>
 </ui>

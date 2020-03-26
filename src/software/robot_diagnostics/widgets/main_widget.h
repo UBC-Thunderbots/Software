@@ -35,6 +35,7 @@ class MainWidget : public QMainWindow
     // dribbler chicker controls
     double dribbler_power;
     double chicker_power;
+    bool chicker_autochick;
 
     // drive controls
     double motor_power_fl;
@@ -44,9 +45,7 @@ class MainWidget : public QMainWindow
     double matrix_x_vel;
     double matrix_y_vel;
     double matrix_angular_vel;
-
-    ChargeMode charge_mode;
-    ChickerMode chicker_mode;
+    bool driving;
 
     std::string led_mode;
 };

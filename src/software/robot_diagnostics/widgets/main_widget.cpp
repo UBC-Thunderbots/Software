@@ -15,9 +15,9 @@ MainWidget::MainWidget(QWidget *parent)
 
     setupFeedback(main_widget);
     setupDrive(main_widget, motor_power_fl, motor_power_fr, motor_power_bl,
-               motor_power_br, matrix_x_vel, matrix_y_vel, matrix_angular_vel);
+               motor_power_br, matrix_x_vel, matrix_y_vel, matrix_angular_vel, driving);
     setupDribbler(main_widget, dribbler_power);
-    setupChicker(main_widget, chicker_power, charge_mode, chicker_mode);
+    setupChicker(main_widget, chicker_power, chicker_autochick);
     setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);
 
