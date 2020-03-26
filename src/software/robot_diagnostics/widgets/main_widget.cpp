@@ -13,10 +13,24 @@ MainWidget::MainWidget(QWidget *parent)
     // https://www.qtcentre.org/threads/41128-Need-to-implement-in-place-line-edit-unable-to-get-lose-focus-of-QLineEdit
     setFocusPolicy(Qt::StrongFocus);
 
+    dribbler_power_changed_callback = [](double dribbler_power) {
+        // TODO (Issue #1229): send some proto
+    };
+
+    direct_per_wheel_power_changed_callback =
+        [](double direct_per_wheel_power, DirectPerWheelMode direct_per_wheel_mode) {
+            // TODO (Issue #1229): send some proto
+        };
+
+    direct_velocity_power_changed_callback = [](double direct_per_wheel_power,
+                                                DirectVelocityMode direct_velocity_mode) {
+        // TODO (Issue #1229): send some proto
+    };
+
     setupFeedback(main_widget);
-    setupDrive(main_widget, motor_power_fl, motor_power_fr, motor_power_bl,
-               motor_power_br, matrix_x_vel, matrix_y_vel, matrix_angular_vel);
-    setupDribbler(main_widget, dribbler_power);
+    setupDrive(main_widget, direct_per_wheel_power_changed_callback,
+               direct_velocity_power_changed_callback);
+    setupDribbler(main_widget, dribbler_power_changed_callback);
     setupChicker(main_widget, chicker_power, chicker_autochick);
     setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);

@@ -37,15 +37,22 @@ class MainWidget : public QMainWindow
     double chicker_power;
     bool chicker_autochick;
 
+    // dribbler controls
+    std::function<void(double)> dribbler_power_changed_callback;
+
     // drive controls
-    double motor_power_fl;
-    double motor_power_fr;
-    double motor_power_bl;
-    double motor_power_br;
+    std::function<void(double, DirectPerWheelMode)>
+        direct_per_wheel_power_changed_callback;
+    std::function<void(double, DirectVelocityMode)>
+        direct_velocity_power_changed_callback;
+
+    double direct_per_wheel_power_fl;
+    double direct_per_wheel_power_fr;
+    double direct_per_wheel_power_bl;
+    double direct_per_wheel_power_br;
     double matrix_x_vel;
     double matrix_y_vel;
     double matrix_angular_vel;
-
     std::string led_mode;
 };
 

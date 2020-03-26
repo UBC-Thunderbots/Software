@@ -12,10 +12,11 @@
  *
  * @param line_edit QLineEdit to read and modify
  * @param slider QSlider to read and modify
- * @param value value to read inputs into
+ * @param value_changed_callback callback to call with new values
  * @param min min value for value
  * @param max max value for value
  * @param scaling how much value should be scaled up to display on slider
  */
-void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider, double &value, double min,
+void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
+                         std::function<void(double)> value_changed_callback, double min,
                          double max, double scaling);

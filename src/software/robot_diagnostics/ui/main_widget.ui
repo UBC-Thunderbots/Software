@@ -30,7 +30,7 @@
      <attribute name="title">
       <string>Direct Per-Wheel Control</string>
      </attribute>
-     <widget class="QSlider" name="slider_motor_fl">
+     <widget class="QSlider" name="slider_direct_per_wheel_fl">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -46,7 +46,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="slider_motor_fr">
+     <widget class="QSlider" name="slider_direct_per_wheel_fr">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -62,7 +62,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="slider_motor_bl">
+     <widget class="QSlider" name="slider_direct_per_wheel_bl">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -78,7 +78,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="slider_motor_br">
+     <widget class="QSlider" name="slider_direct_per_wheel_br">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -94,7 +94,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_motor_fl">
+     <widget class="QLabel" name="label_direct_per_wheel_fl">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -110,7 +110,7 @@
        <string>Motor FL</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_motor_fr">
+     <widget class="QLabel" name="label_direct_per_wheel_fr">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -126,7 +126,7 @@
        <string>Motor FR</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_motor_bl">
+     <widget class="QLabel" name="label_direct_per_wheel_bl">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -142,7 +142,7 @@
        <string>Motor BL</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_motor_br">
+     <widget class="QLabel" name="label_direct_per_wheel_br">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -158,7 +158,7 @@
        <string>Motor BR</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_motor_fl">
+     <widget class="QLineEdit" name="lineEdit_direct_per_wheel_fl">
       <property name="geometry">
        <rect>
         <x>380</x>
@@ -168,7 +168,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_motor_fr">
+     <widget class="QLineEdit" name="lineEdit_direct_per_wheel_fr">
       <property name="geometry">
        <rect>
         <x>380</x>
@@ -178,7 +178,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_motor_bl">
+     <widget class="QLineEdit" name="lineEdit_direct_per_wheel_bl">
       <property name="geometry">
        <rect>
         <x>380</x>
@@ -188,7 +188,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_motor_br">
+     <widget class="QLineEdit" name="lineEdit_direct_per_wheel_br">
       <property name="geometry">
        <rect>
         <x>380</x>

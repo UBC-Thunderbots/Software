@@ -15,6 +15,14 @@ enum class ChargeMode
     FLOAT,
 };
 
+enum class ChickMode
+{
+    KICK,
+    CHIP,
+    AUTOKICK,
+    AUTOCHIP,
+};
+
 /**
  * Set up chicker area of the widget
  *
