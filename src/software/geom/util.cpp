@@ -16,8 +16,8 @@
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
-#include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/collinear.h"
+#include "software/new_geom/util/distance.h"
 
 double proj_length(const Segment &first, const Vector &second)
 {

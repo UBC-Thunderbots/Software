@@ -80,7 +80,7 @@ double lengthSquared(const Segment &segment);
  * @return true if the cross product of the two lines formed by the three
  * points are smaller than EPS
  */
-//bool collinear(const Point &a, const Point &b, const Point &c);
+// bool collinear(const Point &a, const Point &b, const Point &c);
 
 /**
  * Checks if 2 Segments are collinear.

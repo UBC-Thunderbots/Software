@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/new_geom/point.h"
-#include "software/new_geom/util/collinear.h"
 #include "software/new_geom/util/almost_equal.h"
+#include "software/new_geom/util/collinear.h"
 
 // This is a direct copy of geom/segment.h, this is needed to unblock work on the new_geom
 // shape hierarchy.
@@ -90,7 +90,10 @@ class Segment final
         {
             // If the segment and point are in a perfect vertical line, we must use Y
             // coordinate centric logic
-            if (almostEqual(point.x(), getEnd().x(), GeomConstants::FIXED_EPSILON, GeomConstants::ULPS_EPSILON_TEN) && almostEqual(getEnd().x(), getSegStart().x(), GeomConstants::FIXED_EPSILON, GeomConstants::ULPS_EPSILON_TEN))
+            if (almostEqual(point.x(), getEnd().x(), GeomConstants::FIXED_EPSILON,
+                            GeomConstants::ULPS_EPSILON_TEN) &&
+                almostEqual(getEnd().x(), getSegStart().x(), GeomConstants::FIXED_EPSILON,
+                            GeomConstants::ULPS_EPSILON_TEN))
             {
                 // Since segment and point are collinear we only need to check one of the
                 // coordinates, in this case we select Y because all X values are equal
