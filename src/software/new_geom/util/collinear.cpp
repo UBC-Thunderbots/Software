@@ -28,5 +28,6 @@ bool collinear(const Point &a, const Point &b, const Point &c)
     Vector v1 = b - a;
     Vector v2 = c - a;
 
-    return almostEqual(v1.x() * v2.y(), v1.y() * v2.x(), 1e-13, 10);
+    return almostEqual(v1.x() * v2.y(), v1.y() * v2.x(), GeomConstants::FIXED_EPSILON,
+                       GeomConstants::ULPS_EPSILON_TEN);
 }
