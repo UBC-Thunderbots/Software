@@ -6,8 +6,8 @@ cc_library(
     hdrs = ["physics.h"],
     deps = [
         ":physics_linear_alebra",
-        "//firmware/shared:tbots_math",
         "//firmware/shared:util",
+        "//firmware/shared/math:tbots_math",
     ],
 )
 
@@ -24,11 +24,6 @@ cc_library(
     srcs = ["util.c"],
     hdrs = ["util.h"],
     deps = [
-        ":tbots_math",
+        "//firmware/shared/math:tbots_math",
     ],
-)
-
-cc_library(
-    name = "tbots_math",
-    hdrs = ["tbots_math.h"],
 )
