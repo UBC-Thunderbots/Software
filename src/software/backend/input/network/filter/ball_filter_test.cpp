@@ -541,5 +541,5 @@ TEST_F(BallFilterTest,
     // Check the lines are pointing in the same direction
     EXPECT_LT(x_vs_y_regression.regression_line.toNormalUnitVector().cross(
                   y_vs_x_regression.regression_line.toNormalUnitVector()),
-              GeomConstants::EPSILON);
+              GeomConstants::FIXED_EPSILON);
 }
