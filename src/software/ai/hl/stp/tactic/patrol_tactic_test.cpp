@@ -33,10 +33,7 @@ class PatrolTacticTest : public testing::Test
             expected_actions.push_back(expected_action);
         }
     }
-
-
-
-
+    
     /**
      * populates the robot_state_to_complete_actions test variable in the order of points in patrol_points
      * @param patrol_points: points that the robot visits in the patrol tactic
@@ -58,7 +55,7 @@ class PatrolTacticTest : public testing::Test
      * Simulates the running of an action until it is done, allowing the patrol tactic
      * to move on to the next point
      * @param robot: robot that is assigned the tactic
-     * @param newRobotState: A state that satisfies the patrol tactics's conditions of
+     * @param new_robot_state: A state that satisfies the patrol tactics's conditions of
      * moving on on to the next point
      * @param action_ptr: the last action returned by the tactic
      * @param tactic: the patrol tactic
@@ -80,12 +77,12 @@ class PatrolTacticTest : public testing::Test
      * Simulates the running of an action until it is done, allowing the patrol tactic
      * to move on to the next point
      * @param robot: robot that is assigned the tactic
-     * @param newRobotState: A state that satisfies the patrol tactics's conditions of
+     * @param new_robot_state: A state that satisfies the patrol tactics's conditions of
      * moving on on to the next point
      * @param action_ptr: the last action returned by the tactic
      * @param tactic: the patrol tactic
      */
-    void simulateActionToCompletion(Robot &robot, RobotState newRobotState,
+    void simulateActionToCompletion(Robot &robot, RobotState new_robot_state,
                                     std::shared_ptr<Action> action_ptr,
                                     PatrolTactic &tactic)
     {
@@ -93,7 +90,7 @@ class PatrolTacticTest : public testing::Test
         std::unique_ptr<Intent> intent = action_ptr->getNextIntent();
 
         // update state of the robot and tactic
-        robot.updateState(newRobotState);
+        robot.updateState(new_robot_state);
         tactic.updateRobot(robot);
 
         // complete the action
@@ -110,11 +107,11 @@ class PatrolTacticTest : public testing::Test
 TEST_F(PatrolTacticTest, patrol_tactic_constructor)
 {
     Point patrol_point1            = Point(3, 5);
-    double atpatrol_pointTolerance = 1.0;
+    double at_patrol_point_tolerance = 1.0;
     double speed_at_patrol_points    = 1.0;
 
     PatrolTactic tactic =
-        PatrolTactic(std::vector<Point>({patrol_point1}), atpatrol_pointTolerance,
+        PatrolTactic(std::vector<Point>({patrol_point1}), at_patrol_point_tolerance,
                      Angle::zero(), speed_at_patrol_points);
     ASSERT_NE(nullptr, &tactic);
     ASSERT_EQ("Patrol Tactic", tactic.getName());
@@ -128,14 +125,14 @@ TEST_F(PatrolTacticTest, patrol_one_point)
     Vector initial_velocity   = Vector(1, 0);
 
     Point patrol_point1            = Point(3, 5);
-    double atpatrol_pointTolerance = 1.0;
+    double at_patrol_point_tolerance = 1.0;
     double speed_at_patrol_points    = 1.0;
 
     Robot robot = Robot(robot_id, robot_starting_point, initial_velocity, Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     PatrolTactic tactic =
-        PatrolTactic(std::vector<Point>({patrol_point1}), atpatrol_pointTolerance,
+        PatrolTactic(std::vector<Point>({patrol_point1}), at_patrol_point_tolerance,
                      Angle::zero(), speed_at_patrol_points);
 
     tactic.updateRobot(robot);
@@ -164,13 +161,13 @@ TEST_F(PatrolTacticTest, patrol_three_points)
     Point patrol_point3 = Point(3, 3);
     std::vector<Point> patrol_points{patrol_point1, patrol_point2, patrol_point3};
 
-    double atpatrol_pointTolerance = 1.0;
+    double at_patrol_point_tolerance = 1.0;
     double speed_at_patrol_points    = 1.0;
 
     Robot robot = Robot(robot_id, robot_starting_point, initial_velocity, Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    PatrolTactic tactic = PatrolTactic(patrol_points, atpatrol_pointTolerance,
+    PatrolTactic tactic = PatrolTactic(patrol_points, at_patrol_point_tolerance,
                                        Angle::zero(), speed_at_patrol_points);
 
     tactic.updateRobot(robot);
@@ -205,13 +202,13 @@ TEST_F(PatrolTacticTest, patrol_two_points_and_restart)
     Point patrol_point2 = Point(6, 9);
     std::vector<Point> patrol_points{patrol_point1, patrol_point2};
 
-    double atpatrol_pointTolerance = 0.5;
+    double at_patrol_point_tolerance = 0.5;
     double speed_at_patrol_points    = 2.0;
 
     Robot robot = Robot(robot_id, robot_starting_point, initial_velocity, Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    PatrolTactic tactic = PatrolTactic(patrol_points, atpatrol_pointTolerance,
+    PatrolTactic tactic = PatrolTactic(patrol_points, at_patrol_point_tolerance,
                                        Angle::zero(), speed_at_patrol_points);
 
     tactic.updateRobot(robot);
