@@ -20,8 +20,8 @@ bool collinear(const Point &a, const Point &b, const Point &c)
          almostEqual(a.y(), c.y(), GeomConstants::FIXED_EPSILON,
                      GeomConstants::ULPS_EPSILON_TEN)))
     {
-        // Explicit check for the vectors being near vertical or horizontal
-        // This done to avoid near zero comparisons
+        // Explicit check for the vectors being near vertical or horizontal to avoid near
+        // zero comparisons
         return true;
     }
 
