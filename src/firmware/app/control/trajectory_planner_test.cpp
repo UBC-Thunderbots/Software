@@ -302,7 +302,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
                 shared_polynomial2d_getValueOrder3(path, t_start).y, 0.025);
 }
 
-TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation)
+TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_straight_line)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -336,8 +336,70 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation)
 
     double segment_length_sum = 0;
 
-    // Test by checking the length between points
-    // and the length of the total path
+    // Calculate the constant-interpolation period equivalent of the trajectory
+    Trajectory const_interp_trajectory =
+        interpolate_constant_time_trajectory_segmentation(trajectory, num_segments,
+                                                          0.001);
+
+    EXPECT_NEAR(trajectory[num_segments - 1].position.x,
+                const_interp_trajectory
+                    .trajectory_elements[const_interp_trajectory.num_elements - 1]
+                    .position.x,
+                0.001);
+    EXPECT_NEAR(trajectory[num_segments - 1].position.y,
+                const_interp_trajectory
+                    .trajectory_elements[const_interp_trajectory.num_elements - 1]
+                    .position.y,
+                0.001);
+    EXPECT_NEAR(trajectory[num_segments - 1].time,
+                const_interp_trajectory
+                    .trajectory_elements[const_interp_trajectory.num_elements - 1]
+                    .time,
+                0.001);
+
+    EXPECT_NEAR(trajectory[0].position.x,
+                const_interp_trajectory.trajectory_elements[0].position.x, 0.001);
+    EXPECT_NEAR(trajectory[0].position.y,
+                const_interp_trajectory.trajectory_elements[0].position.x, 0.001);
+    EXPECT_NEAR(trajectory[0].time, const_interp_trajectory.trajectory_elements[0].time,
+                0.001);
+}
+
+TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_curved_line)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {2, 0, 1, 0}},
+        .y = {.coefficients = {1, 0, 1, 0}},
+
+    };
+
+    const double t_start            = 0;
+    const double t_end              = 1;
+    const unsigned int num_segments = 5999;
+    const double max_acc            = 3;
+    const double max_speed          = 3;
+    const double initial_speed      = 0;
+    const double final_speed        = 0;
+
+    TrajectoryElement_t* trajectory = generate_constant_arc_length_segmentation(
+        path, t_start, t_end, num_segments, max_acc, max_speed, initial_speed,
+        final_speed);
+
+    // Create the parmeterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+                                             __TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__);
+
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(path, t_start, t_end,
+                                                        arc_length_param);
+
+    const double arc_segment_length =
+        arc_length_param.arc_length_values[arc_length_param.num_values - 1];
+
+    double segment_length_sum = 0;
+
+    // Calculate the constant-interpolation period equivalent of the trajectory
     Trajectory const_interp_trajectory =
         interpolate_constant_time_trajectory_segmentation(trajectory, num_segments,
                                                           0.001);

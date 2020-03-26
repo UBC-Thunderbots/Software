@@ -190,11 +190,8 @@ Trajectory_t interpolate_constant_time_trajectory_segmentation(
     unsigned int time_periods = 1;
     double trajectory_time    = interpolation_period * time_periods;
 
-    // We want to loop through the entire trajectory
-
     // Loop until we find a value JUST larger than the expected
     // Check the element prior and perform linear interpolation
-
     for (unsigned int i = 1; i < num_segments; i++)
     {
         while (constant_arclength_trajectory[i].time >= trajectory_time)

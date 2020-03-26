@@ -71,19 +71,22 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
     double final_speed);
 
 /**
- * Returns a constant interpolation period (time) trajectory based on an input constant
- * arclength trajectory
+ * Returns a constant interpolation period (time) trajectory based on an input trajectory
  *
- * @pre constant_arc_length_
+ * This function is intended to take a variable time trajectory (which is easier to
+ * calculate) then interpolate a constant period trajectory. This is valuable for discrete
+ * time motion controllers that operate only at constant delta-time intervals
  *
- * @param constant_arclength_trajectory [in] The constant arclength trajectory used as
+ * @pre variable_time_trajectory is a valid trajectory
+ *
+ * @param variable_time_trajectory [in] The valid trajectory used as
  * reference for a constant interpolation period trajectory
- * @param num_segments [in] The number of segments in the constant_arclength_trajectory
+ * @param num_segments [in] The number of segments in the variable_time_trajectory
  * input parameter
  * @param interpolation_period [in] The constant change in time that corresponds to each
  * trajectory segment
  *
  */
 Trajectory_t interpolate_constant_time_trajectory_segmentation(
-    TrajectoryElement_t* constant_arclength_trajectory, unsigned int num_segments,
+    TrajectoryElement_t* variable_time_trajectory, unsigned int num_segments,
     const double interpolation_period);
