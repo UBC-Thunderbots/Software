@@ -14,8 +14,8 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
     static TrajectoryElement_t trajectory[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
     static TrajectoryElement_t
         reverse_trajectory[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
-    static double max_allowable_speed_profile[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
-    static double velocity_profile[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
+    double max_allowable_speed_profile[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
+    double velocity_profile[__TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__];
 
     // Variable used to flag if the path is moving "backwards" along the input path
     unsigned int reverse_parameterization = 0;
