@@ -45,7 +45,6 @@ class MainWidget : public QMainWindow
     double matrix_x_vel;
     double matrix_y_vel;
     double matrix_angular_vel;
-    bool driving;
 
     std::string led_mode;
 };

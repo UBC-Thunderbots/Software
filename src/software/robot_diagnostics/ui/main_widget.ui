@@ -198,26 +198,10 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_direct_per_wheel_go_stop">
+     <widget class="QPushButton" name="pushButton_direct_per_wheel_stop">
       <property name="geometry">
        <rect>
-        <x>290</x>
-        <y>150</y>
-        <width>141</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Toggles whether or not to send drive commands to the robot</string>
-      </property>
-      <property name="text">
-       <string>Go</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_direct_per_wheel_stop_and_reset">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
+        <x>200</x>
         <y>150</y>
         <width>131</width>
         <height>31</height>
@@ -227,7 +211,7 @@
        <string>Stop sending drive commands and reset sliders</string>
       </property>
       <property name="text">
-       <string>Stop and Reset</string>
+       <string>Stop</string>
       </property>
      </widget>
     </widget>
@@ -352,26 +336,10 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_direct_velocity_go_stop">
+     <widget class="QPushButton" name="pushButton_direct_velocity_stop">
       <property name="geometry">
        <rect>
-        <x>290</x>
-        <y>150</y>
-        <width>141</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Toggles whether or not to send drive commands to the robot</string>
-      </property>
-      <property name="text">
-       <string>Go</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_direct_velocity_stop_and_reset">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
+        <x>200</x>
         <y>150</y>
         <width>131</width>
         <height>31</height>
@@ -381,7 +349,7 @@
        <string>Stop sending drive commands and reset sliders</string>
       </property>
       <property name="text">
-       <string>Stop and Reset</string>
+       <string>Stop</string>
       </property>
      </widget>
     </widget>
@@ -1059,7 +1027,7 @@
      <string>Power</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_dribbler_run">
+   <widget class="QPushButton" name="pushButton_dribbler_stop">
     <property name="geometry">
      <rect>
       <x>790</x>
@@ -1069,7 +1037,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Go</string>
+     <string>Stop</string>
     </property>
    </widget>
    <widget class="Line" name="line_6">
