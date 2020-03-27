@@ -14,8 +14,8 @@ class PatrolTacticTest : public testing::Test
     const double COST_OF_NONASSIGNED_ROBOT_UNASSIGNED_TACTIC = 1.0;
 
     /**
-     * populates the expected_actions test variable with move_actions in the order of points in patrol_points
-     * vector
+     * populates the expected_actions test variable with move_actions in the order of
+     * points in patrol_points vector
      * @param robot: expected robot that should be assigned to action
      * @param patrol_points: points that the robot visits in the patrol tactic
      * @param angle: expected angle of action
@@ -28,14 +28,16 @@ class PatrolTacticTest : public testing::Test
         {
             auto expected_action = std::make_shared<MoveAction>(false);
             expected_action->updateControlParams(
-                robot, patrol_points[i], angle, speed_at_patrol_points, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
+                robot, patrol_points[i], angle, speed_at_patrol_points,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::AVOID);
             expected_actions.push_back(expected_action);
         }
     }
-    
+
     /**
-     * populates the robot_state_to_complete_actions test variable in the order of points in patrol_points
+     * populates the robot_state_to_complete_actions test variable in the order of points
+     * in patrol_points
      * @param patrol_points: points that the robot visits in the patrol tactic
      * @param velocity : desired velocity of the robot after action in new state
      */
@@ -106,7 +108,7 @@ class PatrolTacticTest : public testing::Test
 
 TEST_F(PatrolTacticTest, patrol_tactic_constructor)
 {
-    Point patrol_point1            = Point(3, 5);
+    Point patrol_point1              = Point(3, 5);
     double at_patrol_point_tolerance = 1.0;
     double speed_at_patrol_points    = 1.0;
 
@@ -120,11 +122,11 @@ TEST_F(PatrolTacticTest, patrol_tactic_constructor)
 TEST_F(PatrolTacticTest, patrol_one_point)
 {
     // Setup
-    int robot_id              = 0;
+    int robot_id               = 0;
     Point robot_starting_point = Point(0, 0);
-    Vector initial_velocity   = Vector(1, 0);
+    Vector initial_velocity    = Vector(1, 0);
 
-    Point patrol_point1            = Point(3, 5);
+    Point patrol_point1              = Point(3, 5);
     double at_patrol_point_tolerance = 1.0;
     double speed_at_patrol_points    = 1.0;
 
@@ -152,9 +154,9 @@ TEST_F(PatrolTacticTest, patrol_one_point)
 TEST_F(PatrolTacticTest, patrol_three_points)
 {
     // setup
-    int robot_id              = 0;
+    int robot_id               = 0;
     Point robot_starting_point = Point(3, 3);
-    Vector initial_velocity   = Vector(3, 1);
+    Vector initial_velocity    = Vector(3, 1);
 
     Point patrol_point1 = Point(3, -3);
     Point patrol_point2 = Point(-3, -3);
@@ -194,9 +196,9 @@ TEST_F(PatrolTacticTest, patrol_three_points)
 TEST_F(PatrolTacticTest, patrol_two_points_and_restart)
 {
     // setup
-    int robot_id              = 0;
+    int robot_id               = 0;
     Point robot_starting_point = Point(-9, 5);
-    Vector initial_velocity   = Vector(0, 0);
+    Vector initial_velocity    = Vector(0, 0);
 
     Point patrol_point1 = Point(7, 11);
     Point patrol_point2 = Point(6, 9);
@@ -229,8 +231,8 @@ TEST_F(PatrolTacticTest, patrol_two_points_and_restart)
                 std::dynamic_pointer_cast<MoveAction>(action_ptr);
             compareMoveActions(expected_actions[i], move_action);
 
-            simulateActionToCompletion(robot, robot_state_to_complete_actions[i], action_ptr,
-                                       tactic);
+            simulateActionToCompletion(robot, robot_state_to_complete_actions[i],
+                                       action_ptr, tactic);
         }
     }
 }
@@ -239,7 +241,7 @@ TEST_F(PatrolTacticTest, cost_of_non_assigned_robot_when_tactic_is_assigned)
 {
     // setup
     Point robot_starting_point = Point(1, 1);
-    Vector initial_velocity   = Vector(0, 1);
+    Vector initial_velocity    = Vector(0, 1);
 
     Robot assigned_robot = Robot(0, robot_starting_point, initial_velocity, Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -264,7 +266,7 @@ TEST_F(PatrolTacticTest, cost_of_non_assigned_robot_when_tactic_is_not_assigned)
 {
     // setup
     Point robot_starting_point = Point(1, 1);
-    Vector initial_velocity   = Vector(0, 1);
+    Vector initial_velocity    = Vector(0, 1);
 
     Robot non_assigned_robot =
         Robot(1, robot_starting_point, initial_velocity, Angle::zero(),
@@ -283,9 +285,9 @@ TEST_F(PatrolTacticTest, cost_of_non_assigned_robot_when_tactic_is_not_assigned)
 TEST_F(PatrolTacticTest, cost_of_already_assigned_robot)
 {
     // setup
-    int robot_id              = 0;
+    int robot_id               = 0;
     Point robot_starting_point = Point(1, 1);
-    Vector initial_velocity   = Vector(0, 1);
+    Vector initial_velocity    = Vector(0, 1);
 
     Robot assigned_robot =
         Robot(robot_id, robot_starting_point, initial_velocity, Angle::zero(),
@@ -302,4 +304,3 @@ TEST_F(PatrolTacticTest, cost_of_already_assigned_robot)
 
     EXPECT_EQ(COST_OF_ASSIGNED_ROBOT, cost);
 }
-
