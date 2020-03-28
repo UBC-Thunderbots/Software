@@ -38,3 +38,11 @@ TEST(CollinearPointsTest, small_double_precision_error_collinear)
     Point r(8, 4);
     EXPECT_TRUE(collinear(p, q, r));
 }
+
+TEST(CollinearPointsTest, vertically_collinear_points)
+{
+    Point p(202, 15);
+    Point q(202, -15);
+    Point r(202.00000000000003, -0.5);
+    EXPECT_TRUE(collinear(p, q, r));
+}
