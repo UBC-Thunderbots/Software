@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
- * The ShadowFreekicker tactic uses two robots to block the majority of an enemy robots
+ * The ShadowFreekicker tactic uses two robots to block the majority of an enemy robot
  *
  */
 class ShadowFreekickerTactic : public Tactic

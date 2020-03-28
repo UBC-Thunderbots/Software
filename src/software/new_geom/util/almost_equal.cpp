@@ -39,12 +39,12 @@ int64_t ulpsDistance(double a, double b)
     return distance;
 }
 
-bool almostEqual(double a, double b, double fixedEpsilon, int ulpsEpsilon)
+bool almostEqual(double a, double b, double fixed_epsilon, int ulps_epsilon)
 {
     // Handle the near-zero case
     const double difference = fabs(a - b);
-    if (difference <= fixedEpsilon)
+    if (difference <= fixed_epsilon)
         return true;
 
-    return ulpsDistance(a, b) <= ulpsEpsilon;
+    return ulpsDistance(a, b) <= ulps_epsilon;
 }
