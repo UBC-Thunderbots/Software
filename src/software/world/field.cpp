@@ -113,9 +113,29 @@ Rectangle Field::friendlyHalf() const
     return Rectangle(friendlyCornerNeg(), Point(0, friendlyCornerPos().y()));
 }
 
+Rectangle Field::friendlyPositiveQuadrant() const
+{
+    return Rectangle(friendlyGoal(), Point(0, friendlyCornerPos().y()));
+}
+
+Rectangle Field::friendlyNegativeQuadrant() const
+{
+    return Rectangle(friendlyGoal(), Point(0, friendlyCornerNeg().y()));
+}
+
 Rectangle Field::enemyHalf() const
 {
     return Rectangle(Point(0, enemyCornerNeg().y()), enemyCornerPos());
+}
+
+Rectangle Field::enemyPositiveQuadrant() const
+{
+    return Rectangle(centerPoint(), enemyCornerPos());
+}
+
+Rectangle Field::enemyNegativeQuadrant() const
+{
+    return Rectangle(centerPoint(), enemyCornerNeg());
 }
 
 Rectangle Field::fieldLines() const

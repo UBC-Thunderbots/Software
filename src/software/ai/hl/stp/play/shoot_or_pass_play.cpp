@@ -74,10 +74,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region(world.field().centerPoint(),
-                                          world.field().enemyCornerPos());
-    Rectangle cherry_pick_2_target_region(world.field().centerPoint(),
-                                          world.field().enemyCornerNeg());
+    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveQuadrant();
+    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeQuadrant();
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
@@ -112,8 +110,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // of the field
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(
-        Rectangle(Point(0, world.field().yLength() / 2), world.field().enemyCornerNeg()));
+    pass_generator.setTargetRegion(world.field().enemyHalf());
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a

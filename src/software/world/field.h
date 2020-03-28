@@ -183,11 +183,39 @@ class Field
     Rectangle friendlyHalf() const;
 
     /**
+     * Gets the friendly positive quadrant of the field
+     *
+     * @return the friendly positive quadrant of the field
+     */
+    Rectangle friendlyPositiveQuadrant() const;
+
+    /**
+     * Gets the friendly negative quadrant of the field
+     *
+     * @return the friendly negative quadrant of the field
+     */
+    Rectangle friendlyNegativeQuadrant() const;
+
+    /**
      * Gets the enemy half of the field
      *
      * @return the enemy half of the field
      */
     Rectangle enemyHalf() const;
+
+    /**
+     * Gets the enemy positive quadrant of the field
+     *
+     * @return the enemy positive quadrant of the field
+     */
+    Rectangle enemyPositiveQuadrant() const;
+
+    /**
+     * Gets the enemy negative quadrant of the field
+     *
+     * @return the enemy negative quadrant of the field
+     */
+    Rectangle enemyNegativeQuadrant() const;
 
     /**
      * Gets the area within the field lines as a rectangle. This is the set of locations
