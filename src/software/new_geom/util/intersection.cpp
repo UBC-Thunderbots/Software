@@ -4,7 +4,7 @@
 #include "software/new_geom/util/collinear.h"
 
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
-                                  const Point &d)
+                                  const Point &d, double fixed_epsilon, int ulps_epsilon)
 {
     double x1 = a.x();
     double y1 = a.y();
@@ -19,8 +19,7 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     double denominatorTermB = (y1 - y2) * (x3 - x4);
     double denominator      = denominatorTermA - denominatorTermB;
 
-    if (almostEqual(denominatorTermA, denominatorTermB, GeomConstants::FIXED_EPSILON,
-                    GeomConstants::ULPS_EPSILON_TEN))
+    if (almostEqual(denominatorTermA, denominatorTermB, fixed_epsilon, ulps_epsilon))
     {
         return std::nullopt;
     }
