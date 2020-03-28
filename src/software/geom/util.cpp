@@ -209,58 +209,6 @@ bool collinear(const Segment &segment1, const Segment &segment2)
     return false;
 }
 
-Point clipPoint(const Point &p, const Point &bound1, const Point &bound2)
-{
-    const double minx = std::min(bound1.x(), bound2.x());
-    const double miny = std::min(bound1.y(), bound2.y());
-    const double maxx = std::max(bound1.x(), bound2.x());
-    const double maxy = std::max(bound1.y(), bound2.y());
-    Point ret         = p;
-    if (p.x() < minx)
-    {
-        ret.set(minx, ret.y());
-    }
-    else if (p.x() > maxx)
-    {
-        ret.set(maxx, ret.y());
-    }
-    if (p.y() < miny)
-    {
-        ret.set(ret.x(), miny);
-    }
-    else if (p.y() > maxy)
-    {
-        ret.set(ret.x(), maxy);
-    }
-    return ret;
-}
-
-Point clipPoint(const Point &p, const Rectangle &r)
-{
-    const double minx = r.negXNegYCorner().x();
-    const double miny = r.negXNegYCorner().y();
-    const double maxx = r.posXPosYCorner().x();
-    const double maxy = r.posXPosYCorner().y();
-    Point ret         = p;
-    if (p.x() < minx)
-    {
-        ret.set(minx, ret.y());
-    }
-    else if (p.x() > maxx)
-    {
-        ret.set(maxx, ret.y());
-    }
-    if (p.y() < miny)
-    {
-        ret.set(ret.x(), miny);
-    }
-    else if (p.y() > maxy)
-    {
-        ret.set(ret.x(), maxy);
-    }
-    return ret;
-}
-
 std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
                                        const Point &segA, const Point &segB)
 {
@@ -586,24 +534,6 @@ std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
     }
 }
 
-Vector reflect(const Vector &v, const Vector &n)
-{
-    if (n.length() < EPS)
-    {
-        return v;
-    }
-    Vector normal = n.normalize();
-    return v - 2 * v.dot(normal) * normal;
-}
-
-Point reflect(const Point &a, const Point &b, const Point &p)
-{
-    // Make a as origin.
-    // Rotate by 90 degrees, does not matter which direction?
-    Vector n = (b - a).rotate(Angle::quarter());
-    return a + reflect(p - a, n);
-}
-
 Point calcBlockCone(const Vector &a, const Vector &b, const double &radius)
 {
     if (a.length() < EPS || b.length() < EPS)
@@ -621,13 +551,6 @@ Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double
     return p + (calcBlockCone(a - p, b - p, radius)).toVector();
 }
 
-Vector calcBlockOtherRay(const Point &a, const Point &c, const Point &g)
-{
-    return reflect(c - a, g - c);  // this, and the next two instances, were
-                                   // changed from a - c since reflect() was
-                                   // fixed
-}
-
 double offsetToLine(Point x0, Point x1, Point p)
 {
     Vector n;
@@ -636,50 +559,6 @@ double offsetToLine(Point x0, Point x1, Point p)
     n = (x1 - x0).perpendicular().normalize();
 
     return fabs(n.dot(p - x0));
-}
-
-double offsetAlongLine(Point x0, Point x1, Point p)
-{
-    Vector n, v;
-
-    // get normal to line
-    n = x1 - x0;
-    n = n.normalize();
-
-    v = p - x0;
-
-    return n.dot(v);
-}
-
-Point segmentNearLine(Point a0, Point a1, Point b0, Point b1)
-{
-    Vector v, n;
-    Point p;
-    double dn, t;
-
-    v = a1 - a0;
-    n = (b1 - b0).normalize();
-    n = n.perpendicular();
-
-    dn = v.dot(n);
-    if (std::fabs(dn) < EPS)
-    {
-        return a0;
-    }
-
-    t = -(a0 - b0).dot(n) / dn;
-
-    if (t < 0)
-    {
-        t = 0;
-    }
-    if (t > 1)
-    {
-        t = 1;
-    }
-    p = a0 + v * t;
-
-    return p;
 }
 
 Angle acuteVertexAngle(Vector v1, Vector v2)

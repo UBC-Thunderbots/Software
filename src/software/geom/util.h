@@ -161,30 +161,6 @@ std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
 Point vectorRectIntersect(const Rectangle &r, const Point &segA, const Point &segB);
 
 /**
- * Clips a point to a rectangle boundary.
- *
- * @param p the point to clip.
- *
- * @param bound1 one corner of the rectangle.
- *
- * @param bound2 the diagonally-opposite corner of the rectangle.
- *
- * @return the closest point to \p p that lies within the rectangle.
- */
-Point clipPoint(const Point &p, const Point &bound1, const Point &bound2);
-
-/**
- * Clips a point to a rectangle boundary.
- *
- * @param p the point to clip.
- *
- * @param r the rectangle.
- *
- * @return the closest point to \p p that lies within the rectangle.
- */
-Point clipPoint(const Point &p, const Rectangle &r);
-
-/**
  * Computes whether there is a unique intersection of two lines.
  *
  * @param a a point on the first line.
@@ -284,19 +260,6 @@ std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
 std::optional<Point> getRayIntersection(Ray ray1, Ray ray2);
 
 /**
- * Reflects a point across a line.
- *
- * @param a a point on the line.
- *
- * @param b another point on the line.
- *
- * @param p the point to reflect.
- *
- * @return the reflection of \p p across the line.
- */
-Point reflect(const Point &a, const Point &b, const Point &p);
-
-/**
  * Given a cone shooting from the origin, determines the furthest location from
  * the origin, at which to place a circle to block the cone.
  *
@@ -336,34 +299,9 @@ Point calcBlockCone(const Vector &a, const Vector &b, const double &radius);
 Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double &radius);
 
 /**
- * Used for defender_blocks_goal
- * a = goal post side
- * c = ball position
- * g = goalie position
- * returns the other ray/cone boundary that is not blocked by goalie
- * I.e. if p is return value,
- * then points to the other side of line p-c is not covered by goalie.
- */
-Vector calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
-
-/*
- * Ported code from CM geom util
- */
-
-/**
  * returns perpendicular offset from line x0-x1 to point p
  */
 double offsetToLine(Point x0, Point x1, Point p);
-
-/**
- * returns perpendicular offset from line x0-x1 to point p
- */
-double offsetAlongLine(Point x0, Point x1, Point p);
-
-/**
- * returns nearest point on segment a0-a1 to line b0-b1
- */
-Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
 
 /**
  * Calculates the acute angle formed by the two given vectors

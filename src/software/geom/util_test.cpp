@@ -422,25 +422,6 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
     }
 }
 
-TEST(GeomUtilTest, test_reflect)
-{
-    Vector ray0(2, 4);
-    Vector normal(-1, 1);
-    Vector reflected = reflect(ray0, normal);
-
-    EXPECT_TRUE((reflected - Vector(4, 2)).length() < 0.0001);
-}
-
-TEST(GeomUtilTest, test_reflect2)
-{
-    Point ray0(2, 4);
-    Point line0(0, 0);
-    Point line1(1, 1);
-    Point reflected = reflect(line0, line1, ray0);
-
-    EXPECT_TRUE((reflected - Point(4, 2)).length() < 0.0001);
-}
-
 TEST(GeomUtilTest, test_calc_block_cone)
 {
     Vector a(5, 10);
@@ -481,16 +462,6 @@ TEST(GeomUtilTest, test_calc_block_cone2)
     EXPECT_TRUE(
         (Point(calcBlockCone(a, b, o, 1) - Point(1, 1.0 + sqrt(2))) - o).length() <
         0.0001);
-}
-
-TEST(GeomUtilTest, test_calc_block_other_ray)
-{
-    // I don't know what the function is supposed to return, so I just set the
-    // test value to the return value of the function for now.
-    Point p(-0.301176, -1.24471);
-    Vector a = calcBlockOtherRay(Point(1, 0), Point(0.2, 1), Point(0.4, 0.1));
-
-    EXPECT_TRUE((Point(a) - p).length() < 0.00001);
 }
 
 TEST(GeomUtilTest, test_offset_to_line)
