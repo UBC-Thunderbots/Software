@@ -14,42 +14,6 @@
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
 
-TEST(GeomUtilTest, test_proj_len)
-{
-    double calculated_val, expected_val;
-    // test case 1
-    Point test1p1(0, 0);
-    Point test1p2(4, 4);
-    Vector test1p3(4, 0);
-    calculated_val = proj_length(Segment(test1p1, test1p2), test1p3);
-    expected_val   = 2 * sqrt(2);
-    EXPECT_DOUBLE_EQ(expected_val, calculated_val);
-
-    // test case 2
-    Point test2p1(0, 0);
-    Point test2p2(4, 0);
-    Vector test2p3(4, 4);
-    calculated_val = proj_length(Segment(test2p1, test2p2), test2p3);
-    expected_val   = 4;
-    EXPECT_EQ(expected_val, calculated_val);
-
-    // test case 3
-    Point test3p1(0, 0);
-    Point test3p2(4, 4);
-    Vector test3p3(-4, -4);
-    calculated_val = proj_length(Segment(test3p1, test3p2), test3p3);
-    expected_val   = -4 * sqrt(2);
-    EXPECT_DOUBLE_EQ(expected_val, calculated_val);
-
-    // test case 4
-    Point test4p1(0, 0);
-    Point test4p2(4, 1);
-    Vector test4p3(-4, -4);
-    calculated_val = proj_length(Segment(test4p1, test4p2), test4p3);
-    expected_val   = -sqrt(32) * (cos((M_PI / 4.0f) - atan(1.0f / 4.0f)));
-    EXPECT_NEAR(expected_val, calculated_val, 0.00001);
-}
-
 TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
 {
     Segment segment = Segment(Point(0, 0), Point(0, 1));
@@ -165,14 +129,6 @@ TEST(GeomUtilTest, test_point_in_rectangle)
     EXPECT_TRUE(!contains(Rectangle(Point(1, 1), Point(-1, -1)), Point(2, 2)));
 }
 
-TEST(GeomUtilTest, test_circle_boundaries)
-{
-    std::vector<Point> test_circle = circleBoundaries(Point(0, 0), 1, 6);
-
-    for (Point i : test_circle)
-        EXPECT_DOUBLE_EQ(1.0, (i - Point(0, 0)).length());
-}
-
 TEST(GeomUtilTest, test_closest_lineseg_point)
 {
     Point l1(-1, 1);
@@ -266,25 +222,6 @@ TEST(GeomUtilTest, test_vector_rect_intersect)
     EXPECT_TRUE((found2 - pr2).length() < 0.001);
     EXPECT_TRUE((found3 - pr3).length() < 0.001);
     EXPECT_TRUE((found4 - pr4).length() < 0.001);
-}
-
-TEST(GeomUtilTest, test_clip_point)
-{
-    Point rect1(-2, -1);
-    Point rect2(2, 1);
-
-    EXPECT_TRUE((clipPoint(Point(1, 1), rect1, rect2) - Point(1, 1)).length() < 0.00001);
-    EXPECT_TRUE((clipPoint(Point(3, 1), rect1, rect2) - Point(2, 1)).length() < 0.00001);
-    EXPECT_TRUE((clipPoint(Point(3, 2), rect1, rect2) - Point(2, 1)).length() < 0.00001);
-}
-
-TEST(GeomUtilTest, test_clip_point2)
-{
-    Rectangle r(Point(-2, -1), Point(2, 1));
-
-    EXPECT_TRUE((clipPoint(Point(1, 1), r) - Point(1, 1)).length() < 0.00001);
-    EXPECT_TRUE((clipPoint(Point(3, 1), r) - Point(2, 1)).length() < 0.00001);
-    EXPECT_TRUE((clipPoint(Point(3, 2), r) - Point(2, 1)).length() < 0.00001);
 }
 
 TEST(GeomUtilTest, test_unique_line_intersect)
@@ -479,41 +416,6 @@ TEST(GeomUtilTest, test_offset_to_line)
     p = Point(2, 0);
 
     EXPECT_NEAR(2, offsetToLine(x0, x1, p), 1e-5);
-}
-
-TEST(GeomUtilTest, test_offset_along_line)
-{
-    Point x0(1, -1);
-    Point x1(5, -2);
-    Point p(2, 1);
-
-    EXPECT_NEAR(0.485071, offsetAlongLine(x0, x1, p), 1e-5);
-
-    p = Point(3, 1);
-
-    EXPECT_NEAR(1.45521, offsetAlongLine(x0, x1, p), 1e-5);
-
-    p = Point(2, -2);
-
-    EXPECT_NEAR(1.21268, offsetAlongLine(x0, x1, p), 1e-5);
-}
-
-TEST(GeomUtilTest, test_segment_near_line)
-{
-    Point seg0(0, 3);
-    Point seg1(3, 2);
-    Point line0(-1, 0);
-    Point line1(3, 5);
-
-    EXPECT_TRUE(
-        (segmentNearLine(seg0, seg1, line0, line1) - Point(1.105263, 2.63158)).length() <
-        0.0001);
-
-    seg0 = Point(0, 3);
-    seg1 = Point(0, 4);
-
-    EXPECT_TRUE((segmentNearLine(seg0, seg1, line0, line1) - Point(0, 3)).length() <
-                0.001);
 }
 
 // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point

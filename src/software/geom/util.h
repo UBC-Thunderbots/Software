@@ -22,16 +22,6 @@ constexpr int sign(double n)
     return n > EPS ? 1 : (n < -EPS ? -1 : 0);
 }
 
-/**
- * Signed magnitude of the projection of `second` on `first`
- */
-double proj_length(const Vector &first, const Vector &second);
-
-/**
- * Signed magnitude of the projection of `first.start -> second` on `first`
- */
-double proj_length(const Segment &first, const Vector &second);
-
 /*
  * The family of `contains` functions determines whether
  * the second parameter is contained, even if partially,
@@ -57,9 +47,6 @@ bool intersects(const Segment &first, const Segment &second);
 bool intersects(const Ray &first, const Segment &second);
 bool intersects(const Segment &first, const Ray &second);
 
-bool isDegenerate(const Segment &segment);
-bool isDegenerate(const Ray &segment);
-
 double length(const Segment &segment);
 
 double lengthSquared(const Segment &segment);
@@ -76,11 +63,6 @@ double lengthSquared(const Segment &segment);
  * @return false : If Segment1 and Segment2 are NOT collinear within EPS distance
  */
 bool collinear(const Segment &segment1, const Segment &segment2);
-
-/**
- * returns a list of points that lie on the border of the circle
- */
-std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points);
 
 /**
  * Finds the Point on line segment closest to point.
@@ -193,19 +175,6 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
 std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
 
 /**
- * Reflects a ray incident on origin given the normal of the reflecting plane.
- *
- * @pre the normal vector cannot have length smaller than EPS.
- *
- * @param v the incident ray to reflect.
- *
- * @param n the vector normal to the reflecting plane.
- *
- * @return the reflected ray.
- */
-Vector reflect(const Vector &v, const Vector &n);
-
-/**
  * Calculates the intersection of a Ray and Segment
  *
  * @param ray: The point and direction
@@ -305,15 +274,6 @@ Angle acuteVertexAngle(Vector v1, Vector v2);
  * @return the acute angle formed by the vector p2->p1 and p2->p3
  */
 Angle acuteVertexAngle(Point p1, Point p2, Point p3);
-Angle acuteVertexAngleNew(Point p1, Point p2, Point p3);
-
-Angle minAngleBetweenVectors(Vector v1, Vector v2);
-
-/**
- * returns time of closest point of approach of two points
- * moving along constant velocity vectors.
- */
-double closestPointTime(Point x1, Vector v1, Point x2, Vector v2);
 
 /**
  * found out if a point is in the vector's direction or against it

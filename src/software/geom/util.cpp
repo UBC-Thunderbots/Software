@@ -19,21 +19,6 @@
 #include "software/new_geom/util/collinear.h"
 #include "software/new_geom/util/distance.h"
 
-double proj_length(const Segment &first, const Vector &second)
-{
-    return proj_length(first.toVector(), second - first.getSegStart().toVector());
-}
-
-double proj_length(const Vector &first, const Vector &second)
-{
-    return first.dot(second) / first.length();
-}
-
-bool isDegenerate(const Segment &segment)
-{
-    return distanceSquared(segment.getSegStart(), segment.getEnd()) < EPS2;
-}
-
 double length(const Segment &segment)
 {
     return distance(segment.getSegStart(), segment.getEnd());
@@ -173,20 +158,6 @@ bool intersects(const Segment &first, const Segment &second)
                                               second.getEnd());  // similar code
 
     return boost::geometry::intersects(AB, CD);
-}
-
-std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points)
-{
-    Angle rotate_amount = Angle::full() / num_points;
-    std::vector<Point> ans;
-    Vector bound(radius, 0.0);
-    for (int i = 0; i < num_points; i++)
-    {
-        Point temp = centre + bound;
-        ans.push_back(temp);
-        bound = bound.rotate(rotate_amount);
-    }
-    return ans;
 }
 
 bool collinear(const Segment &segment1, const Segment &segment2)
