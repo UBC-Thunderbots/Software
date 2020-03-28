@@ -270,7 +270,7 @@ TEST(IntersectsTest, close_parallel_segments_not_intersecting)
 TEST(IntersectsTest,
      test_ray_intersect_position_and_direction_intersect_not_just_direction)
 {
-    // Test to ensure that intersectsNew(Ray, Segment) does not use ray.getDirection() as
+    // Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as
     // a point along the ray (Should be ray.getStart() + ray.GetDirection())
     Segment segment = Segment(Point(-1, 1), Point(1, 1));
 
