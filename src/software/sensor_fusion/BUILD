@@ -2,9 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "vision_detection",
-    srcs = [
-        "vision_detection.cpp",
-    ],
     hdrs = [
         "ball_detection.h",
         "robot_detection.h",
@@ -14,6 +11,15 @@ cc_library(
         "//software/geom",
         "//software/time:timestamp",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "vision_detection_test",
+    srcs = ["vision_detection_test.cpp"],
+    deps = [
+        ":vision_detection",
+        "@gtest//:gtest_main",
     ],
 )
 

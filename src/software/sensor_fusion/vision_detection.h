@@ -31,43 +31,64 @@ class VisionDetection
                     const std::vector<RobotDetection> &friendly_team_detections,
                     const std::vector<RobotDetection> &enemy_team_detections,
                     const std::optional<Field> &field_detection,
-                    const Timestamp latest_timestamp);
+                    const Timestamp latest_timestamp)
+        : ball_detections(ball_detections),
+          friendly_team_detections(friendly_team_detections),
+          enemy_team_detections(enemy_team_detections),
+          field_detection(field_detection),
+          latest_timestamp(latest_timestamp)
+    {
+    }
 
     /**
      * Gets ball detections
      *
      * @return ball detections
      */
-    const std::vector<BallDetection> getBallDetections(void) const;
+    const std::vector<BallDetection> getBallDetections(void) const
+    {
+        return ball_detections;
+    }
 
     /**
      * Gets friendly team detections
      *
      * @return friendly team detections
      */
-    const std::vector<RobotDetection> getFriendlyTeamDetections(void) const;
+    const std::vector<RobotDetection> getFriendlyTeamDetections(void) const
+    {
+        return friendly_team_detections;
+    }
 
     /**
      * Gets enemy team detections
      *
      * @return enemy team detections
      */
-    const std::vector<RobotDetection> getEnemyTeamDetections(void) const;
-
+    const std::vector<RobotDetection> getEnemyTeamDetections(void) const
+    {
+        return enemy_team_detections;
+    }
 
     /**
      * Gets field detection
      *
      * @return field detection
      */
-    const std::optional<Field> getFieldDetection(void) const;
+    const std::optional<Field> getFieldDetection(void) const
+    {
+        return field_detection;
+    }
 
     /**
      * Gets latest timestamp
      *
      * @return latest timestamp
      */
-    const Timestamp getLatestTimestamp(void) const;
+    const Timestamp getLatestTimestamp(void) const
+    {
+        return latest_timestamp;
+    }
 
    private:
     std::vector<BallDetection> ball_detections;

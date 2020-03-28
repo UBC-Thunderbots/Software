@@ -81,7 +81,6 @@ class TeamInfo
     /**
      * Constructor that initializes all fields
      *
-     * @param
      * @param name name
      * @param score score
      * @param red_cards red_cards
@@ -98,91 +97,156 @@ class TeamInfo
     TeamInfo(std::string name, int score, int red_cards,
              std::vector<int> yellow_card_times, int yellow_cards, int timeouts,
              int timeout_time, int goalkeeper, int foul_counter,
-             int ball_placement_failures, bool can_place_ball, int max_allowed_bots);
+             int ball_placement_failures, bool can_place_ball, int max_allowed_bots)
+        : name(name),
+          score(score),
+          red_cards(red_cards),
+          yellow_card_times(yellow_card_times),
+          yellow_cards(yellow_cards),
+          timeouts(timeouts),
+          timeout_time(timeout_time),
+          goalkeeper(goalkeeper),
+          foul_counter(foul_counter),
+          ball_placement_failures(ball_placement_failures),
+          can_place_ball(can_place_ball),
+          max_allowed_bots(max_allowed_bots)
+    {
+    }
 
     /**
      * Return name
      *
      * @return name
      */
-    std::string getName(void) const;
+    std::string getName(void) const
+    {
+        return name;
+    }
 
     /**
      * Return score
      *
      * @return score
      */
-    int getScore(void) const;
+    int getScore(void) const
+    {
+        return score;
+    }
 
     /**
      * Return number of red cards
      *
      * @return number of red cards
      */
-    int getRedCards(void) const;
+    int getRedCards(void) const
+    {
+        return red_cards;
+    }
 
     /**
      * Return yellow card times
      *
      * @return yellow card times
      */
-    std::vector<int> getYellowCardTimes(void) const;
+    std::vector<int> getYellowCardTimes(void) const
+    {
+        return yellow_card_times;
+    }
 
     /**
      * Return number of red cards
      *
      * @return number of red cards
      */
-    int getYellowCards(void) const;
+    int getYellowCards(void) const
+    {
+        return yellow_cards;
+    }
 
     /**
      * Return number of timeouts
      *
      * @return number of timeouts
      */
-    int getTimeouts(void) const;
+    int getTimeouts(void) const
+    {
+        return timeouts;
+    }
 
     /**
      * Return timeout time
      *
      * @return timeout time
      */
-    int getTimeoutTime(void) const;
+    int getTimeoutTime(void) const
+    {
+        return timeout_time;
+    }
 
     /**
      * Return goalkeeper
      *
      * @return goalkeeper
      */
-    int getGoalkeeper(void) const;
+    int getGoalkeeper(void) const
+    {
+        return goalkeeper;
+    }
 
     /**
      * Return foul counter
      *
      * @return foul counter
      */
-    int getFoulCounter(void) const;
+    int getFoulCounter(void) const
+    {
+        return foul_counter;
+    }
 
     /**
      * Return ball placement failures
      *
      * @return ball placement failures
      */
-    int getBallPlacementFailures(void) const;
+    int getBallPlacementFailures(void) const
+    {
+        return ball_placement_failures;
+    }
 
     /**
      * Return can place ball
      *
      * @return can place ball
      */
-    bool getCanPlaceBall(void) const;
+    bool getCanPlaceBall(void) const
+    {
+        return can_place_ball;
+    }
 
     /**
      * Return max allowed bots
      *
      * @return max allowed bots
      */
-    int getMaxAllowedBots(void) const;
+    int getMaxAllowedBots(void) const
+    {
+        return max_allowed_bots;
+    }
+
+    bool operator==(const TeamInfo &other) const
+    {
+        return ((name == other.getName()) && (score == other.getScore()) &&
+                (red_cards == other.getRedCards()) &&
+                (yellow_card_times == other.getYellowCardTimes()) &&
+                (yellow_cards == other.getYellowCards()) &&
+                (timeouts == other.getTimeouts()) &&
+                (timeout_time == other.getTimeoutTime()) &&
+                (goalkeeper == other.getGoalkeeper()) &&
+                (foul_counter == other.getFoulCounter()) &&
+                (ball_placement_failures == other.getBallPlacementFailures()) &&
+                (can_place_ball == other.getCanPlaceBall()) &&
+                (max_allowed_bots == other.getMaxAllowedBots()));
+    }
 
    private:
     // The team's name (empty string if operator has not typed anything).
@@ -299,6 +363,22 @@ class RefboxData
     RefboxStage getStage(void) const
     {
         return stage;
+    }
+
+    bool operator==(const RefboxData &other) const
+    {
+        return ((packet_timestamp == other.getPacketTimestamp()) &&
+                (game_state_timestamp == other.getGameStateTimestamp()) &&
+                (game_state_counter == other.getGameStateCounter()) &&
+                (designated_position == other.getDesignatedPosition()) &&
+                (blue_team_on_positive_half == other.getBlueTeamOnPositiveHalf()) &&
+                (current_game_state_time_remaining ==
+                 other.getCurrentGameStateTimeRemaining()) &&
+                (friendly_team_info == other.getFriendlyTeamInfo()) &&
+                (enemy_team_info == other.getEnemyTeamInfo()) &&
+                (game_state == other.getGameState()) &&
+                (next_game_state == other.getNextGameState()) &&
+                (stage == other.getStage()));
     }
 
    private:
