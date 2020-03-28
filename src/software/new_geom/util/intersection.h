@@ -1,3 +1,5 @@
+#pragma once
+
 #include <unordered_set>
 
 #include "software/new_geom/line.h"
@@ -24,7 +26,9 @@
  * @return the point of intersection, if it exists
  */
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
-                                  const Point &d);
+                                  const Point &d,
+                                  double fixed_epsilon = GeomConstants::FIXED_EPSILON,
+                                  int ulps_epsilon     = GeomConstants::ULPS_EPSILON_TEN);
 
 /**
  * Computes the intersection of two segments.

@@ -84,16 +84,16 @@ class Segment final
      *
      * @return true if this segment contains the given point, false otherwise
      */
-    bool contains(const Point& point) const
+    bool contains(const Point& point, double fixed_epsilon = GeomConstants::FIXED_EPSILON,
+                  int ulps_distance = GeomConstants::ULPS_EPSILON_TEN) const
     {
         if (collinear(point, getSegStart(), getEnd()))
         {
             // If the segment and point are in a perfect vertical line, we must use Y
             // coordinate centric logic
-            if (almostEqual(point.x(), getEnd().x(), GeomConstants::FIXED_EPSILON,
-                            GeomConstants::ULPS_EPSILON_TEN) &&
-                almostEqual(getEnd().x(), getSegStart().x(), GeomConstants::FIXED_EPSILON,
-                            GeomConstants::ULPS_EPSILON_TEN))
+            if (almostEqual(point.x(), getEnd().x(), fixed_epsilon, ulps_distance) &&
+                almostEqual(getEnd().x(), getSegStart().x(), fixed_epsilon,
+                            ulps_distance))
             {
                 // Since segment and point are collinear we only need to check one of the
                 // coordinates, in this case we select Y because all X values are equal
