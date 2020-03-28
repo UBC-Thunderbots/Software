@@ -16,6 +16,7 @@
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
+#include "software/new_geom/util/collinear.h"
 #include "software/new_geom/util/distance.h"
 
 double proj_length(const Segment &first, const Vector &second)
@@ -186,16 +187,6 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
         bound = bound.rotate(rotate_amount);
     }
     return ans;
-}
-
-bool collinear(const Point &a, const Point &b, const Point &c)
-{
-    if ((a - b).lengthSquared() < EPS2 || (b - c).lengthSquared() < EPS2 ||
-        (a - c).lengthSquared() < EPS2)
-    {
-        return true;
-    }
-    return std::fabs((b - a).cross(c - a)) < EPS;
 }
 
 bool collinear(const Segment &segment1, const Segment &segment2)

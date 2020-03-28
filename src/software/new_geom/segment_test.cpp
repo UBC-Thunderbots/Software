@@ -41,3 +41,12 @@ TEST(SegmentContainsPointTest, test_segment_contains_endpoints)
     EXPECT_TRUE(segment.contains(segment.getSegStart()));
     EXPECT_TRUE(segment.contains(segment.getEnd()));
 }
+
+TEST(SegmentContainsPointTest, vertical_segment_contains_point)
+{
+    // A point that is very close to being collinear with a vertical segment
+    Segment segment(Point(202, 15), Point(202, -15));
+    Point point(202.00000000000003, -0.5);
+
+    EXPECT_TRUE(segment.contains(point));
+}
