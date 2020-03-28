@@ -237,9 +237,6 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
         fail_ss << "Path ends at " << path.valueAt(1.0) << " but dest is " << dest;
         throw fail_ss.str();
     }
-
-    // check that the actual destination of the path
-
     // we passed, yay!
 }
 
