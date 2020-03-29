@@ -22,16 +22,6 @@ constexpr int sign(double n)
     return n > EPS ? 1 : (n < -EPS ? -1 : 0);
 }
 
-/**
- * Signed magnitude of the projection of `second` on `first`
- */
-double proj_length(const Vector &first, const Vector &second);
-
-/**
- * Signed magnitude of the projection of `first.start -> second` on `first`
- */
-double proj_length(const Segment &first, const Vector &second);
-
 /*
  * The family of `contains` functions determines whether
  * the second parameter is contained, even if partially,
@@ -42,9 +32,6 @@ bool contains(const Circle &out, const Point &in);
 bool contains(const Ray &out, const Point &in);
 bool contains(const Segment &out, const Point &in);
 bool contains(const Rectangle &out, const Point &in);
-
-bool isDegenerate(const Segment &segment);
-bool isDegenerate(const Ray &segment);
 
 double length(const Segment &segment);
 
@@ -62,11 +49,6 @@ double lengthSquared(const Segment &segment);
  * @return false : If Segment1 and Segment2 are NOT collinear within EPS distance
  */
 bool collinear(const Segment &segment1, const Segment &segment2);
-
-/**
- * returns a list of points that lie on the border of the circle
- */
-std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points);
 
 /**
  * Finds the Point on line segment closest to point.
@@ -129,30 +111,6 @@ std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
 Point vectorRectIntersect(const Rectangle &r, const Point &segA, const Point &segB);
 
 /**
- * Clips a point to a rectangle boundary.
- *
- * @param p the point to clip.
- *
- * @param bound1 one corner of the rectangle.
- *
- * @param bound2 the diagonally-opposite corner of the rectangle.
- *
- * @return the closest point to \p p that lies within the rectangle.
- */
-Point clipPoint(const Point &p, const Point &bound1, const Point &bound2);
-
-/**
- * Clips a point to a rectangle boundary.
- *
- * @param p the point to clip.
- *
- * @param r the rectangle.
- *
- * @return the closest point to \p p that lies within the rectangle.
- */
-Point clipPoint(const Point &p, const Rectangle &r);
-
-/**
  * Computes whether there is a unique intersection of two lines.
  *
  * @param a a point on the first line.
@@ -203,19 +161,6 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
 std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
 
 /**
- * Reflects a ray incident on origin given the normal of the reflecting plane.
- *
- * @pre the normal vector cannot have length smaller than EPS.
- *
- * @param v the incident ray to reflect.
- *
- * @param n the vector normal to the reflecting plane.
- *
- * @return the reflected ray.
- */
-Vector reflect(const Vector &v, const Vector &n);
-
-/**
  * Calculates the intersection of a Ray and Segment
  *
  * @param ray: The point and direction
@@ -250,19 +195,6 @@ std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
  * intersections (overlapping) Returns Point if a single intersection exists.
  */
 std::optional<Point> getRayIntersection(Ray ray1, Ray ray2);
-
-/**
- * Reflects a point across a line.
- *
- * @param a a point on the line.
- *
- * @param b another point on the line.
- *
- * @param p the point to reflect.
- *
- * @return the reflection of \p p across the line.
- */
-Point reflect(const Point &a, const Point &b, const Point &p);
 
 /**
  * Given a cone shooting from the origin, determines the furthest location from
@@ -304,34 +236,9 @@ Point calcBlockCone(const Vector &a, const Vector &b, const double &radius);
 Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double &radius);
 
 /**
- * Used for defender_blocks_goal
- * a = goal post side
- * c = ball position
- * g = goalie position
- * returns the other ray/cone boundary that is not blocked by goalie
- * I.e. if p is return value,
- * then points to the other side of line p-c is not covered by goalie.
- */
-Vector calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
-
-/*
- * Ported code from CM geom util
- */
-
-/**
  * returns perpendicular offset from line x0-x1 to point p
  */
 double offsetToLine(Point x0, Point x1, Point p);
-
-/**
- * returns perpendicular offset from line x0-x1 to point p
- */
-double offsetAlongLine(Point x0, Point x1, Point p);
-
-/**
- * returns nearest point on segment a0-a1 to line b0-b1
- */
-Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
 
 /**
  * Calculates the acute angle formed by the two given vectors
@@ -353,14 +260,6 @@ Angle acuteVertexAngle(Vector v1, Vector v2);
  * @return the acute angle formed by the vector p2->p1 and p2->p3
  */
 Angle acuteVertexAngle(Point p1, Point p2, Point p3);
-
-Angle minAngleBetweenVectors(Vector v1, Vector v2);
-
-/**
- * returns time of closest point of approach of two points
- * moving along constant velocity vectors.
- */
-double closestPointTime(Point x1, Vector v1, Point x2, Vector v2);
 
 /**
  * found out if a point is in the vector's direction or against it
@@ -393,8 +292,6 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
 std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point reference,
                                                             const Circle circle);
 
-bool pointIsRightOfLine(const Segment &line, const Point &point);
-
 /**
  * Returns the mean of a list of points
  *
@@ -402,14 +299,6 @@ bool pointIsRightOfLine(const Segment &line, const Point &point);
  * @return the mean point of points
  */
 Point getPointsMean(const std::vector<Point> &points);
-
-/**
- * Returns the variance of a list of Points
- *
- * @param points the vector of points
- * @return the variance of the list of points
- */
-double getPointsVariance(const std::vector<Point> &points);
 
 /**
  * Function returns the segment defined by the segment between the intersections of two
@@ -554,16 +443,6 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
                                                Vector direction);
 
 /**
- * Returns the binary trespass score of a point and rectangle
- *
- * @param point The point to check for trespassing
- * @param rectangle The rectangle to check for trespassing by the Point parameter
- * @return 1 if the point exists within the rectangle, or on the boundry of the rectangle
- *         0 if the point exists outside of the rectangle
- */
-int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
-
-/**
  * Finds all circles which do not contain a point in them within the given rectangle.
  *
  * NOTE: this only guarantees that the center of each circle is within the
@@ -576,8 +455,6 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
  * provided, returns an empty list. Any points outside the bounding_box are ommitted.
  */
 std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
-
-Polygon circleToPolygon(const Circle &circle, size_t num_points);
 
 /**
  *
