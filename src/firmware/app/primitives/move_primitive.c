@@ -161,7 +161,6 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     //                end_speed [millimeter/s]
 
     // Convert into m/s and rad/s because physics is in m and s
-    printf("Move start called.\n");
     state->destination[0] = (float)(params->params[0]) / 1000.0f;
     state->destination[1] = (float)(params->params[1]) / 1000.0f;
     state->destination[2] = (float)(params->params[2]) / 100.0f;
