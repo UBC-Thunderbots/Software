@@ -183,16 +183,16 @@ class Field
     Rectangle friendlyHalf() const;
 
     /**
-     * Gets the friendly positive quadrant of the field
+     * Gets the friendly positive Y quadrant of the field
      *
-     * @return the friendly positive quadrant of the field
+     * @return the friendly positive Y quadrant of the field
      */
     Rectangle friendlyPositiveYQuadrant() const;
 
     /**
-     * Gets the friendly negative quadrant of the field
+     * Gets the friendly negative Y quadrant of the field
      *
-     * @return the friendly negative quadrant of the field
+     * @return the friendly negative Y quadrant of the field
      */
     Rectangle friendlyNegativeYQuadrant() const;
 
@@ -204,16 +204,16 @@ class Field
     Rectangle enemyHalf() const;
 
     /**
-     * Gets the enemy positive quadrant of the field
+     * Gets the enemy positive Y quadrant of the field
      *
-     * @return the enemy positive quadrant of the field
+     * @return the enemy positive Y quadrant of the field
      */
     Rectangle enemyPositiveYQuadrant() const;
 
     /**
-     * Gets the enemy negative quadrant of the field
+     * Gets the enemy negative Y quadrant of the field
      *
-     * @return the enemy negative quadrant of the field
+     * @return the enemy negative Y quadrant of the field
      */
     Rectangle enemyNegativeYQuadrant() const;
 
