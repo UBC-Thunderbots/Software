@@ -70,8 +70,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveQuadrant();
-    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeQuadrant();
+    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
+    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from

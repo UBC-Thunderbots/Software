@@ -187,14 +187,14 @@ class Field
      *
      * @return the friendly positive quadrant of the field
      */
-    Rectangle friendlyPositiveQuadrant() const;
+    Rectangle friendlyPositiveYQuadrant() const;
 
     /**
      * Gets the friendly negative quadrant of the field
      *
      * @return the friendly negative quadrant of the field
      */
-    Rectangle friendlyNegativeQuadrant() const;
+    Rectangle friendlyNegativeYQuadrant() const;
 
     /**
      * Gets the enemy half of the field
@@ -208,14 +208,14 @@ class Field
      *
      * @return the enemy positive quadrant of the field
      */
-    Rectangle enemyPositiveQuadrant() const;
+    Rectangle enemyPositiveYQuadrant() const;
 
     /**
      * Gets the enemy negative quadrant of the field
      *
      * @return the enemy negative quadrant of the field
      */
-    Rectangle enemyNegativeQuadrant() const;
+    Rectangle enemyNegativeYQuadrant() const;
 
     /**
      * Gets the area within the field lines as a rectangle. This is the set of locations
