@@ -91,9 +91,9 @@ const unsigned ROBOT_VISION_MULTICAST_LISTEN_PORT = 42000;
 // the port that the AI is listening on for robot msgs (unicast)
 const unsigned ROBOT_VISION_UNICAST_SEND_PORT = 42001;
 // the port to listen to the multicast packets for the robot (multicast)
-const unsigned AI_VISION_MULTICAST_SEND_PORT = ROBOT_VISION_MULTICAST_LISTEN_PORT;
+const unsigned AI_VISION_MULTICAST_SEND_PORT = 42000;
 // the port to send unicast packets to for robot msgs (unicast)
-const unsigned AI_VISION_UNICAST_LISTEN_PORT = ROBOT_VISION_UNICAST_SEND_PORT;
+const unsigned AI_VISION_UNICAST_LISTEN_PORT = 42001;
 
 // Primitive Group
 // the port to send multicast packets for the AI (multicast)
@@ -101,6 +101,6 @@ const unsigned ROBOT_PRIMITIVE_MULTICAST_LISTEN_PORT = 42003;
 // the port that the AI is listening on for robot msgs (unicast)
 const unsigned ROBOT_PRIMITIVE_UNICAST_SEND_PORT = 42004;
 // the port to listen to the multicast packets for the robot (multicast)
-const unsigned AI_PRIMITIVE_MULTICAST_SEND_PORT = ROBOT_PRIMITIVE_MULTICAST_LISTEN_PORT;
+const unsigned AI_PRIMITIVE_MULTICAST_SEND_PORT = 42003;
 // the port to send unicast packets to for robot msgs (unicast)
-const unsigned AI_PRIMITIVE_UNICAST_LISTEN_PORT = ROBOT_PRIMITIVE_UNICAST_SEND_PORT;
+const unsigned AI_PRIMITIVE_UNICAST_LISTEN_PORT = 42004;

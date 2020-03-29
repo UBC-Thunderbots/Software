@@ -2,6 +2,8 @@
 
 #include "software/time/timestamp.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "shared/constants.h"
+#include "software/backend/output/wifi/communication/transfer_media/network_medium.h"
 
 const std::string HandheldControllerBackend::name = "handheld_controller";
 
@@ -17,6 +19,7 @@ HandheldControllerBackend::HandheldControllerBackend()
 
 HandheldControllerBackend::HandheldControllerBackend(
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
+    #warning NOT FINALIZED DO NOT LET THIS GET INTO MASTER.
     : wifi_output(
           std::move(std::make_unique<RobotPrimitiveCommunicator>(
               std::make_unique<NetworkMedium>(
