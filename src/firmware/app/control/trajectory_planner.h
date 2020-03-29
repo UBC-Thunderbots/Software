@@ -3,7 +3,7 @@
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/vector_2d.h"
 
-#define __TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS__                                          \
+#define TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS                                              \
     6000  // The maximum size of the array containing trajectory elements
 #define __TRAJECTORY_PLANNER_MAX_PATH_LENGTH__ 18  // [meters]
 
@@ -20,6 +20,18 @@ typedef struct Trajectory
     TrajectoryElement_t* trajectory_elements;
     unsigned int num_elements;
 } Trajectory_t;
+
+typedef struct FirmwareRobotPathParameters
+{
+    Polynomial2dOrder3_t path;
+    double t_start;
+    double t_end;
+    unsigned int num_segments;
+    double max_allowable_acceleration;
+    double max_allowable_speed;
+    double initial_speed;
+    double final_speed;
+} FirmwareRobotPathParameters_t;
 
 /**
  * Returns a planned trajectory as a list of TrajectoryElement's.
@@ -48,27 +60,29 @@ typedef struct Trajectory
  * @pre init_speed > 0
  * @pre final_speed > 0
  *
+ *  @param path_parameters [in] The data structure including important path parameters
+ * such as: *path - The 3D polynomial representing the geometric path
  *
- * @param path [in] The 3D polynomial representing the geometric path
- * @param t_start [in] The path parameter value indicating the beggining of the considered
+ *              *t_start - The path parameter value indicating the beggining of the
+ * considered path *t_end - The path parameter value indicating the end of the considered
  * path
- * @param t_end [in] The path parameter value indicating the end of the considered path
- * @param num_segments [in] The number of segments to discreteize the trajectory into.
- * Must be greater than 2 segments.
- *                      * THE NUMBER OF SEGMENTS MUST BE UNDER
- * __TRAJECTORY_PLANNER_MAX_NUMER_SEGMENTS__
- * @param max_allowable_acceleration [in] The maximum acceleration allowed at any point
- * along the trajectory. This factor limits the maximum delta-velocity and also the max
- * speed around curves due to centripital acceleration [m/s^2]
- * @param max_allowable_speed [in] The maximum speed allowable at any point along the path
- * [m/s]
- * @param initial_speed [in] The initial speed at the start of the trajectory [m/s]
- * @param final_speed [in] The final speed at the end of the trajectory [m/s]
+ *
+ *              *num_segments - The number of segments to discreteize the trajectory into.
+ *                          Must be greater than 2 segments.
+ *                          THE NUMBER OF SEGMENTS MUST BE UNDER
+ *                          TRAJECTORY_PLANNER_MAX_NUMER_SEGMENTS
+ *
+ *              *max_allowable_acceleration - The maximum acceleration allowed at any
+ * point along the trajectory. This factor limits the maximum delta-velocity and also the
+ * max speed around curves due to centripital acceleration [m/s^2]
+ *
+ *              *max_allowable_speed - The maximum speed allowable at any point along the
+ * path [m/s] *initial_speed - The initial speed at the start of the trajectory [m/s]
+ *
+ *              *final_speed - The final speed at the end of the trajectory [m/s]
  */
-TrajectoryElement_t* generate_constant_arc_length_segmentation(
-    Polynomial2dOrder3_t path, double t_start, double t_end, unsigned int num_segments,
-    double max_allowable_acceleration, double max_allowable_speed, double initial_speed,
-    double final_speed);
+void generate_constant_arc_length_segmentation(
+    FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
 
 /**
  * Returns a constant interpolation period (time) trajectory based on an input trajectory
@@ -81,12 +95,10 @@ TrajectoryElement_t* generate_constant_arc_length_segmentation(
  *
  * @param variable_time_trajectory [in] The valid trajectory used as
  * reference for a constant interpolation period trajectory
- * @param num_segments [in] The number of segments in the variable_time_trajectory
- * input parameter
+
  * @param interpolation_period [in] The constant change in time that corresponds to each
  * trajectory segment
  *
  */
 Trajectory_t interpolate_constant_time_trajectory_segmentation(
-    TrajectoryElement_t* variable_time_trajectory, unsigned int num_segments,
-    const double interpolation_period);
+    Trajectory_t* variable_time_trajectory, const double interpolation_period);
