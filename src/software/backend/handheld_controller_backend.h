@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/backend/backend.h"
-#include "software/backend/output/radio/radio_output.h"
+#include "software/backend/output/wifi/wifi_output.h"
 #include "software/parameter/dynamic_parameters.h"
 
 class HandheldControllerBackend : public Backend
@@ -24,7 +24,7 @@ class HandheldControllerBackend : public Backend
 
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
-    // The interface that lets us send primitives to the robots over radio
-    RadioOutput radio_output;
+    // The interface that lets us send primitives to the robots over wifi
+    WifiOutput wifi_output;
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config;
 };

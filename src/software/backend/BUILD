@@ -50,7 +50,7 @@ cc_library(
     hdrs = ["handheld_controller_backend.h"],
     deps = [
         ":backend",
-        "//software/backend/output/radio:radio_output",
+        "//software/backend/output/wifi:wifi_output",
         "//software/time:timestamp",
         "//software/util/design_patterns:generic_factory",
     ],
