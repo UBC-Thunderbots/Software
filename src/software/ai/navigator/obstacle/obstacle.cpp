@@ -200,7 +200,7 @@ bool Obstacle::intersects(const Segment& segment) const
 {
     if (isPolygon())
     {
-        return ::intersectsNew((*_polygon), segment);
+        return ::intersects((*_polygon), segment);
     }
     else
     {
