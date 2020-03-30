@@ -45,6 +45,16 @@ class Polygon : public virtual Shape
      */
     const std::vector<Point>& getPoints() const;
 
+    /**
+     * Check if the points of this polygon make up a Degenerate polygon.
+     *
+     * Every point must equal every other point
+     *
+     * @return true if the points of this polygon make up a Degenerate polygon, false
+     * otherwise
+     */
+    bool isDegenerate();
+
    protected:
     std::vector<Point> points_;
 };

@@ -18,6 +18,7 @@ ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polyg
     }
 }
 
+
 // From:
 // https://math.stackexchange.com/questions/1743995/determine-whether-a-polygon-is-convex-based-on-its-vertices
 bool ConvexPolygon::isConvex()
@@ -28,11 +29,7 @@ bool ConvexPolygon::isConvex()
     }
 
     // Degenerate polygons are convex
-    Point first_point = points_[0];
-    auto it =
-        std::find_if_not(points_.begin(), points_.end(),
-                         [first_point](const Point& p) { return first_point == p; });
-    if (it == points_.end())
+    if (isDegenerate())
     {
         return true;
     }

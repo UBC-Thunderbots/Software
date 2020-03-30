@@ -63,3 +63,15 @@ const std::vector<Point>& Polygon::getPoints() const
 {
     return points_;
 }
+
+bool Polygon::isDegenerate()
+{
+    Point first_point = points_[0];
+    auto it =
+        std::find_if_not(points_.begin(), points_.end(),
+                         [first_point](const Point& p) { return first_point == p; });
+    if (it == points_.end())
+    {
+        return true;
+    }
+}
