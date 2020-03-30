@@ -63,3 +63,14 @@ const std::vector<Point>& Polygon::getPoints() const
 {
     return points_;
 }
+
+std::ostream& operator<<(std::ostream& os, const Polygon& poly)
+{
+    os << '{';
+    for (const auto& pt : poly.getPoints())
+    {
+        os << pt << ' ';
+    }
+    os << '}';
+    return os;
+}
