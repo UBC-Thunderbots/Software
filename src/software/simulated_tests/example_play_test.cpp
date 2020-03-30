@@ -15,6 +15,7 @@ class ExamplePlayTest : public SimulatedTest
 
 TEST_F(ExamplePlayTest, test_example_play)
 {
+    enableVisualizer();
     World world = ::Test::TestUtil::createBlankTestingWorld();
     world       = ::Test::TestUtil::setFriendlyRobotPositions(
         world,
