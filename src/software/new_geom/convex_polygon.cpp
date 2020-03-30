@@ -27,6 +27,16 @@ bool ConvexPolygon::isConvex()
         return false;
     }
 
+    // Degenerate polygons are convex
+    Point first_point = points_[0];
+    auto it =
+        std::find_if_not(points_.begin(), points_.end(),
+                         [first_point](const Point& p) { return first_point == p; });
+    if (it == points_.end())
+    {
+        return true;
+    }
+
     double w_sign       = 0;
     double x_sign       = 0;
     double x_first_sign = 0;
