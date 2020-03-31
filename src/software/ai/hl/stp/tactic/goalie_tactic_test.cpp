@@ -8,8 +8,8 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/test_util/test_util.h"
 #include "software/geom/util.h"
+#include "software/test_util/test_util.h"
 
 // The following tests will make sure the goalie stays in the requested
 // deflated defense area when best positioning to defend the ball.
@@ -186,42 +186,39 @@ TEST_F(GoalieTacticTest, ball_slow_outside_dont_chip_rectangle)
     expectChipAction(ball);
 }
 
-TEST_F(GoalieTacticTest,
-       ball_behind_net_and_moving_toward_net)
+TEST_F(GoalieTacticTest, ball_behind_net_and_moving_toward_net)
 {
     Ball ball = Ball(Point(-5.8, 0.3), Vector(0.5, 0.5), Timestamp::fromSeconds(0));
     // snap to closer goal post
     expectMoveAction(ball, Point(-4.5, 0.5 - ROBOT_MAX_RADIUS_METERS));
 }
 
-TEST_F(GoalieTacticTest,
-       ball_angle_very_sharp_and_low_velocity)
+TEST_F(GoalieTacticTest, ball_angle_very_sharp_and_low_velocity)
 {
     Ball ball = Ball(Point(-4.5, -3), Vector(0, 0.1), Timestamp::fromSeconds(0));
     // snap to closer goal post
     expectMoveAction(ball, Point(-4.5, -0.5 + ROBOT_MAX_RADIUS_METERS));
 }
 
-TEST_F(GoalieTacticTest,
-        ball_far_away_and_zero_velocity)
+TEST_F(GoalieTacticTest, ball_far_away_and_zero_velocity)
 {
-    Ball ball = Ball(Point(4.5, 1), Vector(0,0), Timestamp::fromSeconds(0));
+    Ball ball = Ball(Point(4.5, 1), Vector(0, 0), Timestamp::fromSeconds(0));
     // (-4.5, 0) is friendly goal (-3.7, 0.8), (-3.7, -0.8) is defense area
-    std::optional<Point> intersection = lineIntersection(Point(4.5, 1), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
+    std::optional<Point> intersection = lineIntersection(
+        Point(4.5, 1), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
     expectMoveAction(ball, *intersection);
 }
 
-TEST_F(GoalieTacticTest,
-        ball_outside_defense_area_and_zero_velocity)
+TEST_F(GoalieTacticTest, ball_outside_defense_area_and_zero_velocity)
 {
     Ball ball = Ball(Point(-3, -0.5), Vector(0, 0), Timestamp::fromSeconds(0));
     // (-4.5, 0) is friendly goal (-3.7, 0.8), (-3.7, -0.8) is defense area
-    std::optional<Point> intersection = lineIntersection(Point(-3, -0.5), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
+    std::optional<Point> intersection = lineIntersection(
+        Point(-3, -0.5), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
     expectMoveAction(ball, *intersection);
 }
 
-TEST_F(GoalieTacticTest,
-       ball_in_defense_area_and_zero_velocity)
+TEST_F(GoalieTacticTest, ball_in_defense_area_and_zero_velocity)
 {
     Ball ball = Ball(Point(-4, -0.5), Vector(0, 0), Timestamp::fromSeconds(0));
     expectChipAction(ball);
