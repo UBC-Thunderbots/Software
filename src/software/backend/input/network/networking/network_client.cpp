@@ -192,10 +192,13 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    RefboxGameState game_state = network_filter.getRefboxGameState(packet);
-    world.updateRefboxGameState(game_state);
+    if (world.field().isFieldValid())
+    {
+        RefboxGameState game_state = network_filter.getRefboxGameState(packet);
+        world.updateRefboxGameState(game_state);
 
-    received_world_callback(world);
+        received_world_callback(world);
+    }
 }
 
 void NetworkClient::invertFieldSide(SSL_DetectionFrame& frame)
