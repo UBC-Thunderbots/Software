@@ -58,3 +58,5 @@ class Polygon : public virtual Shape
    protected:
     std::vector<Point> points_;
 };
+
+std::ostream& operator<<(std::ostream& os, const Polygon& poly);

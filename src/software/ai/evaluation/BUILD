@@ -124,6 +124,7 @@ cc_library(
         ":team",
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom/util:intersects",
         "//software/world",
     ],
 )

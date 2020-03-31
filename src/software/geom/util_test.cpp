@@ -46,55 +46,6 @@ TEST(GeomUtilTest, test_collinear)
     }
 }
 
-TEST(GeomUtilTest, test_intersects_triangle_circle)
-{
-    Point test1p1(-5, 0);
-    Point test1p2(5, 0);
-    Point test1p3(2, 5);
-    Point test1c(0, -1);
-    double test1radius = 1;
-    EXPECT_TRUE(
-        !intersects(Triangle(test1p1, test1p2, test1p3),
-                    Circle(test1c,
-                           test1radius)));  // circle is tangent to triangle, no intersect
-
-    Point test2p1(-10, 0);
-    Point test2p2(10, 0);
-    Point test2p3(0, 15);
-    Point test2c(0, 5);
-    double test2radius = 1;
-    EXPECT_TRUE(intersects(
-        Triangle(test2p1, test2p2, test2p3),
-        Circle(test2c,
-               test2radius)));  // circle is completely inside triangle, intersect
-
-    Point test3p1(-5, -5);
-    Point test3p2(5, -5);
-    Point test3p3(0, 0);
-    Point test3c(0, 1);
-    double test3radius = 1;
-    EXPECT_TRUE(
-        !intersects(Triangle(test3p1, test3p2, test3p3),
-                    Circle(test3c,
-                           test3radius)));  // circle is tangent to vertice, no intersect
-
-    Point test4p1(-8, -5);
-    Point test4p2(0, 0);
-    Point test4p3(-3, -2);
-    Point test4c(5, 5);
-    double test4radius = 2;
-    EXPECT_TRUE(
-        !intersects(Triangle(test4p1, test4p2, test4p3), Circle(test4c, test4radius)));
-
-    Point test5p1(-2, -2);
-    Point test5p2(2, -2);
-    Point test5p3(0, 1);
-    Point test5c(0, -1);
-    double test5radius = 1;
-    EXPECT_TRUE(
-        intersects(Triangle(test5p1, test5p2, test5p3), Circle(test5c, test5radius)));
-}
-
 TEST(GeomUtilTest, test_point_in_rectangle)
 {
     // Point in 1st quadrant, rectangle in the 3rd quadrant. Should fail!
@@ -255,110 +206,6 @@ TEST(GeomUtilTest, test_line_intersect)
     }
 }
 
-TEST(GeomUtilTest, test_close_parallel_segments_dont_intersect)
-{
-    // This is a test from a bug found
-    Segment seg_1(Point(1.049, -1.049), Point(1.95, -1.049));
-    Segment seg_2(Point(2, -1), Point(1, -1));
-
-    EXPECT_FALSE(intersects(seg_1, seg_2));
-}
-
-TEST(GeomUtilTest, test_seg_crosses_seg)
-{
-    // should check for the the rare cases
-
-    for (int i = 0; i < 10; i++)
-    {
-        // generate three random points
-        Point a1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point i0(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-
-        // We do not know what the  tolorance of the function is, but we
-        // probabaly should check if segments overlap completely
-
-        bool a_over = std::rand() % 2;
-        bool b_over = std::rand() % 2;
-
-        Point a2 = a1 + (i0 - a1) * (1 + std::rand() % 100 / 100.0 *
-                                             (a_over ? 1 : -1));  // the last part
-        // generate a number
-        // either bigger or
-        // smaller than 1
-        Point b2 =
-            b1 +
-            (i0 - b1) * (1 + std::rand() % 100 / 100.0 *
-                                 (b_over ? 1 : -1));  // as a scaling factor for a2 and b2
-
-        bool expected = a_over && b_over;
-        bool found    = intersects(Segment(a1, a2), Segment(b1, b2));
-
-        // uncomment to print out some messages
-
-
-        EXPECT_EQ(expected, found);
-    }
-}
-
-TEST(GeomUtilTest, test_vector_crosses_seg)
-{
-    // should check for the the rare cases
-
-    // case where vector faces segment but segment may/ may not be long enough
-    for (int i = 0; i < 5; i++)
-    {
-        // generate three random points
-        Point a1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point i0(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-
-        // We do not know what the  tolerance of the function is, but we
-        // probably should check if segments overlap completely
-
-        bool expected = std::rand() % 2;
-
-        Point a2 = a1 + (i0 - a1).normalize();
-        Point b2 =
-            b1 + (i0 - b1) * (1 + (std::rand() % 100 / 100.0) *
-                                      (expected ? 1 : -1));  // as a scaling factor for b2
-
-        Vector ray_direction = (a2 - a1).normalize();
-
-        bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
-
-
-        EXPECT_EQ(expected, found);
-    }
-
-    // case where vector does not face segment
-    for (int i = 0; i < 5; i++)
-    {
-        // generate three random points
-        Point a1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point i0(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-
-        // We do not know what the  tolerance of the function is, but we
-        // probably should check if segments overlap completely
-
-        bool expected = false;
-
-        Point a2 = a1 - ((i0 - a1).normalize());
-        Point b2 = b1 + (i0 - b1) * (1 + std::rand() % 100 / 100.0);  // as a scaling
-        // factor for b2,
-        // make sure it
-        // is long enough
-
-        Vector ray_direction = (a2 - a1).normalize();
-
-        bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
-
-
-        EXPECT_EQ(expected, found);
-    }
-}
-
 TEST(GeomUtilTest, test_calc_block_cone)
 {
     Vector a(5, 10);
@@ -416,19 +263,6 @@ TEST(GeomUtilTest, test_offset_to_line)
     p = Point(2, 0);
 
     EXPECT_NEAR(2, offsetToLine(x0, x1, p), 1e-5);
-}
-
-// Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point
-// along the ray (Should be ray.getStart() + ray.GetDirection())
-TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction)
-{
-    Segment segment = Segment(Point(-1, 1), Point(1, 1));
-
-    Ray position_and_direction = Ray(Point(-2, 0), Vector(0, 1));
-    Ray just_direction         = Ray(Point(0, 0), Vector(0, 1));
-
-    EXPECT_EQ(intersects(position_and_direction, segment), false);
-    EXPECT_EQ(intersects(just_direction, segment), true);
 }
 
 TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
