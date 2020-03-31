@@ -7,11 +7,8 @@ proto_library(
     srcs = [
         "messages_robocup_ssl_detection.proto",
         "messages_robocup_ssl_geometry.proto",
-        "messages_robocup_ssl_geometry_legacy.proto",
-        "messages_robocup_ssl_refbox_log.proto",
         "messages_robocup_ssl_wrapper.proto",
         "ssl_game_controller_common.proto",
-        "ssl_game_controller_team.proto",
         "ssl_game_event.proto",
         "ssl_game_event_2019.proto",
         "ssl_referee.proto",

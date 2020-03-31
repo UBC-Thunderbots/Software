@@ -63,3 +63,15 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "path_planner_test",
+    srcs = ["path_planner_test.cpp"],
+    deps = [
+        ":path_planner",
+        ":straight_line_path_planner",
+        ":theta_star_path_planner",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

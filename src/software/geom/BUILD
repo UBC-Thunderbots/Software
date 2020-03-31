@@ -29,6 +29,7 @@ cc_library(
         "//software/new_geom:triangle",
         "//software/new_geom/util:collinear",
         "//software/new_geom/util:distance",
+        "//software/new_geom/util:intersects",
         "@boost//:geometry",
         "@boost//:polygon",
         "@g3log",

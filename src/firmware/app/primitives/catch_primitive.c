@@ -86,7 +86,6 @@ static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
     float major_accel;
     float timeTarget;
 
-    // printf("Ballnorm: %.2f", ballnorm);
     // if the robot's velocity is slower, then stationary_vel_max (0.05m/s),
     // it follows stationary movement
     if (CURR_STATE_UNIT_CONV * norm2(ballvel[0], ballvel[1]) < STATIONARY_VEL_MAX)

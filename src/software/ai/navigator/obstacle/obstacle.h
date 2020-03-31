@@ -159,12 +159,7 @@ inline std::ostream& operator<<(std::ostream& os, const Obstacle& o)
 {
     if (o.isPolygon())
     {
-        os << "Obstacle is the polygon {";
-        for (const Point& point : (*o.getBoundaryPolygon()).getPoints())
-        {
-            os << point << ",";
-        }
-        os << "}";
+        os << "Obstacle is the polygon " << *o.getBoundaryPolygon();
     }
     else
     {

@@ -77,7 +77,15 @@ TEST_F(FieldTest, update_with_all_parameters)
               field_to_update.fieldBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)),
               field_to_update.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, 3.0)),
+              field_to_update.friendlyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, -3.0)),
+              field_to_update.friendlyNegativeYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field_to_update.enemyHalf());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)),
+              field_to_update.enemyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)),
+              field_to_update.enemyNegativeYQuadrant());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
@@ -119,7 +127,15 @@ TEST_F(FieldTest, update_with_new_field)
               field_to_update.fieldBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)),
               field_to_update.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, 3.0)),
+              field_to_update.friendlyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, -3.0)),
+              field_to_update.friendlyNegativeYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field_to_update.enemyHalf());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)),
+              field_to_update.enemyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)),
+              field_to_update.enemyNegativeYQuadrant());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
