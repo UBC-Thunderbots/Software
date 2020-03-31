@@ -9,6 +9,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/test_util/test_util.h"
+#include "software/geom/util.h"
 
 // The following tests will make sure the goalie stays in the requested
 // deflated defense area when best positioning to defend the ball.
@@ -82,7 +83,7 @@ INSTANTIATE_TEST_CASE_P(Positions, GoalieRestrainTest,
 class GoalieTacticTest : public testing::Test
 {
    protected:
-    void expectMoveAction(Ball ball, const Point& destination)
+    void expectMoveAction(Ball ball, Point destination)
     {
         World world         = ::Test::TestUtil::createBlankTestingWorld();
         world.mutableBall() = std::move(ball);
@@ -104,6 +105,7 @@ class GoalieTacticTest : public testing::Test
         EXPECT_TRUE(move_action->getDestination().isClose(destination, 0.03));
         EXPECT_NEAR(move_action->getFinalSpeed(), 0, 0.001);
     }
+
     void expectStopAction(Ball ball)
     {
         World world         = ::Test::TestUtil::createBlankTestingWorld();
@@ -124,6 +126,7 @@ class GoalieTacticTest : public testing::Test
         auto stop_action = std::dynamic_pointer_cast<StopAction>(action_ptr);
         ASSERT_NE(stop_action, nullptr);
     }
+
     void expectChipAction(Ball ball)
     {
         World world         = ::Test::TestUtil::createBlankTestingWorld();
@@ -165,7 +168,7 @@ TEST_F(GoalieTacticTest, ball_very_fast_in_diagonal_line)
 TEST_F(GoalieTacticTest, ball_very_fast_miss)
 {
     Ball ball = Ball(Point(0, 0), Vector(-4.5, 1), Timestamp::fromSeconds(0));
-    // Goalie is expected to default to centre of goal
+    // Goalie is expected to default to the centre of goal
     expectMoveAction(ball, Point(-3.7, 0));
 }
 
@@ -184,15 +187,42 @@ TEST_F(GoalieTacticTest, ball_slow_outside_dont_chip_rectangle)
 }
 
 TEST_F(GoalieTacticTest,
-       ball_behind_net_and_moving_toward_net)  // snap to closer goal post
+       ball_behind_net_and_moving_toward_net)
 {
     Ball ball = Ball(Point(-5.8, 0.3), Vector(0.5, 0.5), Timestamp::fromSeconds(0));
+    // snap to closer goal post
     expectMoveAction(ball, Point(-4.5, 0.5 - ROBOT_MAX_RADIUS_METERS));
 }
 
 TEST_F(GoalieTacticTest,
-       ball_angle_very_sharp_and_low_velocity)  // snap to closer goal post
+       ball_angle_very_sharp_and_low_velocity)
 {
     Ball ball = Ball(Point(-4.5, -3), Vector(0, 0.1), Timestamp::fromSeconds(0));
+    // snap to closer goal post
     expectMoveAction(ball, Point(-4.5, -0.5 + ROBOT_MAX_RADIUS_METERS));
+}
+
+TEST_F(GoalieTacticTest,
+        ball_far_away_and_zero_velocity)
+{
+    Ball ball = Ball(Point(4.5, 1), Vector(0,0), Timestamp::fromSeconds(0));
+    // (-4.5, 0) is friendly goal (-3.7, 0.8), (-3.7, -0.8) is defense area
+    std::optional<Point> intersection = lineIntersection(Point(4.5, 1), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
+    expectMoveAction(ball, *intersection);
+}
+
+TEST_F(GoalieTacticTest,
+        ball_outside_defense_area_and_zero_velocity)
+{
+    Ball ball = Ball(Point(-3, -0.5), Vector(0, 0), Timestamp::fromSeconds(0));
+    // (-4.5, 0) is friendly goal (-3.7, 0.8), (-3.7, -0.8) is defense area
+    std::optional<Point> intersection = lineIntersection(Point(-3, -0.5), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
+    expectMoveAction(ball, *intersection);
+}
+
+TEST_F(GoalieTacticTest,
+       ball_in_defense_area_and_zero_velocity)
+{
+    Ball ball = Ball(Point(-4, -0.5), Vector(0, 0), Timestamp::fromSeconds(0));
+    expectChipAction(ball);
 }
