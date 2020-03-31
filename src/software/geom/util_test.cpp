@@ -123,25 +123,6 @@ TEST(GeomUtilTest, test_line_circle_intersect)
                     0.00001);
 }
 
-TEST(GeomUtilTest, test_clip_point2)
-{
-    Rectangle r(Point(-2, -1), Point(2, 1));
-
-    EXPECT_TRUE((clipPoint(Point(1, 1), r) - Point(1, 1)).length() < 0.00001);
-    EXPECT_TRUE((clipPoint(Point(3, 1), r) - Point(2, 1)).length() < 0.00001);
-    EXPECT_TRUE((clipPoint(Point(3, 2), r) - Point(2, 1)).length() < 0.00001);
-}
-
-TEST(GeomUtilTest, test_reflect2)
-{
-    Point ray0(2, 4);
-    Point line0(0, 0);
-    Point line1(1, 1);
-    Point reflected = reflect(line0, line1, ray0);
-
-    EXPECT_TRUE((reflected - Point(4, 2)).length() < 0.0001);
-}
-
 TEST(GeomUtilTest, test_calc_block_cone2)
 {
     Point a(5, 10);
