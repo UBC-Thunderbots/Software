@@ -27,12 +27,6 @@ bool ConvexPolygon::isConvex()
         return false;
     }
 
-    // Degenerate polygons are convex
-    if (isDegenerate())
-    {
-        return true;
-    }
-
     double w_sign       = 0;
     double x_sign       = 0;
     double x_first_sign = 0;

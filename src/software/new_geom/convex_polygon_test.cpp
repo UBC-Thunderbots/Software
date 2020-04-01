@@ -129,9 +129,9 @@ TEST(ConvexPolygonIsConvexTest, test_barely_convex_polygon)
 
 TEST(ConvexPolygonIsConvexTest, test_degenerate_polygon)
 {
-    // Degenerate polygons are convex
-    EXPECT_NO_THROW(
-        ConvexPolygon({Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3)}));
+    EXPECT_THROW(
+        ConvexPolygon({Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3), Point(2, 3)}),
+        std::invalid_argument);
 }
 
 TEST(ConvexPolygonIsConvexTest, test_degenerate_polygon_linear_points)
