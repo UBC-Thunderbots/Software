@@ -68,12 +68,15 @@ bool Polygon::isDegenerate()
 {
     // Check that every point is the same as the first point
     Point first_point = points_[0];
-    auto it =
-        std::find_if_not(points_.begin(), points_.end(),
-                         [first_point](const Point& p) { return first_point == p; });
-    if (it == points_.end())
+    auto it           = std::find_if(std::begin(points_), std::end(points_),
+                           [first_point](const Point p) { return first_point != p; });
+    if (it == std::end(points_))
     {
         return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
