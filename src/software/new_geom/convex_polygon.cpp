@@ -18,7 +18,6 @@ ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polyg
     }
 }
 
-
 // From:
 // https://math.stackexchange.com/questions/1743995/determine-whether-a-polygon-is-convex-based-on-its-vertices
 bool ConvexPolygon::isConvex()

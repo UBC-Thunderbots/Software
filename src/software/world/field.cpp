@@ -150,7 +150,7 @@ Rectangle Field::fieldBoundary() const
     return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 }
 
-bool Field::isFieldValid() const
+bool Field::isValid() const
 {
     if (totalXLength() < GeomConstants::FIXED_EPSILON ||
         totalYLength() < GeomConstants::FIXED_EPSILON)

@@ -239,7 +239,7 @@ class Field
      *
      * @return true if field x and y total lengths are valid, false otherwise
      */
-    bool isFieldValid() const;
+    bool isValid() const;
 
     /**
      * Gets the position of the centre of the friendly goal.

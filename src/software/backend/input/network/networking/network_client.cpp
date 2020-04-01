@@ -129,7 +129,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         world.updateFieldGeometry(field);
     }
 
-    if (world.field().isFieldValid())
+    if (world.field().isValid())
     {
         if (packet.has_detection())
         {
@@ -192,11 +192,11 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    if (world.field().isFieldValid())
-    {
-        RefboxGameState game_state = network_filter.getRefboxGameState(packet);
-        world.updateRefboxGameState(game_state);
+    RefboxGameState game_state = network_filter.getRefboxGameState(packet);
+    world.updateRefboxGameState(game_state);
 
+    if (world.field().isValid())
+    {
         received_world_callback(world);
     }
 }
