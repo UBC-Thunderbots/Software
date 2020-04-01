@@ -234,6 +234,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "patrol_tactic_test",
+    srcs = ["patrol_tactic_test.cpp"],
+    deps = [
+        ":patrol_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
