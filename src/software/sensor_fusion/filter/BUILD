@@ -56,6 +56,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "robot_team_filter_test",
+    srcs = ["robot_team_filter_test.cpp"],
+    deps = [
+        ":robot_team_filter",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "sensor_fusion_filters",
     deps = [
