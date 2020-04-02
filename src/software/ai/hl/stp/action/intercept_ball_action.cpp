@@ -40,10 +40,10 @@ std::optional<Point> InterceptBallAction::getPointBallLeavesField(const Field& f
     Ray ball_ray(ball.position(), ball.velocity());
     if (field.pointInFieldLines(ball.position()))
     {
-        std::vector<Point> intersections = intersection(field.fieldLines(), ball_ray);
+        std::unordered_set<Point> intersections = intersection(field.fieldLines(), ball_ray);
         if (!intersections.empty())
         {
-            return intersections[0];
+            intersections.begin();
         }
     }
 

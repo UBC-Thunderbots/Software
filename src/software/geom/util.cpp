@@ -718,7 +718,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         Vector connectedVec              = points[1] - points[0];
         Point halfPoint                  = points[0] + (connectedVec * 0.5);
         Vector perpVec                   = connectedVec.perpendicular();
-        std::vector<Point> intersections = intersection(
+        std::unordered_set<Point> intersections = intersection(
             bounding_box,
             Segment(
                 halfPoint + (perpVec *

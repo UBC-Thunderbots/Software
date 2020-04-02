@@ -44,7 +44,7 @@ std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle boundi
                 Point end = Point(Vector(endX, endY) *
                                   distance(bounding_box.furthestCorner(p2), p2));
 
-                std::vector<Point> edgeIntersects = intersection(
+                std::unordered_set<Point> edgeIntersects = intersection(
                     bounding_box, Segment(Point(start->x(), start->y()), end));
 
                 intersects.insert(intersects.end(), edgeIntersects.begin(),

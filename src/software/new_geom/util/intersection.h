@@ -53,7 +53,7 @@ std::vector<Point> intersection(const Segment &first, const Segment &second);
  * @return a set containing the points of intersection between a polygon and a
  * segment
  */
-std::vector<Point> intersection(const Polygon &polygon, const Segment &segment);
+std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment);
 
 /**
  * Computes the points of intersection between a ray and a line segment.
@@ -89,7 +89,7 @@ std::optional<Point> intersection(const Line &first, const Line &second);
  *
  * @return a set containing the points of intersection between a polygon and a ray
  */
-std::vector<Point> intersection(const Polygon &polygon, const Ray &ray);
+std::unordered_set<Point> intersection(const Polygon &polygon, const Ray &ray);
 
 /**
  * Computes the point of intersection between two rays.
