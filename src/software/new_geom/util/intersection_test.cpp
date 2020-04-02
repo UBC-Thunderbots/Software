@@ -33,24 +33,24 @@ TEST(SegmentSegmentIntersectionsTest, test_segments_overlapping)
 
 TEST(RectangleSegmentIntersectionsTest, test_no_intersections_segment_inside)
 {
-    Rectangle r                      = Rectangle(Point(), Point(5, 5));
-    Segment s                        = Segment(Point(1, 1), Point(3, 4));
+    Rectangle r                             = Rectangle(Point(), Point(5, 5));
+    Segment s                               = Segment(Point(1, 1), Point(3, 4));
     std::unordered_set<Point> intersections = intersection(r, s);
     EXPECT_TRUE(intersections.empty());
 }
 
 TEST(RectangleSegmentIntersectionsTest, test_no_intersections_segment_outside)
 {
-    Rectangle r                      = Rectangle(Point(), Point(5, 5));
-    Segment s                        = Segment(Point(-2, 2.5), Point(-4, 4));
+    Rectangle r                             = Rectangle(Point(), Point(5, 5));
+    Segment s                               = Segment(Point(-2, 2.5), Point(-4, 4));
     std::unordered_set<Point> intersections = intersection(r, s);
     EXPECT_TRUE(intersections.empty());
 }
 
 TEST(RectangleSegmentIntersectionsTest, test_one_intersection)
 {
-    Rectangle r                      = Rectangle(Point(), Point(5, 5));
-    Segment s                        = Segment(Point(0, 2.5), Point(3, 4));
+    Rectangle r                             = Rectangle(Point(), Point(5, 5));
+    Segment s                               = Segment(Point(0, 2.5), Point(3, 4));
     std::unordered_set<Point> intersections = intersection(r, s);
     std::unordered_set<Point> expected      = {Point(0, 2.5)};
     EXPECT_EQ(intersections, expected);
@@ -58,8 +58,8 @@ TEST(RectangleSegmentIntersectionsTest, test_one_intersection)
 
 TEST(RectangleSegmentIntersectionsTest, test_two_intersections)
 {
-    Rectangle r                      = Rectangle(Point(), Point(5, 5));
-    Segment s                        = Segment(Point(0, 2.5), Point(5, 2.5));
+    Rectangle r                             = Rectangle(Point(), Point(5, 5));
+    Segment s                               = Segment(Point(0, 2.5), Point(5, 2.5));
     std::unordered_set<Point> intersections = intersection(r, s);
     std::unordered_set<Point> expected      = {Point(0, 2.5), Point(5, 2.5)};
     EXPECT_EQ(intersections, expected);
@@ -67,8 +67,8 @@ TEST(RectangleSegmentIntersectionsTest, test_two_intersections)
 
 TEST(RectangleSegmentIntersectionsTest, test_three_intersections)
 {
-    Rectangle r                      = Rectangle(Point(), Point(5, 5));
-    Segment s                        = Segment(Point(0, 2.5), Point(0, 5));
+    Rectangle r                             = Rectangle(Point(), Point(5, 5));
+    Segment s                               = Segment(Point(0, 2.5), Point(0, 5));
     std::unordered_set<Point> intersections = intersection(r, s);
     std::unordered_set<Point> expected      = {Point(0, 2.5), Point(0, 5)};
     EXPECT_EQ(intersections, expected);
@@ -76,8 +76,8 @@ TEST(RectangleSegmentIntersectionsTest, test_three_intersections)
 
 TEST(RectangleSegmentIntersectionsTest, test_four_intersections)
 {
-    Rectangle r                      = Rectangle(Point(), Point(5, 5));
-    Segment s                        = Segment(Point(), Point(5, 5));
+    Rectangle r                             = Rectangle(Point(), Point(5, 5));
+    Segment s                               = Segment(Point(), Point(5, 5));
     std::unordered_set<Point> intersections = intersection(r, s);
     std::unordered_set<Point> expected      = {Point(), Point(5, 5)};
     EXPECT_EQ(intersections, expected);

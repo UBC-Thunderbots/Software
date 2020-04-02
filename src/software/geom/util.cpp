@@ -18,8 +18,8 @@
 #include "software/new_geom/triangle.h"
 #include "software/new_geom/util/collinear.h"
 #include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersects.h"
 #include "software/new_geom/util/intersection.h"
+#include "software/new_geom/util/intersects.h"
 
 bool isDegenerate(const Segment &segment)
 {
@@ -715,9 +715,9 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         // vector connecting the two points. Return 2 circles that are centered at the
         // points where the splitting vector intercepts the bounding_box. We should also
         // include circles centered at each of the corners.
-        Vector connectedVec              = points[1] - points[0];
-        Point halfPoint                  = points[0] + (connectedVec * 0.5);
-        Vector perpVec                   = connectedVec.perpendicular();
+        Vector connectedVec                     = points[1] - points[0];
+        Point halfPoint                         = points[0] + (connectedVec * 0.5);
+        Vector perpVec                          = connectedVec.perpendicular();
         std::unordered_set<Point> intersections = intersection(
             bounding_box,
             Segment(
