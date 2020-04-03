@@ -123,107 +123,6 @@ TEST(GeomUtilTest, test_line_circle_intersect)
                     0.00001);
 }
 
-TEST(GeomUtilTest, test_line_rect_intersect)
-{
-    std::vector<Point> intersections = lineRectIntersect(
-        Rectangle(Point(-1, -1), Point(1, 1)), Point(-1, -2), Point(1, 2));
-
-    EXPECT_TRUE(intersections.size() == 2);
-    EXPECT_TRUE((intersections[0] - Point(0.5, 1)).length() < 0.00001 ||
-                (intersections[0] - Point(-0.5, -1)).length() < 0.00001);
-    EXPECT_TRUE((intersections[1] - Point(0.5, 1)).length() < 0.00001 ||
-                (intersections[1] - Point(-0.5, -1)).length() < 0.00001);
-
-    intersections =
-        lineRectIntersect(Rectangle(Point(0, 0), Point(1, 2)), Point(-1, 0), Point(4, 2));
-
-    EXPECT_TRUE(intersections.size() == 2);
-    EXPECT_TRUE((intersections[0] - Point(0, 0.4)).length() < 0.00001 ||
-                (intersections[0] - Point(1, 0.8)).length() < 0.00001);
-    EXPECT_TRUE((intersections[1] - Point(0, 0.4)).length() < 0.00001 ||
-                (intersections[1] - Point(1, 0.8)).length() < 0.00001);
-
-    intersections = lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)), Point(0, 0),
-                                      Point(1, 2));
-
-    EXPECT_TRUE(intersections.size() == 1);
-    EXPECT_TRUE((intersections[0] - Point(0.5, 1)).length() < 0.00001);
-
-    intersections = lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)),
-                                      Point(-0.5, -0.5), Point(0.5, 0.5));
-
-    EXPECT_TRUE(intersections.size() == 0);
-}
-
-TEST(GeomUtilTest, test_vector_rect_intersect)
-{
-    Rectangle rect({1.0, 1.0}, {-1.0, -1.0});
-    Point pr1(((std::rand() % 200) - 100) / 100.0, 1.0);
-    Point pr2(((std::rand() % 200) - 100) / 100.0, -1.0);
-    Point pr3(1.0, ((std::rand() % 200) - 100) / 100.0);
-    Point pr4(-1.0, ((std::rand() % 200) - 100) / 100.0);
-    Point pb(((std::rand() % 200) - 100) / 100.0, ((std::rand() % 200) - 100) / 100.0);
-    Point found1 = vectorRectIntersect(rect, pb, pr1);
-    Point found2 = vectorRectIntersect(rect, pb, pr2);
-    Point found3 = vectorRectIntersect(rect, pb, pr3);
-    Point found4 = vectorRectIntersect(rect, pb, pr4);
-
-
-    EXPECT_TRUE((found1 - pr1).length() < 0.001);
-    EXPECT_TRUE((found2 - pr2).length() < 0.001);
-    EXPECT_TRUE((found3 - pr3).length() < 0.001);
-    EXPECT_TRUE((found4 - pr4).length() < 0.001);
-}
-
-TEST(GeomUtilTest, test_unique_line_intersect)
-{
-    EXPECT_TRUE(uniqueLineIntersects(Point(0, 0), Point(2, 2), Point(1, 0), Point(0, 1)));
-    EXPECT_TRUE(
-        !uniqueLineIntersects(Point(0, 0), Point(1, 1), Point(-1, 0), Point(0, 1)));
-}
-
-TEST(GeomUtilTest, test_line_intersect)
-{
-    // should check for the the rare cases
-
-    for (int i = 0; i < 10; i++)
-    {
-        // generate three random points
-        Point a1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-        Point expected(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
-
-        // We do not know what the  tolorance of the function is, but we
-        // probabaly should check if segments overlap completely
-
-        Point a2 = a1 + (expected - a1) * (1 + std::rand() % 200 / 100.0);
-        Point b2 = b1 + (expected - b1) * (1 + std::rand() % 200 / 100.0);
-
-        Point found = lineIntersection(a1, a2, b1, b2).value();
-
-
-        EXPECT_TRUE((expected - found).length() < 0.0001);
-    }
-}
-
-TEST(GeomUtilTest, test_calc_block_cone)
-{
-    Vector a(5, 10);
-    Vector b(-5, 10);
-
-    EXPECT_TRUE((calcBlockCone(a, b, 1) - Point(0, sqrt(5))).length() < 0.00001);
-
-    a = Vector(0, 8);
-    b = Vector(4, 4);
-
-    EXPECT_TRUE((calcBlockCone(a, b, 1) - Point(1, 1.0 + sqrt(2))).length() < 0.00001);
-
-    a = Vector(2, -4);
-    b = Vector(6, -2);
-
-    EXPECT_TRUE((calcBlockCone(a, b, 1) - Point(1.9741, -1.71212)).length() < 0.00001);
-}
-
 TEST(GeomUtilTest, test_calc_block_cone2)
 {
     Point a(5, 10);
@@ -263,26 +162,6 @@ TEST(GeomUtilTest, test_offset_to_line)
     p = Point(2, 0);
 
     EXPECT_NEAR(2, offsetToLine(x0, x1, p), 1e-5);
-}
-
-TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
-{
-    Segment seg1(Point(0, 0), Point(2, 2));
-    Segment seg2(Point(1, 1), Point(3, 3));
-
-    auto retval = lineIntersection(seg1, seg2);
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1, 1)) != retval.end());
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2, 2)) != retval.end());
-}
-
-TEST(GeomUtilTest, test_line_intersection_segments_collinear_no_overlap)
-{
-    Segment seg1(Point(0, 0), Point(1, 1));
-    Segment seg2(Point(2, 2), Point(3, 3));
-
-    auto retval = lineIntersection(seg1, seg2);
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1, 1)) == retval.end());
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2, 2)) == retval.end());
 }
 
 TEST(GeomUtilTest, test_acuteVertexAngle_angle_over_neg_y_axis)
@@ -329,84 +208,6 @@ TEST(GeomUtilTest, test_acuteVertex_angle_between_points)
     EXPECT_DOUBLE_EQ(45, acuteVertexAngle(p1, p2, p3).toDegrees());
 }
 
-// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
-// segment intersect once
-TEST(GeomUtilTest, test_ray_segment_intersecting)
-{
-    Ray ray         = Ray(Point(1, 1), Vector(0.3, -0.2));
-    Segment segment = Segment(Point(-2, -2), Point(10, -2));
-
-    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
-
-    EXPECT_DOUBLE_EQ(intersection1.value().x(), 5.5);
-    EXPECT_DOUBLE_EQ(intersection1.value().y(), -2);
-    EXPECT_EQ(intersection2, std::nullopt);
-}
-
-// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
-// segment don't intersect
-TEST(GeomUtilTest, test_ray_segment_non_intersecting)
-{
-    Ray ray         = Ray(Point(0, 0), Vector(0.0, 1));
-    Segment segment = Segment(Point(1, 1.1), Point(10, 1.1));
-
-    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
-
-    EXPECT_EQ(intersection1, std::nullopt);
-    EXPECT_EQ(intersection2, std::nullopt);
-}
-
-// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
-// segment are overlapping and parallel
-TEST(GeomUtilTest, test_ray_segment_overlapping)
-{
-    Ray ray         = Ray(Point(1, 1.1), Vector(0.0, 1));
-    Segment segment = Segment(Point(1, 1), Point(1, 5));
-
-    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
-
-    EXPECT_EQ(intersection1.value(), ray.getStart());
-    EXPECT_EQ(intersection2.value(), segment.getEnd());
-}
-
-// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
-// segment are overlapping at segment end and parallel
-TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_end)
-{
-    Ray ray         = Ray(Point(1, 5), Vector(0.0, 1));
-    Segment segment = Segment(Point(1, 1), Point(1, 5));
-
-    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
-
-    EXPECT_EQ(intersection1.value(), ray.getStart());
-    EXPECT_EQ(intersection2.value(), segment.getEnd());
-}
-
-// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
-// segment are overlapping at segment start and parallel
-TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_start)
-{
-    Ray ray         = Ray(Point(1, 1), Vector(0.0, -1));
-    Segment segment = Segment(Point(1, 1), Point(1, 5));
-
-    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
-
-    EXPECT_EQ(intersection1.value(), ray.getStart());
-    EXPECT_EQ(intersection2.value(), segment.getSegStart());
-}
-
-// Test to see if the segment start and end are returned if the ray passes through both
-TEST(GeomUtilTest, test_ray_segment_overlapping_passes_through_seg_start_and_end)
-{
-    Ray ray         = Ray(Point(1, 0), Vector(0.0, 1));
-    Segment segment = Segment(Point(1, 1), Point(1, 5));
-
-    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
-
-    EXPECT_EQ(intersection1.value(), segment.getSegStart());
-    EXPECT_EQ(intersection2.value(), segment.getEnd());
-}
-
 // Check the case where both rays intersect the segment only once (forming an intersection
 // segment within the segment)
 TEST(GeomUtilTest, test_segment_intersect_with_existing_segment)
@@ -435,45 +236,6 @@ TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting)
         getIntersectingSegment(ray1, ray2, segment);
 
     EXPECT_EQ(false, intersecting_segment.has_value());
-}
-
-// Test that a correct intersection point is returned for 2 rays that intersect once
-TEST(GeomUtilTest, test_intersect_ray_ray_do_intersect_once)
-{
-    // Ray at origin pointing upwards
-    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
-    // Ray up and to the right that points right
-    Ray ray2 = Ray(Point(-1, 1), Vector(1, 0));
-
-    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
-
-    EXPECT_EQ(intersection.value(), Point(0, 1));
-}
-
-// Test that an intersection is not returned if the opposite direction of the rays
-// intersect
-TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects)
-{
-    // Ray positioned at origin pointing down
-    Ray ray1 = Ray(Point(0, 0), Vector(0, -1));
-
-    Ray ray2 = Ray(Point(-1, 1), Vector(-1, 0));
-
-    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
-
-    EXPECT_EQ(intersection, std::nullopt);
-}
-
-// Test that an intersection is not returned if the Rays are overlapping
-TEST(GeomUtilTest, test_intersect_ray_ray_overlapping)
-{
-    // Ray positioned at origin pointing up
-    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
-    Ray ray2 = Ray(Point(0, 1), Vector(0, 1));
-
-    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
-
-    EXPECT_EQ(intersection, std::nullopt);
 }
 
 // Test that the segment between the intersecting ray and the segment extreme is returned
@@ -671,31 +433,32 @@ TEST(GeomUtilTest, test_find_open_circles_two_points_in_rectangle)
 
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
+    std::vector<std::pair<Point, double>> expected_origin_and_radii = {
+        std::make_pair(Point(0, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.9, 2))),
+        std::make_pair(Point(0, -1), std::sqrt(std::pow(1.9, 2) + std::pow(0.9, 2))),
+        std::make_pair(Point(-1, -1), std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2))),
+        std::make_pair(Point(-1, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2))),
+        std::make_pair(Point(1, 1), std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2))),
+        std::make_pair(Point(1, -1), std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2)))};
+
     ASSERT_EQ(6, empty_circles.size());
+    for (auto expected_origin_and_radius : expected_origin_and_radii)
+    {
+        bool found             = false;
+        Point expected_origin  = expected_origin_and_radius.first;
+        double expected_radius = expected_origin_and_radius.second;
 
-    EXPECT_EQ(Point(0, 1), empty_circles[0].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.9, 2)),
-                     empty_circles[0].getRadius());
+        for (const Circle &empty_circle : empty_circles)
+        {
+            if (expected_origin == empty_circle.getOrigin())
+            {
+                EXPECT_DOUBLE_EQ(expected_radius, empty_circle.getRadius());
+                found = true;
+            }
+        }
 
-    EXPECT_EQ(Point(0, -1), empty_circles[1].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(0.9, 2)),
-                     empty_circles[1].getRadius());
-
-    EXPECT_EQ(Point(-1, -1), empty_circles[2].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2)),
-                     empty_circles[2].getRadius());
-
-    EXPECT_EQ(Point(-1, 1), empty_circles[3].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2)),
-                     empty_circles[3].getRadius());
-
-    EXPECT_EQ(Point(1, 1), empty_circles[4].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2)),
-                     empty_circles[4].getRadius());
-
-    EXPECT_EQ(Point(1, -1), empty_circles[5].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2)),
-                     empty_circles[5].getRadius());
+        EXPECT_TRUE(found);
+    }
 }
 
 TEST(GeomUtilTest, test_find_open_circle_three_in_rectangle)
@@ -775,56 +538,6 @@ TEST(GeomUtilTest, test_find_open_circle_points_outside_of_box)
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
     ASSERT_EQ(0, empty_circles.size());
-}
-
-TEST(GeomUtilTest, test_ray_rectangle_intersection_no_intersection)
-{
-    Ray ray(Point(5, 5), Vector(1, 1));
-    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
-
-    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
-        std::make_pair(std::nullopt, std::nullopt);
-    auto result = rayRectangleIntersection(ray, rectangle);
-
-    EXPECT_EQ(result, expected_result);
-}
-
-TEST(GeomUtilTest,
-     test_ray_rectangle_intersection_ray_start_inside_rectangle_intersects_side)
-{
-    Ray ray(Point(0, 0), Vector(1, 0));
-    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
-
-    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
-        std::make_pair(Point(1, 0), std::nullopt);
-    auto result = rayRectangleIntersection(ray, rectangle);
-
-    EXPECT_EQ(result, expected_result);
-}
-
-TEST(GeomUtilTest,
-     test_ray_rectangle_intersection_ray_start_inside_rectangle_intersects_corner)
-{
-    Ray ray(Point(0, 0), Vector(1, 1));
-    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
-
-    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
-        std::make_pair(Point(1, 1), std::nullopt);
-    auto result = rayRectangleIntersection(ray, rectangle);
-
-    EXPECT_EQ(result, expected_result);
-}
-
-TEST(GeomUtilTest, test_ray_rectangle_intersection_ray_overlaps_rectangle_segment)
-{
-    Ray ray(Point(-2, -1), Vector(1, 0));
-    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
-
-    std::pair<std::optional<Point>, std::optional<Point>> expected_result =
-        std::make_pair(Point(-1, -1), Point(1, -1));
-    auto result = rayRectangleIntersection(ray, rectangle);
-
-    EXPECT_EQ(result, expected_result);
 }
 
 TEST(GeomUtilTest, test_find_closest_point_zero_points)
