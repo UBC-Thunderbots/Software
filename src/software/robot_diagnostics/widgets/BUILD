@@ -79,6 +79,7 @@ qt_cc_library(
         "//software/robot_diagnostics/ui:main_widget",
         "@g3log",
         "@qt//:qt_widgets",
+        "//shared:constants",
     ],
 )
 
