@@ -1,34 +1,24 @@
 #include "software/new_geom/util/intersects.h"
 
-#include <limits>
-
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
 
-bool intersectsNew(const Polygon &first, const Segment &second)
+bool intersects(const Polygon &first, const Segment &second)
 {
     return first.contains(second.getSegStart()) || first.contains(second.getEnd());
-    //    for (const auto &seg : first.getSegments())
-    //    {
-    //        if (intersectsNew(seg, second))
-    //        {
-    //            return true;
-    //        }
-    //    }
-    //    return false;
 }
 
-bool intersectsNew(const Segment &first, const Polygon &second)
+bool intersects(const Segment &first, const Polygon &second)
 {
-    return intersectsNew(second, first);
+    return intersects(second, first);
 }
 
-bool intersectsNew(const Polygon &first, const Ray &second)
+bool intersects(const Polygon &first, const Ray &second)
 {
     for (const auto &seg : first.getSegments())
     {
-        if (intersectsNew(seg, second))
+        if (intersects(seg, second))
         {
             return true;
         }
@@ -36,12 +26,12 @@ bool intersectsNew(const Polygon &first, const Ray &second)
     return false;
 }
 
-bool intersectsNew(const Ray &first, const Polygon &second)
+bool intersects(const Ray &first, const Polygon &second)
 {
-    return intersectsNew(second, first);
+    return intersects(second, first);
 }
 
-bool intersectsNew(const Polygon &first, const Circle &second)
+bool intersects(const Polygon &first, const Circle &second)
 {
     if (first.contains(second.getOrigin()))
     {
@@ -57,18 +47,18 @@ bool intersectsNew(const Polygon &first, const Circle &second)
     return false;
 }
 
-bool intersectsNew(const Circle &first, const Polygon &second)
+bool intersects(const Circle &first, const Polygon &second)
 {
-    return intersectsNew(second, first);
+    return intersects(second, first);
 }
 
-bool intersectsNew(const Circle &first, const Circle &second)
+bool intersects(const Circle &first, const Circle &second)
 {
     return (first.getOrigin() - second.getOrigin()).length() <
            (first.getRadius() + second.getRadius());
 }
 
-bool intersectsNew(const Segment &first, const Circle &second)
+bool intersects(const Segment &first, const Circle &second)
 {
     double segment_start_circle_origin_distsq =
         distanceSquared(first.getSegStart(), second.getOrigin());
@@ -83,12 +73,12 @@ bool intersectsNew(const Segment &first, const Circle &second)
     return segment_inside_circle && segment_outside_circle;
 }
 
-bool intersectsNew(const Circle &first, const Segment &second)
+bool intersects(const Circle &first, const Segment &second)
 {
-    return intersectsNew(second, first);
+    return intersects(second, first);
 }
 
-bool intersectsNew(const Segment &first, const Segment &second)
+bool intersects(const Segment &first, const Segment &second)
 {
     boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
     boost::geometry::model::segment<Point> CD(second.getSegStart(), second.getEnd());
@@ -96,7 +86,7 @@ bool intersectsNew(const Segment &first, const Segment &second)
     return boost::geometry::intersects(AB, CD);
 }
 
-bool intersectsNew(const Ray &first, const Segment &second)
+bool intersects(const Ray &first, const Segment &second)
 {
     auto intersectionValue =
         intersection(first.getStart(), first.getStart() + first.toUnitVector(),
@@ -113,7 +103,7 @@ bool intersectsNew(const Ray &first, const Segment &second)
     return first.contains(second.getSegStart()) || first.contains(second.getEnd());
 }
 
-bool intersectsNew(const Segment &first, const Ray &second)
+bool intersects(const Segment &first, const Ray &second)
 {
-    return intersectsNew(second, first);
+    return intersects(second, first);
 }

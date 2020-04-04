@@ -93,7 +93,7 @@ cc_library(
     hdrs = ["detect_threat.h"],
     deps = [
         "//shared:constants",
-        "//software/geom",
+        "//software/new_geom/util:intersection",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -124,6 +124,7 @@ cc_library(
         ":team",
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom/util:intersects",
         "//software/world",
     ],
 )

@@ -2,9 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "vision_detection",
-    srcs = [
-        "vision_detection.cpp",
-    ],
+    srcs = ["vision_detection.cpp"],
     hdrs = [
         "ball_detection.h",
         "robot_detection.h",
@@ -17,14 +15,33 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "vision_detection_test",
+    srcs = ["vision_detection_test.cpp"],
+    deps = [
+        ":vision_detection",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "refbox_data",
+    srcs = ["refbox_data.cpp"],
     hdrs = ["refbox_data.h"],
     deps = [
+        ":team_info",
         "//software/geom",
         "//software/proto:ssl_cc_proto",
         "//software/time:timestamp",
         "//software/util/printable_enum_macro",
+    ],
+)
+
+cc_library(
+    name = "team_info",
+    srcs = ["team_info.cpp"],
+    hdrs = ["team_info.h"],
+    deps = [
     ],
 )
 

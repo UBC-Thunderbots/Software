@@ -183,11 +183,39 @@ class Field
     Rectangle friendlyHalf() const;
 
     /**
+     * Gets the friendly positive Y quadrant of the field
+     *
+     * @return the friendly positive Y quadrant of the field
+     */
+    Rectangle friendlyPositiveYQuadrant() const;
+
+    /**
+     * Gets the friendly negative Y quadrant of the field
+     *
+     * @return the friendly negative Y quadrant of the field
+     */
+    Rectangle friendlyNegativeYQuadrant() const;
+
+    /**
      * Gets the enemy half of the field
      *
      * @return the enemy half of the field
      */
     Rectangle enemyHalf() const;
+
+    /**
+     * Gets the enemy positive Y quadrant of the field
+     *
+     * @return the enemy positive Y quadrant of the field
+     */
+    Rectangle enemyPositiveYQuadrant() const;
+
+    /**
+     * Gets the enemy negative Y quadrant of the field
+     *
+     * @return the enemy negative Y quadrant of the field
+     */
+    Rectangle enemyNegativeYQuadrant() const;
 
     /**
      * Gets the area within the field lines as a rectangle. This is the set of locations
@@ -211,7 +239,7 @@ class Field
      *
      * @return true if field x and y total lengths are valid, false otherwise
      */
-    bool isFieldValid() const;
+    bool isValid() const;
 
     /**
      * Gets the position of the centre of the friendly goal.
