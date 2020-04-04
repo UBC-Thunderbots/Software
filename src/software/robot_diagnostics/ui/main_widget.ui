@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>874</width>
-    <height>524</height>
+    <width>892</width>
+    <height>458</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -521,41 +521,6 @@
      <number>24</number>
     </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar_lqi">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>350</y>
-      <width>231</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>24</number>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progressBar_rsii">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>380</y>
-      <width>231</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>-90</number>
-    </property>
-    <property name="maximum">
-     <number>-30</number>
-    </property>
-    <property name="value">
-     <number>-90</number>
-    </property>
-    <property name="format">
-     <string>%v dB</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_status">
     <property name="geometry">
      <rect>
@@ -700,63 +665,6 @@
      <string>Break Beam:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_radio">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>320</y>
-      <width>131</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Radio</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_lqi">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>350</y>
-      <width>131</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>11</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Link Quality (LQI):</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_rssi">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>380</y>
-      <width>131</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>11</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Receive Signal Strength</string>
-    </property>
-    <property name="text">
-     <string>Rx Signal Strength:</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_robot_selection">
     <property name="geometry">
      <rect>
@@ -789,7 +697,7 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>410</y>
+      <y>320</y>
       <width>321</width>
       <height>21</height>
      </rect>
@@ -802,7 +710,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>410</y>
+      <y>320</y>
       <width>51</width>
       <height>17</height>
      </rect>
@@ -820,7 +728,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>440</y>
+      <y>350</y>
       <width>331</width>
       <height>31</height>
      </rect>
@@ -1059,19 +967,6 @@
       <x>130</x>
       <y>230</y>
       <width>241</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="Line" name="line_8">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>320</y>
-      <width>291</width>
       <height>21</height>
      </rect>
     </property>
