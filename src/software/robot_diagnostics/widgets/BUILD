@@ -76,10 +76,10 @@ qt_cc_library(
     src = "robot_selection.cpp",
     hdr = "robot_selection.h",
     deps = [
+        "//shared:constants",
         "//software/robot_diagnostics/ui:main_widget",
         "@g3log",
         "@qt//:qt_widgets",
-        "//shared:constants",
     ],
 )
 

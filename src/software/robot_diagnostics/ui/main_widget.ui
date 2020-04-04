@@ -441,7 +441,7 @@
           <item>
            <widget class="QTabWidget" name="tabWidget">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="direct_per_wheel">
              <attribute name="title">
@@ -466,7 +466,7 @@
                        <string>Front Left Motor</string>
                       </property>
                       <property name="text">
-                       <string>Motor FL</string>
+                       <string>Front Left (%)</string>
                       </property>
                      </widget>
                     </item>
@@ -476,7 +476,7 @@
                        <string>Front Right Motor</string>
                       </property>
                       <property name="text">
-                       <string>Motor FR</string>
+                       <string>Front Right (%)</string>
                       </property>
                      </widget>
                     </item>
@@ -486,7 +486,7 @@
                        <string>Back Left Motor</string>
                       </property>
                       <property name="text">
-                       <string>Motor BL</string>
+                       <string>Back Left (%)</string>
                       </property>
                      </widget>
                     </item>
@@ -496,7 +496,7 @@
                        <string>Back Right Motor</string>
                       </property>
                       <property name="text">
-                       <string>Motor BR</string>
+                       <string>Back Right (%)</string>
                       </property>
                      </widget>
                     </item>

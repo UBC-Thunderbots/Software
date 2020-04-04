@@ -15,8 +15,9 @@
  * @param value_changed_callback callback to call with new values
  * @param min min value for value
  * @param max max value for value
- * @param scaling how much value should be scaled up to display on slider
+ * @param slider_step_size how much the line_edit value should be scaled up to display on
+ * slider
  */
 void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
                          std::function<void(double)> value_changed_callback, double min,
-                         double max, double scaling);
+                         double max, double slider_step_size);

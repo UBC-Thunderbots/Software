@@ -2,21 +2,21 @@
 
 void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
                          std::function<void(double)> value_changed_callback, double min,
-                         double max, double scaling)
+                         double max, double slider_step_size)
 {
-    slider->setMinimum(min * scaling);
-    slider->setMaximum(max * scaling);
+    slider->setMinimum(min * slider_step_size);
+    slider->setMaximum(max * slider_step_size);
     slider->setValue(0);
     line_edit->setText(QString::number(0));
 
-    auto on_slider_changed = [line_edit, scaling,
+    auto on_slider_changed = [line_edit, slider_step_size,
                               value_changed_callback](const int slider_value) {
-        double value = slider_value / scaling;
+        double value = slider_value / slider_step_size;
         line_edit->setText(QString::number(value));
         value_changed_callback(value);
     };
 
-    auto on_line_edit_changed = [line_edit, slider, min, max, scaling,
+    auto on_line_edit_changed = [line_edit, slider, min, max, slider_step_size,
                                  value_changed_callback](const QString &text) {
         bool ok;
         double line_edit_input = text.toDouble(&ok);
@@ -35,12 +35,12 @@ void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
             {
                 line_edit->setText(QString::number(value));
             }
-            slider->setValue(value * scaling);
+            slider->setValue(value * slider_step_size);
         }
         else
         {
             // line_edit input is invalid so get value from slider
-            double value = slider->value() / scaling;
+            double value = slider->value() / slider_step_size;
             line_edit->setText(QString::number(value));
         }
         value_changed_callback(value);
