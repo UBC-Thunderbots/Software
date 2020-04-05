@@ -36,68 +36,6 @@ double lengthSquared(const Segment &segment)
     return distanceSquared(segment.getSegStart(), segment.getEnd());
 }
 
-bool contains(const Triangle &out, const Point &in)
-{
-    double angle                 = 0;
-    std::vector<Point> outPoints = out.getPoints();
-    for (int i = 0, j = 2; i < 3; j = i++)
-    {
-        if ((in - outPoints[i]).length() < EPS)
-        {
-            return true;  // SPECIAL CASE
-        }
-        double a = atan2((outPoints[i] - in).cross(outPoints[j] - in),
-                         (outPoints[i] - in).dot(outPoints[j] - in));
-        angle += a;
-    }
-    return std::fabs(angle) > 6;
-}
-
-bool contains(const Circle &out, const Point &in)
-{
-    return distanceSquared(out.getOrigin(), in) <= out.getRadius() * out.getRadius();
-}
-
-bool contains(const Segment &out, const Point &in)
-{
-    if (collinear(in, out.getSegStart(), out.getEnd()))
-    {
-        // If the segment and point are in a perfect vertical line, we must use Y
-        // coordinate centric logic
-        if ((std::abs(in.x() - out.getEnd().x()) < EPS) &&
-            (std::abs(out.getEnd().x() - out.getSegStart().x()) < EPS))
-        {
-            // if collinear we only need to check one of the coordinates,
-            // in this case we select Y because all X values are equal
-            return (in.y() <= out.getSegStart().y() && in.y() >= out.getEnd().y()) ||
-                   (in.y() <= out.getEnd().y() && in.y() >= out.getSegStart().y());
-        }
-
-        // if collinear we only need to check one of the coordinates,
-        // choose x because we know there is variance in these values
-        return (in.x() <= out.getSegStart().x() && in.x() >= out.getEnd().x()) ||
-               (in.x() <= out.getEnd().x() && in.x() >= out.getSegStart().x());
-    }
-
-    return false;
-}
-
-bool contains(const Ray &out, const Point &in)
-{
-    Point point_in_ray_direction = out.getStart() + out.toUnitVector();
-    if (collinear(in, out.getStart(), point_in_ray_direction) &&
-        (((in - out.getStart()).normalize() - out.toUnitVector()).length() < EPS))
-    {
-        return true;
-    }
-    return false;
-}
-
-bool contains(const Rectangle &out, const Point &in)
-{
-    return out.contains(in);
-}
-
 bool collinear(const Segment &segment1, const Segment &segment2)
 {
     // Two segments are collinear if all Points are collinear
@@ -253,7 +191,7 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
 {
     // If the point is already inside the circe arccos won't work so just return
     // the perp points
-    if (contains(circle, start))
+    if (circle.contains(start))
     {
         double perpDist = std::sqrt(circle.getRadius() * circle.getRadius() -
                                     (circle.getOrigin() - start).lengthSquared());
@@ -463,7 +401,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
         return redundant_segment;
     }
     // Check if the beginning of segment2 lays inside segment1
-    else if (contains(segment1, segment2.getSegStart()))
+    else if (segment1.contains(segment2.getSegStart()))
     {
         // If segment2.getSegStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furthest from segment2.getEnd()
@@ -473,7 +411,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                    : Segment(segment1.getEnd(), segment2.getEnd());
     }
     // Now check if the end of segment2 lays inside segment1
-    else if (contains(segment1, segment2.getEnd()))
+    else if (segment1.contains(segment2.getEnd()))
     {
         // If segment2.getSegStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furtherst from segmen2.getEnd()
@@ -509,8 +447,8 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 
     // The segment is redundant if both points of the smallest segment are contained in
     // the largest segment
-    if (contains(largest_segment, smallest_segment.getSegStart()) &&
-        contains(largest_segment, smallest_segment.getEnd()))
+    if (largest_segment.contains(smallest_segment.getSegStart()) &&
+        largest_segment.contains(smallest_segment.getEnd()))
     {
         return std::make_optional(largest_segment);
     }
@@ -593,7 +531,7 @@ std::vector<Segment> projectCirclesOntoSegment(Segment segment,
     for (Circle circle : circles)
     {
         // If the reference is inside an obstacle there is no open direction
-        if (contains(circle, origin))
+        if (circle.contains(origin))
         {
             obstacle_segment_projections.push_back(segment);
             return obstacle_segment_projections;

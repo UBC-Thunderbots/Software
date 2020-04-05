@@ -22,17 +22,6 @@ constexpr int sign(double n)
     return n > EPS ? 1 : (n < -EPS ? -1 : 0);
 }
 
-/*
- * The family of `contains` functions determines whether
- * the second parameter is contained, even if partially,
- * inside the first parameter.
- */
-bool contains(const Triangle &out, const Point &in);
-bool contains(const Circle &out, const Point &in);
-bool contains(const Ray &out, const Point &in);
-bool contains(const Segment &out, const Point &in);
-bool contains(const Rectangle &out, const Point &in);
-
 double length(const Segment &segment);
 
 double lengthSquared(const Segment &segment);
