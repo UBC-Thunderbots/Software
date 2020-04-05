@@ -70,10 +70,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region(world.field().centerPoint(),
-                                          world.field().enemyCornerPos());
-    Rectangle cherry_pick_2_target_region(world.field().centerPoint(),
-                                          world.field().enemyCornerNeg());
+    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
+    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
@@ -100,8 +98,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(
-        Rectangle(Point(0, world.field().yLength() / 2), world.field().enemyCornerNeg()));
+    pass_generator.setTargetRegion(world.field().enemyHalf());
 
     // Wait for a robot to be assigned to aligned to the ball to pass
     while (!align_to_ball_tactic->getAssignedRobot())

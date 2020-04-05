@@ -1,23 +1,10 @@
 #include "software/new_geom/util/intersection.h"
 
+#include "software/new_geom/util/almost_equal.h"
 #include "software/new_geom/util/collinear.h"
 
-/**
- * Computes the point of intersection between two lines.
- * Note: this computes the intersection of two lines, not line segments.
- *
- * Overlapping lines are considered parallel and not intersecting.
- *
- * See:
- * https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
- *
- * @params a, b points that represent the first line
- * @params c, d points that represent the second line
- *
- * @return the point of intersection, if it exists
- */
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
-                                  const Point &d)
+                                  const Point &d, double fixed_epsilon, int ulps_epsilon)
 {
     double x1 = a.x();
     double y1 = a.y();
@@ -28,8 +15,11 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     double x4 = d.x();
     double y4 = d.y();
 
-    double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (denominator == 0)
+    double denominatorTermA = (x1 - x2) * (y3 - y4);
+    double denominatorTermB = (y1 - y2) * (x3 - x4);
+    double denominator      = denominatorTermA - denominatorTermB;
+
+    if (almostEqual(denominatorTermA, denominatorTermB, fixed_epsilon, ulps_epsilon))
     {
         return std::nullopt;
     }
@@ -54,7 +44,9 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
  */
 constexpr int sign(double n)
 {
-    return n > GeomConstants::EPSILON ? 1 : (n < -GeomConstants::EPSILON ? -1 : 0);
+    return n > GeomConstants::FIXED_EPSILON
+               ? 1
+               : (n < -GeomConstants::FIXED_EPSILON ? -1 : 0);
 }
 
 std::vector<Point> intersection(const Segment &first, const Segment &second)

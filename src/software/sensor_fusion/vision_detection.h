@@ -54,7 +54,6 @@ class VisionDetection
      */
     const std::vector<RobotDetection> getEnemyTeamDetections(void) const;
 
-
     /**
      * Gets field detection
      *

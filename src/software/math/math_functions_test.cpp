@@ -195,9 +195,38 @@ TEST(SigmoidTest, sigmoid_negating_sig_width_flips_sigmoid)
     EXPECT_NEAR(sigmoid(5, 0, -10), 0.018, 0.0001);
 }
 
-int main(int argc, char **argv)
+TEST(NormalizeToRangeTest, test_integral_type_normalize_to_same_range)
 {
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    int result = normalizeValueToRange<int>(64, 0, 100, 0, 100);
+    EXPECT_EQ(64, result);
+}
+
+TEST(NormalizeToRangeTest, test_integral_type_normalize_to_different_range)
+{
+    int result = normalizeValueToRange<int>(64, 0, 100, 0, 1000);
+    EXPECT_EQ(640, result);
+}
+
+TEST(NormalizeToRangeTest, test_integral_type_initial_value_out_of_range)
+{
+    int result = normalizeValueToRange<int>(12, 0, 10, 0, 1000);
+    EXPECT_EQ(1000, result);
+}
+
+TEST(NormalizeToRangeTest, test_floating_point_type_normalize_to_same_range)
+{
+    float result = normalizeValueToRange<float>(39.05, 0.0, 50.0, 0.0, 50.0);
+    EXPECT_FLOAT_EQ(39.05, result);
+}
+
+TEST(NormalizeToRangeTest, test_floating_point_type_normalize_to_different_range)
+{
+    float result = normalizeValueToRange<float>(39.05, 0.0, 50.0, 0.0, 1.0);
+    EXPECT_FLOAT_EQ(0.781, result);
+}
+
+TEST(NormalizeToRangeTest, test_floating_point_type_initial_value_out_of_range)
+{
+    double result = normalizeValueToRange<double>(300, 0, 255, 0, 6);
+    EXPECT_DOUBLE_EQ(6.0, result);
 }

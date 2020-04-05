@@ -19,7 +19,7 @@ jobs:
             --test_output=errors
         # Test Firmware
         - >
-          bazel coverage //firmware/main/app/...    \
+          bazel coverage //firmware/app/...    \
             --compilation_mode=fastbuild            \
             --verbose_test_summary                  \
             --instrumentation_filter=//...          \
@@ -28,7 +28,8 @@ jobs:
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
         # Build ARM Targets For Firmware
         - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
-        - bazel build --cpu=stm32f4 //firmware:firmware_old_main_bin
+        - bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
+        - bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin 
     - name: "Check Formatting"
       script:
         - ./formatting_scripts/check_formatting_ci.sh

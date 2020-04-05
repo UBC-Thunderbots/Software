@@ -1,0 +1,29 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "physics",
+    srcs = ["physics.c"],
+    hdrs = ["physics.h"],
+    deps = [
+        ":physics_linear_alebra",
+        "//firmware/shared:util",
+        "//firmware/shared/math:tbots_math",
+    ],
+)
+
+cc_library(
+    name = "physics_linear_alebra",
+    srcs = ["physics_linear_algebra.c"],
+    hdrs = ["physics_linear_algebra.h"],
+    visibility = ["//visibility:private"],
+    deps = [],
+)
+
+cc_library(
+    name = "util",
+    srcs = ["util.c"],
+    hdrs = ["util.h"],
+    deps = [
+        "//firmware/shared/math:tbots_math",
+    ],
+)

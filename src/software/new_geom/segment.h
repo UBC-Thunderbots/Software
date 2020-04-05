@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/new_geom/point.h"
+#include "software/new_geom/util/almost_equal.h"
 #include "software/new_geom/util/collinear.h"
 
 // This is a direct copy of geom/segment.h, this is needed to unblock work on the new_geom
@@ -83,14 +84,16 @@ class Segment final
      *
      * @return true if this segment contains the given point, false otherwise
      */
-    bool contains(const Point& point) const
+    bool contains(const Point& point, double fixed_epsilon = GeomConstants::FIXED_EPSILON,
+                  int ulps_distance = GeomConstants::ULPS_EPSILON_TEN) const
     {
         if (collinear(point, getSegStart(), getEnd()))
         {
             // If the segment and point are in a perfect vertical line, we must use Y
             // coordinate centric logic
-            if ((std::abs(point.x() - getEnd().x()) < GeomConstants::EPSILON) &&
-                (std::abs(getEnd().x() - getSegStart().x()) < GeomConstants::EPSILON))
+            if (almostEqual(point.x(), getEnd().x(), fixed_epsilon, ulps_distance) &&
+                almostEqual(getEnd().x(), getSegStart().x(), fixed_epsilon,
+                            ulps_distance))
             {
                 // Since segment and point are collinear we only need to check one of the
                 // coordinates, in this case we select Y because all X values are equal

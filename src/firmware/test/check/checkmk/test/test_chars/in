@@ -1,8 +1,0 @@
-/* tests shouldn't allow non-identifier characters. */
-
-# suite The Suite
-
-# tcase The Test Case
-
-# test test@me
-    fail_if(GOT_HERE);

@@ -30,7 +30,7 @@ Point Spline::valueAt(double val) const
     {
         // Note: this could be more performant with binary search
         auto seg_it = std::find_if(segments.begin(), segments.end(),
-                                   [&](const SplineSegment& sseg) {
+                                   [val](const SplineSegment& sseg) {
                                        return (val >= sseg.start && val <= sseg.end);
                                    });
 

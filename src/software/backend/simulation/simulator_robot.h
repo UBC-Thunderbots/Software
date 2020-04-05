@@ -9,7 +9,7 @@
 
 extern "C"
 {
-#include "firmware/main/app/primitives/primitive_manager.h"
+#include "firmware/app/primitives/primitive_manager.h"
 }
 
 /**

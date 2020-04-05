@@ -39,7 +39,7 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
         }
 
         auto it = std::find_if(team_robots.begin(), team_robots.end(),
-                               [&](const Robot& r) { return r.id() == robot.id(); });
+                               [robot](const Robot& r) { return r.id() == robot.id(); });
         if (it != team_robots.end())
         {
             // The robot already exists on the team. Find and update the robot

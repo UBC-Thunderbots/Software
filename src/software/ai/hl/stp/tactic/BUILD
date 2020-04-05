@@ -97,6 +97,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
+        "//software/new_geom/util:intersection",
         "@g3log",
     ],
 )
@@ -154,6 +155,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
+        "//software/new_geom/util:intersection",
         "@g3log",
     ],
 )
@@ -234,6 +236,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "patrol_tactic_test",
+    srcs = ["patrol_tactic_test.cpp"],
+    deps = [
+        ":patrol_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
@@ -247,6 +259,7 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
+        "//software/new_geom/util:intersection",
         "@g3log",
     ],
 )

@@ -8,7 +8,7 @@
 #include <optional>
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
+#include "software/new_geom/util/intersection.h"
 #include "software/world/field.h"
 
 namespace Evaluation
@@ -19,10 +19,12 @@ namespace Evaluation
         Segment friendlyNetSegment =
             Segment(field.friendlyGoalpostPos(), field.friendlyGoalpostNeg());
 
-        std::optional<Point> intersection1 =
-            raySegmentIntersection(ballRay, friendlyNetSegment).first;
-
-        return intersection1;
+        std::vector<Point> intersections = intersection(ballRay, friendlyNetSegment);
+        if (intersections.empty())
+        {
+            return std::nullopt;
+        }
+        return intersections[0];
     }
 
     std::optional<Point> calcBallVelIntersectEnemyNet(Ball ball, Field field)
@@ -31,10 +33,12 @@ namespace Evaluation
         Segment enemyNetSegment =
             Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg());
 
-        std::optional<Point> intersection1 =
-            raySegmentIntersection(ballRay, enemyNetSegment).first;
-
-        return intersection1;
+        std::vector<Point> intersections = intersection(ballRay, enemyNetSegment);
+        if (intersections.empty())
+        {
+            return std::nullopt;
+        }
+        return intersections[0];
     }
 
 };  // namespace Evaluation
