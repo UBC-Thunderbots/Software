@@ -14,7 +14,7 @@
    <string>Robot Diagnostics</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_26">
+   <layout class="QVBoxLayout" name="verticalLayout_27">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_18">
       <item>
@@ -799,6 +799,9 @@
                     <property name="text">
                      <string>Discharge</string>
                     </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">buttonGroup_charge_state</string>
+                    </attribute>
                    </widget>
                   </item>
                   <item>
@@ -806,6 +809,9 @@
                     <property name="text">
                      <string>Float</string>
                     </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">buttonGroup_charge_state</string>
+                    </attribute>
                    </widget>
                   </item>
                   <item>
@@ -813,32 +819,12 @@
                     <property name="text">
                      <string>Charge</string>
                     </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">buttonGroup_charge_state</string>
+                    </attribute>
                    </widget>
                   </item>
-                  <item>
-                   <spacer name="horizontalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkBox_chicker_auto">
-                  <property name="toolTip">
-                   <string>Automatically kick or chip when the breakbeam triggered</string>
-                  </property>
-                  <property name="text">
-                   <string>Auto</string>
-                  </property>
-                 </widget>
                 </item>
                </layout>
               </item>
@@ -874,6 +860,40 @@
                  </widget>
                 </item>
                </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_26">
+              <item>
+               <widget class="QRadioButton" name="radioButton_autokick">
+                <property name="text">
+                 <string>Autokick</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">buttonGroup_autochick</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_autochip">
+                <property name="text">
+                 <string>Autochip</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">buttonGroup_autochick</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_autochick_none">
+                <property name="text">
+                 <string>No Auto</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">buttonGroup_autochick</string>
+                </attribute>
+               </widget>
               </item>
              </layout>
             </item>
@@ -983,4 +1003,8 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup_charge_state"/>
+  <buttongroup name="buttonGroup_autochick"/>
+ </buttongroups>
 </ui>
