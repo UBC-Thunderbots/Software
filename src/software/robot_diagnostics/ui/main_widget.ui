@@ -607,7 +607,7 @@
                    <string>Stop sending drive commands and reset sliders</string>
                   </property>
                   <property name="text">
-                   <string>Stop</string>
+                   <string>Stop and Reset</string>
                   </property>
                  </widget>
                 </item>
@@ -740,7 +740,7 @@
                    <string>Stop sending drive commands and reset sliders</string>
                   </property>
                   <property name="text">
-                   <string>Stop</string>
+                   <string>Stop and Reset</string>
                   </property>
                  </widget>
                 </item>
@@ -984,7 +984,7 @@
             <item>
              <widget class="QPushButton" name="pushButton_dribbler_stop">
               <property name="text">
-               <string>Stop</string>
+               <string>Stop and Reset</string>
               </property>
              </widget>
             </item>
