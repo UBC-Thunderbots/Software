@@ -43,3 +43,29 @@ TEST(ActionTest, getRobot)
     EXPECT_TRUE(robot_opt.has_value());
     EXPECT_EQ(robot, *robot_opt);
 }
+
+TEST(ActionTest, restart_after_done_makes_done_false)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveTestAction action = MoveTestAction(0.05);
+
+    // The first time the Action runs it will always return an Intent to make sure we
+    // are doing the correct thing
+    action.updateControlParams(robot, Point());
+    auto intent_ptr = action.getNextIntent();
+    EXPECT_TRUE(intent_ptr);
+    EXPECT_FALSE(action.done());
+
+    // For subsequent calls, we expect the Action to be done (in this case)
+    intent_ptr = action.getNextIntent();
+    EXPECT_FALSE(intent_ptr);
+    EXPECT_TRUE(action.done());
+
+    //if we restart the action, we expect it to return an intent and
+    // to evaluate "done" as false
+    action.restart();
+    intent_ptr = action.getNextIntent();
+    EXPECT_TRUE(intent_ptr);
+    EXPECT_FALSE(action.done());
+}
