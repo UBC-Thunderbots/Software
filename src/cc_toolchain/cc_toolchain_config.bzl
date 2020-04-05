@@ -192,7 +192,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion"] +
+                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion", "-Werror"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -541,6 +541,7 @@ def _linux_gcc_impl(ctx):
             "c++17",
             "determinism",
             "hardening",
+            "warnings",
             "build-id",
             "no-canonical-prefixes",
             "stdlib",
