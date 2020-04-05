@@ -16,7 +16,8 @@ bool Action::done() const
 
 void Action::restart()
 {
-        intent_sequence = IntentCoroutine::pull_type(boost::bind(&Action::calculateNextIntentWrapper, this, _1));
+    intent_sequence = IntentCoroutine::pull_type(
+        boost::bind(&Action::calculateNextIntentWrapper, this, _1));
 }
 
 std::unique_ptr<Intent> Action::getNextIntent()

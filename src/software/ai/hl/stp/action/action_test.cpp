@@ -62,7 +62,7 @@ TEST(ActionTest, restart_after_done_makes_done_false)
     EXPECT_FALSE(intent_ptr);
     EXPECT_TRUE(action.done());
 
-    //if we restart the action, we expect it to return an intent and
+    // if we restart the action, we expect it to return an intent and
     // to evaluate "done" as false
     action.restart();
     intent_ptr = action.getNextIntent();
