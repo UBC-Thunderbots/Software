@@ -540,6 +540,7 @@ def _linux_gcc_impl(ctx):
             "builtin_include_directories",
             "c++17",
             "determinism",
+            "warnings",
             "hardening",
             "build-id",
             "no-canonical-prefixes",
