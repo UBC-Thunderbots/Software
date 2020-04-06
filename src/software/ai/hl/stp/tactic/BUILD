@@ -155,6 +155,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
+        "//software/new_geom:line",
         "//software/new_geom/util:intersection",
         "@g3log",
     ],
@@ -165,6 +166,9 @@ cc_test(
     srcs = ["goalie_tactic_test.cpp"],
     deps = [
         ":goalie_tactic",
+        "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",

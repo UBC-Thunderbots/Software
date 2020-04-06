@@ -14,24 +14,6 @@
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
 
-TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
-{
-    Segment segment = Segment(Point(0, 0), Point(0, 1));
-
-    Point point = Point(0, 0.5);
-
-    EXPECT_EQ(contains(segment, point), true);
-}
-
-TEST(GeomUtilTest, test_segment_contains_point_no_y_deviation)
-{
-    Segment segment = Segment(Point(0, 0), Point(1, 0));
-
-    Point point = Point(0.5, 0);
-
-    EXPECT_EQ(contains(segment, point), true);
-}
-
 TEST(GeomUtilTest, test_collinear)
 {
     for (unsigned int i = 0; i < 10; ++i)
@@ -44,40 +26,6 @@ TEST(GeomUtilTest, test_collinear)
         bool val     = collinear(pointA, pointB, pointC);
         EXPECT_TRUE(val);
     }
-}
-
-TEST(GeomUtilTest, test_point_in_rectangle)
-{
-    // Point in 1st quadrant, rectangle in the 3rd quadrant. Should fail!
-    EXPECT_TRUE(!contains(Rectangle(Point(0, 0), Point(-2, -2)), Point(1, 1)));
-
-    // Point in 3rd quadrant, rectangle in the 3rd quadrant. Pass!
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-2, -2)), Point(-1, -1)));
-
-    // Point is one of the corners of the rectangle. Pass
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(2, 2)), Point(2, 2)));
-
-    // Point is on the edge of the rectangle. Pass
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)), Point(0, 1)));
-
-    // Point in the 1st quadrant, rectangle in the 1st quadrant. Pass
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)), Point(1, 2)));
-
-    // Point in the 2nd quadrant, rectangle in the 2nd quadrant. Point is off
-    // above, Fail.
-    EXPECT_TRUE(!contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-2, 5)));
-
-    // Point in the 2nd quadrant, rectangle in the 4th quadrant. Point is off to
-    // the left, Fail.
-    EXPECT_TRUE(!contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-7, 2)));
-
-    // Point in the 2nd quadrant, rectangle centered at origin. Point is off
-    // above, Fail.
-    EXPECT_TRUE(contains(Rectangle(Point(1, 1), Point(-1, -1)), Point(0.5, 0.5)));
-
-    // Point in the 2nd quadrant, rectangle centered at origin. Point is off to
-    // the left, Fail.
-    EXPECT_TRUE(!contains(Rectangle(Point(1, 1), Point(-1, -1)), Point(2, 2)));
 }
 
 TEST(GeomUtilTest, test_closest_lineseg_point)
