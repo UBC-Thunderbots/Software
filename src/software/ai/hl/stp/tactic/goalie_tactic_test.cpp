@@ -9,6 +9,8 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/geom/util.h"
+#include "software/new_geom/line.h"
+#include "software/new_geom/util/intersection.h"
 #include "software/test_util/test_util.h"
 
 // The following tests will make sure the goalie stays in the requested
@@ -204,18 +206,18 @@ TEST_F(GoalieTacticTest, ball_far_away_and_zero_velocity)
 {
     Ball ball = Ball(Point(4.5, 1), Vector(0, 0), Timestamp::fromSeconds(0));
     // (-4.5, 0) is friendly goal (-3.7, 0.8), (-3.7, -0.8) is defense area
-    std::optional<Point> intersection = lineIntersection(
-        Point(4.5, 1), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
-    expectMoveAction(ball, *intersection);
+    std::optional<Point> goalie_intersection = intersection(
+        Line(Point(4.5, 1), Point(-4.5, 0)), Line(Point(-3.7, 0.8), Point(-3.7, -0.8)));
+    expectMoveAction(ball, *goalie_intersection);
 }
 
 TEST_F(GoalieTacticTest, ball_outside_defense_area_and_zero_velocity)
 {
     Ball ball = Ball(Point(-3, -0.5), Vector(0, 0), Timestamp::fromSeconds(0));
     // (-4.5, 0) is friendly goal (-3.7, 0.8), (-3.7, -0.8) is defense area
-    std::optional<Point> intersection = lineIntersection(
-        Point(-3, -0.5), Point(-4.5, 0), Point(-3.7, 0.8), Point(-3.7, -0.8));
-    expectMoveAction(ball, *intersection);
+    std::optional<Point> goalie_intersection = intersection(
+        Line(Point(-3, -0.5), Point(-4.5, 0)), Line(Point(-3.7, 0.8), Point(-3.7, -0.8)));
+    expectMoveAction(ball, *goalie_intersection);
 }
 
 TEST_F(GoalieTacticTest, ball_in_defense_area_and_zero_velocity)

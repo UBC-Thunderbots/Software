@@ -155,6 +155,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
+        "//software/new_geom:line",
         "//software/new_geom/util:intersection",
         "@g3log",
     ],
