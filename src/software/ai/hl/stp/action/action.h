@@ -40,7 +40,7 @@ class Action
     bool done() const;
 
     /**
-     * runs the coroutine from the start, effectively restarting the action
+     * Restarts the action logic
      */
     void restart();
 
