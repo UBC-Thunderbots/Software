@@ -58,6 +58,8 @@ The vast majority of the things noted in this document will apply to `C` code as
   typedef struct MyDog MyDog_t;
   ```
 
+* Functions that take no arguments must be declared as `foo(void)` **not** `foo()`, as the second option allows `foo` to take anything as it's arguments ([reference](https://softwareengineering.stackexchange.com/questions/286490/what-is-the-difference-between-function-and-functionvoid/286494))
+
 ### Names and Variables
 
 * Classes, structures, namespaces, unions, enumerates, "typename"-type template parameters, and typedefs names uses `CamelCase` with a capital letter.
