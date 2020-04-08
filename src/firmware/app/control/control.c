@@ -160,9 +160,12 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
 void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
                                float linear_velocity_y, float angular_velocity)
 {
-    float current_vx               = app_firmware_robot_getVelocityX(robot);
-    float current_vy               = app_firmware_robot_getVelocityY(robot);
-    float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
+//    float current_vx               = app_firmware_robot_getVelocityX(robot);
+//    float current_vy               = app_firmware_robot_getVelocityY(robot);
+//    float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
+    float current_vx               = linear_velocity_x;
+    float current_vy               = linear_velocity_y;
+    float current_angular_velocity = angular_velocity;
     float current_orientation      = app_firmware_robot_getOrientation(robot);
 
 
