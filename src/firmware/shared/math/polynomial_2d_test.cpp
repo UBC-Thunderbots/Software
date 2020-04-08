@@ -1,6 +1,7 @@
 extern "C"
 {
 #include "firmware/shared/math/polynomial_2d.h"
+
 #include "firmware/shared/math/polynomial_1d.h"
 }
 
