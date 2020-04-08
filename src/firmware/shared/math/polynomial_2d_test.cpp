@@ -1,8 +1,7 @@
 extern "C"
 {
-#include "firmware/main/math/polynomial_2d.h"
-
-#include "firmware/main/math/polynomial_1d.h"
+#include "firmware/shared/math/polynomial_2d.h"
+#include "firmware/shared/math/polynomial_1d.h"
 }
 
 #include <gtest/gtest.h>
