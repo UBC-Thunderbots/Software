@@ -1,4 +1,4 @@
-#include "firmware/main/math/polynomial_1d.h"
+#include "firmware/shared/math/polynomial_1d.h"
 
 #include <math.h>
 
