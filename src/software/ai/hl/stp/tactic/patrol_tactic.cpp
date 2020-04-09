@@ -77,8 +77,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             AutokickType::NONE, BallCollisionType::AVOID);
         if (move_action->done())
         {
-            move_action = std::make_shared<MoveAction>(
-                false, this->at_patrol_point_tolerance, Angle());
+            move_action->restart();
             patrol_point_index = (patrol_point_index + 1) % patrol_points.size();
             move_action->updateControlParams(
                 *robot, patrol_points.at(patrol_point_index),
