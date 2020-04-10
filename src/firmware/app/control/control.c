@@ -157,17 +157,12 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
     app_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot), wheel_force[2]);
 }
 
-void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
-                               float linear_velocity_y, float angular_velocity)
+void app_control_trackLocalVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
+                                    float linear_velocity_y, float angular_velocity)
 {
-//    float current_vx               = app_firmware_robot_getVelocityX(robot);
-//    float current_vy               = app_firmware_robot_getVelocityY(robot);
-//    float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
-    float current_vx               = linear_velocity_x;
-    float current_vy               = linear_velocity_y;
-    float current_angular_velocity = angular_velocity;
-    float current_orientation      = app_firmware_robot_getOrientation(robot);
-
+    float current_vx               = app_firmware_robot_getVelocityX(robot);
+    float current_vy               = app_firmware_robot_getVelocityY(robot);
+    float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
 
     // This is the "P" term in a PID controller. We essentially do proportional
     // control of our acceleration based on velocity error
@@ -176,9 +171,6 @@ void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
     float desired_acceleration[2];
     desired_acceleration[0] = (linear_velocity_x - current_vx) * VELOCITY_ERROR_GAIN;
     desired_acceleration[1] = (linear_velocity_y - current_vy) * VELOCITY_ERROR_GAIN;
-
-    // Rotate the acceleration vector from the robot frame to the world frame
-    rotate(desired_acceleration, -current_orientation);
 
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;

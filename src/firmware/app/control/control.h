@@ -25,5 +25,5 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
  *                          coordinate frame (m/s)
  * @param angular_velocity The angular velocity to move at (rad/s)
  */
-void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
-                               float linear_velocity_y, float angular_velocity);
+void app_control_trackLocalVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
+                                    float linear_velocity_y, float angular_velocity);
