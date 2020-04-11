@@ -16,7 +16,7 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
                             float linear_accel_y, float angular_accel);
 
 /**
- * Drive the given robot at the given velocity in the global coordinate frame
+ * Drive the given robot at the given velocity in the local coordinate frame
  *
  * @param robot The robot to move at the given velocity
  * @param linear_velocity_x The velocity to move at in the x-direction in the global
