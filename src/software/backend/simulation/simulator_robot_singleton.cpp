@@ -1,6 +1,6 @@
 #include "software/backend/simulation/simulator_robot_singleton.h"
 
-#include "software/logger/Logger.h"
+#include "software/logger/logger.h"
 
 extern "C"
 {

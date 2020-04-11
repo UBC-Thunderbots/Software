@@ -6,7 +6,7 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/util.h"
-#include "software/logger/Logger.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/util/closest_point.h"
 #include "software/new_geom/util/distance.h"
