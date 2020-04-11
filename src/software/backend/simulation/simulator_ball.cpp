@@ -1,6 +1,6 @@
 #include "software/backend/simulation/simulator_ball.h"
 
-#include "software/logger/init.h"
+#include "software/logger/Logger.h"
 
 SimulatorBall::SimulatorBall(std::weak_ptr<PhysicsBall> physics_ball)
     : physics_ball(physics_ball)

@@ -3,7 +3,7 @@
 #include <exception>
 #include <limits>
 
-#include "software/logger/init.h"
+#include "software/logger/Logger.h"
 #include "software/math/math_functions.h"
 
 Controller::Controller(
