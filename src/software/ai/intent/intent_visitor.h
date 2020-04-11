@@ -32,14 +32,14 @@ class IntentVisitor
      *
      * @param The Intent to visit
      */
-    virtual void visit(const CatchIntent &catch_intent) = 0;
-    virtual void visit(const ChipIntent &chip_intent) = 0;
+    virtual void visit(const CatchIntent &catch_intent)                    = 0;
+    virtual void visit(const ChipIntent &chip_intent)                      = 0;
     virtual void visit(const DirectVelocityIntent &direct_velocity_intent) = 0;
-    virtual void visit(const DirectWheelsIntent &direct_wheels_intent) = 0;
-    virtual void visit(const DribbleIntent &direct_wheels_intent) = 0;
-    virtual void visit(const KickIntent &kick_intent) = 0;
-    virtual void visit(const MoveIntent &move_intent) = 0;
-    virtual void visit(const MoveSpinIntent &move_spin_intent) = 0;
-    virtual void visit(const PivotIntent &pivot_intent) = 0;
-    virtual void visit(const StopIntent &stop_intent) = 0;
+    virtual void visit(const DirectWheelsIntent &direct_wheels_intent)     = 0;
+    virtual void visit(const DribbleIntent &direct_wheels_intent)          = 0;
+    virtual void visit(const KickIntent &kick_intent)                      = 0;
+    virtual void visit(const MoveIntent &move_intent)                      = 0;
+    virtual void visit(const MoveSpinIntent &move_spin_intent)             = 0;
+    virtual void visit(const PivotIntent &pivot_intent)                    = 0;
+    virtual void visit(const StopIntent &stop_intent)                      = 0;
 };
