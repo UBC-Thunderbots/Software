@@ -157,8 +157,10 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
     app_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot), wheel_force[2]);
 }
 
-void app_control_trackLocalVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
-                                    float linear_velocity_y, float angular_velocity)
+void app_control_trackVelocityInLocalFrame(FirmwareRobot_t* robot,
+                                           float linear_velocity_x,
+                                           float linear_velocity_y,
+                                           float angular_velocity)
 {
     float current_vx               = app_firmware_robot_getVelocityX(robot);
     float current_vy               = app_firmware_robot_getVelocityY(robot);
