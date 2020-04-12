@@ -1,7 +1,7 @@
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/simulated_tests/mock_ai_wrapper.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"

@@ -4,7 +4,7 @@ cc_library(
     name = "logger",
     hdrs = [
         "custom_logging_levels.h",
-        "init.h",
+        "logger.h",
     ],
     deps = [],
 )

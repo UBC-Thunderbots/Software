@@ -1,6 +1,6 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/time/duration.h"
 
 void SimulatedTest::SetUp()
