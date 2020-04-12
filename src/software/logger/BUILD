@@ -6,5 +6,7 @@ cc_library(
         "custom_logging_levels.h",
         "logger.h",
     ],
-    deps = [],
+    deps = [
+        "@g3log",
+    ],
 )
