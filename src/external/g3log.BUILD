@@ -31,14 +31,14 @@ cc_library(
         ],
     ),
     hdrs = glob(
-               ["src/g3log/*.hpp"],
-               exclude = ["src/g3log/stacktrace_windows.hpp"],
-           ) +
-           # We explicitly require this header so that bazel knows to run the genrule
-           # above to create it
-           [
-               "include/g3log/generated_definitions.hpp",
-           ],
+        ["src/g3log/*.hpp"],
+        exclude = ["src/g3log/stacktrace_windows.hpp"],
+    ) +
+    # We explicitly require this header so that bazel knows to run the genrule
+    # above to create it
+    [
+        "include/g3log/generated_definitions.hpp",
+    ],
     includes = [
         "./include",
         "./src",
