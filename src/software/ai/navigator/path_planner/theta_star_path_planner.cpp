@@ -6,7 +6,6 @@
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
 #include "software/logger/logger.h"
-
 #include "software/new_geom/util/distance.h"
 
 ThetaStarPathPlanner::ThetaStarPathPlanner()

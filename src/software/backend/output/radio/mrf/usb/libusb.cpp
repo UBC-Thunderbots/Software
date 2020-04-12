@@ -8,11 +8,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
-#include "software/logger/logger.h"
 #include <iostream>
 #include <limits>
 #include <string>
 #include <thread>
+
+#include "software/logger/logger.h"
 
 #define STALL_RETRIES 3
 

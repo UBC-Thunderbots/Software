@@ -1,10 +1,10 @@
 #include "software/backend/input/network/networking/network_client.h"
 
 #include <boost/bind.hpp>
-#include "software/logger/logger.h"
 #include <limits>
 
 #include "software/constants.h"
+#include "software/logger/logger.h"
 #include "software/parameter/config.hpp"
 #include "software/parameter/dynamic_parameters.h"
 

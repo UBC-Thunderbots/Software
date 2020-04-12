@@ -1,11 +1,10 @@
 #include "software/ai/hl/stp/action/pivot_action.h"
 
-#include "software/logger/logger.h"
-
 #include "shared/constants.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/intent/pivot_intent.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/angle.h"
 #include "software/parameter/dynamic_parameters.h"
 

@@ -6,12 +6,12 @@
 #include <boost/polygon/voronoi.hpp>
 #include <cassert>
 #include <cmath>
-#include "software/logger/logger.h"
 #include <iostream>
 #include <limits>
 #include <tuple>
 
 #include "software/geom/voronoi_diagram.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"

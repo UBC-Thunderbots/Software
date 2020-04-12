@@ -1,6 +1,7 @@
 #include "software/ai/intent/intent.h"
 
 #include <algorithm>
+
 #include "software/logger/logger.h"
 
 // Implement concrete functions shared by all intents

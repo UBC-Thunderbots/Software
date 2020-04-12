@@ -14,6 +14,7 @@
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 
 #include <algorithm>
+
 #include "software/logger/logger.h"
 
 // Creates a struct which inherits all lambda function given to it and uses their

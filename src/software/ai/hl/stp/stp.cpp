@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <chrono>
 #include <exception>
-#include "software/logger/logger.h"
 #include <random>
 
 #include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
@@ -14,6 +13,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 #include "software/ai/intent/stop_intent.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 

@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/play/shoot_or_pass_play.h"
 
-#include "software/logger/logger.h"
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
@@ -11,6 +9,7 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 

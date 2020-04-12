@@ -1,8 +1,7 @@
 #include "software/geom/voronoi_diagram.h"
 
-#include "software/logger/logger.h"
-
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
 
