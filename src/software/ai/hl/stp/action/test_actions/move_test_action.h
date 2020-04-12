@@ -17,8 +17,9 @@ class MoveTestAction : public Action
      *
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
+     * @param loop_forever restarts the action one it completes
      */
-    explicit MoveTestAction(double close_to_dest_threshold);
+    explicit MoveTestAction(double close_to_dest_threshold, bool loop_forever);
 
     /**
      * Updates the params for this action that cannot be derived from the world

@@ -69,5 +69,4 @@ class InterceptBallAction : public Action
     // Action parameters
     Field field;
     Ball ball;
-    bool loop_forever;
 };

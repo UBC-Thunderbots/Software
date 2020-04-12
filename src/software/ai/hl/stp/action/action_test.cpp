@@ -13,7 +13,7 @@ TEST(ActionTest, test_action_reports_done_at_same_time_nullptr_returned)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveTestAction action = MoveTestAction(0.05);
+    MoveTestAction action = MoveTestAction(0.05, false);
 
     // The first time the Action runs it will always return an Intent to make sure we
     // are doing the correct thing
@@ -36,7 +36,7 @@ TEST(ActionTest, getRobot)
 {
     Robot robot           = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
-    MoveTestAction action = MoveTestAction(0.05);
+    MoveTestAction action = MoveTestAction(0.05, false);
     action.updateControlParams(robot, Point());
 
     std::optional<Robot> robot_opt = action.getRobot();
@@ -48,7 +48,7 @@ TEST(ActionTest, restart_after_done_makes_done_false)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveTestAction action = MoveTestAction(0.05);
+    MoveTestAction action = MoveTestAction(0.05, false);
 
     // The first time the Action runs it will always return an Intent to make sure we
     // are doing the correct thing
@@ -68,4 +68,27 @@ TEST(ActionTest, restart_after_done_makes_done_false)
     intent_ptr = action.getNextIntent();
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
+}
+
+TEST(ActionTest, action_with_loop_forever_does_not_return_nullptr)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveTestAction action = MoveTestAction(0.05, true);
+    action.updateControlParams(robot, Point());
+
+    //run action multiple times, should return an intent every time
+    for(int i = 0; i < 5; i++) {
+        auto intent_ptr = action.getNextIntent();
+        EXPECT_TRUE(intent_ptr);
+        EXPECT_FALSE(action.done());
+    }
+
+    //change point destination and expect intent to be returned every time
+    action.updateControlParams(robot, Point(1,1));
+    for(int i = 0; i < 5; i++) {
+        auto intent_ptr = action.getNextIntent();
+        EXPECT_TRUE(intent_ptr);
+        EXPECT_FALSE(action.done());
+    }
 }
