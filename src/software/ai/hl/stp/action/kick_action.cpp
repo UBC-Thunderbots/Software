@@ -7,7 +7,9 @@
 #include "software/new_geom/polygon.h"
 #include "software/world/ball.h"
 
-KickAction::KickAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
+KickAction::KickAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
+{
+}
 
 void KickAction::updateWorldParams(const Ball &ball)
 {
@@ -83,8 +85,7 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     //                     direction of kick
 
     // A vector in the direction opposite the kick (behind the ball)
-    Vector behind_ball =
-        Vector::createFromAngle(this->kick_direction + Angle::half());
+    Vector behind_ball = Vector::createFromAngle(this->kick_direction + Angle::half());
 
 
     // The points below make up the triangle that defines the region we treat as
@@ -112,10 +113,9 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     // If we're not in position to kick, move into position
     if (!robot_behind_ball)
     {
-        yield(std::make_unique<MoveIntent>(
-            robot->id(), point_behind_ball, kick_direction, 0.0, 0,
-            DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-            BallCollisionType::ALLOW));
+        yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, kick_direction,
+                                           0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
+                                           AutokickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {

@@ -6,7 +6,9 @@
 #include "software/geom/util.h"
 #include "software/new_geom/polygon.h"
 
-ChipAction::ChipAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
+ChipAction::ChipAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
+{
+}
 
 void ChipAction::updateWorldParams(const Ball& ball)
 {
@@ -85,8 +87,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     //                     direction of chip
 
     // A vector in the direction opposite the chip (behind the ball)
-    Vector behind_ball =
-        Vector::createFromAngle(this->chip_direction + Angle::half());
+    Vector behind_ball = Vector::createFromAngle(this->chip_direction + Angle::half());
 
 
     // The points below make up the triangle that defines the region we treat as
@@ -114,10 +115,9 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // If we're not in position to chip, move into position
     if (!robot_behind_ball)
     {
-        yield(std::make_unique<MoveIntent>(
-            robot->id(), point_behind_ball, chip_direction, 0.0, 0,
-            DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
-            BallCollisionType::ALLOW));
+        yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, chip_direction,
+                                           0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
+                                           AutokickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {

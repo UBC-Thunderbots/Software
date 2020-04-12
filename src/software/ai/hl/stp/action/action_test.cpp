@@ -77,16 +77,18 @@ TEST(ActionTest, action_with_loop_forever_does_not_return_nullptr)
     MoveTestAction action = MoveTestAction(0.05, true);
     action.updateControlParams(robot, Point());
 
-    //run action multiple times, should return an intent every time
-    for(int i = 0; i < 5; i++) {
+    // run action multiple times, should return an intent every time
+    for (int i = 0; i < 5; i++)
+    {
         auto intent_ptr = action.getNextIntent();
         EXPECT_TRUE(intent_ptr);
         EXPECT_FALSE(action.done());
     }
 
-    //change point destination and expect intent to be returned every time
-    action.updateControlParams(robot, Point(1,1));
-    for(int i = 0; i < 5; i++) {
+    // change point destination and expect intent to be returned every time
+    action.updateControlParams(robot, Point(1, 1));
+    for (int i = 0; i < 5; i++)
+    {
         auto intent_ptr = action.getNextIntent();
         EXPECT_TRUE(intent_ptr);
         EXPECT_FALSE(action.done());

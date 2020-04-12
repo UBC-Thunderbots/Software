@@ -44,8 +44,9 @@ std::unique_ptr<Intent> Action::getNextIntent()
             // Extract the result from the coroutine. This will be whatever value was
             // yielded by the calculateNextIntent function
             next_intent = intent_sequence.get();
-        } else if (loop_forever) {
-
+        }
+        else if (loop_forever)
+        {
             restart();
             intent_sequence();
             next_intent = intent_sequence.get();
