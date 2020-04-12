@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/action/action.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 Action::Action()
     : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))

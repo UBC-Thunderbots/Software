@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"

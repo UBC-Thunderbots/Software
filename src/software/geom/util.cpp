@@ -6,7 +6,7 @@
 #include <boost/polygon/voronoi.hpp>
 #include <cassert>
 #include <cmath>
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 #include <iostream>
 #include <limits>
 #include <tuple>

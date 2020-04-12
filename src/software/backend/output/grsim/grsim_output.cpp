@@ -1,7 +1,7 @@
 #include "software/backend/output/grsim/grsim_output.h"
 
 #include <chrono>
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 #include <optional>
 
 #include "shared/constants.h"

@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/shoot_or_chip_play.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"

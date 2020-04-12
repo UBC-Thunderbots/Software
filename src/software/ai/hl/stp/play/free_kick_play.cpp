@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/free_kick_play.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/ball.h"
@@ -11,7 +11,6 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
-#include "software/logger/custom_logging_levels.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 using namespace Passing;

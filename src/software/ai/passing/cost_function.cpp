@@ -5,7 +5,7 @@
 
 #include "software/ai/passing/cost_function.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 #include <numeric>
 
 #include "software/../shared/constants.h"

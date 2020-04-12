@@ -3,7 +3,7 @@
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
 #include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
-#include "g3log/g3log.hpp"
+#include "software/logger/logger.h"
 #include "google/protobuf/message.h"
 #include "software/multithreading/thread_safe_buffer.h"
 

@@ -1,7 +1,6 @@
 #include "software/geom/voronoi_diagram.h"
 
-#include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
+#include "software/logger/logger.h"
 
 #include "software/geom/util.h"
 #include "software/new_geom/util/distance.h"

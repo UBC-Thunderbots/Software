@@ -1,6 +1,6 @@
 #include "firmware_new/tools/communication/transfer_media/network_medium.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 #include "boost/array.hpp"
 #include "boost/asio.hpp"

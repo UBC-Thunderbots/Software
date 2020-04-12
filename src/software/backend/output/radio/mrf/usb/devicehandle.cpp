@@ -1,6 +1,6 @@
 #include "software/backend/output/radio/mrf/usb/devicehandle.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 #include "software/backend/output/radio/mrf/usb/libusb.h"
 #include "software/backend/output/radio/mrf/usb/misc.h"
