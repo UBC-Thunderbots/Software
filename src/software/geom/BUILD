@@ -20,6 +20,7 @@ cc_library(
         "-std=c++17",
     ],
     deps = [
+        "//software/logger",
         "//software/new_geom:circle",
         "//software/new_geom:line",
         "//software/new_geom:point",
@@ -33,7 +34,6 @@ cc_library(
         "//software/new_geom/util:intersects",
         "@boost//:geometry",
         "@boost//:polygon",
-        "@g3log",
     ],
 )
 

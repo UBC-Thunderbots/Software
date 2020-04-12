@@ -3,8 +3,6 @@
  */
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/dribble_action.h"
@@ -12,6 +10,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/util/intersection.h"
 
 

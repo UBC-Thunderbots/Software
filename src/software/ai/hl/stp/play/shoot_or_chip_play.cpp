@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/play/shoot_or_chip_play.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
@@ -14,6 +12,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"

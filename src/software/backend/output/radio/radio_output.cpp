@@ -1,9 +1,9 @@
 #include "software/backend/output/radio/radio_output.h"
 
 #include <chrono>
-#include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/logger/logger.h"
 
 RadioOutput::RadioOutput(unsigned int config,
                          std::function<void(RobotStatus)> received_robot_status_callback)

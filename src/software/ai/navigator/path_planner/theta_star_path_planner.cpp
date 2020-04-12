@@ -5,8 +5,7 @@
 
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
-#include <g3log/g3log.hpp>
-
+#include "software/logger/logger.h"
 #include "software/new_geom/util/distance.h"
 
 ThetaStarPathPlanner::ThetaStarPathPlanner()

@@ -1,6 +1,6 @@
 #include "software/backend/input/network/ssl_vision_client.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 SSLVisionClient::SSLVisionClient(boost::asio::io_service& io_service,
                                  const std::string ip_address, const unsigned short port,
