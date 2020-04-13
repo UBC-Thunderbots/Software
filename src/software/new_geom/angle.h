@@ -169,9 +169,11 @@ class Angle final
     constexpr Angle clamp() const;
 
     /**
-     * Verifies if this angle is kept between [−π, π]
+     * Verifies if this angle is kept between [−π, π].
      *
-     * @return if the angle is kept between [−π, π] for invariant
+     * @param angle the angle to verify.
+     *
+     * @return if the angle is kept between [−π, π].
      */
     bool angleBetweenPiAndNegativePi(const Angle &angle) const;
 
