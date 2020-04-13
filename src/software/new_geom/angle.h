@@ -173,7 +173,7 @@ class Angle final
      *
      * @return if the angle is kept between [−π, π] for invariant
      */
-    bool invariantHolds(const Angle &angle) const;
+    bool angleBetweenPiAndNegativePi(const Angle &angle) const;
 
     /**
      * Returns the smallest possible rotational difference between this angle
@@ -491,9 +491,9 @@ inline constexpr Angle Angle::clamp() const
     return remainder(Angle::full());
 }
 
-bool Angle::invariantHolds(const Angle &angle) const
+bool Angle::angleBetweenPiAndNegativePi(const Angle &angle) const
 {
-    return (angle <= fromRadians(-M_PI) && angle >= fromRadians(M_PI));
+    return (angle <= fromRadians(M_PI) && angle >= fromRadians(-M_PI));
 }
 
 inline constexpr Angle Angle::minDiff(const Angle &other) const
