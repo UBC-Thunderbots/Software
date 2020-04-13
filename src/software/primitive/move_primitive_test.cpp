@@ -2,7 +2,7 @@
  * This file contains the unit tests for the MovePrimitive class
  */
 
-#include "software/ai/primitive/move_primitive.h"
+#include "software/primitive/move_primitive.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

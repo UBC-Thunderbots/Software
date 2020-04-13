@@ -2,7 +2,7 @@
  * This file contains the unit tests for the MoveSpinPrimitive class
  */
 
-#include "software/ai/primitive/movespin_primitive.h"
+#include "software/primitive/movespin_primitive.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

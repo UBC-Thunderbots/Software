@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "shared/firmware_primitive_type.h"
-#include "software/ai/primitive/primitive_visitor.h"
+#include "software/primitive/primitive_visitor.h"
 
 /**
  * This struct stores the components of a translated primitive to be sent over radio.

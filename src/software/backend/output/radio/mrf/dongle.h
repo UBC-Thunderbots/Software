@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 #include "software/backend/output/radio/mrf/annunciator.h"
 #include "software/backend/output/radio/mrf/send_reliable_message_operation.h"
 #include "software/backend/output/radio/mrf/usb/libusb.h"

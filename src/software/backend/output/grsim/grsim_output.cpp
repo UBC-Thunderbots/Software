@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "shared/constants.h"
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 #include "software/logger/logger.h"

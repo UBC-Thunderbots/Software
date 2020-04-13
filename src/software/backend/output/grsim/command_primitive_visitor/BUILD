@@ -7,11 +7,11 @@ cc_library(
     deps = [
         ":motion_controller",
         "//shared:constants",
-        "//software/ai/primitive:all_primitives",
-        "//software/ai/primitive:primitive_visitor",
         "//software/new_geom:angle",
         "//software/new_geom:point",
         "//software/new_geom/util:closest_point",
+        "//software/primitive:all_primitives",
+        "//software/primitive:primitive_visitor",
         "//software/world:ball",
         "//software/world:robot",
     ],
@@ -31,7 +31,7 @@ cc_test(
     srcs = ["catch_primitive_test.cpp"],
     deps = [
         ":grsim_command_primitive_visitor",
-        "//software/ai/primitive:catch_primitive",
+        "//software/primitive:catch_primitive",
         "@gtest//:gtest_main",
     ],
 )
@@ -41,7 +41,7 @@ cc_test(
     srcs = ["dribble_primitive_test.cpp"],
     deps = [
         ":grsim_command_primitive_visitor",
-        "//software/ai/primitive:dribble_primitive",
+        "//software/primitive:dribble_primitive",
         "@gtest//:gtest_main",
     ],
 )
@@ -51,7 +51,7 @@ cc_test(
     srcs = ["motion_controller_test.cpp"],
     deps = [
         ":motion_controller",
-        "//software/ai/primitive:move_primitive",
+        "//software/primitive:move_primitive",
         "@gtest//:gtest_main",
     ],
 )
@@ -61,7 +61,7 @@ cc_test(
     srcs = ["movespin_primitive_test.cpp"],
     deps = [
         ":grsim_command_primitive_visitor",
-        "//software/ai/primitive:movespin_primitive",
+        "//software/primitive:movespin_primitive",
         "@gtest//:gtest_main",
     ],
 )
@@ -71,7 +71,7 @@ cc_test(
     srcs = ["pivot_primitive_test.cpp"],
     deps = [
         ":grsim_command_primitive_visitor",
-        "//software/ai/primitive:pivot_primitive",
+        "//software/primitive:pivot_primitive",
         "@gtest//:gtest_main",
     ],
 )

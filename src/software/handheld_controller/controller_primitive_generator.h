@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 #include "software/handheld_controller/controller.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"

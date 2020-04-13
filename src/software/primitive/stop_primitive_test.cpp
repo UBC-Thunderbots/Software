@@ -2,7 +2,7 @@
  * This file contains the unit tests for the StopPrimitive class
  */
 
-#include "software/ai/primitive/stop_primitive.h"
+#include "software/primitive/stop_primitive.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

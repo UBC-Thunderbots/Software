@@ -1,6 +1,6 @@
-#include "software/ai/primitive/catch_primitive.h"
+#include "software/primitive/catch_primitive.h"
 
-#include "software/ai/primitive/primitive_visitor.h"
+#include "software/primitive/primitive_visitor.h"
 
 const std::string CatchPrimitive::PRIMITIVE_NAME = "Catch Primitive";
 

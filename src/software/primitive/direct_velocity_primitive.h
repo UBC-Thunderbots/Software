@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 
 /**
  * This Primitive is extended from Primitive class for the control of linear velocity,

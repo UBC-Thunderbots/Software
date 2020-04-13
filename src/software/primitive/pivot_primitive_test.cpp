@@ -2,7 +2,7 @@
  * This file contains the unit tests for the PivotPrimitive class
  */
 
-#include "software/ai/primitive/pivot_primitive.h"
+#include "software/primitive/pivot_primitive.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

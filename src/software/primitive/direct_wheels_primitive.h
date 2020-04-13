@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 

@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/primitive/move_primitive.h"
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/move_primitive.h"
+#include "software/primitive/primitive.h"
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 

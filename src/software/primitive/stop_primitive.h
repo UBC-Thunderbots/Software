@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 
 class StopPrimitive : public Primitive
 {

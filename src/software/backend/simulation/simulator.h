@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 #include "software/backend/simulation/physics/physics_world.h"
 #include "software/backend/simulation/simulator_ball.h"
 #include "software/backend/simulation/simulator_robot.h"

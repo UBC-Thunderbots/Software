@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/primitive/dribble_primitive.h"
+#include "software/primitive/dribble_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 

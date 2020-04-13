@@ -1,8 +1,8 @@
-#include "software/ai/primitive/direct_wheels_primitive.h"
+#include "software/primitive/direct_wheels_primitive.h"
 
 #include <cstdint>
 
-#include "software/ai/primitive/primitive_visitor.h"
+#include "software/primitive/primitive_visitor.h"
 #include "software/logger/logger.h"
 
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "Direct Wheels Primitive";

@@ -7,7 +7,7 @@
 #include "software/ai/navigator/path_planner/no_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/one_point_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/ai/primitive/all_primitives.h"
+#include "software/primitive/all_primitives.h"
 #include "software/test_util/test_util.h"
 
 class NoPathNavigatorTest : public testing::Test

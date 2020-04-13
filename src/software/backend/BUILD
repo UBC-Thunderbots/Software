@@ -5,9 +5,9 @@ cc_library(
     hdrs = ["backend.h"],
     deps = [
         ":robot_status",
-        "//software/ai/primitive",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/primitive",
         "//software/world",
     ],
 )
