@@ -287,7 +287,7 @@ RefboxData SSLProtobufReader::getRefboxData(const Referee &packet)
                                        packet.proposed_game_events().end()));
 }
 
-// this maps a protobuf Referee_Command enum to its ROS message equivalent
+// this maps a protobuf Referee_Command enum to its equivalent internal type
 // this map is used when we are on the blue team
 const static std::unordered_map<Referee::Command, RefboxGameState> blue_team_command_map =
     {{Referee_Command_HALT, RefboxGameState::HALT},
@@ -309,7 +309,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState> blue_team_com
      {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_US},
      {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_THEM}};
 
-// this maps a protobuf Referee_Command enum to its ROS message equivalent
+// this maps a protobuf Referee_Command enum to its equivalent internal type
 // this map is used when we are on the yellow team
 const static std::unordered_map<Referee::Command, RefboxGameState>
     yellow_team_command_map = {

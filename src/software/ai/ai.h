@@ -8,8 +8,7 @@
 #include "software/world/world.h"
 
 /**
- * This class wraps all our AI logic and decision making to help separate our
- * logic from ROS communication as much as possible.
+ * This class wraps all our AI logic and decision making.
  */
 class AI final
 {
