@@ -52,7 +52,6 @@ Matrix matmul(Matrix A, Matrix B)
  *
  * @param vector a 2D vector to rotate
  * @param rotation_matrix the rotation operator
- * @return void
  */
 void do_rotation(float vector_array[2], Matrix rotation_matrix)
 {

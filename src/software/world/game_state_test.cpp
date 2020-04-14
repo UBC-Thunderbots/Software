@@ -291,13 +291,15 @@ PREDICATE_TEST(isTheirDirectFree, RefboxGameState::DIRECT_FREE_THEM)
 PREDICATE_TEST(isTheirFreeKick, RefboxGameState::DIRECT_FREE_THEM,
                RefboxGameState::INDIRECT_FREE_THEM)
 PREDICATE_TEST(isTheirBallPlacement, RefboxGameState::BALL_PLACEMENT_THEM)
-// PREDICATE_TEST(
-//    isSetupRestart, RefboxGameState::PREPARE_KICKOFF_US,
-//    RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
-//    RefboxGameState::BALL_PLACEMENT_THEM,
-//    // NORMAL_START is a ready state until the restart is cleared when the ball moves
-//    RefboxGameState::NORMAL_START, RefboxGameState::PREPARE_PENALTY_US,
-//    RefboxGameState::PREPARE_PENALTY_THEM)
+PREDICATE_TEST(
+    isSetupRestart, RefboxGameState::PREPARE_KICKOFF_US,
+    RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
+    RefboxGameState::BALL_PLACEMENT_THEM, RefboxGameState::DIRECT_FREE_US,
+    RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_US,
+    RefboxGameState::INDIRECT_FREE_THEM,
+    // NORMAL_START is a ready state until the restart is cleared when the ball moves
+    RefboxGameState::NORMAL_START, RefboxGameState::PREPARE_PENALTY_US,
+    RefboxGameState::PREPARE_PENALTY_THEM)
 PREDICATE_TEST(isSetupState, RefboxGameState::PREPARE_KICKOFF_US,
                RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
                RefboxGameState::BALL_PLACEMENT_THEM, RefboxGameState::PREPARE_PENALTY_US,

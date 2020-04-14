@@ -40,7 +40,6 @@ unsigned argmin(float array[], unsigned size);
  * given array
  * @param  array The array to parse through
  * @param  size  The size of the array
- * @return void
  */
 void fabs_of_array(float array[], float abs_array[], unsigned size);
 
@@ -49,7 +48,6 @@ void fabs_of_array(float array[], float abs_array[], unsigned size);
  * -limiting_value <= value <= limiting_value
  * @param value          The value to limit
  * @param limiting_value The limit to check against
- * @return void
  */
 void limit(float *value, float limiting_value);
 
@@ -59,7 +57,6 @@ void limit(float *value, float limiting_value);
  * @param value  The value to clamp
  * @param lower  The lower limit to check against
  * @param upper  The upper limit to check against
- * @return void
  */
 void clamp(float *value, float lower, float upper);
 
