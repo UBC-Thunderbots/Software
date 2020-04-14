@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/primitive/primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
+#include "software/primitive/primitive.h"
 
 class MoveSpinPrimitive : public Primitive
 {

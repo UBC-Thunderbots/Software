@@ -3,10 +3,10 @@
 #include <boost/asio.hpp>
 #include <string>
 
-#include "software/primitive/primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/parameter/config.hpp"
+#include "software/primitive/primitive.h"
 #include "software/proto/grSim_Packet.pb.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"

@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "software/primitive/primitive_visitor.h"
 #include "software/logger/logger.h"
+#include "software/primitive/primitive_visitor.h"
 
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "Direct Wheels Primitive";
 

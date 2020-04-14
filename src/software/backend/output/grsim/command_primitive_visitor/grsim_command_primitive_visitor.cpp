@@ -1,6 +1,11 @@
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 
 #include "shared/constants.h"
+#include "software/geom/util.h"
+#include "software/logger/logger.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/point.h"
+#include "software/new_geom/util/closest_point.h"
 #include "software/primitive/catch_primitive.h"
 #include "software/primitive/chip_primitive.h"
 #include "software/primitive/direct_velocity_primitive.h"
@@ -11,11 +16,6 @@
 #include "software/primitive/movespin_primitive.h"
 #include "software/primitive/pivot_primitive.h"
 #include "software/primitive/stop_primitive.h"
-#include "software/geom/util.h"
-#include "software/logger/logger.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/util/closest_point.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)

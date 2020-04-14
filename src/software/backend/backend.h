@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/primitive/primitive.h"
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
 /**

@@ -4,11 +4,11 @@
 #include <optional>
 
 #include "shared/constants.h"
-#include "software/primitive/primitive.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/primitive/primitive.h"
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
 #include "software/world/team.h"
