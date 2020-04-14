@@ -11,7 +11,7 @@
 
 TEST(ActionTest, test_action_reports_done_at_same_time_nullptr_returned)
 {
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot = Robot(0, Point(0,0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     MoveTestAction action = MoveTestAction(0.05, false);
 
@@ -46,13 +46,13 @@ TEST(ActionTest, getRobot)
 
 TEST(ActionTest, restart_after_done_makes_done_false)
 {
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot = Robot(0, Point(0,0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     MoveTestAction action = MoveTestAction(0.05, false);
 
     // The first time the Action runs it will always return an Intent to make sure we
     // are doing the correct thing
-    action.updateControlParams(robot, Point());
+    action.updateControlParams(robot, Point(0,0));
     auto intent_ptr = action.getNextIntent();
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
@@ -72,10 +72,10 @@ TEST(ActionTest, restart_after_done_makes_done_false)
 
 TEST(ActionTest, action_with_loop_forever_does_not_return_nullptr)
 {
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot = Robot(0, Point(0,0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     MoveTestAction action = MoveTestAction(0.05, true);
-    action.updateControlParams(robot, Point());
+    action.updateControlParams(robot, Point(0,0));
 
     // run action multiple times, should return an intent every time
     for (int i = 0; i < 5; i++)
