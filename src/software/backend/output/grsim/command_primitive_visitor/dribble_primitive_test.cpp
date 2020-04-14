@@ -3,7 +3,7 @@
  * of the DribblePrimitive class
  */
 
-#include "software/ai/primitive/dribble_primitive.h"
+#include "software/primitive/dribble_primitive.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

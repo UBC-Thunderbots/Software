@@ -8,9 +8,9 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
-#include "software/ai/primitive/all_primitives.h"
-#include "software/ai/primitive/primitive.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/primitive/all_primitives.h"
+#include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
 /**

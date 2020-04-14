@@ -7,10 +7,10 @@ cc_library(
     deps = [
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/ai/primitive",
         "//software/backend/simulation/physics:physics_ball",
         "//software/backend/simulation/physics:physics_robot",
         "//software/logger",
+        "//software/primitive",
     ],
 )
 
@@ -124,9 +124,9 @@ cc_library(
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/ai/primitive",
         "//software/backend/output/radio/mrf:mrf_primitive_visitor",
         "//software/backend/simulation/physics:physics_world",
+        "//software/primitive",
         "//software/world",
     ],
 )

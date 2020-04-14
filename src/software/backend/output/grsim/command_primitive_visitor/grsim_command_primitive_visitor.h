@@ -2,8 +2,8 @@
 
 #include <variant>
 
-#include "software/ai/primitive/primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
+#include "software/primitive/primitive_visitor.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/primitive/all_primitives.h"
+#include "software/primitive/all_primitives.h"
 
 /**
  * Check whether the two given radio primitives are equal
