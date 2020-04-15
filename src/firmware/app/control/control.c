@@ -165,6 +165,13 @@ void app_control_trackVelocityInLocalFrame(FirmwareRobot_t* robot,
     float current_vx               = app_firmware_robot_getVelocityX(robot);
     float current_vy               = app_firmware_robot_getVelocityY(robot);
     float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
+    float current_orientation      = app_firmware_robot_getOrientation(robot);
+    float local_x_norm_vec[2] = {cosf(current_orientation), sinf(current_orientation)};
+    float local_y_norm_vec[2] = {cosf(current_orientation + M_PI / 2),
+                                 sinf(current_orientation + M_PI / 2)};
+
+    current_vx = current_vx * (local_x_norm_vec[0] * linear_velocity_x);
+    current_vy = current_vy * (local_y_norm_vec[0] * linear_velocity_x);
 
     // This is the "P" term in a PID controller. We essentially do proportional
     // control of our acceleration based on velocity error
