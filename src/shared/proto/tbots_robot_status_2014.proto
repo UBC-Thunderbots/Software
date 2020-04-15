@@ -1,88 +1,69 @@
-#pragma once
+syntax = "proto2";
 
-#include <string>
-#include <vector>
-
-// This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
-// and messages related to robot and dongle condition.
-struct RobotStatus
-{
-    // The robot number.
-    // Equivalent to robot_id in Tbots_RobotMsg
-    int32_t robot;
-
-    // Messages related to the robot that are to be displayed in the visualizer
-    // (usually errors that need attention)
-    std::vector<std::string> robot_messages;
-
-    // Messages that are related to the dongle itself
-    // (usually errors that need attention)
-    // Equivalent to network_messages in Tbots_RobotMsg
-    std::vector<std::string> dongle_messages;
-
+message Tbots_RobotStatus2014 {
     // The maximum possible kick speed, in m/s.
-    double kick_speed_max;
+    required double kick_speed_max = 1;
 
     // The kick resolution for HScale.
-    double kick_speed_resolution;
+    required double kick_speed_resolution = 2;
 
     // The maximum possible chip distance, in m.
-    double chip_distance_max;
+    required double chip_distance_max = 3;
 
     // The chip resolution for HScale.
-    double chip_distance_resolution;
+    required double chip_distance_resolution = 4;
 
     // The maximum power level understood by the direct_dribbler function.
-    uint32_t direct_dribbler_max;
+    required uint32 direct_dribbler_max = 5;
 
     // Whether or not the robot is currently responding to radio communication.
-    bool alive;
+    required bool alive = 6;
 
     // Whether the robot is in direct mode.
-    bool direct_control;
+    required bool direct_control = 7;
 
     // Whether or not the ball is interrupting the robot’s laser beam.
-    bool ball_in_beam;
+    required bool ball_in_beam = 8;
 
     // Whether or not the robot’s capacitor is charged enough to kick the ball.
-    bool capacitor_charged_enough_to_kick_ball;
+    required bool capacitor_charged_enough_to_kick_ball = 9;
 
     // Indicates when autokick has been fired.
-    bool autokick_fired;
+    required bool autokick_fired = 10;
 
     // The voltage on the robot’s battery, in volts.
-    double battery_voltage;
+    required double battery_voltage = 11;
 
     // voltage on the robot’s kicking capacitor, in volts.
-    double capacitor_voltage;
+    required double capacitor_voltage = 12;
 
     // The reading of the robot’s laser sensor.
-    double break_beam_reading;
+    required double break_beam_reading = 13;
 
     // The maximum full-scale deflection (maximum possible reading) of the laser sensor.
-    double break_beam_scale;
+    required double break_beam_scale = 14;
 
     // The temperature of the robot’s dribbler motor, in degrees Celsius.
-    double dribbler_temperature;
+    required double dribbler_temperature = 15;
 
     // The speed of the robot’s dribbler motor, in revolutions per minute.
-    int32_t dribbler_speed;
+    required int32 dribbler_speed = 16;
 
     // The temperature of the robot’s mainboard, in degrees Celsius.
-    double board_temperature;
+    required double board_temperature = 17;
 
     // The link quality of the last received packet, from 0 (worst) to 1 (best).
-    double link_quality;
+    required double link_quality = 18;
 
     // The received signal strength of the last received packet, in decibels.
-    int32_t received_signal_strength_db;
+    required int32 received_signal_strength_db = 19;
 
     // Whether or nott the build ID information is valid.
-    bool build_ids_valid;
+    required bool build_ids_valid = 20;
 
     // The microcontroller firmware build ID.
-    uint32_t fw_build_id;
+    required uint32 fw_build_id = 21;
 
     // The FPGA bitstream build ID.
-    uint32_t fpga_build_id;
-};
+    required uint32 fpga_build_id = 22;
+}
