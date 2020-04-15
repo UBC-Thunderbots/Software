@@ -3,19 +3,13 @@ syntax = "proto2";
 import "shared/proto/tbots_robot_status_2014.proto";
 import "shared/proto/tbots_frankie_status.proto";
 
-message Tbots_RobotMsg {
+message TbotsRobotMsg {
 
     // The robot id.
     required int32 robot_id = 4;
 
-    // Messages related to the robot that are to be displayed in the visualizer
-    repeated string robot_messages = 5;
-
-    // Messages that are related to network communication
-    repeated string network_messages = 6;
-
     oneof robot_status {
-        Tbots_RobotStatus2014 robot_status_2014 = 1;
-        Tbots_FrankieStatus frankie_status = 2;
+        TbotsRobotStatus2014 robot_status_2014 = 1;
+        TbotsFrankieStatus frankie_status = 2;
     }
 }

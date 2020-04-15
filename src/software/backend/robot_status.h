@@ -17,7 +17,6 @@ struct RobotStatus
 
     // Messages that are related to the dongle itself
     // (usually errors that need attention)
-    // Equivalent to network_messages in Tbots_RobotMsg
     std::vector<std::string> dongle_messages;
 
     // The maximum possible kick speed, in m/s.

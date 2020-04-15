@@ -1,10 +1,10 @@
 syntax = "proto2";
 
-message Tbots_EncoderData {
+message TbotsEncoderData {
 //TODO define encoder data and create filter for it
 }
 
-message Tbots_FrankieStatus {
+message TbotsFrankieStatus {
 
     // When the proto was created according to lwIP SNTP time
     required uint64 time_created = 1;
@@ -47,7 +47,7 @@ message Tbots_FrankieStatus {
     required int32 dribbler_speed = 10;
 
     // Encoder information TBD
-    required Tbots_EncoderData encoder_data = 11; 
+    required TbotsEncoderData encoder_data = 11; 
 
     /** Temperatures **/
 
