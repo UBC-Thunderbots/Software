@@ -3,7 +3,7 @@
 #include "software/ai/intent/dribble_intent.h"
 
 DribbleAction::DribbleAction(double close_to_dest_threshold)
-    : Action(), close_to_dest_threshold(close_to_dest_threshold)
+    : Action(false), close_to_dest_threshold(close_to_dest_threshold)
 {
 }
 
