@@ -8,7 +8,7 @@
 struct RobotStatus
 {
     // The robot number.
-    // Equivalent to robot_id in Tbots_RobotMsg
+    // Equivalent to robot_id in TbotsRobotMsg
     int32_t robot;
 
     // Messages related to the robot that are to be displayed in the visualizer
