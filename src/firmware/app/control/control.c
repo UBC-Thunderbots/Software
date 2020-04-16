@@ -179,8 +179,10 @@ void app_control_trackVelocityInLocalFrame(FirmwareRobot_t* robot,
     static const float VELOCITY_ERROR_GAIN = 10.0f;
 
     float desired_acceleration[2];
-    desired_acceleration[0] = (linear_velocity_x - current_velocity[0]) * VELOCITY_ERROR_GAIN;
-    desired_acceleration[1] = (linear_velocity_y - current_velocity[1]) * VELOCITY_ERROR_GAIN;
+    desired_acceleration[0] =
+        (linear_velocity_x - current_velocity[0]) * VELOCITY_ERROR_GAIN;
+    desired_acceleration[1] =
+        (linear_velocity_y - current_velocity[1]) * VELOCITY_ERROR_GAIN;
 
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
