@@ -1,15 +1,17 @@
 syntax = "proto2";
 
-import "shared/proto/tbots_robot_status_2014.proto";
-import "shared/proto/tbots_frankie_status.proto";
+import "shared/proto/robot_component_status.proto";
 
-message TbotsRobotMsg {
-
-    // The robot id.
-    required int32 robot_id = 4;
-
-    oneof robot_status {
-        TbotsRobotStatus2014 robot_status_2014 = 1;
-        TbotsFrankieStatus frankie_status = 2;
-    }
+message TbotsRobotMsg
+{
+    required uint32 robot_id                                = 1;
+    repeated ErrorCode error_code                           = 2;
+    required BreakBeamStatus break_beam_status              = 3;
+    required ChipperKickerStatus chipper_kicker_status      = 4;
+    required EncoderData encoder_data                       = 5;
+    required FirmwareStatus firmware_status                 = 6;
+    required MotorStatus motor_status                       = 7;
+    required NetworkStatus network_status                   = 8;
+    required PowerStatus power_status                       = 9;
+    required TemperatureStatus temperature_status           = 10;
 }

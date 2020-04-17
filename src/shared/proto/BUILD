@@ -5,9 +5,8 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "tbots_proto",
     srcs = [
-        "tbots_frankie_status.proto",
+        "robot_component_status.proto",
         "tbots_robot_msg.proto",
-        "tbots_robot_status_2014.proto",
     ],
     visibility = ["//visibility:private"],
 )
