@@ -77,4 +77,4 @@ void RobotCommunicator<SendProto, ReceiveProto>::send_loop(
 }
 
 // place all templated communcation msg send/receive pair initializations here
-template class RobotCommunicator<control_msg, robot_ack>;
+template class RobotCommunicator<ControlMsg, RobotAck>;
