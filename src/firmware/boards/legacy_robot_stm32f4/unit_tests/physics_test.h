@@ -1,2 +1,2 @@
 
-void run_physics_test();
+void run_physics_test(void);

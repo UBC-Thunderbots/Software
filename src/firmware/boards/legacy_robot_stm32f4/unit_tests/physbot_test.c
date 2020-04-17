@@ -57,7 +57,7 @@ START_TEST(test_to_local_coords)
 }
 END_TEST
 
-void run_physbot_test()
+void run_physbot_test(void)
 {
     // Put the name of the suite of tests in here
     Suite *s = suite_create("PhysBot Test");

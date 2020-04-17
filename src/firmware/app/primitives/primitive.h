@@ -86,7 +86,7 @@ typedef struct
      * @return A pointer to a "state" object, ie. whatever this primitive wants to store
      *         in terms of stateful information.
      */
-    void* (*create_state)();
+    void* (*create_state)(void);
 
     /**
      * Destroy an instance of the "state" object for this primitive
@@ -105,7 +105,7 @@ typedef struct
  * @param STATE_TYPE The type of the state object
  */
 #define DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(STATE_TYPE)                  \
-    void* create##STATE_TYPE()                                                           \
+    void* create##STATE_TYPE(void)                                                       \
     {                                                                                    \
         return malloc(sizeof(STATE_TYPE));                                               \
     }                                                                                    \
