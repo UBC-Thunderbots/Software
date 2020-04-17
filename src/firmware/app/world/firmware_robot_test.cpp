@@ -8,7 +8,7 @@ extern "C"
 class FirmwareRobotTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         RobotConstants_t robot_constants = {.mass              = 1.1,
                                             .moment_of_inertia = 1.2,
@@ -28,7 +28,7 @@ class FirmwareRobotTest : public testing::Test
             robot_constants);
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_firmware_robot_destroy(firmware_robot);
     }
@@ -39,47 +39,47 @@ class FirmwareRobotTest : public testing::Test
 
     ControllerState_t* controller_state;
 
-    static float returnEight()
+    static float returnEight(void)
     {
         return 8;
     }
 
-    static float returnNine()
+    static float returnNine(void)
     {
         return 9;
     }
 
-    static float returnTen()
+    static float returnTen(void)
     {
         return 10;
     }
 
-    static float returnEleven()
+    static float returnEleven(void)
     {
         return 11;
     }
 
-    static float returnTwelve()
+    static float returnTwelve(void)
     {
         return 12;
     }
 
-    static float returnThirteen()
+    static float returnThirteen(void)
     {
         return 13;
     }
 
-    static float returnFourteen()
+    static float returnFourteen(void)
     {
         return 14;
     }
 
-    static float returnFifteen()
+    static float returnFifteen(void)
     {
         return 15;
     }
 
-    static float returnSixteen()
+    static float returnSixteen(void)
     {
         return 16;
     }

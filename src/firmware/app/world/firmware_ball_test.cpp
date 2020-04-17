@@ -8,33 +8,33 @@ extern "C"
 class FirmwareBallTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         firmware_ball =
             app_firmware_ball_create(&(this->returnSeven), &(this->returnEight),
                                      &(this->returnNine), &(this->returnTen));
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_firmware_ball_destroy(firmware_ball);
     }
-    static float returnSeven()
+    static float returnSeven(void)
     {
         return 7;
     }
 
-    static float returnEight()
+    static float returnEight(void)
     {
         return 8;
     }
 
-    static float returnNine()
+    static float returnNine(void)
     {
         return 9;
     }
 
-    static float returnTen()
+    static float returnTen(void)
     {
         return 10;
     }

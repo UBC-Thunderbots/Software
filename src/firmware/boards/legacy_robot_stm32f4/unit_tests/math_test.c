@@ -51,7 +51,7 @@ START_TEST(test_atan2f_negative_y_axis)
 }
 END_TEST
 
-void run_math_test()
+void run_math_test(void)
 {
     // Put the name of the suite of tests in here
     Suite *s = suite_create("Math Test");

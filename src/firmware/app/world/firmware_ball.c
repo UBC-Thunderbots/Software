@@ -4,16 +4,16 @@
 
 struct FirmwareBall
 {
-    float (*get_ball_position_x)();
-    float (*get_ball_position_y)();
-    float (*get_ball_velocity_x)();
-    float (*get_ball_velocity_y)();
+    float (*get_ball_position_x)(void);
+    float (*get_ball_position_y)(void);
+    float (*get_ball_velocity_x)(void);
+    float (*get_ball_velocity_y)(void);
 };
 
-FirmwareBall_t* app_firmware_ball_create(float (*get_ball_position_x)(),
-                                         float (*get_ball_position_y)(),
-                                         float (*get_ball_velocity_x)(),
-                                         float (*get_ball_velocity_y)())
+FirmwareBall_t* app_firmware_ball_create(float (*get_ball_position_x)(void),
+                                         float (*get_ball_position_y)(void),
+                                         float (*get_ball_velocity_x)(void),
+                                         float (*get_ball_velocity_y)(void))
 {
     FirmwareBall_t* new_ball = (FirmwareBall_t*)malloc(sizeof(FirmwareBall_t));
 
