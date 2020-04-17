@@ -12,6 +12,7 @@
 * [Getter And Setter Functions](#getter-and-setter-functions)
 * [Spelling](#spelling)
 * [Miscellaneous](#miscellaneous)
+* [Protobuf](#protobuf)
 
 
 Our C++ coding style is based off of [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html). We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce most of the nit-picky parts of the style, such as brackets and alignment, so this document highlights the important rules to follow that clang-format cannot enforce.
@@ -315,3 +316,6 @@ Some general guidelines when writing tests are:
   c[i] = i + 1;
   ```
 
+### Protobuf
+
+Protobufs that we define should follow [Google's Protobuf Style Guide](https://developers.google.com/protocol-buffers/docs/style).

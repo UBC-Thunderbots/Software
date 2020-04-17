@@ -1,9 +1,10 @@
 syntax = "proto2";
 
 // a game event that caused a referee command
-message Game_Event {
-
-    enum GameEventType {
+message Game_Event
+{
+    enum GameEventType
+    {
         // not set
         UNKNOWN = 0;
 
@@ -56,7 +57,8 @@ message Game_Event {
         // Law 12: Double touch
         DOUBLE_TOUCH = 16;
 
-        // Law 13-17: Attacker not too close to the opponent's penalty area when ball enters play
+        // Law 13-17: Attacker not too close to the opponent's penalty area when ball
+        // enters play
         ATTACKER_TO_DEFENCE_AREA = 17;
 
         // Law 13-17: Keeping the correct distance to the ball during opponents freekicks
@@ -71,8 +73,9 @@ message Game_Event {
         // Law 9.2: Ball placement
         BALL_PLACEMENT_FAILED = 21;
 
-        // Law 10: A goal is only scored if the ball has not exceeded a robot height (150mm) between the last
-        // kick of an attacker and the time the ball crossed the goal line.
+        // Law 10: A goal is only scored if the ball has not exceeded a robot height
+        // (150mm) between the last kick of an attacker and the time the ball crossed the
+        // goal line.
         CHIP_ON_GOAL = 22;
     }
 
@@ -80,15 +83,17 @@ message Game_Event {
     required GameEventType gameEventType = 1;
 
     // a team
-    enum Team {
+    enum Team
+    {
         TEAM_UNKNOWN = 0;
-        TEAM_YELLOW = 1;
-        TEAM_BLUE = 2;
+        TEAM_YELLOW  = 1;
+        TEAM_BLUE    = 2;
     }
 
     // information about an originator
-    message Originator {
-        required Team team = 1;
+    message Originator
+    {
+        required Team team    = 1;
         optional uint32 botId = 2;
     }
 
