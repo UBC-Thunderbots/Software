@@ -8,7 +8,7 @@ extern "C"
 class FirmwareRobotTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         RobotConstants_t robot_constants = {.mass              = 1.1,
                                             .moment_of_inertia = 1.2,
