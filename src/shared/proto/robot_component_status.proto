@@ -58,44 +58,44 @@ message EncoderData
 enum ErrorCode
 {
     /** 2014 ROBOT Messages **/
-    //Electrical messages
-    ROBOT_DEAD_MESSAGE                      = 1 ;
-    LOW_CAP_MESSAGE                         = 2 ;
-    LOW_BATTERY_MESSAGE                     = 3 ;
-    HIGH_BOARD_TEMP_MESSAGE                 = 4 ;
+    // Electrical messages
+    ROBOT_DEAD_MESSAGE      = 1;
+    LOW_CAP_MESSAGE         = 2;
+    LOW_BATTERY_MESSAGE     = 3;
+    HIGH_BOARD_TEMP_MESSAGE = 4;
     // Level triggered events
-    CHARGE_TIMEOUT                          = 5 ;
-    WHEEL_0_MOTOR_HOT                       = 6 ;
-    WHEEL_1_MOTOR_HOT                       = 7 ;
-    WHEEL_2_MOTOR_HOT                       = 8 ;
-    WHEEL_3_MOTOR_HOT                       = 9 ;
-    DRIBBLER_MOTOR_HOT                      = 10;
-    WHEEL_0_ENCODER_NOT_COMMUTATING         = 11;
-    WHEEL_1_ENCODER_NOT_COMMUTATING         = 12;
-    WHEEL_2_ENCODER_NOT_COMMUTATING         = 13;
-    WHEEL_3_ENCODER_NOT_COMMUTATING         = 14;
-    WHEEL_0_HALL_SENSOR_STUCK_LOW           = 15;
-    WHEEL_1_HALL_SENSOR_STUCK_LOW           = 16;
-    WHEEL_2_HALL_SENSOR_STUCK_LOW           = 17;
-    WHEEL_3_HALL_SENSOR_STUCK_LOW           = 18;
-    DRIBBLER_HALL_SENSOR_STUCK_LOW          = 19;
-    WHEEL_0_HALL_SENSOR_STUCK_HIGH          = 20;
-    WHEEL_1_HALL_SENSOR_STUCK_HIGH          = 21;
-    WHEEL_2_HALL_SENSOR_STUCK_HIGH          = 22;
-    WHEEL_3_HALL_SENSOR_STUCK_HIGH          = 23;
-    DRIBBLER_HALL_SENSOR_STUCK_HIGH         = 24;
+    CHARGE_TIMEOUT                  = 5;
+    WHEEL_0_MOTOR_HOT               = 6;
+    WHEEL_1_MOTOR_HOT               = 7;
+    WHEEL_2_MOTOR_HOT               = 8;
+    WHEEL_3_MOTOR_HOT               = 9;
+    DRIBBLER_MOTOR_HOT              = 10;
+    WHEEL_0_ENCODER_NOT_COMMUTATING = 11;
+    WHEEL_1_ENCODER_NOT_COMMUTATING = 12;
+    WHEEL_2_ENCODER_NOT_COMMUTATING = 13;
+    WHEEL_3_ENCODER_NOT_COMMUTATING = 14;
+    WHEEL_0_HALL_SENSOR_STUCK_LOW   = 15;
+    WHEEL_1_HALL_SENSOR_STUCK_LOW   = 16;
+    WHEEL_2_HALL_SENSOR_STUCK_LOW   = 17;
+    WHEEL_3_HALL_SENSOR_STUCK_LOW   = 18;
+    DRIBBLER_HALL_SENSOR_STUCK_LOW  = 19;
+    WHEEL_0_HALL_SENSOR_STUCK_HIGH  = 20;
+    WHEEL_1_HALL_SENSOR_STUCK_HIGH  = 21;
+    WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 22;
+    WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 23;
+    DRIBBLER_HALL_SENSOR_STUCK_HIGH = 24;
     // Edge triggered events
-    ICB_CRC_ERROR                           = 25;
-    RECEIVE_FRAME_CHECK_SEQUENCE_FAILURE    = 26;
-    CRASHED_CORE_DUMPED                     = 27;
-    CRASHED_NO_CORE_DUMP                    = 28;
+    ICB_CRC_ERROR                        = 25;
+    RECEIVE_FRAME_CHECK_SEQUENCE_FAILURE = 26;
+    CRASHED_CORE_DUMPED                  = 27;
+    CRASHED_NO_CORE_DUMP                 = 28;
 
     /** 2014 DONGLE Messages **/
-    ESTOP_BROKEN_MESSAGE                    = 29;
-    RX_FCS_FAIL_MESSAGE                     = 30;
-    SECOND_DONGLE_MESSAGE                   = 31;
-    TRANSMIT_QUEUE_FULL_MESSAGE             = 32;
-    RECEIVE_QUEUE_FULL_MESSAGE              = 33;
+    ESTOP_BROKEN_MESSAGE        = 29;
+    RX_FCS_FAIL_MESSAGE         = 30;
+    SECOND_DONGLE_MESSAGE       = 31;
+    TRANSMIT_QUEUE_FULL_MESSAGE = 32;
+    RECEIVE_QUEUE_FULL_MESSAGE  = 33;
 }
 
 /* Firmware build information and primitive status  */
@@ -126,7 +126,7 @@ message MotorStatus
 
     /* Frankie Robot Fields */
     // Encoder information
-    optional EncoderData encoder_data = 3; 
+    optional EncoderData encoder_data = 3;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
