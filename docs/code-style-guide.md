@@ -10,6 +10,7 @@
 * [Exceptions](#exceptions)
 * [Tests](#tests)
 * [Getter And Setter Functions](#getter-and-setter-functions)
+* [Static Creators](#static-creators)
 * [Spelling](#spelling)
 * [Miscellaneous](#miscellaneous)
 * [Protobuf](#protobuf)
@@ -225,7 +226,11 @@ Some general guidelines when writing tests are:
 * in general, getter and setter methods on classes should be written like `getName()`, `setName(string name)`, with the following exceptions
   * getters with the return type `bool` may be prefixed with `is` instead of `get`, ie. `bool isActive()`
   * getters that are used _incredibly_ frequently and are _incredibly_ obvious may not require the `get` prefix. For example `Point::x()` and `Point::y()` 
-  * getters that convert units should be written as `toUnit`. For example `Angle::toDegrees()`
+  * getters that return specific units should be written as `toUnit()`. For example `Angle::toDegrees()`
+
+
+### Static Creators
+* static creators that take an argument of a specific unit should be written as `fromUnit(datatype unit)`. For example `Angle::fromDegrees(double deg)`
 
 
 ### Spelling
