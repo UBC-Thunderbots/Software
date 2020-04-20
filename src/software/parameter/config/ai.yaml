@@ -260,35 +260,6 @@ AIConfig:
           default: 0.85
           type: "double"
           description: Percentage of distance to center of triangle to return as target
-  DefenderCreaseTacticConfig:
-    MaxDefenderSeperationDeg:
-      min: 0.0
-      max: 50
-      default: 13.0
-      type: "double"
-      description: The maximum angle the crease defenders will seperate by, in degrees.
-    MinDefenderSeperationDeg:
-      min: 0.0
-      max: 50
-      default: 3.0
-      type: "double"
-      description: The minimum angle the crease defenders will seperate by, in degrees.
-    BallDistForMaxDefenderSeperation:
-      min: 0.0
-      max: 5
-      default: 3
-      type: "double"
-      description: >-
-        The distance between the ball and the defenders at which they will have their
-        maximum seperation.
-    BallDistForMinDefenderSeperation:
-      min: 0.0
-      max: 5
-      default: 1
-      type: "double"
-      description: >-
-        The distance between the ball and the defenders at which they will have their
-        minimum seperation.
   GoalieTacticConfig:
     BlockConeBuffer:
         min: 0.0

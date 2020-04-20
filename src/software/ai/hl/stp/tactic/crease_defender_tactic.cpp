@@ -70,22 +70,10 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             // Figure out how far away the ball is
             double ball_dist = (ball.position() - *defender_reference_position).length();
 
-            double min_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
-                                                     ->getDefenderCreaseTacticConfig()
-                                                     ->MinDefenderSeperationDeg()
-                                                     ->value();
-            double max_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
-                                                     ->getDefenderCreaseTacticConfig()
-                                                     ->MaxDefenderSeperationDeg()
-                                                     ->value();
-            double min_ball_dist = Util::DynamicParameters->getAIConfig()
-                                       ->getDefenderCreaseTacticConfig()
-                                       ->BallDistForMinDefenderSeperation()
-                                       ->value();
-            double max_ball_dist = Util::DynamicParameters->getAIConfig()
-                                       ->getDefenderCreaseTacticConfig()
-                                       ->BallDistForMaxDefenderSeperation()
-                                       ->value();
+            double min_defender_seperation_deg = 13.0;
+            double max_defender_seperation_deg = 3.0;
+            double min_ball_dist = 1.0;
+            double max_ball_dist = 3.0;
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
