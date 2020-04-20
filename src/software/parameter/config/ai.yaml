@@ -422,13 +422,3 @@ AIConfig:
       default: 6
       type: double
       description: The minimum open angle to the goal that we require before taking a shot
-  ShadowFreekickerTacticConfig:
-    RobotSeparationScalingFactor:
-      min: 1.0
-      max: 5.0
-      default: 1.1
-      type: double
-      description: >-
-        How much to scale the separation distance between the two robots shadowing
-        an enemy freekicker
-
