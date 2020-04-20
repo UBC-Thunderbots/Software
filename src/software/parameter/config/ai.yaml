@@ -391,15 +391,6 @@ AIConfig:
       default: 3.0
       type: "double"
       description: The maximum time that we will wait before committing to a pass
-  ShootOrChipPlayConfig:
-    FallbackChipTargetEnemyGoalOffset:
-      min: 0.0
-      max: 4.0
-      default: 1.5
-      type: double
-      description: >-
-        The x offset from the enemy goal for the fallback chip target, ie. where we will
-        chip if any enemy approches us before we have a good shot or a robot to chip to
   ShootOrPassPlayConfig:
     AbsMinPassScore:
       min: 0.0
