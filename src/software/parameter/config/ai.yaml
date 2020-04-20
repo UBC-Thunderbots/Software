@@ -431,8 +431,4 @@ AIConfig:
       description: >-
         How much to scale the separation distance between the two robots shadowing
         an enemy freekicker
-  HighLevelStrategyConfig:
-    UseShootOrPassInsteadOfShootOrChip:
-      default: true
-      type: bool
-      description: Use the ShootOrPassPlay instead of the ShootOrChipPlay
+
