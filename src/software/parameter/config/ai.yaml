@@ -289,25 +289,6 @@ AIConfig:
       description: >-
         The distance between the ball and the defenders at which they will have their
         minimum seperation.
-  PivotActionConfig:
-    Experimental:
-        type: "bool"
-        default: false
-        description: If toggled, then loose ball will attempt to pivot with bottom parameters
-    ArbScaling:
-        min: 0.0
-        max: 10.0
-        type: "double"
-        default: 1.0
-        description: How quickly to pivot
-    FinishAngleThreshold:
-        min: 0.0
-        max: 360.0
-        type: "double"
-        default: 5.0
-        description: >-
-            How much tolerance in degrees we allow for the final angle before annoucing
-            pivot has finished
   GoalieTacticConfig:
     BlockConeBuffer:
         min: 0.0
