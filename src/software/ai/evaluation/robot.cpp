@@ -119,7 +119,7 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
     double pass_axis_speed =
         ball_velocity.project(ball_to_robot_vector.normalize()).length();
     Angle pass_angle_tolerance = Angle::fromDegrees(15);
-    double min_pass_speed_m_s = 1.0;
-    return std::make_optional<bool>(
-        ball_angle_deviation < pass_angle_tolerance && pass_axis_speed > min_pass_speed_m_s);
+    double min_pass_speed_m_s  = 1.0;
+    return std::make_optional<bool>(ball_angle_deviation < pass_angle_tolerance &&
+                                    pass_axis_speed > min_pass_speed_m_s);
 };

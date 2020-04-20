@@ -72,8 +72,8 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
 
             double min_defender_seperation_deg = 13.0;
             double max_defender_seperation_deg = 3.0;
-            double min_ball_dist = 1.0;
-            double max_ball_dist = 3.0;
+            double min_ball_dist               = 1.0;
+            double max_ball_dist               = 3.0;
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {

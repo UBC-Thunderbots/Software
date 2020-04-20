@@ -1,11 +1,11 @@
 #include "software/ai/evaluation/find_open_areas.h"
-#include "software/geom/util.h"
 
+#include "software/geom/util.h"
 #include "software/parameter/dynamic_parameters.h"
 
 std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
 {
-    double inset = 0.3;
+    double inset     = 0.3;
     double ballX     = world.ball().position().x();
     double fieldX    = world.field().enemyGoal().x() - inset;
     double negFieldY = world.field().enemyCornerNeg().y() + inset;
@@ -14,7 +14,7 @@ std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
     // A rectangle from the ball to the enemy's end of the field, inset by a small amount
     // to give us enough space to catch the ball before it goes out of bounds
     Rectangle target_area_rectangle =
-            Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
+        Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
 
     std::vector<Point> enemy_locations;
     for (Robot robot : world.enemyTeam().getAllRobots())
