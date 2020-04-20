@@ -225,7 +225,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
-        "//software/ai/evaluation:indirect_chip",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",

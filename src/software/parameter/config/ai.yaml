@@ -211,55 +211,6 @@ AIConfig:
           default: 1.0
           type: "double"
           description: how far back in time to check if a robot is receiving a pass
-      IndirectChipConfig:
-        ChipTargetFraction:
-          min: 0.0
-          max: 100.0
-          default: 0.5
-          type: "double"
-          description: Adjusts how far between ball and target the robot will chip
-        ChipPowerBounceThreshold:
-          min: 0.0
-          max: 5.0
-          default: 0.75
-          type: "double"
-          description: Maximum fraction of distance between chipper and target the first bounce should be, so ball is rolling when it reaches the target
-        MaxChipPower:
-          min: 0.0
-          max: 100.0
-          default: 8.0
-          type: "double"
-          description: Maximum power the robot can chip the ball at without malfunctions
-        ChipTargetAreaInset:
-          min: 0.0
-          max: 100.0
-          default: 0.3
-          type: "double"
-          description: Closest distance to edge of field that the robot could chip and chase to
-        MinChipTriArea:
-          min: 0.0
-          max: 100.0
-          default: 0.5
-          type: "double"
-          description: Minimum area of chip target triangle
-        MinChipTriEdgeLen:
-          min: 0.0
-          max: 100.0
-          default: 0.8
-          type: "double"
-          description: Minimum edge length of chip target triangle
-        MinChipTriEdgeAngle:
-          min: 0.0
-          max: 180.0
-          default: 20
-          type: "double"
-          description: Minimum angle in degrees between chip triangle edges
-        ChipCherryPowerDownscale:
-          min: 0.0
-          max: 100.0
-          default: 0.85
-          type: "double"
-          description: Percentage of distance to center of triangle to return as target
   GoalieTacticConfig:
     BlockConeBuffer:
         min: 0.0
