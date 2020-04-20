@@ -5,7 +5,7 @@
 
 std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
 {
-    double inset     = 0.3; // Determined experimentally to be a reasonable value
+    double inset     = 0.3;  // Determined experimentally to be a reasonable value
     double ballX     = world.ball().position().x();
     double fieldX    = world.field().enemyGoal().x() - inset;
     double negFieldY = world.field().enemyCornerNeg().y() + inset;
