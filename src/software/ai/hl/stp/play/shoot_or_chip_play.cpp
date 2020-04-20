@@ -84,6 +84,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
     // Figure out where the fallback chip target is
+    // Experimentally determined to be a reasonable value
     double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =

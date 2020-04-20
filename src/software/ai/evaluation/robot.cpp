@@ -64,6 +64,7 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
 
 
     // check if the ball is within a certain distance of the robot
+    // this is experimentally determined to be a reasonable value
     auto max_dist_to_robot = ROBOT_MAX_RADIUS_METERS + 0.2;
     if ((ball_pos_at_time - robot_pos_at_time).length() > max_dist_to_robot)
     {

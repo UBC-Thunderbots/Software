@@ -193,6 +193,7 @@ void FreeKickPlay::chipAtGoalStage(
     auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), false);
 
     // Figure out where the fallback chip target is
+    // This is exerimentally determined to be a reasonable value
     double fallback_chip_target_x_offset = 1.5;
     Point chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);

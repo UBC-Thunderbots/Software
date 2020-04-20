@@ -70,6 +70,7 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             // Figure out how far away the ball is
             double ball_dist = (ball.position() - *defender_reference_position).length();
 
+            // Experimentally determined to be a reasonable values
             double min_defender_seperation_deg = 13.0;
             double max_defender_seperation_deg = 3.0;
             double min_ball_dist               = 1.0;
