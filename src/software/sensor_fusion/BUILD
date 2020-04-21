@@ -33,7 +33,7 @@ cc_library(
         "//software/geom",
         "//software/proto:ssl_cc_proto",
         "//software/time:timestamp",
-        "//software/util/printable_enum_macro",
+        "//software/util/make_enum_macro",
     ],
 )
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "software/util/printable_enum_macro/printable_enum_macro.h"
+#include "software/util/make_enum_macro/make_enum_macro.h"
 
 TEST(PrintableEnumMacroTest, validate_valid_enum_args_without_trailing_comma) {
     std::string enum_string = "foo, bar, baz";

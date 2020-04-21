@@ -6,7 +6,7 @@
 #include "software/proto/ssl_referee.pb.h"
 #include "software/sensor_fusion/team_info.h"
 #include "software/time/timestamp.h"
-#include "software/util/printable_enum_macro/printable_enum_macro.h"
+#include "software/util/make_enum_macro/make_enum_macro.h"
 
 // clang-format off
 MAKE_ENUM(RefboxGameState,
