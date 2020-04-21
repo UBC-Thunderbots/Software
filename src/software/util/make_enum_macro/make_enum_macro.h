@@ -90,34 +90,34 @@ namespace
         /* switch statement. Adding an extra COUNT value that will not be handled in */  \
         /* these cases means we will get warnings (or errors). See this stackoverflow */ \
         /* answer for a similar explanation: https://stackoverflow.com/a/2102673 */      \
-    };                                                                                   \
-    inline std::ostream& operator<<(std::ostream& os, name value)                        \
-    {                                                                                    \
-        std::string str                       = #__VA_ARGS__;                            \
-        std::vector<std::string> enum_strings = separateEnumStrings(str);                \
-        /* This index lookup relies on the assumption that the enum does not manually */ \
-        /* specify any values. If it did, the underlying integer of the given value */   \
-        /* may be out of range of the vector of strings */                               \
-        os << enum_strings.at(static_cast<int>(value));                                  \
-        return os;                                                                       \
-    }                                                                                    \
-    static inline size_t size##name()                                                    \
-    {                                                                                    \
-        std::string str                       = #__VA_ARGS__;                            \
-        std::vector<std::string> enum_strings = separateEnumStrings(str);                \
-        return enum_strings.size();                                                      \
-    }                                                                                    \
-    static inline std::vector<name> allValues##name()                                    \
-    {                                                                                    \
-        std::vector<name> values;                                                        \
-        for (unsigned int i = 0; i < size##name(); i++)                                  \
-        {                                                                                \
-            /* This casting relies on the assumption that the enum does not manually */  \
-            /* specify any values, because if it did we may cast to different values */  \
-            /* or miss some values entirely when constructing the vector */              \
-            values.emplace_back(static_cast<name>(i));                                   \
-        }                                                                                \
-        return values;                                                                   \
+    }; \
+    inline std::ostream& operator<<(std::ostream& os, name value)                          \
+    {                                                                                      \
+        std::string str                       = #__VA_ARGS__;                              \
+        std::vector<std::string> enum_strings = separateEnumStrings(str);                  \
+        /* This index lookup relies on the assumption that the enum does not manually */   \
+        /* specify any values. If it did, the underlying integer of the given value */     \
+        /* may be out of range of the vector of strings */                                 \
+        os << enum_strings.at(static_cast<int>(value));                                    \
+        return os;                                                                         \
+    }                                                                                      \
+    static inline size_t size##name()                                                      \
+    {                                                                                      \
+        std::string str                       = #__VA_ARGS__;                              \
+        std::vector<std::string> enum_strings = separateEnumStrings(str);                  \
+        return enum_strings.size();                                                        \
+    }                                                                                      \
+    static inline std::vector<name> allValues##name()                                      \
+    {                                                                                      \
+        std::vector<name> values;                                                          \
+        for (unsigned int i = 0; i < size##name(); i++)                                    \
+        {                                                                                  \
+            /* This casting relies on the assumption that the enum does not manually */    \
+            /* specify any values, because if it did we may cast to different values */    \
+            /* or miss some values entirely when constructing the vector */                \
+            values.emplace_back(static_cast<name>(i));                                     \
+        }                                                                                  \
+        return values;                                                                     \
     }
 
 template <typename T>
