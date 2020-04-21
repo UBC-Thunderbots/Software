@@ -58,7 +58,22 @@ namespace
     }
 }  // namespace
 
-
+/**
+ * Creates an enum.
+ *
+ * This enum will have support for
+ * 1. Getting the number of enum values
+ * 2. Getting the string representation of each enum value
+ * 3. Getting a list of all enum values
+ *
+ * IMPORTANT: This macro does NOT support enums that have manually specified values
+ * Eg.
+ * MAKE_ENUM(MyEnum, foo=1, bar)
+ * is not valid
+ *
+ * @param name The name of the enum
+ * @param ... The values of the enum
+ */
 #define MAKE_ENUM(name, ...)                                                               \
     constexpr std::string_view enum_string_args_##name = #__VA_ARGS__;                     \
     static_assert(                                                                         \
