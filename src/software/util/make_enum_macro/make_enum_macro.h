@@ -60,9 +60,9 @@ namespace
 
 
 #define MAKE_ENUM(name, ...)                                                             \
-    constexpr std::string_view enum_string_args = #__VA_ARGS__;                          \
+    constexpr std::string_view enum_string_args_##name = #__VA_ARGS__;                          \
     static_assert(                                                                       \
-        isEnumArgsValid(enum_string_args),                                               \
+        isEnumArgsValid(enum_string_args_##name),                                               \
         "Error: Enums created with the MAKE_ENUM macro may not manually specify enum "   \
         "values. Please remove any enum assignments with the '=' operator");             \
     enum class name                                                                      \
@@ -86,13 +86,13 @@ namespace
         os << enum_strings.at(static_cast<int>(value));                                  \
         return os;                                                                       \
     }                                                                                    \
-    size_t size##name()                                                                  \
+    inline size_t size##name()                                                                  \
     {                                                                                    \
         std::string str                       = #__VA_ARGS__;                            \
         std::vector<std::string> enum_strings = separateEnumStrings(str);                \
         return enum_strings.size();                                                      \
     }                                                                                    \
-    std::vector<name> allValues##name()                                                  \
+    inline std::vector<name> allValues##name()                                                  \
     {                                                                                    \
         std::vector<name> values;                                                        \
         for (unsigned int i = 0; i < size##name(); i++)                                  \
