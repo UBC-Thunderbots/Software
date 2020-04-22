@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <algorithm>
 
 namespace
 {
@@ -30,31 +31,18 @@ namespace
      *
      * @return A vector of strings, where each string is a value from the original string
      */
-    std::vector<std::string> separateEnumStrings(const std::string& enum_string)
+    std::vector<std::string> separateEnumStrings(std::string enum_string)
     {
-        std::vector<std::string> strings;
-        std::ostringstream temp;
-        for (size_t i = 0; i < enum_string.length(); i++)
+        enum_string.erase(remove_if(enum_string.begin(), enum_string.end(), isspace), enum_string.end());
+        std::vector<std::string> separated_enum_strings;
+        std::string segment;
+        std::stringstream enum_string_stream(enum_string);
+        while(std::getline(enum_string_stream, segment, ','))
         {
-            if (isspace(enum_string[i]))
-            {
-                continue;
-            }
-            else if (enum_string[i] == ',')
-            {
-                strings.push_back(temp.str());
-                temp.str(std::string());
-            }
-            else
-                temp << enum_string[i];
+            separated_enum_strings.emplace_back(segment);
         }
 
-        if (temp.tellp() != 0)
-        {
-            strings.push_back(temp.str());
-        }
-
-        return strings;
+        return separated_enum_strings;
     }
 }  // namespace
 
