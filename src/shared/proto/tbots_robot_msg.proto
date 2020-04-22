@@ -8,9 +8,9 @@ message TbotsRobotMsg
     repeated ErrorCode error_code                      = 2;
     required BreakBeamStatus break_beam_status         = 3;
     required ChipperKickerStatus chipper_kicker_status = 4;
-    required EncoderData encoder_data                  = 5;
+    required MotorEncoderData motor_encoder_data       = 5;
     required FirmwareStatus firmware_status            = 6;
-    required MotorStatus motor_status                  = 7;
+    required DribblerStatus dribbler_status            = 7;
     required NetworkStatus network_status              = 8;
     required PowerStatus power_status                  = 9;
     required TemperatureStatus temperature_status      = 10;
