@@ -55,8 +55,9 @@ TEST(PrintableEnumMacroTest, separate_enum_strings_with_trailing_comma)
 }
 
 MAKE_ENUM(TestEnum, Var1, Var2)
-TEST(PrintableEnumMacroTest, test_macro_generated_functions) {
-
+TEST(PrintableEnumMacroTest, test_macro_generated_functions)
+{
     EXPECT_EQ(2, sizeTestEnum());
-    EXPECT_EQ(std::vector<TestEnum>({TestEnum::Var1, TestEnum::Var2}), allValuesTestEnum());
+    EXPECT_EQ(std::vector<TestEnum>({TestEnum::Var1, TestEnum::Var2}),
+              allValuesTestEnum());
 }
