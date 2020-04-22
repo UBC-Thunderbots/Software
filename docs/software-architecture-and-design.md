@@ -484,9 +484,11 @@ Qt is designed to handle hierarchy. It has [an extensive and robust system for m
 Make sure to use layouts, and group widgets in a logical way. For example, several widgets that work together to collect a user's mailing address should be grouped. This group may then be part of a larger group of widgets in a popup dialog asking for billing information.
 
 Here is a good example of laying out widgets in a hierarchy:
+
 ![Good Qt Widget Layout](images/qt_layout_good_example.png)
 
 Do **not** lay out all your widgets in a single layer like this:
+
 ![Bad Qt Widget Layout](images/qt_layout_bad_example.png)
 
 The main point to remember is to use [layouts](https://doc.qt.io/qt-5/layout.html) to group and manage widgets, and to create these groups in a logical way that can be built into a hierarchy. This will make it significantly easier to replace parts of the GUI later, or move components around.
