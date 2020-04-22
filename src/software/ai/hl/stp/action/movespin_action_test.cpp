@@ -8,7 +8,7 @@ TEST(MoveSpinActionTest, getDestination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveSpinAction action = MoveSpinAction(0.05);
+    MoveSpinAction action = MoveSpinAction(0.05, false);
 
     action.updateControlParams(robot, Point(7, 13), AngularVelocity::quarter(), 1.0);
 
@@ -19,7 +19,7 @@ TEST(MoveSpinActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveSpinAction action = MoveSpinAction(0.05);
+    MoveSpinAction action = MoveSpinAction(0.05, false);
 
     action.updateControlParams(robot, Point(1, 0), AngularVelocity::quarter(), 1.0);
     auto intent_ptr = action.getNextIntent();
@@ -39,7 +39,7 @@ TEST(MoveSpinActionTest, robot_at_destination)
 {
     Robot robot = Robot(0, Point(), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveSpinAction action = MoveSpinAction(0.02);
+    MoveSpinAction action = MoveSpinAction(0.02, false);
 
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
@@ -55,7 +55,7 @@ TEST(MoveSpinActionTest, test_action_does_not_prematurely_report_done)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveSpinAction action = MoveSpinAction(0.05);
+    MoveSpinAction action = MoveSpinAction(0.05, false);
 
     // Run the Action several times
     for (int i = 0; i < 10; i++)

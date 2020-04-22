@@ -8,7 +8,7 @@
 #include "software/new_geom/angle.h"
 #include "software/parameter/dynamic_parameters.h"
 
-PivotAction::PivotAction() : Action(true) {}
+PivotAction::PivotAction() : Action(false) {}
 
 void PivotAction::updateControlParams(const Robot& robot, Point pivot_point,
                                       Angle final_angle, Angle pivot_speed,

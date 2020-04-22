@@ -6,7 +6,7 @@
 #include "software/geom/util.h"
 #include "software/new_geom/polygon.h"
 
-ChipAction::ChipAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
+ChipAction::ChipAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
 }
 
@@ -58,6 +58,7 @@ void ChipAction::accept(MutableActionVisitor& visitor)
 
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
+
     // How large the triangle is that defines the region where the robot is
     // behind the ball and ready to chip.
     // We want to keep the region small enough that we won't use the ChipIntent from too
@@ -67,61 +68,69 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // This value is 'X' in the ASCII art below
     double size_of_region_behind_ball = 4 * ROBOT_MAX_RADIUS_METERS;
 
-    // ASCII art showing the region behind the ball
-    // Diagram not to scale
-    //
-    //                             X
-    //                      v-------------v
-    //
-    //                   >  B-------------C
-    //                   |   \           /
-    //                   |    \         /
-    //                   |     \       /       <- Region considered "behind ball"
-    //                 X |      \     /
-    //                   |       \   /
-    //                   |        \ /
-    //    The ball is    >         A
-    //    at A
-    //                             |
-    //                             V
-    //                     direction of chip
-
-    // A vector in the direction opposite the chip (behind the ball)
-    Vector behind_ball = Vector::createFromAngle(this->chip_direction + Angle::half());
-
-
-    // The points below make up the triangle that defines the region we treat as
-    // "behind the ball". They correspond to the vertices labeled 'A', 'B', and 'C'
-    // in the ASCII diagram
-
-    // We make the region close enough to the ball so that the robot will still be
-    // inside it when taking the chip.
-    Point behind_ball_vertex_A = chip_origin;
-    Point behind_ball_vertex_B =
-        behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
-        behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
-    Point behind_ball_vertex_C =
-        behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
-        behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
-
-    Triangle behind_ball_region =
-        Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
-
-    bool robot_behind_ball = behind_ball_region.contains(robot->position());
-    // The point in the middle of the region behind the ball
-    Point point_behind_ball =
-        chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
-
-    // If we're not in position to chip, move into position
-    if (!robot_behind_ball)
+    do
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, chip_direction,
-                                           0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
-    }
-    else
-    {
-        yield(std::make_unique<ChipIntent>(robot->id(), chip_origin, chip_direction,
-                                           chip_distance_meters, 0));
-    }
+
+        // ASCII art showing the region behind the ball
+        // Diagram not to scale
+        //
+        //                             X
+        //                      v-------------v
+        //
+        //                   >  B-------------C
+        //                   |   \           /
+        //                   |    \         /
+        //                   |     \       /       <- Region considered "behind ball"
+        //                 X |      \     /
+        //                   |       \   /
+        //                   |        \ /
+        //    The ball is    >         A
+        //    at A
+        //                             |
+        //                             V
+        //                     direction of chip
+
+        // A vector in the direction opposite the chip (behind the ball)
+
+        Vector behind_ball = Vector::createFromAngle(this->chip_direction + Angle::half());
+
+
+        // The points below make up the triangle that defines the region we treat as
+        // "behind the ball". They correspond to the vertices labeled 'A', 'B', and 'C'
+        // in the ASCII diagram
+
+        // We make the region close enough to the ball so that the robot will still be
+        // inside it when taking the chip.
+        Point behind_ball_vertex_A = chip_origin;
+        Point behind_ball_vertex_B =
+                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+        Point behind_ball_vertex_C =
+                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+
+        Triangle behind_ball_region =
+                Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
+
+        bool robot_behind_ball = behind_ball_region.contains(robot->position());
+        // The point in the middle of the region behind the ball
+        Point point_behind_ball =
+                chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
+
+        // If we're not in position to chip, move into position
+        if (!robot_behind_ball)
+        {
+            yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, chip_direction,
+                                               0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
+                                               AutokickType::NONE, BallCollisionType::ALLOW));
+        }
+        else
+        {
+            yield(std::make_unique<ChipIntent>(robot->id(), chip_origin, chip_direction,
+                                               chip_distance_meters, 0));
+            break;
+        }
+
+    } while (true);
+
 }

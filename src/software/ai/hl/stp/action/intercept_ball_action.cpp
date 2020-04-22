@@ -12,9 +12,8 @@
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
 
-InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
-                                         bool loop_forever)
-    : Action(loop_forever), field(field), ball(ball)
+InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball)
+    : Action(false), field(field), ball(ball)
 {
 }
 
