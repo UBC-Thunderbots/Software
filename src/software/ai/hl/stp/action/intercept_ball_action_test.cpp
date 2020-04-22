@@ -14,7 +14,7 @@ TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
 
-    InterceptBallAction action = InterceptBallAction(field, ball, true);
+    InterceptBallAction action = InterceptBallAction(field, ball);
 
     action.updateWorldParams(field, ball);
     action.updateControlParams(robot);
@@ -46,7 +46,7 @@ TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_t
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
 
-    InterceptBallAction action = InterceptBallAction(field, ball, true);
+    InterceptBallAction action = InterceptBallAction(field, ball);
 
     action.updateWorldParams(field, ball);
     action.updateControlParams(robot);
@@ -78,7 +78,7 @@ TEST(InterceptBallActionTest, test_robot_moves_to_the_ball_if_the_ball_is_moving
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
 
-    InterceptBallAction action = InterceptBallAction(field, ball, true);
+    InterceptBallAction action = InterceptBallAction(field, ball);
 
     action.updateWorldParams(field, ball);
     action.updateControlParams(robot);

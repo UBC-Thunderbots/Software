@@ -9,7 +9,7 @@ TEST(StopActionTest, robot_stopping_without_coasting_while_already_moving)
 {
     Robot robot       = Robot(0, Point(10, 10), Vector(1, 3), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    StopAction action = StopAction(false, 0.05);
+    StopAction action = StopAction(0.05);
 
     action.updateControlParams(robot, false);
     auto intent_ptr = action.getNextIntent();
@@ -33,7 +33,7 @@ TEST(StopAction, robot_stopping_while_already_stopped)
 {
     Robot robot       = Robot(0, Point(10, 10), Vector(), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    StopAction action = StopAction(false, 0.05);
+    StopAction action = StopAction(0.05);
 
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be

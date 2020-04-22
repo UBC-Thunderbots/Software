@@ -23,7 +23,7 @@ class MoveSpinAction : public Action
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
      */
-    explicit MoveSpinAction(
+    explicit MoveSpinAction( bool loop_forever,
         double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
     /**
