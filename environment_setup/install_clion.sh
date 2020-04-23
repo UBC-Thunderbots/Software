@@ -42,7 +42,7 @@ echo "================================================================"
 echo "Installing Bazel Plugin"
 echo "================================================================"
 
-clion_plugin_dir="${HOME}/.CLion${clion_version_year}.{${clion_version_major}}/config/plugins"
+clion_plugin_dir="${HOME}/.CLion${clion_version_year}.${clion_version_major}/config/plugins"
 bazel_plugin_version_year="2020"
 bazel_plugin_version_major="04"
 bazel_plugin_version_minor="13"
