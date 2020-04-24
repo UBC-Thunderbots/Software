@@ -80,11 +80,10 @@ message FirmwareStatus
 /* Data from the motor encoders */
 message MotorEncoderData
 {
-    // speed in metres per second
-    int32 motor_fl_speed = 1;
-    int32 motor_fr_speed = 2;
-    int32 motor_bl_speed = 3;
-    int32 motor_br_speed = 4;
+    int32 motor_fl_speed_m_per_s = 1;
+    int32 motor_fr_speed_m_per_s = 2;
+    int32 motor_bl_speed_m_per_s = 3;
+    int32 motor_br_speed_m_per_s = 4;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
