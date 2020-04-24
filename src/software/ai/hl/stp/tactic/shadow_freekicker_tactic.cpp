@@ -39,15 +39,13 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
 {
     auto move_action      = std::make_shared<MoveAction>(false);
     Point defend_position = robot->position();
+    // Experimentally determined to be a reasonable value
+    double robot_separation_scaling_factor = 1.1;
 
     do
     {
         std::optional<Robot> enemy_with_ball =
             Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
-        double robot_separation_scaling_factor = Util::DynamicParameters->getAIConfig()
-                                                     ->getShadowFreekickerTacticConfig()
-                                                     ->RobotSeparationScalingFactor()
-                                                     ->value();
 
         if (enemy_with_ball.has_value())
         {

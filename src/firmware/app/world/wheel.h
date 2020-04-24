@@ -43,7 +43,7 @@ typedef struct WheelConstants
  * @return A pointer to the created wheel, ownership is given to the caller
  */
 Wheel_t* app_wheel_create(void (*apply_wheel_force)(float),
-                          float (*get_motor_speed_rpm)(), void (*brake)(void),
+                          float (*get_motor_speed_rpm)(void), void (*brake)(void),
                           void (*coast)(void), WheelConstants_t wheel_constants);
 
 /**

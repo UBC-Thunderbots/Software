@@ -165,7 +165,7 @@ START_TEST(test_matrix_struct)
 }
 END_TEST
 
-void run_matrix_test()
+void run_matrix_test(void)
 {
     // Put the name of the suite of tests in here
     Suite *s = suite_create("Matrix Test");

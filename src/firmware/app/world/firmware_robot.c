@@ -8,13 +8,13 @@ struct FirmwareRobot
     // of the field, 0 degrees is towards the enemy goal) unless otherwise specified.
     Chicker_t* chicker;
     Dribbler_t* dribbler;
-    float (*get_robot_position_x)();
-    float (*get_robot_position_y)();
-    float (*get_robot_orientation)();
-    float (*get_robot_velocity_x)();
-    float (*get_robot_velocity_y)();
-    float (*get_robot_velocity_angular)();
-    float (*get_battery_voltage)();
+    float (*get_robot_position_x)(void);
+    float (*get_robot_position_y)(void);
+    float (*get_robot_orientation)(void);
+    float (*get_robot_velocity_x)(void);
+    float (*get_robot_velocity_y)(void);
+    float (*get_robot_velocity_angular)(void);
+    float (*get_battery_voltage)(void);
     ControllerState_t* controller_state;
     Wheel_t* front_right_wheel;
     Wheel_t* front_left_wheel;
@@ -24,10 +24,10 @@ struct FirmwareRobot
 };
 
 FirmwareRobot_t* app_firmware_robot_create(
-    Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(),
-    float (*get_robot_position_y)(), float (*get_robot_orientation)(),
-    float (*get_robot_velocity_x)(), float (*get_robot_velocity_y)(),
-    float (*get_robot_velocity_angular)(), float (*get_battery_voltage)(),
+    Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(void),
+    float (*get_robot_position_y)(void), float (*get_robot_orientation)(void),
+    float (*get_robot_velocity_x)(void), float (*get_robot_velocity_y)(void),
+    float (*get_robot_velocity_angular)(void), float (*get_battery_voltage)(void),
     Wheel_t* front_right_wheel, Wheel_t* front_left_wheel, Wheel_t* back_right_wheel,
     Wheel_t* back_left_wheel, ControllerState_t* controller_state,
     RobotConstants_t robot_constants)

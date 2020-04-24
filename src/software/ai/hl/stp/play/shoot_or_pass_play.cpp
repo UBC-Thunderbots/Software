@@ -27,13 +27,7 @@ std::string ShootOrPassPlay::getName() const
 
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
-    bool use_shoot_or_pass_instead_of_shoot_or_chip =
-        Util::DynamicParameters->getAIConfig()
-            ->getHighLevelStrategyConfig()
-            ->UseShootOrPassInsteadOfShootOrChip()
-            ->value();
-
-    return use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
+    return world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
