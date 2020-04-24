@@ -1,17 +1,17 @@
-syntax = "proto2";
+syntax = "proto3";
 
 import "shared/proto/robot_component_status.proto";
 
 message TbotsRobotMsg
 {
-    required uint32 robot_id                           = 1;
-    repeated ErrorCode error_code                      = 2;
-    required BreakBeamStatus break_beam_status         = 3;
-    required ChipperKickerStatus chipper_kicker_status = 4;
-    required MotorEncoderData motor_encoder_data       = 5;
-    required FirmwareStatus firmware_status            = 6;
-    required DribblerStatus dribbler_status            = 7;
-    required NetworkStatus network_status              = 8;
-    required PowerStatus power_status                  = 9;
-    required TemperatureStatus temperature_status      = 10;
+    uint32 robot_id                           = 1;
+    repeated ErrorCode error_code             = 2;
+    BreakBeamStatus break_beam_status         = 3;
+    ChipperKickerStatus chipper_kicker_status = 4;
+    MotorEncoderData motor_encoder_data       = 5;
+    FirmwareStatus firmware_status            = 6;
+    DribblerStatus dribbler_status            = 7;
+    NetworkStatus network_status              = 8;
+    PowerStatus power_status                  = 9;
+    TemperatureStatus temperature_status      = 10;
 }

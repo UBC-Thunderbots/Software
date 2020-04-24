@@ -1,43 +1,37 @@
-syntax = "proto2";
+syntax = "proto3";
 
 /* Data about the status of the break beam */
 message BreakBeamStatus
 {
     // Whether or not the ball is interrupting the robot’s laser beam.
-    required bool ball_in_beam = 1;
+    bool ball_in_beam = 1;
 
-    // The reading of the robot’s laser sensor.
-    required float break_beam_reading = 2;
+    // The reading of the robot’s laser sensor, normalized to [0,1]
+    float break_beam_reading = 2;
 }
 
 /* Data about the status of the chipper and kicker */
 message ChipperKickerStatus
 {
-    /* Frankie Robot Fields */
     // Indicates the time elapsed since chipper was last fired in ms
     // UINT64_MAX indicates chipper was never fired
-    optional uint64 time_since_chipper_fired = 2;
+    uint64 time_since_chipper_fired = 1;
 
     // Indicates the time elapsed since kicker was last fired in ms
     // UINT64_MAX indicates kicker was never fired
-    optional uint64 time_since_kicker_fired = 3;
-
-    /* 2014 Robot Fields */
-    // Indicates when autokick has been fired.
-    optional bool autokick_fired = 8;
+    uint64 time_since_kicker_fired = 2;
 }
 
 /* Data about the status of the dribbler */
 message DribblerStatus
 {
-    optional int32 dribbler_rpm = 1;
+    int32 dribbler_rpm = 1;
 }
 
 /* Error codes are to be displayed in the visualizer */
 enum ErrorCode
 {
-    /** 2014 ROBOT Messages **/
-    // Electrical messages
+    NO_ERROR                = 0;  // default message
     ROBOT_DEAD_MESSAGE      = 1;
     LOW_CAP_MESSAGE         = 2;
     LOW_BATTERY_MESSAGE     = 3;
@@ -69,7 +63,6 @@ enum ErrorCode
     CRASHED_CORE_DUMPED                  = 27;
     CRASHED_NO_CORE_DUMP                 = 28;
 
-    /** 2014 DONGLE Messages **/
     ESTOP_BROKEN_MESSAGE        = 29;
     RX_FCS_FAIL_MESSAGE         = 30;
     SECOND_DONGLE_MESSAGE       = 31;
@@ -81,52 +74,50 @@ enum ErrorCode
 message FirmwareStatus
 {
     // The microcontroller firmware build ID.
-    required uint32 fw_build_id = 1;
-
-    // Whether or not the build ID information is valid.
-    required bool build_ids_valid = 3;
+    uint32 fw_build_id = 1;
 }
 
 /* Data from the motor encoders */
 message MotorEncoderData
 {
-    optional int32 motor_fl_speed = 1;
-    optional int32 motor_fr_speed = 2;
-    optional int32 motor_bl_speed = 3;
-    optional int32 motor_br_speed = 4;
+    // speed in metres per second
+    int32 motor_fl_speed = 1;
+    int32 motor_fr_speed = 2;
+    int32 motor_bl_speed = 3;
+    int32 motor_br_speed = 4;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
 message NetworkStatus
 {
     // When the proto was created according to lwIP SNTP time
-    optional uint64 time_created = 1;
+    uint64 time_created = 1;
 
     // Indicates the time elapsed since the last vision packet was received in ms
     // UINT64_MAX indicates no vision packet was ever received
-    optional uint64 time_since_last_vision_received = 2;
+    uint64 time_since_last_vision_received = 2;
 
     // Indicates the time elapsed since the last primitive packet was received in ms
     // UINT64_MAX indicates no primitive packet was ever received
-    optional uint64 time_since_last_primitive_received = 3;
+    uint64 time_since_last_primitive_received = 3;
 }
 
 /* Battery and capacitor voltages */
 message PowerStatus
 {
     // The voltage on the robot’s battery, in volts.
-    required double battery_voltage = 1;
+    float battery_voltage = 1;
 
     // voltage on the robot’s capacitor, in volts.
-    required double capacitor_voltage = 2;
+    float capacitor_voltage = 2;
 }
 
 /* Temperature of robot components */
 message TemperatureStatus
 {
     // The temperature of the robot’s dribbler motor, in degrees Celsius.
-    required double dribbler_temperature = 1;
+    float dribbler_temperature = 1;
 
     // The temperature of the robot’s mainboard, in degrees Celsius.
-    required double board_temperature = 2;
+    float board_temperature = 2;
 }
