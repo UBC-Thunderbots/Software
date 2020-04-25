@@ -25,6 +25,7 @@ message ChipperKickerStatus
 /* Data about the status of the dribbler */
 message DribblerStatus
 {
+    // NOTE: positive means clockwise and negative means counterclockwise
     int32 dribbler_rpm = 1;
 }
 
@@ -32,37 +33,38 @@ message DribblerStatus
 enum ErrorCode
 {
     NO_ERROR                = 0;  // default message
-    ROBOT_DEAD_MESSAGE      = 1;
-    LOW_CAP_MESSAGE         = 2;
-    LOW_BATTERY_MESSAGE     = 3;
-    HIGH_BOARD_TEMP_MESSAGE = 4;
+    LOW_CAP_MESSAGE         = 1;
+    LOW_BATTERY_MESSAGE     = 2;
+    HIGH_BOARD_TEMP_MESSAGE = 3;
     // Level triggered events
-    CHARGE_TIMEOUT                  = 5;
-    WHEEL_0_MOTOR_HOT               = 6;
-    WHEEL_1_MOTOR_HOT               = 7;
-    WHEEL_2_MOTOR_HOT               = 8;
-    WHEEL_3_MOTOR_HOT               = 9;
-    DRIBBLER_MOTOR_HOT              = 10;
-    WHEEL_0_ENCODER_NOT_COMMUTATING = 11;
-    WHEEL_1_ENCODER_NOT_COMMUTATING = 12;
-    WHEEL_2_ENCODER_NOT_COMMUTATING = 13;
-    WHEEL_3_ENCODER_NOT_COMMUTATING = 14;
-    WHEEL_0_HALL_SENSOR_STUCK_LOW   = 15;
-    WHEEL_1_HALL_SENSOR_STUCK_LOW   = 16;
-    WHEEL_2_HALL_SENSOR_STUCK_LOW   = 17;
-    WHEEL_3_HALL_SENSOR_STUCK_LOW   = 18;
-    DRIBBLER_HALL_SENSOR_STUCK_LOW  = 19;
-    WHEEL_0_HALL_SENSOR_STUCK_HIGH  = 20;
-    WHEEL_1_HALL_SENSOR_STUCK_HIGH  = 21;
-    WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 22;
-    WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 23;
-    DRIBBLER_HALL_SENSOR_STUCK_HIGH = 24;
+    CHARGE_TIMEOUT                  = 4;
+    WHEEL_0_MOTOR_HOT               = 5;
+    WHEEL_1_MOTOR_HOT               = 6;
+    WHEEL_2_MOTOR_HOT               = 7;
+    WHEEL_3_MOTOR_HOT               = 8;
+    DRIBBLER_MOTOR_HOT              = 9;
+    WHEEL_0_ENCODER_NOT_COMMUTATING = 10;
+    WHEEL_1_ENCODER_NOT_COMMUTATING = 11;
+    WHEEL_2_ENCODER_NOT_COMMUTATING = 12;
+    WHEEL_3_ENCODER_NOT_COMMUTATING = 13;
+    WHEEL_0_HALL_SENSOR_STUCK_LOW   = 14;
+    WHEEL_1_HALL_SENSOR_STUCK_LOW   = 15;
+    WHEEL_2_HALL_SENSOR_STUCK_LOW   = 16;
+    WHEEL_3_HALL_SENSOR_STUCK_LOW   = 17;
+    DRIBBLER_HALL_SENSOR_STUCK_LOW  = 18;
+    WHEEL_0_HALL_SENSOR_STUCK_HIGH  = 19;
+    WHEEL_1_HALL_SENSOR_STUCK_HIGH  = 20;
+    WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 21;
+    WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 22;
+    DRIBBLER_HALL_SENSOR_STUCK_HIGH = 23;
     // Edge triggered events
-    ICB_CRC_ERROR                        = 25;
-    RECEIVE_FRAME_CHECK_SEQUENCE_FAILURE = 26;
-    CRASHED_CORE_DUMPED                  = 27;
-    CRASHED_NO_CORE_DUMP                 = 28;
+    ICB_CRC_ERROR                        = 24;
+    RECEIVE_FRAME_CHECK_SEQUENCE_FAILURE = 25;
+    CRASHED_CORE_DUMPED                  = 26;
+    CRASHED_NO_CORE_DUMP                 = 27;
 
+    // Radio Dongle Errors
+    ROBOT_DEAD_MESSAGE          = 28;
     ESTOP_BROKEN_MESSAGE        = 29;
     RX_FCS_FAIL_MESSAGE         = 30;
     SECOND_DONGLE_MESSAGE       = 31;
@@ -80,10 +82,11 @@ message FirmwareStatus
 /* Data from the motor encoders */
 message MotorEncoderData
 {
-    int32 motor_fl_speed_m_per_s = 1;
-    int32 motor_fr_speed_m_per_s = 2;
-    int32 motor_bl_speed_m_per_s = 3;
-    int32 motor_br_speed_m_per_s = 4;
+    // NOTE: positive means clockwise and negative means counterclockwise
+    int32 motor_fl_rpm = 1;
+    int32 motor_fr_rpm = 2;
+    int32 motor_bl_rpm = 3;
+    int32 motor_br_rpm = 4;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
