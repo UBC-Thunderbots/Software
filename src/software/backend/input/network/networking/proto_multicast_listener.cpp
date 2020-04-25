@@ -5,8 +5,8 @@
 template <class ReceiveProto>
 ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
     boost::asio::io_service& io_service, const std::string ip_address,
-    const unsigned short port, std::function<void(ReceiveProto)> handle_function)
-    : socket_(io_service), handle_function(handle_function)
+    const unsigned short port, std::function<void(ReceiveProto)> receive_callback)
+    : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::address::from_string(ip_address), port);
@@ -50,7 +50,7 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
         auto packet_data = ReceiveProto();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
-        handle_function(packet_data);
+        receive_callback(packet_data);
 
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
@@ -73,3 +73,8 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
             << error << std::endl;
     }
 }
+
+// Place all templated initializations here
+// See https://isocpp.org/wiki/faq/templates#separate-template-class-defn-from-decl
+template class ProtoMulticastListener<Referee>;
+template class ProtoMulticastListener<SSL_WrapperPacket>;

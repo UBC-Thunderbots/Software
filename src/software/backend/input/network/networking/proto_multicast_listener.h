@@ -14,18 +14,18 @@ class ProtoMulticastListener
     /**
      * Creates an ProtoMulticastListener that will listen for ReceiveProto packets from
      * the network on the given address and port. For every ReceiveProto packet received,
-     * the handle_function will be called to perform any operations desired by the caller
+     * the receive_callback will be called to perform any operations desired by the caller
      *
      * @param io_service The io_service to use to service incoming ReceiveProto data
      * @param ip_address The ip address of the multicast group on which to listen for
      * the given ReceiveProto packets
      * @param port The port on which to listen for ReceiveProto packets
-     * @param handle_function The function to run for every ReceiveProto packet received
+     * @param receive_callback The function to run for every ReceiveProto packet received
      * from the network
      */
     ProtoMulticastListener(boost::asio::io_service& io_service, std::string ip_address,
                            unsigned short port,
-                           std::function<void(ReceiveProto)> handle_function);
+                           std::function<void(ReceiveProto)> receive_callback);
 
    private:
     /**
@@ -33,7 +33,7 @@ class ProtoMulticastListener
      * function gets automatically called by the io_service for EVERY packet received by
      * the network. These functions are handled synchronously, so we DO NOT need to worry
      * about concurrency or thread-safety in this function. Because this function also
-     * calls the provided handle_function, this means the handle_function also does not
+     * calls the provided receive_callback, this means the receive_callback also does not
      * need to be thread-safe
      *
      * @param error The error code obtained when receiving the incoming data
@@ -48,13 +48,9 @@ class ProtoMulticastListener
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
     // The maximum length of the buffer we use to receive data packets from the network
-    static constexpr unsigned int max_buffer_length = 4096;
+    static constexpr unsigned int max_buffer_length = 9000;
     // Acts as a buffer to store the raw received data from the network
     std::array<char, max_buffer_length> raw_received_data_;
     // The function to call on every received packet of ReceiveProto data
-    std::function<void(ReceiveProto)> handle_function;
+    std::function<void(ReceiveProto)> receive_callback;
 };
-
-// place all templated initializations here
-template class ProtoMulticastListener<Referee>;
-template class ProtoMulticastListener<SSL_WrapperPacket>;
