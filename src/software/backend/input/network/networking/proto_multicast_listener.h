@@ -5,25 +5,27 @@
 #include <string>
 
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/proto/ssl_referee.pb.h"
 
-class SSLVisionClient
+template <class ReceiveProto>
+class ProtoMulticastListener
 {
    public:
     /**
-     * Creates an SSLVisionClient that will listen for data packets from SSL Vision
-     * on the given address and port. For every vision packet received, the
-     * handle_function will be called to perform any operations desired by the caller
+     * Creates an ProtoMulticastListener that will listen for ReceiveProto packets from
+     * the network on the given address and port. For every ReceiveProto packet received,
+     * the handle_function will be called to perform any operations desired by the caller
      *
-     * @param io_service The io_service to use to service incoming vision data
+     * @param io_service The io_service to use to service incoming ReceiveProto data
      * @param ip_address The ip address of the multicast group on which to listen for
-     * SSL Vision packets
-     * @param port The port on which to listen for SSL Vision packets
-     * @param handle_function The function to run for every vision packet received from
-     * the network
+     * the given ReceiveProto packets
+     * @param port The port on which to listen for ReceiveProto packets
+     * @param handle_function The function to run for every ReceiveProto packet received
+     * from the network
      */
-    SSLVisionClient(boost::asio::io_service& io_service, std::string ip_address,
-                    unsigned short port,
-                    std::function<void(SSL_WrapperPacket)> handle_function);
+    ProtoMulticastListener(boost::asio::io_service& io_service, std::string ip_address,
+                           unsigned short port,
+                           std::function<void(ReceiveProto)> handle_function);
 
    private:
     /**
@@ -40,15 +42,19 @@ class SSLVisionClient
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
 
-    // A UDP socket that we listen on for protobuf messages from SSL Vision
+    // A UDP socket that we listen on for ReceiveProto messages from the network
     boost::asio::ip::udp::socket socket_;
-    // The endpoint for the sender, in this case SSL Vision
+    // The endpoint for the sender
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
     // The maximum length of the buffer we use to receive data packets from the network
     static constexpr unsigned int max_buffer_length = 4096;
     // Acts as a buffer to store the raw received data from the network
     std::array<char, max_buffer_length> raw_received_data_;
-    // The function to call on every received packet of vision data
-    std::function<void(SSL_WrapperPacket)> handle_function;
+    // The function to call on every received packet of ReceiveProto data
+    std::function<void(ReceiveProto)> handle_function;
 };
+
+// place all templated initializations here
+template class ProtoMulticastListener<Referee>;
+template class ProtoMulticastListener<SSL_WrapperPacket>;
