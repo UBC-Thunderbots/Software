@@ -453,7 +453,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    // We update the the ball state because that's what is used as a reference for the
+    // We update the ball state because that's what is used as a reference for the
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
     world.updateBallState(BallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
@@ -478,7 +478,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    // We update the the ball state because that's what is used as a reference for the
+    // We update the ball state because that's what is used as a reference for the
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
     world.updateBallState(
