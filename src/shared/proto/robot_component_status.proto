@@ -32,11 +32,13 @@ message DribblerStatus
 /* Error codes are to be displayed in the visualizer */
 enum ErrorCode
 {
-    NO_ERROR                = 0;  // default message
-    LOW_CAP_MESSAGE         = 1;
-    LOW_BATTERY_MESSAGE     = 2;
-    HIGH_BOARD_TEMP_MESSAGE = 3;
+    // Default message required for proto enums
+    NO_ERROR = 0;
+
     // Level triggered events
+    LOW_CAP_MESSAGE                 = 1;
+    LOW_BATTERY_MESSAGE             = 2;
+    HIGH_BOARD_TEMP_MESSAGE         = 3;
     CHARGE_TIMEOUT                  = 4;
     WHEEL_0_MOTOR_HOT               = 5;
     WHEEL_1_MOTOR_HOT               = 6;
