@@ -56,6 +56,7 @@
     * [Qt Best Practices](#qt-best-practices)
       * [Build A Hierarchy](#build-a-hierarchy)
       * [Create Reusable Widgets](#create-reusable-widgets)
+      * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
 * [Simulated Integration Tests](#simulated-integration-tests)
   * [Architecture](#simulated-integration-tests-architecture)
     * [Simulator Backend](#simulator-backend)
@@ -501,6 +502,11 @@ For example, if you create a few widgets that work together to gather user input
 ![Reusable Widget Example](images/qt_reusable_widget_example.png)
 
 Creating widgets that are slightly more generic and reusable are very useful and allow code and graphical modules to be shared and reused between multiple applications.
+
+### Miscellaneous Qt Tips
+* Define minimum and maximum sizes (if it makes sense) to help enforce the correct sizing of elements
+    * Eg. define a minimum width for a textbox based on what it's expected to contain
+
 
 # Simulated Integration Tests
 When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
