@@ -200,6 +200,20 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["colour_feature"] = feature(
+        name = "colour",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-fdiagnostics-color=always"],
+                    ),
+                ],
+            ),
+        ],
+    )
+
     result["dbg_feature"] = feature(
         name = "dbg",
         flag_sets = [
@@ -539,6 +553,7 @@ def _linux_gcc_impl(ctx):
         implies = [
             "builtin_include_directories",
             "c++17",
+            "colour",
             "determinism",
             "warnings",
             "hardening",
@@ -715,6 +730,7 @@ def _stm32_impl(ctx):
         implies = [
             "stdlib",
             "c++17",
+            "colour",
             "determinism",
             "warnings",
             "no-canonical-prefixes",
