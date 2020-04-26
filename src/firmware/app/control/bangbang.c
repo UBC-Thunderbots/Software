@@ -185,7 +185,7 @@ void BBPositivePlan(BBProfile *b)
     b->Vmid = (vm < 0.0f) ? (-b->MaxV) : (b->MaxV);
 
     // here we recompute the times based on new maximum velocity
-    // and if either time is negative the the acceleration should be flipped
+    // and if either time is negative the acceleration should be flipped
     // to regularize things. This is important because we could have an initial
     // velocity higher than Vmax and in which case we should decellerate to MaxV and
     // then decellerate again when we reach the destination which violated our previous

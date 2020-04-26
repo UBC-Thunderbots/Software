@@ -369,7 +369,7 @@ message GameEvent
     // timeout waiting for the attacking team to perform the free kick
     message KickTimeout
     {
-        // the team that that should have kicked
+        // the team that should have kicked
         required RefboxTeam by_team = 1;
         // the location of the ball
         optional Location location = 2;

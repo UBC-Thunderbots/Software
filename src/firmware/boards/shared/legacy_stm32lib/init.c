@@ -485,7 +485,7 @@ void init_chip(const init_specs_t *specs)
         CPACR                   = cpacr;
     }
 
-    // If we will be running at at most 144 MHz, switch to the lower-power voltage
+    // If we will be running at most 144 MHz, switch to the lower-power voltage
     // regulator mode.
     if (specs->cpu_frequency <= 144)
     {

@@ -4,7 +4,7 @@ cc_library(
     name = "ai",
     srcs = ["ai.cpp"],
     hdrs = ["ai.h"],
-    # We include all the plays here so that that the static
+    # We include all the plays here so that the static
     # variables in the .cpp files that auto-register plays with the
     # PlayFactory. This addresses the issue explained here:
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
