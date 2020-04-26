@@ -186,7 +186,7 @@ double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pas
     // the reception point before the ball. We take the greater of these two risks.
 
     // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
-    // the the receiver point for the pass, then it is guaranteed that it will not be
+    // the receiver point for the pass, then it is guaranteed that it will not be
     // able to intercept the pass anywhere.
 
     // Figure out how long the enemy robot and ball will take to reach the closest

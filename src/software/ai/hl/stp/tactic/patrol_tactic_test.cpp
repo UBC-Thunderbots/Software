@@ -58,7 +58,7 @@ class PatrolTacticTest : public testing::Test
      * to move on to the next point
      * @param robot: robot that is assigned the tactic
      * @param new_robot_state: A state that satisfies the patrol tactics's conditions of
-     * moving on on to the next point
+     * moving on to the next point
      * @param action_ptr: the last action returned by the tactic
      * @param tactic: the patrol tactic
      */
@@ -80,7 +80,7 @@ class PatrolTacticTest : public testing::Test
      * to move on to the next point
      * @param robot: robot that is assigned the tactic
      * @param new_robot_state: A state that satisfies the patrol tactics's conditions of
-     * moving on on to the next point
+     * moving on to the next point
      * @param action_ptr: the last action returned by the tactic
      * @param tactic: the patrol tactic
      */
