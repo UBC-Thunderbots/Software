@@ -54,3 +54,5 @@ class ProtoMulticastListener
     // The function to call on every received packet of ReceiveProto data
     std::function<void(ReceiveProto)> receive_callback;
 };
+
+#include "software/backend/input/network/networking/proto_multicast_listener.tpp"

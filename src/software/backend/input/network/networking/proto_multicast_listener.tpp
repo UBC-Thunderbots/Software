@@ -1,5 +1,3 @@
-#include "software/backend/input/network/networking/proto_multicast_listener.h"
-
 #include "software/logger/logger.h"
 
 template <class ReceiveProto>
@@ -73,8 +71,3 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
             << error << std::endl;
     }
 }
-
-// Place all templated initializations here
-// See https://isocpp.org/wiki/faq/templates#separate-template-class-defn-from-decl
-template class ProtoMulticastListener<Referee>;
-template class ProtoMulticastListener<SSL_WrapperPacket>;

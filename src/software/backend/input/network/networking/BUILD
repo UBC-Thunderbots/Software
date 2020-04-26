@@ -2,8 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "proto_multicast_listener",
-    srcs = ["proto_multicast_listener.cpp"],
-    hdrs = ["proto_multicast_listener.h"],
+    hdrs = [
+        "proto_multicast_listener.h",
+        "proto_multicast_listener.tpp",
+    ],
     visibility = ["//visibility:private"],
     deps = [
         "//software/logger",
