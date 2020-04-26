@@ -6,7 +6,14 @@
 
 bool intersects(const Polygon &first, const Segment &second)
 {
-    return first.contains(second.getSegStart()) || first.contains(second.getEnd());
+    for (const auto &seg : first.getSegments())
+    {
+        if (intersects(seg, second))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool intersects(const Segment &first, const Polygon &second)
