@@ -164,6 +164,32 @@ If you think some ASCII art will help explain something better, go for it! [asci
    */
   float power(float a, float b);
   ```
+    * Functions that perform similar tasks should be commented as a group if it improves clarity. 
+    Example 1: functions with different ordering on arguments
+    ```cpp
+    /**
+     * Returns true if the polygon intersects the circle, false otherwise.
+     *
+     * @param first
+     * @param second
+     * @return true if the polygon intersects the circle, false otherwise
+     */
+    bool intersects(const Polygon &first, const Circle &second);
+    bool intersects(const Circle &first, const Polygon &second);
+    ```
+    Example 2: visitor functions
+    ```cpp
+    /**
+     * Serializes the given Primitive into a radio packet
+     *
+     * @param The Primitive to serialize
+     */
+    void visit(const CatchPrimitive &catch_primitive) override;
+    void visit(const ChipPrimitive &chip_primitive) override;
+    void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
+    etc...
+    ```
+
 
 
 ### Headers
