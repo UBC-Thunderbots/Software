@@ -165,6 +165,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
   float power(float a, float b);
   ```
     * Functions that perform similar tasks should be commented as a group if it improves clarity. 
+    
     Example 1: functions with different ordering on arguments
     ```cpp
     /**
