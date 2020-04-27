@@ -133,7 +133,7 @@
 //}
 //
 //// obstacle with robot additional radius buffer = 0, additional velocity projection
-///buffer / = 0 centred at (1,2) and with (3,2) velocity
+/// buffer / = 0 centred at (1,2) and with (3,2) velocity
 // TEST(NavigatorObstacleTest, shifted_no_buffer_velocity_obstacle_polygon)
 //{
 //    double TEST_EPSILON    = 1e-3;
@@ -215,7 +215,7 @@
 
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {
-    PolygonObstacle obstacle(Rectangle({-1, 1}, {2, -3}));
+    PolygonObstacle polygon_obstacle(Rectangle({-1, 1}, {2, -3}));
 
     Polygon expected = Polygon({
         {-1, -3},
@@ -223,18 +223,13 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
         {2, 1},
         {2, -3},
     });
-    //    EXPECT_TRUE((bool)obstacle.getBoundaryPolygon());
-    //    EXPECT_EQ(expected.getPoints(), (*obstacle.getBoundaryPolygon()).getPoints());
+    EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
 }
 
-// TEST(NavigatorObstacleTest, create_from_circle)
-//{
-//    Obstacle obstacle = Obstacle::createCircleObstacle({2, 2}, 1, 1);
-//
-//    EXPECT_FALSE(obstacle.isPolygon());
-//    EXPECT_TRUE(obstacle.getBoundaryCircle());
-//
-//    EXPECT_EQ((*obstacle.getBoundaryCircle()).getRadius(), (1 +
-//    ROBOT_MAX_RADIUS_METERS)); EXPECT_EQ((*obstacle.getBoundaryCircle()).getOrigin(),
-//    Point(2, 2));
-//}
+TEST(NavigatorObstacleTest, create_from_circle)
+{
+    CircleObstacle circle_obstacle(Circle({2, 2}, 3));
+
+    EXPECT_EQ(circle_obstacle.getCircle().getRadius(), 3);
+    EXPECT_EQ(circle_obstacle.getCircle().getOrigin(), Point(2, 2));
+}

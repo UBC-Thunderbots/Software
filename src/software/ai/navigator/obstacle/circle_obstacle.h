@@ -23,6 +23,13 @@ class CircleObstacle : public ShapeObstacle
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
 
+    /**
+     * Gets underlying circle
+     *
+     * @return circle
+     */
+    const Circle getCircle(void) const;
+
    private:
     Circle circle_;
 };

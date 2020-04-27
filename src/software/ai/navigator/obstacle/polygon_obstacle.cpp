@@ -19,7 +19,12 @@ bool PolygonObstacle::intersects(const Segment& segment) const
 
 std::string PolygonObstacle::toString(void) const
 {
-    //    std::ostringstream ss;
-    //    ss << polygon_;
-    return "hello";
+    std::ostringstream ss;
+    ss << polygon_;
+    return ss.str();
+}
+
+const Polygon PolygonObstacle::getPolygon(void) const
+{
+    return polygon_;
 }

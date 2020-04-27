@@ -22,6 +22,13 @@ class PolygonObstacle : public ShapeObstacle
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
 
+    /**
+     * Gets underlying polygon
+     *
+     * @return polygon
+     */
+    const Polygon getPolygon(void) const;
+
    private:
     Polygon polygon_;
 };
