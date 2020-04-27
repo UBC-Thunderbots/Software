@@ -26,7 +26,7 @@ class MotionConstraintManager : public MutableTacticVisitor
     /**
      * Visits a tactic to register the associated motion constraint
      *
-     * @param tactic The tactic to visit
+     * @param The tactic to register
      *
      * @modifies current_whitelisted_constraints
      */

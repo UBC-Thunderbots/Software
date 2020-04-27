@@ -52,7 +52,7 @@ class Navigator : public IntentVisitor
     /**
      * Registers the given Intent for navigation
      *
-     * @param Intent to registers
+     * @param The Intent to register
      */
     void visit(const CatchIntent &catch_intent) override;
     void visit(const ChipIntent &chip_intent) override;
