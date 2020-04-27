@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/new_geom/point.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
@@ -241,28 +243,30 @@ TEST(TestThetaStarPathPlanner, no_navigable_area)
 // This test is disabled, it can be enabled by removing "DISABLED_" from the test name
 TEST(TestThetaStarPathPlanner, DISABLED_performance)
 {
+    ObstacleFactory obstacle_factory(std::make_shared<ObstacleFactoryConfig>());
+
     // This test can be used to guage performance, and profiled to find areas for
     // improvement
     std::vector<std::vector<Obstacle>> obstacle_sets = {
         {
-            Obstacle(Circle({0, 0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0, 0.5}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0, 1.0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0, 1.5}, ROBOT_MAX_RADIUS_METERS)),
+            obstacle_factory.createRobotObstacle({0, 0}, 1),
+            obstacle_factory.createRobotObstacle({0, 0.5}, 1),
+            obstacle_factory.createRobotObstacle({0, 1.0}, 1),
+            obstacle_factory.createRobotObstacle({0, 1.5}, 1),
         },
         {
-            Obstacle(Circle({0, 0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0, 0.5}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0, 1.0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0, 1.5}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({-0.5, 0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({-0.5, 0.5}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({-0.5, 1.0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({-0.5, 1.5}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0.5, 0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0.5, 0.5}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0.5, 1.0}, ROBOT_MAX_RADIUS_METERS)),
-            Obstacle(Circle({0.5, 1.5}, ROBOT_MAX_RADIUS_METERS)),
+            obstacle_factory.createRobotObstacle({0, 0}, 1),
+            obstacle_factory.createRobotObstacle({0, 0.5}, 1),
+            obstacle_factory.createRobotObstacle({0, 1.0}, 1),
+            obstacle_factory.createRobotObstacle({0, 1.5}, 1),
+            obstacle_factory.createRobotObstacle({-0.5, 0}, 1),
+            obstacle_factory.createRobotObstacle({-0.5, 0.5}, 1),
+            obstacle_factory.createRobotObstacle({-0.5, 1.0}, 1),
+            obstacle_factory.createRobotObstacle({-0.5, 1.5}, 1),
+            obstacle_factory.createRobotObstacle({0.5, 0}, 1),
+            obstacle_factory.createRobotObstacle({0.5, 0.5}, 1),
+            obstacle_factory.createRobotObstacle({0.5, 1.0}, 1),
+            obstacle_factory.createRobotObstacle({0.5, 1.5}, 1),
         }};
     Field field = ::Test::TestUtil::createSSLDivBField();
 

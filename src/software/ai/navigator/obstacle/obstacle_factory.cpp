@@ -22,22 +22,22 @@ std::vector<Obstacle> ObstacleFactory::createObstaclesFromMotionConstraint(
     }
     else if (motion_constraint == MotionConstraint::CENTER_CIRCLE)
     {
-        obstacles.push_back(Obstacle(
+        obstacles.push_back(createObstacle(
             Circle(world.field().centerPoint(),
                    world.field().centerCircleRadius() + shape_expansion_amount)));
     }
     else if (motion_constraint == MotionConstraint::HALF_METER_AROUND_BALL)
     {
         // 0.5 represents half a metre radius
-        obstacles.push_back(
-            Obstacle(Circle(world.ball().position(), 0.5 + shape_expansion_amount)));
+        obstacles.push_back(createObstacle(
+            Circle(world.ball().position(), 0.5 + shape_expansion_amount)));
     }
     else if (motion_constraint == MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA)
     {
         Rectangle rectangle = world.field().enemyDefenseArea();
         // 0.3 is by definition what inflated means
         rectangle.expand(shape_expansion_amount + 0.3);
-        obstacles.push_back(Obstacle(rectangle));
+        obstacles.push_back(createObstacle(rectangle));
     }
     else
     {
@@ -74,7 +74,7 @@ std::vector<Obstacle> ObstacleFactory::createObstaclesFromMotionConstraint(
                 break;
         }
         rectangle.expand(shape_expansion_amount);
-        obstacles.push_back(Obstacle(rectangle));
+        obstacles.push_back(createObstacle(rectangle));
     }
     return obstacles;
 }
@@ -114,7 +114,7 @@ Obstacle ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
         // use hexagonal approximation for velocity obstacle
         Vector velocity_direction_norm_radius =
             velocity_cushion_vector.normalize(radius_cushion);
-        return Obstacle(Polygon(
+        return createObstacle(Polygon(
             {// left side of robot
              robot.position() + velocity_direction_norm_radius.rotate(Angle::quarter()),
              // back left of robot
@@ -136,15 +136,16 @@ Obstacle ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
     }
     else
     {
-        return Obstacle(Circle(robot.position(), radius_cushion));
+        return createObstacle(Circle(robot.position(), radius_cushion));
     }
 }
 
 Obstacle ObstacleFactory::createRobotObstacle(const Point &robot_position,
                                               const double radius_scaling)
 {
-    return Obstacle(Circle(robot_position, radius_scaling * (ROBOT_MAX_RADIUS_METERS +
-                                                             shape_expansion_amount)));
+    return createObstacle(
+        Circle(robot_position,
+               radius_scaling * (ROBOT_MAX_RADIUS_METERS + shape_expansion_amount)));
 }
 
 std::vector<Obstacle> ObstacleFactory::createVelocityObstaclesFromTeam(const Team &team)
@@ -160,7 +161,17 @@ std::vector<Obstacle> ObstacleFactory::createVelocityObstaclesFromTeam(const Tea
 Obstacle ObstacleFactory::createBallObstacle(const Point &ball_position,
                                              double additional_radius_cushion_buffer)
 {
-    return Obstacle(Circle(ball_position, BALL_MAX_RADIUS_METERS +
-                                              additional_radius_cushion_buffer +
-                                              shape_expansion_amount));
+    return createObstacle(Circle(ball_position, BALL_MAX_RADIUS_METERS +
+                                                    additional_radius_cushion_buffer +
+                                                    shape_expansion_amount));
+}
+
+Obstacle ObstacleFactory::createObstacle(const Circle &circle)
+{
+    return Obstacle(std::make_shared<CircleObstacle>(CircleObstacle(circle)));
+}
+
+Obstacle ObstacleFactory::createObstacle(const Polygon &polygon)
+{
+    return Obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
 }

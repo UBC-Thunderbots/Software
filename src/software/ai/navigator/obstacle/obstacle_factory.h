@@ -7,6 +7,9 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
+/**
+ * The obstacle factory creates obstacles with an additional robot radius for navigation
+ */
 class ObstacleFactory
 {
    public:
@@ -90,4 +93,24 @@ class ObstacleFactory
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
     double shape_expansion_amount;
+
+    /**
+     * Create circle obstacle directly from a Circle
+     * Note: this helper function does not add a robot radius
+     *
+     *@param circle Circle
+     *
+     * @return circle shaped obstacle
+     */
+    Obstacle createObstacle(const Circle &circle);
+
+    /**
+     * Create polygon obstacle directly from a Polygon
+     * Note: this helper function does not add a robot radius
+     *
+     *@param polygon Polygon
+     *
+     * @return polygon shaped obstacle
+     */
+    Obstacle createObstacle(const Polygon &polygon);
 };

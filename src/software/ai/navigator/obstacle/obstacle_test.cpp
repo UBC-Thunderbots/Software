@@ -223,6 +223,8 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
         {2, 1},
         {2, -3},
     });
+
+    // std::cout<<Obstacle(std::make_shared<PolygonObstacle>(polygon_obstacle))<<std::endl;
     EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
 }
 
@@ -230,6 +232,7 @@ TEST(NavigatorObstacleTest, create_from_circle)
 {
     CircleObstacle circle_obstacle(Circle({2, 2}, 3));
 
+    std::cout << Obstacle(std::make_shared<CircleObstacle>(circle_obstacle)) << std::endl;
     EXPECT_EQ(circle_obstacle.getCircle().getRadius(), 3);
     EXPECT_EQ(circle_obstacle.getCircle().getOrigin(), Point(2, 2));
 }
