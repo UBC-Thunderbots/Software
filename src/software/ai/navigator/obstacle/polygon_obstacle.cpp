@@ -2,14 +2,14 @@
 
 PolygonObstacle::PolygonObstacle(Polygon polygon) : polygon_(polygon) {}
 
-bool PolygonObstacle::contains(const Point& point) const
+bool PolygonObstacle::contains(const Point& p) const
 {
-    return polygon_.contains(point);
+    return polygon_.contains(p);
 }
 
-double PolygonObstacle::distance(const Point& point) const
+double PolygonObstacle::distance(const Point& p) const
 {
-    return ::distance(polygon_, point);
+    return ::distance(polygon_, p);
 }
 
 bool PolygonObstacle::intersects(const Segment& segment) const

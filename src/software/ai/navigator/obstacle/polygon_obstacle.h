@@ -6,10 +6,10 @@
 /**
  * An Obstacle represented by a Polygon
  */
-class PolygonObstacle : public virtual ShapeObstacle
+class PolygonObstacle : public ShapeObstacle
 {
    public:
-    PolygonObstacle() = delete;
+    PolygonObstacle();
 
     /**
      * Construct a polygon obstacle by with a Polygon

@@ -2,14 +2,14 @@
 
 CircleObstacle::CircleObstacle(Circle circle) : circle_(circle) {}
 
-bool CircleObstacle::contains(const Point& point) const
+bool CircleObstacle::contains(const Point& p) const
 {
-    return circle_.contains(point);
+    return circle_.contains(p);
 }
 
-double CircleObstacle::distance(const Point& point) const
+double CircleObstacle::distance(const Point& p) const
 {
-    return ::distance(circle_, point);
+    return ::distance(circle_, p);
 }
 
 bool CircleObstacle::intersects(const Segment& segment) const

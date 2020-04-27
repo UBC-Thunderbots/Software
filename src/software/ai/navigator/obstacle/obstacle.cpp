@@ -1,9 +1,5 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 
-#include "software/ai/navigator/obstacle/circle_obstacle.h"
-#include "software/ai/navigator/obstacle/polygon_obstacle.h"
-
-
 Obstacle::Obstacle(const std::shared_ptr<ShapeObstacle> shape_obstacle_ptr)
     : shape_obstacle_ptr_(shape_obstacle_ptr)
 {
