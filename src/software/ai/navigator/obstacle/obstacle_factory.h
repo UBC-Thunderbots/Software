@@ -29,11 +29,22 @@ class ObstacleFactory
      *
      * @return Obstacles representing the given motion constraints
      */
-    std::vector<Obstacle> getObstaclesFromMotionConstraints(
+    std::vector<Obstacle> createObstaclesFromMotionConstraints(
         const std::set<MotionConstraint> &motion_constraints, const World &world);
 
     /**
-     * Gets an obstacle representing the given robot
+     * Create obstacles for the given motion constraint
+     *
+     * @param motion_constraint The motion constraint to create obstacles for
+     * @param world World we're enforcing motion constraints in
+     *
+     * @return Obstacles representing the given motion constraint
+     */
+    std::vector<Obstacle> createObstaclesFromMotionConstraint(
+        const MotionConstraint &motion_constraint, const World &world);
+
+    /**
+     * Create an obstacle representing the given robot
      *
      * These obstacles take into account the velocity of the robot to extend the
      * created obstacle in the robot's direction of travel.
@@ -42,10 +53,10 @@ class ObstacleFactory
      *
      * @return An obstacle representing the given robot
      */
-    Obstacle getVelocityObstacleFromRobot(const Robot &robot);
+    Obstacle createVelocityObstacleFromRobot(const Robot &robot);
 
     /**
-     * Gets a list of obstacles representing the given team
+     * Create a list of obstacles representing the given team
      *
      * These obstacles take into account the velocity of the robot to extend the
      * created obstacle in the robot's direction of travel.
@@ -54,8 +65,20 @@ class ObstacleFactory
      *
      * @return A list of obstacles representing the given team
      */
-    std::vector<Obstacle> getVelocityObstaclesFromTeam(const Team &team);
+    std::vector<Obstacle> createVelocityObstaclesFromTeam(const Team &team);
+
+    /**
+     * Create circle obstacle around ball with additional_radius_cushion_buffer
+     *
+     * @param ball                              ball to make obstacle around
+     * @param additional_radius_cushion_buffer  extra buffer around obstacle
+     *
+     * @return obstacle around the ball
+     */
+    Obstacle createBallObstacle(const Ball &ball,
+                                double additional_radius_cushion_buffer);
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
+    double shape_expansion_amount;
 };
