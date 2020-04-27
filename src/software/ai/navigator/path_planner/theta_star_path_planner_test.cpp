@@ -27,7 +27,7 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
     {
         for (auto const& obstacle : obstacles)
         {
-            EXPECT_FALSE(obstacle.containsPoint(path_points[0]))
+            EXPECT_FALSE(obstacle.contains(path_points[0]))
                 << "Only point on path " << path_points[0] << " is in obstacle "
                 << obstacle;
         }

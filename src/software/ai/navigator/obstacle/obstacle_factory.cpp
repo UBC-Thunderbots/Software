@@ -8,6 +8,8 @@ ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> co
 std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
     const std::set<MotionConstraint> &motion_constraints, const World &world)
 {
+    double shape_expansion_amount =
+        config->RobotObstacleInflationFactor()->value() * ROBOT_MAX_RADIUS_METERS;
     std::vector<Obstacle> obstacles;
     Rectangle rectangle({0, 0}, {1, 1});
     for (auto motion_constraint : motion_constraints)
@@ -28,8 +30,7 @@ std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
                 rectangle = Rectangle(
                     world.field().friendlyDefenseArea().posXPosYCorner(),
                     Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
-                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
-                                 ROBOT_MAX_RADIUS_METERS);
+                rectangle.expand(shape_expansion_amount);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::ENEMY_DEFENSE_AREA:
@@ -38,41 +39,37 @@ std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
                 rectangle = Rectangle(
                     world.field().enemyDefenseArea().negXPosYCorner(),
                     Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
-                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
-                                 ROBOT_MAX_RADIUS_METERS);
+                rectangle.expand(shape_expansion_amount);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
                 rectangle = world.field().enemyDefenseArea();
-                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
-                                     ROBOT_MAX_RADIUS_METERS +
-                                 0.3);  // 0.3 is by definition what inflated means
+                // 0.3 is by definition what inflated means
+                rectangle.expand(shape_expansion_amount + 0.3);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::CENTER_CIRCLE:
-                obstacles.push_back(Obstacle::createCircleObstacle(
-                    world.field().centerPoint(), world.field().centerCircleRadius(),
-                    config->RobotObstacleInflationFactor()->value()));
+                obstacles.push_back(Obstacle(
+                    Circle(world.field().centerPoint(),
+                           world.field().centerCircleRadius() + shape_expansion_amount)));
                 break;
             case MotionConstraint::HALF_METER_AROUND_BALL:
-                obstacles.push_back(Obstacle::createCircleObstacle(
-                    world.ball().position(), 0.5,  // 0.5 represents half a metre radius
-                    config->RobotObstacleInflationFactor()->value()));
+                // 0.5 represents half a metre radius
+                obstacles.push_back(Obstacle(
+                    Circle(world.ball().position(), 0.5 + shape_expansion_amount)));
                 break;
             case MotionConstraint::ENEMY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().enemyCornerNeg() -
                                           Vector(0, world.field().boundaryYLength()));
-                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
-                                 ROBOT_MAX_RADIUS_METERS);
+                rectangle.expand(shape_expansion_amount);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::FRIENDLY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().friendlyCornerNeg() -
                                           Vector(0, world.field().boundaryYLength()));
-                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
-                                 ROBOT_MAX_RADIUS_METERS);
+                rectangle.expand(shape_expansion_amount);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
         }
@@ -83,11 +80,67 @@ std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
 
 Obstacle ObstacleFactory::getVelocityObstacleFromRobot(const Robot &robot)
 {
-    double speed_scaling_factor = config->SpeedScalingFactor()->value();
-    double robot_scaling_factor = config->RobotObstacleInflationFactor()->value();
+    double radius_cushion_scaling   = config->SpeedScalingFactor()->value();
+    double velocity_cushion_scaling = config->RobotObstacleInflationFactor()->value();
 
-    return Obstacle::createRobotObstacleWithScalingParams(robot, speed_scaling_factor,
-                                                          robot_scaling_factor);
+    // radius cushion for a hexagonal approximation of a robot
+    double radius_cushion =
+        ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling * 4.0 / std::sqrt(3);
+
+    // vector in the direction of the velocity and with the scaled size of the
+    // velocity
+    Vector velocity_cushion_vector =
+        robot.velocity().normalize(robot.velocity().length() * velocity_cushion_scaling +
+                                   2 * ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
+
+
+    if (velocity_cushion_vector.length() > radius_cushion)
+    {
+        Vector velocity_direction_norm_radius =
+            velocity_cushion_vector.normalize(radius_cushion);
+        return Obstacle(Polygon(
+            {// left side of robot
+             robot.position() + velocity_direction_norm_radius.rotate(Angle::quarter()),
+             // back left of robot
+             robot.position() +
+                 velocity_direction_norm_radius.rotate(Angle::fromDegrees(150)),
+             // back right of robot
+             robot.position() +
+                 velocity_direction_norm_radius.rotate(Angle::fromDegrees(210)),
+             // right side of robot
+             robot.position() +
+                 velocity_direction_norm_radius.rotate(Angle::threeQuarter()),
+             // right side velocity cushions
+             robot.position() +
+                 velocity_direction_norm_radius.rotate(Angle::threeQuarter()) +
+                 velocity_cushion_vector,
+             // left side velocity cushions
+             robot.position() + velocity_direction_norm_radius.rotate(Angle::quarter()) +
+                 velocity_cushion_vector}));
+    }
+    else
+    {
+        // force the robot to face in +x direction
+        Vector facing_direction_norm_radius = Vector(1, 0).normalize(radius_cushion);
+        return Obstacle(Polygon(
+            {// left side of robot
+             robot.position() + facing_direction_norm_radius.rotate(Angle::quarter()),
+             // back left of robot
+             robot.position() +
+                 facing_direction_norm_radius.rotate(Angle::fromDegrees(150)),
+             // back right of robot
+             robot.position() +
+                 facing_direction_norm_radius.rotate(Angle::fromDegrees(210)),
+             // right side of robot
+             robot.position() +
+                 facing_direction_norm_radius.rotate(Angle::threeQuarter()),
+             // front right velocity cushions
+             robot.position() +
+                 facing_direction_norm_radius.rotate(Angle::fromDegrees(330)),
+             // front left velocity cushions
+             robot.position() +
+                 facing_direction_norm_radius.rotate(Angle::fromDegrees(30))}));
+    }
 }
 
 std::vector<Obstacle> ObstacleFactory::getVelocityObstaclesFromTeam(const Team &team)

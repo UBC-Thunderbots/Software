@@ -2,17 +2,24 @@ package(default_visibility = ["//software/ai/navigator:__subpackages__"])
 
 cc_library(
     name = "obstacle",
-    srcs = ["obstacle.cpp"],
-    hdrs = ["obstacle.h"],
+    srcs = [
+        "circle_obstacle.cpp",
+        "obstacle.cpp",
+        "polygon_obstacle.cpp",
+    ],
+    hdrs = [
+        "circle_obstacle.h",
+        "obstacle.h",
+        "polygon_obstacle.h",
+        "shape_obstacle.h",
+    ],
     deps = [
         "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:angle",
+        "//software/new_geom:circle",
         "//software/new_geom:point",
-        "//software/new_geom/util:distance",
+        "//software/new_geom:polygon",
+        "//software/new_geom:segment",
         "//software/new_geom/util:intersects",
-        "//software/world:ball",
-        "//software/world:robot",
     ],
 )
 

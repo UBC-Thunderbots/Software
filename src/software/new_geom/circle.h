@@ -91,6 +91,8 @@ bool operator==(const Circle &c, const Circle &d);
  */
 bool operator!=(const Circle &c, const Circle &d);
 
+std::ostream &operator<<(std::ostream &os, const Circle &circle);
+
 template <>
 struct std::hash<Circle>
 {

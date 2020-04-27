@@ -53,3 +53,9 @@ bool operator!=(const Circle &c, const Circle &d)
 {
     return !(c == d);
 }
+
+std::ostream &operator<<(std::ostream &os, const Circle &circle)
+{
+    os << "Circle at " << circle.getOrigin() << " with radius " << circle.getRadius();
+    return os;
+}

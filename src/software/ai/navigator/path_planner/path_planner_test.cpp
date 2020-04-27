@@ -169,7 +169,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     // check if the path starts inside an obstacle
     auto start_obstacle_or_end_it = std::find_if(
         obstacles.begin(), obstacles.end(),
-        [&path](const auto &obs) { return obs.containsPoint(path.valueAt(0.f)); });
+        [&path](const auto &obs) { return obs.contains(path.valueAt(0.f)); });
     // remove the obstacle from obstacles *temporarily* until we exit the obstacle
     if (start_obstacle_or_end_it != obstacles.end())
     {
@@ -183,7 +183,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     {
         Point pt = path.valueAt(s);
         // check if we exited the first obstacle, and add it back to obstacles
-        if (start_obstacle_or_null && !start_obstacle_or_null->containsPoint(pt))
+        if (start_obstacle_or_null && !start_obstacle_or_null->contains(pt))
         {
             obstacles.emplace_back(*start_obstacle_or_null);
             start_obstacle_or_null = std::nullopt;
@@ -191,7 +191,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
 
         for (const Obstacle &obs : obstacles)
         {
-            if (obs.containsPoint(pt))
+            if (obs.contains(pt))
             {
                 // fail because path intersects obstacle
                 std::stringstream fail_ss;
@@ -213,7 +213,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
 
     bool dest_in_obstacle =
         std::any_of(obstacles.begin(), obstacles.end(),
-                    [&dest](const auto &obs) { return obs.containsPoint(dest); });
+                    [&dest](const auto &obs) { return obs.contains(dest); });
 
     // check if the specified destination is in an obstacle, and if so, check that the
     // robot made progress toward the destination we also check for start_obstacle_or_null
