@@ -14,8 +14,9 @@
 
 /**
  * Returns true if the segment intersects the polygon, false otherwise.
- * A segment is considered to intersect the polygon iff it has one point
- * from the segment inside the polygon, and one point outside the polygon.
+ * A segment is considered to intersect the polygon iff there are at least one point on
+ * the segment that are inside the polygon and at least one point on the segment that is
+ * outside the polygon.
  *
  * @param first
  * @param second
@@ -55,8 +56,9 @@ bool intersects(const Circle &first, const Circle &second);
 
 /**
  * Returns true if the segment intersects the circle, false otherwise.
- * A segment is considered to intersect the circle iff it has one point
- * from the segment inside the circle, and one point outside the circle.
+ * A segment is considered to intersect the circle iff there are at least one point on the
+ * segment that are inside the circle and at least one point on the segment that is
+ * outside the circle.
  *
  * @param first
  * @param second
