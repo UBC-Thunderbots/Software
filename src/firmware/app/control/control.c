@@ -167,11 +167,23 @@ void app_control_trackVelocityInLocalFrame(FirmwareRobot_t* robot,
     float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
     float current_orientation      = app_firmware_robot_getOrientation(robot);
 
-    // Translate from global to local frame
+    // linear_velocity is global
+    // current_v is global
+    // so accel is (local - global)?
+
+    // Rotate both linear and current vel from global to local
+
+    // Rotate the acceleration vector from the world frame to the robot frame
+    // TODO check if this translation is right
+
+    float linear_velocity[2];
+    linear_velocity[0] = linear_velocity_x;
+    linear_velocity[1] = linear_velocity_y;
+    rotate(linear_velocity, current_orientation);
+
     float current_velocity[2];
     current_velocity[0] = current_vx;
     current_velocity[1] = current_vy;
-
     rotate(current_velocity, current_orientation);
 
     // This is the "P" term in a PID controller. We essentially do proportional
@@ -180,9 +192,9 @@ void app_control_trackVelocityInLocalFrame(FirmwareRobot_t* robot,
 
     float desired_acceleration[2];
     desired_acceleration[0] =
-        (linear_velocity_x - current_velocity[0]) * VELOCITY_ERROR_GAIN;
+        (linear_velocity[0] - current_velocity[0]) * VELOCITY_ERROR_GAIN;
     desired_acceleration[1] =
-        (linear_velocity_y - current_velocity[1]) * VELOCITY_ERROR_GAIN;
+        (linear_velocity[1] - current_velocity[1]) * VELOCITY_ERROR_GAIN;
 
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;

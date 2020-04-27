@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["mock_ai_wrapper.h"],
     deps = [
         "//software/ai/primitive",
+        "//software/ai/primitive:direct_velocity_primitive",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/world",

@@ -42,9 +42,9 @@ void SimulatedTest::enableVisualizer()
     int argc     = sizeof(argv) / sizeof(char *) - 1;
     visualizer   = std::make_shared<VisualizerWrapper>(argc, argv);
     backend->Subject<World>::registerObserver(visualizer);
-    backend->Subject<RobotStatus>::registerObserver(visualizer);
-    ai_wrapper->Subject<AIDrawFunction>::registerObserver(visualizer);
-    ai_wrapper->Subject<PlayInfo>::registerObserver(visualizer);
+//    backend->Subject<RobotStatus>::registerObserver(visualizer);
+//    ai_wrapper->Subject<AIDrawFunction>::registerObserver(visualizer);
+//    ai_wrapper->Subject<PlayInfo>::registerObserver(visualizer);
 
     // Simulate in realtime if we are using the Visualizer so we can actually see
     // things at a reasonably realistic speed
