@@ -108,7 +108,6 @@ Obstacle ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
         robot.velocity().normalize(robot.velocity().length() * velocity_cushion_scaling +
                                    2 * ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
 
-
     if (velocity_cushion_vector.length() > radius_cushion)
     {
         // use hexagonal approximation for velocity obstacle
@@ -164,7 +163,7 @@ Obstacle ObstacleFactory::createRobotObstacle(const Point &robot_position,
                radius_scaling * (ROBOT_MAX_RADIUS_METERS + shape_expansion_amount)));
 }
 
-Obstacle ObstacleFactory::createRectangleObstacle(const Rectangle &rectangle)
+Obstacle ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle)
 {
     Rectangle rectangle_exp(rectangle);
     rectangle_exp.expand(shape_expansion_amount);

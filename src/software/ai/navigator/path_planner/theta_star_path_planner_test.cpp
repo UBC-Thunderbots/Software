@@ -67,7 +67,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our starting location
-    std::vector<Obstacle> obstacles = {obstacle_factory.createRectangleObstacle(
+    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
         Rectangle(Point(-0.5, -1), Point(0.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -102,7 +102,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Point start{0, 0}, dest{2.7, 0};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {obstacle_factory.createRectangleObstacle(
+    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
         Rectangle(Point(2.5, -1), Point(3.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -134,8 +134,8 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {
-        obstacle_factory.createRectangleObstacle(Rectangle(Point(1, -1), Point(2, 1)))};
+    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
+        Rectangle(Point(1, -1), Point(2, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
@@ -167,8 +167,8 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{0, 3};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {
-        obstacle_factory.createRectangleObstacle(Rectangle(Point(-1, 1), Point(1, 2)))};
+    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
+        Rectangle(Point(-1, 1), Point(1, 2)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 

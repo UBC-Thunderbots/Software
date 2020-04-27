@@ -55,6 +55,7 @@ cc_test(
         ":obstacle_factory",
         "//software/new_geom:point",
         "//software/new_geom:rectangle",
+        "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
     ],

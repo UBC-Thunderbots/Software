@@ -95,7 +95,7 @@ class ObstacleFactory
      *
      * @return rectangular obstacle
      */
-    Obstacle createRectangleObstacle(const Rectangle &rectangle);
+    Obstacle createObstacleFromRectangle(const Rectangle &rectangle);
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
