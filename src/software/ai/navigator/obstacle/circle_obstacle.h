@@ -33,3 +33,5 @@ class CircleObstacle : public ShapeObstacle
    private:
     Circle circle_;
 };
+
+std::ostream& operator<<(std::ostream& os, const CircleObstacle& circle_obstacle);

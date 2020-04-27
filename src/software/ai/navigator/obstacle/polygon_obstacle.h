@@ -9,13 +9,13 @@
 class PolygonObstacle : public ShapeObstacle
 {
    public:
-    PolygonObstacle();
+    PolygonObstacle() = delete;
 
     /**
      * Construct a polygon obstacle by with a Polygon
      * @param polygon Polygon to make obstacle with
      */
-    explicit PolygonObstacle(const Polygon polygon);
+    explicit PolygonObstacle(const Polygon& polygon);
 
     bool contains(const Point& p) const override;
     double distance(const Point& p) const override;
@@ -32,3 +32,5 @@ class PolygonObstacle : public ShapeObstacle
    private:
     Polygon polygon_;
 };
+
+std::ostream& operator<<(std::ostream& os, const PolygonObstacle& polygon_obstacle);

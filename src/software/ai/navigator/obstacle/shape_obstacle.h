@@ -27,7 +27,6 @@ class ShapeObstacle
      *
      * @return distance to point
      */
-
     virtual double distance(const Point& p) const = 0;
 
     /**

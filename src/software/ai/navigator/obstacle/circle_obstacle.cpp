@@ -28,3 +28,9 @@ const Circle CircleObstacle::getCircle(void) const
 {
     return circle_;
 }
+
+std::ostream& operator<<(std::ostream& os, const CircleObstacle& circle_obstacle)
+{
+    os << circle_obstacle.toString();
+    return os;
+}

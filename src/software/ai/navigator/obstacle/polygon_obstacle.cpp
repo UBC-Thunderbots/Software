@@ -1,6 +1,6 @@
 #include "software/ai/navigator/obstacle/polygon_obstacle.h"
 
-PolygonObstacle::PolygonObstacle(Polygon polygon) : polygon_(polygon) {}
+PolygonObstacle::PolygonObstacle(const Polygon& polygon) : polygon_(polygon) {}
 
 bool PolygonObstacle::contains(const Point& p) const
 {
@@ -27,4 +27,10 @@ std::string PolygonObstacle::toString(void) const
 const Polygon PolygonObstacle::getPolygon(void) const
 {
     return polygon_;
+}
+
+std::ostream& operator<<(std::ostream& os, const PolygonObstacle& polygon_obstacle)
+{
+    os << polygon_obstacle.toString();
+    return os;
 }
