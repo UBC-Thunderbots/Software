@@ -68,6 +68,17 @@ class ObstacleFactory
     std::vector<Obstacle> createVelocityObstaclesFromTeam(const Team &team);
 
     /**
+     * Create circle obstacle around robot with additional radius scaling
+     *
+     * @param robot_position robot position
+     * @param radius_scaling  how much to scale the radius
+     *
+     * @return obstacle around the robot
+     */
+    Obstacle createRobotObstacle(const Point &robot_position,
+                                 const double radius_scaling);
+
+    /**
      * Create circle obstacle around ball with additional_radius_cushion_buffer
      *
      * @param ball                              ball to make obstacle around

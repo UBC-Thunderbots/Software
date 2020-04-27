@@ -48,7 +48,7 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
                                   Angle::zero(), AngularVelocity::zero(),
                                   Timestamp::fromSeconds(0));
             current_velocity_obstacles.emplace_back(
-                obstacle_factory.getVelocityObstacleFromRobot(mock_path_robot));
+                obstacle_factory.createVelocityObstacleFromRobot(mock_path_robot));
         }
     }
 
@@ -66,8 +66,8 @@ VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
     {
         if (obj != current_objective)
         {
-            obstacles.push_back(Obstacle::createCircleObstacle(
-                obj.start, ROBOT_MAX_RADIUS_METERS, inflation_factor));
+            obstacles.push_back(
+                obstacle_factory.createRobotObstacle(obj.start, inflation_factor));
         }
     }
     return obstacles;

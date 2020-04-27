@@ -140,6 +140,13 @@ Obstacle ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
     }
 }
 
+Obstacle ObstacleFactory::createRobotObstacle(const Point &robot_position,
+                                              const double radius_scaling)
+{
+    return Obstacle(Circle(robot_position, radius_scaling * (ROBOT_MAX_RADIUS_METERS +
+                                                             shape_expansion_amount)));
+}
+
 std::vector<Obstacle> ObstacleFactory::createVelocityObstaclesFromTeam(const Team &team)
 {
     std::vector<Obstacle> obstacles;
