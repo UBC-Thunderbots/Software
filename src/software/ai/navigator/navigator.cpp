@@ -247,7 +247,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
     auto obstacles      = obstacle_factory.createVelocityObstaclesFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {
-        double current_dist = obstacle.distance(p);
+        double current_dist = obstacle->distance(p);
         if (current_dist < closest_dist)
         {
             closest_dist = current_dist;

@@ -24,8 +24,6 @@ using namespace Test;
 
 using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
 
-ObstacleFactory obstacle_factory(std::make_shared<ObstacleFactoryConfig>());
-
 struct PlannerTestCase
 {
     std::string name = "Unnamed test case";
@@ -35,88 +33,82 @@ struct PlannerTestCase
     bool should_return_path;
 };
 
-std::vector<PlannerTestCase>
-    test_cases =
-        {{.name               = "Empty field straight line",
-          .start              = Point(0, 0),
-          .dest               = Point(1, 0),
-          .navigable_area     = Rectangle({-1, -1}, {2, 2}),
-          .obstacles          = {},
-          .should_return_path = true},
+ObstacleFactory obstacle_factory(std::make_shared<ObstacleFactoryConfig>());
 
-         {.name               = "Single stationary robot in path",
-          .start              = Point(0, 0),
-          .dest               = Point(2, 0),
-          .navigable_area     = Rectangle({-2, -2}, {2, 2}),
-          .obstacles          = {obstacle_factory.createRobotObstacle(Point({1, 0}), 1)},
-          .should_return_path = true},
+std::vector<PlannerTestCase> test_cases = {
+    {.name               = "Empty field straight line",
+     .start              = Point(0, 0),
+     .dest               = Point(1, 0),
+     .navigable_area     = Rectangle({-1, -1}, {2, 2}),
+     .obstacles          = {},
+     .should_return_path = true},
 
-         {.name               = "Large rectangle in path",
-          .start              = Point(-3, 0),
-          .dest               = Point(4, 0),
-          .navigable_area     = Rectangle({-5, -5}, {5, 5}),
-          .obstacles          = {Obstacle(Rectangle({1, 4}, {2, -4}))},
-          .should_return_path = true},
+    {.name               = "Single stationary robot in path",
+     .start              = Point(0, 0),
+     .dest               = Point(2, 0),
+     .navigable_area     = Rectangle({-2, -2}, {2, 2}),
+     .obstacles          = {obstacle_factory.createRobotObstacle(Point({1, 0}), 1)},
+     .should_return_path = true},
 
-         {.name           = "Circle of robots surrounding friendly robot at distance 1",
-          .start          = Point(0, 0),
-          .dest           = Point(4, 0),
-          .navigable_area = Rectangle({-5, -5}, {5, 5}),
-          .obstacles =
-              {
-                  obstacle_factory.createRobotObstacle(Point({1, 0}), 1),
-                  obstacle_factory.createRobotObstacle(
-                      Point({std::cos(M_PI / 3), std::sin(M_PI / 3)}), 1),
-                  obstacle_factory.createRobotObstacle(
-                      Point({std::cos(2 * M_PI / 3), std::sin(2 * M_PI / 3)}), 1),
-                  obstacle_factory.createRobotObstacle(
-                      Point({std::cos(3 * M_PI / 3), std::sin(3 * M_PI / 3)}), 1),
-                  obstacle_factory.createRobotObstacle(
-                      Point({std::cos(4 * M_PI / 3), std::sin(4 * M_PI / 3)}), 1),
-                  obstacle_factory.createRobotObstacle(
-                      Point({std::cos(5 * M_PI / 3), std::sin(5 * M_PI / 3)}), 1),
-              },
-          .should_return_path = true},
+    {.name           = "Large rectangle in path",
+     .start          = Point(-3, 0),
+     .dest           = Point(4, 0),
+     .navigable_area = Rectangle({-5, -5}, {5, 5}),
+     .obstacles = {obstacle_factory.createRectangleObstacle(Rectangle({1, 4}, {2, -4}))},
+     .should_return_path = true},
 
-         {.name           = "Circle of robots surrounding friendly robot at distance 0.2",
-          .start          = Point(0, 0),
-          .dest           = Point(4, 0),
-          .navigable_area = Rectangle({-5, -5}, {5, 5}),
-          .obstacles =
-              {
-                  obstacle_factory.createRobotObstacle(Point({0.2, 0}), 1),
-                  obstacle_factory.createRobotObstacle(
-                      Point({std::cos(M_PI / 3) * 0.2, std::sin(M_PI / 3) * 0.2}), 1),
-                  obstacle_factory.createRobotObstacle(
-                      Point({std::cos(2 * M_PI / 3) * 0.2, std::sin(2 * M_PI / 3) * 0.2}),
-                      1),
-                  obstacle_factory
-                      .createRobotObstacle(Point({std::cos(3 * M_PI / 3) * 0.2,
-                                                  std::sin(3 * M_PI / 3) * 0.2}),
-                                           1),
-                  obstacle_factory
-                      .createRobotObstacle(Point({std::cos(4 * M_PI / 3) * 0.2,
-                                                  std::sin(4 * M_PI / 3) * 0.2}),
-                                           1),
-                  obstacle_factory
-                      .createRobotObstacle(Point({std::cos(5 * M_PI / 3) * 0.2,
-                                                  std::sin(5 * M_PI / 3) * 0.2}),
-                                           1),
-              },
-          .should_return_path = false},
-         {.name  = "Start inside a rectangular obstacle, dest is outside of obstacle",
-          .start = Point(0, 0),
-          .dest  = Point(4, 0),
-          .navigable_area     = Rectangle({-5, -5}, {5, 5}),
-          .obstacles          = {Obstacle(Rectangle({-1, -1}, {1, 1}))},
-          .should_return_path = true},
-         {.name = "Start and dest inside same obstacle",
-          // NOTE: this test is designed specifically to pass the progress check
-          .start              = Point(0, 0),
-          .dest               = Point(1.5, 0),
-          .navigable_area     = Rectangle({-5, -5}, {5, 5}),
-          .obstacles          = {Obstacle(Rectangle({-1, -1}, {2, 1}))},
-          .should_return_path = true}};
+    {.name           = "Circle of robots surrounding friendly robot at distance 1",
+     .start          = Point(0, 0),
+     .dest           = Point(4, 0),
+     .navigable_area = Rectangle({-5, -5}, {5, 5}),
+     .obstacles =
+         {
+             obstacle_factory.createRobotObstacle(Point({1, 0}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(M_PI / 3), std::sin(M_PI / 3)}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(2 * M_PI / 3), std::sin(2 * M_PI / 3)}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(3 * M_PI / 3), std::sin(3 * M_PI / 3)}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(4 * M_PI / 3), std::sin(4 * M_PI / 3)}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(5 * M_PI / 3), std::sin(5 * M_PI / 3)}), 1),
+         },
+     .should_return_path = true},
+
+    {.name           = "Circle of robots surrounding friendly robot at distance 0.2",
+     .start          = Point(0, 0),
+     .dest           = Point(4, 0),
+     .navigable_area = Rectangle({-5, -5}, {5, 5}),
+     .obstacles =
+         {
+             obstacle_factory.createRobotObstacle(Point({0.2, 0}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(M_PI / 3) * 0.2, std::sin(M_PI / 3) * 0.2}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(2 * M_PI / 3) * 0.2, std::sin(2 * M_PI / 3) * 0.2}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(3 * M_PI / 3) * 0.2, std::sin(3 * M_PI / 3) * 0.2}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(4 * M_PI / 3) * 0.2, std::sin(4 * M_PI / 3) * 0.2}), 1),
+             obstacle_factory.createRobotObstacle(
+                 Point({std::cos(5 * M_PI / 3) * 0.2, std::sin(5 * M_PI / 3) * 0.2}), 1),
+         },
+     .should_return_path = false},
+    {.name           = "Start inside a rectangular obstacle, dest is outside of obstacle",
+     .start          = Point(0, 0),
+     .dest           = Point(4, 0),
+     .navigable_area = Rectangle({-5, -5}, {5, 5}),
+     .obstacles = {obstacle_factory.createRectangleObstacle(Rectangle({-1, -1}, {1, 1}))},
+     .should_return_path = true},
+    {.name = "Start and dest inside same obstacle",
+     // NOTE: this test is designed specifically to pass the progress check
+     .start          = Point(0, 0),
+     .dest           = Point(1.5, 0),
+     .navigable_area = Rectangle({-5, -5}, {5, 5}),
+     .obstacles = {obstacle_factory.createRectangleObstacle(Rectangle({-1, -1}, {2, 1}))},
+     .should_return_path = true}};
 
 
 template <typename PlannerT>
@@ -156,7 +148,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     // check if the path starts inside an obstacle
     auto start_obstacle_or_end_it = std::find_if(
         obstacles.begin(), obstacles.end(),
-        [&path](const auto &obs) { return obs.contains(path.valueAt(0.f)); });
+        [&path](const auto &obs) { return obs->contains(path.valueAt(0.f)); });
     // remove the obstacle from obstacles *temporarily* until we exit the obstacle
     if (start_obstacle_or_end_it != obstacles.end())
     {
@@ -170,7 +162,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     {
         Point pt = path.valueAt(s);
         // check if we exited the first obstacle, and add it back to obstacles
-        if (start_obstacle_or_null && !start_obstacle_or_null->contains(pt))
+        if (start_obstacle_or_null && !(*start_obstacle_or_null)->contains(pt))
         {
             obstacles.emplace_back(*start_obstacle_or_null);
             start_obstacle_or_null = std::nullopt;
@@ -178,7 +170,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
 
         for (const Obstacle &obs : obstacles)
         {
-            if (obs.contains(pt))
+            if (obs->contains(pt))
             {
                 // fail because path intersects obstacle
                 std::stringstream fail_ss;
@@ -200,7 +192,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
 
     bool dest_in_obstacle =
         std::any_of(obstacles.begin(), obstacles.end(),
-                    [&dest](const auto &obs) { return obs.contains(dest); });
+                    [&dest](const auto &obs) { return obs->contains(dest); });
 
     // check if the specified destination is in an obstacle, and if so, check that the
     // robot made progress toward the destination we also check for start_obstacle_or_null

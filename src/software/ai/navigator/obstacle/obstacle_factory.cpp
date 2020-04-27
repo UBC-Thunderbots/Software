@@ -166,6 +166,13 @@ Obstacle ObstacleFactory::createBallObstacle(const Point &ball_position,
                                                     shape_expansion_amount));
 }
 
+Obstacle ObstacleFactory::createRectangleObstacle(const Rectangle &rectangle)
+{
+    Rectangle rectangle_exp(rectangle);
+    rectangle_exp.expand(shape_expansion_amount);
+    return createObstacle(rectangle_exp);
+}
+
 Obstacle ObstacleFactory::createObstacle(const Circle &circle)
 {
     return Obstacle(std::make_shared<CircleObstacle>(CircleObstacle(circle)));

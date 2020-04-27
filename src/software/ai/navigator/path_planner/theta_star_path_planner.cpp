@@ -35,7 +35,7 @@ bool ThetaStarPathPlanner::isUnBlocked(Coordinate test_coord)
         Point p = coordinateToPoint(test_coord);
         for (auto &obstacle : obstacles)
         {
-            if (obstacle.contains(p))
+            if (obstacle->contains(p))
             {
                 blocked = true;
                 break;
@@ -460,7 +460,7 @@ bool ThetaStarPathPlanner::isPointValidAndFreeOfObstacles(Point p)
 
     for (auto &obstacle : obstacles)
     {
-        if (obstacle.contains(p))
+        if (obstacle->contains(p))
         {
             return false;
         }

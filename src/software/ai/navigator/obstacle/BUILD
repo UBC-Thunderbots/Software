@@ -23,17 +23,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "obstacle_test",
-    srcs = ["obstacle_test.cpp"],
-    deps = [
-        ":obstacle",
-        "//software/new_geom:point",
-        "//software/new_geom:rectangle",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_library(
     name = "obstacle_factory",
     srcs = ["obstacle_factory.cpp"],
@@ -45,5 +34,28 @@ cc_library(
         "//software/new_geom:point",
         "//software/parameter:dynamic_parameters",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "obstacle_test",
+    srcs = ["obstacle_test.cpp"],
+    deps = [
+        ":obstacle",
+        "//software/new_geom:point",
+        "//software/new_geom:rectangle",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "obstacle_factory_test",
+    srcs = ["obstacle_factory_test.cpp"],
+    deps = [
+        ":obstacle_factory",
+        "//software/new_geom:point",
+        "//software/new_geom:rectangle",
+        "//software/world",
+        "@gtest//:gtest_main",
     ],
 )

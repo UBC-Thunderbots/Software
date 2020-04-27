@@ -90,6 +90,15 @@ class ObstacleFactory
     Obstacle createBallObstacle(const Point &ball_position,
                                 double additional_radius_cushion_buffer);
 
+    /**
+     * Create rectangle-shaped obstacle
+     *
+     * @param rectangle Rectangle to make obstacle with
+     *
+     * @return rectangular obstacle
+     */
+    Obstacle createRectangleObstacle(const Rectangle &rectangle);
+
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
     double shape_expansion_amount;
