@@ -72,6 +72,16 @@ double distance(const Polygon &first, const Point &second)
     return distance(second, first);
 }
 
+double distance(const Point &first, const Circle &second)
+{
+    return (distance(first, second.getOrigin()) - second.getRadius());
+}
+
+double distance(const Circle &first, const Point &second)
+{
+    return distance(second, first);
+}
+
 double distanceSquared(const Point &first, const Segment &second)
 {
     double seg_lensq          = distanceSquared(second.getSegStart(), second.getEnd());

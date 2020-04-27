@@ -35,12 +35,25 @@ class Obstacle
     /**
      * Determines whether the given Point is contained within this Obstacle
      *
+     * @param point Point to check contain for
+     *
      * @return whether the Point p is contained within this Obstacle
      */
     bool contains(const Point& point) const;
 
     /**
+     * Gets the minimum distance from the obstacle to the point
+     *
+     * @param point Point to get distance to
+     *
+     * @return distance to point
+     */
+    double distance(const Point& point) const;
+
+    /**
      * Determines whether the given Segment intersects this Obstacle
+     *
+     * @param segment Segment to check intersects for
      *
      * @return true if the given Segment intersects this Obstacle
      */

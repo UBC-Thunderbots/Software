@@ -19,7 +19,7 @@ cc_library(
         "//software/new_geom:point",
         "//software/new_geom:polygon",
         "//software/new_geom:segment",
-        "//software/new_geom/util:intersects",
+        "//software/new_geom/util",
     ],
 )
 

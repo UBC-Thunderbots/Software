@@ -7,6 +7,11 @@ bool PolygonObstacle::contains(const Point& point) const
     return polygon_.contains(point);
 }
 
+double PolygonObstacle::distance(const Point& point) const
+{
+    return ::distance(polygon_, point);
+}
+
 bool PolygonObstacle::intersects(const Segment& segment) const
 {
     return ::intersects(polygon_, segment);

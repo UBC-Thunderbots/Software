@@ -2,6 +2,8 @@
 
 #include "software/new_geom/point.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/intersects.h"
 
 /**
  * A ShapeObstacle represents the shape of the obstacle
@@ -25,6 +27,14 @@ class ShapeObstacle
      */
     virtual bool intersects(const Segment& segment) const = 0;
 
+    /**
+     * Gets the minimum distance from the obstacle to the point
+     *
+     * @param point Point to get distance to
+     *
+     * @return distance to point
+     */
+    virtual double distance(const Point& p) const = 0;
     /**
      * Output string to describe the obstacle
      *

@@ -2,7 +2,6 @@
 
 #include "software/ai/navigator/obstacle/shape_obstacle.h"
 #include "software/new_geom/polygon.h"
-#include "software/new_geom/util/intersects.h"
 
 /**
  * An Obstacle represented by a Polygon
@@ -19,6 +18,7 @@ class PolygonObstacle : public virtual ShapeObstacle
     explicit PolygonObstacle(const Polygon polygon);
 
     bool contains(const Point& p) const override;
+    double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
 
