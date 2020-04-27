@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include "software/backend/simulation/simulator.h"
-#include "software/logger/logger.h"
+#include "software/logger/init.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string SimulatorBackend::name = "simulator";

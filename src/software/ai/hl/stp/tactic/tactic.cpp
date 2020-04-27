@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-#include "software/logger/logger.h"
+#include <g3log/g3log.hpp>
 
 Tactic::Tactic(bool loop_forever,
                const std::set<RobotCapabilities::Capability> &capability_reqs_)

@@ -77,8 +77,8 @@ qt_cc_library(
     hdr = "robot_selection.h",
     deps = [
         "//shared:constants",
-        "//software/logger",
         "//software/robot_diagnostics/ui:main_widget",
+        "@g3log",
         "@qt//:qt_widgets",
     ],
 )

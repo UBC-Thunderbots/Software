@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <g3log/g3log.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -16,7 +17,6 @@
 #include "shared/constants.h"
 #include "software/backend/output/radio/mrf/messages.h"
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/logger/logger.h"
 
 namespace
 {

@@ -6,12 +6,12 @@
 #include <boost/polygon/voronoi.hpp>
 #include <cassert>
 #include <cmath>
+#include <g3log/g3log.hpp>
 #include <iostream>
 #include <limits>
 #include <tuple>
 
 #include "software/geom/voronoi_diagram.h"
-#include "software/logger/logger.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
@@ -182,7 +182,7 @@ bool pointInFrontVector(Point offset, Vector direction, Point p)
     // compare angle different
     Angle a1   = direction.orientation();
     Angle a2   = (p - offset).orientation();
-    Angle diff = (a1 - a2).clamp();
+    Angle diff = (a1 - a2).angleMod();
     return diff < Angle::quarter() && diff > -Angle::quarter();
 }
 

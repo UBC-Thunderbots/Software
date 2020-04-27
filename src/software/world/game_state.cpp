@@ -1,6 +1,6 @@
 #include "software/world/game_state.h"
 
-#include "software/logger/logger.h"
+#include <g3log/g3log.hpp>
 
 bool GameState::isHalted() const
 {

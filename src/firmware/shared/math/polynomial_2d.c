@@ -1,4 +1,4 @@
-#include "firmware/shared/math/polynomial_2d.h"
+#include "firmware/main/math/polynomial_2d.h"
 
 #include <assert.h>
 #include <math.h>

@@ -148,8 +148,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/intent:move_intent",
         "//software/ai/intent:pivot_intent",
-        "//software/logger",
         "//software/parameter:dynamic_parameters",
+        "@g3log",
     ],
 )
 

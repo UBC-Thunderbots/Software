@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 
+#include <g3log/g3log.hpp>
+
 #include "shared/constants.h"
 #include "software/ai/evaluation/ball.h"
 #include "software/ai/evaluation/possession.h"
@@ -8,7 +10,6 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 using namespace Passing;

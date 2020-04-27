@@ -40,11 +40,6 @@ class Action
     bool done() const;
 
     /**
-     * Restarts the action logic
-     */
-    void restart();
-
-    /**
      * Runs the coroutine and get the next Intent to run from the calculateNextIntent
      * function. If the Action is not done, the next Intent is returned. If the Action
      * is done, a null unique_ptr is returned.

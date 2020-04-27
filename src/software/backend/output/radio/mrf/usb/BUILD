@@ -6,7 +6,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//software/backend/output/radio/mrf/util",
-        "//software/logger",
+        "@g3log",
         "@libusb",
     ],
 )

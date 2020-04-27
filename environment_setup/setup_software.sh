@@ -38,7 +38,7 @@ sudo apt-get update
 
 host_software_packages=(
     curl
-    cmake # Needed to build some of our dependencies
+    cmake
     gcc-7 # we use gcc 7.4.0
     protobuf-compiler
     libprotobuf-dev

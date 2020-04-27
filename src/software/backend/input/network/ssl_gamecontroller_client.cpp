@@ -1,6 +1,6 @@
 #include "software/backend/input/network/ssl_gamecontroller_client.h"
 
-#include "software/logger/logger.h"
+#include <g3log/g3log.hpp>
 
 SSLGameControllerClient::SSLGameControllerClient(
     boost::asio::io_service& io_service, std::string ip_address, unsigned short port,

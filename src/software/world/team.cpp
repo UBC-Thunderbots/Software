@@ -1,9 +1,9 @@
 #include "software/world/team.h"
 
+#include <g3log/g3log.hpp>
 #include <set>
 
 #include "shared/constants.h"
-#include "software/logger/logger.h"
 
 Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size)
     : team_robots(),

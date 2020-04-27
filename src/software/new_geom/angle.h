@@ -169,15 +169,6 @@ class Angle final
     constexpr Angle clamp() const;
 
     /**
-     * Verifies if this angle is kept between [−π, π].
-     *
-     * @param angle the angle to verify.
-     *
-     * @return if the angle is kept between [−π, π].
-     */
-    bool angleBetweenPiAndNegativePi(const Angle &angle) const;
-
-    /**
      * Returns the smallest possible rotational difference between this angle
      * and another angle.
      *
@@ -186,6 +177,16 @@ class Angle final
      * @return the angle between this Angle and other, in the range [0, π].
      */
     constexpr Angle minDiff(const Angle &other) const;
+
+    /**
+     * Limits this angle to [−π, π].
+     *
+     * The angle is rotated by a multiple of 2π until it lies within the target
+     * interval.
+     *
+     * @return the clamped angle.
+     */
+    constexpr Angle angleMod() const;
 
    private:
     /**
@@ -493,14 +494,14 @@ inline constexpr Angle Angle::clamp() const
     return remainder(Angle::full());
 }
 
-bool Angle::angleBetweenPiAndNegativePi(const Angle &angle) const
-{
-    return (angle <= fromRadians(M_PI) && angle >= fromRadians(-M_PI));
-}
-
 inline constexpr Angle Angle::minDiff(const Angle &other) const
 {
     return (*this - other).clamp().abs();
+}
+
+inline constexpr Angle Angle::angleMod() const
+{
+    return remainder(Angle::full());
 }
 
 inline constexpr Angle::Angle(double rads) : rads(rads) {}
@@ -582,7 +583,7 @@ inline constexpr bool operator>=(const Angle &x, const Angle &y)
 
 inline bool operator==(const Angle &x, const Angle &y)
 {
-    Angle diff = x.clamp().minDiff(y.clamp());
+    Angle diff = x.angleMod().minDiff(y.angleMod());
     return diff.toRadians() <= GeomConstants::FIXED_EPSILON;
 }
 

@@ -14,10 +14,10 @@ qt_cc_library(
         "//software/ai/hl/stp:play_info",
         "//software/backend:robot_status",
         "//software/geom",
-        "//software/logger",
         "//software/visualizer/drawing:draw_functions",
         "//software/visualizer/geom:geometry_conversion",
         "//software/visualizer/ui:main_widget",
+        "@g3log",
         "@qt//:qt_widgets",
     ],
 )
@@ -65,9 +65,9 @@ qt_cc_library(
     deps = [
         ":robot_status_table",
         ":zoomable_qgraphics_view",
-        "//software/logger",
         "//software/parameter",
         "//software/visualizer/ui:main_widget",
+        "@g3log",
         "@qt//:qt_widgets",
     ],
 )

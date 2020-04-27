@@ -1,10 +1,10 @@
 #pragma once
 
+#include <g3log/g3log.hpp>
 #include <optional>
 #include <queue>
 
 #include "shared/constants.h"
-#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_detection.pb.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"

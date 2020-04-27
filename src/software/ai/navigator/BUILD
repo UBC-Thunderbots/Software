@@ -13,10 +13,10 @@ cc_library(
         "//software/ai/navigator/obstacle:obstacle_factory",
         "//software/ai/navigator/path_manager",
         "//software/ai/primitive:all_primitives",
-        "//software/logger",
         "//software/new_geom/util:distance",
         "//software/parameter:dynamic_parameters",
         "//software/world",
+        "@g3log",
     ],
 )
 

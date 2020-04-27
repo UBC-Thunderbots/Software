@@ -1,7 +1,8 @@
 #include "software/world/robot.h"
 
+#include <g3log/g3log.hpp>
+
 #include "shared/constants.h"
-#include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,

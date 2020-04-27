@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/action/action.h"
 
-#include "software/logger/logger.h"
+#include <g3log/g3log.hpp>
 
 Action::Action()
     : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))
@@ -12,12 +12,6 @@ bool Action::done() const
     // The action is done if the coroutine evaluates to false, which means execution
     // has "dropped out" the bottom of the function and there is no more work to do
     return !static_cast<bool>(intent_sequence);
-}
-
-void Action::restart()
-{
-    intent_sequence = IntentCoroutine::pull_type(
-        boost::bind(&Action::calculateNextIntentWrapper, this, _1));
 }
 
 std::unique_ptr<Intent> Action::getNextIntent()

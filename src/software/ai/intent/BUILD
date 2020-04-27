@@ -223,7 +223,7 @@ cc_library(
     hdrs = ["intent.h"],
     deps = [
         "//software/ai/motion_constraint",
-        "//software/logger",
+        "@g3log",
     ],
 )
 

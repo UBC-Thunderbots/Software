@@ -6,9 +6,9 @@ cc_library(
     hdrs = ["ssl_gamecontroller_client.h"],
     #    visibility = ["//visibility:private"],
     deps = [
-        "//software/logger",
         "//software/proto:ssl_cc_proto",
         "@boost//:asio",
+        "@g3log",
     ],
 )
 
@@ -18,9 +18,9 @@ cc_library(
     hdrs = ["ssl_vision_client.h"],
     #    visibility = ["//visibility:private"],
     deps = [
-        "//software/logger",
         "//software/proto:ssl_cc_proto",
         "@boost//:asio",
+        "@g3log",
     ],
 )
 
@@ -59,9 +59,9 @@ cc_library(
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
-        "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
         "//software/world",
+        "@g3log",
     ],
 )

@@ -1,10 +1,10 @@
 #include "software/backend/input/network/network_client.h"
 
 #include <boost/bind.hpp>
+#include <g3log/g3log.hpp>
 #include <limits>
 
 #include "software/constants.h"
-#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
 NetworkClient::NetworkClient(

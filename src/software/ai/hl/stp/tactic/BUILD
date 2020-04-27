@@ -11,9 +11,9 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
         "//software/geom",
-        "//software/logger",
         "//software/new_geom/util:distance",
         "//software/world",
+        "@g3log",
     ],
 )
 
@@ -37,7 +37,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 
@@ -81,7 +81,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 
@@ -97,8 +97,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "//software/logger",
         "//software/new_geom/util:intersection",
+        "@g3log",
     ],
 )
 
@@ -155,9 +155,9 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "//software/logger",
         "//software/new_geom:line",
         "//software/new_geom/util:intersection",
+        "@g3log",
     ],
 )
 
@@ -185,7 +185,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 
@@ -211,7 +211,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 
@@ -236,7 +236,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 
@@ -263,8 +263,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "//software/logger",
         "//software/new_geom/util:intersection",
+        "@g3log",
     ],
 )
 
@@ -281,7 +281,7 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 
@@ -297,8 +297,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
-        "//software/logger",
         "//software/new_geom/util",
+        "@g3log",
     ],
 )
 
@@ -325,7 +325,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 
@@ -350,9 +350,9 @@ cc_library(
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "//software/logger",
         "//software/new_geom/util:distance",
         "//software/parameter:dynamic_parameters",
+        "@g3log",
     ],
 )
 
@@ -381,8 +381,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "//software/logger",
         "//software/parameter:dynamic_parameters",
+        "@g3log",
     ],
 )
 
@@ -407,7 +407,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "//software/logger",
+        "@g3log",
     ],
 )
 

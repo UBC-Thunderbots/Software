@@ -2,9 +2,9 @@
 
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QPushButton>
+#include <g3log/g3log.hpp>
 
 #include "software/ai/hl/stp/play/play.h"
-#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 

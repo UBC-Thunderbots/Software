@@ -10,12 +10,19 @@ jobs:
     - name: "Build, Test, and Run Coverage"
       script:
         - cd src
-        # Run tests and collect coverage
+        # Test Software
         - >
-          bazel coverage //...     \
+          bazel coverage //software/...     \
             --compilation_mode=fastbuild    \
             --verbose_test_summary          \
             --instrumentation_filter=//...  \
+            --test_output=errors
+        # Test Firmware
+        - >
+          bazel coverage //firmware/app/...    \
+            --compilation_mode=fastbuild            \
+            --verbose_test_summary                  \
+            --instrumentation_filter=//...          \
             --test_output=errors
         # Collect Code Coverage Results
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)

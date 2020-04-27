@@ -14,8 +14,7 @@
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 
 #include <algorithm>
-
-#include "software/logger/logger.h"
+#include <g3log/g3log.hpp>
 
 // Creates a struct which inherits all lambda function given to it and uses their
 // Ts::operator(). This can be passed to std::visit to easily write multiple different
@@ -97,7 +96,7 @@ AngularVelocity MotionController::determineAngularVelocityFromPosition(
     const double max_angular_acceleration_radians_per_second_squared)
 {
     // Calculate the angular difference between us and a goal
-    Angle angle_difference = (desired_final_orientation - robot.orientation()).clamp();
+    Angle angle_difference = (desired_final_orientation - robot.orientation()).angleMod();
 
     // Calculate our desired additional turn rate based on a sqrt-esque profile
     // This allows us to rapidly bring the velocity to zero when we're near the
@@ -171,7 +170,7 @@ Vector MotionController::determineLinearVelocityFromPosition(
 
     bool moving_away_from_dest =
         (robot.velocity().orientation() - unit_vector_to_dest.orientation())
-            .clamp()
+            .angleMod()
             .abs() > Angle::quarter();
 
     if (moving_away_from_dest && additional_velocity.length() < robot.velocity().length())

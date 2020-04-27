@@ -1,8 +1,7 @@
 #include "software/ai/intent/intent.h"
 
 #include <algorithm>
-
-#include "software/logger/logger.h"
+#include <g3log/g3log.hpp>
 
 // Implement concrete functions shared by all intents
 

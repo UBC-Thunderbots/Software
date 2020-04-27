@@ -25,7 +25,6 @@ cc_binary(
         "//firmware_new/tools/communication:robot_communicator",
         "//firmware_new/tools/communication/transfer_media:network_medium",
         "//firmware_new/tools/communication/transfer_media:transfer_medium",
-        "//software/logger",
         "@boost//:asio",
         "@com_google_protobuf//:protobuf",
     ],

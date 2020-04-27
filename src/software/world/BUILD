@@ -61,8 +61,8 @@ cc_library(
     hdrs = ["game_state.h"],
     deps = [
         ":ball",
-        "//software/logger",
         "//software/sensor_fusion:refbox_data",
+        "@g3log",
     ],
 )
 

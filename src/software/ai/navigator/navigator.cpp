@@ -1,6 +1,7 @@
 #include "software/ai/navigator/navigator.h"
 
-#include "software/logger/logger.h"
+#include <g3log/g3log.hpp>
+
 #include "software/new_geom/util/distance.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
