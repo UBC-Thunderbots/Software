@@ -29,6 +29,7 @@ cc_test(
     deps = [
         ":obstacle",
         "//software/new_geom:point",
+        "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
     ],
 )

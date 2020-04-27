@@ -21,13 +21,6 @@ class ShapeObstacle
     virtual bool contains(const Point& p) const = 0;
 
     /**
-     * Determines whether the given Segment intersects this ShapeObstacle
-     *
-     * @return true if the given Segment intersects this ShapeObstacle
-     */
-    virtual bool intersects(const Segment& segment) const = 0;
-
-    /**
      * Gets the minimum distance from the obstacle to the point
      *
      * @param point Point to get distance to
@@ -38,9 +31,19 @@ class ShapeObstacle
     virtual double distance(const Point& p) const = 0;
 
     /**
+     * Determines whether the given Segment intersects this ShapeObstacle
+     *
+     * @return true if the given Segment intersects this ShapeObstacle
+     */
+    virtual bool intersects(const Segment& segment) const = 0;
+
+    /**
      * Output string to describe the obstacle
      *
      * @return string that describes the obstacle
      */
-    virtual std::string toString(void) const;
+    virtual std::string toString(void) const
+    {
+        return "ShapeObstacle";
+    }
 };

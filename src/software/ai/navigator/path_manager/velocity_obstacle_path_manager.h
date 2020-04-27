@@ -1,6 +1,6 @@
 #pragma once
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/parameter/dynamic_parameters.h"
 

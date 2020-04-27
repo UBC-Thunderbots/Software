@@ -19,7 +19,7 @@ bool CircleObstacle::intersects(const Segment& segment) const
 
 std::string CircleObstacle::toString(void) const
 {
-    std::ostringstream ss;
-    ss << circle_;
-    return ss.str();
+    //    std::ostringstream ss;
+    //    ss << polygon_;
+    return "hello";
 }
