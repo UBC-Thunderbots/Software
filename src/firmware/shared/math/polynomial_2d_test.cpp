@@ -1,13 +1,12 @@
 extern "C"
 {
-#include "firmware/main/math/polynomial_2d.h"
+#include "firmware/shared/math/polynomial_2d.h"
+
+#include "firmware/shared/math/polynomial_1d.h"
 }
 
 #include <gtest/gtest.h>
-
-#include "math.h"
-#include "polynomial_1d.h"
-#include "polynomial_2d.h"
+#include <math.h>
 
 class Polynomial2dTest : public testing::Test
 {

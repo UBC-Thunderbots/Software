@@ -1,7 +1,7 @@
 #include "software/backend/simulation/simulator_robot.h"
 
 #include "shared/constants.h"
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),

@@ -12,9 +12,9 @@ cc_library(
     restricted_to = ["//cc_toolchain:k8"],
     deps = [
         ":transfer_medium",
+        "//software/logger",
         "//software/multithreading:thread_safe_buffer",
         "@boost//:array",
         "@boost//:asio",
-        "@g3log",
     ],
 )

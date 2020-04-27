@@ -1,11 +1,10 @@
 #include "firmware_new/tools/communication/transfer_media/network_medium.h"
 
-#include <g3log/g3log.hpp>
-
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/asio/error.hpp"
 #include "boost/bind.hpp"
+#include "software/logger/logger.h"
 
 using boost::asio::socket_base;
 using boost::asio::ip::udp;

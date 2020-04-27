@@ -1,7 +1,7 @@
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/simulated_tests/mock_ai_wrapper.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -40,29 +40,6 @@ class MockSimulatedTest : public SimulatedTest
 
     std::shared_ptr<MockAIWrapper> mock_ai_wrapper;
 };
-
-TEST_F(MockSimulatedTest, test_direct_velocity_primitive)
-{
-    enableVisualizer();
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    // Move the ball away from (0, 0) so it doesn't interfere with the robot
-    world.mutableBall() = Ball(Point(6, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot});
-
-    std::vector<ValidationFunction> validation_functions = {};
-
-    std::vector<ValidationFunction> continous_validation_functions = {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                EXPECT_TRUE(true);
-            }};
-
-    backend->startSimulation(world);
-    bool test_passed = world_state_validator->waitForValidationToPass(
-            validation_functions, continous_validation_functions, Duration::fromSeconds(10));
-    EXPECT_TRUE(test_passed);
-}
 
 // NOTE: All these tests use validation functions that assert various things about the
 // timestamp of the world. There is no physics directly involved in these tests, they are

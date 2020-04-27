@@ -2,12 +2,12 @@
 
 #include <time.h>
 
-#include <g3log/g3log.hpp>
 #include <mutex>
 
 #include "shared/constants.h"
 #include "software/backend/output/radio/mrf/dongle.h"
 #include "software/backend/output/radio/mrf/messages.h"
+#include "software/logger/logger.h"
 
 namespace
 {

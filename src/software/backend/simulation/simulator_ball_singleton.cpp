@@ -1,6 +1,6 @@
 #include "software/backend/simulation/simulator_ball_singleton.h"
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 
 std::shared_ptr<SimulatorBall> SimulatorBallSingleton::simulator_ball = nullptr;
 

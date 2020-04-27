@@ -14,7 +14,6 @@ cc_binary(
         "//software/util/design_patterns:generic_factory",
         "//software/visualizer:visualizer_wrapper",
         "@boost//:program_options",
-        "@g3log",
     ],
 )
 

@@ -1,12 +1,11 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/util/closest_point.h"
 
 using namespace Passing;
@@ -194,7 +193,7 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
             best_shot_opt->getPointToShootAt() - robot->position();
         abs_angle_between_pass_and_shot_vectors =
             (robot_to_ball.orientation() - robot_to_shot_target.orientation())
-                .angleMod()
+                .clamp()
                 .abs();
 
         Angle goal_angle =

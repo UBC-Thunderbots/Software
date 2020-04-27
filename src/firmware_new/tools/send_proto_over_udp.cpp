@@ -8,8 +8,8 @@
 #include "firmware_new/proto/control.pb.h"
 #include "firmware_new/tools/communication/robot_communicator.h"
 #include "firmware_new/tools/communication/transfer_media/network_medium.h"
-#include "g3log/g3log.hpp"
 #include "google/protobuf/message.h"
+#include "software/logger/logger.h"
 #include "software/multithreading/thread_safe_buffer.h"
 
 
