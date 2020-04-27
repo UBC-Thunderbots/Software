@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/logger/logger.h"
 
 template <class ReceiveProto>
