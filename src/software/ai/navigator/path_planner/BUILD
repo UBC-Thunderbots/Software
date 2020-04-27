@@ -71,6 +71,7 @@ cc_test(
         ":path_planner",
         ":straight_line_path_planner",
         ":theta_star_path_planner",
+        "//software/ai/navigator/obstacle:obstacle_factory",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

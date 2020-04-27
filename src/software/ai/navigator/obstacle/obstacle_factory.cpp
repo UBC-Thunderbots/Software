@@ -157,10 +157,10 @@ std::vector<Obstacle> ObstacleFactory::createVelocityObstaclesFromTeam(const Tea
     return obstacles;
 }
 
-Obstacle ObstacleFactory::createBallObstacle(const Ball &ball,
+Obstacle ObstacleFactory::createBallObstacle(const Point &ball_position,
                                              double additional_radius_cushion_buffer)
 {
-    return Obstacle(Circle(ball.position(), BALL_MAX_RADIUS_METERS +
-                                                additional_radius_cushion_buffer +
-                                                shape_expansion_amount));
+    return Obstacle(Circle(ball_position, BALL_MAX_RADIUS_METERS +
+                                              additional_radius_cushion_buffer +
+                                              shape_expansion_amount));
 }

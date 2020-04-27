@@ -5,6 +5,7 @@
 #include <typeinfo>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 #include "software/new_geom/point.h"
@@ -22,6 +23,8 @@ static constexpr double DEST_CHECK_EPSILON_M = 1e-3;
 using namespace Test;
 
 using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
+
+ObstacleFactory obstacle_factory(std::make_shared<ObstacleFactoryConfig>());
 
 struct PlannerTestCase
 {
@@ -41,12 +44,11 @@ std::vector<PlannerTestCase>
           .obstacles          = {},
           .should_return_path = true},
 
-         {.name           = "Single stationary robot in path",
-          .start          = Point(0, 0),
-          .dest           = Point(2, 0),
-          .navigable_area = Rectangle({-2, -2}, {2, 2}),
-          .obstacles = {Obstacle::createRobotObstacle(TestUtil::createRobotAtPos({1, 0}),
-                                                      false)},
+         {.name               = "Single stationary robot in path",
+          .start              = Point(0, 0),
+          .dest               = Point(2, 0),
+          .navigable_area     = Rectangle({-2, -2}, {2, 2}),
+          .obstacles          = {obstacle_factory.createRobotObstacle(Point({1, 0}), 1)},
           .should_return_path = true},
 
          {.name               = "Large rectangle in path",
@@ -62,28 +64,17 @@ std::vector<PlannerTestCase>
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
           .obstacles =
               {
-                  Obstacle::createRobotObstacle(TestUtil::createRobotAtPos({1, 0}),
-                                                false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(M_PI / 3), std::sin(M_PI / 3)}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(2 * M_PI / 3), std::sin(2 * M_PI / 3)}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(3 * M_PI / 3), std::sin(3 * M_PI / 3)}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(4 * M_PI / 3), std::sin(4 * M_PI / 3)}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(5 * M_PI / 3), std::sin(5 * M_PI / 3)}),
-                      false),
+                  obstacle_factory.createRobotObstacle(Point({1, 0}), 1),
+                  obstacle_factory.createRobotObstacle(
+                      Point({std::cos(M_PI / 3), std::sin(M_PI / 3)}), 1),
+                  obstacle_factory.createRobotObstacle(
+                      Point({std::cos(2 * M_PI / 3), std::sin(2 * M_PI / 3)}), 1),
+                  obstacle_factory.createRobotObstacle(
+                      Point({std::cos(3 * M_PI / 3), std::sin(3 * M_PI / 3)}), 1),
+                  obstacle_factory.createRobotObstacle(
+                      Point({std::cos(4 * M_PI / 3), std::sin(4 * M_PI / 3)}), 1),
+                  obstacle_factory.createRobotObstacle(
+                      Point({std::cos(5 * M_PI / 3), std::sin(5 * M_PI / 3)}), 1),
               },
           .should_return_path = true},
 
@@ -93,28 +84,24 @@ std::vector<PlannerTestCase>
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
           .obstacles =
               {
-                  Obstacle::createRobotObstacle(TestUtil::createRobotAtPos({0.2, 0}),
-                                                false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(M_PI / 3) * 0.2, std::sin(M_PI / 3) * 0.2}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(2 * M_PI / 3) * 0.2, std::sin(2 * M_PI / 3) * 0.2}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(3 * M_PI / 3) * 0.2, std::sin(3 * M_PI / 3) * 0.2}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(4 * M_PI / 3) * 0.2, std::sin(4 * M_PI / 3) * 0.2}),
-                      false),
-                  Obstacle::createRobotObstacle(
-                      TestUtil::createRobotAtPos(
-                          {std::cos(5 * M_PI / 3) * 0.2, std::sin(5 * M_PI / 3) * 0.2}),
-                      false),
+                  obstacle_factory.createRobotObstacle(Point({0.2, 0}), 1),
+                  obstacle_factory.createRobotObstacle(
+                      Point({std::cos(M_PI / 3) * 0.2, std::sin(M_PI / 3) * 0.2}), 1),
+                  obstacle_factory.createRobotObstacle(
+                      Point({std::cos(2 * M_PI / 3) * 0.2, std::sin(2 * M_PI / 3) * 0.2}),
+                      1),
+                  obstacle_factory
+                      .createRobotObstacle(Point({std::cos(3 * M_PI / 3) * 0.2,
+                                                  std::sin(3 * M_PI / 3) * 0.2}),
+                                           1),
+                  obstacle_factory
+                      .createRobotObstacle(Point({std::cos(4 * M_PI / 3) * 0.2,
+                                                  std::sin(4 * M_PI / 3) * 0.2}),
+                                           1),
+                  obstacle_factory
+                      .createRobotObstacle(Point({std::cos(5 * M_PI / 3) * 0.2,
+                                                  std::sin(5 * M_PI / 3) * 0.2}),
+                                           1),
               },
           .should_return_path = false},
          {.name  = "Start inside a rectangular obstacle, dest is outside of obstacle",
