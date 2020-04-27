@@ -202,6 +202,7 @@ def _make_common_features(ctx):
 
     result["colour_feature"] = feature(
         name = "colour",
+        # the compiler will highlight warnings and errors with colour
         flag_sets = [
             flag_set(
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
