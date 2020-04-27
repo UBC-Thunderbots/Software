@@ -77,18 +77,16 @@ class ObstacleFactory
      * @return obstacle around the robot
      */
     Obstacle createRobotObstacle(const Point &robot_position,
-                                 const double radius_scaling);
+                                 const double radius_scaling = 1.0);
 
     /**
-     * Create circle obstacle around ball with additional_radius_cushion_buffer
+     * Create circle obstacle around ball
      *
-     * @param ball_position                     ball position to make obstacle around
-     * @param additional_radius_cushion_buffer  extra buffer around obstacle
+     * @param ball_position ball position to make obstacle around
      *
      * @return obstacle around the ball
      */
-    Obstacle createBallObstacle(const Point &ball_position,
-                                double additional_radius_cushion_buffer);
+    Obstacle createBallObstacle(const Point &ball_position);
 
     /**
      * Create rectangle-shaped obstacle

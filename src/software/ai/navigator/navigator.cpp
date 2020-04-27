@@ -127,7 +127,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
         if (intent.getBallCollisionType() == BallCollisionType::AVOID)
         {
             auto ball_obstacle =
-                obstacle_factory.createBallObstacle(world.ball().position(), 0.06);
+                obstacle_factory.createBallObstacle(world.ball().position());
             obstacles.push_back(ball_obstacle);
         }
 

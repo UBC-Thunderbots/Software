@@ -260,24 +260,24 @@ TEST_F(TestThetaStarPathPlanner, DISABLED_performance)
     // improvement
     std::vector<std::vector<Obstacle>> obstacle_sets = {
         {
-            obstacle_factory.createRobotObstacle({0, 0}, 1),
-            obstacle_factory.createRobotObstacle({0, 0.5}, 1),
-            obstacle_factory.createRobotObstacle({0, 1.0}, 1),
-            obstacle_factory.createRobotObstacle({0, 1.5}, 1),
+            obstacle_factory.createRobotObstacle({0, 0}),
+            obstacle_factory.createRobotObstacle({0, 0.5}),
+            obstacle_factory.createRobotObstacle({0, 1.0}),
+            obstacle_factory.createRobotObstacle({0, 1.5}),
         },
         {
-            obstacle_factory.createRobotObstacle({0, 0}, 1),
-            obstacle_factory.createRobotObstacle({0, 0.5}, 1),
-            obstacle_factory.createRobotObstacle({0, 1.0}, 1),
-            obstacle_factory.createRobotObstacle({0, 1.5}, 1),
-            obstacle_factory.createRobotObstacle({-0.5, 0}, 1),
-            obstacle_factory.createRobotObstacle({-0.5, 0.5}, 1),
-            obstacle_factory.createRobotObstacle({-0.5, 1.0}, 1),
-            obstacle_factory.createRobotObstacle({-0.5, 1.5}, 1),
-            obstacle_factory.createRobotObstacle({0.5, 0}, 1),
-            obstacle_factory.createRobotObstacle({0.5, 0.5}, 1),
-            obstacle_factory.createRobotObstacle({0.5, 1.0}, 1),
-            obstacle_factory.createRobotObstacle({0.5, 1.5}, 1),
+            obstacle_factory.createRobotObstacle({0, 0}),
+            obstacle_factory.createRobotObstacle({0, 0.5}),
+            obstacle_factory.createRobotObstacle({0, 1.0}),
+            obstacle_factory.createRobotObstacle({0, 1.5}),
+            obstacle_factory.createRobotObstacle({-0.5, 0}),
+            obstacle_factory.createRobotObstacle({-0.5, 0.5}),
+            obstacle_factory.createRobotObstacle({-0.5, 1.0}),
+            obstacle_factory.createRobotObstacle({-0.5, 1.5}),
+            obstacle_factory.createRobotObstacle({0.5, 0}),
+            obstacle_factory.createRobotObstacle({0.5, 0.5}),
+            obstacle_factory.createRobotObstacle({0.5, 1.0}),
+            obstacle_factory.createRobotObstacle({0.5, 1.5}),
         }};
     Field field = ::Test::TestUtil::createSSLDivBField();
 

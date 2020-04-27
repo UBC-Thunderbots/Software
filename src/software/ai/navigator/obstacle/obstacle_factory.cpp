@@ -140,14 +140,6 @@ Obstacle ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
     }
 }
 
-Obstacle ObstacleFactory::createRobotObstacle(const Point &robot_position,
-                                              const double radius_scaling)
-{
-    return createObstacle(
-        Circle(robot_position,
-               radius_scaling * (ROBOT_MAX_RADIUS_METERS + shape_expansion_amount)));
-}
-
 std::vector<Obstacle> ObstacleFactory::createVelocityObstaclesFromTeam(const Team &team)
 {
     std::vector<Obstacle> obstacles;
@@ -158,12 +150,18 @@ std::vector<Obstacle> ObstacleFactory::createVelocityObstaclesFromTeam(const Tea
     return obstacles;
 }
 
-Obstacle ObstacleFactory::createBallObstacle(const Point &ball_position,
-                                             double additional_radius_cushion_buffer)
+Obstacle ObstacleFactory::createBallObstacle(const Point &ball_position)
 {
-    return createObstacle(Circle(ball_position, BALL_MAX_RADIUS_METERS +
-                                                    additional_radius_cushion_buffer +
-                                                    shape_expansion_amount));
+    return createObstacle(
+        Circle(ball_position, BALL_MAX_RADIUS_METERS + 0.06 + shape_expansion_amount));
+}
+
+Obstacle ObstacleFactory::createRobotObstacle(const Point &robot_position,
+                                              const double radius_scaling)
+{
+    return createObstacle(
+        Circle(robot_position,
+               radius_scaling * (ROBOT_MAX_RADIUS_METERS + shape_expansion_amount)));
 }
 
 Obstacle ObstacleFactory::createRectangleObstacle(const Rectangle &rectangle)
