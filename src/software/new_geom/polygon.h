@@ -49,4 +49,8 @@ class Polygon : public virtual Shape
     std::vector<Point> points_;
 };
 
+bool operator==(const Polygon& poly1, const Polygon& poly2);
+
+bool operator!=(const Polygon& poly1, const Polygon& poly2);
+
 std::ostream& operator<<(std::ostream& os, const Polygon& poly);

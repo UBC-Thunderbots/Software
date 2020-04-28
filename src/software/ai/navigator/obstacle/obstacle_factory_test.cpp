@@ -34,7 +34,7 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
     try
     {
         auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+        EXPECT_EQ(expected, polygon_obstacle.getPolygon());
     }
     catch (std::bad_cast)
     {
@@ -138,7 +138,7 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     try
     {
         auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+        EXPECT_EQ(expected, polygon_obstacle.getPolygon());
     }
     catch (std::bad_cast)
     {
@@ -164,7 +164,7 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     try
     {
         auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+        EXPECT_EQ(expected, polygon_obstacle.getPolygon());
     }
     catch (std::bad_cast)
     {
