@@ -169,15 +169,6 @@ class Angle final
     constexpr Angle clamp() const;
 
     /**
-     * Verifies if this angle is kept between [−π, π].
-     *
-     * @param angle the angle to verify.
-     *
-     * @return if the angle is kept between [−π, π].
-     */
-    bool angleBetweenPiAndNegativePi(const Angle &angle) const;
-
-    /**
      * Returns the smallest possible rotational difference between this angle
      * and another angle.
      *
@@ -491,11 +482,6 @@ inline double Angle::tan() const
 inline constexpr Angle Angle::clamp() const
 {
     return remainder(Angle::full());
-}
-
-bool Angle::angleBetweenPiAndNegativePi(const Angle &angle) const
-{
-    return (angle <= fromRadians(M_PI) && angle >= fromRadians(-M_PI));
 }
 
 inline constexpr Angle Angle::minDiff(const Angle &other) const
