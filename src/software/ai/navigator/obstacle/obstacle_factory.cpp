@@ -32,49 +32,19 @@ std::vector<Obstacle> ObstacleFactory::createObstaclesFromMotionConstraint(
         obstacles.push_back(createObstacle(
             Circle(world.ball().position(), 0.5 + shape_expansion_amount)));
     }
-    else if (motion_constraint == MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA)
-    {
-        Rectangle rectangle = world.field().enemyDefenseArea();
-        // 0.3 is by definition what inflated means
-        rectangle.expand(shape_expansion_amount + 0.3);
-        obstacles.push_back(createObstacle(rectangle));
-    }
     else
     {
-        Rectangle rectangle({0, 0}, {1, 1});
-
-        switch (motion_constraint)
+        auto rectangle_ptr =
+            getRectangleFromRectangularMotionConstraint(motion_constraint, world);
+        if (rectangle_ptr)
         {
-            case MotionConstraint::FRIENDLY_DEFENSE_AREA:
-                // We extend the friendly defense area back by several meters to prevent
-                // robots going around the back of the goal
-                rectangle = Rectangle(
-                    world.field().friendlyDefenseArea().posXPosYCorner(),
-                    Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
-                break;
-            case MotionConstraint::ENEMY_DEFENSE_AREA:
-                // We extend the enemy defense area back by several meters to prevent
-                // robots going around the back of the goal
-                rectangle = Rectangle(
-                    world.field().enemyDefenseArea().negXPosYCorner(),
-                    Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
-                break;
-            case MotionConstraint::ENEMY_HALF:
-                rectangle = Rectangle({0, world.field().totalYLength() / 2},
-                                      world.field().enemyCornerNeg() -
-                                          Vector(0, world.field().boundaryYLength()));
-                break;
-            case MotionConstraint::FRIENDLY_HALF:
-                rectangle = Rectangle({0, world.field().totalYLength() / 2},
-                                      world.field().friendlyCornerNeg() -
-                                          Vector(0, world.field().boundaryYLength()));
-                break;
-            default:
-                // already handled in previous if/else
-                break;
+            obstacles.push_back(createObstacle(*rectangle_ptr));
         }
-        rectangle.expand(shape_expansion_amount);
-        obstacles.push_back(createObstacle(rectangle));
+        else
+        {
+            LOG(WARNING) << "No obstacles created for MotionConstraint: "
+                         << motion_constraint;
+        }
     }
     return obstacles;
 }
@@ -178,4 +148,46 @@ Obstacle ObstacleFactory::createObstacle(const Circle &circle)
 Obstacle ObstacleFactory::createObstacle(const Polygon &polygon)
 {
     return Obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+}
+
+std::optional<Rectangle> ObstacleFactory::getRectangleFromRectangularMotionConstraint(
+    const MotionConstraint &motion_constraint, const World &world)
+{
+    Rectangle rectangle({0, 0}, {1, 1});
+    switch (motion_constraint)
+    {
+        case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
+            rectangle = world.field().enemyDefenseArea();
+            // 0.3 is by definition what inflated means
+            rectangle.expand(0.3);
+            break;
+        case MotionConstraint::FRIENDLY_DEFENSE_AREA:
+            // We extend the friendly defense area back by several meters to prevent
+            // robots going around the back of the goal
+            rectangle = Rectangle(
+                world.field().friendlyDefenseArea().posXPosYCorner(),
+                Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
+            break;
+        case MotionConstraint::ENEMY_DEFENSE_AREA:
+            // We extend the enemy defense area back by several meters to prevent
+            // robots going around the back of the goal
+            rectangle = Rectangle(
+                world.field().enemyDefenseArea().negXPosYCorner(),
+                Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
+            break;
+        case MotionConstraint::ENEMY_HALF:
+            rectangle = Rectangle({0, world.field().totalYLength() / 2},
+                                  world.field().enemyCornerNeg() -
+                                      Vector(0, world.field().boundaryYLength()));
+            break;
+        case MotionConstraint::FRIENDLY_HALF:
+            rectangle = Rectangle({0, world.field().totalYLength() / 2},
+                                  world.field().friendlyCornerNeg() -
+                                      Vector(0, world.field().boundaryYLength()));
+            break;
+        default:
+            return std::nullopt;
+    }
+    rectangle.expand(shape_expansion_amount);
+    return std::make_optional<Rectangle>(rectangle);
 }

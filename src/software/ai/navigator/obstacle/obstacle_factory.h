@@ -3,6 +3,7 @@
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/point.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
@@ -105,7 +106,7 @@ class ObstacleFactory
      * Create circle obstacle directly from a Circle
      * Note: this helper function does not add a robot radius
      *
-     *@param circle Circle
+     * @param circle Circle
      *
      * @return circle shaped obstacle
      */
@@ -115,9 +116,21 @@ class ObstacleFactory
      * Create polygon obstacle directly from a Polygon
      * Note: this helper function does not add a robot radius
      *
-     *@param polygon Polygon
+     * @param polygon Polygon
      *
      * @return polygon shaped obstacle
      */
     Obstacle createObstacle(const Polygon &polygon);
+
+    /**
+     * Create rectangle for the given rectangular motion constraint
+     * NOTE: this helper function only handles rectangular motion constraints
+     *
+     * @param motion_constraint The rectangular motion constraint to create obstacles for
+     * @param world World we're enforcing motion constraints in
+     *
+     * @return Rectangle representing the given motion constraint
+     */
+    std::optional<Rectangle> getRectangleFromRectangularMotionConstraint(
+        const MotionConstraint &motion_constraint, const World &world);
 };

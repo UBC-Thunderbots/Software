@@ -31,8 +31,15 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
     Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
     Obstacle obstacle = obstacle_factory.createObstacleFromRectangle(rectangle);
 
-    auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-    EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+    try
+    {
+        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
+        EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "PolygonObstacle was not created for a rectangle";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, create_ball_obstacle)
@@ -42,8 +49,15 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     Circle expected(origin, 0.1985);
     Obstacle obstacle = obstacle_factory.createBallObstacle(origin);
 
-    auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-    EXPECT_EQ(expected, circle_obstacle.getCircle());
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getCircle());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstacle was not created for a ball";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, create_robot_obstacle)
@@ -53,8 +67,15 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     Circle expected(origin, 0.207);
     Obstacle obstacle = obstacle_factory.createRobotObstacle(origin);
 
-    auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-    EXPECT_EQ(expected, circle_obstacle.getCircle());
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getCircle());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstacle was not created for a robot";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
@@ -67,8 +88,15 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
     Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
-    auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-    EXPECT_EQ(expected, circle_obstacle.getCircle());
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getCircle());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstacle was not created for a stationary robot";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
@@ -81,8 +109,15 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
     Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
-    auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-    EXPECT_EQ(expected, circle_obstacle.getCircle());
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getCircle());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstacle was not created for a slow moving robot";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
@@ -100,8 +135,15 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
     Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
-    auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-    EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+    try
+    {
+        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
+        EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "PolygonObstacle was not created for a fast moving robot";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
@@ -119,6 +161,13 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
     Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
-    auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-    EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+    try
+    {
+        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
+        EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "PolygonObstacle was not created for a fast moving robot";
+    }
 }

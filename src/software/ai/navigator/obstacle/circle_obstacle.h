@@ -9,7 +9,7 @@
 class CircleObstacle : public ShapeObstacle
 {
    public:
-    CircleObstacle();
+    CircleObstacle() = delete;
 
     /**
      * Construct a circle obstacle by with a Circle

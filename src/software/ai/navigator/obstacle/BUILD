@@ -31,6 +31,7 @@ cc_library(
         ":obstacle",
         "//software/ai/motion_constraint",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom:point",
         "//software/parameter:dynamic_parameters",
         "//software/world",
