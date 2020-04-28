@@ -54,13 +54,13 @@ TEST_F(MockSimulatedTest, test_direct_velocity_primitive)
     std::vector<ValidationFunction> validation_functions = {};
 
     std::vector<ValidationFunction> continous_validation_functions = {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                EXPECT_TRUE(true);
-            }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            EXPECT_TRUE(true);
+        }};
 
     backend->startSimulation(world);
     bool test_passed = world_state_validator->waitForValidationToPass(
-            validation_functions, continous_validation_functions, Duration::fromSeconds(10));
+        validation_functions, continous_validation_functions, Duration::fromSeconds(10));
     EXPECT_TRUE(test_passed);
 }
 
