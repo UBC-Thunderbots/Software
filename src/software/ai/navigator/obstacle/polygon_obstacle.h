@@ -23,7 +23,7 @@ class PolygonObstacle : public ShapeObstacle
     std::string toString(void) const override;
 
     /**
-     * Gets underlying polygon
+     * Gets the underlying polygon
      *
      * @return polygon
      */

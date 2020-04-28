@@ -41,8 +41,5 @@ class ShapeObstacle
      *
      * @return string that describes the obstacle
      */
-    virtual std::string toString(void) const
-    {
-        return "ShapeObstacle";
-    }
+    virtual std::string toString(void) const = 0;
 };

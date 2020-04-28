@@ -24,7 +24,7 @@ class CircleObstacle : public ShapeObstacle
     std::string toString(void) const override;
 
     /**
-     * Gets underlying circle
+     * Gets the underlying circle
      *
      * @return circle
      */
