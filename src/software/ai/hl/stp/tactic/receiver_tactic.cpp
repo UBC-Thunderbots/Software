@@ -193,7 +193,7 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
             best_shot_opt->getPointToShootAt() - robot->position();
         abs_angle_between_pass_and_shot_vectors =
             (robot_to_ball.orientation() - robot_to_shot_target.orientation())
-                .angleMod()
+                .clamp()
                 .abs();
 
         Angle goal_angle =

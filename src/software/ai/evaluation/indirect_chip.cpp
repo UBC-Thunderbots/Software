@@ -229,12 +229,9 @@ std::optional<Triangle> Evaluation::getLargestValidTriangle(
             double l2                         = (tPoints[2] - tPoints[0]).length();
             double l3                         = (tPoints[2] - tPoints[1]).length();
 
-            Angle a1 =
-                acuteVertexAngle(tPoints[1], tPoints[0], tPoints[2]).angleMod().abs();
-            Angle a2 =
-                acuteVertexAngle(tPoints[0], tPoints[1], tPoints[2]).angleMod().abs();
-            Angle a3 =
-                acuteVertexAngle(tPoints[0], tPoints[2], tPoints[1]).angleMod().abs();
+            Angle a1 = acuteVertexAngle(tPoints[1], tPoints[0], tPoints[2]).clamp().abs();
+            Angle a2 = acuteVertexAngle(tPoints[0], tPoints[1], tPoints[2]).clamp().abs();
+            Angle a3 = acuteVertexAngle(tPoints[0], tPoints[2], tPoints[1]).clamp().abs();
 
             if (area >= largest_area && area >= min_area && l1 >= min_edge_len &&
                 l2 >= min_edge_len && l3 >= min_edge_len &&
