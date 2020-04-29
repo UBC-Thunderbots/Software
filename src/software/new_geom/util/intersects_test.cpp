@@ -57,8 +57,8 @@ TEST(IntersectsTest, segment_contained_in_polygon)
 {
     Polygon p({{-6, 2}, {-1, 1}, {10, 7}, {5, -6}, {-5, -3}});
     Segment s({0, -2}, {4, 1});
-    EXPECT_FALSE(intersects(p, s));
-    EXPECT_FALSE(intersects(s, p));
+    EXPECT_TRUE(intersects(p, s));
+    EXPECT_TRUE(intersects(s, p));
 }
 
 TEST(IntersectsTest, ray_inside_polygon)
@@ -206,16 +206,16 @@ TEST(IntersectsTest, segment_completely_inside_circle)
 {
     Segment s({-8, 4}, {-4, 0});
     Circle c({-6, 2}, 4);
-    EXPECT_FALSE(intersects(s, c));
-    EXPECT_FALSE(intersects(c, s));
+    EXPECT_TRUE(intersects(s, c));
+    EXPECT_TRUE(intersects(c, s));
 }
 
 TEST(IntersectsTest, segment_with_points_on_circle_edge)
 {
     Segment s({-2, 2}, {-6, 6});
     Circle c({-6, 2}, 4);
-    EXPECT_FALSE(intersects(s, c));
-    EXPECT_FALSE(intersects(c, s));
+    EXPECT_TRUE(intersects(s, c));
+    EXPECT_TRUE(intersects(c, s));
 }
 
 TEST(IntersectsTest, segment_circle_intersecting)
