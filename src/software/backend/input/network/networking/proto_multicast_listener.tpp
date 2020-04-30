@@ -72,4 +72,12 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
             << "An unknown network error occurred when attempting to receive ReceiveProto Data. The boost system error code is "
             << error << std::endl;
     }
+
+    if (num_bytes_received == max_buffer_length)
+    {
+        LOG(WARNING)
+            << "The num_bytes_received equals the max_buffer_length, "
+            << "which means that the receive buffer is full and data loss has potentially occurred. "
+            << "Consider increasing max_buffer_length";
+    }
 }
