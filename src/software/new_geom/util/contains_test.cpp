@@ -20,7 +20,7 @@ TEST(ContainsTest, segment_one_point_in_circle_other_point_out)
 {
     Circle c({1.0, 1.0}, 4.0);
     Segment s({-2, 2}, {20, -10});
-    EXPECT_TRUE(containsNew(c, s));
+    EXPECT_FALSE(containsNew(c, s));
 }
 
 
@@ -43,7 +43,7 @@ TEST(ContainsTest, segment_both_points_out_of_circle_passing_through)
 {
     Circle c({1.0, 1.0}, 4.0);
     Segment s({-4, 4}, {2, -4});
-    EXPECT_TRUE(containsNew(c, s));
+    EXPECT_FALSE(containsNew(c, s));
 }
 
 TEST(ContainsTest, segment_completely_out_of_circle)
