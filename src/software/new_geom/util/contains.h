@@ -4,7 +4,8 @@
 #include "software/new_geom/segment.h"
 
 /**
- * Returns true if the Circle contains the Segment, false otherwise
+ * Returns whether the Circle contains the Segment
+ * Segment is considered contained in Circle if both endpoints are inside the Circle
  *
  * @param out
  * @param in
