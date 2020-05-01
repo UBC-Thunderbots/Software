@@ -24,9 +24,6 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
     });
 
     EXPECT_EQ(expected, polygon_obstacle.getPolygon());
-    std::ostringstream polygon_ss;
-    polygon_ss << expected;
-    EXPECT_TRUE(polygon_obstacle.toString().find(polygon_ss.str()) != std::string::npos);
 }
 
 TEST(NavigatorObstacleTest, create_from_circle)
@@ -35,9 +32,37 @@ TEST(NavigatorObstacleTest, create_from_circle)
     CircleObstacle circle_obstacle(expected);
 
     EXPECT_EQ(circle_obstacle.getCircle(), expected);
+}
+
+TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
+{
+    ObstaclePtr obstacle =
+        std::make_shared<PolygonObstacle>(PolygonObstacle(Rectangle({-1, 1}, {2, -3})));
+
+    Polygon expected = Polygon({
+        {-1, -3},
+        {-1, 1},
+        {2, 1},
+        {2, -3},
+    });
+
+    // we expect that the stream operator string for PolygonObstacle will contain the
+    // stream operator string for Polygon
+    std::ostringstream polygon_ss;
+    polygon_ss << expected;
+    EXPECT_TRUE(obstacle->toString().find(polygon_ss.str()) != std::string::npos);
+}
+
+TEST(NavigatorObstacleTest, circle_obstacle_stream_operator_test)
+{
+    Circle expected({2, 2}, 3);
+    ObstaclePtr obstacle = std::make_shared<CircleObstacle>(CircleObstacle(expected));
+
+    // we expect that the stream operator string for CircleObstacle will contain the
+    // stream operator string for Circle
     std::ostringstream circle_ss;
     circle_ss << expected;
-    EXPECT_TRUE(circle_obstacle.toString().find(circle_ss.str()) != std::string::npos);
+    EXPECT_TRUE(obstacle->toString().find(circle_ss.str()) != std::string::npos);
 }
 
 TEST(NavigatorObstacleTest, rectangle_obstacle_contains)
