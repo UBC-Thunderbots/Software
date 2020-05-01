@@ -123,16 +123,4 @@ class ObstacleFactory
      * @return polygon shaped obstacle
      */
     ObstaclePtr createObstacle(const Polygon &polygon);
-
-    /**
-     * Create rectangle for the given rectangular motion constraint
-     * NOTE: this helper function only handles rectangular motion constraints
-     *
-     * @param motion_constraint The rectangular motion constraint to create obstacles for
-     * @param world World we're enforcing motion constraints in
-     *
-     * @return Rectangle representing the given motion constraint
-     */
-    std::optional<Rectangle> getRectangleFromRectangularMotionConstraint(
-        const MotionConstraint &motion_constraint, const World &world);
 };
