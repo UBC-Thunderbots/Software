@@ -83,8 +83,8 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle->distance(inside_point), ::distance(rectangle, inside_point));
-    EXPECT_EQ(obstacle->distance(outside_point), ::distance(rectangle, outside_point));
+    EXPECT_EQ(obstacle->minDistance(inside_point), ::distance(rectangle, inside_point));
+    EXPECT_EQ(obstacle->minDistance(outside_point), ::distance(rectangle, outside_point));
 }
 
 TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
@@ -134,8 +134,8 @@ TEST(NavigatorObstacleTest, polygon_obstacle_distance)
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle->distance(inside_point), ::distance(polygon, inside_point));
-    EXPECT_EQ(obstacle->distance(outside_point), ::distance(polygon, outside_point));
+    EXPECT_EQ(obstacle->minDistance(inside_point), ::distance(polygon, inside_point));
+    EXPECT_EQ(obstacle->minDistance(outside_point), ::distance(polygon, outside_point));
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
@@ -185,8 +185,8 @@ TEST(NavigatorObstacleTest, circle_obstacle_distance)
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(10, 0), outside_point);
 
-    EXPECT_EQ(obstacle->distance(inside_point), ::distance(circle, inside_point));
-    EXPECT_EQ(obstacle->distance(outside_point), ::distance(circle, outside_point));
+    EXPECT_EQ(obstacle->minDistance(inside_point), ::distance(circle, inside_point));
+    EXPECT_EQ(obstacle->minDistance(outside_point), ::distance(circle, outside_point));
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_intersects)

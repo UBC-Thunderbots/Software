@@ -31,7 +31,7 @@ class Obstacle
      *
      * @return distance to point
      */
-    virtual double distance(const Point& p) const = 0;
+    virtual double minDistance(const Point& p) const = 0;
 
     /**
      * Determines whether the given Segment intersects this Obstacle

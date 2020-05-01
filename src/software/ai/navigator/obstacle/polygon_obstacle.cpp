@@ -7,7 +7,7 @@ bool PolygonObstacle::contains(const Point& p) const
     return polygon_.contains(p);
 }
 
-double PolygonObstacle::distance(const Point& p) const
+double PolygonObstacle::minDistance(const Point& p) const
 {
     return ::distance(polygon_, p);
 }

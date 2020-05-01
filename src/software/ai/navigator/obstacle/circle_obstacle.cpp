@@ -7,7 +7,7 @@ bool CircleObstacle::contains(const Point& p) const
     return circle_.contains(p);
 }
 
-double CircleObstacle::distance(const Point& p) const
+double CircleObstacle::minDistance(const Point& p) const
 {
     return ::distance(circle_, p);
 }
