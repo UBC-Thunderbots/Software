@@ -72,8 +72,8 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_contains)
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle->contains(inside_point), rectangle.contains(inside_point));
-    EXPECT_EQ(obstacle->contains(outside_point), rectangle.contains(outside_point));
+    EXPECT_TRUE(obstacle->contains(inside_point));
+    EXPECT_FALSE(obstacle->contains(outside_point));
 }
 
 TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
@@ -83,8 +83,8 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle->minDistance(inside_point), ::distance(rectangle, inside_point));
-    EXPECT_EQ(obstacle->minDistance(outside_point), ::distance(rectangle, outside_point));
+    EXPECT_EQ(obstacle->minDistance(inside_point), 0);
+    EXPECT_EQ(obstacle->minDistance(outside_point), 5);
 }
 
 TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
@@ -96,14 +96,8 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(5, 6), outside_point);
 
-    EXPECT_EQ(obstacle->intersects(intersecting_segment),
-              ::intersects(rectangle, intersecting_segment));
-    EXPECT_EQ(obstacle->intersects(intersecting_segment),
-              ::intersects(rectangle, intersecting_segment));
-    EXPECT_EQ(obstacle->intersects(non_intersecting_segment),
-              ::intersects(rectangle, non_intersecting_segment));
-    EXPECT_EQ(obstacle->intersects(non_intersecting_segment),
-              ::intersects(rectangle, non_intersecting_segment));
+    EXPECT_TRUE(obstacle->intersects(intersecting_segment));
+    EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_contains)
@@ -118,8 +112,8 @@ TEST(NavigatorObstacleTest, polygon_obstacle_contains)
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle->contains(inside_point), polygon.contains(inside_point));
-    EXPECT_EQ(obstacle->contains(outside_point), polygon.contains(outside_point));
+    EXPECT_TRUE(obstacle->contains(inside_point));
+    EXPECT_FALSE(obstacle->contains(outside_point));
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_distance)
@@ -134,8 +128,8 @@ TEST(NavigatorObstacleTest, polygon_obstacle_distance)
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle->minDistance(inside_point), ::distance(polygon, inside_point));
-    EXPECT_EQ(obstacle->minDistance(outside_point), ::distance(polygon, outside_point));
+    EXPECT_EQ(obstacle->minDistance(inside_point), 0);
+    EXPECT_EQ(obstacle->minDistance(outside_point), 5);
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
@@ -152,15 +146,8 @@ TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(5, 6), outside_point);
 
-    EXPECT_EQ(obstacle->intersects(intersecting_segment),
-              ::intersects(polygon, intersecting_segment));
-    EXPECT_EQ(obstacle->intersects(intersecting_segment),
-              ::intersects(polygon, intersecting_segment));
-
-    EXPECT_EQ(obstacle->intersects(non_intersecting_segment),
-              ::intersects(polygon, non_intersecting_segment));
-    EXPECT_EQ(obstacle->intersects(non_intersecting_segment),
-              ::intersects(polygon, non_intersecting_segment));
+    EXPECT_TRUE(obstacle->intersects(intersecting_segment));
+    EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_contains)
@@ -172,8 +159,8 @@ TEST(NavigatorObstacleTest, circle_obstacle_contains)
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(10, 0), outside_point);
 
-    EXPECT_EQ(obstacle->contains(inside_point), circle.contains(inside_point));
-    EXPECT_EQ(obstacle->contains(outside_point), circle.contains(outside_point));
+    EXPECT_TRUE(obstacle->contains(inside_point));
+    EXPECT_FALSE(obstacle->contains(outside_point));
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_distance)
@@ -181,12 +168,12 @@ TEST(NavigatorObstacleTest, circle_obstacle_distance)
     Circle circle({2, 2}, 4);
     ObstaclePtr obstacle(std::make_shared<CircleObstacle>(CircleObstacle(circle)));
     Point inside_point(2, 3);
-    Point outside_point(10, -10);
+    Point outside_point(10, 2);
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(10, 0), outside_point);
 
-    EXPECT_EQ(obstacle->minDistance(inside_point), ::distance(circle, inside_point));
-    EXPECT_EQ(obstacle->minDistance(outside_point), ::distance(circle, outside_point));
+    EXPECT_EQ(obstacle->minDistance(inside_point), 0);
+    EXPECT_EQ(obstacle->minDistance(outside_point), 4);
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_intersects)
@@ -198,13 +185,6 @@ TEST(NavigatorObstacleTest, circle_obstacle_intersects)
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(10, 0), outside_point);
 
-    EXPECT_EQ(obstacle->intersects(intersecting_segment),
-              ::intersects(circle, intersecting_segment));
-    EXPECT_EQ(obstacle->intersects(intersecting_segment),
-              ::intersects(circle, intersecting_segment));
-
-    EXPECT_EQ(obstacle->intersects(non_intersecting_segment),
-              ::intersects(circle, non_intersecting_segment));
-    EXPECT_EQ(obstacle->intersects(non_intersecting_segment),
-              ::intersects(circle, non_intersecting_segment));
+    EXPECT_TRUE(obstacle->intersects(intersecting_segment));
+    EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }
