@@ -34,4 +34,12 @@ class CircleObstacle : public Obstacle
     Circle circle_;
 };
 
+/**
+ * Implements the << operator for printing
+ *
+ * @param ostream The stream to print to
+ * @param circle_obstacle The CircleObstacle to print
+ *
+ * @return The output stream with the string representation of the class appended
+ */
 std::ostream& operator<<(std::ostream& os, const CircleObstacle& circle_obstacle);

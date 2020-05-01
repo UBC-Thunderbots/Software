@@ -33,4 +33,12 @@ class PolygonObstacle : public Obstacle
     Polygon polygon_;
 };
 
+/**
+ * Implements the << operator for printing
+ *
+ * @param ostream The stream to print to
+ * @param polygon_obstacle The PolygonObstacle to print
+ *
+ * @return The output stream with the string representation of the class appended
+ */
 std::ostream& operator<<(std::ostream& os, const PolygonObstacle& polygon_obstacle);
