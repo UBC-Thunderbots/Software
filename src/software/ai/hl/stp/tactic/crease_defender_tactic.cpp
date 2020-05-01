@@ -1,16 +1,16 @@
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
@@ -70,22 +70,11 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             // Figure out how far away the ball is
             double ball_dist = (ball.position() - *defender_reference_position).length();
 
-            double min_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
-                                                     ->getDefenderCreaseTacticConfig()
-                                                     ->MinDefenderSeperationDeg()
-                                                     ->value();
-            double max_defender_seperation_deg = Util::DynamicParameters->getAIConfig()
-                                                     ->getDefenderCreaseTacticConfig()
-                                                     ->MaxDefenderSeperationDeg()
-                                                     ->value();
-            double min_ball_dist = Util::DynamicParameters->getAIConfig()
-                                       ->getDefenderCreaseTacticConfig()
-                                       ->BallDistForMinDefenderSeperation()
-                                       ->value();
-            double max_ball_dist = Util::DynamicParameters->getAIConfig()
-                                       ->getDefenderCreaseTacticConfig()
-                                       ->BallDistForMaxDefenderSeperation()
-                                       ->value();
+            // Experimentally determined to be a reasonable values
+            double min_defender_seperation_deg = 3.0;
+            double max_defender_seperation_deg = 13.0;
+            double min_ball_dist               = 1.0;
+            double max_ball_dist               = 3.0;
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
@@ -152,10 +141,11 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
         // crease defender must follow
         for (auto segment : getPathSegments(field))
         {
-            auto intersection = raySegmentIntersection(shot_ray, segment);
-            if (intersection.first)
+            std::vector<Point> intersections = intersection(shot_ray, segment);
+
+            if (!intersections.empty())
             {
-                defender_position = intersection.first;
+                defender_position = intersections[0];
                 break;
             }
         }
@@ -233,10 +223,11 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
 
     for (auto segment : getPathSegments(field))
     {
-        auto intersection = raySegmentIntersection(ray, segment);
-        if (intersection.first)
+        std::vector<Point> intersections = intersection(ray, segment);
+
+        if (!intersections.empty())
         {
-            return intersection.first;
+            return intersections[0];
         }
     }
 

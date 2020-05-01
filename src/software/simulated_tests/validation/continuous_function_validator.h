@@ -28,7 +28,7 @@ class ContinuousFunctionValidator
      * Runs the ValidationFunction that was given to this FunctionValidator on
      * construction. The ValidationFunction will be restarted if it has completed. As
      * such, the ValidationFunction can never be "done" and will only terminate due to
-     * failures within the ValidationFunction, such as as a failed GoogleTest assert
+     * failures within the ValidationFunction, such as a failed GoogleTest assert
      */
     void executeAndCheckForFailures();
 

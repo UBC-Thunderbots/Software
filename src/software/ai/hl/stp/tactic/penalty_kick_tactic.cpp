@@ -3,8 +3,6 @@
  */
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/dribble_action.h"
@@ -12,6 +10,8 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
+#include "software/new_geom/util/intersection.h"
 
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
@@ -62,20 +62,20 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
     Ray shot_ray = Ray(ball.position(), Vector(robot.value().orientation().cos(),
                                                robot.value().orientation().sin()));
 
-    std::optional<Point> intersect_1 = raySegmentIntersection(shot_ray, goal_line).first;
+    std::vector<Point> intersections = intersection(shot_ray, goal_line);
 
-    if (intersect_1.has_value())
+    if (!intersections.empty())
     {
         // If we have an intersection, calculate if we have a viable shot
 
         const double shooter_to_goal_distance =
-            (robot.value().position() - intersect_1.value()).length();
+            (robot.value().position() - intersections[0]).length();
         const double time_to_score =
             fabs(shooter_to_goal_distance / PENALTY_KICK_SHOT_SPEED) -
             SSL_VISION_DELAY;  // Include the vision delay in our penalty shot
                                // calculations
         const Point goalie_to_goal_distance =
-            (intersect_1.value() = enemy_goalie.value().position());
+            (intersections[0] = enemy_goalie.value().position());
 
         // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
         //          dX - init_vel - (0.5*a*t)t

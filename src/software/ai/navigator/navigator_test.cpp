@@ -7,7 +7,7 @@
 #include "software/ai/navigator/path_planner/no_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/one_point_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/ai/primitive/all_primitives.h"
+#include "software/primitive/all_primitives.h"
 #include "software/test_util/test_util.h"
 
 class NoPathNavigatorTest : public testing::Test
@@ -223,8 +223,6 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
                                                        Angle::fromRadians(2.2), true, 1));
-    //    intents.emplace_back(
-    //        std::make_unique<MoveIntent>(0, Point(), Angle::quarter(), 0, 1));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 

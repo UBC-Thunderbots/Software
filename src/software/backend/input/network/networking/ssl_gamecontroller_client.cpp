@@ -1,6 +1,6 @@
 #include "software/backend/input/network/networking/ssl_gamecontroller_client.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 SSLGameControllerClient::SSLGameControllerClient(
     boost::asio::io_service& io_service, std::string ip_address, unsigned short port,
@@ -18,7 +18,7 @@ SSLGameControllerClient::SSLGameControllerClient(
     {
         LOG(WARNING) << "There was an issue binding the socket to the endpoint when"
                         "trying to connect to the SSL GameController multicast address."
-                        "This may be due to another instance of the the SSLGameController"
+                        "This may be due to another instance of the SSLGameController"
                         "running and using the port already"
                      << std::endl;
         // Throw this exception up to top-level, as we have no valid

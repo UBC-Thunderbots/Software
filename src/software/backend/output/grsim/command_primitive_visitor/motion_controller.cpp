@@ -14,7 +14,8 @@
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 
 #include <algorithm>
-#include <g3log/g3log.hpp>
+
+#include "software/logger/logger.h"
 
 // Creates a struct which inherits all lambda function given to it and uses their
 // Ts::operator(). This can be passed to std::visit to easily write multiple different

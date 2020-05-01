@@ -27,8 +27,9 @@ class Action
    public:
     /**
      * Creates a new Action for the given robot.
+     * @param loop_forever: whether action should continuously restart once its done
      */
-    explicit Action();
+    explicit Action(bool loop_forever);
 
     /**
      * Returns true if the Action is done and false otherwise. The Action is considered
@@ -38,6 +39,11 @@ class Action
      * @return true if the Action is done and false otherwise
      */
     bool done() const;
+
+    /**
+     * Restarts the action logic
+     */
+    void restart();
 
     /**
      * Runs the coroutine and get the next Intent to run from the calculateNextIntent
@@ -111,4 +117,7 @@ class Action
      * @param yield The coroutine push_type for the Action
      */
     virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
+
+    // Whether or not this action should loop forever by restarting each time it is done
+    bool loop_forever;
 };

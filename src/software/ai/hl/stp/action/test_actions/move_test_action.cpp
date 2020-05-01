@@ -3,8 +3,8 @@
 #include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/move_intent.h"
 
-MoveTestAction::MoveTestAction(double close_to_dest_threshold)
-    : Action(), close_to_dest_threshold(close_to_dest_threshold)
+MoveTestAction::MoveTestAction(double close_to_dest_threshold, bool loop_forever)
+    : Action(loop_forever), close_to_dest_threshold(close_to_dest_threshold)
 {
 }
 

@@ -18,9 +18,8 @@ bool HaltTestPlay::isApplicable(const World &world) const
 
 bool HaltTestPlay::invariantHolds(const World &world) const
 {
-    return contains(
-        Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos()),
-        world.ball().position());
+    return Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos())
+        .contains(world.ball().position());
 }
 
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield)

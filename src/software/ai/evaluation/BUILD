@@ -93,7 +93,7 @@ cc_library(
     hdrs = ["detect_threat.h"],
     deps = [
         "//shared:constants",
-        "//software/geom",
+        "//software/new_geom/util:intersection",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -124,6 +124,7 @@ cc_library(
         ":team",
         "//shared:constants",
         "//software/geom",
+        "//software/new_geom/util:intersects",
         "//software/world",
     ],
 )
@@ -144,35 +145,9 @@ cc_library(
     srcs = ["find_open_areas.cpp"],
     hdrs = ["find_open_areas.h"],
     deps = [
-        ":indirect_chip",
         "//software/geom",
         "//software/parameter:dynamic_parameters",
         "//software/world",
-    ],
-)
-
-cc_library(
-    name = "indirect_chip",
-    srcs = ["indirect_chip.cpp"],
-    hdrs = ["indirect_chip.h"],
-    deps = [
-        "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:triangle",
-        "//software/parameter:dynamic_parameters",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "indirect_chip_test",
-    srcs = ["indirect_chip_test.cpp"],
-    deps = [
-        ":indirect_chip",
-        "//software/geom",
-        "//software/test_util",
-        "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 

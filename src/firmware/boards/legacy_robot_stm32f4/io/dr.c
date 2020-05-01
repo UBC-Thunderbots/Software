@@ -134,7 +134,7 @@ void dr_get_ball(dr_ball_data_t *ret)
  * \brief Get the x-component of the robot's position
  * \return The x-component of the robot's position
  */
-float dr_get_robot_position_x()
+float dr_get_robot_position_x(void)
 {
     return current_state.x;
 }
@@ -143,7 +143,7 @@ float dr_get_robot_position_x()
  * \brief Get the y-component of the robot's position
  * \return The y-component of the robot's position
  */
-float dr_get_robot_position_y()
+float dr_get_robot_position_y(void)
 {
     return current_state.y;
 }
@@ -152,7 +152,7 @@ float dr_get_robot_position_y()
  * \brief Get the robot's orientation
  * \return The orientation of the robot
  */
-float dr_get_robot_orientation()
+float dr_get_robot_orientation(void)
 {
     return current_state.angle;
 }
@@ -161,7 +161,7 @@ float dr_get_robot_orientation()
  * \brief Get the x-component of the robot's velocity
  * \return The x-component of the robot's velocity
  */
-float dr_get_robot_velocity_x()
+float dr_get_robot_velocity_x(void)
 {
     return current_state.vx;
 }
@@ -170,7 +170,7 @@ float dr_get_robot_velocity_x()
  * \brief Get the y-component of the robot's velocity
  * \return The y-component of the robot's velocity
  */
-float dr_get_robot_velocity_y()
+float dr_get_robot_velocity_y(void)
 {
     return current_state.vy;
 }
@@ -179,7 +179,7 @@ float dr_get_robot_velocity_y()
  * \brief Get the robot's angular velocity
  * \return The robot's angular velocity
  */
-float dr_get_robot_angular_velocity()
+float dr_get_robot_angular_velocity(void)
 {
     return current_state.avel;
 }
@@ -188,7 +188,7 @@ float dr_get_robot_angular_velocity()
  * \brief Get the x-component of the ball's position
  * \return The x-component of the ball's position
  */
-float dr_get_ball_position_x()
+float dr_get_ball_position_x(void)
 {
     return current_ball_state.x;
 }
@@ -197,7 +197,7 @@ float dr_get_ball_position_x()
  * \brief Get the y-component of the ball's position
  * \return The y-component of the ball's position
  */
-float dr_get_ball_position_y()
+float dr_get_ball_position_y(void)
 {
     return current_ball_state.y;
 }
@@ -206,7 +206,7 @@ float dr_get_ball_position_y()
  * \brief Get the x-component of the ball's velocity
  * \return The x-component of the ball's velocity
  */
-float dr_get_ball_velocity_x()
+float dr_get_ball_velocity_x(void)
 {
     return current_ball_state.vx;
 }
@@ -215,7 +215,7 @@ float dr_get_ball_velocity_x()
  * \brief Get the y-component of the ball's velocity
  * \return The y-component of the ball's velocity
  */
-float dr_get_ball_velocity_y()
+float dr_get_ball_velocity_y(void)
 {
     return current_ball_state.vy;
 }
@@ -238,7 +238,7 @@ void dr_set_robot_frame(int16_t x, int16_t y, int16_t angle)
 }
 
 
-void dr_apply_cam()
+void dr_apply_cam(void)
 {
     float x     = robot_camera_data.x;
     float y     = robot_camera_data.y;

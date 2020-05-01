@@ -5,9 +5,9 @@ cc_library(
     srcs = ["mock_ai_wrapper.cpp"],
     hdrs = ["mock_ai_wrapper.h"],
     deps = [
-        "//software/ai/primitive",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/primitive",
         "//software/world",
     ],
 )

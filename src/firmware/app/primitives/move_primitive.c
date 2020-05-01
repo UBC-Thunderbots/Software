@@ -56,7 +56,6 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * @param pb The data container that has information about major axis time
  * and will store the rotational information
  * @param avel The current rotational velocity of the bot
- * @return void
  */
 void plan_move_rotation(PhysBot* pb, float avel);
 
@@ -66,7 +65,6 @@ void plan_move_rotation(PhysBot* pb, float avel);
  *
  * @param wheel_axes A pointer to the wheel_axes array to populate
  * @param angle the current angle that the bot is facing
- * @return void
  */
 void build_wheel_axes(float (*wheel_axes)[8], float angle)
 {
@@ -120,7 +118,6 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * @param pb The data container that contains information about
  * the direction the robot will move along.
  * @param angle The angle that the robot is currently facing
- * @return void
  */
 void choose_rotation_destination(unsigned optimal_wheel_axes_index, PhysBot* pb,
                                  float angle)
@@ -161,7 +158,6 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     //                end_speed [millimeter/s]
 
     // Convert into m/s and rad/s because physics is in m and s
-    printf("Move start called.\n");
     state->destination[0] = (float)(params->params[0]) / 1000.0f;
     state->destination[1] = (float)(params->params[1]) / 1000.0f;
     state->destination[2] = (float)(params->params[2]) / 100.0f;

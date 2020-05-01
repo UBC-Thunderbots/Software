@@ -1,5 +1,4 @@
 #include <boost/program_options.hpp>
-#include <g3log/g3log.hpp>
 #include <iostream>
 #include <numeric>
 
@@ -7,7 +6,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/visualizer/visualizer_wrapper.h"
 

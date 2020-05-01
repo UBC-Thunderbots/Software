@@ -17,21 +17,15 @@ build_script:
   - |
     if [[ "$JOB_TYPE" == BUILD_TEST_COVERAGE ]]; then
       cd src
-      # Test Software
-      bazel coverage //software/...     \
+      # Run tests and collect coverage
+      bazel coverage //...     \
         --compilation_mode=fastbuild    \
         --verbose_test_summary          \
         --instrumentation_filter=//...  \
         --test_output=errors
-      # Test Firmware
-      bazel coverage //firmware/main/app/...    \
-        --compilation_mode=fastbuild            \
-        --verbose_test_summary                  \
-        --instrumentation_filter=//...          \
-        --test_output=errors
       # Upload coverage results
       bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
-      # Build CPU-specific Targets For Firmware
+      # Build CPU-specific Targets
       bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
       bazel build --cpu=stm32f4 //firmware:firmware_old_main_bin
     elif [[ "$JOB_TYPE" == FORMATTING_CHECK ]]; then

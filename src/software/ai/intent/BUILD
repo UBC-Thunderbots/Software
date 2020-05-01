@@ -7,7 +7,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:catch_primitive",
+        "//software/primitive:catch_primitive",
     ],
 )
 
@@ -27,7 +27,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:chip_primitive",
+        "//software/primitive:chip_primitive",
     ],
 )
 
@@ -47,7 +47,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:direct_velocity_primitive",
+        "//software/primitive:direct_velocity_primitive",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:direct_wheels_primitive",
+        "//software/primitive:direct_wheels_primitive",
     ],
 )
 
@@ -87,7 +87,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:dribble_primitive",
+        "//software/primitive:dribble_primitive",
     ],
 )
 
@@ -107,7 +107,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:kick_primitive",
+        "//software/primitive:kick_primitive",
     ],
 )
 
@@ -127,7 +127,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:move_primitive",
+        "//software/primitive:move_primitive",
     ],
 )
 
@@ -147,7 +147,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:movespin_primitive",
+        "//software/primitive:movespin_primitive",
     ],
 )
 
@@ -167,7 +167,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:pivot_primitive",
+        "//software/primitive:pivot_primitive",
     ],
 )
 
@@ -187,7 +187,7 @@ cc_library(
     deps = [
         ":intent",
         ":intent_visitor",
-        "//software/ai/primitive:stop_primitive",
+        "//software/primitive:stop_primitive",
     ],
 )
 
@@ -223,7 +223,7 @@ cc_library(
     hdrs = ["intent.h"],
     deps = [
         "//software/ai/motion_constraint",
-        "@g3log",
+        "//software/logger",
     ],
 )
 

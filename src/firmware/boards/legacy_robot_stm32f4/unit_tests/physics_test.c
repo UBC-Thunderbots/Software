@@ -57,7 +57,7 @@ END_TEST
 /**
  * Test function manager for physics.c
  */
-void run_physics_test()
+void run_physics_test(void)
 {
     // Put the name of the suite of tests in here
     Suite *s = suite_create("Physics Test");

@@ -1,6 +1,5 @@
 #pragma once
 
-// Need this for size_t
 #include <stddef.h>
 
 #include "firmware/shared/math/polynomial_1d.h"

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/ai/primitive/primitive.h"
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
 /**
@@ -12,7 +12,7 @@
  * need to be sent out (generally to the robots).
  *
  * This produce/consume pattern is performed by extending both "Observer" and
- * "Subject". Please see the the implementation of those classes for details.
+ * "Subject". Please see the implementation of those classes for details.
  */
 class Backend : public Subject<World>,
                 public Subject<RobotStatus>,

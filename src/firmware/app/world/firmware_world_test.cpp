@@ -8,12 +8,12 @@ extern "C"
 class FirmwareWorldTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         firmware_world = app_firmware_world_create(robot, ball);
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_firmware_world_destroy(firmware_world);
     }

@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <chrono>
 #include <exception>
-#include <g3log/g3log.hpp>
 #include <random>
 
 #include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
@@ -14,6 +13,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 #include "software/ai/intent/stop_intent.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -300,7 +300,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    std::string info_play_type = to_string(current_game_state);
+    std::string info_play_type = toString(current_game_state);
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     std::unordered_set<std::string> info_robot_tactic_assignment = {};
     info = PlayInfo(info_play_type, info_play_name, info_robot_tactic_assignment);

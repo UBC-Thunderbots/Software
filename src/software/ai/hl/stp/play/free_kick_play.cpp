@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/play/free_kick_play.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/ball.h"
 #include "software/ai/evaluation/possession.h"
@@ -11,7 +9,7 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
-#include "software/logger/custom_logging_levels.h"
+#include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 using namespace Passing;
@@ -70,10 +68,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region(world.field().centerPoint(),
-                                          world.field().enemyCornerPos());
-    Rectangle cherry_pick_2_target_region(world.field().centerPoint(),
-                                          world.field().enemyCornerNeg());
+    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
+    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
@@ -100,8 +96,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(
-        Rectangle(Point(0, world.field().yLength() / 2), world.field().enemyCornerNeg()));
+    pass_generator.setTargetRegion(world.field().enemyHalf());
 
     // Wait for a robot to be assigned to aligned to the ball to pass
     while (!align_to_ball_tactic->getAssignedRobot())
@@ -198,10 +193,8 @@ void FreeKickPlay::chipAtGoalStage(
     auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), false);
 
     // Figure out where the fallback chip target is
-    double fallback_chip_target_x_offset = Util::DynamicParameters->getAIConfig()
-                                               ->getShootOrChipPlayConfig()
-                                               ->FallbackChipTargetEnemyGoalOffset()
-                                               ->value();
+    // This is exerimentally determined to be a reasonable value
+    double fallback_chip_target_x_offset = 1.5;
     Point chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
 

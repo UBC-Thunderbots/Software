@@ -11,9 +11,9 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util:distance",
         "//software/world",
-        "@g3log",
     ],
 )
 
@@ -37,7 +37,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -81,7 +81,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -97,7 +97,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
+        "//software/new_geom/util:intersection",
     ],
 )
 
@@ -154,7 +155,9 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
+        "//software/new_geom:line",
+        "//software/new_geom/util:intersection",
     ],
 )
 
@@ -163,6 +166,9 @@ cc_test(
     srcs = ["goalie_tactic_test.cpp"],
     deps = [
         ":goalie_tactic",
+        "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
@@ -179,7 +185,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -205,7 +211,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -230,7 +236,17 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "patrol_tactic_test",
+    srcs = ["patrol_tactic_test.cpp"],
+    deps = [
+        ":patrol_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -247,7 +263,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
+        "//software/new_geom/util:intersection",
     ],
 )
 
@@ -264,7 +281,7 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -280,8 +297,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util",
-        "@g3log",
     ],
 )
 
@@ -308,7 +325,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -333,9 +350,9 @@ cc_library(
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util:distance",
         "//software/parameter:dynamic_parameters",
-        "@g3log",
     ],
 )
 
@@ -364,8 +381,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
+        "//software/logger",
         "//software/parameter:dynamic_parameters",
-        "@g3log",
     ],
 )
 
@@ -390,7 +407,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 

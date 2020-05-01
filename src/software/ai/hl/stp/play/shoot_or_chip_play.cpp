@@ -1,11 +1,8 @@
 #include "software/ai/hl/stp/play/shoot_or_chip_play.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
-#include "software/ai/evaluation/indirect_chip.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
@@ -14,7 +11,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
@@ -87,10 +84,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
     // Figure out where the fallback chip target is
-    double fallback_chip_target_x_offset = Util::DynamicParameters->getAIConfig()
-                                               ->getShootOrChipPlayConfig()
-                                               ->FallbackChipTargetEnemyGoalOffset()
-                                               ->value();
+    // Experimentally determined to be a reasonable value
+    double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);

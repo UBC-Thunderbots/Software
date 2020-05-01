@@ -89,7 +89,7 @@ START_TEST(test_radians)
 }
 END_TEST
 
-void run_util_test()
+void run_util_test(void)
 {
     Suite *s  = suite_create("Util Test");
     TCase *tc = tcase_create("Core");

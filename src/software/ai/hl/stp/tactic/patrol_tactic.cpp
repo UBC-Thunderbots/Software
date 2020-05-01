@@ -1,10 +1,9 @@
 #include "software/ai/hl/stp/tactic/patrol_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/logger/logger.h"
 
 
 PatrolTactic::PatrolTactic(const std::vector<Point> &points,
@@ -77,6 +76,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             AutokickType::NONE, BallCollisionType::AVOID);
         if (move_action->done())
         {
+            move_action->restart();
             patrol_point_index = (patrol_point_index + 1) % patrol_points.size();
             move_action->updateControlParams(
                 *robot, patrol_points.at(patrol_point_index),
@@ -84,7 +84,6 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
                 BallCollisionType::AVOID);
         }
-
         yield(move_action);
     } while (true);
 }

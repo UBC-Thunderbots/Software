@@ -17,7 +17,7 @@
  * refbox data, and robot statuses
  *
  * This produce/consume pattern is performed by extending both "Observer" and
- * "Subject". Please see the the implementation of those classes for details.
+ * "Subject". Please see the implementation of those classes for details.
  */
 class SensorFusion : public Subject<World>,
                      public ThreadedObserver<RefboxData>,

@@ -1,6 +1,6 @@
 #include "software/backend/input/network/ssl_vision_client.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
 SSLVisionClient::SSLVisionClient(boost::asio::io_service& io_service,
                                  const std::string ip_address, const unsigned short port,
@@ -18,7 +18,7 @@ SSLVisionClient::SSLVisionClient(boost::asio::io_service& io_service,
     {
         LOG(WARNING) << "There was an issue binding the socket to the endpoint when"
                         "trying to connect to the SSL Vision multicast address. This may"
-                        "be due to another instance of the the SSLVisionClient running"
+                        "be due to another instance of the SSLVisionClient running"
                         "and using the port already"
                      << std::endl;
         // Throw this exception up to top-level, as we have no valid

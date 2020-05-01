@@ -3,13 +3,12 @@
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
-#include "software/ai/primitive/primitive.h"
+#include "software/primitive/primitive.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
 /**
- * This class wraps all our AI logic and decision making to help separate our
- * logic from ROS communication as much as possible.
+ * This class wraps all our AI logic and decision making.
  */
 class AI final
 {

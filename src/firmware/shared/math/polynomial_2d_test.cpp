@@ -1,20 +1,22 @@
 extern "C"
 {
 #include "firmware/shared/math/polynomial_2d.h"
+<<<<<<< HEAD
+=======
+
+#include "firmware/shared/math/polynomial_1d.h"
+>>>>>>> 4bd3d244adb7bfcdf7c4b4e018226c8a93866e73
 }
 
 #include <gtest/gtest.h>
-
-#include "math.h"
-#include "polynomial_1d.h"
-#include "polynomial_2d.h"
+#include <math.h>
 
 class Polynomial2dTest : public testing::Test
 {
    protected:
-    virtual void SetUp() {}
+    virtual void SetUp(void) {}
 
-    virtual void TearDown() {}
+    virtual void TearDown(void) {}
 
     static void expectRawArraysEq(float* expected, float* actual, size_t num_elements,
                                   double tolerance = 10e-10)

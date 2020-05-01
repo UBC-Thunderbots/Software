@@ -5,13 +5,13 @@
 
 #include "software/ai/passing/cost_function.h"
 
-#include <g3log/g3log.hpp>
 #include <numeric>
 
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
 using namespace Passing;
@@ -186,7 +186,7 @@ double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pas
     // the reception point before the ball. We take the greater of these two risks.
 
     // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
-    // the the receiver point for the pass, then it is guaranteed that it will not be
+    // the receiver point for the pass, then it is guaranteed that it will not be
     // able to intercept the pass anywhere.
 
     // Figure out how long the enemy robot and ball will take to reach the closest
