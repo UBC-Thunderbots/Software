@@ -21,7 +21,7 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto stop_action = std::make_shared<StopAction>(false);
+    auto stop_action = std::make_shared<StopAction>();
 
     do
     {

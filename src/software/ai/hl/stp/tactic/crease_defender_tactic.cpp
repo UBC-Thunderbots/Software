@@ -180,7 +180,7 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
 void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto move_action = std::make_shared<MoveAction>(false, 0, Angle());
-    auto stop_action = std::make_shared<StopAction>(false);
+    auto stop_action = std::make_shared<StopAction>();
     do
     {
         std::optional<std::pair<Point, Angle>> desired_robot_state_opt =
