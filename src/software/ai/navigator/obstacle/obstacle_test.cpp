@@ -21,7 +21,7 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
         {2, -3},
     });
 
-    EXPECT_EQ(expected.getPoints(), polygon_obstacle.getPolygon().getPoints());
+    EXPECT_EQ(expected, polygon_obstacle.getPolygon());
     std::ostringstream polygon_ss;
     polygon_ss << expected;
     EXPECT_TRUE(polygon_obstacle.toString().find(polygon_ss.str()) != std::string::npos);
