@@ -58,7 +58,6 @@ void ChipAction::accept(MutableActionVisitor& visitor)
 
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
-
     // How large the triangle is that defines the region where the robot is
     // behind the ball and ready to chip.
     // We want to keep the region small enough that we won't use the ChipIntent from too
@@ -70,7 +69,6 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 
     do
     {
-
         // ASCII art showing the region behind the ball
         // Diagram not to scale
         //
@@ -92,7 +90,8 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         // A vector in the direction opposite the chip (behind the ball)
 
-        Vector behind_ball = Vector::createFromAngle(this->chip_direction + Angle::half());
+        Vector behind_ball =
+            Vector::createFromAngle(this->chip_direction + Angle::half());
 
 
         // The points below make up the triangle that defines the region we treat as
@@ -103,26 +102,27 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // inside it when taking the chip.
         Point behind_ball_vertex_A = chip_origin;
         Point behind_ball_vertex_B =
-                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
         Point behind_ball_vertex_C =
-                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
         Triangle behind_ball_region =
-                Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
+            Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
         bool robot_behind_ball = behind_ball_region.contains(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-                chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
+            chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
         // If we're not in position to chip, move into position
         if (!robot_behind_ball)
         {
-            yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, chip_direction,
-                                               0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                                               AutokickType::NONE, BallCollisionType::ALLOW));
+            yield(std::make_unique<MoveIntent>(
+                robot->id(), point_behind_ball, chip_direction, 0.0, 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                BallCollisionType::ALLOW));
         }
         else
         {
@@ -132,5 +132,4 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
 
     } while (true);
-
 }
