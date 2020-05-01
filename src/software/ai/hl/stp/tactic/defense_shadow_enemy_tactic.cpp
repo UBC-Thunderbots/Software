@@ -71,6 +71,9 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
             LOG(WARNING) << "Running DefenseShadowEnemyTactic without an enemy threat";
             stop_action->updateControlParams(*robot, false);
             yield(stop_action);
+            if(stop_action->done()) {
+                stop_action->restart();
+            }
         }
 
         Robot enemy_robot                   = enemy_threat->robot;

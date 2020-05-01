@@ -69,6 +69,9 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         {
             stop_action->updateControlParams(*robot, false);
             yield(stop_action);
+            if(stop_action->done()) {
+                stop_action->restart();
+            }
         }
 
         Robot enemy_robot = enemy_threat->robot;
