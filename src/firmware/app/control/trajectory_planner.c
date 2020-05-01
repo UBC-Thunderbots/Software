@@ -121,7 +121,6 @@ void generate_constant_arc_length_segmentation(
         {
             velocity_profile[i] = max_allowable_speed_profile[i];
         }
-
         else
         {
             // If the new speed is greater than the maximum limit of the robot, reduce it
