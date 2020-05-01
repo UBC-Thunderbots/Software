@@ -102,3 +102,13 @@ void generate_constant_arc_length_segmentation(
  */
 Trajectory_t interpolate_constant_time_trajectory_segmentation(
     Trajectory_t* variable_time_trajectory, const double interpolation_period);
+
+
+/**
+ * Returns a the total length of any arc specified by an arc parameterizaton
+ *
+ * @param arc_length_param [in] Arc length parameterization
+ * 
+ * @return [out] The arc length in meters
+ */
+double getTotalArcLength(ArcLengthParametrization_t arc_length_param);

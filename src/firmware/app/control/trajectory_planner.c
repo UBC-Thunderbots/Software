@@ -5,6 +5,7 @@
 #include "firmware/shared/math/vector_2d.h"
 #include "math.h"
 #include "stdio.h"
+#include <stdbool.h>
 
 void generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
@@ -30,7 +31,7 @@ void generate_constant_arc_length_segmentation(
     trajectory->num_elements = path_parameters.num_segments;
 
     // Variable used to flag if the path is moving "backwards" along the input path
-    unsigned int reverse_parameterization = 0;
+    bool reverse_parameterization = false;
 
 
     // Check for the parameterization direction
@@ -38,7 +39,7 @@ void generate_constant_arc_length_segmentation(
     // reversed again in the end)
     if (t_end < t_start)
     {
-        reverse_parameterization = 1;
+        reverse_parameterization = true;
 
         // Reverse the direction (Polynomial library can only handle forwards direction)
         double temp = t_start;
@@ -61,7 +62,7 @@ void generate_constant_arc_length_segmentation(
                                                         arc_length_param);
 
     const double arc_segment_length =
-        arc_length_param.arc_length_values[arc_length_param.num_values - 1] /
+        getTotalArcLength(arc_length_param) /
         num_segments;
 
     Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
@@ -121,18 +122,15 @@ void generate_constant_arc_length_segmentation(
         {
             velocity_profile[i] = max_allowable_speed_profile[i];
         }
+        // If the new speed is greater than the maximum limit of the robot, reduce it
+        // to the limit
+        else if (temp_vel >= max_allowable_speed)
+        {
+                velocity_profile[i] = max_allowable_speed;
+        }
         else
         {
-            // If the new speed is greater than the maximum limit of the robot, reduce it
-            // to the limit
-            if (temp_vel >= max_allowable_speed)
-            {
-                velocity_profile[i] = max_allowable_speed;
-            }
-            else
-            {
-                velocity_profile[i] = temp_vel;
-            }
+            velocity_profile[i] = temp_vel;
         }
     }
 
@@ -163,8 +161,9 @@ void generate_constant_arc_length_segmentation(
     }
 
     // If the parameterization ended up being reversed, we need to flip all the values
-    // back
-    if (reverse_parameterization == 1)
+    // back.
+    // TODO: Remove the 'reverse parameterization' hack #1322
+    if (reverse_parameterization == true)
     {
         const double path_duration = traj_elements[num_segments - 1].time;
 
@@ -250,4 +249,9 @@ Trajectory_t interpolate_constant_time_trajectory_segmentation(
     ret.num_elements        = time_periods;
 
     return ret;
+}
+
+
+double getTotalArcLength(ArcLengthParametrization_t arc_length_param) {
+    return arc_length_param.arc_length_values[arc_length_param.num_values-1];
 }
