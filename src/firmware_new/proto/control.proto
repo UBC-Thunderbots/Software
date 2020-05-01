@@ -3,17 +3,16 @@ syntax = "proto2";
 // A test robot msg which serves as an example to modify and use to
 // facilitate firmware testing.
 
-message control_msg {
-
-    required wheel_speed_msg wheel_1_control = 1;
-    optional wheel_speed_msg wheel_2_control = 2;
-    optional wheel_speed_msg wheel_3_control = 3;
-    optional wheel_speed_msg wheel_4_control = 4;
-
+message ControlMsg
+{
+    required WheelSpeedMsg wheel_1_control = 1;
+    optional WheelSpeedMsg wheel_2_control = 2;
+    optional WheelSpeedMsg wheel_3_control = 3;
+    optional WheelSpeedMsg wheel_4_control = 4;
 }
 
-message wheel_speed_msg {
-
+message WheelSpeedMsg
+{
     // speed at which to rotate
     required uint32 rpm = 1;
 
@@ -22,6 +21,7 @@ message wheel_speed_msg {
 }
 
 // Robot response
-message robot_ack {
+message RobotAck
+{
     required uint32 msg_count = 1;
 }

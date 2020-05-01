@@ -3,9 +3,9 @@
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/ai/primitive/move_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/primitive/move_primitive.h"
 
 class MoveAction : public Action
 {
@@ -100,5 +100,4 @@ class MoveAction : public Action
 
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;
-    bool loop_forever;
 };

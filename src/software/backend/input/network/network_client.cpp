@@ -38,7 +38,6 @@ void NetworkClient::setupVisionClient(std::string vision_address, int vision_por
     }
     catch (const boost::exception& ex)
     {
-        // LOG(FATAL) will terminate this process
         LOG(FATAL) << "An error occured while setting up the SSL Vision Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;
@@ -57,7 +56,6 @@ void NetworkClient::setupGameControllerClient(std::string gamecontroller_address
     }
     catch (const boost::exception& ex)
     {
-        // LOG(FATAL) will terminate this process
         LOG(FATAL) << "An error occured while setting up the SSL GameController Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;

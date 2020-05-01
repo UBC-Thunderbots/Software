@@ -1,4 +1,4 @@
-#include "software/ai/primitive/pivot_primitive.h"
+#include "software/primitive/pivot_primitive.h"
 
 #include <gtest/gtest.h>
 
@@ -58,7 +58,7 @@ MotionController::PositionCommand get_motion_command(Robot& robot,
 }
 
 // robot needs to pick the shortest path to rotate, based on where it is and the magnitude
-// of of the vector from its next position to the final position.
+// of the vector from its next position to the final position.
 
 // Test picking a clockwise path
 TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest, visit_pivot_primtive_clockwise)

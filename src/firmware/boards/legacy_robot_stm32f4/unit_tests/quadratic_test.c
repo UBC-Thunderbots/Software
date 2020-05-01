@@ -98,7 +98,7 @@ END_TEST
 /**
  * Test function manager for quadratic.c
  */
-void run_quadratic_test()
+void run_quadratic_test(void)
 {
     // Put the name of the suite of tests in here
     Suite *s = suite_create("Qudratic Test");

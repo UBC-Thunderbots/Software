@@ -65,7 +65,6 @@ PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
  * @param c A major or minor axis component that contains displacement and
  * velocity information
  * @param p A 3 length array of {final velocity, max acceleration, max_velocity}
- * @return void
  */
 void app_physbot_planMove(Component *c, float *p);
 
@@ -81,7 +80,6 @@ void app_physbot_planMove(Component *c, float *p);
  * @param angle the angle that the robot is facing
  * @param major_vec the major vector components on the global axis
  * @param minor_vec the minor vector components on the global axis
- * @return void
  */
 void app_physbot_computeAccelInLocalCoordinates(float *accel, PhysBot pb, float angle,
                                                 float *major_vec, float *minor_vec);

@@ -156,7 +156,7 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
         });
 
     // NOTE: We need to return this in order to prevent it being destructed so
-    //       the the lock is maintained until the value is read
+    //       the lock is maintained until the value is read
     return buffer_lock;
 }
 

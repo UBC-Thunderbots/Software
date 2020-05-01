@@ -8,7 +8,7 @@ extern "C"
 class ChickerTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         requested_kick_speed             = 0;
         requested_chip_distance          = 0;
@@ -22,7 +22,7 @@ class ChickerTest : public testing::Test
                                      &(this->disableAutoKick), &(this->disableAutoChip));
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_chicker_destroy(chicker);
     }
@@ -47,12 +47,12 @@ class ChickerTest : public testing::Test
         autochip_requested_chip_distance = distance;
     }
 
-    static void disableAutoChip()
+    static void disableAutoChip(void)
     {
         autochip_disabled = true;
     }
 
-    static void disableAutoKick()
+    static void disableAutoKick(void)
     {
         autokick_disabled = true;
     }

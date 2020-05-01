@@ -11,9 +11,9 @@ extern "C"
 class Polynomial2dTest : public testing::Test
 {
    protected:
-    virtual void SetUp() {}
+    virtual void SetUp(void) {}
 
-    virtual void TearDown() {}
+    virtual void TearDown(void) {}
 
     static void expectRawArraysEq(float* expected, float* actual, size_t num_elements,
                                   double tolerance = 10e-10)

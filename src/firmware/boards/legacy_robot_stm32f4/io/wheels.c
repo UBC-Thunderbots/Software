@@ -267,22 +267,22 @@ float wheels_get_wheel_rpm(int wheel_index)
     return (float)encoder_speed(wheel_index) * QUARTERDEGREE_TO_RPM;
 }
 
-float wheels_get_front_left_rpm()
+float wheels_get_front_left_rpm(void)
 {
     return wheels_get_wheel_rpm(0);
 }
 
-float wheels_get_front_right_rpm()
+float wheels_get_front_right_rpm(void)
 {
     return wheels_get_wheel_rpm(3);
 }
 
-float wheels_get_back_left_rpm()
+float wheels_get_back_left_rpm(void)
 {
     return wheels_get_wheel_rpm(1);
 }
 
-float wheels_get_back_right_rpm()
+float wheels_get_back_right_rpm(void)
 {
     return wheels_get_wheel_rpm(2);
 }
@@ -323,42 +323,42 @@ void apply_wheel_force_back_left(float force_in_newtons)
     apply_wheel_force(1, force_in_newtons);
 }
 
-void wheels_coast_front_left()
+void wheels_coast_front_left(void)
 {
     wheels_coast(0);
 }
 
-void wheels_coast_front_right()
+void wheels_coast_front_right(void)
 {
     wheels_coast(3);
 }
 
-void wheels_coast_back_left()
+void wheels_coast_back_left(void)
 {
     wheels_coast(1);
 }
 
-void wheels_coast_back_right()
+void wheels_coast_back_right(void)
 {
     wheels_coast(2);
 }
 
-void wheels_brake_front_left()
+void wheels_brake_front_left(void)
 {
     wheels_brake(0);
 }
 
-void wheels_brake_front_right()
+void wheels_brake_front_right(void)
 {
     wheels_brake(3);
 }
 
-void wheels_brake_back_left()
+void wheels_brake_back_left(void)
 {
     wheels_brake(1);
 }
 
-void wheels_brake_back_right()
+void wheels_brake_back_right(void)
 {
     wheels_brake(2);
 }

@@ -1,8 +1,8 @@
 #include "software/handheld_controller/controller_primitive_generator.h"
 
-#include "software/ai/primitive/chip_primitive.h"
-#include "software/ai/primitive/direct_velocity_primitive.h"
-#include "software/ai/primitive/kick_primitive.h"
+#include "software/primitive/chip_primitive.h"
+#include "software/primitive/direct_velocity_primitive.h"
+#include "software/primitive/kick_primitive.h"
 
 ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)

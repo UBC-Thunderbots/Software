@@ -1,4 +1,4 @@
-#include "software/ai/primitive/catch_primitive.h"
+#include "software/primitive/catch_primitive.h"
 
 #include <gtest/gtest.h>
 

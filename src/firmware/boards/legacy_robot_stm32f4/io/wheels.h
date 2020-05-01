@@ -45,10 +45,10 @@ void wheels_tick(log_record_t *record);
  * Get the RPM of each wheel
  * @return The RPM of a wheel
  */
-float wheels_get_front_left_rpm();
-float wheels_get_front_right_rpm();
-float wheels_get_back_left_rpm();
-float wheels_get_back_right_rpm();
+float wheels_get_front_left_rpm(void);
+float wheels_get_front_right_rpm(void);
+float wheels_get_back_left_rpm(void);
+float wheels_get_back_right_rpm(void);
 
 // Apply wheel force to specific wheels
 // TODO: jdoc with direction
@@ -60,17 +60,17 @@ void apply_wheel_force_back_left(float force_in_newtons);
 /**
  * Coast each wheel
  */
-void wheels_coast_front_left();
-void wheels_coast_front_right();
-void wheels_coast_back_left();
-void wheels_coast_back_right();
+void wheels_coast_front_left(void);
+void wheels_coast_front_right(void);
+void wheels_coast_back_left(void);
+void wheels_coast_back_right(void);
 
 /**
  * Brake each wheel
  */
-void wheels_brake_front_left();
-void wheels_brake_front_right();
-void wheels_brake_back_left();
-void wheels_brake_back_right();
+void wheels_brake_front_left(void);
+void wheels_brake_front_right(void);
+void wheels_brake_back_left(void);
+void wheels_brake_back_right(void);
 
 #endif

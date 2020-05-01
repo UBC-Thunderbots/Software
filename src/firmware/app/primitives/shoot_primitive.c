@@ -26,7 +26,6 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ShootPrimitiveState_t)
  *
  * @param pb The PhysBot data container that contains information about the
  * major and minor axis.
- * @return void
  */
 void scale(PhysBot *pb)
 {
@@ -38,12 +37,6 @@ void scale(PhysBot *pb)
         float minor_axis_factor = 1 - abs_factor;
         pb->maj.accel *= minor_axis_factor;
     }
-
-    // Doesn't work that well. Possibly because total_rot is updated too often
-    //    if (total_rot != 0) {
-    //        float rot_factor = 1 - fabsf(pb->rot.disp / total_rot);
-    //        pb->maj.accel *= rot_factor;
-    //    }
 }
 
 
@@ -56,7 +49,6 @@ void scale(PhysBot *pb)
  * @param pb The PhysBot data container that should have minor axis time and
  * will store the rotational information
  * @param avel The rotational velocity of the bot
- * @return void
  */
 void plan_shoot_rotation(PhysBot *pb, float avel)
 {

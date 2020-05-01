@@ -1,9 +1,9 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/primitive/catch_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/primitive/catch_primitive.h"
 
 class CatchIntent : public CatchPrimitive, public Intent
 {

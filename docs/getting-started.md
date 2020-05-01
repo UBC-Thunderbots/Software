@@ -168,7 +168,7 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 ## Flashing And Debugging A STM32F4 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a STM32F4 based main board or radio dongle plugged into your computer. Do not plug both the dongle and the robot at the same time!
 2. Make sure the robot is elevated, with the wheels not touching any surface to avoid experimental firmware causing accidental damage.
-3. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:flash_firmware radio_dongle`. Replace `radio_dongle`, with `robot` to flash the robot.
+3. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:legacy_flash_firmware radio_dongle`. Replace `radio_dongle`, with `robot` to flash the robot.
 4. For the robot, make sure the robot is in bootloader mode (BL switch on the piano keys is down), and push the power switch away from the dribbler (i.e towards the back of the robot) and hold it there before running the command. The dongle can be simply be plugged in with no additional action.
 5. There should be a progress bar indicating the flashing progress, hold the switch back until the process finishes.
 6. When the process is finished, release the power switch, push the BL switch back up, and the robot now has been flashed!
@@ -177,7 +177,7 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 ## Flashing And Debugging A STM32H7 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
 2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
-3. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. This will load the `.elf` file associated with (0) to the the nucleo and put you into a gdb prompt.
+3. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. This will load the `.elf` file associated with (0) to the nucleo and put you into a gdb prompt.
 4. At this point you should be in a gdb window. Take a look at [this tutorial](https://www.cprogramming.com/gdb.html) for some basics.
 
 ## Working with CubeMX to regenerate code

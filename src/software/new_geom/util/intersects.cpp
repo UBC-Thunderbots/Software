@@ -6,7 +6,18 @@
 
 bool intersects(const Polygon &first, const Segment &second)
 {
-    return first.contains(second.getSegStart()) || first.contains(second.getEnd());
+    if (first.contains(second.getSegStart()) || first.contains(second.getEnd()))
+    {
+        return true;
+    }
+    for (const auto &seg : first.getSegments())
+    {
+        if (intersects(seg, second))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool intersects(const Segment &first, const Polygon &second)
@@ -60,17 +71,13 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Segment &first, const Circle &second)
 {
-    double segment_start_circle_origin_distsq =
-        distanceSquared(first.getSegStart(), second.getOrigin());
-    double segment_end_circle_origin_distsq =
-        distanceSquared(first.getEnd(), second.getOrigin());
+    bool segment_endpoint_inside_circle =
+        second.contains(first.getSegStart()) || second.contains(first.getEnd());
 
-    bool segment_inside_circle = containsNew(second, first);
-    double segment_outside_circle =
-        (segment_start_circle_origin_distsq > second.getRadius() * second.getRadius() ||
-         segment_end_circle_origin_distsq > second.getRadius() * second.getRadius());
+    bool segment_crosses_circle =
+        distance(first, second.getOrigin()) < second.getRadius();
 
-    return segment_inside_circle && segment_outside_circle;
+    return segment_endpoint_inside_circle || segment_crosses_circle;
 }
 
 bool intersects(const Circle &first, const Segment &second)

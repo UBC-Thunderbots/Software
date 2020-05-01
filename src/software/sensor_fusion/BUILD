@@ -33,7 +33,7 @@ cc_library(
         "//software/geom",
         "//software/proto:ssl_cc_proto",
         "//software/time:timestamp",
-        "//software/util/printable_enum_macro",
+        "//software/util/make_enum",
     ],
 )
 
@@ -61,11 +61,11 @@ cc_library(
     deps = [
         ":refbox_data",
         ":vision_detection",
-        "//software/ai/primitive",
         "//software/backend:robot_status",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/parameter:dynamic_parameters",
+        "//software/primitive",
         "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/world",
     ],

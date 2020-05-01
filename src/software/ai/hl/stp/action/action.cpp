@@ -2,8 +2,9 @@
 
 #include "software/logger/logger.h"
 
-Action::Action()
-    : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))
+Action::Action(bool loop_forever)
+    : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1)),
+      loop_forever(loop_forever)
 {
 }
 
@@ -42,6 +43,12 @@ std::unique_ptr<Intent> Action::getNextIntent()
         {
             // Extract the result from the coroutine. This will be whatever value was
             // yielded by the calculateNextIntent function
+            next_intent = intent_sequence.get();
+        }
+        else if (loop_forever)
+        {
+            restart();
+            intent_sequence();
             next_intent = intent_sequence.get();
         }
     }

@@ -31,6 +31,29 @@ Language: JavaScript
 DisableFormat: true
 ---
 Language: Proto
-# Don't format proto files.
-DisableFormat: true
+BasedOnStyle: Google
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: 'true'
+AlignEscapedNewlinesLeft: 'false'
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: 'false'
+AllowShortLoopsOnASingleLine: 'false'
+BinPackArguments: 'true'
+BinPackParameters: 'true'
+BreakBeforeBraces: Allman
+BreakStringLiterals: 'false'
+ColumnLimit: '90'
+Cpp11BracedListStyle: 'true'
+IncludeBlocks: Regroup
+IndentCaseLabels: 'true'
+IndentWidth: '4'
+MaxEmptyLinesToKeep: '3'
+NamespaceIndentation: All
+ReflowComments: 'true'
+SortIncludes: 'true'
+Standard: Cpp11
+TabWidth: '4'
+UseTab: Never
 ---

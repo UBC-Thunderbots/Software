@@ -1,3 +1,3 @@
 
 
-void run_math_test();
+void run_math_test(void);

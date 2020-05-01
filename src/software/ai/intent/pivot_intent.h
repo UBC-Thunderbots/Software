@@ -1,9 +1,9 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/primitive/pivot_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/primitive/pivot_primitive.h"
 
 class PivotIntent : public PivotPrimitive, public Intent
 {

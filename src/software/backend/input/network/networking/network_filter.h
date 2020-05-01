@@ -118,7 +118,7 @@ class NetworkFilter
      * corresponding Refbox command, based on which team we are (blue or yellow).
      *
      * @param command a referee command from the protobuf message
-     * @return a ROS message RefboxCommand constant corresponding to the input command
+     * @return a RefboxCommand constant for the corresponding Refbox command
      */
     RefboxGameState getTeamCommand(const Referee::Command &command);
 };

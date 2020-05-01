@@ -13,6 +13,14 @@ TEST(IntersectsTest, polygon_segment_intersecting_on_edge)
     EXPECT_TRUE(intersects(s, p));
 }
 
+TEST(IntersectsTest, polygon_segment_intersecting_middle)
+{
+    Polygon p({{-1, -3}, {-1, 4}, {1, 4}, {1, -3}});
+    Segment s({-7, 0}, {7, 0});
+    EXPECT_TRUE(intersects(p, s));
+    EXPECT_TRUE(intersects(s, p));
+}
+
 TEST(IntersectsTest, polygon_segment_intersecting_on_vertex)
 {
     Polygon p({{-6, 2}, {-1, 1}, {10, 7}, {5, -6}, {-5, -3}});
@@ -198,22 +206,30 @@ TEST(IntersectsTest, segment_completely_inside_circle)
 {
     Segment s({-8, 4}, {-4, 0});
     Circle c({-6, 2}, 4);
-    EXPECT_FALSE(intersects(s, c));
-    EXPECT_FALSE(intersects(c, s));
+    EXPECT_TRUE(intersects(s, c));
+    EXPECT_TRUE(intersects(c, s));
 }
 
 TEST(IntersectsTest, segment_with_points_on_circle_edge)
 {
     Segment s({-2, 2}, {-6, 6});
     Circle c({-6, 2}, 4);
-    EXPECT_FALSE(intersects(s, c));
-    EXPECT_FALSE(intersects(c, s));
+    EXPECT_TRUE(intersects(s, c));
+    EXPECT_TRUE(intersects(c, s));
 }
 
 TEST(IntersectsTest, segment_circle_intersecting)
 {
     Segment s({-8, 2}, {-10, 6});
     Circle c({-6, 2}, 4);
+    EXPECT_TRUE(intersects(s, c));
+    EXPECT_TRUE(intersects(c, s));
+}
+
+TEST(IntersectsTest, segment_circle_intersecting_middle)
+{
+    Segment s({-10, 2}, {10, 2});
+    Circle c({-4, 2}, 4);
     EXPECT_TRUE(intersects(s, c));
     EXPECT_TRUE(intersects(c, s));
 }

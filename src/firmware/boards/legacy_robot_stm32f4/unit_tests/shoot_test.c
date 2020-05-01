@@ -4,4 +4,4 @@
 #include "test.h"
 
 
-void run_shoot_test() {}
+void run_shoot_test(void) {}

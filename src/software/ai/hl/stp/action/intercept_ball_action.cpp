@@ -14,7 +14,7 @@
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
                                          bool loop_forever)
-    : Action(), field(field), ball(ball), loop_forever(loop_forever)
+    : Action(loop_forever), field(field), ball(ball)
 {
 }
 
@@ -121,7 +121,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                 DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
                 BallCollisionType::ALLOW));
         }
-    } while (!Evaluation::robotHasPossession(ball, *robot) || loop_forever);
+    } while (!Evaluation::robotHasPossession(ball, *robot));
 }
 
 void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yield,
