@@ -3,17 +3,54 @@
 #include <sstream>
 
 #include "shared/constants.h"
-#include "software/ai/navigator/obstacle/circle_obstacle.h"
-#include "software/ai/navigator/obstacle/polygon_obstacle.h"
-#include "software/ai/navigator/obstacle/shape_obstacle.h"
-#include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/intersects.h"
 
 /**
  * An obstacle is an area to avoid for navigation
  */
-using Obstacle = std::shared_ptr<ShapeObstacle>;
+class Obstacle
+{
+   public:
+    virtual ~Obstacle() = default;
 
-std::ostream& operator<<(std::ostream& os, const Obstacle& obstacle);
+    /**
+     * Determines whether the given Point is contained within this Obstacle
+     *
+     * @return whether the Point p is contained within this Obstacle
+     */
+    virtual bool contains(const Point& p) const = 0;
+
+    /**
+     * Gets the minimum distance from the obstacle to the point
+     *
+     * @param point Point to get distance to
+     *
+     * @return distance to point
+     */
+    virtual double distance(const Point& p) const = 0;
+
+    /**
+     * Determines whether the given Segment intersects this Obstacle
+     *
+     * @return true if the given Segment intersects this Obstacle
+     */
+    virtual bool intersects(const Segment& segment) const = 0;
+
+    /**
+     * Output string to describe the obstacle
+     *
+     * @return string that describes the obstacle
+     */
+    virtual std::string toString(void) const = 0;
+};
+
+/**
+ * We use a pointer to obstacles to support inheritance
+ */
+using ObstaclePtr = std::shared_ptr<Obstacle>;
+
+std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr);

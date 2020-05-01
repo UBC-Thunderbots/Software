@@ -1,7 +1,7 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 
-std::ostream& operator<<(std::ostream& os, const Obstacle& obstacle)
+std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr)
 {
-    os << obstacle->toString();
+    os << obstacle_ptr->toString();
     return os;
 }

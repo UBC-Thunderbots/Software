@@ -29,7 +29,7 @@ struct PlannerTestCase
     std::string name = "Unnamed test case";
     Point start, dest;
     Rectangle navigable_area;
-    std::vector<Obstacle> obstacles;
+    std::vector<ObstaclePtr> obstacles;
     bool should_return_path;
 };
 
@@ -136,7 +136,7 @@ std::vector<std::pair<std::string, PathPlannerConstructor>>
 
 
 void validatePath(const Path &path, const Point &start, const Point &dest,
-                  const Rectangle &navigable_area, std::vector<Obstacle> &obstacles)
+                  const Rectangle &navigable_area, std::vector<ObstaclePtr> &obstacles)
 {
     // check for zero length path
     if (path.valueAt(0.f) == path.valueAt(1.f))
@@ -152,7 +152,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     std::cout << "Evaluating path at intervals of s=" << path_check_interval << std::endl;
 
     // special case stuff for if the path starts in an obstacle
-    std::optional<Obstacle> start_obstacle_or_null = std::nullopt;
+    std::optional<ObstaclePtr> start_obstacle_or_null = std::nullopt;
     // check if the path starts inside an obstacle
     auto start_obstacle_or_end_it = std::find_if(
         obstacles.begin(), obstacles.end(),
@@ -176,7 +176,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
             start_obstacle_or_null = std::nullopt;
         }
 
-        for (const Obstacle &obs : obstacles)
+        for (const ObstaclePtr &obs : obstacles)
         {
             if (obs->contains(pt))
             {

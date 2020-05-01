@@ -29,7 +29,7 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 {
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
-    Obstacle obstacle = obstacle_factory.createObstacleFromRectangle(rectangle);
+    ObstaclePtr obstacle = obstacle_factory.createObstacleFromRectangle(rectangle);
 
     try
     {
@@ -38,7 +38,7 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstacle was not created for a rectangle";
+        ADD_FAILURE() << "PolygonObstaclePtr was not created for a rectangle";
     }
 }
 
@@ -47,7 +47,7 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.1985);
-    Obstacle obstacle = obstacle_factory.createBallObstacle(origin);
+    ObstaclePtr obstacle = obstacle_factory.createBallObstacle(origin);
 
     try
     {
@@ -56,7 +56,7 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstacle was not created for a ball";
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a ball";
     }
 }
 
@@ -65,7 +65,7 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.207);
-    Obstacle obstacle = obstacle_factory.createRobotObstacle(origin);
+    ObstaclePtr obstacle = obstacle_factory.createRobotObstacle(origin);
 
     try
     {
@@ -74,7 +74,7 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstacle was not created for a robot";
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a robot";
     }
 }
 
@@ -86,7 +86,7 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.041569219381653054);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
     try
     {
@@ -95,7 +95,7 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstacle was not created for a stationary robot";
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a stationary robot";
     }
 }
 
@@ -107,7 +107,7 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.041569219381653054);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
     try
     {
@@ -116,7 +116,7 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstacle was not created for a slow moving robot";
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a slow moving robot";
     }
 }
 
@@ -133,7 +133,7 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
                       Point(-1.694058936210534, 5.4443408352530316),
                       Point(-1.7591655494501515, 5.4960431457668459)});
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
     try
     {
@@ -142,7 +142,7 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstacle was not created for a fast moving robot";
+        ADD_FAILURE() << "PolygonObstaclePtr was not created for a fast moving robot";
     }
 }
 
@@ -159,7 +159,7 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
                       Point(0.88263941441511673, 1.5855016068416794),
                       Point(0.80113894464888358, 1.5690798703962443)});
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
     try
     {
@@ -168,6 +168,6 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstacle was not created for a fast moving robot";
+        ADD_FAILURE() << "PolygonObstaclePtr was not created for a fast moving robot";
     }
 }

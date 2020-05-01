@@ -33,7 +33,7 @@ void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
 }
 
 void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
-                                       std::vector<Obstacle> obstacles)
+                                       std::vector<ObstaclePtr> obstacles)
 {
     // If the path size is 1, just need to check that the point is not within the obstacle
     if (path_points.size() == 1)
@@ -67,7 +67,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our starting location
-    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
         Rectangle(Point(-0.5, -1), Point(0.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -102,7 +102,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Point start{0, 0}, dest{2.7, 0};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
         Rectangle(Point(2.5, -1), Point(3.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -134,7 +134,7 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
         Rectangle(Point(1, -1), Point(2, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -167,7 +167,7 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{0, 3};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
         Rectangle(Point(-1, 1), Point(1, 2)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -202,7 +202,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     Field field = ::Test::TestUtil::createSSLDivBField();
     Point start{2, 2}, dest{-3, -3};
 
-    std::vector<Obstacle> obstacles = {};
+    std::vector<ObstaclePtr> obstacles = {};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
@@ -224,7 +224,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
     Field field = ::Test::TestUtil::createSSLDivBField();
     Point start{2.29, 2.29}, dest{2.3, 2.3};
 
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+    std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
@@ -246,7 +246,7 @@ TEST_F(TestThetaStarPathPlanner, no_navigable_area)
     // Test running theta star with no area to navigate in
     Point start{-1.0, -1.0}, dest{1.0, 1.0};
 
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+    std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
     Rectangle navigable_area({0, 0}, {1, 1});
     auto path = ThetaStarPathPlanner().findPath(start, dest, navigable_area, obstacles);
 
@@ -258,7 +258,7 @@ TEST_F(TestThetaStarPathPlanner, DISABLED_performance)
 {
     // This test can be used to guage performance, and profiled to find areas for
     // improvement
-    std::vector<std::vector<Obstacle>> obstacle_sets = {
+    std::vector<std::vector<ObstaclePtr>> obstacle_sets = {
         {
             obstacle_factory.createRobotObstacle({0, 0}),
             obstacle_factory.createRobotObstacle({0, 0.5}),

@@ -33,7 +33,7 @@ class VelocityObstaclePathManager : public PathManager
      *
      * @return list of obstacles that around other objectives' starts
      */
-    const std::vector<Obstacle> getObstaclesAroundStartOfOtherObjectives(
+    const std::vector<ObstaclePtr> getObstaclesAroundStartOfOtherObjectives(
         const std::unordered_set<PathObjective>& objectives,
         const PathObjective& current_objective);
 

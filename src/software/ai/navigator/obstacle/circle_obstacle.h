@@ -1,12 +1,12 @@
 #pragma once
 
-#include "software/ai/navigator/obstacle/shape_obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/new_geom/circle.h"
 
 /**
  * An Obstacle represented by a Circle
  */
-class CircleObstacle : public ShapeObstacle
+class CircleObstacle : public Obstacle
 {
    public:
     CircleObstacle() = delete;

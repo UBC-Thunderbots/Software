@@ -1,7 +1,9 @@
 #pragma once
 
 #include "software/ai/motion_constraint/motion_constraint.h"
+#include "software/ai/navigator/obstacle/circle_obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/polygon_obstacle.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/point.h"
@@ -31,7 +33,7 @@ class ObstacleFactory
      *
      * @return Obstacles representing the given motion constraints
      */
-    std::vector<Obstacle> createObstaclesFromMotionConstraints(
+    std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
         const std::set<MotionConstraint> &motion_constraints, const World &world);
 
     /**
@@ -42,7 +44,7 @@ class ObstacleFactory
      *
      * @return Obstacles representing the given motion constraint
      */
-    std::vector<Obstacle> createObstaclesFromMotionConstraint(
+    std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
         const MotionConstraint &motion_constraint, const World &world);
 
     /**
@@ -55,7 +57,7 @@ class ObstacleFactory
      *
      * @return An obstacle representing the given robot
      */
-    Obstacle createVelocityObstacleFromRobot(const Robot &robot);
+    ObstaclePtr createVelocityObstacleFromRobot(const Robot &robot);
 
     /**
      * Create a list of obstacles representing the given team
@@ -67,7 +69,7 @@ class ObstacleFactory
      *
      * @return A list of obstacles representing the given team
      */
-    std::vector<Obstacle> createVelocityObstaclesFromTeam(const Team &team);
+    std::vector<ObstaclePtr> createVelocityObstaclesFromTeam(const Team &team);
 
     /**
      * Create circle obstacle around robot with additional radius scaling
@@ -77,8 +79,8 @@ class ObstacleFactory
      *
      * @return obstacle around the robot
      */
-    Obstacle createRobotObstacle(const Point &robot_position,
-                                 const double radius_scaling = 1.0);
+    ObstaclePtr createRobotObstacle(const Point &robot_position,
+                                    const double radius_scaling = 1.0);
 
     /**
      * Create circle obstacle around ball
@@ -87,7 +89,7 @@ class ObstacleFactory
      *
      * @return obstacle around the ball
      */
-    Obstacle createBallObstacle(const Point &ball_position);
+    ObstaclePtr createBallObstacle(const Point &ball_position);
 
     /**
      * Create rectangle-shaped obstacle
@@ -96,7 +98,7 @@ class ObstacleFactory
      *
      * @return rectangular obstacle
      */
-    Obstacle createObstacleFromRectangle(const Rectangle &rectangle);
+    ObstaclePtr createObstacleFromRectangle(const Rectangle &rectangle);
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
@@ -110,7 +112,7 @@ class ObstacleFactory
      *
      * @return circle shaped obstacle
      */
-    Obstacle createObstacle(const Circle &circle);
+    ObstaclePtr createObstacle(const Circle &circle);
 
     /**
      * Create polygon obstacle directly from a Polygon
@@ -120,7 +122,7 @@ class ObstacleFactory
      *
      * @return polygon shaped obstacle
      */
-    Obstacle createObstacle(const Polygon &polygon);
+    ObstaclePtr createObstacle(const Polygon &polygon);
 
     /**
      * Create rectangle for the given rectangular motion constraint

@@ -11,7 +11,6 @@ cc_library(
         "circle_obstacle.h",
         "obstacle.h",
         "polygon_obstacle.h",
-        "shape_obstacle.h",
     ],
     deps = [
         "//shared:constants",

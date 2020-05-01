@@ -1,12 +1,12 @@
 #pragma once
 
-#include "software/ai/navigator/obstacle/shape_obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/new_geom/polygon.h"
 
 /**
  * An Obstacle represented by a Polygon
  */
-class PolygonObstacle : public ShapeObstacle
+class PolygonObstacle : public Obstacle
 {
    public:
     PolygonObstacle() = delete;
