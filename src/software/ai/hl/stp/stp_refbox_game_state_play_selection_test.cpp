@@ -251,10 +251,3 @@ auto all_refbox_game_states = ::Test::TestUtil::getAllRefboxGameStates();
 // INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
 //                        ::testing::ValuesIn(all_refbox_game_states.begin(),
 //                                            all_refbox_game_states.end()));
-
-int main(int argc, char** argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
