@@ -102,4 +102,45 @@ namespace Test
         return Robot(robot_id_counter++, pt, Vector(), Angle(), AngularVelocity(),
                      Timestamp());
     }
+
+    bool TestUtil::checkIfVisuallySimilar(const Polygon &poly1, const Polygon &poly2)
+    {
+        auto ppoints1 = poly1.getPoints();
+        auto ppoints2 = poly2.getPoints();
+        if (ppoints1.size() != ppoints2.size())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < ppoints1.size(); i++)
+        {
+            if (!checkIfVisuallySimilar(ppoints1[i], ppoints2[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool TestUtil::checkIfVisuallySimilar(const Circle &circle1, const Circle &circle2)
+    {
+        if (!checkIfVisuallySimilar(circle1.getOrigin(), circle2.getOrigin()))
+        {
+            return false;
+        }
+        if (fabs(circle1.getRadius() - circle2.getRadius()) > METERS_PER_MILLIMETER)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    bool TestUtil::checkIfVisuallySimilar(const Point &point1, const Point &point2)
+    {
+        return (point1.distanceFromPoint(point2) <=
+                (sqrt(2) * METERS_PER_MILLIMETER + GeomConstants::FIXED_EPSILON));
+    }
+
+    bool checkIfVisuallySimilar(const Circle &circle1, const Circle &circle2) {}
 }  // namespace Test

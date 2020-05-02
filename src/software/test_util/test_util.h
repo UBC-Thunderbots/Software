@@ -1,5 +1,11 @@
 #pragma once
 
+#include <iostream>
+
+#include "shared/constants.h"
+#include "software/new_geom/geom_constants.h"
+#include "software/new_geom/point.h"
+#include "software/new_geom/polygon.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
@@ -98,6 +104,39 @@ namespace Test
          * @return a robot at the point
          */
         static Robot createRobotAtPos(const Point &pt);
+
+        /**
+         * Checks if two polygons are visually similar
+         * Two polygons are visually similar if the corresponding points are within 1
+         * millimetre of each other
+         *
+         * @param poly1, poly2 Polygons to compare
+         *
+         * @return true if the two polygons are visually similar
+         */
+        static bool checkIfVisuallySimilar(const Polygon &poly1, const Polygon &poly2);
+
+        /**
+         * Checks if two circles are visually similar
+         * Two circles are visually similar if the origin and radius are within 1
+         * millimetre of each other
+         *
+         * @param circle1, circle2 Circles to compare
+         *
+         * @return true if the two circles are visually similar
+         */
+        static bool checkIfVisuallySimilar(const Circle &circle1, const Circle &circle2);
+
+        /**
+         * Checks if two points are visually similar
+         * Two points are visually similar if the origin and radius are within 1
+         * millimetre of each other
+         *
+         * @param point1, point2 Points to compare
+         *
+         * @return true if the two points are visually similar
+         */
+        static bool checkIfVisuallySimilar(const Point &point1, const Point &point2);
 
        private:
         /**
