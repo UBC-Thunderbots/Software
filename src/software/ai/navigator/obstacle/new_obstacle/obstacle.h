@@ -49,7 +49,8 @@ class Obstacle
 };
 
 /**
- * We use a pointer to obstacles to support inheritance
+ * We use a pointer to Obstacle to support inheritance
+ * Note: this is a convenience typedef
  */
 using ObstaclePtr = std::shared_ptr<Obstacle>;
 
