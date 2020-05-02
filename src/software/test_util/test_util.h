@@ -106,37 +106,46 @@ namespace Test
         static Robot createRobotAtPos(const Point &pt);
 
         /**
-         * Checks if two polygons are visually similar
-         * Two polygons are visually similar if the corresponding points are visually
-         * similar
+         * Checks if two polygons are within tolerance of each other
+         * Two polygons are within tolerance of each other if the corresponding points are
+         * within tolerance of each other
          *
          * @param poly1, poly2 Polygons to compare
+         * @param tolerance tolerance to check equality with
          *
-         * @return true if the two polygons are visually similar
+         * @return true if the two polygons are within tolerance of each other
          */
-        static bool checkIfVisuallySimilar(const Polygon &poly1, const Polygon &poly2);
+        static bool checkGeometryEqualWithTolerance(const Polygon &poly1,
+                                                    const Polygon &poly2,
+                                                    double tolerance);
 
         /**
-         * Checks if two circles are visually similar
-         * Two circles are visually similar if the origins are visually similar and radius
-         * is within 1 millimetre of each other
+         * Checks if two circles are within tolerance of each other
+         * Two circles are within tolerance of each other if the origins are within
+         * tolerance of each other and radius is within tolerance of each other
          *
          * @param circle1, circle2 Circles to compare
+         * @param tolerance tolerance to check equality with
          *
-         * @return true if the two circles are visually similar
+         * @return true if the two circles are within tolerance of each other
          */
-        static bool checkIfVisuallySimilar(const Circle &circle1, const Circle &circle2);
+        static bool checkGeometryEqualWithTolerance(const Circle &circle1,
+                                                    const Circle &circle2,
+                                                    double tolerance);
 
         /**
-         * Checks if two points are visually similar
-         * Two points are visually similar if the respective x and y values are within 1
-         * millimetre of each other
+         * Checks if two points are within tolerance of each other
+         * Two points are within tolerance of each other if the respective x and y values
+         * are within tolerance of each other
          *
          * @param point1, point2 Points to compare
+         * @param tolerance tolerance to check equality with
          *
-         * @return true if the two points are visually similar
+         * @return true if the two points are within tolerance of each other
          */
-        static bool checkIfVisuallySimilar(const Point &point1, const Point &point2);
+        static bool checkGeometryEqualWithTolerance(const Point &point1,
+                                                    const Point &point2,
+                                                    double tolerance);
 
        private:
         /**
