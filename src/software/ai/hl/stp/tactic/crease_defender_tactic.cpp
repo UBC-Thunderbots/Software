@@ -198,7 +198,7 @@ std::vector<Segment> CreaseDefenderTactic::getPathSegments(Field field)
     // defenders must follow. It's basically the crease inflated by one robot radius
 
     Rectangle inflated_defense_area =
-        *field.friendlyDefenseArea().expand(ROBOT_MAX_RADIUS_METERS * 1.5);
+        field.friendlyDefenseArea().scale(ROBOT_MAX_RADIUS_METERS * 1.5);
 
     return {
         // +x segment

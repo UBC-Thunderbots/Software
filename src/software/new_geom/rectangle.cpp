@@ -69,20 +69,30 @@ Point Rectangle::furthestCorner(const Point &p)
         });
 }
 
-std::optional<Rectangle> Rectangle::expand(double amount)
+Rectangle Rectangle::scale(double amount, bool &scaling_success)
 {
+    Rectangle rectangle(negXNegYCorner(), posXPosYCorner());
+
     // Ensures rectangle cannot be shrunk to less than a point
     if (xLength() < -2 * amount || yLength() < -2 * amount)
     {
-        return std::nullopt;
+        scaling_success = false;
+        return rectangle;
     }
 
-    points_[0] = points_[0] + Vector(-amount, -amount);
-    points_[1] = points_[1] + Vector(-amount, amount);
-    points_[2] = points_[2] + Vector(amount, amount);
-    points_[3] = points_[3] + Vector(amount, -amount);
+    rectangle.points_[0] = rectangle.points_[0] + Vector(-amount, -amount);
+    rectangle.points_[1] = rectangle.points_[1] + Vector(-amount, amount);
+    rectangle.points_[2] = rectangle.points_[2] + Vector(amount, amount);
+    rectangle.points_[3] = rectangle.points_[3] + Vector(amount, -amount);
 
-    return std::make_optional(*this);
+    scaling_success = true;
+    return rectangle;
+}
+
+Rectangle Rectangle::scale(double amount)
+{
+    bool scaling_success = true;
+    return this->scale(amount, scaling_success);
 }
 
 bool Rectangle::operator==(const Rectangle &p) const

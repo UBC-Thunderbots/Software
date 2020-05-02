@@ -67,7 +67,7 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
     // are not altered and are the same points
     // are constrained inside.
     // blow up rectangle to a huge amount, to contain all the points
-    auto big_rectangle = *world.field().friendlyDefenseArea().expand(5);
+    auto big_rectangle = world.field().friendlyDefenseArea().scale(5);
     restrained_position =
         tactic.restrainGoalieInRectangle(requested_position, big_rectangle);
 
