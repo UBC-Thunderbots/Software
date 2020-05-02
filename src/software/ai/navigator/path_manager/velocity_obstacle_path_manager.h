@@ -19,9 +19,8 @@ class VelocityObstaclePathManager : public PathManager
         const std::unordered_set<PathObjective>& objectives,
         const Rectangle& navigable_area) override;
 
-    explicit VelocityObstaclePathManager(
-        std::unique_ptr<PathPlanner> path_planner, ObstacleFactory obstacle_factory,
-        std::shared_ptr<const VelocityObstaclePathManagerConfig> config);
+    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner,
+                                         ObstacleFactory obstacle_factory);
 
    private:
     /**
@@ -39,5 +38,4 @@ class VelocityObstaclePathManager : public PathManager
 
     std::unique_ptr<PathPlanner> path_planner;
     ObstacleFactory obstacle_factory;
-    std::shared_ptr<const VelocityObstaclePathManagerConfig> config;
 };

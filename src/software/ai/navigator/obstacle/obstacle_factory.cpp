@@ -146,12 +146,10 @@ ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position)
         Circle(ball_position, BALL_MAX_RADIUS_METERS + 0.06 + shape_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position,
-                                                 const double radius_scaling)
+ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position)
 {
     return createObstacle(
-        Circle(robot_position,
-               radius_scaling * (ROBOT_MAX_RADIUS_METERS + shape_expansion_amount)));
+        Circle(robot_position, ROBOT_MAX_RADIUS_METERS + shape_expansion_amount));
 }
 
 ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle)

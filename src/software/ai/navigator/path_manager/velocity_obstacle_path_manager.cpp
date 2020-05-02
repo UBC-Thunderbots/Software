@@ -1,11 +1,8 @@
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 
 VelocityObstaclePathManager::VelocityObstaclePathManager(
-    std::unique_ptr<PathPlanner> path_planner, ObstacleFactory obstacle_factory,
-    std::shared_ptr<const VelocityObstaclePathManagerConfig> config)
-    : path_planner(std::move(path_planner)),
-      obstacle_factory(std::move(obstacle_factory)),
-      config(config)
+    std::unique_ptr<PathPlanner> path_planner, ObstacleFactory obstacle_factory)
+    : path_planner(std::move(path_planner)), obstacle_factory(std::move(obstacle_factory))
 {
 }
 
@@ -60,14 +57,12 @@ VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
     const std::unordered_set<PathObjective> &objectives,
     const PathObjective &current_objective)
 {
-    double inflation_factor = config->OtherPathObjectiveStartInflationFactor()->value();
     std::vector<ObstaclePtr> obstacles;
     for (auto const &obj : objectives)
     {
         if (obj != current_objective)
         {
-            obstacles.push_back(
-                obstacle_factory.createRobotObstacle(obj.start, inflation_factor));
+            obstacles.push_back(obstacle_factory.createRobotObstacle(obj.start));
         }
     }
     return obstacles;

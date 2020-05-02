@@ -16,8 +16,7 @@ class NoPathNavigatorTest : public testing::Test
     NoPathNavigatorTest()
         : navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<NoPathTestPathPlanner>(),
-                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                        std::make_shared<VelocityObstaclePathManagerConfig>()),
+                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>())),
                     ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                     std::make_shared<NavigatorConfig>()),
           current_time(Timestamp::fromSeconds(123)),
@@ -44,8 +43,7 @@ class ThetaStarNavigatorTest : public testing::Test
     ThetaStarNavigatorTest()
         : navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<ThetaStarPathPlanner>(),
-                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                        std::make_shared<VelocityObstaclePathManagerConfig>()),
+                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>())),
                     ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                     std::make_shared<NavigatorConfig>())
     {
@@ -273,8 +271,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     Navigator navigator(std::make_unique<VelocityObstaclePathManager>(
                             std::make_unique<OnePointPathTestPathPlanner>(),
-                            ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                            std::make_shared<VelocityObstaclePathManagerConfig>()),
+                            ObstacleFactory(std::make_shared<ObstacleFactoryConfig>())),
                         ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
                         std::make_shared<NavigatorConfig>());
 
