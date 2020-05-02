@@ -129,8 +129,7 @@ namespace Test
 
         /**
          * Checks if two points are visually similar
-         * Two points are visually similar if the origin and radius are within 1
-         * millimetre of each other
+         * Two points are visually similar if they are within 1 millimetre of each other
          *
          * @param point1, point2 Points to compare
          *
