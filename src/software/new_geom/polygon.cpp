@@ -64,6 +64,16 @@ const std::vector<Point>& Polygon::getPoints() const
     return points_;
 }
 
+bool operator==(const Polygon& poly1, const Polygon& poly2)
+{
+    return (poly1.getPoints() == poly2.getPoints());
+}
+
+bool operator!=(const Polygon& poly1, const Polygon& poly2)
+{
+    return !(poly1 == poly2);
+}
+
 std::ostream& operator<<(std::ostream& os, const Polygon& poly)
 {
     os << "Polygon with points {";
