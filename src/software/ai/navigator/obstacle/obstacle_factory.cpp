@@ -25,53 +25,40 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
         }
         break;
         case MotionConstraint::CENTER_CIRCLE:
-            circle_opt = std::make_optional<Circle>(
+            obstacles.push_back(createObstacle(
                 Circle(world.field().centerPoint(),
-                       world.field().centerCircleRadius() + shape_expansion_amount));
+                       world.field().centerCircleRadius() + shape_expansion_amount)));
             break;
         case MotionConstraint::HALF_METER_AROUND_BALL:
             // 0.5 represents half a metre radius
-            circle_opt = std::make_optional<Circle>(
-                Circle(world.ball().position(), 0.5 + shape_expansion_amount));
+            obstacles.push_back(createObstacle(
+                Circle(world.ball().position(), 0.5 + shape_expansion_amount)));
             break;
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
             Rectangle rectangle = world.field().enemyDefenseArea();
             // 0.3 is by definition what inflated means
             rectangle.expand(0.3);
-            rectangle_opt = std::make_optional<Rectangle>(rectangle);
+            rectangle_opt = std::make_optional(rectangle);
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
-            // We extend the friendly defense area back by several meters to prevent
-            // robots going around the back of the goal
-            rectangle_opt = std::make_optional<Rectangle>(Rectangle(
-                world.field().friendlyDefenseArea().posXPosYCorner(),
-                Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y())));
+            rectangle_opt = std::make_optional(world.field().friendlyDefenseArea());
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            // We extend the enemy defense area back by several meters to prevent
-            // robots going around the back of the goal
-            rectangle_opt = std::make_optional<Rectangle>(Rectangle(
-                world.field().enemyDefenseArea().negXPosYCorner(),
-                Point(10, world.field().enemyDefenseArea().negXNegYCorner().y())));
-            break;
-        case MotionConstraint::ENEMY_HALF:
-            rectangle_opt = std::make_optional<Rectangle>(
-                Rectangle({0, world.field().totalYLength() / 2},
-                          world.field().enemyCornerNeg() -
-                              Vector(0, world.field().boundaryYLength())));
+            rectangle_opt = std::make_optional(world.field().enemyDefenseArea());
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            rectangle_opt = std::make_optional<Rectangle>(
-                Rectangle({0, world.field().totalYLength() / 2},
-                          world.field().friendlyCornerNeg() -
-                              Vector(0, world.field().boundaryYLength())));
+            rectangle_opt = std::make_optional(world.field().friendlyHalf());
+            break;
+        case MotionConstraint::ENEMY_HALF:
+            rectangle_opt = std::make_optional(world.field().enemyHalf());
             break;
     }
 
     if (rectangle_opt)
     {
+        rectangle_opt->expand(shape_expansion_amount);
         obstacles.push_back(createObstacle(*rectangle_opt));
     }
     if (circle_opt)
