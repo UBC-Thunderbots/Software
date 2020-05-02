@@ -101,10 +101,10 @@ class Rectangle : public ConvexPolygon
      * @param amount The amount to expand or shrink the rectangle by on all sides, can be
      * positive or negative
      *
-     * @return bool Whether it was possible to expand/shrink the rectangle by
-     * amount requested, rectangle remains unchanged if impossible to expand/shrink
+     * @return expanded rectangle if it was possible to expand/shrink the rectangle by
+     * amount requested, and return std::nullopt if it wasn't possible
      */
-    bool expand(double amount);
+    std::optional<Rectangle> expand(double amount);
 
     bool operator==(const Rectangle &p) const;
 };

@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <iostream>
 #include <utility>
 
 #include "shared/constants.h"
@@ -51,8 +52,7 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
 
     // test to make sure that points given outside of the rectangle
     // are constrained inside
-    auto small_rectangle = world.field().friendlyDefenseArea();
-    small_rectangle.expand(-0.8);
+    auto small_rectangle    = world.field().friendlyDefenseArea();
     auto requested_position = GetParam();
     auto restrained_position =
         tactic.restrainGoalieInRectangle(requested_position, small_rectangle);
@@ -66,10 +66,8 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
     // test to make sure that points given inside of the rectangle
     // are not altered and are the same points
     // are constrained inside.
-    auto big_rectangle = world.field().friendlyDefenseArea();
-
     // blow up rectangle to a huge amount, to contain all the points
-    big_rectangle.expand(5);
+    auto big_rectangle = *world.field().friendlyDefenseArea().expand(5);
     restrained_position =
         tactic.restrainGoalieInRectangle(requested_position, big_rectangle);
 

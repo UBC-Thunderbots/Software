@@ -264,8 +264,8 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             // we want to restrict the block cone to the friendly crease, also potentially
             // scaled by a defense_area_deflation_parameter
-            Rectangle deflated_defense_area = field.friendlyDefenseArea();
-            deflated_defense_area.expand(-defense_area_deflation);
+            Rectangle deflated_defense_area =
+                *field.friendlyDefenseArea().expand(-defense_area_deflation);
 
             // restrain the goalie in the deflated defense area, if the goalie cannot be
             // restrained or if there is no proper intersection, then we safely default to
