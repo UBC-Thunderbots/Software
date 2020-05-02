@@ -4,8 +4,6 @@
 
 #include <algorithm>
 
-#include "shared/constants.h"
-
 /*
  * Unit tests for the unit test utilities
  */
@@ -160,10 +158,8 @@ TEST(TestUtilsTest, polygon_check_if_equal_within_tolerance)
     Polygon poly1({Point(2.323, 2.113), Point(4.567, 1.069), Point(9.245, 1.227)});
     Polygon poly2({Point(2.324, 2.114), Point(4.568, 1.07), Point(9.246, 1.228)});
     Polygon poly3({Point(2.325, 2.115), Point(4.569, 1.071), Point(9.247, 1.229)});
-    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(poly1, poly2,
-                                                                  METERS_PER_MILLIMETER));
-    EXPECT_FALSE(::Test::TestUtil::checkGeometryEqualWithTolerance(
-        poly1, poly3, METERS_PER_MILLIMETER));
+    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(poly1, poly2));
+    EXPECT_FALSE(::Test::TestUtil::checkGeometryEqualWithTolerance(poly1, poly3));
 }
 
 TEST(TestUtilsTest, point_check_if_equal_within_tolerance)
@@ -172,12 +168,9 @@ TEST(TestUtilsTest, point_check_if_equal_within_tolerance)
     Point point2(8.4232391, 4.9139881);
     Point point3(8.424, 4.914);
     Point point4(8.425, 4.915);
-    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(point1, point2,
-                                                                  METERS_PER_MILLIMETER));
-    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(point1, point3,
-                                                                  METERS_PER_MILLIMETER));
-    EXPECT_FALSE(::Test::TestUtil::checkGeometryEqualWithTolerance(
-        point1, point4, METERS_PER_MILLIMETER));
+    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(point1, point2));
+    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(point1, point3));
+    EXPECT_FALSE(::Test::TestUtil::checkGeometryEqualWithTolerance(point1, point4));
 }
 
 TEST(TestUtilsTest, circle_check_if_equal_within_tolerance)
@@ -185,8 +178,6 @@ TEST(TestUtilsTest, circle_check_if_equal_within_tolerance)
     Circle circle1(Point(5.393, 1.113), 6.567);
     Circle circle2(Point(5.394, 1.114), 6.568);
     Circle circle3(Point(5.395, 1.115), 6.569);
-    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(circle1, circle2,
-                                                                  METERS_PER_MILLIMETER));
-    EXPECT_FALSE(::Test::TestUtil::checkGeometryEqualWithTolerance(
-        circle1, circle3, METERS_PER_MILLIMETER));
+    EXPECT_TRUE(::Test::TestUtil::checkGeometryEqualWithTolerance(circle1, circle2));
+    EXPECT_FALSE(::Test::TestUtil::checkGeometryEqualWithTolerance(circle1, circle3));
 }

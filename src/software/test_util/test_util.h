@@ -111,13 +111,14 @@ namespace Test
          * within tolerance of each other
          *
          * @param poly1, poly2 Polygons to compare
-         * @param tolerance tolerance to check equality with
+         * @param tolerance tolerance to check equality with, default is
+         * METERS_PER_MILLIMETER
          *
          * @return true if the two polygons are within tolerance of each other
          */
-        static bool checkGeometryEqualWithTolerance(const Polygon &poly1,
-                                                    const Polygon &poly2,
-                                                    double tolerance);
+        static bool checkGeometryEqualWithTolerance(
+            const Polygon &poly1, const Polygon &poly2,
+            double tolerance = METERS_PER_MILLIMETER);
 
         /**
          * Checks if two circles are within tolerance of each other
@@ -125,13 +126,14 @@ namespace Test
          * tolerance of each other and radius is within tolerance of each other
          *
          * @param circle1, circle2 Circles to compare
-         * @param tolerance tolerance to check equality with
+         * @param tolerance tolerance to check equality with, default is
+         * METERS_PER_MILLIMETER
          *
          * @return true if the two circles are within tolerance of each other
          */
-        static bool checkGeometryEqualWithTolerance(const Circle &circle1,
-                                                    const Circle &circle2,
-                                                    double tolerance);
+        static bool checkGeometryEqualWithTolerance(
+            const Circle &circle1, const Circle &circle2,
+            double tolerance = METERS_PER_MILLIMETER);
 
         /**
          * Checks if two points are within tolerance of each other
@@ -139,13 +141,14 @@ namespace Test
          * are within tolerance of each other
          *
          * @param point1, point2 Points to compare
-         * @param tolerance tolerance to check equality with
+         * @param tolerance tolerance to check equality with, default is
+         * METERS_PER_MILLIMETER
          *
          * @return true if the two points are within tolerance of each other
          */
-        static bool checkGeometryEqualWithTolerance(const Point &point1,
-                                                    const Point &point2,
-                                                    double tolerance);
+        static bool checkGeometryEqualWithTolerance(
+            const Point &point1, const Point &point2,
+            double tolerance = METERS_PER_MILLIMETER);
 
        private:
         /**
