@@ -107,8 +107,8 @@ namespace Test
 
         /**
          * Checks if two polygons are visually similar
-         * Two polygons are visually similar if the corresponding points are within 1
-         * millimetre of each other
+         * Two polygons are visually similar if the corresponding points are visually
+         * similar
          *
          * @param poly1, poly2 Polygons to compare
          *
@@ -118,8 +118,8 @@ namespace Test
 
         /**
          * Checks if two circles are visually similar
-         * Two circles are visually similar if the origin and radius are within 1
-         * millimetre of each other
+         * Two circles are visually similar if the origins are visually similar and radius
+         * is within 1 millimetre of each other
          *
          * @param circle1, circle2 Circles to compare
          *
@@ -129,7 +129,8 @@ namespace Test
 
         /**
          * Checks if two points are visually similar
-         * Two points are visually similar if they are within 1 millimetre of each other
+         * Two points are visually similar if the respective x and y values are within 1
+         * millimetre of each other
          *
          * @param point1, point2 Points to compare
          *
