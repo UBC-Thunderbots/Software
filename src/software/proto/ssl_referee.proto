@@ -4,13 +4,15 @@ import "software/proto/ssl_game_event.proto";
 import "software/proto/ssl_game_event_2019.proto";
 
 // Each UDP packet contains one of these messages.
-message Referee {
+message Referee
+{
     // The UNIX timestamp when the packet was sent, in microseconds.
     // Divide by 1,000,000 to get a time_t.
     required uint64 packet_timestamp = 1;
 
     // These are the "coarse" stages of the game.
-    enum Stage {
+    enum Stage
+    {
         // The first half is about to start.
         // A kickoff is called within this stage.
         // This stage ends with the NORMAL_START.
@@ -66,7 +68,8 @@ message Referee {
     optional sint32 stage_time_left = 3;
 
     // These are the "fine" states of play on the field.
-    enum Command {
+    enum Command
+    {
         // All robots should completely stop moving.
         HALT = 0;
         // Robots must keep 50 cm from the ball.
@@ -98,7 +101,8 @@ message Referee {
         // The yellow team just scored a goal.
         // For information only.
         // For rules compliance, teams must treat as STOP.
-        // Deprecated: Use the score field from the team infos instead. That way, you can also detect revoked goals.
+        // Deprecated: Use the score field from the team infos instead. That way, you can
+        // also detect revoked goals.
         GOAL_YELLOW = 14 [deprecated = true];
         // The blue team just scored a goal. See also GOAL_YELLOW.
         GOAL_BLUE = 15 [deprecated = true];
@@ -119,16 +123,17 @@ message Referee {
     required uint64 command_timestamp = 6;
 
     // Information about a single team.
-    message TeamInfo {
+    message TeamInfo
+    {
         // The team's name (empty string if operator has not typed anything).
         required string name = 1;
         // The number of goals scored by the team during normal play and overtime.
         required uint32 score = 2;
         // The number of red cards issued to the team since the beginning of the game.
         required uint32 red_cards = 3;
-        // The amount of time (in microseconds) left on each yellow card issued to the team.
-        // If no yellow cards are issued, this array has no elements.
-        // Otherwise, times are ordered from smallest to largest.
+        // The amount of time (in microseconds) left on each yellow card issued to the
+        // team. If no yellow cards are issued, this array has no elements. Otherwise,
+        // times are ordered from smallest to largest.
         repeated uint32 yellow_card_times = 4 [packed = true];
         // The total number of yellow cards ever issued to the team.
         required uint32 yellow_cards = 5;
@@ -151,28 +156,30 @@ message Referee {
 
     // Information about the two teams.
     required TeamInfo yellow = 7;
-    required TeamInfo blue = 8;
+    required TeamInfo blue   = 8;
 
     // The coordinates of the Designated Position. These are measured in
     // millimetres and correspond to SSL-Vision coordinates. These fields are
     // always either both present (in the case of a ball placement command) or
     // both absent (in the case of any other command).
-    message Point {
+    message Point
+    {
         required float x = 1;
         required float y = 2;
     }
     optional Point designated_position = 9;
 
     // Information about the direction of play.
-    // True, if the blue team will have it's goal on the positive x-axis of the ssl-vision coordinate system.
-    // Obviously, the yellow team will play on the opposite half.
+    // True, if the blue team will have it's goal on the positive x-axis of the ssl-vision
+    // coordinate system. Obviously, the yellow team will play on the opposite half.
     optional bool blue_team_on_positive_half = 10;
 
     // The game event that caused the referee command.
     // deprecated in favor of game_events.
     optional Game_Event game_event = 11 [deprecated = true];
 
-    // The command that will be issued after the current stoppage and ball placement to continue the game.
+    // The command that will be issued after the current stoppage and ball placement to
+    // continue the game.
     optional Command next_command = 12;
 
     // All game events that were detected since the last RUNNING state.
@@ -192,7 +199,8 @@ message Referee {
     optional int32 current_action_time_remaining = 15;
 }
 
-message ProposedGameEvent {
+message ProposedGameEvent
+{
     // The UNIX timestamp when the game event proposal will time out, in microseconds.
     required uint64 valid_until = 1;
     // The identifier of the proposer.

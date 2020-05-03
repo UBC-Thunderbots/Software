@@ -77,7 +77,7 @@ void PhysicsBall::kick(Vector kick_vector)
 
 void PhysicsBall::chip(const Vector &chip_vector)
 {
-    // Assume the ball is chipped at at a 45 degree angle
+    // Assume the ball is chipped at a 45 degree angle
     // TODO: Use a robot-specific constant
     // https://github.com/UBC-Thunderbots/Software/issues/1179
     Angle chip_angle = Angle::fromDegrees(45);

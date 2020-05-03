@@ -14,7 +14,7 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BAZEL_ROOT_DIR="$CURR_DIR/../src"
 
 # Extensions to check formatting for clang-format
-CLANG_FORMAT_EXTENSIONS=(h cpp c hpp tpp)
+CLANG_FORMAT_EXTENSIONS=(h cpp c hpp tpp proto)
 
 # Function to run clang format
 function run_clang_format () {

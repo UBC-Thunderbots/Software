@@ -12,7 +12,7 @@
  * need to be sent out (generally to the robots).
  *
  * This produce/consume pattern is performed by extending both "Observer" and
- * "Subject". Please see the the implementation of those classes for details.
+ * "Subject". Please see the implementation of those classes for details.
  */
 class Backend : public Subject<World>,
                 public Subject<RobotStatus>,

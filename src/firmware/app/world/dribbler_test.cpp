@@ -8,7 +8,7 @@ extern "C"
 class DribblerTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         requested_rpm = 0;
         coast         = false;
@@ -17,7 +17,7 @@ class DribblerTest : public testing::Test
                                        &(this->returnSeven));
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_dribbler_destroy(dribbler);
     }
@@ -27,12 +27,12 @@ class DribblerTest : public testing::Test
         requested_rpm = rpm;
     }
 
-    static unsigned int returnSeven()
+    static unsigned int returnSeven(void)
     {
         return 7;
     }
 
-    static void enable_coast()
+    static void enable_coast(void)
     {
         coast = true;
     }

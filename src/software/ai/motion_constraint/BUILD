@@ -3,7 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "motion_constraint",
     hdrs = ["motion_constraint.h"],
-    deps = ["//software/util/printable_enum_macro"],
+    deps = ["//software/util/make_enum"],
 )
 
 cc_library(

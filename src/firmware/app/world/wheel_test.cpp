@@ -8,7 +8,7 @@ extern "C"
 class WheelTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         requested_wheel_force = 0;
         brake_called          = true;
@@ -25,7 +25,7 @@ class WheelTest : public testing::Test
                                  brake, coast, wheel_constants);
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_wheel_destroy(wheel);
     }
@@ -35,17 +35,17 @@ class WheelTest : public testing::Test
         requested_wheel_force = force;
     }
 
-    static float get_motor_speed()
+    static float get_motor_speed(void)
     {
         return 17.2;
     }
 
-    static void brake()
+    static void brake(void)
     {
         brake_called = true;
     }
 
-    static void coast()
+    static void coast(void)
     {
         coast_called = true;
     }

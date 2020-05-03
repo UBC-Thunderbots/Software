@@ -23,10 +23,10 @@ typedef struct FirmwareBall FirmwareBall_t;
  * @return A pointer to a ball that will use the given methods to get the ball state,
  *         ownership of the ball is given to the caller
  */
-FirmwareBall_t* app_firmware_ball_create(float (*get_ball_position_x)(),
-                                         float (*get_ball_position_y)(),
-                                         float (*get_ball_velocity_x)(),
-                                         float (*get_ball_velocity_y)());
+FirmwareBall_t* app_firmware_ball_create(float (*get_ball_position_x)(void),
+                                         float (*get_ball_position_y)(void),
+                                         float (*get_ball_velocity_x)(void),
+                                         float (*get_ball_velocity_y)(void));
 
 /**
  * Destroy the given ball, freeing any memory allocated for it

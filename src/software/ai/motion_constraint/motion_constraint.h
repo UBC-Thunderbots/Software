@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-#include "software/util/printable_enum_macro/printable_enum_macro.h"
+#include "software/util/make_enum/make_enum.h"
 
 /**
  * This enum describes the constraints robot movement. They are
