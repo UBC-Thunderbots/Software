@@ -153,7 +153,7 @@ TEST(TestUtilsTest, has_all_valid_refbox_game_states)
     }
 }
 
-TEST(TestUtilsTest, DISABLED_polygon_check_if_equal_within_tolerance)
+TEST(TestUtilsTest, polygon_check_if_equal_within_tolerance)
 {
     Polygon poly1({Point(2.323, 2.113), Point(4.567, 1.069), Point(9.245, 1.227)});
     Polygon poly2({Point(2.324, 2.114), Point(4.568, 1.07), Point(9.246, 1.228)});
@@ -185,7 +185,7 @@ TEST(TestUtilsTest, point_check_if_equal_within_tolerance)
     EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(point8, point7));
 }
 
-TEST(TestUtilsTest, DISABLED_circle_check_if_equal_within_tolerance)
+TEST(TestUtilsTest, circle_check_if_equal_within_tolerance)
 {
     Circle circle1(Point(5.393, 1.113), 6.567);
     Circle circle2(Point(5.394, 1.114), 6.568);

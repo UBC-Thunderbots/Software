@@ -130,6 +130,9 @@ namespace Test
 
     bool TestUtil::equalWithinTolerance(double val1, double val2, double tolerance)
     {
-        return fabs(val1 - val2) < (tolerance + GeomConstants::FIXED_EPSILON * 2);
+        // subtracting one fixed epsilon to account for the error in fabs and one fixed
+        // epsilon to account for the error in subtracting the two vals
+        double difference = fabs(val1 - val2) - GeomConstants::FIXED_EPSILON * 2;
+        return difference < tolerance;
     }
 }  // namespace Test
