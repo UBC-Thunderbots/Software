@@ -94,22 +94,17 @@ class Rectangle : public ConvexPolygon
     Vector diagonal() const;
 
     /**
-     * Gets a scaled version of the rectangle if possible.
      * Attempts to move all edges of the rectangle outwards or inwards towards
      * the centre by an "amount" while maintaining the same location for the center of the
      * rectangle. The rectangle will not shrink to anything smaller than a point.
-     * Note: Will not change "this" rectangle
      *
      * @param amount The amount to expand or shrink the rectangle by on all sides, can be
      * positive or negative
-     * @param scaling_success optional argument that indicates whether the scaling was
-     * successful
      *
-     * @return expanded rectangle if it was possible to expand/shrink the rectangle by
-     * amount requested, and return the original rectangle if possible
+     * @return bool Whether it was possible to expand/shrink the rectangle by
+     * amount requested, rectangle remains unchanged if impossible to expand/shrink
      */
-    Rectangle scale(double amount, bool &scaling_success);
-    Rectangle scale(double amount);
+    bool expand(double amount);
 
     bool operator==(const Rectangle &p) const;
 };

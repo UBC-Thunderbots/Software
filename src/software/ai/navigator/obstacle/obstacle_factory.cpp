@@ -25,31 +25,28 @@ std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
             case MotionConstraint::FRIENDLY_DEFENSE_AREA:
                 // We extend the friendly defense area back by several meters to prevent
                 // robots going around the back of the goal
-                rectangle =
-                    Rectangle(
-                        world.field().friendlyDefenseArea().posXPosYCorner(),
-                        Point(-10,
-                              world.field().friendlyDefenseArea().posXNegYCorner().y()))
-                        .scale(config->RobotObstacleInflationFactor()->value() *
-                               ROBOT_MAX_RADIUS_METERS);
+                rectangle = Rectangle(
+                    world.field().friendlyDefenseArea().posXPosYCorner(),
+                    Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
+                                 ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::ENEMY_DEFENSE_AREA:
                 // We extend the enemy defense area back by several meters to prevent
                 // robots going around the back of the goal
-                rectangle =
-                    Rectangle(
-                        world.field().enemyDefenseArea().negXPosYCorner(),
-                        Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()))
-                        .scale(config->RobotObstacleInflationFactor()->value() *
-                               ROBOT_MAX_RADIUS_METERS);
+                rectangle = Rectangle(
+                    world.field().enemyDefenseArea().negXPosYCorner(),
+                    Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
+                                 ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
-                rectangle = world.field().enemyDefenseArea().scale(
-                    config->RobotObstacleInflationFactor()->value() *
-                        ROBOT_MAX_RADIUS_METERS +
-                    0.3);  // 0.3 is by definition what inflated means
+                rectangle = world.field().enemyDefenseArea();
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
+                                     ROBOT_MAX_RADIUS_METERS +
+                                 0.3);  // 0.3 is by definition what inflated means
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::CENTER_CIRCLE:
@@ -65,17 +62,17 @@ std::vector<Obstacle> ObstacleFactory::getObstaclesFromMotionConstraints(
             case MotionConstraint::ENEMY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().enemyCornerNeg() -
-                                          Vector(0, world.field().boundaryYLength()))
-                                .scale(config->RobotObstacleInflationFactor()->value() *
-                                       ROBOT_MAX_RADIUS_METERS);
+                                          Vector(0, world.field().boundaryYLength()));
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
+                                 ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
             case MotionConstraint::FRIENDLY_HALF:
                 rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                       world.field().friendlyCornerNeg() -
-                                          Vector(0, world.field().boundaryYLength()))
-                                .scale(config->RobotObstacleInflationFactor()->value() *
-                                       ROBOT_MAX_RADIUS_METERS);
+                                          Vector(0, world.field().boundaryYLength()));
+                rectangle.expand(config->RobotObstacleInflationFactor()->value() *
+                                 ROBOT_MAX_RADIUS_METERS);
                 obstacles.push_back(Obstacle(rectangle));
                 break;
         }
