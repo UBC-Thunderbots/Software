@@ -1,0 +1,7 @@
+syntax = 'proto2';
+
+import "software/proto/tbots_perception.proto";
+
+message TbotsReplay {
+    repeated TbotsPerception replay_frames = 1;
+}
