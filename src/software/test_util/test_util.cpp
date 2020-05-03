@@ -124,8 +124,8 @@ namespace Test
     bool TestUtil::equalWithinTolerance(const Point &pt1, const Point &pt2,
                                         double tolerance)
     {
-        return equalWithinTolerance(pt1.x(), pt2.x(), tolerance) &&
-               equalWithinTolerance(pt1.y(), pt2.y(), tolerance);
+        double distance = pt1.distanceFromPoint(pt2);
+        return equalWithinTolerance(distance, 0, tolerance);
     }
 
     bool TestUtil::equalWithinTolerance(double val1, double val2, double tolerance)

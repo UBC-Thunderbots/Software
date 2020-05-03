@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #include "shared/constants.h"
 #include "software/new_geom/geom_constants.h"
 #include "software/new_geom/point.h"
