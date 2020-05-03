@@ -103,49 +103,33 @@ namespace Test
                      Timestamp());
     }
 
-    bool TestUtil::checkGeometryEqualWithTolerance(const Polygon &poly1,
-                                                   const Polygon &poly2, double tolerance)
+    bool TestUtil::equalWithinTolerance(const Polygon &poly1, const Polygon &poly2,
+                                        double tolerance)
     {
-        auto ppoints1 = poly1.getPoints();
-        auto ppoints2 = poly2.getPoints();
-        if (ppoints1.size() != ppoints2.size())
-        {
-            return false;
-        }
-
-        for (int i = 0; i < ppoints1.size(); i++)
-        {
-            if (!checkGeometryEqualWithTolerance(ppoints1[i], ppoints2[i], tolerance))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        auto ppts1 = poly1.getPoints();
+        auto ppts2 = poly2.getPoints();
+        return std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
+                          [tolerance](const Point &p1, const Point &p2) {
+                              return equalWithinTolerance(p1, p2, tolerance);
+                          });
     }
 
-    bool TestUtil::checkGeometryEqualWithTolerance(const Circle &circle1,
-                                                   const Circle &circle2,
-                                                   double tolerance)
+    bool TestUtil::equalWithinTolerance(const Circle &c1, const Circle &c2,
+                                        double tolerance)
     {
-        if (!checkGeometryEqualWithTolerance(circle1.getOrigin(), circle2.getOrigin(),
-                                             tolerance))
-        {
-            return false;
-        }
-        if (fabs(circle1.getRadius() - circle2.getRadius()) > tolerance)
-        {
-            return false;
-        }
-        return true;
+        return equalWithinTolerance(c1.getOrigin(), c2.getOrigin(), tolerance) &&
+               equalWithinTolerance(c1.getRadius(), c2.getRadius(), tolerance);
     }
 
-    bool TestUtil::checkGeometryEqualWithTolerance(const Point &point1,
-                                                   const Point &point2, double tolerance)
+    bool TestUtil::equalWithinTolerance(const Point &pt1, const Point &pt2,
+                                        double tolerance)
     {
-        return (point1.distanceFromPoint(point2) <=
-                (sqrt(2) * tolerance + GeomConstants::FIXED_EPSILON));
+        return equalWithinTolerance(pt1.x(), pt2.x(), tolerance) &&
+               equalWithinTolerance(pt1.y(), pt2.y(), tolerance);
     }
 
-    bool checkGeometryEqualWithTolerance(const Circle &circle1, const Circle &circle2) {}
+    bool TestUtil::equalWithinTolerance(double val1, double val2, double tolerance)
+    {
+        return fabs(val1 - val2) < (tolerance + GeomConstants::FIXED_EPSILON * 2);
+    }
 }  // namespace Test

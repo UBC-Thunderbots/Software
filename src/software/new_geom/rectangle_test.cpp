@@ -169,7 +169,7 @@ TEST(RectangleExpandTests, test_expand_positive)
     Rectangle r = Rectangle(Point(2, -2), Point(-3, 5));
     EXPECT_EQ(r.xLength(), 5);
     EXPECT_EQ(r.yLength(), 7);
-    bool scaling_success;
+    bool scaling_success         = false;
     Rectangle expanded_rectangle = r.scale(4, scaling_success);
     EXPECT_TRUE(scaling_success);
     EXPECT_EQ(expanded_rectangle.xLength(), 13);
@@ -181,8 +181,8 @@ TEST(RectangleExpandTests, test_expand_negative)
     Rectangle r = Rectangle(Point(-3, 3), Point(4, -5));
     EXPECT_EQ(r.xLength(), 7);
     EXPECT_EQ(r.yLength(), 8);
-    bool scaling_success;
-    Rectangle expanded_rectangle = r.scale(-2);
+    bool scaling_success         = false;
+    Rectangle expanded_rectangle = r.scale(-2, scaling_success);
     EXPECT_TRUE(scaling_success);
     EXPECT_EQ(expanded_rectangle.xLength(), 3);
     EXPECT_EQ(expanded_rectangle.yLength(), 4);
@@ -193,7 +193,7 @@ TEST(RectangleExpandTests, test_invalid_expand)
     Rectangle r = Rectangle(Point(-3, 3), Point(4, -5));
     EXPECT_EQ(r.xLength(), 7);
     EXPECT_EQ(r.yLength(), 8);
-    bool scaling_success;
+    bool scaling_success         = true;
     Rectangle expanded_rectangle = r.scale(-5, scaling_success);
     EXPECT_FALSE(scaling_success);
 }

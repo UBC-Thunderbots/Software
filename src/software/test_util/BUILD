@@ -10,6 +10,7 @@ cc_library(
         "//software/new_geom:geom_constants",
         "//software/new_geom:point",
         "//software/new_geom:polygon",
+        "//software/new_geom/util:almost_equal",
         "//software/world",
     ],
 )
