@@ -73,10 +73,10 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
             << error << std::endl;
     }
 
-    if (num_bytes_received == max_buffer_length)
+    if (num_bytes_received >= max_buffer_length)
     {
         LOG(WARNING)
-            << "The num_bytes_received equals the max_buffer_length, "
+            << "num_bytes_received >= max_buffer_length, "
             << "which means that the receive buffer is full and data loss has potentially occurred. "
             << "Consider increasing max_buffer_length";
     }
