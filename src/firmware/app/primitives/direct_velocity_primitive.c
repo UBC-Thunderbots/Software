@@ -32,7 +32,7 @@ static void direct_velocity_tick(void* void_state_ptr, FirmwareWorld_t* world)
     DirectVelocityPrimitiveState_t* state =
         (DirectVelocityPrimitiveState_t*)void_state_ptr;
     FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-    app_control_trackVelocityInLocalFrame(robot, state->direct_target_velocity_x,
+    app_control_trackVelocityInRobotFrame(robot, state->direct_target_velocity_x,
                                           state->direct_target_velocity_y,
                                           state->direct_target_velocity_angular);
 }
