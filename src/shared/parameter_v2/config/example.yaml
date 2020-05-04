@@ -1,0 +1,75 @@
+# Examples of all supported Parameter types and their schemas
+--- # Metadata for this config
+metadata:
+  # If shared is true, all parameters in this file will be visible in configs at the same
+  # level in the directoy structure, as well as all children.
+  shared: false
+  # The name of this config. This will be the name used in the generated code
+  name: ExampleConfig
+--- # Parameters
+BoolParam:
+  type: bool
+  value: true
+  description: >
+    Can be true or false
+DoubleParam:
+  type: double # could also be float
+  min: 0
+  max: 5
+  value: 0.2
+  description: >
+    Can be any value in the range [min, max]
+IntParam:
+  type: int # could also be unsigned
+  min: 0
+  max: 5
+  value: 3
+  description: >
+    Can be any integer value in the range [min, max]
+StringParam:
+  type: std::string
+  value: "Hello World"
+  description: >
+    Any string value. Will NEVER be generated for C code
+EnumParam:
+  type: enum
+  enum: RefboxGameState
+  value: HALT
+  description: >
+    Accepts enum values from the specified enum.
+    The target that builds/defines the enum must be included in the enum_targets attribute
+    of the generate_dynamic_parameters bazel rule (otherwise compilation should fail)
+# Example of using the play factory
+# Because we only really care about the available IndexType values, this may be
+# better-named as type: registry
+FactoryParam:
+  type: factory
+  IndexType: std::string
+  TypeToCreate: Play
+  value: "HaltPlay"
+  description: >
+    Accepts all registered IndexType values for the GenericFactory<IndexType, TypeToCreate>.
+    Exact technical implementation regarding includes TBD, but should be possible based
+    on success of enum experiments.
+# Example of optional parameters
+FriendlyColourOverride:
+  type: enum
+  enum: TeamColour
+  value: BLUE
+  optional: true
+  description: >
+    Optional params will generate with std::optional as their value return type.
+    They can accept std::nullopt as a value. If optional is not specified, it is
+    assumed to be false.
+ConstParam:
+  type: int
+  min: 0
+  max: 255
+  value: 50
+  const: true
+  description:
+    Parameters with the const attribute do not generate with an API to change their values.
+    They are constants. All parameters that are marked constant (with the exception of strings)
+    will be able to be generated for C code. If const is not specified, it is assumed to be true
+
+
