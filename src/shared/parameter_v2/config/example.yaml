@@ -27,10 +27,10 @@ IntParam:
   description: >
     Can be any integer value in the range [min, max]
 StringParam:
-  type: std::string
+  type: string
   value: "Hello World"
   description: >
-    Any string value. Will NEVER be generated for C code
+    Any string value. Will be generated as std::string for CPP and const char* for C.
 EnumParam:
   type: enum
   enum: RefboxGameState
