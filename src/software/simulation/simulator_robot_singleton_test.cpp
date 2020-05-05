@@ -1,12 +1,12 @@
-#include "software/backend/simulation/simulator_robot_singleton.h"
+#include "software/simulation/simulator_robot_singleton.h"
 
 #include <gtest/gtest.h>
 
 #include <cmath>
 
-#include "software/backend/simulation/physics/physics_world.h"
-#include "software/backend/simulation/simulator_ball.h"
-#include "software/backend/simulation/simulator_robot.h"
+#include "software/simulation/physics/physics_world.h"
+#include "software/simulation/simulator_ball.h"
+#include "software/simulation/simulator_robot.h"
 
 extern "C"
 {

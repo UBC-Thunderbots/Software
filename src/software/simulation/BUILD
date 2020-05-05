@@ -7,10 +7,10 @@ cc_library(
     deps = [
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/backend/simulation/physics:physics_ball",
-        "//software/backend/simulation/physics:physics_robot",
         "//software/logger",
         "//software/primitive",
+        "//software/simulation/physics:physics_ball",
+        "//software/simulation/physics:physics_robot",
     ],
 )
 
@@ -20,7 +20,7 @@ cc_test(
     deps = [
         ":simulator_ball",
         ":simulator_robot",
-        "//software/backend/simulation/physics:physics_world",
+        "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
         "//software/world:robot",
@@ -34,8 +34,8 @@ cc_library(
     srcs = ["simulator_ball.cpp"],
     hdrs = ["simulator_ball.h"],
     deps = [
-        "//software/backend/simulation/physics:physics_ball",
         "//software/logger",
+        "//software/simulation/physics:physics_ball",
     ],
 )
 
@@ -44,8 +44,8 @@ cc_test(
     srcs = ["simulator_ball_test.cpp"],
     deps = [
         ":simulator_ball",
-        "//software/backend/simulation/physics:physics_ball",
-        "//software/backend/simulation/physics:physics_world",
+        "//software/simulation/physics:physics_ball",
+        "//software/simulation/physics:physics_world",
         "//software/test_util",
         "@box2d",
         "@gtest//:gtest_main",
@@ -75,8 +75,8 @@ cc_test(
         ":simulator_robot",
         ":simulator_robot_singleton",
         "//firmware/app/world:firmware_robot",
-        "//software/backend/simulation/physics:physics_robot",
-        "//software/backend/simulation/physics:physics_world",
+        "//software/simulation/physics:physics_robot",
+        "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
         "//software/world:robot",
@@ -103,9 +103,9 @@ cc_test(
         ":simulator_ball",
         ":simulator_ball_singleton",
         "//firmware/app/world:firmware_ball",
-        "//software/backend/simulation/physics:physics_world",
         "//software/new_geom:point",
         "//software/new_geom:vector",
+        "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/time:timestamp",
         "//software/world",
@@ -125,8 +125,8 @@ cc_library(
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/backend/output/radio/mrf:mrf_primitive_visitor",
-        "//software/backend/simulation/physics:physics_world",
         "//software/primitive",
+        "//software/simulation/physics:physics_world",
         "//software/world",
     ],
 )

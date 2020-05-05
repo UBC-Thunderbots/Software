@@ -4,7 +4,7 @@ extern "C"
 {
 #include "firmware/app/world/firmware_ball.h"
 }
-#include "software/backend/simulation/simulator_ball.h"
+#include "software/simulation/simulator_ball.h"
 
 /**
  * Because the FirmwareBall_t struct is defined in the .c file (rather than the .h file),

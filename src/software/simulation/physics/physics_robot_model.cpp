@@ -1,9 +1,9 @@
-#include "software/backend/simulation/physics/physics_robot_model.h"
+#include "software/simulation/physics/physics_robot_model.h"
 
 #include <algorithm>
 #include <numeric>
 
-#include "software/backend/simulation/physics/box2d_util.h"
+#include "software/simulation/physics/box2d_util.h"
 
 b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(const Robot& robot,
                                                          double total_chicker_depth)

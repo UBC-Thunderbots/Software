@@ -1,10 +1,10 @@
-#include "software/backend/simulation/simulator_ball.h"
+#include "software/simulation/simulator_ball.h"
 
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
-#include "software/backend/simulation/physics/physics_ball.h"
-#include "software/backend/simulation/physics/physics_world.h"
+#include "software/simulation/physics/physics_ball.h"
+#include "software/simulation/physics/physics_world.h"
 #include "software/test_util/test_util.h"
 
 class SimulatorBallTest : public testing::Test

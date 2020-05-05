@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "software/backend/simulation/physics/physics_ball.h"
+#include "software/simulation/physics/physics_ball.h"
 
 /**
  * The SimulatorBall class acts as a wrapper for a PhysicsBall that deals with more

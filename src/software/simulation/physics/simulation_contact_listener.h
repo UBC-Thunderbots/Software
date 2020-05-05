@@ -2,9 +2,9 @@
 
 #include <Box2D/Box2D.h>
 
-#include "software/backend/simulation/physics/physics_ball.h"
-#include "software/backend/simulation/physics/physics_object_user_data.h"
-#include "software/backend/simulation/physics/physics_robot.h"
+#include "software/simulation/physics/physics_ball.h"
+#include "software/simulation/physics/physics_object_user_data.h"
+#include "software/simulation/physics/physics_robot.h"
 
 /**
  * This class implements a custom ContactListener for a Box2D world so that we

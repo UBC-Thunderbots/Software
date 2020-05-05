@@ -1,10 +1,10 @@
-#include "software/backend/simulation/physics/physics_ball.h"
+#include "software/simulation/physics/physics_ball.h"
 
 #include <cmath>
 
 #include "shared/constants.h"
-#include "software/backend/simulation/physics/box2d_util.h"
-#include "software/backend/simulation/physics/physics_object_user_data.h"
+#include "software/simulation/physics/box2d_util.h"
+#include "software/simulation/physics/physics_object_user_data.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg,
                          const double gravity)

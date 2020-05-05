@@ -3,7 +3,7 @@
 #include <cinttypes>
 #include <optional>
 
-#include "software/backend/simulation/simulator_robot.h"
+#include "software/simulation/simulator_robot.h"
 extern "C"
 {
 #include "firmware/app/world/chicker.h"

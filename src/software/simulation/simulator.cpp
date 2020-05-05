@@ -1,8 +1,8 @@
-#include "software/backend/simulation/simulator.h"
+#include "software/simulation/simulator.h"
 
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/backend/simulation/simulator_ball_singleton.h"
-#include "software/backend/simulation/simulator_robot_singleton.h"
+#include "software/simulation/simulator_ball_singleton.h"
+#include "software/simulation/simulator_robot_singleton.h"
 extern "C"
 {
 #include "firmware/app/world/firmware_ball.h"

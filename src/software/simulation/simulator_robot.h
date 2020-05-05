@@ -3,8 +3,8 @@
 #include <cinttypes>
 #include <memory>
 
-#include "software/backend/simulation/physics/physics_ball.h"
-#include "software/backend/simulation/physics/physics_robot.h"
+#include "software/simulation/physics/physics_ball.h"
+#include "software/simulation/physics/physics_robot.h"
 #include "software/primitive/primitive.h"
 
 extern "C"

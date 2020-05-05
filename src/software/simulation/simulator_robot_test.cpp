@@ -1,11 +1,11 @@
-#include "software/backend/simulation/simulator_robot.h"
+#include "software/simulation/simulator_robot.h"
 
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/backend/simulation/physics/physics_world.h"
-#include "software/backend/simulation/simulator_ball.h"
+#include "software/simulation/physics/physics_world.h"
+#include "software/simulation/simulator_ball.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"

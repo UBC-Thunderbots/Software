@@ -1,11 +1,11 @@
-#include "software/backend/simulation/physics/physics_robot.h"
+#include "software/simulation/physics/physics_robot.h"
 
 #include <algorithm>
 #include <numeric>
 
-#include "software/backend/simulation/physics/box2d_util.h"
-#include "software/backend/simulation/physics/physics_object_user_data.h"
-#include "software/backend/simulation/physics/physics_robot_model.h"
+#include "software/simulation/physics/box2d_util.h"
+#include "software/simulation/physics/physics_object_user_data.h"
+#include "software/simulation/physics/physics_robot_model.h"
 extern "C"
 {
 #include "firmware/shared/physics.h"
