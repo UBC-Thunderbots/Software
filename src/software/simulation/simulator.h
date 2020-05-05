@@ -1,9 +1,9 @@
 #pragma once
 
+#include "software/primitive/primitive.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
-#include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
 /**
