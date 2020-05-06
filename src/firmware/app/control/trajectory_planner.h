@@ -5,10 +5,9 @@
 
 #define TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS                                              \
     6000  // The maximum size of the array containing trajectory elements
-#define __TRAJECTORY_PLANNER_MAX_PATH_LENGTH__ 18  // [meters]
 
 // Struct that defines a single point on a trajectory
-// Includes the Position,and Timedata corresponding to that point
+// Includes the Position,and Time data corresponding to that point
 typedef struct TrajectoryElement
 {
     Vector2d_t position;
