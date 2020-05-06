@@ -47,10 +47,12 @@ class ProtoMulticastListener
     // The endpoint for the sender
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
-    // The maximum length of the buffer we use to receive data packets from the network.
-    // 9000 bytes is the maximum transfer unit (MTU) size we can set on our interfaces.
-    // Anything more and we start fragmenting the packets:
-    // https://en.wikipedia.org/wiki/Jumbo_frame
+    // The maximum length of the buffer we use to receive Protobuf packets from the
+    // network. 9000 bytes is the maximum transfer unit (MTU) size we can set on our
+    // network interfaces, before the frame will be fragmented when it is sent, because
+    // that is the maximum size of a jumbo frame https://en.wikipedia.org/wiki/Jumbo_frame
+    // Any proto message received by ProtoMulticastListener must be smaller than this
+    // length in order to be processed correctly
     static constexpr unsigned int max_buffer_length = 9000;
     // Acts as a buffer to store the raw received data from the network
     std::array<char, max_buffer_length> raw_received_data_;
