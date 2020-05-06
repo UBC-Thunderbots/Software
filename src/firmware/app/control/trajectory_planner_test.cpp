@@ -21,22 +21,22 @@ class TrajectoryPlannerTest : public testing::Test
 
     virtual void TearDown() {}
 
-    static std::vector<double> getSpeedFromTrajectory(Trajectory_t* trajectory,
-                                                      double inital_speed)
+    static std::vector<float> getSpeedFromTrajectory(Trajectory_t* trajectory,
+                                                      float inital_speed)
     {
-        std::vector<double> velocity;
+        std::vector<float> velocity;
 
         // Calculate the delta-position and the delta-time
         velocity.push_back(inital_speed);
 
         for (unsigned i = 1; i < trajectory->num_elements - 1; i++)
         {
-            const double dx = trajectory->trajectory_elements[i + 1].position.x -
+            const float dx = trajectory->trajectory_elements[i + 1].position.x -
                               trajectory->trajectory_elements[i].position.x;
-            const double dy = trajectory->trajectory_elements[i + 1].position.y -
+            const float dy = trajectory->trajectory_elements[i + 1].position.y -
                               trajectory->trajectory_elements[i].position.y;
 
-            const double dt = trajectory->trajectory_elements[i + 1].time -
+            const float dt = trajectory->trajectory_elements[i + 1].time -
                               trajectory->trajectory_elements[i].time;
 
             velocity.push_back(sqrt((pow(dx, 2) + pow(dy, 2))) / dt);
@@ -44,18 +44,18 @@ class TrajectoryPlannerTest : public testing::Test
         return velocity;
     }
 
-    static std::vector<double> getAccelerationsFromSpeed(std::vector<double> speeds,
+    static std::vector<float> getAccelerationsFromSpeed(std::vector<float> speeds,
                                                          Trajectory_t* trajectory)
     {
-        std::vector<double> acceleration;
+        std::vector<float> acceleration;
 
         // Calculate the delta-position and the delta-time
         acceleration.push_back(0.0);
 
         for (unsigned i = 1; i < trajectory->num_elements - 2; i++)
         {
-            const double dv = speeds[i + 1] - speeds[i];
-            const double dt = trajectory->trajectory_elements[i + 1].time -
+            const float dv = speeds[i + 1] - speeds[i];
+            const float dt = trajectory->trajectory_elements[i + 1].time -
                               trajectory->trajectory_elements[i].time;
 
             acceleration.push_back(dv / dt);
@@ -96,16 +96,16 @@ TEST_F(TrajectoryPlannerTest, path_length_and_start_point_end_point_test)
         path_parameters.path, path_parameters.t_start, path_parameters.t_end,
         arc_length_param);
 
-    const double arc_segment_length =
+    const float arc_segment_length =
         arc_length_param.arc_length_values[arc_length_param.num_values - 1];
 
-    double segment_length_sum = 0;
+    float segment_length_sum = 0;
 
     // Test by checking the length between points
     // and the length of the total path
     for (uint i = 0; i < trajectory.num_elements - 1; i++)
     {
-        double length = sqrt(pow(trajectory.trajectory_elements[i].position.x -
+        float length = sqrt(pow(trajectory.trajectory_elements[i].position.x -
                                      trajectory.trajectory_elements[i + 1].position.x,
                                  2) +
                              pow(trajectory.trajectory_elements[i].position.y -
@@ -168,14 +168,14 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    double velocities[path_parameters.num_segments];
-    double accelerations[path_parameters.num_segments];
+    float velocities[path_parameters.num_segments];
+    float accelerations[path_parameters.num_segments];
 
-    std::vector<double> velocity =
+    std::vector<float> velocity =
         getSpeedFromTrajectory(&trajectory, path_parameters.initial_speed);
-    std::vector<double> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
+    std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
 
-    for (double vel : velocity)
+    for (float vel : velocity)
     {
         EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.1 &&
                     vel >= path_parameters.initial_speed);
@@ -184,7 +184,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
     EXPECT_DOUBLE_EQ(velocity.front(), path_parameters.initial_speed);
 
-    for (double acc : acceleration)
+    for (float acc : acceleration)
     {
         EXPECT_TRUE(fabs(acc) <= path_parameters.max_allowable_acceleration * 1.2);
     }
@@ -240,16 +240,16 @@ TEST_F(TrajectoryPlannerTest,
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_end, path_parameters.t_start, arc_length_param);
 
-    const double arc_segment_length =
+    const float arc_segment_length =
         arc_length_param.arc_length_values[arc_length_param.num_values - 1];
 
-    double segment_length_sum = 0;
+    float segment_length_sum = 0;
 
     // Test by checking the length between points
     // and the length of the total path
     for (uint i = 0; i < trajectory.num_elements - 1; i++)
     {
-        double length = sqrt(pow(trajectory.trajectory_elements[i + 1].position.x -
+        float length = sqrt(pow(trajectory.trajectory_elements[i + 1].position.x -
                                      trajectory.trajectory_elements[i].position.x,
                                  2) +
                              pow(trajectory.trajectory_elements[i + 1].position.y -
@@ -302,14 +302,14 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    double velocities[trajectory.num_elements];
-    double accelerations[trajectory.num_elements];
+    float velocities[trajectory.num_elements];
+    float accelerations[trajectory.num_elements];
 
-    std::vector<double> velocity =
+    std::vector<float> velocity =
         getSpeedFromTrajectory(&trajectory, path_parameters.initial_speed);
-    std::vector<double> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
+    std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
 
-    for (double vel : velocity)
+    for (float vel : velocity)
     {
         EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.2 &&
                     vel >= path_parameters.initial_speed);
@@ -319,7 +319,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     EXPECT_DOUBLE_EQ(velocity.front(), path_parameters.initial_speed);
 
-    for (double acc : acceleration)
+    for (float acc : acceleration)
     {
         EXPECT_TRUE(fabs(acc) <= path_parameters.max_allowable_acceleration * 1.2);
     }
@@ -369,10 +369,10 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_straight_line)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    const double arc_segment_length =
+    const float arc_segment_length =
         arc_length_param.arc_length_values[arc_length_param.num_values - 1];
 
-    double segment_length_sum = 0;
+    float segment_length_sum = 0;
 
     // Calculate the constant-interpolation period equivalent of the
     // trajectory->trajectory_elements
@@ -436,7 +436,7 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_curved_line)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    const double arc_segment_length =
+    const float arc_segment_length =
         arc_length_param.arc_length_values[arc_length_param.num_values - 1];
 
     // Calculate the constant-interpolation period equivalent of the

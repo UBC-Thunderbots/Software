@@ -11,7 +11,7 @@
 typedef struct TrajectoryElement
 {
     Vector2d_t position;
-    double time;
+    float time;
 } TrajectoryElement_t;
 
 typedef struct Trajectory
@@ -23,13 +23,13 @@ typedef struct Trajectory
 typedef struct FirmwareRobotPathParameters
 {
     Polynomial2dOrder3_t path;
-    double t_start;
-    double t_end;
+    float t_start;
+    float t_end;
     unsigned int num_segments;
-    double max_allowable_acceleration;
-    double max_allowable_speed;
-    double initial_speed;
-    double final_speed;
+    float max_allowable_acceleration;
+    float max_allowable_speed;
+    float initial_speed;
+    float final_speed;
 } FirmwareRobotPathParameters_t;
 
 /**
@@ -100,7 +100,7 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
  *
  */
 Trajectory_t app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
-    Trajectory_t* variable_time_trajectory, const double interpolation_period);
+    Trajectory_t* variable_time_trajectory, const float interpolation_period);
 
 
 /**
@@ -110,7 +110,7 @@ Trajectory_t app_trajectory_planner_interpolate_constant_time_trajectory_segment
  *
  * @return [out] The arc length in meters
  */
-static double app_trajectory_planner_get_total_arcLength(ArcLengthParametrization_t arc_length_param);
+static float app_trajectory_planner_get_total_arcLength(ArcLengthParametrization_t arc_length_param);
 
 /**
  * Returns the maximum velocity profile for a given curve based on curvature and maximum
@@ -133,9 +133,9 @@ static double app_trajectory_planner_get_total_arcLength(ArcLengthParametrizatio
  * point on the trajectory
  *
  */
-static void app_trajectory_planner_get_max_allowable_speed_profile(double *max_allowable_speed_profile,
+static void app_trajectory_planner_get_max_allowable_speed_profile(float *max_allowable_speed_profile,
                                                                    TrajectoryElement_t *traj_elements,
                                                                    Polynomial2dOrder3_t path, unsigned int num_elements,
                                                                    ArcLengthParametrization_t arc_length_param,
-                                                                   double arc_segment_length,
-                                                                   const double max_allowable_acceleration);
+                                                                   float arc_segment_length,
+                                                                   const float max_allowable_acceleration);
