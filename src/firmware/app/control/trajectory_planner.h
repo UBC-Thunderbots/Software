@@ -20,6 +20,27 @@ typedef struct Trajectory
     unsigned int num_elements;
 } Trajectory_t;
 
+/*
+*   t_start - The path parameter value indicating the beginning of the
+*       considered path
+*   t_end - The path parameter value indicating the end of the considered
+*       path
+*
+*   num_segments - The number of segments to discretize the trajectory into.
+*       Must be greater than 2 segments.
+*       THE NUMBER OF SEGMENTS MUST BE UNDER
+*       TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
+*
+*   max_allowable_acceleration - The maximum acceleration allowed at any
+*       point along the trajectory. This factor limits the maximum delta-velocity and also the
+*       max speed around curves due to centripetal acceleration [m/s^2]
+*
+*   max_allowable_speed - The maximum speed allowable at any point along the
+*
+*   path [m/s] *initial_speed - The initial speed at the start of the trajectory [m/s]
+*
+*   final_speed - The final speed at the end of the trajectory [m/s]
+ */
 typedef struct FirmwareRobotPathParameters
 {
     Polynomial2dOrder3_t path;
@@ -61,24 +82,6 @@ typedef struct FirmwareRobotPathParameters
  *
  *  @param path_parameters [in] The data structure including important path parameters
  * such as: *path - The 3D polynomial representing the geometric path
- *
- *              *t_start - The path parameter value indicating the beggining of the
- * considered path *t_end - The path parameter value indicating the end of the considered
- * path
- *
- *              *num_segments - The number of segments to discreteize the trajectory into.
- *                          Must be greater than 2 segments.
- *                          THE NUMBER OF SEGMENTS MUST BE UNDER
- *                          TRAJECTORY_PLANNER_MAX_NUMER_SEGMENTS
- *
- *              *max_allowable_acceleration - The maximum acceleration allowed at any
- * point along the trajectory. This factor limits the maximum delta-velocity and also the
- * max speed around curves due to centripital acceleration [m/s^2]
- *
- *              *max_allowable_speed - The maximum speed allowable at any point along the
- * path [m/s] *initial_speed - The initial speed at the start of the trajectory [m/s]
- *
- *              *final_speed - The final speed at the end of the trajectory [m/s]
  */
 void app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
