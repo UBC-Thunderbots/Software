@@ -107,6 +107,10 @@ ALL_CPP_ACTIONS = [
 def _make_common_features(ctx):
     result = {}
 
+    result["static_link_cpp_runtimes"] = feature(
+        name = "static_link_cpp_runtimes",
+    )
+
     result["unfiltered_compile_flags_feature"] = feature(
         name = "unfiltered_compile_flags",
         flag_sets = ([
@@ -548,6 +552,7 @@ def _linux_gcc_impl(ctx):
             "stdlib",
             "lld",
             "frame-pointer",
+            "static_link_cpp_runtimes",
         ],
     )
 
