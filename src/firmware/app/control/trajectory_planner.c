@@ -24,8 +24,8 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     float initial_speed                    = path_parameters.initial_speed;
     const float max_allowable_acceleration = path_parameters.max_allowable_acceleration;
     const float max_allowable_speed        = path_parameters.max_allowable_speed;
-    const unsigned int num_segments         = path_parameters.num_segments;
-    const Polynomial2dOrder3_t path         = path_parameters.path;
+    const unsigned int num_segments        = path_parameters.num_segments;
+    const Polynomial2dOrder3_t path        = path_parameters.path;
     float t_end                            = path_parameters.t_end;
     float t_start                          = path_parameters.t_start;
 
@@ -44,8 +44,8 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
 
         // Reverse the direction (Polynomial library can only handle forwards direction)
         float temp = t_start;
-        t_start     = t_end;
-        t_end       = temp;
+        t_start    = t_end;
+        t_end      = temp;
 
         // Reverse the final and initial speeds
         temp          = initial_speed;
@@ -62,13 +62,14 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     shared_polynomial_getArcLengthParametrizationOrder3(path, t_start, t_end,
                                                         arc_length_param);
 
-    const float arc_segment_length = app_trajectory_planner_get_total_arcLength(arc_length_param) / num_segments;
+    const float arc_segment_length =
+        app_trajectory_planner_get_total_arcLength(arc_length_param) / num_segments;
 
     // Now use numerical interpolation to get constant arc length segments for the
     // parameterization
-    app_trajectory_planner_get_max_allowable_speed_profile(max_allowable_speed_profile, traj_elements, path,
-                                                           num_segments, arc_length_param, arc_segment_length,
-                                                           max_allowable_acceleration);
+    app_trajectory_planner_get_max_allowable_speed_profile(
+        max_allowable_speed_profile, traj_elements, path, num_segments, arc_length_param,
+        arc_segment_length, max_allowable_acceleration);
 
     // First point on the velocity profile is always the current speed
     velocity_profile[0] = initial_speed;
@@ -80,7 +81,7 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     {
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
         const float temp_vel = sqrt(pow(velocity_profile[i - 1], 2) +
-                                     2 * arc_segment_length * max_allowable_acceleration);
+                                    2 * arc_segment_length * max_allowable_acceleration);
 
         // If the new speed is greater than the max allowable, reduce it to the max
         if (temp_vel > max_allowable_speed_profile[i])
@@ -107,7 +108,7 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     {
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
         const float temp_vel = sqrt(pow(velocity_profile[i], 2) +
-                                     2 * arc_segment_length * max_allowable_acceleration);
+                                    2 * arc_segment_length * max_allowable_acceleration);
 
         if (velocity_profile[i - 1] > temp_vel)
         {
@@ -150,84 +151,77 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
 }
 
 
-Trajectory_t app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
-        Trajectory_t* variable_time_trajectory, const float interpolation_period)
+void app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
+    Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
+    const float interpolation_period)
 {
-    static TrajectoryElement_t
-        constant_period_trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     // The first point is the same for each trajectory
-    constant_period_trajectory[0].time =
+    constant_period_trajectory->trajectory_elements[0].time =
         variable_time_trajectory->trajectory_elements[0].time;
-    constant_period_trajectory[0].position =
+    constant_period_trajectory->trajectory_elements[0].position =
         variable_time_trajectory->trajectory_elements[0].position;
 
     // Keep track of the current time we are searching for in the constant arclength
     // trajectory
     unsigned int time_periods = 1;
-    float trajectory_time    = interpolation_period * time_periods;
+    float trajectory_time     = interpolation_period * time_periods;
 
     // Loop until we find a value JUST larger than the expected
     // Check the element prior and perform linear interpolation
     for (unsigned int i = 1; i < variable_time_trajectory->num_elements; i++)
     {
-        while (variable_time_trajectory->trajectory_elements[i].time >=
-               trajectory_time)
+        while (variable_time_trajectory->trajectory_elements[i].time >= trajectory_time)
         {
             // Perform a linear interpolation
             const float delta_time =
-                    variable_time_trajectory->trajectory_elements[i].time -
-                    variable_time_trajectory->trajectory_elements[i - 1].time;
+                variable_time_trajectory->trajectory_elements[i].time -
+                variable_time_trajectory->trajectory_elements[i - 1].time;
             const float delta_x =
-                    variable_time_trajectory->trajectory_elements[i].position.x -
-                    variable_time_trajectory->trajectory_elements[i - 1].position.x;
+                variable_time_trajectory->trajectory_elements[i].position.x -
+                variable_time_trajectory->trajectory_elements[i - 1].position.x;
             const float delta_y =
-                    variable_time_trajectory->trajectory_elements[i].position.y -
-                    variable_time_trajectory->trajectory_elements[i - 1].position.y;
+                variable_time_trajectory->trajectory_elements[i].position.y -
+                variable_time_trajectory->trajectory_elements[i - 1].position.y;
 
             const float slope_x = delta_x / delta_time;
             const float slope_y = delta_y / delta_time;
 
             const float interpolated_x =
-                slope_x *
-                    (trajectory_time -
-                     variable_time_trajectory->trajectory_elements[i - 1].time) +
+                slope_x * (trajectory_time -
+                           variable_time_trajectory->trajectory_elements[i - 1].time) +
                 variable_time_trajectory->trajectory_elements[i - 1].position.x;
             const float interpolated_y =
-                slope_y *
-                    (trajectory_time -
-                     variable_time_trajectory->trajectory_elements[i - 1].time) +
+                slope_y * (trajectory_time -
+                           variable_time_trajectory->trajectory_elements[i - 1].time) +
                 variable_time_trajectory->trajectory_elements[i - 1].position.y;
 
-            constant_period_trajectory[time_periods].position.x = interpolated_x;
-            constant_period_trajectory[time_periods].position.y = interpolated_y;
-            constant_period_trajectory[time_periods].time       = trajectory_time;
+            constant_period_trajectory->trajectory_elements[time_periods].position.x =
+                interpolated_x;
+            constant_period_trajectory->trajectory_elements[time_periods].position.y =
+                interpolated_y;
+            constant_period_trajectory->trajectory_elements[time_periods].time =
+                trajectory_time;
 
             time_periods++;
             trajectory_time = interpolation_period * time_periods;
         }
     }
 
-    static Trajectory_t ret;
-
-    ret.trajectory_elements = constant_period_trajectory;
-    ret.num_elements        = time_periods;
-
-    return ret;
+    constant_period_trajectory->num_elements = time_periods;
 }
 
 
-float app_trajectory_planner_get_total_arcLength(ArcLengthParametrization_t arc_length_param)
+float app_trajectory_planner_get_total_arcLength(
+    ArcLengthParametrization_t arc_length_param)
 {
     return arc_length_param.arc_length_values[arc_length_param.num_values - 1];
 }
 
-void app_trajectory_planner_get_max_allowable_speed_profile(float *max_allowable_speed_profile,
-                                                            TrajectoryElement_t *traj_elements,
-                                                            Polynomial2dOrder3_t path, unsigned int num_elements,
-                                                            ArcLengthParametrization_t arc_length_param,
-                                                            float arc_segment_length,
-                                                            const float max_allowable_acceleration)
+void app_trajectory_planner_get_max_allowable_speed_profile(
+    float* max_allowable_speed_profile, TrajectoryElement_t* traj_elements,
+    Polynomial2dOrder3_t path, unsigned int num_elements,
+    ArcLengthParametrization_t arc_length_param, float arc_segment_length,
+    const float max_allowable_acceleration)
 {
     Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
     Polynomial2dOrder1_t second_deriv =

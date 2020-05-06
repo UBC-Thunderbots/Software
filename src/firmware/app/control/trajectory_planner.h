@@ -92,15 +92,17 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
  *
  * @pre variable_time_trajectory is a valid trajectory
  *
+ * @param constant_period_trajectory [in] The array to be filled with the constant time
+ * interpolation period equivalent of the input trajectory
  * @param variable_time_trajectory [in] The valid trajectory used as
  * reference for a constant interpolation period trajectory
-
  * @param interpolation_period [in] The constant change in time that corresponds to each
  * trajectory segment
  *
  */
-Trajectory_t app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
-    Trajectory_t* variable_time_trajectory, const float interpolation_period);
+void app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
+    Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
+    const float interpolation_period);
 
 
 /**
@@ -110,7 +112,8 @@ Trajectory_t app_trajectory_planner_interpolate_constant_time_trajectory_segment
  *
  * @return [out] The arc length in meters
  */
-static float app_trajectory_planner_get_total_arcLength(ArcLengthParametrization_t arc_length_param);
+static float app_trajectory_planner_get_total_arcLength(
+    ArcLengthParametrization_t arc_length_param);
 
 /**
  * Returns the maximum velocity profile for a given curve based on curvature and maximum
@@ -133,9 +136,8 @@ static float app_trajectory_planner_get_total_arcLength(ArcLengthParametrization
  * point on the trajectory
  *
  */
-static void app_trajectory_planner_get_max_allowable_speed_profile(float *max_allowable_speed_profile,
-                                                                   TrajectoryElement_t *traj_elements,
-                                                                   Polynomial2dOrder3_t path, unsigned int num_elements,
-                                                                   ArcLengthParametrization_t arc_length_param,
-                                                                   float arc_segment_length,
-                                                                   const float max_allowable_acceleration);
+static void app_trajectory_planner_get_max_allowable_speed_profile(
+    float* max_allowable_speed_profile, TrajectoryElement_t* traj_elements,
+    Polynomial2dOrder3_t path, unsigned int num_elements,
+    ArcLengthParametrization_t arc_length_param, float arc_segment_length,
+    const float max_allowable_acceleration);

@@ -22,7 +22,7 @@ class TrajectoryPlannerTest : public testing::Test
     virtual void TearDown() {}
 
     static std::vector<float> getSpeedFromTrajectory(Trajectory_t* trajectory,
-                                                      float inital_speed)
+                                                     float inital_speed)
     {
         std::vector<float> velocity;
 
@@ -32,12 +32,12 @@ class TrajectoryPlannerTest : public testing::Test
         for (unsigned i = 1; i < trajectory->num_elements - 1; i++)
         {
             const float dx = trajectory->trajectory_elements[i + 1].position.x -
-                              trajectory->trajectory_elements[i].position.x;
+                             trajectory->trajectory_elements[i].position.x;
             const float dy = trajectory->trajectory_elements[i + 1].position.y -
-                              trajectory->trajectory_elements[i].position.y;
+                             trajectory->trajectory_elements[i].position.y;
 
             const float dt = trajectory->trajectory_elements[i + 1].time -
-                              trajectory->trajectory_elements[i].time;
+                             trajectory->trajectory_elements[i].time;
 
             velocity.push_back(sqrt((pow(dx, 2) + pow(dy, 2))) / dt);
         }
@@ -45,7 +45,7 @@ class TrajectoryPlannerTest : public testing::Test
     }
 
     static std::vector<float> getAccelerationsFromSpeed(std::vector<float> speeds,
-                                                         Trajectory_t* trajectory)
+                                                        Trajectory_t* trajectory)
     {
         std::vector<float> acceleration;
 
@@ -56,7 +56,7 @@ class TrajectoryPlannerTest : public testing::Test
         {
             const float dv = speeds[i + 1] - speeds[i];
             const float dt = trajectory->trajectory_elements[i + 1].time -
-                              trajectory->trajectory_elements[i].time;
+                             trajectory->trajectory_elements[i].time;
 
             acceleration.push_back(dv / dt);
         }
@@ -85,7 +85,8 @@ TEST_F(TrajectoryPlannerTest, path_length_and_start_point_end_point_test)
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters, &trajectory);
+    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                     &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -105,12 +106,13 @@ TEST_F(TrajectoryPlannerTest, path_length_and_start_point_end_point_test)
     // and the length of the total path
     for (uint i = 0; i < trajectory.num_elements - 1; i++)
     {
-        float length = sqrt(pow(trajectory.trajectory_elements[i].position.x -
-                                     trajectory.trajectory_elements[i + 1].position.x,
-                                 2) +
-                             pow(trajectory.trajectory_elements[i].position.y -
-                                     trajectory.trajectory_elements[i + 1].position.y,
-                                 2));
+        float length = static_cast<float>(
+            sqrt(pow(trajectory.trajectory_elements[i].position.x -
+                         trajectory.trajectory_elements[i + 1].position.x,
+                     2) +
+                 pow(trajectory.trajectory_elements[i].position.y -
+                         trajectory.trajectory_elements[i + 1].position.y,
+                     2)));
         segment_length_sum += length;
     }
     EXPECT_NEAR(segment_length_sum, arc_segment_length, 0.01);
@@ -157,7 +159,8 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters, &trajectory);
+    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                     &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -169,8 +172,6 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
     float velocities[path_parameters.num_segments];
-    float accelerations[path_parameters.num_segments];
-
     std::vector<float> velocity =
         getSpeedFromTrajectory(&trajectory, path_parameters.initial_speed);
     std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
@@ -229,7 +230,8 @@ TEST_F(TrajectoryPlannerTest,
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters, &trajectory);
+    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                     &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -249,12 +251,13 @@ TEST_F(TrajectoryPlannerTest,
     // and the length of the total path
     for (uint i = 0; i < trajectory.num_elements - 1; i++)
     {
-        float length = sqrt(pow(trajectory.trajectory_elements[i + 1].position.x -
-                                     trajectory.trajectory_elements[i].position.x,
-                                 2) +
-                             pow(trajectory.trajectory_elements[i + 1].position.y -
-                                     trajectory.trajectory_elements[i].position.y,
-                                 2));
+        float length =
+            static_cast<float>(sqrt(pow(trajectory.trajectory_elements[i + 1].position.x -
+                                            trajectory.trajectory_elements[i].position.x,
+                                        2) +
+                                    pow(trajectory.trajectory_elements[i + 1].position.y -
+                                            trajectory.trajectory_elements[i].position.y,
+                                        2)));
         segment_length_sum += length;
     }
     EXPECT_NEAR(segment_length_sum, arc_segment_length, 0.01);
@@ -291,7 +294,8 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters, &trajectory);
+    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                     &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -303,7 +307,6 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
     float velocities[trajectory.num_elements];
-    float accelerations[trajectory.num_elements];
 
     std::vector<float> velocity =
         getSpeedFromTrajectory(&trajectory, path_parameters.initial_speed);
@@ -358,7 +361,8 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_straight_line)
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters, &trajectory);
+    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                     &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -369,15 +373,15 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_straight_line)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    const float arc_segment_length =
-        arc_length_param.arc_length_values[arc_length_param.num_values - 1];
-
     float segment_length_sum = 0;
 
-    // Calculate the constant-interpolation period equivalent of the
-    // trajectory->trajectory_elements
-    Trajectory_t const_interp_trajectory =
-            app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(&trajectory, 0.001);
+    Trajectory_t const_interp_trajectory;
+    TrajectoryElement_t const_interp_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    const_interp_trajectory.trajectory_elements = const_interp_elements;
+
+    // Calculate the constant-interpolation period equivalent of the trajectory
+    app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
+        &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 const_interp_trajectory
@@ -425,7 +429,8 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_curved_line)
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters, &trajectory);
+    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                     &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -436,13 +441,13 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_curved_line)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    const float arc_segment_length =
-        arc_length_param.arc_length_values[arc_length_param.num_values - 1];
+    Trajectory_t const_interp_trajectory;
+    TrajectoryElement_t const_interp_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    const_interp_trajectory.trajectory_elements = const_interp_elements;
 
-    // Calculate the constant-interpolation period equivalent of the
-    // trajectory->trajectory_elements
-    Trajectory_t const_interp_trajectory =
-            app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(&trajectory, 0.001);
+    // Calculate the constant-interpolation period equivalent of the trajectory
+    app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
+        &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 const_interp_trajectory
