@@ -81,7 +81,7 @@ typedef struct FirmwareRobotPathParameters
  *
  *              *final_speed - The final speed at the end of the trajectory [m/s]
  */
-void generate_constant_arc_length_segmentation(
+void app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
 
 /**
@@ -100,7 +100,7 @@ void generate_constant_arc_length_segmentation(
  * trajectory segment
  *
  */
-Trajectory_t interpolate_constant_time_trajectory_segmentation(
+Trajectory_t app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
     Trajectory_t* variable_time_trajectory, const double interpolation_period);
 
 
@@ -111,7 +111,7 @@ Trajectory_t interpolate_constant_time_trajectory_segmentation(
  *
  * @return [out] The arc length in meters
  */
-double getTotalArcLength(ArcLengthParametrization_t arc_length_param);
+static double app_trajectory_planner_get_total_arcLength(ArcLengthParametrization_t arc_length_param);
 
 /**
  * Returns the maximum velocity profile for a given curve based on curvature and maximum
@@ -134,9 +134,9 @@ double getTotalArcLength(ArcLengthParametrization_t arc_length_param);
  * point on the trajectory
  *
  */
-void getMaxAllowableSpeedProfile(double max_allowable_speed_profile[],
-                                 TrajectoryElement_t traj_elements[],
-                                 Polynomial2dOrder3_t path, unsigned int num_elements,
-                                 ArcLengthParametrization_t arc_length_param,
-                                 double arc_segment_length,
-                                 const double max_allowable_acceleration);
+static void app_trajectory_planner_get_max_allowable_speed_profile(double *max_allowable_speed_profile,
+                                                                   TrajectoryElement_t *traj_elements,
+                                                                   Polynomial2dOrder3_t path, unsigned int num_elements,
+                                                                   ArcLengthParametrization_t arc_length_param,
+                                                                   double arc_segment_length,
+                                                                   const double max_allowable_acceleration);
