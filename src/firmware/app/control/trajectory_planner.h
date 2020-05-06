@@ -21,25 +21,25 @@ typedef struct Trajectory
 } Trajectory_t;
 
 /*
-*   t_start - The path parameter value indicating the beginning of the
-*       considered path
-*   t_end - The path parameter value indicating the end of the considered
-*       path
-*
-*   num_segments - The number of segments to discretize the trajectory into.
-*       Must be greater than 2 segments.
-*       THE NUMBER OF SEGMENTS MUST BE UNDER
-*       TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
-*
-*   max_allowable_acceleration - The maximum acceleration allowed at any
-*       point along the trajectory. This factor limits the maximum delta-velocity and also the
-*       max speed around curves due to centripetal acceleration [m/s^2]
-*
-*   max_allowable_speed - The maximum speed allowable at any point along the
-*
-*   path [m/s] *initial_speed - The initial speed at the start of the trajectory [m/s]
-*
-*   final_speed - The final speed at the end of the trajectory [m/s]
+ *   t_start - The path parameter value indicating the beginning of the
+ *       considered path
+ *   t_end - The path parameter value indicating the end of the considered
+ *       path
+ *
+ *   num_segments - The number of segments to discretize the trajectory into.
+ *       Must be greater than 2 segments.
+ *       THE NUMBER OF SEGMENTS MUST BE UNDER
+ *       TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
+ *
+ *   max_allowable_acceleration - The maximum acceleration allowed at any
+ *       point along the trajectory. This factor limits the maximum delta-velocity and
+ * also the max speed around curves due to centripetal acceleration [m/s^2]
+ *
+ *   max_allowable_speed - The maximum speed allowable at any point along the
+ *
+ *   path [m/s] *initial_speed - The initial speed at the start of the trajectory [m/s]
+ *
+ *   final_speed - The final speed at the end of the trajectory [m/s]
  */
 typedef struct FirmwareRobotPathParameters
 {
@@ -93,7 +93,8 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
  * calculate) then interpolate a constant period trajectory. This is valuable for discrete
  * time motion controllers that operate only at constant delta-time intervals
  *
- * @pre variable_time_trajectory is a valid (obeys the physical limitation of the robot) trajectory
+ * @pre variable_time_trajectory is a valid (obeys the physical limitation of the robot)
+ * trajectory
  *
  * @param constant_period_trajectory [in] The array to be filled with the constant time
  * interpolation period equivalent of the input trajectory

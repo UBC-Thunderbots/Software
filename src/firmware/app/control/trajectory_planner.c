@@ -1,5 +1,6 @@
 #include "firmware/app/control/trajectory_planner.h"
 
+#include <assert.h>
 #include <stdbool.h>
 
 #include "firmware/shared/math/polynomial_1d.h"
@@ -7,7 +8,6 @@
 #include "firmware/shared/math/vector_2d.h"
 #include "math.h"
 #include "stdio.h"
-#include <assert.h>
 
 void app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)

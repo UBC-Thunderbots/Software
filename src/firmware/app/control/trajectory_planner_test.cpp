@@ -64,7 +64,7 @@ class TrajectoryPlannerTest : public testing::Test
     }
 };
 
-TEST_F(TrajectoryPlannerTest, path_length_and_start_point_end_point_test)
+TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {2, 0, 1, 0}},
@@ -208,7 +208,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
 }
 
 TEST_F(TrajectoryPlannerTest,
-       path_length_and_start_point_end_point_test_reverse_direction)
+       check_trajectory_length_and_end_points_match_path_reverse_parameterization)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -340,7 +340,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
                 0.025);
 }
 
-TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_straight_line)
+TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -364,7 +364,7 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_straight_line)
     app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
                                                                      &trajectory);
 
-    // Create the parmeterization to contain the desired number of segments
+    // Create the parameterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
                                              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
 
@@ -407,7 +407,7 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_straight_line)
                 const_interp_trajectory.trajectory_elements[0].time, 0.001);
 }
 
-TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_curved_line)
+TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {2, 0, 1, 0}},
@@ -432,7 +432,7 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_curved_line)
     app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
                                                                      &trajectory);
 
-    // Create the parmeterization to contain the desired number of segments
+    // Create the parameterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
                                              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
 
