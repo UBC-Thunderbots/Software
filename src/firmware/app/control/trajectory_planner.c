@@ -7,6 +7,7 @@
 #include "firmware/shared/math/vector_2d.h"
 #include "math.h"
 #include "stdio.h"
+#include <assert.h>
 
 void app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
@@ -34,6 +35,12 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     // Variable used to flag if the path is moving "backwards" along the input path
     bool reverse_parameterization = false;
 
+    // Check that the pre conditions are met
+    assert(num_segments > 2);
+    assert(max_allowable_acceleration > 0);
+    assert(max_allowable_speed > 0);
+    assert(initial_speed >= 0);
+    assert(final_speed >= 0);
 
     // Check for the parameterization direction
     // If the path is traversed in reverse, then flip all components to forwards (to be
