@@ -108,7 +108,35 @@ Trajectory_t interpolate_constant_time_trajectory_segmentation(
  * Returns a the total length of any arc specified by an arc parameterizaton
  *
  * @param arc_length_param [in] Arc length parameterization
- * 
+ *
  * @return [out] The arc length in meters
  */
 double getTotalArcLength(ArcLengthParametrization_t arc_length_param);
+
+/**
+ * Returns the maximum velocity profile for a given curve based on curvature and maximum
+ * allowable acceleration
+ *
+ * @param max_allowable_speed_profile [in] The pre-allocated array that will contain all
+ * of the maximum allowable velocity values for each point on th curve
+ *
+ * @param traj_elements [in] Trajectory segments including X/Y position
+ *
+ * @param path [in] The polynomial that defines the path of the trajectory
+ *
+ * @param num_elements [in] The number of elements in the trajectory
+ *
+ * @param arc_length_param [in] The arc length parameterization of the path polynomial
+ *
+ * @param arc_segment_length [in] The length of each segment in the trajectory
+ *
+ * @param max_allowable_acceleration [in] The max allowable acceleration at any discrete
+ * point on the trajectory
+ *
+ */
+void getMaxAllowableSpeedProfile(double max_allowable_speed_profile[],
+                                 TrajectoryElement_t traj_elements[],
+                                 Polynomial2dOrder3_t path, unsigned int num_elements,
+                                 ArcLengthParametrization_t arc_length_param,
+                                 double arc_segment_length,
+                                 const double max_allowable_acceleration);

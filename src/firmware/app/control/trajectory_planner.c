@@ -1,11 +1,12 @@
 #include "firmware/app/control/trajectory_planner.h"
 
+#include <stdbool.h>
+
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/vector_2d.h"
 #include "math.h"
 #include "stdio.h"
-#include <stdbool.h>
 
 void generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
@@ -61,52 +62,20 @@ void generate_constant_arc_length_segmentation(
     shared_polynomial_getArcLengthParametrizationOrder3(path, t_start, t_end,
                                                         arc_length_param);
 
-    const double arc_segment_length =
-        getTotalArcLength(arc_length_param) /
-        num_segments;
+    const double arc_segment_length = getTotalArcLength(arc_length_param) / num_segments;
 
-    Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
-    Polynomial2dOrder1_t second_deriv =
-        shared_polynomial2d_differentiateOrder2(first_deriv);
+    //Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
+    //Polynomial2dOrder1_t second_deriv =
+    //    shared_polynomial2d_differentiateOrder2(first_deriv);
 
-    // Now use numerial interpolation to get constant arc length segments for the
+    // Now use numerical interpolation to get constant arc length segments for the
     // parameterization
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        // Get the 't' value corresponding to the current arc length (to be used for
-        // further computing)
-        double t = shared_polynomial2d_getTValueAtArcLengthOrder3(
-            path, i * arc_segment_length, arc_length_param);
+    getMaxAllowableSpeedProfile(max_allowable_speed_profile, traj_elements, path,
+                                     num_segments, arc_length_param, arc_segment_length,
+                                     max_allowable_acceleration);
 
-        // Get the X and Y position at the 't' value defined by the arc length
-        traj_elements[i].position = shared_polynomial2d_getValueOrder3(path, t);
-
-
-        // Create the polynomial representing path curvature
-        //                                              1
-        //                              ---------------------------------
-        //                                     abs(x'y'' - y'x'')
-        //        radius of curvature =      ----------------------
-        //                                     (x'^2 + y'^2)^(3/2)
-        //
-        const double numerator =
-            fabs(shared_polynomial1d_getValueOrder2(first_deriv.x, t) *
-                     shared_polynomial1d_getValueOrder1(second_deriv.y, t) -
-                 shared_polynomial1d_getValueOrder2(first_deriv.y, t) *
-                     shared_polynomial1d_getValueOrder1(second_deriv.x, t));
-        const double denominator =
-            pow(pow(shared_polynomial1d_getValueOrder2(first_deriv.x, t), 2) +
-                    pow(shared_polynomial1d_getValueOrder2(first_deriv.y, t), 2),
-                3.0 / 2.0);
-
-        const double radius_of_curvature = 1 / (numerator / denominator);
-
-        max_allowable_speed_profile[i] =
-            sqrt(max_allowable_acceleration * radius_of_curvature);
-    }
-
-    // First point on the velocity profile is always the current speed
-    velocity_profile[0] = initial_speed;
+        // First point on the velocity profile is always the current speed
+        velocity_profile[0] = initial_speed;
 
     // Loop through the path forwards to ensure that the maximum velocity limit defined by
     // the curvature is not breached by constant max acceleration of the robot (if it is,
@@ -126,7 +95,7 @@ void generate_constant_arc_length_segmentation(
         // to the limit
         else if (temp_vel >= max_allowable_speed)
         {
-                velocity_profile[i] = max_allowable_speed;
+            velocity_profile[i] = max_allowable_speed;
         }
         else
         {
@@ -252,6 +221,53 @@ Trajectory_t interpolate_constant_time_trajectory_segmentation(
 }
 
 
-double getTotalArcLength(ArcLengthParametrization_t arc_length_param) {
-    return arc_length_param.arc_length_values[arc_length_param.num_values-1];
+double getTotalArcLength(ArcLengthParametrization_t arc_length_param)
+{
+    return arc_length_param.arc_length_values[arc_length_param.num_values - 1];
+}
+
+void getMaxAllowableSpeedProfile(double max_allowable_speed_profile[],
+                                 TrajectoryElement_t traj_elements[],
+                                 Polynomial2dOrder3_t path, unsigned int num_elements,
+                                 ArcLengthParametrization_t arc_length_param,
+                                 double arc_segment_length,
+                                 const double max_allowable_acceleration)
+{
+    Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
+    Polynomial2dOrder1_t second_deriv =
+        shared_polynomial2d_differentiateOrder2(first_deriv);
+
+    for (unsigned int i = 0; i < num_elements; i++)
+    {
+        // Get the 't' value corresponding to the current arc length (to be used for
+        // further computing)
+        double t = shared_polynomial2d_getTValueAtArcLengthOrder3(
+            path, i * arc_segment_length, arc_length_param);
+
+        // Get the X and Y position at the 't' value defined by the arc length
+        traj_elements[i].position = shared_polynomial2d_getValueOrder3(path, t);
+
+
+        // Create the polynomial representing path curvature
+        //                                              1
+        //                              ---------------------------------
+        //                                     abs(x'y'' - y'x'')
+        //        radius of curvature =      ----------------------
+        //                                     (x'^2 + y'^2)^(3/2)
+        //
+        const double numerator =
+            fabs(shared_polynomial1d_getValueOrder2(first_deriv.x, t) *
+                     shared_polynomial1d_getValueOrder1(second_deriv.y, t) -
+                 shared_polynomial1d_getValueOrder2(first_deriv.y, t) *
+                     shared_polynomial1d_getValueOrder1(second_deriv.x, t));
+        const double denominator =
+            pow(pow(shared_polynomial1d_getValueOrder2(first_deriv.x, t), 2) +
+                    pow(shared_polynomial1d_getValueOrder2(first_deriv.y, t), 2),
+                3.0 / 2.0);
+
+        const double radius_of_curvature = 1 / (numerator / denominator);
+
+        max_allowable_speed_profile[i] =
+            sqrt(max_allowable_acceleration * radius_of_curvature);
+    }
 }

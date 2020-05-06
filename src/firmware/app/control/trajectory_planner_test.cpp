@@ -60,12 +60,6 @@ class TrajectoryPlannerTest : public testing::Test
 
             acceleration.push_back(dv / dt);
         }
-
-        // for (int i = 0; i < acceleration.size(); i++)
-        // {
-        //     std::cout << "ACC: " << acceleration[i] << " VEL: " << velocity[i]
-        //               << std::endl;
-        // }
         return acceleration;
     }
 };
@@ -444,8 +438,6 @@ TEST_F(TrajectoryPlannerTest, test_constant_time_interpolation_curved_line)
 
     const double arc_segment_length =
         arc_length_param.arc_length_values[arc_length_param.num_values - 1];
-
-    double segment_length_sum = 0;
 
     // Calculate the constant-interpolation period equivalent of the
     // trajectory->trajectory_elements
