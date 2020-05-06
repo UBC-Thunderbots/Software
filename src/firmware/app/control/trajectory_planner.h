@@ -93,7 +93,7 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
  * calculate) then interpolate a constant period trajectory. This is valuable for discrete
  * time motion controllers that operate only at constant delta-time intervals
  *
- * @pre variable_time_trajectory is a valid trajectory
+ * @pre variable_time_trajectory is a valid (obeys the physical limitation of the robot) trajectory
  *
  * @param constant_period_trajectory [in] The array to be filled with the constant time
  * interpolation period equivalent of the input trajectory
