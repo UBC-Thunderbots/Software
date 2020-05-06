@@ -64,18 +64,14 @@ void generate_constant_arc_length_segmentation(
 
     const double arc_segment_length = getTotalArcLength(arc_length_param) / num_segments;
 
-    //Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
-    //Polynomial2dOrder1_t second_deriv =
-    //    shared_polynomial2d_differentiateOrder2(first_deriv);
-
     // Now use numerical interpolation to get constant arc length segments for the
     // parameterization
     getMaxAllowableSpeedProfile(max_allowable_speed_profile, traj_elements, path,
-                                     num_segments, arc_length_param, arc_segment_length,
-                                     max_allowable_acceleration);
+                                num_segments, arc_length_param, arc_segment_length,
+                                max_allowable_acceleration);
 
-        // First point on the velocity profile is always the current speed
-        velocity_profile[0] = initial_speed;
+    // First point on the velocity profile is always the current speed
+    velocity_profile[0] = initial_speed;
 
     // Loop through the path forwards to ensure that the maximum velocity limit defined by
     // the curvature is not breached by constant max acceleration of the robot (if it is,
