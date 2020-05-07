@@ -12,7 +12,7 @@ class PolygonObstacle : public Obstacle
     PolygonObstacle() = delete;
 
     /**
-     * Construct a polygon obstacle by with a Polygon
+     * Construct a polygon obstacle with a Polygon
      * @param polygon Polygon to make obstacle with
      */
     explicit PolygonObstacle(const Polygon& polygon);

@@ -12,7 +12,7 @@ class CircleObstacle : public Obstacle
     CircleObstacle() = delete;
 
     /**
-     * Construct a circle obstacle by with a Circle
+     * Construct a circle obstacle with a Circle
      *
      * @param circle Circle to make obstacle with
      */
