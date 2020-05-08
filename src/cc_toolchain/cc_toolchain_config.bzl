@@ -109,7 +109,6 @@ def _make_common_features(ctx):
 
     result["static_link_cpp_runtimes"] = feature(
         name = "static_link_cpp_runtimes",
-        implies = ["no-unused-command-line-argument"],
     )
 
     result["unfiltered_compile_flags_feature"] = feature(
@@ -375,16 +374,6 @@ def _make_common_features(ctx):
             flag_set(
                 actions = ALL_CPP_ACTIONS,
                 flag_groups = [flag_group(flags = ["-fno-exceptions"])],
-            ),
-        ],
-    )
-
-    result["no-unused-command-line-argument"] = feature(
-        name = "no-unused-command-line-argument",
-        flag_sets = [
-            flag_set(
-                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = ["-Wno-unused-command-line-argument"])],
             ),
         ],
     )
