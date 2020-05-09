@@ -182,7 +182,7 @@ bool pointInFrontVector(Point offset, Vector direction, Point p)
     // compare angle different
     Angle a1   = direction.orientation();
     Angle a2   = (p - offset).orientation();
-    Angle diff = (a1 - a2).angleMod();
+    Angle diff = (a1 - a2).clamp();
     return diff < Angle::quarter() && diff > -Angle::quarter();
 }
 

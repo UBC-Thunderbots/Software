@@ -540,7 +540,7 @@ void vCoRoutineSchedule( void );
  * functions used by tasks.
  *
  * crQUEUE_SEND_FROM_ISR() and crQUEUE_RECEIVE_FROM_ISR() can only be used to
- * pass data between a co-routine and and ISR, whereas xQueueSendFromISR() and
+ * pass data between a co-routine and ISR, whereas xQueueSendFromISR() and
  * xQueueReceiveFromISR() can only be used to pass data between a task and and
  * ISR.
  *
@@ -637,7 +637,7 @@ void vCoRoutineSchedule( void );
  * functions used by tasks.
  *
  * crQUEUE_SEND_FROM_ISR() and crQUEUE_RECEIVE_FROM_ISR() can only be used to
- * pass data between a co-routine and and ISR, whereas xQueueSendFromISR() and
+ * pass data between a co-routine and ISR, whereas xQueueSendFromISR() and
  * xQueueReceiveFromISR() can only be used to pass data between a task and and
  * ISR.
  *

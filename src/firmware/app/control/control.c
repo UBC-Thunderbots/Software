@@ -157,25 +157,31 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
     app_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot), wheel_force[2]);
 }
 
-void app_control_trackVelocity(FirmwareRobot_t* robot, float linear_velocity_x,
-                               float linear_velocity_y, float angular_velocity)
+void app_control_trackVelocityInRobotFrame(FirmwareRobot_t* robot,
+                                           float linear_velocity_x,
+                                           float linear_velocity_y,
+                                           float angular_velocity)
 {
     float current_vx               = app_firmware_robot_getVelocityX(robot);
     float current_vy               = app_firmware_robot_getVelocityY(robot);
     float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
     float current_orientation      = app_firmware_robot_getOrientation(robot);
 
+    // Rotate the current_velocity vector from the world frame to the robot frame
+    float current_velocity[2];
+    current_velocity[0] = current_vx;
+    current_velocity[1] = current_vy;
+    rotate(current_velocity, -current_orientation);
 
     // This is the "P" term in a PID controller. We essentially do proportional
     // control of our acceleration based on velocity error
     static const float VELOCITY_ERROR_GAIN = 10.0f;
 
     float desired_acceleration[2];
-    desired_acceleration[0] = (linear_velocity_x - current_vx) * VELOCITY_ERROR_GAIN;
-    desired_acceleration[1] = (linear_velocity_y - current_vy) * VELOCITY_ERROR_GAIN;
-
-    // Rotate the acceleration vector from the robot frame to the world frame
-    rotate(desired_acceleration, -current_orientation);
+    desired_acceleration[0] =
+        (linear_velocity_x - current_velocity[0]) * VELOCITY_ERROR_GAIN;
+    desired_acceleration[1] =
+        (linear_velocity_y - current_velocity[1]) * VELOCITY_ERROR_GAIN;
 
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
