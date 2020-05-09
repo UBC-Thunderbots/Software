@@ -22,10 +22,12 @@ message ChipperKickerStatus
     uint64 time_since_kicker_fired = 2;
 }
 
-/* Data about the status of the dribbler */
+/* Data about the status of the dribbler
+ * Note that the rotation is from the perspective of rear of the motor, looking down
+ * the shaft starting from the motor body
+ */
 message DribblerStatus
 {
-    // NOTE: positive means clockwise and negative means counterclockwise
     int32 dribbler_rpm = 1;
 }
 
@@ -81,14 +83,16 @@ message FirmwareStatus
     uint32 fw_build_id = 1;
 }
 
-/* Data from the motor encoders */
+/* Data from the motor encoders
+ * Note that the rotation is from the perspective of rear of the motor, looking down
+ * the shaft starting from the motor body
+ */
 message MotorEncoderData
 {
-    // NOTE: positive means clockwise and negative means counterclockwise
-    int32 motor_fl_rpm = 1;
-    int32 motor_fr_rpm = 2;
-    int32 motor_bl_rpm = 3;
-    int32 motor_br_rpm = 4;
+    int32 front_left_rpm  = 1;
+    int32 front_right_rpm = 2;
+    int32 back_left_rpm   = 3;
+    int32 back_right_rpm  = 4;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
