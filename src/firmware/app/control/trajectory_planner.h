@@ -54,7 +54,7 @@ typedef struct FirmwareRobotPathParameters
 } FirmwareRobotPathParameters_t;
 
 /**
- * Returns a planned trajectory as a list of TrajectoryElement's.
+ * Returns a planned trajectory with the list of guarantees based on the assumptions below
  *
  *  Key assumptions & guarantees of this planner are:
  *  - Trajectories are time-optimal assuming INFINITE JERK capability of the robot
@@ -74,14 +74,18 @@ typedef struct FirmwareRobotPathParameters
  *     - To ensure the robot is capable of deccelerating to reach ant sudden changes in
  * the path, the trajectory is checked for backwards continuity
  *
- * @pre num_segments > 2
- * @pre max_allowable_acceleration > 0
- * @pre max_allowable_speed > 0
- * @pre init_speed >= 0
- * @pre final_speed >= 0
+ * @pre path_parameters.num_segments > 2
+ * @pre path_parameters.max_allowable_acceleration > 0
+ * @pre path_parameters.max_allowable_speed > 0
+ * @pre path_parameters.init_speed >= 0
+ * @pre path_parameters.final_speed >= 0
+ * @pre The trajectory.trajectory_elements[] array is pre-allocated ot handle up to the
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS limit
  *
- *  @param path_parameters [in] The data structure including important path parameters
- * such as: *path - The 3D polynomial representing the geometric path
+ * @param path_parameters [in] The data structure including important path parameters as
+ * defined by the FirmwareRobotPathParameters struct
+ * @param trajectory [out[ The planned trajectory that follows robot dynamics limitations
+ * with the appropriate guarantees and assumptions outlines above
  */
 void app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
@@ -95,8 +99,10 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
  *
  * @pre variable_time_trajectory is a valid (obeys the physical limitation of the robot)
  * trajectory
+ * @pre constant_period_trajectory is pre=allocated up the the limit specified by
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @param constant_period_trajectory [in] The array to be filled with the constant time
+ * @param constant_period_trajectory [out] The array to be filled with the constant time
  * interpolation period equivalent of the input trajectory
  * @param variable_time_trajectory [in] The valid trajectory used as
  * reference for a constant interpolation period trajectory
@@ -123,9 +129,11 @@ static float app_trajectory_planner_get_total_arcLength(
  * Returns the maximum velocity profile for a given curve based on curvature and maximum
  * allowable acceleration
  *
- * @param max_allowable_speed_profile [in] The pre-allocated array that will contain all
- * of the maximum allowable velocity values for each point on th curve
+ * @param max_allowable_speed_profile is pre-allocated up the the limit specified by
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
+ * @param max_allowable_speed_profile [out] The pre-allocated array that will contain all
+ * of the maximum allowable velocity values for each point on th curve
  * @param traj_elements [in] Trajectory segments including X/Y position
  *
  * @param path [in] The polynomial that defines the path of the trajectory
@@ -145,3 +153,31 @@ static void app_trajectory_planner_get_max_allowable_speed_profile(
     Polynomial2dOrder3_t path, unsigned int num_elements,
     ArcLengthParametrization_t arc_length_param, float arc_segment_length,
     const float max_allowable_acceleration);
+
+/**
+ * Builds the forwards continuous velocity profile for the given parameters.
+ * NOTE: The velocity profile returned by this function is NOT reverse continuous and does
+ * not guarantee a feasible path to follow.
+ *
+ * NOTE: The velocity_profile wil contain the same number of real elements as the input
+ * max_allowable_speed[] array
+ *
+ * @pre The velocity_profile array is pre-allocated to contain up to
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS elements
+ *
+ * @param num_segments [in] The number of segments(elements) in the
+ * max_allowable_speed_profile input array
+ * @param velocity_profile [out] The array that the forwards continuous array will be
+ * copied into
+ * @param max_allowable_speed_profile [in] The pre-allocated array that will contain all
+ * of the maximum allowable velocity values for each point on th curve
+ * @param arc_segment_length [in] The lenmgth of each arc length segment in meters
+ * @param max_allowable_acceleration [in] The max allowable acceleration at any point in
+ * m/s^2
+ * @param max_allowable_speed [IN] The max allowable speed at any point in m/s
+ *
+ * */
+static void app_trajectory_planner_generate_forwards_velocity_profile(
+    unsigned int num_segments, float* velocity_profile,
+    float* max_allowable_speed_profile, const float arc_segment_length,
+    const float max_allowable_acceleration, const float max_allowable_speed);

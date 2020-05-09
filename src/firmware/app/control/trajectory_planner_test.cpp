@@ -183,7 +183,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     }
 
     EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
-    EXPECT_DOUBLE_EQ(velocity.front(), path_parameters.initial_speed);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
 
     for (float acc : acceleration)
     {
@@ -320,7 +320,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
 
-    EXPECT_DOUBLE_EQ(velocity.front(), path_parameters.initial_speed);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
 
     for (float acc : acceleration)
     {

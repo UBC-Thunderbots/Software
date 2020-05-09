@@ -84,28 +84,9 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     // Loop through the path forwards to ensure that the maximum velocity limit defined by
     // the curvature is not breached by constant max acceleration of the robot (if it is,
     // pull down the acceleration)
-    for (unsigned int i = 1; i < num_segments; i++)
-    {
-        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
-        const float temp_vel = sqrt(pow(velocity_profile[i - 1], 2) +
-                                    2 * arc_segment_length * max_allowable_acceleration);
-
-        // If the new speed is greater than the max allowable, reduce it to the max
-        if (temp_vel > max_allowable_speed_profile[i])
-        {
-            velocity_profile[i] = max_allowable_speed_profile[i];
-        }
-        // If the new speed is greater than the maximum limit of the robot, reduce it
-        // to the limit
-        else if (temp_vel >= max_allowable_speed)
-        {
-            velocity_profile[i] = max_allowable_speed;
-        }
-        else
-        {
-            velocity_profile[i] = temp_vel;
-        }
-    }
+    app_trajectory_planner_generate_forwards_velocity_profile(
+        num_segments, velocity_profile, max_allowable_speed_profile, arc_segment_length,
+        max_allowable_acceleration, max_allowable_speed);
 
     // Now check backwards continuity. This is done to guarantee the robot can deccelerate
     // in time to not breach the maximum allowable speed defined by the path curvature
@@ -266,5 +247,35 @@ void app_trajectory_planner_get_max_allowable_speed_profile(
 
         max_allowable_speed_profile[i] =
             sqrt(max_allowable_acceleration * radius_of_curvature);
+    }
+}
+
+void app_trajectory_planner_generate_forwards_velocity_profile(
+    unsigned int num_segments, float* velocity_profile,
+    float* max_allowable_speed_profile, const float arc_segment_length,
+    const float max_allowable_acceleration, const float max_allowable_speed)
+{
+    for (unsigned int i = 1; i < num_segments; i++)
+    {
+        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
+        const float temp_vel =
+            (float)sqrt(pow(velocity_profile[i - 1], 2) +
+                        2 * arc_segment_length * max_allowable_acceleration);
+
+        // If the new speed is greater than the max allowable, reduce it to the max
+        if (temp_vel > max_allowable_speed_profile[i])
+        {
+            velocity_profile[i] = max_allowable_speed_profile[i];
+        }
+        // If the new speed is greater than the maximum limit of the robot, reduce it
+        // to the limit
+        else if (temp_vel >= max_allowable_speed)
+        {
+            velocity_profile[i] = max_allowable_speed;
+        }
+        else
+        {
+            velocity_profile[i] = temp_vel;
+        }
     }
 }
