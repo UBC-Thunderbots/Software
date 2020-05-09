@@ -26,9 +26,9 @@ ReplayLogger::~ReplayLogger() {
 }
 
 
-void ReplayLogger::onValueReceived(TbotsPerception frame)
+void ReplayLogger::onValueReceived(TbotsSensorProto frame)
 {
-    current_chunk.mutable_replay_frames()->Add(dynamic_cast<TbotsPerception&&>(frame));
+    current_chunk.mutable_replay_frames()->Add(dynamic_cast<TbotsSensorProto&&>(frame));
     if (current_chunk.replay_frames_size() > FRAMES_PER_CHUNK) {
         saveCurrentChunk();
         nextChunk();

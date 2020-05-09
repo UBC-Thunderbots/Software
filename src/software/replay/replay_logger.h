@@ -1,18 +1,18 @@
 #pragma once
 #include <experimental/filesystem>
 #include "software/multithreading/threaded_observer.h"
-#include "software/proto/tbots_perception.pb.h"
+#include "software/proto/tbots_sensor_proto.pb.h"
 #include "software/proto/tbots_replay.pb.h"
 
 
-class ReplayLogger : public ThreadedObserver<TbotsPerception>
+class ReplayLogger : public ThreadedObserver<TbotsSensorProto>
 {
    public:
     explicit ReplayLogger(const std::string& output_directory);
     ReplayLogger(const ReplayLogger&) = delete;
     ~ReplayLogger() override;
    private:
-    void onValueReceived(TbotsPerception frame) override;
+    void onValueReceived(TbotsSensorProto frame) override;
     void nextChunk();
     void saveCurrentChunk();
 

@@ -50,6 +50,6 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "sensor_msg_cc_proto",
-    deps = [":sensor_msg_proto"],
+    name = "tbots_cc_proto",
+    deps = [":tbots_proto"],
 )

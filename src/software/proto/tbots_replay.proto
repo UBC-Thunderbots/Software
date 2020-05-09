@@ -1,7 +1,7 @@
 syntax = 'proto2';
 
-import "software/proto/tbots_perception.proto";
+import "software/proto/tbots_sensor_proto.proto";
 
 message TbotsReplay {
-    repeated TbotsPerception replay_frames = 1;
+    repeated TbotsSensorProto replay_frames = 1;
 }
