@@ -38,9 +38,9 @@ enum ErrorCode
     NO_ERROR = 0;
 
     // Level triggered events
-    LOW_CAP_MESSAGE                 = 1;
-    LOW_BATTERY_MESSAGE             = 2;
-    HIGH_BOARD_TEMP_MESSAGE         = 3;
+    LOW_CAP                         = 1;
+    LOW_BATTERY                     = 2;
+    HIGH_BOARD_TEMP                 = 3;
     CHARGE_TIMEOUT                  = 4;
     WHEEL_0_MOTOR_HOT               = 5;
     WHEEL_1_MOTOR_HOT               = 6;
@@ -61,6 +61,7 @@ enum ErrorCode
     WHEEL_2_HALL_SENSOR_STUCK_HIGH  = 21;
     WHEEL_3_HALL_SENSOR_STUCK_HIGH  = 22;
     DRIBBLER_HALL_SENSOR_STUCK_HIGH = 23;
+
     // Edge triggered events
     ICB_CRC_ERROR                        = 24;
     RECEIVE_FRAME_CHECK_SEQUENCE_FAILURE = 25;
@@ -68,12 +69,12 @@ enum ErrorCode
     CRASHED_NO_CORE_DUMP                 = 27;
 
     // Radio Dongle Errors
-    ROBOT_DEAD_MESSAGE          = 28;
-    ESTOP_BROKEN_MESSAGE        = 29;
-    RX_FCS_FAIL_MESSAGE         = 30;
-    SECOND_DONGLE_MESSAGE       = 31;
-    TRANSMIT_QUEUE_FULL_MESSAGE = 32;
-    RECEIVE_QUEUE_FULL_MESSAGE  = 33;
+    ROBOT_DEAD          = 28;
+    ESTOP_BROKEN        = 29;
+    RX_FCS_FAIL         = 30;
+    SECOND_DONGLE       = 31;
+    TRANSMIT_QUEUE_FULL = 32;
+    RECEIVE_QUEUE_FULL  = 33;
 }
 
 /* Firmware build information  */
