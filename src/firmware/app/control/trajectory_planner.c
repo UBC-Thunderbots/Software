@@ -84,7 +84,7 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     // Loop through the path forwards to ensure that the maximum velocity limit defined by
     // the curvature is not breached by constant max acceleration of the robot (if it is,
     // pull down the acceleration)
-    app_trajectory_planner_generate_forwards_velocity_profile(
+    app_trajectory_planner_generate_forwards_continuous_velocity_profile(
         num_segments, velocity_profile, max_allowable_speed_profile, arc_segment_length,
         max_allowable_acceleration, max_allowable_speed);
 
@@ -92,27 +92,21 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     // in time to not breach the maximum allowable speed defined by the path curvature
     velocity_profile[num_segments - 1] = final_speed;
 
-    for (unsigned int i = num_segments - 1; i > 0; i--)
-    {
-        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
-        const float temp_vel = sqrt(pow(velocity_profile[i], 2) +
-                                    2 * arc_segment_length * max_allowable_acceleration);
+    app_trajectory_planner_generate_backwards_continuous_velocity_profile(
+        num_segments, velocity_profile, arc_segment_length, max_allowable_acceleration);
 
-        if (velocity_profile[i - 1] > temp_vel)
-        {
-            velocity_profile[i - 1] = temp_vel;
-        }
-    }
-
-    // Now that the velocity profile has been defined we can calcuate the time profile of
+    // Now that the velocity profile has been defined we can calculate the time profile of
     // the trajectory
-    traj_elements[0].time = 0.0;
-    for (unsigned int i = 0; i < num_segments - 1; i++)
-    {
-        traj_elements[i + 1].time =
-            traj_elements[i].time +
-            (2 * arc_segment_length) / (velocity_profile[i] + velocity_profile[i + 1]);
-    }
+    app_trajectory_planner_generate_time_profile(traj_elements, num_segments,
+                                                 arc_segment_length, velocity_profile);
+    //    traj_elements[0].time = 0.0;
+    //    for (unsigned int i = 0; i < num_segments - 1; i++)
+    //    {
+    //        traj_elements[i + 1].time =
+    //            traj_elements[i].time +
+    //            (2 * arc_segment_length) / (velocity_profile[i] + velocity_profile[i +
+    //            1]);
+    //    }
 
     // If the parameterization ended up being reversed, we need to flip all the values
     // back.
@@ -250,7 +244,7 @@ void app_trajectory_planner_get_max_allowable_speed_profile(
     }
 }
 
-void app_trajectory_planner_generate_forwards_velocity_profile(
+void app_trajectory_planner_generate_forwards_continuous_velocity_profile(
     unsigned int num_segments, float* velocity_profile,
     float* max_allowable_speed_profile, const float arc_segment_length,
     const float max_allowable_acceleration, const float max_allowable_speed)
@@ -277,5 +271,37 @@ void app_trajectory_planner_generate_forwards_velocity_profile(
         {
             velocity_profile[i] = temp_vel;
         }
+    }
+}
+
+void app_trajectory_planner_generate_backwards_continuous_velocity_profile(
+    unsigned int num_segments, float* forwards_continuous_velocity_profile,
+    const float arc_segment_length, const float max_allowable_acceleration)
+{
+    for (unsigned int i = num_segments - 1; i > 0; i--)
+    {
+        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
+        const float temp_vel =
+            (float)sqrt(pow(forwards_continuous_velocity_profile[i], 2) +
+                        2 * arc_segment_length * max_allowable_acceleration);
+
+        if (forwards_continuous_velocity_profile[i - 1] > temp_vel)
+        {
+            forwards_continuous_velocity_profile[i - 1] = temp_vel;
+        }
+    }
+}
+
+void app_trajectory_planner_generate_time_profile(TrajectoryElement_t* traj_elements,
+                                                  const float num_segments,
+                                                  const float arc_segment_length,
+                                                  float* velocity_profile)
+{
+    traj_elements[0].time = 0.0;
+    for (unsigned int i = 0; i < num_segments - 1; i++)
+    {
+        traj_elements[i + 1].time =
+            traj_elements[i].time +
+            (2 * arc_segment_length) / (velocity_profile[i] + velocity_profile[i + 1]);
     }
 }

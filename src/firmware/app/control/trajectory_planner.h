@@ -177,7 +177,45 @@ static void app_trajectory_planner_get_max_allowable_speed_profile(
  * @param max_allowable_speed [IN] The max allowable speed at any point in m/s
  *
  * */
-static void app_trajectory_planner_generate_forwards_velocity_profile(
+void app_trajectory_planner_generate_forwards_continuous_velocity_profile(
     unsigned int num_segments, float* velocity_profile,
     float* max_allowable_speed_profile, const float arc_segment_length,
     const float max_allowable_acceleration, const float max_allowable_speed);
+
+/**
+ * Modifies a forwards continuous velocity profile to also be backwards continuous based
+ * on the input parameters.
+ *
+ * @pre The input velocity_profile is required to be FORWARDS CONTINUOUS before it is used
+ * as an input to this function
+ *
+ * @param num_segments [in] The number of segments(elements) in the velocity_profile array
+ * @param forwards_continuous_velocity_profile The forwards continuous velocity profile to
+ * ebe modified in-place into a profile that is also backwards continuous
+ * @param arc_segment_length [in] The arc segment length of each segment in the path the
+ * profile is being generated for in meters
+ * @param max_allowable_acceleration [in] The max allowable acceleration at any point on
+ * the velocity profile
+ */
+void app_trajectory_planner_generate_backwards_continuous_velocity_profile(
+    unsigned int num_segments, float* forwards_continuous_velocity_profile,
+    const float arc_segment_length, const float max_allowable_acceleration);
+
+/**
+ *  Adds a time profile to an existing position profile for the given input parameters
+ *
+ *  @pre traj_elements must be pre-allocated and contain all of the position data of the
+ * trajectory
+ *
+ * @param traj_elements The trajectory element array that will be modified to contain the
+ * time profile
+ * @param num_segments [in/ The number of segments(elements) in traj_elements and
+ * velocity_profile
+ * @param arc_segment_length  [in] The arc length of each path segment
+ * @param velocity_profile  The forwards and backwards continuous velocity profile of the
+ * trajectory
+ */
+void app_trajectory_planner_generate_time_profile(TrajectoryElement_t* traj_elements,
+                                                  const float num_segments,
+                                                  const float arc_segment_length,
+                                                  float* velocity_profile);
