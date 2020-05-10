@@ -28,3 +28,15 @@ cc_library(
         "//software/world",
     ],
 )
+
+cc_test(
+    name = "replay_test",
+    srcs = ["replay_test.cpp"],
+    deps = [
+        "replay_logger",
+        "replay_reader",
+        "//software/multithreading:subject",
+        "//software/proto:tbots_cc_proto",
+        "@gtest//:gtest_main",
+    ],
+)
