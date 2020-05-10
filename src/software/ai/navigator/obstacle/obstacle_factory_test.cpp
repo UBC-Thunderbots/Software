@@ -21,8 +21,8 @@ class ObstacleFactoryTest : public testing::Test
     {
     }
 
-    ObstacleFactory obstacle_factory;
     Timestamp current_time;
+    ObstacleFactory obstacle_factory;
 };
 
 TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
@@ -84,14 +84,15 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
     Vector velocity(0.0, 0.0);
     Angle orientation(Angle::fromRadians(2.2));
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
-    Circle expected(origin, 0.041569219381653054);
+    Circle expected(origin, 0.042);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
     ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
     try
     {
         auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-        EXPECT_EQ(expected, circle_obstacle.getCircle());
+        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+            expected, circle_obstacle.getCircle(), METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -126,19 +127,16 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     Vector velocity(0.27, 0.34);
     Angle orientation(Angle::fromRadians(2.2));
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
-    Polygon expected({Point(-2.1325533066198088, 5.0258511552569072),
-                      Point(-2.1386644104795618, 4.984733587118515),
-                      Point(-2.1061111038597526, 4.9588824318616078),
-                      Point(-2.0674466933801914, 4.9741488447430928),
-                      Point(-1.694058936210534, 5.4443408352530316),
-                      Point(-1.7591655494501515, 5.4960431457668459)});
+    Polygon expected({Point(-2.133, 5.026), Point(-2.139, 4.985), Point(-2.106, 4.959),
+                      Point(-2.067, 4.974), Point(-1.694, 5.444), Point(-1.759, 5.496)});
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
     ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
     try
     {
         auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected, polygon_obstacle.getPolygon());
+        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+            expected, polygon_obstacle.getPolygon(), METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -152,19 +150,16 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     Vector velocity(-0.27, 1.34);
     Angle orientation(Angle::fromRadians(-1.2));
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(1.6));
-    Polygon expected({Point(1.1592497651168834, -0.20821086822271753),
-                      Point(1.1867357030264414, -0.23939617273032049),
-                      Point(1.227485937909558, -0.23118530450760297),
-                      Point(1.2407502348831165, -0.19178913177728252),
-                      Point(0.88263941441511673, 1.5855016068416794),
-                      Point(0.80113894464888358, 1.5690798703962443)});
+    Polygon expected({Point(1.159, -0.208), Point(1.187, -0.239), Point(1.227, -0.231),
+                      Point(1.241, -0.192), Point(0.883, 1.586), Point(0.801, 1.569)});
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
     ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
     try
     {
         auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected, polygon_obstacle.getPolygon());
+        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+            expected, polygon_obstacle.getPolygon()));
     }
     catch (std::bad_cast)
     {
