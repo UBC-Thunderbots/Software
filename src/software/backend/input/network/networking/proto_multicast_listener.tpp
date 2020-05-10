@@ -1,11 +1,12 @@
-#include "software/backend/input/network/networking/ssl_gamecontroller_client.h"
+#pragma once
 
 #include "software/logger/logger.h"
 
-SSLGameControllerClient::SSLGameControllerClient(
-    boost::asio::io_service& io_service, std::string ip_address, unsigned short port,
-    std::function<void(Referee)> handle_function)
-    : socket_(io_service), handle_function(handle_function)
+template <class ReceiveProto>
+ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
+    boost::asio::io_service& io_service, const std::string ip_address,
+    const unsigned short port, std::function<void(ReceiveProto)> receive_callback)
+    : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::address::from_string(ip_address), port);
@@ -17,9 +18,9 @@ SSLGameControllerClient::SSLGameControllerClient(
     catch (const boost::exception& ex)
     {
         LOG(WARNING) << "There was an issue binding the socket to the endpoint when"
-                        "trying to connect to the SSL GameController multicast address."
-                        "This may be due to another instance of the SSLGameController"
-                        "running and using the port already"
+                        "trying to connect to the SSL Vision multicast address. This may"
+                        "be due to another instance of the SSLVisionClient running"
+                        "and using the port already"
                      << std::endl;
         // Throw this exception up to top-level, as we have no valid
         // recovery action here
@@ -30,28 +31,31 @@ SSLGameControllerClient::SSLGameControllerClient(
     socket_.set_option(boost::asio::ip::multicast::join_group(
         boost::asio::ip::address::from_string(ip_address)));
 
-    // Start listening for data
+    // Start listening for data asynchronously
+    // See here for a great explanation about asynchronous operations:
+    // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
     socket_.async_receive_from(boost::asio::buffer(raw_received_data_, max_buffer_length),
                                sender_endpoint_,
-                               boost::bind(&SSLGameControllerClient::handleDataReception,
+                               boost::bind(&ProtoMulticastListener::handleDataReception,
                                            this, boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
 }
 
-void SSLGameControllerClient::handleDataReception(const boost::system::error_code& error,
-                                                  size_t num_bytes_received)
+template <class ReceiveProto>
+void ProtoMulticastListener<ReceiveProto>::handleDataReception(
+    const boost::system::error_code& error, size_t num_bytes_received)
 {
     if (!error)
     {
-        auto packet_data = Referee();
+        auto packet_data = ReceiveProto();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
-        handle_function(packet_data);
+        receive_callback(packet_data);
 
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
             boost::asio::buffer(raw_received_data_, max_buffer_length), sender_endpoint_,
-            boost::bind(&SSLGameControllerClient::handleDataReception, this,
+            boost::bind(&ProtoMulticastListener::handleDataReception, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     }
@@ -60,12 +64,20 @@ void SSLGameControllerClient::handleDataReception(const boost::system::error_cod
         // Start listening again to receive the next data
         socket_.async_receive_from(
             boost::asio::buffer(raw_received_data_, max_buffer_length), sender_endpoint_,
-            boost::bind(&SSLGameControllerClient::handleDataReception, this,
+            boost::bind(&ProtoMulticastListener::handleDataReception, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
 
         LOG(WARNING)
-            << "An unknown network error occurred when attempting to receive SSL GameController data. The boost system error code is "
+            << "An unknown network error occurred when attempting to receive ReceiveProto Data. The boost system error code is "
             << error << std::endl;
+    }
+
+    if (num_bytes_received >= max_buffer_length)
+    {
+        LOG(WARNING)
+            << "num_bytes_received >= max_buffer_length, "
+            << "which means that the receive buffer is full and data loss has potentially occurred. "
+            << "Consider increasing max_buffer_length";
     }
 }

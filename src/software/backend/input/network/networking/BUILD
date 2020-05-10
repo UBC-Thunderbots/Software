@@ -1,22 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "ssl_gamecontroller_client",
-    srcs = ["ssl_gamecontroller_client.cpp"],
-    hdrs = ["ssl_gamecontroller_client.h"],
-    #    visibility = ["//visibility:private"],
-    deps = [
-        "//software/logger",
-        "//software/proto:ssl_cc_proto",
-        "@boost//:asio",
+    name = "proto_multicast_listener",
+    hdrs = [
+        "proto_multicast_listener.h",
+        "proto_multicast_listener.tpp",
     ],
-)
-
-cc_library(
-    name = "ssl_vision_client",
-    srcs = ["ssl_vision_client.cpp"],
-    hdrs = ["ssl_vision_client.h"],
-    #    visibility = ["//visibility:private"],
+    visibility = ["//visibility:private"],
     deps = [
         "//software/logger",
         "//software/proto:ssl_cc_proto",
@@ -54,8 +44,7 @@ cc_library(
     hdrs = ["network_client.h"],
     deps = [
         ":network_filter",
-        ":ssl_gamecontroller_client",
-        ":ssl_vision_client",
+        ":proto_multicast_listener",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
