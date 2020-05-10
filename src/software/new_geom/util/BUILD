@@ -174,6 +174,7 @@ cc_library(
     ],
     deps = [
         "//software/new_geom:angle",
+        "//software/new_geom:circle",
         "//software/new_geom:geom_constants",
         "//software/new_geom:line",
         "//software/new_geom:point",
