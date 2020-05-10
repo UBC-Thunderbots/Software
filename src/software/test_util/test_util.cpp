@@ -102,4 +102,37 @@ namespace Test
         return Robot(robot_id_counter++, pt, Vector(), Angle(), AngularVelocity(),
                      Timestamp());
     }
+
+    bool TestUtil::equalWithinTolerance(const Polygon &poly1, const Polygon &poly2,
+                                        double tolerance)
+    {
+        auto ppts1 = poly1.getPoints();
+        auto ppts2 = poly2.getPoints();
+        return std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
+                          [tolerance](const Point &p1, const Point &p2) {
+                              return equalWithinTolerance(p1, p2, tolerance);
+                          });
+    }
+
+    bool TestUtil::equalWithinTolerance(const Circle &c1, const Circle &c2,
+                                        double tolerance)
+    {
+        return equalWithinTolerance(c1.getOrigin(), c2.getOrigin(), tolerance) &&
+               equalWithinTolerance(c1.getRadius(), c2.getRadius(), tolerance);
+    }
+
+    bool TestUtil::equalWithinTolerance(const Point &pt1, const Point &pt2,
+                                        double tolerance)
+    {
+        double distance = pt1.distanceFromPoint(pt2);
+        return equalWithinTolerance(distance, 0, tolerance);
+    }
+
+    bool TestUtil::equalWithinTolerance(double val1, double val2, double tolerance)
+    {
+        // subtracting one fixed epsilon to account for the error in fabs and one fixed
+        // epsilon to account for the error in subtracting the two vals
+        double difference = fabs(val1 - val2) - GeomConstants::FIXED_EPSILON * 2;
+        return difference < tolerance;
+    }
 }  // namespace Test

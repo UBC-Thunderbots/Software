@@ -241,10 +241,3 @@ TEST(MRFPrimitiveVisitorTest, visit_stop_primitive)
     RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

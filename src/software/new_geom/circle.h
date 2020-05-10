@@ -91,6 +91,14 @@ bool operator==(const Circle &c, const Circle &d);
  */
 bool operator!=(const Circle &c, const Circle &d);
 
+/**
+ * Implements the << operator for printing
+ *
+ * @param ostream The stream to print to
+ * @param circle The Circle to print
+ *
+ * @return The output stream with the string representation of the class appended
+ */
 std::ostream &operator<<(std::ostream &os, const Circle &circle);
 
 template <>

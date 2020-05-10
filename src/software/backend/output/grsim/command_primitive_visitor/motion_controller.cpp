@@ -97,7 +97,7 @@ AngularVelocity MotionController::determineAngularVelocityFromPosition(
     const double max_angular_acceleration_radians_per_second_squared)
 {
     // Calculate the angular difference between us and a goal
-    Angle angle_difference = (desired_final_orientation - robot.orientation()).angleMod();
+    Angle angle_difference = (desired_final_orientation - robot.orientation()).clamp();
 
     // Calculate our desired additional turn rate based on a sqrt-esque profile
     // This allows us to rapidly bring the velocity to zero when we're near the
@@ -171,7 +171,7 @@ Vector MotionController::determineLinearVelocityFromPosition(
 
     bool moving_away_from_dest =
         (robot.velocity().orientation() - unit_vector_to_dest.orientation())
-            .angleMod()
+            .clamp()
             .abs() > Angle::quarter();
 
     if (moving_away_from_dest && additional_velocity.length() < robot.velocity().length())

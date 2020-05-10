@@ -15,7 +15,7 @@ MAKE_ENUM(MotionConstraint,
           FRIENDLY_DEFENSE_AREA,
           // The box around the enemy goal
           ENEMY_DEFENSE_AREA,
-          // The box around the enemy goal, inflated by 0.3 meters for certain situations
+          // The inflated box around the enemy defense area
           INFLATED_ENEMY_DEFENSE_AREA,
           // The center circle
           CENTER_CIRCLE,
