@@ -6,8 +6,9 @@
 
 namespace fs = std::experimental::filesystem;
 
-ReplayLogger::ReplayLogger(const std::string& out_dir_path) :
-output_dir_path(out_dir_path), current_chunk(), current_chunk_idx(0)
+ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _frames_per_chunk) :
+output_dir_path(out_dir_path), current_chunk(), current_chunk_idx(0),
+frames_per_chunk(_frames_per_chunk)
 {
     // check if directory exists, if not make a directory
     if (fs::exists(output_dir_path) && !fs::is_directory(output_dir_path)) {
@@ -29,7 +30,7 @@ ReplayLogger::~ReplayLogger() {
 void ReplayLogger::onValueReceived(TbotsSensorProto frame)
 {
     current_chunk.mutable_replay_frames()->Add(dynamic_cast<TbotsSensorProto&&>(frame));
-    if (current_chunk.replay_frames_size() > FRAMES_PER_CHUNK) {
+    if (current_chunk.replay_frames_size() > frames_per_chunk) {
         saveCurrentChunk();
         nextChunk();
     }

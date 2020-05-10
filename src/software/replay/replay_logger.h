@@ -8,7 +8,8 @@
 class ReplayLogger : public ThreadedObserver<TbotsSensorProto>
 {
    public:
-    explicit ReplayLogger(const std::string& output_directory);
+    explicit ReplayLogger(const std::string& output_directory,
+                          int _frames_per_chunk = DEFAULT_FRAMES_PER_CHUNK);
     ReplayLogger(const ReplayLogger&) = delete;
     ~ReplayLogger() override;
    private:
@@ -16,9 +17,10 @@ class ReplayLogger : public ThreadedObserver<TbotsSensorProto>
     void nextChunk();
     void saveCurrentChunk();
 
-    static constexpr int FRAMES_PER_CHUNK = 300;
+    static constexpr int DEFAULT_FRAMES_PER_CHUNK = 300;
 
     TbotsReplay current_chunk;
     size_t current_chunk_idx;
     std::experimental::filesystem::path output_dir_path;
+    const int frames_per_chunk;
 };
