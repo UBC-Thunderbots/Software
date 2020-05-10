@@ -8,9 +8,23 @@ cc_library(
     ],
     deps = [
         "//software/geom",
+        "//software/multithreading:threaded_observer",
         "//software/proto:tbots_cc_proto",
         "//software/time:timestamp",
-        "//software/multithreading:threaded_observer",
+        "//software/world",
+    ],
+)
+
+cc_library(
+    name = "replay_reader",
+    srcs = ["replay_reader.cpp"],
+    hdrs = [
+        "replay_reader.h",
+    ],
+    deps = [
+        "//software/geom",
+        "//software/proto:tbots_cc_proto",
+        "//software/time:timestamp",
         "//software/world",
     ],
 )
