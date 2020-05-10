@@ -28,7 +28,7 @@ message ChipperKickerStatus
  */
 message DribblerStatus
 {
-    int32 dribbler_rpm = 1;
+    float dribbler_rpm = 1;
 }
 
 /* Error codes are to be displayed in the visualizer */
@@ -90,7 +90,7 @@ message FirmwareStatus
  */
 message DriveUnit
 {
-    int32 wheel_rpm          = 1;
+    float wheel_rpm          = 1;
     float wheel_position_rad = 2;
 }
 
