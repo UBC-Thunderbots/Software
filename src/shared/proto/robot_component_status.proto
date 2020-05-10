@@ -84,16 +84,23 @@ message FirmwareStatus
     uint32 fw_build_id = 1;
 }
 
-/* Data from the motor encoders
+/* Encoder data from a single motor
  * Note that the rotation is from the perspective of rear of the motor, looking down
  * the shaft starting from the motor body
  */
-message MotorEncoderData
+message DriveUnit
 {
-    int32 front_left_rpm  = 1;
-    int32 front_right_rpm = 2;
-    int32 back_left_rpm   = 3;
-    int32 back_right_rpm  = 4;
+    int32 wheel_rpm          = 1;
+    float wheel_position_rad = 2;
+}
+
+/* Data from all four motor encoders */
+message DriveEncoderData
+{
+    DriveUnit front_left  = 1;
+    DriveUnit front_right = 2;
+    DriveUnit back_left   = 3;
+    DriveUnit back_right  = 4;
 }
 
 /* Data about the network connection with the robots, including network-derived values */
