@@ -85,6 +85,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraints(
 
 ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
 {
+    // TODO (Issue #1340): Add ASCII art and clean up variables
     double radius_cushion_scaling   = config->SpeedScalingFactor()->value();
     double velocity_cushion_scaling = config->RobotObstacleInflationFactor()->value();
 
