@@ -472,3 +472,61 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     EXPECT_NEAR(trajectory.trajectory_elements[0].time,
                 const_interp_trajectory.trajectory_elements[0].time, 0.001);
 }
+
+TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {0, 0, 1, 0}},
+        .y = {.coefficients = {0, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 0;
+    path_parameters.t_end                      = 1;
+    path_parameters.num_segments               = 5999;
+    path_parameters.max_allowable_acceleration = 3;
+    path_parameters.max_allowable_speed        = 2000;
+    path_parameters.initial_speed              = 0;
+    path_parameters.final_speed                = 3000;
+
+    TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
+
+
+    enum TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                         &trajectory);
+
+    EXPECT_EQ(finalVelocityTooHigh, status);
+}
+
+TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {3, 0, 1, 0}},
+        .y = {.coefficients = {2, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 0;
+    path_parameters.t_end                      = 10;
+    path_parameters.num_segments               = 5999;
+    path_parameters.max_allowable_acceleration = 3;
+    path_parameters.max_allowable_speed        = 20;
+    path_parameters.initial_speed              = 10;
+    path_parameters.final_speed                = 0;
+
+    TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
+
+
+    enum TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
+                                                                         &trajectory);
+
+    EXPECT_EQ(initialVelocityTooHigh, status);
+}

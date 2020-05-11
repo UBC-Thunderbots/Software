@@ -3,13 +3,13 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#include "assert.h"
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
-#include "firmware/shared/math/vector_2d.h"
 #include "math.h"
-#include "stdio.h"
 
-void app_trajectory_planner_generate_constant_arc_length_segmentation(
+enum TrajectoryPlannerGenerationStatus
+app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
 {
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -27,6 +27,9 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     const Polynomial2dOrder3_t path        = path_parameters.path;
     float t_end                            = path_parameters.t_end;
     float t_start                          = path_parameters.t_start;
+
+    enum TrajectoryPlannerGenerationStatus generation_status = OK;
+
 
     trajectory->num_elements = path_parameters.num_segments;
 
@@ -68,13 +71,14 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
                                                         arc_length_parameterization);
 
     const float arc_segment_length =
-        app_trajectory_planner_get_total_arcLength(arc_length_parameterization) / num_segments;
+        app_trajectory_planner_get_total_arcLength(arc_length_parameterization) /
+        num_segments;
 
     // Now use numerical interpolation to get constant arc length segments for the
     // parameterization
     app_trajectory_planner_get_max_allowable_speed_profile(
-        max_allowable_speed_profile, traj_elements, path, num_segments, arc_length_parameterization,
-        arc_segment_length, max_allowable_acceleration);
+        max_allowable_speed_profile, traj_elements, path, num_segments,
+        arc_length_parameterization, arc_segment_length, max_allowable_acceleration);
 
     // First point on the velocity profile is always the current speed
     velocity_profile[0] = initial_speed;
@@ -86,12 +90,33 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
         num_segments, velocity_profile, max_allowable_speed_profile, arc_segment_length,
         max_allowable_acceleration, max_allowable_speed);
 
+    // Check that it was physically possible for the robot to reach the final velocity
+    // requested
+    if (velocity_profile[num_segments - 1] >= final_speed)
+    {
+        velocity_profile[num_segments - 1] = final_speed;
+    }
+    else
+    {
+        generation_status = finalVelocityTooHigh;
+    }
+
     // Now check backwards continuity. This is done to guarantee the robot can deccelerate
     // in time to not breach the maximum allowable speed defined by the path curvature
-    velocity_profile[num_segments - 1] = final_speed;
-
     app_trajectory_planner_generate_backwards_continuous_velocity_profile(
         num_segments, velocity_profile, arc_segment_length, max_allowable_acceleration);
+
+    // Check that it was physically possible for the robot to stay on the path given the
+    // initial velocity
+    if (velocity_profile[0] >= initial_speed)
+    {
+        velocity_profile[0] = initial_speed;
+    }
+    else
+    {
+        generation_status = initialVelocityTooHigh;
+    }
+
 
     // Now that the velocity profile has been defined we can calculate the time profile of
     // the trajectory
@@ -105,6 +130,8 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     {
         app_trajectory_planner_reverse_trajectory_direction(traj_elements, num_segments);
     }
+
+    return generation_status;
 }
 
 
@@ -171,7 +198,8 @@ void app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
 float app_trajectory_planner_get_total_arcLength(
     ArcLengthParametrization_t arc_length_parameterization)
 {
-    return arc_length_parameterization.arc_length_values[arc_length_parameterization.num_values - 1];
+    return arc_length_parameterization
+        .arc_length_values[arc_length_parameterization.num_values - 1];
 }
 
 void app_trajectory_planner_get_max_allowable_speed_profile(

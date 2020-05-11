@@ -20,6 +20,13 @@ typedef struct Trajectory
     unsigned int num_elements;
 } Trajectory_t;
 
+enum TrajectoryPlannerGenerationStatus
+{
+    OK                     = 0,
+    finalVelocityTooHigh   = 1,
+    initialVelocityTooHigh = 2,
+} TrajectoryPlannerGenerationStatus;
+
 typedef struct FirmwareRobotPathParameters
 {
     // The 2D polynomial representation of the path to be followed
@@ -84,8 +91,11 @@ typedef struct FirmwareRobotPathParameters
  * defined by the FirmwareRobotPathParameters struct
  * @param trajectory [out] The planned trajectory that follows robot dynamics limitations
  * with the appropriate guarantees and assumptions outlines above
+ *
+ * @return The outcome of the trajectory generation. Returns OK if trajectory is valid.
  */
-void app_trajectory_planner_generate_constant_arc_length_segmentation(
+enum TrajectoryPlannerGenerationStatus
+app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
 
 /**
