@@ -173,7 +173,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
 
     float velocities[path_parameters.num_segments];
     std::vector<float> velocity =
-            getSpeedsFromTrajectory(&trajectory, path_parameters.initial_speed);
+        getSpeedsFromTrajectory(&trajectory, path_parameters.initial_speed);
     std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
 
     for (float vel : velocity)
@@ -309,7 +309,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     float velocities[trajectory.num_elements];
 
     std::vector<float> velocity =
-            getSpeedsFromTrajectory(&trajectory, path_parameters.initial_speed);
+        getSpeedsFromTrajectory(&trajectory, path_parameters.initial_speed);
     std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
 
     for (float vel : velocity)

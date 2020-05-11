@@ -42,7 +42,8 @@ typedef struct FirmwareRobotPathParameters
     // *       TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
     unsigned int num_segments;
     // The maximum acceleration allowed at any
-    // *       point along the trajectory. This factor limits the maximum delta-velocity and
+    // *       point along the trajectory. This factor limits the maximum delta-velocity
+    // and
     // *       also the max speed around curves due to centripetal acceleration [m/s^2]
     float max_allowable_acceleration;
     // The maximum speed allowable at any point along the
@@ -218,7 +219,17 @@ void app_trajectory_planner_generate_backwards_continuous_velocity_profile(
  * @param velocity_profile  The forwards and backwards continuous velocity profile of the
  * trajectory
  */
-void app_trajectory_planner_generate_time_profile(TrajectoryElement_t* traj_elements,
-                                                  const float num_segments,
-                                                  const float arc_segment_length,
-                                                  float* velocity_profile);
+void static app_trajectory_planner_generate_time_profile(
+    TrajectoryElement_t* traj_elements, const float num_segments,
+    const float arc_segment_length, float* velocity_profile);
+
+/***
+ *  This function takes in a forwards trajectory annd modifies it in place to become a
+ * backwards trajectory NOTE: This function exists to avoid issues outlined in #1322
+ *
+ * @param forwards This is the trajectory that will be modified in place to become a
+ * reverse trajectory
+ * @param num_segments The number of segements(elements) in the forwards array
+ */
+void static app_trajectory_planner_reverse_trajectory_direction(
+    TrajectoryElement_t* forwards, unsigned int num_segments);

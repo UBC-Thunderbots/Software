@@ -12,8 +12,6 @@
 void app_trajectory_planner_generate_constant_arc_length_segmentation(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
 {
-    TrajectoryElement_t reverse_trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
@@ -105,22 +103,7 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     // TODO: Remove the 'reverse parameterization' hack #1322
     if (reverse_parameterization == true)
     {
-        const float path_duration = traj_elements[num_segments - 1].time;
-
-        for (unsigned int i = 0; i < num_segments; i++)
-        {
-            // Reverse the positions
-            reverse_trajectory[(num_segments - 1) - i].position =
-                traj_elements[i].position;
-            reverse_trajectory[(num_segments - 1) - i].time =
-                fabs(path_duration - traj_elements[i].time);
-        }
-        // Copy reverse element array back
-        for (unsigned int i = 0; i < num_segments; i++)
-        {
-            traj_elements[i].position = reverse_trajectory[i].position;
-            traj_elements[i].time     = reverse_trajectory[i].time;
-        }
+        app_trajectory_planner_reverse_trajectory_direction(traj_elements, num_segments);
     }
 }
 
@@ -295,5 +278,25 @@ void app_trajectory_planner_generate_time_profile(TrajectoryElement_t* traj_elem
         traj_elements[i + 1].time =
             traj_elements[i].time +
             (2 * arc_segment_length) / (velocity_profile[i] + velocity_profile[i + 1]);
+    }
+}
+
+void app_trajectory_planner_reverse_trajectory_direction(TrajectoryElement_t* forwards,
+                                                         unsigned int num_segments)
+{
+    TrajectoryElement_t reverse[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    const float path_duration = forwards[num_segments - 1].time;
+
+    for (unsigned int i = 0; i < num_segments; i++)
+    {
+        // Reverse the positions
+        reverse[(num_segments - 1) - i].position = forwards[i].position;
+        reverse[(num_segments - 1) - i].time     = fabs(path_duration - forwards[i].time);
+    }
+    // Copy reverse element array back
+    for (unsigned int i = 0; i < num_segments; i++)
+    {
+        forwards[i].position = reverse[i].position;
+        forwards[i].time     = reverse[i].time;
     }
 }
