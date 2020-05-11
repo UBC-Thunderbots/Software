@@ -99,14 +99,6 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     // the trajectory
     app_trajectory_planner_generate_time_profile(traj_elements, num_segments,
                                                  arc_segment_length, velocity_profile);
-    //    traj_elements[0].time = 0.0;
-    //    for (unsigned int i = 0; i < num_segments - 1; i++)
-    //    {
-    //        traj_elements[i + 1].time =
-    //            traj_elements[i].time +
-    //            (2 * arc_segment_length) / (velocity_profile[i] + velocity_profile[i +
-    //            1]);
-    //    }
 
     // If the parameterization ended up being reversed, we need to flip all the values
     // back.

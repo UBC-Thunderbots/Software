@@ -21,35 +21,35 @@ typedef struct Trajectory
 } Trajectory_t;
 
 /*
- *   t_start - The path parameter value indicating the beginning of the
- *       considered path
- *   t_end - The path parameter value indicating the end of the considered
- *       path
- *
- *   num_segments - The number of segments to discretize the trajectory into.
- *       Must be greater than 2 segments.
- *       THE NUMBER OF SEGMENTS MUST BE UNDER
- *       TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
- *
- *   max_allowable_acceleration - The maximum acceleration allowed at any
- *       point along the trajectory. This factor limits the maximum delta-velocity and
- * also the max speed around curves due to centripetal acceleration [m/s^2]
- *
- *   max_allowable_speed - The maximum speed allowable at any point along the
- *
- *   path [m/s] *initial_speed - The initial speed at the start of the trajectory [m/s]
- *
+
+
+
  *   final_speed - The final speed at the end of the trajectory [m/s]
  */
 typedef struct FirmwareRobotPathParameters
 {
+    // The 2D polynomial representation of the path to be followed
     Polynomial2dOrder3_t path;
+    // The path parameter value indicating the beginning of the
+    // considered path
     float t_start;
+    // The path parameter value indicating the end of the considered
+    // path
     float t_end;
+    // The number of segments to discretize the trajectory into.
+    // *       Must be greater than 2 segments.
+    // *       THE NUMBER OF SEGMENTS MUST BE UNDER
+    // *       TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
     unsigned int num_segments;
+    // The maximum acceleration allowed at any
+    // *       point along the trajectory. This factor limits the maximum delta-velocity and
+    // *       also the max speed around curves due to centripetal acceleration [m/s^2]
     float max_allowable_acceleration;
+    // The maximum speed allowable at any point along the
     float max_allowable_speed;
+    // The initial speed at the start of the trajectory [m/s]
     float initial_speed;
+    // The final speed at the end of the trajectory [m/s]
     float final_speed;
 } FirmwareRobotPathParameters_t;
 
@@ -84,7 +84,7 @@ typedef struct FirmwareRobotPathParameters
  *
  * @param path_parameters [in] The data structure including important path parameters as
  * defined by the FirmwareRobotPathParameters struct
- * @param trajectory [out[ The planned trajectory that follows robot dynamics limitations
+ * @param trajectory [out] The planned trajectory that follows robot dynamics limitations
  * with the appropriate guarantees and assumptions outlines above
  */
 void app_trajectory_planner_generate_constant_arc_length_segmentation(
