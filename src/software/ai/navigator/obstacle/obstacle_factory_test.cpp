@@ -17,7 +17,8 @@ class ObstacleFactoryTest : public testing::Test
    public:
     ObstacleFactoryTest()
         : current_time(Timestamp::fromSeconds(123)),
-          obstacle_factory(std::make_shared<ObstacleFactoryConfig>())
+          obstacle_factory(
+              Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig())
     {
     }
 

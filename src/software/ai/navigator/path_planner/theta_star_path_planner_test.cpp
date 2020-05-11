@@ -13,7 +13,8 @@ class TestThetaStarPathPlanner : public testing::Test
 {
    public:
     TestThetaStarPathPlanner()
-        : obstacle_factory(std::make_shared<ObstacleFactoryConfig>())
+        : obstacle_factory(
+              Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig())
     {
     }
 
