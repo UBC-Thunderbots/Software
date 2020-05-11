@@ -40,8 +40,10 @@ class Observer
      */
     virtual std::optional<T> popMostRecentlyReceivedValue(Duration max_wait_time) final;
 
+    virtual std::optional<T> popLeastRecentlyReceivedValue(Duration max_wait_time) final;
+
    private:
-    const size_t DEFAULT_BUFFER_SIZE = 1;
+    const size_t DEFAULT_BUFFER_SIZE = 2000;
 
     ThreadSafeBuffer<T> buffer;
 };
@@ -61,4 +63,10 @@ template <typename T>
 std::optional<T> Observer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
 {
     return buffer.popMostRecentlyAddedValue(max_wait_time);
+}
+
+template <typename T>
+std::optional<T> Observer<T>::popLeastRecentlyReceivedValue(Duration max_wait_time)
+{
+    return buffer.popLeastRecentlyAddedValue(max_wait_time);
 }

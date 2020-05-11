@@ -34,6 +34,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "ordered_threaded_observer",
+    hdrs = ["ordered_threaded_observer.h"],
+    deps = [
+        ":observer",
+        ":thread_safe_buffer",
+        "//software/time:duration",
+        "@boost//:bind",
+    ],
+)
+
 cc_test(
     name = "observer_test",
     srcs = ["observer_test.cpp"],

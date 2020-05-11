@@ -3,6 +3,16 @@
 
 namespace fs = std::experimental::filesystem;
 
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::set<T>& set) {
+    os << '{';
+    for (const auto& val : set) {
+        os << val << ' ';
+    }
+    os << '}';
+    return os;
+}
+
 ReplayReader::ReplayReader(const std::string& _replay_dir)
 : replay_dir(_replay_dir), cur_frame_idx(0)
 {
@@ -28,6 +38,8 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
             } catch(std::invalid_argument&) {};
     });
 
+    std::cout << chunk_indices << std::endl;
+
     if (chunk_indices.size() == 0) {
         throw std::invalid_argument(replay_dir.string() +
         " contains no files with number names! It is not a valid replay directory!");
@@ -42,7 +54,7 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
 
 std::optional<TbotsSensorProto> ReplayReader::getNextFrame()
 {
-    if (cur_chunk_idx >= cur_chunk.replay_frames_size()) {
+    if (cur_frame_idx >= cur_chunk.replay_frames_size()) {
         try {
             nextChunk();
         } catch (std::out_of_range&) {
