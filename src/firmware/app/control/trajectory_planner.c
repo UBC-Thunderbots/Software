@@ -59,21 +59,21 @@ void app_trajectory_planner_generate_constant_arc_length_segmentation(
     }
 
     // Create the parmeterization to contain the desired number of segments
-    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_parameterization,
                                              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
 
     // Get all of the points for the arc length parameterization (Not constant arc length
     // segments)
     shared_polynomial_getArcLengthParametrizationOrder3(path, t_start, t_end,
-                                                        arc_length_param);
+                                                        arc_length_parameterization);
 
     const float arc_segment_length =
-        app_trajectory_planner_get_total_arcLength(arc_length_param) / num_segments;
+        app_trajectory_planner_get_total_arcLength(arc_length_parameterization) / num_segments;
 
     // Now use numerical interpolation to get constant arc length segments for the
     // parameterization
     app_trajectory_planner_get_max_allowable_speed_profile(
-        max_allowable_speed_profile, traj_elements, path, num_segments, arc_length_param,
+        max_allowable_speed_profile, traj_elements, path, num_segments, arc_length_parameterization,
         arc_segment_length, max_allowable_acceleration);
 
     // First point on the velocity profile is always the current speed
@@ -169,15 +169,15 @@ void app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
 
 
 float app_trajectory_planner_get_total_arcLength(
-    ArcLengthParametrization_t arc_length_param)
+    ArcLengthParametrization_t arc_length_parameterization)
 {
-    return arc_length_param.arc_length_values[arc_length_param.num_values - 1];
+    return arc_length_parameterization.arc_length_values[arc_length_parameterization.num_values - 1];
 }
 
 void app_trajectory_planner_get_max_allowable_speed_profile(
     float* max_allowable_speed_profile, TrajectoryElement_t* traj_elements,
     Polynomial2dOrder3_t path, unsigned int num_elements,
-    ArcLengthParametrization_t arc_length_param, float arc_segment_length,
+    ArcLengthParametrization_t arc_length_parameterization, float arc_segment_length,
     const float max_allowable_acceleration)
 {
     Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
@@ -189,7 +189,7 @@ void app_trajectory_planner_get_max_allowable_speed_profile(
         // Get the 't' value corresponding to the current arc length (to be used for
         // further computing)
         float t = shared_polynomial2d_getTValueAtArcLengthOrder3(
-            path, i * arc_segment_length, arc_length_param);
+            path, i * arc_segment_length, arc_length_parameterization);
 
         // Get the X and Y position at the 't' value defined by the arc length
         traj_elements[i].position = shared_polynomial2d_getValueOrder3(path, t);
