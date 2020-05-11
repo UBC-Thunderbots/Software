@@ -20,12 +20,6 @@ typedef struct Trajectory
     unsigned int num_elements;
 } Trajectory_t;
 
-/*
-
-
-
- *   final_speed - The final speed at the end of the trajectory [m/s]
- */
 typedef struct FirmwareRobotPathParameters
 {
     // The 2D polynomial representation of the path to be followed
