@@ -58,9 +58,12 @@ typedef struct FirmwareRobotPathParameters
  *
  *  Key assumptions & guarantees of this planner are:
  *  - Trajectories are time-optimal assuming INFINITE JERK capability of the robot
- *  - No speed on the trajectory is larger than the 'max_allowable_speed' parameter.
+ *
+ *  - No speed on the trajectory is larger than the 'max_allowable_speed' parameter
+ *
  *  - No acceleration value between points on the trajectory can be larger than the
  * 'max_allowable_acceleration' input parameter
+ *
  *  - Assuming the grip-limit of the robot IS THE SAME AS THE MAX ACCELERATION then at no
  * point on the path can the sum of centripetal and acceleration force be greater than
  * 'max_allowable_acceleration'
