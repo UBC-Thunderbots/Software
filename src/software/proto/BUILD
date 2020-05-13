@@ -17,6 +17,18 @@ proto_library(
 )
 
 proto_library(
+    name = "sensor_msg",
+    srcs = [
+        "sensor_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":ssl_proto",
+        "//shared/proto:tbots_proto",
+    ],
+)
+
+proto_library(
     name = "grsim_proto",
     srcs = [
         "grSim_Commands.proto",
