@@ -137,7 +137,7 @@ static float app_trajectory_planner_get_total_arcLength(
  * Returns the maximum velocity profile for a given curve based on curvature and maximum
  * allowable acceleration
  *
- * @param max_allowable_speed_profile is pre-allocated up the the limit specified by
+ * @pre max_allowable_speed_profile is pre-allocated up the the limit specified by
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
  * @param max_allowable_speed_profile [out] The pre-allocated array that will contain all
