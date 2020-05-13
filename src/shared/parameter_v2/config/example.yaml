@@ -41,7 +41,7 @@ EnumParam:
     of the generate_dynamic_parameters bazel rule (otherwise compilation should fail)
 # Example of using the play factory
 # Because we only really care about the available IndexType values, this may be
-# better-named as type: registry
+# better named as type: registry
 FactoryParam:
   type: factory
   IndexType: std::string
