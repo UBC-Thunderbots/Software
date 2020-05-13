@@ -319,7 +319,7 @@ void app_trajectory_planner_reverse_trajectory_direction(TrajectoryElement_t* fo
     {
         // Reverse the positions
         reverse[(num_segments - 1) - i].position = forwards[i].position;
-        reverse[(num_segments - 1) - i].time     = fabs(path_duration - forwards[i].time);
+        reverse[(num_segments - 1) - i].time     = path_duration - forwards[i].time;
     }
     // Copy reverse element array back
     for (unsigned int i = 0; i < num_segments; i++)

@@ -38,14 +38,14 @@ typedef struct FirmwareRobotPathParameters
     // path
     float t_end;
     // The number of segments to discretize the trajectory into.
-    // *       Must be greater than 2 segments.
-    // *       THE NUMBER OF SEGMENTS MUST BE UNDER
-    // *       TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
+    // * Must be greater than 2 segments.
+    // * THE NUMBER OF SEGMENTS MUST BE UNDER
+    // * TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
     unsigned int num_segments;
     // The maximum acceleration allowed at any
-    // *       point along the trajectory. This factor limits the maximum delta-velocity
+    // * point along the trajectory. This factor limits the maximum delta-velocity
     // and
-    // *       also the max speed around curves due to centripetal acceleration [m/s^2]
+    // * also the max speed around curves due to centripetal acceleration [m/s^2]
     float max_allowable_acceleration;
     // The maximum speed allowable at any point along the trajectory```
     float max_allowable_speed;
