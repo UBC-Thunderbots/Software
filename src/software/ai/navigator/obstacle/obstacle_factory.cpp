@@ -37,7 +37,8 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
             Rectangle rectangle = world.field().enemyDefenseArea();
-            // 0.3 is by definition what inflated means
+            // TODO (Issue #1332): remove this hardcoded 0.3 value and use a an
+            // inflatedEnemyDefenseArea
             rectangle.expand(0.3);
             rectangle_opt = std::make_optional(rectangle);
         }
