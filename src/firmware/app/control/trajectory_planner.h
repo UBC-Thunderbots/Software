@@ -7,7 +7,7 @@
     6000  // The maximum size of the array containing trajectory elements
 
 // Struct that defines a single point on a trajectory
-// Includes the Position,and Time data corresponding to that point
+// Includes the Position and Time data corresponding to that point
 typedef struct TrajectoryElement
 {
     Vector2d_t position;
