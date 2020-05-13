@@ -1,17 +1,14 @@
-load(":parameter.bzl", "generate_dynamic_parameters")
+load(":parameter.bzl", "c_dynamic_parameters", "cpp_dynamic_parameters")
 
-generate_dynamic_parameters(
-    name = "dynamic_parameters_cpp",
+cpp_dynamic_parameters(
+    name = "cpp_params",
     enum_targets = [
         "//software/sensor_fusion:refbox_data",
     ],
-    generated_parameter_file = "dynamic_parameters.hpp",
+    generated_parameter_file = "cpp_dynamic_parameters.h",
 )
 
-generate_dynamic_parameters(
-    name = "dynamic_parameters_c",
-    enum_targets = [
-        "//software/sensor_fusion:refbox_data",
-    ],
-    generated_parameter_file = "dynamic_parameters.h",
+c_dynamic_parameters(
+    name = "c_params",
+    generated_parameter_file = "c_parameters.h",
 )

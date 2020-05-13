@@ -3,16 +3,7 @@ def _generate_dynamic_parameters_impl(ctx):
 
     args = ctx.actions.args()
     args.add("--output_file", output_file)
-
-    if output_file.extension == "hpp":
-        args.add("-cpp")
-    elif output_file.extension == "h":
-        args.add("-c")
-    else:
-        fail(
-            msg = "Invalid file extension. Expected 'h' or 'hpp'",
-            attr = output_file.name,
-        )
+    args.add("-{}".format(ctx.attr.output_language))
 
     # Retrieve paths to the header files directly listed in each enum_target
     # These paths are relative to the bazel WORKSPACE root
@@ -39,5 +30,24 @@ generate_dynamic_parameters = rule(
             cfg = "host",
         ),
         "generated_parameter_file": attr.output(mandatory = True),
+        "output_language": attr.string(
+            mandatory = True,
+            values = ["c", "cpp"],
+        ),
     },
 )
+
+def c_dynamic_parameters(name, generated_parameter_file):
+    generate_dynamic_parameters(
+        name = name,
+        generated_parameter_file = generated_parameter_file,
+        output_language = "c",
+    )
+
+def cpp_dynamic_parameters(name, generated_parameter_file, enum_targets = []):
+    generate_dynamic_parameters(
+        name = name,
+        generated_parameter_file = generated_parameter_file,
+        enum_targets = enum_targets,
+        output_language = "cpp",
+    )
