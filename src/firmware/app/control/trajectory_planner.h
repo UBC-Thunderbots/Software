@@ -34,7 +34,7 @@ typedef struct FirmwareRobotPathParameters
     // The path parameter value indicating the beginning time of the
     // considered path
     float t_start;
-    // The path parameter value indicating the end of the considered
+    // The path parameter value indicating the end time of the considered
     // path
     float t_end;
     // The number of segments to discretize the trajectory into.
