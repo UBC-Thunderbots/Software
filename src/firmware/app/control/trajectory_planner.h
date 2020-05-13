@@ -31,7 +31,7 @@ typedef struct FirmwareRobotPathParameters
 {
     // The 2D polynomial representation of the path to be followed
     Polynomial2dOrder3_t path;
-    // The path parameter value indicating the beginning of the
+    // The path parameter value indicating the beginning time of the
     // considered path
     float t_start;
     // The path parameter value indicating the end of the considered
