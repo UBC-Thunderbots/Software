@@ -76,7 +76,7 @@ typedef struct FirmwareRobotPathParameters
  * robot, or the centripetal acceleration limit defined by the curvature and robot speed -
  * the planner will assume the max acceleration that will remain bellow this limit.
  *
- *     - To ensure the robot is capable of deccelerating to reach ant sudden changes in
+ *     - To ensure the robot is capable of deccelerating to reach any sudden changes in
  * the path, the trajectory is checked for backwards continuity
  *
  * @pre path_parameters.num_segments > 2
