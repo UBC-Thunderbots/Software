@@ -47,7 +47,7 @@ typedef struct FirmwareRobotPathParameters
     // and
     // *       also the max speed around curves due to centripetal acceleration [m/s^2]
     float max_allowable_acceleration;
-    // The maximum speed allowable at any point along the
+    // The maximum speed allowable at any point along the trajectory```
     float max_allowable_speed;
     // The initial speed at the start of the trajectory [m/s]
     float initial_speed;
