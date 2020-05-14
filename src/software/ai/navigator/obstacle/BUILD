@@ -4,19 +4,19 @@ cc_library(
     name = "obstacle",
     srcs = [
         "circle_obstacle.cpp",
+        "convex_polygon_obstacle.cpp",
         "obstacle.cpp",
-        "polygon_obstacle.cpp",
     ],
     hdrs = [
         "circle_obstacle.h",
+        "convex_polygon_obstacle.h",
         "obstacle.h",
-        "polygon_obstacle.h",
     ],
     deps = [
         "//shared:constants",
         "//software/new_geom:circle",
+        "//software/new_geom:convex_polygon",
         "//software/new_geom:point",
-        "//software/new_geom:polygon",
         "//software/new_geom:segment",
         "//software/new_geom/util",
     ],

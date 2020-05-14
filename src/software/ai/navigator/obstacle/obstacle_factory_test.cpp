@@ -34,12 +34,12 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
+        auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
         EXPECT_EQ(expected, polygon_obstacle.getPolygon());
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstaclePtr was not created for a rectangle";
+        ADD_FAILURE() << "ConvexPolygonObstaclePtr was not created for a rectangle";
     }
 }
 
@@ -135,13 +135,14 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
+        auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
         EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
             expected, polygon_obstacle.getPolygon(), METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstaclePtr was not created for a fast moving robot";
+        ADD_FAILURE()
+            << "ConvexPolygonObstaclePtr was not created for a fast moving robot";
     }
 }
 
@@ -158,12 +159,13 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
+        auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
         EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
             expected, polygon_obstacle.getPolygon()));
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstaclePtr was not created for a fast moving robot";
+        ADD_FAILURE()
+            << "ConvexPolygonObstaclePtr was not created for a fast moving robot";
     }
 }

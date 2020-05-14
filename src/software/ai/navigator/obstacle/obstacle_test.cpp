@@ -4,26 +4,26 @@
 #include <math.h>
 
 #include "software/ai/navigator/obstacle/circle_obstacle.h"
-#include "software/ai/navigator/obstacle/polygon_obstacle.h"
+#include "software/ai/navigator/obstacle/convex_polygon_obstacle.h"
 #include "software/new_geom/circle.h"
+#include "software/new_geom/convex_polygon.h"
 #include "software/new_geom/point.h"
-#include "software/new_geom/polygon.h"
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
 
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {
-    PolygonObstacle polygon_obstacle(Rectangle({-1, 1}, {2, -3}));
+    ConvexPolygonObstacle convex_polygon_obstacle(Rectangle({-1, 1}, {2, -3}));
 
-    Polygon expected = Polygon({
+    ConvexPolygon expected = ConvexPolygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
 
-    EXPECT_EQ(expected, polygon_obstacle.getPolygon());
+    EXPECT_EQ(expected, convex_polygon_obstacle.getPolygon());
 }
 
 TEST(NavigatorObstacleTest, create_from_circle)
@@ -34,23 +34,23 @@ TEST(NavigatorObstacleTest, create_from_circle)
     EXPECT_EQ(circle_obstacle.getCircle(), expected);
 }
 
-TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
+TEST(NavigatorObstacleTest, convex_polygon_obstacle_stream_operator_test)
 {
-    ObstaclePtr obstacle =
-        std::make_shared<PolygonObstacle>(PolygonObstacle(Rectangle({-1, 1}, {2, -3})));
+    ObstaclePtr obstacle = std::make_shared<ConvexPolygonObstacle>(
+        ConvexPolygonObstacle(Rectangle({-1, 1}, {2, -3})));
 
-    Polygon expected = Polygon({
+    ConvexPolygon expected = ConvexPolygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
 
-    // we expect that the stream operator string for PolygonObstacle will contain the
-    // stream operator string for Polygon
-    std::ostringstream polygon_ss;
-    polygon_ss << expected;
-    EXPECT_TRUE(obstacle->toString().find(polygon_ss.str()) != std::string::npos);
+    // we expect that the stream operator string for ConvexPolygonObstacle will contain
+    // the stream operator string for ConvexPolygon
+    std::ostringstream convex_polygon_ss;
+    convex_polygon_ss << expected;
+    EXPECT_TRUE(obstacle->toString().find(convex_polygon_ss.str()) != std::string::npos);
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_stream_operator_test)
@@ -68,7 +68,8 @@ TEST(NavigatorObstacleTest, circle_obstacle_stream_operator_test)
 TEST(NavigatorObstacleTest, rectangle_obstacle_contains)
 {
     Rectangle rectangle({-1, 1}, {2, -3});
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(rectangle)));
+    ObstaclePtr obstacle(
+        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(rectangle)));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -79,7 +80,8 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_contains)
 TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
 {
     Rectangle rectangle({-1, -3}, {2, 1});
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(rectangle)));
+    ObstaclePtr obstacle(
+        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(rectangle)));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -90,7 +92,8 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
 TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
 {
     Rectangle rectangle({-1, 1}, {2, -3});
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(rectangle)));
+    ObstaclePtr obstacle(
+        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(rectangle)));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
     Segment intersecting_segment(inside_point, outside_point);
@@ -100,15 +103,16 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
     EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }
 
-TEST(NavigatorObstacleTest, polygon_obstacle_contains)
+TEST(NavigatorObstacleTest, convex_polygon_obstacle_contains)
 {
-    Polygon polygon = Polygon({
+    ConvexPolygon convex_polygon = ConvexPolygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    ObstaclePtr obstacle(
+        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(convex_polygon)));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -116,15 +120,16 @@ TEST(NavigatorObstacleTest, polygon_obstacle_contains)
     EXPECT_FALSE(obstacle->contains(outside_point));
 }
 
-TEST(NavigatorObstacleTest, polygon_obstacle_distance)
+TEST(NavigatorObstacleTest, convex_polygon_obstacle_distance)
 {
-    Polygon polygon = Polygon({
+    ConvexPolygon convex_polygon = ConvexPolygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    ObstaclePtr obstacle(
+        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(convex_polygon)));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -132,15 +137,16 @@ TEST(NavigatorObstacleTest, polygon_obstacle_distance)
     EXPECT_EQ(obstacle->distance(outside_point), 5);
 }
 
-TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
+TEST(NavigatorObstacleTest, convex_polygon_obstacle_intersects)
 {
-    Polygon polygon = Polygon({
+    ConvexPolygon convex_polygon = ConvexPolygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    ObstaclePtr obstacle(
+        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(convex_polygon)));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
     Segment intersecting_segment(inside_point, outside_point);

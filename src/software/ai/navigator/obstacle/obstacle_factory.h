@@ -2,8 +2,8 @@
 
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/circle_obstacle.h"
+#include "software/ai/navigator/obstacle/convex_polygon_obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/polygon_obstacle.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/point.h"
@@ -113,12 +113,12 @@ class ObstacleFactory
     ObstaclePtr createObstacle(const Circle &circle);
 
     /**
-     * Create polygon obstacle directly from a Polygon
+     * Create convex_polygon obstacle directly from a ConvexPolygon
      * Note: this helper function does not add a robot radius
      *
-     * @param polygon Polygon
+     * @param convex_polygon ConvexPolygon
      *
-     * @return polygon shaped obstacle
+     * @return convex_polygon shaped obstacle
      */
-    ObstaclePtr createObstacle(const Polygon &polygon);
+    ObstaclePtr createObstacle(const ConvexPolygon &convex_polygon);
 };

@@ -105,7 +105,7 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
         // use hexagonal approximation for velocity obstacle
         Vector velocity_direction_norm_radius =
             velocity_cushion_vector.normalize(radius_cushion);
-        return createObstacle(Polygon(
+        return createObstacle(ConvexPolygon(
             {// left side of robot
              robot.position() + velocity_direction_norm_radius.rotate(Angle::quarter()),
              // back left of robot
@@ -166,7 +166,8 @@ ObstaclePtr ObstacleFactory::createObstacle(const Circle &circle)
     return ObstaclePtr(std::make_shared<CircleObstacle>(CircleObstacle(circle)));
 }
 
-ObstaclePtr ObstacleFactory::createObstacle(const Polygon &polygon)
+ObstaclePtr ObstacleFactory::createObstacle(const ConvexPolygon &convex_polygon)
 {
-    return ObstaclePtr(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    return ObstaclePtr(
+        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(convex_polygon)));
 }
