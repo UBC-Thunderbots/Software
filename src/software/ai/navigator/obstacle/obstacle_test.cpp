@@ -23,7 +23,7 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
         {2, -3},
     });
 
-    EXPECT_EQ(expected, convex_polygon_obstacle.getPolygon());
+    EXPECT_EQ(expected, convex_polygon_obstacle.getConvexPolygon());
 }
 
 TEST(NavigatorObstacleTest, create_from_circle)

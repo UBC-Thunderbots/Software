@@ -27,7 +27,7 @@ std::string ConvexPolygonObstacle::toString(void) const
     return ss.str();
 }
 
-const ConvexPolygon ConvexPolygonObstacle::getPolygon(void) const
+const ConvexPolygon ConvexPolygonObstacle::getConvexPolygon(void) const
 {
     return convex_polygon_;
 }

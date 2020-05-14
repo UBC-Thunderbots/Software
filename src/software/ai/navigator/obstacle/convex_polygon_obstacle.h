@@ -4,7 +4,7 @@
 #include "software/new_geom/convex_polygon.h"
 
 /**
- * An Obstacle represented by a Polygon
+ * An Obstacle represented by a ConvexPolygon
  */
 class ConvexPolygonObstacle : public Obstacle
 {
@@ -27,7 +27,7 @@ class ConvexPolygonObstacle : public Obstacle
      *
      * @return convex_polygon
      */
-    const ConvexPolygon getPolygon(void) const;
+    const ConvexPolygon getConvexPolygon(void) const;
 
    private:
     ConvexPolygon convex_polygon_;

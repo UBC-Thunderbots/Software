@@ -35,7 +35,7 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
     try
     {
         auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected, polygon_obstacle.getPolygon());
+        EXPECT_EQ(expected, polygon_obstacle.getConvexPolygon());
     }
     catch (std::bad_cast)
     {
@@ -137,7 +137,7 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     {
         auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
         EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-            expected, polygon_obstacle.getPolygon(), METERS_PER_MILLIMETER));
+            expected, polygon_obstacle.getConvexPolygon(), METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -161,7 +161,7 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     {
         auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
         EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-            expected, polygon_obstacle.getPolygon()));
+            expected, polygon_obstacle.getConvexPolygon()));
     }
     catch (std::bad_cast)
     {
