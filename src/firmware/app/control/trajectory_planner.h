@@ -4,7 +4,8 @@
 #include "firmware/shared/math/vector_2d.h"
 
 #define TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS                                              \
-    6000  // The maximum size of the array containing trajectory elements
+    9000  // The maximum size of the array containing trajectory elements. Assuming the
+          // longest possible path is 9 meters with 1mm segments
 
 // Struct that defines a single point on a trajectory
 // Includes the Position and Time data corresponding to that point
@@ -31,21 +32,21 @@ typedef struct FirmwareRobotPathParameters
 {
     // The 2D polynomial representation of the path to be followed
     Polynomial2dOrder3_t path;
-    // The path parameter value indicating the beginning time of the
+    // The path parameterization value indicating the beginning of the
     // considered path
     float t_start;
-    // The path parameter value indicating the end time of the considered
+    // The path parameterization value indicating the end of the considered
     // path
     float t_end;
     // The number of segments to discretize the trajectory into.
-    // * Must be greater than 2 segments.
-    // * THE NUMBER OF SEGMENTS MUST BE UNDER
-    // * TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
+    //  Must be greater than 2 segments.
+    //  THE NUMBER OF SEGMENTS MUST BE UNDER
+    //  TRAJECTORY_PLANNER_MAX_NUMBER_SEGMENTS
     unsigned int num_segments;
     // The maximum acceleration allowed at any
-    // * point along the trajectory. This factor limits the maximum delta-velocity
+    //  point along the trajectory. This factor limits the maximum delta-velocity
     // and
-    // * also the max speed around curves due to centripetal acceleration [m/s^2]
+    //  also the max speed around curves due to centripetal acceleration [m/s^2]
     float max_allowable_acceleration;
     // The maximum speed allowable at any point along the trajectory```
     float max_allowable_speed;
@@ -76,7 +77,7 @@ typedef struct FirmwareRobotPathParameters
  * robot, or the centripetal acceleration limit defined by the curvature and robot speed -
  * the planner will assume the max acceleration that will remain bellow this limit.
  *
- *     - To ensure the robot is capable of deccelerating to reach any sudden changes in
+ *     - To ensure the robot is capable of deccelerating to react to any sudden changes in
  * the path, the trajectory is checked for backwards continuity
  *
  * @pre path_parameters.num_segments > 2
@@ -84,7 +85,7 @@ typedef struct FirmwareRobotPathParameters
  * @pre path_parameters.max_allowable_speed > 0
  * @pre path_parameters.init_speed >= 0
  * @pre path_parameters.final_speed >= 0
- * @pre The trajectory.trajectory_elements[] array is pre-allocated ot handle up to the
+ * @pre The trajectory.trajectory_elements[] array is pre-allocated to handle up to the
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS limit
  *
  * @param path_parameters [in] The data structure including important path parameters as
@@ -167,7 +168,7 @@ static void app_trajectory_planner_get_max_allowable_speed_profile(
  * NOTE: The velocity profile returned by this function is NOT reverse continuous and does
  * not guarantee a feasible path to follow.
  *
- * NOTE: The velocity_profile wil contain the same number of real elements as the input
+ * NOTE: The velocity_profile will contain the same number of real elements as the input
  * max_allowable_speed[] array
  *
  * @pre The velocity_profile array is pre-allocated to contain up to
@@ -194,6 +195,8 @@ void app_trajectory_planner_generate_forwards_continuous_velocity_profile(
  * Modifies a forwards continuous velocity profile to also be backwards continuous based
  * on the input parameters.
  *
+ * NOTE: This function does not break forwards continuity of the trajectory
+ *
  * @pre The input velocity_profile is required to be FORWARDS CONTINUOUS before it is used
  * as an input to this function
  *
@@ -214,10 +217,11 @@ void app_trajectory_planner_generate_backwards_continuous_velocity_profile(
  *
  *  @pre traj_elements must be pre-allocated and contain all of the position data of the
  * trajectory
+ *  @pre The trajectory has been created and is backwards and forwards continuous
  *
  * @param traj_elements The trajectory element array that will be modified to contain the
  * time profile
- * @param num_segments [in/ The number of segments(elements) in traj_elements and
+ * @param num_segments [in] The number of segments(elements) in traj_elements and
  * velocity_profile
  * @param arc_segment_length  [in] The arc length of each path segment
  * @param velocity_profile  The forwards and backwards continuous velocity profile of the
@@ -230,6 +234,8 @@ void static app_trajectory_planner_generate_time_profile(
 /***
  *  This function takes in a forwards trajectory annd modifies it in place to become a
  * backwards trajectory NOTE: This function exists to avoid issues outlined in #1322
+ *
+ *  TODO: Remove when #1322 is merged.
  *
  * @param forwards This is the trajectory that will be modified in place to become a
  * reverse trajectory
