@@ -75,7 +75,6 @@ cc_library(
     ],
     deps = [
         ":grsim_backend",
-        ":handheld_controller_backend",
         ":radio_backend",
         ":simulator_backend",
     ],
