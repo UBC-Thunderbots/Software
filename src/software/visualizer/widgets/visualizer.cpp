@@ -22,7 +22,7 @@ Visualizer::Visualizer(
     setCentralWidget(main_widget);
 
     connect(update_timer, &QTimer::timeout, this, &Visualizer::updateVisualizer);
-    update_timer->start(update_timer_interval.getMilliseconds());
+    update_timer->start((int)update_timer_interval.getMilliseconds());
 }
 
 void Visualizer::updateVisualizer()
