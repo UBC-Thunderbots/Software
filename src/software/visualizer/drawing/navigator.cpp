@@ -18,9 +18,6 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
         pen.setWidth(2);
         pen.setCosmetic(true);
 
-        QBrush brush(navigator_path_color);
-        brush.setStyle(Qt::BrushStyle::SolidPattern);
-
         for (const auto& path : planned_paths)
         {
             for (size_t i = 1; i < path.size(); i++)
@@ -33,4 +30,28 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
     };
 
     return AIDrawFunction(draw_function);
+}
+
+void drawObstacle(QGraphicsScene* scene, const ObstaclePtr obstacle, const QColor& color)
+{
+    QPen pen(color);
+    pen.setWidth(2);
+    pen.setCosmetic(true);
+
+    if (std::shared_ptr<ConvexPolygonObstacle> convex_polygon_obstacle =
+            std::dynamic_pointer_cast<ConvexPolygonObstacle>(obstacle))
+    {
+        auto poly = createQPolygonF(convex_polygon_obstacle->getConvexPolygon());
+        scene->addPolygon(poly, pen);
+    }
+
+    if (std::shared_ptr<CircleObstacle> circle_obstacle =
+            std::dynamic_pointer_cast<CircleObstacle>(obstacle))
+    {
+        Point origin  = circle_obstacle->getCircle().getOrigin();
+        double radius = circle_obstacle->getCircle().getRadius();
+        QRectF circle_bounding_rect(createQPointF(origin + Vector(-radius, radius)),
+                                    createQPointF(origin + Vector(radius, -radius)));
+        scene->addEllipse(circle_bounding_rect, pen);
+    }
 }
