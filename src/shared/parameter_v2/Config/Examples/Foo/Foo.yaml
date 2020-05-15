@@ -1,0 +1,10 @@
+SomeParameter:
+  type: bool
+  value: false
+  description: some parameter
+AnotherParameter:
+  type: int
+  min: 0
+  max: 5
+  value: 3
+  description: another parameter

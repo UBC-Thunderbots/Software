@@ -1,82 +1,105 @@
 # Examples and descriptions of all Parameter types that can be used
-AllValidParameterTypes:
-  BoolParam:
+BoolParam:
+  type: bool
+  value: true
+  description: >
+    Can be true or false
+IntParam:
+  type: int
+  min: 0
+  max: 5
+  value: 3
+  description: >
+    Can be any integer value in the range [min, max]
+UnsignedIntParam:
+  type: uint
+  min: 0 # Must be >= 0
+  max: 5
+  value: 3
+  description: >
+    Can be any integer value in the range [min, max].
+    The minimum value must be >= 0
+FloatParam:
+  type: float
+  min: 1.1
+  max: 9.01
+  value: 4.04
+  description: >
+    Can be any value in the range [min, max]
+DoubleParam:
+  type: double
+  min: 0
+  max: 5
+  value: 0.2
+  description: >
+    Can be any value in the range [min, max].
+
+    Will not be generated for C code, because we assume that is firmware code
+    that cannot represent doubles.
+StringParam:
+  type: string
+  value: "Hello World"
+  description: >
+    Any string value
+EnumParam:
+  type: enum
+  enum: RefboxGameState
+  value: HALT
+  description: >
+    Accepts enum values from the specified enum. For example if there was an enum defined as
+
+    enum TeamColour {
+      YELLOW,
+      BLUE
+    }
+
+    Then this parameter would only accept TeamColour.YELLOW and TeamColour.BLUE as valid values.
+
+    The target that builds/defines the enum must be included in the enum_deps attribute
+    of the bazel rule (otherwise compilation should fail).
+
+    Will only generate for CPP code.
+FactoryParam:
+  type: factory
+  IndexType: std::string
+  TypeToCreate: Play
+  value: "HaltPlay"
+  description: >
+    Accepts all registered IndexType values for the GenericFactory<IndexType, TypeToCreate>.
+
+    For example, if there was a GenericFactory<std::string, Play> with 3 entries registered
+    as ("Stop", "Defense", "Offense"), then this parameter would only accept
+    "Stop", "Defense", and "Offense" as valid values.
+
+    Will only generate for CPP code.
+
+NestedConfig:
+  # Config files can contain additional configs (and these configs can in turn contain more configs).
+  # This allows us to logically group parameters into a hierarchy.
+  Foo:
     type: bool
     value: true
-    description: >
-      Can be true or false
-  IntParam:
+    description: foo
+  Bar:
     type: int
     min: 0
     max: 5
     value: 3
-    description: >
-      Can be any integer value in the range [min, max]
-  UnsignedIntParam:
-    type: uint
-    min: 0 # Must be >= 0
-    max: 5
-    value: 3
-    description: >
-      Can be any integer value in the range [min, max].
-      The minimum value must be >= 0
-  FloatParam:
-    type: float
-    min: 1.1
-    max: 9.01
-    value: 4.04
-    description: >
-      Can be any value in the range [min, max]
-  DoubleParam:
-    type: double
-    min: 0
-    max: 5
-    value: 0.2
-    description: >
-      Can be any value in the range [min, max].
-      Will not be generated for C code, because we assume that is firmware code
-      that cannot represent doubles.
-  StringParam:
-    type: string
-    value: "Hello World"
-    description: >
-      Any string value
-  EnumParam:
-    type: enum
-    enum: RefboxGameState
-    value: HALT
-    description: >
-      Accepts enum values from the specified enum.
-      The target that builds/defines the enum must be included in the enum_deps attribute
-      of the bazel rule (otherwise compilation should fail).
-      Will only generate for CPP output.
-  # Example of using the play factory
-  # Because we only really care about the available IndexType values, this may be
-  # better named as type: registry
-  FactoryParam:
-    type: factory
-    IndexType: std::string
-    TypeToCreate: Play
-    value: "HaltPlay"
-    description: >
-      Accepts all registered IndexType values for the GenericFactory<IndexType, TypeToCreate>.
-      Exact technical implementation regarding includes TBD, but should be possible based
-      on success of enum experiments.
-      Will only generate for CPP output.
+    description: bar
 
-# Examples and descriptions of special Parameter attributes
-SpecialParameterAttributesExamples:
+SpecialParameterAttributes:
+  # Parameters can be labeled with additional attributes regardless of their type
   OptionalParameter:
     type: enum
     enum: TeamColour
     value: BLUE
     optional: true
     description: >
-      Optional params will generate with std::optional as their value return type.
+      Optional parameters will generate with std::optional as their value return type.
       They can accept std::nullopt as a value. If optional is not specified, it is
       assumed to be false.
 
-      Can only be generated for CPP.
+      Will only generate for CPP code.
   ConstParameter:
     type: int
     min: 0
@@ -85,30 +108,25 @@ SpecialParameterAttributesExamples:
     const: true
     description: >
       Parameters with the const attribute do not generate with an API to change their values.
-      They are constants. If const is not specified, it is assumed to be true.
+      They are constants. If const is not specified, it is assumed to be false.
 
-      Only parameters that are marked constant will be able to be generated for C code.
-# A full example of what a config may look like
-ExampleConfig:
-  ExampleParam1:
-    type: bool
-    value: false
-    description: >
-      some parameter
-  ExampleParam2:
-    type: bool
-    value: true
-    const: true
-    description: >
-      another parameter
-  NestedConfig:
-    NestedParam:
-      type: bool,
-      value: false
-      optional: true
-      description: >
-        Configs can contain other configs with additional parameters
-  # Configs can also include other configs using their relative filepath combined with the path
-  # inside the config file (to access nested configs).
-  # This will give this config access to the included config in the generated code
-  include: ../foo/bar/SomeOtherConfig
+      Only parameters that are marked as const will be generated for C code.
+
+IncludingOtherConfigs:
+  # Configs can include other configs simply by using the "include" key and
+  # providing the path to the config file to be included.
+  #
+  # The include paths follow the same concepts at Bazel:
+  # - Files in the same directory can be specified with a colon preceding the filename
+  #   Eg. include: ":SomeFile.yaml"
+  # - Otherwise, the absolute filepath relative to the root of the config directory
+  #   (ie. the top-level directory containing all the config files) must be provided.
+  #   Eg. include: "Config/Examples:Example.yaml"
+  #
+  # The name of the file to be included must be the last component of the path, and
+  # separated by a colon. If the name of the file matches the name of its parent
+  # directory, the colon and filename can be omitted.
+  # For example, the following includes are equivalent.
+  include:
+    - "Config/Foo/Foo.yaml"
+    - "Config/Foo"
