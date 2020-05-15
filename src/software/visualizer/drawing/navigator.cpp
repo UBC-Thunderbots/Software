@@ -9,7 +9,8 @@
 AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {
     auto planned_paths = navigator->getPlannedPathPoints();
-    auto draw_function = [planned_paths](QGraphicsScene* scene) {
+    auto obstacles     = navigator->getObstacles();
+    auto draw_function = [planned_paths, obstacles](QGraphicsScene* scene) {
         QPen pen(navigator_path_color);
         // The cap style must be NOT be set to SquareCap. It can be set to anything else.
         // Drawing a line of length 0 with the SquareCap style causes a large line to be
@@ -27,26 +28,29 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
                 scene->addLine(line, pen);
             }
         }
+
+        for (const auto& obstacle : obstacles)
+        {
+            drawObstacle(scene, obstacle, pen);
+        }
     };
 
     return AIDrawFunction(draw_function);
 }
 
-void drawObstacle(QGraphicsScene* scene, const ObstaclePtr obstacle, const QColor& color)
+void drawObstacle(QGraphicsScene* scene, const ObstaclePtr obstacle, const QPen& pen)
 {
-    QPen pen(color);
-    pen.setWidth(2);
-    pen.setCosmetic(true);
-
-    if (std::shared_ptr<ConvexPolygonObstacle> convex_polygon_obstacle =
-            std::dynamic_pointer_cast<ConvexPolygonObstacle>(obstacle))
+    std::shared_ptr<ConvexPolygonObstacle> convex_polygon_obstacle =
+        std::dynamic_pointer_cast<ConvexPolygonObstacle>(obstacle);
+    if (convex_polygon_obstacle)
     {
         auto poly = createQPolygonF(convex_polygon_obstacle->getConvexPolygon());
         scene->addPolygon(poly, pen);
     }
 
-    if (std::shared_ptr<CircleObstacle> circle_obstacle =
-            std::dynamic_pointer_cast<CircleObstacle>(obstacle))
+    std::shared_ptr<CircleObstacle> circle_obstacle =
+        std::dynamic_pointer_cast<CircleObstacle>(obstacle);
+    if (circle_obstacle)
     {
         Point origin  = circle_obstacle->getCircle().getOrigin();
         double radius = circle_obstacle->getCircle().getRadius();

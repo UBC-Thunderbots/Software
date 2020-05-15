@@ -18,8 +18,10 @@ QRectF createQRectF(const Rectangle& rectangle)
 QPolygonF createQPolygonF(const Polygon& polygon)
 {
     std::vector<QPointF> qpoints;
-    std::transform(polygon.getPoints().begin(), polygon.getPoints().end(),
-                   qpoints.begin(), createQPointF);
+    for (const auto& p : polygon.getPoints())
+    {
+        qpoints.push_back(createQPointF(p));
+    }
     return QPolygonF(QVector<QPointF>::fromStdVector(qpoints));
 }
 

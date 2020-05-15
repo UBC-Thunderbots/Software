@@ -18,6 +18,6 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator);
  *
  * @param scene The scene to draw on
  * @param obstacle The ObstaclePtr to draw
- * @param color The color to draw the obstacle
+ * @param pen The QPen to draw the obstacle
  */
-void drawObstacle(QGraphicsScene* scene, const ObstaclePtr obstacle, const QColor& color);
+void drawObstacle(QGraphicsScene* scene, const ObstaclePtr obstacle, const QPen& pen);

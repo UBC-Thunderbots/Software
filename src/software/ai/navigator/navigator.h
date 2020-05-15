@@ -50,6 +50,13 @@ class Navigator : public IntentVisitor
     std::vector<std::vector<Point>> getPlannedPathPoints();
 
     /**
+     * Get the obstacles for navigation
+     *
+     * @return obstacles
+     */
+    std::vector<ObstaclePtr> getObstacles();
+
+    /**
      * Registers the given Intent for navigation
      *
      * @param The Intent to register
@@ -151,8 +158,9 @@ class Navigator : public IntentVisitor
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
 
-    // This is used by the visualizer to see the planned paths
-    std::vector<std::vector<Point>> planned_paths;
+    // The following are used by the visualizer for drawing
+    std::vector<std::vector<Point>> visualizer_planned_paths;
+    std::vector<ObstaclePtr> visualizer_obstacles;
 
     // These are obstacles that represent robots that aren't
     // assigned move intents
