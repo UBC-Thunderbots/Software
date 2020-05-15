@@ -85,8 +85,8 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                     &trajectory);
+    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                 &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -159,8 +159,8 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                     &trajectory);
+    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                 &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -230,8 +230,8 @@ TEST_F(TrajectoryPlannerTest,
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                     &trajectory);
+    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                 &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -294,8 +294,8 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                     &trajectory);
+    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                 &trajectory);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -361,8 +361,8 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                     &trajectory);
+    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                 &trajectory);
 
     // Create the parameterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -380,7 +380,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     const_interp_trajectory.trajectory_elements = const_interp_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
+    app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
         &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
@@ -429,8 +429,8 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                     &trajectory);
+    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                 &trajectory);
 
     // Create the parameterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -446,7 +446,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     const_interp_trajectory.trajectory_elements = const_interp_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolate_constant_time_trajectory_segmentation(
+    app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
         &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
@@ -496,8 +496,8 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
 
 
     enum TrajectoryPlannerGenerationStatus status =
-        app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                         &trajectory);
+        app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                     &trajectory);
 
     EXPECT_EQ(finalVelocityTooHigh, status);
 }
@@ -525,8 +525,8 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
 
 
     enum TrajectoryPlannerGenerationStatus status =
-        app_trajectory_planner_generate_constant_arc_length_segmentation(path_parameters,
-                                                                         &trajectory);
+        app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
+                                                                     &trajectory);
 
     EXPECT_EQ(initialVelocityTooHigh, status);
 }
