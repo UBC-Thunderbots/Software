@@ -3,10 +3,10 @@
 #include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
 
 /**
- * Create a drivetrain for a robot with given drive units
+ * Initialize the IO layer for the Drivetrain
  *
- * NOTE: This does not take ownership of the given drive units. The driveunits must remain
- *       valid for the entire lifetime of this drivetrain.
+ * NOTE: This does not take ownership of the given drive units. The driveunit's must
+ *       remain valid until this function is called again.
  *
  * @param front_left_drive_unit
  * @param front_right_drive_unit
