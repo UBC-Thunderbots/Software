@@ -1,22 +1,19 @@
 #include "firmware/app/control/trajectory_planner.h"
 
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
 
 #include "assert.h"
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
-#include "math.h"
 
+// The following function is based on an algorithm described in
+// http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
 TrajectoryPlannerGenerationStatus
 app_trajectory_planner_generateConstantArcLengthSegmentation(
-    FirmwareRobotPathParameters_t path_parameters,
-    Trajectory_t trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
+    FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
 {
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-
     // Set the internal path parameter variables
     TrajectoryElement_t* traj_elements = trajectory->trajectory_elements;
 
@@ -43,10 +40,12 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
     assert(max_allowable_speed > 0);
     assert(initial_speed >= 0);
     assert(final_speed >= 0);
+    assert(num_segments <= TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
 
     // Check for the parameterization direction
     // If the path is traversed in reverse, then flip all components to forwards (to be
     // reversed again in the end)
+    //  TODO: Remove after #1322 is merged
     if (t_end < t_start)
     {
         reverse_parameterization = true;
@@ -72,8 +71,7 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
                                                         arc_length_parameterization);
 
     const float arc_segment_length =
-        app_trajectory_planner_getTotalArcLength(arc_length_parameterization) /
-        num_segments;
+        shared_polynomial2d_getTotalArcLength(arc_length_parameterization) / num_segments;
 
     // Now use numerical interpolation to get constant arc length segments for the
     // parameterization
@@ -83,10 +81,12 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
 
     // Generate the profile for the maximum physically valid velocity at each point on the
     // profile
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     app_trajectory_planner_getMaxAllowableSpeedProfile(
         max_allowable_speed_profile, path, num_segments, arc_length_parameterization,
         arc_segment_length, max_allowable_acceleration);
 
+    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     // First point on the velocity profile is always the current speed
     velocity_profile[0] = initial_speed;
 
@@ -143,8 +143,7 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
 
 
 void app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
-    Trajectory_t constant_period_trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    Trajectory_t variable_time_trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
     const float interpolation_period)
 {
     // The first point is the same for each trajectory
@@ -202,14 +201,6 @@ void app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
     constant_period_trajectory->num_elements = time_periods;
 }
 
-
-float app_trajectory_planner_getTotalArcLength(
-    ArcLengthParametrization_t arc_length_paramameterization)
-{
-    return arc_length_paramameterization
-        .arc_length_values[arc_length_paramameterization.num_values - 1];
-}
-
 static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
     TrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, const unsigned int num_elements,
@@ -231,8 +222,8 @@ static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
 void app_trajectory_planner_getMaxAllowableSpeedProfile(
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, unsigned int num_elements,
-    ArcLengthParametrization_t arc_length_parameterization, float arc_segment_length,
-    const float max_allowable_acceleration)
+    ArcLengthParametrization_t arc_length_parameterization,
+    const float arc_segment_length, const float max_allowable_acceleration)
 {
     Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
     Polynomial2dOrder1_t second_deriv =
@@ -270,7 +261,7 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
 }
 
 void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
-    unsigned int num_segments,
+    const unsigned int num_segments,
     float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const float arc_segment_length, const float max_allowable_acceleration,
@@ -302,7 +293,7 @@ void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
 }
 
 void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
-    unsigned int num_segments,
+    const unsigned int num_segments,
     float forwards_continuous_velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const float arc_segment_length, const float max_allowable_acceleration)
 {
@@ -336,7 +327,7 @@ void app_trajectory_planner_generateTimeProfile(
 
 void app_trajectory_planner_reverseTrajectoryDirection(
     TrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    unsigned int num_segments)
+    const unsigned int num_segments)
 {
     TrajectoryElement_t reverse[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     const float path_duration = forwards[num_segments - 1].time;

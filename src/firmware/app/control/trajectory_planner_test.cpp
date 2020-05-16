@@ -4,15 +4,13 @@ extern "C"
 }
 
 #include <gtest/gtest.h>
+#include <math.h>
 
-#include <iostream>
 #include <vector>
 
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/vector_2d.h"
-#include "math.h"
-#include "trajectory_planner.h"
 
 class TrajectoryPlannerTest : public testing::Test
 {
@@ -171,7 +169,6 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    float velocities[path_parameters.num_segments];
     std::vector<float> velocity =
         getSpeedsFromTrajectory(&trajectory, path_parameters.initial_speed);
     std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);

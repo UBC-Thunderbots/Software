@@ -80,7 +80,11 @@ typedef struct FirmwareRobotPathParameters
  *     - To ensure the robot is capable of deccelerating to react to any sudden changes in
  * the path, the trajectory is checked for backwards continuity
  *
- * @pre path_parameters.num_segments > 2
+ * NOTE: The following function is based on an algorithm described in
+ * http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
+ *
+ * @pre path_parameters.num_segments > 2 and num_segments <=
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  * @pre path_parameters.max_allowable_acceleration > 0
  * @pre path_parameters.max_allowable_speed > 0
  * @pre path_parameters.init_speed >= 0
@@ -97,8 +101,7 @@ typedef struct FirmwareRobotPathParameters
  */
 TrajectoryPlannerGenerationStatus
 app_trajectory_planner_generateConstantArcLengthSegmentation(
-    FirmwareRobotPathParameters_t path_parameters,
-    Trajectory_t trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+    FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
 
 /**
  * Returns a constant interpolation period (time) trajectory based on an input trajectory
@@ -122,26 +125,15 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
  *
  */
 void app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
-    Trajectory_t constant_period_trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    Trajectory_t variable_time_trajectory[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
     const float interpolation_period);
-
-
-/**
- * Returns a the total length of any arc specified by an arc parameterizaton
- *
- * @param arc_length_param [in] Arc length parameterization
- *
- * @return [out] The arc length in meters
- */
-static float app_trajectory_planner_getTotalArcLength(
-    ArcLengthParametrization_t arc_length_parameterization);
 
 /**
  * Generates the X/Y points for each position on the constant arc length trajectory
  *
- * @pre traj_elements is pre-allocated up the the limit specified by
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+ * @pre traj_elements [in/out] is pre-allocated up the the limit specified by
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS. Will be modified to contain the X/Y points of the
+ * trajectory
  *
  * @param path [in] The polynomial that defines the path of the trajectory
  *
@@ -163,7 +155,7 @@ static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
  * Returns the maximum velocity profile for a given curve based on curvature and maximum
  * allowable acceleration
  *
- * @pre max_allowable_speed_profile is pre-allocated up the the limit specified by
+ * @pre max_allowable_speed_profile is pre-allocated up at least the limit specified by
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
  * @param max_allowable_speed_profile [out] The pre-allocated array that will contain all
@@ -184,9 +176,9 @@ static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
  */
 static void app_trajectory_planner_getMaxAllowableSpeedProfile(
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    Polynomial2dOrder3_t path, unsigned int num_elements,
-    ArcLengthParametrization_t arc_length_parameterization, float arc_segment_length,
-    const float max_allowable_acceleration);
+    Polynomial2dOrder3_t path, const unsigned int num_elements,
+    ArcLengthParametrization_t arc_length_parameterization,
+    const float arc_segment_length, const float max_allowable_acceleration);
 
 /**
  * Builds the forwards continuous velocity profile for the given parameters.
@@ -196,7 +188,7 @@ static void app_trajectory_planner_getMaxAllowableSpeedProfile(
  * NOTE: The velocity_profile will contain the same number of elements as the input
  * max_allowable_speed[] array
  *
- * @pre The velocity_profile array is pre-allocated to contain up to
+ * @pre The velocity_profile array is pre-allocated to contain up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS elements
  *
  * @param num_segments [in] The number of segments(elements) in the
@@ -212,7 +204,7 @@ static void app_trajectory_planner_getMaxAllowableSpeedProfile(
  *
  * */
 void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
-    unsigned int num_segments,
+    const unsigned int num_segments,
     float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const float arc_segment_length, const float max_allowable_acceleration,
@@ -226,17 +218,19 @@ void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
  *
  * @pre The input velocity_profile is required to be FORWARDS CONTINUOUS before it is used
  * as an input to this function
+ * @pre forwards_continuous_velocity_profile is pre-allocated up to at least
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
  * @param num_segments [in] The number of segments(elements) in the velocity_profile array
- * @param forwards_continuous_velocity_profile The forwards continuous velocity profile to
- * ebe modified in-place into a profile that is also backwards continuous
+ * @param forwards_continuous_velocity_profile [in/out] The forwards continuous velocity
+ * profile to ebe modified in-place into a profile that is also backwards continuous
  * @param arc_segment_length [in] The arc segment length of each segment in the path the
  * profile is being generated for in meters
  * @param max_allowable_acceleration [in] The max allowable acceleration at any point on
  * the velocity profile
  */
 void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
-    unsigned int num_segments,
+    const unsigned int num_segments,
     float forwards_continuous_velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const float arc_segment_length, const float max_allowable_acceleration);
 
@@ -245,6 +239,8 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  *
  *  @pre traj_elements must be pre-allocated and contain all of the position data of the
  * trajectory
+ * @pre traj_elements & velocity_profile are pre-allocated up to at least
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
  * @param traj_elements The trajectory element array that will be modified to contain the
  * time profile
@@ -256,7 +252,8 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  */
 void static app_trajectory_planner_generateTimeProfile(
     TrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float num_segments, const float arc_segment_length, float* velocity_profile);
+    const float num_segments, const float arc_segment_length,
+    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /***
  *  This function takes in a forwards trajectory annd modifies it in place to become a
@@ -264,10 +261,11 @@ void static app_trajectory_planner_generateTimeProfile(
  *
  *  TODO: Remove when #1322 is merged.
  *
+ * @pre forwards is pre-allocated up to at least TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  * @param forwards This is the trajectory that will be modified in place to become a
  * reverse trajectory
  * @param num_segments The number of segements(elements) in the forwards array
  */
 void static app_trajectory_planner_reverseTrajectoryDirection(
     TrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    unsigned int num_segments);
+    const unsigned int num_segments);

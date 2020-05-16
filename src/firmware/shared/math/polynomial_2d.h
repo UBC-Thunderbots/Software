@@ -155,3 +155,13 @@ GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DECLARATION(3);
 GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(1);
 GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(2);
 GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(3);
+
+/**
+ * Returns a the total length of any arc specified by an arc parameterizaton
+ *
+ * @param arc_length_param [in] Arc length parameterization
+ *
+ * @return [out] The arc length in meters
+ */
+float shared_polynomial2d_getTotalArcLength(
+    ArcLengthParametrization_t arc_length_paramameterization);

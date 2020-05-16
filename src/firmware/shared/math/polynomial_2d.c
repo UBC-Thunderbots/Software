@@ -194,3 +194,10 @@ GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
 GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(3)
 GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(2)
 GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
+
+float shared_polynomial2d_getTotalArcLength(
+    ArcLengthParametrization_t arc_length_paramameterization)
+{
+    return arc_length_paramameterization
+        .arc_length_values[arc_length_paramameterization.num_values - 1];
+}
