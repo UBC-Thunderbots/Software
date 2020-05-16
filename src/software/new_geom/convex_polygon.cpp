@@ -167,3 +167,44 @@ double ConvexPolygon::area() const
 
     return std::abs(first_term - second_term) / 2;
 }
+
+Point ConvexPolygon::centroid() const
+{
+    // Adapted from
+    // https://www.geeksforgeeks.org/find-the-centroid-of-a-non-self-intersecting-closed-polygon/
+    double x_centre = 0;
+    double y_centre = 0;
+
+    for (unsigned i = 0; i < points_.size(); i++)
+    {
+        double x0 = points_[i].x();
+        double y0 = points_[i].y();
+        double x1 = points_[(i + 1) % points_.size()].x();
+        double y1 = points_[(i + 1) % points_.size()].y();
+        double A  = (x0 * y1) - (x1 * y0);
+
+        x_centre += (x0 + x1) * A;
+        y_centre += (y0 + y1) * A;
+    }
+
+    return Point((Vector(x_centre, y_centre )/ (6 * area())));
+}
+
+ConvexPolygon ConvexPolygon::expand(const Vector& v) const
+{
+    std::vector<Point> expanded_points(points_.size());
+    Point c = centroid();
+
+    for (const auto& p : points_)
+    {
+        if ((p - c).project(v).normalize() == v.normalize())
+        {
+            expanded_points.push_back(p + v);
+        }
+        else
+        {
+            expanded_points.push_back(p);
+        }
+    }
+    return ConvexPolygon(expanded_points);
+}

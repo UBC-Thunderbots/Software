@@ -10,12 +10,29 @@ class ConvexPolygon : public Polygon, public ConvexShape
 {
    public:
     ConvexPolygon() = delete;
+
     /**
      * Returns the area of this convex polygon
      *
      * @return The area of this convex polygon
      */
     double area() const override;
+
+    /**
+     * Returns the centroid of this convex polygon
+     *
+     * @return The centroid of this convex polygon
+     */
+    Point centroid() const;
+
+    /**
+     * Returns the convex polygon expanded towards v
+     * The convex polygon is split in half perpendicular to v and points on the half that
+     * v is pointing are translated by v
+     *
+     * @return a convex polygon expanded by v
+     */
+    ConvexPolygon expand(const Vector& v) const;
 
     /**
      * Construct a convex polygon by drawing line segments between consecutive
