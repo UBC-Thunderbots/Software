@@ -1,4 +1,5 @@
 #include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
+#include "firmware/app/world/wheel.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -21,7 +22,9 @@ DriveTrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_dri
 void io_drivetrain_unit_applyForce(DriveTrainUnit_t* drive_train_unit,
                                    float force_newtons)
 {
-    // TODO: proper implementation for this
+    // NOTE: This is a placeholder implementation. With the new controller we will not
+    //       control each wheel by applying "force" to it, but rather by directly
+    //       applying voltage
 
     float pwm_percentage = fmin(1.0f, fabs(force_newtons) / 255.0f);
 
