@@ -194,6 +194,28 @@ Point ConvexPolygon::centroid() const
 
 ConvexPolygon ConvexPolygon::expand(const Vector& v) const
 {
+    // ASCII art showing an expanded ConvexPolygon
+    //
+    // Original ConvexPolygon:
+    //
+    //            B---------C
+    //            |         |
+    //            |         |
+    //            A---------D
+    //
+    //                 |
+    //                 V
+    //          expansion vector
+    //
+    // Expanded ConvexPolygon (A and D are shifted down):
+    //
+    //            B---------C
+    //            |         |
+    //            |         |
+    //            |         |
+    //            A'--------D'
+    //
+
     std::vector<Point> expanded_points;
     Point c = centroid();
 
