@@ -20,23 +20,6 @@ RadioBackend::RadioBackend()
 {
 }
 
-RadioBackend::RadioBackend(
-    std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
-    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_VISION_MULTICAST_PORT,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
-                    boost::bind(&RadioBackend::receiveWorld, this, _1),
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig()),
-      radio_output(DEFAULT_RADIO_CONFIG,
-                   [this](RobotStatus status) {
-                       Subject<RobotStatus>::sendValueToObservers(status);
-                   }),
-      controller_input_config(controller_input_config)
-{
-}
-
 void RadioBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
     radio_output.sendPrimitives(*primitives_ptr);

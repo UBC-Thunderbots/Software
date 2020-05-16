@@ -11,14 +11,6 @@ class RadioBackend : public Backend
 
     RadioBackend();
 
-    /**
-     * Creates a new PrimitiveGenerator
-     *
-     * @param controller_input_config The config for the RadioBackend
-     */
-    RadioBackend(
-        std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
-
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;
 
@@ -43,5 +35,4 @@ class RadioBackend : public Backend
 
     ConstPrimitiveVectorPtr most_recently_received_primitives;
     std::mutex most_recently_received_primitives_mutex;
-    std::shared_ptr<const HandheldControllerInputConfig> controller_input_config;
 };
