@@ -253,6 +253,33 @@ TEST(DistanceTest, point_right_rectangle)
     EXPECT_DOUBLE_EQ(distance(r, p), expected);
 }
 
+TEST(DistanceTest, point_in_circle)
+{
+    Circle circle(Point(2, 3), 4);
+    Point point(3, 4);
+    double expected = 0.0;
+    EXPECT_DOUBLE_EQ(distance(point, circle), expected);
+    EXPECT_DOUBLE_EQ(distance(circle, point), expected);
+}
+
+TEST(DistanceTest, point_on_circle_circumference)
+{
+    Circle circle(Point(2.5, 3), 4);
+    Point point(6.5, 3);
+    double expected = 0.0;
+    EXPECT_DOUBLE_EQ(distance(point, circle), expected);
+    EXPECT_DOUBLE_EQ(distance(circle, point), expected);
+}
+
+TEST(DistanceTest, point_outside_circle)
+{
+    Circle circle(Point(2.5, -2), 1);
+    Point point(6.5, -2);
+    double expected = 3.0;
+    EXPECT_DOUBLE_EQ(distance(point, circle), expected);
+    EXPECT_DOUBLE_EQ(distance(circle, point), expected);
+}
+
 TEST(DistanceTest, point_on_segment_end_squared)
 {
     Point p(12, 5);

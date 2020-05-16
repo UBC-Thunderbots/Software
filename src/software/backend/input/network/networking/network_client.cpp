@@ -36,7 +36,7 @@ void NetworkClient::setupVisionClient(std::string vision_address, int vision_por
     // Set up our connection over udp to receive vision packets
     try
     {
-        ssl_vision_client = std::make_unique<SSLVisionClient>(
+        ssl_vision_client = std::make_unique<ProtoMulticastListener<SSL_WrapperPacket>>(
             io_service, vision_address, vision_port,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
     }
@@ -55,7 +55,7 @@ void NetworkClient::setupGameControllerClient(std::string gamecontroller_address
     // Set up our connection over udp to receive gamecontroller packets
     try
     {
-        ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
+        ssl_gamecontroller_client = std::make_unique<ProtoMulticastListener<Referee>>(
             io_service, gamecontroller_address, gamecontroller_port,
             boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
     }

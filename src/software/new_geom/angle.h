@@ -178,16 +178,6 @@ class Angle final
      */
     constexpr Angle minDiff(const Angle &other) const;
 
-    /**
-     * Limits this angle to [−π, π].
-     *
-     * The angle is rotated by a multiple of 2π until it lies within the target
-     * interval.
-     *
-     * @return the clamped angle.
-     */
-    constexpr Angle angleMod() const;
-
    private:
     /**
      * The measurement in radians of this Angle.
@@ -499,11 +489,6 @@ inline constexpr Angle Angle::minDiff(const Angle &other) const
     return (*this - other).clamp().abs();
 }
 
-inline constexpr Angle Angle::angleMod() const
-{
-    return remainder(Angle::full());
-}
-
 inline constexpr Angle::Angle(double rads) : rads(rads) {}
 
 inline constexpr Angle operator-(const Angle &angle)
@@ -583,7 +568,7 @@ inline constexpr bool operator>=(const Angle &x, const Angle &y)
 
 inline bool operator==(const Angle &x, const Angle &y)
 {
-    Angle diff = x.angleMod().minDiff(y.angleMod());
+    Angle diff = x.clamp().minDiff(y.clamp());
     return diff.toRadians() <= GeomConstants::FIXED_EPSILON;
 }
 

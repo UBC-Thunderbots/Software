@@ -104,9 +104,3 @@ TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test)
     // the "S" in the sigmoid within the given number of iterations
     EXPECT_GE(min.at(0), 3);
 }
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

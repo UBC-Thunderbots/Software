@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include "software/new_geom/circle.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
@@ -55,6 +56,17 @@ double distance(const Segment &first, const Point &second);
  */
 double distance(const Point &first, const Polygon &second);
 double distance(const Polygon &first, const Point &second);
+
+/**
+ * Finds the shortest distance between a Point and a Circle. If the Point is inside the
+ * Circle, the shortest distance is 0.
+ *
+ * @param first
+ * @param second
+ * @return the shortest distance between first and second
+ */
+double distance(const Point &first, const Circle &second);
+double distance(const Circle &first, const Point &second);
 
 /**
  * Finds the squared shortest distance between a Point and a Segment

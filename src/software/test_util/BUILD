@@ -5,7 +5,14 @@ cc_library(
     testonly = True,
     srcs = ["test_util.cpp"],
     hdrs = ["test_util.h"],
-    deps = ["//software/world"],
+    deps = [
+        "//shared:constants",
+        "//software/new_geom:geom_constants",
+        "//software/new_geom:point",
+        "//software/new_geom:polygon",
+        "//software/new_geom/util:almost_equal",
+        "//software/world",
+    ],
 )
 
 cc_test(
