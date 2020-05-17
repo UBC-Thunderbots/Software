@@ -219,9 +219,37 @@ ConvexPolygon ConvexPolygon::expand(const Vector& v) const
     std::vector<Point> expanded_points;
     Point c = centroid();
 
+    enum Orientation
+    {
+        LEFT,
+        RIGHT,
+        ON_THE_LINE
+    };
+
+    auto orientation = [&](const Point& p) {
+        Point b1 = c + v.perpendicular();
+        Point b2 = c - v.perpendicular();
+        double d =
+            (p.x() - b1.x()) * (b2.y() - b1.y()) - (p.y() - b1.y()) * (b2.x() - b1.x());
+        if (d == 0)
+        {
+            return Orientation::ON_THE_LINE;
+        }
+        else if (d < 0)
+        {
+            return Orientation::LEFT;
+        }
+        else
+        {
+            return Orientation::RIGHT;
+        }
+    };
+
+    Orientation orientation_of_v = orientation(c + v);
+
     for (const auto& p : points_)
     {
-        if ((p - c).project(v).normalize() == v.normalize())
+        if (orientation(p) == orientation_of_v)
         {
             expanded_points.push_back(p + v);
         }
