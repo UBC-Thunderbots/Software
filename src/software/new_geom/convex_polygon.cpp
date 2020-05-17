@@ -226,6 +226,8 @@ ConvexPolygon ConvexPolygon::expand(const Vector& v) const
         ON_THE_LINE
     };
 
+    // Draws a line perpendicular to v along c and returns which side of the line the
+    // point p is on
     auto orientation = [&](const Point& p) {
         Point b1 = c + v.perpendicular();
         Point b2 = c - v.perpendicular();
