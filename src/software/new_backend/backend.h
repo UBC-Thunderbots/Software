@@ -3,6 +3,7 @@
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/primitive/primitive.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
 
 /**
