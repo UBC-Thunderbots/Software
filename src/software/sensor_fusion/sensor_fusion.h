@@ -3,9 +3,11 @@
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/refbox_data.h"
+#include "software/sensor_fusion/ssl_protobuf_reader.h"
 #include "software/sensor_fusion/vision_detection.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
@@ -19,10 +21,7 @@
  * This produce/consume pattern is performed by extending both "Observer" and
  * "Subject". Please see the implementation of those classes for details.
  */
-class SensorFusion : public Subject<World>,
-                     public ThreadedObserver<RefboxData>,
-                     public ThreadedObserver<RobotStatus>,
-                     public ThreadedObserver<VisionDetection>
+class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
 {
    public:
     SensorFusion();
@@ -36,23 +35,21 @@ class SensorFusion : public Subject<World>,
     SensorFusion(const SensorFusion &)            = delete;
 
    private:
-    void onValueReceived(RefboxData refbox_data) override;
-    void onValueReceived(RobotStatus robot_status) override;
-    void onValueReceived(VisionDetection vision_detection) override;
+    void onValueReceived(SensorMsg sensor_msg) override;
 
     /**
-     * Updates world based on new refbox data
+     * Updates world based on a new SensorMsg
      *
-     * @param refbox_data new refbox data
+     * @param sensor_msg new SensorMsg
      */
-    void updateWorld(const RefboxData &refbox_data);
+    void updateWorld(SensorMsg sensor_msg);
 
     /**
-     * Updates world based on a new robot status
+     * Updates world based on a new SensorMsg
      *
-     * @param robot_status new robot status
+     * @param sensor_msg new SensorMsg
      */
-    void updateWorld(const RobotStatus &robot_status);
+    void updateWorld(SSL_WrapperPacket packet);
 
     /**
      * Updates world based on a new vision detection
@@ -68,7 +65,7 @@ class SensorFusion : public Subject<World>,
      *
      * @return ball if found in vision_detection
      */
-    std::optional<Ball> getBallFromvisionDetecion(
+    std::optional<Ball> getBallFromVisionDetection(
         const VisionDetection &vision_detection);
 
     /**
@@ -78,7 +75,7 @@ class SensorFusion : public Subject<World>,
      *
      * @return friendly team from vision_detection
      */
-    Team getFriendlyTeamFromvisionDetecion(const VisionDetection &vision_detection);
+    Team getFriendlyTeamFromVisionDetection(const VisionDetection &vision_detection);
 
     /**
      * Get enemy team from a vision detection
@@ -87,7 +84,7 @@ class SensorFusion : public Subject<World>,
      *
      * @return enemy team from vision_detection
      */
-    Team getEnemyTeamFromvisionDetecion(const VisionDetection &vision_detection);
+    Team getEnemyTeamFromVisionDetection(const VisionDetection &vision_detection);
 
     // Objects used to aggregate and store state. We use these to aggregate the state
     // so that we always publish "complete" data, not just data from a single frame/
@@ -101,4 +98,7 @@ class SensorFusion : public Subject<World>,
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    // The backend that handles reading and processing protobuf messages
+    SSLProtobufReader ssl_protobuf_reader;
 };

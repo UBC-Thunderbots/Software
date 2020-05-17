@@ -13,6 +13,7 @@
 #include "software/sensor_fusion/ball_detection.h"
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/sensor_fusion/robot_detection.h"
+#include "software/sensor_fusion/vision_detection.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
@@ -21,7 +22,7 @@ class SSLProtobufReader
 {
    public:
     /**
-     * Creates a new SSLProtobufReader for data input and filtering
+     * Creates a new SSLProtobufReader for reading and processing protobufs
      */
     explicit SSLProtobufReader();
 
@@ -37,7 +38,7 @@ class SSLProtobufReader
     Field getFieldData(const SSL_GeometryData &geometry_packet);
 
     /**
-     * Filters the ball data contained in the list of SSL detection frames and returns the
+     * Reads the ball data contained in the list of SSL detection frames and returns the
      * ball detections
      *
      * @param detections A list of new DetectionFrames containing ball data
@@ -48,7 +49,7 @@ class SSLProtobufReader
         const std::vector<SSL_DetectionFrame> &detections);
 
     /**
-     * Filters the robot data for the given team contained in the list of DetectionFrames
+     * Reads the robot data for the given team contained in the list of DetectionFrames
      * and returns the most up to date detections of the given team
      *
      * @param detections A list of new DetectionFrames containing given team robot data
@@ -59,6 +60,31 @@ class SSLProtobufReader
      */
     std::vector<RobotDetection> getTeamDetections(
         const std::vector<SSL_DetectionFrame> &detections, TeamType team_type);
+
+    /**
+     * Reads a VisionDetection from a SSL_DetectionFrame
+     *
+     * @param detection The SSL_DetectionFrame to process
+     *
+     * @return Vision from the given SSL_DetectionFrame
+     */
+    VisionDetection getVisionDetection(SSL_DetectionFrame detection);
+
+    /**
+     * Inverts all positions and orientations across the x and y axis of the field
+     *
+     * @param frame The frame to invert. It will be mutated in-place
+     */
+    void invertFieldSide(SSL_DetectionFrame &frame);
+
+    /**
+     * Given a detection, figures out if the camera is enabled
+     *
+     * @param detection SSL_DetectionFrame to consider
+     *
+     * @return whether the camera is enabled
+     */
+    bool isCameraEnabled(const SSL_DetectionFrame &detection);
 
     /**
      * Parses RefboxData from a Referee proto message

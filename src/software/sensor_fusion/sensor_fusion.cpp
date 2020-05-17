@@ -13,59 +13,66 @@ SensorFusion::SensorFusion()
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
-      enemy_team_filter()
+      enemy_team_filter(),
+      ssl_protobuf_reader()
 {
 }
 
-void SensorFusion::onValueReceived(RefboxData refbox_data)
+void SensorFusion::onValueReceived(SensorMsg sensor_msg)
 {
-    updateWorld(refbox_data);
+    updateWorld(sensor_msg);
     Subject<World>::sendValueToObservers(world);
 }
 
-void SensorFusion::onValueReceived(RobotStatus robot_status)
+void SensorFusion::updateWorld(SensorMsg sensor_msg)
 {
-    updateWorld(robot_status);
-    Subject<World>::sendValueToObservers(world);
+    if (sensor_msg.has_ssl_vision_msg())
+    {
+        updateWorld(*sensor_msg.mutable_ssl_vision_msg());
+    }
 }
 
-void SensorFusion::onValueReceived(VisionDetection vision_detection)
+void SensorFusion::updateWorld(SSL_WrapperPacket packet)
 {
-    updateWorld(vision_detection);
-    Subject<World>::sendValueToObservers(world);
-}
+    if (packet.has_geometry())
+    {
+        const auto &latest_geometry_data = packet.geometry();
+        Field field = ssl_protobuf_reader.getFieldData(latest_geometry_data);
+        world.updateFieldGeometry(field);
+    }
 
-void SensorFusion::updateWorld(const RefboxData &refbox_data)
-{
-    world.updateRefboxData(refbox_data);
+    if (packet.has_detection())
+    {
+        SSL_DetectionFrame detection = *packet.mutable_detection();
+        VisionDetection vision_detection =
+            ssl_protobuf_reader.getVisionDetection(detection);
+        updateWorld(vision_detection);
+    }
 }
-
-void SensorFusion::updateWorld(const RobotStatus &robot_status)
-{
-    // TODO: incorporate robot_status into world and update world
-    // https://github.com/UBC-Thunderbots/Software/issues/1149
-}
+// void SensorFusion::updateWorld(const RefboxData &refbox_data)
+//{
+//    world.updateRefboxData(refbox_data);
+//}
+//
+// void SensorFusion::updateWorld(const RobotStatus &robot_status)
+//{
+//    // TODO: incorporate robot_status into world and update world
+//    // https://github.com/UBC-Thunderbots/Software/issues/1149
+//}
 
 void SensorFusion::updateWorld(const VisionDetection &vision_detection)
 {
-    world.mutableEnemyTeam()    = getEnemyTeamFromvisionDetecion(vision_detection);
-    world.mutableFriendlyTeam() = getFriendlyTeamFromvisionDetecion(vision_detection);
+    world.mutableEnemyTeam()    = getEnemyTeamFromVisionDetection(vision_detection);
+    world.mutableFriendlyTeam() = getFriendlyTeamFromVisionDetection(vision_detection);
 
-    std::optional<Field> field_detection = vision_detection.getFieldDetection();
-
-    if (field_detection)
-    {
-        world.updateFieldGeometry(*field_detection);
-    }
-
-    std::optional<Ball> new_ball = getBallFromvisionDetecion(vision_detection);
+    std::optional<Ball> new_ball = getBallFromVisionDetection(vision_detection);
     if (new_ball)
     {
         world.updateBallState(new_ball->currentState());
     }
 }
 
-std::optional<Ball> SensorFusion::getBallFromvisionDetecion(
+std::optional<Ball> SensorFusion::getBallFromVisionDetection(
     const VisionDetection &vision_detection)
 {
     std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
@@ -74,7 +81,7 @@ std::optional<Ball> SensorFusion::getBallFromvisionDetecion(
     return new_ball;
 }
 
-Team SensorFusion::getFriendlyTeamFromvisionDetecion(
+Team SensorFusion::getFriendlyTeamFromVisionDetection(
     const VisionDetection &vision_detection)
 {
     std::vector<RobotDetection> friendly_robot_detections =
@@ -89,7 +96,8 @@ Team SensorFusion::getFriendlyTeamFromvisionDetecion(
     return new_friendly_team;
 }
 
-Team SensorFusion::getEnemyTeamFromvisionDetecion(const VisionDetection &vision_detection)
+Team SensorFusion::getEnemyTeamFromVisionDetection(
+    const VisionDetection &vision_detection)
 {
     std::vector<RobotDetection> enemy_robot_detections =
         vision_detection.getEnemyTeamDetections();

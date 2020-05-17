@@ -1,4 +1,4 @@
-#include "software/backend/input/network/ssl_protobuf_reader.h"
+#include "software/sensor_fusion/ssl_protobuf_reader.h"
 
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
@@ -231,6 +231,45 @@ std::vector<RobotDetection> SSLProtobufReader::getTeamDetections(
     return robot_detections;
 }
 
+VisionDetection SSLProtobufReader::getVisionDetection(SSL_DetectionFrame detection)
+{
+    std::vector<BallDetection> ball_detections;
+    std::vector<RobotDetection> friendly_team_detections;
+    std::vector<RobotDetection> enemy_team_detections;
+    Timestamp latest_timestamp;
+
+    // We invert the field side if we explicitly choose to override the values
+    // provided by refbox. The 'defending_positive_side' parameter dictates the side
+    // we are defending if we are overriding the value
+    // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
+    if (Util::DynamicParameters->getAIControlConfig()
+            ->getRefboxConfig()
+            ->OverrideRefboxDefendingSide()
+            ->value() &&
+        Util::DynamicParameters->getAIControlConfig()
+            ->getRefboxConfig()
+            ->DefendingPositiveSide()
+            ->value())
+    {
+        invertFieldSide(detection);
+    }
+
+    if (isCameraEnabled(detection))
+    {
+        // filter protos into internal data structures
+        ball_detections          = getBallDetections({detection});
+        friendly_team_detections = getTeamDetections({detection}, TeamType::FRIENDLY);
+        enemy_team_detections    = getTeamDetections({detection}, TeamType::ENEMY);
+    }
+
+    latest_timestamp = Timestamp::fromSeconds(detection.t_capture());
+
+    VisionDetection vision_detection(ball_detections, friendly_team_detections,
+                                     enemy_team_detections, latest_timestamp);
+
+    return vision_detection;
+}
+
 RefboxData SSLProtobufReader::getRefboxData(const Referee &packet)
 {
     // SSL Referee proto messages' `Command` fields map to `RefboxGameState` data
@@ -367,4 +406,54 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
 RefboxStage SSLProtobufReader::getRefboxStage(const Referee::Stage &stage)
 {
     return refbox_stage_map.at(stage);
+}
+
+void SSLProtobufReader::invertFieldSide(SSL_DetectionFrame &frame)
+{
+    for (SSL_DetectionBall &ball : *frame.mutable_balls())
+    {
+        ball.set_x(-ball.x());
+        ball.set_y(-ball.y());
+    }
+    for (const auto &team : {frame.mutable_robots_yellow(), frame.mutable_robots_blue()})
+    {
+        for (SSL_DetectionRobot &robot : *team)
+        {
+            robot.set_x(-robot.x());
+            robot.set_y(-robot.y());
+            robot.set_orientation(robot.orientation() + M_PI);
+        }
+    }
+}
+
+bool SSLProtobufReader::isCameraEnabled(const SSL_DetectionFrame &detection)
+{
+    bool camera_disabled = false;
+    switch (detection.camera_id())
+    {
+        // TODO: create an array of dynamic params to index into with camera_id()
+        // may be resolved by https://github.com/UBC-Thunderbots/Software/issues/960
+        case 0:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
+            break;
+        case 1:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
+            break;
+        case 2:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
+            break;
+        case 3:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
+            break;
+        default:
+            LOG(WARNING) << "An unkown camera id was detected, disabled by default "
+                         << "id: " << detection.camera_id() << std::endl;
+            camera_disabled = true;
+            break;
+    }
+    return !camera_disabled;
 }
