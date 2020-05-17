@@ -193,3 +193,11 @@ TEST(ConvexPolygonExpandTest, test_rectangle_up_left)
     Vector expansion_vector({-2, 3});
     EXPECT_EQ(poly.expand(expansion_vector), expected);
 }
+
+TEST(ConvexPolygonExpandTest, test_rectangle_0_vector)
+{
+    ConvexPolygon poly({{1, 1}, {1, 3}, {5, 3}, {5, 1}});
+    ConvexPolygon expected(poly);
+    Vector expansion_vector({0, 0});
+    EXPECT_EQ(poly.expand(expansion_vector), expected);
+}
