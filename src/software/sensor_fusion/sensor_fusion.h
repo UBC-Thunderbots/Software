@@ -1,9 +1,12 @@
 #pragma once
 
+#include <google/protobuf/repeated_field.h>
+
+#include "software/proto/sensor_msg.pb.h"
+
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/refbox_data.h"
@@ -12,6 +15,8 @@
 #include "software/world/ball.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
+
+using namespace google::protobuf;
 
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
@@ -50,6 +55,20 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
      * @param sensor_msg new SensorMsg
      */
     void updateWorld(SSL_WrapperPacket packet);
+
+    /**
+     * Updates world based on a new Referee
+     *
+     * @param referee new Referee
+     */
+    void updateWorld(Referee referee);
+
+    /**
+     * Updates world based on repeated TbotsRobotMsg
+     *
+     * @param tbots_robot_msgs new repeated TbotsRobotMsg
+     */
+    void updateWorld(google::protobuf::RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs);
 
     /**
      * Updates world based on a new vision detection
