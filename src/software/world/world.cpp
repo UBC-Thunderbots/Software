@@ -136,9 +136,21 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
     }
 }
 
-void World::updateRefboxData(const RefboxData &refbox_data)
+void World::updateRefboxStage(const RefboxStage &stage)
 {
-    updateRefboxGameState(refbox_data.getGameState());
+    refbox_stage_history.push_back(stage);
+    // Take the consensus of the previous refbox messages
+    if (!refbox_stage_history.empty() &&
+        std::all_of(
+            refbox_stage_history.begin(), refbox_stage_history.end(),
+            [&](auto gamestate) { return gamestate == refbox_stage_history.front(); }))
+    {
+        refbox_stage_ = stage;
+    }
+    else
+    {
+        refbox_stage_ = stage;
+    }
 }
 
 Timestamp World::getMostRecentTimestampFromMembers()

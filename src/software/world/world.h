@@ -76,12 +76,11 @@ class World final
     void updateRefboxGameState(const RefboxGameState& game_state);
 
     /**
-     * Updates the refbox data
+     * Updates the refbox stage
      *
-     * @param refbox_data the data sent by refbox
+     * @param stage the stage sent by refbox
      */
-    void updateRefboxData(const RefboxData& refbox_data);
-
+    void updateRefboxStage(const RefboxStage& stage);
 
     /**
      * Returns a const reference to the Field in the world
@@ -153,8 +152,6 @@ class World final
      */
     GameState& mutableGameState();
 
-
-
     /**
      * Gets the most recent Timestamp stored in the history of the World
      *
@@ -184,15 +181,17 @@ class World final
      * @param Timestamp corresponding to when the World was last updated
      */
     void updateTimestamp(Timestamp timestamp);
+
     /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
      * friendly_team, enemy_team and game_state are equal. The last update
-     * timestamp and refbox_game_state_history are not part of the equality.
+     * timestamp and histories are not part of the equality.
      *
      * @param other The world to compare against for equality
      * @return True if the other robot is equal to this world, and false otherwise
      */
     bool operator==(const World& other) const;
+
     /**
      * Defines the inequality operator for a World.
      *
@@ -207,9 +206,12 @@ class World final
     Team friendly_team_;
     Team enemy_team_;
     GameState game_state_;
+    RefboxStage refbox_stage_;
     // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
     // A small buffer that stores previous refbox game state
     boost::circular_buffer<RefboxGameState> refbox_game_state_history;
+    // A small buffer that stores previous refbox stage
+    boost::circular_buffer<RefboxStage> refbox_stage_history;
 };

@@ -270,62 +270,6 @@ VisionDetection SSLProtobufReader::getVisionDetection(SSL_DetectionFrame detecti
     return vision_detection;
 }
 
-RefboxData SSLProtobufReader::getRefboxData(const Referee &packet)
-{
-    // SSL Referee proto messages' `Command` fields map to `RefboxGameState` data
-    // structures
-    RefboxGameState game_state      = getRefboxGameState(packet.command());
-    RefboxGameState next_game_state = getRefboxGameState(packet.next_command());
-
-    TeamInfo friendly_team_info, enemy_team_info;
-
-    TeamInfo yellow_team_info(
-        packet.yellow().name(), packet.yellow().score(), packet.yellow().red_cards(),
-        std::vector<int>(packet.yellow().yellow_card_times().begin(),
-                         packet.yellow().yellow_card_times().begin()),
-        packet.yellow().yellow_cards(), packet.yellow().timeouts(),
-        packet.yellow().timeout_time(), packet.yellow().goalkeeper(),
-        packet.yellow().foul_counter(), packet.yellow().ball_placement_failures(),
-        packet.yellow().can_place_ball(), packet.yellow().max_allowed_bots());
-
-    TeamInfo blue_team_info(
-        packet.blue().name(), packet.blue().score(), packet.blue().red_cards(),
-        std::vector<int>(packet.blue().yellow_card_times().begin(),
-                         packet.blue().yellow_card_times().begin()),
-        packet.blue().yellow_cards(), packet.blue().timeouts(),
-        packet.blue().timeout_time(), packet.blue().goalkeeper(),
-        packet.blue().foul_counter(), packet.blue().ball_placement_failures(),
-        packet.blue().can_place_ball(), packet.blue().max_allowed_bots());
-
-    if (Util::DynamicParameters->getAIControlConfig()
-            ->getRefboxConfig()
-            ->FriendlyColorYellow()
-            ->value())
-    {
-        friendly_team_info = yellow_team_info;
-        enemy_team_info    = blue_team_info;
-    }
-    else
-    {
-        friendly_team_info = blue_team_info;
-        enemy_team_info    = yellow_team_info;
-    }
-
-    RefboxStage stage = getRefboxStage(packet.stage());
-
-    return RefboxData(
-        Timestamp::fromMilliseconds(packet.packet_timestamp() / 1000),
-        Timestamp::fromMilliseconds(packet.command_timestamp() / 1000),
-        packet.command_counter(),
-        Point(packet.designated_position().x(), packet.designated_position().y()),
-        packet.blue_team_on_positive_half(),
-        Duration::fromMilliseconds(packet.current_action_time_remaining() / 1000),
-        friendly_team_info, enemy_team_info, game_state, next_game_state, stage,
-        std::vector<GameEvent>(packet.game_events().begin(), packet.game_events().end()),
-        std::vector<ProposedGameEvent>(packet.proposed_game_events().begin(),
-                                       packet.proposed_game_events().end()));
-}
-
 // this maps a protobuf Referee_Command enum to its equivalent internal type
 // this map is used when we are on the blue team
 const static std::unordered_map<Referee::Command, RefboxGameState> blue_team_command_map =
@@ -371,18 +315,18 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
         {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
         {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
-RefboxGameState SSLProtobufReader::getRefboxGameState(const Referee::Command &command)
+RefboxGameState SSLProtobufReader::getRefboxGameState(const Referee &packet)
 {
     if (!Util::DynamicParameters->getAIControlConfig()
              ->getRefboxConfig()
              ->FriendlyColorYellow()
              ->value())
     {
-        return blue_team_command_map.at(command);
+        return blue_team_command_map.at(packet.command());
     }
     else
     {
-        return yellow_team_command_map.at(command);
+        return yellow_team_command_map.at(packet.command());
     }
 }
 
@@ -403,9 +347,9 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
     {Referee_Stage_PENALTY_SHOOTOUT, RefboxStage::PENALTY_SHOOTOUT},
     {Referee_Stage_POST_GAME, RefboxStage::POST_GAME}};
 
-RefboxStage SSLProtobufReader::getRefboxStage(const Referee::Stage &stage)
+RefboxStage SSLProtobufReader::getRefboxStage(const Referee &packet)
 {
-    return refbox_stage_map.at(stage);
+    return refbox_stage_map.at(packet.stage());
 }
 
 void SSLProtobufReader::invertFieldSide(SSL_DetectionFrame &frame)

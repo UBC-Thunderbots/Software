@@ -26,7 +26,6 @@ cc_test(
 
 cc_library(
     name = "refbox_data",
-    srcs = ["refbox_data.cpp"],
     hdrs = ["refbox_data.h"],
     deps = [
         ":team_info",

@@ -71,6 +71,26 @@ class SSLProtobufReader
     VisionDetection getVisionDetection(SSL_DetectionFrame detection);
 
     /**
+     * Converts a Referee packet into a RefboxGameState for the Refbox command contained
+     * in the packet, based on which team we are (blue or yellow).
+     *
+     * @param packet Referee protobuf
+     *
+     * @return RefboxGameState from command
+     */
+    RefboxGameState getRefboxGameState(const Referee &packet);
+
+    /**
+     * Converts a Referee protobuf Stage contained in the Referee packet into a
+     * RefboxStage
+     *
+     * @param packet Referee protobuf
+     *
+     * @return RefboxStage from stage
+     */
+    RefboxStage getRefboxStage(const Referee &packet);
+
+    /**
      * Inverts all positions and orientations across the x and y axis of the field
      *
      * @param frame The frame to invert. It will be mutated in-place
@@ -85,15 +105,6 @@ class SSLProtobufReader
      * @return whether the camera is enabled
      */
     bool isCameraEnabled(const SSL_DetectionFrame &detection);
-
-    /**
-     * Parses RefboxData from a Referee proto message
-     *
-     * @param packet Referee proto to parse
-     *
-     * @return RefboxData parsed from the packet
-     */
-    RefboxData getRefboxData(const Referee &packet);
 
     virtual ~SSLProtobufReader() = default;
 
@@ -112,23 +123,4 @@ class SSLProtobufReader
     // field_state used to handle the case where an optional field of
     // the geometry packet that we rely does not exists
     Field field_state;
-
-    /**
-     * Converts a protobuf Referee::Command into a RefboxGameState for the
-     * corresponding Refbox command, based on which team we are (blue or yellow).
-     *
-     * @param command a referee command from the protobuf message
-     *
-     * @return RefboxGameState from command
-     */
-    RefboxGameState getRefboxGameState(const Referee::Command &command);
-
-    /**
-     * Converts a protobuf stage into a RefboxStage
-     *
-     * @param stage Referee protobuf Stage
-     *
-     * @return RefboxStage from stage
-     */
-    RefboxStage getRefboxStage(const Referee::Stage &stage);
 };

@@ -2,11 +2,10 @@
 
 #include <google/protobuf/repeated_field.h>
 
-#include "software/proto/sensor_msg.pb.h"
-
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/refbox_data.h"
@@ -59,9 +58,9 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     /**
      * Updates world based on a new Referee
      *
-     * @param referee new Referee
+     * @param packet new Referee packet
      */
-    void updateWorld(Referee referee);
+    void updateWorld(Referee packet);
 
     /**
      * Updates world based on repeated TbotsRobotMsg

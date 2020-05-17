@@ -36,7 +36,7 @@ void SensorFusion::updateWorld(SensorMsg sensor_msg)
         updateWorld(*sensor_msg.mutable_ssl_refbox_msg());
     }
 
-        updateWorld(*sensor_msg.mutable_tbots_robot_msg());
+    updateWorld(*sensor_msg.mutable_tbots_robot_msg());
 }
 
 void SensorFusion::updateWorld(SSL_WrapperPacket packet)
@@ -57,14 +57,14 @@ void SensorFusion::updateWorld(SSL_WrapperPacket packet)
     }
 }
 
-void SensorFusion::updateWorld(Referee referee) {}
+void SensorFusion::updateWorld(Referee packet)
+{
+    world.updateRefboxGameState(ssl_protobuf_reader.getRefboxGameState(packet));
+    world.updateRefboxStage(ssl_protobuf_reader.getRefboxStage(packet));
+}
 
-// void SensorFusion::updateWorld(const RefboxData &refbox_data)
-//{
-//    world.updateRefboxData(refbox_data);
-//}
-
-void SensorFusion::updateWorld(google::protobuf::RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs)
+void SensorFusion::updateWorld(
+    google::protobuf::RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs)
 {
     // TODO: incorporate TbotsRobotMsg into world and update world
     // https://github.com/UBC-Thunderbots/Software/issues/1149
