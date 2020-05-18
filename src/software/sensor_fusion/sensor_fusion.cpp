@@ -63,8 +63,7 @@ void SensorFusion::updateWorld(Referee packet)
     world.updateRefboxStage(ssl_protobuf_reader.getRefboxStage(packet));
 }
 
-void SensorFusion::updateWorld(
-    google::protobuf::RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs)
+void SensorFusion::updateWorld(RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs)
 {
     // TODO: incorporate TbotsRobotMsg into world and update world
     // https://github.com/UBC-Thunderbots/Software/issues/1149

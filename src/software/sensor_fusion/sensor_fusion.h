@@ -67,7 +67,7 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
      *
      * @param tbots_robot_msgs new repeated TbotsRobotMsg
      */
-    void updateWorld(google::protobuf::RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs);
+    void updateWorld(RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs);
 
     /**
      * Updates world based on a new vision detection
