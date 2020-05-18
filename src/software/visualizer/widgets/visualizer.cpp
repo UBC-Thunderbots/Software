@@ -6,6 +6,7 @@ Visualizer::Visualizer(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
+    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer,
     std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
     std::shared_ptr<ThunderbotsConfig> config)
@@ -15,6 +16,7 @@ Visualizer::Visualizer(
       world_draw_functions_buffer(world_draw_functions_buffer),
       ai_draw_functions_buffer(ai_draw_functions_buffer),
       play_info_buffer(play_info_buffer),
+      sensor_msg_buffer(sensor_msg_buffer),
       robot_status_buffer(robot_status_buffer),
       view_area_buffer(view_area_buffer),
       update_timer_interval(Duration::fromSeconds(1.0 / 60.0))
@@ -29,6 +31,7 @@ void Visualizer::updateVisualizer()
 {
     draw();
     updatePlayInfo();
+    updateSensorMsg();
     updateRobotStatus();
     updateDrawViewArea();
 }
@@ -56,6 +59,16 @@ void Visualizer::updatePlayInfo()
     if (play_info)
     {
         main_widget->updatePlayInfo(play_info.value());
+    }
+}
+
+void Visualizer::updateSensorMsg()
+{
+    std::optional<SensorMsg> sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue();
+    while (sensor_msg)
+    {
+        main_widget->updateSensorMsg(sensor_msg.value());
+        sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue();
     }
 }
 

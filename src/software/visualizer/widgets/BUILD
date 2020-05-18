@@ -15,6 +15,7 @@ qt_cc_library(
         "//software/backend:robot_status",
         "//software/geom",
         "//software/logger",
+        "//software/proto:sensor_msg_cc_proto",
         "//software/visualizer/drawing:draw_functions",
         "//software/visualizer/geom:geometry_conversion",
         "//software/visualizer/ui:main_widget",
@@ -31,6 +32,7 @@ qt_cc_library(
         "//software/ai/hl/stp:play_info",
         "//software/backend:robot_status",
         "//software/multithreading:thread_safe_buffer",
+        "//software/proto:sensor_msg_cc_proto",
         "//software/time:duration",
         "//software/visualizer/geom:geometry_conversion",
         "@qt//:qt_widgets",
@@ -103,6 +105,7 @@ qt_cc_library(
     hdr = "robot_status_table.h",
     deps = [
         "//software/backend:robot_status",
+        "//software/proto:sensor_msg_cc_proto",
         "//software/time:duration",
         "@qt//:qt_core",
         "@qt//:qt_widgets",

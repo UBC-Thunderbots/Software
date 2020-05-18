@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "software/backend/robot_status.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/time/duration.h"
 
 /**
@@ -43,6 +44,15 @@ class RobotStatusTable : public QTableWidget
     std::map<std::string, Duration> getStatusMessages() const;
 
    public slots:
+    /**
+     * Updates the table with a new robot status. If the status message already exists,
+     * the message age is refreshed to 0. Othewise, a new message is added with an age of
+     * 0.
+     *
+     * @param sensor_msg The status to add to the table
+     */
+    void updateSensorMsg(const SensorMsg& sensor_msg);
+
     /**
      * Updates the table with a new robot status. If the status message already exists,
      * the message age is refreshed to 0. Othewise, a new message is added with an age of

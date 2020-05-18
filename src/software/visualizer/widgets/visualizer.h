@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/multithreading/thread_safe_buffer.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/time/duration.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/widgets/main_widget.h"
@@ -31,6 +32,7 @@ class Visualizer : public QMainWindow
      * WorldDrawFunctions
      * @param ai_draw_functions_buffer The buffer used to receive new AIDrawFunctions
      * @param play_info_buffer The buffer used to receive new PlayInfo
+     * @param sensor_msg_buffer The buffer used to receive new SensorMsgs
      * @param robot_status_buffer The buffer used to receive new RobotStatuses
      * @param view_area_buffer The buffer used to receive Rectangles that specify the area
      * of the world to display in the view
@@ -39,6 +41,7 @@ class Visualizer : public QMainWindow
         std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
+        std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer,
         std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
         std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
         std::shared_ptr<ThunderbotsConfig> config);
@@ -64,6 +67,11 @@ class Visualizer : public QMainWindow
     void updatePlayInfo();
 
     /**
+     * Updates and displays the newly provided SensorMsg.
+     */
+    void updateSensorMsg();
+
+    /**
      * Updates and displays the newly provided RobotStatus.
      */
     void updateRobotStatus();
@@ -82,6 +90,7 @@ class Visualizer : public QMainWindow
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
+    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
