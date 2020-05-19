@@ -11,7 +11,7 @@
 // The following function is based on an algorithm described in
 // http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
 TrajectoryPlannerGenerationStatus
-app_trajectory_planner_generateConstantArcLengthSegmentation(
+app_trajectory_planner_generateConstantArcLengthTrajectory(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
 {
     // Set the internal path parameter variables
@@ -105,7 +105,7 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
     }
     else
     {
-        generation_status = finalVelocityTooHigh;
+        generation_status = FINAL_VELOCITY_TOO_HIGH;
     }
 
     // Now check backwards continuity. This is done to guarantee the robot can deccelerate
@@ -121,7 +121,7 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
     }
     else
     {
-        generation_status = initialVelocityTooHigh;
+        generation_status = INITIAL_VELOCITY_TOO_HIGH;
     }
 
 

@@ -23,9 +23,9 @@ typedef struct Trajectory
 
 typedef enum TrajectoryPlannerGenerationStatus
 {
-    OK                     = 0,
-    finalVelocityTooHigh   = 1,
-    initialVelocityTooHigh = 2,
+    OK                        = 0,
+    FINAL_VELOCITY_TOO_HIGH   = 1,
+    INITIAL_VELOCITY_TOO_HIGH = 2,
 } TrajectoryPlannerGenerationStatus;
 
 typedef struct FirmwareRobotPathParameters
@@ -100,7 +100,7 @@ typedef struct FirmwareRobotPathParameters
  * @return The outcome of the trajectory generation. Returns OK if trajectory is valid.
  */
 TrajectoryPlannerGenerationStatus
-app_trajectory_planner_generateConstantArcLengthSegmentation(
+app_trajectory_planner_generateConstantArcLengthTrajectory(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
 
 /**
