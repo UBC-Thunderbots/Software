@@ -7,7 +7,7 @@ install:
 
 jobs:
   include:
-    - name: "Software - Build, Test, and Run Coverage"
+    - name: "Software - x86 - Build, Test, and Run Coverage"
       script:
         - cd src
         # Run tests and collect coverage
@@ -19,7 +19,7 @@ jobs:
             --test_output=errors
         # Collect Code Coverage Results
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
-    - name: "Firmware - Build, Test, and Run Coverage"
+    - name: "Firmware - x86 - Build, Test, and Run Coverage"
       script:
         - cd src
         # Run tests and collect coverage
@@ -37,7 +37,7 @@ jobs:
             --test_output=errors
         # Collect Code Coverage Results
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
-    - name: "Firmware - Build Arm Targets"
+    - name: "Firmware - Arm - Build"
       script:
         - cd src
         - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
