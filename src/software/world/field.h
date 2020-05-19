@@ -145,6 +145,13 @@ class Field
     Point centerPoint() const;
 
     /**
+     * Returns the center line of the field (as a segment)
+     *
+     * @return the center line of the field
+     */
+    Segment centerLine() const;
+
+    /**
      * Gets the width of the defense area in metres, which runs along the y-axis. This is
      * the total width of how far the defense area stretches from one side of the goal to
      * the other.

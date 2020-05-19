@@ -1,11 +1,5 @@
 #include "software/visualizer/drawing/navigator.h"
 
-#include <QtWidgets/QGraphicsScene>
-
-#include "software/new_geom/segment.h"
-#include "software/visualizer/drawing/colors.h"
-#include "software/visualizer/geom/geometry_conversion.h"
-
 AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {
     auto planned_paths = navigator->getPlannedPathPoints();
@@ -24,8 +18,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
             for (size_t i = 1; i < path.size(); i++)
             {
                 Segment path_segment(path[i - 1], path[i]);
-                QLineF line = createQLineF(path_segment);
-                scene->addLine(line, pen);
+                drawSegment(scene, path_segment, pen);
             }
         }
 
@@ -44,18 +37,13 @@ void drawObstacle(QGraphicsScene* scene, const ObstaclePtr obstacle, const QPen&
         std::dynamic_pointer_cast<ConvexPolygonObstacle>(obstacle);
     if (convex_polygon_obstacle)
     {
-        auto poly = createQPolygonF(convex_polygon_obstacle->getConvexPolygon());
-        scene->addPolygon(poly, pen);
+        drawConvexPolygon(scene, convex_polygon_obstacle->getConvexPolygon(), pen);
     }
 
     std::shared_ptr<CircleObstacle> circle_obstacle =
         std::dynamic_pointer_cast<CircleObstacle>(obstacle);
     if (circle_obstacle)
     {
-        Point origin  = circle_obstacle->getCircle().getOrigin();
-        double radius = circle_obstacle->getCircle().getRadius();
-        QRectF circle_bounding_rect(createQPointF(origin + Vector(-radius, radius)),
-                                    createQPointF(origin + Vector(radius, -radius)));
-        scene->addEllipse(circle_bounding_rect, pen);
+        drawCircle(scene, circle_obstacle->getCircle(), pen);
     }
 }

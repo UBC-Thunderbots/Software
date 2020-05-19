@@ -10,11 +10,25 @@ cc_library(
 )
 
 cc_library(
+    name = "geom",
+    srcs = ["geom.cpp"],
+    hdrs = ["geom.h"],
+    deps = [
+        "//software/geom",
+        "//software/visualizer/geom:geometry_conversion",
+        "@qt//:qt_core",
+        "@qt//:qt_gui",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
     name = "ball",
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
         ":colors",
+        ":geom",
         "//shared:constants",
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",
@@ -30,6 +44,7 @@ cc_library(
     hdrs = ["field.h"],
     deps = [
         ":colors",
+        ":geom",
         "//shared:constants",
         "//software/visualizer/geom:geometry_conversion",
         "//software/world:field",
@@ -83,6 +98,7 @@ cc_library(
     deps = [
         ":colors",
         ":draw_functions",
+        ":geom",
         "//software/ai/navigator",
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",

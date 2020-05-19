@@ -175,6 +175,11 @@ Point Field::centerPoint() const
     return Point(0, 0);
 }
 
+Segment Field::centerLine() const
+{
+    return Segment({0, friendlyCornerPos().y()}, {0, friendlyCornerNeg().y()});
+}
+
 Point Field::friendlyGoal() const
 {
     return Point(-xLength() / 2.0, 0.0);

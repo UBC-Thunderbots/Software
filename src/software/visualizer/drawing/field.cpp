@@ -1,9 +1,5 @@
 #include "software/visualizer/drawing/field.h"
 
-#include "shared/constants.h"
-#include "software/visualizer/drawing/colors.h"
-#include "software/visualizer/geom/geometry_conversion.h"
-
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {
     scene->addRect(createQRectF(field.fieldLines()), pen);
@@ -44,35 +40,31 @@ void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
     pen.setWidth(0);
     pen.setCosmetic(true);
 
-    double goal_depth = field.goalXLength();
-    QPointF friendly_goal_top_left(field.friendlyGoal().x() - goal_depth,
-                                   field.friendlyGoalpostPos().y());
-    QPointF friendly_goal_bottom_right(field.friendlyGoal().x(),
-                                       field.friendlyGoalpostNeg().y());
-    QRectF friendly_goal_rect(friendly_goal_top_left, friendly_goal_bottom_right);
-    scene->addRect(friendly_goal_rect, pen, friendly_team_brush);
+//    drawRectangle(scene, field.friendlyDefenseArea(), pen, friendly_team_brush);
+//    drawRectangle(scene, field.enemyDefenseArea(), pen, enemy_team_brush);
+    // double goal_depth = field.goalXLength();
+    // QPointF friendly_goal_top_left(field.friendlyGoal().x() - goal_depth,
+    //                               field.friendlyGoalpostPos().y());
+    // QPointF friendly_goal_bottom_right(field.friendlyGoal().x(),
+    //                                   field.friendlyGoalpostNeg().y());
+    // QRectF friendly_goal_rect(friendly_goal_top_left, friendly_goal_bottom_right);
+    // scene->addRect(friendly_goal_rect, pen);
 
-    QPointF enemy_goal_top_left(field.enemyGoal().x(), field.enemyGoalpostPos().y());
-    QPointF enemy_goal_bottom_right(field.enemyGoal().x() + goal_depth,
-                                    field.enemyGoalpostNeg().y());
-    QRectF enemy_goal_rect(enemy_goal_top_left, enemy_goal_bottom_right);
-    scene->addRect(enemy_goal_rect, pen, enemy_team_brush);
+    // QPointF enemy_goal_top_left(field.enemyGoal().x(), field.enemyGoalpostPos().y());
+    // QPointF enemy_goal_bottom_right(field.enemyGoal().x() + goal_depth,
+    //                                field.enemyGoalpostNeg().y());
+    // QRectF enemy_goal_rect(enemy_goal_top_left, enemy_goal_bottom_right);
+    // scene->addRect(enemy_goal_rect, pen);
 }
 
 void drawCenterLine(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    scene->addLine(0, field.friendlyCornerPos().y(), 0, field.friendlyCornerNeg().y(),
-                   pen);
+    drawSegment(scene, field.centerLine(), pen);
 }
 
 void drawCenterCircle(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    // The addEllipse function does not center the ellipse at the given coordinates, so it
-    // is slightly easier to define the bounding rect within which the ellipse is drawn
-    QRectF center_circle_bounding_rect(
-        QPointF(-field.centerCircleRadius(), field.centerCircleRadius()),
-        QPointF(field.centerCircleRadius(), -field.centerCircleRadius()));
-    scene->addEllipse(center_circle_bounding_rect, pen);
+    drawCircle(scene, field.centerCircle(), pen);
 }
 
 void drawField(QGraphicsScene* scene, const Field& field)
