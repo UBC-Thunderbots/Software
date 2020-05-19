@@ -214,3 +214,27 @@ TEST(RectangleEqualsTests, test_rectangles_not_equal_different_bottom_left_point
     Rectangle p = Rectangle(Point(0, 0), Point(5, 5));
     EXPECT_FALSE(r == p);
 }
+
+TEST(RectangleExpandTest, test_right)
+{
+    Rectangle rectangle({1, 1}, {5, 3});
+    Rectangle expected({1, 1}, {8, 3});
+    Vector expansion_vector({3, 0});
+    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+}
+
+TEST(RectangleExpandTest, test_up_left)
+{
+    Rectangle rectangle({1, 1}, {5, 3});
+    Rectangle expected({-1, 1}, {5, 6});
+    Vector expansion_vector({-2, 3});
+    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+}
+
+TEST(RectangleExpandTest, test_0_vector)
+{
+    Rectangle rectangle({1, 1}, {5, 3});
+    Rectangle expected(rectangle);
+    Vector expansion_vector({0, 0});
+    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+}

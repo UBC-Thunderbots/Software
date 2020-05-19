@@ -106,5 +106,16 @@ class Rectangle : public ConvexPolygon
      */
     bool expand(double amount);
 
+    /**
+     * Returns the Rectangle expanded in the direction of v in two steps
+     * 1. The Rectangle is split in half perpendicular to v*(1,0) and points on the half
+     * that v*(1,0) is pointing are translated by v*(1,0)
+     * 2. The Rectangle is split in half perpendicular to v*(0,1) and points on the half
+     * that v*(0,1) is pointing are translated by v*(0,1)
+     *
+     * @return a Rectangle expanded in the direction of v
+     */
+    Rectangle expand(const Vector &v) const;
+
     bool operator==(const Rectangle &p) const;
 };
