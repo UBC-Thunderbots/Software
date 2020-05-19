@@ -120,8 +120,8 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
  * interpolation period equivalent of the input trajectory
  * @param variable_time_trajectory [in] The valid trajectory used as
  * reference for a constant interpolation period trajectory
- * @param interpolation_period [in] The constant change in time that corresponds to each
- * trajectory segment
+ * @param interpolation_period [in] The constant change in time [s] that corresponds to
+ * each trajectory segment.
  *
  */
 void app_trajectory_planner_interpolateConstantTimeTrajectory(
