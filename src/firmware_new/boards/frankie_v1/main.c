@@ -74,6 +74,7 @@ void StartDefaultTask(void *argument);
 /* USER CODE BEGIN PFP */
 
 static void initIoLayer(void);
+static void initIoDrivetrain(void);
 
 /* USER CODE END PFP */
 
@@ -81,6 +82,11 @@ static void initIoLayer(void);
 /* USER CODE BEGIN 0 */
 
 static void initIoLayer(void)
+{
+    initIoDrivetrain();
+}
+
+void initIoDrivetrain(void)
 {
     // Initialize a motor driver with the given suffix, on the given
     // timer channel
@@ -112,10 +118,10 @@ static void initIoLayer(void)
         drivetrain_unit_##MOTOR_NAME_SUFFIX = io_drivetrain_unit_create(motor_driver);   \
     }
 
-    DriveTrainUnit_t *drivetrain_unit_front_left;
-    DriveTrainUnit_t *drivetrain_unit_back_left;
-    DriveTrainUnit_t *drivetrain_unit_back_right;
-    DriveTrainUnit_t *drivetrain_unit_front_right;
+    DrivetrainUnit_t *drivetrain_unit_front_left;
+    DrivetrainUnit_t *drivetrain_unit_back_left;
+    DrivetrainUnit_t *drivetrain_unit_back_right;
+    DrivetrainUnit_t *drivetrain_unit_front_right;
     INIT_DRIVETRAIN_UNIT(front_left, TIM_CHANNEL_1);
     INIT_DRIVETRAIN_UNIT(back_left, TIM_CHANNEL_2);
     INIT_DRIVETRAIN_UNIT(back_right, TIM_CHANNEL_3);

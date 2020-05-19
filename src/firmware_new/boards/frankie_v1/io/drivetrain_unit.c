@@ -6,19 +6,19 @@
 typedef struct DrivetrainUnit
 {
     AllegroA3931MotorDriver_t* motor_driver;
-} DriveTrainUnit_t;
+} DrivetrainUnit_t;
 
-DriveTrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver)
+DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver)
 {
-    DriveTrainUnit_t* drivetrain_unit =
-        (DriveTrainUnit_t*)malloc(sizeof(DriveTrainUnit_t));
+    DrivetrainUnit_t* drivetrain_unit =
+        (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
 
     drivetrain_unit->motor_driver = motor_driver;
 
     return drivetrain_unit;
 }
 
-void io_drivetrain_unit_applyForce(DriveTrainUnit_t* drive_train_unit,
+void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
                                    float force_newtons)
 {
     // NOTE: This is a placeholder implementation. With the new controller we will not
