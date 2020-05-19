@@ -174,7 +174,7 @@ static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
  * point on the trajectory
  *
  */
-static void app_trajectory_planner_getMaxAllowableSpeedProfile(
+void app_trajectory_planner_getMaxAllowableSpeedProfile(
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, const unsigned int num_elements,
     ArcLengthParametrization_t arc_length_parameterization,
@@ -242,8 +242,8 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  * @pre traj_elements & velocity_profile are pre-allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @param traj_elements The trajectory element array that will be modified to contain the
- * time profile
+ * @param traj_elements [in/out] The trajectory element array that will be modified to
+ * contain the time profile
  * @param num_segments [in] The number of segments(elements) in traj_elements and
  * velocity_profile
  * @param arc_segment_length  [in] The arc length of each path segment
