@@ -553,8 +553,7 @@ TEST_F(TrajectoryPlannerTest,
                 0.01);
 }
 
-TEST_F(TrajectoryPlannerTest,
-       check_trajectory_length_and_end_points_match_path_reverse_parameterization)
+TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterization)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -609,6 +608,45 @@ TEST_F(TrajectoryPlannerTest,
         segment_length_sum += length;
     }
     EXPECT_NEAR(segment_length_sum, arc_segment_length, 0.01);
+}
+
+TEST_F(TrajectoryPlannerTest,
+       check_trajectory_end_points_match_path_reverse_parameterization)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {0, 0, 1, 0}},
+        .y = {.coefficients = {0, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 1;
+    path_parameters.t_end                      = 0;
+    path_parameters.num_segments               = 5999;
+    path_parameters.max_allowable_acceleration = 3;
+    path_parameters.max_allowable_speed        = 3;
+    path_parameters.initial_speed              = 0;
+    path_parameters.final_speed                = 0;
+
+    TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
+
+
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
+
+    // Create the parmeterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(
+        path, path_parameters.t_end, path_parameters.t_start, arc_length_param);
+
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_end).x, 0.01);
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.y,
@@ -731,8 +769,8 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     const_interp_trajectory.trajectory_elements = const_interp_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
-        &const_interp_trajectory, &trajectory, 0.001);
+    app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
+                                                             &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 const_interp_trajectory
@@ -799,8 +837,8 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     const_interp_trajectory.trajectory_elements = const_interp_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
-        &const_interp_trajectory, &trajectory, 0.001);
+    app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
+                                                             &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 const_interp_trajectory

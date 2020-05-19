@@ -142,7 +142,7 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
 }
 
 
-void app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
+void app_trajectory_planner_interpolateConstantTimeTrajectory(
     Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
     const float interpolation_period)
 {
