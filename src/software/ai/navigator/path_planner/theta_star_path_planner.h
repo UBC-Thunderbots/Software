@@ -33,7 +33,7 @@ class ThetaStarPathPlanner : public PathPlanner
      */
     std::optional<Path> findPath(const Point &start, const Point &destination,
                                  const Rectangle &navigable_area,
-                                 const std::vector<Obstacle> &obstacles) override;
+                                 const std::vector<ObstaclePtr> &obstacles) override;
 
    private:
     class Coordinate : public std::pair<int, int>
@@ -291,7 +291,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param obstacles obstacles to avoid
      */
     void resetAndInitializeMemberVariables(const Rectangle &navigable_area,
-                                           const std::vector<Obstacle> &obstacles);
+                                           const std::vector<ObstaclePtr> &obstacles);
 
     // if close to destination then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
@@ -310,7 +310,7 @@ class ThetaStarPathPlanner : public PathPlanner
     const double SIZE_OF_GRID_CELL_IN_METERS =
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
-    std::vector<Obstacle> obstacles;
+    std::vector<ObstaclePtr> obstacles;
     int num_grid_rows;
     int num_grid_cols;
     double max_navigable_x_coord;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/navigator/obstacle/new_obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/new_geom/polygon.h"
 
 /**
@@ -18,7 +18,7 @@ class PolygonObstacle : public Obstacle
     explicit PolygonObstacle(const Polygon& polygon);
 
     bool contains(const Point& p) const override;
-    double minDistance(const Point& p) const override;
+    double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
 
