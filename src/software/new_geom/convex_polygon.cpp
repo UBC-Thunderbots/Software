@@ -170,8 +170,8 @@ double ConvexPolygon::area() const
 
 Point ConvexPolygon::centroid() const
 {
-    // Adapted from
-    // https://www.geeksforgeeks.org/find-the-centroid-of-a-non-self-intersecting-closed-polygon/
+    // Explanation of the math/geometry behind this:
+    // https://fotino.me/calculating-centroids/
     double x_centre    = 0;
     double y_centre    = 0;
     double signed_area = 0;
