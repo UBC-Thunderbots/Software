@@ -2,8 +2,6 @@
 
 #include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
 
-// TODO: better name for this file/"class"?
-
 typedef struct DrivetrainUnit DriveTrainUnit_t;
 
 /**

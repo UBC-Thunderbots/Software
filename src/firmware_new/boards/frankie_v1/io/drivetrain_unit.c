@@ -3,8 +3,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "firmware/app/world/wheel.h"
-
 typedef struct DrivetrainUnit
 {
     AllegroA3931MotorDriver_t* motor_driver;
