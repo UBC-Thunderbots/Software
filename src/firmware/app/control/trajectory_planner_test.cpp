@@ -623,7 +623,7 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.path                       = path;
     path_parameters.t_start                    = 1;
     path_parameters.t_end                      = 0;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -668,10 +668,10 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     };
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 500;
+    path_parameters.path         = path;
+    path_parameters.t_start      = 0;
+    path_parameters.t_end        = 1;
+    path_parameters.num_segments = 500;  // Use a low segment density for variety
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 9;
     path_parameters.initial_speed              = 1;
