@@ -21,7 +21,10 @@ SensorFusion::SensorFusion()
 void SensorFusion::onValueReceived(SensorMsg sensor_msg)
 {
     updateWorld(sensor_msg);
-    Subject<World>::sendValueToObservers(world);
+    if (world.field().isValid())
+    {
+        Subject<World>::sendValueToObservers(world);
+    }
 }
 
 void SensorFusion::updateWorld(SensorMsg sensor_msg)
