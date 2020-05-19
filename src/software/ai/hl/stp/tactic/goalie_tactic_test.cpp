@@ -150,7 +150,7 @@ class GoalieTacticTest : public testing::Test
         ASSERT_NE(chip_action, nullptr);
         EXPECT_TRUE(chip_action->getChipOrigin().isClose(world.ball().position(), 0.001));
         EXPECT_EQ(chip_action->getChipDirection(),
-                  (world.ball().position() - world.field().friendlyGoal()).orientation());
+                  (world.ball().position() - world.field().friendlyGoalCenter()).orientation());
         EXPECT_NEAR(chip_action->getChipDistanceMeters(), 2, 0.001);
     }
 };

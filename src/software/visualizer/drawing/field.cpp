@@ -1,36 +1,27 @@
 #include "software/visualizer/drawing/field.h"
 
+#include "shared/constants.h"
+
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    scene->addRect(createQRectF(field.fieldLines()), pen);
+    drawRectangle(scene,field.fieldLines(),pen);
 }
 
 void drawFieldPhysicalBoundaryLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    scene->addRect(createQRectF(field.fieldBoundary()), pen);
+    drawRectangle(scene,field.fieldBoundary(),pen);
 }
 
 void drawDefenseAreas(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    scene->addRect(createQRectF(field.friendlyDefenseArea()), pen);
-    scene->addRect(createQRectF(field.enemyDefenseArea()), pen);
+    drawRectangle(scene,field.friendlyDefenseArea(),pen);
+    drawRectangle(scene,field.enemyDefenseArea(),pen);
 }
 
 void drawGoals(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    double goal_depth = field.goalXLength();
-    QPointF friendly_goal_top_left(field.friendlyGoal().x() - goal_depth,
-                                   field.friendlyGoalpostPos().y());
-    QPointF friendly_goal_bottom_right(field.friendlyGoal().x(),
-                                       field.friendlyGoalpostNeg().y());
-    QRectF friendly_goal_rect(friendly_goal_top_left, friendly_goal_bottom_right);
-    scene->addRect(friendly_goal_rect, pen);
-
-    QPointF enemy_goal_top_left(field.enemyGoal().x(), field.enemyGoalpostPos().y());
-    QPointF enemy_goal_bottom_right(field.enemyGoal().x() + goal_depth,
-                                    field.enemyGoalpostNeg().y());
-    QRectF enemy_goal_rect(enemy_goal_top_left, enemy_goal_bottom_right);
-    scene->addRect(enemy_goal_rect, pen);
+    drawRectangle(scene, field.friendlyGoal(),pen);
+    drawRectangle(scene, field.enemyGoal(),pen);
 }
 
 void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
@@ -40,21 +31,8 @@ void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
     pen.setWidth(0);
     pen.setCosmetic(true);
 
-//    drawRectangle(scene, field.friendlyDefenseArea(), pen, friendly_team_brush);
-//    drawRectangle(scene, field.enemyDefenseArea(), pen, enemy_team_brush);
-    // double goal_depth = field.goalXLength();
-    // QPointF friendly_goal_top_left(field.friendlyGoal().x() - goal_depth,
-    //                               field.friendlyGoalpostPos().y());
-    // QPointF friendly_goal_bottom_right(field.friendlyGoal().x(),
-    //                                   field.friendlyGoalpostNeg().y());
-    // QRectF friendly_goal_rect(friendly_goal_top_left, friendly_goal_bottom_right);
-    // scene->addRect(friendly_goal_rect, pen);
-
-    // QPointF enemy_goal_top_left(field.enemyGoal().x(), field.enemyGoalpostPos().y());
-    // QPointF enemy_goal_bottom_right(field.enemyGoal().x() + goal_depth,
-    //                                field.enemyGoalpostNeg().y());
-    // QRectF enemy_goal_rect(enemy_goal_top_left, enemy_goal_bottom_right);
-    // scene->addRect(enemy_goal_rect, pen);
+    drawRectangle(scene, field.friendlyGoal(), pen, friendly_team_brush);
+    drawRectangle(scene, field.enemyGoal(), pen, enemy_team_brush);
 }
 
 void drawCenterLine(QGraphicsScene* scene, const Field& field, QPen pen)

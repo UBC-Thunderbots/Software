@@ -106,7 +106,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             }
             else
             {
-                enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
+                enemy_shot_vector = field.friendlyGoalCenter() - enemy_robot.position();
             }
 
             Point position_to_block_shot =

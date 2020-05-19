@@ -47,7 +47,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
     Robot friendly_robot = Robot(0, Point(-2, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot friendly_goalie =
-        Robot(1, world.field().friendlyGoal(), Vector(0, 0), Angle::zero(),
+        Robot(1, world.field().friendlyGoalCenter(), Vector(0, 0), Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({friendly_robot, friendly_goalie});
     world.mutableFriendlyTeam().assignGoalie(1);
@@ -84,7 +84,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_sid
     Robot friendly_robot = Robot(0, Point(-2, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot friendly_goalie =
-        Robot(1, world.field().friendlyGoal(), Vector(0, 0), Angle::zero(),
+        Robot(1, world.field().friendlyGoalCenter(), Vector(0, 0), Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({friendly_robot, friendly_goalie});
     world.mutableFriendlyTeam().assignGoalie(1);

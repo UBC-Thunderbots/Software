@@ -104,7 +104,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
                                        pass.receiverPoint(), enemy_team.getAllRobots());
 
     Angle open_angle_to_goal = Angle::zero();
-    Point shot_target        = field.enemyGoal();
+    Point shot_target        = field.enemyGoalCenter();
     if (shot_opt && shot_opt->getOpenAngle().abs() > Angle::fromDegrees(0))
     {
         open_angle_to_goal = shot_opt->getOpenAngle();
@@ -335,8 +335,8 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
     double on_field_quality = rectangleSigmoid(reduced_size_field, position, sig_width);
 
     // Add a negative weight for positions closer to our goal
-    Vector vec_to_friendly_goal      = Vector(field.friendlyGoal().x() - position.x(),
-                                         field.friendlyGoal().y() - position.y());
+    Vector vec_to_friendly_goal      = Vector(field.friendlyGoalCenter().x() - position.x(),
+                                         field.friendlyGoalCenter().y() - position.y());
     double distance_to_friendly_goal = vec_to_friendly_goal.length();
     double near_friendly_goal_quality =
         (1 -

@@ -306,7 +306,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
-        Robot(0, world.field().enemyGoal() + Vector(0, 0.5), {0, 0}, Angle::zero(),
+        Robot(0, world.field().enemyGoalCenter() + Vector(0, 0.5), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateEnemyTeamState(enemy_team);
@@ -378,7 +378,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
     Team enemy_team(
         Duration::fromSeconds(10),
         {// Enemy goalie
-         Robot(0, world.field().enemyGoal() + Vector(-0.1, 0.5), {0, 0}, Angle::quarter(),
+         Robot(0, world.field().enemyGoalCenter() + Vector(-0.1, 0.5), {0, 0}, Angle::quarter(),
                AngularVelocity::zero(), Timestamp::fromSeconds(0)),
          // Enemy marking friendly in the center
          Robot(1, {2.4, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
@@ -562,11 +562,11 @@ TEST_F(PassingEvaluationTest, ratePass_attempting_to_pass_and_receive_no_shot)
               Timestamp::fromSeconds(0)),
     });
     world.mutableEnemyTeam().updateRobots({
-        Robot(0, world.field().enemyGoal(), {0, 0}, Angle::zero(),
+        Robot(0, world.field().enemyGoalCenter(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(1, world.field().enemyGoal() - Vector(0, 0.2), {0, 0}, Angle::zero(),
+        Robot(1, world.field().enemyGoalCenter() - Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(2, world.field().enemyGoal() + Vector(0, 0.2), {0, 0}, Angle::zero(),
+        Robot(2, world.field().enemyGoalCenter() + Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
 

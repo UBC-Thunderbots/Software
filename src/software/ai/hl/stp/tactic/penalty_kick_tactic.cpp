@@ -145,7 +145,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
     do
     {
-        Vector behind_ball_vector = (ball.position() - field.enemyGoal());
+        Vector behind_ball_vector = (ball.position() - field.enemyGoalCenter());
         // A point behind the ball that leaves 5cm between the ball and kicker of the
         // robot
         Point behind_ball = ball.position() + behind_ball_vector.normalize(

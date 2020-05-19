@@ -253,14 +253,28 @@ class Field
      *
      * @return the position of the friendly goal.
      */
-    Point friendlyGoal() const;
+    Point friendlyGoalCenter() const;
 
     /**
      * Gets the position of the centre of the enemy goal.
      *
      * @return the position of the enemy goal.
      */
-    Point enemyGoal() const;
+    Point enemyGoalCenter() const;
+
+    /**
+     * Gets the area within the friendly goal.
+     *
+     * @return the area within the friendly goal.
+     */
+    Rectangle friendlyGoal() const;
+
+    /**
+     * Gets the area within the enemy goal.
+     *
+     * @return the area within the enemy goal.
+     */
+    Rectangle enemyGoal() const;
 
     /**
      * Gets the position of the penalty mark near the enemy goal.

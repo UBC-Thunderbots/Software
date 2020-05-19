@@ -115,12 +115,12 @@ Rectangle Field::friendlyHalf() const
 
 Rectangle Field::friendlyPositiveYQuadrant() const
 {
-    return Rectangle(friendlyGoal(), Point(0, friendlyCornerPos().y()));
+    return Rectangle(friendlyGoalCenter(), Point(0, friendlyCornerPos().y()));
 }
 
 Rectangle Field::friendlyNegativeYQuadrant() const
 {
-    return Rectangle(friendlyGoal(), Point(0, friendlyCornerNeg().y()));
+    return Rectangle(friendlyGoalCenter(), Point(0, friendlyCornerNeg().y()));
 }
 
 Rectangle Field::enemyHalf() const
@@ -180,64 +180,82 @@ Segment Field::centerLine() const
     return Segment({0, friendlyCornerPos().y()}, {0, friendlyCornerNeg().y()});
 }
 
-Point Field::friendlyGoal() const
+Point Field::friendlyGoalCenter() const
 {
     return Point(-xLength() / 2.0, 0.0);
 }
 
-Point Field::enemyGoal() const
+Point Field::enemyGoalCenter() const
 {
     return Point(xLength() / 2.0, 0.0);
 }
 
+Rectangle Field::friendlyGoal() const
+{
+     Point friendly_goal_top_left(friendlyGoalCenter().x() - goalXLength(),
+                                   friendlyGoalpostPos().y());
+     Point friendly_goal_bottom_right(friendlyGoalCenter().x(),
+                                       friendlyGoalpostNeg().y());
+     return Rectangle(friendly_goal_top_left, friendly_goal_bottom_right);
+
+}
+
+Rectangle Field::enemyGoal() const
+{
+     Point enemy_goal_top_left(enemyGoalCenter().x(), enemyGoalpostPos().y());
+     Point enemy_goal_bottom_right(enemyGoalCenter().x() + goalXLength(),
+                                    enemyGoalpostNeg().y());
+     return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
+}
+
 Point Field::penaltyEnemy() const
 {
-    return Point(enemyGoal().x() - defenseAreaXLength(), enemyGoal().y());
+    return Point(enemyGoalCenter().x() - defenseAreaXLength(), enemyGoalCenter().y());
 }
 
 Point Field::penaltyFriendly() const
 {
-    return Point(friendlyGoal().x() + defenseAreaXLength(), friendlyGoal().y());
+    return Point(friendlyGoalCenter().x() + defenseAreaXLength(), friendlyGoalCenter().y());
 }
 
 Point Field::friendlyCornerPos() const
 {
-    return Point(friendlyGoal().x(), yLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), yLength() / 2.0);
 }
 
 Point Field::friendlyCornerNeg() const
 {
-    return Point(friendlyGoal().x(), -yLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), -yLength() / 2.0);
 }
 
 Point Field::enemyCornerPos() const
 {
-    return Point(enemyGoal().x(), yLength() / 2);
+    return Point(enemyGoalCenter().x(), yLength() / 2);
 }
 
 Point Field::enemyCornerNeg() const
 {
-    return Point(enemyGoal().x(), -yLength() / 2);
+    return Point(enemyGoalCenter().x(), -yLength() / 2);
 }
 
 Point Field::friendlyGoalpostPos() const
 {
-    return Point(friendlyGoal().x(), goalYLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), goalYLength() / 2.0);
 }
 
 Point Field::friendlyGoalpostNeg() const
 {
-    return Point(friendlyGoal().x(), -goalYLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), -goalYLength() / 2.0);
 }
 
 Point Field::enemyGoalpostPos() const
 {
-    return Point(enemyGoal().x(), goalYLength() / 2.0);
+    return Point(enemyGoalCenter().x(), goalYLength() / 2.0);
 }
 
 Point Field::enemyGoalpostNeg() const
 {
-    return Point(enemyGoal().x(), -goalYLength() / 2.0);
+    return Point(enemyGoalCenter().x(), -goalYLength() / 2.0);
 }
 
 double Field::boundaryYLength() const

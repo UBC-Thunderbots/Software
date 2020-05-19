@@ -26,7 +26,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().enemyGoal(), 0.05));
+    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().enemyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
 
@@ -45,7 +45,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().friendlyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
 
@@ -61,7 +61,7 @@ TEST(CalcBestShotTest,
     world.updateFriendlyTeamState(team);
 
     world = ::Test::TestUtil::setEnemyRobotPositions(
-        world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
+        world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
     auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
@@ -71,7 +71,7 @@ TEST(CalcBestShotTest,
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().enemyGoal().x(), -0.3), 0.05));
+        Point(world.field().enemyGoalCenter().x(), -0.3), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
@@ -87,7 +87,7 @@ TEST(CalcBestShotTest,
     world.updateEnemyTeamState(team);
 
     world = ::Test::TestUtil::setFriendlyRobotPositions(
-        world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
+        world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
     auto result = Evaluation::calcBestShotOnFriendlyGoal(
@@ -97,7 +97,7 @@ TEST(CalcBestShotTest,
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+        Point(world.field().friendlyGoalCenter().x(), -0.3), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
@@ -116,7 +116,7 @@ TEST(CalcBestShotTest,
     world.updateFriendlyTeamState(team);
 
     world = ::Test::TestUtil::setEnemyRobotPositions(
-        world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
+        world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
     auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
@@ -126,7 +126,7 @@ TEST(CalcBestShotTest,
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().enemyGoal().x(), -0.3), 0.05));
+        Point(world.field().enemyGoalCenter().x(), -0.3), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
@@ -145,7 +145,7 @@ TEST(CalcBestShotTest,
     world.updateEnemyTeamState(team);
 
     world = ::Test::TestUtil::setFriendlyRobotPositions(
-        world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
+        world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
     auto result = Evaluation::calcBestShotOnFriendlyGoal(
@@ -155,7 +155,7 @@ TEST(CalcBestShotTest,
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+        Point(world.field().friendlyGoalCenter().x(), -0.3), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
@@ -206,8 +206,8 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
 {
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::fromDegrees(90)};
+    Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
+    Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
     auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -219,8 +219,8 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
 {
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::fromDegrees(45)};
+    Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
+    Shot shot = {world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -232,8 +232,8 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
 {
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::zero()};
+    Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
+    Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
 
     auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -245,8 +245,8 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
 {
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().friendlyGoal() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::fromDegrees(90)};
+    Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
+    Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
     auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -258,8 +258,8 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
 {
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().friendlyGoal() + Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::fromDegrees(45)};
+    Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
+    Shot shot = {world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -271,8 +271,8 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_fully_blocked_net)
 {
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::zero()};
+    Point shot_origin = world.field().enemyGoalCenter() + Vector(0.5, 0);
+    Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
 
     auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 

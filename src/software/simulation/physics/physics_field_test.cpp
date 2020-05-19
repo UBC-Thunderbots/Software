@@ -112,7 +112,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
     Field field_parameter(::Test::TestUtil::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
-    Ball ball_parameter(field_parameter.enemyGoal() + Vector(-1, 0), Vector(3.0, 0),
+    Ball ball_parameter(field_parameter.enemyGoalCenter() + Vector(-1, 0), Vector(3.0, 0),
                         Timestamp::fromSeconds(0));
     auto physics_ball = PhysicsBall(world, ball_parameter, 0.1, 9.8);
 
@@ -138,7 +138,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
     Field field_parameter(::Test::TestUtil::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
-    Ball ball_parameter(field_parameter.friendlyGoal() + Vector(1, 0), Vector(-3.0, 0),
+    Ball ball_parameter(field_parameter.friendlyGoalCenter() + Vector(1, 0), Vector(-3.0, 0),
                         Timestamp::fromSeconds(0));
     auto physics_ball = PhysicsBall(world, ball_parameter, 0.1, 9.8);
 
