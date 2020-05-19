@@ -335,7 +335,7 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
     double on_field_quality = rectangleSigmoid(reduced_size_field, position, sig_width);
 
     // Add a negative weight for positions closer to our goal
-    Vector vec_to_friendly_goal      = Vector(field.friendlyGoalCenter().x() - position.x(),
+    Vector vec_to_friendly_goal = Vector(field.friendlyGoalCenter().x() - position.x(),
                                          field.friendlyGoalCenter().y() - position.y());
     double distance_to_friendly_goal = vec_to_friendly_goal.length();
     double near_friendly_goal_quality =

@@ -112,7 +112,8 @@ class ShadowFreekickerTacticTest : public testing::Test
         goal_to_ball_angle =
             (world.ball().position() - world.field().friendlyGoalCenter()).orientation();
         goal_to_dest_angle =
-            (move_action->getDestination() - world.field().friendlyGoalCenter()).orientation();
+            (move_action->getDestination() - world.field().friendlyGoalCenter())
+                .orientation();
     }
 
     World world;

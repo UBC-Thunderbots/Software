@@ -92,8 +92,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         Point(world.field().friendlyGoalpostPos().x() +
                   world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world.field().defenseAreaYLength() / 2.0),
-        Point(world.field().friendlyGoalCenter().x() + world.field().defenseAreaXLength() +
-                  2 * ROBOT_MAX_RADIUS_METERS,
+        Point(world.field().friendlyGoalCenter().x() +
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoalCenter().y()),
         Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
               world.field().defenseAreaYLength() / 2.0),

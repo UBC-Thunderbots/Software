@@ -192,20 +192,18 @@ Point Field::enemyGoalCenter() const
 
 Rectangle Field::friendlyGoal() const
 {
-     Point friendly_goal_top_left(friendlyGoalCenter().x() - goalXLength(),
-                                   friendlyGoalpostPos().y());
-     Point friendly_goal_bottom_right(friendlyGoalCenter().x(),
-                                       friendlyGoalpostNeg().y());
-     return Rectangle(friendly_goal_top_left, friendly_goal_bottom_right);
-
+    Point friendly_goal_top_left(friendlyGoalCenter().x() - goalXLength(),
+                                 friendlyGoalpostPos().y());
+    Point friendly_goal_bottom_right(friendlyGoalCenter().x(), friendlyGoalpostNeg().y());
+    return Rectangle(friendly_goal_top_left, friendly_goal_bottom_right);
 }
 
 Rectangle Field::enemyGoal() const
 {
-     Point enemy_goal_top_left(enemyGoalCenter().x(), enemyGoalpostPos().y());
-     Point enemy_goal_bottom_right(enemyGoalCenter().x() + goalXLength(),
-                                    enemyGoalpostNeg().y());
-     return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
+    Point enemy_goal_top_left(enemyGoalCenter().x(), enemyGoalpostPos().y());
+    Point enemy_goal_bottom_right(enemyGoalCenter().x() + goalXLength(),
+                                  enemyGoalpostNeg().y());
+    return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
 }
 
 Point Field::penaltyEnemy() const
@@ -215,7 +213,8 @@ Point Field::penaltyEnemy() const
 
 Point Field::penaltyFriendly() const
 {
-    return Point(friendlyGoalCenter().x() + defenseAreaXLength(), friendlyGoalCenter().y());
+    return Point(friendlyGoalCenter().x() + defenseAreaXLength(),
+                 friendlyGoalCenter().y());
 }
 
 Point Field::friendlyCornerPos() const

@@ -378,8 +378,8 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
     Team enemy_team(
         Duration::fromSeconds(10),
         {// Enemy goalie
-         Robot(0, world.field().enemyGoalCenter() + Vector(-0.1, 0.5), {0, 0}, Angle::quarter(),
-               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+         Robot(0, world.field().enemyGoalCenter() + Vector(-0.1, 0.5), {0, 0},
+               Angle::quarter(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
          // Enemy marking friendly in the center
          Robot(1, {2.4, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
                Timestamp::fromSeconds(0))});

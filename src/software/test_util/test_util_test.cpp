@@ -72,7 +72,8 @@ TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_positive_number_of_r
         Timestamp::fromSeconds(0));
 
     EXPECT_EQ(2, world.enemyTeam().numRobots());
-    EXPECT_EQ(world.field().enemyGoalCenter(), (*world.enemyTeam().getRobotById(0)).position());
+    EXPECT_EQ(world.field().enemyGoalCenter(),
+              (*world.enemyTeam().getRobotById(0)).position());
     EXPECT_EQ(world.field().friendlyCornerPos(),
               (*world.enemyTeam().getRobotById(1)).position());
     EXPECT_EQ(Vector(), (*world.enemyTeam().getRobotById(0)).velocity());

@@ -26,7 +26,8 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().enemyGoalCenter(), 0.05));
+    EXPECT_TRUE(
+        result->getPointToShootAt().isClose(world.field().enemyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
 
@@ -45,7 +46,8 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(
+        result->getPointToShootAt().isClose(world.field().friendlyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
 
@@ -220,7 +222,8 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
+    Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
+                 Angle::fromDegrees(45)};
 
     auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -259,7 +262,8 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
     World world       = ::Test::TestUtil::createBlankTestingWorld();
     Field field       = ::Test::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
+    Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
+                 Angle::fromDegrees(45)};
 
     auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 

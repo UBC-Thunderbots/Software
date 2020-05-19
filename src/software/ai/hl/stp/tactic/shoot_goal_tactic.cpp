@@ -164,7 +164,8 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // If an enemy is about to steal the ball from us, we try chip over them to
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
-            Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoalCenter();
+            Point fallback_chip_target =
+                chip_target ? *chip_target : field.enemyGoalCenter();
             chip_action->updateControlParams(*robot, ball.position(),
                                              fallback_chip_target, CHIP_DIST);
             yield(chip_action);

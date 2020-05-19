@@ -86,8 +86,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // goal_defense_point_center is a point on the semicircle around the friendly
         // defense area, that can block the direct path from the ball to the net.
-        Point goal_defense_point_center =
-            world.field().friendlyGoalCenter() - semicircle_radius * goal_to_ball_unit_vector;
+        Point goal_defense_point_center = world.field().friendlyGoalCenter() -
+                                          semicircle_radius * goal_to_ball_unit_vector;
 
         // position robots on either side of the "goal defense point"
         Point goal_defense_point_left =

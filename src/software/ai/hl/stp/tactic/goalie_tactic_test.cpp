@@ -149,8 +149,9 @@ class GoalieTacticTest : public testing::Test
         auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
         ASSERT_NE(chip_action, nullptr);
         EXPECT_TRUE(chip_action->getChipOrigin().isClose(world.ball().position(), 0.001));
-        EXPECT_EQ(chip_action->getChipDirection(),
-                  (world.ball().position() - world.field().friendlyGoalCenter()).orientation());
+        EXPECT_EQ(
+            chip_action->getChipDirection(),
+            (world.ball().position() - world.field().friendlyGoalCenter()).orientation());
         EXPECT_NEAR(chip_action->getChipDistanceMeters(), 2, 0.001);
     }
 };

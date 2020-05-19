@@ -4,24 +4,24 @@
 
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    drawRectangle(scene,field.fieldLines(),pen);
+    drawRectangle(scene, field.fieldLines(), pen);
 }
 
 void drawFieldPhysicalBoundaryLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    drawRectangle(scene,field.fieldBoundary(),pen);
+    drawRectangle(scene, field.fieldBoundary(), pen);
 }
 
 void drawDefenseAreas(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    drawRectangle(scene,field.friendlyDefenseArea(),pen);
-    drawRectangle(scene,field.enemyDefenseArea(),pen);
+    drawRectangle(scene, field.friendlyDefenseArea(), pen);
+    drawRectangle(scene, field.enemyDefenseArea(), pen);
 }
 
 void drawGoals(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    drawRectangle(scene, field.friendlyGoal(),pen);
-    drawRectangle(scene, field.enemyGoal(),pen);
+    drawRectangle(scene, field.friendlyGoal(), pen);
+    drawRectangle(scene, field.enemyGoal(), pen);
 }
 
 void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,

@@ -406,10 +406,10 @@ TEST(EnemyThreatTest, no_enemies_on_field)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = ::Test::TestUtil::setBallPosition(
-        world,
-        Point(world.field().friendlyGoalCenter()) + Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
-        Timestamp::fromSeconds(0));
+    world = ::Test::TestUtil::setBallPosition(world,
+                                              Point(world.field().friendlyGoalCenter()) +
+                                                  Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
+                                              Timestamp::fromSeconds(0));
 
     auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                  world.enemyTeam(), world.ball(), false);
@@ -429,10 +429,10 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     enemy_team.updateRobots({enemy_robot_0});
     world.updateEnemyTeamState(enemy_team);
 
-    world = ::Test::TestUtil::setBallPosition(
-        world,
-        Point(world.field().friendlyGoalCenter()) + Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
-        Timestamp::fromSeconds(0));
+    world = ::Test::TestUtil::setBallPosition(world,
+                                              Point(world.field().friendlyGoalCenter()) +
+                                                  Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
+                                              Timestamp::fromSeconds(0));
 
     auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                  world.enemyTeam(), world.ball(), false);
@@ -447,7 +447,8 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     ASSERT_TRUE(threat.best_shot_angle);
     EXPECT_NEAR(threat.best_shot_angle->toDegrees(), 30, 5);
     ASSERT_TRUE(threat.best_shot_target);
-    EXPECT_TRUE(threat.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(
+        threat.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat.passer);
 }
@@ -522,7 +523,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_0.best_shot_angle);
     EXPECT_NEAR(threat_0.best_shot_angle->toDegrees(), 15, 5);
     ASSERT_TRUE(threat_0.best_shot_target);
-    EXPECT_TRUE(threat_0.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(
+        threat_0.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_0.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat_0.passer);
 
@@ -533,7 +535,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_1.best_shot_angle);
     EXPECT_NEAR(threat_1.best_shot_angle->toDegrees(), 20, 5);
     ASSERT_TRUE(threat_1.best_shot_target);
-    EXPECT_TRUE(threat_1.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(
+        threat_1.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_1.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_1.passer);
     EXPECT_EQ(threat_1.passer, enemy_robot_1);
@@ -545,7 +548,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_2.best_shot_angle);
     EXPECT_NEAR(threat_2.best_shot_angle->toDegrees(), 5, 5);
     ASSERT_TRUE(threat_2.best_shot_target);
-    EXPECT_TRUE(threat_2.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
+    EXPECT_TRUE(
+        threat_2.best_shot_target->isClose(world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_2.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_2.passer);
     EXPECT_EQ(threat_2.passer, enemy_robot_1);

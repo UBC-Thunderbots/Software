@@ -51,9 +51,10 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // first find the 3 intersections with each side of the restricted area
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
-    auto width_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                                     Line(goalie_restricted_area.posXPosYCorner(),
-                                          goalie_restricted_area.posXNegYCorner()));
+    auto width_x_goal =
+        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
+                     Line(goalie_restricted_area.posXPosYCorner(),
+                          goalie_restricted_area.posXNegYCorner()));
     auto pos_side_x_goal =
         intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
                      Line(goalie_restricted_area.posXPosYCorner(),
