@@ -1,4 +1,5 @@
 #pragma once
+#include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/parameter/dynamic_parameters.h"
@@ -18,9 +19,8 @@ class VelocityObstaclePathManager : public PathManager
         const std::unordered_set<PathObjective>& objectives,
         const Rectangle& navigable_area) override;
 
-    explicit VelocityObstaclePathManager(
-        std::unique_ptr<PathPlanner> path_planner, ObstacleFactory obstacle_factory,
-        std::shared_ptr<const VelocityObstaclePathManagerConfig> config);
+    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner,
+                                         ObstacleFactory obstacle_factory);
 
    private:
     /**
@@ -32,11 +32,10 @@ class VelocityObstaclePathManager : public PathManager
      *
      * @return list of obstacles that around other objectives' starts
      */
-    const std::vector<Obstacle> getObstaclesAroundStartOfOtherObjectives(
+    const std::vector<ObstaclePtr> getObstaclesAroundStartOfOtherObjectives(
         const std::unordered_set<PathObjective>& objectives,
         const PathObjective& current_objective);
 
     std::unique_ptr<PathPlanner> path_planner;
     ObstacleFactory obstacle_factory;
-    std::shared_ptr<const VelocityObstaclePathManagerConfig> config;
 };
