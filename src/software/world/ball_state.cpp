@@ -1,9 +1,7 @@
 #include "software/world/ball_state.h"
 
-BallState::BallState(const Point& position, const Vector& velocity)
+BallState::BallState(const Point& position, const Vector& velocity) : position_(position), velocity_(velocity)
 {
-    this->position_  = position;
-    this->velocity_  = velocity;
 }
 
 Point BallState::position() const

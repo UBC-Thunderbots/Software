@@ -27,8 +27,19 @@ cc_library(
     srcs = ["ball_state_with_timestamp.cpp"],
     hdrs = ["ball_state_with_timestamp.h"],
     deps = [
-        "//software/geom",
+        ":ball_state",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
         "//software/time:timestamp",
+    ],
+)
+
+cc_test(
+    name = "ball_state_with_timestamp_test",
+    srcs = ["ball_state_with_timestamp_test.cpp"],
+    deps = [
+        ":ball_state_with_timestamp",
+        "@gtest//:gtest_main",
     ],
 )
 
