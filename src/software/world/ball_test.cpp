@@ -45,6 +45,16 @@ TEST_F(BallTest, construct_with_params)
     EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
 }
 
+TEST_F(BallTest, construct_with_initial_state)
+{
+    Ball ball =
+        Ball(BallStateWithTimestamp(Point(1, 2.3), Vector(-0.04, 0.0), current_time));
+
+    EXPECT_EQ(Point(1, 2.3), ball.position());
+    EXPECT_EQ(Vector(-0.04, 0.0), ball.velocity());
+    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
+}
+
 TEST_F(BallTest, update_state_with_all_params)
 {
     Ball ball = Ball(Point(), Vector(), current_time);
