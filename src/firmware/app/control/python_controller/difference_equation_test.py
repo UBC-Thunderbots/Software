@@ -111,12 +111,46 @@ class TestDifferenceEquation(unittest.TestCase):
 
         system_response = difference_equation.get_output_history()
 
-        plt.plot(T, system_response)
-        plt.plot(T, yout)
-        plt.show()
+        for i in range(0, len(T)):
+            self.assertAlmostEqual(yout[i], system_response[i], 4)
+
+    def test_run_for_ticks(self):
+        """
+        This test checks the step response of the DifferenceEquation class vs the discrete transfer function (2nd order)
+        using the python control toolbox
+        """
+
+        sample_time = 0.0001  # [s]
+        end_time = 20
+
+        J = 0.01
+        B = 0.001
+        K = 1
+
+        s = ct.tf([1, 0], 1)
+
+        step_input = 1
+
+        continuous_tf = K / (J * s ** 2 + B * s + 1.5)
+
+        discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
+        difference_equation = de.DifferenceEquation(
+            discrete_tf.num[0][0], discrete_tf.den[0][0]
+        )
+
+        num_points = int(end_time / sample_time) + 1
+
+        T = np.linspace(0, end_time, num_points)
+        T, yout = ct.step_response(discrete_tf, T)
+
+        difference_equation.run_for_ticks(num_points, 1)
+
+        system_response = difference_equation.get_output_history()
 
         for i in range(0, len(T)):
             self.assertAlmostEqual(yout[i], system_response[i], 4)
+
+        difference_equation.time_step_count = num_points
 
 
 if __name__ == "__main__":

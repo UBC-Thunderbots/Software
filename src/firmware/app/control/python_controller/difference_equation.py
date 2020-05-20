@@ -103,3 +103,7 @@ class DifferenceEquation:
 
     def get_output_history(self):
         return self.__previous_output
+
+    def run_for_ticks(self, numer_of_ticks: int, input: float):
+        for i in range(0, numer_of_ticks):
+            self.tick(input)
