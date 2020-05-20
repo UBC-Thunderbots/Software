@@ -1,9 +1,8 @@
 #include "software/world/ball.h"
 
 #include "shared/constants.h"
-#include "software/world/ball_state_with_timestamp.h"
 
-Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
+Ball::Ball(const Point& position, const Vector& velocity, const Timestamp &timestamp,
            unsigned int history_size)
     : states_(history_size)
 {
@@ -15,14 +14,14 @@ Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
     updateState(BallStateWithTimestamp(position, velocity, timestamp));
 }
 
-Ball::Ball(BallStateWithTimestamp &ball_state, unsigned int history_size) : states_(history_size)
+Ball::Ball(const BallStateWithTimestamp &initial_state, unsigned int history_size) : states_(history_size)
 {
     if (history_size <= 0)
     {
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateState(ball_state);
+    updateState(initial_state);
 }
 
 BallStateWithTimestamp Ball::currentState() const
@@ -106,7 +105,7 @@ boost::circular_buffer<BallStateWithTimestamp> Ball::getPreviousStates() const
     return states_;
 }
 
-std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
+std::optional<int> Ball::getHistoryIndexFromTimestamp(const Timestamp &timestamp) const
 {
     for (unsigned i = 0; i < states_.size(); i++)
     {

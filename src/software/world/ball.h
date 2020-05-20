@@ -2,9 +2,9 @@
 
 #include <boost/circular_buffer.hpp>
 #include <optional>
-#include <vector>
 
 #include "software/new_geom/point.h"
+#include "software/new_geom/vector.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball_state_with_timestamp.h"
 
@@ -12,7 +12,7 @@ class Ball final
 {
    public:
     /**
-     * Creates a new ball with a new state given by the position and velocity
+     * Creates a new ball with the given initial state
      *
      * @param position The position of the ball, with coordinates in metres
      * @param velocity The velocity of the ball, in metres per second
@@ -20,19 +20,18 @@ class Ball final
      * given position and velocity
      * @param history_size The number of previous ball states that should be stored. Must
      * be > 0
-     *
      */
-    explicit Ball(Point position, Vector velocity, const Timestamp &timestamp,
+    explicit Ball(const Point& position, const Vector& velocity, const Timestamp &timestamp,
                   unsigned int history_size = 20);
 
-
     /**
-     * Creates a new ball with the given BallState
+     * Creates a new ball with the given initial state
      *
-     * @param ball_state the state of the ball
-     * @param history_size the number of previous ball states that should be stored
+     * @param initial_state The initial state of the ball
+     * @param history_size The number of previous ball states that should be stored. Must
+     * be > 0
      */
-    explicit Ball(BallStateWithTimestamp &ball_state, unsigned int history_size = 20);
+    explicit Ball(const BallStateWithTimestamp& initial_state, unsigned int history_size = 20);
 
     /**
      * Returns the current state of the ball
@@ -126,7 +125,7 @@ class Ball final
      * @return Index of the ball's update timestamp closest to the desired time or a
      * std::nullopt if there is not matching timestamp.
      */
-    std::optional<int> getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
+    std::optional<int> getHistoryIndexFromTimestamp(const Timestamp &timestamp) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and

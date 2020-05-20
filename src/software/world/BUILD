@@ -5,7 +5,9 @@ cc_library(
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
-        "//software/geom",
+        "//shared:constants",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
         "//software/time:timestamp",
         "//software/world:ball_state_with_timestamp",
         "@boost//:circular_buffer",
