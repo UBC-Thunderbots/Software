@@ -94,7 +94,7 @@ class TrajectoryPlannerTest : public testing::Test
     }
 };
 
-TEST_F(TrajectoryPlannerTest, test_forward_continuity_curvature_limited)
+TEST_F(TrajectoryPlannerTest, test_forward_continuity_path_curvature_max_speed_limited
 {
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
@@ -389,7 +389,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line_accele
                 0.01);
 }
 
-TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line_acceleration10)
+TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line_acceleration_high_acceleration)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
