@@ -1,7 +1,7 @@
 #include "software/world/ball.h"
 
 #include "shared/constants.h"
-#include "software/world/ball_state.h"
+#include "software/world/ball_state_with_timestamp.h"
 
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
            unsigned int history_size)
@@ -12,10 +12,10 @@ Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateState(BallState(position, velocity, timestamp));
+    updateState(BallStateWithTimestamp(position, velocity, timestamp));
 }
 
-Ball::Ball(BallState &ball_state, unsigned int history_size) : states_(history_size)
+Ball::Ball(BallStateWithTimestamp &ball_state, unsigned int history_size) : states_(history_size)
 {
     if (history_size <= 0)
     {
@@ -25,12 +25,12 @@ Ball::Ball(BallState &ball_state, unsigned int history_size) : states_(history_s
     updateState(ball_state);
 }
 
-BallState Ball::currentState() const
+BallStateWithTimestamp Ball::currentState() const
 {
     return states_.front();
 }
 
-void Ball::updateState(const BallState &new_state)
+void Ball::updateState(const BallStateWithTimestamp &new_state)
 {
     if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
     {
@@ -53,7 +53,7 @@ void Ball::updateStateToPredictedState(const Timestamp &timestamp)
     Point new_position      = estimatePositionAtFutureTime(duration_in_future);
     Vector new_velocity     = estimateVelocityAtFutureTime(duration_in_future);
 
-    updateState(BallState(new_position, new_velocity, timestamp));
+    updateState(BallStateWithTimestamp(new_position, new_velocity, timestamp));
 }
 
 Timestamp Ball::lastUpdateTimestamp() const
@@ -101,7 +101,7 @@ Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) co
     return velocity() * exp(-0.1 * seconds_in_future);
 }
 
-boost::circular_buffer<BallState> Ball::getPreviousStates() const
+boost::circular_buffer<BallStateWithTimestamp> Ball::getPreviousStates() const
 {
     return states_;
 }

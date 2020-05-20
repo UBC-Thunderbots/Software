@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/time:timestamp",
-        "//software/world:ball_state",
+        "//software/world:ball_state_with_timestamp",
         "@boost//:circular_buffer",
     ],
 )
@@ -17,15 +17,15 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
-        ":ball_state",
+        ":ball_state_with_timestamp",
         "@gtest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "ball_state",
-    srcs = ["ball_state.cpp"],
-    hdrs = ["ball_state.h"],
+    name = "ball_state_with_timestamp",
+    srcs = ["ball_state_with_timestamp.cpp"],
+    hdrs = ["ball_state_with_timestamp.h"],
     deps = [
         "//software/geom",
         "//software/time:timestamp",

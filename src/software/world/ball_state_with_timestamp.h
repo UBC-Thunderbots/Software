@@ -5,7 +5,7 @@
 #include "software/new_geom/point.h"
 #include "software/time/timestamp.h"
 
-class BallState final
+class BallStateWithTimestamp final
 {
    public:
     /**
@@ -16,7 +16,7 @@ class BallState final
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit BallState(Point position, Vector velocity, const Timestamp &timestamp);
+    explicit BallStateWithTimestamp(Point position, Vector velocity, const Timestamp &timestamp);
 
     /**
      * Returns the position of the ball represented by this state
@@ -47,7 +47,7 @@ class BallState final
      * @return True if the other ball state is equal to this ball state, and false
      * otherwise
      */
-    bool operator==(const BallState &other) const;
+    bool operator==(const BallStateWithTimestamp &other) const;
 
     /**
      * Defines the inequality operator for a BallState.
@@ -56,7 +56,7 @@ class BallState final
      * @return True if the other ball state is not equal to this ball state, and false
      * otherwise
      */
-    bool operator!=(const BallState &other) const;
+    bool operator!=(const BallStateWithTimestamp &other) const;
 
    private:
     Point position_;

@@ -26,7 +26,7 @@ cc_library(
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion:refbox_data",
         "//software/world:ball",
-        "//software/world:ball_state",
+        "//software/world:ball_state_with_timestamp",
         "//software/world:field",
         "//software/world:team",
     ],
