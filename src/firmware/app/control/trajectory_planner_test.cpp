@@ -307,7 +307,7 @@ TEST_F(TrajectoryPlannerTest, check_end_points_match_path)
         0.01);
 }
 
-TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line_acceleration3)
+TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line_medium_acceleration)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
