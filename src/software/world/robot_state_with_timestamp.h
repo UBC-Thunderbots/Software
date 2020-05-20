@@ -24,7 +24,8 @@ class RobotStateWithTimestamp : public RobotState
      * given position and velocity
      */
     explicit RobotStateWithTimestamp(const Point &position, const Vector &velocity,
-                                     const Angle &orientation, const AngularVelocity &angular_velocity,
+                                     const Angle &orientation,
+                                     const AngularVelocity &angular_velocity,
                                      const Timestamp &timestamp);
 
     /**
@@ -34,7 +35,8 @@ class RobotStateWithTimestamp : public RobotState
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit RobotStateWithTimestamp(const RobotState& robot_state, const Timestamp& timestamp);
+    explicit RobotStateWithTimestamp(const RobotState &robot_state,
+                                     const Timestamp &timestamp);
 
     /**
      * Returns the timestamp of the robot represented by this state

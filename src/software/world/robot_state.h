@@ -21,7 +21,8 @@ class RobotState
      * @param angular_velocity The angular velocity of the robot
      */
     explicit RobotState(const Point &position, const Vector &velocity,
-                                     const Angle &orientation, const AngularVelocity &angular_velocity);
+                        const Angle &orientation,
+                        const AngularVelocity &angular_velocity);
 
     /**
      * Returns the position of the robot represented by this state

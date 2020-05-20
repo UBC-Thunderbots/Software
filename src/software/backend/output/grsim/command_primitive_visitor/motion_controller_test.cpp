@@ -769,9 +769,9 @@ TEST_F(MotionControllerTest, positive_rotation_position_test)
         Robot temp_robo =
             Robot(4, robot.position(), robot_velocities.linear_velocity, new_orientation,
                   robot_velocities.angular_velocity, current_time);
-        robot.updateState(RobotStateWithTimestamp(robot.position(), robot_velocities.linear_velocity,
-                                                  new_orientation, robot_velocities.angular_velocity,
-                                                  current_time));
+        robot.updateState(RobotStateWithTimestamp(
+            robot.position(), robot_velocities.linear_velocity, new_orientation,
+            robot_velocities.angular_velocity, current_time));
     }
 
     EXPECT_NEAR(robot.orientation().toRadians(), destination_angle.toRadians(),
@@ -808,9 +808,9 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
             robot.orientation() +
             Angle::fromRadians(robot.angularVelocity().toRadians() * delta_time);
 
-        robot.updateState(RobotStateWithTimestamp(robot.position(), robot_velocities.linear_velocity,
-                                                  new_orientation, robot_velocities.angular_velocity,
-                                                  current_time));
+        robot.updateState(RobotStateWithTimestamp(
+            robot.position(), robot_velocities.linear_velocity, new_orientation,
+            robot_velocities.angular_velocity, current_time));
     }
 
     EXPECT_NEAR(robot.orientation().toRadians(), destination_angle.toRadians(),

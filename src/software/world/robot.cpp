@@ -15,7 +15,21 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateState(RobotStateWithTimestamp(position, velocity, orientation, angular_velocity, timestamp));
+    updateState(RobotStateWithTimestamp(position, velocity, orientation, angular_velocity,
+                                        timestamp));
+}
+
+Robot::Robot(RobotId id, const RobotStateWithTimestamp &initial_state,
+             unsigned int history_size,
+             const std::set<RobotCapabilities::Capability> &unavailable_capabilities)
+    : id_(id), states_(history_size), unavailable_capabilities_(unavailable_capabilities)
+{
+    if (history_size < 1)
+    {
+        throw std::invalid_argument("Error: history_size must be greater than 0");
+    }
+
+    updateState(initial_state);
 }
 
 void Robot::updateState(const RobotStateWithTimestamp &new_state)
@@ -54,7 +68,7 @@ void Robot::updateStateToPredictedState(const Duration &duration_in_future)
 
     updateState(RobotStateWithTimestamp(new_position, new_velocity, new_orientation,
                                         new_angular_velocity,
-                           lastUpdateTimestamp() + duration_in_future));
+                                        lastUpdateTimestamp() + duration_in_future));
 }
 
 Timestamp Robot::lastUpdateTimestamp() const
