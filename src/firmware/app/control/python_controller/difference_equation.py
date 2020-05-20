@@ -12,9 +12,11 @@ import collections
 import _collections_abc
 import os
 
-class DifferenceEquation:
 
-    def __init__(self, tf_numerator_coefficients: list, tf_denominator_coefficients: list):
+class DifferenceEquation:
+    def __init__(
+        self, tf_numerator_coefficients: list, tf_denominator_coefficients: list
+    ):
 
         """ Creates a difference equation based on the input discrete domain transfer function
 
@@ -32,7 +34,7 @@ class DifferenceEquation:
         # This is done so that the output of the difference equation is not scaled
         for i in range(0, len(self.__numerator_coefficients)):
             self.__numerator_coefficients[i] /= self.__denominator_coefficients[0]
-            
+
         for i in range(0, len(self.__denominator_coefficients)):
             self.__denominator_coefficients[i] /= self.__denominator_coefficients[0]
 
@@ -55,13 +57,17 @@ class DifferenceEquation:
         for i in range(0, self.__input_coeffs_order):
 
             # Calculate how many input 'steps' back in time we must use for the given numerator coefficient
-            index = self.time_step_count + (self.__input_coeffs_order - self.__controller_rank - i)
+            index = self.time_step_count + (
+                self.__input_coeffs_order - self.__controller_rank - i
+            )
 
             # If we must go more time steps backwards than are recorded, the term has no effect on the output
-            if(index < 0 or len(self.__previous_input) < index+1):
+            if index < 0 or len(self.__previous_input) < index + 1:
                 effect_of_previous_input += 0
             else:
-                effect_of_previous_input += self.__numerator_coefficients[i] * self.__previous_input[index]
+                effect_of_previous_input += (
+                    self.__numerator_coefficients[i] * self.__previous_input[index]
+                )
 
         # Generate the systems response due to previous output
         effect_of_previous_output = 0
@@ -74,10 +80,12 @@ class DifferenceEquation:
             index = self.time_step_count - i
 
             # If we must go more time steps backwards than are recorded, the term has no effect on the output
-            if(index <  0 or len(self.__previous_output) < index+1):
+            if index < 0 or len(self.__previous_output) < index + 1:
                 effect_of_previous_output += 0
             else:
-                effect_of_previous_output += self.__denominator_coefficients[i] * self.__previous_output[index]
+                effect_of_previous_output += (
+                    self.__denominator_coefficients[i] * self.__previous_output[index]
+                )
 
         # The new output of the system in the difference between the effect of the inputs and the effect of the outputs
         new_output = effect_of_previous_input - effect_of_previous_output
@@ -90,7 +98,7 @@ class DifferenceEquation:
 
         # Increase the count of time steps
         self.time_step_count += 1
-        
+
         return new_output
 
     def get_output_history(self):

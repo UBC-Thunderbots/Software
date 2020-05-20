@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 import unittest
 import difference_equation as de
 
-class TestDifferenceEquation(unittest.TestCase):
 
+class TestDifferenceEquation(unittest.TestCase):
     def test_output(self):
         """
         Test that the difference equation follows the correct output sequence
@@ -25,19 +25,19 @@ class TestDifferenceEquation(unittest.TestCase):
         self.assertEqual(output, 0)
 
         output = difference_equation.tick(1)
-        
+
         self.assertEqual(output, 1)
 
         output = difference_equation.tick(1)
-        
+
         self.assertEqual(output, 1)
 
         output = difference_equation.tick(1)
-        
+
         self.assertEqual(output, 0)
 
         output = difference_equation.tick(1)
-        
+
         self.assertEqual(output, 1)
 
     def test_step_function_first_order(self):
@@ -51,25 +51,26 @@ class TestDifferenceEquation(unittest.TestCase):
 
         J = 0.001
         B = 0.001
-        K = 1/1000
+        K = 1 / 1000
 
         s = ct.tf([1, 0], 1)
 
         step_input = 1
 
-        continuous_tf = K/(J*s + B)
+        continuous_tf = K / (J * s + B)
 
-        discrete_tf = ct.sample_system(continuous_tf, sample_time, 'zoh' )
-        difference_equation = de.DifferenceEquation(discrete_tf.num[0][0], discrete_tf.den[0][0])
+        discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
+        difference_equation = de.DifferenceEquation(
+            discrete_tf.num[0][0], discrete_tf.den[0][0]
+        )
 
-        num_points = int(end_time/sample_time)+1
+        num_points = int(end_time / sample_time) + 1
 
         T = np.linspace(0, end_time, num_points)
         T, yout = ct.step_response(discrete_tf, T)
 
         for i in range(0, num_points):
             difference_equation.tick(step_input)
-
 
         system_response = difference_equation.get_output_history()
 
@@ -93,12 +94,14 @@ class TestDifferenceEquation(unittest.TestCase):
 
         step_input = 1
 
-        continuous_tf = K/(J*s**2 + B*s + 1.5)
+        continuous_tf = K / (J * s ** 2 + B * s + 1.5)
 
-        discrete_tf = ct.sample_system(continuous_tf, sample_time, 'zoh')
-        difference_equation = de.DifferenceEquation(discrete_tf.num[0][0], discrete_tf.den[0][0])
+        discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
+        difference_equation = de.DifferenceEquation(
+            discrete_tf.num[0][0], discrete_tf.den[0][0]
+        )
 
-        num_points = int(end_time/sample_time)+1
+        num_points = int(end_time / sample_time) + 1
 
         T = np.linspace(0, end_time, num_points)
         T, yout = ct.step_response(discrete_tf, T)
@@ -116,5 +119,5 @@ class TestDifferenceEquation(unittest.TestCase):
             self.assertAlmostEqual(yout[i], system_response[i], 4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
