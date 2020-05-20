@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
-#include "software/world/robot_state.h"
+#include "software/world/robot_state_with_timestamp.h"
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
@@ -15,10 +15,10 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateState(RobotState(position, velocity, orientation, angular_velocity, timestamp));
+    updateState(RobotStateWithTimestamp(position, velocity, orientation, angular_velocity, timestamp));
 }
 
-void Robot::updateState(const RobotState &new_state)
+void Robot::updateState(const RobotStateWithTimestamp &new_state)
 {
     if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
     {
@@ -29,7 +29,7 @@ void Robot::updateState(const RobotState &new_state)
     states_.push_front(new_state);
 }
 
-RobotState Robot::currentState() const
+RobotStateWithTimestamp Robot::currentState() const
 {
     return states_.front();
 }
@@ -52,8 +52,8 @@ void Robot::updateStateToPredictedState(const Duration &duration_in_future)
     AngularVelocity new_angular_velocity =
         estimateAngularVelocityAtFutureTime(duration_in_future);
 
-    updateState(RobotState(new_position, new_velocity, new_orientation,
-                           new_angular_velocity,
+    updateState(RobotStateWithTimestamp(new_position, new_velocity, new_orientation,
+                                        new_angular_velocity,
                            lastUpdateTimestamp() + duration_in_future));
 }
 
@@ -147,7 +147,7 @@ AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
     return angularVelocity();
 }
 
-boost::circular_buffer<RobotState> Robot::getPreviousStates() const
+boost::circular_buffer<RobotStateWithTimestamp> Robot::getPreviousStates() const
 {
     return states_;
 }

@@ -7,7 +7,7 @@
 #include "software/world/robot_capabilities.h"
 
 // This class represents the state of a Robot at a single point in time
-class RobotState final
+class RobotStateWithTimestamp final
 {
    public:
     /**
@@ -22,9 +22,9 @@ class RobotState final
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation, const AngularVelocity &angular_velocity,
-                        const Timestamp &timestamp);
+    explicit RobotStateWithTimestamp(const Point &position, const Vector &velocity,
+                                     const Angle &orientation, const AngularVelocity &angular_velocity,
+                                     const Timestamp &timestamp);
 
     /**
      * Returns the position of the robot represented by this state
@@ -69,7 +69,7 @@ class RobotState final
      * @return True if the other robot state is equal to this robot state, and false
      * otherwise
      */
-    bool operator==(const RobotState &other) const;
+    bool operator==(const RobotStateWithTimestamp &other) const;
 
     /**
      * Defines the inequality operator for a RobotState.
@@ -78,7 +78,7 @@ class RobotState final
      * @return True if the other robot state is not equal to this robot state, and false
      * otherwise
      */
-    bool operator!=(const RobotState &other) const;
+    bool operator!=(const RobotStateWithTimestamp &other) const;
 
    private:
     Point position_;

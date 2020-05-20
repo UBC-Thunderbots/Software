@@ -9,7 +9,7 @@
 #include "software/new_geom/point.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
-#include "software/world/robot_state.h"
+#include "software/world/robot_state_with_timestamp.h"
 
 using RobotId = unsigned int;
 /**
@@ -45,9 +45,9 @@ class Robot
      *
      * @param new_robot_state A robot state containing new robot data
      */
-    void updateState(const RobotState &new_robot_state);
+    void updateState(const RobotStateWithTimestamp &new_robot_state);
 
-    RobotState currentState() const;
+    RobotStateWithTimestamp currentState() const;
 
     /**
      * Updates the robot's state to be its predicted state at the given timestamp.
@@ -182,7 +182,7 @@ class Robot
      * @return circular_buffer containing all previous states up to the history_size field
      * cap
      */
-    boost::circular_buffer<RobotState> getPreviousStates() const;
+    boost::circular_buffer<RobotStateWithTimestamp> getPreviousStates() const;
 
     /**
      * Finds an update timestamp that is close to the provided timestamp and returns the
@@ -260,7 +260,7 @@ class Robot
     // queue, This buffer will never be empty as it's initialized with a RobotState on
     // creation
     // The buffer size (history_size) must be > 0
-    boost::circular_buffer<RobotState> states_;
+    boost::circular_buffer<RobotStateWithTimestamp> states_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapabilities::Capability> unavailable_capabilities_;
