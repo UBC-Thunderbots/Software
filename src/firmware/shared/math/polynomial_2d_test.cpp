@@ -430,7 +430,7 @@ TEST_F(Polynomial2dTest, get_total_arc_length)
         shared_polynomial2d_getTotalArcLength(arc_length_parameterization);
 
     EXPECT_EQ(total_arc_length, arc_length_values[2]);
-};
+}
 
 TEST_F(Polynomial2dTest, get_t_value_on_arc_length_below_arc_lengths_in_parametrization)
 {
