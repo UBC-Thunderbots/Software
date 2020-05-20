@@ -5,6 +5,9 @@
 #include "software/time/timestamp.h"
 #include "software/world/ball_state.h"
 
+/**
+ * Represents the state of a ball at a specific time
+ */
 class BallStateWithTimestamp : public BallState
 {
    public:
