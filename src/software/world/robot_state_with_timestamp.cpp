@@ -2,45 +2,24 @@
 
 RobotStateWithTimestamp::RobotStateWithTimestamp(const Point &position, const Vector &velocity,
                                                  const Angle &orientation, const AngularVelocity &angular_velocity,
-                                                 const Timestamp &timestamp)
+                                                 const Timestamp &timestamp) : RobotState(position, velocity, orientation, angular_velocity), timestamp_(timestamp)
 {
-    this->position_         = position;
-    this->velocity_         = velocity;
-    this->orientation_      = orientation;
-    this->angular_velocity_ = angular_velocity;
-    this->timestamp_        = timestamp;
 }
 
-Point RobotStateWithTimestamp::position() const
-{
-    return position_;
-}
-
-Vector RobotStateWithTimestamp::velocity() const
-{
-    return velocity_;
-}
-
-Angle RobotStateWithTimestamp::orientation() const
-{
-    return orientation_;
-}
-
-AngularVelocity RobotStateWithTimestamp::angularVelocity() const
-{
-    return angular_velocity_;
-}
+RobotStateWithTimestamp::RobotStateWithTimestamp(const RobotState& robot_state, const Timestamp& timestamp) : RobotState(robot_state), timestamp_(timestamp) {}
 
 Timestamp RobotStateWithTimestamp::timestamp() const
 {
     return timestamp_;
 }
 
+RobotState RobotStateWithTimestamp::getRobotState() const {
+    return RobotState(position_, velocity_, orientation_, angular_velocity_);
+}
+
 bool RobotStateWithTimestamp::operator==(const RobotStateWithTimestamp &other) const
 {
-    return this->position() == other.position() && this->velocity() == other.velocity() &&
-           this->orientation() == other.orientation() &&
-           this->angularVelocity() == other.angularVelocity();
+    return this->getRobotState() == other.getRobotState();
 }
 
 bool RobotStateWithTimestamp::operator!=(const RobotStateWithTimestamp &other) const

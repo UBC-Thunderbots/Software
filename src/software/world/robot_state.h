@@ -70,7 +70,7 @@ class RobotState
      */
     bool operator!=(const RobotState &other) const;
 
-   private:
+   protected:
     Point position_;
     Vector velocity_;
     Angle orientation_;

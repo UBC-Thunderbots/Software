@@ -103,14 +103,16 @@ cc_library(
     srcs = ["robot_state_with_timestamp.cpp"],
     hdrs = ["robot_state_with_timestamp.h"],
     deps = [
-        ":robot_capabilities",
-        "//software/geom",
+        ":robot_state",
+        "//software/new_geom:angle",
         "//software/new_geom:angular_velocity",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
         "//software/time:timestamp",
     ],
 )
 
-cc_library(
+cc_test(
     name = "robot_state_with_timestamp_test",
     srcs = ["robot_state_with_timestamp_test.cpp"],
     deps = [
