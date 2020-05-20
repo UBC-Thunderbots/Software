@@ -23,14 +23,14 @@ class BallState
      *
      * @return the position of the ball represented by this state
      */
-    virtual Point position() const;
+    Point position() const;
 
     /**
      * Returns the velocity of the ball represented by this state
      *
      * @return the velocity of the ball represented by this state
      */
-    virtual Vector velocity() const;
+    Vector velocity() const;
 
     /**
      * Defines the equality operator for a BallState. BallStates are equal if their
