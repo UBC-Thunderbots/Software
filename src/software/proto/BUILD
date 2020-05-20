@@ -27,6 +27,18 @@ proto_library(
     deps = [],
 )
 
+proto_library(
+    name = "sensor_msg_proto",
+    srcs = [
+        "sensor_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":ssl_proto",
+        "//shared/proto:tbots_proto",
+    ],
+)
+
 cc_proto_library(
     name = "ssl_cc_proto",
     deps = [":ssl_proto"],
@@ -35,4 +47,9 @@ cc_proto_library(
 cc_proto_library(
     name = "grsim_cc_proto",
     deps = [":grsim_proto"],
+)
+
+cc_proto_library(
+    name = "sensor_msg_cc_proto",
+    deps = [":sensor_msg_proto"],
 )

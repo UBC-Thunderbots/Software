@@ -8,7 +8,7 @@ message TbotsRobotMsg
     repeated ErrorCode error_code             = 2;
     BreakBeamStatus break_beam_status         = 3;
     ChipperKickerStatus chipper_kicker_status = 4;
-    DriveEncoderData drive_encoder_data       = 5;
+    DriveUnits drive_units                    = 5;
     FirmwareStatus firmware_status            = 6;
     DribblerStatus dribbler_status            = 7;
     NetworkStatus network_status              = 8;

@@ -90,12 +90,12 @@ message FirmwareStatus
  */
 message DriveUnit
 {
-    float wheel_rpm          = 1;
-    float wheel_position_rad = 2;
+    float wheel_ang_vel_rad_s = 1;
+    float wheel_position_rad  = 2;
 }
 
-/* Data from all four motor encoders */
-message DriveEncoderData
+/* Data from all four drive units */
+message DriveUnits
 {
     DriveUnit front_left  = 1;
     DriveUnit front_right = 2;
