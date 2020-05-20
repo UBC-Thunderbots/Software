@@ -54,7 +54,7 @@ cc_library(
 #
 #py_binary(
 #    name = "python_control",
-#    srcs = ["//firmware/app/control/python_controller/difference_equation.py"],
+#    srcs = ["//firmware/app/control/python_controller/difference_equation.py.py"],
 #    deps = [
 #        requirement("numpy"),
 #        requirement("control"),

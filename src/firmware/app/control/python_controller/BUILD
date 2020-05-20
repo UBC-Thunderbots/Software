@@ -4,12 +4,16 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("@python_control_deps//:requirements.bzl", "requirement")
 
 py_binary(
-    name = "python_control",
-    srcs = ["//firmware/app/control/python_controller/difference_equation.py"],
+    name = "difference_equation",
+    srcs = [":difference_equation.py"],
+    main = ":difference_equation.py",
     deps = [
         requirement("numpy"),
         requirement("control"),
         requirement("scipy"),
+        requirement("pyparsing"),
+        requirement("cycler"),
+        requirement("kiwisolver"),
     ],
 )
 
