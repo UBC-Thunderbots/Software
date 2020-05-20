@@ -19,50 +19,180 @@ class TrajectoryPlannerTest : public testing::Test
 
     virtual void TearDown() {}
 
-    static std::vector<float> getSpeedsFromTrajectory(Trajectory_t* trajectory,
-                                                      float inital_speed)
+    static std::vector<double> getSpeedsFromTrajectory(
+        FirmwareRobotPathParameters_t path_parameters)
     {
-        std::vector<float> velocity;
+        std::vector<double> velocity;
 
-        // Calculate the delta-position and the delta-time
-        velocity.push_back(inital_speed);
 
-        for (unsigned i = 1; i < trajectory->num_elements - 1; i++)
+        // Create the parmeterization to contain the desired number of segments
+        CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_parameterization,
+                                                 TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+        float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+        shared_polynomial_getArcLengthParametrizationOrder3(
+            path_parameters.path, path_parameters.t_start, path_parameters.t_end,
+            arc_length_parameterization);
+
+        const float arc_segment_length =
+            shared_polynomial2d_getTotalArcLength(arc_length_parameterization) /
+            path_parameters.num_segments;
+
+
+        app_trajectory_planner_getMaxAllowableSpeedProfile(
+            max_allowable_speed_profile, path_parameters.path,
+            path_parameters.num_segments, arc_length_parameterization, arc_segment_length,
+            path_parameters.max_allowable_acceleration);
+
+        float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+        velocity_profile[0] = path_parameters.initial_speed;
+        app_trajectory_planner_generateForwardsContinuousVelocityProfile(
+            path_parameters.num_segments, velocity_profile, max_allowable_speed_profile,
+            arc_segment_length, path_parameters.max_allowable_acceleration,
+            path_parameters.max_allowable_speed);
+
+        // Check that it was physically possible for the robot to reach the final velocity
+        // requested
+        if (velocity_profile[path_parameters.num_segments - 1] >=
+            path_parameters.final_speed)
         {
-            const float dx = trajectory->trajectory_elements[i + 1].position.x -
-                             trajectory->trajectory_elements[i].position.x;
-            const float dy = trajectory->trajectory_elements[i + 1].position.y -
-                             trajectory->trajectory_elements[i].position.y;
-
-            const float dt = trajectory->trajectory_elements[i + 1].time -
-                             trajectory->trajectory_elements[i].time;
-
-            velocity.push_back(sqrt((pow(dx, 2) + pow(dy, 2))) / dt);
+            velocity_profile[path_parameters.num_segments - 1] =
+                path_parameters.final_speed;
         }
+
+        app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
+            path_parameters.num_segments, velocity_profile, arc_segment_length,
+            path_parameters.max_allowable_acceleration);
+
+        velocity_profile[0] = path_parameters.initial_speed;
+
+        for (unsigned int i = 0; i < path_parameters.num_segments; i++)
+        {
+            velocity.push_back(velocity_profile[i]);
+        }
+
         return velocity;
     }
 
-    static std::vector<float> getAccelerationsFromSpeed(std::vector<float> speeds,
-                                                        Trajectory_t* trajectory)
+    static std::vector<double> getAccelerationsFromSpeed(std::vector<double> speeds,
+                                                         Trajectory_t* trajectory)
     {
-        std::vector<float> acceleration;
+        std::vector<double> acceleration;
 
-        // Calculate the delta-position and the delta-time
-        acceleration.push_back(0.0);
 
-        for (unsigned i = 1; i < trajectory->num_elements - 2; i++)
+        for (unsigned int i = 0; i < trajectory->num_elements - 1; i++)
         {
-            const float dv = speeds[i + 1] - speeds[i];
-            const float dt = trajectory->trajectory_elements[i + 1].time -
-                             trajectory->trajectory_elements[i].time;
-
+            const double dv = speeds[i + 1] - speeds[i];
+            const double dt = trajectory->trajectory_elements[i + 1].time -
+                              trajectory->trajectory_elements[i].time;
             acceleration.push_back(dv / dt);
         }
+
         return acceleration;
     }
 };
 
-TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
+TEST_F(TrajectoryPlannerTest, test_forward_continuity_path_curvature_max_speed_limited)
+{
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    const unsigned int num_segments = 10;
+
+    for (unsigned int i = 0; i < num_segments; i++)
+    {
+        max_allowable_speed_profile[i] = 1;
+    }
+
+    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    const float arc_segment_length         = 1.0;
+    const float max_allowable_acceleration = 0.1;
+    const float max_allowable_speed        = 10;
+
+    app_trajectory_planner_generateForwardsContinuousVelocityProfile(
+        num_segments, velocity_profile, max_allowable_speed_profile, arc_segment_length,
+        max_allowable_acceleration, max_allowable_speed);
+
+    for (unsigned int i = 0; i < num_segments; i++)
+    {
+        EXPECT_TRUE(velocity_profile[i] <= 1);
+    }
+}
+
+TEST_F(TrajectoryPlannerTest, test_forward_continuity_max_speed_limited)
+{
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    const unsigned int num_segments = 10;
+
+    for (unsigned int i = 0; i < num_segments; i++)
+    {
+        max_allowable_speed_profile[i] = 8;
+    }
+
+    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    const float arc_segment_length         = 1.0;
+    const float max_allowable_acceleration = 1.3;
+    const float max_allowable_speed        = 4;
+
+    app_trajectory_planner_generateForwardsContinuousVelocityProfile(
+        num_segments, velocity_profile, max_allowable_speed_profile, arc_segment_length,
+        max_allowable_acceleration, max_allowable_speed);
+
+    for (unsigned int i = 0; i < num_segments; i++)
+    {
+        EXPECT_TRUE(velocity_profile[i] <= 4);
+    }
+}
+
+TEST_F(TrajectoryPlannerTest, test_backwards_continuity)
+{
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    const unsigned int num_segments        = 3;
+    const float arc_segment_length         = 1.0;
+    const float max_allowable_acceleration = 1.3;
+    const float max_allowable_speed        = 15;
+
+    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    velocity_profile[0] = 0;
+    velocity_profile[1] = velocity_profile[0] + 10;
+    velocity_profile[2] = 0;
+
+    app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
+        num_segments, velocity_profile, arc_segment_length, max_allowable_acceleration);
+
+    EXPECT_EQ(velocity_profile[0], 0);
+    EXPECT_NEAR(velocity_profile[1], 1.61245155, 0.001);
+    EXPECT_EQ(velocity_profile[2], 0);
+}
+
+TEST_F(TrajectoryPlannerTest, test_backwards_continuity_to_initial_velocity)
+{
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    const unsigned int num_segments        = 3;
+    const float arc_segment_length         = 1.0;
+    const float max_allowable_acceleration = 1.3;
+    const float max_allowable_speed        = 15;
+
+    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    velocity_profile[0] = 40;
+    velocity_profile[1] = velocity_profile[0] + 10;
+    velocity_profile[2] = 0;
+
+    app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
+        num_segments, velocity_profile, arc_segment_length, max_allowable_acceleration);
+
+    EXPECT_NEAR(velocity_profile[0], 2.28035092, 0.001);
+    EXPECT_NEAR(velocity_profile[1], 1.61245155, 0.001);
+    EXPECT_EQ(velocity_profile[2], 0);
+}
+
+TEST_F(TrajectoryPlannerTest, check_trajectory_length)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {2, 0, 1, 0}},
@@ -71,10 +201,12 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 5999;
+    path_parameters.path    = path;
+    path_parameters.t_start = 0;
+    path_parameters.t_end   = 1;
+    path_parameters.num_segments =
+        TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS;  // For tests the number of segments is
+                                              // arbitrary, so use the maximum possible
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -83,9 +215,10 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                 &trajectory);
-
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
                                              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
@@ -96,7 +229,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
         arc_length_param);
 
     const float arc_segment_length =
-        arc_length_param.arc_length_values[arc_length_param.num_values - 1];
+        shared_polynomial2d_getTotalArcLength(arc_length_param);
 
     float segment_length_sum = 0;
 
@@ -114,6 +247,45 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
         segment_length_sum += length;
     }
     EXPECT_NEAR(segment_length_sum, arc_segment_length, 0.01);
+}
+
+TEST_F(TrajectoryPlannerTest, check_end_points_match_path)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {2, 0, 1, 0}},
+        .y = {.coefficients = {1, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path    = path;
+    path_parameters.t_start = 0;
+    path_parameters.t_end   = 1;
+    path_parameters.num_segments =
+        TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS;  // For tests the number of segments is
+                                              // arbitrary, so use the maximum possible
+    path_parameters.max_allowable_acceleration = 3;
+    path_parameters.max_allowable_speed        = 3;
+    path_parameters.initial_speed              = 0;
+    path_parameters.final_speed                = 0;
+
+    TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
+
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
+
+    // Create the parmeterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(
+        path_parameters.path, path_parameters.t_start, path_parameters.t_end,
+        arc_length_param);
+
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 1].position.x,
         shared_polynomial2d_getValueOrder3(path_parameters.path, path_parameters.t_end).x,
@@ -135,7 +307,8 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length_and_end_points_match_path)
         0.01);
 }
 
-TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
+TEST_F(TrajectoryPlannerTest,
+       dynamics_dont_exceed_maximums_straight_line_medium_acceleration)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -144,10 +317,11 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 3;
-    path_parameters.num_segments               = 500;
+    path_parameters.path    = path;
+    path_parameters.t_start = 0;
+    path_parameters.t_end   = 3;
+    path_parameters.num_segments =
+        500;  // Choose a low fidelity path to switch up the test cases
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 9;
     path_parameters.initial_speed              = 2;
@@ -157,8 +331,10 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                 &trajectory);
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -169,22 +345,32 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    std::vector<float> velocity =
-        getSpeedsFromTrajectory(&trajectory, path_parameters.initial_speed);
-    std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
+    std::vector<double> velocity     = getSpeedsFromTrajectory(path_parameters);
+    std::vector<double> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.1 &&
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
                     vel >= path_parameters.initial_speed);
     }
 
     EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
     EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
 
-    for (float acc : acceleration)
+    // Loop through the positive acceleration of the bang-bang profile
+    unsigned int i = 0;
+    while (acceleration[i] > path_parameters.max_allowable_acceleration)
     {
-        EXPECT_TRUE(fabs(acc) <= path_parameters.max_allowable_acceleration * 1.2);
+        EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        i++;
+    }
+    i++;  // Skip the transition acceleration from positive to negative
+
+    // Loop through the negative acceleration portion of the bang-bang profile
+    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
+    {
+        EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        i++;
     }
 
     EXPECT_NEAR(
@@ -205,7 +391,171 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_straight_line)
 }
 
 TEST_F(TrajectoryPlannerTest,
-       check_trajectory_length_and_end_points_match_path_reverse_parameterization)
+       dynamics_dont_exceed_maximums_straight_line_acceleration_high_acceleration)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {0, 0, 1, 0}},
+        .y = {.coefficients = {0, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 0;
+    path_parameters.t_end                      = 3;
+    path_parameters.num_segments               = 500;
+    path_parameters.max_allowable_acceleration = 10;
+    path_parameters.max_allowable_speed        = 9;
+    path_parameters.initial_speed              = 2;
+    path_parameters.final_speed                = 5;
+
+    TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
+
+
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
+    ;
+
+    // Create the parmeterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(
+        path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
+
+    std::vector<double> velocity     = getSpeedsFromTrajectory(path_parameters);
+    std::vector<double> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
+
+    for (float vel : velocity)
+    {
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
+                    vel >= path_parameters.initial_speed);
+    }
+
+    EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
+
+    // Loop through the positive acceleration of the bang-bang profile
+    unsigned int i = 0;
+    while (acceleration[i] > path_parameters.max_allowable_acceleration)
+    {
+        EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        i++;
+    }
+    i++;  // Skip the transition acceleration from positive to negative
+
+    // Loop through the negative acceleration portion of the bang-bang profile
+    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
+    {
+        EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        i++;
+    }
+
+    EXPECT_NEAR(
+        trajectory.trajectory_elements[path_parameters.num_segments - 1].position.x,
+        shared_polynomial2d_getValueOrder3(path_parameters.path, path_parameters.t_end).x,
+        0.01);
+    EXPECT_NEAR(
+        trajectory.trajectory_elements[path_parameters.num_segments - 1].position.y,
+        shared_polynomial2d_getValueOrder3(path_parameters.path, path_parameters.t_end).y,
+        0.01);
+
+    EXPECT_NEAR(trajectory.trajectory_elements[0].position.x,
+                shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).x,
+                0.01);
+    EXPECT_NEAR(trajectory.trajectory_elements[0].position.y,
+                shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).y,
+                0.01);
+}
+
+TEST_F(TrajectoryPlannerTest,
+       dynamics_dont_exceed_maximums_straight_line_max_vel_not_reached)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {0, 0, 1, 0}},
+        .y = {.coefficients = {0, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 0;
+    path_parameters.t_end                      = 3;
+    path_parameters.num_segments               = 500;
+    path_parameters.max_allowable_acceleration = 1;
+    path_parameters.max_allowable_speed        = 30;
+    path_parameters.initial_speed              = 0;
+    path_parameters.final_speed                = 0;
+
+    TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
+
+
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
+
+    // Create the parmeterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(
+        path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
+
+    std::vector<double> velocity     = getSpeedsFromTrajectory(path_parameters);
+    std::vector<double> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
+
+    for (float vel : velocity)
+    {
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
+                    vel >= path_parameters.initial_speed);
+    }
+
+    EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
+
+    // Loop through the positive acceleration of the bang-bang profile
+    unsigned int i = 0;
+    while (acceleration[i] > path_parameters.max_allowable_acceleration)
+    {
+        EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        i++;
+    }
+    i++;  // Skip the transition acceleration from positive to negative
+
+    // Loop through the negative acceleration portion of the bang-bang profile
+    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
+    {
+        EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        i++;
+    }
+
+    EXPECT_NEAR(
+        trajectory.trajectory_elements[path_parameters.num_segments - 1].position.x,
+        shared_polynomial2d_getValueOrder3(path_parameters.path, path_parameters.t_end).x,
+        0.01);
+    EXPECT_NEAR(
+        trajectory.trajectory_elements[path_parameters.num_segments - 1].position.y,
+        shared_polynomial2d_getValueOrder3(path_parameters.path, path_parameters.t_end).y,
+        0.01);
+
+    EXPECT_NEAR(trajectory.trajectory_elements[0].position.x,
+                shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).x,
+                0.01);
+    EXPECT_NEAR(trajectory.trajectory_elements[0].position.y,
+                shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).y,
+                0.01);
+}
+
+TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterization)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -217,7 +567,7 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.path                       = path;
     path_parameters.t_start                    = 1;
     path_parameters.t_end                      = 0;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -227,8 +577,10 @@ TEST_F(TrajectoryPlannerTest,
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                 &trajectory);
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -258,6 +610,45 @@ TEST_F(TrajectoryPlannerTest,
         segment_length_sum += length;
     }
     EXPECT_NEAR(segment_length_sum, arc_segment_length, 0.01);
+}
+
+TEST_F(TrajectoryPlannerTest,
+       check_trajectory_end_points_match_path_reverse_parameterization)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {0, 0, 1, 0}},
+        .y = {.coefficients = {0, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 1;
+    path_parameters.t_end                      = 0;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_acceleration = 3;
+    path_parameters.max_allowable_speed        = 3;
+    path_parameters.initial_speed              = 0;
+    path_parameters.final_speed                = 0;
+
+    TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
+
+
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
+
+    // Create the parmeterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(
+        path, path_parameters.t_end, path_parameters.t_start, arc_length_param);
+
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_end).x, 0.01);
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.y,
@@ -279,20 +670,22 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     };
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 500;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 9;
-    path_parameters.initial_speed              = 1;
+    path_parameters.path         = path;
+    path_parameters.t_start      = -1;
+    path_parameters.t_end        = 1;
+    path_parameters.num_segments = 500;  // Use a low segment density for variety
+    path_parameters.max_allowable_acceleration = 5;
+    path_parameters.max_allowable_speed        = 5;
+    path_parameters.initial_speed              = 1.87;
     path_parameters.final_speed                = 5;
 
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                 &trajectory);
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -305,23 +698,55 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     float velocities[trajectory.num_elements];
 
-    std::vector<float> velocity =
-        getSpeedsFromTrajectory(&trajectory, path_parameters.initial_speed);
-    std::vector<float> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
+    std::vector<double> velocity     = getSpeedsFromTrajectory(path_parameters);
+    std::vector<double> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.2 &&
-                    vel >= path_parameters.initial_speed);
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed);
     }
 
     EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
 
     EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
 
-    for (float acc : acceleration)
+    unsigned int i = 0;
+    // Acceleration phase coming up to a curve that must be slowed down for
+    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
     {
-        EXPECT_TRUE(fabs(acc) <= path_parameters.max_allowable_acceleration * 1.2);
+        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_acceleration, 0.001);
+        i++;
+    }
+    i++;  // Skip the transition acceleration from positive to negative
+
+    // Slowing down for a curve
+    while (fabs(acceleration[i] + path_parameters.max_allowable_acceleration) < 0.1)
+    {
+        EXPECT_NEAR(acceleration[i], -path_parameters.max_allowable_acceleration, 0.001);
+        i++;
+    }
+
+    // Skip the acceleration ramp-up phase where the acceleration is related to the
+    // curvature This part is skipped because it is dependent on path curvature and cannot
+    // be compared to the maximum acceleration specified by the path parameters
+    while (fabs(fabs(acceleration[i]) - path_parameters.max_allowable_acceleration) >=
+           0.01)
+    {
+        i++;
+    }
+
+    // Check the final acceleration phase up to steady state
+    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
+    {
+        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_acceleration, 0.001);
+        i++;
+    }
+    i++;  // Skip transition acceleration going to steady state (zero)
+
+    while (i < path_parameters.num_segments)
+    {
+        EXPECT_NEAR(acceleration[i], 0, 0.001);
+        i++;
     }
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
@@ -332,7 +757,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     EXPECT_NEAR(trajectory.trajectory_elements[0].position.x,
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).x,
                 0.025);
-    EXPECT_NEAR(trajectory.trajectory_elements[0].position.x,
+    EXPECT_NEAR(trajectory.trajectory_elements[0].position.y,
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).y,
                 0.025);
 }
@@ -349,7 +774,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -358,8 +783,10 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
-    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                 &trajectory);
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
 
     // Create the parameterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -370,15 +797,13 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
-    float segment_length_sum = 0;
-
     Trajectory_t const_interp_trajectory;
     TrajectoryElement_t const_interp_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     const_interp_trajectory.trajectory_elements = const_interp_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
-        &const_interp_trajectory, &trajectory, 0.001);
+    app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
+                                                             &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 const_interp_trajectory
@@ -416,7 +841,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -426,8 +851,10 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     Trajectory_t trajectory = {.trajectory_elements = const_arc_elements};
 
 
-    app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                 &trajectory);
+    TrajectoryPlannerGenerationStatus status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
+    EXPECT_EQ(OK, status);
 
     // Create the parameterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -443,8 +870,8 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     const_interp_trajectory.trajectory_elements = const_interp_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
-        &const_interp_trajectory, &trajectory, 0.001);
+    app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
+                                                             &trajectory, 0.001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
                 const_interp_trajectory
@@ -482,7 +909,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 2000;
     path_parameters.initial_speed              = 0;
@@ -493,12 +920,14 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
 
 
     enum TrajectoryPlannerGenerationStatus status =
-        app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                     &trajectory);
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
 
-    EXPECT_EQ(finalVelocityTooHigh, status);
+    EXPECT_EQ(FINAL_VELOCITY_TOO_HIGH, status);
 }
 
+// Set the initial velocity to a speed that is so high the robot cannot possible slow down
+// in time to follow the path
 TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
 {
     Polynomial2dOrder3_t path = {
@@ -511,7 +940,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 10;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 20;
     path_parameters.initial_speed              = 10;
@@ -522,8 +951,8 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
 
 
     enum TrajectoryPlannerGenerationStatus status =
-        app_trajectory_planner_generateConstantArcLengthSegmentation(path_parameters,
-                                                                     &trajectory);
+        app_trajectory_planner_generateConstantArcLengthTrajectory(path_parameters,
+                                                                   &trajectory);
 
-    EXPECT_EQ(initialVelocityTooHigh, status);
+    EXPECT_EQ(INITIAL_VELOCITY_TOO_HIGH, status);
 }

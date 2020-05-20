@@ -167,6 +167,7 @@ gazelle_dependencies()
 # Bazel buildtools, provide us with the bazel formatter ("buildifier")
 http_archive(
     name = "com_github_bazelbuild_buildtools",
+    sha256 = "46ead728d66d48969f8ae3b88f2fd10fddfc80dd7903fb8b5bff9c568f0ebf25",
     strip_prefix = "buildtools-9e63c6f02e63adaab63e21a3a8feb75f4f7503cb",
     url = "https://github.com/bazelbuild/buildtools/archive/9e63c6f02e63adaab63e21a3a8feb75f4f7503cb.zip",
 )

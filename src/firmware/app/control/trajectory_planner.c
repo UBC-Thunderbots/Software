@@ -8,10 +8,10 @@
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 
-// The following function is based on an algorithm described in
+// The following function is based on an algorithm described in page 18 of:
 // http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
 TrajectoryPlannerGenerationStatus
-app_trajectory_planner_generateConstantArcLengthSegmentation(
+app_trajectory_planner_generateConstantArcLengthTrajectory(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
 {
     // Set the internal path parameter variables
@@ -105,7 +105,7 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
     }
     else
     {
-        generation_status = finalVelocityTooHigh;
+        generation_status = FINAL_VELOCITY_TOO_HIGH;
     }
 
     // Now check backwards continuity. This is done to guarantee the robot can deccelerate
@@ -121,7 +121,7 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
     }
     else
     {
-        generation_status = initialVelocityTooHigh;
+        generation_status = INITIAL_VELOCITY_TOO_HIGH;
     }
 
 
@@ -142,7 +142,7 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
 }
 
 
-void app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
+void app_trajectory_planner_interpolateConstantTimeTrajectory(
     Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
     const float interpolation_period)
 {
@@ -270,25 +270,15 @@ void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
     for (unsigned int i = 1; i < num_segments; i++)
     {
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
-        const float temp_vel =
-            (float)sqrt(pow(velocity_profile[i - 1], 2) +
-                        2 * arc_segment_length * max_allowable_acceleration);
+        float temp_vel = (float)sqrt(pow(velocity_profile[i - 1], 2) +
+                                     2 * arc_segment_length * max_allowable_acceleration);
 
-        // If the new speed is greater than the max allowable, reduce it to the max
-        if (temp_vel > max_allowable_speed_profile[i])
-        {
-            velocity_profile[i] = max_allowable_speed_profile[i];
-        }
-        // If the new speed is greater than the maximum limit of the robot, reduce it
-        // to the limit
-        else if (temp_vel >= max_allowable_speed)
-        {
-            velocity_profile[i] = max_allowable_speed;
-        }
-        else
-        {
-            velocity_profile[i] = temp_vel;
-        }
+        // Pick  the lowest of the maximum the available speeds
+        const float lowest_speed =
+            fmin(max_allowable_speed_profile[i], max_allowable_speed);
+        const float speed_to_set = fmin(lowest_speed, temp_vel);
+
+        velocity_profile[i] = speed_to_set;
     }
 }
 
@@ -317,11 +307,11 @@ void app_trajectory_planner_generateTimeProfile(
     float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     traj_elements[0].time = 0.0;
-    for (unsigned int i = 0; i < num_segments - 1; i++)
+    for (unsigned int i = 1; i < num_segments; i++)
     {
-        traj_elements[i + 1].time =
-            traj_elements[i].time +
-            (2 * arc_segment_length) / (velocity_profile[i] + velocity_profile[i + 1]);
+        traj_elements[i].time =
+            traj_elements[i - 1].time +
+            (2 * arc_segment_length) / (velocity_profile[i] + velocity_profile[i - 1]);
     }
 }
 

@@ -57,7 +57,7 @@ cc_binary(
     deps = [
         ":controller_primitive_generator",
         ":xbox_360_controller",
-        "//software/backend:handheld_controller_backend",
+        "//software/backend:radio_backend",
         "//software/parameter:dynamic_parameters",
     ],
 )

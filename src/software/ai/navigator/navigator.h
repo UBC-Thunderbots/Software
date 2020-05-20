@@ -158,7 +158,7 @@ class Navigator : public IntentVisitor
     // assigned move intents
     // When move intents are processed to path plan,
     // we can avoid these non-"moving" robots
-    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
+    std::vector<ObstaclePtr> friendly_non_move_intent_robot_obstacles;
 
     // intents that need path planning
     std::vector<MoveIntent> move_intents_for_path_planning;

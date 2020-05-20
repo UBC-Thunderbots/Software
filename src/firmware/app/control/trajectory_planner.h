@@ -23,9 +23,9 @@ typedef struct Trajectory
 
 typedef enum TrajectoryPlannerGenerationStatus
 {
-    OK                     = 0,
-    finalVelocityTooHigh   = 1,
-    initialVelocityTooHigh = 2,
+    OK                        = 0,
+    FINAL_VELOCITY_TOO_HIGH   = 1,
+    INITIAL_VELOCITY_TOO_HIGH = 2,
 } TrajectoryPlannerGenerationStatus;
 
 typedef struct FirmwareRobotPathParameters
@@ -80,7 +80,7 @@ typedef struct FirmwareRobotPathParameters
  *     - To ensure the robot is capable of deccelerating to react to any sudden changes in
  * the path, the trajectory is checked for backwards continuity
  *
- * NOTE: The following function is based on an algorithm described in
+ * NOTE: The following function is based on an algorithm described in page 18 of
  * http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
  *
  * @pre path_parameters.num_segments > 2 and num_segments <=
@@ -100,7 +100,7 @@ typedef struct FirmwareRobotPathParameters
  * @return The outcome of the trajectory generation. Returns OK if trajectory is valid.
  */
 TrajectoryPlannerGenerationStatus
-app_trajectory_planner_generateConstantArcLengthSegmentation(
+app_trajectory_planner_generateConstantArcLengthTrajectory(
     FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
 
 /**
@@ -120,18 +120,18 @@ app_trajectory_planner_generateConstantArcLengthSegmentation(
  * interpolation period equivalent of the input trajectory
  * @param variable_time_trajectory [in] The valid trajectory used as
  * reference for a constant interpolation period trajectory
- * @param interpolation_period [in] The constant change in time that corresponds to each
- * trajectory segment
+ * @param interpolation_period [in] The constant change in time [s] that corresponds to
+ * each trajectory segment.
  *
  */
-void app_trajectory_planner_interpolateConstantTimeTrajectorySegmentation(
+void app_trajectory_planner_interpolateConstantTimeTrajectory(
     Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
     const float interpolation_period);
 
 /**
  * Generates the X/Y points for each position on the constant arc length trajectory
  *
- * @pre traj_elements [in/out] is pre-allocated up the the limit specified by
+ * @pre traj_elements [out] is pre-allocated up the the limit specified by
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS. Will be modified to contain the X/Y points of the
  * trajectory
  *
@@ -174,7 +174,7 @@ static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
  * point on the trajectory
  *
  */
-static void app_trajectory_planner_getMaxAllowableSpeedProfile(
+void app_trajectory_planner_getMaxAllowableSpeedProfile(
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, const unsigned int num_elements,
     ArcLengthParametrization_t arc_length_parameterization,
@@ -242,13 +242,13 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  * @pre traj_elements & velocity_profile are pre-allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @param traj_elements The trajectory element array that will be modified to contain the
- * time profile
+ * @param traj_elements [in/out] The trajectory element array that will be modified to
+ * contain the time profile
  * @param num_segments [in] The number of segments(elements) in traj_elements and
  * velocity_profile
  * @param arc_segment_length  [in] The arc length of each path segment
- * @param velocity_profile  The forwards and backwards continuous velocity profile of the
- * trajectory
+ * @param velocity_profile [in] The forwards and backwards continuous velocity profile of
+ * the trajectory
  */
 void static app_trajectory_planner_generateTimeProfile(
     TrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
