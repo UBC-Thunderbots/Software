@@ -131,7 +131,7 @@ void app_trajectory_planner_interpolateConstantTimeTrajectory(
 /**
  * Generates the X/Y points for each position on the constant arc length trajectory
  *
- * @pre traj_elements [in/out] is pre-allocated up the the limit specified by
+ * @pre traj_elements [out] is pre-allocated up the the limit specified by
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS. Will be modified to contain the X/Y points of the
  * trajectory
  *
