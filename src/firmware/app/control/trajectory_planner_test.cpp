@@ -720,13 +720,21 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     i++;  // Skip the transition acceleration from positive to negative
 
     // Slowing down for a curve
-    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
+    while (fabs(acceleration[i] + path_parameters.max_allowable_acceleration) < 0.1)
     {
         EXPECT_NEAR(acceleration[i], -path_parameters.max_allowable_acceleration, 0.001);
         i++;
     }
 
-    i = 225;  // Skip the acceleration ramp-up phase
+    // Skip the acceleration ramp-up phase where the acceleration is related to the
+    // curvature This part is skipped because it is dependent on path curvature and cannot
+    // be compared to the maximum acceleration specified by the path parameters
+    while (fabs(fabs(acceleration[i]) - path_parameters.max_allowable_acceleration) >=
+           0.01)
+    {
+        i++;
+    }
+
     // Check the final acceleration phase up to steady state
     while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
     {
