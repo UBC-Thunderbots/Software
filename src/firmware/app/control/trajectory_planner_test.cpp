@@ -350,7 +350,7 @@ TEST_F(TrajectoryPlannerTest,
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.1 &&
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
                     vel >= path_parameters.initial_speed);
     }
 
@@ -359,7 +359,7 @@ TEST_F(TrajectoryPlannerTest,
 
     // Loop through the positive acceleration of the bang-bang profile
     unsigned int i = 0;
-    while (acceleration[i] > path_parameters.max_allowable_acceleration * 0.95)
+    while (acceleration[i] > path_parameters.max_allowable_acceleration)
     {
         EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
         i++;
@@ -367,7 +367,7 @@ TEST_F(TrajectoryPlannerTest,
     i++;  // Skip the transition acceleration from positive to negative
 
     // Loop through the negative acceleration portion of the bang-bang profile
-    while (acceleration[i] < -path_parameters.max_allowable_acceleration * 0.95)
+    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
     {
         EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
         i++;
@@ -433,7 +433,7 @@ TEST_F(TrajectoryPlannerTest,
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.1 &&
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
                     vel >= path_parameters.initial_speed);
     }
 
@@ -442,7 +442,7 @@ TEST_F(TrajectoryPlannerTest,
 
     // Loop through the positive acceleration of the bang-bang profile
     unsigned int i = 0;
-    while (acceleration[i] > path_parameters.max_allowable_acceleration * 0.95)
+    while (acceleration[i] > path_parameters.max_allowable_acceleration)
     {
         EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
         i++;
@@ -450,7 +450,7 @@ TEST_F(TrajectoryPlannerTest,
     i++;  // Skip the transition acceleration from positive to negative
 
     // Loop through the negative acceleration portion of the bang-bang profile
-    while (acceleration[i] < -path_parameters.max_allowable_acceleration * 0.95)
+    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
     {
         EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
         i++;
@@ -515,7 +515,7 @@ TEST_F(TrajectoryPlannerTest,
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.1 &&
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
                     vel >= path_parameters.initial_speed);
     }
 
@@ -524,7 +524,7 @@ TEST_F(TrajectoryPlannerTest,
 
     // Loop through the positive acceleration of the bang-bang profile
     unsigned int i = 0;
-    while (acceleration[i] > path_parameters.max_allowable_acceleration * 0.95)
+    while (acceleration[i] > path_parameters.max_allowable_acceleration)
     {
         EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
         i++;
@@ -532,7 +532,7 @@ TEST_F(TrajectoryPlannerTest,
     i++;  // Skip the transition acceleration from positive to negative
 
     // Loop through the negative acceleration portion of the bang-bang profile
-    while (acceleration[i] < -path_parameters.max_allowable_acceleration * 0.95)
+    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
     {
         EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
         i++;
@@ -671,12 +671,12 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     };
     FirmwareRobotPathParameters_t path_parameters;
     path_parameters.path         = path;
-    path_parameters.t_start      = 0;
+    path_parameters.t_start      = -1;
     path_parameters.t_end        = 1;
     path_parameters.num_segments = 500;  // Use a low segment density for variety
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 9;
-    path_parameters.initial_speed              = 1;
+    path_parameters.max_allowable_acceleration = 5;
+    path_parameters.max_allowable_speed        = 5;
+    path_parameters.initial_speed              = 1.87;
     path_parameters.final_speed                = 5;
 
     TrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -703,19 +703,42 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed * 1.2 &&
-                    vel >= path_parameters.initial_speed);
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed);
     }
 
     EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
 
     EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
 
-    for (double acc : acceleration)
+    unsigned int i = 0;
+    // Acceleration phase coming up to a curve that must be slowed down for
+    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
     {
-        // Leave a little bit of tolerence on the max acceleration in case of floating
-        // poiunt errors
-        EXPECT_TRUE(fabs(acc) <= path_parameters.max_allowable_acceleration * 1.05);
+        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_acceleration, 0.001);
+        i++;
+    }
+    i++;  // Skip the transition acceleration from positive to negative
+
+    // Slowing down for a curve
+    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
+    {
+        EXPECT_NEAR(acceleration[i], -path_parameters.max_allowable_acceleration, 0.001);
+        i++;
+    }
+
+    i = 225;  // Skip the acceleration ramp-up phase
+    // Check the final acceleration phase up to steady state
+    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
+    {
+        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_acceleration, 0.001);
+        i++;
+    }
+    i++;  // Skip transition acceleration going to steady state (zero)
+
+    while (i < path_parameters.num_segments)
+    {
+        EXPECT_NEAR(acceleration[i], 0, 0.001);
+        i++;
     }
 
     EXPECT_NEAR(trajectory.trajectory_elements[trajectory.num_elements - 1].position.x,
@@ -726,7 +749,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     EXPECT_NEAR(trajectory.trajectory_elements[0].position.x,
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).x,
                 0.025);
-    EXPECT_NEAR(trajectory.trajectory_elements[0].position.x,
+    EXPECT_NEAR(trajectory.trajectory_elements[0].position.y,
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_start).y,
                 0.025);
 }
