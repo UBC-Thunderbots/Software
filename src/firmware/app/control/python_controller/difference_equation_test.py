@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import unittest
 
 
-class TestStringMethods(unittest.TestCase):
+class TestDifferenceEquation(unittest.TestCase):
 
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')

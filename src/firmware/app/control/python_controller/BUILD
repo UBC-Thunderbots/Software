@@ -17,13 +17,17 @@ py_binary(
     ],
 )
 
-#py_test(
-#    name = "discrete_controller_test",
-#    srcs = ["//firmware/app/control/python_controller/difference_equation_test.py"],
-#    deps = [
-#        "//firmware/app/control/python_controller:python_control",
-#        requirement("numpy"),
-#        requirement("control"),
-#        requirement("scipy"),
-#    ],
-#)
+py_test(
+    name = "discrete_controller_test",
+    srcs = [":difference_equation_test.py"],
+    main = ":difference_equation_test.py",
+    deps = [
+        "//firmware/app/control/python_controller:difference_equation",
+        requirement("numpy"),
+        requirement("control"),
+        requirement("scipy"),
+        requirement("pyparsing"),
+        requirement("cycler"),
+        requirement("kiwisolver"),
+    ],
+)
