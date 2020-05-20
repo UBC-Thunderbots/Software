@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "udp_multicast.h"
 
 /* USER CODE END Includes */
@@ -59,8 +59,6 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 osThreadId_t defaultTaskHandle;
 /* USER CODE BEGIN PV */
 
-static AllegroA3931MotorDriver_t *motor_0;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,34 +73,62 @@ void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
-static void initWheelMotors(void);
+static void initIoLayer(void);
+static void initIoDrivetrain(void);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void initWheelMotors(void)
+static void initIoLayer(void)
 {
-    GpioPin_t *reset_pin =
-        io_gpio_pin_create(motor_0_reset_GPIO_Port, motor_0_reset_Pin, ACTIVE_LOW);
-    GpioPin_t *coast_pin =
-        io_gpio_pin_create(motor_0_coast_GPIO_Port, motor_0_coast_Pin, ACTIVE_LOW);
-    GpioPin_t *mode_pin =
-        io_gpio_pin_create(motor_0_mode_GPIO_Port, motor_0_mode_Pin, ACTIVE_HIGH);
-    GpioPin_t *direction_pin = io_gpio_pin_create(motor_0_direction_GPIO_Port,
-                                                  motor_0_direction_Pin, ACTIVE_HIGH);
-    GpioPin_t *brake_pin =
-        io_gpio_pin_create(motor_0_brake_GPIO_Port, motor_0_brake_Pin, ACTIVE_LOW);
-    GpioPin_t *esf_pin =
-        io_gpio_pin_create(motor_0_esf_GPIO_Port, motor_0_esf_Pin, ACTIVE_HIGH);
-    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIM_CHANNEL_1);
+    initIoDrivetrain();
+}
 
-    motor_0 = io_allegro_a3931_motor_driver_create(
-        pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin);
+void initIoDrivetrain(void)
+{
+    // Initialize a motor driver with the given suffix, on the given
+    // timer channel
+#define INIT_DRIVETRAIN_UNIT(MOTOR_NAME_SUFFIX, TIMER_CHANNEL)                           \
+    {                                                                                    \
+        GpioPin_t *reset_pin =                                                           \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_reset_GPIO_Port,        \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_reset_Pin, ACTIVE_LOW); \
+        GpioPin_t *coast_pin =                                                           \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_coast_GPIO_Port,        \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_coast_Pin, ACTIVE_LOW); \
+        GpioPin_t *mode_pin =                                                            \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_mode_GPIO_Port,         \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_mode_Pin, ACTIVE_HIGH); \
+        GpioPin_t *direction_pin = io_gpio_pin_create(                                   \
+            wheel_motor_##MOTOR_NAME_SUFFIX##_direction_GPIO_Port,                       \
+            wheel_motor_##MOTOR_NAME_SUFFIX##_direction_Pin, ACTIVE_HIGH);               \
+        GpioPin_t *brake_pin =                                                           \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_brake_GPIO_Port,        \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_brake_Pin, ACTIVE_LOW); \
+        GpioPin_t *esf_pin =                                                             \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_esf_GPIO_Port,          \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_esf_Pin, ACTIVE_HIGH);  \
+        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIMER_CHANNEL);                    \
+                                                                                         \
+        AllegroA3931MotorDriver_t *motor_driver = io_allegro_a3931_motor_driver_create(  \
+            pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin); \
+        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);                      \
+        drivetrain_unit_##MOTOR_NAME_SUFFIX = io_drivetrain_unit_create(motor_driver);   \
+    }
 
-    io_allegro_a3931_motor_driver_setDirection(motor_0, COUNTERCLOCKWISE);
-    io_allegro_a3931_motor_setPwmPercentage(motor_0, 0.0);
+    DrivetrainUnit_t *drivetrain_unit_front_left;
+    DrivetrainUnit_t *drivetrain_unit_back_left;
+    DrivetrainUnit_t *drivetrain_unit_back_right;
+    DrivetrainUnit_t *drivetrain_unit_front_right;
+    INIT_DRIVETRAIN_UNIT(front_left, TIM_CHANNEL_1);
+    INIT_DRIVETRAIN_UNIT(back_left, TIM_CHANNEL_2);
+    INIT_DRIVETRAIN_UNIT(back_right, TIM_CHANNEL_3);
+    INIT_DRIVETRAIN_UNIT(front_right, TIM_CHANNEL_4);
+
+    io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
+                       drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
 /* USER CODE END 0 */
@@ -150,7 +176,7 @@ int main(void)
     MX_TIM4_Init();
     /* USER CODE BEGIN 2 */
 
-    initWheelMotors();
+    initIoLayer();
 
     /* USER CODE END 2 */
 
@@ -193,10 +219,6 @@ int main(void)
     /* USER CODE BEGIN WHILE */
     while (1)
     {
-        // TODO: Confirm with akhil if this should still compile with legacy_freertos
-        // enabled
-        //       (we should never get here anyhow)
-        // MX_LWIP_Process();
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
@@ -341,6 +363,18 @@ static void MX_TIM4_Init(void)
     {
         Error_Handler();
     }
+    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+    {
+        Error_Handler();
+    }
     /* USER CODE BEGIN TIM4_Init 2 */
 
     /* USER CODE END TIM4_Init 2 */
@@ -438,6 +472,7 @@ static void MX_GPIO_Init(void)
 
     /* GPIO Ports Clock Enable */
     __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOH_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -445,14 +480,43 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOG_CLK_ENABLE();
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOB,
-                      motor_0_esf_Pin | LD3_Pin | motor_0_reset_Pin | motor_0_coast_Pin |
-                          motor_0_mode_Pin | LD2_Pin | motor_0_direction_Pin |
-                          motor_0_brake_Pin,
+    HAL_GPIO_WritePin(
+        GPIOF,
+        wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
+            wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
+            wheel_motor_front_right_direction_Pin | wheel_motor_front_right_brake_Pin |
+            wheel_motor_front_right_esf_Pin,
+        GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(
+        GPIOC, wheel_motor_back_right_coast_Pin | wheel_motor_back_left_direction_Pin,
+        GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOA,
+                      wheel_motor_back_right_brake_Pin |
+                          wheel_motor_back_right_reset_Pin |
+                          wheel_motor_back_right_direction_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(
+        GPIOB,
+        wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
+            wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |
+            wheel_motor_back_left_coast_Pin | LD3_Pin | wheel_motor_back_left_mode_Pin |
+            wheel_motor_front_left_reset_Pin | wheel_motor_front_left_coast_Pin |
+            wheel_motor_front_left_mode_Pin | LD2_Pin |
+            wheel_motor_front_left_direction_Pin | wheel_motor_front_left_brake_Pin,
+        GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(wheel_motor_back_right_mode_GPIO_Port,
+                      wheel_motor_back_right_mode_Pin, GPIO_PIN_RESET);
 
     /*Configure GPIO pin : USER_Btn_Pin */
     GPIO_InitStruct.Pin  = USER_Btn_Pin;
@@ -460,12 +524,53 @@ static void MX_GPIO_Init(void)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
-    /*Configure GPIO pins : motor_0_esf_Pin LD3_Pin motor_0_reset_Pin motor_0_coast_Pin
-                             motor_0_mode_Pin LD2_Pin motor_0_direction_Pin
-       motor_0_brake_Pin */
-    GPIO_InitStruct.Pin = motor_0_esf_Pin | LD3_Pin | motor_0_reset_Pin |
-                          motor_0_coast_Pin | motor_0_mode_Pin | LD2_Pin |
-                          motor_0_direction_Pin | motor_0_brake_Pin;
+    /*Configure GPIO pins : wheel_motor_back_right_esf_Pin
+       wheel_motor_front_right_reset_Pin wheel_motor_front_right_coast_Pin
+       wheel_motor_front_right_mode_Pin wheel_motor_front_right_direction_Pin
+       wheel_motor_front_right_brake_Pin wheel_motor_front_right_esf_Pin */
+    GPIO_InitStruct.Pin =
+        wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
+        wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
+        wheel_motor_front_right_direction_Pin | wheel_motor_front_right_brake_Pin |
+        wheel_motor_front_right_esf_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : wheel_motor_back_right_coast_Pin
+     * wheel_motor_back_left_direction_Pin */
+    GPIO_InitStruct.Pin =
+        wheel_motor_back_right_coast_Pin | wheel_motor_back_left_direction_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : wheel_motor_back_right_brake_Pin
+     * wheel_motor_back_right_reset_Pin wheel_motor_back_right_direction_Pin */
+    GPIO_InitStruct.Pin = wheel_motor_back_right_brake_Pin |
+                          wheel_motor_back_right_reset_Pin |
+                          wheel_motor_back_right_direction_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : wheel_motor_back_left_brake_Pin wheel_motor_back_left_esf_Pin
+       wheel_motor_front_left_esf_Pin wheel_motor_back_left_reset_Pin
+                             wheel_motor_back_left_coast_Pin LD3_Pin
+       wheel_motor_back_left_mode_Pin wheel_motor_front_left_reset_Pin
+                             wheel_motor_front_left_coast_Pin
+       wheel_motor_front_left_mode_Pin LD2_Pin wheel_motor_front_left_direction_Pin
+                             wheel_motor_front_left_brake_Pin */
+    GPIO_InitStruct.Pin =
+        wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
+        wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |
+        wheel_motor_back_left_coast_Pin | LD3_Pin | wheel_motor_back_left_mode_Pin |
+        wheel_motor_front_left_reset_Pin | wheel_motor_front_left_coast_Pin |
+        wheel_motor_front_left_mode_Pin | LD2_Pin | wheel_motor_front_left_direction_Pin |
+        wheel_motor_front_left_brake_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -483,6 +588,13 @@ static void MX_GPIO_Init(void)
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : wheel_motor_back_right_mode_Pin */
+    GPIO_InitStruct.Pin   = wheel_motor_back_right_mode_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(wheel_motor_back_right_mode_GPIO_Port, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 4 */
