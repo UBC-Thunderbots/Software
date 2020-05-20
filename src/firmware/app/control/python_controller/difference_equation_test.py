@@ -9,23 +9,44 @@ import control as ct
 from control.matlab import *
 import matplotlib.pyplot as plt
 import unittest
+from firmware.app.control.python_controller.difference_equation import DifferenceEquation
 
 
 class TestDifferenceEquation(unittest.TestCase):
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
+    def test_step_function(self):
 
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
+        sample_time = 0.0001  # [s]
+        end_time = 5
 
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+        J = 0.001
+        B = 0.001
+        K = 1/1000
+
+        s = ct.tf([1, 0], 1)
+
+        step_input = 1
+
+        continuous_tf = K/(J*s + B)
+
+        discrete_tf = ct.sample_system(continuous_tf, sample_time, 'zoh' )
+        difference_equation = DifferenceEquation(discrete_tf.num[0][0], discrete_tf.den[0][0])
+
+        difference_equation_output = []
+
+        difference_equation.tick(step_input)
+
+        num_points = int(end_time/sample_time)+1
+
+        T = np.linspace(0, 5, num_points)
+        T, yout = ct.step_response(discrete_tf, T)
+
+        for i in range(0, num_points-1):
+            difference_equation.tick(1)
+
+        for i in range(0, len(T)):
+            self.assertAlmostEqual(yout[i], difference_equation.previous_output[i], 6)
+
 
 if __name__ == '__main__':
     unittest.main()
