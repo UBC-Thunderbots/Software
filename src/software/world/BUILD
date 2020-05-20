@@ -89,6 +89,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "robot_test",
+    srcs = ["robot_test.cpp"],
+    deps = [
+        ":robot",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "robot_state_with_timestamp",
     srcs = ["robot_state_with_timestamp.cpp"],
@@ -101,11 +110,11 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "robot_test",
-    srcs = ["robot_test.cpp"],
+cc_library(
+    name = "robot_state_with_timestamp_test",
+    srcs = ["robot_state_with_timestamp_test.cpp"],
     deps = [
-        ":robot",
+        ":robot_state_with_timestamp",
         "@gtest//:gtest_main",
     ],
 )
