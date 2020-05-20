@@ -48,3 +48,11 @@ cc_library(
         "//firmware/shared:physics",
     ],
 )
+
+py_test(
+    name = "discrete_controller_test",
+    srcs = ["//firmware/app/control/python_controller/difference_equation.py"],
+    #    deps = [
+    #        "//path/to/a/py/library",
+    #    ],
+)

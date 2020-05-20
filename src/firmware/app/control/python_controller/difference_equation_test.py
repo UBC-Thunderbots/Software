@@ -10,6 +10,7 @@ from control.matlab import *
 import matplotlib.pyplot as plt
 import unittest
 
+
 class TestStringMethods(unittest.TestCase):
 
     def test_upper(self):
