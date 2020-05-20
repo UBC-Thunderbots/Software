@@ -247,7 +247,7 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  * @param num_segments [in] The number of segments(elements) in traj_elements and
  * velocity_profile
  * @param arc_segment_length  [in] The arc length of each path segment
- * @param velocity_profile  The forwards and backwards continuous velocity profile of the
+ * @param velocity_profile [in] The forwards and backwards continuous velocity profile of the
  * trajectory
  */
 void static app_trajectory_planner_generateTimeProfile(
