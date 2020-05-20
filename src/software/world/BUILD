@@ -33,6 +33,25 @@ cc_library(
 )
 
 cc_library(
+    name = "ball_state",
+    srcs = ["ball_state.cpp"],
+    hdrs = ["ball_state.h"],
+    deps = [
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+    ],
+)
+
+cc_test(
+    name = "ball_state_test",
+    srcs = ["ball_state_test.cpp"],
+    deps = [
+        ":ball_state",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "field",
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
