@@ -565,7 +565,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterizat
     path_parameters.path                       = path;
     path_parameters.t_start                    = 1;
     path_parameters.t_end                      = 0;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -741,7 +741,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -808,7 +808,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
@@ -876,7 +876,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 5999;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 2000;
     path_parameters.initial_speed              = 0;

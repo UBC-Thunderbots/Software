@@ -8,7 +8,7 @@
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 
-// The following function is based on an algorithm described in
+// The following function is based on an algorithm described in page 18 of:
 // http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
 TrajectoryPlannerGenerationStatus
 app_trajectory_planner_generateConstantArcLengthTrajectory(

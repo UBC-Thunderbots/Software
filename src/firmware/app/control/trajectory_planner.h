@@ -80,7 +80,7 @@ typedef struct FirmwareRobotPathParameters
  *     - To ensure the robot is capable of deccelerating to react to any sudden changes in
  * the path, the trajectory is checked for backwards continuity
  *
- * NOTE: The following function is based on an algorithm described in
+ * NOTE: The following function is based on an algorithm described in page 18 of
  * http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
  *
  * @pre path_parameters.num_segments > 2 and num_segments <=
