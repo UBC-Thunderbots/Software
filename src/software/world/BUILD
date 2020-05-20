@@ -111,6 +111,27 @@ cc_test(
 )
 
 cc_library(
+    name = "robot_state",
+    srcs = ["robot_state.cpp"],
+    hdrs = ["robot_state.h"],
+    deps = [
+        "//software/new_geom:angle",
+        "//software/new_geom:angular_velocity",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+    ],
+)
+
+cc_test(
+    name = "robot_state_test",
+    srcs = ["robot_state_test.cpp"],
+    deps = [
+        ":robot_state",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "robot_capabilities",
     hdrs = ["robot_capabilities.h"],
     deps = [],
