@@ -35,7 +35,8 @@ class NetworkFilter
      * @return The most up to date state of the ball given the new DetectionFrame
      * information
      */
-    BallStateWithTimestamp getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections);
+    BallStateWithTimestamp getFilteredBallData(
+        const std::vector<SSL_DetectionFrame> &detections);
 
     /**
      * Returns a new Field object containing the most up to date state of the field given

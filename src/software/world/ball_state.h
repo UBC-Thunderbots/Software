@@ -40,7 +40,7 @@ class BallState
      * @return True if the other ball state is equal to this ball state, and false
      * otherwise
      */
-    bool operator==(const BallState &other) const;
+    bool operator==(const BallState& other) const;
 
     /**
      * Defines the inequality operator for a BallState.
@@ -49,7 +49,7 @@ class BallState
      * @return True if the other ball state is not equal to this ball state, and false
      * otherwise
      */
-    bool operator!=(const BallState &other) const;
+    bool operator!=(const BallState& other) const;
 
    protected:
     Point position_;

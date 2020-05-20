@@ -337,7 +337,8 @@ std::optional<Ball> BallFilter::getFilteredData(
 
     if (ball_detection_buffer.size() >= 2)
     {
-        std::optional<BallStateWithTimestamp> filtered_ball = estimateBallState(ball_detection_buffer);
+        std::optional<BallStateWithTimestamp> filtered_ball =
+            estimateBallState(ball_detection_buffer);
         if (filtered_ball)
         {
             return Ball(*filtered_ball);

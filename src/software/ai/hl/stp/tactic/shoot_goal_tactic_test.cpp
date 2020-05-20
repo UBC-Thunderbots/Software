@@ -181,7 +181,8 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
 
-    BallStateWithTimestamp ballState(Point(0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    BallStateWithTimestamp ballState(Point(0.5, 0), Vector(0, 0),
+                                     Timestamp::fromSeconds(0));
     world.updateBallState(ballState);
 
     ShootGoalTactic tactic =
@@ -200,7 +201,8 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
 
-    BallStateWithTimestamp ballState(Point(3, -2.5), Vector(0, 0), Timestamp::fromSeconds(0));
+    BallStateWithTimestamp ballState(Point(3, -2.5), Vector(0, 0),
+                                     Timestamp::fromSeconds(0));
     world.updateBallState(ballState);
 
     ShootGoalTactic tactic =

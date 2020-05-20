@@ -21,8 +21,8 @@ class Ball final
      * @param history_size The number of previous ball states that should be stored. Must
      * be > 0
      */
-    explicit Ball(const Point& position, const Vector& velocity, const Timestamp &timestamp,
-                  unsigned int history_size = 20);
+    explicit Ball(const Point &position, const Vector &velocity,
+                  const Timestamp &timestamp, unsigned int history_size = 20);
 
     /**
      * Creates a new ball with the given initial state
@@ -31,7 +31,8 @@ class Ball final
      * @param history_size The number of previous ball states that should be stored. Must
      * be > 0
      */
-    explicit Ball(const BallStateWithTimestamp& initial_state, unsigned int history_size = 20);
+    explicit Ball(const BallStateWithTimestamp &initial_state,
+                  unsigned int history_size = 20);
 
     /**
      * Returns the current state of the ball

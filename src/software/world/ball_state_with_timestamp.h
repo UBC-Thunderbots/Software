@@ -16,7 +16,8 @@ class BallStateWithTimestamp : public BallState
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit BallStateWithTimestamp(const Point& position, const Vector& velocity, const Timestamp &timestamp);
+    explicit BallStateWithTimestamp(const Point &position, const Vector &velocity,
+                                    const Timestamp &timestamp);
 
     /**
      * Creates a new ball state with timestamp information
@@ -25,7 +26,8 @@ class BallStateWithTimestamp : public BallState
      * @param timestamp The timestamp at which the ball was observed to be
      * at the given state
      */
-    explicit BallStateWithTimestamp(const BallState& ball_state, const Timestamp &timestamp);
+    explicit BallStateWithTimestamp(const BallState &ball_state,
+                                    const Timestamp &timestamp);
 
     /**
      * Returns the timestamp of the ball represented by this state

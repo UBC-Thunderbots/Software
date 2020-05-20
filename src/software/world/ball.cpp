@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 
-Ball::Ball(const Point& position, const Vector& velocity, const Timestamp &timestamp,
+Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
            unsigned int history_size)
     : states_(history_size)
 {
@@ -14,7 +14,8 @@ Ball::Ball(const Point& position, const Vector& velocity, const Timestamp &times
     updateState(BallStateWithTimestamp(position, velocity, timestamp));
 }
 
-Ball::Ball(const BallStateWithTimestamp &initial_state, unsigned int history_size) : states_(history_size)
+Ball::Ball(const BallStateWithTimestamp &initial_state, unsigned int history_size)
+    : states_(history_size)
 {
     if (history_size <= 0)
     {
