@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "shared/proto/tbots_robot_msg.proto";
+import "software/proto/ssl_referee.proto";
+import "software/proto/messages_robocup_ssl_wrapper.proto";
+
+message SensorMsg
+{
+    Referee ssl_refbox_msg                 = 1;
+    SSL_WrapperPacket ssl_vision_msg       = 2;
+    repeated TbotsRobotMsg tbots_robot_msg = 3;
+}
