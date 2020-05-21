@@ -277,21 +277,17 @@ void static app_trajectory_planner_generateTimeProfile(
  *
  *  TODO: Remove when #1322 is merged.
  *
- * @pre forwards is pre-allocated up to at least TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
- * @param forwards This is the trajectory that will be modified in place to become a
+ * @param forwards_trajectory This is the trajectory that will be modified in place to become a
  * reverse trajectory
- * @param num_segments The number of segements(elements) in the forwards array
  */
 void static app_trajectory_planner_reverseTrajectoryDirection(
-    PositionTrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const unsigned int num_segments);
+    PositionTrajectory_t* forwards_trajectory);
 
 /***
  * This function generates a velocity trajectory that corresponds to the time-optimal
  * velocity to follow a specified path. This profile is based on the input position trajectory
  *
- * @param path_parameters [in] Parameters defining the path and physical limitations of
- * kinematics
+ * @param positionTrajectory [in] The position trajectory to build the velocity trajectory from
  * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
  * time-optimal velocity to follow a specified path
  */

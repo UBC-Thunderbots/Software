@@ -213,8 +213,9 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length)
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+                                       .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
@@ -270,8 +271,9 @@ TEST_F(TrajectoryPlannerTest, check_end_points_match_path)
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
@@ -328,8 +330,9 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.final_speed                = 5;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -410,8 +413,9 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.final_speed                = 5;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -493,8 +497,9 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -574,8 +579,9 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterizat
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -632,8 +638,9 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -666,6 +673,55 @@ TEST_F(TrajectoryPlannerTest,
                 0.01);
 }
 
+TEST_F(TrajectoryPlannerTest,
+       check_trajectory_speed_profile_reverse_parameterization)
+{
+    Polynomial2dOrder3_t path = {
+            .x = {.coefficients = {0, 0, 1, 0}},
+            .y = {.coefficients = {0, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 0;
+    path_parameters.t_end                      = 1;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_acceleration = 3;
+    path_parameters.max_allowable_speed        = 3;
+    path_parameters.initial_speed              = 0;
+    path_parameters.final_speed                = 0;
+
+    PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
+
+    float forwards_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    TrajectoryPlannerGenerationStatus_t status =
+            app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+    EXPECT_EQ(OK, status);
+
+    // Copy the 'forwards' velocity profile (as if t1 < t2)
+    for(unsigned int i = 0; i < path_parameters.num_segments; i++){
+        forwards_speed_profile[i] = trajectory.speed_profile[i];
+    }
+
+    // Reverse the parameterization
+    float temp = trajectory.path_parameters.t_start;
+    trajectory.path_parameters.t_start = trajectory.path_parameters.t_end;
+    trajectory.path_parameters.t_end = temp;
+
+    status =
+            app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+    EXPECT_EQ(OK, status);
+
+   for(unsigned int i = 0; i < trajectory.path_parameters.num_segments; i++){
+       EXPECT_EQ(forwards_speed_profile[i], trajectory.speed_profile[path_parameters.num_segments-1 -i]);
+   }
+}
+
 TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 {
     Polynomial2dOrder3_t path = {
@@ -684,8 +740,9 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     path_parameters.final_speed                = 5;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
@@ -789,8 +846,10 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
@@ -807,8 +866,11 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
 
     PositionTrajectory_t const_interp_trajectory;
     PositionTrajectoryElement_t
-        const_interp_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    const_interp_trajectory.trajectory_elements = const_interp_elements;
+        const_interp_traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float const_interp_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    const_interp_trajectory.speed_profile = const_interp_speed_profile;
+    const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
     app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
@@ -855,15 +917,16 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     path_parameters.path                       = path;
     path_parameters.t_start                    = 0;
     path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.num_segments               = 500;
     path_parameters.max_allowable_acceleration = 3;
     path_parameters.max_allowable_speed        = 3;
     path_parameters.initial_speed              = 0;
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -881,8 +944,11 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
 
     PositionTrajectory_t const_interp_trajectory;
     PositionTrajectoryElement_t
-        const_interp_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    const_interp_trajectory.trajectory_elements = const_interp_elements;
+            const_interp_traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float const_interp_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    const_interp_trajectory.speed_profile = const_interp_speed_profile;
+    const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
     app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
@@ -936,8 +1002,9 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
     path_parameters.final_speed                = 3000;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -967,8 +1034,9 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
     path_parameters.final_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
-                                       .path_parameters     = path_parameters};
+            .path_parameters     = path_parameters, .speed_profile = speed_profile};
 
 
     TrajectoryPlannerGenerationStatus_t status =
