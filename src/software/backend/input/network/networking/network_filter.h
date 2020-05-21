@@ -12,9 +12,9 @@
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
-#include "software/world/timestamped_ball_state.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
+#include "software/world/timestamped_ball_state.h"
 
 class NetworkFilter
 {

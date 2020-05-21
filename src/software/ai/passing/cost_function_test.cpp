@@ -457,7 +457,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
     world.updateBallStateWithTimestamp(
-            TimestampedBallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
+        TimestampedBallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
@@ -483,8 +483,8 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
     world.updateBallStateWithTimestamp(TimestampedBallState(
-            {0, 0}, {0, 0},
-            Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
+        {0, 0}, {0, 0},
+        Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 

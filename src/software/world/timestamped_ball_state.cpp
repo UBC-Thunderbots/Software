@@ -1,7 +1,6 @@
 #include "software/world/timestamped_ball_state.h"
 
-TimestampedBallState::TimestampedBallState(const Point &position,
-                                           const Vector &velocity,
+TimestampedBallState::TimestampedBallState(const Point &position, const Vector &velocity,
                                            const Timestamp &timestamp)
     : BallState(position, velocity), timestamp_(timestamp)
 {
