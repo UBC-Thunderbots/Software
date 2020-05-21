@@ -85,28 +85,35 @@ bool Rectangle::expand(double amount)
     return true;
 }
 
-Rectangle Rectangle::expand(const Vector &v) const
+Rectangle Rectangle::expandXDirection(double x) const
 {
     Point negCorner = negXNegYCorner();
     Point posCorner = posXPosYCorner();
-    if (v.x() > 0)
+    if (x > 0)
     {
-        posCorner = posCorner + Vector(v.x(), 0);
+        posCorner = posCorner + Vector(x, 0);
     }
 
-    if (v.y() > 0)
+    if (x < 0)
     {
-        posCorner = posCorner + Vector(0, v.y());
+        negCorner = negCorner + Vector(x, 0);
+    }
+    return Rectangle(negCorner, posCorner);
+}
+
+Rectangle Rectangle::expandYDirection(double y) const
+{
+    Point negCorner = negXNegYCorner();
+    Point posCorner = posXPosYCorner();
+
+    if (y > 0)
+    {
+        posCorner = posCorner + Vector(0, y);
     }
 
-    if (v.x() < 0)
+    if (y < 0)
     {
-        negCorner = negCorner + Vector(v.x(), 0);
-    }
-
-    if (v.y() < 0)
-    {
-        negCorner = negCorner + Vector(0, v.y());
+        negCorner = negCorner + Vector(0, y);
     }
     return Rectangle(negCorner, posCorner);
 }
