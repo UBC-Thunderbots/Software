@@ -83,7 +83,7 @@ RobotId Robot::id() const
 
 Point Robot::position() const
 {
-    return states_.front().position();
+    return states_.front().robotState().position();
 }
 
 Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) const
@@ -103,7 +103,7 @@ Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) co
 
 Vector Robot::velocity() const
 {
-    return states_.front().velocity();
+    return states_.front().robotState().velocity();
 }
 
 Vector Robot::estimateVelocityAtFutureTime(const Duration &duration_in_future) const
@@ -122,7 +122,7 @@ Vector Robot::estimateVelocityAtFutureTime(const Duration &duration_in_future) c
 
 Angle Robot::orientation() const
 {
-    return states_.front().orientation();
+    return states_.front().robotState().orientation();
 }
 
 Angle Robot::estimateOrientationAtFutureTime(const Duration &duration_in_future) const
@@ -142,7 +142,7 @@ Angle Robot::estimateOrientationAtFutureTime(const Duration &duration_in_future)
 
 AngularVelocity Robot::angularVelocity() const
 {
-    return states_.front().angularVelocity();
+    return states_.front().robotState().angularVelocity();
 }
 
 AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
