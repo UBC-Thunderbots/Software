@@ -3,7 +3,8 @@
 #include "software/new_geom/convex_polygon.h"
 
 /**
- * A rectangle that cannot be rotated.
+ * A rectangle is a ConvexPolygon of four Points with the invariant that two sides are
+ * parallel to the x axis and two sides are parallel to the y axis
  */
 class Rectangle : public ConvexPolygon
 {
@@ -106,25 +107,19 @@ class Rectangle : public ConvexPolygon
      * @return bool Whether it was possible to expand/shrink the rectangle by
      * amount requested, rectangle remains unchanged if impossible to expand/shrink
      */
-    bool legacyAdditiveSizeChange(double amount);
+    bool inflate(double amount);
 
     /**
-     * Returns the Rectangle expanded in the direction of (x, 0)
-     * If x is positive, then move the right edge of the Rectangle to the right by |x|
-     * If x is negative, then move the left edge of the Rectangle to the left by |x|
+     * Returns the Rectangle expanded in the direction of v
+     * To maintain the Rectangle invariant, this is done in two steps:
+     * 1. The Rectangle is split in half perpendicular to v*(1,0) and points on the half
+     * that v*(1,0) is pointing are translated by v*(1,0)
+     * 2. The Rectangle is split in half perpendicular to v*(0,1) and points on the half
+     * that v*(0,1) is pointing are translated by v*(0,1)
      *
-     * @return a Rectangle expanded in the direction of (x, 0)
+     * @return a Rectangle expanded in the direction of v
      */
-    Rectangle expandXMinOrXMax(double x) const;
-
-    /**
-     * Returns the Rectangle expanded in the direction of (0, y)
-     * If y is positive, then raise the top of the Rectangle by |y|
-     * If y is negative, then lower the bottom of the Rectangle by |y|
-     *
-     * @return a Rectangle expanded in the direction of (0, y)
-     */
-    Rectangle expandYMinOrYMax(double y) const;
+    Rectangle expand(const Vector &v) const;
 
     bool operator==(const Rectangle &p) const;
 };
