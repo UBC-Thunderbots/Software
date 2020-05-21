@@ -109,22 +109,22 @@ class Rectangle : public ConvexPolygon
     bool legacyAdditiveSizeChange(double amount);
 
     /**
-     * Returns the Rectangle expanded in the direction of (x_component, 0)
-     * The Rectangle is split along a vertical line through the center and points on the
-     * side that (x_component, 0) points in are translated by (x_component, 0)
+     * Returns the Rectangle expanded in the direction of (x, 0)
+     * If x is positive, then move the right edge of the Rectangle to the right by |x|
+     * If x is negative, then move the left edge of the Rectangle to the left by |x|
      *
-     * @return a Rectangle expanded in the direction of (x_component, 0)
+     * @return a Rectangle expanded in the direction of (x, 0)
      */
-    Rectangle expandXDirection(double x_component) const;
+    Rectangle expandXMinOrXMax(double x) const;
 
     /**
-     * Returns the Rectangle expanded in the direction of (0, y_component)
-     * The Rectangle is split along a horizontal line through the center and points on the
-     * side that (0, y_component) points in are translated by (0, y_component)
+     * Returns the Rectangle expanded in the direction of (0, y)
+     * If y is positive, then raise the top of the Rectangle by |y|
+     * If y is negative, then lower the bottom of the Rectangle by |y|
      *
-     * @return a Rectangle expanded in the direction of (0, y_component)
+     * @return a Rectangle expanded in the direction of (0, y)
      */
-    Rectangle expandYDirection(double y_component) const;
+    Rectangle expandYMinOrYMax(double y) const;
 
     bool operator==(const Rectangle &p) const;
 };

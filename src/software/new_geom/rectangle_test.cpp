@@ -219,26 +219,26 @@ TEST(RectangleExpandTest, test_right)
 {
     Rectangle rectangle({1, 1}, {5, 3});
     Rectangle expected({1, 1}, {8, 3});
-    EXPECT_EQ(rectangle.expandXDirection(3), expected);
+    EXPECT_EQ(rectangle.expandXMinOrXMax(3), expected);
 }
 
 TEST(RectangleExpandTest, test_up_left)
 {
     Rectangle rectangle({1, 1}, {5, 3});
     Rectangle expected({-1, 1}, {5, 6});
-    EXPECT_EQ(rectangle.expandXDirection(-2).expandYDirection(3), expected);
+    EXPECT_EQ(rectangle.expandXMinOrXMax(-2).expandYMinOrYMax(3), expected);
 }
 
 TEST(RectangleExpandTest, test_down_right)
 {
     Rectangle rectangle({1, 1}, {5, 3});
     Rectangle expected({1, 0}, {9, 3});
-    EXPECT_EQ(rectangle.expandXDirection(4).expandYDirection(-1), expected);
+    EXPECT_EQ(rectangle.expandXMinOrXMax(4).expandYMinOrYMax(-1), expected);
 }
 
 TEST(RectangleExpandTest, test_0_vector)
 {
     Rectangle rectangle({1, 1}, {5, 3});
     Rectangle expected(rectangle);
-    EXPECT_EQ(rectangle.expandXDirection(0).expandYDirection(0), expected);
+    EXPECT_EQ(rectangle.expandXMinOrXMax(0).expandYMinOrYMax(0), expected);
 }

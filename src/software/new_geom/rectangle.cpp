@@ -85,35 +85,35 @@ bool Rectangle::legacyAdditiveSizeChange(double amount)
     return true;
 }
 
-Rectangle Rectangle::expandXDirection(double x_component) const
+Rectangle Rectangle::expandXMinOrXMax(double x) const
 {
     Point negCorner = negXNegYCorner();
     Point posCorner = posXPosYCorner();
-    if (x_component > 0)
+    if (x > 0)
     {
-        posCorner = posCorner + Vector(x_component, 0);
+        posCorner = posCorner + Vector(x, 0);
     }
 
-    if (x_component < 0)
+    if (x < 0)
     {
-        negCorner = negCorner + Vector(x_component, 0);
+        negCorner = negCorner + Vector(x, 0);
     }
     return Rectangle(negCorner, posCorner);
 }
 
-Rectangle Rectangle::expandYDirection(double y_component) const
+Rectangle Rectangle::expandYMinOrYMax(double y) const
 {
     Point negCorner = negXNegYCorner();
     Point posCorner = posXPosYCorner();
 
-    if (y_component > 0)
+    if (y > 0)
     {
-        posCorner = posCorner + Vector(0, y_component);
+        posCorner = posCorner + Vector(0, y);
     }
 
-    if (y_component < 0)
+    if (y < 0)
     {
-        negCorner = negCorner + Vector(0, y_component);
+        negCorner = negCorner + Vector(0, y);
     }
     return Rectangle(negCorner, posCorner);
 }
