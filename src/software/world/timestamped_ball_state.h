@@ -8,7 +8,7 @@
 /**
  * Represents the state of a ball at a specific time
  */
-class TimestampedBallState : public BallState
+class TimestampedBallState
 {
    public:
     /**
@@ -44,11 +44,11 @@ class TimestampedBallState : public BallState
      *
      * @return the ball state without any timestamp information
      */
-    BallState getBallState() const;
+    BallState ballState() const;
 
     /**
-     * Defines the equality operator for a BallState. BallStates are equal if their
-     * positions and velocities are the same
+     * Defines the equality operator for a TimestampedBallState. TimestampedBallStates
+     * are equal if their positions and velocities are the same
      *
      * @param other The ball state to compare against for equality
      * @return True if the other ball state is equal to this ball state, and false
@@ -57,7 +57,7 @@ class TimestampedBallState : public BallState
     bool operator==(const TimestampedBallState &other) const;
 
     /**
-     * Defines the inequality operator for a BallState.
+     * Defines the inequality operator for a TimestampedBallState.
      *
      * @param other The ball state to compare against for inequality
      * @return True if the other ball state is not equal to this ball state, and false
@@ -67,4 +67,5 @@ class TimestampedBallState : public BallState
 
    private:
     Timestamp timestamp_;
+    BallState ball_state_;
 };
