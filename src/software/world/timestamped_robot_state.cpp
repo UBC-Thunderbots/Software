@@ -5,7 +5,8 @@ TimestampedRobotState::TimestampedRobotState(const Point &position,
                                              const Angle &orientation,
                                              const AngularVelocity &angular_velocity,
                                              const Timestamp &timestamp)
-    : robot_state_(position, velocity, orientation, angular_velocity), timestamp_(timestamp)
+    : robot_state_(position, velocity, orientation, angular_velocity),
+      timestamp_(timestamp)
 {
 }
 
