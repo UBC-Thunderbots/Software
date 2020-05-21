@@ -89,6 +89,21 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Install Python3
+echo "================================================================"
+echo "Installing Python3"
+echo "================================================================"
+
+# Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
+sudo apt-get update
+sudo apt-get install python3 -y
+if [ $? -ne 0 ]; then
+    echo "##############################################################"
+    echo "Error: Installing Python failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 # Symlink qt include directory
 # As the Qt Bazel rules depend on an include directory which varies between Linux
 # platforms, we symlink this directory to one place in our source tree
