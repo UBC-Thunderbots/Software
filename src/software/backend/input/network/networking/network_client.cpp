@@ -170,7 +170,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
             if (!camera_disabled)
             {
-                BallStateWithTimestamp ball_state =
+                TimestampedBallState ball_state =
                     network_filter.getFilteredBallData({detection});
                 world.updateBallState(ball_state);
 

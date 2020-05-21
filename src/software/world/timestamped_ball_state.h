@@ -8,7 +8,7 @@
 /**
  * Represents the state of a ball at a specific time
  */
-class BallStateWithTimestamp : public BallState
+class TimestampedBallState : public BallState
 {
    public:
     /**
@@ -19,8 +19,8 @@ class BallStateWithTimestamp : public BallState
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit BallStateWithTimestamp(const Point &position, const Vector &velocity,
-                                    const Timestamp &timestamp);
+    explicit TimestampedBallState(const Point &position, const Vector &velocity,
+                                  const Timestamp &timestamp);
 
     /**
      * Creates a new ball state with timestamp information
@@ -29,8 +29,8 @@ class BallStateWithTimestamp : public BallState
      * @param timestamp The timestamp at which the ball was observed to be
      * at the given state
      */
-    explicit BallStateWithTimestamp(const BallState &ball_state,
-                                    const Timestamp &timestamp);
+    explicit TimestampedBallState(const BallState &ball_state,
+                                  const Timestamp &timestamp);
 
     /**
      * Returns the timestamp of the ball represented by this state
@@ -54,7 +54,7 @@ class BallStateWithTimestamp : public BallState
      * @return True if the other ball state is equal to this ball state, and false
      * otherwise
      */
-    bool operator==(const BallStateWithTimestamp &other) const;
+    bool operator==(const TimestampedBallState &other) const;
 
     /**
      * Defines the inequality operator for a BallState.
@@ -63,7 +63,7 @@ class BallStateWithTimestamp : public BallState
      * @return True if the other ball state is not equal to this ball state, and false
      * otherwise
      */
-    bool operator!=(const BallStateWithTimestamp &other) const;
+    bool operator!=(const TimestampedBallState &other) const;
 
    private:
     Timestamp timestamp_;

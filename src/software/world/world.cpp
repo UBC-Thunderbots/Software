@@ -39,7 +39,7 @@ void World::updateFieldGeometry(const Field &new_field_data)
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateBallState(const BallStateWithTimestamp &new_ball_state)
+void World::updateBallState(const TimestampedBallState &new_ball_state)
 {
     ball_.updateState(new_ball_state);
     updateTimestamp(getMostRecentTimestampFromMembers());

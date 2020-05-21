@@ -93,7 +93,7 @@ class SensorFusion : public Subject<World>,
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
     Field field_state;
-    BallStateWithTimestamp ball_state;
+    TimestampedBallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;
     World world;

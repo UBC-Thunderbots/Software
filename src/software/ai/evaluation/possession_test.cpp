@@ -189,7 +189,7 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
     world.updateBallState(
-        BallStateWithTimestamp({0.1, 2.5}, {0, 10}, Timestamp::fromSeconds(3.5)));
+            TimestampedBallState({0.1, 2.5}, {0, 10}, Timestamp::fromSeconds(3.5)));
 
     robot0.updateState(RobotState(Point(-2, 3), Vector(), Angle::zero(),
                                   AngularVelocity::zero(), Timestamp::fromSeconds(3.5)));
@@ -219,7 +219,7 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     world.updateBallState(
-        BallStateWithTimestamp({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4)));
+            TimestampedBallState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4)));
 
     robot0.updateState(RobotState(Point(-2, 3), Vector(), Angle::zero(),
                                   AngularVelocity::zero(), Timestamp::fromSeconds(4)));

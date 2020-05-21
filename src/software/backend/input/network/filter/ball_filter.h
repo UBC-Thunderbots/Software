@@ -8,7 +8,7 @@
 #include "software/sensor_fusion/ball_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
-#include "software/world/ball_state_with_timestamp.h"
+#include "software/world/timestamped_ball_state.h"
 #include "software/world/field.h"
 
 /**
@@ -131,7 +131,7 @@ class BallFilter
      * @return The filtered current state of the ball. If a filtered result cannot be
      * calculated, returns std::nullopt
      */
-    std::optional<BallStateWithTimestamp> estimateBallState(
+    std::optional<TimestampedBallState> estimateBallState(
         boost::circular_buffer<BallDetection> ball_detections);
 
    private:

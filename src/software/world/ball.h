@@ -6,7 +6,7 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
 #include "software/time/timestamp.h"
-#include "software/world/ball_state_with_timestamp.h"
+#include "software/world/timestamped_ball_state.h"
 
 class Ball final
 {
@@ -31,13 +31,13 @@ class Ball final
      * @param history_size The number of previous ball states that should be stored. Must
      * be > 0
      */
-    explicit Ball(const BallStateWithTimestamp &initial_state,
+    explicit Ball(const TimestampedBallState &initial_state,
                   unsigned int history_size = 20);
 
     /**
      * Returns the current state of the ball
      */
-    BallStateWithTimestamp currentState() const;
+    TimestampedBallState currentState() const;
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -45,7 +45,7 @@ class Ball final
      *
      * @param new_state the new state of the ball
      */
-    void updateState(const BallStateWithTimestamp &new_state);
+    void updateState(const TimestampedBallState &new_state);
 
     /**
      * Updates the ball's state to be its predicted state at the given timestamp.
@@ -116,7 +116,7 @@ class Ball final
      * @return The circular buffer containing the state history starting with the newest
      * available data at index 0
      */
-    boost::circular_buffer<BallStateWithTimestamp> getPreviousStates() const;
+    boost::circular_buffer<TimestampedBallState> getPreviousStates() const;
 
     /**
      * Finds an update timestamp that is close to the provided timestamp and returns the
@@ -150,5 +150,5 @@ class Ball final
     // queue, This buffer will never be empty as it's initialized with a BallState on
     // creation
     // The buffer size (history_size) must be > 0
-    boost::circular_buffer<BallStateWithTimestamp> states_;
+    boost::circular_buffer<TimestampedBallState> states_;
 };

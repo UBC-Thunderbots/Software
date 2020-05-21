@@ -5,7 +5,7 @@
 
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/world/ball.h"
-#include "software/world/ball_state_with_timestamp.h"
+#include "software/world/timestamped_ball_state.h"
 #include "software/world/field.h"
 #include "software/world/game_state.h"
 #include "software/world/team.h"
@@ -52,7 +52,7 @@ class World final
      *
      * @param new_ball_data A BallState containing new ball information
      */
-    void updateBallState(const BallStateWithTimestamp& new_ball_state);
+    void updateBallState(const TimestampedBallState& new_ball_state);
 
     /**
      * Updates the state of the friendly team in the world with the new team data
