@@ -53,6 +53,7 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     {
         ball_pos_at_time = ball.getPreviousStates()
                                .at(*ball.getHistoryIndexFromTimestamp(*timestamp))
+                               .ballState()
                                .position();
     }
     else
@@ -99,10 +100,12 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
         ball_pos = world.ball()
                        .getPreviousStates()
                        .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
+                       .ballState()
                        .position();
         ball_velocity = world.ball()
                             .getPreviousStates()
                             .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
+                            .ballState()
                             .velocity();
     }
     else

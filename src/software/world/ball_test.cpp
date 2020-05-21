@@ -292,7 +292,7 @@ TEST_F(BallTest, get_position_history)
     std::vector<Point> previous_positions{};
     for (int i = 0; i < previous_states.size(); i++)
     {
-        previous_positions.push_back(previous_states.at(i).position());
+        previous_positions.push_back(previous_states.at(i).ballState().position());
     }
     EXPECT_EQ(prevPositions, previous_positions);
 }
@@ -312,7 +312,7 @@ TEST_F(BallTest, get_velocity_history)
     std::vector<Vector> previous_velocities{};
     for (int i = 0; i < previous_states.size(); i++)
     {
-        previous_velocities.push_back(previous_states.at(i).velocity());
+        previous_velocities.push_back(previous_states.at(i).ballState().velocity());
     }
     EXPECT_EQ(prevVelocities, previous_velocities);
 }

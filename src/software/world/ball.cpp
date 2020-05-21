@@ -63,7 +63,7 @@ Timestamp Ball::lastUpdateTimestamp() const
 
 Point Ball::position() const
 {
-    return states_.front().position();
+    return states_.front().ballState().position();
 }
 
 Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) const
@@ -83,7 +83,7 @@ Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) con
 
 Vector Ball::velocity() const
 {
-    return states_.front().velocity();
+    return states_.front().ballState().velocity();
 }
 
 Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) const
