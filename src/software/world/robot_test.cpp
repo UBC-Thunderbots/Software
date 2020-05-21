@@ -503,7 +503,8 @@ TEST_F(RobotTest, get_angular_velocity_history)
     std::vector<AngularVelocity> previous_angular_velocities{};
     for (int i = 0; i < previous_states.size(); i++)
     {
-        previous_angular_velocities.push_back(previous_states.at(i).robotState().angularVelocity());
+        previous_angular_velocities.push_back(
+            previous_states.at(i).robotState().angularVelocity());
     }
     EXPECT_EQ(prevAngularVelocities, previous_angular_velocities);
 }
