@@ -2,34 +2,12 @@
 
 #include <gtest/gtest.h>
 
-TEST(RobotStateWithTimestampTest, get_position)
-{
-    TimestampedRobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
-                                AngularVelocity::half(), Timestamp::fromSeconds(0.1));
-    EXPECT_EQ(state.position(), Point(1.1, -0.5));
-}
-
-TEST(RobotStateWithTimestampTest, get_velocity)
+TEST(RobotStateWithTimestampTest, get_timestamp)
 {
     TimestampedRobotState state(RobotState(Point(1.1, -0.5), Vector(3, 0),
                                            Angle::quarter(), AngularVelocity::half()),
                                 Timestamp::fromSeconds(0.1));
-    EXPECT_EQ(state.velocity(), Vector(3, 0));
-}
-
-TEST(RobotStateWithTimestampTest, get_orientation)
-{
-    TimestampedRobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
-                                AngularVelocity::half(), Timestamp::fromSeconds(0.1));
-    EXPECT_EQ(state.orientation(), Angle::quarter());
-}
-
-TEST(RobotStateWithTimestampTest, get_angular_velocity)
-{
-    TimestampedRobotState state(RobotState(Point(1.1, -0.5), Vector(3, 0),
-                                           Angle::quarter(), AngularVelocity::half()),
-                                Timestamp::fromSeconds(0.1));
-    EXPECT_EQ(state.angularVelocity(), AngularVelocity::half());
+    EXPECT_EQ(state.timestamp(), Timestamp::fromSeconds(0.1));
 }
 
 TEST(RobotStateWithTimestampTest, get_robot_state)
@@ -37,7 +15,7 @@ TEST(RobotStateWithTimestampTest, get_robot_state)
     TimestampedRobotState state(RobotState(Point(1.1, -0.5), Vector(3, 0),
                                            Angle::quarter(), AngularVelocity::half()),
                                 Timestamp::fromSeconds(0.1));
-    EXPECT_EQ(state.getRobotState(),
+    EXPECT_EQ(state.robotState(),
               RobotState(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                          AngularVelocity::half()));
 }

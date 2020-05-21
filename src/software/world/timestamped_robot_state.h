@@ -10,7 +10,7 @@
 /**
  * This class represents the state of a robot at a single point in time
  */
-class TimestampedRobotState : public RobotState
+class TimestampedRobotState
 {
    public:
     /**
@@ -50,7 +50,7 @@ class TimestampedRobotState : public RobotState
      *
      * @return the robot state without any timestamp information
      */
-    RobotState getRobotState() const;
+    RobotState robotState() const;
 
     /**
      * Defines the equality operator for a TimestampedRobotState.
@@ -74,4 +74,5 @@ class TimestampedRobotState : public RobotState
 
    private:
     Timestamp timestamp_;
+    RobotState robot_state_;
 };
