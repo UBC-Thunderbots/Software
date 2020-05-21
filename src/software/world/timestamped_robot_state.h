@@ -10,7 +10,7 @@
 /**
  * This class represents the state of a robot at a single point in time
  */
-class RobotStateWithTimestamp : public RobotState
+class TimestampedRobotState : public RobotState
 {
    public:
     /**
@@ -23,10 +23,10 @@ class RobotStateWithTimestamp : public RobotState
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit RobotStateWithTimestamp(const Point &position, const Vector &velocity,
-                                     const Angle &orientation,
-                                     const AngularVelocity &angular_velocity,
-                                     const Timestamp &timestamp);
+    explicit TimestampedRobotState(const Point &position, const Vector &velocity,
+                                   const Angle &orientation,
+                                   const AngularVelocity &angular_velocity,
+                                   const Timestamp &timestamp);
 
     /**
      * Creates a new robot state with the given initial state and timestamp
@@ -35,8 +35,8 @@ class RobotStateWithTimestamp : public RobotState
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit RobotStateWithTimestamp(const RobotState &robot_state,
-                                     const Timestamp &timestamp);
+    explicit TimestampedRobotState(const RobotState &robot_state,
+                                   const Timestamp &timestamp);
 
     /**
      * Returns the timestamp of the robot represented by this state
@@ -53,7 +53,7 @@ class RobotStateWithTimestamp : public RobotState
     RobotState getRobotState() const;
 
     /**
-     * Defines the equality operator for a RobotStateWithTimestamp.
+     * Defines the equality operator for a TimestampedRobotState.
      * RobotStateWithTimestamps are equal if their positions, velocities,
      * orientation, and angular velocity are the same.
      *
@@ -61,16 +61,16 @@ class RobotStateWithTimestamp : public RobotState
      * @return True if the other robot state is equal to this robot state, and false
      * otherwise
      */
-    bool operator==(const RobotStateWithTimestamp &other) const;
+    bool operator==(const TimestampedRobotState &other) const;
 
     /**
-     * Defines the inequality operator for a RobotStateWithTimestamp.
+     * Defines the inequality operator for a TimestampedRobotState.
      *
      * @param other The robot state to compare against for inequality
      * @return True if the other robot state is not equal to this robot state, and false
      * otherwise
      */
-    bool operator!=(const RobotStateWithTimestamp &other) const;
+    bool operator!=(const TimestampedRobotState &other) const;
 
    private:
     Timestamp timestamp_;

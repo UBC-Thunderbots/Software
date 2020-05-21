@@ -8,7 +8,7 @@
 class PatrolTacticTest : public testing::Test
 {
    protected:
-    std::vector<RobotStateWithTimestamp> robot_state_to_complete_actions;
+    std::vector<TimestampedRobotState> robot_state_to_complete_actions;
     std::vector<std::shared_ptr<MoveAction>> expected_actions;
     const double COST_OF_ASSIGNED_ROBOT                      = 0.0;
     const double COST_OF_NONASSIGNED_ROBOT_UNASSIGNED_TACTIC = 1.0;
@@ -46,7 +46,7 @@ class PatrolTacticTest : public testing::Test
     {
         for (int i = 0; i < patrol_points.size(); i++)
         {
-            RobotStateWithTimestamp robotState = RobotStateWithTimestamp(
+            TimestampedRobotState robotState = TimestampedRobotState(
                 patrol_points[i], velocity, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(std::time(nullptr)));
             robot_state_to_complete_actions.push_back(robotState);
@@ -84,7 +84,7 @@ class PatrolTacticTest : public testing::Test
      * @param action_ptr: the last action returned by the tactic
      * @param tactic: the patrol tactic
      */
-    void simulateActionToCompletion(Robot &robot, RobotStateWithTimestamp new_robot_state,
+    void simulateActionToCompletion(Robot &robot, TimestampedRobotState new_robot_state,
                                     std::shared_ptr<Action> action_ptr,
                                     PatrolTactic &tactic)
     {

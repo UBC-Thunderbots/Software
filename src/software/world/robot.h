@@ -9,7 +9,7 @@
 #include "software/new_geom/vector.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
-#include "software/world/robot_state_with_timestamp.h"
+#include "software/world/timestamped_robot_state.h"
 
 using RobotId = unsigned int;
 
@@ -51,7 +51,7 @@ class Robot
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
     explicit Robot(
-        RobotId id, const RobotStateWithTimestamp &initial_state,
+        RobotId id, const TimestampedRobotState &initial_state,
         unsigned int history_size = 20,
         const std::set<RobotCapabilities::Capability> &unavailable_capabilities =
             std::set<RobotCapabilities::Capability>());
@@ -62,9 +62,9 @@ class Robot
      *
      * @param new_robot_state A robot state containing new robot data
      */
-    void updateState(const RobotStateWithTimestamp &new_robot_state);
+    void updateState(const TimestampedRobotState &new_robot_state);
 
-    RobotStateWithTimestamp currentState() const;
+    TimestampedRobotState currentState() const;
 
     /**
      * Updates the robot's state to be its predicted state at the given timestamp.
@@ -199,7 +199,7 @@ class Robot
      * @return circular_buffer containing all previous states up to the history_size field
      * cap
      */
-    boost::circular_buffer<RobotStateWithTimestamp> getPreviousStates() const;
+    boost::circular_buffer<TimestampedRobotState> getPreviousStates() const;
 
     /**
      * Finds an update timestamp that is close to the provided timestamp and returns the
@@ -277,7 +277,7 @@ class Robot
     // queue, This buffer will never be empty as it's initialized with a RobotState on
     // creation
     // The buffer size (history_size) must be > 0
-    boost::circular_buffer<RobotStateWithTimestamp> states_;
+    boost::circular_buffer<TimestampedRobotState> states_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapabilities::Capability> unavailable_capabilities_;
