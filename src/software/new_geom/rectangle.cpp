@@ -69,7 +69,7 @@ Point Rectangle::furthestCorner(const Point &p)
         });
 }
 
-bool Rectangle::expand(double amount)
+bool Rectangle::legacyAdditiveSizeChange(double amount)
 {
     // Ensures rectangle cannot be shrunk to less than a point
     if (xLength() < -2 * amount || yLength() < -2 * amount)
@@ -85,35 +85,35 @@ bool Rectangle::expand(double amount)
     return true;
 }
 
-Rectangle Rectangle::expandXDirection(double x) const
+Rectangle Rectangle::expandXDirection(double x_component) const
 {
     Point negCorner = negXNegYCorner();
     Point posCorner = posXPosYCorner();
-    if (x > 0)
+    if (x_component > 0)
     {
-        posCorner = posCorner + Vector(x, 0);
+        posCorner = posCorner + Vector(x_component, 0);
     }
 
-    if (x < 0)
+    if (x_component < 0)
     {
-        negCorner = negCorner + Vector(x, 0);
+        negCorner = negCorner + Vector(x_component, 0);
     }
     return Rectangle(negCorner, posCorner);
 }
 
-Rectangle Rectangle::expandYDirection(double y) const
+Rectangle Rectangle::expandYDirection(double y_component) const
 {
     Point negCorner = negXNegYCorner();
     Point posCorner = posXPosYCorner();
 
-    if (y > 0)
+    if (y_component > 0)
     {
-        posCorner = posCorner + Vector(0, y);
+        posCorner = posCorner + Vector(0, y_component);
     }
 
-    if (y < 0)
+    if (y_component < 0)
     {
-        negCorner = negCorner + Vector(0, y);
+        negCorner = negCorner + Vector(0, y_component);
     }
     return Rectangle(negCorner, posCorner);
 }

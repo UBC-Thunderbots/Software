@@ -98,31 +98,33 @@ class Rectangle : public ConvexPolygon
      * the centre by an "amount" while maintaining the same location for the center of the
      * rectangle. The rectangle will not shrink to anything smaller than a point.
      *
+     * NOTE: this is a deprecated function that will be removed in #1331 or #1332
+     *
      * @param amount The amount to expand or shrink the rectangle by on all sides, can be
      * positive or negative
      *
      * @return bool Whether it was possible to expand/shrink the rectangle by
      * amount requested, rectangle remains unchanged if impossible to expand/shrink
      */
-    bool expand(double amount);
+    bool legacyAdditiveSizeChange(double amount);
 
     /**
-     * Returns the Rectangle expanded in the direction of (x,0)
+     * Returns the Rectangle expanded in the direction of (x_component, 0)
      * The Rectangle is split along a vertical line through the center and points on the
-     * side that (x,0) points in are translated by (x,0)
+     * side that (x_component, 0) points in are translated by (x_component, 0)
      *
-     * @return a Rectangle expanded in the direction of (x,0)
+     * @return a Rectangle expanded in the direction of (x_component, 0)
      */
-    Rectangle expandXDirection(double x) const;
+    Rectangle expandXDirection(double x_component) const;
 
     /**
-     * Returns the Rectangle expanded in the direction of (0,y)
+     * Returns the Rectangle expanded in the direction of (0, y_component)
      * The Rectangle is split along a horizontal line through the center and points on the
-     * side that (0,y) points in are translated by (0,y)
+     * side that (0, y_component) points in are translated by (0, y_component)
      *
-     * @return a Rectangle expanded in the direction of (0,y)
+     * @return a Rectangle expanded in the direction of (0, y_component)
      */
-    Rectangle expandYDirection(double y) const;
+    Rectangle expandYDirection(double y_component) const;
 
     bool operator==(const Rectangle &p) const;
 };
