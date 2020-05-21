@@ -8,7 +8,7 @@ proto_library(
         "robot_component_status.proto",
         "tbots_robot_msg.proto",
     ],
-    visibility = ["//visibility:private"],
+    # Note: this library is public so that proto libraries in firmware or software can build from it
 )
 
 cc_proto_library(

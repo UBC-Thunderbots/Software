@@ -1,4 +1,4 @@
-#include "software/ai/navigator/obstacle/new_obstacle/circle_obstacle.h"
+#include "software/ai/navigator/obstacle/circle_obstacle.h"
 
 CircleObstacle::CircleObstacle(Circle circle) : circle_(circle) {}
 
@@ -7,7 +7,7 @@ bool CircleObstacle::contains(const Point& p) const
     return circle_.contains(p);
 }
 
-double CircleObstacle::minDistance(const Point& p) const
+double CircleObstacle::distance(const Point& p) const
 {
     return ::distance(circle_, p);
 }
