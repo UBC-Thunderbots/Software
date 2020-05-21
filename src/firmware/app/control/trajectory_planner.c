@@ -122,6 +122,9 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
         generation_status = INITIAL_VELOCITY_TOO_HIGH;
     }
 
+    // At this point the velocity profile is finished (assuming no kinematic impossibilities)
+    trajectory->speed_profile = velocity_profile;
+    // TODO reverse the speed profile if there is reverse param. Also add a static speed profile to every test
 
     // Now that the velocity profile has been defined we can calculate the time profile of
     // the trajectory
@@ -334,3 +337,7 @@ void app_trajectory_planner_reverseTrajectoryDirection(
         forwards[i].time     = reverse[i].time;
     }
 }
+
+TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
+        PositionTrajectory_t* positionTrajectory,
+        VelocityTrajectory_t* velocity_trajectory);

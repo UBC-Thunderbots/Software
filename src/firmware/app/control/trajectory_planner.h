@@ -47,6 +47,7 @@ typedef struct PositionTrajectory
 {
     PositionTrajectoryElement_t* trajectory_elements;
     FirmwareRobotPathParameters_t path_parameters;
+    float* speed_profile;
 } PositionTrajectory_t;
 
 // Struct that defines a single point on a velocity trajectory
@@ -61,7 +62,7 @@ typedef struct VelocityTrajectoryElement
 typedef struct VelocityTrajectory
 {
     VelocityTrajectoryElement_t* trajectory_elements;
-    unsigned int num_elements;
+    FirmwareRobotPathParameters_t path_parameters;
 } VelocityTrajectory_t;
 
 typedef enum TrajectoryPlannerGenerationStatus
@@ -284,3 +285,16 @@ void static app_trajectory_planner_generateTimeProfile(
 void static app_trajectory_planner_reverseTrajectoryDirection(
     PositionTrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const unsigned int num_segments);
+
+/***
+ * This function generates a velocity trajectory that corresponds to the time-optimal
+ * velocity to follow a specified path. This profile is based on the input position trajectory
+ *
+ * @param path_parameters [in] Parameters defining the path and physical limitations of
+ * kinematics
+ * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
+ * time-optimal velocity to follow a specified path
+ */
+TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
+        PositionTrajectory_t* positionTrajectory,
+        VelocityTrajectory_t* velocity_trajectory);
