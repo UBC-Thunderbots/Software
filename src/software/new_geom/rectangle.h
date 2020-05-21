@@ -108,8 +108,8 @@ class Rectangle : public ConvexPolygon
 
     /**
      * Returns the Rectangle expanded in the direction of (x,0)
-     * The Rectangle is split in half along a vertical line through the center and points
-     * on the half that (x,0) points in are translated by (x,0)
+     * The Rectangle is split along a vertical line through the center and points on the
+     * side that (x,0) points in are translated by (x,0)
      *
      * @return a Rectangle expanded in the direction of (x,0)
      */
@@ -117,8 +117,8 @@ class Rectangle : public ConvexPolygon
 
     /**
      * Returns the Rectangle expanded in the direction of (0,y)
-     * The Rectangle is split in half along a horizontal line through the center and
-     * points on the half that (0,y) points in are translated by (0,y)
+     * The Rectangle is split along a horizontal line through the center and points on the
+     * side that (0,y) points in are translated by (0,y)
      *
      * @return a Rectangle expanded in the direction of (0,y)
      */

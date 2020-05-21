@@ -192,7 +192,7 @@ Point ConvexPolygon::centroid() const
     return Point((Vector(x_centre, y_centre) / (3 * signed_area)));
 }
 
-ConvexPolygon ConvexPolygon::expand(const Vector& v) const
+ConvexPolygon ConvexPolygon::expand(const Vector& expansion_vector) const
 {
     // ASCII art showing an expanded ConvexPolygon
     //
@@ -217,47 +217,46 @@ ConvexPolygon ConvexPolygon::expand(const Vector& v) const
     //
 
     std::vector<Point> expanded_points;
-    Point c = centroid();
+    Point centroid_point = centroid();
 
-    enum Orientation
+    // left and right is with respect to the vector pointing straight up
+    enum SideOfDividingLine
     {
         LEFT,
         RIGHT,
         ON_THE_LINE
     };
 
-    // Draws a line perpendicular to v along c and returns which side of the line the
-    // point p is on
-    auto orientation = [&](const Point& p) {
-        Point b1 = c + v.perpendicular();
-        Point b2 = c - v.perpendicular();
-        double d =
-            (p.x() - b1.x()) * (b2.y() - b1.y()) - (p.y() - b1.y()) * (b2.x() - b1.x());
+    // For a dividing line through centroid_point and perpendicular to the
+    // expansion_vector, returns which side of the line the point p is on
+    auto side_of_dividing_line = [&](const Point& p) {
+        double d = (p - centroid_point).cross(expansion_vector.perpendicular());
         if (d == 0)
         {
-            return Orientation::ON_THE_LINE;
+            return SideOfDividingLine::ON_THE_LINE;
         }
         else if (d < 0)
         {
-            return Orientation::LEFT;
+            return SideOfDividingLine::LEFT;
         }
         else
         {
-            return Orientation::RIGHT;
+            return SideOfDividingLine::RIGHT;
         }
     };
 
-    Orientation orientation_of_v = orientation(c + v);
+    SideOfDividingLine side_of_dividing_line_of_expansion_vector =
+        side_of_dividing_line(centroid_point + expansion_vector);
 
-    for (const auto& p : points_)
+    for (const auto& point : points_)
     {
-        if (orientation(p) == orientation_of_v)
+        if (side_of_dividing_line(point) == side_of_dividing_line_of_expansion_vector)
         {
-            expanded_points.push_back(p + v);
+            expanded_points.push_back(point + expansion_vector);
         }
         else
         {
-            expanded_points.push_back(p);
+            expanded_points.push_back(point);
         }
     }
     return ConvexPolygon(expanded_points);

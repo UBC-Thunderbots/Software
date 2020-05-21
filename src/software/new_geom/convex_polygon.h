@@ -26,13 +26,13 @@ class ConvexPolygon : public Polygon, public ConvexShape
     Point centroid() const;
 
     /**
-     * Returns the ConvexPolygon expanded in the direction of v
-     * The ConvexPolygon is split in half perpendicular to v and points on the half that
-     * v is pointing are translated by v
+     * Returns the ConvexPolygon expanded in the direction of expansion_vector
+     * The ConvexPolygon is split in half perpendicular to expansion_vector and points on
+     * the half that expansion_vector is pointing are translated by expansion_vector
      *
-     * @return a ConvexPolygon expanded in the direction of v
+     * @return a ConvexPolygon expanded in the direction of expansion_vector
      */
-    ConvexPolygon expand(const Vector& v) const;
+    ConvexPolygon expand(const Vector& expansion_vector) const;
 
     /**
      * Construct a convex polygon by drawing line segments between consecutive
