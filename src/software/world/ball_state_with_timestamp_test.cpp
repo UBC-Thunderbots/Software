@@ -2,20 +2,6 @@
 
 #include <gtest/gtest.h>
 
-TEST(BallStateWithTimestampTest, get_position)
-{
-    BallStateWithTimestamp ball_state(Point(1, -2.3), Vector(0, 0.4),
-                                      Timestamp::fromSeconds(1.1));
-    EXPECT_EQ(ball_state.position(), Point(1, -2.3));
-}
-
-TEST(BallStateWithTimestampTest, get_velocity)
-{
-    BallStateWithTimestamp ball_state(BallState(Point(1, -2.3), Vector(0, 0.4)),
-                                      Timestamp::fromSeconds(0.1));
-    EXPECT_EQ(ball_state.velocity(), Vector(0, 0.4));
-}
-
 TEST(BallStateWithTimestampTest, get_timestamp)
 {
     BallStateWithTimestamp ball_state(Point(1, -2.3), Vector(0, 0.4),

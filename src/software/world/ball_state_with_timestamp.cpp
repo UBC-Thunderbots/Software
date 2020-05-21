@@ -20,7 +20,7 @@ Timestamp BallStateWithTimestamp::timestamp() const
 
 BallState BallStateWithTimestamp::getBallState() const
 {
-    return BallState(position_, velocity_);
+    return BallState(position(), velocity());
 }
 
 bool BallStateWithTimestamp::operator==(const BallStateWithTimestamp &other) const

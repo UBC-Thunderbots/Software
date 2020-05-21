@@ -51,7 +51,7 @@ class BallState
      */
     bool operator!=(const BallState& other) const;
 
-   protected:
+   private:
     Point position_;
     Vector velocity_;
 };
