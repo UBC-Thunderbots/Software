@@ -7,42 +7,6 @@
     9000  // The maximum size of the array containing trajectory elements. Assuming the
           // longest possible path is 9 meters with 1mm segments
 
-// Struct that defines a single point on a trajectory
-// Includes the Position and Time data corresponding to that point
-typedef struct PositionTrajectoryElement
-{
-    Vector2d_t position;
-    float time;
-} PositionTrajectoryElement_t;
-
-typedef struct PositionTrajectory
-{
-    PositionTrajectoryElement_t* trajectory_elements;
-    unsigned int num_elements;
-} PositionTrajectory_t;
-
-// Struct that defines a single point on a velocity trajectory
-// Includes the velocity and Time data corresponding to that point
-typedef struct VelocityTrajectoryElement
-{
-    Vector2d_t linear_velocity;
-    float angular_velocity;
-    float time;
-} VelocityTrajectoryElement_t;
-
-typedef struct VelocityTrajectory
-{
-    PositionTrajectoryElement_t* trajectory_elements;
-    unsigned int num_elements;
-} VelocityTrajectory_t;
-
-typedef enum TrajectoryPlannerGenerationStatus
-{
-    OK                        = 0,
-    FINAL_VELOCITY_TOO_HIGH   = 1,
-    INITIAL_VELOCITY_TOO_HIGH = 2,
-} TrajectoryPlannerGenerationStatus_t;
-
 typedef struct FirmwareRobotPathParameters
 {
     // The 2D polynomial representation of the path to be followed
@@ -70,6 +34,42 @@ typedef struct FirmwareRobotPathParameters
     // The final speed at the end of the trajectory [m/s]
     float final_speed;
 } FirmwareRobotPathParameters_t;
+
+// Struct that defines a single point on a trajectory
+// Includes the Position and Time data corresponding to that point
+typedef struct PositionTrajectoryElement
+{
+    Vector2d_t position;
+    float time;
+} PositionTrajectoryElement_t;
+
+typedef struct PositionTrajectory
+{
+    PositionTrajectoryElement_t* trajectory_elements;
+    FirmwareRobotPathParameters_t path_parameters;
+} PositionTrajectory_t;
+
+// Struct that defines a single point on a velocity trajectory
+// Includes the velocity and Time data corresponding to that point
+typedef struct VelocityTrajectoryElement
+{
+    Vector2d_t linear_velocity;
+    float angular_velocity;
+    float time;
+} VelocityTrajectoryElement_t;
+
+typedef struct VelocityTrajectory
+{
+    VelocityTrajectoryElement_t* trajectory_elements;
+    unsigned int num_elements;
+} VelocityTrajectory_t;
+
+typedef enum TrajectoryPlannerGenerationStatus
+{
+    OK                        = 0,
+    FINAL_VELOCITY_TOO_HIGH   = 1,
+    INITIAL_VELOCITY_TOO_HIGH = 2,
+} TrajectoryPlannerGenerationStatus_t;
 
 /**
  * Returns a planned trajectory with the list of guarantees based on the assumptions below
@@ -116,7 +116,7 @@ typedef struct FirmwareRobotPathParameters
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantArcLengthTrajectory(
-    FirmwareRobotPathParameters_t path_parameters, PositionTrajectory_t* trajectory);
+    PositionTrajectory_t* trajectory);
 
 /**
  * Returns a constant interpolation period (time) trajectory based on an input trajectory
@@ -284,16 +284,3 @@ void static app_trajectory_planner_generateTimeProfile(
 void static app_trajectory_planner_reverseTrajectoryDirection(
     PositionTrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const unsigned int num_segments);
-
-/***
- * This function generates a velocity trajectory that corresponds to the time-optimal
- * velocity to follow a specified path
- *
- * @param path_parameters [in] Parameters defining the path and physical limitations of
- * kinematics
- * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
- * time-optimal velocity to follow a specified path
- */
-TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
-    FirmwareRobotPathParameters_t path_parameters,
-    VelocityTrajectory_t* velocity_trajectory);

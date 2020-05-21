@@ -12,24 +12,22 @@
 // http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantArcLengthTrajectory(
-    FirmwareRobotPathParameters_t path_parameters, PositionTrajectory_t* trajectory)
+    PositionTrajectory_t* trajectory)
 {
     // Set the internal path parameter variables
     PositionTrajectoryElement_t* traj_elements = trajectory->trajectory_elements;
 
-    float final_speed                      = path_parameters.final_speed;
-    float initial_speed                    = path_parameters.initial_speed;
-    const float max_allowable_acceleration = path_parameters.max_allowable_acceleration;
-    const float max_allowable_speed        = path_parameters.max_allowable_speed;
-    const unsigned int num_segments        = path_parameters.num_segments;
-    const Polynomial2dOrder3_t path        = path_parameters.path;
-    float t_end                            = path_parameters.t_end;
-    float t_start                          = path_parameters.t_start;
+    float final_speed   = trajectory->path_parameters.final_speed;
+    float initial_speed = trajectory->path_parameters.initial_speed;
+    const float max_allowable_acceleration =
+        trajectory->path_parameters.max_allowable_acceleration;
+    const float max_allowable_speed = trajectory->path_parameters.max_allowable_speed;
+    const unsigned int num_segments = trajectory->path_parameters.num_segments;
+    const Polynomial2dOrder3_t path = trajectory->path_parameters.path;
+    float t_end                     = trajectory->path_parameters.t_end;
+    float t_start                   = trajectory->path_parameters.t_start;
 
     TrajectoryPlannerGenerationStatus_t generation_status = OK;
-
-
-    trajectory->num_elements = path_parameters.num_segments;
 
     // Variable used to flag if the path is moving "backwards" along the input path
     bool reverse_parameterization = false;
@@ -159,7 +157,8 @@ void app_trajectory_planner_interpolateConstantTimeTrajectory(
 
     // Loop until we find a value JUST larger than the expected
     // Check the element prior and perform linear interpolation
-    for (unsigned int i = 1; i < variable_time_trajectory->num_elements; i++)
+    for (unsigned int i = 1; i < variable_time_trajectory->path_parameters.num_segments;
+         i++)
     {
         while (variable_time_trajectory->trajectory_elements[i].time >= trajectory_time)
         {
@@ -198,7 +197,7 @@ void app_trajectory_planner_interpolateConstantTimeTrajectory(
         }
     }
 
-    constant_period_trajectory->num_elements = time_periods;
+    constant_period_trajectory->path_parameters.num_segments = time_periods;
 }
 
 static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
@@ -334,70 +333,4 @@ void app_trajectory_planner_reverseTrajectoryDirection(
         forwards[i].position = reverse[i].position;
         forwards[i].time     = reverse[i].time;
     }
-}
-
-TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
-    FirmwareRobotPathParameters_t path_parameters,
-    VelocityTrajectory_t* velocity_trajectory)
-{
-    VelocityTrajectoryElement_t* trajectory_elements =
-        velocity_trajectory->trajectory_elements;
-
-    // Create the parmeterization to contain the desired number of segments
-    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_parameterization,
-                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
-
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    shared_polynomial_getArcLengthParametrizationOrder3(
-        path_parameters.path, path_parameters.t_start, path_parameters.t_end,
-        arc_length_parameterization);
-
-    const float arc_segment_length =
-        shared_polynomial2d_getTotalArcLength(arc_length_parameterization) /
-        path_parameters.num_segments;
-
-
-    app_trajectory_planner_getMaxAllowableSpeedProfile(
-        max_allowable_speed_profile, path_parameters.path, path_parameters.num_segments,
-        arc_length_parameterization, arc_segment_length,
-        path_parameters.max_allowable_acceleration);
-
-    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    velocity_profile[0] = path_parameters.initial_speed;
-    app_trajectory_planner_generateForwardsContinuousVelocityProfile(
-        path_parameters.num_segments, velocity_profile, max_allowable_speed_profile,
-        arc_segment_length, path_parameters.max_allowable_acceleration,
-        path_parameters.max_allowable_speed);
-
-    // Check that it was physically possible for the robot to reach the final velocity
-    // requested
-    TrajectoryPlannerGenerationStatus_t status = OK;
-    if (velocity_profile[path_parameters.num_segments - 1] >= path_parameters.final_speed)
-    {
-        velocity_profile[path_parameters.num_segments - 1] = path_parameters.final_speed;
-    }
-    else
-    {
-        status = FINAL_VELOCITY_TOO_HIGH;
-    }
-
-    app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
-        path_parameters.num_segments, velocity_profile, arc_segment_length,
-        path_parameters.max_allowable_acceleration);
-
-    // Check that it was physically possible for the robot to stay on the path considering
-    // the initial velocity
-    if (velocity_profile[0] <= path_parameters.initial_speed)
-        path_parameters.initial_speed)
-        {
-            velocity_profile[0] = path_parameters.initial_speed;
-        }
-    else
-    {
-        status = INITIAL_VELOCITY_TOO_HIGH;
-    }
-
-    return status;
 }
