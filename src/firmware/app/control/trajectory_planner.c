@@ -10,12 +10,12 @@
 
 // The following function is based on an algorithm described in page 18 of:
 // http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
-TrajectoryPlannerGenerationStatus
+TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantArcLengthTrajectory(
-    FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory)
+    FirmwareRobotPathParameters_t path_parameters, PositionTrajectory_t* trajectory)
 {
     // Set the internal path parameter variables
-    TrajectoryElement_t* traj_elements = trajectory->trajectory_elements;
+    PositionTrajectoryElement_t* traj_elements = trajectory->trajectory_elements;
 
     float final_speed                      = path_parameters.final_speed;
     float initial_speed                    = path_parameters.initial_speed;
@@ -26,7 +26,7 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
     float t_end                            = path_parameters.t_end;
     float t_start                          = path_parameters.t_start;
 
-    TrajectoryPlannerGenerationStatus generation_status = OK;
+    TrajectoryPlannerGenerationStatus_t generation_status = OK;
 
 
     trajectory->num_elements = path_parameters.num_segments;
@@ -143,8 +143,8 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
 
 
 void app_trajectory_planner_interpolateConstantTimeTrajectory(
-    Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
-    const float interpolation_period)
+    PositionTrajectory_t* constant_period_trajectory,
+    PositionTrajectory_t* variable_time_trajectory, const float interpolation_period)
 {
     // The first point is the same for each trajectory
     constant_period_trajectory->trajectory_elements[0].time =
@@ -202,7 +202,7 @@ void app_trajectory_planner_interpolateConstantTimeTrajectory(
 }
 
 static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
-    TrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    PositionTrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, const unsigned int num_elements,
     ArcLengthParametrization_t arc_length_parameterization,
     const float arc_segment_length)
@@ -302,7 +302,7 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
 }
 
 void app_trajectory_planner_generateTimeProfile(
-    TrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    PositionTrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const float num_segments, const float arc_segment_length,
     float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
@@ -316,10 +316,10 @@ void app_trajectory_planner_generateTimeProfile(
 }
 
 void app_trajectory_planner_reverseTrajectoryDirection(
-    TrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    PositionTrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const unsigned int num_segments)
 {
-    TrajectoryElement_t reverse[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    PositionTrajectoryElement_t reverse[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     const float path_duration = forwards[num_segments - 1].time;
 
     for (unsigned int i = 0; i < num_segments; i++)
@@ -334,4 +334,70 @@ void app_trajectory_planner_reverseTrajectoryDirection(
         forwards[i].position = reverse[i].position;
         forwards[i].time     = reverse[i].time;
     }
+}
+
+TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
+    FirmwareRobotPathParameters_t path_parameters,
+    VelocityTrajectory_t* velocity_trajectory)
+{
+    VelocityTrajectoryElement_t* trajectory_elements =
+        velocity_trajectory->trajectory_elements;
+
+    // Create the parmeterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_parameterization,
+                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    shared_polynomial_getArcLengthParametrizationOrder3(
+        path_parameters.path, path_parameters.t_start, path_parameters.t_end,
+        arc_length_parameterization);
+
+    const float arc_segment_length =
+        shared_polynomial2d_getTotalArcLength(arc_length_parameterization) /
+        path_parameters.num_segments;
+
+
+    app_trajectory_planner_getMaxAllowableSpeedProfile(
+        max_allowable_speed_profile, path_parameters.path, path_parameters.num_segments,
+        arc_length_parameterization, arc_segment_length,
+        path_parameters.max_allowable_acceleration);
+
+    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    velocity_profile[0] = path_parameters.initial_speed;
+    app_trajectory_planner_generateForwardsContinuousVelocityProfile(
+        path_parameters.num_segments, velocity_profile, max_allowable_speed_profile,
+        arc_segment_length, path_parameters.max_allowable_acceleration,
+        path_parameters.max_allowable_speed);
+
+    // Check that it was physically possible for the robot to reach the final velocity
+    // requested
+    TrajectoryPlannerGenerationStatus_t status = OK;
+    if (velocity_profile[path_parameters.num_segments - 1] >= path_parameters.final_speed)
+    {
+        velocity_profile[path_parameters.num_segments - 1] = path_parameters.final_speed;
+    }
+    else
+    {
+        status = FINAL_VELOCITY_TOO_HIGH;
+    }
+
+    app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
+        path_parameters.num_segments, velocity_profile, arc_segment_length,
+        path_parameters.max_allowable_acceleration);
+
+    // Check that it was physically possible for the robot to stay on the path considering
+    // the initial velocity
+    if (velocity_profile[0] <= path_parameters.initial_speed)
+        path_parameters.initial_speed)
+        {
+            velocity_profile[0] = path_parameters.initial_speed;
+        }
+    else
+    {
+        status = INITIAL_VELOCITY_TOO_HIGH;
+    }
+
+    return status;
 }
