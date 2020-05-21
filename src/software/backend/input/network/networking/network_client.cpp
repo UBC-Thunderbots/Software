@@ -172,7 +172,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             {
                 TimestampedBallState ball_state =
                     network_filter.getFilteredBallData({detection});
-                world.updateBallState(ball_state);
+                world.updateBallStateWithTimestamp(ball_state);
 
                 Team friendly_team =
                     network_filter.getFilteredFriendlyTeamData({detection});

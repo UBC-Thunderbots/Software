@@ -52,7 +52,7 @@ class World final
      *
      * @param new_ball_data A BallState containing new ball information
      */
-    void updateBallState(const TimestampedBallState& new_ball_state);
+    void updateBallStateWithTimestamp(const TimestampedBallState& new_ball_state);
 
     /**
      * Updates the state of the friendly team in the world with the new team data

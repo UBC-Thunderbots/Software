@@ -15,7 +15,7 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     world.mutableFriendlyTeam().updateRobots({robot});
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
-    world.updateBallState(ballState);
+    world.updateBallStateWithTimestamp(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -47,7 +47,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
                                                      Timestamp::fromSeconds(0));
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
-    world.updateBallState(ballState);
+    world.updateBallStateWithTimestamp(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -120,7 +120,7 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
                                                      Timestamp::fromSeconds(0));
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
-    world.updateBallState(ballState);
+    world.updateBallStateWithTimestamp(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -152,7 +152,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
                                                      Timestamp::fromSeconds(0));
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
-    world.updateBallState(ballState);
+    world.updateBallStateWithTimestamp(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -183,7 +183,7 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
 
     TimestampedBallState ballState(Point(0.5, 0), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
-    world.updateBallState(ballState);
+    world.updateBallStateWithTimestamp(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -203,7 +203,7 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
 
     TimestampedBallState ballState(Point(3, -2.5), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
-    world.updateBallState(ballState);
+    world.updateBallStateWithTimestamp(ballState);
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),

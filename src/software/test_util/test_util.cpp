@@ -70,7 +70,7 @@ namespace Test
     {
         TimestampedBallState ballState =
             TimestampedBallState(ball_position, world.ball().velocity(), timestamp);
-        world.updateBallState(ballState);
+        world.updateBallStateWithTimestamp(ballState);
 
         return world;
     }
@@ -80,7 +80,7 @@ namespace Test
     {
         TimestampedBallState ballState =
             TimestampedBallState(world.ball().position(), ball_velocity, timestamp);
-        world.updateBallState(ballState);
+        world.updateBallStateWithTimestamp(ballState);
 
         return world;
     }
