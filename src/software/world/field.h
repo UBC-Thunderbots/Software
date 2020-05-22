@@ -145,11 +145,12 @@ class Field
     Point centerPoint() const;
 
     /**
-     * Returns the center line of the field (as a segment)
+     * Returns the halfway line of the field (as a segment)
+     * The segment is on the Y axis and is bounded by the field lines
      *
      * @return the center line of the field
      */
-    Segment centerLine() const;
+    Segment halfwayLine() const;
 
     /**
      * Gets the width of the defense area in metres, which runs along the y-axis. This is

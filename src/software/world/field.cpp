@@ -175,7 +175,7 @@ Point Field::centerPoint() const
     return Point(0, 0);
 }
 
-Segment Field::centerLine() const
+Segment Field::halfwayLine() const
 {
     return Segment({0, friendlyCornerPos().y()}, {0, friendlyCornerNeg().y()});
 }

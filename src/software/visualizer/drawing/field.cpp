@@ -37,7 +37,7 @@ void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
 
 void drawCenterLine(QGraphicsScene* scene, const Field& field, QPen pen)
 {
-    drawSegment(scene, field.centerLine(), pen);
+    drawSegment(scene, field.halfwayLine(), pen);
 }
 
 void drawCenterCircle(QGraphicsScene* scene, const Field& field, QPen pen)
