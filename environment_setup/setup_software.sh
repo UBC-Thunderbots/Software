@@ -46,6 +46,7 @@ host_software_packages=(
     qt5-default # The GUI library for our visualizer
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
+    python3       # Python 3
     python3-yaml # yaml for cfg generation (Dynamic Parameters)
     python-minimal # This is required for bazel, we've seen some issues where
                    # the bazel install hasn't installed it properly
@@ -85,21 +86,6 @@ sudo apt-get install bazel -y
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
-    echo "##############################################################"
-    exit 1
-fi
-
-# Install Python3
-echo "================================================================"
-echo "Installing Python3"
-echo "================================================================"
-
-# Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
-sudo apt-get update
-sudo apt-get install python3 -y
-if [ $? -ne 0 ]; then
-    echo "##############################################################"
-    echo "Error: Installing Python failed"
     echo "##############################################################"
     exit 1
 fi

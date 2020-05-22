@@ -46,7 +46,7 @@ class TestDifferenceEquation(unittest.TestCase):
         using the python control toolbox
         """
 
-        sample_time = 0.0001  # [s]
+        sample_time = 0.1  # [s]
         end_time = 5
 
         J = 0.001
@@ -83,7 +83,7 @@ class TestDifferenceEquation(unittest.TestCase):
         using the python control toolbox
         """
 
-        sample_time = 0.0001  # [s]
+        sample_time = 0.01  # [s]
         end_time = 20
 
         J = 0.01
@@ -116,11 +116,11 @@ class TestDifferenceEquation(unittest.TestCase):
 
     def test_run_for_ticks(self):
         """
-        This test checks the step response of the DifferenceEquation class vs the discrete transfer function (2nd order)
-        using the python control toolbox
+        This test checks the run_for_ticks member function to ensure that the difference equation is ran for exactly the
+        number of specified iterations
         """
 
-        sample_time = 0.0001  # [s]
+        sample_time = 0.1  # [s]
         end_time = 20
 
         J = 0.01
@@ -143,14 +143,29 @@ class TestDifferenceEquation(unittest.TestCase):
         T = np.linspace(0, end_time, num_points)
         T, yout = ct.step_response(discrete_tf, T)
 
-        difference_equation.run_for_ticks(num_points, 1)
+        difference_equation.run_for_ticks(num_points, step_input)
 
         system_response = difference_equation.get_output_history()
 
         for i in range(0, len(T)):
             self.assertAlmostEqual(yout[i], system_response[i], 4)
 
-        difference_equation.time_step_count = num_points
+        self.assertEqual(num_points, difference_equation.get_timestep_count())
+
+    def test_get_time_step_count(self):
+        """
+        This test checks the get_time_step_count() member function to ensure it returns the exact numer of steps
+        the difference equation has iterated through
+        """
+
+        denominator = [1, 2, 4]
+        numerator = [1]
+
+        difference_equation = de.DifferenceEquation(denominator, numerator);
+
+        for i in range(0, 100):
+            self.assertEqual(difference_equation.get_timestep_count() , i)
+            difference_equation.tick(0)
 
 
 if __name__ == "__main__":
