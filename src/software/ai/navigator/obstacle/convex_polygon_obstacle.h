@@ -21,13 +21,7 @@ class ConvexPolygonObstacle : public Obstacle
     double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
-
-    /**
-     * Gets the underlying convex_polygon
-     *
-     * @return convex_polygon
-     */
-    const ConvexPolygon getConvexPolygon(void) const;
+    const ObstacleShape getObstacleShape(void) const override;
 
    private:
     ConvexPolygon convex_polygon_;

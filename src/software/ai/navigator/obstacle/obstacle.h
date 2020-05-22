@@ -1,13 +1,34 @@
 #pragma once
 
 #include <sstream>
+#include <variant>
 
 #include "shared/constants.h"
+#include "software/new_geom/circle.h"
+#include "software/new_geom/convex_polygon.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
+
+// Creates a struct which inherits all lambda function given to it and uses their
+// Ts::operator(). This can be passed to std::visit to easily write multiple different
+// lambdas for each type of motion controller commands below. See
+// https://en.cppreference.com/w/cpp/utility/variant/visit for more details.
+template <class... Ts>
+struct overload : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overload(Ts...)->overload<Ts...>;
+
+/**
+ * We use this variant when we need to know the underlying shape of the obstacle, e.g. in
+ * tests and for drawing with the visualizer
+ */
+using ObstacleShape = std::variant<ConvexPolygon, Circle>;
 
 /**
  * An obstacle is an area to avoid for navigation
@@ -46,6 +67,13 @@ class Obstacle
      * @return string that describes the obstacle
      */
     virtual std::string toString(void) const = 0;
+
+    /**
+     * Gets the shape of the obstacle
+     *
+     * @return The ObstacleShape
+     */
+    virtual const ObstacleShape getObstacleShape(void) const = 0;
 };
 
 /**

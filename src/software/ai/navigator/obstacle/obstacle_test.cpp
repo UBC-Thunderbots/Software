@@ -15,23 +15,46 @@
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {
     ConvexPolygonObstacle convex_polygon_obstacle(Rectangle({-1, 1}, {2, -3}));
-
-    ConvexPolygon expected = ConvexPolygon({
+    ConvexPolygon expected       = ConvexPolygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
+    ObstacleShape obstacle_shape = convex_polygon_obstacle.getObstacleShape();
 
-    EXPECT_EQ(expected, convex_polygon_obstacle.getConvexPolygon());
+    std::visit(overload{[&obstacle_shape, expected](const ConvexPolygon& convex_polygon) {
+                            EXPECT_EQ(expected, convex_polygon);
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
+                            ADD_FAILURE()
+                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                        },
+                        [](auto arg) {
+                            throw std::invalid_argument(
+                                "Unrecognized type passed via std::variant");
+                        }},
+               obstacle_shape);
 }
 
 TEST(NavigatorObstacleTest, create_from_circle)
 {
     Circle expected({2, 2}, 3);
     CircleObstacle circle_obstacle(expected);
+    ObstacleShape obstacle_shape = circle_obstacle.getObstacleShape();
 
-    EXPECT_EQ(circle_obstacle.getCircle(), expected);
+    std::visit(overload{[&obstacle_shape, expected](const ConvexPolygon& convex_polygon) {
+                            ADD_FAILURE()
+                                << "Expected Circle, Obstacle was of type ConvexPolygon";
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
+                            EXPECT_EQ(circle, expected);
+                        },
+                        [](auto arg) {
+                            throw std::invalid_argument(
+                                "Unrecognized type passed via std::variant");
+                        }},
+               obstacle_shape);
 }
 
 TEST(NavigatorObstacleTest, convex_polygon_obstacle_stream_operator_test)

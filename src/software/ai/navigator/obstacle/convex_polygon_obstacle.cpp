@@ -27,9 +27,9 @@ std::string ConvexPolygonObstacle::toString(void) const
     return ss.str();
 }
 
-const ConvexPolygon ConvexPolygonObstacle::getConvexPolygon(void) const
+const ObstacleShape ConvexPolygonObstacle::getObstacleShape(void) const
 {
-    return convex_polygon_;
+    return ObstacleShape(convex_polygon_);
 }
 
 std::ostream& operator<<(std::ostream& os,

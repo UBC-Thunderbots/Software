@@ -31,16 +31,21 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
     ObstaclePtr obstacle = obstacle_factory.createObstacleFromRectangle(rectangle);
+    ObstacleShape obstacle_shape = obstacle->getObstacleShape();
 
-    try
-    {
-        auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected, polygon_obstacle.getConvexPolygon());
-    }
-    catch (std::bad_cast)
-    {
-        ADD_FAILURE() << "ConvexPolygonObstaclePtr was not created for a rectangle";
-    }
+    std::visit(overload{[&obstacle_shape, expected](const ConvexPolygon& convex_polygon) {
+                            EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+                                expected, convex_polygon, METERS_PER_MILLIMETER));
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
+                            ADD_FAILURE()
+                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                        },
+                        [](auto arg) {
+                            throw std::invalid_argument(
+                                "Unrecognized type passed via std::variant");
+                        }},
+               obstacle_shape);
 }
 
 TEST_F(ObstacleFactoryTest, create_ball_obstacle)
@@ -132,18 +137,21 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
                       Point(-2.067, 4.974), Point(-1.694, 5.444), Point(-1.759, 5.496)});
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
     ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstacleShape obstacle_shape = obstacle->getObstacleShape();
 
-    try
-    {
-        auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
-        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-            expected, polygon_obstacle.getConvexPolygon(), METERS_PER_MILLIMETER));
-    }
-    catch (std::bad_cast)
-    {
-        ADD_FAILURE()
-            << "ConvexPolygonObstaclePtr was not created for a fast moving robot";
-    }
+    std::visit(overload{[&obstacle_shape, expected](const ConvexPolygon& convex_polygon) {
+                            EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+                                expected, convex_polygon, METERS_PER_MILLIMETER));
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
+                            ADD_FAILURE()
+                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                        },
+                        [](auto arg) {
+                            throw std::invalid_argument(
+                                "Unrecognized type passed via std::variant");
+                        }},
+               obstacle_shape);
 }
 
 TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
@@ -156,16 +164,19 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
                       Point(1.241, -0.192), Point(0.883, 1.586), Point(0.801, 1.569)});
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
     ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstacleShape obstacle_shape = obstacle->getObstacleShape();
 
-    try
-    {
-        auto polygon_obstacle = dynamic_cast<ConvexPolygonObstacle&>(*obstacle);
-        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-            expected, polygon_obstacle.getConvexPolygon()));
-    }
-    catch (std::bad_cast)
-    {
-        ADD_FAILURE()
-            << "ConvexPolygonObstaclePtr was not created for a fast moving robot";
-    }
+    std::visit(overload{[&obstacle_shape, expected](const ConvexPolygon& convex_polygon) {
+                            EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+                                expected, convex_polygon, METERS_PER_MILLIMETER));
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
+                            ADD_FAILURE()
+                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                        },
+                        [](auto arg) {
+                            throw std::invalid_argument(
+                                "Unrecognized type passed via std::variant");
+                        }},
+               obstacle_shape);
 }

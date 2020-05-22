@@ -24,6 +24,11 @@ std::string CircleObstacle::toString(void) const
     return ss.str();
 }
 
+const ObstacleShape CircleObstacle::getObstacleShape(void) const
+{
+    return ObstacleShape(circle_);
+}
+
 const Circle CircleObstacle::getCircle(void) const
 {
     return circle_;

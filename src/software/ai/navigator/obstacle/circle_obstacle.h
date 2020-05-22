@@ -22,6 +22,7 @@ class CircleObstacle : public Obstacle
     double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
+    const ObstacleShape getObstacleShape(void) const override;
 
     /**
      * Gets the underlying circle
