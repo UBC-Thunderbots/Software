@@ -108,7 +108,5 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
-
-    // The backend that handles reading and processing protobuf messages
     SSLProtobufReader ssl_protobuf_reader;
 };

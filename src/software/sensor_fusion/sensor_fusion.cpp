@@ -40,9 +40,17 @@ void SensorFusion::updateWorld(SSL_WrapperPacket packet)
 {
     if (packet.has_geometry())
     {
-        const auto &latest_geometry_data = packet.geometry();
-        Field field = ssl_protobuf_reader.getFieldData(latest_geometry_data);
-        world.updateFieldGeometry(field);
+        std::optional<Field> field = ssl_protobuf_reader.getField(packet.geometry());
+        if (field)
+        {
+            world.updateFieldGeometry(*field);
+        }
+        else
+        {
+            LOG(WARNING)
+                << "Invalid field packet has been detected, which means field may be unreliable "
+                << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
+        }
     }
 
     if (packet.has_detection())

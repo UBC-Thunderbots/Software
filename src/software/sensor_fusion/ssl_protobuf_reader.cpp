@@ -1,35 +1,11 @@
 #include "software/sensor_fusion/ssl_protobuf_reader.h"
 
-// We can initialize the field_state with all zeroes here because this state will never
-// be accessed by an external observer to this class. the getFieldData must be called to
-// get any field data which will update the state with the given protobuf data
-SSLProtobufReader::SSLProtobufReader()
-    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0))
-{
-}
+SSLProtobufReader::SSLProtobufReader() {}
 
-Field SSLProtobufReader::getFieldData(const SSL_GeometryData &geometry_packet)
+std::optional<Field> SSLProtobufReader::getField(
+    const SSL_GeometryData &geometry_packet) const
 {
     SSL_GeometryFieldSize field_data = geometry_packet.field();
-    std::optional<Field> field_opt   = createFieldFromPacketGeometry(field_data);
-
-    if (field_opt)
-    {
-        field_state = *field_opt;
-    }
-    else
-    {
-        LOG(WARNING)
-            << "Invalid field packet has been detected, which means field_state may be unreliable "
-            << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
-    }
-
-    return field_state;
-}
-
-std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
-    const SSL_GeometryFieldSize &packet_geometry) const
-{
     // We can't guarantee the order that any geometry elements are passed to us in, so
     // We map the name of each line/arc to the actual object so we can refer to them
     // consistently
@@ -40,11 +16,9 @@ std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
     //
     // Arc names:
     // CenterCircle
-    for (int i = 0; i < packet_geometry.field_arcs_size(); i++)
+    for (const auto &arc : field_data.field_arcs())
     {
-        const SSL_FieldCicularArc &arc = packet_geometry.field_arcs(i);
-        std::string arc_name           = arc.name();
-        ssl_circular_arcs[arc_name]    = arc;
+        ssl_circular_arcs[arc.name()] = arc;
     }
 
     // Field Lines
@@ -68,11 +42,9 @@ std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
     // LeftFieldRightPenaltyStretch
     // RightFieldLeftPenaltyStretch
     // RightFieldRightPenaltyStretch
-    for (int i = 0; i < packet_geometry.field_lines_size(); i++)
+    for (const auto &line : field_data.field_lines())
     {
-        const SSL_FieldLineSegment &line = packet_geometry.field_lines(i);
-        std::string line_name            = line.name();
-        ssl_field_lines[line_name]       = line;
+        ssl_field_lines[line.name()] = line;
     }
 
     // Check that CenterCircle exists before using it
@@ -83,10 +55,10 @@ std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
     }
 
     // Extract the data we care about and convert all units to meters
-    double field_length   = packet_geometry.field_length() * METERS_PER_MILLIMETER;
-    double field_width    = packet_geometry.field_width() * METERS_PER_MILLIMETER;
-    double goal_width     = packet_geometry.goalwidth() * METERS_PER_MILLIMETER;
-    double boundary_width = packet_geometry.boundary_width() * METERS_PER_MILLIMETER;
+    double field_length   = field_data.field_length() * METERS_PER_MILLIMETER;
+    double field_width    = field_data.field_width() * METERS_PER_MILLIMETER;
+    double goal_width     = field_data.goalwidth() * METERS_PER_MILLIMETER;
+    double boundary_width = field_data.boundary_width() * METERS_PER_MILLIMETER;
     double center_circle_radius =
         ssl_center_circle->second.radius() * METERS_PER_MILLIMETER;
 

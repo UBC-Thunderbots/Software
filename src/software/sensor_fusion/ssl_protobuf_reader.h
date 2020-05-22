@@ -26,16 +26,17 @@ class SSLProtobufReader
      */
     explicit SSLProtobufReader();
 
+    virtual ~SSLProtobufReader() = default;
+
     /**
-     * Returns a new Field object containing the most up to date state of the field given
-     * the new GeometryData information
+     * Returns a Field object given geometry data from a protobuf packet
      *
      * @param geometry_packet The SSL_GeometryData packet containing new field data
      *
-     * @return a Field object containing the most up to date state of the field given the
-     * new GeometryData information
+     * @return A Field object representing the field specified with the provided geometry
+     *      If packet_geometry is not a valid packet, then will return std::nullopt
      */
-    Field getFieldData(const SSL_GeometryData &geometry_packet);
+    std::optional<Field> getField(const SSL_GeometryData &geometry_packet) const;
 
     /**
      * Reads the ball data contained in the list of SSL detection frames and returns the
@@ -105,22 +106,4 @@ class SSLProtobufReader
      * @return whether the camera is enabled
      */
     bool isCameraEnabled(const SSL_DetectionFrame &detection);
-
-    virtual ~SSLProtobufReader() = default;
-
-   private:
-    /**
-     * Creates a Field object given geometry data from a protobuf packet
-     *
-     * @param packet_geometry The SSL_GeometryFieldSize data from a protobuf packet
-     * containing field geometry
-     * @return A Field object representing the field specified with the provided geometry
-     *      If packet_geometry is not a valid packet, then will return std::nullopt
-     */
-    std::optional<Field> createFieldFromPacketGeometry(
-        const SSL_GeometryFieldSize &packet_geometry) const;
-
-    // field_state used to handle the case where an optional field of
-    // the geometry packet that we rely does not exists
-    Field field_state;
 };
