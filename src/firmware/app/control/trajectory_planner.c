@@ -433,7 +433,7 @@ void app_trajectory_planner_generateVelocityTrajectory(
         position_elements[position_trajectory->path_parameters.num_segments - 2]
             .position.y;
 
-    // The unit vector of the direction is 1/magnitide(vector) *vector
+    // The unit vector of the direction is 1/magnitude(vector) *vector
     const float x_velocity_component =
         (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2))) * delta_x *
         position_trajectory
