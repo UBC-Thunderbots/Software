@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <optional>
 
 #include "software/geom/shot.h"
 #include "software/new_geom/circle.h"

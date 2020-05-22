@@ -2,6 +2,8 @@
 
 #include "software/new_geom/util/almost_equal.h"
 #include "software/new_geom/util/collinear.h"
+#define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
+#include "software/new_geom/point_boost_geometry_compatability.h"
 
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
                                   const Point &d, double fixed_epsilon, int ulps_epsilon)

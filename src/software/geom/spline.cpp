@@ -1,5 +1,8 @@
 #include "software/geom/spline.h"
 
+#include <sstream>
+#include <algorithm>
+
 Spline::Spline(const std::vector<Point>& points) : knots(points)
 {
     initLinearSegments(points);

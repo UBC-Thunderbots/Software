@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Box2D/Box2D.h>
+#include <functional>
 
 #include "shared/constants.h"
 #include "software/new_geom/point.h"

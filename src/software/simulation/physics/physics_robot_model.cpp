@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <vector>
 
 #include "software/simulation/physics/box2d_util.h"
 

@@ -1,15 +1,29 @@
 #include "software/geom/voronoi_diagram.h"
 
+#include <boost/polygon/voronoi.hpp>
+
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
+#define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
+#include "software/new_geom/point_boost_geometry_compatability.h"
+
+using boost::polygon::voronoi_builder;
+using boost::polygon::voronoi_vertex;
+
+VoronoiDiagram::VoronoiDiagram(std::vector<Point> points) :
+diagram(std::make_shared<boost::polygon::voronoi_diagram<double>>())
+{
+    construct_voronoi(points.begin(), points.end(), diagram.get());
+    this->points = points;
+}
 
 std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle bounding_box)
 {
     std::vector<Point> intersects;
 
-    for (auto edge : diagram.edges())
+    for (auto edge : diagram->edges())
     {
         // Edges extending outside the rectangle will be infinite edges
         if (!edge.is_finite() && edge.is_primary())
@@ -68,7 +82,7 @@ std::vector<Circle> VoronoiDiagram::voronoiVerticesToOpenCircles(
     // https://stackoverflow.com/questions/34342038/how-to-triangulate-polygons-in-boost
 
     std::vector<Circle> empty_circles;
-    for (auto vertex : diagram.vertices())
+    for (auto vertex : diagram->vertices())
     {
         // We only want to consider vertices within our rectangle
         if (bounding_box.contains(Point(vertex.x(), vertex.y())))
