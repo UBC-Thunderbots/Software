@@ -127,7 +127,6 @@ class TrajectoryPlannerTest : public testing::Test
             position_elements[position_trajectory->path_parameters.num_segments - 2]
                 .position.y;
 
-        // The unit vector of the direction is 1/magnitide(vector) *vector
         unit_vectors.push_back(Vector(delta_x, delta_y).normalize(1));
         return unit_vectors;
     }
@@ -1039,6 +1038,13 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
                 const_interp_trajectory.trajectory_elements[0].time, 0.001);
 }
 
+
+// This test generates a scenario where there is not enough elements in the
+// TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS specified array as there path is quite long and the
+// maximum speed of the path is low. This means that most (likely all) arc-lenght segments
+// require multiple interpolation periods to traverse, and therefore requires more space
+// than the constant arc_length trajectory that is alread 1 element away from
+// TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
 TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elements)
 {
     Polynomial2dOrder3_t path = {

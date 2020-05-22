@@ -67,9 +67,14 @@ typedef struct VelocityTrajectory
 
 typedef enum TrajectoryPlannerGenerationStatus
 {
-    OK                              = 0,
-    FINAL_VELOCITY_TOO_HIGH         = 1,
-    INITIAL_VELOCITY_TOO_HIGH       = 2,
+    OK                        = 0,
+    FINAL_VELOCITY_TOO_HIGH   = 1,
+    INITIAL_VELOCITY_TOO_HIGH = 2,
+
+    // INTERPOLATION_ELEMENT_MAXED_OUT is returned when the constant time interpolation
+    // function uses up all the avaiable array space provided to it. This can happen
+    // because constant interpolation period trajectories do not necessarily have the same
+    // number of elements as their constant arc-length counterparts
     INTERPOLATION_ELEMENT_MAXED_OUT = 3,
 } TrajectoryPlannerGenerationStatus_t;
 

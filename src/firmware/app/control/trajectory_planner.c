@@ -433,13 +433,16 @@ void app_trajectory_planner_generateVelocityTrajectory(
         position_elements[position_trajectory->path_parameters.num_segments - 2]
             .position.y;
 
+    // Get the inverse magnitude of the direction vector for normalization
+    const float vector_magnitude_inverse = (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2)));
+
     // The unit vector of the direction is 1/magnitide(vector) *vector
     const float x_velocity_component =
-        (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2))) * delta_x *
+        vector_magnitude_inverse * delta_x *
         position_trajectory
             ->speed_profile[position_trajectory->path_parameters.num_segments - 1];
     const float y_velocity_component =
-        (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2))) * delta_y *
+        vector_magnitude_inverse * delta_y *
         position_trajectory
             ->speed_profile[position_trajectory->path_parameters.num_segments - 1];
 
