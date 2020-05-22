@@ -4,13 +4,7 @@
 #include "software/parameter/dynamic_parameters.h"
 
 SensorFusion::SensorFusion()
-    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
-      ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
-      friendly_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      enemy_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
+    : ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
       enemy_team_filter(),
@@ -89,7 +83,7 @@ std::optional<Ball> SensorFusion::getBallFromVisionDetection(
 {
     std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
     std::optional<Ball> new_ball =
-        ball_filter.getFilteredData(ball_detections, field_state);
+        ball_filter.getFilteredData(ball_detections, world.field());
     return new_ball;
 }
 
@@ -99,7 +93,7 @@ Team SensorFusion::getFriendlyTeamFromVisionDetection(
     std::vector<RobotDetection> friendly_robot_detections =
         vision_detection.getFriendlyTeamDetections();
     Team new_friendly_team = friendly_team_filter.getFilteredData(
-        friendly_team_state, friendly_robot_detections);
+        world.friendlyTeam(), friendly_robot_detections);
     int friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
                                  ->getRefboxConfig()
                                  ->FriendlyGoalieId()
@@ -114,7 +108,7 @@ Team SensorFusion::getEnemyTeamFromVisionDetection(
     std::vector<RobotDetection> enemy_robot_detections =
         vision_detection.getEnemyTeamDetections();
     Team new_enemy_team =
-        enemy_team_filter.getFilteredData(enemy_team_state, enemy_robot_detections);
+        enemy_team_filter.getFilteredData(world.enemyTeam(), enemy_robot_detections);
     int enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
                               ->getRefboxConfig()
                               ->EnemyGoalieId()
