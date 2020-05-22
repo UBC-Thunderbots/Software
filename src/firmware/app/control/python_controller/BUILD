@@ -22,7 +22,7 @@ py_test(
     srcs = [":difference_equation_test.py"],
     main = ":difference_equation_test.py",
     deps = [
-        "//firmware/app/control/python_controller:difference_equation",
+        ":difference_equation",
         requirement("numpy"),
         requirement("control"),
         requirement("scipy"),
