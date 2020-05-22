@@ -3,13 +3,9 @@ package(default_visibility = ["//software/ai/navigator:__subpackages__"])
 cc_library(
     name = "obstacle",
     srcs = [
-        "circle_obstacle.cpp",
-        "convex_polygon_obstacle.cpp",
         "obstacle.cpp",
     ],
     hdrs = [
-        "circle_obstacle.h",
-        "convex_polygon_obstacle.h",
         "obstacle.h",
     ],
     deps = [
@@ -19,6 +15,7 @@ cc_library(
         "//software/new_geom:point",
         "//software/new_geom:segment",
         "//software/new_geom/util",
+        "//software/util/variant_visitor",
     ],
 )
 

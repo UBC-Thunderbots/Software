@@ -1,7 +1,63 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 
-std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr)
+#include "software/util/variant_visitor/variant_visitor.h"
+
+Obstacle::Obstacle(const Circle& circle) : obstacle_shape_(circle) {}
+
+Obstacle::Obstacle(const ConvexPolygon& convex_polygon) : obstacle_shape_(convex_polygon)
 {
-    os << obstacle_ptr->toString();
+}
+
+bool Obstacle::contains(const Point& p) const
+{
+    return std::visit(
+        overload{[&p](const ConvexPolygon& convex_polygon) -> bool {
+                     return convex_polygon.contains(p);
+                 },
+                 [&p](const Circle& circle) -> bool { return circle.contains(p); }},
+        obstacle_shape_);
+}
+
+double Obstacle::distance(const Point& p) const
+{
+    return std::visit(
+        overload{[&p](const ConvexPolygon& convex_polygon) -> double {
+                     return ::distance(convex_polygon, p);
+                 },
+                 [&p](const Circle& circle) -> double { return ::distance(circle, p); }},
+        obstacle_shape_);
+}
+
+bool Obstacle::intersects(const Segment& segment) const
+{
+    return std::visit(overload{[&segment](const ConvexPolygon& convex_polygon) -> bool {
+                                   return ::intersects(convex_polygon, segment);
+                               },
+                               [&segment](const Circle& circle) -> bool {
+                                   return ::intersects(circle, segment);
+                               }},
+                      obstacle_shape_);
+}
+
+const ObstacleShape Obstacle::getObstacleShape(void) const
+{
+    return obstacle_shape_;
+}
+
+std::string Obstacle::toString(void) const
+{
+    std::ostringstream ss;
+    std::visit(
+        overload{[&ss](const ConvexPolygon& convex_polygon) {
+                     ss << "Obstacle with shape " << convex_polygon;
+                 },
+                 [&ss](const Circle& circle) { ss << "Obstacle with shape " << circle; }},
+        obstacle_shape_);
+    return ss.str();
+}
+
+std::ostream& operator<<(std::ostream& os, const Obstacle& obstacle)
+{
+    os << obstacle.toString();
     return os;
 }

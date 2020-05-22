@@ -24,14 +24,28 @@ using ObstacleShape = std::variant<ConvexPolygon, Circle>;
 class Obstacle
 {
    public:
-    virtual ~Obstacle() = default;
+    Obstacle() = delete;
+
+    /**
+     * Construct a obstacle with a Circle
+     *
+     * @param circle Circle to make obstacle with
+     */
+    explicit Obstacle(const Circle& circle);
+
+    /**
+     * Construct a obstacle with a ConvexPolygon
+     *
+     * @param circle ConvexPolygon to make obstacle with
+     */
+    explicit Obstacle(const ConvexPolygon& convex_polygon);
 
     /**
      * Determines whether the given Point is contained within this Obstacle
      *
      * @return whether the Point p is contained within this Obstacle
      */
-    virtual bool contains(const Point& p) const = 0;
+    bool contains(const Point& p) const;
 
     /**
      * Gets the minimum distance from the obstacle to the point
@@ -40,35 +54,32 @@ class Obstacle
      *
      * @return distance to point
      */
-    virtual double distance(const Point& p) const = 0;
+    double distance(const Point& p) const;
 
     /**
      * Determines whether the given Segment intersects this Obstacle
      *
      * @return true if the given Segment intersects this Obstacle
      */
-    virtual bool intersects(const Segment& segment) const = 0;
+    bool intersects(const Segment& segment) const;
 
     /**
      * Output string to describe the obstacle
      *
      * @return string that describes the obstacle
      */
-    virtual std::string toString(void) const = 0;
+    std::string toString(void) const;
 
     /**
      * Gets the shape of the obstacle
      *
      * @return The ObstacleShape
      */
-    virtual const ObstacleShape getObstacleShape(void) const = 0;
-};
+    const ObstacleShape getObstacleShape(void) const;
 
-/**
- * We use a pointer to Obstacle to support inheritance
- * Note: this is a convenience typedef
- */
-using ObstaclePtr = std::shared_ptr<Obstacle>;
+   private:
+    ObstacleShape obstacle_shape_;
+};
 
 /**
  * Implements the << operator for printing
@@ -78,4 +89,4 @@ using ObstaclePtr = std::shared_ptr<Obstacle>;
  *
  * @return The output stream with the string representation of the class appended
  */
-std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr);
+std::ostream& operator<<(std::ostream& os, const Obstacle& obstacle);
