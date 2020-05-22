@@ -114,22 +114,10 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
-        ":robot_state",
+        ":timestamped_robot_state",
         "//software/geom",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
-    ],
-)
-
-cc_library(
-    name = "robot_state",
-    srcs = ["robot_state.cpp"],
-    hdrs = ["robot_state.h"],
-    deps = [
-        ":robot_capabilities",
-        "//software/geom",
-        "//software/new_geom:angular_velocity",
-        "//software/time:timestamp",
     ],
 )
 
@@ -138,6 +126,50 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "timestamped_robot_state",
+    srcs = ["timestamped_robot_state.cpp"],
+    hdrs = ["timestamped_robot_state.h"],
+    deps = [
+        ":robot_state",
+        "//software/new_geom:angle",
+        "//software/new_geom:angular_velocity",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/time:timestamp",
+    ],
+)
+
+cc_test(
+    name = "timestamped_robot_state_test",
+    srcs = ["timestamped_robot_state_test.cpp"],
+    deps = [
+        ":timestamped_robot_state",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "robot_state",
+    srcs = ["robot_state.cpp"],
+    hdrs = ["robot_state.h"],
+    deps = [
+        "//software/new_geom:angle",
+        "//software/new_geom:angular_velocity",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+    ],
+)
+
+cc_test(
+    name = "robot_state_test",
+    srcs = ["robot_state_test.cpp"],
+    deps = [
+        ":robot_state",
         "@gtest//:gtest_main",
     ],
 )
