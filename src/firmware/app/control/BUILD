@@ -23,6 +23,7 @@ cc_test(
     srcs = ["trajectory_planner_test.cpp"],
     deps = [
         ":trajectory_planner",
+        "//software/new_geom:vector",
         "@gtest//:gtest_main",
     ],
 )

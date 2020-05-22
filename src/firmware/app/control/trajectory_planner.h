@@ -277,20 +277,21 @@ void static app_trajectory_planner_generateTimeProfile(
  *
  *  TODO: Remove when #1322 is merged.
  *
- * @param forwards_trajectory This is the trajectory that will be modified in place to become a
- * reverse trajectory
+ * @param forwards_trajectory This is the trajectory that will be modified in place to
+ * become a reverse trajectory
  */
 void static app_trajectory_planner_reverseTrajectoryDirection(
     PositionTrajectory_t* forwards_trajectory);
 
 /***
  * This function generates a velocity trajectory that corresponds to the time-optimal
- * velocity to follow a specified path. This profile is based on the input position trajectory
+ * velocity to follow a specified path. This profile is based on the input position
+ * trajectory
  *
- * @param positionTrajectory [in] The position trajectory to build the velocity trajectory from
+ * @param position_trajectory [in] The position trajectory to build the velocity
+ * trajectory from
  * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
  * time-optimal velocity to follow a specified path
  */
 TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
-        PositionTrajectory_t* positionTrajectory,
-        VelocityTrajectory_t* velocity_trajectory);
+    PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory);
