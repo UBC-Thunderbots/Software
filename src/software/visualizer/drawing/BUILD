@@ -101,6 +101,7 @@ cc_library(
         ":geom",
         "//software/ai/navigator",
         "//software/geom",
+        "//software/util/variant_visitor",
         "//software/visualizer/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],

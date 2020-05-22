@@ -6,6 +6,7 @@
 #include <boost/filesystem.hpp>
 
 #include "software/parameter/parameter.h"
+#include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"
 
 

@@ -11,6 +11,7 @@
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
+#include "software/util/variant_visitor/variant_visitor.h"
 
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {

@@ -9,6 +9,7 @@
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/rectangle.h"
 #include "software/test_util/test_util.h"
+#include "software/util/variant_visitor/variant_visitor.h"
 #include "software/world/robot.h"
 
 

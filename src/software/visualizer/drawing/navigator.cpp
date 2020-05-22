@@ -1,5 +1,7 @@
 #include "software/visualizer/drawing/navigator.h"
 
+#include "software/util/variant_visitor/variant_visitor.h"
+
 AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {
     auto planned_paths = navigator->getPlannedPathPoints();
