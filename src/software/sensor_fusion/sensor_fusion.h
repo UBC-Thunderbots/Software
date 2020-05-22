@@ -70,11 +70,18 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     void updateWorld(RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs);
 
     /**
-     * Updates world based on a new vision detection
+     * Updates world based on a new SSL_GeometryData
      *
-     * @param vision_detection new vision detection
+     * @param geometry_packet new SSL_GeometryData
      */
-    void updateWorld(const VisionDetection &vision_detection);
+    void updateWorld(const SSL_GeometryData &geometry_packet);
+
+    /**
+     * Updates world based on a new SSL_DetectionFrame
+     *
+     * @param ssl_detection_frame new SSL_DetectionFrame
+     */
+    void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
      * Get ball from a vision detection

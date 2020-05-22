@@ -236,10 +236,8 @@ VisionDetection SSLProtobufReader::getVisionDetection(SSL_DetectionFrame detecti
 
     latest_timestamp = Timestamp::fromSeconds(detection.t_capture());
 
-    VisionDetection vision_detection(ball_detections, friendly_team_detections,
-                                     enemy_team_detections, latest_timestamp);
-
-    return vision_detection;
+    return VisionDetection(ball_detections, friendly_team_detections,
+                           enemy_team_detections, latest_timestamp);
 }
 
 // this maps a protobuf Referee_Command enum to its equivalent internal type

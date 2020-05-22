@@ -40,25 +40,27 @@ void SensorFusion::updateWorld(SSL_WrapperPacket packet)
 {
     if (packet.has_geometry())
     {
-        std::optional<Field> field = ssl_protobuf_reader.getField(packet.geometry());
-        if (field)
-        {
-            world.updateFieldGeometry(*field);
-        }
-        else
-        {
-            LOG(WARNING)
-                << "Invalid field packet has been detected, which means field may be unreliable "
-                << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
-        }
+        updateWorld(packet.geometry());
     }
 
     if (packet.has_detection())
     {
-        SSL_DetectionFrame detection = *packet.mutable_detection();
-        VisionDetection vision_detection =
-            ssl_protobuf_reader.getVisionDetection(detection);
-        updateWorld(vision_detection);
+        updateWorld(*packet.mutable_detection());
+    }
+}
+
+void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
+{
+    std::optional<Field> field = ssl_protobuf_reader.getField(geometry_packet);
+    if (field)
+    {
+        world.updateFieldGeometry(*field);
+    }
+    else
+    {
+        LOG(WARNING)
+            << "Invalid field packet has been detected, which means field may be unreliable "
+            << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
     }
 }
 
@@ -70,15 +72,15 @@ void SensorFusion::updateWorld(Referee packet)
 
 void SensorFusion::updateWorld(RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs)
 {
-    // TODO: incorporate TbotsRobotMsg into world and update world
-    // https://github.com/UBC-Thunderbots/Software/issues/1149
+    // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
 }
 
-void SensorFusion::updateWorld(const VisionDetection &vision_detection)
+void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
-    world.mutableEnemyTeam()    = getEnemyTeamFromVisionDetection(vision_detection);
-    world.mutableFriendlyTeam() = getFriendlyTeamFromVisionDetection(vision_detection);
-
+    VisionDetection vision_detection =
+        ssl_protobuf_reader.getVisionDetection(ssl_detection_frame);
+    world.mutableEnemyTeam()     = getEnemyTeamFromVisionDetection(vision_detection);
+    world.mutableFriendlyTeam()  = getFriendlyTeamFromVisionDetection(vision_detection);
     std::optional<Ball> new_ball = getBallFromVisionDetection(vision_detection);
     if (new_ball)
     {
