@@ -3,8 +3,6 @@
 #include <QtWidgets/QGraphicsEllipseItem>
 
 #include "shared/constants.h"
-#include "software/new_geom/segment.h"
-#include "software/visualizer/geom/geometry_conversion.h"
 
 void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor& color)
 {
@@ -15,8 +13,8 @@ void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor& 
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
-    Segment robot_velocity(robot.position(), robot.position() + robot.velocity());
-    scene->addLine(createQLineF(robot_velocity), pen);
+    drawSegment(scene, Segment(robot.position(), robot.position() + robot.velocity()),
+                pen);
 }
 
 void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor& color)

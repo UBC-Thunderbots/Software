@@ -57,6 +57,7 @@ cc_library(
     srcs = ["robot.cpp"],
     hdrs = ["robot.h"],
     deps = [
+        ":geom",
         "//shared:constants",
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",
