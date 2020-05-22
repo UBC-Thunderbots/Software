@@ -158,9 +158,9 @@ class Navigator : public IntentVisitor
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
 
-    // The following are used by the visualizer for drawing
-    std::vector<std::vector<Point>> visualizer_planned_paths;
-    std::vector<ObstaclePtr> visualizer_obstacles;
+    // The following are exposed to users of the Navigator
+    std::vector<std::vector<Point>> user_planned_paths;
+    std::vector<ObstaclePtr> user_obstacles;
 
     // These are obstacles that represent robots that aren't
     // assigned move intents
