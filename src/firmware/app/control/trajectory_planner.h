@@ -293,5 +293,5 @@ void static app_trajectory_planner_reverseTrajectoryDirection(
  * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
  * time-optimal velocity to follow a specified path
  */
-TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
+void app_trajectory_planner_generateVelocityTrajectory(
     PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory);

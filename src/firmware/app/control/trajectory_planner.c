@@ -378,7 +378,7 @@ void app_trajectory_planner_reverseTrajectoryDirection(
     }
 }
 
-TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTrajectory(
+void app_trajectory_planner_generateVelocityTrajectory(
     PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory)
 {
     PositionTrajectoryElement_t* position_elements =
@@ -440,6 +440,4 @@ TrajectoryPlannerGenerationStatus_t app_trajectory_planner_generateVelocityTraje
         .angular_velocity = 0;
     velocity_elements[position_trajectory->path_parameters.num_segments - 1].time =
         position_elements[position_trajectory->path_parameters.num_segments - 1].time;
-
-    return OK;
 }
