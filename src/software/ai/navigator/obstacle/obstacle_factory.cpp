@@ -39,7 +39,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
             Rectangle rectangle = world.field().enemyDefenseArea();
             // TODO (Issue #1332): remove this hardcoded 0.3 value and use a an
             // inflatedEnemyDefenseArea
-            rectangle.expand(0.3);
+            rectangle.inflate(0.3);
             rectangle_opt = std::make_optional(rectangle);
         }
         break;
@@ -59,7 +59,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
 
     if (rectangle_opt)
     {
-        rectangle_opt->expand(shape_expansion_amount);
+        rectangle_opt->inflate(shape_expansion_amount);
         obstacles.push_back(createObstacle(*rectangle_opt));
     }
     if (circle_opt)
@@ -157,7 +157,7 @@ ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position)
 ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle)
 {
     Rectangle rectangle_exp(rectangle);
-    rectangle_exp.expand(shape_expansion_amount);
+    rectangle_exp.inflate(shape_expansion_amount);
     return createObstacle(rectangle_exp);
 }
 
