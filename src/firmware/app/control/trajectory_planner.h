@@ -290,7 +290,7 @@ void static app_trajectory_planner_generateTimeProfile(
 void static app_trajectory_planner_reverseTrajectoryDirection(
     PositionTrajectory_t* forwards_trajectory);
 
-/***
+/**
  * This function generates a velocity trajectory that corresponds to the time-optimal
  * velocity to follow a specified path. This profile is based on the input position
  * trajectory
