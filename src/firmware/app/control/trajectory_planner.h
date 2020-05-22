@@ -67,9 +67,10 @@ typedef struct VelocityTrajectory
 
 typedef enum TrajectoryPlannerGenerationStatus
 {
-    OK                        = 0,
-    FINAL_VELOCITY_TOO_HIGH   = 1,
-    INITIAL_VELOCITY_TOO_HIGH = 2,
+    OK                              = 0,
+    FINAL_VELOCITY_TOO_HIGH         = 1,
+    INITIAL_VELOCITY_TOO_HIGH       = 2,
+    INTERPOLATION_ELEMENT_MAXED_OUT = 3,
 } TrajectoryPlannerGenerationStatus_t;
 
 /**
@@ -140,7 +141,8 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
  * each trajectory segment.
  *
  */
-void app_trajectory_planner_interpolateConstantTimeTrajectory(
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_interpolateConstantTimeTrajectory(
     PositionTrajectory_t* constant_period_trajectory,
     PositionTrajectory_t* variable_time_trajectory, const float interpolation_period);
 

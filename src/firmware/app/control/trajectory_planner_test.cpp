@@ -923,8 +923,9 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
-                                                             &trajectory, 0.001);
+    status = app_trajectory_planner_interpolateConstantTimeTrajectory(
+        &const_interp_trajectory, &trajectory, 0.001);
+    EXPECT_EQ(OK, status);
 
     EXPECT_NEAR(
         trajectory.trajectory_elements[trajectory.path_parameters.num_segments - 1]
@@ -994,16 +995,20 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
 
     PositionTrajectory_t const_interp_trajectory;
+
     PositionTrajectoryElement_t
         const_interp_traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
     float const_interp_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     const_interp_trajectory.speed_profile       = const_interp_speed_profile;
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    app_trajectory_planner_interpolateConstantTimeTrajectory(&const_interp_trajectory,
-                                                             &trajectory, 0.001);
+    status = app_trajectory_planner_interpolateConstantTimeTrajectory(
+        &const_interp_trajectory, &trajectory, 0.001);
+
+    EXPECT_EQ(OK, status);
 
     EXPECT_NEAR(
         trajectory.trajectory_elements[trajectory.path_parameters.num_segments - 1]
@@ -1032,6 +1037,61 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
                 const_interp_trajectory.trajectory_elements[0].position.x, 0.001);
     EXPECT_NEAR(trajectory.trajectory_elements[0].time,
                 const_interp_trajectory.trajectory_elements[0].time, 0.001);
+}
+
+TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elements)
+{
+    Polynomial2dOrder3_t path = {
+        .x = {.coefficients = {2, 0, 1, 0}},
+        .y = {.coefficients = {1, 0, 1, 0}},
+
+    };
+
+    FirmwareRobotPathParameters_t path_parameters;
+    path_parameters.path                       = path;
+    path_parameters.t_start                    = 0;
+    path_parameters.t_end                      = 2;
+    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_acceleration = 10;
+    path_parameters.max_allowable_speed        = 0.1;
+    path_parameters.initial_speed              = 0;
+    path_parameters.final_speed                = 0;
+
+    PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    PositionTrajectory_t trajectory = {.trajectory_elements = const_arc_elements,
+                                       .path_parameters     = path_parameters,
+                                       .speed_profile       = speed_profile};
+
+
+    TrajectoryPlannerGenerationStatus_t status =
+        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+    EXPECT_EQ(OK, status);
+
+    // Create the parameterization to contain the desired number of segments
+    CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
+                                             TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(
+        path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
+
+    PositionTrajectory_t const_interp_trajectory;
+
+    PositionTrajectoryElement_t
+        const_interp_traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    float const_interp_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    const_interp_trajectory.speed_profile       = const_interp_speed_profile;
+    const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
+
+    // Calculate the constant-interpolation period equivalent of the trajectory
+    status = app_trajectory_planner_interpolateConstantTimeTrajectory(
+        &const_interp_trajectory, &trajectory, 0.001);
+
+    EXPECT_EQ(INTERPOLATION_ELEMENT_MAXED_OUT, status);
 }
 
 TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
@@ -1099,6 +1159,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
 }
 
 TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleration)
+
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -1146,12 +1207,12 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
         const float element_speed =
             sqrt(pow(velocity_trajectory.trajectory_elements[i].linear_velocity.x, 2) +
                  pow(velocity_trajectory.trajectory_elements[i].linear_velocity.y, 2));
-        EXPECT_FLOAT_EQ(trajectory.speed_profile[i], element_speed);
+        EXPECT_NEAR(trajectory.speed_profile[i], element_speed, 0.001);
 
-        EXPECT_FLOAT_EQ(direction_unit_vectors[i].x() * trajectory.speed_profile[i],
-                        velocity_trajectory.trajectory_elements[i].linear_velocity.x);
-        EXPECT_FLOAT_EQ(direction_unit_vectors[i].y() * trajectory.speed_profile[i],
-                        velocity_trajectory.trajectory_elements[i].linear_velocity.y);
+        EXPECT_NEAR(direction_unit_vectors[i].x() * trajectory.speed_profile[i],
+                    velocity_trajectory.trajectory_elements[i].linear_velocity.x, 0.001);
+        EXPECT_NEAR(direction_unit_vectors[i].y() * trajectory.speed_profile[i],
+                    velocity_trajectory.trajectory_elements[i].linear_velocity.y, 0.001);
     }
 }
 
