@@ -118,7 +118,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     return field;
 }
 
-BallState NetworkFilter::getFilteredBallData(
+TimestampedBallState NetworkFilter::getFilteredBallData(
     const std::vector<SSL_DetectionFrame> &detections)
 {
     auto ball_detections = std::vector<BallDetection>();

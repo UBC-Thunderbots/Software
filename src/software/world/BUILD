@@ -5,9 +5,11 @@ cc_library(
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
-        "//software/geom",
+        "//shared:constants",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
         "//software/time:timestamp",
-        "//software/world:ball_state",
+        "//software/world:timestamped_ball_state",
         "@boost//:circular_buffer",
     ],
 )
@@ -17,7 +19,28 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
+        ":timestamped_ball_state",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "timestamped_ball_state",
+    srcs = ["timestamped_ball_state.cpp"],
+    hdrs = ["timestamped_ball_state.h"],
+    deps = [
         ":ball_state",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/time:timestamp",
+    ],
+)
+
+cc_test(
+    name = "timestamped_ball_state_test",
+    srcs = ["timestamped_ball_state_test.cpp"],
+    deps = [
+        ":timestamped_ball_state",
         "@gtest//:gtest_main",
     ],
 )
@@ -27,8 +50,17 @@ cc_library(
     srcs = ["ball_state.cpp"],
     hdrs = ["ball_state.h"],
     deps = [
-        "//software/geom",
-        "//software/time:timestamp",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+    ],
+)
+
+cc_test(
+    name = "ball_state_test",
+    srcs = ["ball_state_test.cpp"],
+    deps = [
+        ":ball_state",
+        "@gtest//:gtest_main",
     ],
 )
 
