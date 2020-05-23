@@ -13,9 +13,7 @@
 #include "software/new_geom/util/intersects.h"
 
 /**
- * We use this variant when we need to know the underlying shape of the obstacle, e.g. in
- * tests and for drawing with the visualizer
- */
+ * Represents the underlying shape of the obstacle */
 using ObstacleShape = std::variant<ConvexPolygon, Circle>;
 
 /**
@@ -85,7 +83,7 @@ class Obstacle
  * Implements the << operator for printing
  *
  * @param ostream The stream to print to
- * @param obstacle_ptr The ObstaclePtr to print
+ * @param obstacle_ptr The Obstacle to print
  *
  * @return The output stream with the string representation of the class appended
  */

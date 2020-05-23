@@ -7,7 +7,7 @@
 
 std::optional<Path> NoPathTestPathPlanner::findPath(
     const Point &start, const Point &destination, const Rectangle &navigable_area,
-    const std::vector<ObstaclePtr> &obstacles)
+    const std::vector<Obstacle> &obstacles)
 {
     return std::nullopt;
 }

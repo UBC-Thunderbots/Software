@@ -54,7 +54,7 @@ class Navigator : public IntentVisitor
      *
      * @return obstacles
      */
-    std::vector<ObstaclePtr> getObstacles();
+    std::vector<Obstacle> getObstacles();
 
     /**
      * Registers the given Intent for navigation
@@ -160,13 +160,13 @@ class Navigator : public IntentVisitor
 
     // The following are exposed to users of the Navigator
     std::vector<std::vector<Point>> user_planned_paths;
-    std::vector<ObstaclePtr> user_obstacles;
+    std::vector<Obstacle> user_obstacles;
 
     // These are obstacles that represent robots that aren't
     // assigned move intents
     // When move intents are processed to path plan,
     // we can avoid these non-"moving" robots
-    std::vector<ObstaclePtr> friendly_non_move_intent_robot_obstacles;
+    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
 
     // intents that need path planning
     std::vector<MoveIntent> move_intents_for_path_planning;

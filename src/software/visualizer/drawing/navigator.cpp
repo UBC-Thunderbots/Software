@@ -26,7 +26,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 
         for (const auto& obstacle : obstacles)
         {
-            drawObstacle(scene, obstacle->getObstacleShape(), pen);
+            drawObstacle(scene, obstacle.getObstacleShape(), pen);
         }
     };
 
@@ -37,15 +37,9 @@ void drawObstacle(QGraphicsScene* scene, const ObstacleShape& obstacle_shape,
                   const QPen& pen)
 {
     std::visit(
-        overload{[scene, &obstacle_shape, pen](const ConvexPolygon& convex_polygon) {
+        overload{[scene, pen](const Circle& circle) { drawCircle(scene, circle, pen); },
+                 [scene, pen](const ConvexPolygon& convex_polygon) {
                      drawConvexPolygon(scene, convex_polygon, pen);
-                 },
-                 [scene, &obstacle_shape, pen](const Circle& circle) {
-                     drawCircle(scene, circle, pen);
-                 },
-                 [](auto arg) {
-                     throw std::invalid_argument(
-                         "Unrecognized type passed via std::variant");
                  }},
         obstacle_shape);
 }

@@ -11,8 +11,7 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 
     Rectangle navigable_area = Rectangle(Point(0, 0), Point(1, 1));
 
-    auto path =
-        planner->findPath(start, dest, navigable_area, std::vector<ObstaclePtr>());
+    auto path = planner->findPath(start, dest, navigable_area, std::vector<Obstacle>());
 
     EXPECT_TRUE(path != std::nullopt);
 

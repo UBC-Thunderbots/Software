@@ -251,7 +251,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
     auto obstacles      = obstacle_factory.createVelocityObstaclesFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {
-        double current_dist = obstacle->distance(p);
+        double current_dist = obstacle.distance(p);
         if (current_dist < closest_dist)
         {
             closest_dist = current_dist;
@@ -275,7 +275,7 @@ std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
     return user_planned_paths;
 }
 
-std::vector<ObstaclePtr> Navigator::getObstacles()
+std::vector<Obstacle> Navigator::getObstacles()
 {
     return user_obstacles;
 }
