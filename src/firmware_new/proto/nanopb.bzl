@@ -2,7 +2,67 @@ load("@rules_proto//proto:defs.bzl", "ProtoInfo", "proto_library")
 load("@com_google_protobuf//:protobuf.bzl", "proto_gen")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-def c_proto_library(name, srcs, **kwargs):
+# TODO: rename this file to `rules.bzl` to be consistent with other parts of the repo?
+
+# TODO: this should probably eventually be a seperate "nanopb_rules" repository so we
+#       don't have to seperately include nanopb and pass it into this rule. Maybe
+#       open pull request to the nanopb repository?
+
+def _nanopb_proto_library_impl(ctx):
+    # Get all the proto files recursively from the dependencies of this rule
+    proto_infos = [dep[ProtoInfo] for dep in ctx.attr.deps]
+    all_proto_files = depset()
+    for proto_info in proto_infos:
+        all_proto_files = depset(transitive = [all_proto_files, proto_info.transitive_sources])
+
+    # For each proto file, generate the equivalent C code using nanopb
+    all_proto_hdr_files = []
+    all_proto_src_files = []
+
+    for proto_file in all_proto_files.to_list():
+        h_out = proto_file.basename + ".pb.h"
+        c_out = proto_file.basename + ".pb.c"
+
+        nanopb_generator_path = ctx.attr.nanopb_generator.path
+        native.genrule(
+            name = "%s_proto_ch_genrule" % (proto_file),
+            srcs = [proto_file],
+            tools = ctx.attr.nanopb_generator,
+            cmd = "python3 $(location @nanopb//:nanopb_generator) $(location %)" % (proto_file),
+            outs = [h_out, c_out],
+        )
+
+        all_proto_src_files.append(c_out)
+        all_proto_hdr_files.append(h_out)
+
+    return native.cc_library(
+        name = ctx.attr.name,
+        srcs = all_proto_src_files,
+        hdrs = all_proto_hdr_files,
+        deps = ctx.attr.nanopb_srcs,
+    )
+
+nanopb_proto_library = rule(
+    implementation = _nanopb_proto_library_impl,
+    # TODO: doc comments for each attribute
+    attrs = {
+        "deps": attr.label_list(
+            mandatory = True,
+            # TODO: figure out what provider to specify here to restrict to things that
+            #       provide [ProtoInfo]. See: https://github.com/bazelbuild/bazel/issues/6901
+            providers = [
+                #                "ProtoInfo",
+            ],
+        ),
+        # TODO: more strict requirements on this attr
+        "nanopb_srcs": attr.label_list(mandatory = True),
+        # TODO: more strict requirements on this attr
+        "nanopb_generator": attr.label(mandatory = True),
+    },
+)
+
+# TODO: delete this
+def c_proto_library_old(name, srcs, **kwargs):
     """Creates a cc_library given the proto files.
 
     nanopb relies on protoc to do the parsing before it converts the files into
