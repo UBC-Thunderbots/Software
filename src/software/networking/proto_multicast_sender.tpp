@@ -3,10 +3,9 @@
 #include "software/logger/logger.h"
 
 template <class SendProto>
-ProtoMulticastSender<SendProto>::ProtoMulticastSender(
-    boost::asio::io_service& io_service,
-    const std::string ip_address,
-    const unsigned short port)
+ProtoMulticastSender<SendProto>::ProtoMulticastSender(boost::asio::io_service& io_service,
+                                                      const std::string ip_address,
+                                                      const unsigned short port)
     : socket(io_service)
 {
     boost::asio::ip::address multicast_addr =
@@ -41,4 +40,3 @@ void ProtoMulticastSender<SendProto>::sendData(const SendProto& message)
     message.SerializeToString(&data_buffer);
     socket.send_to(boost::asio::buffer(data_buffer), receiver_endpoint);
 }
-

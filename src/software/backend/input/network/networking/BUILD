@@ -30,11 +30,11 @@ cc_library(
     hdrs = ["network_client.h"],
     deps = [
         ":network_filter",
-        "//software/networking:proto_multicast_listener",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
         "//software/logger",
+        "//software/networking:proto_multicast_listener",
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
         "//software/world",

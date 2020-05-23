@@ -12,7 +12,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "proto_multicast_sender",
     hdrs = [
