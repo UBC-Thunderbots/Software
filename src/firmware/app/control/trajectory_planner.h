@@ -122,7 +122,7 @@ typedef enum TrajectoryPlannerGenerationStatus
  * @return The outcome of the trajectory generation. Returns OK if trajectory is valid.
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantArcLengthTrajectory(
+app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
     PositionTrajectory_t* trajectory);
 
 /**
