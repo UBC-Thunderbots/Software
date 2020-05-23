@@ -139,16 +139,12 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
 
 void World::updateRefboxStage(const RefboxStage &stage)
 {
+    // TODO (Issue #1369): Clean this up
     refbox_stage_history.push_back(stage);
     // Take the consensus of the previous refbox messages
     if (!refbox_stage_history.empty() &&
-        std::all_of(
-            refbox_stage_history.begin(), refbox_stage_history.end(),
-            [&](auto gamestate) { return gamestate == refbox_stage_history.front(); }))
-    {
-        current_refbox_stage_ = stage;
-    }
-    else
+        std::all_of(refbox_stage_history.begin(), refbox_stage_history.end(),
+                    [&](auto stage) { return stage == refbox_stage_history.front(); }))
     {
         current_refbox_stage_ = stage;
     }

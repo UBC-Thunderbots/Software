@@ -40,46 +40,16 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     void onValueReceived(SensorMsg sensor_msg) override;
 
     /**
-     * Updates world based on a new SensorMsg
+     * Updates world based on a new data
      *
-     * @param sensor_msg new SensorMsg
+     * @param new data
      */
     void updateWorld(const SensorMsg &sensor_msg);
-
-    /**
-     * Updates world based on a new SensorMsg
-     *
-     * @param sensor_msg new SensorMsg
-     */
     void updateWorld(const SSL_WrapperPacket &packet);
-
-    /**
-     * Updates world based on a new Referee
-     *
-     * @param packet new Referee packet
-     */
     void updateWorld(const Referee &packet);
-
-    /**
-     * Updates world based on repeated TbotsRobotMsg
-     *
-     * @param tbots_robot_msgs new repeated TbotsRobotMsg
-     */
     void updateWorld(
         const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
-
-    /**
-     * Updates world based on a new SSL_GeometryData
-     *
-     * @param geometry_packet new SSL_GeometryData
-     */
     void updateWorld(const SSL_GeometryData &geometry_packet);
-
-    /**
-     * Updates world based on a new SSL_DetectionFrame
-     *
-     * @param ssl_detection_frame new SSL_DetectionFrame
-     */
     void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
@@ -93,21 +63,13 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
         const VisionDetection &vision_detection);
 
     /**
-     * Get friendly team from a vision detection
+     * Get team from a vision detection
      *
      * @param vision_detection
      *
-     * @return friendly team from vision_detection
+     * @return team from vision_detection
      */
     Team getFriendlyTeamFromVisionDetection(const VisionDetection &vision_detection);
-
-    /**
-     * Get enemy team from a vision detection
-     *
-     * @param vision_detection
-     *
-     * @return enemy team from vision_detection
-     */
     Team getEnemyTeamFromVisionDetection(const VisionDetection &vision_detection);
 
     World world;
