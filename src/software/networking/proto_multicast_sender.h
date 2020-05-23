@@ -14,6 +14,7 @@ class ProtoMulticastSender
      *
      * @param io_service The io_service to use to service outgoing SendProto data
      * @param ip_address The ip address of the multicast group to send data on
+     * (IPv4 in dotted decimal or IPv6 in hex string)
      * @param port The port to send SendProto data on
      */
     ProtoMulticastSender(boost::asio::io_service& io_service, std::string ip_address,
@@ -25,15 +26,17 @@ class ProtoMulticastSender
      * Sends a protobuf message over the initialized multicast group and port
      * This function returns after the message has been sent.
      *
-     * @param message The protobuf message to send over the joined multicast group
+     * @param message The protobuf message to send over the multicast group
      */
     void sendProto(const SendProto& message);
 
    private:
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;
+
     // The endpoint for the receiver
     boost::asio::ip::udp::endpoint receiver_endpoint;
+
     // Buffer to hold serialized protobuf data
     std::string data_buffer;
 };
