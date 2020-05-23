@@ -88,7 +88,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     static constexpr std::size_t ai_draw_functions_buffer_size    = 2;
     // We only care about the most recent PlayInfo, so the buffer is of size 1
     static constexpr std::size_t play_info_buffer_size = 1;
-    // We don't want to miss any robot status updates so we make the buffer larger
+    // We don't want to miss any SensorMsg updates so we make the buffer larger
     static constexpr std::size_t sensor_msg_buffer_size = 60;
     // We don't want to miss any robot status updates so we make the buffer larger
     static constexpr std::size_t robot_status_buffer_size = 60;
