@@ -5,6 +5,7 @@
 #include <unordered_set>
 
 #include "software/new_geom/point.h"
+#include "software/test_util/test_util.h"
 
 TEST(ConvexPolygonConstructorTest, test_construct_from_vector)
 {
@@ -139,4 +140,64 @@ TEST(ConvexPolygonIsConvexTest, test_degenerate_polygon_linear_points)
     EXPECT_THROW(
         ConvexPolygon({Point(0, 3), Point(1, 3), Point(2, 3), Point(3, 3), Point(4, 3)}),
         std::invalid_argument);
+}
+
+TEST(ConvexPolygonCentroidTest, test_triangle)
+{
+    ConvexPolygon poly({{1, 2}, {2, 3}, {1, 3}});
+    EXPECT_TRUE(
+        ::Test::TestUtil::equalWithinTolerance(Point(1.333, 2.666), poly.centroid()));
+}
+
+TEST(ConvexPolygonCentroidTest, test_rectangle)
+{
+    ConvexPolygon poly({{-1, -1}, {-1, 3}, {5, 3}, {5, -1}});
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(Point(2, 1), poly.centroid()));
+}
+
+TEST(ConvexPolygonCentroidTest, test_irregular_shape)
+{
+    ConvexPolygon poly({{-1, -1}, {-8, 4}, {-2, 4}, {1, 2}, {2, 0}});
+    EXPECT_TRUE(
+        ::Test::TestUtil::equalWithinTolerance(Point(-2.28, 1.88), poly.centroid()));
+}
+
+TEST(ConvexPolygonExpandTest, test_three_points_up)
+{
+    ConvexPolygon poly({{1, 2}, {2, 3}, {1, 3}});
+    ConvexPolygon expected({{1, 2}, {2, 6}, {1, 6}});
+    Vector expansion_vector({0, 3});
+    EXPECT_EQ(poly.expand(expansion_vector), expected);
+}
+
+TEST(ConvexPolygonExpandTest, test_three_points_left)
+{
+    ConvexPolygon poly({{1, 2}, {2, 3}, {1, 3}});
+    ConvexPolygon expected({{-1, 2}, {2, 3}, {-1, 3}});
+    Vector expansion_vector({-2, 0});
+    EXPECT_EQ(poly.expand(expansion_vector), expected);
+}
+
+TEST(ConvexPolygonExpandTest, test_five_points_right)
+{
+    ConvexPolygon poly({{1, 1}, {1, 3}, {2, 3}, {5, 3}, {5, 1}});
+    ConvexPolygon expected({{1, 1}, {1, 3}, {2, 3}, {8, 3}, {8, 1}});
+    Vector expansion_vector({3, 0});
+    EXPECT_EQ(poly.expand(expansion_vector), expected);
+}
+
+TEST(ConvexPolygonExpandTest, test_five_points_up_left)
+{
+    ConvexPolygon poly({{1, 1}, {1, 3}, {2, 3}, {5, 3}, {5, 1}});
+    ConvexPolygon expected({{-1, 4}, {-1, 6}, {0, 6}, {5, 3}, {5, 1}});
+    Vector expansion_vector({-2, 3});
+    EXPECT_EQ(poly.expand(expansion_vector), expected);
+}
+
+TEST(ConvexPolygonExpandTest, test_four_points_0_vector)
+{
+    ConvexPolygon poly({{1, 1}, {1, 3}, {3, 3}, {5, 3}, {5, 1}});
+    ConvexPolygon expected(poly);
+    Vector expansion_vector({0, 0});
+    EXPECT_EQ(poly.expand(expansion_vector), expected);
 }

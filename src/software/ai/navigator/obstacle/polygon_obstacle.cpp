@@ -1,4 +1,4 @@
-#include "software/ai/navigator/obstacle/new_obstacle/polygon_obstacle.h"
+#include "software/ai/navigator/obstacle/polygon_obstacle.h"
 
 PolygonObstacle::PolygonObstacle(const Polygon& polygon) : polygon_(polygon) {}
 
@@ -7,7 +7,7 @@ bool PolygonObstacle::contains(const Point& p) const
     return polygon_.contains(p);
 }
 
-double PolygonObstacle::minDistance(const Point& p) const
+double PolygonObstacle::distance(const Point& p) const
 {
     return ::distance(polygon_, p);
 }

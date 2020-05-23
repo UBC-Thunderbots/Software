@@ -188,14 +188,18 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
     Robot robot2 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
-    world.updateBallState(BallState({0.1, 2.5}, {0, 10}, Timestamp::fromSeconds(3.5)));
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState({0.1, 2.5}, {0, 10}, Timestamp::fromSeconds(3.5)));
 
-    robot0.updateState(RobotState(Point(-2, 3), Vector(), Angle::zero(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(3.5)));
-    robot1.updateState(RobotState(Point(-2, 0), Vector(), Angle::quarter(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(3.5)));
-    robot2.updateState(RobotState(Point(1.5, 2.3), Vector(), Angle::zero(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(3.5)));
+    robot0.updateState(TimestampedRobotState(Point(-2, 3), Vector(), Angle::zero(),
+                                             AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(3.5)));
+    robot1.updateState(TimestampedRobotState(Point(-2, 0), Vector(), Angle::quarter(),
+                                             AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(3.5)));
+    robot2.updateState(TimestampedRobotState(Point(1.5, 2.3), Vector(), Angle::zero(),
+                                             AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(3.5)));
 
     team.updateRobots({robot0, robot1, robot2});
     world.updateFriendlyTeamState(team);
@@ -217,14 +221,18 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
     Robot robot2 = Robot(2, Point(1.5, 2.3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    world.updateBallState(BallState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4)));
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4)));
 
-    robot0.updateState(RobotState(Point(-2, 3), Vector(), Angle::zero(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(4)));
-    robot1.updateState(RobotState(Point(-2, 0), Vector(), Angle::quarter(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(4)));
-    robot2.updateState(RobotState(Point(1.5, 2.3), Vector(), Angle::zero(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(4)));
+    robot0.updateState(TimestampedRobotState(Point(-2, 3), Vector(), Angle::zero(),
+                                             AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(4)));
+    robot1.updateState(TimestampedRobotState(Point(-2, 0), Vector(), Angle::quarter(),
+                                             AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(4)));
+    robot2.updateState(TimestampedRobotState(Point(1.5, 2.3), Vector(), Angle::zero(),
+                                             AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(4)));
 
 
     team.updateRobots({robot0, robot1, robot2});

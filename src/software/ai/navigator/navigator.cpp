@@ -119,14 +119,15 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
         auto obstacles = friendly_non_move_intent_robot_obstacles;
 
         auto motion_constraint_obstacles =
-            obstacle_factory.getObstaclesFromMotionConstraints(
+            obstacle_factory.createObstaclesFromMotionConstraints(
                 intent.getMotionConstraints(), world);
         obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                          motion_constraint_obstacles.end());
 
         if (intent.getBallCollisionType() == BallCollisionType::AVOID)
         {
-            auto ball_obstacle = Obstacle::createCircularBallObstacle(world.ball(), 0.06);
+            auto ball_obstacle =
+                obstacle_factory.createBallObstacle(world.ball().position());
             obstacles.push_back(ball_obstacle);
         }
 
@@ -189,7 +190,7 @@ void Navigator::registerNonMoveIntentRobotId(RobotId id)
     auto robot = world.friendlyTeam().getRobotById(id);
     if (robot)
     {
-        auto robot_obstacle = obstacle_factory.getVelocityObstacleFromRobot(*robot);
+        auto robot_obstacle = obstacle_factory.createVelocityObstacleFromRobot(*robot);
         friendly_non_move_intent_robot_obstacles.push_back(robot_obstacle);
     }
 }
@@ -243,10 +244,10 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
 
     // find min dist between p and any robot
     double closest_dist = DBL_MAX;
-    auto obstacles      = obstacle_factory.getVelocityObstaclesFromTeam(enemy_team);
+    auto obstacles      = obstacle_factory.createVelocityObstaclesFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {
-        double current_dist = distance(p, (*obstacle.getBoundaryPolygon()));
+        double current_dist = obstacle->distance(p);
         if (current_dist < closest_dist)
         {
             closest_dist = current_dist;

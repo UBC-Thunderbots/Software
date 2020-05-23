@@ -30,3 +30,19 @@ cc_library(
         ":pwm_pin",
     ],
 )
+
+cc_library(
+    name = "drivetrain",
+    srcs = ["drivetrain.c"],
+    hdrs = ["drivetrain.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [":drivetrain_unit"],
+)
+
+cc_library(
+    name = "drivetrain_unit",
+    srcs = ["drivetrain_unit.c"],
+    hdrs = ["drivetrain_unit.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [":allegro_a3931_motor_driver"],
+)

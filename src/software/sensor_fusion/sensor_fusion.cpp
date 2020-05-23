@@ -61,7 +61,7 @@ void SensorFusion::updateWorld(const VisionDetection &vision_detection)
     std::optional<Ball> new_ball = getBallFromvisionDetecion(vision_detection);
     if (new_ball)
     {
-        world.updateBallState(new_ball->currentState());
+        world.updateBallStateWithTimestamp(new_ball->currentState());
     }
 }
 

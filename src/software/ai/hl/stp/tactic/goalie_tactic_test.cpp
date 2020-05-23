@@ -52,12 +52,12 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
     // test to make sure that points given outside of the rectangle
     // are constrained inside
     auto small_rectangle = world.field().friendlyDefenseArea();
-    small_rectangle.expand(-0.8);
+    small_rectangle.inflate(-0.8);
     auto requested_position = GetParam();
     auto restrained_position =
         tactic.restrainGoalieInRectangle(requested_position, small_rectangle);
 
-    // scaling the restrained position by a slight bit as containsPoint does not count
+    // scaling the restrained position by a slight bit as contains does not count
     // the points right on the edge of the rectangle. For the purposes of the goalie
     // we are okay if the point is right on the edge, or close enough.
     EXPECT_TRUE(small_rectangle.contains((*restrained_position)));
@@ -69,7 +69,7 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
     auto big_rectangle = world.field().friendlyDefenseArea();
 
     // blow up rectangle to a huge amount, to contain all the points
-    big_rectangle.expand(5);
+    big_rectangle.inflate(5);
     restrained_position =
         tactic.restrainGoalieInRectangle(requested_position, big_rectangle);
 
