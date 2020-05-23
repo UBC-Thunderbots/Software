@@ -1,8 +1,6 @@
 #pragma once
 
 #include "software/ai/motion_constraint/motion_constraint.h"
-#include "software/ai/navigator/obstacle/circle_obstacle.h"
-#include "software/ai/navigator/obstacle/convex_polygon_obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
@@ -33,7 +31,7 @@ class ObstacleFactory
      *
      * @return Obstacles representing the given motion constraints
      */
-    std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
+    std::vector<Obstacle> createObstaclesFromMotionConstraints(
         const std::set<MotionConstraint> &motion_constraints, const World &world);
 
     /**
@@ -44,7 +42,7 @@ class ObstacleFactory
      *
      * @return Obstacles representing the given motion constraint
      */
-    std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
+    std::vector<Obstacle> createObstaclesFromMotionConstraint(
         const MotionConstraint &motion_constraint, const World &world);
 
     /**
@@ -57,7 +55,7 @@ class ObstacleFactory
      *
      * @return An obstacle representing the given robot
      */
-    ObstaclePtr createVelocityObstacleFromRobot(const Robot &robot);
+    Obstacle createVelocityObstacleFromRobot(const Robot &robot);
 
     /**
      * Create a list of obstacles representing the given team
@@ -69,7 +67,7 @@ class ObstacleFactory
      *
      * @return A list of obstacles representing the given team
      */
-    std::vector<ObstaclePtr> createVelocityObstaclesFromTeam(const Team &team);
+    std::vector<Obstacle> createVelocityObstaclesFromTeam(const Team &team);
 
     /**
      * Create circle obstacle around robot with additional radius scaling
@@ -78,7 +76,7 @@ class ObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createRobotObstacle(const Point &robot_position);
+    Obstacle createRobotObstacle(const Point &robot_position);
 
     /**
      * Create circle obstacle around ball
@@ -87,7 +85,7 @@ class ObstacleFactory
      *
      * @return obstacle around the ball
      */
-    ObstaclePtr createBallObstacle(const Point &ball_position);
+    Obstacle createBallObstacle(const Point &ball_position);
 
     /**
      * Create rectangle-shaped obstacle
@@ -96,7 +94,7 @@ class ObstacleFactory
      *
      * @return rectangular obstacle
      */
-    ObstaclePtr createObstacleFromRectangle(const Rectangle &rectangle);
+    Obstacle createObstacleFromRectangle(const Rectangle &rectangle);
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
@@ -110,7 +108,7 @@ class ObstacleFactory
      *
      * @return circle shaped obstacle
      */
-    ObstaclePtr createObstacle(const Circle &circle);
+    Obstacle createObstacle(const Circle &circle);
 
     /**
      * Create convex_polygon obstacle directly from a ConvexPolygon
@@ -120,5 +118,5 @@ class ObstacleFactory
      *
      * @return convex_polygon shaped obstacle
      */
-    ObstaclePtr createObstacle(const ConvexPolygon &convex_polygon);
+    Obstacle createObstacle(const ConvexPolygon &convex_polygon);
 };

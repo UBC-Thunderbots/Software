@@ -7,10 +7,10 @@ ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> co
 {
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
+std::vector<Obstacle> ObstacleFactory::createObstaclesFromMotionConstraint(
     const MotionConstraint &motion_constraint, const World &world)
 {
-    std::vector<ObstaclePtr> obstacles;
+    std::vector<Obstacle> obstacles;
     std::optional<Circle> circle_opt       = std::nullopt;
     std::optional<Rectangle> rectangle_opt = std::nullopt;
 
@@ -18,7 +18,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
     {
         case MotionConstraint::ENEMY_ROBOTS_COLLISION:
         {
-            std::vector<ObstaclePtr> enemy_robot_obstacles =
+            std::vector<Obstacle> enemy_robot_obstacles =
                 createVelocityObstaclesFromTeam(world.enemyTeam());
             obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
                              enemy_robot_obstacles.end());
@@ -70,10 +70,10 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
     return obstacles;
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraints(
+std::vector<Obstacle> ObstacleFactory::createObstaclesFromMotionConstraints(
     const std::set<MotionConstraint> &motion_constraints, const World &world)
 {
-    std::vector<ObstaclePtr> obstacles;
+    std::vector<Obstacle> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles =
@@ -84,7 +84,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraints(
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
+Obstacle ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
 {
     // TODO (Issue #1340): Add ASCII art and clean up variables
     double radius_cushion_scaling   = config->SpeedScalingFactor()->value();
@@ -131,10 +131,9 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
     }
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
-    const Team &team)
+std::vector<Obstacle> ObstacleFactory::createVelocityObstaclesFromTeam(const Team &team)
 {
-    std::vector<ObstaclePtr> obstacles;
+    std::vector<Obstacle> obstacles;
     for (const auto &robot : team.getAllRobots())
     {
         obstacles.push_back(createVelocityObstacleFromRobot(robot));
@@ -142,32 +141,31 @@ std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position)
+Obstacle ObstacleFactory::createBallObstacle(const Point &ball_position)
 {
     return createObstacle(
         Circle(ball_position, BALL_MAX_RADIUS_METERS + 0.06 + shape_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position)
+Obstacle ObstacleFactory::createRobotObstacle(const Point &robot_position)
 {
     return createObstacle(
         Circle(robot_position, ROBOT_MAX_RADIUS_METERS + shape_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle)
+Obstacle ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle)
 {
     Rectangle rectangle_exp(rectangle);
     rectangle_exp.expand(shape_expansion_amount);
     return createObstacle(rectangle_exp);
 }
 
-ObstaclePtr ObstacleFactory::createObstacle(const Circle &circle)
+Obstacle ObstacleFactory::createObstacle(const Circle &circle)
 {
-    return ObstaclePtr(std::make_shared<CircleObstacle>(CircleObstacle(circle)));
+    return Obstacle(circle);
 }
 
-ObstaclePtr ObstacleFactory::createObstacle(const ConvexPolygon &convex_polygon)
+Obstacle ObstacleFactory::createObstacle(const ConvexPolygon &convex_polygon)
 {
-    return ObstaclePtr(
-        std::make_shared<ConvexPolygonObstacle>(ConvexPolygonObstacle(convex_polygon)));
+    return Obstacle(convex_polygon);
 }

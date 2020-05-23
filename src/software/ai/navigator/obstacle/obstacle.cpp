@@ -11,30 +11,30 @@ Obstacle::Obstacle(const ConvexPolygon& convex_polygon) : obstacle_shape_(convex
 bool Obstacle::contains(const Point& p) const
 {
     return std::visit(
-        overload{[&p](const ConvexPolygon& convex_polygon) -> bool {
+        overload{[&p](const Circle& circle) -> bool { return circle.contains(p); },
+                 [&p](const ConvexPolygon& convex_polygon) -> bool {
                      return convex_polygon.contains(p);
-                 },
-                 [&p](const Circle& circle) -> bool { return circle.contains(p); }},
+                 }},
         obstacle_shape_);
 }
 
 double Obstacle::distance(const Point& p) const
 {
     return std::visit(
-        overload{[&p](const ConvexPolygon& convex_polygon) -> double {
+        overload{[&p](const Circle& circle) -> double { return ::distance(circle, p); },
+                 [&p](const ConvexPolygon& convex_polygon) -> double {
                      return ::distance(convex_polygon, p);
-                 },
-                 [&p](const Circle& circle) -> double { return ::distance(circle, p); }},
+                 }},
         obstacle_shape_);
 }
 
 bool Obstacle::intersects(const Segment& segment) const
 {
-    return std::visit(overload{[&segment](const ConvexPolygon& convex_polygon) -> bool {
-                                   return ::intersects(convex_polygon, segment);
-                               },
-                               [&segment](const Circle& circle) -> bool {
+    return std::visit(overload{[&segment](const Circle& circle) -> bool {
                                    return ::intersects(circle, segment);
+                               },
+                               [&segment](const ConvexPolygon& convex_polygon) -> bool {
+                                   return ::intersects(convex_polygon, segment);
                                }},
                       obstacle_shape_);
 }
@@ -48,10 +48,10 @@ std::string Obstacle::toString(void) const
 {
     std::ostringstream ss;
     std::visit(
-        overload{[&ss](const ConvexPolygon& convex_polygon) {
+        overload{[&ss](const Circle& circle) { ss << "Obstacle with shape " << circle; },
+                 [&ss](const ConvexPolygon& convex_polygon) {
                      ss << "Obstacle with shape " << convex_polygon;
-                 },
-                 [&ss](const Circle& circle) { ss << "Obstacle with shape " << circle; }},
+                 }},
         obstacle_shape_);
     return ss.str();
 }
