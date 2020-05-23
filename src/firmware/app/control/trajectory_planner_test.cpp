@@ -1041,7 +1041,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
 
 // This test generates a scenario where there is not enough elements in the
 // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS specified array as there path is quite long and the
-// maximum speed of the path is low. This means that most (likely all) arc-lenght segments
+// maximum speed of the path is low. This means that most (likely all) arc-length segments
 // require multiple interpolation periods to traverse, and therefore requires more space
 // than the constant arc_length trajectory that is alread 1 element away from
 // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
