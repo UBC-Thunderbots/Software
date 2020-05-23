@@ -14,8 +14,28 @@
 using boost::asio::ip::udp;
 using google::protobuf::Message;
 
+
+/*
+ * send_proto_over_udp
+ *
+ * This file serves as a testing file to easily send proto at a fixed rate.
+ * Plug the computers ethernet port into an ethernet switch/router.
+ *
+ * Run `ifconfig` in the terminal and find your ethernet interface.
+ * On linux it will usually be eth0 or enp3s0f1
+ *
+ * Plug the STM32H7 into the same switch/router and then run this with
+ * bazel run //firmware_new/tools:send_proto_over_udp -- your_interface_here
+ *
+ */
 int main(int argc, char* argv[])
 {
+    if (argc != 2)
+    {
+        throw std::invalid_argument(
+            "Please provide the interface you wish to multicast over");
+    }
+
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     // we create a wheel control msg, and request wheel 1 to spin at 100 rpm forwards
@@ -37,7 +57,7 @@ int main(int argc, char* argv[])
 
     // create ProtoMulticastSender to send proto
     auto sender = std::make_unique<ProtoMulticastSender<ControlMsg>>(
-        io_service, std::string(AI_MULTICAST_ADDRESS) + "%enp3s0f1",
+        io_service, std::string(AI_MULTICAST_ADDRESS) + "%" + std::string(argv[1]),
         AI_MULTICAST_SEND_PORT);
 
     while (1)
