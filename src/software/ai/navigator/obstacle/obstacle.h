@@ -83,7 +83,7 @@ class Obstacle
  * Implements the << operator for printing
  *
  * @param ostream The stream to print to
- * @param obstacle_ptr The Obstacle to print
+ * @param obstacle The Obstacle to print
  *
  * @return The output stream with the string representation of the class appended
  */
