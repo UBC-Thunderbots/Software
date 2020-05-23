@@ -1,6 +1,7 @@
 load("@rules_proto//proto:defs.bzl", "ProtoInfo", "proto_library")
 load("@com_google_protobuf//:protobuf.bzl", "proto_gen")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:toolchain_utils.bzl", "find_cpp_toolchain")
 
 # TODO: rename this file to `rules.bzl` to be consistent with other parts of the repo?
 
@@ -20,27 +21,65 @@ def _nanopb_proto_library_impl(ctx):
     all_proto_src_files = []
 
     for proto_file in all_proto_files.to_list():
-        h_out = proto_file.basename + ".pb.h"
-        c_out = proto_file.basename + ".pb.c"
+        h_out_name = proto_file.basename + ".pb.h"
+        c_out_name = proto_file.basename + ".pb.c"
 
-        nanopb_generator_path = ctx.attr.nanopb_generator.path
+        c_out = ctx.actions.declare_file(c_out_name)
+        h_out = ctx.actions.declare_file(h_out_name)
+
+        # TODO: implement
+        #nanopb_generator_path = ctx.attr.nanopb_generator.location
+        #native.genrule(
+        #    name = "%s_proto_ch_genrule" % (proto_file),
+        #    srcs = [proto_file],
+        #    tools = ctx.attr.nanopb_generator,
+        #    cmd = "python3 $(location @nanopb//:nanopb_generator) $(location %)" % (proto_file),
+        #    outs = [h_out, c_out],
+        #)
+
+        # TODO: implement me!
         native.genrule(
-            name = "%s_proto_ch_genrule" % (proto_file),
-            srcs = [proto_file],
-            tools = ctx.attr.nanopb_generator,
-            cmd = "python3 $(location @nanopb//:nanopb_generator) $(location %)" % (proto_file),
-            outs = [h_out, c_out],
+            # TODO: rename me
+            name = "create_files",
+            srcs = [],
+            outs = [c_out, h_out],
+            cmd = "touch " + c_out_name + " && touch " + h_out_name,
         )
 
         all_proto_src_files.append(c_out)
         all_proto_hdr_files.append(h_out)
 
-    return native.cc_library(
-        name = ctx.attr.name,
-        srcs = all_proto_src_files,
-        hdrs = all_proto_hdr_files,
-        deps = ctx.attr.nanopb_srcs,
+    cc_toolchain = find_cpp_toolchain(ctx)
+    feature_configuration = cc_common.configure_features(
+        ctx = ctx,
+        cc_toolchain = cc_toolchain,
     )
+
+    (compilation_context, compilation_outputs) = cc_common.compile(
+        name = "compile_nanopb_outputs",
+        actions = ctx.actions,
+        feature_configuration = feature_configuration,
+        cc_toolchain = cc_toolchain,
+        srcs = all_proto_src_files,
+        public_hdrs = all_proto_hdr_files,
+    )
+
+    (linking_context, linking_outputs) = \
+        cc_common.create_linking_context_from_compilation_outputs(
+            name = "link_nanopb_outputs",
+            compilation_outputs = compilation_outputs,
+            actions = ctx.actions,
+            feature_configuration = feature_configuration,
+            cc_toolchain = cc_toolchain,
+        )
+
+# TODO: delete
+#    return native.cc_library(
+#        name = ctx.attr.name,
+#        srcs = all_proto_src_files,
+#        hdrs = all_proto_hdr_files,
+#        deps = ctx.attr.nanopb_srcs,
+#    )
 
 nanopb_proto_library = rule(
     implementation = _nanopb_proto_library_impl,
@@ -58,7 +97,14 @@ nanopb_proto_library = rule(
         "nanopb_srcs": attr.label_list(mandatory = True),
         # TODO: more strict requirements on this attr
         "nanopb_generator": attr.label(mandatory = True),
+        "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
     },
+    provides = [
+        "CcProvider",
+    ],
+    toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
+    fragments = ["cpp"],
+    host_fragments = ["cpp"],
 )
 
 # TODO: delete this
