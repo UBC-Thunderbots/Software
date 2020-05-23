@@ -3,7 +3,8 @@
 #include <iostream>
 
 #include "firmware_new/proto/control.pb.h"
-#include "firmware_new/tools/communication/transfer_media/transfer_medium.h"
+#include "software/networking/proto_multicast_listener.h"
+#include "software/networking/proto_multicast_sender.h"
 #include "software/multithreading/thread_safe_buffer.h"
 
 using boost::asio::ip::udp;
@@ -11,7 +12,9 @@ using google::protobuf::Message;
 
 template <class SendProto, class ReceiveProto>
 RobotCommunicator<SendProto, ReceiveProto>::RobotCommunicator(
-    std::unique_ptr<TransferMedium> medium, MsgSentCallback<SendProto> sent_callback,
+    ProtoMulticastSender<SendProto> proto_sender,
+    ProtoMulticastListener<ReceiveProto> proto_reciever,
+    MsgSentCallback<SendProto> sent_callback,
     MsgReceivedCallback<ReceiveProto> received_callback)
     : sent_callback(sent_callback),
       received_callback(received_callback),

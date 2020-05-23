@@ -3,7 +3,7 @@
 #include "software/logger/logger.h"
 
 template <class SendProto>
-ProtoMulticastSender<ReceiveProto>::ProtoMulticastSender(
+ProtoMulticastSender<SendProto>::ProtoMulticastSender(
     boost::asio::io_service& io_service,
     const std::string ip_address,
     const unsigned short port)
@@ -36,6 +36,9 @@ ProtoMulticastSender<ReceiveProto>::ProtoMulticastSender(
 }
 
 template <class SendProto>
-void ProtoMulticastSender<SendProto>::sendData(const SendProto& message){
+void ProtoMulticastSender<SendProto>::sendData(const SendProto& message)
+{
+    message.SerializeToString(&data_buffer);
+    socket.send_to(boost::asio::buffer(data_buffer), receiver_endpoint);
 }
 

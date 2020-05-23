@@ -1,5 +1,3 @@
-#pragma once
-
 #include "software/logger/logger.h"
 
 template <class ReceiveProto>
@@ -71,13 +69,5 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
         LOG(WARNING)
             << "An unknown network error occurred when attempting to receive ReceiveProto Data. The boost system error code is "
             << error << std::endl;
-    }
-
-    if (num_bytes_received >= max_buffer_length)
-    {
-        LOG(WARNING)
-            << "num_bytes_received >= max_buffer_length, "
-            << "which means that the receive buffer is full and data loss has potentially occurred. "
-            << "Consider increasing max_buffer_length";
     }
 }

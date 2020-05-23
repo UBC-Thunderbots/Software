@@ -7,8 +7,8 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 
-template <class SendProto>
-class ProtoMulticastSender
+template <class ReceiveProto>
+class ProtoMulticastListener
 {
    public:
     /**
@@ -23,7 +23,7 @@ class ProtoMulticastSender
      * @param receive_callback The function to run for every ReceiveProto packet received
      * from the network
      */
-    ProtoMulticastSender(boost::asio::io_service& io_service, std::string ip_address,
+    ProtoMulticastListener(boost::asio::io_service& io_service, std::string ip_address,
                            unsigned short port,
                            std::function<void(ReceiveProto)> receive_callback);
 
@@ -39,19 +39,15 @@ class ProtoMulticastSender
      * @param error The error code obtained when receiving the incoming data
      * @param num_bytes_received How many bytes of data were received
      */
-    void sendData(const SendProto& message);
+    void handleDataReception(const boost::system::error_code& error,
+                             size_t num_bytes_received);
 
     // A UDP socket that we listen on for ReceiveProto messages from the network
     boost::asio::ip::udp::socket socket_;
     // The endpoint for the sender
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
-    // The maximum length of the buffer we use to receive Protobuf packets from the
-    // network. 9000 bytes is the maximum transfer unit (MTU) size we can set on our
-    // network interfaces, before the frame will be fragmented when it is sent, because
-    // that is the maximum size of a jumbo frame https://en.wikipedia.org/wiki/Jumbo_frame
-    // Any proto message received by ProtoMulticastListener must be smaller than this
-    // length in order to be processed correctly
+    // The maximum length of the buffer we use to receive data packets from the network
     static constexpr unsigned int max_buffer_length = 9000;
     // Acts as a buffer to store the raw received data from the network
     std::array<char, max_buffer_length> raw_received_data_;
@@ -59,4 +55,4 @@ class ProtoMulticastSender
     std::function<void(ReceiveProto)> receive_callback;
 };
 
-#include "software/backend/input/network/networking/proto_multicast_sender.tpp"
+#include "software/backend/input/network/networking/proto_multicast_listener.tpp"

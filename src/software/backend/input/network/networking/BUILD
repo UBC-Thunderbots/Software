@@ -1,20 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "proto_multicast_listener",
-    hdrs = [
-        "proto_multicast_listener.h",
-        "proto_multicast_listener.tpp",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "//software/logger",
-        "//software/proto:ssl_cc_proto",
-        "@boost//:asio",
-    ],
-)
-
-cc_library(
     name = "network_filter",
     srcs = ["network_filter.cpp"],
     hdrs = ["network_filter.h"],
@@ -44,7 +30,7 @@ cc_library(
     hdrs = ["network_client.h"],
     deps = [
         ":network_filter",
-        ":proto_multicast_listener",
+        "//software/networking:proto_multicast_listener",
         "//software/backend/input/network/filter:ball_filter",
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
