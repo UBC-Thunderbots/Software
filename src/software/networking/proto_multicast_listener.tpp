@@ -9,7 +9,8 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
-        boost::asio::ip::address::from_string(ip_address), port);
+        boost::asio::ip::make_address(ip_address),
+        port);
     socket_.open(listen_endpoint.protocol());
     try
     {
@@ -80,4 +81,10 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
             << "which means that the receive buffer is full and data loss has potentially occurred. "
             << "Consider increasing max_buffer_length";
     }
+}
+
+template <class ReceiveProto>
+void ProtoMulticastSender<ReceiveProto>::~ProtoMulticastSender()
+{
+    socket_.close();
 }

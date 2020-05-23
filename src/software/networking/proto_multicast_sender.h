@@ -29,7 +29,7 @@ class ProtoMulticastSender
 
    private:
     // A UDP socket to send data over
-    boost::asio::ip::udp::socket socket;
+    boost::asio::ip::udp::socket socket_;
     // The endpoint for the receiver
     boost::asio::ip::udp::endpoint receiver_endpoint;
 };

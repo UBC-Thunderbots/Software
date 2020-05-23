@@ -6,8 +6,6 @@
 #include "boost/bind.hpp"
 #include "firmware_new/boards/frankie_v1/constants.h"
 #include "firmware_new/proto/control.pb.h"
-#include "firmware_new/tools/communication/robot_communicator.h"
-#include "firmware_new/tools/communication/transfer_media/network_medium.h"
 #include "google/protobuf/message.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/thread_safe_buffer.h"
@@ -33,22 +31,18 @@ int main(int argc, char* argv[])
     control_req.mutable_wheel_2_control()->CopyFrom(WheelControl);
     control_req.mutable_wheel_2_control()->CopyFrom(WheelControl);
 
-    int count = 0;
+    // create an io service and run it in a thread to handle async calls
+    boost::asio::io_service io_service;
+    auto io_service_thread = std::thread([]() { io_service.run(); });
 
-    // create a RobotCommunicator with a NetworkMedium
-    RobotCommunicator<ControlMsg, RobotAck> communicator(
-        std::make_unique<NetworkMedium>(std::string(AI_MULTICAST_ADDRESS) + "%eth0",
-                                        AI_MULTICAST_SEND_PORT, AI_UNICAST_LISTEN_PORT),
-        [&](const ControlMsg& msg) {
-            std::cout << "COMP Txed " << count++ << " msgs " << std::endl;
-        },
-        [&](const RobotAck& msg) {
-            std::cout << "STM32 Rxed " << msg.msg_count() << " msgs " << std::endl;
-        });
+    // create ProtoMulticastSender to send Msg
+    auto sender = std::make_unique<ProtoMulticastSender<ControlMsg>>(
+            io_service, std::string(AI_MULTICAST_ADDRESS) + "%eth0", AI_MULTICAST_SEND_PORT);
+
 
     while (1)
     {
-        communicator.send_proto(control_req);
+        sender.sendProto(control_req);
 
         // 4000 hz test
         std::this_thread::sleep_for(std::chrono::nanoseconds(250000));
