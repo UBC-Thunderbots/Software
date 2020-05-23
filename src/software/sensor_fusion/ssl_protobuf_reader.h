@@ -69,7 +69,7 @@ class SSLProtobufReader
      *
      * @return Vision from the given SSL_DetectionFrame
      */
-    VisionDetection getVisionDetection(SSL_DetectionFrame detection);
+    VisionDetection getVisionDetection(const SSL_DetectionFrame &detection_frame);
 
     /**
      * Converts a Referee packet into a RefboxGameState for the Refbox command contained

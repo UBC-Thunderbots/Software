@@ -205,8 +205,8 @@ class World final
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
-    GameState game_state_;
-    RefboxStage refbox_stage_;
+    GameState current_refbox_game_state_;
+    RefboxStage current_refbox_stage_;
     // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;

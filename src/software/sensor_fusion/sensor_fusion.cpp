@@ -21,22 +21,22 @@ void SensorFusion::onValueReceived(SensorMsg sensor_msg)
     }
 }
 
-void SensorFusion::updateWorld(SensorMsg sensor_msg)
+void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
-        updateWorld(*sensor_msg.mutable_ssl_vision_msg());
+        updateWorld(sensor_msg.ssl_vision_msg());
     }
 
     if (sensor_msg.has_ssl_refbox_msg())
     {
-        updateWorld(*sensor_msg.mutable_ssl_refbox_msg());
+        updateWorld(sensor_msg.ssl_refbox_msg());
     }
 
-    updateWorld(*sensor_msg.mutable_tbots_robot_msg());
+    updateWorld(sensor_msg.tbots_robot_msg());
 }
 
-void SensorFusion::updateWorld(SSL_WrapperPacket packet)
+void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
 {
     if (packet.has_geometry())
     {
@@ -45,7 +45,7 @@ void SensorFusion::updateWorld(SSL_WrapperPacket packet)
 
     if (packet.has_detection())
     {
-        updateWorld(*packet.mutable_detection());
+        updateWorld(packet.detection());
     }
 }
 
@@ -64,13 +64,14 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     }
 }
 
-void SensorFusion::updateWorld(Referee packet)
+void SensorFusion::updateWorld(const Referee &packet)
 {
     world.updateRefboxGameState(ssl_protobuf_reader.getRefboxGameState(packet));
     world.updateRefboxStage(ssl_protobuf_reader.getRefboxStage(packet));
 }
 
-void SensorFusion::updateWorld(RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs)
+void SensorFusion::updateWorld(
+    const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
 {
     // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
 }

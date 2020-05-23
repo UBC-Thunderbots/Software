@@ -15,8 +15,6 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
-using namespace google::protobuf;
-
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
  * need to perform. It produces Worlds that may be used, and consumes vision detections,
@@ -46,28 +44,29 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
      *
      * @param sensor_msg new SensorMsg
      */
-    void updateWorld(SensorMsg sensor_msg);
+    void updateWorld(const SensorMsg &sensor_msg);
 
     /**
      * Updates world based on a new SensorMsg
      *
      * @param sensor_msg new SensorMsg
      */
-    void updateWorld(SSL_WrapperPacket packet);
+    void updateWorld(const SSL_WrapperPacket &packet);
 
     /**
      * Updates world based on a new Referee
      *
      * @param packet new Referee packet
      */
-    void updateWorld(Referee packet);
+    void updateWorld(const Referee &packet);
 
     /**
      * Updates world based on repeated TbotsRobotMsg
      *
      * @param tbots_robot_msgs new repeated TbotsRobotMsg
      */
-    void updateWorld(RepeatedPtrField<TbotsRobotMsg> tbots_robot_msgs);
+    void updateWorld(
+        const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
 
     /**
      * Updates world based on a new SSL_GeometryData

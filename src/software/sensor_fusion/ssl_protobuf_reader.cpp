@@ -203,12 +203,14 @@ std::vector<RobotDetection> SSLProtobufReader::getTeamDetections(
     return robot_detections;
 }
 
-VisionDetection SSLProtobufReader::getVisionDetection(SSL_DetectionFrame detection)
+VisionDetection SSLProtobufReader::getVisionDetection(
+    const SSL_DetectionFrame &detection_frame)
 {
     std::vector<BallDetection> ball_detections;
     std::vector<RobotDetection> friendly_team_detections;
     std::vector<RobotDetection> enemy_team_detections;
     Timestamp latest_timestamp;
+    SSL_DetectionFrame detection = detection_frame;
 
     // We invert the field side if we explicitly choose to override the values
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
