@@ -4,7 +4,7 @@
 
 template <class SendProto>
 ProtoMulticastSender<SendProto>::ProtoMulticastSender(boost::asio::io_service& io_service,
-                                                      const std::string ip_address,
+                                                      const std::string& ip_address,
                                                       const unsigned short port)
     : socket_(io_service)
 {

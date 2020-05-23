@@ -4,7 +4,7 @@
 
 template <class ReceiveProto>
 ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
-    boost::asio::io_service& io_service, const std::string ip_address,
+    boost::asio::io_service& io_service, const std::string& ip_address,
     const unsigned short port, std::function<void(ReceiveProto)> receive_callback)
     : socket_(io_service), receive_callback(receive_callback)
 {

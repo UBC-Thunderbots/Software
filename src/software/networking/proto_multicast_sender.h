@@ -17,8 +17,8 @@ class ProtoMulticastSender
      * (IPv4 in dotted decimal or IPv6 in hex string)
      * @param port The port to send SendProto data on
      */
-    ProtoMulticastSender(boost::asio::io_service& io_service, std::string ip_address,
-                         unsigned short port);
+    ProtoMulticastSender(boost::asio::io_service& io_service,
+                         const std::string& ip_address, unsigned short port);
 
     virtual ~ProtoMulticastSender();
 

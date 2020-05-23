@@ -20,8 +20,8 @@ class ProtoMulticastListener
      * @param receive_callback The function to run for every ReceiveProto packet received
      * from the network
      */
-    ProtoMulticastListener(boost::asio::io_service& io_service, std::string ip_address,
-                           unsigned short port,
+    ProtoMulticastListener(boost::asio::io_service& io_service,
+                           const std::string& ip_address, unsigned short port,
                            std::function<void(ReceiveProto)> receive_callback);
 
     virtual ~ProtoMulticastListener();
