@@ -19,13 +19,21 @@ proto_library(
 # TODO add ctx to macro https://github.com/UBC-Thunderbots/Software/issues/1133
 nanopb_proto_library(
     name = "fw_c_proto",
+    # TODO: should be able to specify defaults for nanopb stuff here
     nanopb_generator = "@nanopb//:nanopb_generator",
     nanopb_srcs = [
         "@nanopb//:nanopb_header",
     ],
+    protoc_compiler = "@com_google_protobuf//:protoc",
     deps = [
         ":fw_proto",
     ],
+)
+
+cc_binary(
+    name = "just_testing",
+    srcs = ["just_testing.cpp"],
+    deps = [":fw_c_proto"],
 )
 
 # TODO: delete
@@ -35,8 +43,8 @@ nanopb_proto_library(
 #    restricted_to = ["//cc_toolchain:stm32h7"],
 #)
 
-cc_proto_library(
-    name = "fw_cc_proto",
-    restricted_to = ["//cc_toolchain:k8"],
-    deps = [":fw_proto"],
-)
+#cc_proto_library(
+#    name = "fw_cc_proto",
+#    restricted_to = ["//cc_toolchain:k8"],
+#    deps = [":fw_proto"],
+#)

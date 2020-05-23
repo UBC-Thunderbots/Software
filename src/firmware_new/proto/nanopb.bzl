@@ -3,6 +3,8 @@ load("@com_google_protobuf//:protobuf.bzl", "proto_gen")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_cc//cc:toolchain_utils.bzl", "find_cpp_toolchain")
 
+# TODO: move this to `external/nanopb.bzl`
+
 # TODO: rename this file to `rules.bzl` to be consistent with other parts of the repo?
 
 # TODO: this should probably eventually be a seperate "nanopb_rules" repository so we
@@ -21,29 +23,51 @@ def _nanopb_proto_library_impl(ctx):
     all_proto_src_files = []
 
     for proto_file in all_proto_files.to_list():
-        h_out_name = proto_file.basename + ".pb.h"
-        c_out_name = proto_file.basename + ".pb.c"
+        #native.genrule(
+        #    name = "%s_proto_pb_genrule" % (proto_name),
+        #    srcs = [src],
+        #    tools = ["@com_google_protobuf//:protoc"],
+        #    cmd = "protoc -o %s.pb $(location %s) && mv %s.pb $@" % (proto_name, src, proto_name),
+        #    outs = ["%s.pb" % proto_name],
+        #)
+        #native.genrule(
+        #    name = "%s_proto_ch_genrule" % (proto_name),
+        #    srcs = ["%s.pb" % (proto_name)],
+        #    tools = ["@nanopb//:nanopb_generator"],
+        #    cmd = "python3 $(location @nanopb//:nanopb_generator) $(location %s.pb)" % (proto_name),
+        #    outs = [h_out, c_out],
+        #)
+
+        # TODO: will this breakdown if the proto file is not in the current directly
+        pb_file_name = proto_file.basename.strip(".proto") + ".pb"
+        pb_file = ctx.actions.declare_file(pb_file_name)
+
+        # TODO: implement me!
+        # TODO: go over all fields and add if good
+        # TODO: include directories (should just be the root bazel directory?)
+        # TODO: we should be using the given proto compiler here
+        ctx.actions.run_shell(
+            inputs = [proto_file],
+            outputs = [pb_file],
+            command = "protoc -o %s %s" % (pb_file.path, proto_file.path),
+        )
+
+        # TODO: is this gonna cause bugs if the proto file isn't in the current directory?
+        h_out_name = proto_file.basename.strip("\.proto") + ".pb.h"
+        c_out_name = proto_file.basename.strip("\.proto") + ".pb.c"
 
         c_out = ctx.actions.declare_file(c_out_name)
         h_out = ctx.actions.declare_file(h_out_name)
 
-        # TODO: implement
-        #nanopb_generator_path = ctx.attr.nanopb_generator.location
-        #native.genrule(
-        #    name = "%s_proto_ch_genrule" % (proto_file),
-        #    srcs = [proto_file],
-        #    tools = ctx.attr.nanopb_generator,
-        #    cmd = "python3 $(location @nanopb//:nanopb_generator) $(location %)" % (proto_file),
-        #    outs = [h_out, c_out],
-        #)
-
-        # TODO: implement me!
-        native.genrule(
-            # TODO: rename me
-            name = "create_files",
-            srcs = [],
-            outs = [c_out, h_out],
-            cmd = "touch " + c_out_name + " && touch " + h_out_name,
+        # TODO: REMOVE ALL PRINT STATEMENTS
+        print(ctx.attr.nanopb_generator)
+        print(ctx.executable.nanopb_generator)
+        print(pb_file.path)
+        ctx.actions.run_shell(
+            tools = [ctx.executable.nanopb_generator],
+            inputs = [pb_file],
+            outputs = [c_out, h_out],
+            command = "%s %s" % (ctx.executable.nanopb_generator.path, pb_file.path),
         )
 
         all_proto_src_files.append(c_out)
@@ -73,6 +97,11 @@ def _nanopb_proto_library_impl(ctx):
             cc_toolchain = cc_toolchain,
         )
 
+    return CcInfo(
+        compilation_context = compilation_context,
+        linking_context = linking_context,
+    )
+
 # TODO: delete
 #    return native.cc_library(
 #        name = ctx.attr.name,
@@ -90,17 +119,19 @@ nanopb_proto_library = rule(
             # TODO: figure out what provider to specify here to restrict to things that
             #       provide [ProtoInfo]. See: https://github.com/bazelbuild/bazel/issues/6901
             providers = [
-                #                "ProtoInfo",
+                ProtoInfo,
             ],
         ),
         # TODO: more strict requirements on this attr
-        "nanopb_srcs": attr.label_list(mandatory = True),
+        "nanopb_srcs": attr.label_list(mandatory = True, providers = [CcInfo]),
         # TODO: more strict requirements on this attr
-        "nanopb_generator": attr.label(mandatory = True),
+        "nanopb_generator": attr.label(mandatory = True, executable = True, cfg = "host"),
+        "protoc_compiler": attr.label(mandatory = True, executable = True, cfg = "host"),
         "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
     },
     provides = [
-        "CcProvider",
+        # TODO: uncomment this, not working, but it should......
+        #        "CcInfo",
     ],
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
     fragments = ["cpp"],
