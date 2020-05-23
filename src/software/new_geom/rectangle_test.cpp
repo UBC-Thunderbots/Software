@@ -169,7 +169,7 @@ TEST(RectangleExpandTests, test_expand_positive)
     Rectangle r = Rectangle(Point(2, -2), Point(-3, 5));
     EXPECT_EQ(r.xLength(), 5);
     EXPECT_EQ(r.yLength(), 7);
-    r.expand(4);
+    r.inflate(4);
     EXPECT_EQ(r.xLength(), 13);
     EXPECT_EQ(r.yLength(), 15);
 }
@@ -179,7 +179,7 @@ TEST(RectangleExpandTests, test_expand_negative)
     Rectangle r = Rectangle(Point(-3, 3), Point(4, -5));
     EXPECT_EQ(r.xLength(), 7);
     EXPECT_EQ(r.yLength(), 8);
-    r.expand(-2);
+    r.inflate(-2);
     EXPECT_EQ(r.xLength(), 3);
     EXPECT_EQ(r.yLength(), 4);
 }
@@ -189,7 +189,7 @@ TEST(RectangleExpandTests, test_invalid_expand)
     Rectangle r = Rectangle(Point(-3, 3), Point(4, -5));
     EXPECT_EQ(r.xLength(), 7);
     EXPECT_EQ(r.yLength(), 8);
-    EXPECT_FALSE(r.expand(-5));
+    EXPECT_FALSE(r.inflate(-5));
     EXPECT_EQ(r.xLength(), 7);
     EXPECT_EQ(r.yLength(), 8);
 }
@@ -213,4 +213,36 @@ TEST(RectangleEqualsTests, test_rectangles_not_equal_different_bottom_left_point
     Rectangle r = Rectangle(Point(1, 1), Point(6, 6));
     Rectangle p = Rectangle(Point(0, 0), Point(5, 5));
     EXPECT_FALSE(r == p);
+}
+
+TEST(RectangleExpandTest, test_right)
+{
+    Rectangle rectangle({1, 1}, {5, 3});
+    Rectangle expected({1, 1}, {8, 3});
+    Vector expansion_vector({3, 0});
+    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+}
+
+TEST(RectangleExpandTest, test_up_left)
+{
+    Rectangle rectangle({1, 1}, {5, 3});
+    Rectangle expected({-1, 1}, {5, 6});
+    Vector expansion_vector({-2, 3});
+    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+}
+
+TEST(RectangleExpandTest, test_down_right)
+{
+    Rectangle rectangle({1, 1}, {5, 3});
+    Rectangle expected({1, 0}, {9, 3});
+    Vector expansion_vector({4, -1});
+    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+}
+
+TEST(RectangleExpandTest, test_0_vector)
+{
+    Rectangle rectangle({1, 1}, {5, 3});
+    Rectangle expected(rectangle);
+    Vector expansion_vector({0, 0});
+    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
 }

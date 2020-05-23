@@ -69,7 +69,7 @@ Point Rectangle::furthestCorner(const Point &p)
         });
 }
 
-bool Rectangle::expand(double amount)
+bool Rectangle::inflate(double amount)
 {
     // Ensures rectangle cannot be shrunk to less than a point
     if (xLength() < -2 * amount || yLength() < -2 * amount)
@@ -83,6 +83,32 @@ bool Rectangle::expand(double amount)
     points_[3] = points_[3] + Vector(amount, -amount);
 
     return true;
+}
+
+Rectangle Rectangle::expand(const Vector &v) const
+{
+    Point negCorner = negXNegYCorner();
+    Point posCorner = posXPosYCorner();
+    if (v.x() > 0)
+    {
+        posCorner = posCorner + Vector(v.x(), 0);
+    }
+
+    if (v.y() > 0)
+    {
+        posCorner = posCorner + Vector(0, v.y());
+    }
+
+    if (v.x() < 0)
+    {
+        negCorner = negCorner + Vector(v.x(), 0);
+    }
+
+    if (v.y() < 0)
+    {
+        negCorner = negCorner + Vector(0, v.y());
+    }
+    return Rectangle(negCorner, posCorner);
 }
 
 bool Rectangle::operator==(const Rectangle &p) const

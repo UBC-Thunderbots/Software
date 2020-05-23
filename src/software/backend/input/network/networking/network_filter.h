@@ -12,9 +12,9 @@
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
-#include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
+#include "software/world/timestamped_ball_state.h"
 
 class NetworkFilter
 {
@@ -35,7 +35,8 @@ class NetworkFilter
      * @return The most up to date state of the ball given the new DetectionFrame
      * information
      */
-    BallState getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections);
+    TimestampedBallState getFilteredBallData(
+        const std::vector<SSL_DetectionFrame> &detections);
 
     /**
      * Returns a new Field object containing the most up to date state of the field given
@@ -89,7 +90,7 @@ class NetworkFilter
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
     Field field_state;
-    BallState ball_state;
+    TimestampedBallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;
 

@@ -246,6 +246,7 @@ cc_test(
     ],
     deps = [
         ":convex_polygon",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

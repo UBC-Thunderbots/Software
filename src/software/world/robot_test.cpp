@@ -36,13 +36,28 @@ TEST_F(RobotTest, construct_with_all_params)
     EXPECT_EQ(current_time, robot.lastUpdateTimestamp());
 }
 
+TEST_F(RobotTest, construct_with_initial_state)
+{
+    Robot robot = Robot(
+        3, TimestampedRobotState(Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
+                                 AngularVelocity::fromRadians(-0.6), current_time));
+
+    EXPECT_EQ(3, robot.id());
+    EXPECT_EQ(Point(1, 1), robot.position());
+    EXPECT_EQ(Vector(-0.3, 0), robot.velocity());
+    EXPECT_EQ(Angle::fromRadians(2.2), robot.orientation());
+    EXPECT_EQ(AngularVelocity::fromRadians(-0.6), robot.angularVelocity());
+    EXPECT_EQ(current_time, robot.lastUpdateTimestamp());
+}
+
 TEST_F(RobotTest, update_state_with_all_params)
 {
     Robot robot =
         Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
 
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
 
     EXPECT_EQ(0, robot.id());
     EXPECT_EQ(Point(-1.2, 3), robot.position());
@@ -57,9 +72,9 @@ TEST_F(RobotTest, update_state_with_new_robot)
     Robot robot =
         Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
 
-    RobotState update_robot =
-        RobotState(Point(-1.2, 3), robot.velocity(), Angle::quarter(),
-                   robot.angularVelocity(), current_time);
+    TimestampedRobotState update_robot =
+        TimestampedRobotState(Point(-1.2, 3), robot.velocity(), Angle::quarter(),
+                              robot.angularVelocity(), current_time);
 
     robot.updateState(update_robot);
 
@@ -402,16 +417,19 @@ TEST_F(RobotTest, get_position_history)
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
 
-    boost::circular_buffer<RobotState> previous_states = robot.getPreviousStates();
+    boost::circular_buffer<TimestampedRobotState> previous_states =
+        robot.getPreviousStates();
     std::vector<Point> previous_positions{};
     for (int i = 0; i < previous_states.size(); i++)
     {
-        previous_positions.push_back(previous_states.at(i).position());
+        previous_positions.push_back(previous_states.at(i).robotState().position());
     }
     EXPECT_EQ(prevPositions, previous_positions);
 }
@@ -422,16 +440,19 @@ TEST_F(RobotTest, get_velocity_history)
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
 
-    boost::circular_buffer<RobotState> previous_states = robot.getPreviousStates();
+    boost::circular_buffer<TimestampedRobotState> previous_states =
+        robot.getPreviousStates();
     std::vector<Vector> previous_velocities{};
     for (int i = 0; i < previous_states.size(); i++)
     {
-        previous_velocities.push_back(previous_states.at(i).velocity());
+        previous_velocities.push_back(previous_states.at(i).robotState().velocity());
     }
     EXPECT_EQ(prevVelocities, previous_velocities);
 }
@@ -443,16 +464,19 @@ TEST_F(RobotTest, get_orientation_history)
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
 
-    boost::circular_buffer<RobotState> previous_states = robot.getPreviousStates();
+    boost::circular_buffer<TimestampedRobotState> previous_states =
+        robot.getPreviousStates();
     std::vector<Angle> previous_orientations{};
     for (int i = 0; i < previous_states.size(); i++)
     {
-        previous_orientations.push_back(previous_states.at(i).orientation());
+        previous_orientations.push_back(previous_states.at(i).robotState().orientation());
     }
     EXPECT_EQ(prevOrientations, previous_orientations);
 }
@@ -467,16 +491,20 @@ TEST_F(RobotTest, get_angular_velocity_history)
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.2), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.2), half_second_future));
 
-    boost::circular_buffer<RobotState> previous_states = robot.getPreviousStates();
+    boost::circular_buffer<TimestampedRobotState> previous_states =
+        robot.getPreviousStates();
     std::vector<AngularVelocity> previous_angular_velocities{};
     for (int i = 0; i < previous_states.size(); i++)
     {
-        previous_angular_velocities.push_back(previous_states.at(i).angularVelocity());
+        previous_angular_velocities.push_back(
+            previous_states.at(i).robotState().angularVelocity());
     }
     EXPECT_EQ(prevAngularVelocities, previous_angular_velocities);
 }
@@ -487,12 +515,15 @@ TEST_F(RobotTest, get_timestamp_history)
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.2), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.2), half_second_future));
 
-    boost::circular_buffer<RobotState> previous_states = robot.getPreviousStates();
+    boost::circular_buffer<TimestampedRobotState> previous_states =
+        robot.getPreviousStates();
     std::vector<Timestamp> previous_timestamps{};
     for (int i = 0; i < previous_states.size(); i++)
     {
@@ -505,10 +536,12 @@ TEST_F(RobotTest, get_timestamp_index_fetches_first_index)
 {
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.2), one_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.2), one_second_future));
 
     EXPECT_EQ(0, robot.getHistoryIndexFromTimestamp(one_second_future));
 }
@@ -517,10 +550,12 @@ TEST_F(RobotTest, get_timestamp_index_fetches_last_index)
 {
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.2), one_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.2), one_second_future));
 
     EXPECT_EQ(2, robot.getHistoryIndexFromTimestamp(current_time));
 }
@@ -529,10 +564,12 @@ TEST_F(RobotTest, get_timestamp_index_no_matching_timestamp)
 {
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
                         AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(RobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                                 AngularVelocity::fromRadians(1.2), one_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(
+        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                              AngularVelocity::fromRadians(1.2), one_second_future));
 
     Timestamp no_matching_time =
         half_second_future +
