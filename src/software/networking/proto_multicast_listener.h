@@ -24,6 +24,8 @@ class ProtoMulticastListener
                            unsigned short port,
                            std::function<void(ReceiveProto)> receive_callback);
 
+    virtual ~ProtoMulticastListener();
+
    private:
     /**
      * The function that is called to process any data received by the io_service. This

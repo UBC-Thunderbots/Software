@@ -8,7 +8,7 @@
 #include "firmware_new/proto/control.pb.h"
 #include "google/protobuf/message.h"
 #include "software/logger/logger.h"
-#include "software/multithreading/thread_safe_buffer.h"
+#include "software/networking/proto_multicast_sender.h"
 
 
 using boost::asio::ip::udp;
@@ -33,16 +33,16 @@ int main(int argc, char* argv[])
 
     // create an io service and run it in a thread to handle async calls
     boost::asio::io_service io_service;
-    auto io_service_thread = std::thread([]() { io_service.run(); });
+    auto io_service_thread = std::thread([&]() { io_service.run(); });
 
-    // create ProtoMulticastSender to send Msg
+    // create ProtoMulticastSender to send proto
     auto sender = std::make_unique<ProtoMulticastSender<ControlMsg>>(
-            io_service, std::string(AI_MULTICAST_ADDRESS) + "%eth0", AI_MULTICAST_SEND_PORT);
-
+        io_service, std::string(AI_MULTICAST_ADDRESS) + "%enp3s0f1",
+        AI_MULTICAST_SEND_PORT);
 
     while (1)
     {
-        sender.sendProto(control_req);
+        sender->sendProto(control_req);
 
         // 4000 hz test
         std::this_thread::sleep_for(std::chrono::nanoseconds(250000));

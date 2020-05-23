@@ -19,19 +19,23 @@ class ProtoMulticastSender
     ProtoMulticastSender(boost::asio::io_service& io_service, std::string ip_address,
                          unsigned short port);
 
+    virtual ~ProtoMulticastSender();
+
     /**
      * Sends a protobuf message over the initialized multicast group and port
      * This function returns after the message has been sent.
      *
      * @param message The protobuf message to send over the joined multicast group
      */
-    sendProto(const SendProto& message);
+    void sendProto(const SendProto& message);
 
    private:
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;
     // The endpoint for the receiver
     boost::asio::ip::udp::endpoint receiver_endpoint;
+    // Buffer to hold serialized protobuf data
+    std::string data_buffer;
 };
 
 #include "software/networking/proto_multicast_sender.tpp"

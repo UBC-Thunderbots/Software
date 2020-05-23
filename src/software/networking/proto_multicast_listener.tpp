@@ -9,8 +9,7 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
-        boost::asio::ip::make_address(ip_address),
-        port);
+        boost::asio::ip::make_address(ip_address), port);
     socket_.open(listen_endpoint.protocol());
     try
     {
@@ -84,7 +83,7 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
 }
 
 template <class ReceiveProto>
-void ProtoMulticastSender<ReceiveProto>::~ProtoMulticastSender()
+ProtoMulticastListener<ReceiveProto>::~ProtoMulticastListener()
 {
     socket_.close();
 }
