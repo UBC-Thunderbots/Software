@@ -257,7 +257,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length)
                                        .speed_profile       = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -316,7 +316,7 @@ TEST_F(TrajectoryPlannerTest, check_end_points_match_path)
                                        .speed_profile       = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
@@ -377,7 +377,7 @@ TEST_F(TrajectoryPlannerTest,
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
@@ -461,7 +461,7 @@ TEST_F(TrajectoryPlannerTest,
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
     ;
 
@@ -546,7 +546,7 @@ TEST_F(TrajectoryPlannerTest,
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
@@ -629,7 +629,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterizat
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
@@ -689,7 +689,7 @@ TEST_F(TrajectoryPlannerTest,
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
@@ -745,7 +745,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_speed_profile_reverse_parameteriz
     float forwards_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Copy the 'forwards' velocity profile (as if t1 < t2)
@@ -759,7 +759,8 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_speed_profile_reverse_parameteriz
     trajectory.path_parameters.t_start = trajectory.path_parameters.t_end;
     trajectory.path_parameters.t_end   = temp;
 
-    status = app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+    status =
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     for (unsigned int i = 0; i < trajectory.path_parameters.num_segments; i++)
@@ -793,7 +794,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
                                        .speed_profile       = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parmeterization to contain the desired number of segments
@@ -901,7 +902,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
                                        .speed_profile       = speed_profile};
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parameterization to contain the desired number of segments
@@ -922,7 +923,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    status = app_trajectory_planner_interpolateConstantTimeTrajectory(
+    status = app_trajectory_planner_interpolateConstantTimePositionTrajectory(
         &const_interp_trajectory, &trajectory, 0.001);
     EXPECT_EQ(OK, status);
 
@@ -981,7 +982,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parameterization to contain the desired number of segments
@@ -1004,7 +1005,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    status = app_trajectory_planner_interpolateConstantTimeTrajectory(
+    status = app_trajectory_planner_interpolateConstantTimePositionTrajectory(
         &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_EQ(OK, status);
@@ -1071,7 +1072,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elem
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
 
     // Create the parameterization to contain the desired number of segments
@@ -1094,7 +1095,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elem
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    status = app_trajectory_planner_interpolateConstantTimeTrajectory(
+    status = app_trajectory_planner_interpolateConstantTimePositionTrajectory(
         &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_EQ(INTERPOLATION_ELEMENT_MAXED_OUT, status);
@@ -1126,7 +1127,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
 
     EXPECT_EQ(FINAL_VELOCITY_TOO_HIGH, status);
 }
@@ -1159,7 +1160,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
 
     EXPECT_EQ(INITIAL_VELOCITY_TOO_HIGH, status);
 }
@@ -1191,7 +1192,7 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
 
     EXPECT_EQ(OK, status);
 
@@ -1248,7 +1249,7 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_parabola_path_high_acceleratio
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
 
     EXPECT_EQ(OK, status);
 
@@ -1305,7 +1306,7 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_curved_path_low_acceleration)
 
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantArcLengthTrajectory(&trajectory);
+        app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
 
     EXPECT_EQ(OK, status);
 

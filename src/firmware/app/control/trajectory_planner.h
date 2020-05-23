@@ -122,7 +122,7 @@ typedef enum TrajectoryPlannerGenerationStatus
  * @return The outcome of the trajectory generation. Returns OK if trajectory is valid.
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantArcLengthTrajectory(
+app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
     PositionTrajectory_t* trajectory);
 
 /**
@@ -147,7 +147,7 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
  *
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_interpolateConstantTimeTrajectory(
+app_trajectory_planner_interpolateConstantTimePositionTrajectory(
     PositionTrajectory_t* constant_period_trajectory,
     PositionTrajectory_t* variable_time_trajectory, const float interpolation_period);
 
@@ -273,10 +273,9 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  * @param velocity_profile [in] The forwards and backwards continuous velocity profile of
  * the trajectory
  */
-void static app_trajectory_planner_generateTimeProfile(
-    PositionTrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float num_segments, const float arc_segment_length,
-    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+void static app_trajectory_planner_generatePositionTrajectoryTimeProfile(
+    PositionTrajectoryElement_t* traj_elements, const float num_segments,
+    const float arc_segment_length, float* velocity_profile);
 
 /***
  *  This function takes in a forwards trajectory annd modifies it in place to become a
@@ -287,7 +286,7 @@ void static app_trajectory_planner_generateTimeProfile(
  * @param forwards_trajectory This is the trajectory that will be modified in place to
  * become a reverse trajectory
  */
-void static app_trajectory_planner_reverseTrajectoryDirection(
+void static app_trajectory_planner_reversePositionTrajectoryDirection(
     PositionTrajectory_t* forwards_trajectory);
 
 /**
