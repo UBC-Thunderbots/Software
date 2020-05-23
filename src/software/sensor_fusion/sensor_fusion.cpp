@@ -84,7 +84,7 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     std::optional<Ball> new_ball = getBallFromVisionDetection(vision_detection);
     if (new_ball)
     {
-        world.updateBallState(new_ball->currentState());
+        world.updateBallStateWithTimestamp(new_ball->currentState());
     }
 }
 

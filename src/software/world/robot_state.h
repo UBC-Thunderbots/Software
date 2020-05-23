@@ -3,11 +3,12 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
-#include "software/time/timestamp.h"
-#include "software/world/robot_capabilities.h"
+#include "software/new_geom/vector.h"
 
-// This class represents the state of a Robot at a single point in time
-class RobotState final
+/**
+ * This class represents the physical state of a robot
+ */
+class RobotState
 {
    public:
     /**
@@ -16,15 +17,12 @@ class RobotState final
      *
      * @param position The position of the robot, with coordinates in metres
      * @param velocity The velocity of the robot, in metres per second
-     * @param orientation The orientation of the robot, in Radians.
-     * @param angular_velocity The angular velocity of the robot, in Radians
-     * per second
-     * @param timestamp The timestamp at which the ball was observed to be at the
-     * given position and velocity
+     * @param orientation The orientation of the robot
+     * @param angular_velocity The angular velocity of the robot
      */
     explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation, const AngularVelocity &angular_velocity,
-                        const Timestamp &timestamp);
+                        const Angle &orientation,
+                        const AngularVelocity &angular_velocity);
 
     /**
      * Returns the position of the robot represented by this state
@@ -55,13 +53,6 @@ class RobotState final
     AngularVelocity angularVelocity() const;
 
     /**
-     * Returns the timestamp of the robot represented by this state
-     *
-     * @return the timestamp of the robot represented by this state
-     */
-    Timestamp timestamp() const;
-
-    /**
      * Defines the equality operator for a RobotState. RobotStates are equal if their
      * positions, velocities, orientation, and angular velocity are the same
      *
@@ -82,12 +73,7 @@ class RobotState final
 
    private:
     Point position_;
-
     Vector velocity_;
-
     Angle orientation_;
-
     AngularVelocity angular_velocity_;
-
-    Timestamp timestamp_;
 };

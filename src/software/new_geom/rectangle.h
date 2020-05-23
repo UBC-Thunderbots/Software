@@ -3,7 +3,8 @@
 #include "software/new_geom/convex_polygon.h"
 
 /**
- * A rectangle that cannot be rotated.
+ * A rectangle is a ConvexPolygon of four Points with the invariant that two sides are
+ * parallel to the x axis and two sides are parallel to the y axis
  */
 class Rectangle : public ConvexPolygon
 {
@@ -98,13 +99,27 @@ class Rectangle : public ConvexPolygon
      * the centre by an "amount" while maintaining the same location for the center of the
      * rectangle. The rectangle will not shrink to anything smaller than a point.
      *
+     * NOTE: this is a deprecated function that will be removed in #1331 or #1332
+     *
      * @param amount The amount to expand or shrink the rectangle by on all sides, can be
      * positive or negative
      *
      * @return bool Whether it was possible to expand/shrink the rectangle by
      * amount requested, rectangle remains unchanged if impossible to expand/shrink
      */
-    bool expand(double amount);
+    bool inflate(double amount);
+
+    /**
+     * Returns the Rectangle expanded in the direction of v
+     * To maintain the Rectangle invariant, this is done in two steps:
+     * 1. The Rectangle is split in half perpendicular to v*(1,0) and points on the half
+     * that v*(1,0) is pointing are translated by v*(1,0)
+     * 2. The Rectangle is split in half perpendicular to v*(0,1) and points on the half
+     * that v*(0,1) is pointing are translated by v*(0,1)
+     *
+     * @return a Rectangle expanded in the direction of v
+     */
+    Rectangle expand(const Vector &v) const;
 
     bool operator==(const Rectangle &p) const;
 };
