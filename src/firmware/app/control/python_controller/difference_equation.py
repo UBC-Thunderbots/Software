@@ -16,7 +16,7 @@ import os
 
 class DifferenceEquation:
     def __init__(
-        self, tf_numerator_coefficients: list, tf_denominator_coefficients: list
+        self, tf_numerator_coefficients: list[float], tf_denominator_coefficients: list[float]
     ):
 
         """ Creates a difference equation based on the input discrete domain transfer function
@@ -115,3 +115,8 @@ class DifferenceEquation:
 
     def get_timestep_count(self):
         return self.__time_step_count
+
+    def get_input_coefficients(self):
+        return self.__numerator_coefficientsl
+    def get_output_coefficients(self):
+        return self.__denominator_coefficients

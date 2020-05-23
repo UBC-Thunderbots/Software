@@ -7,7 +7,6 @@ This file contains the unit tests for the DifferenceEquation class
 import numpy as np
 import control as ct
 from control.matlab import *
-import matplotlib.pyplot as plt
 import unittest
 import difference_equation as de
 
