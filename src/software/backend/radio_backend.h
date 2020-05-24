@@ -3,6 +3,9 @@
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/output/radio/radio_output.h"
+#include "software/proto/sensor_msg.pb.h"
+#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/robot_component_status.pb.h"
 
 class RadioBackend : public Backend
 {
@@ -23,6 +26,10 @@ class RadioBackend : public Backend
      * @param world The new world
      */
     void receiveWorld(World world);
+
+    void receiveRobotStatus(RobotStatus robot_status);
+
+    TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status);
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
