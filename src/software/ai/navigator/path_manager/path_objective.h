@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/world/robot.h"
 
 /**
  * Path objective is used to pass information from navigator

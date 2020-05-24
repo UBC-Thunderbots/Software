@@ -18,9 +18,11 @@ class VelocityObstaclePathManager : public PathManager
     const std::map<RobotId, std::optional<Path>> getManagedPaths(
         const std::unordered_set<PathObjective>& objectives,
         const Rectangle& navigable_area) override;
+    const std::vector<Obstacle> getObstacles(void) const override;
 
     explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner,
                                          ObstacleFactory obstacle_factory);
+
 
    private:
     /**
@@ -38,4 +40,5 @@ class VelocityObstaclePathManager : public PathManager
 
     std::unique_ptr<PathPlanner> path_planner;
     ObstacleFactory obstacle_factory;
+    std::vector<Obstacle> path_planning_obstacles;
 };

@@ -159,8 +159,7 @@ class Navigator : public IntentVisitor
     std::unique_ptr<Primitive> current_primitive;
 
     // The following are exposed to users of the Navigator
-    std::vector<std::vector<Point>> user_planned_paths;
-    std::vector<Obstacle> user_obstacles;
+    std::vector<std::vector<Point>> planned_paths;
 
     // These are obstacles that represent robots that aren't
     // assigned move intents

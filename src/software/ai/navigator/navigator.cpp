@@ -86,7 +86,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
     this->world = world;
-    user_planned_paths.clear();
+    planned_paths.clear();
     move_intents_for_path_planning.clear();
     friendly_non_move_intent_robot_obstacles.clear();
 
@@ -113,7 +113,6 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
     const std::vector<MoveIntent> &move_intents)
 {
     std::unordered_set<PathObjective> path_objectives;
-    user_obstacles.clear();
 
     for (const auto &intent : move_intents)
     {
@@ -132,8 +131,6 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
                 obstacle_factory.createBallObstacle(world.ball().position());
             obstacles.push_back(ball_obstacle);
         }
-
-        user_obstacles.insert(user_obstacles.end(), obstacles.begin(), obstacles.end());
 
         auto robot = world.friendlyTeam().getRobotById(intent.getRobotId());
 
@@ -207,7 +204,7 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
         double desired_final_speed;
         Point final_dest;
         std::vector<Point> path_points = path->getKnots();
-        user_planned_paths.emplace_back(path_points);
+        planned_paths.emplace_back(path_points);
 
         if (path_points.size() <= 2)
         {
@@ -272,10 +269,10 @@ double Navigator::calculateTransitionSpeedBetweenSegments(const Point &p1,
 
 std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
 {
-    return user_planned_paths;
+    return planned_paths;
 }
 
 std::vector<Obstacle> Navigator::getObstacles()
 {
-    return user_obstacles;
+    return path_manager->getObstacles();
 }

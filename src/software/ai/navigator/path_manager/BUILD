@@ -10,6 +10,7 @@ cc_library(
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/path_planner",
         "//software/geom",
+        "//software/world",
     ],
 )
 
