@@ -14,10 +14,10 @@ void drawRectangle(QGraphicsScene* scene, const Rectangle& rectangle, const QPen
     }
 }
 
-void drawConvexPolygon(QGraphicsScene* scene, const ConvexPolygon& convex_polygon,
-                       const QPen& pen, std::optional<QBrush> brush_opt)
+void drawPolygon(QGraphicsScene* scene, const Polygon& polygon, const QPen& pen,
+                 std::optional<QBrush> brush_opt)
 {
-    auto poly = createQPolygonF(convex_polygon);
+    auto poly = createQPolygonF(polygon);
     if (brush_opt)
     {
         scene->addPolygon(poly, pen, brush_opt.value());

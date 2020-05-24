@@ -105,7 +105,7 @@ Obstacle ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
         // use hexagonal approximation for velocity obstacle
         Vector velocity_direction_norm_radius =
             velocity_cushion_vector.normalize(radius_cushion);
-        return createObstacle(ConvexPolygon(
+        return createObstacle(Polygon(
             {// left side of robot
              robot.position() + velocity_direction_norm_radius.rotate(Angle::quarter()),
              // back left of robot
@@ -165,7 +165,7 @@ Obstacle ObstacleFactory::createObstacle(const Circle &circle)
     return Obstacle(circle);
 }
 
-Obstacle ObstacleFactory::createObstacle(const ConvexPolygon &convex_polygon)
+Obstacle ObstacleFactory::createObstacle(const Polygon &polygon)
 {
-    return Obstacle(convex_polygon);
+    return Obstacle(polygon);
 }

@@ -37,9 +37,8 @@ void drawObstacle(QGraphicsScene* scene, const ObstacleShape& obstacle_shape,
                   const QPen& pen)
 {
     std::visit(
-        overload{[scene, pen](const Circle& circle) { drawCircle(scene, circle, pen); },
-                 [scene, pen](const ConvexPolygon& convex_polygon) {
-                     drawConvexPolygon(scene, convex_polygon, pen);
-                 }},
+        overload{
+            [scene, pen](const Circle& circle) { drawCircle(scene, circle, pen); },
+            [scene, pen](const Polygon& polygon) { drawPolygon(scene, polygon, pen); }},
         obstacle_shape);
 }

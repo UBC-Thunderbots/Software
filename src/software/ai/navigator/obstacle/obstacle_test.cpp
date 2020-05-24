@@ -4,8 +4,8 @@
 #include <math.h>
 
 #include "software/new_geom/circle.h"
-#include "software/new_geom/convex_polygon.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/polygon.h"
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
@@ -14,7 +14,7 @@
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {
     Obstacle obstacle(Rectangle({-1, 1}, {2, -3}));
-    ConvexPolygon expected       = ConvexPolygon({
+    Polygon expected             = Polygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
@@ -22,12 +22,12 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
     });
     ObstacleShape obstacle_shape = obstacle.getObstacleShape();
 
-    std::visit(overload{[&obstacle_shape, expected](const ConvexPolygon& convex_polygon) {
-                            EXPECT_EQ(expected, convex_polygon);
+    std::visit(overload{[&obstacle_shape, expected](const Polygon& polygon) {
+                            EXPECT_EQ(expected, polygon);
                         },
                         [&obstacle_shape, expected](const Circle& circle) {
                             ADD_FAILURE()
-                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                                << "Expected Polygon, Obstacle was of type Circle";
                         }},
                obstacle_shape);
 }
@@ -38,9 +38,9 @@ TEST(NavigatorObstacleTest, create_from_circle)
     Obstacle obstacle(expected);
     ObstacleShape obstacle_shape = obstacle.getObstacleShape();
 
-    std::visit(overload{[&obstacle_shape, expected](const ConvexPolygon& convex_polygon) {
+    std::visit(overload{[&obstacle_shape, expected](const Polygon& polygon) {
                             ADD_FAILURE()
-                                << "Expected Circle, Obstacle was of type ConvexPolygon";
+                                << "Expected Circle, Obstacle was of type Polygon";
                         },
                         [&obstacle_shape, expected](const Circle& circle) {
                             EXPECT_EQ(circle, expected);
@@ -48,22 +48,22 @@ TEST(NavigatorObstacleTest, create_from_circle)
                obstacle_shape);
 }
 
-TEST(NavigatorObstacleTest, convex_polygon_obstacle_stream_operator_test)
+TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
 {
     Obstacle obstacle = Obstacle(Rectangle({-1, 1}, {2, -3}));
 
-    ConvexPolygon expected = ConvexPolygon({
+    Polygon expected = Polygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
 
-    // we expect that the stream operator string for Obstacle with shape ConvexPolygon
-    // will contain the stream operator string for ConvexPolygon
-    std::ostringstream convex_polygon_ss;
-    convex_polygon_ss << expected;
-    EXPECT_TRUE(obstacle.toString().find(convex_polygon_ss.str()) != std::string::npos);
+    // we expect that the stream operator string for Obstacle with shape Polygon
+    // will contain the stream operator string for Polygon
+    std::ostringstream polygon_ss;
+    polygon_ss << expected;
+    EXPECT_TRUE(obstacle.toString().find(polygon_ss.str()) != std::string::npos);
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_stream_operator_test)
@@ -113,15 +113,15 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
     EXPECT_FALSE(obstacle.intersects(non_intersecting_segment));
 }
 
-TEST(NavigatorObstacleTest, convex_polygon_obstacle_contains)
+TEST(NavigatorObstacleTest, polygon_obstacle_contains)
 {
-    ConvexPolygon convex_polygon = ConvexPolygon({
+    Polygon polygon = Polygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
-    Obstacle obstacle(convex_polygon);
+    Obstacle obstacle(polygon);
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -129,15 +129,15 @@ TEST(NavigatorObstacleTest, convex_polygon_obstacle_contains)
     EXPECT_FALSE(obstacle.contains(outside_point));
 }
 
-TEST(NavigatorObstacleTest, convex_polygon_obstacle_distance)
+TEST(NavigatorObstacleTest, polygon_obstacle_distance)
 {
-    ConvexPolygon convex_polygon = ConvexPolygon({
+    Polygon polygon = Polygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
-    Obstacle obstacle(convex_polygon);
+    Obstacle obstacle(polygon);
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -145,15 +145,15 @@ TEST(NavigatorObstacleTest, convex_polygon_obstacle_distance)
     EXPECT_EQ(obstacle.distance(outside_point), 5);
 }
 
-TEST(NavigatorObstacleTest, convex_polygon_obstacle_intersects)
+TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
 {
-    ConvexPolygon convex_polygon = ConvexPolygon({
+    Polygon polygon = Polygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
-    Obstacle obstacle(convex_polygon);
+    Obstacle obstacle(polygon);
     Point inside_point(0, -1);
     Point outside_point(5, 5);
     Segment intersecting_segment(inside_point, outside_point);

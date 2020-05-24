@@ -36,11 +36,11 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 
     std::visit(overload{[expected](const Circle& circle) {
                             ADD_FAILURE()
-                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                                << "Expected Polygon, Obstacle was of type Circle";
                         },
-                        [expected](const ConvexPolygon& convex_polygon) {
+                        [expected](const Polygon& polygon) {
                             EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-                                expected, convex_polygon, METERS_PER_MILLIMETER));
+                                expected, polygon, METERS_PER_MILLIMETER));
                         }},
                obstacle_shape);
 }
@@ -54,7 +54,7 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     ObstacleShape obstacle_shape = obstacle.getObstacleShape();
 
     std::visit(overload{[expected](const Circle& circle) { EXPECT_EQ(expected, circle); },
-                        [expected](const ConvexPolygon& convex_polygon) {
+                        [expected](const Polygon& polygon) {
                             ADD_FAILURE() << "CircleObstacle was not created for a ball";
                         }},
                obstacle_shape);
@@ -69,7 +69,7 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     ObstacleShape obstacle_shape = obstacle.getObstacleShape();
 
     std::visit(overload{[expected](const Circle& circle) { EXPECT_EQ(expected, circle); },
-                        [expected](const ConvexPolygon& convex_polygon) {
+                        [expected](const Polygon& polygon) {
                             ADD_FAILURE() << "CircleObstacle was not created for a robot";
                         }},
                obstacle_shape);
@@ -91,7 +91,7 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
                      EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
                          expected, circle, METERS_PER_MILLIMETER));
                  },
-                 [expected](const ConvexPolygon& convex_polygon) {
+                 [expected](const Polygon& polygon) {
                      ADD_FAILURE()
                          << "CircleObstacle was not created for a stationary robot";
                  }},
@@ -111,7 +111,7 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
 
     std::visit(
         overload{[expected](const Circle& circle) { EXPECT_EQ(expected, circle); },
-                 [expected](const ConvexPolygon& convex_polygon) {
+                 [expected](const Polygon& polygon) {
                      ADD_FAILURE()
                          << "CircleObstacle was not created for a slow moving robot";
                  }},
@@ -132,11 +132,11 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
 
     std::visit(overload{[expected](const Circle& circle) {
                             ADD_FAILURE()
-                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                                << "Expected Polygon, Obstacle was of type Circle";
                         },
-                        [expected](const ConvexPolygon& convex_polygon) {
+                        [expected](const Polygon& polygon) {
                             EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-                                expected, convex_polygon, METERS_PER_MILLIMETER));
+                                expected, polygon, METERS_PER_MILLIMETER));
                         }},
                obstacle_shape);
 }
@@ -155,11 +155,11 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
 
     std::visit(overload{[expected](const Circle& circle) {
                             ADD_FAILURE()
-                                << "Expected ConvexPolygon, Obstacle was of type Circle";
+                                << "Expected Polygon, Obstacle was of type Circle";
                         },
-                        [expected](const ConvexPolygon& convex_polygon) {
+                        [expected](const Polygon& polygon) {
                             EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-                                expected, convex_polygon, METERS_PER_MILLIMETER));
+                                expected, polygon, METERS_PER_MILLIMETER));
                         }},
                obstacle_shape);
 }

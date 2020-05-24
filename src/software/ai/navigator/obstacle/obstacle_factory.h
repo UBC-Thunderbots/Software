@@ -111,12 +111,12 @@ class ObstacleFactory
     Obstacle createObstacle(const Circle &circle);
 
     /**
-     * Create convex_polygon obstacle directly from a ConvexPolygon
+     * Create polygon obstacle directly from a Polygon
      * Note: this helper function does not add a robot radius
      *
-     * @param convex_polygon ConvexPolygon
+     * @param polygon Polygon
      *
-     * @return convex_polygon shaped obstacle
+     * @return polygon shaped obstacle
      */
-    Obstacle createObstacle(const ConvexPolygon &convex_polygon);
+    Obstacle createObstacle(const Polygon &polygon);
 };

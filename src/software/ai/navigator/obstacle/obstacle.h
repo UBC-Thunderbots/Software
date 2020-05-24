@@ -5,7 +5,6 @@
 
 #include "shared/constants.h"
 #include "software/new_geom/circle.h"
-#include "software/new_geom/convex_polygon.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
@@ -14,7 +13,7 @@
 
 /**
  * Represents the underlying shape of the obstacle */
-using ObstacleShape = std::variant<ConvexPolygon, Circle>;
+using ObstacleShape = std::variant<Polygon, Circle>;
 
 /**
  * An obstacle is an area to avoid for navigation
@@ -32,11 +31,11 @@ class Obstacle
     explicit Obstacle(const Circle& circle);
 
     /**
-     * Construct a obstacle with a ConvexPolygon
+     * Construct a obstacle with a Polygon
      *
-     * @param circle ConvexPolygon to make obstacle with
+     * @param circle Polygon to make obstacle with
      */
-    explicit Obstacle(const ConvexPolygon& convex_polygon);
+    explicit Obstacle(const Polygon& polygon);
 
     /**
      * Determines whether the given Point is contained within this Obstacle
