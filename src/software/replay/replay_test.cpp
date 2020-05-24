@@ -36,8 +36,8 @@ class TestSubject : public Subject<TbotsSensorProto>
 
 TbotsSensorProto generateTestFrame(int value)
 {
-    TbotsSensorProto test_frame;
-    SSL_DetectionBall test_ball;
+    TbotsSensorProto test_frame = TbotsSensorProto::default_instance();
+    SSL_DetectionBall test_ball = SSL_DetectionBall::default_instance();
     test_ball.set_area(value);
     test_ball.set_confidence(0.5);
     test_ball.set_pixel_x(420);
@@ -45,7 +45,7 @@ TbotsSensorProto generateTestFrame(int value)
     test_ball.set_x(123);
     test_ball.set_y(456);
     test_ball.set_z(789);
-    test_frame.ssl_wrapperpacket().InitAsDefaultInstance();
+    *test_frame.mutable_ssl_wrapperpacket() = SSL_WrapperPacket::default_instance();
     test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->mutable_balls()->Add(
         dynamic_cast<SSL_DetectionBall&&>(test_ball));
     test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_frame_number(value);
@@ -73,8 +73,9 @@ TEST_F(ReplayTest, test_single_segment_single_message)
         auto frame = reader.getNextFrame();
         if (!frame)
             FAIL();
+        EXPECT_TRUE(frame->has_ssl_wrapperpacket());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
-            test_frame.ssl_wrapperpacket(), *frame));
+            test_frame.ssl_wrapperpacket(), frame->ssl_wrapperpacket()));
     }
 }
 
@@ -105,11 +106,14 @@ TEST_F(ReplayTest, test_single_segment_multiple_message)
         for (auto expected_message : test_messages)
         {
             auto actual_message_or_null = reader.getNextFrame();
-            if (!actual_message_or_null)
-                FAIL();
+            if (!actual_message_or_null) {
+                FAIL() << "failed on idx " << expected_message.ssl_wrapperpacket().detection().t_sent();
+            }
+            EXPECT_TRUE(actual_message_or_null->has_ssl_wrapperpacket());
             EXPECT_TRUE(
                 google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
-                    expected_message, *actual_message_or_null));
+                    expected_message.ssl_wrapperpacket(), actual_message_or_null->ssl_wrapperpacket()));
+            std::cout << "idx " << expected_message.ssl_wrapperpacket().detection().t_sent() << " passed";
         }
     }
 }
@@ -144,6 +148,7 @@ TEST_F(ReplayTest, test_multiple_segment_multiple_message)
             if (!actual_message_or_null)
                 FAIL();
 
+            EXPECT_TRUE(actual_message_or_null->has_ssl_wrapperpacket());
             std::cout << "ACTUAL: " << actual_message_or_null->ssl_wrapperpacket().detection().t_sent()
                       << " EXPECTED: " << expected_message.ssl_wrapperpacket().detection().t_sent()
                       << std::endl;

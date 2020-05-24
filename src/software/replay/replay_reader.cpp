@@ -57,7 +57,8 @@ std::optional<TbotsSensorProto> ReplayReader::getNextFrame()
     if (cur_frame_idx >= cur_chunk.replay_frames_size()) {
         try {
             nextChunk();
-        } catch (std::out_of_range&) {
+        } catch (std::out_of_range& e) {
+            std::cout << "PEA BRAIN TIME " << e.what() << std::endl;
             return std::nullopt;
         }
     }
@@ -72,7 +73,8 @@ void ReplayReader::nextChunk() {
     auto cur_chunk_ifstream = std::ifstream(replay_dir / std::to_string(cur_chunk_idx));
     bool success = cur_chunk.ParseFromIstream(&cur_chunk_ifstream);
     if (!success) {
-        throw std::out_of_range("Reached end of replay!");
+        std::string error_msg = "Reached end of replay at idx " + std::to_string(cur_chunk_idx);
+        throw std::out_of_range(error_msg);
     }
     cur_frame_idx = 0;
 }

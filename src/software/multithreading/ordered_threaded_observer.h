@@ -94,7 +94,6 @@ void OrderedThreadedObserver<T>::continuouslyPullValuesFromBuffer()
 template <typename T>
 OrderedThreadedObserver<T>::~OrderedThreadedObserver()
 {
-    // We must wait for the thread to stop, as if we destroy it while it's still
-    // running we will segfault
+    // TODO: possibly do something more intelligent here
     pull_from_buffer_thread.join();
 }

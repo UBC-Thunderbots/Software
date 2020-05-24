@@ -47,7 +47,7 @@ ReplayLogger::~ReplayLogger() {
 void ReplayLogger::onValueReceived(TbotsSensorProto frame)
 {
     frame.set_fuck(5);
-    current_chunk.mutable_replay_frames()->Add(dynamic_cast<TbotsSensorProto&&>(frame));
+    current_chunk.mutable_replay_frames()->Add(dynamic_cast<TbotsSensorProto &&>(frame));
     LOG(INFO) << "Logging to chunk " << current_chunk_idx;
     if (current_chunk.replay_frames_size() >= frames_per_chunk) {
         saveCurrentChunk();
@@ -58,11 +58,12 @@ void ReplayLogger::onValueReceived(TbotsSensorProto frame)
 
 void ReplayLogger::nextChunk() {
     current_chunk_idx++;
-    current_chunk.clear_replay_frames();
+    current_chunk.Clear();
 }
 void ReplayLogger::saveCurrentChunk() {
     fs::path chunk_path = output_dir_path / std::to_string(current_chunk_idx);
-    std::ofstream chunk_ofstream(chunk_path);
-    current_chunk.SerializeToOstream(&chunk_ofstream);
-    chunk_ofstream << std::flush;
+    // this is a stupid ass hack but hopefully it wont SIGABRT anymore
+    std::string chunk_str = current_chunk.SerializeAsString();
+    std::ofstream chunk_ofstream(chunk_path, std::ios_base::out | std::ios_base::binary);
+    chunk_ofstream << chunk_str << std::flush;
 }
