@@ -116,7 +116,8 @@ namespace Test
          * @return true if the two polygons are within tolerance of each other
          */
         static bool equalWithinTolerance(const Polygon &poly1, const Polygon &poly2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+                                         double tolerance = METERS_PER_MILLIMETER,
+                                         bool debug       = true);
 
         /**
          * Checks if two circles are within tolerance of each other
@@ -130,7 +131,8 @@ namespace Test
          * @return true if the two circles are within tolerance of each other
          */
         static bool equalWithinTolerance(const Circle &c1, const Circle &c2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+                                         double tolerance = METERS_PER_MILLIMETER,
+                                         bool debug       = true);
 
         /**
          * Checks if two points are within tolerance of each other
@@ -144,7 +146,8 @@ namespace Test
          * @return true if the two points are within tolerance of each other
          */
         static bool equalWithinTolerance(const Point &pt1, const Point &pt2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+                                         double tolerance = METERS_PER_MILLIMETER,
+                                         bool debug       = true);
 
         /**
          * Checks if two values are within tolerance of each other
@@ -156,7 +159,8 @@ namespace Test
          * @return true if the two values are within tolerance of each other
          */
         static bool equalWithinTolerance(double val1, double val2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+                                         double tolerance = METERS_PER_MILLIMETER,
+                                         bool debug       = true);
 
        private:
         /**
