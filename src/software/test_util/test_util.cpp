@@ -1,5 +1,7 @@
 #include "software/test_util/test_util.h"
 
+#include <iostream>
+
 namespace Test
 {
     Field TestUtil::createSSLDivBField()
@@ -108,24 +110,51 @@ namespace Test
     {
         auto ppts1 = poly1.getPoints();
         auto ppts2 = poly2.getPoints();
-        return std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
-                          [tolerance](const Point &p1, const Point &p2) {
-                              return equalWithinTolerance(p1, p2, tolerance);
-                          });
+        if (std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
+                       [tolerance](const Point &p1, const Point &p2) {
+                           return equalWithinTolerance(p1, p2, tolerance);
+                       }))
+        {
+            return true;
+        }
+        else
+        {
+            std::cout << "Polygon 1 was " << poly1 << std::endl;
+            std::cout << "Polygon 2 was " << poly2 << std::endl;
+            return false;
+        }
     }
 
     bool TestUtil::equalWithinTolerance(const Circle &c1, const Circle &c2,
                                         double tolerance)
     {
-        return equalWithinTolerance(c1.getOrigin(), c2.getOrigin(), tolerance) &&
-               equalWithinTolerance(c1.getRadius(), c2.getRadius(), tolerance);
+        if (equalWithinTolerance(c1.getOrigin(), c2.getOrigin(), tolerance) &&
+            equalWithinTolerance(c1.getRadius(), c2.getRadius(), tolerance))
+        {
+            return true;
+        }
+        else
+        {
+            std::cout << "Circle 1 was " << c1 << std::endl;
+            std::cout << "Circle 2 was " << c2 << std::endl;
+            return false;
+        }
     }
 
     bool TestUtil::equalWithinTolerance(const Point &pt1, const Point &pt2,
                                         double tolerance)
     {
         double distance = pt1.distanceFromPoint(pt2);
-        return equalWithinTolerance(distance, 0, tolerance);
+        if (equalWithinTolerance(distance, 0, tolerance))
+        {
+            return true;
+        }
+        else
+        {
+            std::cout << "Point 1 was " << pt1 << std::endl;
+            std::cout << "Point 2 was " << pt2 << std::endl;
+            return false;
+        }
     }
 
     bool TestUtil::equalWithinTolerance(double val1, double val2, double tolerance)
@@ -133,6 +162,15 @@ namespace Test
         // subtracting one fixed epsilon to account for the error in fabs and one fixed
         // epsilon to account for the error in subtracting the two vals
         double difference = fabs(val1 - val2) - GeomConstants::FIXED_EPSILON * 2;
-        return difference < tolerance;
+        if (difference < tolerance)
+        {
+            return true;
+        }
+        else
+        {
+            std::cout << "Value 1 was " << val1 << std::endl;
+            std::cout << "Value 2 was " << val2 << std::endl;
+            return false;
+        }
     }
 }  // namespace Test
