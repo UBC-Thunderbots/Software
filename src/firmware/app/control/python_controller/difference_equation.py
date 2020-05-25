@@ -14,6 +14,42 @@ import _collections_abc
 import os
 
 
+class DifferenceEquation2:
+    def __init__(
+            self, discrete_tf: ct.TransferFunction):
+        """ Creates a difference equation based on the input discrete domain transfer function
+
+        :param discrete_tf The discrete transfer function (Z domain) representing the system
+        """
+        # Copy the numerator and denominator of the input TF
+        numerator_coefficients = discrete_tf.num[0][0]
+        denominator_coefficients = discrete_tf.den[0][0]
+
+        # Store the order of the numerator and denominator for calculation later
+        self.__denominator_order = len(denominator_coefficients)
+        self.__numerator_order = len(numerator_coefficients)
+
+        # Normalize by the coefficient of the highest order denominator term
+        # This is done so that the output of the difference equation is not scaled
+        self.__input_coefficients = [coeff/self.__numerator_coefficients[0] for coeff in self.__numerator_coefficients]
+        self.__output_coefficients = [coeff/self.__numerator_coefficients[0] for coeff in self.__denominator_coefficients]
+  
+    def calculate_output(self, input_history: list[float], output_history: list[float] ):
+        """ Calculated the output of the difference equation given the list of previous(and current) outputs
+        and inputs to the system
+
+        :param input_history The last N inputs, where N is the order of the original TF's numerator
+        aka self.__numerator_order
+
+        :param output_history The last M outputs, where M is the order of the original TF's denominator
+        aka self.__denominator_order
+        """
+
+        # Use the input history and multiply with the input coefficients
+
+
+        # Use the output history and multiply with the output coefficients
+
 class DifferenceEquation:
     def __init__(
         self, tf_numerator_coefficients: list[float], tf_denominator_coefficients: list[float]
