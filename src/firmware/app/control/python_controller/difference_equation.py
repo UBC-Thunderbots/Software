@@ -9,14 +9,11 @@ import numpy as np
 import control as ct
 from control.matlab import *
 import matplotlib.pyplot as plt
-import collections
-import _collections_abc
-import os
+import functools
 
 
-class DifferenceEquation2:
-    def __init__(
-            self, discrete_tf: ct.TransferFunction):
+class Difference_Equation:
+    def __init__(self, discrete_tf: ct.TransferFunction):
         """ Creates a difference equation based on the input discrete domain transfer function
 
         :param discrete_tf The discrete transfer function (Z domain) representing the system
@@ -31,10 +28,18 @@ class DifferenceEquation2:
 
         # Normalize by the coefficient of the highest order denominator term
         # This is done so that the output of the difference equation is not scaled
-        self.__input_coefficients = [coeff/self.__numerator_coefficients[0] for coeff in self.__numerator_coefficients]
-        self.__output_coefficients = [coeff/self.__numerator_coefficients[0] for coeff in self.__denominator_coefficients]
-  
-    def calculate_output(self, input_history: list[float], output_history: list[float] ):
+        self.__input_coefficients = [
+            coeff / denominator_coefficients[0] for coeff in numerator_coefficients
+        ]
+        self.__output_coefficients = [
+            coeff / denominator_coefficients[0] for coeff in denominator_coefficients
+        ]
+
+        # The first element in the output coefficient list corresponds to the system output for a given input,
+        # so we will 'remove' it here by setting it's value to zero - and therefor no contribution
+        self.__output_coefficients[0] = 0
+
+    def calculate_output(self, output_history, input_history):
         """ Calculated the output of the difference equation given the list of previous(and current) outputs
         and inputs to the system
 
@@ -46,13 +51,43 @@ class DifferenceEquation2:
         """
 
         # Use the input history and multiply with the input coefficients
-
+        # TODO this section here doesn't account for how the index values of the coefficients
+        # and the history element you would like to access to not line up
+        # Solutions: Maybe add blank spaces to the beggining of the arrays
+        # or perhaps do some shifting by a constant difference between orders
+        # before doing the math
+        input_response = 0
+        for i in range(
+            self.__denominator_order - self.__numerator_order, self.__denominator_order
+        ):
+            input_response += input_history[i] * self.__input_coefficients[i]
 
         # Use the output history and multiply with the output coefficients
+        output_response = [
+            coefficient * input_value
+            for coefficient, input_value in zip(
+                self.__output_coefficients, output_history
+            )
+        ]
+
+        return input_response - functools.reduce(lambda a, b: a + b, output_response)
+
+    def get_input_order(self):
+        return self.__numerator_order
+
+    def get_output_order(self):
+        return self.__denominator_order
+
+    def get_input_coefficients(self):
+        return self.__input_coefficients
+
+    def get_output_coefficients(self):
+        return self.__output_coefficients
+
 
 class DifferenceEquation:
     def __init__(
-        self, tf_numerator_coefficients: list[float], tf_denominator_coefficients: list[float]
+        self, tf_numerator_coefficients: list, tf_denominator_coefficients: list,
     ):
 
         """ Creates a difference equation based on the input discrete domain transfer function
@@ -72,12 +107,10 @@ class DifferenceEquation:
 
         # Normalize by the coefficient of the highest order denominator term
         # This is done so that the output of the difference equation is not scaled
-        self.__numerator_coefficients = [coeff/self.__numerator_coefficients[0] for coeff in self.__numerator_coefficients]
-        # for i in range(0, len(self.__numerator_coefficients)):
-        #     self.__numerator_coefficients[i] /= self.__denominator_coefficients[0]
-        self.__denominator_coefficients = [coeff/self.__numerator_coefficients[0] for coeff in self.__denominator_coefficients]
-        # for i in range(0, len(self.__denominator_coefficients)):
-        #     self.__denominator_coefficients[i] /= self.__denominator_coefficients[0]
+        for i in range(0, len(self.__numerator_coefficients)):
+            self.__numerator_coefficients[i] /= self.__denominator_coefficients[0]
+        for i in range(0, len(self.__denominator_coefficients)):
+            self.__denominator_coefficients[i] /= self.__denominator_coefficients[0]
 
         # We must keep track of the system state and previous states
         self.__time_step_count = 0
@@ -99,7 +132,7 @@ class DifferenceEquation:
 
             # Calculate how many input 'steps' back in time we must use for the given numerator coefficient
             index = self.__time_step_count + (
-                    self.__numerator_order - self.__denominator_order - i
+                self.__numerator_order - self.__denominator_order - i
             )
 
             # If we must go more time steps backwards than are recorded, the term has no effect on the output
@@ -153,6 +186,7 @@ class DifferenceEquation:
         return self.__time_step_count
 
     def get_input_coefficients(self):
-        return self.__numerator_coefficientsl
+        return self.__numerator_coefficients
+
     def get_output_coefficients(self):
         return self.__denominator_coefficients
