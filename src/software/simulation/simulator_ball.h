@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include "software/simulation/physics/physics_ball.h"
 

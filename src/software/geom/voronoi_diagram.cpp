@@ -12,8 +12,8 @@
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_vertex;
 
-VoronoiDiagram::VoronoiDiagram(std::vector<Point> points) :
-diagram(std::make_shared<boost::polygon::voronoi_diagram<double>>())
+VoronoiDiagram::VoronoiDiagram(std::vector<Point> points)
+    : diagram(std::make_shared<boost::polygon::voronoi_diagram<double>>())
 {
     construct_voronoi(points.begin(), points.end(), diagram.get());
     this->points = points;

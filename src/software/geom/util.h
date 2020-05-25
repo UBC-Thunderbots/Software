@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstddef>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "software/geom/shot.h"
 #include "software/new_geom/circle.h"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/spline.h"

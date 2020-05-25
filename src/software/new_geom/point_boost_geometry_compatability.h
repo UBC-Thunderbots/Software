@@ -1,8 +1,8 @@
 /**
  * This file contains everything neccesarry to allow our `point` type to be used with
- * boost algorithms. Because it includes parts of boost geometry, it is very expensive,
- * and so we have gone to great lengths to ensure it is not copied into another header
- * file (and thus potentially recursively across the whole codebase)
+ * boost algorithms. Because it includes parts of boost geometry, it is very expensive
+ * in terms of build time, and so we have gone to great lengths to ensure it is not copied
+ * into another header file (and thus potentially recursively across the whole codebase)
  */
 
 #ifndef POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
@@ -35,9 +35,9 @@ struct boost::polygon::geometry_concept<Point>
 template <>
 struct boost::polygon::point_traits<Point>
 {
-    typedef int coordinate_type;
+    typedef double coordinate_type;
 
-    static coordinate_type get(const Point &point, orientation_2d orient)
+    static int get(const Point &point, orientation_2d orient)
     {
         return (orient == HORIZONTAL) ? point.x() : point.y();
     }
