@@ -31,10 +31,14 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 {
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
-    Obstacle obstacle = obstacle_factory.createObstacleFromRectangle(rectangle);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    ObstaclePtr obstacle = obstacle_factory.createObstacleFromRectangle(rectangle);
+    ObstacleShape obstacle_shape = obstacle->getObstacleShape();
 
-    std::visit(overload{[expected](const Circle& circle) {
+    std::visit(overload{[&obstacle_shape, expected](const Polygon& polygon) {
+                            EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+                                expected, polygon, METERS_PER_MILLIMETER));
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
                             ADD_FAILURE()
                                 << "Expected Polygon, Obstacle was of type Circle";
                         },
@@ -50,14 +54,17 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.1985);
-    Obstacle obstacle            = obstacle_factory.createBallObstacle(origin);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    ObstaclePtr obstacle = obstacle_factory.createBallObstacle(origin);
 
-    std::visit(overload{[expected](const Circle& circle) { EXPECT_EQ(expected, circle); },
-                        [expected](const Polygon& polygon) {
-                            ADD_FAILURE() << "CircleObstacle was not created for a ball";
-                        }},
-               obstacle_shape);
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getCircle());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a ball";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, create_robot_obstacle)
@@ -65,14 +72,17 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.207);
-    Obstacle obstacle            = obstacle_factory.createRobotObstacle(origin);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    ObstaclePtr obstacle = obstacle_factory.createRobotObstacle(origin);
 
-    std::visit(overload{[expected](const Circle& circle) { EXPECT_EQ(expected, circle); },
-                        [expected](const Polygon& polygon) {
-                            ADD_FAILURE() << "CircleObstacle was not created for a robot";
-                        }},
-               obstacle_shape);
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getCircle());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a robot";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
@@ -83,19 +93,18 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.042);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
-    std::visit(
-        overload{[expected](const Circle& circle) {
-                     EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-                         expected, circle, METERS_PER_MILLIMETER));
-                 },
-                 [expected](const Polygon& polygon) {
-                     ADD_FAILURE()
-                         << "CircleObstacle was not created for a stationary robot";
-                 }},
-        obstacle_shape);
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+            expected, circle_obstacle.getCircle(), METERS_PER_MILLIMETER));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a stationary robot";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
@@ -106,16 +115,17 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.041569219381653054);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
-    std::visit(
-        overload{[expected](const Circle& circle) { EXPECT_EQ(expected, circle); },
-                 [expected](const Polygon& polygon) {
-                     ADD_FAILURE()
-                         << "CircleObstacle was not created for a slow moving robot";
-                 }},
-        obstacle_shape);
+    try
+    {
+        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getCircle());
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "CircleObstaclePtr was not created for a slow moving robot";
+    }
 }
 
 TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
@@ -127,10 +137,14 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     Polygon expected({Point(-2.133, 5.026), Point(-2.139, 4.985), Point(-2.106, 4.959),
                       Point(-2.067, 4.974), Point(-1.694, 5.444), Point(-1.759, 5.496)});
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstacleShape obstacle_shape = obstacle->getObstacleShape();
 
-    std::visit(overload{[expected](const Circle& circle) {
+    std::visit(overload{[&obstacle_shape, expected](const Polygon& polygon) {
+                            EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+                                expected, polygon, METERS_PER_MILLIMETER));
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
                             ADD_FAILURE()
                                 << "Expected Polygon, Obstacle was of type Circle";
                         },
@@ -150,10 +164,14 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     Polygon expected({Point(1.159, -0.208), Point(1.187, -0.239), Point(1.227, -0.231),
                       Point(1.241, -0.192), Point(0.883, 1.586), Point(0.801, 1.569)});
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
-    Obstacle obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstacleShape obstacle_shape = obstacle->getObstacleShape();
 
-    std::visit(overload{[expected](const Circle& circle) {
+    std::visit(overload{[&obstacle_shape, expected](const Polygon& polygon) {
+                            EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+                                expected, polygon, METERS_PER_MILLIMETER));
+                        },
+                        [&obstacle_shape, expected](const Circle& circle) {
                             ADD_FAILURE()
                                 << "Expected Polygon, Obstacle was of type Circle";
                         },
