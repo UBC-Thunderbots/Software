@@ -13,16 +13,13 @@ RobotStatusTable::RobotStatusTable(QWidget* parent, Duration message_expiry_age)
     age_update_timer.start(timer_interval_milliseconds);
 }
 
-void RobotStatusTable::updateSensorMsg(const SensorMsg& sensor_msg)
+void RobotStatusTable::updateTbotsRobotMsg(const TbotsRobotMsg& tbots_robot_msg)
 {
-    for (const auto& robot_msg : sensor_msg.tbots_robot_msg())
+    for (const auto& error_code : tbots_robot_msg.error_code())
     {
-        for (const auto& error_code : robot_msg.error_code())
-        {
-            std::string message =
-                ErrorCode_descriptor()->FindValueByNumber(error_code)->name();
-            updateStatusMessageString(message);
-        }
+        std::string message =
+            ErrorCode_descriptor()->FindValueByNumber(error_code)->name();
+        updateStatusMessageString(message);
     }
     updateTableView();
 }
