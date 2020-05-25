@@ -18,43 +18,45 @@ def _nanopb_proto_library_impl(ctx):
     for proto_info in proto_infos:
         all_proto_files = depset(transitive = [all_proto_files, proto_info.transitive_sources])
 
+    # Generate import flags for the protobuf compiler so it can find proto files we
+    # depend on
+    import_flags = depset(direct = ["-I."])
+
+    for dep in ctx.attr.deps:
+        import_flags = depset(
+            transitive = [import_flags, depset(direct = dep.proto.import_flags)],
+        )
+        deps = depset(transitive = [deps, depset(direct = dep.proto.deps)])
+
     # For each proto file, generate the equivalent C code using nanopb
     all_proto_hdr_files = []
     all_proto_src_files = []
 
     for proto_file in all_proto_files.to_list():
-        #native.genrule(
-        #    name = "%s_proto_pb_genrule" % (proto_name),
-        #    srcs = [src],
-        #    tools = ["@com_google_protobuf//:protoc"],
-        #    cmd = "protoc -o %s.pb $(location %s) && mv %s.pb $@" % (proto_name, src, proto_name),
-        #    outs = ["%s.pb" % proto_name],
-        #)
-        #native.genrule(
-        #    name = "%s_proto_ch_genrule" % (proto_name),
-        #    srcs = ["%s.pb" % (proto_name)],
-        #    tools = ["@nanopb//:nanopb_generator"],
-        #    cmd = "python3 $(location @nanopb//:nanopb_generator) $(location %s.pb)" % (proto_name),
-        #    outs = [h_out, c_out],
-        #)
-
         # TODO: will this breakdown if the proto file is not in the current directly
         pb_file_name = proto_file.basename.strip(".proto") + ".pb"
         pb_file = ctx.actions.declare_file(pb_file_name)
+
+        inputs = 
 
         # TODO: implement me!
         # TODO: go over all fields and add if good
         # TODO: include directories (should just be the root bazel directory?)
         # TODO: we should be using the given proto compiler here
+        ctx.actions.run(
+            inputs = [proto]
+        )
         ctx.actions.run_shell(
             inputs = [proto_file],
+            tools = [ctx.executable.protoc],
             outputs = [pb_file],
-            command = "protoc -o %s %s" % (pb_file.path, proto_file.path),
+            command = "%s -o %s %s" %
+                      (ctx.executable.protoc_compiler.path, pb_file.path, proto_file.path),
         )
 
         # TODO: is this gonna cause bugs if the proto file isn't in the current directory?
-        h_out_name = proto_file.basename.strip("\.proto") + ".pb.h"
-        c_out_name = proto_file.basename.strip("\.proto") + ".pb.c"
+        h_out_name = proto_file.basename.strip("\\.proto") + ".pb.h"
+        c_out_name = proto_file.basename.strip("\\.proto") + ".pb.c"
 
         c_out = ctx.actions.declare_file(c_out_name)
         h_out = ctx.actions.declare_file(h_out_name)
@@ -79,6 +81,18 @@ def _nanopb_proto_library_impl(ctx):
         cc_toolchain = cc_toolchain,
     )
 
+    # Get the compilation and linking contexts from all nanopb srcs
+    nanopb_compilation_contexts = [
+        label[CcInfo].compilation_context
+        for label in ctx.attr.nanopb_srcs
+        if label[CcInfo].compilation_context != None
+    ]
+    nanopb_linking_contexts = [
+        label[CcInfo].linking_context
+        for label in ctx.attr.nanopb_srcs
+        if label[CcInfo].linking_context != None
+    ]
+
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
         actions = ctx.actions,
@@ -86,6 +100,7 @@ def _nanopb_proto_library_impl(ctx):
         cc_toolchain = cc_toolchain,
         srcs = all_proto_src_files,
         public_hdrs = all_proto_hdr_files,
+        compilation_contexts = nanopb_compilation_contexts,
     )
 
     (linking_context, linking_outputs) = \
@@ -95,6 +110,7 @@ def _nanopb_proto_library_impl(ctx):
             actions = ctx.actions,
             feature_configuration = feature_configuration,
             cc_toolchain = cc_toolchain,
+            linking_contexts = nanopb_linking_contexts,
         )
 
     return CcInfo(
@@ -102,22 +118,12 @@ def _nanopb_proto_library_impl(ctx):
         linking_context = linking_context,
     )
 
-# TODO: delete
-#    return native.cc_library(
-#        name = ctx.attr.name,
-#        srcs = all_proto_src_files,
-#        hdrs = all_proto_hdr_files,
-#        deps = ctx.attr.nanopb_srcs,
-#    )
-
 nanopb_proto_library = rule(
     implementation = _nanopb_proto_library_impl,
     # TODO: doc comments for each attribute
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
-            # TODO: figure out what provider to specify here to restrict to things that
-            #       provide [ProtoInfo]. See: https://github.com/bazelbuild/bazel/issues/6901
             providers = [
                 ProtoInfo,
             ],
@@ -126,7 +132,7 @@ nanopb_proto_library = rule(
         "nanopb_srcs": attr.label_list(mandatory = True, providers = [CcInfo]),
         # TODO: more strict requirements on this attr
         "nanopb_generator": attr.label(mandatory = True, executable = True, cfg = "host"),
-        "protoc_compiler": attr.label(mandatory = True, executable = True, cfg = "host"),
+        "protoc": attr.label(mandatory = True, executable = True, cfg = "host"),
         "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
     },
     provides = [
