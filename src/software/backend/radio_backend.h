@@ -12,6 +12,8 @@ class RadioBackend : public Backend
    public:
     static const std::string name;
 
+    TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status);
+
     RadioBackend();
 
    private:
@@ -28,8 +30,6 @@ class RadioBackend : public Backend
     void receiveWorld(World world);
 
     void receiveRobotStatus(RobotStatus robot_status);
-
-    TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status);
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;

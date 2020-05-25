@@ -45,6 +45,15 @@ cc_library(
     alwayslink = True,
 )
 
+cc_test(
+    name = "radio_backend_test",
+    srcs = ["radio_backend_test.cpp"],
+    deps = [
+        ":radio_backend",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "simulator_backend",
     srcs = ["simulator_backend.cpp"],

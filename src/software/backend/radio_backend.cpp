@@ -36,15 +36,13 @@ void RadioBackend::receiveWorld(World world)
 
 void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
 {
-    // Convert robot_status to TBotsRobotMsg
+    SensorMsg sensor_msg;
     TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(&robot_status);
-    //TbotsRobotMsg robot_msg;
-    //SensorMsg sensor_msg;
-    //sensor_msg.set_tbots_robot_msg(robot_msg);
-    //Subject<SensorMsg>::sendValueToObservers(sensor_msg);
+    TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
+    added_robot_msg = &robot_msg;
+    Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 
-// TODO unit test this
 TbotsRobotMsg RadioBackend::convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status)
 {
     TbotsRobotMsg robot_msg;
@@ -54,34 +52,31 @@ TbotsRobotMsg RadioBackend::convertRobotStatusToTbotsRobotMsg(RobotStatus* robot
     PowerStatus power_status_msg;
     TemperatureStatus temperature_status_msg;
 
+    // Insufficient ChipperKickerStatus info
+    // Insufficient DriveUnits info
+    // Insufficient NetworkStatus info
+
     robot_msg.set_robot_id(robot_status->robot);
 
-    // TODO how to convert ErrorCode convert from robot_messages to ErrorCode
+    // TODO check if ErrorCode can be converted
 
     break_beam_msg.set_ball_in_beam(robot_status->ball_in_beam);
-    // TODO msg is float but robot_status is double
     break_beam_msg.set_break_beam_reading(robot_status->break_beam_reading);
-    robot_msg.set_break_beam_status(break_beam_msg);
-
-    // Insufficient ChipperKickerStatus
-
-    // Insufficient DriveUnits
+    robot_msg.set_allocated_break_beam_status(&break_beam_msg);
 
     firmware_status_msg.set_fw_build_id(robot_status->fw_build_id);
-    robot_msg.set_firmware_status(firmware_status_msg);
+    robot_msg.set_allocated_firmware_status(&firmware_status_msg);
 
     dribbler_status_msg.set_dribbler_rpm(robot_status->dribbler_speed);
-    robot_msg.set_dribbler_status(dribbler_status_msg);
-
-    // Insufficient NetworkStatus
-
+    robot_msg.set_allocated_dribbler_status(&dribbler_status_msg);
+    
     power_status_msg.set_battery_voltage(robot_status->battery_voltage);
     power_status_msg.set_capacitor_voltage(robot_status->capacitor_voltage);
-    robot_msg.set_power_status(power_status_msg);
+    robot_msg.set_allocated_power_status(&power_status_msg);
 
     temperature_status_msg.set_dribbler_temperature(robot_status->dribbler_temperature);
     temperature_status_msg.set_board_temperature(robot_status->board_temperature);
-    robot_msg.set_temperature_status(temperature_status_msg);
+    robot_msg.set_allocated_temperature_status(&temperature_status_msg);
 
     return robot_msg;
 }
