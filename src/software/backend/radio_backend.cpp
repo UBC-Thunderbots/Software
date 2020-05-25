@@ -6,7 +6,6 @@
 
 const std::string RadioBackend::name = "radio";
 
-// TODO change callback to bind
 RadioBackend::RadioBackend()
     : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
                     Util::Constants::SSL_VISION_MULTICAST_PORT,
@@ -15,9 +14,8 @@ RadioBackend::RadioBackend()
                     boost::bind(&RadioBackend::receiveWorld, this, _1),
                     Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
                     Util::DynamicParameters->getCameraConfig()),
-      radio_output(DEFAULT_RADIO_CONFIG, [this](RobotStatus status) {
-          Subject<RobotStatus>::sendValueToObservers(status);
-      })
+      radio_output(DEFAULT_RADIO_CONFIG,
+                   boost::bind(&RadioBackend::receiveRobotStatus, this, _1))
 {
 }
 
@@ -37,9 +35,9 @@ void RadioBackend::receiveWorld(World world)
 void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
 {
     SensorMsg sensor_msg;
-    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(&robot_status);
+    TbotsRobotMsg robot_msg        = convertRobotStatusToTbotsRobotMsg(&robot_status);
     TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
-    added_robot_msg = &robot_msg;
+    added_robot_msg                = &robot_msg;
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 
@@ -69,7 +67,7 @@ TbotsRobotMsg RadioBackend::convertRobotStatusToTbotsRobotMsg(RobotStatus* robot
 
     dribbler_status_msg.set_dribbler_rpm(robot_status->dribbler_speed);
     robot_msg.set_allocated_dribbler_status(&dribbler_status_msg);
-    
+
     power_status_msg.set_battery_voltage(robot_status->battery_voltage);
     power_status_msg.set_capacitor_voltage(robot_status->capacitor_voltage);
     robot_msg.set_allocated_power_status(&power_status_msg);
