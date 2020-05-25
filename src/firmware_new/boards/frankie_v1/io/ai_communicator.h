@@ -1,56 +1,49 @@
 #pragma once
 /**
- * This file is an abstraction around LwIP for all the networking components
+ * This file is an abstraction around LwIP to communicate with AI
  */
 
-#include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
-#include "firmware_new/boards/frankie_v1/io/pwm_pin.h"
+#include "shared/proto/tbots_robot_msg_fw.pb.h"
 
-typedef struct AllegroA3931MotorDriver AllegroA3931MotorDriver_t;
+typedef struct AICommunicator_t;
+typedef void (*vision_callback_t)(VisionMsg vision);
+typedef void (*primitive_callback_t)(PrimitiveMsg primitive);
 
 /**
- * Create a Motor Driver
- * @param pwm_pin The PWM pin to the driver. Note that this must be configured to
- *                operate in the correct frequency range for the motor driver. Please
- *                talk to Elec. to determine this.
- * @param reset_pin A GPIO pin connected to the "reset" pin on the motor driver.
- * @param coast_pin A GPIO pin connected to the "coast" pin on the motor driver.
- * @param mode_pin A GPIO pin connected to the "mode" pin on the motor driver.
- * @param direction_pin A GPIO pin connected to the "direction" pin on the motor driver.
- * @param brake_pin A GPIO pin connected to the "brake" pin on the motor driver.
- * @param esf_pin A GPIO pin connected to the "ESF" pin on the motor driver.
- *                The "ESF" pin, when active, causes the motor driver to stop the
- *                motor if a short is detected.
+ * Create an AICommunicator: contains all the networking required to communicate with AI
  *
- * @return A motor driver with the pwm percentage set to zero.
- */
-AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(
-    PwmPin_t* pwm_pin, GpioPin_t* reset_pin, GpioPin_t* coast_pin, GpioPin_t* mode_pin,
-    GpioPin_t* direction_pin, GpioPin_t* brake_pin, GpioPin_t* esf_pin);
-
-/**
- * Destroy the given motor driver
- * @param motor_driver The motor driver to destroy
- */
-void io_allegro_a3931_motor_driver_destroy(AllegroA3931MotorDriver_t* motor_driver);
-
-/**
- * Set the rotation direction for the given motor driver
+ * @param multicast_address The multicast address or multicast "channel" the robot is
+ * connected to
+ * @param vision_port The port vision messages will be received
+ * @param primitive_port The port primitive messages will be received
+ * @param robot_status_port The port robot status messages should be sent to
  *
- * Note that the rotation is from the perspective of rear of the motor, looking down
- * the shaft starting from the motor body
- *
- * @param motor_driver
- * @param direction
+ * @return An ai_communicator with all the connections established
  */
-void io_allegro_a3931_motor_driver_setDirection(
-    AllegroA3931MotorDriver_t* motor_driver,
-    AllegroA3931MotorDriverDriveDirection direction);
+AICommunicator_t* io_ai_communicator_create(const char* multicast_address,
+                                            unsigned vision_port, unsigned primtive_port,
+                                            unsigned robot_status_port)
 
-/**
- * Set the PWM percentage for the given motor driver
- * @param motor_driver
- * @param pwm_percentage A value in [0,1] indicating the PWM percentage
- */
-void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_driver,
-                                             float pwm_percentage);
+    /**
+     * Destroy the given io_ai_communicator
+     * @param io_ai_communicator The communicator
+     */
+    void io_ai_communicator_destroy(AICommunicator_t* io_ai_communicator)
+
+
+    /**
+     * Send a TbotsRobotMsg to AI
+     *
+     * @param io_ai_communicator
+     * @param robot_msg The protobuf message containing the RobotStatus
+     */
+    void io_ai_communicator_sendTbotsRobotMsg(AICommunicator_t* io_ai_communicator,
+                                              TbotsRobotMsg& robot_msg)
+
+    /**
+     * This is to be called
+     *
+     * @param vision_callback The callback to trigger on a new vision messages
+     * @param primitive_callback The callback to trigger on a new primitive message.
+     */
+    void io_ai_communicator_Task

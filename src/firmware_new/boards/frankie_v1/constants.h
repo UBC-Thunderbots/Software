@@ -19,3 +19,5 @@ const unsigned ROBOT_UNICAST_SEND_PORT = 42001;
 const unsigned AI_MULTICAST_SEND_PORT = ROBOT_MULTICAST_LISTEN_PORT;
 // the port to send unicast packets to for robot msgs (unicast)
 const unsigned AI_UNICAST_LISTEN_PORT = ROBOT_UNICAST_SEND_PORT;
+// maximum transfer unit size in bytes
+const unsigned MAXIMUM_TRANSFER_UNIT_BYTES = 9000;
