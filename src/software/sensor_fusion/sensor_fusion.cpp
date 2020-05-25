@@ -4,83 +4,107 @@
 #include "software/parameter/dynamic_parameters.h"
 
 SensorFusion::SensorFusion()
-    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
-      ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
-      friendly_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      enemy_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
+    : ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
-      enemy_team_filter()
+      enemy_team_filter(),
+      ssl_protobuf_reader()
 {
 }
 
-void SensorFusion::onValueReceived(RefboxData refbox_data)
+void SensorFusion::onValueReceived(SensorMsg sensor_msg)
 {
-    updateWorld(refbox_data);
-    Subject<World>::sendValueToObservers(world);
-}
-
-void SensorFusion::onValueReceived(RobotStatus robot_status)
-{
-    updateWorld(robot_status);
-    Subject<World>::sendValueToObservers(world);
-}
-
-void SensorFusion::onValueReceived(VisionDetection vision_detection)
-{
-    updateWorld(vision_detection);
-    Subject<World>::sendValueToObservers(world);
-}
-
-void SensorFusion::updateWorld(const RefboxData &refbox_data)
-{
-    world.updateRefboxData(refbox_data);
-}
-
-void SensorFusion::updateWorld(const RobotStatus &robot_status)
-{
-    // TODO: incorporate robot_status into world and update world
-    // https://github.com/UBC-Thunderbots/Software/issues/1149
-}
-
-void SensorFusion::updateWorld(const VisionDetection &vision_detection)
-{
-    world.mutableEnemyTeam()    = getEnemyTeamFromvisionDetecion(vision_detection);
-    world.mutableFriendlyTeam() = getFriendlyTeamFromvisionDetecion(vision_detection);
-
-    std::optional<Field> field_detection = vision_detection.getFieldDetection();
-
-    if (field_detection)
+    updateWorld(sensor_msg);
+    if (world.field().isValid())
     {
-        world.updateFieldGeometry(*field_detection);
+        Subject<World>::sendValueToObservers(world);
+    }
+}
+
+void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
+{
+    if (sensor_msg.has_ssl_vision_msg())
+    {
+        updateWorld(sensor_msg.ssl_vision_msg());
     }
 
-    std::optional<Ball> new_ball = getBallFromvisionDetecion(vision_detection);
+    if (sensor_msg.has_ssl_refbox_msg())
+    {
+        updateWorld(sensor_msg.ssl_refbox_msg());
+    }
+
+    updateWorld(sensor_msg.tbots_robot_msg());
+}
+
+void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
+{
+    if (packet.has_geometry())
+    {
+        updateWorld(packet.geometry());
+    }
+
+    if (packet.has_detection())
+    {
+        updateWorld(packet.detection());
+    }
+}
+
+void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
+{
+    std::optional<Field> field = ssl_protobuf_reader.getField(geometry_packet);
+    if (field)
+    {
+        world.updateFieldGeometry(*field);
+    }
+    else
+    {
+        LOG(WARNING)
+            << "Invalid field packet has been detected, which means field may be unreliable "
+            << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
+    }
+}
+
+void SensorFusion::updateWorld(const Referee &packet)
+{
+    world.updateRefboxGameState(ssl_protobuf_reader.getRefboxGameState(packet));
+    world.updateRefboxStage(ssl_protobuf_reader.getRefboxStage(packet));
+}
+
+void SensorFusion::updateWorld(
+    const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
+{
+    // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
+}
+
+void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
+{
+    VisionDetection vision_detection =
+        ssl_protobuf_reader.getVisionDetection(ssl_detection_frame);
+    world.mutableEnemyTeam()     = getEnemyTeamFromVisionDetection(vision_detection);
+    world.mutableFriendlyTeam()  = getFriendlyTeamFromVisionDetection(vision_detection);
+    std::optional<Ball> new_ball = getBallFromVisionDetection(vision_detection);
     if (new_ball)
     {
         world.updateBallStateWithTimestamp(new_ball->currentState());
     }
 }
 
-std::optional<Ball> SensorFusion::getBallFromvisionDetecion(
+std::optional<Ball> SensorFusion::getBallFromVisionDetection(
     const VisionDetection &vision_detection)
 {
     std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
     std::optional<Ball> new_ball =
-        ball_filter.getFilteredData(ball_detections, field_state);
+        ball_filter.getFilteredData(ball_detections, world.field());
     return new_ball;
 }
 
-Team SensorFusion::getFriendlyTeamFromvisionDetecion(
+Team SensorFusion::getFriendlyTeamFromVisionDetection(
     const VisionDetection &vision_detection)
 {
     std::vector<RobotDetection> friendly_robot_detections =
         vision_detection.getFriendlyTeamDetections();
     Team new_friendly_team = friendly_team_filter.getFilteredData(
-        friendly_team_state, friendly_robot_detections);
+        world.friendlyTeam(), friendly_robot_detections);
     int friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
                                  ->getRefboxConfig()
                                  ->FriendlyGoalieId()
@@ -89,12 +113,13 @@ Team SensorFusion::getFriendlyTeamFromvisionDetecion(
     return new_friendly_team;
 }
 
-Team SensorFusion::getEnemyTeamFromvisionDetecion(const VisionDetection &vision_detection)
+Team SensorFusion::getEnemyTeamFromVisionDetection(
+    const VisionDetection &vision_detection)
 {
     std::vector<RobotDetection> enemy_robot_detections =
         vision_detection.getEnemyTeamDetections();
     Team new_enemy_team =
-        enemy_team_filter.getFilteredData(enemy_team_state, enemy_robot_detections);
+        enemy_team_filter.getFilteredData(world.enemyTeam(), enemy_robot_detections);
     int enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
                               ->getRefboxConfig()
                               ->EnemyGoalieId()
