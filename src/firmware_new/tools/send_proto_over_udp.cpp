@@ -16,8 +16,6 @@ using google::protobuf::Message;
 
 
 /*
- * send_proto_over_udp
- *
  * This file serves as a testing file to easily send proto at a fixed rate.
  * Plug the computers ethernet port into an ethernet switch/router.
  *
