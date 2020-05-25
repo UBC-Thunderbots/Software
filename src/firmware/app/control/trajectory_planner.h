@@ -147,7 +147,7 @@ app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
  *
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_interpolateConstantTimePositionTrajectory(
+app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
     PositionTrajectory_t* constant_period_trajectory,
     PositionTrajectory_t* variable_time_trajectory, const float interpolation_period);
 

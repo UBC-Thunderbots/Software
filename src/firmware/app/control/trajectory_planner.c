@@ -140,7 +140,7 @@ app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
 
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_interpolateConstantTimePositionTrajectory(
+app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
     PositionTrajectory_t* constant_period_trajectory,
     PositionTrajectory_t* variable_time_trajectory, const float interpolation_period)
 {
@@ -219,23 +219,21 @@ app_trajectory_planner_interpolateConstantTimePositionTrajectory(
     {
         return INTERPOLATION_ELEMENT_MAXED_OUT;
     }
-    else
-    {
-        const unsigned int last_element_index =
-            variable_time_trajectory->path_parameters.num_segments - 1;
 
-        // The last element of both trajectories are also identical
-        constant_period_trajectory->trajectory_elements[time_periods].time =
-            variable_time_trajectory->trajectory_elements[last_element_index].time;
-        constant_period_trajectory->trajectory_elements[time_periods].position =
-            variable_time_trajectory->trajectory_elements[last_element_index].position;
-        constant_period_trajectory->speed_profile[time_periods] =
-            variable_time_trajectory->speed_profile[last_element_index];
+    const unsigned int last_element_index =
+        variable_time_trajectory->path_parameters.num_segments - 1;
 
-        // Set the new number of time periods
-        constant_period_trajectory->path_parameters.num_segments = ++time_periods;
-        return OK;
-    }
+    // The last element of both trajectories are also identical
+    constant_period_trajectory->trajectory_elements[time_periods].time =
+        variable_time_trajectory->trajectory_elements[last_element_index].time;
+    constant_period_trajectory->trajectory_elements[time_periods].position =
+        variable_time_trajectory->trajectory_elements[last_element_index].position;
+    constant_period_trajectory->speed_profile[time_periods] =
+        variable_time_trajectory->speed_profile[last_element_index];
+
+    // Set the new number of time periods
+    constant_period_trajectory->path_parameters.num_segments = ++time_periods;
+    return OK;
 }
 
 static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(

@@ -463,7 +463,6 @@ TEST_F(TrajectoryPlannerTest,
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantArcLengthPositionTrajectory(&trajectory);
     EXPECT_EQ(OK, status);
-    ;
 
     // Create the parmeterization to contain the desired number of segments
     CREATE_STATIC_ARC_LENGTH_PARAMETRIZATION(arc_length_param,
@@ -923,7 +922,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    status = app_trajectory_planner_interpolateConstantTimePositionTrajectory(
+    status = app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         &const_interp_trajectory, &trajectory, 0.001);
     EXPECT_EQ(OK, status);
 
@@ -1005,7 +1004,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    status = app_trajectory_planner_interpolateConstantTimePositionTrajectory(
+    status = app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_EQ(OK, status);
@@ -1095,7 +1094,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elem
     const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-interpolation period equivalent of the trajectory
-    status = app_trajectory_planner_interpolateConstantTimePositionTrajectory(
+    status = app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         &const_interp_trajectory, &trajectory, 0.001);
 
     EXPECT_EQ(INTERPOLATION_ELEMENT_MAXED_OUT, status);
