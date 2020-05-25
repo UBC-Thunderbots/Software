@@ -8,73 +8,89 @@ import numpy as np
 import control as ct
 from control.matlab import *
 import unittest
-import difference_equation as de
+import differenceequation as de
 import collections
 
 
 class TestDifferenceEquation(unittest.TestCase):
-    # def test_run_for_ticks(self):
-    #     """
-    #     This test checks the run_for_ticks member function to ensure that the difference equation is ran for exactly the
-    #     number of specified iterations
-    #     """
-    #
-    #     sample_time = 0.1  # [s]
-    #     end_time = 20
-    #
-    #     J = 0.01
-    #     B = 0.001
-    #     K = 1
-    #
-    #     s = ct.tf([1, 0], 1)
-    #
-    #     step_input = 1
-    #
-    #     continuous_tf = K / (J * s ** 2 + B * s + 1.5)
-    #
-    #     discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
-    #     difference_equation = de.DifferenceEquation(
-    #         discrete_tf.num[0][0], discrete_tf.den[0][0]
-    #     )
-    #
-    #     num_points = int(end_time / sample_time) + 1
-    #
-    #     T = np.linspace(0, end_time, num_points)
-    #     T, yout = ct.step_response(discrete_tf, T)
-    #
-    #     difference_equation.run_for_ticks(num_points, step_input)
-    #
-    #     system_response = difference_equation.get_output_history()
-    #
-    #     for i in range(0, len(T)):
-    #         self.assertAlmostEqual(yout[i], system_response[i], 4)
-    #
-    #     self.assertEqual(num_points, difference_equation.get_timestep_count())
-    #
-    # def test_get_time_step_count(self):
-    #     """
-    #     This test checks the get_time_step_count() member function to ensure it returns the exact numer of steps
-    #     the difference equation has iterated through
-    #     """
-    #
-    #     denominator = [1, 2, 4]
-    #     numerator = [1]
-    #
-    #     difference_equation = de.DifferenceEquation(denominator, numerator)
-    #
-    #     for i in range(0, 100):
-    #         self.assertEqual(difference_equation.get_timestep_count(), i)
-    #         difference_equation.tick(0)
+    def test_simulator_tick(self):
+        """
+        Test that the difference equation simulator follows the correct output sequence
+        as a human-checked sequence with constant input
+        """
 
-    #########################################333
+        numerator = [1, 1]
+        denominator = [1, 1, 1]
+        interpolation_period = 0.1
+        input_value = 1
+
+        transfer_function = tf(numerator, denominator, interpolation_period)
+        difference_equation = de.DifferenceEquation(transfer_function)
+
+        deSim = de.DifferenceEquationSimulator(difference_equation)
+
+        deSim.tick(input_value)
+        deSim.tick(input_value)
+        deSim.tick(input_value)
+        deSim.tick(input_value)
+        deSim.tick(input_value)
+        deSim.tick(input_value)
+
+        self.assertEqual(deSim.full_output_history[0], 0)
+        self.assertEqual(deSim.full_output_history[1], 1)
+        self.assertEqual(deSim.full_output_history[2], 1)
+        self.assertEqual(deSim.full_output_history[3], 0)
+        self.assertEqual(deSim.full_output_history[4], 1)
+        self.assertEqual(deSim.full_output_history[4], 1)
+
+    def test_simulator_run_for_ticks(self):
+        """
+        This test checks the step response of the DifferenceEquation class vs the discrete transfer function
+        for a specified number of ticks
+        """
+
+        sample_time = 0.01  # [s]
+        end_time = 20
+
+        J = 0.01
+        B = 0.001
+        K = 1
+
+        s = ct.tf([1, 0], 1)
+
+        step_input = 1
+
+        continuous_tf = (K * s ** 2 + K * B * s) / (J * s ** 2 + B * s + 1.5)
+
+        discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
+
+        difference_equation = de.DifferenceEquation(discrete_tf)
+
+        num_points = int(end_time / sample_time) + 1
+
+        T = np.linspace(0, end_time, num_points)
+        T, yout = ct.step_response(discrete_tf, T)
+
+        # Create and run the difference equation simulator for the same number
+        # of ticks as the control toolbox discrete controller
+        deSim = de.DifferenceEquationSimulator(difference_equation)
+        deSim.run_for_ticks(num_points, step_input)
+
+        for i in range(0, len(T)):
+            self.assertAlmostEqual(yout[i], deSim.full_output_history[i], 4)
+
     def test_difference_equation_init(self):
+        """
+        Tests that the difference equation initialization function creates and normalized the input discrete TF
+        properly 
+        """
         numerator = [1, 0]
         denominator = [1, 1, 1]
         interpolation_period = 0.1
 
         transfer_function = ct.tf(numerator, denominator, interpolation_period)
 
-        difference_equation = de.Difference_Equation(transfer_function)
+        difference_equation = de.DifferenceEquation(transfer_function)
 
         self.assertEqual(difference_equation.get_output_order(), len(denominator))
         self.assertEqual(difference_equation.get_input_order(), len(numerator))
@@ -98,7 +114,7 @@ class TestDifferenceEquation(unittest.TestCase):
 
         transfer_function = ct.tf(numerator, denominator, interpolation_period)
 
-        difference_equation = de.Difference_Equation(transfer_function)
+        difference_equation = de.DifferenceEquation(transfer_function)
 
         self.assertEqual(difference_equation.get_input_coefficients()[0], 0.5)
         self.assertEqual(difference_equation.get_input_coefficients()[1], 0)
@@ -127,7 +143,7 @@ class TestDifferenceEquation(unittest.TestCase):
             outputs.append(0)
 
         transfer_function = tf(numerator, denominator, interpolation_period)
-        difference_equation = de.Difference_Equation(transfer_function)
+        difference_equation = de.DifferenceEquation(transfer_function)
         inputs.appendleft(input_value)
 
         outputs.appendleft(difference_equation.calculate_output(outputs, inputs))
@@ -154,7 +170,6 @@ class TestDifferenceEquation(unittest.TestCase):
         self.assertEqual(outputs[0], 1)
 
     def test_output_of_difference_equation_against_discrete_tf_first_order(self):
-
         """
         This test checks the step response of the DifferenceEquation class vs the discrete transfer function (1st order)
         using the python control toolbox
@@ -175,7 +190,7 @@ class TestDifferenceEquation(unittest.TestCase):
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
-        difference_equation = de.Difference_Equation(discrete_tf)
+        difference_equation = de.DifferenceEquation(discrete_tf)
 
         num_points = int(end_time / sample_time) + 1
 
@@ -223,7 +238,7 @@ class TestDifferenceEquation(unittest.TestCase):
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
-        difference_equation = de.Difference_Equation(discrete_tf)
+        difference_equation = de.DifferenceEquation(discrete_tf)
 
         num_points = int(end_time / sample_time) + 1
 
@@ -273,7 +288,7 @@ class TestDifferenceEquation(unittest.TestCase):
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
-        difference_equation = de.Difference_Equation(discrete_tf)
+        difference_equation = de.DifferenceEquation(discrete_tf)
 
         num_points = int(end_time / sample_time) + 1
 
@@ -321,7 +336,7 @@ class TestDifferenceEquation(unittest.TestCase):
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
-        difference_equation = de.Difference_Equation(discrete_tf)
+        difference_equation = de.DifferenceEquation(discrete_tf)
 
         num_points = int(end_time / sample_time) + 1
 
