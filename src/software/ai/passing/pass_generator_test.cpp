@@ -76,8 +76,8 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     // could use, so we don't, and hence this test does not really test convergence
     // of pass start time.
 
-    world.updateBallState(
-        BallState(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(3, {1, 0}, {0.5, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -131,7 +131,8 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
 {
     // Test that the pass generator does not converge to use the robot set as the passer
 
-    world.updateBallState(BallState({2, 0.5}, {0, 0}, Timestamp::fromSeconds(0)));
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState({2, 0.5}, {0, 0}, Timestamp::fromSeconds(0)));
     pass_generator->setPasserPoint({2, 0.5});
 
     Team friendly_team(Duration::fromSeconds(10));
@@ -175,7 +176,8 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
 {
     // Test that we do not converge to a pass from the passer robot to itself
 
-    world.updateBallState(BallState({3.5, 0}, {0, 0}, Timestamp::fromSeconds(0)));
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState({3.5, 0}, {0, 0}, Timestamp::fromSeconds(0)));
     pass_generator->setPasserPoint({3.5, 0});
 
     // The passer robot
