@@ -56,12 +56,12 @@ def _nanopb_proto_library_impl(ctx):
     # Get the compilation and linking contexts from all nanopb srcs
     nanopb_compilation_contexts = [
         label[CcInfo].compilation_context
-        for label in ctx.attr.nanopb_srcs
+        for label in ctx.attr.nanopb_libs
         if label[CcInfo].compilation_context != None
     ]
     nanopb_linking_contexts = [
         label[CcInfo].linking_context
-        for label in ctx.attr.nanopb_srcs
+        for label in ctx.attr.nanopb_libs
         if label[CcInfo].linking_context != None
     ]
 
@@ -105,10 +105,23 @@ nanopb_proto_library = rule(
                 ProtoInfo,
             ],
         ),
-        "nanopb_srcs": attr.label_list(mandatory = True, providers = [CcInfo]),
-        "nanopb_generator": attr.label(mandatory = True, executable = True, cfg = "host"),
-        "protoc": attr.label(mandatory = True, executable = True, cfg = "host"),
-        "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+        "nanopb_libs": attr.label_list(
+            providers = [CcInfo],
+            default = [Label("@com_github_nanopb_nanopb//:nanopb_header")],
+        ),
+        "nanopb_generator": attr.label(
+            executable = True,
+            cfg = "host",
+            default = Label("@com_github_nanopb_nanopb//:nanopb_generator"),
+        ),
+        "protoc": attr.label(
+            executable = True,
+            cfg = "host",
+            default = Label("@com_google_protobuf//:protoc"),
+        ),
+        "_cc_toolchain": attr.label(
+            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
+        ),
     },
     provides = [
         CcInfo,

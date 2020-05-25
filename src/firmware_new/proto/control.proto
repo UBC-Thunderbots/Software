@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+//import "software/proto/grSim_commands.proto";
+
 // A test robot msg which serves as an example to modify and use to
 // facilitate firmware testing.
 
