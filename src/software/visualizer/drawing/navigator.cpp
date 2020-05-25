@@ -26,7 +26,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 
         for (const auto& obstacle : obstacles)
         {
-            drawObstacle(scene, obstacle.getObstacleShape(), pen);
+            drawObstacle(scene, obstacle->getObstacleShape(), pen);
         }
     };
 

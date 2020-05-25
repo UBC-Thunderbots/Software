@@ -35,7 +35,7 @@ bool ThetaStarPathPlanner::isUnBlocked(Coordinate test_coord)
         Point p = coordinateToPoint(test_coord);
         for (auto &obstacle : obstacles)
         {
-            if (obstacle.contains(p))
+            if (obstacle->contains(p))
             {
                 blocked = true;
                 break;
@@ -169,10 +169,9 @@ bool ThetaStarPathPlanner::updateVertex(Coordinate current_coord, Coordinate new
 }
 
 // top level function
-std::optional<Path> ThetaStarPathPlanner::findPath(const Point &start,
-                                                   const Point &destination,
-                                                   const Rectangle &navigable_area,
-                                                   const std::vector<Obstacle> &obstacles)
+std::optional<Path> ThetaStarPathPlanner::findPath(
+    const Point &start, const Point &destination, const Rectangle &navigable_area,
+    const std::vector<ObstaclePtr> &obstacles)
 {
     resetAndInitializeMemberVariables(navigable_area, obstacles);
 
@@ -460,7 +459,7 @@ bool ThetaStarPathPlanner::isPointValidAndFreeOfObstacles(Point p)
 
     for (auto &obstacle : obstacles)
     {
-        if (obstacle.contains(p))
+        if (obstacle->contains(p))
         {
             return false;
         }
@@ -492,7 +491,7 @@ ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::pointToCoordinate(Point p
 }
 
 void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
-    const Rectangle &navigable_area, const std::vector<Obstacle> &obstacles)
+    const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles)
 {
     // Initialize member variables
     this->obstacles = obstacles;

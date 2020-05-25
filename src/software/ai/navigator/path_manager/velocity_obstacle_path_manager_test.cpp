@@ -11,7 +11,7 @@ TEST(TestVelocityObstaclePathManager, test_no_obstacles)
     auto path_manager = std::make_unique<VelocityObstaclePathManager>(
         std::make_unique<StraightLinePathPlanner>(),
         ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()));
-    std::vector<Obstacle> obstacles;
+    std::vector<ObstaclePtr> obstacles;
 
     Rectangle navigable_area = Rectangle(Point(0, 0), Point(1, 1));
     std::unordered_set<PathObjective> path_objectives;

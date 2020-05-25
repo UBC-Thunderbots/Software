@@ -8,7 +8,7 @@
 
 std::optional<Path> OnePointPathTestPathPlanner::findPath(
     const Point &start, const Point &destination, const Rectangle &navigable_area,
-    const std::vector<Obstacle> &obstacles)
+    const std::vector<ObstaclePtr> &obstacles)
 {
     if (start == destination)
     {
