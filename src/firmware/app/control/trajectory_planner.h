@@ -75,7 +75,7 @@ typedef enum TrajectoryPlannerGenerationStatus
     // function uses up all the avaiable array space provided to it. This can happen
     // because constant interpolation period trajectories do not necessarily have the same
     // number of elements as their constant arc-length counterparts
-    INTERPOLATION_ELEMENT_MAXED_OUT = 3,
+    INTERPOLATION_ELEMENT_MAXED_OUT,
 } TrajectoryPlannerGenerationStatus_t;
 
 /**
