@@ -10,6 +10,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/new_geom/rectangle.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/ui/ui_main_widget.h"
 #include "software/visualizer/widgets/ai_control.h"
@@ -62,6 +63,13 @@ class MainWidget : public QWidget
      * @param play_info The new PlayInfo to display
      */
     void updatePlayInfo(const PlayInfo& play_info);
+
+    /**
+     * Updates and displays the newly provided SensorMsg.
+     *
+     * @param sensor_msg The new robot status to display
+     */
+    void updateSensorMsg(const SensorMsg& sensor_msg);
 
     /**
      * Updates and displays the newly provided RobotStatus.
