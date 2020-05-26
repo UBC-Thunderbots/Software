@@ -194,7 +194,7 @@ cc_library(
     srcs = ["action.cpp"],
     hdrs = ["action.h"],
     deps = [
-            ":mutable_action_visitor",
+        ":mutable_action_visitor",
         "//software/ai/intent",
         "//software/world:ball",
         "//software/world:robot",
@@ -223,8 +223,8 @@ cc_library(
     srcs = ["action_world_params_update_visitor.cpp"],
     hdrs = ["action_world_params_update_visitor.h"],
     deps = [
-        ":mutable_action_visitor",
         ":all_actions",
+        ":mutable_action_visitor",
         "//software/world",
     ],
 )
