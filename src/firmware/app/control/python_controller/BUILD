@@ -14,6 +14,7 @@ py_binary(
         requirement("pyparsing"),
         requirement("cycler"),
         requirement("kiwisolver"),
+        requirement("python-dateutil"),
     ],
 )
 
