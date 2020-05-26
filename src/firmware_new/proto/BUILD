@@ -15,3 +15,8 @@ nanopb_proto_library(
         ":fw_proto",
     ],
 )
+
+cc_proto_library(
+    name = "fw_cc_proto",
+    deps = [":fw_proto"],
+)
