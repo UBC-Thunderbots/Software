@@ -1,35 +1,11 @@
-#include "software/backend/input/network/ssl_protobuf_reader.h"
+#include "software/sensor_fusion/ssl_protobuf_reader.h"
 
-// We can initialize the field_state with all zeroes here because this state will never
-// be accessed by an external observer to this class. the getFieldData must be called to
-// get any field data which will update the state with the given protobuf data
-SSLProtobufReader::SSLProtobufReader()
-    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0))
-{
-}
+SSLProtobufReader::SSLProtobufReader() {}
 
-Field SSLProtobufReader::getFieldData(const SSL_GeometryData &geometry_packet)
+std::optional<Field> SSLProtobufReader::getField(
+    const SSL_GeometryData &geometry_packet) const
 {
     SSL_GeometryFieldSize field_data = geometry_packet.field();
-    std::optional<Field> field_opt   = createFieldFromPacketGeometry(field_data);
-
-    if (field_opt)
-    {
-        field_state = *field_opt;
-    }
-    else
-    {
-        LOG(WARNING)
-            << "Invalid field packet has been detected, which means field_state may be unreliable "
-            << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
-    }
-
-    return field_state;
-}
-
-std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
-    const SSL_GeometryFieldSize &packet_geometry) const
-{
     // We can't guarantee the order that any geometry elements are passed to us in, so
     // We map the name of each line/arc to the actual object so we can refer to them
     // consistently
@@ -40,11 +16,9 @@ std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
     //
     // Arc names:
     // CenterCircle
-    for (int i = 0; i < packet_geometry.field_arcs_size(); i++)
+    for (const auto &arc : field_data.field_arcs())
     {
-        const SSL_FieldCicularArc &arc = packet_geometry.field_arcs(i);
-        std::string arc_name           = arc.name();
-        ssl_circular_arcs[arc_name]    = arc;
+        ssl_circular_arcs[arc.name()] = arc;
     }
 
     // Field Lines
@@ -68,11 +42,9 @@ std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
     // LeftFieldRightPenaltyStretch
     // RightFieldLeftPenaltyStretch
     // RightFieldRightPenaltyStretch
-    for (int i = 0; i < packet_geometry.field_lines_size(); i++)
+    for (const auto &line : field_data.field_lines())
     {
-        const SSL_FieldLineSegment &line = packet_geometry.field_lines(i);
-        std::string line_name            = line.name();
-        ssl_field_lines[line_name]       = line;
+        ssl_field_lines[line.name()] = line;
     }
 
     // Check that CenterCircle exists before using it
@@ -83,10 +55,10 @@ std::optional<Field> SSLProtobufReader::createFieldFromPacketGeometry(
     }
 
     // Extract the data we care about and convert all units to meters
-    double field_length   = packet_geometry.field_length() * METERS_PER_MILLIMETER;
-    double field_width    = packet_geometry.field_width() * METERS_PER_MILLIMETER;
-    double goal_width     = packet_geometry.goalwidth() * METERS_PER_MILLIMETER;
-    double boundary_width = packet_geometry.boundary_width() * METERS_PER_MILLIMETER;
+    double field_length   = field_data.field_length() * METERS_PER_MILLIMETER;
+    double field_width    = field_data.field_width() * METERS_PER_MILLIMETER;
+    double goal_width     = field_data.goalwidth() * METERS_PER_MILLIMETER;
+    double boundary_width = field_data.boundary_width() * METERS_PER_MILLIMETER;
     double center_circle_radius =
         ssl_center_circle->second.radius() * METERS_PER_MILLIMETER;
 
@@ -231,60 +203,43 @@ std::vector<RobotDetection> SSLProtobufReader::getTeamDetections(
     return robot_detections;
 }
 
-RefboxData SSLProtobufReader::getRefboxData(const Referee &packet)
+VisionDetection SSLProtobufReader::getVisionDetection(
+    const SSL_DetectionFrame &detection_frame)
 {
-    // SSL Referee proto messages' `Command` fields map to `RefboxGameState` data
-    // structures
-    RefboxGameState game_state      = getRefboxGameState(packet.command());
-    RefboxGameState next_game_state = getRefboxGameState(packet.next_command());
+    std::vector<BallDetection> ball_detections;
+    std::vector<RobotDetection> friendly_team_detections;
+    std::vector<RobotDetection> enemy_team_detections;
+    Timestamp latest_timestamp;
+    SSL_DetectionFrame detection = detection_frame;
 
-    TeamInfo friendly_team_info, enemy_team_info;
-
-    TeamInfo yellow_team_info(
-        packet.yellow().name(), packet.yellow().score(), packet.yellow().red_cards(),
-        std::vector<int>(packet.yellow().yellow_card_times().begin(),
-                         packet.yellow().yellow_card_times().begin()),
-        packet.yellow().yellow_cards(), packet.yellow().timeouts(),
-        packet.yellow().timeout_time(), packet.yellow().goalkeeper(),
-        packet.yellow().foul_counter(), packet.yellow().ball_placement_failures(),
-        packet.yellow().can_place_ball(), packet.yellow().max_allowed_bots());
-
-    TeamInfo blue_team_info(
-        packet.blue().name(), packet.blue().score(), packet.blue().red_cards(),
-        std::vector<int>(packet.blue().yellow_card_times().begin(),
-                         packet.blue().yellow_card_times().begin()),
-        packet.blue().yellow_cards(), packet.blue().timeouts(),
-        packet.blue().timeout_time(), packet.blue().goalkeeper(),
-        packet.blue().foul_counter(), packet.blue().ball_placement_failures(),
-        packet.blue().can_place_ball(), packet.blue().max_allowed_bots());
-
+    // We invert the field side if we explicitly choose to override the values
+    // provided by refbox. The 'defending_positive_side' parameter dictates the side
+    // we are defending if we are overriding the value
+    // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
     if (Util::DynamicParameters->getAIControlConfig()
             ->getRefboxConfig()
-            ->FriendlyColorYellow()
+            ->OverrideRefboxDefendingSide()
+            ->value() &&
+        Util::DynamicParameters->getAIControlConfig()
+            ->getRefboxConfig()
+            ->DefendingPositiveSide()
             ->value())
     {
-        friendly_team_info = yellow_team_info;
-        enemy_team_info    = blue_team_info;
+        invertFieldSide(detection);
     }
-    else
+
+    if (isCameraEnabled(detection))
     {
-        friendly_team_info = blue_team_info;
-        enemy_team_info    = yellow_team_info;
+        // filter protos into internal data structures
+        ball_detections          = getBallDetections({detection});
+        friendly_team_detections = getTeamDetections({detection}, TeamType::FRIENDLY);
+        enemy_team_detections    = getTeamDetections({detection}, TeamType::ENEMY);
     }
 
-    RefboxStage stage = getRefboxStage(packet.stage());
+    latest_timestamp = Timestamp::fromSeconds(detection.t_capture());
 
-    return RefboxData(
-        Timestamp::fromMilliseconds(packet.packet_timestamp() / 1000),
-        Timestamp::fromMilliseconds(packet.command_timestamp() / 1000),
-        packet.command_counter(),
-        Point(packet.designated_position().x(), packet.designated_position().y()),
-        packet.blue_team_on_positive_half(),
-        Duration::fromMilliseconds(packet.current_action_time_remaining() / 1000),
-        friendly_team_info, enemy_team_info, game_state, next_game_state, stage,
-        std::vector<GameEvent>(packet.game_events().begin(), packet.game_events().end()),
-        std::vector<ProposedGameEvent>(packet.proposed_game_events().begin(),
-                                       packet.proposed_game_events().end()));
+    return VisionDetection(ball_detections, friendly_team_detections,
+                           enemy_team_detections, latest_timestamp);
 }
 
 // this maps a protobuf Referee_Command enum to its equivalent internal type
@@ -332,18 +287,18 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
         {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
         {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
-RefboxGameState SSLProtobufReader::getRefboxGameState(const Referee::Command &command)
+RefboxGameState SSLProtobufReader::getRefboxGameState(const Referee &packet)
 {
     if (!Util::DynamicParameters->getAIControlConfig()
              ->getRefboxConfig()
              ->FriendlyColorYellow()
              ->value())
     {
-        return blue_team_command_map.at(command);
+        return blue_team_command_map.at(packet.command());
     }
     else
     {
-        return yellow_team_command_map.at(command);
+        return yellow_team_command_map.at(packet.command());
     }
 }
 
@@ -364,7 +319,57 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
     {Referee_Stage_PENALTY_SHOOTOUT, RefboxStage::PENALTY_SHOOTOUT},
     {Referee_Stage_POST_GAME, RefboxStage::POST_GAME}};
 
-RefboxStage SSLProtobufReader::getRefboxStage(const Referee::Stage &stage)
+RefboxStage SSLProtobufReader::getRefboxStage(const Referee &packet)
 {
-    return refbox_stage_map.at(stage);
+    return refbox_stage_map.at(packet.stage());
+}
+
+void SSLProtobufReader::invertFieldSide(SSL_DetectionFrame &frame)
+{
+    for (SSL_DetectionBall &ball : *frame.mutable_balls())
+    {
+        ball.set_x(-ball.x());
+        ball.set_y(-ball.y());
+    }
+    for (const auto &team : {frame.mutable_robots_yellow(), frame.mutable_robots_blue()})
+    {
+        for (SSL_DetectionRobot &robot : *team)
+        {
+            robot.set_x(-robot.x());
+            robot.set_y(-robot.y());
+            robot.set_orientation(robot.orientation() + M_PI);
+        }
+    }
+}
+
+bool SSLProtobufReader::isCameraEnabled(const SSL_DetectionFrame &detection)
+{
+    bool camera_disabled = false;
+    switch (detection.camera_id())
+    {
+        // TODO: create an array of dynamic params to index into with camera_id()
+        // may be resolved by https://github.com/UBC-Thunderbots/Software/issues/960
+        case 0:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
+            break;
+        case 1:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
+            break;
+        case 2:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
+            break;
+        case 3:
+            camera_disabled =
+                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
+            break;
+        default:
+            LOG(WARNING) << "An unkown camera id was detected, disabled by default "
+                         << "id: " << detection.camera_id() << std::endl;
+            camera_disabled = true;
+            break;
+    }
+    return !camera_disabled;
 }

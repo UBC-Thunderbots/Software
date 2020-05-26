@@ -4,12 +4,12 @@
 
 template <class ReceiveProto>
 ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
-    boost::asio::io_service& io_service, const std::string ip_address,
+    boost::asio::io_service& io_service, const std::string& ip_address,
     const unsigned short port, std::function<void(ReceiveProto)> receive_callback)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
-        boost::asio::ip::address::from_string(ip_address), port);
+        boost::asio::ip::make_address(ip_address), port);
     socket_.open(listen_endpoint.protocol());
     try
     {
@@ -17,14 +17,11 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
     }
     catch (const boost::exception& ex)
     {
-        LOG(WARNING) << "There was an issue binding the socket to the endpoint when"
-                        "trying to connect to the SSL Vision multicast address. This may"
-                        "be due to another instance of the SSLVisionClient running"
-                        "and using the port already"
-                     << std::endl;
-        // Throw this exception up to top-level, as we have no valid
-        // recovery action here
-        throw;
+        LOG(FATAL) << "There was an issue binding the socket to the endpoint when"
+                      "trying to connect to the multicast address. This may"
+                      "be due to another instance of the ProtoMulicastListener running"
+                      "and using the port already"
+                   << std::endl;
     }
 
     // Join the multicast group.
@@ -80,4 +77,10 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
             << "which means that the receive buffer is full and data loss has potentially occurred. "
             << "Consider increasing max_buffer_length";
     }
+}
+
+template <class ReceiveProto>
+ProtoMulticastListener<ReceiveProto>::~ProtoMulticastListener()
+{
+    socket_.close();
 }

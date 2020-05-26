@@ -72,6 +72,14 @@ void MainWidget::updatePlayInfo(const PlayInfo& play_info)
     main_widget->play_and_tactic_info_text_edit->setText(play_info_string);
 }
 
+void MainWidget::updateSensorMsg(const SensorMsg& sensor_msg)
+{
+    for (const auto& robot_msg : sensor_msg.tbots_robot_msg())
+    {
+        main_widget->robot_status_table_widget->updateTbotsRobotMsg(robot_msg);
+    }
+}
+
 void MainWidget::updateRobotStatus(const RobotStatus& robot_status)
 {
     main_widget->robot_status_table_widget->updateRobotStatus(robot_status);

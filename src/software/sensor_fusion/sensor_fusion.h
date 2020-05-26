@@ -1,11 +1,15 @@
 #pragma once
 
+#include <google/protobuf/repeated_field.h>
+
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/refbox_data.h"
+#include "software/sensor_fusion/ssl_protobuf_reader.h"
 #include "software/sensor_fusion/vision_detection.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
@@ -19,10 +23,7 @@
  * This produce/consume pattern is performed by extending both "Observer" and
  * "Subject". Please see the implementation of those classes for details.
  */
-class SensorFusion : public Subject<World>,
-                     public ThreadedObserver<RefboxData>,
-                     public ThreadedObserver<RobotStatus>,
-                     public ThreadedObserver<VisionDetection>
+class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
 {
    public:
     SensorFusion();
@@ -36,30 +37,20 @@ class SensorFusion : public Subject<World>,
     SensorFusion(const SensorFusion &)            = delete;
 
    private:
-    void onValueReceived(RefboxData refbox_data) override;
-    void onValueReceived(RobotStatus robot_status) override;
-    void onValueReceived(VisionDetection vision_detection) override;
+    void onValueReceived(SensorMsg sensor_msg) override;
 
     /**
-     * Updates world based on new refbox data
+     * Updates world based on a new data
      *
-     * @param refbox_data new refbox data
+     * @param new data
      */
-    void updateWorld(const RefboxData &refbox_data);
-
-    /**
-     * Updates world based on a new robot status
-     *
-     * @param robot_status new robot status
-     */
-    void updateWorld(const RobotStatus &robot_status);
-
-    /**
-     * Updates world based on a new vision detection
-     *
-     * @param vision_detection new vision detection
-     */
-    void updateWorld(const VisionDetection &vision_detection);
+    void updateWorld(const SensorMsg &sensor_msg);
+    void updateWorld(const SSL_WrapperPacket &packet);
+    void updateWorld(const Referee &packet);
+    void updateWorld(
+        const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
+    void updateWorld(const SSL_GeometryData &geometry_packet);
+    void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
      * Get ball from a vision detection
@@ -68,37 +59,22 @@ class SensorFusion : public Subject<World>,
      *
      * @return ball if found in vision_detection
      */
-    std::optional<Ball> getBallFromvisionDetecion(
+    std::optional<Ball> getBallFromVisionDetection(
         const VisionDetection &vision_detection);
 
     /**
-     * Get friendly team from a vision detection
+     * Get team from a vision detection
      *
      * @param vision_detection
      *
-     * @return friendly team from vision_detection
+     * @return team from vision_detection
      */
-    Team getFriendlyTeamFromvisionDetecion(const VisionDetection &vision_detection);
+    Team getFriendlyTeamFromVisionDetection(const VisionDetection &vision_detection);
+    Team getEnemyTeamFromVisionDetection(const VisionDetection &vision_detection);
 
-    /**
-     * Get enemy team from a vision detection
-     *
-     * @param vision_detection
-     *
-     * @return enemy team from vision_detection
-     */
-    Team getEnemyTeamFromvisionDetecion(const VisionDetection &vision_detection);
-
-    // Objects used to aggregate and store state. We use these to aggregate the state
-    // so that we always publish "complete" data, not just data from a single frame/
-    // part of the field
-    Field field_state;
-    TimestampedBallState ball_state;
-    Team friendly_team_state;
-    Team enemy_team_state;
     World world;
-
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+    SSLProtobufReader ssl_protobuf_reader;
 };

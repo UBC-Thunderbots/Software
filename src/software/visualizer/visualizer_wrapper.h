@@ -11,6 +11,7 @@
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/visualizer/drawing/draw_functions.h"
 #include "software/visualizer/widgets/visualizer.h"
 #include "software/world/world.h"
@@ -22,6 +23,7 @@
 class VisualizerWrapper : public ThreadedObserver<World>,
                           public ThreadedObserver<AIDrawFunction>,
                           public ThreadedObserver<PlayInfo>,
+                          public ThreadedObserver<SensorMsg>,
                           public ThreadedObserver<RobotStatus>
 {
    public:
@@ -63,6 +65,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     void onValueReceived(World world) override;
     void onValueReceived(AIDrawFunction draw_function) override;
     void onValueReceived(PlayInfo play_info) override;
+    void onValueReceived(SensorMsg sensor_msg) override;
     void onValueReceived(RobotStatus robot_status) override;
 
     std::thread run_visualizer_thread;
@@ -73,6 +76,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
+    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
@@ -84,6 +88,8 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     static constexpr std::size_t ai_draw_functions_buffer_size    = 2;
     // We only care about the most recent PlayInfo, so the buffer is of size 1
     static constexpr std::size_t play_info_buffer_size = 1;
+    // We don't want to miss any SensorMsg updates so we make the buffer larger
+    static constexpr std::size_t sensor_msg_buffer_size = 60;
     // We don't want to miss any robot status updates so we make the buffer larger
     static constexpr std::size_t robot_status_buffer_size = 60;
     // We only care about the most recent view area that was requested, so the

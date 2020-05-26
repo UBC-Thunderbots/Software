@@ -4,6 +4,7 @@
 #include <QtWidgets/QTableWidget>
 #include <chrono>
 
+#include "shared/proto/tbots_robot_msg.pb.h"
 #include "software/backend/robot_status.h"
 #include "software/time/duration.h"
 
@@ -45,7 +46,16 @@ class RobotStatusTable : public QTableWidget
    public slots:
     /**
      * Updates the table with a new robot status. If the status message already exists,
-     * the message age is refreshed to 0. Othewise, a new message is added with an age of
+     * the message age is refreshed to 0. Otherwise, a new message is added with an age of
+     * 0.
+     *
+     * @param tbots_robot_msg The status to add to the table
+     */
+    void updateTbotsRobotMsg(const TbotsRobotMsg& tbots_robot_msg);
+
+    /**
+     * Updates the table with a new robot status. If the status message already exists,
+     * the message age is refreshed to 0. Otherwise, a new message is added with an age of
      * 0.
      *
      * @param robot_status The status to add to the table
@@ -62,6 +72,15 @@ class RobotStatusTable : public QTableWidget
      * Removes any status messages from the table whose age is greater than the expiry age
      */
     void removeOldStatusMessages();
+
+    /**
+     * Updates status_messages with a new status message string. If the status message
+     * already exists, the message age is refreshed to 0. Otherwise, a new message is
+     * added with an age of 0.
+     *
+     * @param robot_status The status to add to the table
+     */
+    void updateStatusMessageString(const std::string& message);
 
     /**
      * Updates the table view (the actual rendered table the user sees) with the latest
