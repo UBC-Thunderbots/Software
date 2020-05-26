@@ -72,8 +72,6 @@ def _nanopb_proto_library_impl(ctx):
         cc_toolchain = cc_toolchain,
         srcs = all_proto_src_files,
         public_hdrs = all_proto_hdr_files,
-        # TODO: this really feels like a bit of a hack. Is there no cleaner way to
-        #       construct this path
         includes = [
             ctx.genfiles_dir.path + "/" + ctx.build_file_path[:-len("BUILD")] +
             generation_folder_name,
