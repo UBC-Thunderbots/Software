@@ -105,85 +105,72 @@ namespace Test
                      Timestamp());
     }
 
-    bool TestUtil::equalWithinTolerance(const Polygon &poly1, const Polygon &poly2,
-                                        double tolerance, bool debug)
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(const Polygon &poly1,
+                                                              const Polygon &poly2,
+                                                              double tolerance)
     {
         auto ppts1 = poly1.getPoints();
         auto ppts2 = poly2.getPoints();
         if (std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
                        [tolerance](const Point &p1, const Point &p2) {
-                           return equalWithinTolerance(p1, p2, tolerance, false);
+                           return equalWithinTolerance(p1, p2, tolerance);
                        }))
         {
-            return true;
+            return ::testing::AssertionSuccess();
         }
         else
         {
-            if (debug)
-            {
-                std::cout << "Polygon 1 was " << poly1 << std::endl;
-                std::cout << "Polygon 2 was " << poly2 << std::endl;
-            }
-            return false;
+            return ::testing::AssertionFailure()
+                   << "Polygon 1 was " << poly1 << ", polygon 2 was " << poly2;
         }
     }
 
-    bool TestUtil::equalWithinTolerance(const Circle &c1, const Circle &c2,
-                                        double tolerance, bool debug)
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(const Circle &c1,
+                                                              const Circle &c2,
+                                                              double tolerance)
     {
-        if (equalWithinTolerance(c1.getOrigin(), c2.getOrigin(), tolerance, false) &&
-            equalWithinTolerance(c1.getRadius(), c2.getRadius(), tolerance, false))
+        if (equalWithinTolerance(c1.getOrigin(), c2.getOrigin(), tolerance) &&
+            equalWithinTolerance(c1.getRadius(), c2.getRadius(), tolerance))
         {
-            return true;
+            return ::testing::AssertionSuccess();
         }
         else
         {
-            if (debug)
-            {
-                std::cout << "Circle 1 was " << c1 << std::endl;
-                std::cout << "Circle 2 was " << c2 << std::endl;
-            }
-            return false;
+            return ::testing::AssertionFailure()
+                   << "Circle 1 was " << c1 << ", circle 2 was " << c2;
         }
     }
 
-    bool TestUtil::equalWithinTolerance(const Point &pt1, const Point &pt2,
-                                        double tolerance, bool debug)
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(const Point &pt1,
+                                                              const Point &pt2,
+                                                              double tolerance)
     {
         double distance = pt1.distanceFromPoint(pt2);
-        if (equalWithinTolerance(distance, 0, tolerance, false))
+        if (equalWithinTolerance(distance, 0, tolerance))
         {
-            return true;
+            return ::testing::AssertionSuccess();
         }
         else
         {
-            if (debug)
-            {
-                std::cout << "Point 1 was " << pt1 << std::endl;
-                std::cout << "Point 2 was " << pt2 << std::endl;
-            }
-            return false;
+            return ::testing::AssertionFailure()
+                   << "Point 1 was " << pt1 << ", point 2 was " << pt2;
         }
     }
 
-    bool TestUtil::equalWithinTolerance(double val1, double val2, double tolerance,
-                                        bool debug)
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(double val1, double val2,
+                                                              double tolerance)
     {
         // subtracting one fixed epsilon to account for the error in fabs and one fixed
         // epsilon to account for the error in subtracting the two vals
         double difference = fabs(val1 - val2) - GeomConstants::FIXED_EPSILON * 2;
         if (difference < tolerance)
         {
-            return true;
+            return ::testing::AssertionSuccess();
         }
         else
         {
-            if (debug)
-            {
-                std::cout << "Value 1 was " << val1 << std::endl;
-                std::cout << "Value 2 was " << val2 << std::endl;
-            }
-            return false;
+            return ::testing::AssertionFailure()
+                   << "Value 1 was " << val1 << ", value 2 was " << val2;
         }
     }
 }  // namespace Test
