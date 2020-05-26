@@ -7,7 +7,6 @@ proto_library(
     name = "fw_proto",
     srcs = ["control.proto"],
     visibility = ["//visibility:private"],
-    deps = ["//software/proto:grsim_proto"],
 )
 
 nanopb_proto_library(
