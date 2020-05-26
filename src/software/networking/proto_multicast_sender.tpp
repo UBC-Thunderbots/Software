@@ -21,10 +21,10 @@ ProtoMulticastSender<SendProto>::ProtoMulticastSender(boost::asio::io_service& i
     }
     catch (const boost::exception& ex)
     {
-        LOG(WARNING) << "There was an issue binding the socket_ to the endpoint when"
-                        "trying to connect to the provided port"
-                        "Please make sure no other program is using the port"
-                     << std::endl;
+        LOG(FATAL) << "There was an issue binding the socket_ to the endpoint when"
+                      "trying to connect to the provided port"
+                      "Please make sure no other program is using the port"
+                   << std::endl;
 
         // Throw this exception up to top-level, as we have no valid
         // recovery action here

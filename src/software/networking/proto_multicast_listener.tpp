@@ -17,11 +17,11 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
     }
     catch (const boost::exception& ex)
     {
-        LOG(WARNING) << "There was an issue binding the socket to the endpoint when"
-                        "trying to connect to the SSL Vision multicast address. This may"
-                        "be due to another instance of the SSLVisionClient running"
-                        "and using the port already"
-                     << std::endl;
+        LOG(FATAL) << "There was an issue binding the socket to the endpoint when"
+                      "trying to connect to the multicast address. This may"
+                      "be due to another instance of the ProtoMulicastListener running"
+                      "and using the port already"
+                   << std::endl;
         // Throw this exception up to top-level, as we have no valid
         // recovery action here
         throw;
