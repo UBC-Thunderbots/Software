@@ -4,9 +4,6 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
-#include "software/proto/ssl_referee.pb.h"
-
 template <class ReceiveProto>
 class ProtoMulticastListener
 {
@@ -18,14 +15,16 @@ class ProtoMulticastListener
      *
      * @param io_service The io_service to use to service incoming ReceiveProto data
      * @param ip_address The ip address of the multicast group on which to listen for
-     * the given ReceiveProto packets
+     * the given ReceiveProto packets (IPv4 in dotted decimal or IPv6 in hex string)
      * @param port The port on which to listen for ReceiveProto packets
      * @param receive_callback The function to run for every ReceiveProto packet received
      * from the network
      */
-    ProtoMulticastListener(boost::asio::io_service& io_service, std::string ip_address,
-                           unsigned short port,
+    ProtoMulticastListener(boost::asio::io_service& io_service,
+                           const std::string& ip_address, unsigned short port,
                            std::function<void(ReceiveProto)> receive_callback);
+
+    virtual ~ProtoMulticastListener();
 
    private:
     /**
@@ -60,4 +59,4 @@ class ProtoMulticastListener
     std::function<void(ReceiveProto)> receive_callback;
 };
 
-#include "software/backend/input/network/networking/proto_multicast_listener.tpp"
+#include "software/networking/proto_multicast_listener.tpp"
