@@ -2,11 +2,9 @@ package(default_visibility = ["//software/ai/navigator:__subpackages__"])
 
 cc_library(
     name = "obstacle",
-    srcs = [
-        "obstacle.cpp",
-    ],
     hdrs = [
         "obstacle.h",
+        "obstacle.tpp",
     ],
     deps = [
         "//shared:constants",

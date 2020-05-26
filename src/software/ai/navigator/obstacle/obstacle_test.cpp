@@ -9,48 +9,32 @@
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
-#include "software/util/variant_visitor/variant_visitor.h"
 
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {
-    Obstacle obstacle(Rectangle({-1, 1}, {2, -3}));
-    Polygon expected             = Polygon({
+    GeomObstacle<Polygon> polygon_obstacle(Rectangle({-1, 1}, {2, -3}));
+    Polygon expected = Polygon({
         {-1, -3},
         {-1, 1},
         {2, 1},
         {2, -3},
     });
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
 
-    std::visit(overload{[&obstacle_shape, expected](const Polygon& polygon) {
-                            EXPECT_EQ(expected, polygon);
-                        },
-                        [&obstacle_shape, expected](const Circle& circle) {
-                            ADD_FAILURE()
-                                << "Expected Polygon, Obstacle was of type Circle";
-                        }},
-               obstacle_shape);
+    EXPECT_EQ(expected, polygon_obstacle.getGeom());
 }
 
 TEST(NavigatorObstacleTest, create_from_circle)
 {
     Circle expected({2, 2}, 3);
-    Obstacle obstacle(expected);
-    ObstacleShape obstacle_shape = obstacle.getObstacleShape();
+    GeomObstacle<Circle> circle_obstacle(expected);
 
-    std::visit(overload{[&obstacle_shape, expected](const Polygon& polygon) {
-                            ADD_FAILURE()
-                                << "Expected Circle, Obstacle was of type Polygon";
-                        },
-                        [&obstacle_shape, expected](const Circle& circle) {
-                            EXPECT_EQ(circle, expected);
-                        }},
-               obstacle_shape);
+    EXPECT_EQ(circle_obstacle.getGeom(), expected);
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
 {
-    Obstacle obstacle = Obstacle(Rectangle({-1, 1}, {2, -3}));
+    ObstaclePtr obstacle(
+        std::make_shared<GeomObstacle<Polygon>>((Rectangle({-1, 1}, {2, -3}))));
 
     Polygon expected = Polygon({
         {-1, -3},
@@ -59,58 +43,58 @@ TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
         {2, -3},
     });
 
-    // we expect that the stream operator string for Obstacle with shape Polygon
+    // we expect that the stream operator string for ObstaclePtr with shape Polygon
     // will contain the stream operator string for Polygon
     std::ostringstream polygon_ss;
     polygon_ss << expected;
-    EXPECT_TRUE(obstacle.toString().find(polygon_ss.str()) != std::string::npos);
+    EXPECT_TRUE(obstacle->toString().find(polygon_ss.str()) != std::string::npos);
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_stream_operator_test)
 {
     Circle expected({2, 2}, 3);
-    Obstacle obstacle = Obstacle(expected);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(expected));
 
-    // we expect that the stream operator string for Obstacle with shape Circle will
+    // we expect that the stream operator string for ObstaclePtr with shape Circle will
     // contain the stream operator string for Circle
     std::ostringstream circle_ss;
     circle_ss << expected;
-    EXPECT_TRUE(obstacle.toString().find(circle_ss.str()) != std::string::npos);
+    EXPECT_TRUE(obstacle->toString().find(circle_ss.str()) != std::string::npos);
 }
 
 TEST(NavigatorObstacleTest, rectangle_obstacle_contains)
 {
     Rectangle rectangle({-1, 1}, {2, -3});
-    Obstacle obstacle(rectangle);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(rectangle));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_TRUE(obstacle.contains(inside_point));
-    EXPECT_FALSE(obstacle.contains(outside_point));
+    EXPECT_TRUE(obstacle->contains(inside_point));
+    EXPECT_FALSE(obstacle->contains(outside_point));
 }
 
 TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
 {
     Rectangle rectangle({-1, -3}, {2, 1});
-    Obstacle obstacle(rectangle);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(rectangle));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle.distance(inside_point), 0);
-    EXPECT_EQ(obstacle.distance(outside_point), 5);
+    EXPECT_EQ(obstacle->distance(inside_point), 0);
+    EXPECT_EQ(obstacle->distance(outside_point), 5);
 }
 
 TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
 {
     Rectangle rectangle({-1, 1}, {2, -3});
-    Obstacle obstacle(rectangle);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(rectangle));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(5, 6), outside_point);
 
-    EXPECT_TRUE(obstacle.intersects(intersecting_segment));
-    EXPECT_FALSE(obstacle.intersects(non_intersecting_segment));
+    EXPECT_TRUE(obstacle->intersects(intersecting_segment));
+    EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_contains)
@@ -121,12 +105,12 @@ TEST(NavigatorObstacleTest, polygon_obstacle_contains)
         {2, 1},
         {2, -3},
     });
-    Obstacle obstacle(polygon);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(polygon));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_TRUE(obstacle.contains(inside_point));
-    EXPECT_FALSE(obstacle.contains(outside_point));
+    EXPECT_TRUE(obstacle->contains(inside_point));
+    EXPECT_FALSE(obstacle->contains(outside_point));
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_distance)
@@ -137,12 +121,12 @@ TEST(NavigatorObstacleTest, polygon_obstacle_distance)
         {2, 1},
         {2, -3},
     });
-    Obstacle obstacle(polygon);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(polygon));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
-    EXPECT_EQ(obstacle.distance(inside_point), 0);
-    EXPECT_EQ(obstacle.distance(outside_point), 5);
+    EXPECT_EQ(obstacle->distance(inside_point), 0);
+    EXPECT_EQ(obstacle->distance(outside_point), 5);
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
@@ -153,51 +137,51 @@ TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
         {2, 1},
         {2, -3},
     });
-    Obstacle obstacle(polygon);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(polygon));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(5, 6), outside_point);
 
-    EXPECT_TRUE(obstacle.intersects(intersecting_segment));
-    EXPECT_FALSE(obstacle.intersects(non_intersecting_segment));
+    EXPECT_TRUE(obstacle->intersects(intersecting_segment));
+    EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_contains)
 {
     Circle circle({2, 2}, 4);
-    Obstacle obstacle(circle);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(circle));
     Point inside_point(2, 3);
     Point outside_point(10, -10);
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(10, 0), outside_point);
 
-    EXPECT_TRUE(obstacle.contains(inside_point));
-    EXPECT_FALSE(obstacle.contains(outside_point));
+    EXPECT_TRUE(obstacle->contains(inside_point));
+    EXPECT_FALSE(obstacle->contains(outside_point));
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_distance)
 {
     Circle circle({2, 2}, 4);
-    Obstacle obstacle(circle);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(circle));
     Point inside_point(2, 3);
     Point outside_point(10, 2);
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(10, 0), outside_point);
 
-    EXPECT_EQ(obstacle.distance(inside_point), 0);
-    EXPECT_EQ(obstacle.distance(outside_point), 4);
+    EXPECT_EQ(obstacle->distance(inside_point), 0);
+    EXPECT_EQ(obstacle->distance(outside_point), 4);
 }
 
 TEST(NavigatorObstacleTest, circle_obstacle_intersects)
 {
     Circle circle({2, 2}, 4);
-    Obstacle obstacle(circle);
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(circle));
     Point inside_point(2, 3);
     Point outside_point(10, -10);
     Segment intersecting_segment(inside_point, outside_point);
     Segment non_intersecting_segment(Point(10, 0), outside_point);
 
-    EXPECT_TRUE(obstacle.intersects(intersecting_segment));
-    EXPECT_FALSE(obstacle.intersects(non_intersecting_segment));
+    EXPECT_TRUE(obstacle->intersects(intersecting_segment));
+    EXPECT_FALSE(obstacle->intersects(non_intersecting_segment));
 }

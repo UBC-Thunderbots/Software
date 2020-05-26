@@ -168,6 +168,5 @@ ObstaclePtr ObstacleFactory::createObstacle(const Circle &circle)
 
 ObstaclePtr ObstacleFactory::createObstacle(const Polygon &polygon)
 {
-    return ObstaclePtr(
-        std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    return ObstaclePtr(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
 }

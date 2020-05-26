@@ -2,8 +2,8 @@
 
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/circle_obstacle.h"
-#include "software/ai/navigator/obstacle/polygon_obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/polygon_obstacle.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/point.h"

@@ -1,10 +1,8 @@
 #pragma once
 
 #include <sstream>
-#include <variant>
 
 #include "shared/constants.h"
-#include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
@@ -12,37 +10,19 @@
 #include "software/new_geom/util/intersects.h"
 
 /**
- * Represents the underlying shape of the obstacle */
-using ObstacleShape = std::variant<Polygon, Circle>;
-
-/**
  * An obstacle is an area to avoid for navigation
  */
 class Obstacle
 {
    public:
-    Obstacle() = delete;
-
-    /**
-     * Construct a obstacle with a Circle
-     *
-     * @param circle Circle to make obstacle with
-     */
-    explicit Obstacle(const Circle& circle);
-
-    /**
-     * Construct a obstacle with a Polygon
-     *
-     * @param circle Polygon to make obstacle with
-     */
-    explicit Obstacle(const Polygon& polygon);
+    virtual ~Obstacle() = default;
 
     /**
      * Determines whether the given Point is contained within this Obstacle
      *
      * @return whether the Point p is contained within this Obstacle
      */
-    bool contains(const Point& p) const;
+    virtual bool contains(const Point& p) const = 0;
 
     /**
      * Gets the minimum distance from the obstacle to the point
@@ -51,32 +31,58 @@ class Obstacle
      *
      * @return distance to point
      */
-    double distance(const Point& p) const;
+    virtual double distance(const Point& p) const = 0;
 
     /**
      * Determines whether the given Segment intersects this Obstacle
      *
      * @return true if the given Segment intersects this Obstacle
      */
-    bool intersects(const Segment& segment) const;
+    virtual bool intersects(const Segment& segment) const = 0;
 
     /**
      * Output string to describe the obstacle
      *
      * @return string that describes the obstacle
      */
-    std::string toString(void) const;
+    virtual std::string toString(void) const = 0;
+};
+
+template <typename GEOM_TYPE>
+class GeomObstacle : public Obstacle
+{
+   public:
+    GeomObstacle() = delete;
 
     /**
-     * Gets the shape of the obstacle
+     * Construct a circle obstacle with a Circle
      *
-     * @return The ObstacleShape
+     * @param circle Circle to make obstacle with
      */
-    const ObstacleShape getObstacleShape(void) const;
+    explicit GeomObstacle(const GEOM_TYPE& geom);
+
+    bool contains(const Point& p) const override;
+    double distance(const Point& p) const override;
+    bool intersects(const Segment& segment) const override;
+    std::string toString(void) const override;
+
+    /**
+     * Gets the underlying GEOM_TYPE
+     *
+     * @return geom type
+     */
+    const GEOM_TYPE getGeom(void) const;
 
    private:
-    ObstacleShape obstacle_shape_;
+    GEOM_TYPE geom_;
 };
+
+
+/**
+ * We use a pointer to Obstacle to support inheritance
+ * Note: this is a convenience typedef
+ */
+using ObstaclePtr = std::shared_ptr<Obstacle>;
 
 /**
  * Implements the << operator for printing
@@ -86,4 +92,6 @@ class Obstacle
  *
  * @return The output stream with the string representation of the class appended
  */
-std::ostream& operator<<(std::ostream& os, const Obstacle& obstacle);
+std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr);
+
+#include "software/ai/navigator/obstacle/obstacle.tpp"
