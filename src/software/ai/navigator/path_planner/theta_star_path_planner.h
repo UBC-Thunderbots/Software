@@ -1,5 +1,9 @@
 #pragma once
+
 #include <unistd.h>
+
+#include <map>
+#include <set>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
 
