@@ -8,9 +8,7 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/new_geom:circle",
         "//software/new_geom:point",
-        "//software/new_geom:polygon",
         "//software/new_geom:segment",
         "//software/new_geom/util",
     ],

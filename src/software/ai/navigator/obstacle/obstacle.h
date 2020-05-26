@@ -4,7 +4,6 @@
 
 #include "shared/constants.h"
 #include "software/new_geom/point.h"
-#include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
@@ -92,6 +91,10 @@ using ObstaclePtr = std::shared_ptr<Obstacle>;
  *
  * @return The output stream with the string representation of the class appended
  */
-std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr);
+inline std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr)
+{
+    os << obstacle_ptr->toString();
+    return os;
+}
 
 #include "software/ai/navigator/obstacle/obstacle.tpp"

@@ -24,21 +24,21 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
             }
         }
 
-        for (const auto& obstacle : obstacles)
-        {
-            drawObstacle(scene, obstacle->getObstacleShape(), pen);
-        }
+        //        for (const auto& obstacle : obstacles)
+        //        {
+        //            drawObstacle(scene, obstacle, pen);
+        //        }
     };
 
     return AIDrawFunction(draw_function);
 }
 
-void drawObstacle(QGraphicsScene* scene, const ObstacleShape& obstacle_shape,
-                  const QPen& pen)
+void drawObstacle(QGraphicsScene* scene, const ObstaclePtr& obstacle_ptr, const QPen& pen)
 {
-    std::visit(
-        overload{
-            [scene, pen](const Circle& circle) { drawCircle(scene, circle, pen); },
-            [scene, pen](const Polygon& polygon) { drawPolygon(scene, polygon, pen); }},
-        obstacle_shape);
+    //    std::visit(
+    //        overload{
+    //            [scene, pen](const Circle& circle) { drawCircle(scene, circle, pen); },
+    //            [scene, pen](const Polygon& polygon) { drawPolygon(scene, polygon, pen);
+    //            }},
+    //        obstacle_shape);
 }

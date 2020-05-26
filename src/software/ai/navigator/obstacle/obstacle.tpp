@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/ai/navigator/obstacle/obstacle.h"
 
 template <typename GEOM_TYPE>
@@ -35,17 +37,4 @@ template <typename GEOM_TYPE>
 const GEOM_TYPE GeomObstacle<GEOM_TYPE>::getGeom(void) const
 {
     return geom_;
-}
-
-template <typename GEOM_TYPE>
-std::ostream& operator<<(std::ostream& os, const GeomObstacle<GEOM_TYPE>& geom_obstacle)
-{
-    os << geom_obstacle.toString();
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr)
-{
-    os << obstacle_ptr->toString();
-    return os;
 }
