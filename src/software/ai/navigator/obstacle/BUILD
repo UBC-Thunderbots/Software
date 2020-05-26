@@ -13,7 +13,6 @@ cc_library(
         "//software/new_geom:polygon",
         "//software/new_geom:segment",
         "//software/new_geom/util",
-        "//software/util/variant_visitor",
     ],
 )
 
@@ -39,7 +38,6 @@ cc_test(
         ":obstacle",
         "//software/new_geom:point",
         "//software/new_geom:rectangle",
-        "//software/util/variant_visitor",
         "@gtest//:gtest_main",
     ],
 )
@@ -52,7 +50,6 @@ cc_test(
         "//software/new_geom:point",
         "//software/new_geom:rectangle",
         "//software/test_util",
-        "//software/util/variant_visitor",
         "//software/world",
         "@gtest//:gtest_main",
     ],

@@ -41,5 +41,5 @@ class PathManager
      *
      * @return obstacles
      */
-    virtual const std::vector<Obstacle> getObstacles(void) const = 0;
+    virtual const std::vector<ObstaclePtr> getObstacles(void) const = 0;
 };
