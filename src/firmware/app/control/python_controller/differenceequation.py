@@ -42,7 +42,7 @@ class DifferenceEquation:
         # so we will remove it here so it has no contribution
         del self.__output_coefficients[0]
 
-    def calculate_output(self, output_history: List[float], input_history: List[float]):
+    def calculate_output(self, output_history: List[float], input_history: List[float]) -> float:
         """ 
         Calculates the output of the difference equation given the list of previous(and current) outputs
         and inputs to the system
