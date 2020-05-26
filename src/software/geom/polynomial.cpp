@@ -1,6 +1,6 @@
 #include "software/geom/polynomial.h"
 
-Polynomial::Polynomial(const std::vector<double>& coeffs) : coeffs(coeffs)
+Polynomial1d::Polynomial1d(const std::vector<double>& coeffs) : coeffs(coeffs)
 {
     if (coeffs.size() && (coeffs[0] == 0))
     {
@@ -9,7 +9,7 @@ Polynomial::Polynomial(const std::vector<double>& coeffs) : coeffs(coeffs)
     }
 }
 
-Polynomial::Polynomial(const std::initializer_list<double>& coeffs) : coeffs(coeffs)
+Polynomial1d::Polynomial1d(const std::initializer_list<double>& coeffs) : coeffs(coeffs)
 {
     if (this->coeffs.size() && (this->coeffs[0] == 0))
     {
@@ -18,7 +18,7 @@ Polynomial::Polynomial(const std::initializer_list<double>& coeffs) : coeffs(coe
     }
 }
 
-Polynomial::Polynomial(const std::pair<double, double>& constraint1,
+Polynomial1d::Polynomial1d(const std::pair<double, double>& constraint1,
                        const std::pair<double, double>& constraint2)
 {
     if (constraint1.first == constraint2.first)
@@ -31,12 +31,12 @@ Polynomial::Polynomial(const std::pair<double, double>& constraint1,
     coeffs.push_back(constraint1.second - (constraint1.first * slope));
 }
 
-const std::vector<double>& Polynomial::getCoeffs() const
+const std::vector<double>& Polynomial1d::getCoeffs() const
 {
     return coeffs;
 }
 
-double Polynomial::valueAt(double val) const
+double Polynomial1d::valueAt(double val) const
 {
     double retval = 0;
     for (size_t i = 0; i < coeffs.size(); i++)

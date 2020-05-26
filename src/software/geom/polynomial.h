@@ -6,13 +6,14 @@
 #include "software/new_geom/point.h"
 
 /**
- * Polynomial is a representation of a polynomial
+ * Polynomial1d is a representation of a polynomial
  * that can calculate values at a given input
  */
-class Polynomial
+class Polynomial1d
 {
    public:
-    Polynomial() = delete;
+    Polynomial1d() = delete;
+
     /**
      * Construct a polynomial from coefficients
      * s.t. n = coeffs.size() == the degree of the polynomial
@@ -24,7 +25,7 @@ class Polynomial
      *
      * @throws std::invalid_argument if coeffs[0] == 0
      */
-    explicit Polynomial(const std::vector<double>& coeffs);
+    explicit Polynomial1d(const std::vector<double>& coeffs);
 
     /**
      * Construct a polynomial from coefficients
@@ -36,8 +37,9 @@ class Polynomial
      *
      * @throws std::invalid_argument if coeffs[0] == 0
      */
-    explicit Polynomial(const std::initializer_list<double>& coeffs);
+    explicit Polynomial1d(const std::initializer_list<double>& coeffs);
 
+    // TODO: rename this to `constructLinearPolynomial`?
     /**
      * Construct a linear polynomial from two pairs of input/output
      *
@@ -46,7 +48,7 @@ class Polynomial
      *
      * @throws std::invalid_argument if constraint1.first == constraint2.first
      */
-    explicit Polynomial(const std::pair<double, double>& constraint1,
+    explicit Polynomial1d(const std::pair<double, double>& constraint1,
                         const std::pair<double, double>& constraint2);
 
     /**

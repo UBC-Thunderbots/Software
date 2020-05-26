@@ -1,14 +1,14 @@
-#include "software/new_geom/polynomial.h"
+#include "software/new_geom/polynomial1d.h"
 
 #include "software/new_geom/geom_constants.h"
 
-Polynomial::Polynomial() {}
+Polynomial1d::Polynomial1d() {}
 
-Polynomial::Polynomial(const std::vector<double> &coeffs) : coeffs(coeffs) {}
+Polynomial1d::Polynomial1d(const std::vector<double> &coeffs) : coeffs(coeffs) {}
 
-Polynomial::Polynomial(const std::initializer_list<double> &coeffs) : coeffs(coeffs) {}
+Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs) : coeffs(coeffs) {}
 
-double Polynomial::getCoeff(unsigned int order) const
+double Polynomial1d::getCoeff(unsigned int order) const
 {
     if (order >= coeffs.size())
     {
@@ -20,7 +20,7 @@ double Polynomial::getCoeff(unsigned int order) const
     }
 }
 
-void Polynomial::setCoeff(unsigned int order, double coeff)
+void Polynomial1d::setCoeff(unsigned int order, double coeff)
 {
     if (order >= coeffs.size())
     {
@@ -29,7 +29,7 @@ void Polynomial::setCoeff(unsigned int order, double coeff)
     coeffs[order] = coeff;
 }
 
-unsigned int Polynomial::getOrder() const
+unsigned int Polynomial1d::getOrder() const
 {
     if (coeffs.size() != 0)
     {
@@ -45,7 +45,7 @@ unsigned int Polynomial::getOrder() const
     return 0;
 }
 
-double Polynomial::valueAt(double val) const
+double Polynomial1d::valueAt(double val) const
 {
     // Horner's Method:
     // https://www.geeksforgeeks.org/horners-method-polynomial-evaluation/
@@ -58,9 +58,9 @@ double Polynomial::valueAt(double val) const
     return retval;
 }
 
-Polynomial operator+(const Polynomial &p1, const Polynomial &p2)
+Polynomial1d operator+(const Polynomial1d &p1, const Polynomial1d &p2)
 {
-    Polynomial sum;
+    Polynomial1d sum;
     unsigned int max_order = std::max(p1.getOrder(), p2.getOrder());
     for (unsigned int i = 0; i <= max_order; i++)
     {
@@ -69,9 +69,9 @@ Polynomial operator+(const Polynomial &p1, const Polynomial &p2)
     return sum;
 }
 
-Polynomial operator-(const Polynomial &p1, const Polynomial &p2)
+Polynomial1d operator-(const Polynomial1d &p1, const Polynomial1d &p2)
 {
-    Polynomial difference;
+    Polynomial1d difference;
     unsigned int max_order = std::max(p1.getOrder(), p2.getOrder());
     for (unsigned int i = 0; i <= max_order; i++)
     {
@@ -80,9 +80,9 @@ Polynomial operator-(const Polynomial &p1, const Polynomial &p2)
     return difference;
 }
 
-Polynomial operator*(const Polynomial &p1, const Polynomial &p2)
+Polynomial1d operator*(const Polynomial1d &p1, const Polynomial1d &p2)
 {
-    Polynomial product;
+    Polynomial1d product;
     unsigned int p1_order = p1.getOrder();
     unsigned int p2_order = p2.getOrder();
     for (unsigned int i = 0; i <= p1_order; i++)
@@ -96,22 +96,22 @@ Polynomial operator*(const Polynomial &p1, const Polynomial &p2)
     return product;
 }
 
-Polynomial &operator+=(Polynomial &p1, const Polynomial &p2)
+Polynomial1d &operator+=(Polynomial1d &p1, const Polynomial1d &p2)
 {
     return p1 = p1 + p2;
 }
 
-Polynomial &operator-=(Polynomial &p1, const Polynomial &p2)
+Polynomial1d &operator-=(Polynomial1d &p1, const Polynomial1d &p2)
 {
     return p1 = p1 - p2;
 }
 
-Polynomial &operator*=(Polynomial &p1, const Polynomial &p2)
+Polynomial1d &operator*=(Polynomial1d &p1, const Polynomial1d &p2)
 {
     return p1 = p1 * p2;
 }
 
-bool operator==(const Polynomial &p1, const Polynomial &p2)
+bool operator==(const Polynomial1d &p1, const Polynomial1d &p2)
 {
     unsigned int p1_order = p1.getOrder();
     unsigned int p2_order = p2.getOrder();

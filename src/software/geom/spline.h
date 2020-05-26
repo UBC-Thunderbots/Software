@@ -77,12 +77,12 @@ class Spline
     class SplineSegment
     {
        public:
-        SplineSegment(Polynomial x, Polynomial y, double start, double end)
+        SplineSegment(Polynomial1d x, Polynomial1d y, double start, double end)
             : x(x), y(y), start(start), end(end)
         {
         }
-        const Polynomial x;
-        const Polynomial y;
+        const Polynomial1d x;
+        const Polynomial1d y;
         const double start;
         const double end;
     };

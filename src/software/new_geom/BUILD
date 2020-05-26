@@ -112,10 +112,20 @@ cc_library(
 )
 
 cc_library(
-    name = "polynomial",
-    srcs = ["polynomial.cpp"],
-    hdrs = ["polynomial.h"],
+    name = "polynomial1d",
+    srcs = ["polynomial1d.cpp"],
+    hdrs = ["polynomial1d.h"],
     deps = [":geom_constants"],
+)
+
+cc_library(
+    name = "polynomial2d",
+    srcs = ["polynomial2d.cpp"],
+    hdrs = ["polynomial2d.h"],
+    deps = [
+        ":point",
+        ":polynomial1d",
+    ],
 )
 
 cc_library(
@@ -173,12 +183,23 @@ cc_test(
 )
 
 cc_test(
-    name = "polynomial_test",
+    name = "polynomial1d_test",
     srcs = [
-        "polynomial_test.cpp",
+        "polynomial1d_test.cpp",
     ],
     deps = [
-        ":polynomial",
+        ":polynomial1d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "polynomial2d_test",
+    srcs = [
+        "polynomial2d_test.cpp",
+    ],
+    deps = [
+        ":polynomial2d",
         "@gtest//:gtest_main",
     ],
 )

@@ -82,9 +82,11 @@ void Spline::initLinearSegments(const std::vector<Point>& points)
             double input_start = (i - 1) / ((double)points.size() - 1);
             double input_end   = (i) / ((double)points.size() - 1);
 
-            Polynomial poly_x = Polynomial(std::make_pair(input_start, points[i - 1].x()),
+            Polynomial1d poly_x =
+                Polynomial1d(std::make_pair(input_start, points[i - 1].x()),
                                            std::make_pair(input_end, points[i].x()));
-            Polynomial poly_y = Polynomial(std::make_pair(input_start, points[i - 1].y()),
+            Polynomial1d poly_y =
+                Polynomial1d(std::make_pair(input_start, points[i - 1].y()),
                                            std::make_pair(input_end, points[i].y()));
             segments.push_back(SplineSegment(poly_x, poly_y, input_start, input_end));
         }
