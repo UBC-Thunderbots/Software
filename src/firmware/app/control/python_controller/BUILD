@@ -23,11 +23,5 @@ py_test(
     main = ":difference_equation_test.py",
     deps = [
         ":difference_equation",
-        requirement("numpy"),
-        requirement("control"),
-        requirement("scipy"),
-        requirement("pyparsing"),
-        requirement("cycler"),
-        requirement("kiwisolver"),
     ],
 )

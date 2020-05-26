@@ -11,6 +11,7 @@ from control.matlab import *
 import matplotlib.pyplot as plt
 import functools
 import collections
+from typing import List
 
 
 class DifferenceEquation:
@@ -41,7 +42,7 @@ class DifferenceEquation:
         # so we will remove it here so it has no contribution
         del self.__output_coefficients[0]
 
-    def calculate_output(self, output_history: list[float], input_history: list[float]):
+    def calculate_output(self, output_history: List[float], input_history: List[float]):
         """ 
         Calculates the output of the difference equation given the list of previous(and current) outputs
         and inputs to the system
