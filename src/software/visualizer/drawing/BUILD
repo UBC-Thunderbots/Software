@@ -93,6 +93,22 @@ cc_library(
 )
 
 cc_library(
+    name = "obstacle_artist",
+    srcs = ["obstacle_artist.cpp"],
+    hdrs = ["obstacle_artist.h"],
+    deps = [
+        ":colors",
+        ":draw_functions",
+        ":geom",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/obstacle:obstacle_visitor",
+        "//software/geom",
+        "//software/visualizer/geom:geometry_conversion",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
     name = "navigator",
     srcs = ["navigator.cpp"],
     hdrs = ["navigator.h"],
@@ -100,9 +116,9 @@ cc_library(
         ":colors",
         ":draw_functions",
         ":geom",
+        ":obstacle_artist",
         "//software/ai/navigator",
         "//software/geom",
-        "//software/util/variant_visitor",
         "//software/visualizer/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],

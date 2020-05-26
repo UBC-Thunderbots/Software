@@ -6,6 +6,8 @@ cc_library(
         "obstacle.h",
         "obstacle.tpp",
     ],
+    # We expose obstacle so that it can visualized
+    visibility = ["//visibility:public"],
     deps = [
         "obstacle_visitor",
         "//shared:constants",
@@ -57,6 +59,8 @@ cc_test(
 cc_library(
     name = "obstacle_visitor",
     hdrs = ["obstacle_visitor.h"],
+    # We expose obstacle visitor so that it can visualized
+    visibility = ["//visibility:public"],
     deps = [
         "//software/new_geom:circle",
         "//software/new_geom:polygon",
