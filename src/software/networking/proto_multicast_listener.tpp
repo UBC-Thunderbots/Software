@@ -22,9 +22,6 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
                       "be due to another instance of the ProtoMulicastListener running"
                       "and using the port already"
                    << std::endl;
-        // Throw this exception up to top-level, as we have no valid
-        // recovery action here
-        throw;
     }
 
     // Join the multicast group.
