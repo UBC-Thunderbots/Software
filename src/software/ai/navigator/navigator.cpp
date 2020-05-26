@@ -244,7 +244,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
     double robot_proximity_limit = config->EnemyRobotProximityLimit()->value();
 
     // find min dist between p and any robot
-    double closest_dist = DBL_MAX;
+    double closest_dist = std::numeric_limits<double>::max();
     auto obstacles      = obstacle_factory.createVelocityObstaclesFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {

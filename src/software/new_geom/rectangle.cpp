@@ -1,5 +1,7 @@
 #include "software/new_geom/rectangle.h"
 
+#include <algorithm>
+
 Rectangle::Rectangle(const Point &point1, const Point &point2)
     : ConvexPolygon({Point(point1.x() < point2.x() ? point1.x() : point2.x(),
                            point1.y() < point2.y() ? point1.y() : point2.y()),

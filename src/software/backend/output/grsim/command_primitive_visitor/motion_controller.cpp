@@ -248,8 +248,8 @@ AngularVelocity MotionController::determineAngularVelocityFromVelocity(
     }
 
     new_angular_velocity =
-        std::clamp(new_angular_velocity, -abs(angular_velocity.toRadians()),
-                   abs(angular_velocity.toRadians()));
+        std::clamp(new_angular_velocity, -std::abs(angular_velocity.toRadians()),
+                   std::abs(angular_velocity.toRadians()));
     new_angular_velocity = std::clamp(new_angular_velocity,
                                       -max_angular_acceleration_meters_per_second_squared,
                                       max_angular_acceleration_meters_per_second_squared);
