@@ -62,9 +62,9 @@ class GeomObstacle : public Obstacle
     GeomObstacle() = delete;
 
     /**
-     * Construct a circle obstacle with a Circle
+     * Construct a GeomObstacle with GEOM_TYPE
      *
-     * @param circle Circle to make obstacle with
+     * @param geom GEOM_TYPE to make obstacle with
      */
     explicit GeomObstacle(const GEOM_TYPE& geom);
 
