@@ -6,7 +6,6 @@ cc_library(
     hdrs = ["catch_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -26,7 +25,6 @@ cc_library(
     hdrs = ["chip_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -46,7 +44,6 @@ cc_library(
     hdrs = ["direct_velocity_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -66,7 +63,6 @@ cc_library(
     hdrs = ["direct_wheels_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -86,7 +82,6 @@ cc_library(
     hdrs = ["dribble_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -106,7 +101,6 @@ cc_library(
     hdrs = ["kick_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -126,7 +120,6 @@ cc_library(
     hdrs = ["move_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -146,7 +139,6 @@ cc_library(
     hdrs = ["movespin_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
         "//software/new_geom:angular_velocity",
     ],
@@ -167,7 +159,6 @@ cc_library(
     hdrs = ["pivot_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//shared:constants",
         "//software/geom",
     ],
@@ -188,7 +179,6 @@ cc_library(
     hdrs = ["stop_primitive.h"],
     deps = [
         ":primitive",
-        ":primitive_visitor",
         "//software/geom",
     ],
 )
@@ -222,11 +212,10 @@ cc_library(
 cc_library(
     name = "primitive_visitor",
     hdrs = ["primitive_visitor.h"],
-    deps = [],
 )
 
 cc_library(
     name = "primitive",
     hdrs = ["primitive.h"],
-    deps = [],
+    deps = ["primitive_visitor"],
 )

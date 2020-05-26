@@ -4,11 +4,7 @@
 #include <string>
 #include <vector>
 
-// We forward-declare the PrimitiveVisitor interface (pure virtual class) because we need
-// to know about the existence of this class in order to accept visitors with the
-// accept() function. We cannot use an #include statement because this creates a cyclic
-// dependency
-class PrimitiveVisitor;
+#include "software/primitive/primitive_visitor.h"
 
 /**
  * Defines a Robot Primitive, which is the most basic action / unit of work a robot can
