@@ -1,4 +1,6 @@
 #pragma once
+
+#include <optional>
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
