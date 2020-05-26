@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "shared/constants.h"
+#include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/util/distance.h"
@@ -45,6 +46,13 @@ class Obstacle
      * @return string that describes the obstacle
      */
     virtual std::string toString(void) const = 0;
+
+    /**
+     * Accepts an Obstacle Visitor and calls the visit function
+     *
+     * @param visitor An Obstacle Visitor
+     */
+    virtual void accept(ObstacleVisitor& visitor) const = 0;
 };
 
 template <typename GEOM_TYPE>
@@ -64,6 +72,7 @@ class GeomObstacle : public Obstacle
     double distance(const Point& p) const override;
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
+    void accept(ObstacleVisitor& visitor) const override;
 
     /**
      * Gets the underlying GEOM_TYPE

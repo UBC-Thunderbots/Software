@@ -38,3 +38,9 @@ const GEOM_TYPE GeomObstacle<GEOM_TYPE>::getGeom(void) const
 {
     return geom_;
 }
+
+template <typename GEOM_TYPE>
+void GeomObstacle<GEOM_TYPE>::accept(ObstacleVisitor& visitor) const
+{
+    visitor.visit(*this);
+}

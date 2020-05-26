@@ -7,6 +7,7 @@ cc_library(
         "obstacle.tpp",
     ],
     deps = [
+        "obstacle_visitor",
         "//shared:constants",
         "//software/new_geom:point",
         "//software/new_geom:segment",
@@ -50,5 +51,14 @@ cc_test(
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "obstacle_visitor",
+    hdrs = ["obstacle_visitor.h"],
+    deps = [
+        "//software/new_geom:circle",
+        "//software/new_geom:polygon",
     ],
 )
