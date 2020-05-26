@@ -158,9 +158,7 @@ class Navigator : public IntentVisitor
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
 
-    // The following are exposed to users of the Navigator
     std::vector<std::vector<Point>> planned_paths;
-    std::vector<std::vector<Point>> user_planned_paths;
 
     // These are obstacles that represent robots that aren't
     // assigned move intents

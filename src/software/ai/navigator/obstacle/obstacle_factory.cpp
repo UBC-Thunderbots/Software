@@ -163,12 +163,10 @@ ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectan
 
 ObstaclePtr ObstacleFactory::createObstacle(const Circle &circle)
 {
-    return ObstaclePtr(
-        std::make_shared<GeomObstacle<Circle>>(GeomObstacle<Circle>(circle)));
+    return std::make_shared<GeomObstacle<Circle>>(GeomObstacle<Circle>(circle));
 }
 
 ObstaclePtr ObstacleFactory::createObstacle(const Polygon &polygon)
 {
-    return ObstaclePtr(
-        std::make_shared<GeomObstacle<Polygon>>(GeomObstacle<Polygon>(polygon)));
+    return std::make_shared<GeomObstacle<Polygon>>(GeomObstacle<Polygon>(polygon));
 }
