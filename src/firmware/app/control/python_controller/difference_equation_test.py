@@ -94,7 +94,7 @@ class TestDifferenceEquation(unittest.TestCase):
 
         difference_equation = de.DifferenceEquation(transfer_function)
 
-        self.assertEqual(difference_equation.get_output_order(), len(denominator))
+        self.assertEqual(difference_equation.get_system_order(), len(denominator))
         self.assertEqual(difference_equation.get_input_order(), len(numerator))
 
         for i in range(0, len(numerator)):
@@ -200,14 +200,14 @@ class TestDifferenceEquation(unittest.TestCase):
         T, yout = ct.step_response(discrete_tf, T)
 
         # Set up circular buffers for input/output management
-        inputs = collections.deque(maxlen=difference_equation.get_output_order())
-        outputs = collections.deque(maxlen=difference_equation.get_output_order())
+        inputs = collections.deque(maxlen=difference_equation.get_system_order())
+        outputs = collections.deque(maxlen=difference_equation.get_system_order())
 
         full_output_history = []
 
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             inputs.append(0)
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             outputs.append(0)
 
         for i in range(0, num_points):
@@ -248,14 +248,14 @@ class TestDifferenceEquation(unittest.TestCase):
         T, yout = ct.step_response(discrete_tf, T)
 
         # Set up circular buffers for input/output management
-        inputs = collections.deque(maxlen=difference_equation.get_output_order())
-        outputs = collections.deque(maxlen=difference_equation.get_output_order())
+        inputs = collections.deque(maxlen=difference_equation.get_system_order())
+        outputs = collections.deque(maxlen=difference_equation.get_system_order())
 
         full_output_history = []
 
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             inputs.append(0)
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             outputs.append(0)
 
         for i in range(0, num_points):
@@ -298,14 +298,14 @@ class TestDifferenceEquation(unittest.TestCase):
         T, yout = ct.step_response(discrete_tf, T)
 
         # Set up circular buffers for input/output management
-        inputs = collections.deque(maxlen=difference_equation.get_output_order())
-        outputs = collections.deque(maxlen=difference_equation.get_output_order())
+        inputs = collections.deque(maxlen=difference_equation.get_system_order())
+        outputs = collections.deque(maxlen=difference_equation.get_system_order())
 
         full_output_history = []
 
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             inputs.append(0)
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             outputs.append(0)
 
         for i in range(0, num_points):
@@ -346,14 +346,14 @@ class TestDifferenceEquation(unittest.TestCase):
         T, yout = ct.step_response(discrete_tf, T)
 
         # Set up circular buffers for input/output management
-        inputs = collections.deque(maxlen=difference_equation.get_output_order())
-        outputs = collections.deque(maxlen=difference_equation.get_output_order())
+        inputs = collections.deque(maxlen=difference_equation.get_system_order())
+        outputs = collections.deque(maxlen=difference_equation.get_system_order())
 
         full_output_history = []
 
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             inputs.append(0)
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             outputs.append(0)
 
         for i in range(0, num_points):

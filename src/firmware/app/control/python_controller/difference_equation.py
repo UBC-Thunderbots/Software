@@ -26,7 +26,7 @@ class DifferenceEquation:
         denominator_coefficients = discrete_tf.den[0][0]
 
         # Store the order of the numerator and denominator for calculation later
-        self.__denominator_order = len(denominator_coefficients)
+        self.__system_order = len(denominator_coefficients)
         self.__numerator_order = len(numerator_coefficients)
 
         # Normalize by the coefficient of the highest order denominator term
@@ -50,7 +50,7 @@ class DifferenceEquation:
         and inputs to the system
         
         :param output_history The last M outputs, where M is the order of the original TF's denominator
-        aka self.__denominator_order
+        aka self.__system_order
         
         :param input_history The last N inputs, where N is the order of the original TF's numerator
         aka self.__numerator_order
@@ -58,8 +58,8 @@ class DifferenceEquation:
 
         # Calcualte the effect of the input history has on the output
         input_response = 0
-        history_index_shift = self.__denominator_order - self.__numerator_order
-        for i in range(history_index_shift, self.__denominator_order):
+        history_index_shift = self.__system_order - self.__numerator_order
+        for i in range(history_index_shift, self.__system_order):
             input_response += (
                 input_history[i] * self.__input_coefficients[i - history_index_shift]
             )
@@ -74,17 +74,17 @@ class DifferenceEquation:
 
         return input_response - functools.reduce(lambda a, b: a + b, output_response)
 
+    def get_system_order(self):
+        """
+        Returns the order of the system (denominator of TF) polynomial
+        """
+        return self.__system_order
+
     def get_input_order(self):
         """
-        Returns the order of the input polynomial
+        Returns the order of the input(numerator of TF) polynomial
         """
         return self.__numerator_order
-
-    def get_output_order(self):
-        """
-        Returns the order of the output polynomial
-        """
-        return self.__denominator_order
 
     def get_input_coefficients(self):
         """
@@ -105,21 +105,21 @@ class DifferenceEquationSimulator:
     def __init__(self, difference_equation: DifferenceEquation):
         """ 
         Creates a difference equation simulator based on the input difference equation transfer function
-
+f
         :param difference_equation The difference equation transfer function (Z domain) representing the system
         """
 
         # Create the circular buffers that are sized to contain all the needed information
         # required to run the difference equation
         self.__input_buffer = collections.deque(
-            maxlen=difference_equation.get_output_order()
+            maxlen=difference_equation.get_system_order()
         )
         self.__output_buffer = collections.deque(
-            maxlen=difference_equation.get_output_order()
+            maxlen=difference_equation.get_system_order()
         )
 
         # Fill each buffer with zeros as initialization
-        for i in range(0, difference_equation.get_output_order()):
+        for i in range(0, difference_equation.get_system_order()):
             self.__input_buffer.append(0)
             self.__output_buffer.append(0)
 
