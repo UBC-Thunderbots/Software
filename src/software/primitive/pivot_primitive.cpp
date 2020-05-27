@@ -1,7 +1,6 @@
 #include "software/primitive/pivot_primitive.h"
 
 #include "shared/constants.h"
-#include "software/primitive/primitive_visitor.h"
 
 const std::string PivotPrimitive::PRIMITIVE_NAME = "Pivot Primitive";
 

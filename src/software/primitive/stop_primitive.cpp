@@ -1,7 +1,5 @@
 #include "software/primitive/stop_primitive.h"
 
-#include "software/primitive/primitive_visitor.h"
-
 const std::string StopPrimitive::PRIMITIVE_NAME = "Stop Primitive";
 
 StopPrimitive::StopPrimitive(unsigned int robot_id, bool coast)

@@ -1,7 +1,5 @@
 #include "software/primitive/chip_primitive.h"
 
-#include "software/primitive/primitive_visitor.h"
-
 const std::string ChipPrimitive::PRIMITIVE_NAME = "Chip Primitive";
 
 ChipPrimitive::ChipPrimitive(unsigned int robot_id, const Point &chip_origin,

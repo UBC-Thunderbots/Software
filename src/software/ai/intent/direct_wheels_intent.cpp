@@ -1,7 +1,5 @@
 #include "software/ai/intent/direct_wheels_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string DirectWheelsIntent::INTENT_NAME = "Direct Wheels Intent";
 
 DirectWheelsIntent::DirectWheelsIntent(unsigned int robot_id,

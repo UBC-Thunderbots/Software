@@ -7,7 +7,7 @@ cc_library(
     hdrs = ["move_test_action.h"],
     deps = [
         "//software/ai/hl/stp/action",
-        "//software/ai/hl/stp/action:action_visitor",
+        "//software/ai/hl/stp/action:mutable_action_visitor",
         "//software/ai/intent:move_intent",
         "//software/geom",
     ],

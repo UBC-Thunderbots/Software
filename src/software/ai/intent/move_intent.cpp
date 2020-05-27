@@ -1,7 +1,5 @@
 #include "software/ai/intent/move_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string MoveIntent::INTENT_NAME = "Move Intent";
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
