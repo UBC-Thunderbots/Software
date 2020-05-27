@@ -11,11 +11,11 @@
 #include "software/backend/robot_status.h"
 #include "software/new_geom/rectangle.h"
 #include "software/proto/sensor_msg.pb.h"
+#include "software/qt_gui/generic_widgets/robot_status.h"
 #include "software/qt_gui/visualizer/drawing/draw_functions.h"
 #include "software/qt_gui/visualizer/ui/ui_main_widget.h"
 #include "software/qt_gui/visualizer/widgets/ai_control.h"
 #include "software/qt_gui/visualizer/widgets/parameters.h"
-#include "software/qt_gui/generic_widgets/robot_status.h"
 #include "software/qt_gui/visualizer/widgets/world_view.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui

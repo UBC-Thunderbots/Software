@@ -1,4 +1,5 @@
 #include "software/qt_gui/robot_diagnostics/widgets/main_widget.h"
+
 #include "software/qt_gui/generic_widgets/robot_status.h"
 
 MainWidget::MainWidget(QWidget *parent)

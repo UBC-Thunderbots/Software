@@ -8,9 +8,9 @@
 #include "software/backend/robot_status.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/proto/sensor_msg.pb.h"
-#include "software/time/duration.h"
 #include "software/qt_gui/visualizer/drawing/draw_functions.h"
 #include "software/qt_gui/visualizer/widgets/main_widget.h"
+#include "software/time/duration.h"
 
 /**
  * This is the main window / application object for the visualizer.
