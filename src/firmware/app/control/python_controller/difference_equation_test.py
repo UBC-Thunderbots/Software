@@ -54,15 +54,18 @@ class TestDifferenceEquation(unittest.TestCase):
         sample_time = 0.01  # [seconds]
         end_time = 20
 
-        J = 0.01
-        B = 0.001
-        K = 1
+        coefficient_1 = 0.01
+        coefficient_2 = 0.001
+        coefficient_3 = 1
 
+        # Construct the Laplace operator
         s = ct.tf([1, 0], 1)
 
         step_input = 1
 
-        continuous_tf = (K * s ** 2 + K * B * s) / (J * s ** 2 + B * s + 1.5)
+        continuous_tf = (coefficient_3 * s ** 2 + coefficient_3 * coefficient_2 * s) / (
+            coefficient_1 * s ** 2 + coefficient_2 * s + 1.5
+        )
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
@@ -180,15 +183,16 @@ class TestDifferenceEquation(unittest.TestCase):
         sample_time = 0.1  # [seconds]
         end_time = 5
 
-        J = 0.001
-        B = 0.001
-        K = 1 / 1000
+        coefficient_1 = 0.001
+        coefficient_2 = 0.001
+        coefficient_3 = 1 / 1000
 
+        # Construct the Laplace operator
         s = ct.tf([1, 0], 1)
 
         step_input = 1
 
-        continuous_tf = K / (J * s + B)
+        continuous_tf = coefficient_3 / (coefficient_1 * s + coefficient_2)
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
@@ -228,15 +232,18 @@ class TestDifferenceEquation(unittest.TestCase):
         sample_time = 0.01  # [seconds]
         end_time = 20
 
-        J = 0.01
-        B = 0.001
-        K = 1
+        coefficient_1 = 0.01
+        coefficient_2 = 0.001
+        coefficient_3 = 1
 
+        # Construct the Laplace operator
         s = ct.tf([1, 0], 1)
 
         step_input = 1
 
-        continuous_tf = K / (J * s ** 2 + B * s + 1.5)
+        continuous_tf = coefficient_3 / (
+            coefficient_1 * s ** 2 + coefficient_2 * s + 1.5
+        )
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
@@ -278,15 +285,18 @@ class TestDifferenceEquation(unittest.TestCase):
         sample_time = 0.01  # [seconds]
         end_time = 20
 
-        J = 0.01
-        B = 0.001
-        K = 1
+        coefficient_1 = 0.01
+        coefficient_2 = 0.001
+        coefficient_3 = 1
 
+        # Construct the Laplace operator
         s = ct.tf([1, 0], 1)
 
         step_input = 1
 
-        continuous_tf = (K * s ** 2 + K * B * s) / (J * s ** 2 + B * s + 1.5)
+        continuous_tf = (coefficient_3 * s ** 2 + coefficient_3 * coefficient_2 * s) / (
+            coefficient_1 * s ** 2 + coefficient_2 * s + 1.5
+        )
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
@@ -326,15 +336,18 @@ class TestDifferenceEquation(unittest.TestCase):
         sample_time = 0.10  # [seconds]
         end_time = 10
 
-        J = 0.01
-        B = 0.001
-        K = 1
+        coefficient_1 = 0.01
+        coefficient_2 = 0.001
+        coefficient_3 = 1
 
+        # Construct the Laplace operator
         s = ct.tf([1, 0], 1)
 
         step_input = 1
 
-        continuous_tf = (K * s) / (J * s ** 3 + B * s + 1.5)
+        continuous_tf = (coefficient_3 * s) / (
+            coefficient_1 * s ** 3 + coefficient_2 * s + 1.5
+        )
 
         discrete_tf = ct.sample_system(continuous_tf, sample_time, "zoh")
 
