@@ -11,8 +11,8 @@ cc_binary(
         "//software/backend:all_backends",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
+        "//software/qt_gui/visualizer:visualizer_wrapper",
         "//software/util/design_patterns:generic_factory",
-        "//software/visualizer:visualizer_wrapper",
         "@boost//:program_options",
     ],
 )

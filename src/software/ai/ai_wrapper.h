@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/visualizer/drawing/draw_functions.h"
+#include "software/qt_gui/visualizer/drawing/draw_functions.h"
 #include "software/world/world.h"
 
 /**

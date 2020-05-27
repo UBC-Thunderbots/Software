@@ -20,9 +20,9 @@ cc_library(
         "//software/ai:ai_wrapper",
         "//software/backend:simulator_backend",
         "//software/logger",
+        "//software/qt_gui/visualizer:visualizer_wrapper",
         "//software/simulated_tests/validation:world_state_validator",
         "//software/time:duration",
-        "//software/visualizer:visualizer_wrapper",
         "@gtest",
     ],
 )

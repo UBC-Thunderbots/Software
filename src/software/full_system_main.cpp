@@ -8,7 +8,7 @@
 #include "software/constants.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
-#include "software/visualizer/visualizer_wrapper.h"
+#include "software/qt_gui/visualizer/visualizer_wrapper.h"
 
 
 using namespace boost::program_options;
