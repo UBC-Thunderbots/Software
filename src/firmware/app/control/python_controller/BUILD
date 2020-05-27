@@ -5,8 +5,8 @@ load("@python_control_deps//:requirements.bzl", "requirement")
 
 py_binary(
     name = "difference_equation",
-    srcs = [":differenceequation.py"],
-    main = ":differenceequation.py",
+    srcs = [":difference_equation.py"],
+    main = ":difference_equation.py",
     deps = [
         requirement("numpy"),
         requirement("control"),

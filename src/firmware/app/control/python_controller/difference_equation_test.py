@@ -8,10 +8,12 @@ import numpy as np
 import control as ct
 from control.matlab import *
 import unittest
-import differenceequation as de
+import difference_equation as de
 import collections
 
 
+# TODO As part of #1381: https://github.com/UBC-Thunderbots/Software/issues/1381
+# these unit tests must be re-done using Pytest as the testing framework
 class TestDifferenceEquation(unittest.TestCase):
     def test_simulator_tick(self):
         """
@@ -49,7 +51,7 @@ class TestDifferenceEquation(unittest.TestCase):
         for a specified number of ticks
         """
 
-        sample_time = 0.01  # [s]
+        sample_time = 0.01  # [seconds]
         end_time = 20
 
         J = 0.01
@@ -175,7 +177,7 @@ class TestDifferenceEquation(unittest.TestCase):
         using the python control toolbox
         """
 
-        sample_time = 0.1  # [s]
+        sample_time = 0.1  # [seconds]
         end_time = 5
 
         J = 0.001
@@ -223,7 +225,7 @@ class TestDifferenceEquation(unittest.TestCase):
         using the python control toolbox
         """
 
-        sample_time = 0.01  # [s]
+        sample_time = 0.01  # [seconds]
         end_time = 20
 
         J = 0.01
@@ -273,7 +275,7 @@ class TestDifferenceEquation(unittest.TestCase):
         for a system where the numerator and denominator are equal order
         """
 
-        sample_time = 0.01  # [s]
+        sample_time = 0.01  # [seconds]
         end_time = 20
 
         J = 0.01
@@ -321,7 +323,7 @@ class TestDifferenceEquation(unittest.TestCase):
         for a system where the system has high order
         """
 
-        sample_time = 0.10  # [s]
+        sample_time = 0.10  # [seconds]
         end_time = 10
 
         J = 0.01
