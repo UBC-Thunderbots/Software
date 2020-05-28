@@ -3,21 +3,16 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "geom",
     srcs = [
-        "polynomial.cpp",
+        "linear_spline.cpp",
         "shot.cpp",
-        "spline.cpp",
         "util.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "polynomial.h",
+        "linear_spline.h",
         "shot.h",
-        "spline.h",
         "util.h",
         "voronoi_diagram.h",
-    ],
-    copts = [
-        "-std=c++17",
     ],
     deps = [
         "//software/logger",
@@ -27,6 +22,7 @@ cc_library(
         "//software/new_geom:polygon",
         "//software/new_geom:ray",
         "//software/new_geom:rectangle",
+        "//software/new_geom:spline2d",
         "//software/new_geom:triangle",
         "//software/new_geom/util:collinear",
         "//software/new_geom/util:distance",
@@ -38,20 +34,9 @@ cc_library(
 )
 
 cc_test(
-    name = "spline_test",
+    name = "linear_spline_test",
     srcs = [
-        "spline_test.cpp",
-    ],
-    deps = [
-        ":geom",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "polynomial_test",
-    srcs = [
-        "polynomial_test.cpp",
+        "linear_spline_test.cpp",
     ],
     deps = [
         ":geom",

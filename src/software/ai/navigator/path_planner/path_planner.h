@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/geom/spline.h"
+#include "software/geom/linear_spline.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
 
@@ -13,7 +13,7 @@
  * from start to the destination
  */
 
-using Path = Spline;
+using Path = LinearSpline;
 
 class PathPlanner
 {

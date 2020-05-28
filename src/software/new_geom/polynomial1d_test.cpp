@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "software/new_geom/polynomial1d.h"
+
+#include <gtest/gtest.h>
 
 TEST(Polynomial1dTest, test_default_constructor)
 {
@@ -49,6 +49,38 @@ TEST(Polynomial1dTest, test_polynomial_coeffs_list_constructor)
     EXPECT_DOUBLE_EQ(p.valueAt(-2), 9);
     EXPECT_DOUBLE_EQ(p.valueAt(1), 6);
     EXPECT_DOUBLE_EQ(p.valueAt(3), 34);
+}
+
+TEST(TestSpline, test_polynomial_linear_constructor)
+{
+    std::pair<double, double> constraint1, constraint2;
+    constraint1 = std::make_pair(2.0, 3.0);
+    constraint2 = std::make_pair(6.0, 4.0);
+    Polynomial1d p =
+        Polynomial1d::constructLinearPolynomialFromConstraints(constraint1, constraint2);
+    EXPECT_EQ(1, p.getOrder());
+    EXPECT_EQ(p.getCoeff(0), 2.5);
+    EXPECT_EQ(p.getCoeff(1), 0.25);
+    EXPECT_EQ(p.valueAt(constraint1.first), constraint1.second);
+    EXPECT_EQ(p.valueAt(constraint2.first), constraint2.second);
+}
+
+TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
+{
+    std::pair<double, double> constraint1, constraint2;
+    constraint1 = std::make_pair(2.0, -3.0);
+    constraint2 = std::make_pair(2.0, -4.0);
+    try
+    {
+        Polynomial1d p = Polynomial1d::constructLinearPolynomialFromConstraints(
+            constraint1, constraint2);
+    }
+    catch (std::invalid_argument &e)
+    {
+        SUCCEED();
+        return;
+    }
+    ADD_FAILURE() << "Successfully able to build a polynomial that isn't a function";
 }
 
 TEST(Polynomial1dTest, test_set_coeff)
@@ -128,7 +160,7 @@ TEST(Polynomial1dTest, test_multiplication_operator)
     EXPECT_DOUBLE_EQ(product.getOrder(), 7);
 }
 
-TEST(Polynomial1dTest, test_plus_equals_oeprator)
+TEST(Polynomial1dTest, test_plus_equals_operator)
 {
     Polynomial1d p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
     Polynomial1d p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
@@ -143,7 +175,7 @@ TEST(Polynomial1dTest, test_plus_equals_oeprator)
     EXPECT_DOUBLE_EQ(p1.getOrder(), 5);
 }
 
-TEST(Polynomial1dTest, test_minus_equals_oeprator)
+TEST(Polynomial1dTest, test_minus_equals_operator)
 {
     Polynomial1d p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
     Polynomial1d p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
@@ -158,7 +190,7 @@ TEST(Polynomial1dTest, test_minus_equals_oeprator)
     EXPECT_DOUBLE_EQ(p1.getOrder(), 5);
 }
 
-TEST(Polynomial1dTest, test_multiply_equals_oeprator)
+TEST(Polynomial1dTest, test_multiply_equals_operator)
 {
     Polynomial1d p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
     Polynomial1d p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
