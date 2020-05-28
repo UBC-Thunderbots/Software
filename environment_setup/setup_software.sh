@@ -39,17 +39,19 @@ sudo apt-get update
 host_software_packages=(
     curl
     cmake # Needed to build some of our dependencies
-    gcc-7 # we use gcc 7.4.0
+    gcc-10 # we use gcc 10
+    libgcc
     protobuf-compiler
     libprotobuf-dev
     libusb-1.0-0-dev
+    libstdc++-10-dev
     qt5-default # The GUI library for our visualizer
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
     python3       # Python 3
     python3-yaml # yaml for cfg generation (Dynamic Parameters)
-    python-minimal # This is required for bazel, we've seen some issues where
-                   # the bazel install hasn't installed it properly
+    python2-minimal # This is required for bazel, we've seen some issues where
+                    # the bazel install hasn't installed it properly
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have 
                     # to manually install it ourselves
