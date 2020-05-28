@@ -95,7 +95,7 @@ std::optional<Field> SSLProtobufReader::getField(
 
     Field field =
         Field(field_length, field_width, defense_length, defense_width, goal_width,
-              boundary_width, center_circle_radius, Timestamp::fromSeconds(0));
+              boundary_width, center_circle_radius);
     return field;
 }
 

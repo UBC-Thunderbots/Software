@@ -4,7 +4,7 @@
 #include "software/parameter/dynamic_parameters.h"
 
 World::World()
-    : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
+    : World(Field(),
             Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
             Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
                                                 ->RobotExpiryBufferMilliseconds()
@@ -35,7 +35,7 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
 
 void World::updateFieldGeometry(const Field &new_field_data)
 {
-    field_.updateDimensions(new_field_data);
+    field_ = new_field_data;
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -159,7 +159,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
     // Add all member timestamps to a list
     std::initializer_list<Timestamp> member_timestamps = {
         friendly_team_.getMostRecentTimestamp(), enemy_team_.getMostRecentTimestamp(),
-        ball_.getPreviousStates().front().timestamp(), field_.getMostRecentTimestamp()};
+        ball_.getPreviousStates().front().timestamp()};
     // Return the max
 
     return std::max(member_timestamps);

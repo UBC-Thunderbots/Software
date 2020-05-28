@@ -11,7 +11,7 @@
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
 NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config)
-    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
+    : field_state(),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
       friendly_team_state(Duration::fromMilliseconds(
           Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
@@ -114,7 +114,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
 
     Field field =
         Field(field_length, field_width, defense_length, defense_width, goal_width,
-              boundary_width, center_circle_radius, Timestamp::fromSeconds(0));
+              boundary_width, center_circle_radius);
     return field;
 }
 

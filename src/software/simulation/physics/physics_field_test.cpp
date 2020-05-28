@@ -8,17 +8,16 @@
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
-TEST(PhysicsFieldTest, test_get_field_with_timestamp)
+TEST(PhysicsFieldTest, test_get_field)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
     Field field_parameter(::Test::TestUtil::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
-    auto field         = physics_field.getFieldWithTimestamp(Timestamp::fromSeconds(3.3));
+    auto field         = physics_field.getField();
 
     EXPECT_EQ(field_parameter, field);
-    EXPECT_EQ(Timestamp::fromSeconds(3.3), field.getMostRecentTimestamp());
 }
 
 TEST(PhysicsFieldTest, test_field_added_to_physics_world_on_creation)
@@ -74,7 +73,7 @@ TEST(PhysicsFieldTest, test_field_dimensions_do_not_change_during_simulation_ste
         world->Step(1.0 / 60.0, 5, 8);
     }
 
-    auto field = physics_field.getFieldWithTimestamp(Timestamp::fromSeconds(3.3));
+    auto field = physics_field.getField();
     EXPECT_EQ(field, field_parameter);
 }
 
