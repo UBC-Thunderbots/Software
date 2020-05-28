@@ -85,7 +85,7 @@ enum FirmwarePrimitiveType
      *
      * The parameters are:
      * - The velocity (mm/s)
-     * - dribble speed (no unit)
+     * - dribble speed (rpm)
      * - margin (no unit)
      */
     CATCH = 4;
