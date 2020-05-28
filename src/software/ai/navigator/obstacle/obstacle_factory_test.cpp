@@ -123,30 +123,28 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
     }
 }
 
-// TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
-//{
-//    Point origin(-2.1, 5);
-//    Vector velocity(0.27, 0.34);
-//    Angle orientation(Angle::fromRadians(2.2));
-//    AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
-//    Polygon expected({Point(-2.133, 5.026), Point(-2.139, 4.985), Point(-2.106, 4.959),
-//                      Point(-2.067, 4.974), Point(-1.694, 5.444),
-//                      Point(-1.759, 5.496)});
-//    Robot robot = Robot(3, origin, velocity, orientation, angular_velocity,
-//    current_time);
-//    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
-//
-//    try
-//    {
-//        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
-//        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-//            expected, polygon_obstacle.getGeom(), METERS_PER_MILLIMETER));
-//    }
-//    catch (std::bad_cast)
-//    {
-//        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
-//    }
-//}
+TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
+{
+    Point origin(-2.1, 5);
+    Vector velocity(1.27, 0.34);
+    Angle orientation(Angle::fromRadians(2.2));
+    AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
+    Polygon expected({Point(-2.161, 5.231), Point(-2.331, 5.062), Point(-2.269, 4.831),
+                      Point(-2.038, 4.769), Point(-1.671, 4.867), Point(-1.795, 5.329)});
+    Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
+    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+
+    try
+    {
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
+        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+            expected, polygon_obstacle.getGeom(), METERS_PER_MILLIMETER));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
+    }
+}
 
 TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
 {
@@ -154,9 +152,8 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     Vector velocity(-0.27, 1.34);
     Angle orientation(Angle::fromRadians(-1.2));
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(1.6));
-    Polygon expected({Point(0.966, -0.247), Point(1.12373, -0.426528),
-                      Point(1.35804, -0.379316), Point(1.43431, -0.152788),
-                      Point(1.3572, 0.229907), Point(0.888576, 0.135482)});
+    Polygon expected({Point(0.966, -0.247), Point(1.124, -0.427), Point(1.358, -0.379),
+                      Point(1.434, -0.153), Point(1.357, 0.230), Point(0.889, 0.135)});
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
     ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 
