@@ -1,7 +1,7 @@
 #include "software/new_geom/linear_spline2d.h"
 
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
 LinearSpline2d::LinearSpline2d(const std::vector<Point>& points) : knots(points)
 {
