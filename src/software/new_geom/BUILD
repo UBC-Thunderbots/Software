@@ -159,6 +159,15 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "linear_spline2d",
+    srcs = ["linear_spline2d.cpp"],
+    hdrs = ["linear_spline2d.h"],
+    deps = [
+        ":spline2d",
+    ],
+)
+
 cc_test(
     name = "angle_test",
     srcs = [
@@ -300,6 +309,17 @@ cc_test(
     ],
     deps = [
         ":triangle",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "linear_spline_test",
+    srcs = [
+        "linear_spline_test.cpp",
+    ],
+    deps = [
+        ":linear_spline2d",
         "@gtest//:gtest_main",
     ],
 )

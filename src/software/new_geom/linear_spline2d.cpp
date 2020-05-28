@@ -1,16 +1,16 @@
-#include "software/geom/linear_spline.h"
+#include "software/new_geom/linear_spline2d.h"
 
-LinearSpline::LinearSpline(const std::vector<Point>& points) : knots(points)
+LinearSpline2d::LinearSpline2d(const std::vector<Point>& points) : knots(points)
 {
     initLinearSegments(points);
 }
 
-LinearSpline::LinearSpline(const std::initializer_list<Point>& points) : knots(points)
+LinearSpline2d::LinearSpline2d(const std::initializer_list<Point>& points) : knots(points)
 {
     initLinearSegments(points);
 }
 
-const Point LinearSpline::getValueAt(double val) const
+const Point LinearSpline2d::getValueAt(double val) const
 {
     if (val < 0.0 || val > 1.0)
     {
@@ -48,31 +48,31 @@ const Point LinearSpline::getValueAt(double val) const
     return retval;
 }
 
-size_t LinearSpline::getNumKnots(void) const
+size_t LinearSpline2d::getNumKnots(void) const
 {
     return knots.size();
 }
 
-const std::vector<Point> LinearSpline::getKnots(void) const
+const std::vector<Point> LinearSpline2d::getKnots(void) const
 {
     return knots;
 }
 
-const Point LinearSpline::getStartPoint(void) const
+const Point LinearSpline2d::getStartPoint(void) const
 {
     return knots.front();
 }
 
-const Point LinearSpline::getEndPoint(void) const
+const Point LinearSpline2d::getEndPoint(void) const
 {
     return knots.back();
 }
 
-const std::vector<SplineSegment2d> LinearSpline::getSplineSegments() const {
+const std::vector<SplineSegment2d> LinearSpline2d::getSplineSegments() const {
     return segments;
 }
 
-void LinearSpline::initLinearSegments(const std::vector<Point>& points)
+void LinearSpline2d::initLinearSegments(const std::vector<Point>& points)
 {
     if (points.size() == 0)
     {

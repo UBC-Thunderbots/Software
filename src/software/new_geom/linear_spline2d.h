@@ -10,10 +10,10 @@
  * A linear spline is a spline composed of a series of linear 2d polynomials, ie. a series
  * of connected line segments
  */
-class LinearSpline : Spline2d
+class LinearSpline2d : Spline2d
 {
    public:
-    LinearSpline() = delete;
+    LinearSpline2d() = delete;
     /**
      * Construct a spline by drawing line segments between consecutive
      * Points
@@ -22,7 +22,7 @@ class LinearSpline : Spline2d
      *
      * @param points Points on the spline
      */
-    explicit LinearSpline(const std::vector<Point>& points);
+    explicit LinearSpline2d(const std::vector<Point>& points);
 
     /**
      * Construct a spline by drawing line segments between consecutive
@@ -32,7 +32,7 @@ class LinearSpline : Spline2d
      *
      * @param points Points on the spline
      */
-    LinearSpline(const std::initializer_list<Point>& points);
+    LinearSpline2d(const std::initializer_list<Point>& points);
 
     /**
      * Please see parent class for jdoc

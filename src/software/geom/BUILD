@@ -3,13 +3,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "geom",
     srcs = [
-        "linear_spline.cpp",
         "shot.cpp",
         "util.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "linear_spline.h",
         "shot.h",
         "util.h",
         "voronoi_diagram.h",
@@ -22,7 +20,6 @@ cc_library(
         "//software/new_geom:polygon",
         "//software/new_geom:ray",
         "//software/new_geom:rectangle",
-        "//software/new_geom:spline2d",
         "//software/new_geom:triangle",
         "//software/new_geom/util:collinear",
         "//software/new_geom/util:distance",
@@ -30,17 +27,6 @@ cc_library(
         "//software/new_geom/util:intersects",
         "@boost//:geometry",
         "@boost//:polygon",
-    ],
-)
-
-cc_test(
-    name = "linear_spline_test",
-    srcs = [
-        "linear_spline_test.cpp",
-    ],
-    deps = [
-        ":geom",
-        "@gtest//:gtest_main",
     ],
 )
 
