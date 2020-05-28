@@ -72,7 +72,8 @@ TEST(LinearSplineTest, test_three_knot_value_at_out_of_range)
 
     if (failing)
     {
-        ADD_FAILURE() << "LinearSpline2d returning value for value (-0.1) outside of domain";
+        ADD_FAILURE()
+            << "LinearSpline2d returning value for value (-0.1) outside of domain";
         return;
     }
 
@@ -87,7 +88,8 @@ TEST(LinearSplineTest, test_three_knot_value_at_out_of_range)
 
     if (failing)
     {
-        ADD_FAILURE() << "LinearSpline2d returning value for value (1.1) outside of domain";
+        ADD_FAILURE()
+            << "LinearSpline2d returning value for value (1.1) outside of domain";
         return;
     }
 }
@@ -110,7 +112,8 @@ TEST(LinearSplineTest, test_one_knot_value_at_out_of_range)
 
     if (failing)
     {
-        ADD_FAILURE() << "LinearSpline2d returning value for value (-0.1) outside of domain";
+        ADD_FAILURE()
+            << "LinearSpline2d returning value for value (-0.1) outside of domain";
         return;
     }
 
@@ -125,7 +128,8 @@ TEST(LinearSplineTest, test_one_knot_value_at_out_of_range)
 
     if (failing)
     {
-        ADD_FAILURE() << "LinearSpline2d returning value for value (1.1) outside of domain";
+        ADD_FAILURE()
+            << "LinearSpline2d returning value for value (1.1) outside of domain";
         return;
     }
 }
@@ -148,7 +152,8 @@ TEST(LinearSplineTest, test_two_knot_value_at_out_of_range)
 
     if (failing)
     {
-        ADD_FAILURE() << "LinearSpline2d returning value for value (-0.1) outside of domain";
+        ADD_FAILURE()
+            << "LinearSpline2d returning value for value (-0.1) outside of domain";
         return;
     }
 
@@ -163,7 +168,8 @@ TEST(LinearSplineTest, test_two_knot_value_at_out_of_range)
 
     if (failing)
     {
-        ADD_FAILURE() << "LinearSpline2d returning value for value (1.1) outside of domain";
+        ADD_FAILURE()
+            << "LinearSpline2d returning value for value (1.1) outside of domain";
         return;
     }
 }

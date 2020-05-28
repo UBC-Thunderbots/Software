@@ -147,7 +147,8 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
 
     // compute an s value interval that roughly corresponds to length
     // PATH_CHECK_INTERVAL_M assuming that the path is locally linear
-    double s_per_meter_ratio   = 0.05 / (path.getValueAt(0.05) - path.getValueAt(0.0)).length();
+    double s_per_meter_ratio =
+        0.05 / (path.getValueAt(0.05) - path.getValueAt(0.0)).length();
     double path_check_interval = s_per_meter_ratio * PATH_CHECK_INTERVAL_M;
 
     std::cout << "Evaluating path at intervals of s=" << path_check_interval << std::endl;
@@ -209,7 +210,8 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     // obstacle and never exit it
     if (dest_in_obstacle || start_obstacle_or_null)
     {
-        if ((path.getValueAt(1.0) - dest).length() >= (path.getValueAt(0.0) - dest).length())
+        if ((path.getValueAt(1.0) - dest).length() >=
+            (path.getValueAt(0.0) - dest).length())
         {
             // fail because no progress to destination
             std::stringstream fail_ss;

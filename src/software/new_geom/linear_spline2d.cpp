@@ -68,7 +68,8 @@ const Point LinearSpline2d::getEndPoint(void) const
     return knots.back();
 }
 
-const std::vector<SplineSegment2d> LinearSpline2d::getSplineSegments() const {
+const std::vector<SplineSegment2d> LinearSpline2d::getSplineSegments() const
+{
     return segments;
 }
 

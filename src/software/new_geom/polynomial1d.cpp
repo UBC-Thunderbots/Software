@@ -1,15 +1,21 @@
+#include "software/new_geom/polynomial1d.h"
+
 #include <stdexcept>
 
-#include "software/new_geom/polynomial1d.h"
 #include "software/new_geom/geom_constants.h"
 
 Polynomial1d::Polynomial1d() {}
 
 Polynomial1d::Polynomial1d(const std::vector<double> &coeffs) : coeffs(coeffs) {}
 
-Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs) : coeffs(coeffs) {}
+Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs) : coeffs(coeffs)
+{
+}
 
-Polynomial1d Polynomial1d::constructLinearPolynomialFromConstraints(const std::pair<double, double> &constraint1, const std::pair<double, double> &constraint2) {
+Polynomial1d Polynomial1d::constructLinearPolynomialFromConstraints(
+    const std::pair<double, double> &constraint1,
+    const std::pair<double, double> &constraint2)
+{
     if (constraint1.first == constraint2.first)
     {
         throw std::invalid_argument("Both inputs are equal - does not define a function");

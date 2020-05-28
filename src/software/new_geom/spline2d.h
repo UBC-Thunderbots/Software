@@ -98,7 +98,6 @@ class Spline2d
     virtual const std::vector<SplineSegment2d> getSplineSegments() const = 0;
 
    protected:
-
     /**
      * Create a SplineSegment2d
      *

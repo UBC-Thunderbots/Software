@@ -6,15 +6,18 @@ SplineSegment2d::SplineSegment2d(double start_val, double end_val,
 {
 }
 
-double SplineSegment2d::getStartVal() const {
+double SplineSegment2d::getStartVal() const
+{
     return start_val;
 }
 
-double SplineSegment2d::getEndVal() const {
+double SplineSegment2d::getEndVal() const
+{
     return end_val;
 }
 
-Polynomial2d SplineSegment2d::getPolynomial() const {
+Polynomial2d SplineSegment2d::getPolynomial() const
+{
     return polynomial;
 }
 

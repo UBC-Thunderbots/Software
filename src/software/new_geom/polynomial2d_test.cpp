@@ -1,15 +1,16 @@
-#include <gtest/gtest.h>
-
 #include "software/new_geom/polynomial2d.h"
 
-TEST(Polynomial2dTest, default_constructor){
+#include <gtest/gtest.h>
+
+TEST(Polynomial2dTest, default_constructor)
+{
     const Polynomial2d p;
 
-    EXPECT_EQ(Point(0,0),  p.valueAt(0));
-    EXPECT_EQ(Point(0,0), p.valueAt(10));
-    EXPECT_EQ(Point(0,0), p.valueAt(-10));
-    EXPECT_EQ(Point(0,0), p.valueAt(10000000000));
-    EXPECT_EQ(Point(0,0), p.valueAt(-10000000000));
+    EXPECT_EQ(Point(0, 0), p.valueAt(0));
+    EXPECT_EQ(Point(0, 0), p.valueAt(10));
+    EXPECT_EQ(Point(0, 0), p.valueAt(-10));
+    EXPECT_EQ(Point(0, 0), p.valueAt(10000000000));
+    EXPECT_EQ(Point(0, 0), p.valueAt(-10000000000));
 
     Polynomial1d p_x = p.getPolyX();
     Polynomial1d p_y = p.getPolyY();
@@ -25,7 +26,8 @@ TEST(Polynomial2dTest, default_constructor){
     EXPECT_DOUBLE_EQ(p_y.getOrder(), 0);
 }
 
-TEST(Polynomial2dTest, constructor_from_two_1d_polynomials_and_value_at){
+TEST(Polynomial2dTest, constructor_from_two_1d_polynomials_and_value_at)
+{
     const Polynomial1d p_x({0, 2, 5, 7});
     const Polynomial1d p_y({0, 3, 1, 8});
     const Polynomial2d p(p_x, p_y);
@@ -38,7 +40,8 @@ TEST(Polynomial2dTest, constructor_from_two_1d_polynomials_and_value_at){
     EXPECT_EQ(expected_point, p.valueAt(t_val));
 }
 
-TEST(Polynomial2dTest, get_poly_x){
+TEST(Polynomial2dTest, get_poly_x)
+{
     const Polynomial1d p_x({0, 2, 5, 7});
     const Polynomial1d p_y({0, 3, 1, 8});
     const Polynomial2d p(p_x, p_y);
@@ -46,7 +49,8 @@ TEST(Polynomial2dTest, get_poly_x){
     EXPECT_EQ(p_x, p.getPolyX());
 }
 
-TEST(Polynomial2dTest, get_poly_y){
+TEST(Polynomial2dTest, get_poly_y)
+{
     const Polynomial1d p_x({0, 2, 5, 7});
     const Polynomial1d p_y({0, 3, 1, 8});
     const Polynomial2d p(p_x, p_y);

@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "software/new_geom/polynomial2d.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/polynomial2d.h"
 #include "software/new_geom/spline2d.h"
 
 /**
