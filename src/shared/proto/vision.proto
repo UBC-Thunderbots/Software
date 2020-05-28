@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message RobotState
+{
+    Point global_position    = 1;
+    Angle global_orientation = 2;
+    Vector global_velocity   = 3;
+}
+
+message BallState
+{
+    Point global_position  = 1;
+    Vector global_velocity = 2;
+}
