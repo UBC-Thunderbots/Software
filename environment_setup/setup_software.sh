@@ -46,6 +46,7 @@ host_software_packages=(
     qt5-default # The GUI library for our visualizer
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
+    python3       # Python 3
     python3-yaml # yaml for cfg generation (Dynamic Parameters)
     python-minimal # This is required for bazel, we've seen some issues where
                    # the bazel install hasn't installed it properly
