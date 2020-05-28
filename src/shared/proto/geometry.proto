@@ -1,3 +1,5 @@
+syntax = "proto3";
+
 message Point
 {
     // x coordinate
