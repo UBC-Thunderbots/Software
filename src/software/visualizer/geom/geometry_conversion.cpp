@@ -15,6 +15,16 @@ QRectF createQRectF(const Rectangle& rectangle)
                   createQPointF(rectangle.posXPosYCorner()));
 }
 
+QPolygonF createQPolygonF(const Polygon& polygon)
+{
+    std::vector<QPointF> qpoints;
+    for (const auto& p : polygon.getPoints())
+    {
+        qpoints.push_back(createQPointF(p));
+    }
+    return QPolygonF(QVector<QPointF>::fromStdVector(qpoints));
+}
+
 QLineF createQLineF(const Segment& segment)
 {
     return QLineF(createQPointF(segment.getSegStart()), createQPointF(segment.getEnd()));

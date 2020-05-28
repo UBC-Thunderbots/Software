@@ -10,11 +10,25 @@ cc_library(
 )
 
 cc_library(
+    name = "geom",
+    srcs = ["geom.cpp"],
+    hdrs = ["geom.h"],
+    deps = [
+        "//software/geom",
+        "//software/visualizer/geom:geometry_conversion",
+        "@qt//:qt_core",
+        "@qt//:qt_gui",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
     name = "ball",
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
         ":colors",
+        ":geom",
         "//shared:constants",
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",
@@ -30,6 +44,7 @@ cc_library(
     hdrs = ["field.h"],
     deps = [
         ":colors",
+        ":geom",
         "//shared:constants",
         "//software/visualizer/geom:geometry_conversion",
         "//software/world:field",
@@ -42,6 +57,7 @@ cc_library(
     srcs = ["robot.cpp"],
     hdrs = ["robot.h"],
     deps = [
+        ":geom",
         "//shared:constants",
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",
@@ -77,12 +93,30 @@ cc_library(
 )
 
 cc_library(
+    name = "obstacle_artist",
+    srcs = ["obstacle_artist.cpp"],
+    hdrs = ["obstacle_artist.h"],
+    deps = [
+        ":colors",
+        ":draw_functions",
+        ":geom",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/obstacle:obstacle_visitor",
+        "//software/geom",
+        "//software/visualizer/geom:geometry_conversion",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
     name = "navigator",
     srcs = ["navigator.cpp"],
     hdrs = ["navigator.h"],
     deps = [
         ":colors",
         ":draw_functions",
+        ":geom",
+        ":obstacle_artist",
         "//software/ai/navigator",
         "//software/geom",
         "//software/visualizer/geom:geometry_conversion",

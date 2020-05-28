@@ -1,7 +1,5 @@
 #include "software/primitive/movespin_primitive.h"
 
-#include "software/primitive/primitive_visitor.h"
-
 const std::string MoveSpinPrimitive::PRIMITIVE_NAME = "MoveSpin Primitive";
 
 MoveSpinPrimitive::MoveSpinPrimitive(unsigned int robot_id, const Point &dest,

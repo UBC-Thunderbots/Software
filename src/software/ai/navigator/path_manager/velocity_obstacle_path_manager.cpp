@@ -10,6 +10,7 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
     const std::unordered_set<PathObjective> &objectives, const Rectangle &navigable_area)
 {
     std::map<RobotId, std::optional<Path>> managed_paths;
+    path_planning_obstacles.clear();
 
     // Velocity obstacles used to avoid collisions.
     // As we plan a path for each robot, a corresponding obstacle will be added
@@ -26,6 +27,8 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
                               current_velocity_obstacles.end());
         path_obstacles.insert(path_obstacles.end(), current_objective.obstacles.begin(),
                               current_objective.obstacles.end());
+        path_planning_obstacles.insert(path_planning_obstacles.end(),
+                                       path_obstacles.begin(), path_obstacles.end());
         auto path = path_planner->findPath(current_objective.start, current_objective.end,
                                            navigable_area, path_obstacles);
 
@@ -50,6 +53,11 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
     }
 
     return managed_paths;
+}
+
+const std::vector<ObstaclePtr> VelocityObstaclePathManager::getObstacles(void) const
+{
+    return path_planning_obstacles;
 }
 
 const std::vector<ObstaclePtr>

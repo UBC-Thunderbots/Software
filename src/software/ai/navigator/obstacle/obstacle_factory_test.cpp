@@ -34,12 +34,12 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-        EXPECT_EQ(expected, polygon_obstacle.getPolygon());
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
+        EXPECT_EQ(expected, polygon_obstacle.getGeom());
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstaclePtr was not created for a rectangle";
+        ADD_FAILURE() << "Polygon Obstacle was not created for a rectangle";
     }
 }
 
@@ -52,12 +52,12 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
 
     try
     {
-        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-        EXPECT_EQ(expected, circle_obstacle.getCircle());
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstaclePtr was not created for a ball";
+        ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a ball";
     }
 }
 
@@ -70,12 +70,12 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
 
     try
     {
-        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-        EXPECT_EQ(expected, circle_obstacle.getCircle());
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstaclePtr was not created for a robot";
+        ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a robot";
     }
 }
 
@@ -91,13 +91,13 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
 
     try
     {
-        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
         EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-            expected, circle_obstacle.getCircle(), METERS_PER_MILLIMETER));
+            expected, circle_obstacle.getGeom(), METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstaclePtr was not created for a stationary robot";
+        ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a stationary robot";
     }
 }
 
@@ -113,12 +113,13 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
 
     try
     {
-        auto circle_obstacle = dynamic_cast<CircleObstacle&>(*obstacle);
-        EXPECT_EQ(expected, circle_obstacle.getCircle());
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
+        EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "CircleObstaclePtr was not created for a slow moving robot";
+        ADD_FAILURE()
+            << "GeomObstacle<Circle>Ptr was not created for a slow moving robot";
     }
 }
 
@@ -135,13 +136,13 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
         EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-            expected, polygon_obstacle.getPolygon(), METERS_PER_MILLIMETER));
+            expected, polygon_obstacle.getGeom(), METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstaclePtr was not created for a fast moving robot";
+        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
     }
 }
 
@@ -158,12 +159,12 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
 
     try
     {
-        auto polygon_obstacle = dynamic_cast<PolygonObstacle&>(*obstacle);
-        EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
-            expected, polygon_obstacle.getPolygon()));
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
     }
     catch (std::bad_cast)
     {
-        ADD_FAILURE() << "PolygonObstaclePtr was not created for a fast moving robot";
+        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
     }
 }

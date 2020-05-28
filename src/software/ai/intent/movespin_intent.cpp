@@ -1,7 +1,5 @@
 #include "software/ai/intent/movespin_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string MoveSpinIntent::INTENT_NAME = "MoveSpin Intent";
 
 MoveSpinIntent::MoveSpinIntent(unsigned int robot_id, const Point &dest,

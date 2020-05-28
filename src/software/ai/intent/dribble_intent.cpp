@@ -1,7 +1,5 @@
 #include "software/ai/intent/dribble_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string DribbleIntent::INTENT_NAME = "Dribble Intent";
 
 DribbleIntent::DribbleIntent(unsigned int robot_id, const Point &dest,

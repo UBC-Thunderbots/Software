@@ -104,15 +104,16 @@ class ShadowFreekickerTacticTest : public testing::Test
             (world.ball().position() - move_action->getDestination()).length();
 
         Line ball_to_goal_line =
-            Line(world.ball().position(), world.field().friendlyGoal());
+            Line(world.ball().position(), world.field().friendlyGoalCenter());
 
         middle_line_to_friendly_robot_distance =
             distance(ball_to_goal_line, move_action->getDestination());
 
         goal_to_ball_angle =
-            (world.ball().position() - world.field().friendlyGoal()).orientation();
+            (world.ball().position() - world.field().friendlyGoalCenter()).orientation();
         goal_to_dest_angle =
-            (move_action->getDestination() - world.field().friendlyGoal()).orientation();
+            (move_action->getDestination() - world.field().friendlyGoalCenter())
+                .orientation();
     }
 
     World world;

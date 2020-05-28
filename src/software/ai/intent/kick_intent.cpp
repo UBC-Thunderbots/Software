@@ -1,7 +1,5 @@
 #include "software/ai/intent/kick_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string KickIntent::INTENT_NAME = "Kick Intent";
 
 KickIntent::KickIntent(unsigned int robot_id, const Point &kick_origin,

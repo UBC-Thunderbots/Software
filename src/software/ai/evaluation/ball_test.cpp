@@ -32,7 +32,8 @@ TEST(BallInFriendlyHalfTest, ball_barely_in_enemy_half)
 TEST(BallInFriendlyHalfTest, ball_at_enemy_goal)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball   = Ball(field.enemyGoal(), Vector(0, 0), Timestamp::fromMilliseconds(0));
+    Ball ball =
+        Ball(field.enemyGoalCenter(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_FALSE(Evaluation::ballInFriendlyHalf(field, ball));
 }
@@ -65,7 +66,8 @@ TEST(BallInEnemyHalfTest, ball_barely_in_friendly_half)
 TEST(BallInEnemyHalfTest, ball_at_friendly_goal)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball = Ball(field.friendlyGoal(), Vector(0, 0), Timestamp::fromMilliseconds(0));
+    Ball ball =
+        Ball(field.friendlyGoalCenter(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_FALSE(Evaluation::ballInEnemyHalf(field, ball));
 }

@@ -3,15 +3,9 @@
 #include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/robot.h"
-
-// We forward-declare the MutableActionVisitor interface (pure virtual class) because we
-// need to know about the existence of this class in order to accept visitors with the
-// accept() function. We cannot use an #include statement because this creates a cyclic
-// dependency
-//
-class MutableActionVisitor;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with

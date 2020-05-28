@@ -1,7 +1,5 @@
 #include "software/ai/intent/pivot_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string PivotIntent::INTENT_NAME = "Pivot Intent";
 
 PivotIntent::PivotIntent(unsigned int robot_id, const Point &pivot_point,

@@ -1,7 +1,5 @@
 #include "software/ai/intent/chip_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string ChipIntent::INTENT_NAME = "Chip Intent";
 
 ChipIntent::ChipIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,

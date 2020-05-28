@@ -1,7 +1,5 @@
 #include "software/ai/intent/catch_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
 const std::string CatchIntent::INTENT_NAME = "Catch Intent";
 
 CatchIntent::CatchIntent(unsigned int robot_id, double velocity, double dribbler_rpm,
