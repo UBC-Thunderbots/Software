@@ -74,19 +74,27 @@ TEST_F(FieldTest, update_with_all_parameters)
 
     EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
               field_to_update.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.8, 1.0), Point(-3.5, -1.0)),
+              field_to_update.friendlyDefenseAreaToBoundary());
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(4.8, 1.0), Point(3.5, -1.0)),
+              field_to_update.enemyDefenseAreaToBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
               field_to_update.fieldLines());
     EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3)),
               field_to_update.fieldBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)),
               field_to_update.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(0, 3.3)),
+              field_to_update.friendlyHalfToBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, 3.0)),
               field_to_update.friendlyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, -3.0)),
               field_to_update.friendlyNegativeYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field_to_update.enemyHalf());
+    EXPECT_EQ(Rectangle(Point(0, -3.3), Point(4.8, 3.3)),
+              field_to_update.enemyHalfToBoundary());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)),
               field_to_update.enemyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)),
@@ -129,19 +137,27 @@ TEST_F(FieldTest, update_with_new_field)
 
     EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
               field_to_update.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.8, 1.0), Point(-3.5, -1.0)),
+              field_to_update.friendlyDefenseAreaToBoundary());
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(4.8, 1.0), Point(3.5, -1.0)),
+              field_to_update.enemyDefenseAreaToBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
               field_to_update.fieldLines());
     EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3)),
               field_to_update.fieldBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)),
               field_to_update.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(0, 3.3)),
+              field_to_update.friendlyHalfToBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, 3.0)),
               field_to_update.friendlyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, -3.0)),
               field_to_update.friendlyNegativeYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field_to_update.enemyHalf());
+    EXPECT_EQ(Rectangle(Point(0, -3.3), Point(4.8, 3.3)),
+              field_to_update.enemyHalfToBoundary());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)),
               field_to_update.enemyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)),

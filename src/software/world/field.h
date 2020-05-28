@@ -177,6 +177,13 @@ class Field
     Rectangle friendlyDefenseArea() const;
 
     /**
+     * Gets the friendly defense area extended to field boundary as a Rectangle.
+     *
+     * @return defense area of the friendly team
+     */
+    Rectangle friendlyDefenseAreaToBoundary() const;
+
+    /**
      * Gets the enemy defense area as a Rectangle.
      *
      * @return defense area of the enemy team
@@ -184,11 +191,25 @@ class Field
     Rectangle enemyDefenseArea() const;
 
     /**
-     * Gets the friendly half of the field
+     * Gets the enemy defense area extended to field boundary as a Rectangle.
+     *
+     * @return defense area of the enemy team
+     */
+    Rectangle enemyDefenseAreaToBoundary() const;
+
+    /**
+     * Gets the friendly half of the field within field lines
      *
      * @return the friendly half of the field
      */
     Rectangle friendlyHalf() const;
+
+    /**
+     * Gets the friendly half of the field within field boundary
+     *
+     * @return the friendly half of the field
+     */
+    Rectangle friendlyHalfToBoundary() const;
 
     /**
      * Gets the friendly positive Y quadrant of the field
@@ -205,11 +226,18 @@ class Field
     Rectangle friendlyNegativeYQuadrant() const;
 
     /**
-     * Gets the enemy half of the field
+     * Gets the enemy half of the field within field lines
      *
      * @return the enemy half of the field
      */
     Rectangle enemyHalf() const;
+
+    /**
+     * Gets the enemy half of the field within field boundary
+     *
+     * @return the enemy half of the field
+     */
+    Rectangle enemyHalfToBoundary() const;
 
     /**
      * Gets the enemy positive Y quadrant of the field

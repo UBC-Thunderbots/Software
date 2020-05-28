@@ -2,17 +2,15 @@
 
 ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config)
     : config(config),
-      shape_expansion_amount(config->RobotObstacleInflationFactor()->value() *
-                             ROBOT_MAX_RADIUS_METERS)
+      obstacle_expansion_amount(config->RobotObstacleInflationFactor()->value() *
+                                ROBOT_MAX_RADIUS_METERS)
 {
 }
 
 std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
-    const MotionConstraint &motion_constraint, const World &world)
+    const MotionConstraint &motion_constraint, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
-    std::optional<Circle> circle_opt       = std::nullopt;
-    std::optional<Rectangle> rectangle_opt = std::nullopt;
 
     switch (motion_constraint)
     {
@@ -25,53 +23,42 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
         }
         break;
         case MotionConstraint::CENTER_CIRCLE:
-            obstacles.push_back(createObstacle(
-                Circle(world.field().centerPoint(),
-                       world.field().centerCircleRadius() + shape_expansion_amount)));
+            obstacles.push_back(expandForRobotSize(
+                Circle(world.field().centerPoint(), world.field().centerCircleRadius())));
             break;
         case MotionConstraint::HALF_METER_AROUND_BALL:
             // 0.5 represents half a metre radius
-            obstacles.push_back(createObstacle(
-                Circle(world.ball().position(), 0.5 + shape_expansion_amount)));
+            obstacles.push_back(expandForRobotSize(Circle(world.ball().position(), 0.5)));
             break;
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
-            Rectangle rectangle = world.field().enemyDefenseArea();
-            // TODO (Issue #1332): remove this hardcoded 0.3 value and use a an
-            // inflatedEnemyDefenseArea
-            rectangle.inflate(0.3);
-            rectangle_opt = std::make_optional(rectangle);
+            obstacles.push_back(expandThreeSidesForInflatedRobotSize(
+                world.field().enemyDefenseAreaToBoundary(), TeamType::ENEMY));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
-            rectangle_opt = std::make_optional(world.field().friendlyDefenseArea());
+            obstacles.push_back(expandThreeSidesForRobotSize(
+                world.field().friendlyDefenseAreaToBoundary(), TeamType::FRIENDLY));
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            rectangle_opt = std::make_optional(world.field().enemyDefenseArea());
+            obstacles.push_back(expandThreeSidesForRobotSize(
+                world.field().enemyDefenseAreaToBoundary(), TeamType::ENEMY));
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            rectangle_opt = std::make_optional(world.field().friendlyHalf());
+            obstacles.push_back(expandOneSideForRobotSize(
+                world.field().friendlyHalfToBoundary(), TeamType::FRIENDLY));
             break;
         case MotionConstraint::ENEMY_HALF:
-            rectangle_opt = std::make_optional(world.field().enemyHalf());
+            obstacles.push_back(expandOneSideForRobotSize(
+                world.field().enemyHalfToBoundary(), TeamType::ENEMY));
             break;
-    }
-
-    if (rectangle_opt)
-    {
-        rectangle_opt->inflate(shape_expansion_amount);
-        obstacles.push_back(createObstacle(*rectangle_opt));
-    }
-    if (circle_opt)
-    {
-        obstacles.push_back(createObstacle(*circle_opt));
     }
 
     return obstacles;
 }
 
 std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraints(
-    const std::set<MotionConstraint> &motion_constraints, const World &world)
+    const std::set<MotionConstraint> &motion_constraints, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
@@ -84,55 +71,66 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraints(
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
+ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot) const
 {
-    // TODO (Issue #1340): Add ASCII art and clean up variables
-    double radius_cushion_scaling   = config->SpeedScalingFactor()->value();
-    double velocity_cushion_scaling = config->RobotObstacleInflationFactor()->value();
+    // radius of a hexagonal approximation of a robot
+    double robot_hexagon_radius =
+        (ROBOT_MAX_RADIUS_METERS + obstacle_expansion_amount) * 2.0 / std::sqrt(3);
 
-    // radius cushion for a hexagonal approximation of a robot
-    double radius_cushion =
-        ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling * 4.0 / std::sqrt(3);
+    // vector in the direction of the velocity and proportional to the norm the velocity
+    Vector inflated_velocity_vector = robot.velocity().normalize(
+        robot.velocity().length() * config->SpeedScalingFactor()->value() +
+        obstacle_expansion_amount);
 
-    // vector in the direction of the velocity and with the scaled size of the
-    // velocity
-    Vector velocity_cushion_vector =
-        robot.velocity().normalize(robot.velocity().length() * velocity_cushion_scaling +
-                                   2 * ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
+    /* If the robot is travelling slower than a threshold, then a stationary robot
+     * obstacle will be returned. If the robot is travelling faster than a threshold, then
+     * the robot will be represented by a velocity obstacle, which is an irregular hexagon
+     * like so:
+     *
+     *                        _____
+     *                       /     \
+     *                      /       \
+     *       The robot >   +    R    +       <
+     *       is at R       |         |       |
+     *                     |         |       | The length of the velocity
+     *                     |         |       | obstacle extension is
+     *                     |         |       | proportional to the robot velocity
+     *                     |         |       |
+     *                     +---------+       <
+     *                          |
+     *                          |
+     *                          V
+     *                velocity of the robot
+     */
 
-    if (velocity_cushion_vector.length() > radius_cushion)
+    if (inflated_velocity_vector.length() > robot_hexagon_radius)
     {
-        // use hexagonal approximation for velocity obstacle
-        Vector velocity_direction_norm_radius =
-            velocity_cushion_vector.normalize(radius_cushion);
-        return createObstacle(Polygon(
+        Vector velocity_norm_radius =
+            inflated_velocity_vector.normalize(robot_hexagon_radius);
+        return std::make_shared<GeomObstacle<Polygon>>(Polygon(
             {// left side of robot
-             robot.position() + velocity_direction_norm_radius.rotate(Angle::quarter()),
+             robot.position() + velocity_norm_radius.rotate(Angle::quarter()),
              // back left of robot
-             robot.position() +
-                 velocity_direction_norm_radius.rotate(Angle::fromDegrees(150)),
+             robot.position() + velocity_norm_radius.rotate(Angle::fromDegrees(150)),
              // back right of robot
-             robot.position() +
-                 velocity_direction_norm_radius.rotate(Angle::fromDegrees(210)),
+             robot.position() + velocity_norm_radius.rotate(Angle::fromDegrees(210)),
              // right side of robot
-             robot.position() +
-                 velocity_direction_norm_radius.rotate(Angle::threeQuarter()),
-             // right side velocity cushions
-             robot.position() +
-                 velocity_direction_norm_radius.rotate(Angle::threeQuarter()) +
-                 velocity_cushion_vector,
-             // left side velocity cushions
-             robot.position() + velocity_direction_norm_radius.rotate(Angle::quarter()) +
-                 velocity_cushion_vector}));
+             robot.position() + velocity_norm_radius.rotate(Angle::threeQuarter()),
+             // right side of velocity obstacle extension
+             robot.position() + velocity_norm_radius.rotate(Angle::threeQuarter()) +
+                 inflated_velocity_vector,
+             // left side of velocity obstacle extension
+             robot.position() + velocity_norm_radius.rotate(Angle::quarter()) +
+                 inflated_velocity_vector}));
     }
     else
     {
-        return createObstacle(Circle(robot.position(), radius_cushion));
+        return createRobotObstacle(robot.position());
     }
 }
 
 std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
-    const Team &team)
+    const Team &team) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (const auto &robot : team.getAllRobots())
@@ -142,31 +140,69 @@ std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position)
+ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position) const
 {
-    return createObstacle(
-        Circle(ball_position, BALL_MAX_RADIUS_METERS + 0.06 + shape_expansion_amount));
+    return expandForRobotSize(Circle(ball_position, BALL_MAX_RADIUS_METERS + 0.06));
 }
 
-ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position)
+ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position) const
 {
-    return createObstacle(
-        Circle(robot_position, ROBOT_MAX_RADIUS_METERS + shape_expansion_amount));
+    return expandForRobotSize(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
 }
 
-ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle)
+ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle) const
 {
-    Rectangle rectangle_exp(rectangle);
-    rectangle_exp.inflate(shape_expansion_amount);
-    return createObstacle(rectangle_exp);
+    return expandForRobotSize(Polygon(rectangle));
 }
 
-ObstaclePtr ObstacleFactory::createObstacle(const Circle &circle)
+ObstaclePtr ObstacleFactory::expandForRobotSize(const Circle &circle) const
 {
-    return std::make_shared<GeomObstacle<Circle>>(GeomObstacle<Circle>(circle));
+    return std::make_shared<GeomObstacle<Circle>>(
+        Circle(circle.getOrigin(), circle.getRadius() + obstacle_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::createObstacle(const Polygon &polygon)
+ObstaclePtr ObstacleFactory::expandForRobotSize(const Polygon &polygon) const
 {
-    return std::make_shared<GeomObstacle<Polygon>>(GeomObstacle<Polygon>(polygon));
+    return std::make_shared<GeomObstacle<Polygon>>(polygon.expand(obstacle_expansion_amount * Vector(-1, 0))
+                        .expand(obstacle_expansion_amount * Vector(1, 0))
+                        .expand(obstacle_expansion_amount * Vector(0, -1))
+                        .expand(obstacle_expansion_amount * Vector(0, 1)));
+}
+
+ObstaclePtr ObstacleFactory::expandThreeSidesForRobotSize(const Rectangle &rectangle,
+                                                       TeamType team_type) const
+{
+    return expandOneSideForRobotSize(
+        rectangle.expand(obstacle_expansion_amount * Vector(0, -1))
+            .expand(obstacle_expansion_amount * Vector(0, 1)),
+        team_type);
+}
+
+ObstaclePtr ObstacleFactory::expandOneSideForRobotSize(const Rectangle &rectangle,
+                                                    TeamType team_type) const
+{
+    if (team_type == TeamType::FRIENDLY)
+    {
+        return std::make_shared<GeomObstacle<Polygon>>(rectangle.expand(obstacle_expansion_amount * Vector(1, 0)));
+    }
+    else
+    {
+        return std::make_shared<GeomObstacle<Polygon>>(rectangle.expand(obstacle_expansion_amount * Vector(-1, 0)));
+    }
+}
+
+ObstaclePtr ObstacleFactory::expandThreeSidesForInflatedRobotSize(const Rectangle &rectangle,
+                                                               TeamType team_type) const
+{
+    double inflated_expansion_amount = obstacle_expansion_amount + 0.3;
+    Rectangle vert_exp_rect = rectangle.expand(inflated_expansion_amount * Vector(0, -1))
+                                  .expand(inflated_expansion_amount * Vector(0, 1));
+    if (team_type == TeamType::FRIENDLY)
+    {
+        return std::make_shared<GeomObstacle<Polygon>>(vert_exp_rect.expand({inflated_expansion_amount, 0}));
+    }
+    else
+    {
+        return std::make_shared<GeomObstacle<Polygon>>(vert_exp_rect.expand({-inflated_expansion_amount, 0}));
+    }
 }

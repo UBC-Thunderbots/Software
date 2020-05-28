@@ -32,7 +32,7 @@ class ObstacleFactory
      * @return Obstacles representing the given motion constraints
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
-        const std::set<MotionConstraint> &motion_constraints, const World &world);
+        const std::set<MotionConstraint> &motion_constraints, const World &world) const;
 
     /**
      * Create obstacles for the given motion constraint
@@ -43,7 +43,7 @@ class ObstacleFactory
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
-        const MotionConstraint &motion_constraint, const World &world);
+        const MotionConstraint &motion_constraint, const World &world) const;
 
     /**
      * Create an obstacle representing the given robot
@@ -55,7 +55,7 @@ class ObstacleFactory
      *
      * @return An obstacle representing the given robot
      */
-    ObstaclePtr createVelocityObstacleFromRobot(const Robot &robot);
+    ObstaclePtr createVelocityObstacleFromRobot(const Robot &robot) const;
 
     /**
      * Create a list of obstacles representing the given team
@@ -67,7 +67,7 @@ class ObstacleFactory
      *
      * @return A list of obstacles representing the given team
      */
-    std::vector<ObstaclePtr> createVelocityObstaclesFromTeam(const Team &team);
+    std::vector<ObstaclePtr> createVelocityObstaclesFromTeam(const Team &team) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling
@@ -76,7 +76,7 @@ class ObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createRobotObstacle(const Point &robot_position);
+    ObstaclePtr createRobotObstacle(const Point &robot_position) const;
 
     /**
      * Create circle obstacle around ball
@@ -85,7 +85,7 @@ class ObstacleFactory
      *
      * @return obstacle around the ball
      */
-    ObstaclePtr createBallObstacle(const Point &ball_position);
+    ObstaclePtr createBallObstacle(const Point &ball_position) const;
 
     /**
      * Create rectangle-shaped obstacle
@@ -94,29 +94,58 @@ class ObstacleFactory
      *
      * @return rectangular obstacle
      */
-    ObstaclePtr createObstacleFromRectangle(const Rectangle &rectangle);
+    ObstaclePtr createObstacleFromRectangle(const Rectangle &rectangle) const;
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
-    double shape_expansion_amount;
+    double obstacle_expansion_amount;
 
     /**
-     * Create circle obstacle directly from a Circle
-     * Note: this helper function does not add a robot radius
+     * Returns an obstacle for the shapep expanded on all sides to account for the size of
+     * the robot
      *
-     * @param circle Circle
+     * @param The shape to expand
      *
-     * @return circle shaped obstacle
+     * @return expanded ObstaclePtr
      */
-    ObstaclePtr createObstacle(const Circle &circle);
+    ObstaclePtr expandForRobotSize(const Circle &circle) const;
+    ObstaclePtr expandForRobotSize(const Polygon &polygon) const;
+
 
     /**
-     * Create polygon obstacle directly from a Polygon
-     * Note: this helper function does not add a robot radius
+     * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy),
+     * +y, and -y sides to account for the size of the robot
      *
-     * @param polygon Polygon
+     * @param rectangle Rectangle to expand
+     * @param team_type The side that the Rectangle belongs to
      *
-     * @return polygon shaped obstacle
+     * @return expanded Rectangle as an obstacle
      */
-    ObstaclePtr createObstacle(const Polygon &polygon);
+    ObstaclePtr expandThreeSidesForRobotSize(const Rectangle &rectangle,
+                                          TeamType team_type) const;
+
+    /**
+     * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy)
+     * sides to account for the size of the robot
+     *
+     * @param rectangle Rectangle to expand
+     * @param team_type The side that the Rectangle belongs to
+     *
+     * @return expanded Rectangle as an obstacle
+     */
+    ObstaclePtr expandOneSideForRobotSize(const Rectangle &rectangle,
+                                       TeamType team_type) const;
+
+    /**
+     * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy),
+     * +y, and -y sides to account for the size of the robot plus an additional inflation
+     * amount
+     *
+     * @param rectangle Rectangle to expand
+     * @param team_type The side that the Rectangle belongs to
+     *
+     * @return expanded Rectangle as an obstacle
+     */
+    ObstaclePtr expandThreeSidesForInflatedRobotSize(const Rectangle &rectangle,
+                                                  TeamType team_type) const;
 };
