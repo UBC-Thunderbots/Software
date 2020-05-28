@@ -33,7 +33,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 
     tactic.updateRobot(receiver);
 
-    Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
+    Angle shot_dir = (field.enemyGoalCenter() - receiver.position()).orientation();
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
     ASSERT_NE(move_action, nullptr);
@@ -74,7 +74,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     {
         tactic.updateWorldParams(friendly_team, enemy_team, ball);
         tactic.updateControlParams(pass);
-        Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
+        Angle shot_dir = (field.enemyGoalCenter() - receiver.position()).orientation();
 
         auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
         ASSERT_NE(move_action, nullptr);

@@ -54,19 +54,19 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
-            Point(0, 0), world.field().enemyGoal().toVector().orientation(), 0);
+            Point(0, 0), world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_3->updateControlParams(
             Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_4->updateControlParams(
             Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_5->updateControlParams(
             Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_6->updateControlParams(
             Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
 

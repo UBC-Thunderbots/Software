@@ -113,6 +113,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
     const std::vector<MoveIntent> &move_intents)
 {
     std::unordered_set<PathObjective> path_objectives;
+
     for (const auto &intent : move_intents)
     {
         // start with non-MoveIntent robots and then add motion constraints
@@ -269,4 +270,9 @@ double Navigator::calculateTransitionSpeedBetweenSegments(const Point &p1,
 std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
 {
     return planned_paths;
+}
+
+std::vector<ObstaclePtr> Navigator::getObstacles()
+{
+    return path_manager->getObstacles();
 }

@@ -3,8 +3,6 @@
 #include <gtest/gtest.h>
 #include <math.h>
 
-#include "software/ai/navigator/obstacle/circle_obstacle.h"
-#include "software/ai/navigator/obstacle/polygon_obstacle.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
@@ -14,8 +12,7 @@
 
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {
-    PolygonObstacle polygon_obstacle(Rectangle({-1, 1}, {2, -3}));
-
+    GeomObstacle<Polygon> polygon_obstacle(Rectangle({-1, 1}, {2, -3}));
     Polygon expected = Polygon({
         {-1, -3},
         {-1, 1},
@@ -23,21 +20,21 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
         {2, -3},
     });
 
-    EXPECT_EQ(expected, polygon_obstacle.getPolygon());
+    EXPECT_EQ(expected, polygon_obstacle.getGeom());
 }
 
 TEST(NavigatorObstacleTest, create_from_circle)
 {
     Circle expected({2, 2}, 3);
-    CircleObstacle circle_obstacle(expected);
+    GeomObstacle<Circle> circle_obstacle(expected);
 
-    EXPECT_EQ(circle_obstacle.getCircle(), expected);
+    EXPECT_EQ(circle_obstacle.getGeom(), expected);
 }
 
 TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
 {
-    ObstaclePtr obstacle =
-        std::make_shared<PolygonObstacle>(PolygonObstacle(Rectangle({-1, 1}, {2, -3})));
+    ObstaclePtr obstacle(
+        std::make_shared<GeomObstacle<Polygon>>((Rectangle({-1, 1}, {2, -3}))));
 
     Polygon expected = Polygon({
         {-1, -3},
@@ -46,8 +43,8 @@ TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
         {2, -3},
     });
 
-    // we expect that the stream operator string for PolygonObstacle will contain the
-    // stream operator string for Polygon
+    // we expect that the stream operator string for ObstaclePtr with shape Polygon
+    // will contain the stream operator string for Polygon
     std::ostringstream polygon_ss;
     polygon_ss << expected;
     EXPECT_TRUE(obstacle->toString().find(polygon_ss.str()) != std::string::npos);
@@ -56,10 +53,10 @@ TEST(NavigatorObstacleTest, polygon_obstacle_stream_operator_test)
 TEST(NavigatorObstacleTest, circle_obstacle_stream_operator_test)
 {
     Circle expected({2, 2}, 3);
-    ObstaclePtr obstacle = std::make_shared<CircleObstacle>(CircleObstacle(expected));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(expected));
 
-    // we expect that the stream operator string for CircleObstacle will contain the
-    // stream operator string for Circle
+    // we expect that the stream operator string for ObstaclePtr with shape Circle will
+    // contain the stream operator string for Circle
     std::ostringstream circle_ss;
     circle_ss << expected;
     EXPECT_TRUE(obstacle->toString().find(circle_ss.str()) != std::string::npos);
@@ -68,7 +65,7 @@ TEST(NavigatorObstacleTest, circle_obstacle_stream_operator_test)
 TEST(NavigatorObstacleTest, rectangle_obstacle_contains)
 {
     Rectangle rectangle({-1, 1}, {2, -3});
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(rectangle)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(rectangle));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -79,7 +76,7 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_contains)
 TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
 {
     Rectangle rectangle({-1, -3}, {2, 1});
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(rectangle)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(rectangle));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -90,7 +87,7 @@ TEST(NavigatorObstacleTest, rectangle_obstacle_distance)
 TEST(NavigatorObstacleTest, rectangle_obstacle_intersects)
 {
     Rectangle rectangle({-1, 1}, {2, -3});
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(rectangle)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(rectangle));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
     Segment intersecting_segment(inside_point, outside_point);
@@ -108,7 +105,7 @@ TEST(NavigatorObstacleTest, polygon_obstacle_contains)
         {2, 1},
         {2, -3},
     });
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(polygon));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -124,7 +121,7 @@ TEST(NavigatorObstacleTest, polygon_obstacle_distance)
         {2, 1},
         {2, -3},
     });
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(polygon));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
 
@@ -140,7 +137,7 @@ TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
         {2, 1},
         {2, -3},
     });
-    ObstaclePtr obstacle(std::make_shared<PolygonObstacle>(PolygonObstacle(polygon)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Polygon>>(polygon));
     Point inside_point(0, -1);
     Point outside_point(5, 5);
     Segment intersecting_segment(inside_point, outside_point);
@@ -153,7 +150,7 @@ TEST(NavigatorObstacleTest, polygon_obstacle_intersects)
 TEST(NavigatorObstacleTest, circle_obstacle_contains)
 {
     Circle circle({2, 2}, 4);
-    ObstaclePtr obstacle(std::make_shared<CircleObstacle>(CircleObstacle(circle)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(circle));
     Point inside_point(2, 3);
     Point outside_point(10, -10);
     Segment intersecting_segment(inside_point, outside_point);
@@ -166,7 +163,7 @@ TEST(NavigatorObstacleTest, circle_obstacle_contains)
 TEST(NavigatorObstacleTest, circle_obstacle_distance)
 {
     Circle circle({2, 2}, 4);
-    ObstaclePtr obstacle(std::make_shared<CircleObstacle>(CircleObstacle(circle)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(circle));
     Point inside_point(2, 3);
     Point outside_point(10, 2);
     Segment intersecting_segment(inside_point, outside_point);
@@ -179,7 +176,7 @@ TEST(NavigatorObstacleTest, circle_obstacle_distance)
 TEST(NavigatorObstacleTest, circle_obstacle_intersects)
 {
     Circle circle({2, 2}, 4);
-    ObstaclePtr obstacle(std::make_shared<CircleObstacle>(CircleObstacle(circle)));
+    ObstaclePtr obstacle(std::make_shared<GeomObstacle<Circle>>(circle));
     Point inside_point(2, 3);
     Point outside_point(10, -10);
     Segment intersecting_segment(inside_point, outside_point);
