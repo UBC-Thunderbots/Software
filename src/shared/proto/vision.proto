@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "shared/proto/geometry.proto";
+
 message RobotState
 {
     Point global_position    = 1;
