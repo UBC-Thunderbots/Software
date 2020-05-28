@@ -4,14 +4,14 @@ import "shared/proto/geometry.proto";
 
 message RobotState
 {
-    Point global_position         = 1;
-    Angle global_orientation      = 2;
-    Vector global_velocity        = 3;
-    Angle global_angular_velocity = 4;
+    Point global_position_meters                  = 1;
+    Angle global_orientation_radians              = 2;
+    Vector global_velocity_meters_per_sec         = 3;
+    Angle global_angular_velocity_radians_per_sec = 4;
 }
 
 message BallState
 {
-    Point global_position  = 1;
-    Vector global_velocity = 2;
+    Point global_position_meters          = 1;
+    Vector global_velocity_meters_per_sec = 2;
 }
