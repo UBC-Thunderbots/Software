@@ -5,19 +5,19 @@ import "shared/proto/radio_primitive.proto";
 
 message VisionMsg
 {
-    // epoch timestamp of captured vision data
+    // Epoch timestamp of captured vision data
     uint64 timestamp = 1;
 
     // Robot ID to RobotState map
     map<uint32, RobotState> robot_states = 2;
 
-    // ball state
+    // Ball state
     BallState ball_state = 3;
 }
 
 message PrimitiveMsg
 {
-    // epoch timestamp when primitives were assigned
+    // Epoch timestamp when primitives were assigned
     uint64 timestamp = 1;
 
     // Robot ID to RadioPrimitive map

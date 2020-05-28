@@ -6,10 +6,10 @@ syntax = "proto3";
 // using the MRF-Dongle.
 message RadioPrimitive
 {
-    // A numeric ID representing the primitive for firmware
+    // A numeric id representing the primitive for firmware
     FirmwarePrimitiveType prim_type = 1;
 
-    // the parameters to be encoded into the packet
+    // The parameters to be encoded into the packet
     double parameter1 = 2;
     double parameter2 = 3;
     double parameter3 = 4;
@@ -43,8 +43,10 @@ enum FirmwarePrimitiveType
     /**
      * Move Primitive
      *
-     * The parameters are the relative position, the relative orientation,
-     * and the time delta.
+     * The parameters are:
+     * - relative position (x, y)(mm, mm)
+     * - relative orientation (centiradians)
+     * - final speed (mm/s)
      *
      * The extra field is 0 if the caller doesn’t care about orientation,
      * or 1 if it does.
@@ -54,7 +56,9 @@ enum FirmwarePrimitiveType
     /**
      * Dribble Primitive
      *
-     * The parameters are the relative position and orientation.
+     * The parameters are:
+     * - relative position (x, y)(mm, mm)
+     * - relative orientation (centiradians)
      *
      * The extra field is 0 if small kicks are prohibited or 1 if they are
      * allowed.
@@ -66,8 +70,10 @@ enum FirmwarePrimitiveType
      *
      * Note that in HL, this is split into kick and chip.
      *
-     * The parameters are the relative position, relative orientation, and
-     * power (either m/s or m).
+     * The parameters are:
+     * - relative position (x, y)(mm, mm)
+     * - relative orientation (centiradians)
+     * - power (either m/s or m).
      *
      * The extra field has bit 0 clear to kick or set to chip, and bit 1
      * set if the caller cares about orientation.
@@ -77,14 +83,20 @@ enum FirmwarePrimitiveType
     /**
      * Catch Primitive
      *
-     * The parameters are the velocity, dribble speed, and margin.
+     * The parameters are:
+     * - The velocity (mm/s)
+     * - dribble speed (no unit)
+     * - margin (no unit)
      */
     CATCH = 4;
 
     /**
      * Pivot Primitive
      *
-     * The parameters are the relative centre point, the swing, and the
+     * The parameters are:
+     * - The relative centre point (x, y)(mm, mm)
+     * - The radius to pivot around (mm)
+     * - The angle to pivot to (centiradians)
      * orientation.
      */
     PIVOT = 5;
@@ -92,7 +104,11 @@ enum FirmwarePrimitiveType
     /**
      * Spin Primitive
      *
-     * The parameters are the relative position and angular velocity.
+     * The parameters are
+     * - relative x position (mm)
+     * - relative y position (mm)
+     * - angular velocity (centiradians/s)
+     * - final speed (mm/s)
      */
     SPIN = 6;
 
