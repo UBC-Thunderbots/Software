@@ -79,7 +79,7 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
         (ROBOT_MAX_RADIUS_METERS + obstacle_expansion_amount) * 2.0 / std::sqrt(3);
 
     // vector in the direction of the velocity and proportional to the norm the velocity
-    Vector inflated_velocity_vector = robot.velocity().normalize(
+    Vector expanded_velocity_vector = robot.velocity().normalize(
         robot.velocity().length() * config->SpeedScalingFactor()->value() +
         obstacle_expansion_amount);
 
@@ -104,10 +104,10 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
      *                velocity of the robot
      */
 
-    if (inflated_velocity_vector.length() > robot_hexagon_radius)
+    if (expanded_velocity_vector.length() > robot_hexagon_radius)
     {
         Vector velocity_norm_radius =
-            inflated_velocity_vector.normalize(robot_hexagon_radius);
+            expanded_velocity_vector.normalize(robot_hexagon_radius);
         return std::make_shared<GeomObstacle<Polygon>>(Polygon(
             {// left side of robot
              robot.position() + velocity_norm_radius.rotate(Angle::quarter()),
@@ -119,10 +119,10 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
              robot.position() + velocity_norm_radius.rotate(Angle::threeQuarter()),
              // right side of velocity obstacle extension
              robot.position() + velocity_norm_radius.rotate(Angle::threeQuarter()) +
-                 inflated_velocity_vector,
+                 expanded_velocity_vector,
              // left side of velocity obstacle extension
              robot.position() + velocity_norm_radius.rotate(Angle::quarter()) +
-                 inflated_velocity_vector}));
+                 expanded_velocity_vector}));
     }
     else
     {
