@@ -133,7 +133,7 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
 //                      Point(-2.067, 4.974), Point(-1.694, 5.444),
 //                      Point(-1.759, 5.496)});
 //    Robot robot = Robot(3, origin, velocity, orientation, angular_velocity,
-//    current_time);     
+//    current_time);
 //    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
 //
 //    try

@@ -122,7 +122,7 @@ class ObstacleFactory
      * @return expanded Rectangle as an obstacle
      */
     ObstaclePtr expandThreeSidesForRobotSize(const Rectangle &rectangle,
-                                          TeamType team_type) const;
+                                             TeamType team_type) const;
 
     /**
      * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy)
@@ -134,7 +134,7 @@ class ObstacleFactory
      * @return expanded Rectangle as an obstacle
      */
     ObstaclePtr expandOneSideForRobotSize(const Rectangle &rectangle,
-                                       TeamType team_type) const;
+                                          TeamType team_type) const;
 
     /**
      * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy),
@@ -147,5 +147,5 @@ class ObstacleFactory
      * @return expanded Rectangle as an obstacle
      */
     ObstaclePtr expandThreeSidesForInflatedRobotSize(const Rectangle &rectangle,
-                                                  TeamType team_type) const;
+                                                     TeamType team_type) const;
 };
