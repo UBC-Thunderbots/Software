@@ -106,6 +106,14 @@ cc_library(
         ":angle",
         ":geom_constants",
         ":vector",
+    ],
+)
+
+cc_library(
+    name = "point_boost_geometry_compatability",
+    hdrs = ["point_boost_geometry_compatability.h"],
+    deps = [
+        ":point",
         "@boost//:geometry",
         "@boost//:polygon",
     ],

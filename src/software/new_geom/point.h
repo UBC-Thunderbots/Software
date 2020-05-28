@@ -1,8 +1,5 @@
 #pragma once
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/register/point.hpp>
-#include <boost/polygon/point_concept.hpp>
 #include <cmath>
 #include <iostream>
 
@@ -259,22 +256,3 @@ namespace std
         }
     };
 }  // namespace std
-
-// Make our Point class "compatible" with boost. This lets us pass our Points directly
-// into boost algorithms
-BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(Point, double, cs::cartesian, x, y, setX, setY)
-template <>
-struct boost::polygon::geometry_concept<Point>
-{
-    typedef point_concept type;
-};
-template <>
-struct boost::polygon::point_traits<Point>
-{
-    typedef int coordinate_type;
-
-    static coordinate_type get(const Point &point, orientation_2d orient)
-    {
-        return (orient == HORIZONTAL) ? point.x() : point.y();
-    }
-};

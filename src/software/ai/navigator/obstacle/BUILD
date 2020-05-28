@@ -2,21 +2,16 @@ package(default_visibility = ["//software/ai/navigator:__subpackages__"])
 
 cc_library(
     name = "obstacle",
-    srcs = [
-        "circle_obstacle.cpp",
-        "obstacle.cpp",
-        "polygon_obstacle.cpp",
-    ],
     hdrs = [
-        "circle_obstacle.h",
         "obstacle.h",
-        "polygon_obstacle.h",
+        "obstacle.tpp",
     ],
+    # We expose obstacle so that it can visualized
+    visibility = ["//visibility:public"],
     deps = [
+        "obstacle_visitor",
         "//shared:constants",
-        "//software/new_geom:circle",
         "//software/new_geom:point",
-        "//software/new_geom:polygon",
         "//software/new_geom:segment",
         "//software/new_geom/util",
     ],
@@ -58,5 +53,16 @@ cc_test(
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "obstacle_visitor",
+    hdrs = ["obstacle_visitor.h"],
+    # We expose obstacle visitor so that it can visualized
+    visibility = ["//visibility:public"],
+    deps = [
+        "//software/new_geom:circle",
+        "//software/new_geom:polygon",
     ],
 )

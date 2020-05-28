@@ -7,5 +7,6 @@ cc_library(
     deps = [
         "//software/geom",
         "@qt//:qt_core",
+        "@qt//:qt_gui",
     ],
 )

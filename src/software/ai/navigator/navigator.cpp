@@ -113,6 +113,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
     const std::vector<MoveIntent> &move_intents)
 {
     std::unordered_set<PathObjective> path_objectives;
+
     for (const auto &intent : move_intents)
     {
         // start with non-MoveIntent robots and then add motion constraints
@@ -243,7 +244,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
     double robot_proximity_limit = config->EnemyRobotProximityLimit()->value();
 
     // find min dist between p and any robot
-    double closest_dist = DBL_MAX;
+    double closest_dist = std::numeric_limits<double>::max();
     auto obstacles      = obstacle_factory.createVelocityObstaclesFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {
@@ -269,4 +270,9 @@ double Navigator::calculateTransitionSpeedBetweenSegments(const Point &p1,
 std::vector<std::vector<Point>> Navigator::getPlannedPathPoints()
 {
     return planned_paths;
+}
+
+std::vector<ObstaclePtr> Navigator::getObstacles()
+{
+    return path_manager->getObstacles();
 }

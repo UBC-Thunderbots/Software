@@ -1,9 +1,10 @@
 #pragma once
 
-// We forward-declare all the tactics because if we include them we induce a
-// circular dependency between the Individual library for each tactic and this
-// visitor. Ex: `CherryPickTactic` includes `TacticVisitor`, but `TacticVisitor`
-// also includes `CherryPickTactic`
+// We forward-declare all the tactics because if we include them we induce a circular
+// dependency between the individual library for each tactic and this visitor. This is
+// because tactic.h includes tactic_visitor.h, and each individual library includes
+// tactic.h. Note: every subclass of this visitor must include all of the classes listed
+// below
 class CherryPickTactic;
 class ShadowFreekickerTactic;
 class GoalieTactic;

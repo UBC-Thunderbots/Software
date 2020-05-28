@@ -1,7 +1,5 @@
 #include "software/primitive/kick_primitive.h"
 
-#include "software/primitive/primitive_visitor.h"
-
 const std::string KickPrimitive::PRIMITIVE_NAME = "Kick Primitive";
 
 KickPrimitive::KickPrimitive(unsigned int robot_id, const Point &kick_origin,

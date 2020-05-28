@@ -85,7 +85,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
             field, friendly_team, enemy_team, enemy_robot, ROBOT_MAX_RADIUS_METERS,
             robots_to_ignore);
 
-        Vector enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
+        Vector enemy_shot_vector = field.friendlyGoalCenter() - enemy_robot.position();
         Point position_to_block_shot =
             enemy_robot.position() + enemy_shot_vector.normalize(shadow_distance);
         if (best_enemy_shot_opt)

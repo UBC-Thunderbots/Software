@@ -122,10 +122,10 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
     bait_move_tactic_1->updateControlParams(
         bait_move_tactic_1_pos,
-        (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
+        (world.field().enemyGoalCenter() - bait_move_tactic_1_pos).orientation(), 0.0);
     bait_move_tactic_2->updateControlParams(
         bait_move_tactic_2_pos,
-        (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0);
+        (world.field().enemyGoalCenter() - bait_move_tactic_2_pos).orientation(), 0.0);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::ONE_TOUCH_SHOT);

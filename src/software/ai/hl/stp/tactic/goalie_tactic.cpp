@@ -5,7 +5,6 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
@@ -51,15 +50,16 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // first find the 3 intersections with each side of the restricted area
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
-    auto width_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoal()),
-                                     Line(goalie_restricted_area.posXPosYCorner(),
-                                          goalie_restricted_area.posXNegYCorner()));
+    auto width_x_goal =
+        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
+                     Line(goalie_restricted_area.posXPosYCorner(),
+                          goalie_restricted_area.posXNegYCorner()));
     auto pos_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoal()),
+        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
                      Line(goalie_restricted_area.posXPosYCorner(),
                           goalie_restricted_area.negXPosYCorner()));
     auto neg_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoal()),
+        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
                      Line(goalie_restricted_area.posXNegYCorner(),
                           goalie_restricted_area.negXNegYCorner()));
 
@@ -76,7 +76,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     else if (width_x_goal &&
              width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
              width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y() &&
-             field.friendlyGoal().x() <= goalie_desired_position.x())
+             field.friendlyGoalCenter().x() <= goalie_desired_position.x())
     {
         return std::make_optional<Point>(*width_x_goal);
     }
@@ -240,7 +240,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             {
                 chip_action->updateControlParams(
                     *robot, ball.position(),
-                    (ball.position() - field.friendlyGoal()).orientation(), 2);
+                    (ball.position() - field.friendlyGoalCenter()).orientation(), 2);
                 next_action = chip_action;
             }
         }

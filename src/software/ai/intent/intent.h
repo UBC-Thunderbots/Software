@@ -3,15 +3,8 @@
 #include <set>
 #include <string>
 
+#include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
-
-// We forward-declare the IntentVisitor interface (pure virtual class) because we need
-// to know about the existence of this class in order to accept visitors with the
-// accept() function. We cannot use an #include statement because this creates a cyclic
-// dependency
-//
-// This class can be found in ai/intent/intent_visitor.h
-class IntentVisitor;
 
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a

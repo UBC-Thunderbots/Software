@@ -66,7 +66,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
         else
         {
             const Vector ball_to_net_direction =
-                (field.friendlyGoal() - ball.position())
+                (field.friendlyGoalCenter() - ball.position())
                     .normalize(FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
             Vector perpendicular_to_ball_direction =

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"

@@ -3,7 +3,6 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/new_geom/rectangle.h"
 #include "software/parameter/dynamic_parameters.h"
 
@@ -164,14 +163,15 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // If an enemy is about to steal the ball from us, we try chip over them to
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
-            Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
+            Point fallback_chip_target =
+                chip_target ? *chip_target : field.enemyGoalCenter();
             chip_action->updateControlParams(*robot, ball.position(),
                                              fallback_chip_target, CHIP_DIST);
             yield(chip_action);
         }
         else
         {
-            Vector behind_ball_vector = (ball.position() - field.enemyGoal());
+            Vector behind_ball_vector = (ball.position() - field.enemyGoalCenter());
             // A point behind the ball that leaves 5cm between the ball and kicker of the
             // robot
             Point behind_ball =
