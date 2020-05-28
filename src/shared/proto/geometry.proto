@@ -1,0 +1,23 @@
+message Point
+{
+    // x coordinate
+    float x = 1;
+
+    // y coordinate
+    float y = 2;
+}
+
+message Vector
+{
+    // x component
+    float x_component = 1;
+
+    // y component
+    float y_component = 2;
+}
+
+message Angle
+{
+    // the angle in radians
+    double radians = 1;
+}
