@@ -330,7 +330,7 @@ class Field
      * Gets the margin for being out of bounds on the top or bottom of the
      * field in metres.
      *
-     * @return the size of the margin/bounds around the field
+     * @return the size of the margin/bounds around the field in metres
      */
     double boundaryMargin() const;
 
