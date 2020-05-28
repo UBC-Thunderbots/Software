@@ -3,6 +3,7 @@
 #include <QtCore/QLine>
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
+#include <QtGui/QPolygonF>
 
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
@@ -21,6 +22,13 @@ QPointF createQPointF(const Point& point);
  * @return The QRectF representation of the given Rectangle
  */
 QRectF createQRectF(const Rectangle& rectangle);
+
+/**
+ * Converts our Polygon class to a QPolygonF
+ * @param polygon The Polygon to convert
+ * @return The QPolygonF representation of the given Polygon
+ */
+QPolygonF createQPolygonF(const Polygon& polygon);
 
 /**
  * Converts our Segment class to a QLineF

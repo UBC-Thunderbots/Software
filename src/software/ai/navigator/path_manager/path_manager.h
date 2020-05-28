@@ -35,4 +35,11 @@ class PathManager
         const Rectangle &navigable_area) = 0;
 
     virtual ~PathManager() = default;
+
+    /**
+     * Get the obstacles being used for path planning
+     *
+     * @return obstacles
+     */
+    virtual const std::vector<ObstaclePtr> getObstacles(void) const = 0;
 };

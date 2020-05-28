@@ -59,8 +59,13 @@ TEST_F(FieldTest, update_with_all_parameters)
     EXPECT_DOUBLE_EQ(6.6, field_to_update.totalYLength());
     EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryYLength());
 
-    EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoal());
-    EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoal());
+    EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoalCenter());
+    EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoalCenter());
+
+    EXPECT_EQ(Rectangle(Point(-4.68, -0.5), Point(-4.5, 0.5)).getPoints(),
+              field_to_update.friendlyGoal().getPoints());
+    EXPECT_EQ(Rectangle(Point(4.68, -0.5), Point(4.5, 0.5)).getPoints(),
+              field_to_update.enemyGoal().getPoints());
 
     EXPECT_EQ(Point(-4.5, 0.5), field_to_update.friendlyGoalpostPos());
     EXPECT_EQ(Point(-4.5, -0.5), field_to_update.friendlyGoalpostNeg());
@@ -109,8 +114,13 @@ TEST_F(FieldTest, update_with_new_field)
     EXPECT_DOUBLE_EQ(6.6, field_to_update.totalYLength());
     EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryYLength());
 
-    EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoal());
-    EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoal());
+    EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoalCenter());
+    EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoalCenter());
+
+    EXPECT_EQ(Rectangle(Point(-4.68, -0.5), Point(-4.5, 0.5)).getPoints(),
+              field_to_update.friendlyGoal().getPoints());
+    EXPECT_EQ(Rectangle(Point(4.68, -0.5), Point(4.5, 0.5)).getPoints(),
+              field_to_update.enemyGoal().getPoints());
 
     EXPECT_EQ(Point(-4.5, 0.5), field_to_update.friendlyGoalpostPos());
     EXPECT_EQ(Point(-4.5, -0.5), field_to_update.friendlyGoalpostNeg());

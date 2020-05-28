@@ -69,7 +69,7 @@ TEST(DefenseShadowEnemyTacticTest,
     ASSERT_NE(move_action, nullptr);
     EXPECT_TRUE(move_action->getDestination().isClose(ball.position(), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
-                  (enemy_robot.position() - field.friendlyGoal()).orientation()),
+                  (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
 }

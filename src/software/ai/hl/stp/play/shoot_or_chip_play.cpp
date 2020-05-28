@@ -88,7 +88,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
     double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
-        world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
+        world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),

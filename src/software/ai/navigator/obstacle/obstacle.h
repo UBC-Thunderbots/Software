@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "shared/constants.h"
+#include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/new_geom/point.h"
-#include "software/new_geom/polygon.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersects.h"
@@ -47,7 +47,45 @@ class Obstacle
      * @return string that describes the obstacle
      */
     virtual std::string toString(void) const = 0;
+
+    /**
+     * Accepts an Obstacle Visitor and calls the visit function
+     *
+     * @param visitor An Obstacle Visitor
+     */
+    virtual void accept(ObstacleVisitor& visitor) const = 0;
 };
+
+template <typename GEOM_TYPE>
+class GeomObstacle : public Obstacle
+{
+   public:
+    GeomObstacle() = delete;
+
+    /**
+     * Construct a GeomObstacle with GEOM_TYPE
+     *
+     * @param geom GEOM_TYPE to make obstacle with
+     */
+    explicit GeomObstacle(const GEOM_TYPE& geom);
+
+    bool contains(const Point& p) const override;
+    double distance(const Point& p) const override;
+    bool intersects(const Segment& segment) const override;
+    std::string toString(void) const override;
+    void accept(ObstacleVisitor& visitor) const override;
+
+    /**
+     * Gets the underlying GEOM_TYPE
+     *
+     * @return geom type
+     */
+    const GEOM_TYPE getGeom(void) const;
+
+   private:
+    GEOM_TYPE geom_;
+};
+
 
 /**
  * We use a pointer to Obstacle to support inheritance
@@ -63,4 +101,10 @@ using ObstaclePtr = std::shared_ptr<Obstacle>;
  *
  * @return The output stream with the string representation of the class appended
  */
-std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr);
+inline std::ostream& operator<<(std::ostream& os, const ObstaclePtr& obstacle_ptr)
+{
+    os << obstacle_ptr->toString();
+    return os;
+}
+
+#include "software/ai/navigator/obstacle/obstacle.tpp"
