@@ -31,9 +31,9 @@ TEST(RadioBackendTest, test_convert_robot_status_tbots_robot_msg)
                                 .fw_build_id = 1,
                                 1};
 
-    // TODO write unit test and clean up struct
-    // RadioBackend radio_backend
-    // TbotsRobotMsg robot_msg = radio_backend.convert...();
+    // TODO RadioBackend constructor messing up unit test
+    RadioBackend radio_backend;
+    TbotsRobotMsg robot_msg = radio_backend.convertRobotStatusToTbotsRobotMsg(&robot_status);
 
     EXPECT_DOUBLE_EQ(0.6, 0.6);
 }

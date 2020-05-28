@@ -2,10 +2,10 @@
 
 #include "shared/proto/robot_component_status.pb.h"
 #include "shared/proto/tbots_robot_msg.pb.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/output/radio/radio_output.h"
-#include "software/proto/sensor_msg.pb.h"
 
 class RadioBackend : public Backend
 {
