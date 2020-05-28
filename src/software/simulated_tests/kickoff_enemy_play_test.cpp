@@ -1,9 +1,10 @@
 
+#include "software/ai/hl/stp/play/kickoff_enemy_play.h"
+
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/ai/hl/stp/play/kickoff_enemy_play.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
@@ -15,7 +16,6 @@ class KickoffEnemyPlayTest : public SimulatedTest
 
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 {
-    enableVisualizer();
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     world = ::Test::TestUtil::setEnemyRobotPositions(
