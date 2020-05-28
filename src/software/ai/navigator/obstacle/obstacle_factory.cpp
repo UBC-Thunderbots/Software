@@ -32,25 +32,26 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
             break;
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
-            obstacles.push_back(expandThreeSidesForInflatedRobotSize(
-                world.field().enemyDefenseAreaToBoundary(), TeamType::ENEMY));
+            obstacles.push_back(expandForInflatedRobotSize(
+                world.field().enemyDefenseAreaToBoundary(), {{-1, 0}, {0, -1}, {0, 1}}));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
-            obstacles.push_back(expandThreeSidesForRobotSize(
-                world.field().friendlyDefenseAreaToBoundary(), TeamType::FRIENDLY));
+            obstacles.push_back(
+                expandForRobotSize(world.field().friendlyDefenseAreaToBoundary(),
+                                   {{1, 0}, {0, -1}, {0, 1}}));
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            obstacles.push_back(expandThreeSidesForRobotSize(
-                world.field().enemyDefenseAreaToBoundary(), TeamType::ENEMY));
+            obstacles.push_back(expandForRobotSize(
+                world.field().enemyDefenseAreaToBoundary(), {{-1, 0}, {0, -1}, {0, 1}}));
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            obstacles.push_back(expandOneSideForRobotSize(
-                world.field().friendlyHalfToBoundary(), TeamType::FRIENDLY));
+            obstacles.push_back(
+                expandForRobotSize(world.field().friendlyHalfToBoundary(), {{1, 0}}));
             break;
         case MotionConstraint::ENEMY_HALF:
-            obstacles.push_back(expandOneSideForRobotSize(
-                world.field().enemyHalfToBoundary(), TeamType::ENEMY));
+            obstacles.push_back(
+                expandForRobotSize(world.field().enemyHalfToBoundary(), {{-1, 0}}));
             break;
     }
 
@@ -170,44 +171,25 @@ ObstaclePtr ObstacleFactory::expandForRobotSize(const Polygon &polygon) const
             .expand(obstacle_expansion_amount * Vector(0, 1)));
 }
 
-ObstaclePtr ObstacleFactory::expandThreeSidesForRobotSize(const Rectangle &rectangle,
-                                                          TeamType team_type) const
+ObstaclePtr ObstacleFactory::expandForRobotSize(
+    const Rectangle &rectangle, const std::vector<Vector> &directions) const
 {
-    return expandOneSideForRobotSize(
-        rectangle.expand(obstacle_expansion_amount * Vector(0, -1))
-            .expand(obstacle_expansion_amount * Vector(0, 1)),
-        team_type);
+    Rectangle retval = rectangle;
+    for (const auto &v : directions)
+    {
+        retval = retval.expand(obstacle_expansion_amount * v);
+    }
+    return std::make_shared<GeomObstacle<Polygon>>(retval);
 }
 
-ObstaclePtr ObstacleFactory::expandOneSideForRobotSize(const Rectangle &rectangle,
-                                                       TeamType team_type) const
-{
-    if (team_type == TeamType::FRIENDLY)
-    {
-        return std::make_shared<GeomObstacle<Polygon>>(
-            rectangle.expand(obstacle_expansion_amount * Vector(1, 0)));
-    }
-    else
-    {
-        return std::make_shared<GeomObstacle<Polygon>>(
-            rectangle.expand(obstacle_expansion_amount * Vector(-1, 0)));
-    }
-}
-
-ObstaclePtr ObstacleFactory::expandThreeSidesForInflatedRobotSize(
-    const Rectangle &rectangle, TeamType team_type) const
+ObstaclePtr ObstacleFactory::expandForInflatedRobotSize(
+    const Rectangle &rectangle, const std::vector<Vector> &directions) const
 {
     double inflated_expansion_amount = obstacle_expansion_amount + 0.3;
-    Rectangle vert_exp_rect = rectangle.expand(inflated_expansion_amount * Vector(0, -1))
-                                  .expand(inflated_expansion_amount * Vector(0, 1));
-    if (team_type == TeamType::FRIENDLY)
+    Rectangle retval                 = rectangle;
+    for (const auto &v : directions)
     {
-        return std::make_shared<GeomObstacle<Polygon>>(
-            vert_exp_rect.expand({inflated_expansion_amount, 0}));
+        retval = retval.expand(inflated_expansion_amount * v);
     }
-    else
-    {
-        return std::make_shared<GeomObstacle<Polygon>>(
-            vert_exp_rect.expand({-inflated_expansion_amount, 0}));
-    }
+    return std::make_shared<GeomObstacle<Polygon>>(retval);
 }

@@ -101,7 +101,7 @@ class ObstacleFactory
     double obstacle_expansion_amount;
 
     /**
-     * Returns an obstacle for the shapep expanded on all sides to account for the size of
+     * Returns an obstacle for the shape expanded on all sides to account for the size of
      * the robot
      *
      * @param The shape to expand
@@ -111,41 +111,27 @@ class ObstacleFactory
     ObstaclePtr expandForRobotSize(const Circle &circle) const;
     ObstaclePtr expandForRobotSize(const Polygon &polygon) const;
 
-
     /**
-     * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy),
-     * +y, and -y sides to account for the size of the robot
+     * Returns an obstacle from the Rectangle expanded in the directions in vector
+     * multiplied to account for robot size
      *
      * @param rectangle Rectangle to expand
-     * @param team_type The side that the Rectangle belongs to
+     * @param directions The list of directions to expand the Rectangle
      *
      * @return expanded Rectangle as an obstacle
      */
-    ObstaclePtr expandThreeSidesForRobotSize(const Rectangle &rectangle,
-                                             TeamType team_type) const;
+    ObstaclePtr expandForRobotSize(const Rectangle &rectangle,
+                                   const std::vector<Vector> &directions) const;
 
     /**
-     * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy)
-     * sides to account for the size of the robot
+     * Returns an obstacle from the Rectangle expanded in the directions in vector
+     * multiplied to account for inflated robot size
      *
      * @param rectangle Rectangle to expand
-     * @param team_type The side that the Rectangle belongs to
+     * @param directions The list of directions to expand the Rectangle
      *
      * @return expanded Rectangle as an obstacle
      */
-    ObstaclePtr expandOneSideForRobotSize(const Rectangle &rectangle,
-                                          TeamType team_type) const;
-
-    /**
-     * Returns an obstacle from the Rectangle expanded on +x (if friendly), -x (if enemy),
-     * +y, and -y sides to account for the size of the robot plus an additional inflation
-     * amount
-     *
-     * @param rectangle Rectangle to expand
-     * @param team_type The side that the Rectangle belongs to
-     *
-     * @return expanded Rectangle as an obstacle
-     */
-    ObstaclePtr expandThreeSidesForInflatedRobotSize(const Rectangle &rectangle,
-                                                     TeamType team_type) const;
+    ObstaclePtr expandForInflatedRobotSize(const Rectangle &rectangle,
+                                           const std::vector<Vector> &directions) const;
 };
