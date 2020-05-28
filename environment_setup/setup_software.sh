@@ -40,7 +40,6 @@ host_software_packages=(
     curl
     cmake # Needed to build some of our dependencies
     gcc-10 # we use gcc 10
-    libgcc
     protobuf-compiler
     libprotobuf-dev
     libusb-1.0-0-dev
