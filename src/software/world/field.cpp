@@ -6,9 +6,7 @@
 #include "software/new_geom/rectangle.h"
 #include "software/time/timestamp.h"
 
-Field::Field()
-: Field(0, 0,0, 0, 0, 0, 0)
-{}
+Field::Field() : Field(0, 0, 0, 0, 0, 0, 0) {}
 
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
              double defense_y_length, double goal_y_length, double boundary_buffer_size,
@@ -212,12 +210,12 @@ double Field::boundaryMargin() const
     return boundary_buffer_size_;
 }
 
-bool Field::pointInFriendlyDefenseArea(const Point& p) const
+bool Field::pointInFriendlyDefenseArea(const Point &p) const
 {
     return friendlyDefenseArea().contains(p);
 }
 
-bool Field::pointInEnemyDefenseArea(const Point& p) const
+bool Field::pointInEnemyDefenseArea(const Point &p) const
 {
     return enemyDefenseArea().contains(p);
 }

@@ -39,7 +39,7 @@ class Field
      * Default constructs a field with all dimensions set to 0. This default
      * field will be invalid (ie. isValid() returns false)
      */
-     explicit Field();
+    explicit Field();
 
     /**
      * Constructs a new field with the given dimensions
@@ -317,14 +317,14 @@ class Field
      *
      * @returns true if point p is in friendly defense area
      */
-    bool pointInFriendlyDefenseArea(const Point& p) const;
+    bool pointInFriendlyDefenseArea(const Point &p) const;
 
     /**
      * Returns whether p is in the enemy defense area
      *
      * @returns true if point p is in enemy defense area
      */
-    bool pointInEnemyDefenseArea(const Point& p) const;
+    bool pointInEnemyDefenseArea(const Point &p) const;
 
     /**
      * Returns whether p is within the field lines of the this field.
@@ -380,5 +380,4 @@ class Field
     double boundary_buffer_size_;
     // The radius of the center circle in metres
     double center_circle_radius_;
-
 };

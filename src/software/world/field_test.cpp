@@ -17,9 +17,8 @@ class FieldTest : public ::testing::Test
         boundary_buffer_size = 0.3;
         center_circle_radius = 0.5;
 
-        field =
-            Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                  boundary_buffer_size, center_circle_radius);
+        field = Field(x_length, y_length, defense_x_length, defense_y_length,
+                      goal_y_length, boundary_buffer_size, center_circle_radius);
     }
 
     Field field;
@@ -47,61 +46,52 @@ TEST_F(FieldTest, construct_with_parameters)
 
 TEST_F(FieldTest, equality_operator_fields_with_different_x_lengths)
 {
-    Field field_1 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
-    Field field_2 =
-        Field(x_length / 2, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_2 = Field(x_length / 2, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
     EXPECT_NE(field_1, field_2);
 }
 
 TEST_F(FieldTest, equality_operator_fields_with_different_y_lengths)
 {
-    Field field_1 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
-    Field field_2 =
-        Field(x_length, y_length * 2, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_2 = Field(x_length, y_length * 2, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
     EXPECT_NE(field_1, field_2);
 }
 
 TEST_F(FieldTest, equality_operator_fields_with_different_defense_x_length)
 {
-    Field field_1 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
-    Field field_2 =
-        Field(x_length, y_length, defense_x_length * 2, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_2 = Field(x_length, y_length, defense_x_length * 2, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
     EXPECT_NE(field_1, field_2);
 }
 
 TEST_F(FieldTest, equality_operator_fields_with_different_defense_y_length)
 {
-    Field field_1 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
-    Field field_2 =
-        Field(x_length, y_length, defense_x_length, defense_y_length / 2, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length / 2,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
     EXPECT_NE(field_1, field_2);
 }
 
 TEST_F(FieldTest, equality_operator_fields_with_different_goal_y_length)
 {
-    Field field_1 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
     Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length, 0,
                           boundary_buffer_size, center_circle_radius);
@@ -111,9 +101,8 @@ TEST_F(FieldTest, equality_operator_fields_with_different_goal_y_length)
 
 TEST_F(FieldTest, equality_operator_fields_with_different_boundary_buffer_size)
 {
-    Field field_1 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
     Field field_2 =
         Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
@@ -124,13 +113,11 @@ TEST_F(FieldTest, equality_operator_fields_with_different_boundary_buffer_size)
 
 TEST_F(FieldTest, equality_operator_fields_with_different_center_circle_radius)
 {
-    Field field_1 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius);
+    Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius);
 
-    Field field_2 =
-        Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-              boundary_buffer_size, center_circle_radius * 10);
+    Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length, boundary_buffer_size, center_circle_radius * 10);
 
     EXPECT_NE(field_1, field_2);
 }

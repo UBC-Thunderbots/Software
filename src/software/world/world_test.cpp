@@ -141,8 +141,8 @@ TEST_F(WorldTest, equality_different_ball)
 
 TEST_F(WorldTest, equality_different_field)
 {
-    Field field1        = Field(0, 0, 0, 0, 0, 0, 0);
-    Field field2        = Field(0, 5, 03, 0, 0, 2, 0);
+    Field field1       = Field(0, 0, 0, 0, 0, 0, 0);
+    Field field2       = Field(0, 5, 03, 0, 0, 2, 0);
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     Team friendly_team = Team(Duration::fromMilliseconds(0));
     Team enemy_team    = Team(Duration::fromMilliseconds(0));

@@ -4,8 +4,7 @@
 #include "software/parameter/dynamic_parameters.h"
 
 World::World()
-    : World(Field(),
-            Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
+    : World(Field(), Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
             Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
                                                 ->RobotExpiryBufferMilliseconds()
                                                 ->value())),
