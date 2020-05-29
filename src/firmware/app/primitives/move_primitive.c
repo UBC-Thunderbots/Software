@@ -1,8 +1,8 @@
 #include "firmware/app/primitives/move_primitive.h"
 
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
@@ -167,8 +167,8 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    float dx            = state->destination[0] - app_firmware_robot_getPositionX(robot);
-    float dy            = state->destination[1] - app_firmware_robot_getPositionY(robot);
+    float dx = state->destination[0] - app_firmware_robot_getPositionX(robot);
+    float dy = state->destination[1] - app_firmware_robot_getPositionY(robot);
     // Add a small number to avoid division by zero
     float total_disp    = sqrtf(dx * dx + dy * dy) + 1e-6;
     state->major_vec[0] = dx / total_disp;
@@ -207,7 +207,7 @@ void move_end(void* void_state_ptr, FirmwareWorld_t* world)
 
 void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
-    MovePrimitiveState_t* state  = (MovePrimitiveState_t*)(void_state_ptr);
+    MovePrimitiveState_t* state = (MovePrimitiveState_t*)(void_state_ptr);
     assert(!isnan(state->major_vec[0]));
     assert(!isnan(state->major_vec[1]));
     assert(!isnan(state->minor_vec[0]));
