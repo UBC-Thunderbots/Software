@@ -5,7 +5,28 @@
 #include <math.h>
 
 #include "shared/constants.h"
-#include "software/world/ball.h"
+
+TEST(PhysicsBallTest, test_get_position)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, 9.8);
+
+    EXPECT_LT((initial_ball_state.position() - physics_ball.position()).length(), 1e-7);
+}
+
+TEST(PhysicsBallTest, test_get_velocity)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, 9.8);
+
+    EXPECT_LT((initial_ball_state.velocity() - physics_ball.velocity()).length(), 1e-7);
+}
 
 TEST(PhysicsBallTest, test_get_ball_state)
 {
@@ -16,8 +37,8 @@ TEST(PhysicsBallTest, test_get_ball_state)
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, 9.8);
     auto ball_state         = physics_ball.getBallState();
 
-    EXPECT_LT((ball_state.position() - physics_ball.position()).length(), 1e-7);
-    EXPECT_LT((ball_state.velocity() - physics_ball.velocity()).length(), 1e-7);
+    EXPECT_LT((initial_ball_state.position() - ball_state.position()).length(), 1e-7);
+    EXPECT_LT((initial_ball_state.velocity() - ball_state.velocity()).length(), 1e-7);
 }
 
 TEST(PhysicsBallTest, test_ball_added_to_physics_world_on_creation)
