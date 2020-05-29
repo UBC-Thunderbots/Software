@@ -69,6 +69,7 @@ cc_library(
     hdrs = ["robot_status.h"],
     deps = [
         "//shared/proto:tbots_cc_proto",
+        "//software/logger",
     ],
 )
 
