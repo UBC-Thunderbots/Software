@@ -11,7 +11,7 @@ class Polynomial2d
    public:
     /**
      * Construct a 2D polynomial. This will construct the polynomial such that
-     * always returns the point (0,0).
+     * it always returns the point (0,0).
      */
     Polynomial2d();
 

@@ -2,7 +2,7 @@
 
 #include "software/new_geom/linear_spline2d.h"
 
-TEST(LinearSplineTest, test_three_knot_value_at)
+TEST(LinearSpline2dTest, test_constructor_three_knot)
 {
     std::vector<Point> points({Point(4, 18), Point(3, 0), Point(-7, -1)});
     LinearSpline2d s(points);
@@ -15,7 +15,7 @@ TEST(LinearSplineTest, test_three_knot_value_at)
     EXPECT_EQ(s.getValueAt(1.0), points[2]);
 }
 
-TEST(LinearSplineTest, test_one_knot_value_at)
+TEST(LinearSpline2dTest, test_constructor_one_knot)
 {
     std::vector<Point> points({Point(3, 7)});
     LinearSpline2d s(points);
@@ -28,7 +28,7 @@ TEST(LinearSplineTest, test_one_knot_value_at)
     EXPECT_EQ(s.getValueAt(1.0), points[0]);
 }
 
-TEST(LinearSplineTest, test_double_repeated_knot_value_at)
+TEST(LinearSpline2dTest, test_constructor_double_repeated_knot)
 {
     std::vector<Point> points({Point(-3, 20), Point(-3, 20)});
     LinearSpline2d s(points);
@@ -41,7 +41,7 @@ TEST(LinearSplineTest, test_double_repeated_knot_value_at)
     EXPECT_EQ(s.getValueAt(1.0), points[0]);
 }
 
-TEST(LinearSplineTest, test_two_knot_value_at)
+TEST(LinearSpline2dTest, test_constructor_two_knot)
 {
     std::vector<Point> points({Point(-3, -21), Point(4, 32)});
     LinearSpline2d s(points);
@@ -54,127 +54,36 @@ TEST(LinearSplineTest, test_two_knot_value_at)
     EXPECT_EQ(s.getValueAt(1.0), points[1]);
 }
 
-TEST(LinearSplineTest, test_three_knot_value_at_out_of_range)
-{
-    std::vector<Point> points({Point(4, 18), Point(3, 0), Point(-7, -1)});
-    LinearSpline2d s(points);
-
-    bool failing = true;
-
-    try
-    {
-        s.getValueAt(-0.1);
-    }
-    catch (std::invalid_argument &e)
-    {
-        failing = false;
-    }
-
-    if (failing)
-    {
-        ADD_FAILURE()
-            << "LinearSpline2d returning value for value (-0.1) outside of domain";
-        return;
-    }
-
-    try
-    {
-        s.getValueAt(1.1);
-    }
-    catch (std::invalid_argument &e)
-    {
-        failing = false;
-    }
-
-    if (failing)
-    {
-        ADD_FAILURE()
-            << "LinearSpline2d returning value for value (1.1) outside of domain";
-        return;
-    }
-}
-
-TEST(LinearSplineTest, test_one_knot_value_at_out_of_range)
+TEST(LinearSpline2dTest, test_one_knot_value_at_out_of_range)
 {
     std::vector<Point> points({Point(1, -18)});
     LinearSpline2d s(points);
 
-    bool failing = true;
-
-    try
-    {
-        s.getValueAt(-0.1);
-    }
-    catch (std::invalid_argument &e)
-    {
-        failing = false;
-    }
-
-    if (failing)
-    {
-        ADD_FAILURE()
-            << "LinearSpline2d returning value for value (-0.1) outside of domain";
-        return;
-    }
-
-    try
-    {
-        s.getValueAt(1.1);
-    }
-    catch (std::invalid_argument &e)
-    {
-        failing = false;
-    }
-
-    if (failing)
-    {
-        ADD_FAILURE()
-            << "LinearSpline2d returning value for value (1.1) outside of domain";
-        return;
-    }
+    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(1,-18), 1e-9));
+    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(1,-18), 1e-9));
 }
 
-TEST(LinearSplineTest, test_two_knot_value_at_out_of_range)
+
+TEST(LinearSpline2dTest, test_two_knot_value_at_out_of_range)
 {
     std::vector<Point> points({Point(1, -2), Point(1, -18)});
     LinearSpline2d s(points);
 
-    bool failing = true;
-
-    try
-    {
-        s.getValueAt(-0.1);
-    }
-    catch (std::invalid_argument &e)
-    {
-        failing = false;
-    }
-
-    if (failing)
-    {
-        ADD_FAILURE()
-            << "LinearSpline2d returning value for value (-0.1) outside of domain";
-        return;
-    }
-
-    try
-    {
-        s.getValueAt(1.1);
-    }
-    catch (std::invalid_argument &e)
-    {
-        failing = false;
-    }
-
-    if (failing)
-    {
-        ADD_FAILURE()
-            << "LinearSpline2d returning value for value (1.1) outside of domain";
-        return;
-    }
+    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(1,-2), 1e-9));
+    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(1,-18), 1e-9));
 }
 
-TEST(LinearSplineTest, test_spline_points_list_constructor)
+
+TEST(LinearSpline2dTest, test_three_knot_value_at_out_of_range)
+{
+    std::vector<Point> points({Point(4, 18), Point(3, 0), Point(-7, -1)});
+    LinearSpline2d s(points);
+
+    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(4,18), 1e-9));
+    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(-7,-1), 1e-9));
+}
+
+TEST(LinearSpline2dTest, test_spline_points_list_constructor)
 {
     std::vector<Point> points({Point(1, 2), Point(2, 3), Point(0, -1)});
     LinearSpline2d s({Point(1, 2), Point(2, 3), Point(0, -1)});
@@ -185,7 +94,7 @@ TEST(LinearSplineTest, test_spline_points_list_constructor)
     EXPECT_EQ(s.getEndPoint(), points[2]);
 }
 
-TEST(LinearSplineTest, test_spline_points_vector_constructor)
+TEST(LinearSpline2dTest, test_spline_points_vector_constructor)
 {
     std::vector<Point> points({Point(1, 2), Point(2, 3), Point(0, -1)});
     LinearSpline2d s(points);

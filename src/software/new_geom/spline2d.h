@@ -13,10 +13,22 @@ class SplineSegment2d
    public:
     SplineSegment2d() = delete;
 
+    /**
+     * Get the first input to the polynomial that falls on the spline
+     * @return The first input to the polynomial that falls on the spline
+     */
     double getStartVal() const;
 
+    /**
+     * Get the last input to the polynomial that falls on the spline
+     * @return The last input to the polynomial that falls on the spline
+     */
     double getEndVal() const;
 
+    /**
+     * Get the polynomial underlying this spline segment
+     * @return The polynomial underlying this spline segment
+     */
     Polynomial2d getPolynomial() const;
 
    private:
@@ -91,9 +103,10 @@ class Spline2d
     virtual const Point getEndPoint() const = 0;
 
     /**
-     * Get the segments that make up this spline
+     * Get the segments that make up this spline.
      *
-     * @return The segments that make up this spline
+     * @return The segments that make up this spline, with the order of segments being
+     *         the order in which they appear along the spline, going from start to end.
      */
     virtual const std::vector<SplineSegment2d> getSplineSegments() const = 0;
 

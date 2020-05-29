@@ -36,12 +36,16 @@ class Polynomial1d
      *
      * @param constraint1 first pair of values: first is the input, second is the output
      * @param constraint2 second pair of values: first is the input, second is the output
+     * @param input_1 The first input
+     * @param output_1 The value the created polynomial must output if given input_1
+     * @param input_2 The second input
+     * @param output_2 The value the created polynomial must output if given input_2
      *
-     * @throws std::invalid_argument if constraint1.first == constraint2.first
+     * @throws std::invalid_argument if input_1 == input_2
      */
     static Polynomial1d constructLinearPolynomialFromConstraints(
-        const std::pair<double, double> &constraint1,
-        const std::pair<double, double> &constraint2);
+            double input_1, double output_1, double input_2, double output_2
+        );
 
     /**
      * Returns the coefficient of the term of given order

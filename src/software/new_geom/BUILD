@@ -324,7 +324,7 @@ cc_test(
 cc_test(
     name = "linear_spline_test",
     srcs = [
-        "linear_spline_test.cpp",
+        "linear_spline2d_test.cpp",
     ],
     deps = [
         ":linear_spline2d",

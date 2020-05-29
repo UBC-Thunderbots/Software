@@ -13,17 +13,16 @@ Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs) : coeffs
 }
 
 Polynomial1d Polynomial1d::constructLinearPolynomialFromConstraints(
-    const std::pair<double, double> &constraint1,
-    const std::pair<double, double> &constraint2)
+double input_1, double output_1, double input_2, double output_2)
 {
-    if (constraint1.first == constraint2.first)
+    if (input_1 == input_2)
     {
         throw std::invalid_argument("Both inputs are equal - does not define a function");
     }
-    double slope = (constraint2.second - constraint1.second) /
-                   (constraint2.first - constraint1.first);
+    double slope = (output_2 - output_1) /
+                   (input_2 - input_1);
     std::vector<double> coeffs;
-    coeffs.push_back(constraint1.second - (constraint1.first * slope));
+    coeffs.push_back(output_1 - (input_1 * slope));
     coeffs.push_back(slope);
     return Polynomial1d(coeffs);
 }

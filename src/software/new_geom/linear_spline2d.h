@@ -34,50 +34,30 @@ class LinearSpline2d : Spline2d
      */
     LinearSpline2d(const std::initializer_list<Point>& points);
 
-    /**
-     * Please see parent class for jdoc
-     */
     const Point getValueAt(double val) const override;
 
-    /**
-     * Please see parent class for jdoc
-     */
     size_t getNumKnots(void) const override;
 
-    /**
-     * Please see parent class for jdoc
-     */
     const std::vector<Point> getKnots(void) const override;
 
-    /**
-     * Please see parent class for jdoc
-     */
     const Point getStartPoint(void) const override;
 
-    /**
-     * Please see parent class for jdoc
-     */
     const Point getEndPoint(void) const override;
 
-    /**
-     * Please see parent class for jdoc
-     */
     const std::vector<SplineSegment2d> getSplineSegments() const override;
 
    private:
-    // segments represent the polynomials that interpolate between
-    // time at index to index + 1
+    // The segments making up this spline, from the start to the end
     std::vector<SplineSegment2d> segments;
 
     // points that connect segments
     const std::vector<Point> knots;
 
     /**
-     * Initialize segments with points.size() - 1 linear segments interpolating
-     * the points
-     * Initialize start and end points
+     * Initialize segments with points.size() - 1 linear segments, interpolating
+     * the given points
      *
-     * @throws std::runtime_error if points.size() == 1
+     * @throws std::invalid_argument if points.size() <= 1
      *
      * @param points points to interpolate
      */

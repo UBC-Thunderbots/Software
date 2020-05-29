@@ -53,27 +53,22 @@ TEST(Polynomial1dTest, test_polynomial_coeffs_list_constructor)
 
 TEST(TestSpline, test_polynomial_linear_constructor)
 {
-    std::pair<double, double> constraint1, constraint2;
-    constraint1 = std::make_pair(2.0, 3.0);
-    constraint2 = std::make_pair(6.0, 4.0);
     Polynomial1d p =
-        Polynomial1d::constructLinearPolynomialFromConstraints(constraint1, constraint2);
+        Polynomial1d::constructLinearPolynomialFromConstraints(2.0, 3.0, 6.0, 4.0);
     EXPECT_EQ(1, p.getOrder());
     EXPECT_EQ(p.getCoeff(0), 2.5);
     EXPECT_EQ(p.getCoeff(1), 0.25);
-    EXPECT_EQ(p.valueAt(constraint1.first), constraint1.second);
-    EXPECT_EQ(p.valueAt(constraint2.first), constraint2.second);
+    EXPECT_EQ(p.valueAt(2.0), 3.0);
+    EXPECT_EQ(p.valueAt(6.0), 4.0);
 }
 
 TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
 {
     std::pair<double, double> constraint1, constraint2;
-    constraint1 = std::make_pair(2.0, -3.0);
-    constraint2 = std::make_pair(2.0, -4.0);
     try
     {
-        Polynomial1d p = Polynomial1d::constructLinearPolynomialFromConstraints(
-            constraint1, constraint2);
+        Polynomial1d p =
+            Polynomial1d::constructLinearPolynomialFromConstraints(2.0, -3.0, 2.0, -4.0);
     }
     catch (std::invalid_argument &e)
     {

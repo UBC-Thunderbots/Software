@@ -15,7 +15,7 @@ TEST(Polynomial2dTest, default_constructor)
     Polynomial1d p_x = p.getPolyX();
     Polynomial1d p_y = p.getPolyY();
 
-    for (size_t i = 0; i < 10; i++)
+    for (int i = -10; i < 10; i++)
     {
         EXPECT_DOUBLE_EQ(p_x.getCoeff(i), 0);
         EXPECT_DOUBLE_EQ(p_x.valueAt(i), 0);
@@ -31,9 +31,6 @@ TEST(Polynomial2dTest, constructor_from_two_1d_polynomials_and_value_at)
     const Polynomial1d p_x({0, 2, 5, 7});
     const Polynomial1d p_y({0, 3, 1, 8});
     const Polynomial2d p(p_x, p_y);
-
-    EXPECT_EQ(p_x, p.getPolyX());
-    EXPECT_EQ(p_y, p.getPolyY());
 
     const double t_val = 0.33;
     const Point expected_point(p_x.valueAt(t_val), p_y.valueAt(t_val));
