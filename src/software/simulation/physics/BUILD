@@ -44,9 +44,9 @@ cc_library(
         ":box2d_util",
         ":physics_object_user_data",
         "//shared:constants",
-        "//software/geom",
-        "//software/time:timestamp",
-        "//software/world:ball",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/world:ball_state",
         "@box2d",
     ],
 )
