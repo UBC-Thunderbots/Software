@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "shared/proto/geometry.proto";
 
-message RobotState
+message RobotStateMsg
 {
     Point global_position_meters                  = 1;
     Angle global_orientation_radians              = 2;
@@ -10,7 +10,7 @@ message RobotState
     Angle global_angular_velocity_radians_per_sec = 4;
 }
 
-message BallState
+message BallStateMsg
 {
     Point global_position_meters          = 1;
     Vector global_velocity_meters_per_sec = 2;

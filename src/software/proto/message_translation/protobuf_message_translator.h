@@ -4,7 +4,7 @@
 #include "software/primitive/primitive.h"
 
 /**
- * Translates internal messages such as World and Primitives to their
+ * Translates internal messages such as World, Geometry and Primitives to their
  * respective protobuf message.
  */
 class ProtobufMessageTranslator

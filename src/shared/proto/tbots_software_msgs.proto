@@ -9,10 +9,10 @@ message VisionMsg
     uint64 timestamp = 1;
 
     // Robot ID to RobotState map
-    map<uint32, RobotState> robot_states = 2;
+    map<uint32, RobotStateMsg> robot_states = 2;
 
     // Ball state
-    BallState ball_state = 3;
+    BallStateMsg ball_state = 3;
 }
 
 message PrimitiveMsg
@@ -21,5 +21,5 @@ message PrimitiveMsg
     uint64 timestamp = 1;
 
     // Robot ID to RadioPrimitive map
-    map<uint32, RadioPrimitive> robot_primitive = 2;
+    map<uint32, RadioPrimitiveMsg> robot_primitive = 2;
 }

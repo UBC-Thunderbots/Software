@@ -2,15 +2,12 @@
 
 VisionMsg ProtobufMessageTranslator::getVisionMsgFromWorld(World world) {
 
-    world.
-
-
 }
 
 PrimitiveMsg ProtoMessageTranslator::getPrimitiveMsgFromPrimitiveVector(
         ConstPrimitiveVectorPtr primitives)
 {
-    PrimitiveMsg
+    PrimitiveMsg primitive_msg;
 }
 
 PointMsg ProtoMessageTranslator::getPointMsgFromPoint(Point point) {
@@ -33,4 +30,12 @@ VectorMsg ProtoMessageTranslator::getVectorMsgFromVector(Vector vector) {
     vector_msg.set_x(vector.x());
     vector_msg.set_y(vector.y());
     return vector_msg;
+}
+
+
+RadioPrimitiveMsg ProtoMessageTranslator::getRadioPrimitiveMsgFromPrimitive(Primitive primitive)
+{
+    auto primitive_visitor = ProtobufPrimitiveVisitor();
+    primitive_visitor.visit(primitive);
+    return primitive_visitor.getRadioPrimitiveMsg();
 }

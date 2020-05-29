@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-// We call this a RadioPrimitive and not just a "Primitive"
+// We call this a RadioPrimitiveMsg and not just a "Primitive"
 // because the contents of this message are a 1-1 mapping
 // with the existing `RadioPrimitive` we send over radio
 // using the MRF-Dongle.
-message RadioPrimitive
+message RadioPrimitiveMsg
 {
     // A numeric id representing the primitive for firmware
     FirmwarePrimitiveType prim_type = 1;
