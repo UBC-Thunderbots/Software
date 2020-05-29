@@ -45,15 +45,6 @@ cc_library(
     alwayslink = True,
 )
 
-cc_test(
-    name = "radio_backend_test",
-    srcs = ["radio_backend_test.cpp"],
-    deps = [
-        ":radio_backend",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_library(
     name = "simulator_backend",
     srcs = ["simulator_backend.cpp"],
@@ -74,8 +65,20 @@ cc_library(
 
 cc_library(
     name = "robot_status",
+    srcs = ["robot_status.cpp"],
     hdrs = ["robot_status.h"],
-    deps = [],
+    deps = [
+        "//software/proto:sensor_msg_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "robot_status_test",
+    srcs = ["robot_status_test.cpp"],
+    deps = [
+        ":robot_status",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(

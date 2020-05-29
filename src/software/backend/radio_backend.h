@@ -1,8 +1,5 @@
 #pragma once
 
-#include "shared/proto/robot_component_status.pb.h"
-#include "shared/proto/tbots_robot_msg.pb.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/output/radio/radio_output.h"
@@ -11,8 +8,6 @@ class RadioBackend : public Backend
 {
    public:
     static const std::string name;
-
-    TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status);
 
     RadioBackend();
 
@@ -28,8 +23,6 @@ class RadioBackend : public Backend
      * @param world The new world
      */
     void receiveWorld(World world);
-
-    void receiveRobotStatus(RobotStatus robot_status);
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;

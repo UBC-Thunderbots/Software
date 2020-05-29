@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "software/proto/sensor_msg.pb.h"
+
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.
 struct RobotStatus
@@ -84,3 +86,5 @@ struct RobotStatus
     // The FPGA bitstream build ID.
     uint32_t fpga_build_id;
 };
+
+TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status);
