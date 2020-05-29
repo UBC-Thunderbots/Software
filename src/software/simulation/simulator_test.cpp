@@ -132,3 +132,53 @@ TEST(SimulatorTest, test_simulate_multiple_robots_with_primitives)
     EXPECT_LT((new_robot_1->position() - Point(0, -2)).length(), 0.2);
     EXPECT_LT((new_robot_1->orientation().minDiff(Angle::half())), Angle::fromDegrees(5));
 }
+
+TEST(SimulatorTest, test_send_robot_to_origin)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    // Move the ball away from (0, 0) so it doesn't interfere with the robots
+    world.mutableBall() = Ball(Point(6, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    Robot robot_0(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    world.mutableFriendlyTeam().updateRobots({robot_0});
+
+    std::unique_ptr<Primitive> move_primitive_0 = std::make_unique<MovePrimitive>(
+            0, Point(0, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+            AutokickType::NONE);
+    std::vector<std::unique_ptr<Primitive>> primitives;
+    primitives.emplace_back(std::move(move_primitive_0));
+    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
+            std::move(primitives));
+
+    Simulator simulator(world);
+    simulator.setPrimitives(primitives_ptr);
+
+    auto rr = world.friendlyTeam().getRobotById(0);
+    if(rr) {
+        auto p = rr->position();
+        std::cout << "initial_position: " << p << std::endl;
+    }
+
+        // Because simulation is very fast, and we don't want these tests to be fragile and
+    // break due to subtle issues with control or firmware, we let this simulation run for
+    // a long time to robots should settle at their final destinations before we perform
+    // our assertions. All we care about is that everything worked together to ultimately
+    // get them to their desired final states
+    for (unsigned int i = 0; i < 10; i++)
+    {
+        simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+        World new_world = simulator.getWorld();
+        auto r = new_world.friendlyTeam().getRobotById(0);
+        if(r) {
+            auto p = r->position();
+            std::cout << p << std::endl;
+        }
+    }
+
+    World new_world = simulator.getWorld();
+
+    std::optional<Robot> new_robot_0 = new_world.friendlyTeam().getRobotById(0);
+    ASSERT_TRUE(new_robot_0);
+    auto p = new_robot_0->position();
+    std::cout << "final position: " << p << std::endl;
+}
