@@ -6,9 +6,8 @@ cc_library(
     deps = [
         "//shared:constants",
         "//shared:firmware_primitive_type",
+        "//shared/proto:tbots_cc_proto",
         "//software/primitive:all_primitives",
         "//software/primitive:primitive_visitor",
-        "//shared/proto:tbots_cc_proto",
     ],
 )
-

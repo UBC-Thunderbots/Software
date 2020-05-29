@@ -3,7 +3,7 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string WifiBackend::name = "radio";
+const std::string WifiBackend::name = "wifi";
 
 WifiBackend::WifiBackend()
     : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,

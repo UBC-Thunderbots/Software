@@ -87,10 +87,10 @@ const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
 const unsigned MAX_MULTICAST_CHANNELS = 16;
-const unsigned MULTICAST_ADDRESS_SIZE = 20;
+const unsigned MULTICAST_ADDRESS_SIZE = 21;
 
 // TODO is there a better way to do this?
-// base + offset doesn't seem very clean, maybe better to have them explicitly defined
+// base + offset doesn't seem very clean, maybe better to have them explicitly defined?
 const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_ADDRESS_SIZE] = {
     "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
     "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
