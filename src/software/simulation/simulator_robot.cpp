@@ -121,7 +121,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
         for (auto ball : this->balls_in_dribbler_area)
         {
             Vector kick_vector = Vector::createFromAngle(
-                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+                robot->getRobotState().orientation());
             kick_vector = kick_vector.normalize(speed_m_per_s);
             ball->kick(kick_vector);
         }
@@ -134,7 +134,7 @@ void SimulatorRobot::chip(float distance_m)
         for (auto ball : this->balls_in_dribbler_area)
         {
             Vector chip_vector = Vector::createFromAngle(
-                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+                robot->getRobotState().orientation());
             chip_vector = chip_vector.normalize(distance_m);
             ball->chip(chip_vector);
         }
