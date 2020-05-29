@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "software/new_geom/linear_spline2d.h"
+
+#include <gtest/gtest.h>
 
 TEST(LinearSpline2dTest, test_constructor_three_knot)
 {
@@ -59,8 +59,8 @@ TEST(LinearSpline2dTest, test_one_knot_value_at_out_of_range)
     std::vector<Point> points({Point(1, -18)});
     LinearSpline2d s(points);
 
-    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(1,-18), 1e-9));
-    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(1,-18), 1e-9));
+    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(1, -18), 1e-9));
+    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(1, -18), 1e-9));
 }
 
 
@@ -69,8 +69,8 @@ TEST(LinearSpline2dTest, test_two_knot_value_at_out_of_range)
     std::vector<Point> points({Point(1, -2), Point(1, -18)});
     LinearSpline2d s(points);
 
-    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(1,-2), 1e-9));
-    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(1,-18), 1e-9));
+    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(1, -2), 1e-9));
+    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(1, -18), 1e-9));
 }
 
 
@@ -79,8 +79,8 @@ TEST(LinearSpline2dTest, test_three_knot_value_at_out_of_range)
     std::vector<Point> points({Point(4, 18), Point(3, 0), Point(-7, -1)});
     LinearSpline2d s(points);
 
-    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(4,18), 1e-9));
-    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(-7,-1), 1e-9));
+    EXPECT_TRUE(s.getValueAt(-0.1).isClose(Point(4, 18), 1e-9));
+    EXPECT_TRUE(s.getValueAt(1.1).isClose(Point(-7, -1), 1e-9));
 }
 
 TEST(LinearSpline2dTest, test_spline_points_list_constructor)

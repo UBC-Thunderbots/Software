@@ -43,9 +43,10 @@ class Polynomial1d
      *
      * @throws std::invalid_argument if input_1 == input_2
      */
-    static Polynomial1d constructLinearPolynomialFromConstraints(
-            double input_1, double output_1, double input_2, double output_2
-        );
+    static Polynomial1d constructLinearPolynomialFromConstraints(double input_1,
+                                                                 double output_1,
+                                                                 double input_2,
+                                                                 double output_2);
 
     /**
      * Returns the coefficient of the term of given order
