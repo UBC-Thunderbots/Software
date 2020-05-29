@@ -26,8 +26,8 @@ class PhysicsRobotModel
      * These polygons are all created assuming the robot is at (0, 0) and facing along the
      * positive x-axis (ie. has an orientation of 0). This is fine because when these
      * polygons are used to create fixtures for a robot object, they are applied relative
-     * to the physics body. This means that we do not need to account for any initial state
-     * here.
+     * to the physics body. This means that we do not need to account for any initial
+     * state here.
      *
      * See the ASCII diagram below for a rough view of how the robot is created.
      * - The regions made with the '+' symbol are the front left and right bodies

@@ -3,6 +3,7 @@
 #include <Box2D/Box2D.h>
 
 #include <optional>
+
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
 #include "software/world/ball_state.h"
@@ -24,7 +25,7 @@ class PhysicsBall
      * @param mass_kg The mass of the ball in kg
      * @param gravity The acceleration due to gravity on the ball, in m/s^2
      */
-    explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
+    explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
                          const double mass_kg, const double gravity);
 
     PhysicsBall() = delete;

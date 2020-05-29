@@ -4,10 +4,10 @@
 
 #include <functional>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
+#include "software/new_geom/point.h"
+#include "software/new_geom/vector.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/world/robot_state.h"
 
@@ -40,15 +40,16 @@ class PhysicsRobot
      * @param robot_state The initial robot state
      * @param mass_kg The mass of the robot in kg
      */
-    explicit PhysicsRobot(const unsigned int id, std::shared_ptr<b2World> world, const RobotState &robot_state, double mass_kg);
+    explicit PhysicsRobot(const unsigned int id, std::shared_ptr<b2World> world,
+                          const RobotState &robot_state, double mass_kg);
 
     PhysicsRobot() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
     // issues with the b2World and how it tracks bodies in the world, because as objects
     // are copied and destroyed, they will destroy the bodies in the b2World as well
-    PhysicsRobot& operator=(const PhysicsRobot&) = delete;
-    PhysicsRobot(const PhysicsRobot&)            = delete;
+    PhysicsRobot &operator=(const PhysicsRobot &) = delete;
+    PhysicsRobot(const PhysicsRobot &)            = delete;
 
     /**
      * Destroys the PhysicsRobot object and removes any corresponding bodies
@@ -71,7 +72,7 @@ class PhysicsRobot
      * @param callback The function to register
      */
     void registerDribblerBallContactCallback(
-        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+        std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
 
     /**
      * Adds the given function to this PhysicsRobot's list of dribbler-ball contact
@@ -80,7 +81,7 @@ class PhysicsRobot
      * @param callback The function to register
      */
     void registerDribblerBallStartContactCallback(
-        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+        std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
 
     /**
      * Adds the given function to this PhysicsRobot's list of dribbler-ball contact
@@ -89,7 +90,7 @@ class PhysicsRobot
      * @param callback The function to register
      */
     void registerDribblerBallEndContactCallback(
-        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+        std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
 
     /**
      * Adds the given function to this PhysicsRobot's list of chicker-ball contact
@@ -98,20 +99,20 @@ class PhysicsRobot
      * @param callback The function to register
      */
     void registerChickerBallStartContactCallback(
-        std::function<void(PhysicsRobot*, PhysicsBall*)> callback);
+        std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
 
     /**
      * Returns a list of contact callbacks for this class
      *
      * @return a list of contact callbacks for this class
      */
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
     getDribblerBallContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
     getDribblerBallStartContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
     getDribblerBallEndContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
     getChickerBallStartContactCallbacks() const;
 
     /**
@@ -243,17 +244,17 @@ class PhysicsRobot
 
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
-    b2Body* robot_body;
+    b2Body *robot_body;
 
     unsigned int robot_id;
 
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         dribbler_ball_contact_callbacks;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         dribbler_ball_start_contact_callbacks;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         dribbler_ball_end_contact_callbacks;
-    std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
+    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         chicker_ball_contact_callbacks;
 
     // This is a somewhat arbitrary value for damping. We keep it relatively low

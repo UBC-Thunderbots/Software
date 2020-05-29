@@ -24,12 +24,15 @@ const double PhysicsRobot::chicker_thickness = 0.005;
 const double PhysicsRobot::total_chicker_depth =
     PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
-PhysicsRobot::PhysicsRobot(unsigned int id, std::shared_ptr<b2World> world, const RobotState &robot_state, double mass_kg) : robot_id(id)
+PhysicsRobot::PhysicsRobot(unsigned int id, std::shared_ptr<b2World> world,
+                           const RobotState& robot_state, double mass_kg)
+    : robot_id(id)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
     robot_body_def.position.Set(robot_state.position().x(), robot_state.position().y());
-    robot_body_def.linearVelocity.Set(robot_state.velocity().x(), robot_state.velocity().y());
+    robot_body_def.linearVelocity.Set(robot_state.velocity().x(),
+                                      robot_state.velocity().y());
     robot_body_def.angle           = robot_state.orientation().toRadians();
     robot_body_def.angularVelocity = robot_state.angularVelocity().toRadians();
     robot_body_def.linearDamping   = robot_linear_damping;
@@ -58,8 +61,8 @@ PhysicsRobot::~PhysicsRobot()
     }
 }
 
-void PhysicsRobot::setupRobotBodyFixtures(const RobotState &robot_state, double total_chicker_depth,
-                                          double mass_kg)
+void PhysicsRobot::setupRobotBodyFixtures(const RobotState& robot_state,
+                                          double total_chicker_depth, double mass_kg)
 {
     b2FixtureDef robot_body_fixture_def;
     robot_body_fixture_def.restitution = robot_body_restitution;
@@ -68,11 +71,11 @@ void PhysicsRobot::setupRobotBodyFixtures(const RobotState &robot_state, double 
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
 
     b2PolygonShape* main_body_shape =
-            PhysicsRobotModel::getMainRobotBodyShape(total_chicker_depth);
+        PhysicsRobotModel::getMainRobotBodyShape(total_chicker_depth);
     b2PolygonShape* front_left_body_shape =
-            PhysicsRobotModel::getRobotBodyShapeFrontLeft(total_chicker_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontLeft(total_chicker_depth);
     b2PolygonShape* front_right_body_shape =
-            PhysicsRobotModel::getRobotBodyShapeFrontRight(total_chicker_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontRight(total_chicker_depth);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
     double total_shape_area = 0.0;
@@ -89,7 +92,8 @@ void PhysicsRobot::setupRobotBodyFixtures(const RobotState &robot_state, double 
     }
 }
 
-void PhysicsRobot::setupDribblerFixture(const RobotState &robot_state, double dribbler_depth)
+void PhysicsRobot::setupDribblerFixture(const RobotState& robot_state,
+                                        double dribbler_depth)
 {
     b2FixtureDef robot_dribbler_fixture_def;
     robot_dribbler_fixture_def.density = robot_dribbler_density;
@@ -119,7 +123,8 @@ void PhysicsRobot::setupDribblerFixture(const RobotState &robot_state, double dr
     robot_body->CreateFixture(&robot_dribbler_fixture_def);
 }
 
-void PhysicsRobot::setupChickerFixture(const RobotState &robot_state, double total_chicker_depth,
+void PhysicsRobot::setupChickerFixture(const RobotState& robot_state,
+                                       double total_chicker_depth,
                                        double chicker_thickness)
 {
     b2FixtureDef robot_chicker_fixture_def;
@@ -151,7 +156,8 @@ void PhysicsRobot::setupChickerFixture(const RobotState &robot_state, double tot
     robot_body->CreateFixture(&robot_chicker_fixture_def);
 }
 
-unsigned int PhysicsRobot::getRobotId() const {
+unsigned int PhysicsRobot::getRobotId() const
+{
     return robot_id;
 }
 

@@ -6,7 +6,7 @@
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 
-b2PolygonShape * PhysicsRobotModel::getMainRobotBodyShape(double total_chicker_depth)
+b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(double total_chicker_depth)
 {
     const unsigned int num_shape_vertices = b2_maxPolygonVertices;
     b2Vec2 robot_body_vertices[num_shape_vertices];
@@ -40,7 +40,7 @@ b2PolygonShape * PhysicsRobotModel::getMainRobotBodyShape(double total_chicker_d
     return body_shape;
 }
 
-b2PolygonShape * PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_chicker_depth)
+b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_chicker_depth)
 {
     // These points are already give in counter-clockwise order, so we can directly create
     // a polygon (Box2D requires that polygon vertices are given in counter-clockwise
@@ -62,7 +62,7 @@ b2PolygonShape * PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_chic
     return shape;
 }
 
-b2PolygonShape * PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_chicker_depth)
+b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_chicker_depth)
 {
     auto shape_points = getRobotFrontLeftShapePoints(total_chicker_depth);
 

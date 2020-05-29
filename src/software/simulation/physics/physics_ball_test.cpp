@@ -35,7 +35,7 @@ TEST(PhysicsBallTest, test_get_ball_state)
 
     BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, 9.8);
-    auto ball_state         = physics_ball.getBallState();
+    auto ball_state   = physics_ball.getBallState();
 
     EXPECT_LT((initial_ball_state.position() - ball_state.position()).length(), 1e-7);
     EXPECT_LT((initial_ball_state.velocity() - ball_state.velocity()).length(), 1e-7);

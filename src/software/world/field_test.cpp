@@ -189,7 +189,8 @@ TEST_F(FieldTest, point_not_in_entire_field)
     EXPECT_FALSE(field.pointInEntireField(p));
 }
 
-TEST_F(FieldTest, create_ssl_division_b_field) {
+TEST_F(FieldTest, create_ssl_division_b_field)
+{
     Field field = Field::createSSLDivisionBField();
 
     // Check that the field has the correct dimensions for a
