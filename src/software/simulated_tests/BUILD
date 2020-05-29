@@ -56,3 +56,18 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "kickoff_friendly_play_test",
+    srcs = ["kickoff_friendly_play_test.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:kickoff_friendly_play",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/time:timestamp",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
