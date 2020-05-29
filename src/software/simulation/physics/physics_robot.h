@@ -4,11 +4,12 @@
 
 #include <functional>
 
-#include "shared/constants.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/vector.h"
+#include "software/new_geom/angle.h"
+#include "software/new_geom/angular_velocity.h"
 #include "software/simulation/physics/physics_ball.h"
-#include "software/time/timestamp.h"
-#include "software/world/robot.h"
+#include "software/world/robot_state.h"
 
 /**
  * This class represent a Robot in a Box2D physics simulation. It provides a convenient
@@ -35,10 +36,10 @@ class PhysicsRobot
      * steps.
      *
      * @param world A shared_ptr to a Box2D World
-     * @param robot The Robot to be created in the Box2D world
+     * @param robot_state The initial robot state
      * @param mass_kg The mass of the robot in kg
      */
-    explicit PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot,
+    explicit PhysicsRobot(std::shared_ptr<b2World> world, const RobotState &robot_state,
                           double mass_kg);
 
     PhysicsRobot() = delete;
@@ -107,26 +108,11 @@ class PhysicsRobot
     getChickerBallStartContactCallbacks() const;
 
     /**
-     * Returns a Robot object representing the current state of the robot object in the
-     * simulated Box2D world the robot was created in. The timestamp is provided as a
-     * parameter so that the caller can control the timestamp of the data being returned,
-     * since the caller will have context about the Box2D world and simulation time step,
-     * and can synchronize the Robot timestamp with other objects.
+     * Returns the current robot state
      *
-     * @param timestamp The timestamp for the returned Robot to have
-     *
-     * @return A Robot object representing the current state of the robot object in the
-     * simulated Box2D world the robot was originally created in. The returned Robot
-     * object will have the same timestamp as the one provided in the parameter
+     * @return the current robot state
      */
-    Robot getRobotWithTimestamp(const Timestamp& timestamp) const;
-
-    /**
-     * Returns the id of this physics robot
-     *
-     * @return the id of this physics robot
-     */
-    RobotId getRobotId() const;
+    RobotState getRobotState() const;
 
     /**
      * Returns the current position of the robot, in global field coordinates, in meters
@@ -190,24 +176,24 @@ class PhysicsRobot
      * Creates as many fixtures as necessary to represent the body shape of the given
      * robot and them to this class' b2Body
      *
-     * @param robot The robot to create fixtures for
+     * @param robot_state The robot to create fixtures for
      * @param total_chicker_depth The distance from the front face of the robot to the
      * back of the chicker, ie. how far inset into the front of the robot the chicker is
      * @param mass_kg The mass of the robot in kg
      */
-    void setupRobotBodyFixtures(const Robot& robot, double total_chicker_depth,
+    void setupRobotBodyFixtures(const RobotState &robot_state, double total_chicker_depth,
                                 double mass_kg);
 
     /**
      * Creates a fixture to represent the chicker of the robot. It is partially inset into
      * the front of the robot.
      *
-     * @param robot The robot to create the fixture for
+     * @param robot_state The robot to create the fixture for
      * @param total_chicker_depth The distance from the front face of the robot to the
      * back of the chicker, ie. how far inset into the front of the robot the chicker is
      * @param chicker_thickness How thick the chicker fixture shape is
      */
-    void setupChickerFixture(const Robot& robot, double total_chicker_depth,
+    void setupChickerFixture(const RobotState &robot_state, double total_chicker_depth,
                              double chicker_thickness);
 
     /**
@@ -216,10 +202,10 @@ class PhysicsRobot
      * the dribbling area. The dribbler area fills the inset area at the front of the
      * robot.
      *
-     * @param robot The robot to create the fixture for
+     * @param robot_state The robot to create the fixture for
      * @param dribbler_depth How far inset into the front of the robot the chicker is
      */
-    void setupDribblerFixture(const Robot& robot, double dribbler_depth);
+    void setupDribblerFixture(const RobotState &robot_state, double dribbler_depth);
 
     /**
      * A helper function that applies force to the robot body as if there was a wheel
@@ -251,8 +237,6 @@ class PhysicsRobot
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
     b2Body* robot_body;
-
-    RobotId robot_id;
 
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
         dribbler_ball_contact_callbacks;
