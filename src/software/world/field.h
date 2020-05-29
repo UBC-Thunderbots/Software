@@ -36,13 +36,6 @@ class Field
 {
    public:
     /**
-     * Creates a field with the standard SSL Division B dimensions
-     *
-     * @return a field with the standard SSL Division B dimensions
-     */
-    static Field createSSLDivisionBField();
-
-    /**
      * Default constructs a field with all dimensions set to 0. This default
      * field will be invalid (ie. isValid() returns false)
      */
