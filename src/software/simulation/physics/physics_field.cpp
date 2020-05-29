@@ -87,9 +87,7 @@ void PhysicsField::setupFriendlyGoal(const Field &field)
     field_body->CreateFixture(&friendly_goal_fixture_def);
 }
 
-Field PhysicsField::getFieldWithTimestamp(const Timestamp &timestamp) const
+Field PhysicsField::getField() const
 {
-    Field ret = field;
-    ret.updateTimestamp(timestamp);
-    return ret;
+    return field;
 }

@@ -10,7 +10,7 @@ class WorldTest : public ::testing::Test
    protected:
     WorldTest()
         : current_time(Timestamp::fromSeconds(123)),
-          field(0, 0, 0, 0, 0, 0, 0, current_time),
+          field(),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
@@ -58,7 +58,7 @@ TEST_F(WorldTest, default_constructor)
 {
     World world;
     // Check that objects used for construction are returned by the accessors
-    EXPECT_EQ(Field(0, 0, 0, 0, 0, 0, 0, current_time), world.field());
+    EXPECT_EQ(Field(), world.field());
     EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
     EXPECT_EQ(Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
                                                   ->RobotExpiryBufferMilliseconds()
@@ -132,7 +132,7 @@ TEST_F(WorldTest, equality_different_ball)
 {
     World world1;
     Ball ball          = Ball(Point(1, 0), Vector(13, 0), Timestamp::fromSeconds(0));
-    Field field        = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
+    Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(0));
     Team enemy_team    = Team(Duration::fromMilliseconds(0));
     World world2       = World(field, ball, friendly_team, enemy_team);
@@ -141,12 +141,13 @@ TEST_F(WorldTest, equality_different_ball)
 
 TEST_F(WorldTest, equality_different_field)
 {
-    World world1;
+    Field field1       = Field(0, 0, 0, 0, 0, 0, 0);
+    Field field2       = Field(0, 5, 03, 0, 0, 2, 0);
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    Field field        = Field(0, 5, 03, 0, 0, 2, 0, Timestamp::fromSeconds(0));
     Team friendly_team = Team(Duration::fromMilliseconds(0));
     Team enemy_team    = Team(Duration::fromMilliseconds(0));
-    World world2       = World(field, ball, friendly_team, enemy_team);
+    World world1       = World(field1, ball, friendly_team, enemy_team);
+    World world2       = World(field2, ball, friendly_team, enemy_team);
     EXPECT_NE(world1, world2);
 }
 
@@ -154,7 +155,7 @@ TEST_F(WorldTest, equality_different_friendly_team)
 {
     World world1;
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    Field field        = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
+    Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(1500));
     Team enemy_team    = Team(Duration::fromMilliseconds(0));
     World world2       = World(field, ball, friendly_team, enemy_team);
@@ -165,7 +166,7 @@ TEST_F(WorldTest, equality_different_enemy_team)
 {
     World world1;
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    Field field        = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
+    Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(0));
     Team enemy_team    = Team(Duration::fromMilliseconds(1300));
     World world2       = World(field, ball, friendly_team, enemy_team);

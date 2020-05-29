@@ -40,18 +40,12 @@ class PhysicsField
 
     /**
      * Returns a Field object representing the current state of the field object in the
-     * simulated Box2D world the field was created in. The timestamp is provided as a
-     * parameter so that the caller can control the timestamp of the data being returned,
-     * since the caller will have context about the Box2D world and simulation time step,
-     * and can synchronize the Field timestamp with other objects.
-     *
-     * @param timestamp The timestamp for the returned Field to have
+     * simulated Box2D world the field was created in.
      *
      * @return A Field object representing the current state of the field object in the
-     * simulated Box2D world the field was originally created in. The returned Field
-     * object will have the same timestamp as the one provided in the parameter
+     * simulated Box2D world the field was originally created in.
      */
-    Field getFieldWithTimestamp(const Timestamp& timestamp) const;
+    Field getField() const;
 
    private:
     /**
