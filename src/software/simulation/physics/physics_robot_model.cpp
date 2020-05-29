@@ -1,13 +1,12 @@
 #include "software/simulation/physics/physics_robot_model.h"
 
 #include <algorithm>
-#include <numeric>
 #include <vector>
 
+#include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 
-b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(const Robot& robot,
-                                                         double total_chicker_depth)
+b2PolygonShape * PhysicsRobotModel::getMainRobotBodyShape(double total_chicker_depth)
 {
     const unsigned int num_shape_vertices = b2_maxPolygonVertices;
     b2Vec2 robot_body_vertices[num_shape_vertices];
@@ -41,13 +40,12 @@ b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(const Robot& robot,
     return body_shape;
 }
 
-b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(const Robot& robot,
-                                                              double total_chicker_depth)
+b2PolygonShape * PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_chicker_depth)
 {
     // These points are already give in counter-clockwise order, so we can directly create
     // a polygon (Box2D requires that polygon vertices are given in counter-clockwise
     // order)
-    auto shape_points = getRobotFrontLeftShapePoints(robot, total_chicker_depth);
+    auto shape_points = getRobotFrontLeftShapePoints(total_chicker_depth);
 
     // The shape is added relative to the body, so we do not need to rotate these points
     // to match the robot's orientation
@@ -64,10 +62,9 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(const Robot& robot
     return shape;
 }
 
-b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(const Robot& robot,
-                                                               double total_chicker_depth)
+b2PolygonShape * PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_chicker_depth)
 {
-    auto shape_points = getRobotFrontLeftShapePoints(robot, total_chicker_depth);
+    auto shape_points = getRobotFrontLeftShapePoints(total_chicker_depth);
 
     // Mirror the points over the x-axis to get the points for the front-right shape
     std::transform(shape_points.begin(), shape_points.end(), shape_points.begin(),
@@ -93,8 +90,7 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(const Robot& robo
     return shape;
 }
 
-std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(const Robot& robot,
-                                                                   double chicker_depth)
+std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(double chicker_depth)
 {
     // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of
     // 0) First find the y-coordinate of the front-left edge of the body by solving x^2 +
