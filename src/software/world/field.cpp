@@ -24,6 +24,13 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
 {
 }
 
+Field Field::createSSLDivisionBField() {
+    // Using the dimensions of a standard Division B SSL field
+    // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_dimensions
+    Field field = Field(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5);
+    return field;
+}
+
 double Field::xLength() const
 {
     return field_x_length_;
