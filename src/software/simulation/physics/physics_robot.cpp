@@ -1,6 +1,7 @@
 #include "software/simulation/physics/physics_robot.h"
 
 #include <algorithm>
+#include <boost/asio/detail/shared_ptr.hpp>
 
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
@@ -23,8 +24,7 @@ const double PhysicsRobot::chicker_thickness = 0.005;
 const double PhysicsRobot::total_chicker_depth =
     PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
-PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const RobotState &robot_state,
-                           double mass_kg)
+PhysicsRobot::PhysicsRobot(unsigned int id, std::shared_ptr<b2World> world, const RobotState &robot_state, double mass_kg) : robot_id(id)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -149,6 +149,10 @@ void PhysicsRobot::setupChickerFixture(const RobotState &robot_state, double tot
     chicker_shape->Set(chicker_shape_vertices, num_vertices);
     robot_chicker_fixture_def.shape = chicker_shape;
     robot_body->CreateFixture(&robot_chicker_fixture_def);
+}
+
+unsigned int PhysicsRobot::getRobotId() const {
+    return robot_id;
 }
 
 void PhysicsRobot::registerDribblerBallContactCallback(

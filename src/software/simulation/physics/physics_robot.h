@@ -35,12 +35,12 @@ class PhysicsRobot
      * will be automatically added to the Box2D world and updated during world update
      * steps.
      *
+     * @param id The id of the robot
      * @param world A shared_ptr to a Box2D World
      * @param robot_state The initial robot state
      * @param mass_kg The mass of the robot in kg
      */
-    explicit PhysicsRobot(std::shared_ptr<b2World> world, const RobotState &robot_state,
-                          double mass_kg);
+    explicit PhysicsRobot(const unsigned int id, std::shared_ptr<b2World> world, const RobotState &robot_state, double mass_kg);
 
     PhysicsRobot() = delete;
 
@@ -55,6 +55,13 @@ class PhysicsRobot
      * from the physics world if the robot is part of one.
      */
     ~PhysicsRobot();
+
+    /**
+     * Returns the id of this physics robot
+     *
+     * @return the id of this physics robot
+     */
+    unsigned int getRobotId() const;
 
     /**
      * Adds the given function to this PhysicsRobot's list of dribbler-ball contact
@@ -237,6 +244,8 @@ class PhysicsRobot
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
     b2Body* robot_body;
+
+    unsigned int robot_id;
 
     std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
         dribbler_ball_contact_callbacks;
