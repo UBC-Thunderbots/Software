@@ -68,7 +68,7 @@ cc_library(
     srcs = ["robot_status.cpp"],
     hdrs = ["robot_status.h"],
     deps = [
-        "//software/proto:sensor_msg_cc_proto",
+        "//shared/proto:tbots_cc_proto",
     ],
 )
 

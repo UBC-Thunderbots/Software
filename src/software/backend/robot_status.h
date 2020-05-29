@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "software/proto/sensor_msg.pb.h"
+#include "shared/proto/tbots_robot_msg.pb.h"
 
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.
@@ -87,4 +87,11 @@ struct RobotStatus
     uint32_t fpga_build_id;
 };
 
+/**
+ * Converts RobotStatus to TbotsRobotMsg
+ * Does not convert ErrorCode, ChipperKickerStatus,
+ * DriveUnits, and NetworkStatus due to insufficient info
+ *
+ * @param robot_status The RobotStatus
+ */
 TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status);

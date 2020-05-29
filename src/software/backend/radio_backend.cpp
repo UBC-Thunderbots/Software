@@ -37,7 +37,8 @@ void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
 {
     SensorMsg sensor_msg;
     TbotsRobotMsg robot_msg        = convertRobotStatusToTbotsRobotMsg(&robot_status);
-    TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
+    TbotsRobotMsg* added_robot_msg = new TbotsRobotMsg();
+    added_robot_msg                = sensor_msg.add_tbots_robot_msg();
     added_robot_msg                = &robot_msg;
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
