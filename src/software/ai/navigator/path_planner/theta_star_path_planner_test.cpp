@@ -82,8 +82,8 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     std::vector<Point> path_points = path->getKnots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path->startPoint());
-    EXPECT_EQ(dest, path->endPoint());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({0, 0.1}, {3.1, -0.1});
@@ -117,7 +117,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     std::vector<Point> path_points = path->getKnots();
 
     // The path should start at exactly the start point
-    EXPECT_EQ(start, path->startPoint());
+    EXPECT_EQ(start, path->getStartPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 0.1}, {3.1, -0.1});
@@ -149,8 +149,8 @@ TEST_F(TestThetaStarPathPlanner,
     std::vector<Point> path_points = path->getKnots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->startPoint());
-    EXPECT_EQ(dest, path->endPoint());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
@@ -182,8 +182,8 @@ TEST_F(TestThetaStarPathPlanner,
     std::vector<Point> path_points = path->getKnots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path->startPoint());
-    EXPECT_EQ(dest, path->endPoint());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box(
@@ -215,9 +215,9 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 
     // Since there are no obstacles, there should be two path points, one at the start
     // and one at the destination
-    EXPECT_EQ(2, path->size());
-    EXPECT_EQ(start, path->startPoint());
-    EXPECT_EQ(dest, path->endPoint());
+    EXPECT_EQ(2, path->getNumKnots());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
@@ -237,9 +237,9 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     std::vector<Point> path_points = path->getKnots();
 
-    EXPECT_EQ(2, path->size());
-    EXPECT_EQ(start, path->startPoint());
-    EXPECT_EQ(dest, path->endPoint());
+    EXPECT_EQ(2, path->getNumKnots());
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
 }
 
 TEST_F(TestThetaStarPathPlanner, no_navigable_area)

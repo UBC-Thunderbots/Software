@@ -44,8 +44,7 @@ World PhysicsWorld::getWorld() const
     }
     if (physics_field)
     {
-        new_world.mutableField() =
-            physics_field->getFieldWithTimestamp(current_timestamp);
+        new_world.mutableField() = physics_field->getField();
     }
 
     new_world.mutableFriendlyTeam().clearAllRobots();

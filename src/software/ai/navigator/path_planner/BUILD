@@ -6,6 +6,7 @@ cc_library(
     deps = [
         "//software/ai/navigator/obstacle",
         "//software/geom",
+        "//software/new_geom:linear_spline2d",
         "//software/new_geom/util:distance",
     ],
 )

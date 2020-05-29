@@ -51,7 +51,7 @@ cc_library(
         ":hal",
         ":lwip",
         "//firmware_new/proto:fw_c_proto",
-        "@nanopb",
+        "@com_github_nanopb_nanopb//:nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause

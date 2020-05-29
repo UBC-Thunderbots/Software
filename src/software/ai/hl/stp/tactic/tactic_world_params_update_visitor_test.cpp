@@ -11,8 +11,7 @@ TEST(TacticUpdateVisitorTest, update_cherry_pick_tactic)
     World update_world      = ::Test::TestUtil::createBlankTestingWorld();
     update_world            = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     CherryPickTactic tactic = CherryPickTactic(initial_world, target_region);
     EXPECT_EQ(tactic.getWorld(), initial_world);
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
@@ -26,8 +25,7 @@ TEST(TacticUpdateVisitorTest, update_chip_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     ChipTactic tactic = ChipTactic(initial_world.ball(), false);
     EXPECT_EQ(tactic.getBall(), initial_world.ball());
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
@@ -41,8 +39,7 @@ TEST(TacticUpdateVisitorTest, update_crease_defender_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     CreaseDefenderTactic tactic = CreaseDefenderTactic(
         initial_world.field(), initial_world.ball(), initial_world.friendlyTeam(),
         initial_world.enemyTeam(), CreaseDefenderTactic::LEFT);
@@ -64,8 +61,7 @@ TEST(TacticUpdateVisitorTest, update_defense_shadow_enemy)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     DefenseShadowEnemyTactic tactic = DefenseShadowEnemyTactic(
         initial_world.field(), initial_world.friendlyTeam(), initial_world.enemyTeam(),
         initial_world.ball(), true, 10.0);
@@ -87,8 +83,7 @@ TEST(TacticUpdateVisitorTest, update_goalie_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     GoalieTactic tactic =
         GoalieTactic(initial_world.ball(), initial_world.field(),
                      initial_world.friendlyTeam(), initial_world.enemyTeam());
@@ -124,8 +119,7 @@ TEST(TacticUpdateVisitorTest, update_penalty_kick_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     Robot robot = Robot(3, Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
                         AngularVelocity::fromRadians(-0.6), Timestamp::fromSeconds(0));
     PenaltyKickTactic tactic = PenaltyKickTactic(
@@ -144,8 +138,7 @@ TEST(TacticUpdateVisitorTest, update_receiver_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
     ReceiverTactic tactic =
         ReceiverTactic(initial_world.field(), initial_world.friendlyTeam(),
@@ -168,8 +161,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_enemy_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     ShadowEnemyTactic tactic = ShadowEnemyTactic(
         initial_world.field(), initial_world.friendlyTeam(), initial_world.enemyTeam(),
         true, initial_world.ball(), 10.0, false, false);
@@ -191,8 +183,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     ShadowFreekickerTactic tactic =
         ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT, initial_world.enemyTeam(),
                                initial_world.ball(), initial_world.field(), false);
@@ -212,8 +203,7 @@ TEST(TacticUpdateVisitorTest, update_shoot_goal_tactic)
     World update_world  = ::Test::TestUtil::createBlankTestingWorld();
     update_world        = ::Test::TestUtil::setBallPosition(update_world, Point(1, 0),
                                                      Timestamp::fromSeconds(0));
-    update_world.updateFieldGeometry(
-        Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, Timestamp::fromSeconds(0)));
+    update_world.updateFieldGeometry(Field(10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0));
     ShootGoalTactic tactic = ShootGoalTactic(
         initial_world.field(), initial_world.friendlyTeam(), initial_world.enemyTeam(),
         initial_world.ball(), Angle::zero(), std::nullopt, false);

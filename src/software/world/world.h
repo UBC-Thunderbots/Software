@@ -153,9 +153,11 @@ class World final
     GameState& mutableGameState();
 
     /**
-     * Gets the most recent Timestamp stored in the history of the World
+     * Returns the most recent timestamp value of all timestamped member
+     * objects of the world
      *
-     * @return returns Timestamp : The most recent Timestamp stored in the history
+     * @return the most recent timestamp value of all timestamped member
+     * objects of the world
      */
     const Timestamp getMostRecentTimestamp() const;
 
