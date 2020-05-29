@@ -36,7 +36,7 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
         managed_paths.insert({current_objective.robot_id, path});
 
         // store velocity obstacle for current path
-        if (path && path->size() >= 2)
+        if (path && path->getNumKnots() >= 2)
         {
             // We want to avoid the start of every other path, assuming that
             // there is a robot moving along the path from the path's start

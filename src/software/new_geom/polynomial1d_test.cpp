@@ -1,10 +1,10 @@
-#include "software/new_geom/polynomial.h"
+#include "software/new_geom/polynomial1d.h"
 
 #include <gtest/gtest.h>
 
-TEST(PolynomialTest, test_default_constructor)
+TEST(Polynomial1dTest, test_default_constructor)
 {
-    Polynomial p;
+    Polynomial1d p;
     for (size_t i = 0; i < 10; i++)
     {
         EXPECT_DOUBLE_EQ(p.getCoeff(i), 0);
@@ -13,20 +13,20 @@ TEST(PolynomialTest, test_default_constructor)
     EXPECT_DOUBLE_EQ(p.getOrder(), 0);
 }
 
-TEST(PolynomialTest, test_polynomial_flat_line_constructor)
+TEST(Polynomial1dTest, test_polynomial_flat_line_constructor)
 {
     std::vector<double> coeffs({});
-    Polynomial p(coeffs);
+    Polynomial1d p(coeffs);
     EXPECT_EQ(p.getCoeff(0), 0);
     EXPECT_EQ(p.valueAt(1), 0);
     EXPECT_EQ(p.valueAt(-2), 0);
     EXPECT_EQ(p.valueAt(3), 0);
 }
 
-TEST(PolynomialTest, test_polynomial_coeffs_constructor)
+TEST(Polynomial1dTest, test_polynomial_coeffs_constructor)
 {
     std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
-    Polynomial p(coeffs);
+    Polynomial1d p(coeffs);
     EXPECT_DOUBLE_EQ(p.getCoeff(0), 1);
     EXPECT_DOUBLE_EQ(p.getCoeff(1), 2);
     EXPECT_DOUBLE_EQ(p.getCoeff(2), 3);
@@ -37,10 +37,10 @@ TEST(PolynomialTest, test_polynomial_coeffs_constructor)
     EXPECT_DOUBLE_EQ(p.valueAt(3), 34);
 }
 
-TEST(PolynomialTest, test_polynomial_coeffs_list_constructor)
+TEST(Polynomial1dTest, test_polynomial_coeffs_list_constructor)
 {
     std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
-    Polynomial p({1, 2, 3});
+    Polynomial1d p({1, 2, 3});
     EXPECT_DOUBLE_EQ(p.getCoeff(0), 1);
     EXPECT_DOUBLE_EQ(p.getCoeff(1), 2);
     EXPECT_DOUBLE_EQ(p.getCoeff(2), 3);
@@ -51,10 +51,37 @@ TEST(PolynomialTest, test_polynomial_coeffs_list_constructor)
     EXPECT_DOUBLE_EQ(p.valueAt(3), 34);
 }
 
-TEST(PolynomialTest, test_set_coeff)
+TEST(TestSpline, test_polynomial_linear_constructor)
+{
+    Polynomial1d p =
+        Polynomial1d::constructLinearPolynomialFromConstraints(2.0, 3.0, 6.0, 4.0);
+    EXPECT_EQ(1, p.getOrder());
+    EXPECT_EQ(p.getCoeff(0), 2.5);
+    EXPECT_EQ(p.getCoeff(1), 0.25);
+    EXPECT_EQ(p.valueAt(2.0), 3.0);
+    EXPECT_EQ(p.valueAt(6.0), 4.0);
+}
+
+TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
+{
+    std::pair<double, double> constraint1, constraint2;
+    try
+    {
+        Polynomial1d p =
+            Polynomial1d::constructLinearPolynomialFromConstraints(2.0, -3.0, 2.0, -4.0);
+    }
+    catch (std::invalid_argument &e)
+    {
+        SUCCEED();
+        return;
+    }
+    ADD_FAILURE() << "Successfully able to build a polynomial that isn't a function";
+}
+
+TEST(Polynomial1dTest, test_set_coeff)
 {
     std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
-    Polynomial p(coeffs);
+    Polynomial1d p(coeffs);
     p.setCoeff(2, 4);
     p.setCoeff(3, 5);
     p.setCoeff(100, 6);
@@ -63,31 +90,31 @@ TEST(PolynomialTest, test_set_coeff)
     EXPECT_DOUBLE_EQ(p.getCoeff(100), 6);
 }
 
-TEST(PolynomialTest, get_order)
+TEST(Polynomial1dTest, get_order)
 {
     std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
-    Polynomial p(coeffs);
+    Polynomial1d p(coeffs);
     EXPECT_EQ(p.getOrder(), 2);
 
     p.setCoeff(2, 0);
     EXPECT_EQ(p.getOrder(), 1);
 }
 
-TEST(PolynomialTest, test_get_order)
+TEST(Polynomial1dTest, test_get_order)
 {
     std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
-    Polynomial p(coeffs);
+    Polynomial1d p(coeffs);
     EXPECT_DOUBLE_EQ(p.getOrder(), 2);
 
     p.setCoeff(100, 6);
     EXPECT_DOUBLE_EQ(p.getOrder(), 100);
 }
 
-TEST(PolynomialTest, test_plus_operator)
+TEST(Polynomial1dTest, test_plus_operator)
 {
-    Polynomial p1({2, 4.5, 6, 8});      // 2 + 4.5x + 6x^2 + 8x^3
-    Polynomial p2({0, 3, 6, 9.2, 12});  // 0 + 3x + 6x^2 + 9.2x^3 + 12x^4
-    Polynomial sum = p1 + p2;
+    Polynomial1d p1({2, 4.5, 6, 8});      // 2 + 4.5x + 6x^2 + 8x^3
+    Polynomial1d p2({0, 3, 6, 9.2, 12});  // 0 + 3x + 6x^2 + 9.2x^3 + 12x^4
+    Polynomial1d sum = p1 + p2;
     EXPECT_DOUBLE_EQ(sum.getCoeff(0), 2);
     EXPECT_DOUBLE_EQ(sum.getCoeff(1), 7.5);
     EXPECT_DOUBLE_EQ(sum.getCoeff(2), 12);
@@ -97,11 +124,11 @@ TEST(PolynomialTest, test_plus_operator)
     EXPECT_DOUBLE_EQ(sum.getOrder(), 4);
 }
 
-TEST(PolynomialTest, test_minus_operator)
+TEST(Polynomial1dTest, test_minus_operator)
 {
-    Polynomial p1({2, 4.5, 6, 8});      // 2 + 4.5x + 6x^2 + 8x^3
-    Polynomial p2({0, 3, 6, 9.2, 12});  // 0 + 3x + 6x^2 + 9.2x^3 + 12x^4
-    Polynomial difference = p1 - p2;
+    Polynomial1d p1({2, 4.5, 6, 8});      // 2 + 4.5x + 6x^2 + 8x^3
+    Polynomial1d p2({0, 3, 6, 9.2, 12});  // 0 + 3x + 6x^2 + 9.2x^3 + 12x^4
+    Polynomial1d difference = p1 - p2;
     EXPECT_DOUBLE_EQ(difference.getCoeff(0), 2);
     EXPECT_DOUBLE_EQ(difference.getCoeff(1), 1.5);
     EXPECT_DOUBLE_EQ(difference.getCoeff(2), 0);
@@ -111,11 +138,11 @@ TEST(PolynomialTest, test_minus_operator)
     EXPECT_DOUBLE_EQ(difference.getOrder(), 4);
 }
 
-TEST(PolynomialTest, test_multiplication_operator)
+TEST(Polynomial1dTest, test_multiplication_operator)
 {
-    Polynomial p1({2, 4.5, 6, 8});      // 2 + 4.5x + 6x^2 + 8x^3
-    Polynomial p2({0, 3, 6, 9.2, 12});  // 0 + 3x + 6x^2 + 9.2x^3 + 12x^4
-    Polynomial product = p1 * p2;
+    Polynomial1d p1({2, 4.5, 6, 8});      // 2 + 4.5x + 6x^2 + 8x^3
+    Polynomial1d p2({0, 3, 6, 9.2, 12});  // 0 + 3x + 6x^2 + 9.2x^3 + 12x^4
+    Polynomial1d product = p1 * p2;
     EXPECT_DOUBLE_EQ(product.getCoeff(0), 0);
     EXPECT_DOUBLE_EQ(product.getCoeff(1), 6);
     EXPECT_DOUBLE_EQ(product.getCoeff(2), 25.5);
@@ -128,10 +155,10 @@ TEST(PolynomialTest, test_multiplication_operator)
     EXPECT_DOUBLE_EQ(product.getOrder(), 7);
 }
 
-TEST(PolynomialTest, test_plus_equals_oeprator)
+TEST(Polynomial1dTest, test_plus_equals_operator)
 {
-    Polynomial p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
-    Polynomial p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
+    Polynomial1d p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
+    Polynomial1d p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
     p1 += p2;
     EXPECT_DOUBLE_EQ(p1.getCoeff(0), 11);
     EXPECT_DOUBLE_EQ(p1.getCoeff(1), 4.3);
@@ -143,10 +170,10 @@ TEST(PolynomialTest, test_plus_equals_oeprator)
     EXPECT_DOUBLE_EQ(p1.getOrder(), 5);
 }
 
-TEST(PolynomialTest, test_minus_equals_oeprator)
+TEST(Polynomial1dTest, test_minus_equals_operator)
 {
-    Polynomial p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
-    Polynomial p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
+    Polynomial1d p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
+    Polynomial1d p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
     p1 -= p2;
     EXPECT_DOUBLE_EQ(p1.getCoeff(0), -3);
     EXPECT_DOUBLE_EQ(p1.getCoeff(1), 0.3);
@@ -158,10 +185,10 @@ TEST(PolynomialTest, test_minus_equals_oeprator)
     EXPECT_DOUBLE_EQ(p1.getOrder(), 5);
 }
 
-TEST(PolynomialTest, test_multiply_equals_oeprator)
+TEST(Polynomial1dTest, test_multiply_equals_operator)
 {
-    Polynomial p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
-    Polynomial p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
+    Polynomial1d p1({4, 2.3, 1, 6, 2});     // 4 + 2.3x + 1x^2 + 6x^3 + 2x^4
+    Polynomial1d p2({7, 2, 3, 8.3, 1, 5});  // 7 + 2x + 3x^2 + 8.3x^3 + 1x^4 + 5x^5
     p1 *= p2;
     EXPECT_DOUBLE_EQ(p1.getCoeff(0), 28);
     EXPECT_DOUBLE_EQ(p1.getCoeff(1), 24.1);
