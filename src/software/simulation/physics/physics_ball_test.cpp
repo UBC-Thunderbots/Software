@@ -202,7 +202,7 @@ TEST(PhysicsBallTest, test_ball_changes_direction_after_object_deflection)
 
 TEST(PhysicsBallTest, test_apply_force_to_stationary_ball)
 {
-    // Apply force to a statinonary ball
+    // Apply force to a stationary ball
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     BallState initial_ball_state(Point(0, 0), Vector(0, 0));
