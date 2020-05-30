@@ -61,7 +61,8 @@ PhysicsRobot::~PhysicsRobot()
 }
 
 void PhysicsRobot::setupRobotBodyFixtures(const RobotState& robot_state,
-                                          double total_chicker_depth, const double mass_kg)
+                                          double total_chicker_depth,
+                                          const double mass_kg)
 {
     b2FixtureDef robot_body_fixture_def;
     robot_body_fixture_def.restitution = robot_body_restitution;
