@@ -44,30 +44,30 @@ class TrajectoryPlannerTest : public testing::Test
         app_trajectory_planner_getMaxAllowableSpeedProfile(
             max_allowable_speed_profile, path_parameters.path,
             path_parameters.num_segments, arc_length_parameterization, arc_segment_length,
-            path_parameters.max_allowable_acceleration);
+            path_parameters.max_allowable_linear_acceleration);
 
         float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
-        velocity_profile[0] = path_parameters.initial_speed;
+        velocity_profile[0] = path_parameters.initial_linear_speed;
         app_trajectory_planner_generateForwardsContinuousVelocityProfile(
             path_parameters.num_segments, velocity_profile, max_allowable_speed_profile,
-            arc_segment_length, path_parameters.max_allowable_acceleration,
-            path_parameters.max_allowable_speed);
+            arc_segment_length, path_parameters.max_allowable_linear_acceleration,
+            path_parameters.max_allowable_linear_speed);
 
         // Check that it was physically possible for the robot to reach the final velocity
         // requested
         if (velocity_profile[path_parameters.num_segments - 1] >=
-            path_parameters.final_speed)
+            path_parameters.final_linear_speed)
         {
             velocity_profile[path_parameters.num_segments - 1] =
-                path_parameters.final_speed;
+                path_parameters.final_linear_speed;
         }
 
         app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
             path_parameters.num_segments, velocity_profile, arc_segment_length,
-            path_parameters.max_allowable_acceleration);
+            path_parameters.max_allowable_linear_acceleration);
 
-        velocity_profile[0] = path_parameters.initial_speed;
+        velocity_profile[0] = path_parameters.initial_linear_speed;
 
         for (unsigned int i = 0; i < path_parameters.num_segments; i++)
         {
@@ -245,10 +245,10 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_length)
     path_parameters.num_segments =
         TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS;  // For tests the number of segments is
                                               // arbitrary, so use the maximum possible
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 3;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 3;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -304,10 +304,10 @@ TEST_F(TrajectoryPlannerTest, check_end_points_match_path)
     path_parameters.num_segments =
         TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS;  // For tests the number of segments is
                                               // arbitrary, so use the maximum possible
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 3;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 3;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -364,10 +364,10 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.t_end   = 3;
     path_parameters.num_segments =
         500;  // Choose a low fidelity path to switch up the test cases
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 9;
-    path_parameters.initial_speed              = 2;
-    path_parameters.final_speed                = 5;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 9;
+    path_parameters.initial_linear_speed              = 2;
+    path_parameters.final_linear_speed                = 5;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -394,26 +394,28 @@ TEST_F(TrajectoryPlannerTest,
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
-                    vel >= path_parameters.initial_speed);
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_linear_speed &&
+                    vel >= path_parameters.initial_linear_speed);
     }
 
-    EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
-    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
+    EXPECT_NEAR(velocity.back(), path_parameters.final_linear_speed, 0.1);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_linear_speed);
 
     // Loop through the positive acceleration of the bang-bang profile
     unsigned int i = 0;
-    while (acceleration[i] > path_parameters.max_allowable_acceleration)
+    while (acceleration[i] > path_parameters.max_allowable_linear_acceleration)
     {
-        EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        EXPECT_NEAR(path_parameters.max_allowable_linear_acceleration, acceleration[i],
+                    0.01);
         i++;
     }
     i++;  // Skip the transition acceleration from positive to negative
 
     // Loop through the negative acceleration portion of the bang-bang profile
-    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
+    while (acceleration[i] < -path_parameters.max_allowable_linear_acceleration)
     {
-        EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        EXPECT_NEAR(-path_parameters.max_allowable_linear_acceleration, acceleration[i],
+                    0.01);
         i++;
     }
 
@@ -444,14 +446,14 @@ TEST_F(TrajectoryPlannerTest,
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 3;
-    path_parameters.num_segments               = 500;
-    path_parameters.max_allowable_acceleration = 10;
-    path_parameters.max_allowable_speed        = 9;
-    path_parameters.initial_speed              = 2;
-    path_parameters.final_speed                = 5;
+    path_parameters.path                              = path;
+    path_parameters.t_start                           = 0;
+    path_parameters.t_end                             = 3;
+    path_parameters.num_segments                      = 500;
+    path_parameters.max_allowable_linear_acceleration = 10;
+    path_parameters.max_allowable_linear_speed        = 9;
+    path_parameters.initial_linear_speed              = 2;
+    path_parameters.final_linear_speed                = 5;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -478,26 +480,28 @@ TEST_F(TrajectoryPlannerTest,
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
-                    vel >= path_parameters.initial_speed);
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_linear_speed &&
+                    vel >= path_parameters.initial_linear_speed);
     }
 
-    EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
-    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
+    EXPECT_NEAR(velocity.back(), path_parameters.final_linear_speed, 0.1);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_linear_speed);
 
     // Loop through the positive acceleration of the bang-bang profile
     unsigned int i = 0;
-    while (acceleration[i] > path_parameters.max_allowable_acceleration)
+    while (acceleration[i] > path_parameters.max_allowable_linear_acceleration)
     {
-        EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        EXPECT_NEAR(path_parameters.max_allowable_linear_acceleration, acceleration[i],
+                    0.01);
         i++;
     }
     i++;  // Skip the transition acceleration from positive to negative
 
     // Loop through the negative acceleration portion of the bang-bang profile
-    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
+    while (acceleration[i] < -path_parameters.max_allowable_linear_acceleration)
     {
-        EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        EXPECT_NEAR(-path_parameters.max_allowable_linear_acceleration, acceleration[i],
+                    0.01);
         i++;
     }
 
@@ -528,14 +532,14 @@ TEST_F(TrajectoryPlannerTest,
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 3;
-    path_parameters.num_segments               = 500;
-    path_parameters.max_allowable_acceleration = 1;
-    path_parameters.max_allowable_speed        = 30;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path                              = path;
+    path_parameters.t_start                           = 0;
+    path_parameters.t_end                             = 3;
+    path_parameters.num_segments                      = 500;
+    path_parameters.max_allowable_linear_acceleration = 1;
+    path_parameters.max_allowable_linear_speed        = 30;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -562,26 +566,28 @@ TEST_F(TrajectoryPlannerTest,
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed &&
-                    vel >= path_parameters.initial_speed);
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_linear_speed &&
+                    vel >= path_parameters.initial_linear_speed);
     }
 
-    EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
-    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
+    EXPECT_NEAR(velocity.back(), path_parameters.final_linear_speed, 0.1);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_linear_speed);
 
     // Loop through the positive acceleration of the bang-bang profile
     unsigned int i = 0;
-    while (acceleration[i] > path_parameters.max_allowable_acceleration)
+    while (acceleration[i] > path_parameters.max_allowable_linear_acceleration)
     {
-        EXPECT_NEAR(path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        EXPECT_NEAR(path_parameters.max_allowable_linear_acceleration, acceleration[i],
+                    0.01);
         i++;
     }
     i++;  // Skip the transition acceleration from positive to negative
 
     // Loop through the negative acceleration portion of the bang-bang profile
-    while (acceleration[i] < -path_parameters.max_allowable_acceleration)
+    while (acceleration[i] < -path_parameters.max_allowable_linear_acceleration)
     {
-        EXPECT_NEAR(-path_parameters.max_allowable_acceleration, acceleration[i], 0.01);
+        EXPECT_NEAR(-path_parameters.max_allowable_linear_acceleration, acceleration[i],
+                    0.01);
         i++;
     }
 
@@ -611,14 +617,14 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterizat
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 1;
-    path_parameters.t_end                      = 0;
-    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 3;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path         = path;
+    path_parameters.t_start      = 1;
+    path_parameters.t_end        = 0;
+    path_parameters.num_segments = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 3;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -671,14 +677,14 @@ TEST_F(TrajectoryPlannerTest,
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 1;
-    path_parameters.t_end                      = 0;
-    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 3;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path         = path;
+    path_parameters.t_start      = 1;
+    path_parameters.t_end        = 0;
+    path_parameters.num_segments = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 3;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -726,14 +732,14 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_speed_profile_reverse_parameteriz
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 3;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path         = path;
+    path_parameters.t_start      = 0;
+    path_parameters.t_end        = 1;
+    path_parameters.num_segments = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 3;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -781,10 +787,10 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     path_parameters.t_start      = -1;
     path_parameters.t_end        = 1;
     path_parameters.num_segments = 500;  // Use a low segment density for variety
-    path_parameters.max_allowable_acceleration = 5;
-    path_parameters.max_allowable_speed        = 5;
-    path_parameters.initial_speed              = 1.87;
-    path_parameters.final_speed                = 5;
+    path_parameters.max_allowable_linear_acceleration = 5;
+    path_parameters.max_allowable_linear_speed        = 5;
+    path_parameters.initial_linear_speed              = 1.87;
+    path_parameters.final_linear_speed                = 5;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -812,42 +818,48 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     for (float vel : velocity)
     {
-        EXPECT_TRUE(vel <= path_parameters.max_allowable_speed);
+        EXPECT_TRUE(vel <= path_parameters.max_allowable_linear_speed);
     }
 
-    EXPECT_NEAR(velocity.back(), path_parameters.final_speed, 0.1);
+    EXPECT_NEAR(velocity.back(), path_parameters.final_linear_speed, 0.1);
 
-    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_speed);
+    EXPECT_FLOAT_EQ(velocity.front(), path_parameters.initial_linear_speed);
 
     unsigned int i = 0;
     // Acceleration phase coming up to a curve that must be slowed down for
-    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
+    while (fabs(acceleration[i] - path_parameters.max_allowable_linear_acceleration) <
+           0.1)
     {
-        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_acceleration, 0.001);
+        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_linear_acceleration,
+                    0.001);
         i++;
     }
     i++;  // Skip the transition acceleration from positive to negative
 
     // Slowing down for a curve
-    while (fabs(acceleration[i] + path_parameters.max_allowable_acceleration) < 0.1)
+    while (fabs(acceleration[i] + path_parameters.max_allowable_linear_acceleration) <
+           0.1)
     {
-        EXPECT_NEAR(acceleration[i], -path_parameters.max_allowable_acceleration, 0.001);
+        EXPECT_NEAR(acceleration[i], -path_parameters.max_allowable_linear_acceleration,
+                    0.001);
         i++;
     }
 
     // Skip the acceleration ramp-up phase where the acceleration is related to the
     // curvature This part is skipped because it is dependent on path curvature and cannot
     // be compared to the maximum acceleration specified by the path parameters
-    while (fabs(fabs(acceleration[i]) - path_parameters.max_allowable_acceleration) >=
-           0.01)
+    while (fabs(fabs(acceleration[i]) -
+                path_parameters.max_allowable_linear_acceleration) >= 0.01)
     {
         i++;
     }
 
     // Check the final acceleration phase up to steady state
-    while (fabs(acceleration[i] - path_parameters.max_allowable_acceleration) < 0.1)
+    while (fabs(acceleration[i] - path_parameters.max_allowable_linear_acceleration) <
+           0.1)
     {
-        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_acceleration, 0.001);
+        EXPECT_NEAR(acceleration[i], path_parameters.max_allowable_linear_acceleration,
+                    0.001);
         i++;
     }
     i++;  // Skip transition acceleration going to steady state (zero)
@@ -884,14 +896,14 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 500;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 3;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path                              = path;
+    path_parameters.t_start                           = 0;
+    path_parameters.t_end                             = 1;
+    path_parameters.num_segments                      = 500;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 3;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -964,14 +976,14 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 500;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 3;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path                              = path;
+    path_parameters.t_start                           = 0;
+    path_parameters.t_end                             = 1;
+    path_parameters.num_segments                      = 500;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 3;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -1054,14 +1066,14 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elem
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 2;
-    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
-    path_parameters.max_allowable_acceleration = 10;
-    path_parameters.max_allowable_speed        = 0.1;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path         = path;
+    path_parameters.t_start      = 0;
+    path_parameters.t_end        = 2;
+    path_parameters.num_segments = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_linear_acceleration = 10;
+    path_parameters.max_allowable_linear_speed        = 0.1;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -1109,14 +1121,14 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 2000;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 3000;
+    path_parameters.path         = path;
+    path_parameters.t_start      = 0;
+    path_parameters.t_end        = 1;
+    path_parameters.num_segments = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 2000;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 3000;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -1142,14 +1154,14 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 3;
-    path_parameters.num_segments               = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 50;
-    path_parameters.initial_speed              = 20;
-    path_parameters.final_speed                = 0;
+    path_parameters.path         = path;
+    path_parameters.t_start      = 0;
+    path_parameters.t_end        = 3;
+    path_parameters.num_segments = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 50;
+    path_parameters.initial_linear_speed              = 20;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -1174,14 +1186,14 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = 0;
-    path_parameters.t_end                      = 3;
-    path_parameters.num_segments               = 1000;
-    path_parameters.max_allowable_acceleration = 10;
-    path_parameters.max_allowable_speed        = 9;
-    path_parameters.initial_speed              = 2;
-    path_parameters.final_speed                = 5;
+    path_parameters.path                              = path;
+    path_parameters.t_start                           = 0;
+    path_parameters.t_end                             = 3;
+    path_parameters.num_segments                      = 1000;
+    path_parameters.max_allowable_linear_acceleration = 10;
+    path_parameters.max_allowable_linear_speed        = 9;
+    path_parameters.initial_linear_speed              = 2;
+    path_parameters.final_linear_speed                = 5;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -1231,14 +1243,14 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_parabola_path_high_acceleratio
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = -1;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 1000;
-    path_parameters.max_allowable_acceleration = 10;
-    path_parameters.max_allowable_speed        = 5;
-    path_parameters.initial_speed              = 0;
-    path_parameters.final_speed                = 0;
+    path_parameters.path                              = path;
+    path_parameters.t_start                           = -1;
+    path_parameters.t_end                             = 1;
+    path_parameters.num_segments                      = 1000;
+    path_parameters.max_allowable_linear_acceleration = 10;
+    path_parameters.max_allowable_linear_speed        = 5;
+    path_parameters.initial_linear_speed              = 0;
+    path_parameters.final_linear_speed                = 0;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -1288,14 +1300,14 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_curved_path_low_acceleration)
     };
 
     FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.path                       = path;
-    path_parameters.t_start                    = -1;
-    path_parameters.t_end                      = 1;
-    path_parameters.num_segments               = 1000;
-    path_parameters.max_allowable_acceleration = 3;
-    path_parameters.max_allowable_speed        = 5;
-    path_parameters.initial_speed              = 2;
-    path_parameters.final_speed                = 1;
+    path_parameters.path                              = path;
+    path_parameters.t_start                           = -1;
+    path_parameters.t_end                             = 1;
+    path_parameters.num_segments                      = 1000;
+    path_parameters.max_allowable_linear_acceleration = 3;
+    path_parameters.max_allowable_linear_speed        = 5;
+    path_parameters.initial_linear_speed              = 2;
+    path_parameters.final_linear_speed                = 1;
 
     PositionTrajectoryElement_t const_arc_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];

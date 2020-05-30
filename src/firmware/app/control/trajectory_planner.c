@@ -17,11 +17,12 @@ app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
     // Set the internal path parameter variables
     PositionTrajectoryElement_t* traj_elements = trajectory->trajectory_elements;
 
-    float final_speed   = trajectory->path_parameters.final_speed;
-    float initial_speed = trajectory->path_parameters.initial_speed;
+    float final_speed   = trajectory->path_parameters.final_linear_speed;
+    float initial_speed = trajectory->path_parameters.initial_linear_speed;
     const float max_allowable_acceleration =
-        trajectory->path_parameters.max_allowable_acceleration;
-    const float max_allowable_speed = trajectory->path_parameters.max_allowable_speed;
+        trajectory->path_parameters.max_allowable_linear_acceleration;
+    const float max_allowable_speed =
+        trajectory->path_parameters.max_allowable_linear_speed;
     const unsigned int num_segments = trajectory->path_parameters.num_segments;
     const Polynomial2dOrder3_t path = trajectory->path_parameters.path;
     float t_end                     = trajectory->path_parameters.t_end;
@@ -436,4 +437,142 @@ void app_trajectory_planner_generateVelocityTrajectory(
     velocity_elements[last_element_index].angular_velocity  = 0;
     velocity_elements[last_element_index].time =
         position_elements[last_element_index].time;
+}
+
+void app_trajectory_planner_generateConstantParameterizationSegments(
+    PositionTrajectory_t trajectory)
+{
+    FirmwareRobotPathParameters_t path_parameters    = trajectory.path_parameters;
+    PositionTrajectoryElement_t* trajectory_elements = trajectory.trajectory_elements;
+    // Calculate the size of each parameterization step
+    const float delta_parameterization =
+        (path_parameters.t_end - path_parameters.t_start) / path_parameters.num_segments;
+
+    // Save the arc length of each segment for kinematic calculations later
+    float segment_arc_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    // Calculate all of the positions and orientations for each constant paramertization
+    // segment
+    for (unsigned int i = 0; i < path_parameters.num_segments; i++)
+    {
+        trajectory.trajectory_elements[i].position = shared_polynomial2d_getValueOrder3(
+            path_parameters.path, i * delta_parameterization);
+    }
+
+    // Use the difference between adjacent points to calculate the total length of each
+    // segment
+    for (unsigned int i = 0; i < path_parameters.num_segments - 1; i++)
+    {
+        segment_arc_lengths[i] = sqrt(
+            pow(trajectory_elements[i + 1].position.x - trajectory_elements[i].position.x,
+                2) +
+            pow(trajectory_elements[i + 1].position.y - trajectory_elements[i].position.y,
+                2));
+    }
+}
+
+void app_trajectory_planner_generatePositionAndOrientations(
+    PositionTrajectory_t* trajectory)
+{
+    // Set the internal path parameter variables
+    PositionTrajectoryElement_t* trajectory_elements = trajectory->trajectory_elements;
+
+    float final_linear_speed   = trajectory->path_parameters.final_linear_speed;
+    float initial_linear_speed = trajectory->path_parameters.initial_linear_speed;
+    const float max_allowable_linear_acceleration =
+        trajectory->path_parameters.max_allowable_linear_acceleration;
+    const float max_allowable_linear_speed =
+        trajectory->path_parameters.max_allowable_linear_speed;
+    const float max_allowable_angular_acceleration =
+        trajectory->path_parameters.max_allowable_angular_acceleration;
+    const float max_allowable_angular_speed =
+        trajectory->path_parameters.max_allowable_angular_speed;
+    const unsigned int num_segments = trajectory->path_parameters.num_segments;
+    const Polynomial2dOrder3_t path = trajectory->path_parameters.path;
+    const Polynomial1dOrder3_t orientation_profile =
+        trajectory->path_parameters.orientation_profile;
+    float t_end   = trajectory->path_parameters.t_end;
+    float t_start = trajectory->path_parameters.t_start;
+
+    TrajectoryPlannerGenerationStatus_t generation_status = OK;
+
+    // Variable used to flag if the path is moving "backwards" along the input path
+    bool reverse_parameterization = false;
+
+    // Check that the pre conditions are met
+    assert(num_segments > 2);
+    assert(max_allowable_linear_acceleration > 0);
+    assert(max_allowable_angular_acceleration > 0);
+    assert(max_allowable_linear_speed > 0);
+    asset(max_allowable_angular_speed > 0);
+    assert(initial_linear_speed >= 0);
+    assert(final_linear_speed >= 0);
+    assert(num_segments <= TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
+    // Check for the parameterization direction
+    // If the path is traversed in reverse, then flip all components to forwards (to be
+    // reversed again in the end)
+    //  TODO: Remove after #1322 is merged
+    if (t_end < t_start)
+    {
+        reverse_parameterization = true;
+
+        // Reverse the direction (Polynomial library can only handle forwards direction)
+        float temp = t_start;
+        t_start    = t_end;
+        t_end      = temp;
+
+        // Reverse the final and initial speeds
+        temp                 = initial_linear_speed;
+        initial_linear_speed = final_linear_speed;
+        final_linear_speed   = temp;
+    }
+
+    // Create an array that will hold all of the segment lengths for the trajectory
+    // This is needed because the trajectory wil be broken up into constant 't' values
+    // where 't' is the input parameter to the path and orientation polynomials By using a
+    // constant 't' we can compare the orientation and linear profiles directly
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    const float t_segment_size = (t_end - t_start) / num_segments;
+
+    // Get all of the points for the arc length parameterization (Not constant arc length
+    // segments)
+    shared_polynomial_getArcLengthParametrizationOrder3(path, t_start, t_end,
+                                                        arc_length_parameterization);
+
+    const float arc_segment_length =
+        shared_polynomial2d_getTotalArcLength(arc_length_parameterization) / num_segments;
+}
+
+void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
+    PositionTrajectory_t trajectory, const float t_segment_size,
+    TrajectorySegment_t trajectory_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
+{
+    const float t_start                              = trajectory.path_parameters.t_start;
+    PositionTrajectoryElement_t* trajectory_elements = trajectory.trajectory_elements;
+    trajectory_elements->orientation                 = shared_polynomial1d_getValueOrder3(
+        trajectory.path_parameters.orientation_profile, t_start);
+    trajectory_elements->position =
+        shared_polynomial2d_getValueOrder3(trajectory.path_parameters.path, t_start);
+
+    for (unsigned int i = 1; i < trajectory.path_parameters.num_segments; i++)
+    {
+        // Grab the states at each 't' value
+        trajectory_elements->orientation = shared_polynomial1d_getValueOrder3(
+            trajectory.path_parameters.orientation_profile, t_start + i * t_segment_size);
+        trajectory_elements->position = shared_polynomial2d_getValueOrder3(
+            trajectory.path_parameters.path, t_start + i * t_segment_size);
+
+        // Calculate the length of each segment and store it
+        const float delta_x =
+            trajectory_elements[i].position.x - trajectory_elements[i - 1].position.x;
+        const float delta_y =
+            trajectory_elements[i].position.y - trajectory_elements[i - 1].position.y;
+
+        const float linear_segment_length = sqrt(pow(delta_x, 2) + pow(delta_y, 2));
+        const float angular_segment_length =
+            trajectory_elements[i].orientation - trajectory_elements->orientation[i - 1];
+        trajectory_segments[i].linear_segment_length  = linear_segment_length;
+        trajectory_segments[i].angular_segment_length = angular_segment_length;
+    }
 }
