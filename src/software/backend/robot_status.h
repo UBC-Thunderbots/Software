@@ -89,7 +89,7 @@ struct RobotStatus
 
 /**
  * Converts RobotStatus to TbotsRobotMsg
- * Does not convert ErrorCode, ChipperKickerStatus,
+ * Does not convert ChipperKickerStatus,
  * DriveUnits, and NetworkStatus due to insufficient info
  *
  * @param robot_status The RobotStatus
