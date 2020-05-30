@@ -7,7 +7,7 @@
 #include "software/backend/backend.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/qt_gui/visualizer/visualizer_wrapper.h"
+#include "software/gui/visualizer/visualizer_wrapper.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 
