@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QtWidgets/QGraphicsScene>
+#include "../../../../../../.cache/bazel/_bazel_cody/bc67860d71ef5a6fe8384091c58fcd52/execroot/__main__/external/qt/QtWidgets/QGraphicsScene"
 
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/visualizer/drawing/colors.h"
 #include "software/visualizer/drawing/draw_functions.h"
-#include "software/visualizer/drawing/geom.h"
+#include "software/gui/visualizer/drawing/geom.h"
 #include "software/visualizer/geom/geometry_conversion.h"
 
 /**

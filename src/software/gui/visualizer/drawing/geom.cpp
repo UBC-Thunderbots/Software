@@ -1,4 +1,4 @@
-#include "software/visualizer/drawing/geom.h"
+#include "software/gui/visualizer/drawing/geom.h"
 
 void drawRectangle(QGraphicsScene* scene, const Rectangle& rectangle, const QPen& pen,
                    std::optional<QBrush> brush_opt)

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QtCore/QLine>
-#include <QtCore/QPoint>
-#include <QtCore/QRect>
-#include <QtGui/QPolygonF>
-#include <QtWidgets/QGraphicsScene>
+#include "../../../../../../.cache/bazel/_bazel_cody/bc67860d71ef5a6fe8384091c58fcd52/execroot/__main__/external/qt/QtCore/QLine"
+#include "../../../../../../.cache/bazel/_bazel_cody/bc67860d71ef5a6fe8384091c58fcd52/execroot/__main__/external/qt/QtCore/QPoint"
+#include "../../../../../../.cache/bazel/_bazel_cody/bc67860d71ef5a6fe8384091c58fcd52/execroot/__main__/external/qt/QtCore/QRect"
+#include "../../../../../../.cache/bazel/_bazel_cody/bc67860d71ef5a6fe8384091c58fcd52/execroot/__main__/external/qt/QtGui/QPolygonF"
+#include "../../../../../../.cache/bazel/_bazel_cody/bc67860d71ef5a6fe8384091c58fcd52/execroot/__main__/external/qt/QtWidgets/QGraphicsScene"
 
 #include "software/new_geom/circle.h"
 #include "software/new_geom/polygon.h"

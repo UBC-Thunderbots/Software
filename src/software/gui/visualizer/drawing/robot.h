@@ -3,7 +3,7 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/new_geom/segment.h"
-#include "software/visualizer/drawing/geom.h"
+#include "software/gui/visualizer/drawing/geom.h"
 #include "software/visualizer/geom/geometry_conversion.h"
 #include "software/world/robot.h"
 

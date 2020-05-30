@@ -7,8 +7,8 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/visualizer/drawing/colors.h"
 #include "software/visualizer/drawing/draw_functions.h"
-#include "software/visualizer/drawing/geom.h"
-#include "software/visualizer/drawing/obstacle_artist.h"
+#include "software/gui/visualizer/drawing/geom.h"
+#include "software/gui/visualizer/drawing/obstacle_artist.h"
 #include "software/visualizer/geom/geometry_conversion.h"
 
 /**
