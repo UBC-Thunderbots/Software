@@ -15,7 +15,7 @@ cc_library(
     hdrs = ["geom.h"],
     deps = [
         "//software/geom",
-        "//software/visualizer/geom:geometry_conversion",
+        "//software/gui/visualizer/geom:geometry_conversion",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
@@ -103,7 +103,7 @@ cc_library(
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/obstacle:obstacle_visitor",
         "//software/geom",
-        "//software/visualizer/geom:geometry_conversion",
+        "//software/gui/visualizer/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],
 )

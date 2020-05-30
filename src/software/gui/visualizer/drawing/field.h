@@ -2,9 +2,9 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/visualizer/drawing/colors.h"
+#include "software/gui/visualizer/drawing/colors.h"
 #include "software/gui/visualizer/drawing/geom.h"
-#include "software/visualizer/geom/geometry_conversion.h"
+#include "software/gui/visualizer/geom/geometry_conversion.h"
 #include "software/world/field.h"
 
 /**
