@@ -1,10 +1,10 @@
 #pragma once
 
-#include "QtCore/QLine"
-#include "QtCore/QPoint"
-#include "QtCore/QRect"
-#include "QtGui/QPolygonF"
-#include "QtWidgets/QGraphicsScene"
+#include <QtCore/QLine>
+#include <QtCore/QPoint>
+#include <QtCore/QRect>
+#include <QtGui/QPolygonF>
+#include <QtWidgets/QGraphicsScene>
 
 #include "software/new_geom/circle.h"
 #include "software/new_geom/polygon.h"

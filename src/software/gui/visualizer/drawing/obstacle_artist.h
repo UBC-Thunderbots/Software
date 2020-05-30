@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtWidgets/QGraphicsScene"
+#include <QtWidgets/QGraphicsScene>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
