@@ -41,7 +41,7 @@ class PhysicsRobot
      * @param mass_kg The mass of the robot in kg
      */
     explicit PhysicsRobot(const unsigned int id, std::shared_ptr<b2World> world,
-                          const RobotState &robot_state, double mass_kg);
+                          const RobotState &robot_state, const double mass_kg);
 
     PhysicsRobot() = delete;
 
