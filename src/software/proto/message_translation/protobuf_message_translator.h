@@ -14,40 +14,41 @@ class ProtobufMessageTranslator
      * Returns a VisionMsg proto given a World.
      *
      * @param world The world msg to extract the VisionMsg from
-     * @return The VisionMsg proto containing the friendly team and ball information
+     * @return The unique_ptr to a VisionMsg proto containing the friendly team and ball
+     * information
      */
-    static VisionMsg getVisionMsgFromWorld(World world);
+    static std::unique_ptr<VisionMsg> getVisionMsgFromWorld(World world);
 
     /**
      * Returns a PrimitiveMsg proto given a ConstPrimitiveVectorPtr
      *
      * @param primitives The primitives to include in the PrimitiveMsg
-     * @returns The PrimitiveMsg proto containing the primitives
+     * @returns The unique_ptr to a PrimitiveMsg proto containing the primitives
      */
-    static PrimitiveMsg getPrimitiveMsgFromPrimitiveVector(
+    static std::unique_ptr<PrimitiveMsg> getPrimitiveMsgFromPrimitiveVector(
         ConstPrimitiveVectorPtr primitives);
 
     /**
      * Returns a PointMsg proto given a Point
      *
      * @param The Point to convert to proto
-     * @return The PointMsg after conversion
+     * @return The unique_ptr to a PointMsg after conversion
      */
-    static PointMsg getPointMsgFromPoint(Point point);
+    static std::unique_ptr<PointMsg> getPointMsgFromPoint(Point point);
 
     /**
      * Returns a AngleMsg proto given an Angle
      *
      * @param The Angle to convert to proto
-     * @return The AngleMsg after conversion
+     * @return The unique_ptr to a AngleMsg after conversion
      */
-    static AngleMsg getAngleMsgFromAngle(Angle angle);
+    static std::unique_ptr<AngleMsg> getAngleMsgFromAngle(Angle angle);
 
     /**
      * Returns a VectorMsg proto given a Vector
      *
-     * @param The Point to convert to proto
-     * @return The PointMsg after conversion
+     * @param The Vector to convert to proto
+     * @return The unique_ptr to a VectorMsg after conversion
      */
-    static VectorMsg getVectorMsgFromVector(Vector vector);
+    static std::unique_ptr<VectorMsg> getVectorMsgFromVector(Vector vector);
 };

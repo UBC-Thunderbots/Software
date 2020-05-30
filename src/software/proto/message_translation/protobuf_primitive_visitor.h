@@ -36,13 +36,13 @@ class ProtobufPrimitiveVisitor : public PrimitiveVisitor
     void visit(const StopPrimitive &stop_primitive) override;
 
     /**
-     * Returns a RadioPrimitiveMsg
+     * Returns a unique_ptr RadioPrimitiveMsg
      *
-     * @return The most recent constructed msg created by this
-     * ProtobufPrimitiveVisitor
+     * @return The unique_ptr to most recently constructed msg
+     * created by this ProtobufPrimitiveVisitor
      */
-    RadioPrimitive getRadioPrimitiveMsg();
+    std::unique_ptr<RadioPrimitiveMsg> getRadioPrimitiveMsg();
 
    private:
-    std::optional<RadioPrimitiveMsg> prim_msg;
+    std::unique_ptr<RadioPrimitiveMsg> prim_msg_ptr;
 };

@@ -45,5 +45,4 @@ class WifiBackend : public Backend
     std::unique_ptr<ProtoMulticastSender<VisionMsg>> vision_output;
     std::unique_ptr<ProtoMulticastSender<PrimitiveMsg>> primitive_output;
     std::unique_ptr<ProtoMulticastListener<TbotsRobotMsg>> robot_status_input;
-    std::unique_ptr<ProtoMulticastListener
 };

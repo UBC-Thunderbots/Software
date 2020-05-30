@@ -4,23 +4,23 @@
 #include "shared/proto/radio_primitive.pb.h"
 #include "software/ai/primitive/all_primitives.h"
 
-RadioPrimitive ProtobufPrimitiveVisitor::getRadioPrimitiveProto()
+std::unique_ptr<RadioPrimitiveMsg> ProtobufPrimitiveVisitor::getRadioPrimitiveProto()
 {
     // If we've never visited a primitive (and so have never populated the
-    // `prim_msg`) then throw an exception
-    if (!prim_msg)
+    // `prim_msg_ptr`) then throw an exception
+    if (!prim_msg_ptr)
     {
         std::string err_msg = std::string(typeid(this).name()) + ": " + __func__ +
                               " called without ever having visited anything";
         throw std::runtime_error(err_msg);
     }
 
-    return *prim_msg;
+    return prim_msg_ptr;
 }
 
 void ProtobufPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::CATCH);
     prim_msg->set_parameter1(catch_primitive.getVelocity());
     prim_msg->set_parameter2(catch_primitive.getDribblerSpeed());
@@ -30,7 +30,7 @@ void ProtobufPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 
 void ProtobufPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::SHOOT);
     prim_msg->set_parameter1(chip_primitive.getChipOrigin().x() * MILLIMETERS_PER_METER);
     prim_msg->set_parameter2(chip_primitive.getChipOrigin().y() * MILLIMETERS_PER_METER);
@@ -43,7 +43,7 @@ void ProtobufPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 void ProtobufPrimitiveVisitor::visit(
     const DirectVelocityPrimitive &direct_velocity_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::DIRECT_VELOCITY);
     prim_msg->set_parameter1(direct_velocity_primitive.getXVelocity() *
                              MILLIMETERS_PER_METER);
@@ -57,7 +57,7 @@ void ProtobufPrimitiveVisitor::visit(
 
 void ProtobufPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::DIRECT_WHEELS);
     prim_msg->set_parameter1(
         static_cast<double>(direct_wheels_primitive.getWheel0Power()));
@@ -73,7 +73,7 @@ void ProtobufPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_
 
 void ProtobufPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::DRIBBLE);
     prim_msg->set_parameter1(dribble_primitive.getDestination().x() *
                              MILLIMETERS_PER_METER);
@@ -88,7 +88,7 @@ void ProtobufPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 
 void ProtobufPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::SHOOT);
     prim_msg->set_parameter1(kick_primitive.getKickOrigin().x() * MILLIMETERS_PER_METER);
     prim_msg->set_parameter2(kick_primitive.getKickOrigin().y() * MILLIMETERS_PER_METER);
@@ -100,7 +100,7 @@ void ProtobufPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
 void ProtobufPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::MOVE);
     prim_msg->set_parameter1(move_primitive.getDestination().x() * MILLIMETERS_PER_METER);
     prim_msg->set_parameter2(move_primitive.getDestination().y() * MILLIMETERS_PER_METER);
@@ -118,7 +118,7 @@ void ProtobufPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 
 void ProtobufPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::SPIN);
     prim_msg->set_parameter1(movespin_primitive.getDestination().x() *
                              MILLIMETERS_PER_METER);
@@ -132,7 +132,7 @@ void ProtobufPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive
 
 void ProtobufPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::PIVOT);
     prim_msg->set_parameter1(pivot_primitive.getPivotPoint().x() * MILLIMETERS_PER_METER);
     prim_msg->set_parameter2(pivot_primitive.getPivotPoint().y() * MILLIMETERS_PER_METER);
@@ -145,7 +145,7 @@ void ProtobufPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
 void ProtobufPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
-    prim_msg = RadioPrimitive();
+    prim_msg = std::make_unique<RadioPrimitiveMsg>();
     prim_msg->set_prim_type(FirmwarePrimitiveType::STOP);
     prim_msg->set_extra_bits((uint32_t)stop_primitive.robotShouldCoast());
 }
