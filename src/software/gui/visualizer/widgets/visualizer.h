@@ -6,10 +6,10 @@
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
-#include "software/multithreading/thread_safe_buffer.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/gui/visualizer/drawing/draw_functions.h"
 #include "software/gui/visualizer/widgets/main_widget.h"
+#include "software/multithreading/thread_safe_buffer.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/time/duration.h"
 
 /**
