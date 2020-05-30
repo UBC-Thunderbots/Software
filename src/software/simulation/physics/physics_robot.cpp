@@ -1,7 +1,6 @@
 #include "software/simulation/physics/physics_robot.h"
 
 #include <algorithm>
-#include <boost/asio/detail/shared_ptr.hpp>
 
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
