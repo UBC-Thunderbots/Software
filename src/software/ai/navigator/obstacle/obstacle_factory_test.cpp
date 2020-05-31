@@ -26,6 +26,58 @@ class ObstacleFactoryTest : public testing::Test
     ObstacleFactory obstacle_factory;
 };
 
+class ObstacleFactoryMotionConstraintTest : public testing::Test
+{
+   public:
+    ObstacleFactoryMotionConstraintTest()
+        : current_time(Timestamp::fromSeconds(123)),
+          obstacle_factory(
+              Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig()),
+          field(),
+          ball(Point(1, 2), Vector(-0.3, 0), current_time),
+          friendly_team(Duration::fromMilliseconds(1000)),
+          enemy_team(Duration::fromMilliseconds(1000)),
+          world(field, ball, friendly_team, enemy_team)
+    {
+    }
+
+    void SetUp() override
+    {
+        // An arbitrary fixed point in time
+        // We use this fixed point in time to make the tests deterministic.
+        field = ::Test::TestUtil::createSSLDivBField();
+
+        Robot friendly_robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                                       AngularVelocity::threeQuarter(), current_time);
+
+        Robot friendly_robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                                       AngularVelocity::zero(), current_time);
+
+        friendly_team.updateRobots({friendly_robot_0, friendly_robot_1});
+        friendly_team.assignGoalie(1);
+
+        Robot enemy_robot_0 = Robot(0, Point(0.5, -2.5), Vector(), Angle::fromRadians(1),
+                                    AngularVelocity::fromRadians(2), current_time);
+
+        Robot enemy_robot_1 = Robot(1, Point(), Vector(-0.5, 4), Angle::quarter(),
+                                    AngularVelocity::half(), current_time);
+
+        enemy_team.updateRobots({enemy_robot_0, enemy_robot_1});
+        enemy_team.assignGoalie(0);
+
+        // Construct the world with arguments
+        world = World(field, ball, friendly_team, enemy_team);
+    }
+
+    Timestamp current_time;
+    Field field;
+    Ball ball;
+    Team friendly_team;
+    Team enemy_team;
+    World world;
+    ObstacleFactory obstacle_factory;
+};
+
 TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 {
     Rectangle rectangle(Point(1, 3), Point(5, 8));
@@ -166,5 +218,167 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     catch (std::bad_cast)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, enemy_robots_collision)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::ENEMY_ROBOTS_COLLISION, world);
+    EXPECT_EQ(2, obstacles.size());
+    try
+    {
+        Circle expected({0.5, -2.5}, 0.207);
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Circle Obstacle was not created for stationary enemy robot";
+    }
+
+    try
+    {
+        Polygon expected({{-0.237, -0.030},
+                          {-0.092, -0.220},
+                          {0.144, -0.191},
+                          {0.237, 0.0296},
+                          {0.123, 0.946},
+                          {-0.352, 0.886}});
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[1]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, centre_circle)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::CENTER_CIRCLE, world);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Circle expected({0, 0}, 0.617);
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Circle Obstacle was not created";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, half_metre_around_ball)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::HALF_METER_AROUND_BALL, world);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Circle expected({1, 2}, 0.617);
+        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Circle Obstacle was not created";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Polygon expected({{3.083, -1.417}, {3.083, 1.417}, {4.8, 1.417}, {4.8, -1.417}});
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Polygon Obstacle was not created";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, friendly_defense_area)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::FRIENDLY_DEFENSE_AREA, world);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Polygon expected(
+            {{-4.8, -1.117}, {-4.8, 1.117}, {-3.383, 1.117}, {-3.383, -1.117}});
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Polygon Obstacle was not created";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, enemy_defense_area)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::ENEMY_DEFENSE_AREA, world);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Polygon expected({{3.383, -1.117}, {3.383, 1.117}, {4.8, 1.117}, {4.8, -1.117}});
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Polygon Obstacle was not created";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, friendly_half)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::FRIENDLY_HALF, world);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Polygon expected({{-4.8, -3.3}, {-4.8, 3.3}, {0.117, 3.3}, {0.117, -3.3}});
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Polygon Obstacle was not created";
+    }
+}
+
+TEST_F(ObstacleFactoryMotionConstraintTest, enemy_half)
+{
+    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+        MotionConstraint::ENEMY_HALF, world);
+    EXPECT_EQ(1, obstacles.size());
+    try
+    {
+        Polygon expected({{-0.117, -3.3}, {-0.117, 3.3}, {4.8, 3.3}, {4.8, -3.3}});
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        EXPECT_TRUE(
+            ::Test::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+    }
+    catch (std::bad_cast)
+    {
+        ADD_FAILURE() << "Polygon Obstacle was not created";
     }
 }
