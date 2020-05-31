@@ -1,7 +1,10 @@
 #pragma once
 
-#include "shared/proto/tbots_software_msgs.h"
+#include "shared/proto/geometry.pb.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
+#include "shared/proto/vision.pb.h"
 #include "software/primitive/primitive.h"
+#include "software/world/world.h"
 
 /**
  * Translates internal messages such as World, Geometry and Primitives to their
@@ -17,7 +20,7 @@ class ProtobufMessageTranslator
      * @return The unique_ptr to a VisionMsg proto containing the friendly team and ball
      * information
      */
-    static std::unique_ptr<VisionMsg> getVisionMsgFromWorld(World world);
+    static std::unique_ptr<VisionMsg> getVisionMsgFromWorld(const World& world);
 
     /**
      * Returns a PrimitiveMsg proto given a ConstPrimitiveVectorPtr
@@ -26,29 +29,25 @@ class ProtobufMessageTranslator
      * @returns The unique_ptr to a PrimitiveMsg proto containing the primitives
      */
     static std::unique_ptr<PrimitiveMsg> getPrimitiveMsgFromPrimitiveVector(
-        ConstPrimitiveVectorPtr primitives);
+        const ConstPrimitiveVectorPtr& primitives);
 
     /**
-     * Returns a PointMsg proto given a Point
+     * Internal geometry types to protobuf msg conversions
      *
-     * @param The Point to convert to proto
-     * @return The unique_ptr to a PointMsg after conversion
+     * @param The geom type (Point, Angle, Vector) to convert to proto
+     * @return The unique_ptr to the converted GeomMsg
      */
-    static std::unique_ptr<PointMsg> getPointMsgFromPoint(Point point);
+    static std::unique_ptr<PointMsg> getPointMsgFromPoint(const Point& point);
+    static std::unique_ptr<AngleMsg> getAngleMsgFromAngle(const Angle& angle);
+    static std::unique_ptr<VectorMsg> getVectorMsgFromVector(const Vector& vector);
 
     /**
-     * Returns a AngleMsg proto given an Angle
+     * Returns a RobotStateMsg proto given a Robot
      *
-     * @param The Angle to convert to proto
-     * @return The unique_ptr to a AngleMsg after conversion
+     * @param The Robot to convert to proto
+     * @return The unique_ptr to a RobotStateMsg after conversion
      */
-    static std::unique_ptr<AngleMsg> getAngleMsgFromAngle(Angle angle);
-
-    /**
-     * Returns a VectorMsg proto given a Vector
-     *
-     * @param The Vector to convert to proto
-     * @return The unique_ptr to a VectorMsg after conversion
-     */
-    static std::unique_ptr<VectorMsg> getVectorMsgFromVector(Vector vector);
+    static std::unique_ptr<RobotStateMsg> getRobotStateMsgFromRobot(const Robot& robot);
+    static std::unique_ptr<BallStateMsg> getBallStateMsgFromBall(const Ball& ball);
+    static std::unique_ptr<TimestampMsg> getCurrentTimestampMsg();
 };

@@ -36,5 +36,4 @@ void RadioOutput::sendVisionPacket(const Team &friendly_team, Ball ball)
             robot.id(), robot.position(), robot.orientation()));
     }
     sendVisionPacket(robot_tuples, ball);
-    sendVisionPacket(robot_tuples, ball);
 }

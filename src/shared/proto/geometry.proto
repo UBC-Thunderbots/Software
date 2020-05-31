@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-message Point
+message PointMsg
 {
     // x coordinate
     double x = 1;
@@ -9,7 +9,7 @@ message Point
     double y = 2;
 }
 
-message Vector
+message VectorMsg
 {
     // x component
     double x_component = 1;
@@ -18,7 +18,7 @@ message Vector
     double y_component = 2;
 }
 
-message Angle
+message AngleMsg
 {
     // the angle in radians
     double radians = 1;

@@ -3,8 +3,8 @@
 #include <array>
 #include <optional>
 
-#include "shared/proto/primitive.pb.h"
-#include "software/ai/primitive/primitive_visitor.h"
+#include "shared/proto/radio_primitive.pb.h"
+#include "software/primitive/primitive_visitor.h"
 
 /**
  * This class implements a Visitor that serializes the Primitive classes into packets
