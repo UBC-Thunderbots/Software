@@ -212,7 +212,7 @@ class Field
     Rectangle enemyHalf() const;
 
     /**
-     * Gets the enemy half of the field within field boundary
+     * Gets the enemy half of the field within the field boundary
      *
      * @return the enemy half of the field
      */
