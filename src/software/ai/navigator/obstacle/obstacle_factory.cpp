@@ -78,7 +78,7 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
     double robot_hexagon_radius =
         (ROBOT_MAX_RADIUS_METERS + obstacle_expansion_amount) * 2.0 / std::sqrt(3);
 
-    // vector in the direction of the velocity and proportional to the norm the velocity
+    // vector in the direction of the velocity and proportional to the magnitude of the velocity
     Vector expanded_velocity_vector = robot.velocity().normalize(
         robot.velocity().length() * config->SpeedScalingFactor()->value() +
         obstacle_expansion_amount);
