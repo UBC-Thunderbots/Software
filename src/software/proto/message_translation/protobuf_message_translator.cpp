@@ -7,25 +7,25 @@
 std::unique_ptr<VisionMsg> ProtobufMessageTranslator::getVisionMsgFromWorld(
     const World& world)
 {
+    // create msg and set timestamp
     auto vision_msg = std::make_unique<VisionMsg>();
+    vision_msg->set_allocated_timestamp(getCurrentTimestampMsg().release());
 
-    // get current timestamp
-    auto timestamp = ProtobufMessageTranslator::getCurrentTimestampMsg();
-    vision_msg->set_allocated_timestamp(timestamp.release());
-
-    // get robot states
+    // set robot_states map
     auto& robot_states_map = *vision_msg->mutable_robot_states();
     auto friendly_robots   = world.friendlyTeam().getAllRobots();
 
+    // For every friendly robot, we create a RobotStateMsg proto. The unique_ptr
+    // is dereferenced, and there is an implicit deep copy into robot_states_map
+    //
+    // Since the unique_ptr immediately loses scope after the copy, the memory is freed
     std::for_each(friendly_robots.begin(), friendly_robots.end(),
                   [&](const Robot& robot) {
-                      robot_states_map[robot.id()] =
-                          *ProtobufMessageTranslator::getRobotStateMsgFromRobot(robot);
+                      robot_states_map[robot.id()] = *getRobotStateMsgFromRobot(robot);
                   });
 
-    // get ball state
-    auto ball_state = ProtobufMessageTranslator::getBallStateMsgFromBall(world.ball());
-    vision_msg->set_allocated_ball_state(ball_state.release());
+    // set ball state
+    vision_msg->set_allocated_ball_state(getBallStateMsgFromBall(world.ball()).release());
 
     return std::move(vision_msg);
 }
@@ -34,22 +34,24 @@ std::unique_ptr<PrimitiveMsg>
 ProtobufMessageTranslator::getPrimitiveMsgFromPrimitiveVector(
     const ConstPrimitiveVectorPtr& primitives)
 {
+    // create msg and update timestamp
     auto primitive_msg = std::make_unique<PrimitiveMsg>();
+    primitive_msg->set_allocated_timestamp(getCurrentTimestampMsg().release());
 
-    // get current timestamp
-    auto timestamp = ProtobufMessageTranslator::getCurrentTimestampMsg();
-    primitive_msg->set_allocated_timestamp(timestamp.release());
-
-    // get primitives
+    // set robot primitives
     auto& robot_primitives_map = *primitive_msg->mutable_robot_primitives();
     auto primitive_visitor     = ProtobufPrimitiveVisitor();
 
-    std::for_each(primitives->begin(), primitives->end(),
-                  [&](const std::unique_ptr<Primitive>& primitive) {
-                      primitive->accept(primitive_visitor);
-                      robot_primitives_map[primitive->getRobotId()] =
-                          *primitive_visitor.getRadioPrimitiveMsg();
-                  });
+    // For every primitive that is converted, the unique_ptr is dereferenced,
+    // and there is an implicit deep copy into the robot_primitives_map
+    //
+    // Since the unique_ptr immediately loses scope after the copy, the memory is freed
+    std::for_each(primitives->begin(), primitives->end(), [&](const auto& primitive) {
+        primitive->accept(primitive_visitor);
+
+        robot_primitives_map[primitive->getRobotId()] =
+            *primitive_visitor.getRadioPrimitiveMsg();
+    });
 
 
     return std::move(primitive_msg);
@@ -58,12 +60,10 @@ ProtobufMessageTranslator::getPrimitiveMsgFromPrimitiveVector(
 std::unique_ptr<RobotStateMsg> ProtobufMessageTranslator::getRobotStateMsgFromRobot(
     const Robot& robot)
 {
-    auto position = ProtobufMessageTranslator::getPointMsgFromPoint(robot.position());
-    auto orientation =
-        ProtobufMessageTranslator::getAngleMsgFromAngle(robot.orientation());
-    auto velocity = ProtobufMessageTranslator::getVectorMsgFromVector(robot.velocity());
-    auto angular_velocity =
-        ProtobufMessageTranslator::getAngleMsgFromAngle(robot.angularVelocity());
+    auto position         = getPointMsgFromPoint(robot.position());
+    auto orientation      = getAngleMsgFromAngle(robot.orientation());
+    auto velocity         = getVectorMsgFromVector(robot.velocity());
+    auto angular_velocity = getAngleMsgFromAngle(robot.angularVelocity());
 
     auto robot_state_msg = std::make_unique<RobotStateMsg>();
 
@@ -79,7 +79,7 @@ std::unique_ptr<RobotStateMsg> ProtobufMessageTranslator::getRobotStateMsgFromRo
 std::unique_ptr<BallStateMsg> ProtobufMessageTranslator::getBallStateMsgFromBall(
     const Ball& ball)
 {
-    auto position = ProtobufMessageTranslator::getPointMsgFromPoint(ball.position());
+    auto position       = getPointMsgFromPoint(ball.position());
     auto ball_state_msg = std::make_unique<BallStateMsg>();
 
     ball_state_msg->set_allocated_global_position_meters(position.release());

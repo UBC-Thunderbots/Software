@@ -32,6 +32,15 @@ class ProtobufMessageTranslator
         const ConstPrimitiveVectorPtr& primitives);
 
     /**
+     * Returns (Robot, Ball)StateMsg given a (Robot, Ball)
+     *
+     * @param The (Robot, Ball) to convert to StateMsg proto
+     * @return The unique_ptr to a (Robot, Ball)StateMsg after conversion
+     */
+    static std::unique_ptr<RobotStateMsg> getRobotStateMsgFromRobot(const Robot& robot);
+    static std::unique_ptr<BallStateMsg> getBallStateMsgFromBall(const Ball& ball);
+
+    /**
      * Internal geometry types to protobuf msg conversions
      *
      * @param The geom type (Point, Angle, Vector) to convert to proto
@@ -42,12 +51,9 @@ class ProtobufMessageTranslator
     static std::unique_ptr<VectorMsg> getVectorMsgFromVector(const Vector& vector);
 
     /**
-     * Returns a RobotStateMsg proto given a Robot
+     * Returns a timestamp msg with the time that this function was called
      *
-     * @param The Robot to convert to proto
-     * @return The unique_ptr to a RobotStateMsg after conversion
+     * @return The unique_ptr to a TimestampMsg with the current UTC time
      */
-    static std::unique_ptr<RobotStateMsg> getRobotStateMsgFromRobot(const Robot& robot);
-    static std::unique_ptr<BallStateMsg> getBallStateMsgFromBall(const Ball& ball);
     static std::unique_ptr<TimestampMsg> getCurrentTimestampMsg();
 };
