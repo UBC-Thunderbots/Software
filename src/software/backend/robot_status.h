@@ -94,4 +94,4 @@ struct RobotStatus
  *
  * @param robot_status The RobotStatus
  */
-TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(RobotStatus* robot_status);
+TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(const RobotStatus &robot_status);

@@ -79,7 +79,7 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_robot_msg)
                                 .fw_build_id = 2,
                                 1};
 
-    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(&robot_status);
+    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
 
     EXPECT_EQ(robot_msg.robot_id(), 1);
     for (int i = 0; i < robot_msg.error_code_size(); i++)
@@ -143,7 +143,7 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_invalid_ro
                                 .fw_build_id = 2,
                                 1};
 
-    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(&robot_status);
+    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
 
     EXPECT_EQ(robot_msg.robot_id(), 1);
     for (int i = 0; i < robot_msg.error_code_size(); i++)
@@ -196,7 +196,7 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_invalid_robot_ms
                                 .fw_build_id = 2,
                                 1};
 
-    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(&robot_status);
+    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
 
     EXPECT_EQ(robot_msg.robot_id(), 1);
     EXPECT_EQ(robot_msg.error_code_size(), 0);
