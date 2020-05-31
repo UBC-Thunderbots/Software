@@ -41,11 +41,11 @@ class World final
                    const Team& enemy_team, unsigned int buffer_size = 20);
 
     /**
-     * Updates the state of the field in the world with the new field data
+     * Updates the state of the field in the world with the new field
      *
-     * @param new_field_data A Field containing new field information
+     * @param new_fieldA new Field
      */
-    void updateFieldGeometry(const Field& new_field_data);
+    void updateField(const Field& new_field);
 
     /**
      * Updates the state of the ball in the world with the new ball data
@@ -88,13 +88,6 @@ class World final
      * @return a const reference to the Field in the world
      */
     const Field& field() const;
-
-    /**
-     * Returns a mutable reference to the Field in the world
-     *
-     * @return a mutable reference to the Field in the world
-     */
-    Field& mutableField();
 
     /**
      * Returns a const reference to the Ball in the world

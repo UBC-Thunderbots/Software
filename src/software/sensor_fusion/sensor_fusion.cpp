@@ -54,7 +54,7 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     std::optional<Field> field = ssl_protobuf_reader.getField(geometry_packet);
     if (field)
     {
-        world.updateFieldGeometry(*field);
+        world.updateField(*field);
     }
     else
     {

@@ -32,10 +32,9 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateFieldGeometry(const Field &new_field_data)
+void World::updateField(const Field &new_field)
 {
-    field_ = new_field_data;
-    updateTimestamp(getMostRecentTimestampFromMembers());
+    field_ = new_field;
 }
 
 void World::updateBallStateWithTimestamp(const TimestampedBallState &new_ball_state)
@@ -76,11 +75,6 @@ void World::updateTimestamp(Timestamp time_stamp)
 }
 
 const Field &World::field() const
-{
-    return field_;
-}
-
-Field &World::mutableField()
 {
     return field_;
 }

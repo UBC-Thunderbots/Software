@@ -126,7 +126,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     {
         const auto& latest_geometry_data = packet.geometry();
         Field field = network_filter.getFieldData(latest_geometry_data);
-        world.updateFieldGeometry(field);
+        world.updateField(field);
     }
 
     if (world.field().isValid())
