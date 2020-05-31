@@ -34,4 +34,15 @@ Windows has a new Windows Subsystem for Linux component that can be used to deve
 
 ## X Server Setup
 
-1. [Download VcXsrv](https://sourceforge.net/projects/vcxsrv/files/latest/download)
+1. [Download and install VcXsrv](https://sourceforge.net/projects/vcxsrv/files/latest/download)
+2. Start WSL and use your terminal text editor of choice to edit `/etc/profile.d/wsl-integration.sh` and change the line `export LIBGL_ALWAYS_INDIRECT=1` to `# export LIBGL_ALWAYS_INDIRECT=1`
+    - This comments out the line that sets the `LIBGL_ALWAYS_INDIRECT` environment variable which sets OpenGL programs to render on the X server instead of directly using the local OpenGL drivers. Unfortunately, this only supports OpenGL 1.4 which makes thunderbots give a black window and completely breaks grSim. 
+    - This makes WSL use the `llvmpipe` software rasterizer instead, which will run extremely poorly on low spec machines. 
+3. Start an X server by opening Xlaunch through the Start menu.
+    - Choose 'Multiple windows' on the first screen
+    - Choose 'Start no client' on the second screen
+    - On the third screen, name sure 'Native opengl' is UNCHECKED and 'Disable access control' is CHECKED
+4. Restart WSL with `wsl --shutdown` on the Windows command line. Open WSL again through the Start menu.
+5. Verify that your system is configured correctly by running `glxgears -info` on the Linux command line. You should see a window pop up with spinning gears and the line `GL_RENDERER   = llvmpipe (LLVM 9.0, 256 bits)` at the top of the output.
+
+Once you have completed all of the above, complete the [Software Setup](./getting-started.md).
