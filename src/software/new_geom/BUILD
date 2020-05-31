@@ -176,6 +176,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "interpolating_cubic_b_spline",
+    srcs = ["interpolating_cubic_b_spline.cpp"],
+    hdrs = ["interpolating_cubic_b_spline.h"],
+    deps = [
+        ":ray",
+        ":spline2d",
+    ],
+)
+
+cc_library(
+    name = "bezier_curve",
+    srcs = ["bezier_curve.cpp"],
+    hdrs = ["bezier_curve.h"],
+    deps = [
+        ":point",
+        ":spline2d",
+    ],
+)
+
 cc_test(
     name = "angle_test",
     srcs = [
@@ -328,6 +348,24 @@ cc_test(
     ],
     deps = [
         ":linear_spline2d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "interpolating_cubic_b_spline_test",
+    srcs = ["interpolating_cubic_b_spline_test.cpp"],
+    deps = [
+        ":interpolating_cubic_b_spline",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "bezier_curve_test",
+    srcs = ["bezier_curve_test.cpp"],
+    deps = [
+        ":bezier_curve",
         "@gtest//:gtest_main",
     ],
 )

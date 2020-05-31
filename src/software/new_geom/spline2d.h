@@ -1,6 +1,7 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/polynomial2d.h"
 
+// TODO: should this extend anything else in the geometry hierarchy?
 // Pre-declaration so we can make this a friend class of SplineSegment2d
 class Spline2d;
 
@@ -8,6 +9,8 @@ class Spline2d;
  * A segment of a spline, defined by a 2d polynomial, and the start and end values that
  * define the section of the 2d polynomial that is part of the spline
  */
+ // TODO: should this be in it's own file?
+ // TODO: this should be made a virtual class so that we can have different implementations
 class SplineSegment2d
 {
    public:
@@ -31,7 +34,7 @@ class SplineSegment2d
      */
     Polynomial2d getPolynomial() const;
 
-   private:
+   protected:
     friend class Spline2d;
 
     /**
@@ -48,6 +51,7 @@ class SplineSegment2d
      */
     SplineSegment2d(double start_val, double end_val, Polynomial2d polynomial);
 
+   private:
     const double start_val;
     const double end_val;
     const Polynomial2d polynomial;
@@ -72,6 +76,7 @@ class Spline2d
      * @return value of spline evaluated at value val. If val not in [0,1]
      *         then the closest endpoint
      */
+     // TODO: `val` is a terrible argument name since we're getting the `value`. Rename.
     virtual const Point getValueAt(double val) const = 0;
 
     /**
@@ -80,6 +85,11 @@ class Spline2d
      * @return The knots of this spline, including the start and end points
      */
     virtual const std::vector<Point> getKnots() const = 0;
+
+    // TODO: jdoc for this function
+    // TODO: better name for this function. It's mathematically accurate but not
+    //       intuitively obvious
+    virtual const std::vector<double> getKnotVector();
 
     /**
      * Gets the number of knots in the spline including start and end points
