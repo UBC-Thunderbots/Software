@@ -186,7 +186,7 @@ class Field
     /**
      * Gets the friendly half of the field within field boundary
      *
-     * @return the friendly half of the field
+     * @return the friendly half of the field within the field boundary
      */
     Rectangle friendlyHalfToBoundary() const;
 
