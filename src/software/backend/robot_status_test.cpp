@@ -79,21 +79,21 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_robot_msg)
                                 .fw_build_id = 2,
                                 1};
 
-    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
 
-    EXPECT_EQ(robot_msg.robot_id(), 1);
-    for (int i = 0; i < robot_msg.error_code_size(); i++)
+    EXPECT_EQ(robot_msg->robot_id(), 1);
+    for (int i = 0; i < robot_msg->error_code_size(); i++)
     {
-        EXPECT_EQ(robot_msg.error_code(i), expected_error_code[i]);
+        EXPECT_EQ(robot_msg->error_code(i), expected_error_code[i]);
     }
-    EXPECT_EQ(robot_msg.break_beam_status().ball_in_beam(), true);
-    EXPECT_EQ(robot_msg.break_beam_status().break_beam_reading(), 2.0);
-    EXPECT_EQ(robot_msg.firmware_status().fw_build_id(), 2);
-    EXPECT_EQ(robot_msg.dribbler_status().dribbler_rpm(), 3.0);
-    EXPECT_EQ(robot_msg.power_status().battery_voltage(), 4.0);
-    EXPECT_EQ(robot_msg.power_status().capacitor_voltage(), 5.0);
-    EXPECT_EQ(robot_msg.temperature_status().dribbler_temperature(), 6.0);
-    EXPECT_EQ(robot_msg.temperature_status().board_temperature(), 7.0);
+    EXPECT_EQ(robot_msg->break_beam_status().ball_in_beam(), true);
+    EXPECT_EQ(robot_msg->break_beam_status().break_beam_reading(), 2.0);
+    EXPECT_EQ(robot_msg->firmware_status().fw_build_id(), 2);
+    EXPECT_EQ(robot_msg->dribbler_status().dribbler_rpm(), 3.0);
+    EXPECT_EQ(robot_msg->power_status().battery_voltage(), 4.0);
+    EXPECT_EQ(robot_msg->power_status().capacitor_voltage(), 5.0);
+    EXPECT_EQ(robot_msg->temperature_status().dribbler_temperature(), 6.0);
+    EXPECT_EQ(robot_msg->temperature_status().board_temperature(), 7.0);
 }
 
 TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_invalid_robot_msg)
@@ -143,21 +143,21 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_invalid_ro
                                 .fw_build_id = 2,
                                 1};
 
-    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
 
-    EXPECT_EQ(robot_msg.robot_id(), 1);
-    for (int i = 0; i < robot_msg.error_code_size(); i++)
+    EXPECT_EQ(robot_msg->robot_id(), 1);
+    for (int i = 0; i < robot_msg->error_code_size(); i++)
     {
-        EXPECT_EQ(robot_msg.error_code(i), expected_error_code[i]);
+        EXPECT_EQ(robot_msg->error_code(i), expected_error_code[i]);
     }
-    EXPECT_EQ(robot_msg.break_beam_status().ball_in_beam(), true);
-    EXPECT_EQ(robot_msg.break_beam_status().break_beam_reading(), 2.0);
-    EXPECT_EQ(robot_msg.firmware_status().fw_build_id(), 2);
-    EXPECT_EQ(robot_msg.dribbler_status().dribbler_rpm(), 3.0);
-    EXPECT_EQ(robot_msg.power_status().battery_voltage(), 4.0);
-    EXPECT_EQ(robot_msg.power_status().capacitor_voltage(), 5.0);
-    EXPECT_EQ(robot_msg.temperature_status().dribbler_temperature(), 6.0);
-    EXPECT_EQ(robot_msg.temperature_status().board_temperature(), 7.0);
+    EXPECT_EQ(robot_msg->break_beam_status().ball_in_beam(), true);
+    EXPECT_EQ(robot_msg->break_beam_status().break_beam_reading(), 2.0);
+    EXPECT_EQ(robot_msg->firmware_status().fw_build_id(), 2);
+    EXPECT_EQ(robot_msg->dribbler_status().dribbler_rpm(), 3.0);
+    EXPECT_EQ(robot_msg->power_status().battery_voltage(), 4.0);
+    EXPECT_EQ(robot_msg->power_status().capacitor_voltage(), 5.0);
+    EXPECT_EQ(robot_msg->temperature_status().dribbler_temperature(), 6.0);
+    EXPECT_EQ(robot_msg->temperature_status().board_temperature(), 7.0);
 }
 
 TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_invalid_robot_msg)
@@ -196,16 +196,16 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_invalid_robot_ms
                                 .fw_build_id = 2,
                                 1};
 
-    TbotsRobotMsg robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
 
-    EXPECT_EQ(robot_msg.robot_id(), 1);
-    EXPECT_EQ(robot_msg.error_code_size(), 0);
-    EXPECT_EQ(robot_msg.break_beam_status().ball_in_beam(), true);
-    EXPECT_EQ(robot_msg.break_beam_status().break_beam_reading(), 2.0);
-    EXPECT_EQ(robot_msg.firmware_status().fw_build_id(), 2);
-    EXPECT_EQ(robot_msg.dribbler_status().dribbler_rpm(), 3.0);
-    EXPECT_EQ(robot_msg.power_status().battery_voltage(), 4.0);
-    EXPECT_EQ(robot_msg.power_status().capacitor_voltage(), 5.0);
-    EXPECT_EQ(robot_msg.temperature_status().dribbler_temperature(), 6.0);
-    EXPECT_EQ(robot_msg.temperature_status().board_temperature(), 7.0);
+    EXPECT_EQ(robot_msg->robot_id(), 1);
+    EXPECT_EQ(robot_msg->error_code_size(), 0);
+    EXPECT_EQ(robot_msg->break_beam_status().ball_in_beam(), true);
+    EXPECT_EQ(robot_msg->break_beam_status().break_beam_reading(), 2.0);
+    EXPECT_EQ(robot_msg->firmware_status().fw_build_id(), 2);
+    EXPECT_EQ(robot_msg->dribbler_status().dribbler_rpm(), 3.0);
+    EXPECT_EQ(robot_msg->power_status().battery_voltage(), 4.0);
+    EXPECT_EQ(robot_msg->power_status().capacitor_voltage(), 5.0);
+    EXPECT_EQ(robot_msg->temperature_status().dribbler_temperature(), 6.0);
+    EXPECT_EQ(robot_msg->temperature_status().board_temperature(), 7.0);
 }

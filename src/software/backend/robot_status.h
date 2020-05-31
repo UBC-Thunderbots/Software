@@ -94,4 +94,5 @@ struct RobotStatus
  *
  * @param robot_status The RobotStatus
  */
-TbotsRobotMsg convertRobotStatusToTbotsRobotMsg(const RobotStatus &robot_status);
+std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
+    const RobotStatus &robot_status);
