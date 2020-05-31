@@ -108,6 +108,7 @@ class Simulator
      */
     unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
 
+    std::optional<unsigned int> friendly_goalie_id;
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>

@@ -210,7 +210,7 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
         {
             // we are going to destination
             desired_final_speed = intent.getFinalSpeed();
-            final_dest          = path->endPoint();
+            final_dest          = path->getEndPoint();
         }
         else
         {

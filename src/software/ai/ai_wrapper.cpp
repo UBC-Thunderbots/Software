@@ -2,8 +2,8 @@
 
 #include <boost/bind.hpp>
 
+#include "software/gui/visualizer/drawing/navigator.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/visualizer/drawing/navigator.h"
 
 AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> ai_config,
                      std::shared_ptr<const AIControlConfig> control_config)

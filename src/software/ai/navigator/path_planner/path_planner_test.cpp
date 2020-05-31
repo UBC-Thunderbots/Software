@@ -140,14 +140,15 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
                   const Rectangle &navigable_area, std::vector<ObstaclePtr> &obstacles)
 {
     // check for zero length path
-    if (path.valueAt(0.f) == path.valueAt(1.f))
+    if (path.getValueAt(0.f) == path.getValueAt(1.f))
     {
         throw std::string("zero length path!");
     }
 
     // compute an s value interval that roughly corresponds to length
     // PATH_CHECK_INTERVAL_M assuming that the path is locally linear
-    double s_per_meter_ratio   = 0.05 / (path.valueAt(0.05) - path.valueAt(0.0)).length();
+    double s_per_meter_ratio =
+        0.05 / (path.getValueAt(0.05) - path.getValueAt(0.0)).length();
     double path_check_interval = s_per_meter_ratio * PATH_CHECK_INTERVAL_M;
 
     std::cout << "Evaluating path at intervals of s=" << path_check_interval << std::endl;
@@ -157,7 +158,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     // check if the path starts inside an obstacle
     auto start_obstacle_or_end_it = std::find_if(
         obstacles.begin(), obstacles.end(),
-        [&path](const auto &obs) { return obs->contains(path.valueAt(0.f)); });
+        [&path](const auto &obs) { return obs->contains(path.getValueAt(0.f)); });
     // remove the obstacle from obstacles *temporarily* until we exit the obstacle
     if (start_obstacle_or_end_it != obstacles.end())
     {
@@ -169,7 +170,7 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     for (double s = 0.0; s <= 1.0;
          s = (s != 1.0 && s + path_check_interval > 1.0) ? 1.0 : s + path_check_interval)
     {
-        Point pt = path.valueAt(s);
+        Point pt = path.getValueAt(s);
         // check if we exited the first obstacle, and add it back to obstacles
         if (start_obstacle_or_null && !(*start_obstacle_or_null)->contains(pt))
         {
@@ -209,7 +210,8 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
     // obstacle and never exit it
     if (dest_in_obstacle || start_obstacle_or_null)
     {
-        if ((path.valueAt(1.0) - dest).length() >= (path.valueAt(0.0) - dest).length())
+        if ((path.getValueAt(1.0) - dest).length() >=
+            (path.getValueAt(0.0) - dest).length())
         {
             // fail because no progress to destination
             std::stringstream fail_ss;
@@ -218,11 +220,11 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
             throw fail_ss.str();
         }
     }
-    else if ((path.valueAt(1.0) - dest).length() >= DEST_CHECK_EPSILON_M)
+    else if ((path.getValueAt(1.0) - dest).length() >= DEST_CHECK_EPSILON_M)
     {
         // fail because didn't reach destination
         std::stringstream fail_ss;
-        fail_ss << "Path ends at " << path.valueAt(1.0) << " but dest is " << dest;
+        fail_ss << "Path ends at " << path.getValueAt(1.0) << " but dest is " << dest;
         throw fail_ss.str();
     }
     // we passed, yay!
