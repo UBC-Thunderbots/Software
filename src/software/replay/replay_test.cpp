@@ -52,6 +52,7 @@ TbotsSensorProto generateTestFrame(int value)
     test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_t_capture(value);
     test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_t_sent(value);
     test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_camera_id(value);
+    assert(test_frame.has_ssl_wrapperpacket());
     return test_frame;
 }
 
@@ -113,7 +114,8 @@ TEST_F(ReplayTest, test_single_segment_multiple_message)
             EXPECT_TRUE(
                 google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
                     expected_message.ssl_wrapperpacket(), actual_message_or_null->ssl_wrapperpacket()));
-            std::cout << "idx " << expected_message.ssl_wrapperpacket().detection().t_sent() << " passed";
+            std::cout << "idx " << expected_message.ssl_wrapperpacket().detection().t_sent() << " passed"
+                      << std::endl;
         }
     }
 }
@@ -149,8 +151,9 @@ TEST_F(ReplayTest, test_multiple_segment_multiple_message)
                 FAIL();
 
             EXPECT_TRUE(actual_message_or_null->has_ssl_wrapperpacket());
-            std::cout << "ACTUAL: " << actual_message_or_null->ssl_wrapperpacket().detection().t_sent()
-                      << " EXPECTED: " << expected_message.ssl_wrapperpacket().detection().t_sent()
+            EXPECT_TRUE(google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
+                        expected_message.ssl_wrapperpacket(), actual_message_or_null->ssl_wrapperpacket()));
+            std::cout << "idx " << expected_message.ssl_wrapperpacket().detection().t_sent() << " passed"
                       << std::endl;
         }
     }

@@ -6,6 +6,4 @@ import "software/proto/messages_robocup_ssl_wrapper.proto";
 // this is just a placeholder until the real sensorproto is introduced
 message TbotsSensorProto {
     optional SSL_WrapperPacket ssl_wrapperpacket = 1;
-    optional Referee referee = 2;
-    required int32 fuck = 3;
 }
