@@ -187,9 +187,9 @@ cc_library(
 )
 
 cc_library(
-    name = "bezier_curve",
-    srcs = ["bezier_curve.cpp"],
-    hdrs = ["bezier_curve.h"],
+    name = "bezier_curve2d",
+    srcs = ["bezier_curve2d.cpp"],
+    hdrs = ["bezier_curve2d.h"],
     deps = [
         ":point",
         ":spline2d",
@@ -362,10 +362,10 @@ cc_test(
 )
 
 cc_test(
-    name = "bezier_curve_test",
-    srcs = ["bezier_curve_test.cpp"],
+    name = "bezier_curve2d_test",
+    srcs = ["bezier_curve2d_test.cpp"],
     deps = [
-        ":bezier_curve",
+        ":bezier_curve2d",
         "@gtest//:gtest_main",
     ],
 )
