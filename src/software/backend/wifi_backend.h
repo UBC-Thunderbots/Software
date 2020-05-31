@@ -30,14 +30,6 @@ class WifiBackend : public Backend
      */
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
-    /**
-     * Converts a the friendly team and ball inside the World msg to the proto VisionMsg
-     *
-     * @param world The world containing the friendly team and ball to send
-     * @returns The VisionMsg to send to the robots
-     */
-    VisionMsg getVisionMsgFromWorld(World world);
-
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
 
