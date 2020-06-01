@@ -9,30 +9,6 @@
 std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
     const RobotStatus& robot_status)
 {
-    //    std::map<std::string, ErrorCode> errorStringToEnumMap;
-    std::vector<std::string> errorStrings = {
-        "charge timeout",
-        "wheel 0 motor hot",
-        "wheel 1 motor hot",
-        "wheel 2 motor hot",
-        "wheel 3 motor hot",
-        "dribbler motor hot",
-        "wheel 0 encoder not commutating",
-        "wheel 1 encoder not commutating",
-        "wheel 2 encoder not commutating",
-        "wheel 3 encoder not commutating",
-        "wheel 0 Hall sensor stuck low",
-        "wheel 1 Hall sensor stuck low",
-        "wheel 2 Hall sensor stuck low",
-        "wheel 3 Hall sensor stuck low",
-        "dribbler Hall sensor stuck low",
-        "wheel 0 Hall sensor stuck high",
-        "wheel 1 Hall sensor stuck high",
-        "wheel 2 Hall sensor stuck high",
-        "wheel 3 Hall sensor stuck high",
-        "dribbler Hall sensor stuck high",
-    };
-
     // Insufficient information to make the TbotsRobotMsg fields for
     // ChipperKickerStatus, DriveUnits, and NetworkStatus
     auto robot_msg = std::make_unique<TbotsRobotMsg>();
@@ -42,25 +18,20 @@ std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
     ErrorCode error_code;
     for (auto& msg : robot_status.robot_messages)
     {
+        // Parse error message into enum string representation
+        // by capitalizing and replacing spaces with underscores
+        // Ex. "wheel 0 motor hot" -> "WHEEL_0_MOTOR_HOT"
+        std::string enum_string = msg;
+        std::transform(enum_string.begin(), enum_string.end(), enum_string.begin(),
+                       ::toupper);
+        std::replace(enum_string.begin(), enum_string.end(), ' ', '_');
+
+        // Map error message string to corresponding enum
+        bool errorCodeSuccess = ErrorCode_Parse(enum_string, &error_code);
         // If it is a valid error message, add to error_code
-        if (std::find(errorStrings.begin(), errorStrings.end(), msg) !=
-            errorStrings.end())
+        if (errorCodeSuccess)
         {
-            // Parse error message into enum string representation
-            // by capitalizing and replacing spaces with underscores
-            // Ex. "wheel 0 motor hot" -> "WHEEL_0_MOTOR_HOT"
-            std::string enum_string = msg;
-
-            std::transform(enum_string.begin(), enum_string.end(), enum_string.begin(),
-                           ::toupper);
-            std::replace(enum_string.begin(), enum_string.end(), ' ', '_');
-
-            // Map error message string to corresponding enum
-            bool errorCodeSuccess = ErrorCode_Parse(enum_string, &error_code);
-            if (errorCodeSuccess)
-            {
-                robot_msg->add_error_code(error_code);
-            }
+            robot_msg->add_error_code(error_code);
         }
         else
         {
