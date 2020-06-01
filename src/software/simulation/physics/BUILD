@@ -44,9 +44,9 @@ cc_library(
         ":box2d_util",
         ":physics_object_user_data",
         "//shared:constants",
-        "//software/geom",
-        "//software/time:timestamp",
-        "//software/world:ball",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/world:ball_state",
         "@box2d",
     ],
 )
@@ -93,8 +93,9 @@ cc_library(
     hdrs = ["physics_robot_model.h"],
     deps = [
         ":box2d_util",
+        "//shared:constants",
         "//software/new_geom:point",
-        "//software/world:robot",
+        "//software/world:robot_state",
         "@box2d",
     ],
 )
@@ -110,9 +111,11 @@ cc_library(
         ":physics_robot_model",
         "//firmware/shared:physics",
         "//shared:constants",
-        "//software/geom",
-        "//software/time:timestamp",
-        "//software/world:robot",
+        "//software/new_geom:angle",
+        "//software/new_geom:angular_velocity",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/world:robot_state",
         "@box2d",
     ],
 )
