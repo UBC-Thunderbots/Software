@@ -19,7 +19,7 @@ class ProtobufPrimitiveVisitor : public PrimitiveVisitor
     ProtobufPrimitiveVisitor() = default;
 
     /**
-     * Visitors the corresponding primitive and creates the necessary
+     * Visit the corresponding primitive and creates the necessary
      * protobuf for that primitive
      *
      * @param *_primitive The primitive to convert to protobuf

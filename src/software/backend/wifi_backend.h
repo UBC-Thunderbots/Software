@@ -42,9 +42,9 @@ class WifiBackend : public Backend
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
     /**
-     * Joins the specified multicast group the vision_output, primitive_output
-     * and robot_status input to a specific multicast channel. Multicast Channel
-     * and Multicast Group are used interchangably.
+     * Joins the specified multicast group on the vision_output, primitive_output
+     * and robot_status_input. Multicast Channel and Multicast Group are used
+     * interchangably.
      *
      * NOTE: This will terminate the existing connection on the previous channel
      * if it exists.

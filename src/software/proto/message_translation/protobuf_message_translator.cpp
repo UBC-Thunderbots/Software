@@ -18,7 +18,7 @@ std::unique_ptr<VisionMsg> ProtobufMessageTranslator::getVisionMsgFromWorld(
     // For every friendly robot, we create a RobotStateMsg proto. The unique_ptr
     // is dereferenced, and there is an implicit deep copy into robot_states_map
     //
-    // Since the unique_ptr immediately loses scope after the copy, the memory is freed
+    // Since the unique_ptr immediately looses scope after the copy, the memory is freed
     std::for_each(friendly_robots.begin(), friendly_robots.end(),
                   [&](const Robot& robot) {
                       robot_states_map[robot.id()] = *getRobotStateMsgFromRobot(robot);
@@ -45,7 +45,7 @@ ProtobufMessageTranslator::getPrimitiveMsgFromPrimitiveVector(
     // For every primitive that is converted, the unique_ptr is dereferenced,
     // and there is an implicit deep copy into the robot_primitives_map
     //
-    // Since the unique_ptr immediately loses scope after the copy, the memory is freed
+    // Since the unique_ptr immediately looses scope after the copy, the memory is freed
     std::for_each(primitives->begin(), primitives->end(), [&](const auto& primitive) {
         primitive->accept(primitive_visitor);
 
