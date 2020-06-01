@@ -21,11 +21,15 @@ WifiBackend::WifiBackend()
     // connect to current channel
     joinMulticastChannel(Util::DynamicParameters->getNetworkConfig()->Channel()->value());
 
+    // TODO can't register callbacks with the immutable parameters, why?
     // add callback to switch channels on param change
     Util::MutableDynamicParameters->getMutableNetworkConfig()
         ->mutableChannel()
         ->registerCallbackFunction(
             boost::bind(&WifiBackend::joinMulticastChannel, this, _1));
+
+    // start the thread to run the io_service in the background
+    io_service_thread = std::thread([this]() { io_service.run(); });
 }
 
 WifiBackend::~WifiBackend()
@@ -47,7 +51,10 @@ void WifiBackend::receiveWorld(World world)
 
 void WifiBackend::receiveTbotsRobotMsg(TbotsRobotMsg robot_msg)
 {
-    // TODO handle me
+    SensorMsg sensor_msg;
+    TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
+    *added_robot_msg               = robot_msg;
+    Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 
 void WifiBackend::joinMulticastChannel(int channel)

@@ -83,15 +83,12 @@ const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
 const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
 const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
 
+
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
-const unsigned MAX_MULTICAST_CHANNELS = 16;
-const unsigned MULTICAST_ADDRESS_SIZE = 21;
-
-// TODO is there a better way to do this?
-// base + offset doesn't seem very clean, maybe better to have them explicitly defined?
-const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_ADDRESS_SIZE] = {
+// TODO is there a better way to do this? w/out doing string manip
+const char MULTICAST_CHANNELS[16][21] = {
     "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
     "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
     "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
