@@ -7,8 +7,8 @@
 #include "software/primitive/primitive_visitor.h"
 
 /**
- * This class implements a Visitor that serializes the Primitive classes into packets
- * that can be send over the radio to the physical robots
+ * This class implements a Visitor that converts the Primitive classes into
+ * RadioPrimitiveMsgs
  */
 class ProtobufPrimitiveVisitor : public PrimitiveVisitor
 {
