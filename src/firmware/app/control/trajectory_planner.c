@@ -85,14 +85,14 @@ app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
         max_allowable_speed_profile, path, num_segments, arc_length_parameterization,
         arc_segment_length, max_allowable_acceleration);
 
-    float* velocity_profile = trajectory->speed_profile;
+    float* velocity_profile = trajectory->linear_speed_profile;
     // First point on the velocity profile is always the current speed
     velocity_profile[0] = initial_speed;
 
     // Loop through the path forwards to ensure that the maximum velocity limit defined by
     // the curvature is not breached by constant max acceleration of the robot (if it is,
     // pull down the acceleration)
-    app_trajectory_planner_generateForwardsContinuousVelocityProfile(
+    app_trajectory_planner_generateForwardsContinuousLinearSpeedProfile(
         num_segments, velocity_profile, max_allowable_speed_profile, arc_segment_length,
         max_allowable_acceleration, max_allowable_speed);
 
@@ -109,7 +109,7 @@ app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
 
     // Now check backwards continuity. This is done to guarantee the robot can deccelerate
     // in time to not breach the maximum allowable speed defined by the path curvature
-    app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
+    app_trajectory_planner_generateBackwardsContinuousSpeedProfile(
         num_segments, velocity_profile, arc_segment_length, max_allowable_acceleration);
 
     // Check that it was physically possible for the robot to stay on the path given the
@@ -153,8 +153,8 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         variable_time_trajectory->trajectory_elements[0].time;
     constant_period_trajectory->trajectory_elements[0].position =
         variable_time_trajectory->trajectory_elements[0].position;
-    constant_period_trajectory->speed_profile[0] =
-        variable_time_trajectory->speed_profile[0];
+    constant_period_trajectory->linear_speed_profile[0] =
+        variable_time_trajectory->linear_speed_profile[0];
 
     // Keep track of the current time we are searching for in the constant arclength
     // trajectory
@@ -179,8 +179,9 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
             const float delta_y =
                 variable_time_trajectory->trajectory_elements[i].position.y -
                 variable_time_trajectory->trajectory_elements[i - 1].position.y;
-            const float delta_speed = variable_time_trajectory->speed_profile[i] -
-                                      variable_time_trajectory->speed_profile[i - 1];
+            const float delta_speed =
+                variable_time_trajectory->linear_speed_profile[i] -
+                variable_time_trajectory->linear_speed_profile[i - 1];
 
             const float slope_x     = delta_x / delta_time;
             const float slope_y     = delta_y / delta_time;
@@ -200,13 +201,14 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
                 slope_speed *
                     (trajectory_time -
                      variable_time_trajectory->trajectory_elements[i - 1].time) +
-                variable_time_trajectory->speed_profile[i - 1];
+                variable_time_trajectory->linear_speed_profile[i - 1];
 
             constant_period_trajectory->trajectory_elements[time_periods].position.x =
                 interpolated_x;
             constant_period_trajectory->trajectory_elements[time_periods].position.y =
                 interpolated_y;
-            constant_period_trajectory->speed_profile[time_periods] = interpolated_speed;
+            constant_period_trajectory->linear_speed_profile[time_periods] =
+                interpolated_speed;
             constant_period_trajectory->trajectory_elements[time_periods].time =
                 trajectory_time;
 
@@ -229,8 +231,8 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         variable_time_trajectory->trajectory_elements[last_element_index].time;
     constant_period_trajectory->trajectory_elements[time_periods].position =
         variable_time_trajectory->trajectory_elements[last_element_index].position;
-    constant_period_trajectory->speed_profile[time_periods] =
-        variable_time_trajectory->speed_profile[last_element_index];
+    constant_period_trajectory->linear_speed_profile[time_periods] =
+        variable_time_trajectory->linear_speed_profile[last_element_index];
 
     // Set the new number of time periods
     constant_period_trajectory->path_parameters.num_segments = ++time_periods;
@@ -296,12 +298,10 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
     }
 }
 
-void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
-    const unsigned int num_segments,
-    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float arc_segment_length, const float max_allowable_acceleration,
-    const float max_allowable_speed)
+void app_trajectory_planner_generateForwardsContinuousLinearSpeedProfile(
+    const unsigned int num_segments, float* velocity_profile,
+    float* max_allowable_speed_profile, const float arc_segment_length,
+    const float max_allowable_acceleration, const float max_allowable_speed)
 {
     for (unsigned int i = 1; i < num_segments; i++)
     {
@@ -318,9 +318,301 @@ void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
     }
 }
 
-void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
-    const unsigned int num_segments,
-    float forwards_continuous_velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateForwardsContinuousLinearSpeedProfile_2(
+    PositionTrajectory_t* trajectory,
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
+{
+    const unsigned int num_segments = trajectory->path_parameters.num_segments;
+    const float max_allowable_speed =
+        trajectory->path_parameters.max_allowable_linear_speed;
+    const float max_allowable_acceleration =
+        trajectory->path_parameters.max_allowable_linear_acceleration;
+
+    trajectory->trajectory_elements[0].linear_speed =
+        trajectory->path_parameters.initial_linear_speed;
+
+    for (unsigned int i = 1; i < num_segments; i++)
+    {
+        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
+        float temp_vel =
+            (float)sqrt(pow(trajectory->trajectory_elements[i - 1].linear_speed, 2) +
+                        2 * segment_lengths[i - 1].linear_segment_length *
+                            max_allowable_acceleration);
+
+        // Pick  the lowest of the maximum the available speeds
+        const float lowest_speed =
+            fmin(max_allowable_speed_profile[i], max_allowable_speed);
+        const float speed_to_set = fmin(lowest_speed, temp_vel);
+
+        trajectory->trajectory_elements[i].linear_speed = speed_to_set;
+    }
+
+    if (trajectory->trajectory_elements[num_segments - 1].linear_speed <
+        trajectory->path_parameters.final_linear_speed)
+    {
+        return FINAL_VELOCITY_TOO_HIGH;
+    }
+
+    trajectory->trajectory_elements[num_segments - 1].linear_speed =
+        trajectory->path_parameters.final_linear_speed;
+    return OK;
+}
+
+
+void app_trajectory_planner_generateForwardsContinuousAngularSpeedProfile_2(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
+{
+    const unsigned int num_segments = trajectory->path_parameters.num_segments;
+    const float max_allowable_speed =
+        trajectory->path_parameters.max_allowable_angular_speed;
+    const float max_allowable_acceleration =
+        trajectory->path_parameters.max_allowable_angular_acceleration;
+
+    trajectory->trajectory_elements[0].angular_speed = 0;
+
+    for (unsigned int i = 1; i < num_segments; i++)
+    {
+        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
+        float temp_vel =
+            (float)sqrt(pow(trajectory->trajectory_elements[i - 1].angular_speed, 2) +
+                        2 * segment_lengths[i - 1].angular_segment_length *
+                            max_allowable_acceleration);
+
+        // Pick  the lowest of the maximum the available speeds
+        const float speed_to_set = fmin(max_allowable_speed, temp_vel);
+
+        trajectory->trajectory_elements[i].angular_speed = speed_to_set;
+    }
+
+    // The final velocity of an angular profile is assumed zero
+    trajectory->trajectory_elements[num_segments - 1].angular_speed = 0;
+}
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const bool is_angular_trajectory)
+{
+    const unsigned int num_segments = trajectory->path_parameters.num_segments;
+
+
+    const float max_allowable_acceleration =
+        is_angular_trajectory
+            ? trajectory->path_parameters.max_allowable_angular_acceleration
+            : trajectory->path_parameters.max_allowable_linear_acceleration;
+
+    for (unsigned int i = num_segments - 1; i > 0; i--)
+    {
+        // Initialize variables to the appropriate domain
+        float current_speed              = 0;
+        float previous_speed             = 0;
+        float max_allowable_acceleration = 0;
+        float seg_length                 = 0;
+
+        if (is_angular_trajectory)
+        {
+            current_speed  = trajectory->trajectory_elements[i].angular_speed;
+            previous_speed = trajectory->trajectory_elements[i - 1].angular_speed;
+            max_allowable_acceleration =
+                trajectory->path_parameters.max_allowable_angular_acceleration;
+            seg_length = segment_lengths[i - 1].angular_segment_length;
+        }
+        else
+        {
+            current_speed  = trajectory->trajectory_elements[i].linear_speed;
+            previous_speed = trajectory->trajectory_elements[i - 1].linear_speed;
+            max_allowable_acceleration =
+                trajectory->path_parameters.max_allowable_linear_speed;
+            seg_length = segment_lengths[i - 1].linear_segment_length;
+        }
+
+        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
+        float temp_vel = (float)sqrt(pow(current_speed, 2) +
+                                     2 * seg_length * max_allowable_acceleration);
+
+
+        // If the velocity at [i-1] is larger than it physically possible to deccelerate
+        // from, pull the speed at [i-1] lower
+        if (previous_speed > temp_vel)
+        {
+            if (is_angular_trajectory)
+            {
+                trajectory->trajectory_elements[i - 1].angular_speed = temp_vel;
+            }
+            else
+            {
+                trajectory->trajectory_elements[i - 1].linear_speed = temp_vel;
+            }
+        }
+    }
+
+    // Check that we are able to deccelerate fast enough that the initial velocity allows
+    // for the path to be followed
+    // Note: The initial speed of an angular profile is always assumed to be zero
+    if (is_angular_trajectory && trajectory->trajectory_elements[0].angular_speed >= 0.0)
+    {
+        trajectory->trajectory_elements[0].angular_speed = 0.0;
+        return OK;
+    }
+    else if (!is_angular_trajectory &&
+             trajectory->trajectory_elements[0].linear_speed >=
+                 trajectory->path_parameters.initial_linear_speed)
+    {
+        trajectory->trajectory_elements[0].linear_speed =
+            trajectory->path_parameters.initial_linear_speed;
+        return OK;
+    }
+
+    return INITIAL_VELOCITY_TOO_HIGH;
+}
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateBackwardsContinuousLinearSpeedProfile(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
+{
+    return app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
+        trajectory, segment_lengths, false);
+}
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateBackwardsContinuousAngularSpeedProfile(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
+{
+    return app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
+        trajectory, segment_lengths, true);
+}
+
+void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
+    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths)
+{
+    PositionTrajectoryElement_t* trajectory_elements = trajectory->trajectory_elements;
+
+    float* linear_speed_profile  = trajectory->linear_speed_profile;
+    float* angular_speed_profile = trajectory->angular_speed_profile;
+
+    // The timing of a trajectory is relative and starts with zero
+    trajectory_elements[0].time = 0.0;
+
+    // Calculate the time required for linear and rotational segment
+    // then use the largest of the calculated times as the total time for the segment
+    // Use the relative time difference to scale the speed (linear or angular) that is
+    // 'faster' than the other to make them arrive at the same point
+    for (unsigned int i = 1; i < trajectory->path_parameters.num_segments; i++)
+    {
+        // Initialize the variables to hold the length of time for each segment
+        float angular_segment_delta_time = 0;
+        float linear_segment_delta_time  = 0;
+
+        // Check that we are not dividing by zero
+        if (trajectory->linear_speed_profile[i] == 0 &&
+            trajectory->linear_speed_profile[i - 1] == 0)
+        {
+            linear_segment_delta_time = 0;
+        }
+        else
+        {
+            linear_segment_delta_time =
+                (2 * segment_lengths[i - 1].linear_segment_length) /
+                (trajectory->linear_speed_profile[i] +
+                 trajectory->linear_speed_profile[i - 1]);
+        }
+
+        // Check that we are not dividing by zero
+        if (trajectory->angular_speed_profile[i] == 0 &&
+            trajectory->angular_speed_profile[i - 1] == 0)
+        {
+            angular_segment_delta_time = 0;
+        }
+        else
+        {
+            angular_segment_delta_time =
+                (2 * segment_lengths[i - 1].angular_segment_length) /
+                (trajectory->angular_speed_profile[i] +
+                 trajectory->angular_speed_profile[i - 1]);
+        }
+
+        // Now we know the time requirements for following the linear and angular path
+        // profiles Pick the largest and scale the previous speed by a proportional amount
+        if (angular_segment_delta_time > linear_segment_delta_time &&
+            angular_segment_delta_time != 0)
+        {
+            // In this case the linear velocity needs to be scaled down
+            const float linear_scale_factor =
+                linear_segment_delta_time / angular_segment_delta_time;
+            trajectory->linear_speed_profile[i - 1] =
+                trajectory->linear_speed_profile[i - 1] * linear_scale_factor;
+            trajectory->trajectory_elements[i].time =
+                trajectory->trajectory_elements[i - 1].time + angular_segment_delta_time;
+        }
+        else if (linear_segment_delta_time > angular_segment_delta_time &&
+                 linear_segment_delta_time != 0)
+        {
+            // In this case the angular velocity needs to be scaled down
+            const float angular_scale_factor =
+                angular_segment_delta_time / linear_segment_delta_time;
+            trajectory->angular_speed_profile[i - 1] =
+                trajectory->angular_speed_profile[i - 1] * angular_scale_factor;
+            trajectory->trajectory_elements[i].time =
+                trajectory->trajectory_elements[i - 1].time + linear_segment_delta_time;
+        }
+        else
+        {
+            // Catch-all case that there is no change in position for both the linear and
+            // angular paths
+            trajectory->trajectory_elements[i].time =
+                trajectory->trajectory_elements[i - 1].time + 0.0;
+        }
+    }
+}
+
+void app_trajectory_planner_getMaxAllowableSpeedProfile_2(
+    Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
+    const float t_end, const float max_allowable_acceleration,
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
+{
+    Polynomial2dOrder2_t first_deriv = shared_polynomial2d_differentiateOrder3(path);
+    Polynomial2dOrder1_t second_deriv =
+        shared_polynomial2d_differentiateOrder2(first_deriv);
+    const float delta_t = (t_end - t_start) / num_elements;
+
+    for (unsigned int i = 0; i < num_elements; i++)
+    {
+        // Get the 't' value corresponding to the current arc length (to be used for
+        // further computing)
+        float t = t_start + i * delta_t;
+
+        // Create the polynomial representing path curvature
+        //                                              1
+        //                              ---------------------------------
+        //                                     abs(x'y'' - y'x'')
+        //        radius of curvature =      ----------------------
+        //                                     (x'^2 + y'^2)^(3/2)
+        //
+        const float numerator =
+            fabs(shared_polynomial1d_getValueOrder2(first_deriv.x, t) *
+                     shared_polynomial1d_getValueOrder1(second_deriv.y, t) -
+                 shared_polynomial1d_getValueOrder2(first_deriv.y, t) *
+                     shared_polynomial1d_getValueOrder1(second_deriv.x, t));
+        const float denominator =
+            pow(pow(shared_polynomial1d_getValueOrder2(first_deriv.x, t), 2) +
+                    pow(shared_polynomial1d_getValueOrder2(first_deriv.y, t), 2),
+                3.0 / 2.0);
+
+        const float radius_of_curvature = 1 / (numerator / denominator);
+
+        max_allowable_speed_profile[i] =
+            sqrt(max_allowable_acceleration * radius_of_curvature);
+    }
+}
+
+void app_trajectory_planner_generateBackwardsContinuousSpeedProfile(
+    const unsigned int num_segments, float* forwards_continuous_velocity_profile,
     const float arc_segment_length, const float max_allowable_acceleration)
 {
     for (unsigned int i = num_segments - 1; i > 0; i--)
@@ -370,14 +662,14 @@ void app_trajectory_planner_reversePositionTrajectoryDirection(
 
         // Reverse the speed profile
         reverse_speed_profile[(num_segments - 1) - i] =
-            forwards_trajectory->speed_profile[i];
+            forwards_trajectory->linear_speed_profile[i];
     }
     // Copy reverse element array back
     for (unsigned int i = 0; i < num_segments; i++)
     {
         forwards_trajectory->trajectory_elements[i].position = reverse[i].position;
         forwards_trajectory->trajectory_elements[i].time     = reverse[i].time;
-        forwards_trajectory->speed_profile[i]                = reverse_speed_profile[i];
+        forwards_trajectory->linear_speed_profile[i]         = reverse_speed_profile[i];
     }
 }
 
@@ -402,10 +694,10 @@ void app_trajectory_planner_generateVelocityTrajectory(
         // The unit vector of the direction is 1/magnitide(vector) *vector
         const float x_velocity_component = (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2))) *
                                            delta_x *
-                                           position_trajectory->speed_profile[i];
+                                           position_trajectory->linear_speed_profile[i];
         const float y_velocity_component = (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2))) *
                                            delta_y *
-                                           position_trajectory->speed_profile[i];
+                                           position_trajectory->linear_speed_profile[i];
 
         // Copy data into the velocity element array
         velocity_elements[i].linear_velocity.x = x_velocity_component;
@@ -426,10 +718,10 @@ void app_trajectory_planner_generateVelocityTrajectory(
     const float vector_magnitude_inverse = (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2)));
     const float x_velocity_component =
         vector_magnitude_inverse * delta_x *
-        position_trajectory->speed_profile[last_element_index];
+        position_trajectory->linear_speed_profile[last_element_index];
     const float y_velocity_component =
         vector_magnitude_inverse * delta_y *
-        position_trajectory->speed_profile[last_element_index];
+        position_trajectory->linear_speed_profile[last_element_index];
 
     // Copy data into the velocity element array
     velocity_elements[last_element_index].linear_velocity.x = x_velocity_component;
@@ -504,7 +796,7 @@ void app_trajectory_planner_generatePositionAndOrientations(
     assert(max_allowable_linear_acceleration > 0);
     assert(max_allowable_angular_acceleration > 0);
     assert(max_allowable_linear_speed > 0);
-    asset(max_allowable_angular_speed > 0);
+    assert(max_allowable_angular_speed > 0);
     assert(initial_linear_speed >= 0);
     assert(final_linear_speed >= 0);
     assert(num_segments <= TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
@@ -532,36 +824,41 @@ void app_trajectory_planner_generatePositionAndOrientations(
     // This is needed because the trajectory wil be broken up into constant 't' values
     // where 't' is the input parameter to the path and orientation polynomials By using a
     // constant 't' we can compare the orientation and linear profiles directly
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    const float t_segment_size = (t_end - t_start) / num_segments;
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
-    // Get all of the points for the arc length parameterization (Not constant arc length
-    // segments)
-    shared_polynomial_getArcLengthParametrizationOrder3(path, t_start, t_end,
-                                                        arc_length_parameterization);
+    app_trajectory_planner_generateStatesAndReturnSegmentLengths(trajectory,
+                                                                 segment_lengths);
 
-    const float arc_segment_length =
-        shared_polynomial2d_getTotalArcLength(arc_length_parameterization) / num_segments;
+    // Now that we have the states and segment lengths we must calculate the speed
+    // profiles for both the linear and angular trajectories
 }
 
 void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
-    PositionTrajectory_t trajectory, const float t_segment_size,
+    PositionTrajectory_t* trajectory,
     TrajectorySegment_t trajectory_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
-    const float t_start                              = trajectory.path_parameters.t_start;
-    PositionTrajectoryElement_t* trajectory_elements = trajectory.trajectory_elements;
-    trajectory_elements->orientation                 = shared_polynomial1d_getValueOrder3(
-        trajectory.path_parameters.orientation_profile, t_start);
-    trajectory_elements->position =
-        shared_polynomial2d_getValueOrder3(trajectory.path_parameters.path, t_start);
+    const float t_start = trajectory->path_parameters.t_start;
 
-    for (unsigned int i = 1; i < trajectory.path_parameters.num_segments; i++)
+    PositionTrajectoryElement_t* trajectory_elements = trajectory->trajectory_elements;
+
+    trajectory_elements[0].orientation = shared_polynomial1d_getValueOrder3(
+        trajectory->path_parameters.orientation_profile, t_start);
+
+    trajectory_elements[0].position =
+        shared_polynomial2d_getValueOrder3(trajectory->path_parameters.path, t_start);
+
+    const float t_segment_size =
+        (trajectory->path_parameters.t_end - trajectory->path_parameters.t_start) /
+        trajectory->path_parameters.num_segments;
+
+    for (unsigned int i = 1; i < trajectory->path_parameters.num_segments; i++)
     {
         // Grab the states at each 't' value
-        trajectory_elements->orientation = shared_polynomial1d_getValueOrder3(
-            trajectory.path_parameters.orientation_profile, t_start + i * t_segment_size);
-        trajectory_elements->position = shared_polynomial2d_getValueOrder3(
-            trajectory.path_parameters.path, t_start + i * t_segment_size);
+        trajectory_elements[i].orientation = shared_polynomial1d_getValueOrder3(
+            trajectory->path_parameters.orientation_profile,
+            t_start + i * t_segment_size);
+        trajectory_elements[i].position = shared_polynomial2d_getValueOrder3(
+            trajectory->path_parameters.path, t_start + i * t_segment_size);
 
         // Calculate the length of each segment and store it
         const float delta_x =
@@ -571,8 +868,9 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
 
         const float linear_segment_length = sqrt(pow(delta_x, 2) + pow(delta_y, 2));
         const float angular_segment_length =
-            trajectory_elements[i].orientation - trajectory_elements->orientation[i - 1];
-        trajectory_segments[i].linear_segment_length  = linear_segment_length;
-        trajectory_segments[i].angular_segment_length = angular_segment_length;
+            trajectory_elements[i].orientation - trajectory_elements[i - 1].orientation;
+
+        trajectory_segments[i - 1].linear_segment_length  = linear_segment_length;
+        trajectory_segments[i - 1].angular_segment_length = angular_segment_length;
     }
 }

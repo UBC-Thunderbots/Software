@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/vector_2d.h"
 
@@ -59,7 +61,8 @@ typedef struct PositionTrajectory
 {
     PositionTrajectoryElement_t* trajectory_elements;
     FirmwareRobotPathParameters_t path_parameters;
-    float* speed_profile;
+    float* linear_speed_profile;
+    float* angular_speed_profile;
 } PositionTrajectory_t;
 
 // Struct that defines a single point on a velocity trajectory
@@ -244,12 +247,44 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
  * @param max_allowable_speed [in] The max allowable speed at any point in m/s
  *
  * */
-void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
-    const unsigned int num_segments,
-    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+void app_trajectory_planner_generateForwardsContinuousLinearSpeedProfile(
+    const unsigned int num_segments, float* velocity_profile,
+    float* max_allowable_speed_profile, const float arc_segment_length,
+    const float max_allowable_acceleration, const float max_allowable_speed);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateForwardsContinuousLinearSpeedProfile_2(
+    PositionTrajectory_t* trajectory,
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float arc_segment_length, const float max_allowable_acceleration,
-    const float max_allowable_speed);
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+
+void app_trajectory_planner_generateForwardsContinuousAngularSpeedProfile_2(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+
+static TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const bool is_angular_trajectory);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateBackwardsContinuousLinearSpeedProfile(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateBackwardsContinuousAngularSpeedProfile(
+    PositionTrajectory_t* trajectory,
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+
+void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
+    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths);
+
+void app_trajectory_planner_getMaxAllowableSpeedProfile_2(
+    Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
+    const float t_end, const float max_allowable_acceleration,
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Modifies a forwards continuous velocity profile to also be backwards continuous based
@@ -270,9 +305,8 @@ void app_trajectory_planner_generateForwardsContinuousVelocityProfile(
  * @param max_allowable_acceleration [in] The max allowable acceleration at any point on
  * the velocity profile
  */
-void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
-    const unsigned int num_segments,
-    float forwards_continuous_velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+void app_trajectory_planner_generateBackwardsContinuousSpeedProfile(
+    const unsigned int num_segments, float* forwards_continuous_velocity_profile,
     const float arc_segment_length, const float max_allowable_acceleration);
 
 /**
@@ -320,6 +354,18 @@ void static app_trajectory_planner_reversePositionTrajectoryDirection(
 void app_trajectory_planner_generateVelocityTrajectory(
     PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory);
 
+/**
+ * This function calculates the robot state at every point along the trajectory (X/Y amd
+ * orientation) along with the physical length of these segments (meters, radians)
+ *
+ * @pre All arrays in the Trajectory must be pre-allocated up to at least
+ * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
+ *
+ * @param trajectory [in] The trajectory with pre-allocated arrays to contain trajectory
+ * data
+ * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
+ * time-optimal velocity to follow a specified path
+ */
 void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
-    PositionTrajectory_t trajectory, const float t_segment_size,
+    PositionTrajectory_t* trajectory,
     TrajectorySegment_t trajectory_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
