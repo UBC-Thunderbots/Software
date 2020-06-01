@@ -1,0 +1,8 @@
+NetworkConfig:
+    Channel:
+      min: 0
+      max: 15
+      default: 0
+      type: "int"
+      description: >-
+          The multicast channel to join to communicate with the robots
