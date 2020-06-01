@@ -30,6 +30,18 @@ class WifiBackend : public Backend
      */
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
+    /**
+     * Connects the vision_output, primitive_output and robot_status input
+     * to a specific multicast channel indicated by the channel argument.
+     *
+     * NOTE: This will terminate the existing connection on the previous channel
+     * if it exists.
+     *
+     * @param channel The channel to join, index of array specified
+     *        at //shared:constants - MULTICAST_CHANNELS
+     */
+    void WifiBackend::connectOnChannel(int channel);
+
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
 

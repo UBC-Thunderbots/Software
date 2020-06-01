@@ -1,4 +1,5 @@
-#include "software/backend/radio_backend.h"
+#include "software/backend/wifi_backend.h"
+
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -51,8 +52,7 @@ void WifiBackend::connectOnChannel(int channel)
 
     robot_status_input.reset(new ProtoMulticastListener<TbotsRobotMsg>(
         io_service, MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1));
-    );
+        boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1)));
 }
 
 // Register this backend in the genericFactory
