@@ -1,7 +1,9 @@
 #include "software/backend/wifi_backend.h"
 
+#include "shared/constants.h"
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/proto/message_translation/protobuf_message_translator.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string WifiBackend::name = "wifi";
@@ -13,25 +15,33 @@ WifiBackend::WifiBackend()
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&WifiBackend::receiveWorld, this, _1),
                     Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig())
+                    Util::DynamicParameters->getCameraConfig()),
+      io_service()
 {
     // connect to current channel
-    connectOnChannel(Util::DynamicParameters->getNetworkConfig()->Channel()->value());
+    joinMulticastChannel(Util::DynamicParameters->getNetworkConfig()->Channel()->value());
 
     // add callback to switch channels on param change
-    Util::DynamicParameters->getNetworkConfig()->Channel()->registerCallbackFunction(
-        boost::bind(&WifiBackend::connectOnChannel, this, _1));
+    Util::MutableDynamicParameters->getMutableNetworkConfig()
+        ->mutableChannel()
+        ->registerCallbackFunction(
+            boost::bind(&WifiBackend::joinMulticastChannel, this, _1));
+}
+
+WifiBackend::~WifiBackend()
+{
+    io_service_thread.join();
 }
 
 void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
     primitive_output->sendProto(
-        ProtobufMessageTranslator::getPrimitiveMsgFromPrimitiveVector(primitives_ptr));
+        *ProtobufMessageTranslator::getPrimitiveMsgFromPrimitiveVector(primitives_ptr));
 }
 
 void WifiBackend::receiveWorld(World world)
 {
-    vision_output->sendProto(ProtobufMessageTranslator::getVisionMsgFromWorld(world));
+    vision_output->sendProto(*ProtobufMessageTranslator::getVisionMsgFromWorld(world));
     Subject<World>::sendValueToObservers(world);
 }
 
@@ -40,10 +50,8 @@ void WifiBackend::receiveTbotsRobotMsg(TbotsRobotMsg robot_msg)
     // TODO handle me
 }
 
-void WifiBackend::connectOnChannel(int channel)
+void WifiBackend::joinMulticastChannel(int channel)
 {
-    // when ProtoMulticastSenders and ProtoMulticastListeners are destroyed,
-    // they close the sockets before freeing memory
     vision_output.reset(new ProtoMulticastSender<VisionMsg>(
         io_service, MULTICAST_CHANNELS[channel], VISION_PORT));
 

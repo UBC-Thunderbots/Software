@@ -52,6 +52,7 @@ cc_library(
     deps = [
         ":backend",
         "//shared:constants",
+        "//software:constants",
         "//software/backend/input/network/networking:network_client",
         "//software/networking:proto_multicast_listener",
         "//software/networking:proto_multicast_sender",

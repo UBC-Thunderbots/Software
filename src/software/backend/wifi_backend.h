@@ -3,6 +3,7 @@
 #include "shared/proto/tbots_robot_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
+#include "software/backend/input/network/networking/network_client.h"
 #include "software/networking/proto_multicast_listener.h"
 #include "software/networking/proto_multicast_sender.h"
 
@@ -10,6 +11,8 @@ class WifiBackend : public Backend
 {
    public:
     WifiBackend();
+
+    virtual ~WifiBackend();
 
     static const std::string name;
 
@@ -23,6 +26,14 @@ class WifiBackend : public Backend
     void receiveWorld(World world);
 
     /**
+     * This is registered as an async callback function on the robot_status_input
+     * to receive msgs from the robot.
+     *
+     * @param robot_msg The robot_msg from a robot
+     */
+    void receiveTbotsRobotMsg(TbotsRobotMsg robot_msg);
+
+    /**
      * This is called when we receive a primitive vector because
      * the backend is a ThreadedObserver of the ConstantPrimitiveVectorPtr
      *
@@ -31,16 +42,18 @@ class WifiBackend : public Backend
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
     /**
-     * Connects the vision_output, primitive_output and robot_status input
-     * to a specific multicast channel indicated by the channel argument.
+     * Joins the proper multicast group the vision_output, primitive_output
+     * and robot_status input to a specific multicast channel indicated by the index.
+     * Multicast Channel and Multicast Group are used interchangably.
      *
      * NOTE: This will terminate the existing connection on the previous channel
      * if it exists.
      *
-     * @param channel The channel to join, index of array specified
-     *        at //shared:constants - MULTICAST_CHANNELS
+     * @param channel The channel to join, index of MULTICAST_CHANNELS in
+     * shared/constants.h
      */
-    void WifiBackend::connectOnChannel(int channel);
+    void joinMulticastChannel(int channel);
+
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
@@ -49,4 +62,11 @@ class WifiBackend : public Backend
     std::unique_ptr<ProtoMulticastSender<VisionMsg>> vision_output;
     std::unique_ptr<ProtoMulticastSender<PrimitiveMsg>> primitive_output;
     std::unique_ptr<ProtoMulticastListener<TbotsRobotMsg>> robot_status_input;
+
+    // The io_service that will be used to serivce all network requests
+    boost::asio::io_service io_service;
+
+    // The thread running the io_service in the background. This thread will run for the
+    // entire lifetime of the class
+    std::thread io_service_thread;
 };
