@@ -1069,10 +1069,10 @@ class TrajectoryPlannerTest : public testing::Test
 //
 //// This test generates a scenario where there is not enough elements in the
 //// TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS specified array as there path is quite long and
-///the / maximum speed of the path is low. This means that most (likely all) arc-length
-///segments / require multiple interpolation periods to traverse, and therefore requires
-///more space / than the constant arc_length trajectory that is alread 1 element away from
-//// TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+/// the / maximum speed of the path is low. This means that most (likely all) arc-length
+/// segments / require multiple interpolation periods to traverse, and therefore requires
+/// more space / than the constant arc_length trajectory that is alread 1 element away
+/// from / TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
 // TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elements)
 //{
 //    Polynomial2dOrder3_t path = {
@@ -1161,7 +1161,7 @@ class TrajectoryPlannerTest : public testing::Test
 //}
 //
 //// Set the initial velocity to a speed that is so high the robot cannot possible slow
-///down / in time to follow the path
+/// down / in time to follow the path
 // TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
 //{
 //    Polynomial2dOrder3_t path = {
@@ -1412,8 +1412,8 @@ TEST_F(TrajectoryPlannerTest, test_robot_state_generation_at_constant_t_interval
     app_trajectory_planner_generateStatesAndReturnSegmentLengths(&trajectory,
                                                                  segment_lengths);
 
-    const float delta_t =
-        (path_parameters.t_end - path_parameters.t_start) / path_parameters.num_segments;
+    const float delta_t = (path_parameters.t_end - path_parameters.t_start) /
+                          (path_parameters.num_segments - 1);
 
     // Check that all of the state variables are correct
     for (unsigned int i = 0; i < path_parameters.num_segments; i++)
@@ -1430,6 +1430,12 @@ TEST_F(TrajectoryPlannerTest, test_robot_state_generation_at_constant_t_interval
         EXPECT_FLOAT_EQ(expected_position.y,
                         trajectory.trajectory_elements[i].position.y);
     }
+    EXPECT_FLOAT_EQ(
+        trajectory.trajectory_elements[path_parameters.num_segments - 1].position.y, 1);
+    EXPECT_FLOAT_EQ(
+        trajectory.trajectory_elements[path_parameters.num_segments - 1].position.x, 1);
+    EXPECT_FLOAT_EQ(
+        trajectory.trajectory_elements[path_parameters.num_segments - 1].orientation, 1);
 }
 
 TEST_F(TrajectoryPlannerTest, test_robot_segment_size_generation_at_constant_t_intervals)
@@ -1518,9 +1524,10 @@ TEST_F(TrajectoryPlannerTest,
     app_trajectory_planner_generateStatesAndReturnSegmentLengths(&trajectory,
                                                                  segment_lengths);
 
-    const float delta_length = total_path_length_linear / path_parameters.num_segments;
+    const float delta_length =
+        total_path_length_linear / (path_parameters.num_segments - 1);
     const float delta_length_orientation =
-        total_path_length_angular / path_parameters.num_segments;
+        total_path_length_angular / (path_parameters.num_segments - 1);
     // Check that all of the segment lengths are correct
     for (unsigned int i = 0; i < path_parameters.num_segments - 1; i++)
     {
@@ -2034,6 +2041,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_maximum_speed_curve_straight_line)
 
 TEST_F(TrajectoryPlannerTest,
        test_generate_forwards_and_backwards_continuous_speed_profiles_angular_and_linear)
+
 {
     FirmwareRobotPathParameters_t path_parameters;
     path_parameters.max_allowable_angular_acceleration = 1;
@@ -2084,16 +2092,16 @@ TEST_F(TrajectoryPlannerTest,
 
     // Check that the values of the acceleration period are correct
     EXPECT_NEAR(trajectory.trajectory_elements[0].linear_speed, 0, 0.0001);
-    EXPECT_NEAR(trajectory.trajectory_elements[1].linear_speed, 0.5318, 0.0001);
-    EXPECT_NEAR(trajectory.trajectory_elements[2].linear_speed, 0.7521, 0.0001);
-    EXPECT_NEAR(trajectory.trajectory_elements[3].linear_speed, 0.9211, 0.0001);
+    EXPECT_NEAR(trajectory.trajectory_elements[1].linear_speed, 0.5606, 0.0001);
+    EXPECT_NEAR(trajectory.trajectory_elements[2].linear_speed, 0.7928, 0.0001);
+    EXPECT_NEAR(trajectory.trajectory_elements[3].linear_speed, 0.9709, 0.0001);
     EXPECT_NEAR(trajectory.trajectory_elements[4].linear_speed, 1.0, 0.0001);
 
     EXPECT_NEAR(trajectory.trajectory_elements[0].angular_speed, 0, 0.0001);
-    EXPECT_NEAR(trajectory.trajectory_elements[1].angular_speed, 0.4472, 0.0001);
-    EXPECT_NEAR(trajectory.trajectory_elements[2].angular_speed, 0.6324, 0.0001);
-    EXPECT_NEAR(trajectory.trajectory_elements[3].angular_speed, 0.7745, 0.0001);
-    EXPECT_NEAR(trajectory.trajectory_elements[4].angular_speed, 0.89442, 0.0001);
+    EXPECT_NEAR(trajectory.trajectory_elements[1].angular_speed, 0.4714, 0.0001);
+    EXPECT_NEAR(trajectory.trajectory_elements[2].angular_speed, 0.6666, 0.0001);
+    EXPECT_NEAR(trajectory.trajectory_elements[3].angular_speed, 0.8165, 0.0001);
+    EXPECT_NEAR(trajectory.trajectory_elements[4].angular_speed, 0.9428, 0.0001);
 
     // Check that the path speed is limited by the maximum value set in the path
     // parameters
@@ -2119,13 +2127,13 @@ TEST_F(TrajectoryPlannerTest,
         1 - 0, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 4].linear_speed,
-        0.9211, 0.0001);
+        0.9709, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 3].linear_speed,
-        0.7521, 0.0001);
+        0.7928, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 2].linear_speed,
-        0.5318, 0.0001);
+        0.5606, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 1].linear_speed,
         path_parameters.final_linear_speed, 0.0001);
@@ -2133,16 +2141,16 @@ TEST_F(TrajectoryPlannerTest,
 
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 5].angular_speed,
-        0.8944, 0.0001);
+        0.9428, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 4].angular_speed,
-        0.7745, 0.0001);
+        0.8165, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 3].angular_speed,
-        0.6324, 0.0001);
+        0.6666, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 2].angular_speed,
-        0.4472, 0.0001);
+        0.4714, 0.0001);
     EXPECT_NEAR(
         trajectory.trajectory_elements[path_parameters.num_segments - 1].angular_speed, 0,
         0.0001);
@@ -2158,12 +2166,12 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_linear_limiting)
     path_parameters.max_allowable_linear_acceleration  = 1;
     path_parameters.max_allowable_linear_speed         = 1;
     path_parameters.num_segments                       = 100;
-    path_parameters.initial_linear_speed               = 0;
-    path_parameters.final_linear_speed                 = 0;
+    path_parameters.initial_linear_speed               = 1;
+    path_parameters.final_linear_speed                 = 1;
     path_parameters.t_start                            = 1;
     path_parameters.t_end                              = 2;
     path_parameters.path                = {.x = {0, 0, 1, 0}, .y = {0, 0, 1, 0}};
-    path_parameters.orientation_profile = {.coefficients = {0, 0, 1, 0}};
+    path_parameters.orientation_profile = {.coefficients = {0, 0, 0, 0}};
 
     float linear_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float angular_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -2208,5 +2216,14 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_linear_limiting)
     app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(&trajectory,
                                                                    segment_lengths);
 
-    std::cout << "hello world";
+    EXPECT_FLOAT_EQ(trajectory.trajectory_elements[0].time, 0.0);
+    for (unsigned int i = 1; i < path_parameters.num_segments; i++)
+    {
+        EXPECT_EQ(trajectory.trajectory_elements[i].time,
+                  trajectory.trajectory_elements[i - 1].time +
+                      segment_lengths[i - 1].linear_segment_length /
+                          path_parameters.initial_linear_speed);
+    }
+    EXPECT_NEAR(trajectory.trajectory_elements[path_parameters.num_segments - 1].time,
+                sqrt(2) / path_parameters.initial_linear_speed, 0.0001);
 }

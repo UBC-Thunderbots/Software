@@ -493,9 +493,6 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
 {
     PositionTrajectoryElement_t* trajectory_elements = trajectory->trajectory_elements;
 
-    float* linear_speed_profile  = trajectory->linear_speed_profile;
-    float* angular_speed_profile = trajectory->angular_speed_profile;
-
     // The timing of a trajectory is relative and starts with zero
     trajectory_elements[0].time = 0.0;
 
@@ -510,8 +507,8 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
         float linear_segment_delta_time  = 0;
 
         // Check that we are not dividing by zero
-        if (trajectory->linear_speed_profile[i] == 0 &&
-            trajectory->linear_speed_profile[i - 1] == 0)
+        if (trajectory->trajectory_elements[i].linear_speed == 0 &&
+            trajectory->trajectory_elements[i - 1].linear_speed == 0)
         {
             linear_segment_delta_time = 0;
         }
@@ -519,13 +516,13 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
         {
             linear_segment_delta_time =
                 (2 * segment_lengths[i - 1].linear_segment_length) /
-                (trajectory->linear_speed_profile[i] +
-                 trajectory->linear_speed_profile[i - 1]);
+                (trajectory->trajectory_elements[i].linear_speed +
+                 trajectory->trajectory_elements[i - 1].linear_speed);
         }
 
         // Check that we are not dividing by zero
-        if (trajectory->angular_speed_profile[i] == 0 &&
-            trajectory->angular_speed_profile[i - 1] == 0)
+        if (trajectory->trajectory_elements[i].angular_speed == 0 &&
+            trajectory->trajectory_elements[i - 1].angular_speed == 0)
         {
             angular_segment_delta_time = 0;
         }
@@ -533,8 +530,8 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
         {
             angular_segment_delta_time =
                 (2 * segment_lengths[i - 1].angular_segment_length) /
-                (trajectory->angular_speed_profile[i] +
-                 trajectory->angular_speed_profile[i - 1]);
+                (trajectory->trajectory_elements[i].angular_speed +
+                 trajectory->trajectory_elements[i - 1].angular_speed);
         }
 
         // Now we know the time requirements for following the linear and angular path
@@ -545,7 +542,7 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
             // In this case the linear velocity needs to be scaled down
             const float linear_scale_factor =
                 linear_segment_delta_time / angular_segment_delta_time;
-            trajectory->linear_speed_profile[i - 1] =
+            trajectory->trajectory_elements[i - 1].linear_speed =
                 trajectory->linear_speed_profile[i - 1] * linear_scale_factor;
             trajectory->trajectory_elements[i].time =
                 trajectory->trajectory_elements[i - 1].time + angular_segment_delta_time;
@@ -556,8 +553,9 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
             // In this case the angular velocity needs to be scaled down
             const float angular_scale_factor =
                 angular_segment_delta_time / linear_segment_delta_time;
-            trajectory->angular_speed_profile[i - 1] =
-                trajectory->angular_speed_profile[i - 1] * angular_scale_factor;
+            trajectory->trajectory_elements[i - 1].angular_speed =
+                trajectory->trajectory_elements[i - 1].angular_speed *
+                angular_scale_factor;
             trajectory->trajectory_elements[i].time =
                 trajectory->trajectory_elements[i - 1].time + linear_segment_delta_time;
         }
@@ -849,7 +847,7 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
 
     const float t_segment_size =
         (trajectory->path_parameters.t_end - trajectory->path_parameters.t_start) /
-        trajectory->path_parameters.num_segments;
+        (trajectory->path_parameters.num_segments - 1);
 
     for (unsigned int i = 1; i < trajectory->path_parameters.num_segments; i++)
     {
