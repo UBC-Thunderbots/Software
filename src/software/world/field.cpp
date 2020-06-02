@@ -71,13 +71,6 @@ Rectangle Field::friendlyDefenseArea() const
         Point(-field_x_length_ * 0.5 + defense_x_length_, -defense_y_length_ / 2.0));
 }
 
-Rectangle Field::friendlyDefenseAreaToBoundary() const
-{
-    return Rectangle(
-        Point(-totalXLength() * 0.5, defense_y_length_ / 2.0),
-        Point(-field_x_length_ * 0.5 + defense_x_length_, -defense_y_length_ / 2.0));
-}
-
 Rectangle Field::enemyDefenseArea() const
 {
     return Rectangle(
@@ -85,23 +78,9 @@ Rectangle Field::enemyDefenseArea() const
         Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
 }
 
-Rectangle Field::enemyDefenseAreaToBoundary() const
-{
-    return Rectangle(
-        Point(totalXLength() * 0.5, defense_y_length_ / 2.0),
-        Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
-}
-
 Rectangle Field::friendlyHalf() const
 {
     return Rectangle(friendlyCornerNeg(), Point(0, friendlyCornerPos().y()));
-}
-
-Rectangle Field::friendlyHalfToBoundary() const
-{
-    Point neg_x_neg_y_corner(-totalXLength() / 2, -totalYLength() / 2);
-    Point pos_x_pos_y_corner(0, totalYLength() / 2);
-    return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 }
 
 Rectangle Field::friendlyPositiveYQuadrant() const
@@ -117,13 +96,6 @@ Rectangle Field::friendlyNegativeYQuadrant() const
 Rectangle Field::enemyHalf() const
 {
     return Rectangle(Point(0, enemyCornerNeg().y()), enemyCornerPos());
-}
-
-Rectangle Field::enemyHalfToBoundary() const
-{
-    Point neg_x_neg_y_corner(0, -totalYLength() / 2);
-    Point pos_x_pos_y_corner(totalXLength() / 2, totalYLength() / 2);
-    return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 }
 
 Rectangle Field::enemyPositiveYQuadrant() const

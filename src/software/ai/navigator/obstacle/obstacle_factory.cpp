@@ -2,8 +2,8 @@
 
 ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config)
     : config(config),
-      robot_expansion_amount(config->RobotObstacleInflationFactor()->value() *
-                             ROBOT_MAX_RADIUS_METERS)
+      robot_radius_expansion_amount(config->RobotObstacleInflationFactor()->value() *
+                                    ROBOT_MAX_RADIUS_METERS)
 {
 }
 
@@ -23,35 +23,39 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
         }
         break;
         case MotionConstraint::CENTER_CIRCLE:
-            obstacles.push_back(expandForRobotSize(
+            obstacles.push_back(fromCircle(
                 Circle(world.field().centerPoint(), world.field().centerCircleRadius())));
             break;
         case MotionConstraint::HALF_METER_AROUND_BALL:
             // 0.5 represents half a metre radius
-            obstacles.push_back(expandForRobotSize(Circle(world.ball().position(), 0.5)));
+            obstacles.push_back(fromCircle(Circle(world.ball().position(), 0.5)));
             break;
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
-            obstacles.push_back(expandForInflatedRobotSize(
-                world.field().enemyDefenseAreaToBoundary(), {{-1, 0}, {0, -1}, {0, 1}}));
+            obstacles.push_back(fromFieldRectangle(
+                world.field().enemyDefenseArea(), world.field().fieldLines(),
+                world.field().fieldBoundary(), robot_radius_expansion_amount + 0.3));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
-            obstacles.push_back(
-                expandForRobotSize(world.field().friendlyDefenseAreaToBoundary(),
-                                   {{1, 0}, {0, -1}, {0, 1}}));
+            obstacles.push_back(fromFieldRectangle(world.field().friendlyDefenseArea(),
+                                                   world.field().fieldLines(),
+                                                   world.field().fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            obstacles.push_back(expandForRobotSize(
-                world.field().enemyDefenseAreaToBoundary(), {{-1, 0}, {0, -1}, {0, 1}}));
+            obstacles.push_back(fromFieldRectangle(world.field().enemyDefenseArea(),
+                                                   world.field().fieldLines(),
+                                                   world.field().fieldBoundary()));
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            obstacles.push_back(
-                expandForRobotSize(world.field().friendlyHalfToBoundary(), {{1, 0}}));
+            obstacles.push_back(fromFieldRectangle(world.field().friendlyHalf(),
+                                                   world.field().fieldLines(),
+                                                   world.field().fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_HALF:
-            obstacles.push_back(
-                expandForRobotSize(world.field().enemyHalfToBoundary(), {{-1, 0}}));
+            obstacles.push_back(fromFieldRectangle(world.field().enemyHalf(),
+                                                   world.field().fieldLines(),
+                                                   world.field().fieldBoundary()));
             break;
     }
 
@@ -76,13 +80,13 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
 {
     // radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
-        (ROBOT_MAX_RADIUS_METERS + robot_expansion_amount) * 2.0 / std::sqrt(3);
+        (ROBOT_MAX_RADIUS_METERS + robot_radius_expansion_amount) * 2.0 / std::sqrt(3);
 
     // vector in the direction of the velocity and proportional to the magnitude of the
     // velocity
     Vector expanded_velocity_vector = robot.velocity().normalize(
         robot.velocity().length() * config->SpeedScalingFactor()->value() +
-        robot_expansion_amount);
+        robot_radius_expansion_amount);
 
     /* If the robot is travelling slower than a threshold, then a stationary robot
      * obstacle will be returned. If the robot is travelling faster than a threshold, then
@@ -144,53 +148,61 @@ std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
 
 ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position) const
 {
-    return expandForRobotSize(Circle(ball_position, BALL_MAX_RADIUS_METERS));
+    return fromCircle(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
 ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position) const
 {
-    return expandForRobotSize(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
+    return fromCircle(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
 }
 
 ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle) const
 {
-    return expandForRobotSize(Polygon(rectangle));
+    return fromPolygon(Polygon(rectangle));
 }
 
-ObstaclePtr ObstacleFactory::expandForRobotSize(const Circle &circle) const
+ObstaclePtr ObstacleFactory::fromCircle(const Circle &circle) const
 {
     return std::make_shared<GeomObstacle<Circle>>(
-        Circle(circle.getOrigin(), circle.getRadius() + robot_expansion_amount));
+        Circle(circle.getOrigin(), circle.getRadius() + robot_radius_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::expandForRobotSize(const Polygon &polygon) const
+ObstaclePtr ObstacleFactory::fromPolygon(const Polygon &polygon) const
 {
     return std::make_shared<GeomObstacle<Polygon>>(
-        polygon.expand(Vector(-1, 0).normalize(robot_expansion_amount))
-            .expand(Vector(1, 0).normalize(robot_expansion_amount))
-            .expand(Vector(0, -1).normalize(robot_expansion_amount))
-            .expand(Vector(0, 1).normalize(robot_expansion_amount)));
+        polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
+            .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))
+            .expand(Vector(0, -1).normalize(robot_radius_expansion_amount))
+            .expand(Vector(0, 1).normalize(robot_radius_expansion_amount)));
 }
 
-ObstaclePtr ObstacleFactory::expandForRobotSize(
-    const Rectangle &rectangle, const std::vector<Vector> &directions) const
+ObstaclePtr ObstacleFactory::fromFieldRectangle(const Rectangle &field_rectangle,
+                                                const Rectangle &field_lines,
+                                                const Rectangle &field_boundary) const
 {
-    Rectangle retval = rectangle;
-    for (const auto &v : directions)
-    {
-        retval = retval.expand(robot_expansion_amount * v);
-    }
-    return std::make_shared<GeomObstacle<Polygon>>(retval);
+    return fromFieldRectangle(field_rectangle, field_lines, field_boundary,
+                              robot_radius_expansion_amount);
 }
 
-ObstaclePtr ObstacleFactory::expandForInflatedRobotSize(
-    const Rectangle &rectangle, const std::vector<Vector> &directions) const
+ObstaclePtr ObstacleFactory::fromFieldRectangle(const Rectangle &field_rectangle,
+                                                const Rectangle &field_lines,
+                                                const Rectangle &field_boundary,
+                                                double expansion_amount) const
 {
-    double inflated_expansion_amount = robot_expansion_amount + 0.3;
-    Rectangle retval                 = rectangle;
-    for (const auto &v : directions)
-    {
-        retval = retval.expand(inflated_expansion_amount * v);
-    }
-    return std::make_shared<GeomObstacle<Polygon>>(retval);
+    double xMin = field_rectangle.xMin();
+    double xMax = field_rectangle.xMax();
+    double yMin = field_rectangle.yMin();
+    double yMax = field_rectangle.yMax();
+
+    xMin =
+        (xMin == field_lines.xMin()) ? field_boundary.xMin() : (xMin - expansion_amount);
+    xMax =
+        (xMax == field_lines.xMax()) ? field_boundary.xMax() : (xMax + expansion_amount);
+    yMin =
+        (yMin == field_lines.yMin()) ? field_boundary.yMin() : (yMin - expansion_amount);
+    yMax =
+        (yMax == field_lines.yMax()) ? field_boundary.yMax() : (yMax + expansion_amount);
+
+    return std::make_shared<GeomObstacle<Polygon>>(
+        Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
 }

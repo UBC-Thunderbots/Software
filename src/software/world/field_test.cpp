@@ -61,22 +61,15 @@ TEST_F(FieldTest, construct_with_parameters)
 
     EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
               field.friendlyDefenseArea());
-    EXPECT_EQ(Rectangle(Point(-4.8, 1.0), Point(-3.5, -1.0)),
-              field.friendlyDefenseAreaToBoundary());
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
-    EXPECT_EQ(Rectangle(Point(4.8, 1.0), Point(3.5, -1.0)),
-              field.enemyDefenseAreaToBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)), field.fieldLines());
     EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3)), field.fieldBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)), field.friendlyHalf());
-    EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(0, 3.3)),
-              field.friendlyHalfToBoundary());
     EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, 3.0)),
               field.friendlyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, -3.0)),
               field.friendlyNegativeYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field.enemyHalf());
-    EXPECT_EQ(Rectangle(Point(0, -3.3), Point(4.8, 3.3)), field.enemyHalfToBoundary());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)), field.enemyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)), field.enemyNegativeYQuadrant());
 

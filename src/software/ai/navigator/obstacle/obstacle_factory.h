@@ -98,7 +98,7 @@ class ObstacleFactory
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
-    double robot_expansion_amount;
+    double robot_radius_expansion_amount;
 
     /**
      * Returns an obstacle for the shape expanded on all sides to account for the size of
@@ -106,32 +106,29 @@ class ObstacleFactory
      *
      * @param The shape to expand
      *
-     * @return expanded ObstaclePtr
+     * @return ObstaclePtr
      */
-    ObstaclePtr expandForRobotSize(const Circle &circle) const;
-    ObstaclePtr expandForRobotSize(const Polygon &polygon) const;
+    ObstaclePtr fromCircle(const Circle &circle) const;
+    ObstaclePtr fromPolygon(const Polygon &polygon) const;
 
     /**
-     * Returns an obstacle from the Rectangle expanded in the directions in vector
-     * multiplied to account for robot size
+     * Returns an obstacle for the field_rectangle expanded on all sides to account for
+     * the size of the robot. If a side of the field_rectangle lies along a field line,
+     * then it is expanded out to the field boundary
      *
-     * @param rectangle Rectangle to expand
-     * @param directions The list of directions to expand the Rectangle
+     * @param field_rectangle The rectangle to make obstacle
+     * @param field_lines The rectangle representing field lines
+     * @param field_boundary The rectangle representing field boundary
+     * @param expansion_amount (optional overload) The amount to expand all sides of the
+     * rectangle
      *
-     * @return expanded Rectangle as an obstacle
+     * @return ObstaclePtr
      */
-    ObstaclePtr expandForRobotSize(const Rectangle &rectangle,
-                                   const std::vector<Vector> &directions) const;
-
-    /**
-     * Returns an obstacle from the Rectangle expanded in the directions in vector
-     * multiplied to account for inflated robot size
-     *
-     * @param rectangle Rectangle to expand
-     * @param directions The list of directions to expand the Rectangle
-     *
-     * @return expanded Rectangle as an obstacle
-     */
-    ObstaclePtr expandForInflatedRobotSize(const Rectangle &rectangle,
-                                           const std::vector<Vector> &directions) const;
+    ObstaclePtr fromFieldRectangle(const Rectangle &field_rectangle,
+                                   const Rectangle &field_lines,
+                                   const Rectangle &field_boundary) const;
+    ObstaclePtr fromFieldRectangle(const Rectangle &field_rectangle,
+                                   const Rectangle &field_lines,
+                                   const Rectangle &field_boundary,
+                                   double expansion_amount) const;
 };
