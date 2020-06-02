@@ -588,7 +588,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_g
     // and are right in front of it
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivBField();
     Pass pass({4, 0}, {3.5, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -603,7 +603,7 @@ TEST_F(PassingEvaluationTest,
     // goal
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivBField();
     Pass pass({-1, 0}, {0, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -622,7 +622,7 @@ TEST_F(PassingEvaluationTest,
         Robot(1, {1, -10}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivBField();
     Pass pass({3.5, 0}, {3, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -639,7 +639,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
         Robot(0, {0.2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivBField();
     Pass pass({1, 1}, {0, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -650,7 +650,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
 TEST_F(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
 {
     // As we decrease the open angle to the goal, the shot score should also decrease
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivBField();
     Pass pass({3.5, 0.0}, {3, 0}, 1, Timestamp::fromSeconds(1));
     Team enemy_team(Duration::fromSeconds(10));
 
@@ -1022,7 +1022,7 @@ TEST_F(PassingEvaluationTest,
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
 {
-    Field f = ::Test::TestUtil::createSSLDivBField();
+    Field f = Field::createSSLDivBField();
 
     // Check that the static quality is basically 0 at the edge of the field
     EXPECT_LE(getStaticPositionQuality(f, Point(-4.5, 0)), 0.13);
@@ -1033,7 +1033,7 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
 {
-    Field f = ::Test::TestUtil::createSSLDivBField();
+    Field f = Field::createSSLDivBField();
 
     // Check that we have a static quality of almost 0 near our goal
     EXPECT_LE(getStaticPositionQuality(f, Point(-4.0, 0)), 0.14);
@@ -1041,7 +1041,7 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
 {
-    Field f = ::Test::TestUtil::createSSLDivBField();
+    Field f = Field::createSSLDivBField();
 
     // Check that we have a large static quality near the enemy goal
     EXPECT_GE(getStaticPositionQuality(f, Point(3.0, 0)), 0.80);

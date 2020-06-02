@@ -53,7 +53,7 @@ TEST(MoveTacticTest, robot_at_destination)
 TEST(MoveTacticTest, test_calculate_robot_cost)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    world.updateField(::Test::TestUtil::createSSLDivBField());
+    world.updateField(Field::createSSLDivBField());
 
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));

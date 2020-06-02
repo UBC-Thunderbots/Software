@@ -13,7 +13,7 @@ TEST(PhysicsFieldTest, test_get_field)
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
+    Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
     auto field         = physics_field.getField();
 
@@ -25,7 +25,7 @@ TEST(PhysicsFieldTest, test_field_added_to_physics_world_on_creation)
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
+    Field field_parameter(Field::createSSLDivBField());
 
     EXPECT_EQ(0, world->GetBodyCount());
 
@@ -41,7 +41,7 @@ TEST(PhysicsFieldTest, test_physics_field_is_removed_from_world_when_destroyed)
     auto world = std::make_shared<b2World>(gravity);
 
     {
-        Field field_parameter(::Test::TestUtil::createSSLDivBField());
+        Field field_parameter(Field::createSSLDivBField());
 
         EXPECT_EQ(0, world->GetBodyCount());
 
@@ -60,7 +60,7 @@ TEST(PhysicsFieldTest, test_field_dimensions_do_not_change_during_simulation_ste
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
+    Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
     // We have to take lots of small steps because a significant amount of accuracy
@@ -82,7 +82,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
+    Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
     Ball ball_parameter(field_parameter.friendlyHalf().posXPosYCorner(), Vector(0, 2),
@@ -108,7 +108,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
+    Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
     Ball ball_parameter(field_parameter.enemyGoalCenter() + Vector(-1, 0), Vector(3.0, 0),
@@ -134,7 +134,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
-    Field field_parameter(::Test::TestUtil::createSSLDivBField());
+    Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
     Ball ball_parameter(field_parameter.friendlyGoalCenter() + Vector(1, 0),

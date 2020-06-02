@@ -22,7 +22,7 @@ class WorldTest : public ::testing::Test
     {
         // An arbitrary fixed point in time
         // We use this fixed point in time to make the tests deterministic.
-        field = ::Test::TestUtil::createSSLDivBField();
+        field = Field::createSSLDivBField();
 
         Robot friendly_robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
                                        AngularVelocity::threeQuarter(), current_time);

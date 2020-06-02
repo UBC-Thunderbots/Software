@@ -411,7 +411,7 @@ TEST(GeomUtilTest, test_find_open_circles_two_points_in_rectangle)
 
 TEST(GeomUtilTest, test_find_open_circle_three_in_rectangle)
 {
-    Rectangle rectangle = ::Test::TestUtil::createSSLDivBField().fieldLines();
+    Rectangle rectangle = Field::createSSLDivBField().fieldLines();
 
     std::vector<Point> points         = {Point(-1, -1), Point(1, -1), Point(0, 1)};
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);

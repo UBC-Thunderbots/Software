@@ -34,7 +34,7 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
    protected:
     void SetUp() override
     {
-        world.updateField(::Test::TestUtil::createSSLDivBField());
+        world.updateField(Field::createSSLDivBField());
     }
 
     STP stp;
@@ -205,7 +205,7 @@ class STPRefboxGameStatePlaySelectionTest
         };
         // Give an explicit seed to STP so that our tests are deterministic
         stp = STP(default_play_constructor, 0);
-        world.updateField(::Test::TestUtil::createSSLDivBField());
+        world.updateField(Field::createSSLDivBField());
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));

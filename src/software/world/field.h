@@ -40,6 +40,12 @@ class Field
      * field will be invalid (ie. isValid() returns false)
      */
     explicit Field();
+    /**
+     * Creates a field with the standard SSL Division B dimensions
+     *
+     * @return a field with the standard SSL Division B dimensions
+     */
+    static Field createSSLDivBField();
 
     /**
      * Constructs a new field with the given dimensions
