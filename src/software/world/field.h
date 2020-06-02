@@ -46,7 +46,7 @@ class Field
      *
      * @return a field with the standard SSL Division B dimensions
      */
-    static Field createSSLDivBField();
+    static const Field createSSLDivBField();
 
     /**
      * Constructs a new field with the given dimensions

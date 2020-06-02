@@ -24,10 +24,7 @@
 class World final
 {
    public:
-    /**
-     * Creates an Empty World
-     */
-    explicit World();
+    World() = delete;
 
     /**
      * Creates a new world.

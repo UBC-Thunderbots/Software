@@ -54,22 +54,6 @@ class WorldTest : public ::testing::Test
     World world;
 };
 
-TEST_F(WorldTest, default_constructor)
-{
-    World world;
-    // Check that objects used for construction are returned by the accessors
-    EXPECT_EQ(Field(), world.field());
-    EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
-    EXPECT_EQ(Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
-                                                  ->RobotExpiryBufferMilliseconds()
-                                                  ->value())),
-              world.friendlyTeam());
-    EXPECT_EQ(Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
-                                                  ->RobotExpiryBufferMilliseconds()
-                                                  ->value())),
-              world.enemyTeam());
-}
-
 TEST_F(WorldTest, construction_with_parameters)
 {
     // Check that objects used for construction are returned by the accessors
@@ -77,14 +61,6 @@ TEST_F(WorldTest, construction_with_parameters)
     EXPECT_EQ(ball, world.ball());
     EXPECT_EQ(friendly_team, world.friendlyTeam());
     EXPECT_EQ(enemy_team, world.enemyTeam());
-}
-
-// Test that getMostRecentTimestamp functions properly
-TEST_F(WorldTest, get_most_recent_from_members)
-{
-    World world;
-
-    EXPECT_EQ(world.getMostRecentTimestamp(), Timestamp::fromSeconds(0));
 }
 
 // Test that most recent timestamp from member objects works
@@ -113,8 +89,8 @@ TEST_F(WorldTest, get_timestamp_history)
 
 TEST_F(WorldTest, equality_basic_tests)
 {
-    World world1;
-    World world2;
+    World world1 = world;
+    World world2 = world;
     EXPECT_EQ(world1, world2);
     EXPECT_EQ(world2, world1);
     EXPECT_EQ(world1, world1);
@@ -122,15 +98,15 @@ TEST_F(WorldTest, equality_basic_tests)
 
 TEST_F(WorldTest, equality_different_timestamp)
 {
-    World world1;
-    World world3;
-    world3.updateTimestamp(Timestamp::fromSeconds(100));
+    World world1 = world;
+    World world3 = world;
+    world3.updateTimestamp(current_time + Duration::fromSeconds(100));
     EXPECT_EQ(world1, world3);
 }
 
 TEST_F(WorldTest, equality_different_ball)
 {
-    World world1;
+    World world1       = world;
     Ball ball          = Ball(Point(1, 0), Vector(13, 0), Timestamp::fromSeconds(0));
     Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(0));
@@ -153,7 +129,7 @@ TEST_F(WorldTest, equality_different_field)
 
 TEST_F(WorldTest, equality_different_friendly_team)
 {
-    World world1;
+    World world1       = world;
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(1500));
@@ -164,7 +140,7 @@ TEST_F(WorldTest, equality_different_friendly_team)
 
 TEST_F(WorldTest, equality_different_enemy_team)
 {
-    World world1;
+    World world1       = world;
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(0));

@@ -24,7 +24,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
 {
 }
 
-Field Field::createSSLDivBField()
+const Field Field::createSSLDivBField()
 {
     // Using the dimensions of a standard Division B SSL field
     return Field(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5);
