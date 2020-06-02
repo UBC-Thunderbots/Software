@@ -39,11 +39,9 @@ class PhysicsField
     ~PhysicsField();
 
     /**
-     * Returns a Field object representing the current state of the field object in the
-     * simulated Box2D world the field was created in.
+     * Returns the current state of the Field
      *
-     * @return A Field object representing the current state of the field object in the
-     * simulated Box2D world the field was originally created in.
+     * @return the current state of the Field
      */
     Field getField() const;
 
