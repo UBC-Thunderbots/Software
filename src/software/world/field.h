@@ -163,7 +163,7 @@ class Field
     Rectangle enemyDefenseArea() const;
 
     /**
-     * Gets the friendly half of the field within field lines
+     * Gets the friendly half of the field
      *
      * @return the friendly half of the field
      */
@@ -184,7 +184,7 @@ class Field
     Rectangle friendlyNegativeYQuadrant() const;
 
     /**
-     * Gets the enemy half of the field within field lines
+     * Gets the enemy half of the field
      *
      * @return the enemy half of the field
      */
