@@ -6,22 +6,21 @@
 
 class FieldTest : public ::testing::Test
 {
-   protected:
-    void SetUp() override
+   public:
+    FieldTest()
+        : x_length(9.0),
+          y_length(6.0),
+          defense_x_length(1.0),
+          defense_y_length(2.0),
+          goal_y_length(1.0),
+          boundary_buffer_size(0.3),
+          center_circle_radius(0.5),
+          field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
+                boundary_buffer_size, center_circle_radius)
     {
-        x_length             = 9.0;
-        y_length             = 6.0;
-        defense_x_length     = 1.0;
-        defense_y_length     = 2.0;
-        goal_y_length        = 1.0;
-        boundary_buffer_size = 0.3;
-        center_circle_radius = 0.5;
-
-        field = Field(x_length, y_length, defense_x_length, defense_y_length,
-                      goal_y_length, boundary_buffer_size, center_circle_radius);
     }
 
-    Field field;
+   protected:
     double x_length;
     double y_length;
     double defense_x_length;
@@ -29,6 +28,7 @@ class FieldTest : public ::testing::Test
     double goal_y_length;
     double boundary_buffer_size;
     double center_circle_radius;
+    Field field;
 };
 
 TEST_F(FieldTest, construct_with_parameters)
@@ -42,6 +42,60 @@ TEST_F(FieldTest, construct_with_parameters)
     EXPECT_DOUBLE_EQ(center_circle_radius, field.centerCircleRadius());
     EXPECT_DOUBLE_EQ(defense_y_length, field.defenseAreaYLength());
     EXPECT_DOUBLE_EQ(defense_x_length, field.defenseAreaXLength());
+    EXPECT_DOUBLE_EQ(9.6, field.totalXLength());
+    EXPECT_DOUBLE_EQ(6.6, field.totalYLength());
+    EXPECT_DOUBLE_EQ(0.3, field.boundaryMargin());
+
+    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoalCenter());
+    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoalCenter());
+
+    EXPECT_EQ(Rectangle(Point(-4.68, -0.5), Point(-4.5, 0.5)).getPoints(),
+              field.friendlyGoal().getPoints());
+    EXPECT_EQ(Rectangle(Point(4.68, -0.5), Point(4.5, 0.5)).getPoints(),
+              field.enemyGoal().getPoints());
+
+    EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
+    EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
+    EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
+    EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
+
+    EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+              field.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)), field.fieldLines());
+    EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3)), field.fieldBoundary());
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)), field.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, 3.0)),
+              field.friendlyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, -3.0)),
+              field.friendlyNegativeYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field.enemyHalf());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)), field.enemyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)), field.enemyNegativeYQuadrant());
+
+    EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
+    EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
+
+    EXPECT_EQ(Point(-4.5, 3.0), field.friendlyCornerPos());
+    EXPECT_EQ(Point(-4.5, -3.0), field.friendlyCornerNeg());
+    EXPECT_EQ(Point(4.5, 3.0), field.enemyCornerPos());
+    EXPECT_EQ(Point(4.5, -3.0), field.enemyCornerNeg());
+
+    EXPECT_EQ(Point(0, 0), field.centerPoint());
+}
+
+TEST_F(FieldTest, test_create_ssl_div_b_field)
+{
+    // The field was already constructed in the test setup, so we only need to check
+    // values here
+    field = Field::createSSLDivBField();
+    EXPECT_DOUBLE_EQ(9.0, field.xLength());
+    EXPECT_DOUBLE_EQ(6.0, field.yLength());
+    EXPECT_DOUBLE_EQ(1.0, field.goalYLength());
+    EXPECT_DOUBLE_EQ(ROBOT_MAX_RADIUS_METERS * 2, field.goalXLength());
+    EXPECT_DOUBLE_EQ(0.5, field.centerCircleRadius());
+    EXPECT_DOUBLE_EQ(2.0, field.defenseAreaYLength());
+    EXPECT_DOUBLE_EQ(1.0, field.defenseAreaXLength());
     EXPECT_DOUBLE_EQ(9.6, field.totalXLength());
     EXPECT_DOUBLE_EQ(6.6, field.totalYLength());
     EXPECT_DOUBLE_EQ(0.3, field.boundaryMargin());
