@@ -2,8 +2,8 @@
 
 ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config)
     : config(config),
-      obstacle_expansion_amount(config->RobotObstacleInflationFactor()->value() *
-                                ROBOT_MAX_RADIUS_METERS)
+      robot_expansion_amount(config->RobotObstacleInflationFactor()->value() *
+                             ROBOT_MAX_RADIUS_METERS)
 {
 }
 
@@ -76,12 +76,13 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
 {
     // radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
-        (ROBOT_MAX_RADIUS_METERS + obstacle_expansion_amount) * 2.0 / std::sqrt(3);
+        (ROBOT_MAX_RADIUS_METERS + robot_expansion_amount) * 2.0 / std::sqrt(3);
 
-    // vector in the direction of the velocity and proportional to the magnitude of the velocity
+    // vector in the direction of the velocity and proportional to the magnitude of the
+    // velocity
     Vector expanded_velocity_vector = robot.velocity().normalize(
         robot.velocity().length() * config->SpeedScalingFactor()->value() +
-        obstacle_expansion_amount);
+        robot_expansion_amount);
 
     /* If the robot is travelling slower than a threshold, then a stationary robot
      * obstacle will be returned. If the robot is travelling faster than a threshold, then
@@ -143,7 +144,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
 
 ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position) const
 {
-    return expandForRobotSize(Circle(ball_position, BALL_MAX_RADIUS_METERS + 0.06));
+    return expandForRobotSize(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
 ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position) const
@@ -159,16 +160,16 @@ ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectan
 ObstaclePtr ObstacleFactory::expandForRobotSize(const Circle &circle) const
 {
     return std::make_shared<GeomObstacle<Circle>>(
-        Circle(circle.getOrigin(), circle.getRadius() + obstacle_expansion_amount));
+        Circle(circle.getOrigin(), circle.getRadius() + robot_expansion_amount));
 }
 
 ObstaclePtr ObstacleFactory::expandForRobotSize(const Polygon &polygon) const
 {
     return std::make_shared<GeomObstacle<Polygon>>(
-        polygon.expand(obstacle_expansion_amount * Vector(-1, 0))
-            .expand(obstacle_expansion_amount * Vector(1, 0))
-            .expand(obstacle_expansion_amount * Vector(0, -1))
-            .expand(obstacle_expansion_amount * Vector(0, 1)));
+        polygon.expand(Vector(-1, 0).normalize(robot_expansion_amount))
+            .expand(Vector(1, 0).normalize(robot_expansion_amount))
+            .expand(Vector(0, -1).normalize(robot_expansion_amount))
+            .expand(Vector(0, 1).normalize(robot_expansion_amount)));
 }
 
 ObstaclePtr ObstacleFactory::expandForRobotSize(
@@ -177,7 +178,7 @@ ObstaclePtr ObstacleFactory::expandForRobotSize(
     Rectangle retval = rectangle;
     for (const auto &v : directions)
     {
-        retval = retval.expand(obstacle_expansion_amount * v);
+        retval = retval.expand(robot_expansion_amount * v);
     }
     return std::make_shared<GeomObstacle<Polygon>>(retval);
 }
@@ -185,7 +186,7 @@ ObstaclePtr ObstacleFactory::expandForRobotSize(
 ObstaclePtr ObstacleFactory::expandForInflatedRobotSize(
     const Rectangle &rectangle, const std::vector<Vector> &directions) const
 {
-    double inflated_expansion_amount = obstacle_expansion_amount + 0.3;
+    double inflated_expansion_amount = robot_expansion_amount + 0.3;
     Rectangle retval                 = rectangle;
     for (const auto &v : directions)
     {

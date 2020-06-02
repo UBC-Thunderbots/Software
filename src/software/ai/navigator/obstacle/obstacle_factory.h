@@ -98,7 +98,7 @@ class ObstacleFactory
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
-    double obstacle_expansion_amount;
+    double robot_expansion_amount;
 
     /**
      * Returns an obstacle for the shape expanded on all sides to account for the size of

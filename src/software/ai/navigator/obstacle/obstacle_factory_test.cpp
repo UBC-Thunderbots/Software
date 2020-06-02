@@ -99,7 +99,7 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
 {
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
-    Circle expected(origin, 0.1985);
+    Circle expected(origin, 0.1385);
     ObstaclePtr obstacle = obstacle_factory.createBallObstacle(origin);
 
     try
