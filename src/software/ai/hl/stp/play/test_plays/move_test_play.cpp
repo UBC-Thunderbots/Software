@@ -29,8 +29,9 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         move_test_tactic_friendly_goal->updateControlParams(
-            world.field().friendlyGoalCenter());
-        move_test_tactic_enemy_goal->updateControlParams(world.field().enemyGoalCenter());
+            world->field().friendlyGoalCenter());
+        move_test_tactic_enemy_goal->updateControlParams(
+            world->field().enemyGoalCenter());
         move_test_tactic_center_field->updateControlParams(Point(0, 0));
 
         yield({move_test_tactic_center_field, move_test_tactic_friendly_goal,

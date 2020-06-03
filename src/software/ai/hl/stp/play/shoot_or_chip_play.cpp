@@ -52,32 +52,32 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
      */
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world->ball(), world->field(), world->friendlyTeam(), world->enemyTeam());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
+        std::make_shared<CreaseDefenderTactic>(world->field(), world->ball(),
+                                               world->friendlyTeam(), world->enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
+        std::make_shared<CreaseDefenderTactic>(world->field(), world->ball(),
+                                               world->friendlyTeam(), world->enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
     std::array<std::shared_ptr<PatrolTactic>, 2> patrol_tactics = {
         std::make_shared<PatrolTactic>(
             std::vector<Point>(
-                {Point(world.field().enemyCornerPos().x() - 3 * ROBOT_MAX_RADIUS_METERS,
-                       world.field().enemyCornerPos().y() - 3 * ROBOT_MAX_RADIUS_METERS),
+                {Point(world->field().enemyCornerPos().x() - 3 * ROBOT_MAX_RADIUS_METERS,
+                       world->field().enemyCornerPos().y() - 3 * ROBOT_MAX_RADIUS_METERS),
                  Point(3 * ROBOT_MAX_RADIUS_METERS,
-                       world.field().yLength() / 2 - 3 * ROBOT_MAX_RADIUS_METERS)}),
+                       world->field().yLength() / 2 - 3 * ROBOT_MAX_RADIUS_METERS)}),
             .03, Angle::half(), 0),
         std::make_shared<PatrolTactic>(
             std::vector<Point>(
                 {Point(3 * ROBOT_MAX_RADIUS_METERS,
-                       -world.field().yLength() / 2 + 3 * ROBOT_MAX_RADIUS_METERS),
+                       -world->field().yLength() / 2 + 3 * ROBOT_MAX_RADIUS_METERS),
                  Point(
-                     world.field().enemyCornerNeg().x() - 3 * ROBOT_MAX_RADIUS_METERS,
-                     world.field().enemyCornerNeg().y() + 3 * ROBOT_MAX_RADIUS_METERS)}),
+                     world->field().enemyCornerNeg().x() - 3 * ROBOT_MAX_RADIUS_METERS,
+                     world->field().enemyCornerNeg().y() + 3 * ROBOT_MAX_RADIUS_METERS)}),
             .03, Angle::half(), 0)};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -88,10 +88,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
     double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
-        world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
+        world->field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        world->field(), world->friendlyTeam(), world->enemyTeam(), world->ball(),
         MIN_OPEN_ANGLE_FOR_SHOT, fallback_chip_target, false);
 
     do
@@ -100,7 +100,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
-        Team friendly_team_for_goalie = world.friendlyTeam();
+        Team friendly_team_for_goalie = world->friendlyTeam();
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
             if (crease_defender_tactic->getAssignedRobot())
@@ -118,17 +118,17 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Update tactics moving to open areas
         std::vector<Point> enemy_robot_points;
-        for (auto const &robot : world.enemyTeam().getAllRobots())
+        for (auto const &robot : world->enemyTeam().getAllRobots())
         {
             enemy_robot_points.emplace_back(robot.position());
         }
-        std::vector<Circle> chip_targets = findGoodChipTargets(world);
+        std::vector<Circle> chip_targets = findGoodChipTargets(*world);
         for (unsigned i = 0;
              i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++)
         {
             // Face towards the ball
             Angle orientation =
-                (world.ball().position() - chip_targets[i].getOrigin()).orientation();
+                (world->ball().position() - chip_targets[i].getOrigin()).orientation();
             // Move a bit backwards to make it more likely we'll receive the chip
             Point position =
                 chip_targets[i].getOrigin() -

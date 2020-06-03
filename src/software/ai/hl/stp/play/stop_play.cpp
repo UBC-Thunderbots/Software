@@ -59,7 +59,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<MoveTactic>(true)};
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world->ball(), world->field(), world->friendlyTeam(), world->enemyTeam());
 
     // we want to find the radius of the semicircle in which the defense area can be
     // inscribed, this is so the robots can snap to that semicircle and not enter the
@@ -67,13 +67,14 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
     //
     // http://www.stumblingrobot.com/2015/10/06/
     // find-the-largest-rectangle-that-can-be-inscribed-in-a-semicircle/
-    float semicircle_radius = sqrt(2) * world.field().friendlyDefenseArea().yLength();
+    float semicircle_radius = sqrt(2) * world->field().friendlyDefenseArea().yLength();
 
     do
     {
         // goalie tactic
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats =
+            Evaluation::getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                           world->enemyTeam(), world->ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
@@ -81,12 +82,12 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // for positioning all the robots (excluding the goalie). The positioning vector
         // will be used to position robots tangent to the goal_to_ball_unit_vector
         Vector goal_to_ball_unit_vector =
-            (world.field().friendlyGoalCenter() - world.ball().position()).normalize();
+            (world->field().friendlyGoalCenter() - world->ball().position()).normalize();
         Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perpendicular();
 
         // goal_defense_point_center is a point on the semicircle around the friendly
         // defense area, that can block the direct path from the ball to the net.
-        Point goal_defense_point_center = world.field().friendlyGoalCenter() -
+        Point goal_defense_point_center = world->field().friendlyGoalCenter() -
                                           semicircle_radius * goal_to_ball_unit_vector;
 
         // position robots on either side of the "goal defense point"
@@ -99,10 +100,10 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         move_tactics.at(0)->updateControlParams(
             goal_defense_point_left,
-            (world.ball().position() - goal_defense_point_left).orientation(), 0);
+            (world->ball().position() - goal_defense_point_left).orientation(), 0);
         move_tactics.at(1)->updateControlParams(
             goal_defense_point_right,
-            (world.ball().position() - goal_defense_point_right).orientation(), 0);
+            (world->ball().position() - goal_defense_point_right).orientation(), 0);
 
         // ball_defense_point_center is a point on the circle around the ball that the
         // line from the center of the goal to the ball intersects. A robot will be placed
@@ -110,7 +111,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // We add an extra robot radius as a buffer to be extra safe we don't break any
         // rules by getting too close
         Point ball_defense_point_center =
-            world.ball().position() +
+            world->ball().position() +
             (0.5 + 2 * ROBOT_MAX_RADIUS_METERS) * goal_to_ball_unit_vector;
         Point ball_defense_point_left =
             ball_defense_point_center -
@@ -121,13 +122,13 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         move_tactics.at(2)->updateControlParams(
             ball_defense_point_center,
-            (world.ball().position() - ball_defense_point_center).orientation(), 0);
+            (world->ball().position() - ball_defense_point_center).orientation(), 0);
         move_tactics.at(3)->updateControlParams(
             ball_defense_point_left,
-            (world.ball().position() - ball_defense_point_left).orientation(), 0);
+            (world->ball().position() - ball_defense_point_left).orientation(), 0);
         move_tactics.at(4)->updateControlParams(
             ball_defense_point_right,
-            (world.ball().position() - ball_defense_point_right).orientation(), 0);
+            (world->ball().position() - ball_defense_point_right).orientation(), 0);
 
         // insert all the move tactics to the result
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());

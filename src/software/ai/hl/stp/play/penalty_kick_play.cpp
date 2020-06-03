@@ -29,7 +29,7 @@ bool PenaltyKickPlay::invariantHolds(const World &world) const
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>(
-        world.ball(), world.field(), world.enemyTeam().goalie(), true);
+        world->ball(), world->field(), world->enemyTeam().goalie(), true);
 
     auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
 
@@ -44,38 +44,38 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::vector<std::shared_ptr<Tactic>> tactics_to_run;
 
         Vector behind_ball_direction =
-            (world.ball().position() - world.field().enemyGoalpostPos()).normalize();
+            (world->ball().position() - world->field().enemyGoalpostPos()).normalize();
         Angle shoot_angle =
-            (world.field().enemyGoalpostPos() - world.ball().position()).orientation();
+            (world->field().enemyGoalpostPos() - world->ball().position()).orientation();
 
-        Point behind_ball = world.ball().position() + behind_ball_direction.normalize(
-                                                          DIST_TO_FRONT_OF_ROBOT_METERS +
-                                                          BALL_MAX_RADIUS_METERS + 0.1);
+        Point behind_ball = world->ball().position() + behind_ball_direction.normalize(
+                                                           DIST_TO_FRONT_OF_ROBOT_METERS +
+                                                           BALL_MAX_RADIUS_METERS + 0.1);
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
-            Point(0, 0), world.field().enemyGoalCenter().toVector().orientation(), 0);
+            Point(0, 0), world->field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_3->updateControlParams(
             Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoalCenter().toVector().orientation(), 0);
+            world->field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_4->updateControlParams(
             Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoalCenter().toVector().orientation(), 0);
+            world->field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_5->updateControlParams(
             Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoalCenter().toVector().orientation(), 0);
+            world->field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_6->updateControlParams(
             Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoalCenter().toVector().orientation(), 0);
+            world->field().enemyGoalCenter().toVector().orientation(), 0);
 
         shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
 
         // If we are setting up for penalty kick, move our robots to position
-        if (world.gameState().isSetupState())
+        if (world->gameState().isSetupState())
         {
             tactics_to_run.emplace_back(shooter_setup_move);
         }
-        else if (world.gameState().isOurPenalty())
+        else if (world->gameState().isOurPenalty())
         {
             tactics_to_run.emplace_back(penalty_shot_tactic);
         }

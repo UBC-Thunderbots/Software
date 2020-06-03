@@ -41,27 +41,27 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world->ball(), world->field(), world->friendlyTeam(), world->enemyTeam());
     auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        world->field(), world->friendlyTeam(), world->enemyTeam(), world->ball(),
         Angle::fromDegrees(5), std::nullopt, true);
 
     auto defense_shadow_enemy_tactic = std::make_shared<DefenseShadowEnemyTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), true,
+        world->field(), world->friendlyTeam(), world->enemyTeam(), world->ball(), true,
         3 * ROBOT_MAX_RADIUS_METERS);
 
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, world.ball(), 0.5,
+        std::make_shared<ShadowEnemyTactic>(world->field(), world->friendlyTeam(),
+                                            world->enemyTeam(), true, world->ball(), 0.5,
                                             enemy_team_can_pass, false);
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
+        std::make_shared<CreaseDefenderTactic>(world->field(), world->ball(),
+                                               world->friendlyTeam(), world->enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
+        std::make_shared<CreaseDefenderTactic>(world->field(), world->ball(),
+                                               world->friendlyTeam(), world->enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
@@ -73,12 +73,13 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats =
+            Evaluation::getAllEnemyThreats(world->field(), world->friendlyTeam(),
+                                           world->enemyTeam(), world->ball(), false);
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
-        Team friendly_team_for_goalie = world.friendlyTeam();
+        Team friendly_team_for_goalie = world->friendlyTeam();
 
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
@@ -121,7 +122,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         else
         {
             auto nearest_enemy_robot =
-                Evaluation::nearestRobot(world.enemyTeam(), world.ball().position());
+                Evaluation::nearestRobot(world->enemyTeam(), world->ball().position());
             if (nearest_enemy_robot)
             {
                 Point block_point =
@@ -148,7 +149,7 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
     std::vector<std::shared_ptr<MoveTactic>> move_tactics)
 {
     auto nearest_enemy_robot =
-        Evaluation::nearestRobot(world.enemyTeam(), world.ball().position());
+        Evaluation::nearestRobot(world->enemyTeam(), world->ball().position());
     if (nearest_enemy_robot)
     {
         Point block_point = nearest_enemy_robot->position() +

@@ -95,7 +95,7 @@ class Play
 
    protected:
     // The Play's knowledge of the most up-to-date World
-    World world;
+    std::optional<World> world;
 
    private:
     /**
