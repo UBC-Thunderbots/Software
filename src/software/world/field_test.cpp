@@ -133,8 +133,8 @@ TEST_F(FieldTest, equality_operator_fields_with_different_goal_y_length)
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length,
                           goal_y_length, boundary_buffer_size, center_circle_radius);
 
-    Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length, 0,
-                          boundary_buffer_size, center_circle_radius);
+    Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length,
+                          goal_y_length + 2, boundary_buffer_size, center_circle_radius);
 
     EXPECT_NE(field_1, field_2);
 }
@@ -227,4 +227,16 @@ TEST_F(FieldTest, point_not_in_entire_field)
 {
     Point p(-4.91, -0.88);
     EXPECT_FALSE(field.pointInEntireField(p));
+}
+
+TEST_F(FieldTest, degenerate_field_zero_lengths)
+{
+    EXPECT_THROW(Field(0, 2, 3, 1, 0, 0, 4), std::invalid_argument);
+    EXPECT_THROW(Field(2, 2, 3, 0, 2, 3, 4), std::invalid_argument);
+}
+
+TEST_F(FieldTest, degenerate_field_neg_lengths)
+{
+    EXPECT_THROW(Field(-4, 2, 3, -1, 5, 5, 4), std::invalid_argument);
+    EXPECT_THROW(Field(2, 2, 3, -2, 2, 3, 4), std::invalid_argument);
 }
