@@ -40,7 +40,7 @@ class World final
     /**
      * Updates the state of the field in the world with the new field
      *
-     * @param new_fieldA new Field
+     * @param new_field A new Field
      */
     void updateField(const Field& new_field);
 
