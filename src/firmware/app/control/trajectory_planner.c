@@ -630,37 +630,6 @@ void app_trajectory_planner_generateBackwardsContinuousSpeedProfile(
     }
 }
 
-void app_trajectory_planner_reversePositionTrajectoryDirection(
-    PositionTrajectory_t* forwards_trajectory)
-{
-    PositionTrajectoryElement_t reverse[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float reverse_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    const unsigned int num_segments = forwards_trajectory->path_parameters.num_segments;
-
-    const float path_duration =
-        forwards_trajectory->trajectory_elements[num_segments - 1].time;
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        // Reverse the positions
-        reverse[(num_segments - 1) - i].position =
-            forwards_trajectory->trajectory_elements[i].position;
-        reverse[(num_segments - 1) - i].time =
-            path_duration - forwards_trajectory->trajectory_elements[i].time;
-
-        // Reverse the speed profile
-        reverse_speed_profile[(num_segments - 1) - i] =
-            forwards_trajectory->linear_speed_profile[i];
-    }
-    // Copy reverse element array back
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        forwards_trajectory->trajectory_elements[i].position = reverse[i].position;
-        forwards_trajectory->trajectory_elements[i].time     = reverse[i].time;
-        forwards_trajectory->linear_speed_profile[i]         = reverse_speed_profile[i];
-    }
-}
-
 void app_trajectory_planner_generateConstantParameterizationSegments(
     PositionTrajectory_t trajectory)
 {
