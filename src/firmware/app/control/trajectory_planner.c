@@ -693,80 +693,23 @@ void app_trajectory_planner_generateConstantParameterizationSegments(
     }
 }
 
-void app_trajectory_planner_generatePositionAndOrientations(
-    PositionTrajectory_t* trajectory)
-{
-    // Set the internal path parameter variables
-    PositionTrajectoryElement_t* trajectory_elements = trajectory->trajectory_elements;
-
-    float final_linear_speed   = trajectory->path_parameters.final_linear_speed;
-    float initial_linear_speed = trajectory->path_parameters.initial_linear_speed;
-    const float max_allowable_linear_acceleration =
-        trajectory->path_parameters.max_allowable_linear_acceleration;
-    const float max_allowable_linear_speed =
-        trajectory->path_parameters.max_allowable_linear_speed;
-    const float max_allowable_angular_acceleration =
-        trajectory->path_parameters.max_allowable_angular_acceleration;
-    const float max_allowable_angular_speed =
-        trajectory->path_parameters.max_allowable_angular_speed;
-    const unsigned int num_segments = trajectory->path_parameters.num_segments;
-    const Polynomial2dOrder3_t path = trajectory->path_parameters.path;
-    const Polynomial1dOrder3_t orientation_profile =
-        trajectory->path_parameters.orientation_profile;
-    float t_end   = trajectory->path_parameters.t_end;
-    float t_start = trajectory->path_parameters.t_start;
-
-    TrajectoryPlannerGenerationStatus_t generation_status = OK;
-
-    // Variable used to flag if the path is moving "backwards" along the input path
-    bool reverse_parameterization = false;
-
-    // Check that the pre conditions are met
-    assert(num_segments > 2);
-    assert(max_allowable_linear_acceleration > 0);
-    assert(max_allowable_angular_acceleration > 0);
-    assert(max_allowable_linear_speed > 0);
-    assert(max_allowable_angular_speed > 0);
-    assert(initial_linear_speed >= 0);
-    assert(final_linear_speed >= 0);
-    assert(num_segments <= TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
-
-    // Check for the parameterization direction
-    // If the path is traversed in reverse, then flip all components to forwards (to be
-    // reversed again in the end)
-    //  TODO: Remove after #1322 is merged
-    if (t_end < t_start)
-    {
-        reverse_parameterization = true;
-
-        // Reverse the direction (Polynomial library can only handle forwards direction)
-        float temp = t_start;
-        t_start    = t_end;
-        t_end      = temp;
-
-        // Reverse the final and initial speeds
-        temp                 = initial_linear_speed;
-        initial_linear_speed = final_linear_speed;
-        final_linear_speed   = temp;
-    }
-
-    // Create an array that will hold all of the segment lengths for the trajectory
-    // This is needed because the trajectory wil be broken up into constant 't' values
-    // where 't' is the input parameter to the path and orientation polynomials By using a
-    // constant 't' we can compare the orientation and linear profiles directly
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    app_trajectory_planner_generateStatesAndReturnSegmentLengths(trajectory,
-                                                                 segment_lengths);
-
-    // Now that we have the states and segment lengths we must calculate the speed
-    // profiles for both the linear and angular trajectories
-}
-
 void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
     PositionTrajectory_t* trajectory,
     TrajectorySegment_t trajectory_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
+    // Check that the pre conditions are met
+    assert(trajectory->path_parameters.num_segments > 2);
+    assert(trajectory->path_parameters.max_allowable_linear_acceleration >= 0);
+    assert(trajectory->path_parameters.max_allowable_angular_acceleration >= 0);
+    assert(trajectory->path_parameters.max_allowable_linear_speed >= 0);
+    assert(trajectory->path_parameters.max_allowable_angular_speed >= 0);
+    assert(trajectory->path_parameters.initial_linear_speed >= 0);
+    assert(trajectory->path_parameters.final_linear_speed >= 0);
+    assert(trajectory->path_parameters.max_allowable_angular_acceleration >= 0);
+    assert(trajectory->path_parameters.max_allowable_angular_speed >= 0);
+    assert(trajectory->path_parameters.num_segments <=
+           TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+
     const float t_start = trajectory->path_parameters.t_start;
 
     PositionTrajectoryElement_t* trajectory_elements = trajectory->trajectory_elements;

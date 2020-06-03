@@ -349,40 +349,6 @@ TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
     FirmwareRobotPathParameters_t path_parameters,
     PositionTrajectory_t* constant_period_trajectory, const float interpolation_period);
-/**
- * Modifies a forwards continuous velocity profile to also be backwards continuous based
- * on the input parameters.
- *
- * NOTE: This function does not break forwards continuity of the trajectory
- *
- * @pre The input velocity_profile is required to be FORWARDS CONTINUOUS before it is used
- * as an input to this function
- * @pre forwards_continuous_velocity_profile is pre-allocated up to at least
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
- *
- * @param num_segments [in] The number of segments(elements) in the velocity_profile array
- * @param forwards_continuous_velocity_profile [in/out] The forwards continuous velocity
- * profile to ebe modified in-place into a profile that is also backwards continuous
- * @param arc_segment_length [in] The arc segment length of each segment in the path the
- * profile is being generated for in meters
- * @param max_allowable_acceleration [in] The max allowable acceleration at any point on
- * the velocity profile
- */
-void app_trajectory_planner_generateBackwardsContinuousSpeedProfile(
-    const unsigned int num_segments, float* forwards_continuous_velocity_profile,
-    const float arc_segment_length, const float max_allowable_acceleration);
-
-/***
- *  This function takes in a forwards trajectory annd modifies it in place to become a
- * backwards trajectory NOTE: This function exists to avoid issues outlined in #1322
- *
- *  TODO: Remove when #1322 is merged.
- *
- * @param forwards_trajectory This is the trajectory that will be modified in place to
- * become a reverse trajectory
- */
-void static app_trajectory_planner_reversePositionTrajectoryDirection(
-    PositionTrajectory_t* forwards_trajectory);
 
 /**
  * This function calculates the robot state at every point along the trajectory (X/Y amd
