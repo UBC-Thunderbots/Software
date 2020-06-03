@@ -22,7 +22,6 @@ class PassGeneratorTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        world = ::Test::TestUtil::createBlankTestingWorld();
         world.updateField(Field::createSSLDivBField());
         pass_generator = std::make_shared<PassGenerator>(world, Point(0, 0),
                                                          PassType::ONE_TOUCH_SHOT, true);
@@ -64,7 +63,7 @@ class PassGeneratorTest : public testing::Test
         EXPECT_LE(std::abs(curr_score - prev_score), min_score_diff);
     }
 
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
     std::shared_ptr<PassGenerator> pass_generator;
 };
 
