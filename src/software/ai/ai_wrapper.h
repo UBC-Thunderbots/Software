@@ -40,5 +40,5 @@ class AIWrapper : public ThreadedObserver<World>,
 
     AI ai;
     std::shared_ptr<const AIControlConfig> control_config;
-    World most_recent_world;
+    std::optional<World> most_recent_world;
 };

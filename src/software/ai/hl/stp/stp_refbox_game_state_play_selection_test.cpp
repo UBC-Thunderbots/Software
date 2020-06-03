@@ -38,7 +38,7 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
     }
 
     STP stp;
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
@@ -226,7 +226,7 @@ class STPRefboxGameStatePlaySelectionTest
     }
 
     STP stp;
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTest,
