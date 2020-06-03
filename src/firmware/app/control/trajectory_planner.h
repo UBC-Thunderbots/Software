@@ -281,6 +281,16 @@ app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentD
     const float desired_segment_duration, unsigned int trajectory_index,
     bool rebalance_angular);
 
+void app_trajectory_planner_generateVelocityTrajectory_2(
+    PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
+    PositionTrajectory_t* trajectory);
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+    PositionTrajectory_t* trajectory, PositionTrajectory_t* constant_period_trajectory,
+    const float interpolation_period);
 /**
  * Modifies a forwards continuous velocity profile to also be backwards continuous based
  * on the input parameters.
