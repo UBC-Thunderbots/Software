@@ -85,8 +85,21 @@ cc_library(
 
 cc_library(
     name = "robot_status",
+    srcs = ["robot_status.cpp"],
     hdrs = ["robot_status.h"],
-    deps = [],
+    deps = [
+        "//shared/proto:tbots_cc_proto",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "robot_status_test",
+    srcs = ["robot_status_test.cpp"],
+    deps = [
+        ":robot_status",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(
