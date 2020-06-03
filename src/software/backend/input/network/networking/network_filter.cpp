@@ -25,9 +25,9 @@ NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config)
 {
 }
 
-Field NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
+std::optional<Field> NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
 {
-    if (geometry_packet.has_field())
+    if (field_state && geometry_packet.has_field())
     {
         SSL_GeometryFieldSize field_data = geometry_packet.field();
         Field field                      = createFieldFromPacketGeometry(field_data);
@@ -117,7 +117,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     return field;
 }
 
-TimestampedBallState NetworkFilter::getFilteredBallData(
+std::optional<TimestampedBallState> NetworkFilter::getFilteredBallData(
     const std::vector<SSL_DetectionFrame> &detections)
 {
     auto ball_detections = std::vector<BallDetection>();
@@ -144,11 +144,14 @@ TimestampedBallState NetworkFilter::getFilteredBallData(
         }
     }
 
-    std::optional<Ball> new_ball =
-        ball_filter.getFilteredData(ball_detections, field_state);
-    if (new_ball)
+    if (field_state)
     {
-        ball_state = new_ball->currentState();
+        std::optional<Ball> new_ball =
+            ball_filter.getFilteredData(ball_detections, *field_state);
+        if (new_ball)
+        {
+            ball_state = new_ball->currentState();
+        }
     }
 
     return ball_state;

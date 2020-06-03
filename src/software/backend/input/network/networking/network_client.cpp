@@ -169,9 +169,12 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
             if (!camera_disabled)
             {
-                TimestampedBallState ball_state =
+                std::optional<TimestampedBallState> ball_state =
                     network_filter.getFilteredBallData({detection});
-                ball.updateState(ball_state);
+                if (ball_state)
+                {
+                    ball.updateState(*ball_state);
+                }
 
                 friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
                 int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();

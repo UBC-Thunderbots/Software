@@ -6,8 +6,6 @@
 #include "software/new_geom/rectangle.h"
 #include "software/time/timestamp.h"
 
-Field::Field() : Field(0, 0, 0, 0, 0, 0, 0) {}
-
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
              double defense_y_length, double goal_y_length, double boundary_buffer_size,
              double center_circle_radius)

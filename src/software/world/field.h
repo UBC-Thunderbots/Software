@@ -35,11 +35,7 @@ typedef enum
 class Field
 {
    public:
-    /**
-     * Default constructs a field with all dimensions set to 0. This default
-     * field will be invalid (ie. isValid() returns false)
-     */
-    explicit Field();
+    explicit Field() = delete;
 
     /**
      * Creates a field with the standard SSL Division B dimensions

@@ -10,7 +10,7 @@ class WorldTest : public ::testing::Test
    protected:
     WorldTest()
         : current_time(Timestamp::fromSeconds(123)),
-          field(),
+          field(Field::createSSLDivBField()),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
@@ -22,8 +22,6 @@ class WorldTest : public ::testing::Test
     {
         // An arbitrary fixed point in time
         // We use this fixed point in time to make the tests deterministic.
-        field = Field::createSSLDivBField();
-
         Robot friendly_robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
                                        AngularVelocity::threeQuarter(), current_time);
 
@@ -108,7 +106,6 @@ TEST_F(WorldTest, equality_different_ball)
 {
     World world1       = world;
     Ball ball          = Ball(Point(1, 0), Vector(13, 0), Timestamp::fromSeconds(0));
-    Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(0));
     Team enemy_team    = Team(Duration::fromMilliseconds(0));
     World world2       = World(field, ball, friendly_team, enemy_team);
@@ -131,7 +128,6 @@ TEST_F(WorldTest, equality_different_friendly_team)
 {
     World world1       = world;
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(1500));
     Team enemy_team    = Team(Duration::fromMilliseconds(0));
     World world2       = World(field, ball, friendly_team, enemy_team);
@@ -142,7 +138,6 @@ TEST_F(WorldTest, equality_different_enemy_team)
 {
     World world1       = world;
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    Field field        = Field();
     Team friendly_team = Team(Duration::fromMilliseconds(0));
     Team enemy_team    = Team(Duration::fromMilliseconds(1300));
     World world2       = World(field, ball, friendly_team, enemy_team);
