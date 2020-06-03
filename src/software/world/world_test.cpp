@@ -10,7 +10,7 @@ class WorldTest : public ::testing::Test
    protected:
     WorldTest()
         : current_time(Timestamp::fromSeconds(123)),
-          field(Field::createSSLDivBField()),
+          field(::Test::TestUtil::createSSLDivBField()),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),

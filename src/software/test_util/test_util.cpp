@@ -4,9 +4,16 @@
 
 namespace Test
 {
+    Field TestUtil::createSSLDivBField()
+    {
+        // Using the dimensions of a standard Division B SSL field
+        Field field = Field(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5);
+        return field;
+    }
+
     World TestUtil::createBlankTestingWorld()
     {
-        Field field        = Field::createSSLDivBField();
+        Field field        = createSSLDivBField();
         Team friendly_team = Team(Duration::fromMilliseconds(1000));
         Team enemy_team    = Team(Duration::fromMilliseconds(1000));
         Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));

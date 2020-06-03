@@ -35,14 +35,7 @@ typedef enum
 class Field
 {
    public:
-    explicit Field() = delete;
-
-    /**
-     * Creates a field with the standard SSL Division B dimensions
-     *
-     * @return a field with the standard SSL Division B dimensions
-     */
-    static const Field createSSLDivBField();
+    Field() = delete;
 
     /**
      * Constructs a new field with the given dimensions

@@ -22,6 +22,12 @@ namespace Test
     {
        public:
         /**
+         * Creates a field with the standard SSL Division B dimensions
+         * @return a field with the standard SSL Division B dimensions
+         */
+        static Field createSSLDivBField();
+
+        /**
          * Creates a World object with a normal SSL Division B field, default (empty)
          * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
          * field with no velocity.
