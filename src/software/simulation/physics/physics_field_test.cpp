@@ -85,9 +85,9 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
     Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
-    Ball ball_parameter(field_parameter.friendlyHalf().posXPosYCorner(), Vector(0, 2),
-                        Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 0.1, 9.8);
+    BallState initial_ball_state(field_parameter.friendlyHalf().posXPosYCorner(),
+                                 Vector(0, 2));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -99,7 +99,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
         world->Step(1.0 / 60.0, 5, 8);
     }
 
-    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
+    auto ball = physics_ball.getBallState();
     EXPECT_LT((Vector(0, -2) - ball.velocity()).length(), 1e-5);
 }
 
@@ -111,9 +111,9 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
     Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
-    Ball ball_parameter(field_parameter.enemyGoalCenter() + Vector(-1, 0), Vector(3.0, 0),
-                        Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 0.1, 9.8);
+    BallState initial_ball_state(field_parameter.enemyGoalCenter() + Vector(-1, 0),
+                                 Vector(3.0, 0));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -125,7 +125,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
         world->Step(1.0 / 60.0, 5, 8);
     }
 
-    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
+    auto ball = physics_ball.getBallState();
     EXPECT_LT((Vector(-3.0, 0.0) - ball.velocity()).length(), 1e-3);
 }
 
@@ -137,9 +137,9 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
     Field field_parameter(Field::createSSLDivBField());
     auto physics_field = PhysicsField(world, field_parameter);
 
-    Ball ball_parameter(field_parameter.friendlyGoalCenter() + Vector(1, 0),
-                        Vector(-3.0, 0), Timestamp::fromSeconds(0));
-    auto physics_ball = PhysicsBall(world, ball_parameter, 0.1, 9.8);
+    BallState initial_ball_state(field_parameter.friendlyGoalCenter() + Vector(1, 0),
+                                 Vector(-3.0, 0));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, 9.8);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -151,6 +151,6 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
         world->Step(1.0 / 60.0, 5, 8);
     }
 
-    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
+    auto ball = physics_ball.getBallState();
     EXPECT_LT((Vector(3.0, 0.0) - ball.velocity()).length(), 1e-3);
 }

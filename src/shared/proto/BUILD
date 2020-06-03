@@ -5,8 +5,12 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "tbots_proto",
     srcs = [
+        "geometry.proto",
+        "radio_primitive.proto",
         "robot_component_status.proto",
         "tbots_robot_msg.proto",
+        "tbots_software_msgs.proto",
+        "vision.proto",
     ],
     # Note: this library is public so that proto libraries in firmware or software can build from it
 )

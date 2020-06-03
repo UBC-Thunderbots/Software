@@ -17,19 +17,22 @@ PhysicsWorld::PhysicsWorld(const World& world)
 void PhysicsWorld::initWorld(const World& world)
 {
     physics_field = std::make_shared<PhysicsField>(b2_world, world.field());
-    physics_ball  = std::make_shared<PhysicsBall>(b2_world, world.ball(), BALL_MASS_KG,
-                                                 acceleration_due_to_gravity);
+    physics_ball =
+        std::make_shared<PhysicsBall>(b2_world, world.ball().currentState().ballState(),
+                                      BALL_MASS_KG, acceleration_due_to_gravity);
     friendly_physics_robots.clear();
     for (const auto& friendly_robot : world.friendlyTeam().getAllRobots())
     {
         friendly_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-            b2_world, friendly_robot, ROBOT_WITH_BATTERY_MASS_KG));
+            friendly_robot.id(), b2_world, friendly_robot.currentState().robotState(),
+            ROBOT_WITH_BATTERY_MASS_KG));
     }
     enemy_physics_robots.clear();
     for (const auto& enemy_robot : world.enemyTeam().getAllRobots())
     {
         enemy_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-            b2_world, enemy_robot, ROBOT_WITH_BATTERY_MASS_KG));
+            enemy_robot.id(), b2_world, enemy_robot.currentState().robotState(),
+            ROBOT_WITH_BATTERY_MASS_KG));
     }
     current_timestamp = world.getMostRecentTimestamp();
 }
@@ -40,7 +43,9 @@ World PhysicsWorld::getWorld() const
     new_world.updateTimestamp(current_timestamp);
     if (physics_ball)
     {
-        new_world.mutableBall() = physics_ball->getBallWithTimestamp(current_timestamp);
+        TimestampedBallState timestamped_ball_state(physics_ball->getBallState(),
+                                                    current_timestamp);
+        new_world.mutableBall() = Ball(timestamped_ball_state);
     }
     if (physics_field)
     {
@@ -51,7 +56,9 @@ World PhysicsWorld::getWorld() const
     std::vector<Robot> friendly_robots;
     for (const auto& robot : friendly_physics_robots)
     {
-        friendly_robots.emplace_back(robot->getRobotWithTimestamp(current_timestamp));
+        TimestampedRobotState timestamped_robot_state(robot->getRobotState(),
+                                                      current_timestamp);
+        friendly_robots.emplace_back(Robot(robot->getRobotId(), timestamped_robot_state));
     }
     new_world.mutableFriendlyTeam().updateRobots(friendly_robots);
 
@@ -59,7 +66,9 @@ World PhysicsWorld::getWorld() const
     std::vector<Robot> enemy_robots;
     for (const auto& robot : enemy_physics_robots)
     {
-        enemy_robots.emplace_back(robot->getRobotWithTimestamp(current_timestamp));
+        TimestampedRobotState timestamped_robot_state(robot->getRobotState(),
+                                                      current_timestamp);
+        enemy_robots.emplace_back(Robot(robot->getRobotId(), timestamped_robot_state));
     }
     new_world.mutableEnemyTeam().updateRobots(enemy_robots);
 
