@@ -40,17 +40,17 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     void onValueReceived(SensorMsg sensor_msg) override;
 
     /**
-     * Updates world based on a new data
+     * Updates relevant components of world based on a new data
      *
      * @param new data
      */
-    void updateWorld(const SensorMsg &sensor_msg);
-    void updateWorld(const SSL_WrapperPacket &packet);
-    void updateWorld(const Referee &packet);
-    void updateWorld(
+    void updateWorldComponents(const SensorMsg &sensor_msg);
+    void updateWorldComponents(const SSL_WrapperPacket &packet);
+    void updateWorldComponents(const Referee &packet);
+    void updateWorldComponents(
         const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
-    void updateWorld(const SSL_GeometryData &geometry_packet);
-    void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
+    void updateWorldComponents(const SSL_GeometryData &geometry_packet);
+    void updateWorldComponents(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
      * Get ball from a vision detection
@@ -72,7 +72,13 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     Team getFriendlyTeamFromVisionDetection(const VisionDetection &vision_detection);
     Team getEnemyTeamFromVisionDetection(const VisionDetection &vision_detection);
 
-    World world;
+    std::optional<Field> field;
+    Ball ball;
+    Team friendly_team;
+    Team enemy_team;
+    RefboxGameState game_state;
+    RefboxStage refbox_stage;
+
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;

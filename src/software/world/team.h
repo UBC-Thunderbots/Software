@@ -23,8 +23,9 @@ class Team
      * @param buffer_size The number of elements in the Timestamp history buffer of the
      * Team object
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration,
-                  unsigned int buffer_size = 20);
+    explicit Team(
+        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50),
+        unsigned int buffer_size                     = 20);
 
     /**
      * Create a new team

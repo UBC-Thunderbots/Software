@@ -14,49 +14,46 @@ SensorFusion::SensorFusion()
 
 void SensorFusion::onValueReceived(SensorMsg sensor_msg)
 {
-    updateWorld(sensor_msg);
-    if (world.field().isValid())
+    updateWorldComponents(sensor_msg);
+    if (field)
     {
-        Subject<World>::sendValueToObservers(world);
+        Subject<World>::sendValueToObservers(
+            World(*field, ball, friendly_team, enemy_team));
     }
 }
 
-void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
+void SensorFusion::updateWorldComponents(const SensorMsg &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
-        updateWorld(sensor_msg.ssl_vision_msg());
+        updateWorldComponents(sensor_msg.ssl_vision_msg());
     }
 
     if (sensor_msg.has_ssl_refbox_msg())
     {
-        updateWorld(sensor_msg.ssl_refbox_msg());
+        updateWorldComponents(sensor_msg.ssl_refbox_msg());
     }
 
-    updateWorld(sensor_msg.tbots_robot_msg());
+    updateWorldComponents(sensor_msg.tbots_robot_msg());
 }
 
-void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
+void SensorFusion::updateWorldComponents(const SSL_WrapperPacket &packet)
 {
     if (packet.has_geometry())
     {
-        updateWorld(packet.geometry());
+        updateWorldComponents(packet.geometry());
     }
 
     if (packet.has_detection())
     {
-        updateWorld(packet.detection());
+        updateWorldComponents(packet.detection());
     }
 }
 
-void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
+void SensorFusion::updateWorldComponents(const SSL_GeometryData &geometry_packet)
 {
-    std::optional<Field> field = ssl_protobuf_reader.getField(geometry_packet);
-    if (field)
-    {
-        world.updateField(*field);
-    }
-    else
+    field = ssl_protobuf_reader.getField(geometry_packet);
+    if (!field)
     {
         LOG(WARNING)
             << "Invalid field packet has been detected, which means field may be unreliable "
@@ -64,38 +61,42 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     }
 }
 
-void SensorFusion::updateWorld(const Referee &packet)
+void SensorFusion::updateWorldComponents(const Referee &packet)
 {
-    world.updateRefboxGameState(ssl_protobuf_reader.getRefboxGameState(packet));
-    world.updateRefboxStage(ssl_protobuf_reader.getRefboxStage(packet));
+    game_state   = ssl_protobuf_reader.getRefboxGameState(packet);
+    refbox_stage = ssl_protobuf_reader.getRefboxStage(packet);
 }
 
-void SensorFusion::updateWorld(
+void SensorFusion::updateWorldComponents(
     const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
 {
     // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
 }
 
-void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
+void SensorFusion::updateWorldComponents(const SSL_DetectionFrame &ssl_detection_frame)
 {
     VisionDetection vision_detection =
         ssl_protobuf_reader.getVisionDetection(ssl_detection_frame);
-    world.mutableEnemyTeam()     = getEnemyTeamFromVisionDetection(vision_detection);
-    world.mutableFriendlyTeam()  = getFriendlyTeamFromVisionDetection(vision_detection);
+    enemy_team                   = getEnemyTeamFromVisionDetection(vision_detection);
+    friendly_team                = getFriendlyTeamFromVisionDetection(vision_detection);
     std::optional<Ball> new_ball = getBallFromVisionDetection(vision_detection);
     if (new_ball)
     {
-        world.updateBallStateWithTimestamp(new_ball->currentState());
+        ball.updateState(new_ball->currentState());
     }
 }
 
 std::optional<Ball> SensorFusion::getBallFromVisionDetection(
     const VisionDetection &vision_detection)
 {
-    std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
-    std::optional<Ball> new_ball =
-        ball_filter.getFilteredData(ball_detections, world.field());
-    return new_ball;
+    if (field)
+    {
+        std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
+        std::optional<Ball> new_ball =
+            ball_filter.getFilteredData(ball_detections, *field);
+        return new_ball;
+    }
+    return std::nullopt;
 }
 
 Team SensorFusion::getFriendlyTeamFromVisionDetection(
@@ -103,8 +104,8 @@ Team SensorFusion::getFriendlyTeamFromVisionDetection(
 {
     std::vector<RobotDetection> friendly_robot_detections =
         vision_detection.getFriendlyTeamDetections();
-    Team new_friendly_team = friendly_team_filter.getFilteredData(
-        world.friendlyTeam(), friendly_robot_detections);
+    Team new_friendly_team =
+        friendly_team_filter.getFilteredData(friendly_team, friendly_robot_detections);
     int friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
                                  ->getRefboxConfig()
                                  ->FriendlyGoalieId()
@@ -119,7 +120,7 @@ Team SensorFusion::getEnemyTeamFromVisionDetection(
     std::vector<RobotDetection> enemy_robot_detections =
         vision_detection.getEnemyTeamDetections();
     Team new_enemy_team =
-        enemy_team_filter.getFilteredData(world.enemyTeam(), enemy_robot_detections);
+        enemy_team_filter.getFilteredData(enemy_team, enemy_robot_detections);
     int enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
                               ->getRefboxConfig()
                               ->EnemyGoalieId()
