@@ -262,19 +262,8 @@ void app_trajectory_planner_generateForwardsContinuousAngularSpeedProfile_2(
     PositionTrajectory_t* trajectory,
     TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
-static TrajectoryPlannerGenerationStatus_t
+TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
-    PositionTrajectory_t* trajectory,
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const bool is_angular_trajectory);
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateBackwardsContinuousLinearSpeedProfile(
-    PositionTrajectory_t* trajectory,
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateBackwardsContinuousAngularSpeedProfile(
     PositionTrajectory_t* trajectory,
     TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
@@ -285,6 +274,12 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile_2(
     Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
     const float t_end, const float max_allowable_acceleration,
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentDuration(
+    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths,
+    const float desired_segment_duration, unsigned int trajectory_index,
+    bool rebalance_angular);
 
 /**
  * Modifies a forwards continuous velocity profile to also be backwards continuous based

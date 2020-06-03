@@ -394,98 +394,67 @@ void app_trajectory_planner_generateForwardsContinuousAngularSpeedProfile_2(
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
     PositionTrajectory_t* trajectory,
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const bool is_angular_trajectory)
+    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     const unsigned int num_segments = trajectory->path_parameters.num_segments;
 
-
-    const float max_allowable_acceleration =
-        is_angular_trajectory
-            ? trajectory->path_parameters.max_allowable_angular_acceleration
-            : trajectory->path_parameters.max_allowable_linear_acceleration;
+    const float max_allowable_acceleration_linear =
+        trajectory->path_parameters.max_allowable_linear_acceleration;
+    const float max_allowable_acceleration_angular =
+        trajectory->path_parameters.max_allowable_angular_acceleration;
 
     for (unsigned int i = num_segments - 1; i > 0; i--)
     {
-        // Initialize variables to the appropriate domain
-        float current_speed              = 0;
-        float previous_speed             = 0;
-        float max_allowable_acceleration = 0;
-        float seg_length                 = 0;
+        const float current_speed_linear =
+            trajectory->trajectory_elements[i].linear_speed;
+        const float current_speed_angular =
+            trajectory->trajectory_elements[i].angular_speed;
+        const float previous_speed_linear =
+            trajectory->trajectory_elements[i - 1].linear_speed;
+        const float previous_speed_angular =
+            trajectory->trajectory_elements[i - 1].angular_speed;
+        const float segment_length_linear = segment_lengths[i - 1].linear_segment_length;
+        const float segment_length_angular =
+            segment_lengths[i - 1].angular_segment_length;
 
-        if (is_angular_trajectory)
-        {
-            current_speed  = trajectory->trajectory_elements[i].angular_speed;
-            previous_speed = trajectory->trajectory_elements[i - 1].angular_speed;
-            max_allowable_acceleration =
-                trajectory->path_parameters.max_allowable_angular_acceleration;
-            seg_length = segment_lengths[i - 1].angular_segment_length;
-        }
-        else
-        {
-            current_speed  = trajectory->trajectory_elements[i].linear_speed;
-            previous_speed = trajectory->trajectory_elements[i - 1].linear_speed;
-            max_allowable_acceleration =
-                trajectory->path_parameters.max_allowable_linear_speed;
-            seg_length = segment_lengths[i - 1].linear_segment_length;
-        }
 
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
-        float temp_vel = (float)sqrt(pow(current_speed, 2) +
-                                     2 * seg_length * max_allowable_acceleration);
+        float temp_vel_linear =
+            (float)sqrt(pow(current_speed_linear, 2) +
+                        2 * segment_length_linear * max_allowable_acceleration_linear);
+        float temp_vel_angular =
+            (float)sqrt(pow(current_speed_angular, 2) +
+                        2 * segment_length_angular * max_allowable_acceleration_angular);
 
 
         // If the velocity at [i-1] is larger than it physically possible to deccelerate
         // from, pull the speed at [i-1] lower
-        if (previous_speed > temp_vel)
+        if (previous_speed_linear > temp_vel_linear)
         {
-            if (is_angular_trajectory)
-            {
-                trajectory->trajectory_elements[i - 1].angular_speed = temp_vel;
-            }
-            else
-            {
-                trajectory->trajectory_elements[i - 1].linear_speed = temp_vel;
-            }
+            trajectory->trajectory_elements[i - 1].linear_speed = temp_vel_linear;
+        }
+        if (previous_speed_angular > temp_vel_angular)
+        {
+            trajectory->trajectory_elements[i - 1].angular_speed = temp_vel_angular;
         }
     }
 
     // Check that we are able to deccelerate fast enough that the initial velocity allows
     // for the path to be followed
     // Note: The initial speed of an angular profile is always assumed to be zero
-    if (is_angular_trajectory && trajectory->trajectory_elements[0].angular_speed >= 0.0)
-    {
-        trajectory->trajectory_elements[0].angular_speed = 0.0;
-        return OK;
-    }
-    else if (!is_angular_trajectory &&
-             trajectory->trajectory_elements[0].linear_speed >=
-                 trajectory->path_parameters.initial_linear_speed)
+    TrajectoryPlannerGenerationStatus_t status = OK;
+
+    trajectory->trajectory_elements[0].angular_speed = 0.0;
+
+    if (trajectory->trajectory_elements[0].linear_speed <
+        trajectory->path_parameters.initial_linear_speed)
     {
         trajectory->trajectory_elements[0].linear_speed =
             trajectory->path_parameters.initial_linear_speed;
-        return OK;
+        status = INITIAL_VELOCITY_TOO_HIGH;
     }
 
-    return INITIAL_VELOCITY_TOO_HIGH;
-}
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateBackwardsContinuousLinearSpeedProfile(
-    PositionTrajectory_t* trajectory,
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
-{
-    return app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
-        trajectory, segment_lengths, false);
-}
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateBackwardsContinuousAngularSpeedProfile(
-    PositionTrajectory_t* trajectory,
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
-{
-    return app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(
-        trajectory, segment_lengths, true);
+    return status;
 }
 
 void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
@@ -536,26 +505,19 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
 
         // Now we know the time requirements for following the linear and angular path
         // profiles Pick the largest and scale the previous speed by a proportional amount
-        if (angular_segment_delta_time > linear_segment_delta_time &&
-            angular_segment_delta_time != 0)
+        if (angular_segment_delta_time > linear_segment_delta_time)
         {
             // In this case the linear velocity needs to be scaled down
-            const float linear_scale_factor =
-                linear_segment_delta_time / angular_segment_delta_time;
-            trajectory->trajectory_elements[i - 1].linear_speed =
-                trajectory->linear_speed_profile[i - 1] * linear_scale_factor;
+            app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentDuration(
+                &trajectory, segment_lengths, angular_segment_delta_time, i, false);
             trajectory->trajectory_elements[i].time =
                 trajectory->trajectory_elements[i - 1].time + angular_segment_delta_time;
         }
-        else if (linear_segment_delta_time > angular_segment_delta_time &&
-                 linear_segment_delta_time != 0)
+        else if (linear_segment_delta_time > angular_segment_delta_time)
         {
             // In this case the angular velocity needs to be scaled down
-            const float angular_scale_factor =
-                angular_segment_delta_time / linear_segment_delta_time;
-            trajectory->trajectory_elements[i - 1].angular_speed =
-                trajectory->trajectory_elements[i - 1].angular_speed *
-                angular_scale_factor;
+            app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentDuration(
+                &trajectory, segment_lengths, angular_segment_delta_time, i, true);
             trajectory->trajectory_elements[i].time =
                 trajectory->trajectory_elements[i - 1].time + linear_segment_delta_time;
         }
@@ -566,6 +528,44 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
             trajectory->trajectory_elements[i].time =
                 trajectory->trajectory_elements[i - 1].time + 0.0;
         }
+    }
+}
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentDuration(
+    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths,
+    const float desired_segment_duration, unsigned int trajectory_index,
+    bool rebalance_angular)
+{
+    // Initialize variables and values for the type of trajectory being modified
+    float current_speed  = 0;
+    float segment_length = 0;
+
+    if (rebalance_angular)
+    {
+        current_speed =
+            trajectory->trajectory_elements[trajectory_index - 1].angular_speed;
+        segment_length = segment_lengths[trajectory_index - 1].angular_segment_length;
+    }
+    else
+    {
+        current_speed =
+            trajectory->trajectory_elements[trajectory_index - 1].linear_speed;
+        segment_length = segment_lengths[trajectory_index - 1].linear_segment_length;
+    }
+
+    // Calculate the new final velocity based on the initial velocity, segment length, and
+    // the desired segment duration
+    const float next_speed =
+        (2 * segment_length / desired_segment_duration) + current_speed;
+
+    if (rebalance_angular)
+    {
+        trajectory->trajectory_elements[trajectory_index].angular_speed = next_speed;
+    }
+    else
+    {
+        trajectory->trajectory_elements[trajectory_index].linear_speed = next_speed;
     }
 }
 
@@ -608,6 +608,31 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile_2(
             sqrt(max_allowable_acceleration * radius_of_curvature);
     }
 }
+
+// TrajectoryPlannerGenerationStatus_t
+// app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(PositionTrajectory_t*
+// position_trajectory, VelocityTrajectory_t* velocity_trajectory){
+//    // Generate the segments and states
+//    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+//    app_trajectory_planner_generateStatesAndReturnSegmentLengths(position_trajectory,
+//    segment_lengths);
+//
+//    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+//    app_trajectory_planner_getMaxAllowableSpeedProfile_2(position_trajectory->path_parameters.path,
+//    position_trajectory->path_parameters.num_segments,
+//    position_trajectory->path_parameters.t_start,
+//    position_trajectory->path_parameters.t_end,
+//    position_trajectory->path_parameters.max_allowable_linear_acceleration,
+//    max_allowable_speed_profile);
+//
+//    app_trajectory_planner_generateForwardsContinuousLinearSpeedProfile_2(position_trajectory,
+//    max_allowable_speed_profile, segment_lengths);
+//    app_trajectory_planner_generateForwardsContinuousAngularSpeedProfile_2(position_trajectory,
+//    segment_lengths);
+//
+//    app_trajectory_planner_generateBackwardsContinuousSpeedProfile_2(position_trajectory,
+//    segment_lengths, )
+//}
 
 void app_trajectory_planner_generateBackwardsContinuousSpeedProfile(
     const unsigned int num_segments, float* forwards_continuous_velocity_profile,
