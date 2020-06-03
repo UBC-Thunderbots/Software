@@ -24,6 +24,13 @@ class RadioBackend : public Backend
      */
     void receiveWorld(World world);
 
+    /**
+     * Convert robot_status to TbotsRobotMsg and send as a SensorMsg to observers
+     *
+     * @param robot_status The RobotStatus
+     */
+    void receiveRobotStatus(RobotStatus robot_status);
+
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
 
