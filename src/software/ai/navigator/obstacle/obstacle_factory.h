@@ -108,8 +108,8 @@ class ObstacleFactory
      *
      * @return ObstaclePtr
      */
-    ObstaclePtr fromCircle(const Circle &circle) const;
-    ObstaclePtr fromPolygon(const Polygon &polygon) const;
+    ObstaclePtr createInflatedByRobotRadius(const Circle &circle) const;
+    ObstaclePtr createInflatedByRobotRadius(const Polygon &polygon) const;
 
     /**
      * Returns an obstacle for the field_rectangle expanded on all sides to account for
@@ -124,11 +124,10 @@ class ObstacleFactory
      *
      * @return ObstaclePtr
      */
-    ObstaclePtr fromFieldRectangle(const Rectangle &field_rectangle,
-                                   const Rectangle &field_lines,
-                                   const Rectangle &field_boundary) const;
-    ObstaclePtr fromFieldRectangle(const Rectangle &field_rectangle,
-                                   const Rectangle &field_lines,
-                                   const Rectangle &field_boundary,
-                                   double expansion_amount) const;
+    ObstaclePtr createFieldRectangleObstacleInflatedByRobotRadius(
+        const Rectangle &field_rectangle, const Rectangle &field_lines,
+        const Rectangle &field_boundary) const;
+    ObstaclePtr createFieldRectangleObstacleCustomInflation(
+        const Rectangle &field_rectangle, const Rectangle &field_lines,
+        const Rectangle &field_boundary, double expansion_amount) const;
 };

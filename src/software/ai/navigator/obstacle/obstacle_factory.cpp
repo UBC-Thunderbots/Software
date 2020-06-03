@@ -23,39 +23,40 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
         }
         break;
         case MotionConstraint::CENTER_CIRCLE:
-            obstacles.push_back(fromCircle(
+            obstacles.push_back(createInflatedByRobotRadius(
                 Circle(world.field().centerPoint(), world.field().centerCircleRadius())));
             break;
         case MotionConstraint::HALF_METER_AROUND_BALL:
             // 0.5 represents half a metre radius
-            obstacles.push_back(fromCircle(Circle(world.ball().position(), 0.5)));
+            obstacles.push_back(
+                createInflatedByRobotRadius(Circle(world.ball().position(), 0.5)));
             break;
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
-            obstacles.push_back(fromFieldRectangle(
+            obstacles.push_back(createFieldRectangleObstacleCustomInflation(
                 world.field().enemyDefenseArea(), world.field().fieldLines(),
                 world.field().fieldBoundary(), robot_radius_expansion_amount + 0.3));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
-            obstacles.push_back(fromFieldRectangle(world.field().friendlyDefenseArea(),
-                                                   world.field().fieldLines(),
-                                                   world.field().fieldBoundary()));
+            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
+                world.field().friendlyDefenseArea(), world.field().fieldLines(),
+                world.field().fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            obstacles.push_back(fromFieldRectangle(world.field().enemyDefenseArea(),
-                                                   world.field().fieldLines(),
-                                                   world.field().fieldBoundary()));
+            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
+                world.field().enemyDefenseArea(), world.field().fieldLines(),
+                world.field().fieldBoundary()));
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            obstacles.push_back(fromFieldRectangle(world.field().friendlyHalf(),
-                                                   world.field().fieldLines(),
-                                                   world.field().fieldBoundary()));
+            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
+                world.field().friendlyHalf(), world.field().fieldLines(),
+                world.field().fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_HALF:
-            obstacles.push_back(fromFieldRectangle(world.field().enemyHalf(),
-                                                   world.field().fieldLines(),
-                                                   world.field().fieldBoundary()));
+            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
+                world.field().enemyHalf(), world.field().fieldLines(),
+                world.field().fieldBoundary()));
             break;
     }
 
@@ -148,26 +149,26 @@ std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
 
 ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position) const
 {
-    return fromCircle(Circle(ball_position, BALL_MAX_RADIUS_METERS));
+    return createInflatedByRobotRadius(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
 ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position) const
 {
-    return fromCircle(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
+    return createInflatedByRobotRadius(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
 }
 
 ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle) const
 {
-    return fromPolygon(Polygon(rectangle));
+    return createInflatedByRobotRadius(Polygon(rectangle));
 }
 
-ObstaclePtr ObstacleFactory::fromCircle(const Circle &circle) const
+ObstaclePtr ObstacleFactory::createInflatedByRobotRadius(const Circle &circle) const
 {
     return std::make_shared<GeomObstacle<Circle>>(
         Circle(circle.getOrigin(), circle.getRadius() + robot_radius_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::fromPolygon(const Polygon &polygon) const
+ObstaclePtr ObstacleFactory::createInflatedByRobotRadius(const Polygon &polygon) const
 {
     return std::make_shared<GeomObstacle<Polygon>>(
         polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
@@ -176,18 +177,17 @@ ObstaclePtr ObstacleFactory::fromPolygon(const Polygon &polygon) const
             .expand(Vector(0, 1).normalize(robot_radius_expansion_amount)));
 }
 
-ObstaclePtr ObstacleFactory::fromFieldRectangle(const Rectangle &field_rectangle,
-                                                const Rectangle &field_lines,
-                                                const Rectangle &field_boundary) const
+ObstaclePtr ObstacleFactory::createFieldRectangleObstacleInflatedByRobotRadius(
+    const Rectangle &field_rectangle, const Rectangle &field_lines,
+    const Rectangle &field_boundary) const
 {
-    return fromFieldRectangle(field_rectangle, field_lines, field_boundary,
-                              robot_radius_expansion_amount);
+    return createFieldRectangleObstacleCustomInflation(
+        field_rectangle, field_lines, field_boundary, robot_radius_expansion_amount);
 }
 
-ObstaclePtr ObstacleFactory::fromFieldRectangle(const Rectangle &field_rectangle,
-                                                const Rectangle &field_lines,
-                                                const Rectangle &field_boundary,
-                                                double expansion_amount) const
+ObstaclePtr ObstacleFactory::createFieldRectangleObstacleCustomInflation(
+    const Rectangle &field_rectangle, const Rectangle &field_lines,
+    const Rectangle &field_boundary, double expansion_amount) const
 {
     double xMin = field_rectangle.xMin();
     double xMax = field_rectangle.xMax();
