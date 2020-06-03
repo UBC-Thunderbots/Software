@@ -37,22 +37,23 @@ void PhysicsWorld::initWorld(const World& world)
     current_timestamp = world.getMostRecentTimestamp();
 }
 
-World PhysicsWorld::getWorld() const
+std::optional<World> PhysicsWorld::getWorld() const
 {
-    World new_world;
-    new_world.updateTimestamp(current_timestamp);
+    std::optional<Field> field;
+    Ball ball;
+    Team friendly_team;
+    Team enemy_team;
     if (physics_ball)
     {
         TimestampedBallState timestamped_ball_state(physics_ball->getBallState(),
                                                     current_timestamp);
-        new_world.mutableBall() = Ball(timestamped_ball_state);
+        ball = Ball(timestamped_ball_state);
     }
     if (physics_field)
     {
-        new_world.updateField(physics_field->getField());
+        field = physics_field->getField();
     }
 
-    new_world.mutableFriendlyTeam().clearAllRobots();
     std::vector<Robot> friendly_robots;
     for (const auto& robot : friendly_physics_robots)
     {
@@ -60,9 +61,8 @@ World PhysicsWorld::getWorld() const
                                                       current_timestamp);
         friendly_robots.emplace_back(Robot(robot->getRobotId(), timestamped_robot_state));
     }
-    new_world.mutableFriendlyTeam().updateRobots(friendly_robots);
+    friendly_team = Team(friendly_robots);
 
-    new_world.mutableEnemyTeam().clearAllRobots();
     std::vector<Robot> enemy_robots;
     for (const auto& robot : enemy_physics_robots)
     {
@@ -70,9 +70,16 @@ World PhysicsWorld::getWorld() const
                                                       current_timestamp);
         enemy_robots.emplace_back(Robot(robot->getRobotId(), timestamped_robot_state));
     }
-    new_world.mutableEnemyTeam().updateRobots(enemy_robots);
+    enemy_team = Team(enemy_robots);
 
-    return new_world;
+    if (field)
+    {
+        World new_world(*field, ball, friendly_team, enemy_team);
+        new_world.updateTimestamp(current_timestamp);
+        return new_world;
+    }
+
+    return std::nullopt;
 }
 
 void PhysicsWorld::stepSimulation(const Duration& time_step)

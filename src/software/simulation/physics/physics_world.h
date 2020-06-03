@@ -34,10 +34,10 @@ class PhysicsWorld
     PhysicsWorld(const PhysicsWorld&)            = delete;
 
     /**
-     * Returns the current state of the world
+     * Returns the current state of the world if available
      * @return the current state of the world
      */
-    World getWorld() const;
+    std::optional<World> getWorld() const;
 
     /**
      * Advances the Box2D world physics by the given time step

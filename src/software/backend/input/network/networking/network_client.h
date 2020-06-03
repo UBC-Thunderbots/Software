@@ -132,8 +132,11 @@ class NetworkClient
     // gamecontroller data
     std::unique_ptr<ProtoMulticastListener<Referee>> ssl_gamecontroller_client;
 
-    // The most up-to-date state of the world
-    World world;
+    // The most up-to-date state of the world components
+    std::optional<Field> field;
+    Ball ball;
+    Team friendly_team;
+    Team enemy_team;
 
     // The io_service that will be used to serivce all network requests
     boost::asio::io_service io_service;

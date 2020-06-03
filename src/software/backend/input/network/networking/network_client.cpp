@@ -125,11 +125,10 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     if (packet.has_geometry())
     {
         const auto& latest_geometry_data = packet.geometry();
-        Field field = network_filter.getFieldData(latest_geometry_data);
-        world.updateField(field);
+        field = network_filter.getFieldData(latest_geometry_data);
     }
 
-    if (world.field().isValid())
+    if (field)
     {
         if (packet.has_detection())
         {
@@ -172,32 +171,29 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             {
                 TimestampedBallState ball_state =
                     network_filter.getFilteredBallData({detection});
-                world.updateBallStateWithTimestamp(ball_state);
+                ball.updateState(ball_state);
 
-                Team friendly_team =
-                    network_filter.getFilteredFriendlyTeamData({detection});
+                friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
                 int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
                 friendly_team.assignGoalie(friendly_goalie_id);
-                world.mutableFriendlyTeam() = friendly_team;
 
-                Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
+                enemy_team = network_filter.getFilteredEnemyTeamData({detection});
                 int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
                 enemy_team.assignGoalie(enemy_goalie_id);
-                world.mutableEnemyTeam() = enemy_team;
             }
         }
 
-        received_world_callback(world);
+        received_world_callback(World(*field, ball, friendly_team, enemy_team));
     }
 }
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    RefboxGameState game_state = network_filter.getRefboxGameState(packet);
-    world.updateRefboxGameState(game_state);
-
-    if (world.field().isValid())
+    if (field)
     {
+        RefboxGameState game_state = network_filter.getRefboxGameState(packet);
+        World world(*field, ball, friendly_team, enemy_team);
+        world.updateRefboxGameState(game_state);
         received_world_callback(world);
     }
 }
