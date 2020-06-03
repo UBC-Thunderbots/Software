@@ -78,7 +78,7 @@ void VisualizerWrapper::onValueReceived(World world)
     auto world_draw_function = getDrawWorldFunction(world);
     world_draw_functions_buffer->push(world_draw_function);
 
-    if (!initial_view_area_set && world.field().isValid())
+    if (!initial_view_area_set)
     {
         initial_view_area_set = true;
         view_area_buffer->push(world.field().fieldBoundary());
