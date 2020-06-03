@@ -14,7 +14,7 @@ SensorFusion::SensorFusion()
 
 void SensorFusion::onValueReceived(SensorMsg sensor_msg)
 {
-    updateWorldComponents(sensor_msg);
+    updateWorld(sensor_msg);
     if (field)
     {
         Subject<World>::sendValueToObservers(
@@ -22,7 +22,7 @@ void SensorFusion::onValueReceived(SensorMsg sensor_msg)
     }
 }
 
-void SensorFusion::updateWorldComponents(const SensorMsg &sensor_msg)
+void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {

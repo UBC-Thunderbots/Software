@@ -40,11 +40,18 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     void onValueReceived(SensorMsg sensor_msg) override;
 
     /**
+     * Updates components of world based on a new data and sends World to observers if
+     * complete
+     *
+     * @param new data
+     */
+    void updateWorld(const SensorMsg &sensor_msg);
+
+    /**
      * Updates relevant components of world based on a new data
      *
      * @param new data
      */
-    void updateWorldComponents(const SensorMsg &sensor_msg);
     void updateWorldComponents(const SSL_WrapperPacket &packet);
     void updateWorldComponents(const Referee &packet);
     void updateWorldComponents(
