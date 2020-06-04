@@ -367,7 +367,7 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
  * Function generates a constant interpolation period trajectory based on the input path
  * parameters and interpolation period
  *
- * @pre path parameter variables must all be initialized
+ * @pre path_parameter variables must all be initialised
  *
  * @pre velocity trajectory element array must be pre-allocated up to
  * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
