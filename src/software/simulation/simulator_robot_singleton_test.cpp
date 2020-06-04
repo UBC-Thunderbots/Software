@@ -27,13 +27,24 @@ class SimulatorRobotSingletonTest : public testing::Test
     createWorldWithEnemyRobots(Robot robot, Ball ball,
                                std::vector<Point> enemy_robot_positions)
     {
-        World world = ::Test::TestUtil::createBlankTestingWorld();
-        world = ::Test::TestUtil::setEnemyRobotPositions(world, enemy_robot_positions,
-                                                         Timestamp::fromSeconds(0));
+        auto physics_world  = std::make_shared<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
+        physics_world->setBallState(ball.currentState().ballState());
+        PhysicsWorld::RobotStateWithId_t robot_state{.id = robot.id(), .robot_state = robot.currentState().robotState()};
+        physics_world->addYellowRobots({robot_state});
 
-        world.mutableFriendlyTeam().updateRobots({robot});
-        world.mutableBall() = ball;
-        auto physics_world  = std::make_shared<PhysicsWorld>(world);
+        for(const auto& pos : enemy_robot_positions) {
+            auto id = physics_world->getAvailableBlueRobotId();
+            if(id) {
+                auto state = PhysicsWorld::RobotStateWithId{
+                        .id = id.value(),
+                        .robot_state = RobotState(pos, Vector(0, 0), Angle::zero(), AngularVelocity::zero())
+                };
+                physics_world->addBlueRobots({state});
+            }
+            else {
+                ADD_FAILURE() << "Not enough available robot IDs";
+            }
+        }
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
         auto physics_robot = physics_world->getFriendlyPhysicsRobots().at(0);
@@ -1029,14 +1040,15 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spin
 
 TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    Robot robot7(7, Point(1.2, 0), Vector(-2.3, 0.2), Angle::fromRadians(-1.2),
-                 AngularVelocity::quarter(), Timestamp::fromSeconds(0));
-    Robot robot2(2, Point(0, -4.03), Vector(0, 1), Angle::fromRadians(0.3),
-                 AngularVelocity::half(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot7, robot2});
+    auto physics_world           = std::make_unique<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
+    auto robot_states = std::vector<PhysicsWorld::RobotStateWithId_t>{
+            PhysicsWorld::RobotStateWithId{.id = 7, .robot_state = RobotState(Point(1.2, 0), Vector(-2.3, 0.2), Angle::fromRadians(-1.2),
+                                                                              AngularVelocity::quarter())},
+            PhysicsWorld::RobotStateWithId{.id = 2, .robot_state = RobotState(Point(0, -4.03), Vector(0, 1), Angle::fromRadians(0.3),
+                                                                              AngularVelocity::half())}
+    };
+    physics_world->addYellowRobots(robot_states);
 
-    auto physics_world           = std::make_unique<PhysicsWorld>(world);
     auto friendly_physics_robots = physics_world->getFriendlyPhysicsRobots();
     ASSERT_EQ(2, friendly_physics_robots.size());
     auto simulator_robot_7 =
