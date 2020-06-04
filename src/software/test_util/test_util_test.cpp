@@ -201,3 +201,59 @@ TEST(TestUtilsTest, circle_check_if_equal_within_tolerance)
     EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(circle1, circle2));
     EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(circle1, circle3));
 }
+
+TEST(TestUtilsTest, vector_check_if_equal_within_tolerance)
+{
+    Vector vector1(8.423, 4.913);
+    Vector vector2(8.4232391, 4.9139881);
+    Vector vector3(8.424, 4.914);
+    Vector vector4(8.425, 4.915);
+    Vector vector5(5.393, 1.113);
+    Vector vector6(5.394, 1.114);
+    Vector vector7(9.245, 1.227);
+    Vector vector8(9.246, 1.227);
+
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(vector1, vector2,
+                                                       2 * METERS_PER_MILLIMETER));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(vector1, vector3,
+                                                       2 * METERS_PER_MILLIMETER));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(vector1, vector4));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(vector5, vector6,
+                                                       2 * METERS_PER_MILLIMETER));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(vector6, vector5,
+                                                       2 * METERS_PER_MILLIMETER));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(vector7, vector8));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(vector8, vector7));
+}
+
+TEST(TestUtilsTest, angle_check_if_equal_within_tolerance)
+{
+    Angle angle1 = Angle::fromDegrees(5);
+    Angle angle2 = Angle::fromDegrees(5.5);
+    Angle angle3 = Angle::fromDegrees(189);
+    Angle angle4 = Angle::fromDegrees(190);
+    Angle angle5 = Angle::fromDegrees(-10);
+
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(angle1, angle2, Angle::fromDegrees(0.5)));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(angle1, angle2, Angle::fromDegrees(0.49)));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(angle3, angle4, Angle::fromDegrees(1)));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(angle3, angle4, Angle::fromDegrees(0.99)));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(angle1, angle5, Angle::fromDegrees(15)));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(angle4, angle5, Angle::fromDegrees(180)));
+}
+
+TEST(TestUtilsTest, robot_state_check_if_equal_within_tolerance)
+{
+    RobotState state1(Point(1.01, 2.58), Vector(0.0, -2.06), Angle::fromDegrees(4), AngularVelocity::fromDegrees(67.4));
+    RobotState state2(Point(1.01, 2.59), Vector(0.005, -2.05), Angle::fromDegrees(5), AngularVelocity::fromDegrees(67.6));
+    RobotState state3(Point(1.11, 2.59), Vector(0.0, -2.06), Angle::fromDegrees(4), AngularVelocity::fromDegrees(67.4));
+    RobotState state4(Point(1.01, 2.58), Vector(0.4, -2.58), Angle::fromDegrees(4), AngularVelocity::fromDegrees(67.4));
+    RobotState state5(Point(1.01, 2.58), Vector(0.0, -2.06), Angle::fromDegrees(6.4), AngularVelocity::fromDegrees(67.4));
+    RobotState state6(Point(1.01, 2.58), Vector(0.0, -2.06), Angle::fromDegrees(4), AngularVelocity::fromDegrees(70.02));
+
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(state1, state2, 0.02, Angle::fromDegrees(1)));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state3, 0.1, Angle::fromDegrees(1)));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state4, 0.5, Angle::fromDegrees(1)));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state5, 1e-3, Angle::fromDegrees(2)));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state6, 1e-3, Angle::fromDegrees(2.5)));
+}

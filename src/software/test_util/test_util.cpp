@@ -141,6 +141,44 @@ namespace Test
         }
     }
 
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(const Angle &a1,
+                                                              const Angle &a2,
+                                                              const Angle& tolerance)
+    {
+        // subtract a fixed epsilon for error in:
+        // - angle subtraction (internal to minDiff)
+        // - angle clamping (internal to minDiff)
+        // - angle absolute value (internal to minDiff)
+        // - the tolerance abs()
+        auto difference = a1.minDiff(a2) - Angle::fromRadians(GeomConstants::FIXED_EPSILON * 4);
+        if (difference < tolerance.abs())
+        {
+            return ::testing::AssertionSuccess();
+        }
+        else
+        {
+            return ::testing::AssertionFailure()
+                    << "Angle 1 was " << a1 << ", angle 2 was " << a2;
+        }
+    }
+
+
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(const Vector &v1,
+                                                              const Vector &v2,
+                                                              double tolerance)
+    {
+        double distance = (v1 - v2).length();
+        if (equalWithinTolerance(distance, 0, tolerance))
+        {
+            return ::testing::AssertionSuccess();
+        }
+        else
+        {
+            return ::testing::AssertionFailure()
+                    << "Vector 1 was " << v1 << ", vector 2 was " << v2;
+        }
+    }
+
     ::testing::AssertionResult TestUtil::equalWithinTolerance(const Point &pt1,
                                                               const Point &pt2,
                                                               double tolerance)
@@ -172,5 +210,39 @@ namespace Test
             return ::testing::AssertionFailure()
                    << "Value 1 was " << val1 << ", value 2 was " << val2;
         }
+    }
+
+    ::testing::AssertionResult
+    TestUtil::equalWithinTolerance(const RobotState &state1, const RobotState &state2, const double linear_tolerance,
+                                   const Angle &angular_tolerance) {
+        if(!TestUtil::equalWithinTolerance(state1.position(), state2.position(), linear_tolerance)) {
+            return ::testing::AssertionFailure() << "The first state's position was " << state1.position() << ", the second state's position was " << state2.position();
+        }
+        if(!TestUtil::equalWithinTolerance(state1.velocity(), state2.velocity(), linear_tolerance)) {
+            return ::testing::AssertionFailure() << "The first state's velocity was " << state1.velocity() << ", the second state's velocity was " << state2.velocity();
+        }
+        if(!TestUtil::equalWithinTolerance(state1.orientation(), state2.orientation(), angular_tolerance)) {
+            return ::testing::AssertionFailure() << "The first state's orientation was " << state1.orientation() << ", the second state's orientation was " << state2.orientation();
+        }
+        if(!TestUtil::equalWithinTolerance(state1.angularVelocity(), state2.angularVelocity(), angular_tolerance)) {
+            return ::testing::AssertionFailure() << "The first state's angular velocity was " << state1.angularVelocity() << ", the second state's angular velocity was " << state2.angularVelocity();
+        }
+
+        return ::testing::AssertionSuccess();
+    }
+
+    // TODO: test
+    ::testing::AssertionResult
+    TestUtil::equalWithinTolerance(const PhysicsWorld::RobotStateWithId_t &state1, const PhysicsWorld::RobotStateWithId_t &state2, const double linear_tolerance,
+                                   const Angle &angular_tolerance) {
+        if(state1.id != state2.id) {
+            return ::testing::AssertionFailure() << "The first state's id was " << state1.id << ", the second state's id was " << state2.id;
+        }
+        auto state_equality_result = equalWithinTolerance(state1.robot_state, state2.robot_state, linear_tolerance, angular_tolerance);
+        if(!state_equality_result) {
+            return state_equality_result;
+        }
+
+        return ::testing::AssertionSuccess();
     }
 }  // namespace Test

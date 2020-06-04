@@ -11,6 +11,7 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
+#include "software/simulation/physics/physics_world.h"
 
 namespace Test
 {
@@ -136,6 +137,31 @@ namespace Test
             const Circle &c1, const Circle &c2, double tolerance = METERS_PER_MILLIMETER);
 
         /**
+         * Checks if two Angles are within tolerance of each other
+         *
+         * @param a1, a2 Angles to compare
+         * @param tolerance tolerance to check equality with
+         *
+         * @return AssertionSuccess if the two Angles are within tolerance of each other
+         */
+        static ::testing::AssertionResult equalWithinTolerance(
+                const Angle &a1, const Angle &a2, const Angle& tolerance);
+
+        /**
+         * Checks if two vectors are within tolerance of each other
+         * Two vectors are within tolerance of each other if the respective x and y values
+         * are within tolerance of each other
+         *
+         * @param v1, v2 Vectors to compare
+         * @param tolerance tolerance to check equality with, default is
+         * METERS_PER_MILLIMETER
+         *
+         * @return AssertionSuccess if the two points are within tolerance of each other
+         */
+        static ::testing::AssertionResult equalWithinTolerance(
+                const Vector &v1, const Vector &v2, double tolerance = METERS_PER_MILLIMETER);
+
+        /**
          * Checks if two points are within tolerance of each other
          * Two points are within tolerance of each other if the respective x and y values
          * are within tolerance of each other
@@ -160,6 +186,37 @@ namespace Test
          */
         static ::testing::AssertionResult equalWithinTolerance(
             double val1, double val2, double tolerance = METERS_PER_MILLIMETER);
+
+        /**
+         * Checks if two RobotStates are within tolernace of each other.
+         * Two states are within tolerance if each other if their positions and velocities
+         * are within the linear tolerance, and their oriengations and angular velocities
+         * are within the angular tolerance
+         *
+         * @param state1, state2 states to compare
+         * @param linear_tolerance The tolerance to check positions and velocities with
+         * @param angular_tolerance The tolerance to check orientations and angular
+         * velocities with
+         *
+         * @return AssertionSuccess if the two values are within tolernace of each other
+         */
+        static ::testing::AssertionResult equalWithinTolerance(
+                const RobotState& state1, const RobotState& state2, double linear_tolerance, const Angle& angular_tolerance);
+
+        /**
+         * Checks if two RobotStateWithIds are within tolernace of each other.
+         * Two states are within tolerance if their states are within tolerance
+         * of each other
+         *
+         * @param state1, state2 states to compare
+         * @param linear_tolerance The tolerance to check positions and velocities with
+         * @param angular_tolerance The tolerance to check orientations and angular
+         * velocities with
+         *
+         * @return AssertionSuccess if the two values are within tolernace of each other
+         */
+        static ::testing::AssertionResult equalWithinTolerance(
+                const PhysicsWorld::RobotStateWithId_t& state1, const PhysicsWorld::RobotStateWithId_t& state2, double linear_tolerance, const Angle& angular_tolerance);
 
        private:
         /**
