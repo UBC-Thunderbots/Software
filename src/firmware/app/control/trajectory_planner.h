@@ -303,7 +303,7 @@ void app_trajectory_planner_generateVelocityTrajectory(
  * NOTE: The following function is based on an algorithm described in page 18 of
  * http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
  *
- * @pre path_parameters.num_segments > 2 and num_segments <=
+ * @pre path_parameters.num_segments > 2 and <=
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  * @pre path_parameters.max_allowable_linear_acceleration > 0
  * @pre path_parameters.max_allowable_linear_speed > 0
