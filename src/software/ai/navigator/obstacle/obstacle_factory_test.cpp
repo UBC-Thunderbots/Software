@@ -12,27 +12,27 @@
 #include "software/world/robot.h"
 
 
-class ObstacleFactoryTest : public testing::Test
+class RobotNavigationObstacleFactoryTest : public testing::Test
 {
    public:
-    ObstacleFactoryTest()
+    RobotNavigationObstacleFactoryTest()
         : current_time(Timestamp::fromSeconds(123)),
-          obstacle_factory(
-              Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig())
+          obstacle_factory(Util::DynamicParameters->getAIConfig()
+                               ->getRobotNavigationObstacleFactoryConfig())
     {
     }
 
     Timestamp current_time;
-    ObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory obstacle_factory;
 };
 
-class ObstacleFactoryMotionConstraintTest : public testing::Test
+class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
 {
    public:
-    ObstacleFactoryMotionConstraintTest()
+    RobotNavigationObstacleFactoryMotionConstraintTest()
         : current_time(Timestamp::fromSeconds(123)),
-          obstacle_factory(
-              Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig()),
+          obstacle_factory(Util::DynamicParameters->getAIConfig()
+                               ->getRobotNavigationObstacleFactoryConfig()),
           field(),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
@@ -75,10 +75,10 @@ class ObstacleFactoryMotionConstraintTest : public testing::Test
     Team friendly_team;
     Team enemy_team;
     World world;
-    ObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory obstacle_factory;
 };
 
-TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
+TEST_F(RobotNavigationObstacleFactoryTest, create_rectangle_obstacle)
 {
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
@@ -95,7 +95,7 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
     }
 }
 
-TEST_F(ObstacleFactoryTest, create_ball_obstacle)
+TEST_F(RobotNavigationObstacleFactoryTest, create_ball_obstacle)
 {
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
@@ -113,7 +113,7 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     }
 }
 
-TEST_F(ObstacleFactoryTest, create_robot_obstacle)
+TEST_F(RobotNavigationObstacleFactoryTest, create_robot_obstacle)
 {
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
@@ -131,7 +131,7 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     }
 }
 
-TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
+TEST_F(RobotNavigationObstacleFactoryTest, stationary_robot_obstacle)
 {
     Point origin(2.3, 3);
     Vector velocity(0.0, 0.0);
@@ -153,7 +153,7 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
     }
 }
 
-TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
+TEST_F(RobotNavigationObstacleFactoryTest, slow_moving_robot_obstacle)
 {
     Point origin(-2.1, 5);
     Vector velocity(0.0007, 0.004);
@@ -175,7 +175,7 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
     }
 }
 
-TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
+TEST_F(RobotNavigationObstacleFactoryTest, fast_moving_robot_obstacle)
 {
     Point origin(-2.1, 5);
     Vector velocity(1.27, 0.34);
@@ -198,7 +198,7 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     }
 }
 
-TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
+TEST_F(RobotNavigationObstacleFactoryTest, another_fast_moving_robot_obstacle)
 {
     Point origin(1.2, -0.2);
     Vector velocity(-0.27, 1.34);
@@ -221,7 +221,7 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, enemy_robots_collision)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_robots_collision)
 {
     auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::ENEMY_ROBOTS_COLLISION, world);
@@ -256,7 +256,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, enemy_robots_collision)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, centre_circle)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
 {
     auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::CENTER_CIRCLE, world);
@@ -274,7 +274,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, centre_circle)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, half_metre_around_ball)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, half_metre_around_ball)
 {
     auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::HALF_METER_AROUND_BALL, world);
@@ -292,7 +292,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, half_metre_around_ball)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
 {
     auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
@@ -310,7 +310,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, friendly_defense_area)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area)
 {
     auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::FRIENDLY_DEFENSE_AREA, world);
@@ -329,7 +329,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, friendly_defense_area)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, enemy_defense_area)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
 {
     auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::ENEMY_DEFENSE_AREA, world);
@@ -347,7 +347,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, enemy_defense_area)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, friendly_half)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
 {
     auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::FRIENDLY_HALF, world);
@@ -365,7 +365,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, friendly_half)
     }
 }
 
-TEST_F(ObstacleFactoryMotionConstraintTest, enemy_half)
+TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
 {
     auto obstacles =
         obstacle_factory.createFromMotionConstraint(MotionConstraint::ENEMY_HALF, world);

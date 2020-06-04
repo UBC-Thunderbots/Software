@@ -4,7 +4,7 @@
 #include "software/new_geom/util/distance.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
-                     ObstacleFactory obstacle_factory,
+                     RobotNavigationObstacleFactory obstacle_factory,
                      std::shared_ptr<const NavigatorConfig> config)
     : config(config),
       obstacle_factory(std::move(obstacle_factory)),

@@ -9,21 +9,22 @@
 #include "software/world/world.h"
 
 /**
- * The obstacle factory creates obstacles for navigation
- * NOTE: All obstacles created include at least an additional robot radius margin around
- * the obstacle
+ * The RobotNavigationObstacleFactory creates obstacles for navigation with a robot
+ * NOTE: All obstacles created include at least an additional robot radius margin on all
+ * sides of the obstacle
  */
-class ObstacleFactory
+class RobotNavigationObstacleFactory
 {
    public:
-    ObstacleFactory() = delete;
+    RobotNavigationObstacleFactory() = delete;
 
     /**
-     * Create an ObstacleFactory with the given configuration
+     * Create an RobotNavigationObstacleFactory with the given configuration
      *
      * @param config The configuration used to determine how obstacles should be generated
      */
-    ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config);
+    RobotNavigationObstacleFactory(
+        std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config);
 
     /**
      * Create obstacles for the given motion constraints
@@ -91,8 +92,8 @@ class ObstacleFactory
 
     /**
      * Returns an obstacle for the shape
-     * NOTE: as with all other obstacles created by ObstacleFactory, the shapes are
-     * expanded on all sides to account for the radius of the robot
+     * NOTE: as with all other obstacles created by RobotNavigationObstacleFactory, the
+     * shapes are expanded on all sides to account for the radius of the robot
      *
      * @param The shape to expand
      *
@@ -102,7 +103,7 @@ class ObstacleFactory
     ObstaclePtr createFromShape(const Polygon &polygon) const;
 
    private:
-    std::shared_ptr<const ObstacleFactoryConfig> config;
+    std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config;
     double robot_radius_expansion_amount;
 
     /**
@@ -113,16 +114,13 @@ class ObstacleFactory
      * @param field_rectangle The rectangle to make obstacle
      * @param field_lines The rectangle representing field lines
      * @param field_boundary The rectangle representing field boundary
-     * @param expansion_amount (optional overload) The amount to expand all sides of the
-     * rectangle
+     * @param additional_expansion_amount (optional) The amount to expand all sides of the
+     * rectangle in addition to the robot radius
      *
      * @return ObstaclePtr
      */
     ObstaclePtr createFromFieldRectangle(const Rectangle &field_rectangle,
                                          const Rectangle &field_lines,
-                                         const Rectangle &field_boundary) const;
-    ObstaclePtr createFromFieldRectangle(const Rectangle &field_rectangle,
-                                         const Rectangle &field_lines,
                                          const Rectangle &field_boundary,
-                                         double expansion_amount) const;
+                                         double additional_expansion_amount = 0.0) const;
 };

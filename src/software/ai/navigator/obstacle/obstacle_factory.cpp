@@ -1,13 +1,14 @@
 #include "software/ai/navigator/obstacle/obstacle_factory.h"
 
-ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> config)
+RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
+    std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config)
     : config(config),
       robot_radius_expansion_amount(config->RobotObstacleInflationFactor()->value() *
                                     ROBOT_MAX_RADIUS_METERS)
 {
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraint(
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
     const MotionConstraint &motion_constraint, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
@@ -34,7 +35,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraint(
         {
             obstacles.push_back(createFromFieldRectangle(
                 world.field().enemyDefenseArea(), world.field().fieldLines(),
-                world.field().fieldBoundary(), robot_radius_expansion_amount + 0.3));
+                world.field().fieldBoundary(), 0.3));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
@@ -62,7 +63,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraint(
     return obstacles;
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraints(
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraints(
     const std::set<MotionConstraint> &motion_constraints, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
@@ -75,7 +76,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraints(
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createFromRobot(const Robot &robot) const
+ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) const
 {
     // radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
@@ -134,7 +135,8 @@ ObstaclePtr ObstacleFactory::createFromRobot(const Robot &robot) const
     }
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createFromTeam(const Team &team) const
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
+    const Team &team) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (const auto &robot : team.getAllRobots())
@@ -144,23 +146,25 @@ std::vector<ObstaclePtr> ObstacleFactory::createFromTeam(const Team &team) const
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createFromBallPosition(const Point &ball_position) const
+ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
+    const Point &ball_position) const
 {
     return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
-ObstaclePtr ObstacleFactory::createFromRobotPosition(const Point &robot_position) const
+ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
+    const Point &robot_position) const
 {
     return createFromShape(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
 }
 
-ObstaclePtr ObstacleFactory::createFromShape(const Circle &circle) const
+ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Circle &circle) const
 {
     return std::make_shared<GeomObstacle<Circle>>(
         Circle(circle.getOrigin(), circle.getRadius() + robot_radius_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::createFromShape(const Polygon &polygon) const
+ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Polygon &polygon) const
 {
     return std::make_shared<GeomObstacle<Polygon>>(
         polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
@@ -169,23 +173,15 @@ ObstaclePtr ObstacleFactory::createFromShape(const Polygon &polygon) const
             .expand(Vector(0, 1).normalize(robot_radius_expansion_amount)));
 }
 
-ObstaclePtr ObstacleFactory::createFromFieldRectangle(
+ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     const Rectangle &field_rectangle, const Rectangle &field_lines,
-    const Rectangle &field_boundary) const
+    const Rectangle &field_boundary, double additional_expansion_amount) const
 {
-    return createFromFieldRectangle(field_rectangle, field_lines, field_boundary,
-                                    robot_radius_expansion_amount);
-}
-
-ObstaclePtr ObstacleFactory::createFromFieldRectangle(const Rectangle &field_rectangle,
-                                                      const Rectangle &field_lines,
-                                                      const Rectangle &field_boundary,
-                                                      double expansion_amount) const
-{
-    double xMin = field_rectangle.xMin();
-    double xMax = field_rectangle.xMax();
-    double yMin = field_rectangle.yMin();
-    double yMax = field_rectangle.yMax();
+    double xMin             = field_rectangle.xMin();
+    double xMax             = field_rectangle.xMax();
+    double yMin             = field_rectangle.yMin();
+    double yMax             = field_rectangle.yMax();
+    double expansion_amount = robot_radius_expansion_amount + additional_expansion_amount;
 
     xMin =
         (xMin == field_lines.xMin()) ? field_boundary.xMin() : (xMin - expansion_amount);

@@ -33,8 +33,8 @@ struct PlannerTestCase
     bool should_return_path;
 };
 
-ObstacleFactory obstacle_factory(
-    Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig());
+RobotNavigationObstacleFactory obstacle_factory(
+    Util::DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig());
 
 std::vector<PlannerTestCase>
     test_cases =

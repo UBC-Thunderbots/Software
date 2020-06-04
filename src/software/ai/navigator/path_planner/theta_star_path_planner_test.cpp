@@ -13,12 +13,12 @@ class TestThetaStarPathPlanner : public testing::Test
 {
    public:
     TestThetaStarPathPlanner()
-        : obstacle_factory(
-              Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig())
+        : obstacle_factory(Util::DynamicParameters->getAIConfig()
+                               ->getRobotNavigationObstacleFactoryConfig())
     {
     }
 
-    ObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory obstacle_factory;
 };
 
 void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,

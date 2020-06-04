@@ -1,7 +1,8 @@
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 
 VelocityObstaclePathManager::VelocityObstaclePathManager(
-    std::unique_ptr<PathPlanner> path_planner, ObstacleFactory obstacle_factory)
+    std::unique_ptr<PathPlanner> path_planner,
+    RobotNavigationObstacleFactory obstacle_factory)
     : path_planner(std::move(path_planner)), obstacle_factory(std::move(obstacle_factory))
 {
 }

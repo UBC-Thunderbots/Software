@@ -28,7 +28,7 @@ class Navigator : public IntentVisitor
      * @param config The navigator config
      */
     explicit Navigator(std::unique_ptr<PathManager> path_manager,
-                       ObstacleFactory obstacle_factory,
+                       RobotNavigationObstacleFactory obstacle_factory,
                        std::shared_ptr<const NavigatorConfig> config);
 
     /**
@@ -146,7 +146,7 @@ class Navigator : public IntentVisitor
     double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
 
     std::shared_ptr<const NavigatorConfig> config;
-    ObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory obstacle_factory;
 
     // Path manager used to navigate around obstacles
     std::unique_ptr<PathManager> path_manager;
