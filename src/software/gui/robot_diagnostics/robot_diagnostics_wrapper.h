@@ -7,7 +7,6 @@
 #include <thread>
 
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics.h"
-#include "software/multithreading/subject.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
@@ -19,8 +18,7 @@
  * This class wraps our RobotDiagnostics object which is responsible for allowing users to
  * interact with and debug the robot
  */
-class RobotDiagnosticsWrapper : public Subject<ConstPrimitiveVectorPtr>,
-                                public ThreadedObserver<SensorMsg>
+class RobotDiagnosticsWrapper : public ThreadedObserver<SensorMsg>
 {
    public:
     RobotDiagnosticsWrapper() = delete;

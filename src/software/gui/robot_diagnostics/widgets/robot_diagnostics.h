@@ -5,6 +5,7 @@
 #include <boost/bind.hpp>
 #include <memory>
 
+#include "software/gui/generic_widgets/robot_status/robot_status.h"
 #include "software/gui/robot_diagnostics/ui/ui_main_widget.h"
 #include "software/gui/robot_diagnostics/widgets/chicker.h"
 #include "software/gui/robot_diagnostics/widgets/dribbler.h"
@@ -58,6 +59,16 @@ class RobotDiagnostics : public QMainWindow
     void receiveDirectVelocityPower(double direct_per_wheel_power,
                                     DirectVelocityMode direct_velocity_mode);
     void receiveDribblerPower(double dribbler_power);
+
+    /**
+     * Setup widgets
+     */
+    void setupWidgets();
+
+    /**
+     * Update components based on new information from the buffers
+     */
+    void updateRobotDiagnostics();
 
     // Indicates which robot we're communicating with
     unsigned int robot_selection;

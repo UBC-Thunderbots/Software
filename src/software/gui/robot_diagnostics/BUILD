@@ -7,7 +7,6 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/gui/robot_diagnostics/widgets:robot_diagnostics_widget",
-        "//software/multithreading:subject",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
         "//software/primitive",
