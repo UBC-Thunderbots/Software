@@ -1029,15 +1029,16 @@ TEST_F(TrajectoryPlannerTest,
     path_parameters.max_allowable_angular_speed        = 3;
     path_parameters.max_allowable_linear_acceleration  = 3;
     path_parameters.max_allowable_linear_speed         = 3;
+    path_parameters.initial_linear_speed               = 1;
+    path_parameters.final_linear_speed                 = 1;
     path_parameters.num_segments                       = num_segments;
 
     float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.trajectory_elements  = trajectory_elements;
-    trajectory.linear_speed_profile = speed_profile;
-    trajectory.path_parameters      = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
 
     app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
         &trajectory, max_allowable_speed_profile, segment_lengths);
@@ -1075,9 +1076,8 @@ TEST_F(TrajectoryPlannerTest, test_forwards_continuity_varying_segment_length)
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.linear_speed_profile = speed_profile;
-    trajectory.path_parameters      = path_parameters;
-    trajectory.trajectory_elements  = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     segment_lengths[0].linear_segment_length = 1.0;
     segment_lengths[1].linear_segment_length = 2.0;
@@ -1130,9 +1130,8 @@ TEST_F(TrajectoryPlannerTest, test_forwards_continuity_final_velocity_too_high)
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.linear_speed_profile = speed_profile;
-    trajectory.path_parameters      = path_parameters;
-    trajectory.trajectory_elements  = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
@@ -1172,9 +1171,8 @@ TEST_F(TrajectoryPlannerTest, test_forwards_continuity_varying_segment_length_an
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.angular_speed_profile = speed_profile;
-    trajectory.path_parameters       = path_parameters;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(&trajectory,
                                                                        segment_lengths);
@@ -1219,9 +1217,8 @@ TEST_F(TrajectoryPlannerTest,
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.angular_speed_profile = speed_profile;
-    trajectory.path_parameters       = path_parameters;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(&trajectory,
                                                                        segment_lengths);
@@ -1260,9 +1257,8 @@ TEST_F(TrajectoryPlannerTest,
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.linear_speed_profile = speed_profile;
-    trajectory.path_parameters      = path_parameters;
-    trajectory.trajectory_elements  = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.trajectory_elements[0].linear_speed = 4;
     trajectory.trajectory_elements[1].linear_speed = 3;
@@ -1309,9 +1305,8 @@ TEST_F(TrajectoryPlannerTest,
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.linear_speed_profile = speed_profile;
-    trajectory.path_parameters      = path_parameters;
-    trajectory.trajectory_elements  = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.trajectory_elements[0].linear_speed = 4;
     trajectory.trajectory_elements[1].linear_speed = 3;
@@ -1358,9 +1353,8 @@ TEST_F(TrajectoryPlannerTest,
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.linear_speed_profile = speed_profile;
-    trajectory.path_parameters      = path_parameters;
-    trajectory.trajectory_elements  = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.trajectory_elements[0].linear_speed = 20;
     trajectory.trajectory_elements[1].linear_speed = 3;
@@ -1404,9 +1398,8 @@ TEST_F(TrajectoryPlannerTest,
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.angular_speed_profile = speed_profile;
-    trajectory.path_parameters       = path_parameters;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.trajectory_elements[0].angular_speed = 0;
     trajectory.trajectory_elements[1].angular_speed = 3;
@@ -1451,9 +1444,8 @@ TEST_F(TrajectoryPlannerTest,
 
     PositionTrajectory_t trajectory;
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    trajectory.angular_speed_profile = speed_profile;
-    trajectory.path_parameters       = path_parameters;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.path_parameters     = path_parameters;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.trajectory_elements[0].angular_speed = 0;
     trajectory.trajectory_elements[1].angular_speed = 3;
@@ -1522,9 +1514,7 @@ TEST_F(TrajectoryPlannerTest,
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
-    trajectory.angular_speed_profile = angular_speed_profile;
-    trajectory.linear_speed_profile  = linear_speed_profile;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.path_parameters.path = {.x = {0, 0, 1, 0}, .y = {0, 0, 1, 0}};
     trajectory.path_parameters.orientation_profile = {.coefficients = {0, 0, 1, 0}};
@@ -1638,9 +1628,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_no_angular_profile)
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
-    trajectory.angular_speed_profile = angular_speed_profile;
-    trajectory.linear_speed_profile  = linear_speed_profile;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.path_parameters.path = {.x = {0, 0, 1, 0}, .y = {0, 0, 1, 0}};
     trajectory.path_parameters.orientation_profile = {.coefficients = {0, 0, 1, 0}};
@@ -1710,9 +1698,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_linear_limiting)
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
-    trajectory.angular_speed_profile = angular_speed_profile;
-    trajectory.linear_speed_profile  = linear_speed_profile;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.path_parameters = path_parameters;
 
@@ -1779,9 +1765,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_no_linear_profile)
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
-    trajectory.angular_speed_profile = angular_speed_profile;
-    trajectory.linear_speed_profile  = linear_speed_profile;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.path_parameters = path_parameters;
 
@@ -1853,9 +1837,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_orientation_limiting)
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
-    trajectory.angular_speed_profile = angular_speed_profile;
-    trajectory.linear_speed_profile  = linear_speed_profile;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.path_parameters = path_parameters;
 
@@ -1927,9 +1909,7 @@ TEST_F(TrajectoryPlannerTest, test_rebalance_trajectory_segment_linear)
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
-    trajectory.angular_speed_profile = angular_speed_profile;
-    trajectory.linear_speed_profile  = linear_speed_profile;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.path_parameters = path_parameters;
 
@@ -1981,9 +1961,7 @@ TEST_F(TrajectoryPlannerTest, test_rebalance_trajectory_segment_angular)
     PositionTrajectoryElement_t trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     PositionTrajectory_t trajectory;
-    trajectory.angular_speed_profile = angular_speed_profile;
-    trajectory.linear_speed_profile  = linear_speed_profile;
-    trajectory.trajectory_elements   = trajectory_elements;
+    trajectory.trajectory_elements = trajectory_elements;
 
     trajectory.path_parameters = path_parameters;
 
