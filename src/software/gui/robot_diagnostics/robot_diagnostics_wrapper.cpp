@@ -36,7 +36,7 @@ void RobotDiagnosticsWrapper::createAndRunRobotDiagnostics(int argc, char** argv
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    RobotDiagnostics* robot_diagnostics = new RobotDiagnostics();
+    RobotDiagnostics* robot_diagnostics = new RobotDiagnostics(sensor_msg_buffer);
     robot_diagnostics->show();
 
     // Run the QApplication and all windows / widgets. This function will block
