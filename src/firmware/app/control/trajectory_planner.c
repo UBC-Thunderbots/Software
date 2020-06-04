@@ -29,8 +29,8 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
     constant_period_trajectory->trajectory_elements[0].angular_speed =
         variable_time_trajectory->trajectory_elements[0].angular_speed;
 
-    // Keep track of the current time we are searching for in the constant arclength
-    // trajectory
+    // Keep track of the current time we are searching for in the constant
+    // parameterization trajectory
     unsigned int time_periods = 1;
     float trajectory_time     = interpolation_period * time_periods;
 
@@ -478,8 +478,6 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
 
     for (unsigned int i = 0; i < num_elements; i++)
     {
-        // Get the 't' value corresponding to the current arc length (to be used for
-        // further computing)
         float t = t_start + i * delta_t;
 
         // Create the polynomial representing path curvature
@@ -612,55 +610,6 @@ app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
     return status;
 }
 
-void app_trajectory_planner_generateBackwardsContinuousSpeedProfile(
-    const unsigned int num_segments, float* forwards_continuous_velocity_profile,
-    const float arc_segment_length, const float max_allowable_acceleration)
-{
-    for (unsigned int i = num_segments - 1; i > 0; i--)
-    {
-        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
-        const float temp_vel =
-            (float)sqrt(pow(forwards_continuous_velocity_profile[i], 2) +
-                        2 * arc_segment_length * max_allowable_acceleration);
-
-        if (forwards_continuous_velocity_profile[i - 1] > temp_vel)
-        {
-            forwards_continuous_velocity_profile[i - 1] = temp_vel;
-        }
-    }
-}
-
-void app_trajectory_planner_generateConstantParameterizationSegments(
-    PositionTrajectory_t trajectory)
-{
-    FirmwareRobotPathParameters_t path_parameters    = trajectory.path_parameters;
-    PositionTrajectoryElement_t* trajectory_elements = trajectory.trajectory_elements;
-    // Calculate the size of each parameterization step
-    const float delta_parameterization =
-        (path_parameters.t_end - path_parameters.t_start) / path_parameters.num_segments;
-
-    // Save the arc length of each segment for kinematic calculations later
-    float segment_arc_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    // Calculate all of the positions and orientations for each constant paramertization
-    // segment
-    for (unsigned int i = 0; i < path_parameters.num_segments; i++)
-    {
-        trajectory.trajectory_elements[i].position = shared_polynomial2d_getValueOrder3(
-            path_parameters.path, i * delta_parameterization);
-    }
-
-    // Use the difference between adjacent points to calculate the total length of each
-    // segment
-    for (unsigned int i = 0; i < path_parameters.num_segments - 1; i++)
-    {
-        segment_arc_lengths[i] = sqrt(
-            pow(trajectory_elements[i + 1].position.x - trajectory_elements[i].position.x,
-                2) +
-            pow(trajectory_elements[i + 1].position.y - trajectory_elements[i].position.y,
-                2));
-    }
-}
 
 void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
     PositionTrajectory_t* trajectory,

@@ -91,9 +91,9 @@ typedef enum TrajectoryPlannerGenerationStatus
     INITIAL_VELOCITY_TOO_HIGH,
 
     // INTERPOLATION_ELEMENT_MAXED_OUT is returned when the constant time interpolation
-    // function uses up all the avaiable array space provided to it. This can happen
+    // function uses up all the available array space provided to it. This can happen
     // because constant interpolation period trajectories do not necessarily have the same
-    // number of elements as their constant arc-length counterparts
+    // number of elements as their constant parameterization counterparts
     INTERPOLATION_ELEMENT_MAXED_OUT,
 } TrajectoryPlannerGenerationStatus_t;
 

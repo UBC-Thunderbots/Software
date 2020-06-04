@@ -493,10 +493,10 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_curved_line)
 
 // This test generates a scenario where there is not enough elements in the
 // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS specified array as there path is quite long and
-// the maximum speed of the path is low. This means that most (likely all) arc-length
-// segments require multiple interpolation periods to traverse, and therefore requires
-// more space than the constant arc_length trajectory that is already 1 element away
-// from TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+// the maximum speed of the path is low. This means that most (likely all) constant
+// parameterization segments require multiple interpolation periods to traverse, and
+// therefore requires more space than the constant parameterization trajectory that is
+// already 1 element away from TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
 TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_too_many_elements)
 {
     Polynomial2dOrder3_t path = {
@@ -1109,11 +1109,6 @@ TEST_F(TrajectoryPlannerTest, test_forwards_continuity_final_velocity_too_high)
     {
         max_allowable_speed_profile[i] = 10;
     }
-
-    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    const float arc_segment_length         = 1.0;
-    const float max_allowable_acceleration = 0.1;
-    const float max_allowable_speed        = 10;
 
     TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     segment_lengths[0].linear_segment_length = 1.0;
