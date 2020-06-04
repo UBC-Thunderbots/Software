@@ -246,7 +246,7 @@ app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
                         2 * segment_length_angular * max_allowable_acceleration_angular);
 
 
-        // If the velocity at [i-1] is larger than it physically possible to deccelerate
+        // If the velocity at [i-1] is larger than it physically possible to decelerate
         // from, pull the speed at [i-1] lower
         if (previous_speed_linear > temp_vel_linear)
         {
@@ -258,7 +258,7 @@ app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
         }
     }
 
-    // Check that we are able to deccelerate fast enough that the initial velocity allows
+    // Check that we are able to decelerate fast enough that the initial velocity allows
     // for the path to be followed
     // Note: The initial speed of an angular profile is always assumed to be zero
     TrajectoryPlannerGenerationStatus_t status = OK;

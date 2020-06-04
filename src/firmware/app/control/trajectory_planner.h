@@ -112,11 +112,14 @@ typedef enum TrajectoryPlannerGenerationStatus
  *
  * @param constant_period_trajectory [out] The array to be filled with the constant time
  * interpolation period equivalent of the input trajectory
+ *
  * @param variable_time_trajectory [in] The valid trajectory used as
  * reference for a constant interpolation period trajectory
+ *
  * @param interpolation_period [in] The constant change in time [s] that corresponds to
  * each trajectory segment.
  *
+ * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
@@ -127,9 +130,6 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
  * Builds the forwards continuous linear velocity profile for the given parameters.
  * NOTE: The velocity profile returned by this function is NOT reverse continuous and does
  * not guarantee a feasible path to follow.
- *
- * NOTE: The velocity_profile will contain the same number of elements as the input
- * max_allowable_linear_speed[] array
  *
  * @pre The velocity_profile array is pre-allocated to contain up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS elements
@@ -154,25 +154,22 @@ app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
  * NOTE: The velocity profile returned by this function is NOT reverse continuous and does
  * not guarantee a feasible path to follow.
  *
- * NOTE: The velocity_profile will contain the same number of elements as the input
- * max_allowable_linear_speed[] array
- *
  * @pre The velocity_profile array is pre-allocated to contain up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS elements
  *
- * @param trajectory [in/out] The trajectory that contains the path parameters and will be
- * modified max_allowable_speed_profile input array
+ * @param trajectory [in/out] The trajectory that contains the path parameters and array
+ * of trajectory elements
  *
  * @param segment_lengths [in] The length of each segment in the trajectory [meters]
  *
- * @return The generation status. Can be OK or an error message
+ * @return A status indicating whether or not generation was successful
  * */
 void app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(
     PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths);
 
 /**
  * Function modifies an existing trajectory speed profile to be backwards continuous -
- * meaning that it is possible to deccelerate fast enough to reach each point on the
+ * meaning that it is possible to decelerate fast enough to reach each point on the
  * trajectory
  *
  * @pre trajectory has initialized path parameters
@@ -184,7 +181,7 @@ void app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(
  *
  * @param segment_lengths [in] The length of each segment in the trajectory
  *
- * @return Trajectory generation status. Can be OK or error message
+ * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
@@ -255,7 +252,8 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
  *
  * @param rebalance_angular [in] Boolean to select if the angular or linear segment is to
  * be modified. rebalance_angular == true means that the angular segment will be modified
- * @return
+ *
+ * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentDuration(
@@ -297,7 +295,7 @@ void app_trajectory_planner_generateVelocityTrajectory(
  * robot, or the centripetal acceleration limit defined by the curvature and robot speed -
  * the planner will assume the max acceleration that will remain bellow this limit.
  *
- *     - To ensure the robot is capable of deccelerating to react to any sudden changes in
+ *     - To ensure the robot is capable of decelerating to react to any sudden changes in
  * the path, the trajectory is checked for backwards continuity
  *
  * NOTE: The following function is based on an algorithm described in page 18 of
@@ -313,9 +311,9 @@ void app_trajectory_planner_generateVelocityTrajectory(
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS limit
  *
  * @param trajectory [in/out] The trajectory with pre-initialized path parameters. Will be
-modified in-place
+ *   modified in-place
  *
- * @return The generation status. Can be OK or error message.
+ * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
@@ -340,7 +338,7 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
  * @param interpolation_period [in] The interpolation period desired of the constant
  * interpolation period trajectory
  *
- * @return Generation status, this can be OK or an error message
+ * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
@@ -381,7 +379,7 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
  *
  * @param interpolation_period ; The interpolation period of the trajectory in seconds
  *
- * @return Generation status. Can be OK or an error message.
+ * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
