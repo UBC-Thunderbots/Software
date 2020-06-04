@@ -4,8 +4,8 @@ package(default_visibility = ["//software/gui/robot_diagnostics:__subpackages__"
 
 qt_cc_library(
     name = "robot_diagnostics_widget",
-    src = "main_widget.cpp",
-    hdr = "main_widget.h",
+    src = "robot_diagnostics.cpp",
+    hdr = "robot_diagnostics.h",
     deps = [
         ":chicker",
         ":dribbler",
