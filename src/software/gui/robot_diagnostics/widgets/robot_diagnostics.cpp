@@ -1,5 +1,7 @@
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics.h"
 
+#include <iostream>
+
 #include "software/gui/generic_widgets/robot_status/robot_status.h"
 
 RobotDiagnostics::RobotDiagnostics(
@@ -32,11 +34,21 @@ RobotDiagnostics::RobotDiagnostics(
         // TODO (Issue #1229): send some proto
     };
 
-    setupFeedback(main_widget);
+    state_updated_callback = []() {
+        // TODO (Issue #1229): send some proto
+    };
+
+    chicker_state_changed_callback = [](double chicker_power, ChargeMode charge_mode,
+                                        ChickMode chick_mode) {
+        std::cout << chicker_power << std::endl;
+    };
+
+
+    setupChicker(main_widget, chicker_state_changed_callback);
+    setupDribbler(main_widget, dribbler_power_changed_callback);
     setupDrive(main_widget, direct_per_wheel_power_changed_callback,
                direct_velocity_power_changed_callback);
-    setupDribbler(main_widget, dribbler_power_changed_callback);
-    setupChicker(main_widget, chicker_power, chicker_autochick);
+    setupFeedback(main_widget);
     setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);
     setupRobotStatusTable(main_widget->robot_status_table_widget);

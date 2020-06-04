@@ -46,6 +46,10 @@ class RobotDiagnostics : public QMainWindow
     double dribbler_power;
     double chicker_power;
     bool chicker_autochick;
+    ChargeMode chicker_charge_mode;
+    ChickMode chicker_chick_mode;
+
+    std::function<void(double, ChargeMode, ChickMode)> chicker_state_changed_callback;
 
     // dribbler controls
     std::function<void(double)> dribbler_power_changed_callback;
@@ -55,6 +59,8 @@ class RobotDiagnostics : public QMainWindow
         direct_per_wheel_power_changed_callback;
     std::function<void(double, DirectVelocityMode)>
         direct_velocity_power_changed_callback;
+
+    std::function<void()> state_updated_callback;
 
     double direct_per_wheel_power_fl;
     double direct_per_wheel_power_fr;
