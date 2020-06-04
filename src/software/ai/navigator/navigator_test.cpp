@@ -14,12 +14,12 @@ class NoPathNavigatorTest : public testing::Test
 {
    public:
     NoPathNavigatorTest()
-        : obstacle_factory(RobotNavigationObstacleFactory(
+        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
               Util::DynamicParameters->getAIConfig()
                   ->getRobotNavigationObstacleFactoryConfig())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
-                        std::make_unique<NoPathTestPathPlanner>(), obstacle_factory),
-                    obstacle_factory,
+                        std::make_unique<NoPathTestPathPlanner>(), robot_navigation_obstacle_factory),
+                    robot_navigation_obstacle_factory,
                     Util::DynamicParameters->getAIConfig()->getNavigatorConfig()),
           current_time(Timestamp::fromSeconds(123)),
           field(::Test::TestUtil::createSSLDivBField()),
@@ -29,7 +29,7 @@ class NoPathNavigatorTest : public testing::Test
     {
     }
 
-    RobotNavigationObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 
     // The navigator under test
     Navigator navigator;
@@ -45,17 +45,17 @@ class ThetaStarNavigatorTest : public testing::Test
 {
    public:
     ThetaStarNavigatorTest()
-        : obstacle_factory(RobotNavigationObstacleFactory(
+        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
               Util::DynamicParameters->getAIConfig()
                   ->getRobotNavigationObstacleFactoryConfig())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
-                        std::make_unique<ThetaStarPathPlanner>(), obstacle_factory),
-                    obstacle_factory,
+                        std::make_unique<ThetaStarPathPlanner>(), robot_navigation_obstacle_factory),
+                    robot_navigation_obstacle_factory,
                     Util::DynamicParameters->getAIConfig()->getNavigatorConfig())
     {
     }
 
-    RobotNavigationObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 
     Navigator navigator;
 };

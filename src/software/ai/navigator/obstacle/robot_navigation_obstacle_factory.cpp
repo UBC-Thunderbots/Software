@@ -1,4 +1,4 @@
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
 RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
     std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config)

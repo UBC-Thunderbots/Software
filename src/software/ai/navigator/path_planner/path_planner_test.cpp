@@ -5,7 +5,7 @@
 #include <typeinfo>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 #include "software/new_geom/point.h"
@@ -33,7 +33,7 @@ struct PlannerTestCase
     bool should_return_path;
 };
 
-RobotNavigationObstacleFactory obstacle_factory(
+RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
     Util::DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig());
 
 std::vector<PlannerTestCase>
@@ -49,14 +49,14 @@ std::vector<PlannerTestCase>
           .start              = Point(0, 0),
           .dest               = Point(2, 0),
           .navigable_area     = Rectangle({-2, -2}, {2, 2}),
-          .obstacles          = {obstacle_factory.createFromRobotPosition(Point({1, 0}))},
+          .obstacles          = {robot_navigation_obstacle_factory.createFromRobotPosition(Point({1, 0}))},
           .should_return_path = true},
 
          {.name           = "Large rectangle in path",
           .start          = Point(-3, 0),
           .dest           = Point(4, 0),
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
-          .obstacles = {obstacle_factory.createFromShape(Rectangle({1, 4}, {2, -4}))},
+          .obstacles = {robot_navigation_obstacle_factory.createFromShape(Rectangle({1, 4}, {2, -4}))},
           .should_return_path = true},
 
          {.name           = "Circle of robots surrounding friendly robot at distance 1",
@@ -65,16 +65,16 @@ std::vector<PlannerTestCase>
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
           .obstacles =
               {
-                  obstacle_factory.createFromRobotPosition(Point({1, 0})),
-                  obstacle_factory.createFromRobotPosition(
+                  robot_navigation_obstacle_factory.createFromRobotPosition(Point({1, 0})),
+                  robot_navigation_obstacle_factory.createFromRobotPosition(
                       Point({std::cos(M_PI / 3), std::sin(M_PI / 3)})),
-                  obstacle_factory.createFromRobotPosition(
+                  robot_navigation_obstacle_factory.createFromRobotPosition(
                       Point({std::cos(2 * M_PI / 3), std::sin(2 * M_PI / 3)})),
-                  obstacle_factory.createFromRobotPosition(
+                  robot_navigation_obstacle_factory.createFromRobotPosition(
                       Point({std::cos(3 * M_PI / 3), std::sin(3 * M_PI / 3)})),
-                  obstacle_factory.createFromRobotPosition(
+                  robot_navigation_obstacle_factory.createFromRobotPosition(
                       Point({std::cos(4 * M_PI / 3), std::sin(4 * M_PI / 3)})),
-                  obstacle_factory.createFromRobotPosition(
+                  robot_navigation_obstacle_factory.createFromRobotPosition(
                       Point({std::cos(5 * M_PI / 3), std::sin(5 * M_PI / 3)})),
               },
           .should_return_path = true},
@@ -85,19 +85,19 @@ std::vector<PlannerTestCase>
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
           .obstacles =
               {
-                  obstacle_factory.createFromRobotPosition(Point({0.2, 0})),
-                  obstacle_factory.createFromRobotPosition(
+                  robot_navigation_obstacle_factory.createFromRobotPosition(Point({0.2, 0})),
+                  robot_navigation_obstacle_factory.createFromRobotPosition(
                       Point({std::cos(M_PI / 3) * 0.2, std::sin(M_PI / 3) * 0.2})),
-                  obstacle_factory.createFromRobotPosition(
+                  robot_navigation_obstacle_factory.createFromRobotPosition(
                       Point(
                           {std::cos(2 * M_PI / 3) * 0.2, std::sin(2 * M_PI / 3) * 0.2})),
-                  obstacle_factory
+                  robot_navigation_obstacle_factory
                       .createFromRobotPosition(Point({std::cos(3 * M_PI / 3) * 0.2,
                                                       std::sin(3 * M_PI / 3) * 0.2})),
-                  obstacle_factory
+                  robot_navigation_obstacle_factory
                       .createFromRobotPosition(Point({std::cos(4 * M_PI / 3) * 0.2,
                                                       std::sin(4 * M_PI / 3) * 0.2})),
-                  obstacle_factory
+                  robot_navigation_obstacle_factory
                       .createFromRobotPosition(Point({std::cos(5 * M_PI / 3) * 0.2,
                                                       std::sin(5 * M_PI / 3) * 0.2})),
               },
@@ -106,14 +106,14 @@ std::vector<PlannerTestCase>
           .start = Point(0, 0),
           .dest  = Point(4, 0),
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
-          .obstacles = {obstacle_factory.createFromShape(Rectangle({-1, -1}, {1, 1}))},
+          .obstacles = {robot_navigation_obstacle_factory.createFromShape(Rectangle({-1, -1}, {1, 1}))},
           .should_return_path = true},
          {.name = "Start and dest inside same obstacle",
           // NOTE: this test is designed specifically to pass the progress check
           .start          = Point(0, 0),
           .dest           = Point(1.5, 0),
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
-          .obstacles = {obstacle_factory.createFromShape(Rectangle({-1, -1}, {2, 1}))},
+          .obstacles = {robot_navigation_obstacle_factory.createFromShape(Rectangle({-1, -1}, {2, 1}))},
           .should_return_path = true}};
 
 

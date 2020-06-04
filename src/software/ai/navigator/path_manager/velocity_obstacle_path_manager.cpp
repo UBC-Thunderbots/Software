@@ -2,8 +2,8 @@
 
 VelocityObstaclePathManager::VelocityObstaclePathManager(
     std::unique_ptr<PathPlanner> path_planner,
-    RobotNavigationObstacleFactory obstacle_factory)
-    : path_planner(std::move(path_planner)), obstacle_factory(std::move(obstacle_factory))
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory)
+    : path_planner(std::move(path_planner)), robot_navigation_obstacle_factory(std::move(robot_navigation_obstacle_factory))
 {
 }
 
@@ -49,7 +49,7 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
                                   Angle::zero(), AngularVelocity::zero(),
                                   Timestamp::fromSeconds(0));
             current_velocity_obstacles.emplace_back(
-                obstacle_factory.createFromRobot(mock_path_robot));
+                robot_navigation_obstacle_factory.createFromRobot(mock_path_robot));
         }
     }
 
@@ -71,7 +71,7 @@ VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
     {
         if (obj != current_objective)
         {
-            obstacles.push_back(obstacle_factory.createFromRobotPosition(obj.start));
+            obstacles.push_back(robot_navigation_obstacle_factory.createFromRobotPosition(obj.start));
         }
     }
     return obstacles;

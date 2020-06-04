@@ -10,7 +10,7 @@ cc_library(
         "//software/ai/intent:all_intents",
         "//software/ai/intent:intent_visitor",
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/obstacle:obstacle_factory",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/ai/navigator/path_manager",
         "//software/logger",
         "//software/new_geom/util:distance",

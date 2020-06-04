@@ -4,10 +4,10 @@
 #include "software/new_geom/util/distance.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
-                     RobotNavigationObstacleFactory obstacle_factory,
+                     RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
                      std::shared_ptr<const NavigatorConfig> config)
     : config(config),
-      obstacle_factory(std::move(obstacle_factory)),
+      robot_navigation_obstacle_factory(std::move(robot_navigation_obstacle_factory)),
       path_manager(std::move(path_manager))
 
 {
@@ -119,7 +119,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
         // start with non-MoveIntent robots and then add motion constraints
         auto obstacles = friendly_non_move_intent_robot_obstacles;
 
-        auto motion_constraint_obstacles = obstacle_factory.createFromMotionConstraints(
+        auto motion_constraint_obstacles = robot_navigation_obstacle_factory.createFromMotionConstraints(
             intent.getMotionConstraints(), world);
         obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                          motion_constraint_obstacles.end());
@@ -127,7 +127,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
         if (intent.getBallCollisionType() == BallCollisionType::AVOID)
         {
             auto ball_obstacle =
-                obstacle_factory.createFromBallPosition(world.ball().position());
+                robot_navigation_obstacle_factory.createFromBallPosition(world.ball().position());
             obstacles.push_back(ball_obstacle);
         }
 
@@ -190,7 +190,7 @@ void Navigator::registerNonMoveIntentRobotId(RobotId id)
     auto robot = world.friendlyTeam().getRobotById(id);
     if (robot)
     {
-        auto robot_obstacle = obstacle_factory.createFromRobot(*robot);
+        auto robot_obstacle = robot_navigation_obstacle_factory.createFromRobot(*robot);
         friendly_non_move_intent_robot_obstacles.push_back(robot_obstacle);
     }
 }
@@ -244,7 +244,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
 
     // find min dist between p and any robot
     double closest_dist = std::numeric_limits<double>::max();
-    auto obstacles      = obstacle_factory.createFromTeam(enemy_team);
+    auto obstacles      = robot_navigation_obstacle_factory.createFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {
         double current_dist = obstacle->distance(p);

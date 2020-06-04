@@ -6,7 +6,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/primitive/all_primitives.h"
@@ -24,11 +24,11 @@ class Navigator : public IntentVisitor
      * Create a Navigator
      * @param path_manager The path manager that will be used for path creation for all
      *                     the robots
-     * @param obstacle_factory Will be used to generate obstacles from various constructs
+     * @param robot_navigation_obstacle_factory Will be used to generate obstacles from various constructs
      * @param config The navigator config
      */
     explicit Navigator(std::unique_ptr<PathManager> path_manager,
-                       RobotNavigationObstacleFactory obstacle_factory,
+                       RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
                        std::shared_ptr<const NavigatorConfig> config);
 
     /**
@@ -146,7 +146,7 @@ class Navigator : public IntentVisitor
     double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
 
     std::shared_ptr<const NavigatorConfig> config;
-    RobotNavigationObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 
     // Path manager used to navigate around obstacles
     std::unique_ptr<PathManager> path_manager;

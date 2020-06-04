@@ -59,7 +59,7 @@ cc_test(
     srcs = ["theta_star_path_planner_test.cpp"],
     deps = [
         ":theta_star_path_planner",
-        "//software/ai/navigator/obstacle:obstacle_factory",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
         "//software/world:field",
         "@gtest//:gtest_main",
@@ -73,7 +73,7 @@ cc_test(
         ":path_planner",
         ":straight_line_path_planner",
         ":theta_star_path_planner",
-        "//software/ai/navigator/obstacle:obstacle_factory",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
