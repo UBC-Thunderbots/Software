@@ -1,78 +1,150 @@
 #include "software/simulation/physics/physics_world.h"
 
 #include "shared/constants.h"
+#include <limits>
 
-PhysicsWorld::PhysicsWorld(const World& world)
+PhysicsWorld::PhysicsWorld(const Field& field) :
+    b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
+    current_timestamp(Timestamp::fromSeconds(0)),
+    contact_listener(std::make_unique<SimulationContactListener>()),
+    physics_field(std::make_shared<PhysicsField>(b2_world, field)),
+    physics_ball(nullptr)
 {
-    b2Vec2 gravity(0, 0);
-    b2_world          = std::make_shared<b2World>(gravity);
-    current_timestamp = Timestamp::fromSeconds(0);
-
-    contact_listener = std::make_unique<SimulationContactListener>();
     b2_world->SetContactListener(contact_listener.get());
-
-    initWorld(world);
 }
 
-void PhysicsWorld::initWorld(const World& world)
-{
-    physics_field = std::make_shared<PhysicsField>(b2_world, world.field());
-    physics_ball =
-        std::make_shared<PhysicsBall>(b2_world, world.ball().currentState().ballState(),
-                                      BALL_MASS_KG, acceleration_due_to_gravity);
-    friendly_physics_robots.clear();
-    for (const auto& friendly_robot : world.friendlyTeam().getAllRobots())
-    {
-        friendly_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-            friendly_robot.id(), b2_world, friendly_robot.currentState().robotState(),
-            ROBOT_WITH_BATTERY_MASS_KG));
-    }
-    enemy_physics_robots.clear();
-    for (const auto& enemy_robot : world.enemyTeam().getAllRobots())
-    {
-        enemy_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-            enemy_robot.id(), b2_world, enemy_robot.currentState().robotState(),
-            ROBOT_WITH_BATTERY_MASS_KG));
-    }
-    current_timestamp = world.getMostRecentTimestamp();
+const Field PhysicsWorld::getField() const {
+    return physics_field->getField();
 }
 
-World PhysicsWorld::getWorld() const
-{
-    World new_world;
-    new_world.updateTimestamp(current_timestamp);
-    if (physics_ball)
-    {
-        TimestampedBallState timestamped_ball_state(physics_ball->getBallState(),
-                                                    current_timestamp);
-        new_world.mutableBall() = Ball(timestamped_ball_state);
-    }
-    if (physics_field)
-    {
-        new_world.mutableField() = physics_field->getField();
+const std::optional<BallState> PhysicsWorld::getBallState() const {
+    return physics_ball ? std::make_optional(physics_ball->getBallState()) : std::nullopt;
+}
+
+const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getYellowRobotStates() const {
+    std::vector<PhysicsWorld::RobotStateWithId> robot_states;
+    for(const auto& robot : yellow_physics_robots) {
+        auto state_with_id = PhysicsWorld::RobotStateWithId{.id = robot->getRobotId(), .robot_state = robot->getRobotState()};
+        robot_states.emplace_back(state_with_id);
     }
 
-    new_world.mutableFriendlyTeam().clearAllRobots();
-    std::vector<Robot> friendly_robots;
-    for (const auto& robot : friendly_physics_robots)
-    {
-        TimestampedRobotState timestamped_robot_state(robot->getRobotState(),
-                                                      current_timestamp);
-        friendly_robots.emplace_back(Robot(robot->getRobotId(), timestamped_robot_state));
-    }
-    new_world.mutableFriendlyTeam().updateRobots(friendly_robots);
+    return robot_states;
+}
 
-    new_world.mutableEnemyTeam().clearAllRobots();
-    std::vector<Robot> enemy_robots;
-    for (const auto& robot : enemy_physics_robots)
-    {
-        TimestampedRobotState timestamped_robot_state(robot->getRobotState(),
-                                                      current_timestamp);
-        enemy_robots.emplace_back(Robot(robot->getRobotId(), timestamped_robot_state));
+const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getBlueRobotStates() const {
+    std::vector<PhysicsWorld::RobotStateWithId> robot_states;
+    for(const auto& robot : blue_physics_robots) {
+        auto state_with_id = PhysicsWorld::RobotStateWithId{.id = robot->getRobotId(), .robot_state = robot->getRobotState()};
+        robot_states.emplace_back(state_with_id);
     }
-    new_world.mutableEnemyTeam().updateRobots(enemy_robots);
 
-    return new_world;
+    return robot_states;
+}
+
+const Timestamp PhysicsWorld::getTimestamp() const {
+    return current_timestamp;
+}
+
+void PhysicsWorld::setField(const Field &field) {
+    if(field.isValid()) {
+        physics_field = std::make_shared<PhysicsField>(b2_world, field);
+    }
+}
+
+void PhysicsWorld::setBallState(const BallState &ball_state) {
+    physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG, acceleration_due_to_gravity);
+}
+
+void PhysicsWorld::removeBall() {
+    physics_ball.reset();
+}
+
+void PhysicsWorld::addYellowRobots(const std::vector<RobotStateWithId>& robots) {
+    for(const auto& state_with_id : robots) {
+        if(isYellowRobotIdAvailable(state_with_id.id)) {
+            yellow_physics_robots.emplace_back(
+                    std::make_shared<PhysicsRobot>(state_with_id.id, b2_world, state_with_id.robot_state, ROBOT_WITH_BATTERY_MASS_KG)
+                    );
+        }else {
+            std::stringstream ss;
+            ss << "Yellow robot with id " << state_with_id.id << " already exists in the physics world" << std::endl;
+            throw std::runtime_error(ss.str());
+        }
+    }
+}
+
+void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots) {
+    for(const auto& state_with_id : robots) {
+        if(isBlueRobotIdAvailable(state_with_id.id)) {
+            blue_physics_robots.emplace_back(
+                    std::make_shared<PhysicsRobot>(state_with_id.id, b2_world, state_with_id.robot_state, ROBOT_WITH_BATTERY_MASS_KG)
+            );
+        }else {
+            std::stringstream ss;
+            ss << "Blue robot with id " << state_with_id.id << " already exists in the physics world" << std::endl;
+            throw std::runtime_error(ss.str());
+        }
+    }
+}
+
+std::optional<unsigned int> PhysicsWorld::getAvailableYellowRobotId() const {
+    for(unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++) {
+        if(isYellowRobotIdAvailable(i)) {
+            return std::make_optional<unsigned int>(i);
+        }
+    }
+
+    if(isYellowRobotIdAvailable(std::numeric_limits<unsigned int>::max())) {
+        return std::numeric_limits<unsigned int>::max();
+    }
+
+    return std::nullopt;
+}
+
+bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const {
+    bool id_available = true;
+    for(const auto& robot : yellow_physics_robots) {
+        if(!robot) {
+            throw std::runtime_error("Encountered a nullptr to a yellow physics robot in the physics world");
+        }
+
+        if(id == robot->getRobotId()) {
+            id_available = false;
+            break;
+        }
+    }
+
+    return id_available;
+}
+
+std::optional<unsigned int> PhysicsWorld::getAvailableBlueRobotId() const {
+    for(unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++) {
+        if(isBlueRobotIdAvailable(i)) {
+            return std::make_optional<unsigned int>(i);
+        }
+    }
+
+    if(isBlueRobotIdAvailable(std::numeric_limits<unsigned int>::max())) {
+        return std::numeric_limits<unsigned int>::max();
+    }
+
+    return std::nullopt;
+}
+
+bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const {
+    bool id_available = true;
+    for(const auto& robot : blue_physics_robots) {
+        if(!robot) {
+            throw std::runtime_error("Encountered a nullptr to a blue physics robot in the physics world");
+        }
+
+        if(id == robot->getRobotId()) {
+            id_available = false;
+            break;
+        }
+    }
+
+    return id_available;
 }
 
 void PhysicsWorld::stepSimulation(const Duration& time_step)
@@ -84,7 +156,7 @@ void PhysicsWorld::stepSimulation(const Duration& time_step)
 std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getFriendlyPhysicsRobots() const
 {
     std::vector<std::weak_ptr<PhysicsRobot>> robots;
-    for (const auto& friendly_physics_robot : friendly_physics_robots)
+    for (const auto& friendly_physics_robot : yellow_physics_robots)
     {
         robots.emplace_back(friendly_physics_robot);
     }

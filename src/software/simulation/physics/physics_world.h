@@ -18,13 +18,18 @@
 class PhysicsWorld
 {
    public:
-    /**
-     * Creates a new PhysicsWorld given a World.
-     *
-     * @param world the world to create
-     */
-    explicit PhysicsWorld(const World& world);
+    // TODO: where shoudl this go? the world/ folder? here?
+    typedef struct RobotStateWithId_t {
+        unsigned int id;
+        RobotState robot_state;
+    } RobotStateWithId;
 
+    /**
+     * Creates a new PhysicsWorld that will contain no robots and no ball.
+     *
+     * @param field The initial state of the field
+     */
+    explicit PhysicsWorld(const Field& field);
     PhysicsWorld() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -34,13 +39,129 @@ class PhysicsWorld
     PhysicsWorld(const PhysicsWorld&)            = delete;
 
     /**
-     * Returns the current state of the world
-     * @return the current state of the world
+     * Returns the field in the physics world
+     *
+     * @return the field in the physics world
      */
-    World getWorld() const;
+    const Field getField() const;
 
     /**
-     * Advances the Box2D world physics by the given time step
+     * Returns the state of the ball in the physics world, if it exists
+     *
+     * @return the state of the ball in the physics world, if it exists
+     */
+    const std::optional<BallState> getBallState() const;
+
+    /**
+     * Returns the states and IDs of all yellow robots in the physics world.
+     *
+     * There is no guarantee as to what order the robots are returned in.
+     *
+     * @return the states and IDs of all yellow robots in the physics world
+     */
+    const std::vector<RobotStateWithId> getYellowRobotStates() const;
+
+    /**
+     * Returns the states and IDs of all blue robots in the physics world.
+     *
+     * There is no guarantee as to what order the robots are returned in.
+     *
+     * @return the states and IDs of all blue robots in the physics world
+     */
+    const std::vector<RobotStateWithId> getBlueRobotStates() const;
+
+    /**
+     * Returns the current timestamp of the physics world
+     *
+     * @return the current timestamp of the physics world
+     */
+    const Timestamp getTimestamp() const;
+
+    /**
+     * Sets the field in the physics world. The field must be valid. If an invalid
+     * field is provided the field is not updated.
+     *
+     * @param field the new field
+     */
+    void setField(const Field& field);
+
+    /**
+     * Sets the state of the ball in the physics world. No more than 1 ball may exist
+     * in the physics world at a time. If there is no ball in the physics world, a ball
+     * is added with the given state. If a ball already exists, it's state is set to the
+     * given state.
+     *
+     * @param ball_state The new ball state
+     */
+    void setBallState(const BallState& ball_state);
+
+    /**
+     * Removes the ball from the physics world
+     */
+    void removeBall();
+
+    /**
+     * Adds robots to the yellow team with the given initial states. The robot IDs must
+     * not be duplicated and must not match the ID of any robot already on the yellow team.
+     *
+     * @throws runtime_error if any of the given robot ids are duplicated, or a
+     * yellow robot already exists with the ID
+     *
+     * @param robots the robots to add
+     */
+    void addYellowRobots(const std::vector<RobotStateWithId>& robots);
+
+    /**
+     * Adds robots to the yellow team with the given initial states. The robot IDs must
+     * not be duplicated and must not match the ID of any robot already on the yellow team.
+     *
+     * @throws runtime_error if any of the given robot ids are duplicated, or a
+     * yellow robot already exists with the ID
+     *
+     * @param robots the robots to add
+     */
+    void addBlueRobots(const std::vector<RobotStateWithId>& robots);
+
+    /**
+     * Returns the lowest available robot ID that is not already in use by a yellow robot.
+     * If no ID is available, returns std::nullopt.
+     *
+     * @return an available robot ID that is not already in use by a yellow robot.
+     * If no ID is available, returns std::nullopt
+     */
+    std::optional<unsigned int> getAvailableYellowRobotId() const;
+
+    /**
+     * Returns true if the given id is not already in use by a yellow robot,
+     * and false otherwise.
+     *
+     * @param id The id to check
+     * @return true if the given id is not already in use by a yellow robot,
+     * and false otherwise
+     */
+    bool isYellowRobotIdAvailable(unsigned int id) const;
+
+    /**
+     * Returns the lowest available robot ID that is not already in use by a blue robot.
+     * If no ID is available, returns std::nullopt.
+     *
+     * @return an available robot ID that is not already in use by a blue robot.
+     * If no ID is available, returns std::nullopt
+     */
+    std::optional<unsigned int> getAvailableBlueRobotId() const;
+
+    /**
+     * Returns true if the given id is not already in use by a blue robot,
+     * and false otherwise.
+     *
+     * @param id The id to check
+     * @return true if the given id is not already in use by a blue robot,
+     * and false otherwise
+     */
+    bool isBlueRobotIdAvailable(unsigned int id) const;
+
+    /**
+     * Advances the physics simulation by the given time step
      *
      * @param time_step how much to advance the world physics by
      */
@@ -68,12 +189,6 @@ class PhysicsWorld
     // The timestamp of the simulated physics world
     Timestamp current_timestamp;
 
-    /**
-     * Sets the state of the internal world used for simulation
-     * @param world the new state of the world to start the simulation from
-     */
-    void initWorld(const World& world);
-
     // 3 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
@@ -84,12 +199,10 @@ class PhysicsWorld
 
     std::unique_ptr<SimulationContactListener> contact_listener;
 
-    // Abstractions of objects in the world
-    std::shared_ptr<PhysicsBall> physics_ball;
+    // TODO: is the best way to handle the field? Just check it everywhere to maintain
+    // no nullptr invariant?
     std::shared_ptr<PhysicsField> physics_field;
-    std::vector<std::shared_ptr<PhysicsRobot>> friendly_physics_robots;
-    // Keep track of enemy physics robots as well, because although we don't
-    // necessarily control them with our firmware they can still be
-    // simulated to move given initial velocities
-    std::vector<std::shared_ptr<PhysicsRobot>> enemy_physics_robots;
+    std::shared_ptr<PhysicsBall> physics_ball;
+    std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
+    std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
 };
