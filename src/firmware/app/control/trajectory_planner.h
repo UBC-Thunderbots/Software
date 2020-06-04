@@ -170,7 +170,7 @@ app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
 void app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(
     PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths);
 
-/***
+/**
  * Function modifies an existing trajectory speed profile to be backwards continuous -
  * meaning that it is possible to deccelerate fast enough to reach each point on the
  * trajectory
@@ -190,7 +190,7 @@ TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
     PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths);
 
-/***
+/**
  * Function uses the speed profiles specified by the trajectory to calculate the
  * cumulative duration of time required to reach each point
  *
@@ -234,7 +234,7 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
     float* max_allowable_speed_profile);
 
 
-/***
+/**
  * Function rebalances the specified linear or angular segment of a trajectory to have the
  * specified duration. The final speed at the end of the segment will be modified to reach
  * the specified value
@@ -276,7 +276,6 @@ app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentD
 void app_trajectory_planner_generateVelocityTrajectory(
     PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory);
 
-/***
 /**
  * Returns a planned trajectory with the list of guarantees based on the assumptions below
  *
@@ -322,7 +321,7 @@ TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     PositionTrajectory_t* trajectory);
 
-/***
+/**
  * Function generates a constant interpolation period trajectory from the path parameters
  * specified in the constant parameterization trajectory. The function creates a constant
  * parameterization trajectory then uses linear interpolation to calculate the equivalent
@@ -364,7 +363,7 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
     PositionTrajectory_t* trajectory,
     TrajectorySegment_t trajectory_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
-/***
+/**
  * Function generates a constant interpolation period trajectory based on the input path
  * parameters and interpolation period
  *
