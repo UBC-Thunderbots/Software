@@ -286,8 +286,8 @@ void app_trajectory_planner_generateVelocityTrajectory(
  * 'max_allowable_linear_acceleration' input parameter
  *
  *  - Assuming the grip-limit of the robot IS THE SAME AS THE MAX ACCELERATION then at no
- * point on the path can the sum of centripetal and acceleration force be greater than
- * 'max_allowable_linear_acceleration'
+ *    point on the path can the sum of centripetal and acceleration force be greater than
+ *    'max_allowable_linear_acceleration'
  *
  *  PositionTrajectory generation is done by assuming constant acceleration capability.
  *      - The generator will assume maximum acceleration for the robot between each
