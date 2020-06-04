@@ -20,8 +20,6 @@ static constexpr double PATH_CHECK_INTERVAL_M = 0.05;
 // have reached the destination
 static constexpr double DEST_CHECK_EPSILON_M = 1e-3;
 
-using namespace Test;
-
 using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
 
 struct PlannerTestCase
