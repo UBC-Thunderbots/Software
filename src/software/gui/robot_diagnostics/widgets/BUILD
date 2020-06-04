@@ -52,6 +52,7 @@ qt_cc_library(
     deps = [
         ":slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
+        "//software/util/make_enum",
         "@qt//:qt_widgets",
     ],
 )
