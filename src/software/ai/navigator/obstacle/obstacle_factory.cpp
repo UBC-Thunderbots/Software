@@ -17,46 +17,45 @@ std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraint(
         case MotionConstraint::ENEMY_ROBOTS_COLLISION:
         {
             std::vector<ObstaclePtr> enemy_robot_obstacles =
-                createVelocityObstaclesFromTeam(world.enemyTeam());
+                createFromTeam(world.enemyTeam());
             obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
                              enemy_robot_obstacles.end());
         }
         break;
         case MotionConstraint::CENTER_CIRCLE:
-            obstacles.push_back(createInflatedByRobotRadius(
+            obstacles.push_back(createFromShape(
                 Circle(world.field().centerPoint(), world.field().centerCircleRadius())));
             break;
         case MotionConstraint::HALF_METER_AROUND_BALL:
             // 0.5 represents half a metre radius
-            obstacles.push_back(
-                createInflatedByRobotRadius(Circle(world.ball().position(), 0.5)));
+            obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
             break;
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
-            obstacles.push_back(createFieldRectangleObstacleCustomInflation(
+            obstacles.push_back(createFromFieldRectangle(
                 world.field().enemyDefenseArea(), world.field().fieldLines(),
                 world.field().fieldBoundary(), robot_radius_expansion_amount + 0.3));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
-            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
+            obstacles.push_back(createFromFieldRectangle(
                 world.field().friendlyDefenseArea(), world.field().fieldLines(),
                 world.field().fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
-                world.field().enemyDefenseArea(), world.field().fieldLines(),
-                world.field().fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(world.field().enemyDefenseArea(),
+                                                         world.field().fieldLines(),
+                                                         world.field().fieldBoundary()));
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
-                world.field().friendlyHalf(), world.field().fieldLines(),
-                world.field().fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(world.field().friendlyHalf(),
+                                                         world.field().fieldLines(),
+                                                         world.field().fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_HALF:
-            obstacles.push_back(createFieldRectangleObstacleInflatedByRobotRadius(
-                world.field().enemyHalf(), world.field().fieldLines(),
-                world.field().fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(world.field().enemyHalf(),
+                                                         world.field().fieldLines(),
+                                                         world.field().fieldBoundary()));
             break;
     }
 
@@ -76,7 +75,7 @@ std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraints(
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot) const
+ObstaclePtr ObstacleFactory::createFromRobot(const Robot &robot) const
 {
     // radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
@@ -131,38 +130,37 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
     }
     else
     {
-        return createAroundRobotPosition(robot.position());
+        return createFromRobotPosition(robot.position());
     }
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
-    const Team &team) const
+std::vector<ObstaclePtr> ObstacleFactory::createFromTeam(const Team &team) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (const auto &robot : team.getAllRobots())
     {
-        obstacles.push_back(createVelocityObstacleFromRobot(robot));
+        obstacles.push_back(createFromRobot(robot));
     }
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createAroundBallPosition(const Point &ball_position) const
+ObstaclePtr ObstacleFactory::createFromBallPosition(const Point &ball_position) const
 {
-    return createInflatedByRobotRadius(Circle(ball_position, BALL_MAX_RADIUS_METERS));
+    return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
-ObstaclePtr ObstacleFactory::createAroundRobotPosition(const Point &robot_position) const
+ObstaclePtr ObstacleFactory::createFromRobotPosition(const Point &robot_position) const
 {
-    return createInflatedByRobotRadius(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
+    return createFromShape(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
 }
 
-ObstaclePtr ObstacleFactory::createInflatedByRobotRadius(const Circle &circle) const
+ObstaclePtr ObstacleFactory::createFromShape(const Circle &circle) const
 {
     return std::make_shared<GeomObstacle<Circle>>(
         Circle(circle.getOrigin(), circle.getRadius() + robot_radius_expansion_amount));
 }
 
-ObstaclePtr ObstacleFactory::createInflatedByRobotRadius(const Polygon &polygon) const
+ObstaclePtr ObstacleFactory::createFromShape(const Polygon &polygon) const
 {
     return std::make_shared<GeomObstacle<Polygon>>(
         polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
@@ -171,17 +169,18 @@ ObstaclePtr ObstacleFactory::createInflatedByRobotRadius(const Polygon &polygon)
             .expand(Vector(0, 1).normalize(robot_radius_expansion_amount)));
 }
 
-ObstaclePtr ObstacleFactory::createFieldRectangleObstacleInflatedByRobotRadius(
+ObstaclePtr ObstacleFactory::createFromFieldRectangle(
     const Rectangle &field_rectangle, const Rectangle &field_lines,
     const Rectangle &field_boundary) const
 {
-    return createFieldRectangleObstacleCustomInflation(
-        field_rectangle, field_lines, field_boundary, robot_radius_expansion_amount);
+    return createFromFieldRectangle(field_rectangle, field_lines, field_boundary,
+                                    robot_radius_expansion_amount);
 }
 
-ObstaclePtr ObstacleFactory::createFieldRectangleObstacleCustomInflation(
-    const Rectangle &field_rectangle, const Rectangle &field_lines,
-    const Rectangle &field_boundary, double expansion_amount) const
+ObstaclePtr ObstacleFactory::createFromFieldRectangle(const Rectangle &field_rectangle,
+                                                      const Rectangle &field_lines,
+                                                      const Rectangle &field_boundary,
+                                                      double expansion_amount) const
 {
     double xMin = field_rectangle.xMin();
     double xMax = field_rectangle.xMax();

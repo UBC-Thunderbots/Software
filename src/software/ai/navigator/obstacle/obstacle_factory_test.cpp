@@ -82,7 +82,7 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 {
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
-    ObstaclePtr obstacle = obstacle_factory.createInflatedByRobotRadius(rectangle);
+    ObstaclePtr obstacle = obstacle_factory.createFromShape(rectangle);
 
     try
     {
@@ -100,7 +100,7 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.1385);
-    ObstaclePtr obstacle = obstacle_factory.createAroundBallPosition(origin);
+    ObstaclePtr obstacle = obstacle_factory.createFromBallPosition(origin);
 
     try
     {
@@ -118,7 +118,7 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.207);
-    ObstaclePtr obstacle = obstacle_factory.createAroundRobotPosition(origin);
+    ObstaclePtr obstacle = obstacle_factory.createFromRobotPosition(origin);
 
     try
     {
@@ -139,7 +139,7 @@ TEST_F(ObstacleFactoryTest, stationary_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.207);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createFromRobot(robot);
 
     try
     {
@@ -161,7 +161,7 @@ TEST_F(ObstacleFactoryTest, slow_moving_robot_obstacle)
     AngularVelocity angular_velocity(AngularVelocity::fromRadians(-0.6));
     Circle expected(origin, 0.207);
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createFromRobot(robot);
 
     try
     {
@@ -184,7 +184,7 @@ TEST_F(ObstacleFactoryTest, fast_moving_robot_obstacle)
     Polygon expected({Point(-2.161, 5.231), Point(-2.331, 5.062), Point(-2.269, 4.831),
                       Point(-2.038, 4.769), Point(-1.671, 4.867), Point(-1.795, 5.329)});
     Robot robot = Robot(3, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createFromRobot(robot);
 
     try
     {
@@ -207,7 +207,7 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
     Polygon expected({Point(0.966, -0.247), Point(1.124, -0.427), Point(1.358, -0.379),
                       Point(1.434, -0.153), Point(1.357, 0.230), Point(0.889, 0.135)});
     Robot robot = Robot(4, origin, velocity, orientation, angular_velocity, current_time);
-    ObstaclePtr obstacle = obstacle_factory.createVelocityObstacleFromRobot(robot);
+    ObstaclePtr obstacle = obstacle_factory.createFromRobot(robot);
 
     try
     {

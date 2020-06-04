@@ -9,7 +9,9 @@
 #include "software/world/world.h"
 
 /**
- * The obstacle factory creates obstacles with an additional robot radius for navigation
+ * The obstacle factory creates obstacles for navigation
+ * NOTE: All obstacles created include at least an additional robot radius margin around
+ * the obstacle
  */
 class ObstacleFactory
 {
@@ -55,7 +57,7 @@ class ObstacleFactory
      *
      * @return An obstacle representing the given robot
      */
-    ObstaclePtr createVelocityObstacleFromRobot(const Robot &robot) const;
+    ObstaclePtr createFromRobot(const Robot &robot) const;
 
     /**
      * Create a list of obstacles representing the given team
@@ -67,7 +69,7 @@ class ObstacleFactory
      *
      * @return A list of obstacles representing the given team
      */
-    std::vector<ObstaclePtr> createVelocityObstaclesFromTeam(const Team &team) const;
+    std::vector<ObstaclePtr> createFromTeam(const Team &team) const;
 
     /**
      * Create circle obstacle around robot with additional radius scaling
@@ -76,7 +78,7 @@ class ObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createAroundRobotPosition(const Point &robot_position) const;
+    ObstaclePtr createFromRobotPosition(const Point &robot_position) const;
 
     /**
      * Create circle obstacle around ball
@@ -85,18 +87,19 @@ class ObstacleFactory
      *
      * @return obstacle around the ball
      */
-    ObstaclePtr createAroundBallPosition(const Point &ball_position) const;
+    ObstaclePtr createFromBallPosition(const Point &ball_position) const;
 
     /**
-     * Returns an obstacle for the shape expanded on all sides to account for the size of
-     * the robot
+     * Returns an obstacle for the shape
+     * NOTE: as with all other obstacles created by ObstacleFactory, the shapes are
+     * expanded on all sides to account for the radius of the robot
      *
      * @param The shape to expand
      *
      * @return ObstaclePtr
      */
-    ObstaclePtr createInflatedByRobotRadius(const Circle &circle) const;
-    ObstaclePtr createInflatedByRobotRadius(const Polygon &polygon) const;
+    ObstaclePtr createFromShape(const Circle &circle) const;
+    ObstaclePtr createFromShape(const Polygon &polygon) const;
 
    private:
     std::shared_ptr<const ObstacleFactoryConfig> config;
@@ -115,10 +118,11 @@ class ObstacleFactory
      *
      * @return ObstaclePtr
      */
-    ObstaclePtr createFieldRectangleObstacleInflatedByRobotRadius(
-        const Rectangle &field_rectangle, const Rectangle &field_lines,
-        const Rectangle &field_boundary) const;
-    ObstaclePtr createFieldRectangleObstacleCustomInflation(
-        const Rectangle &field_rectangle, const Rectangle &field_lines,
-        const Rectangle &field_boundary, double expansion_amount) const;
+    ObstaclePtr createFromFieldRectangle(const Rectangle &field_rectangle,
+                                         const Rectangle &field_lines,
+                                         const Rectangle &field_boundary) const;
+    ObstaclePtr createFromFieldRectangle(const Rectangle &field_rectangle,
+                                         const Rectangle &field_lines,
+                                         const Rectangle &field_boundary,
+                                         double expansion_amount) const;
 };

@@ -127,7 +127,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
         if (intent.getBallCollisionType() == BallCollisionType::AVOID)
         {
             auto ball_obstacle =
-                obstacle_factory.createAroundBallPosition(world.ball().position());
+                obstacle_factory.createFromBallPosition(world.ball().position());
             obstacles.push_back(ball_obstacle);
         }
 
@@ -190,7 +190,7 @@ void Navigator::registerNonMoveIntentRobotId(RobotId id)
     auto robot = world.friendlyTeam().getRobotById(id);
     if (robot)
     {
-        auto robot_obstacle = obstacle_factory.createVelocityObstacleFromRobot(*robot);
+        auto robot_obstacle = obstacle_factory.createFromRobot(*robot);
         friendly_non_move_intent_robot_obstacles.push_back(robot_obstacle);
     }
 }
@@ -244,7 +244,7 @@ double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &en
 
     // find min dist between p and any robot
     double closest_dist = std::numeric_limits<double>::max();
-    auto obstacles      = obstacle_factory.createVelocityObstaclesFromTeam(enemy_team);
+    auto obstacles      = obstacle_factory.createFromTeam(enemy_team);
     for (const auto &obstacle : obstacles)
     {
         double current_dist = obstacle->distance(p);
