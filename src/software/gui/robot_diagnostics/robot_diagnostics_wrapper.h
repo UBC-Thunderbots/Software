@@ -7,18 +7,20 @@
 #include <thread>
 
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics.h"
+#include "software/multithreading/subject.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
+#include "software/primitive/primitive.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
-
 
 /**
  * This class wraps our RobotDiagnostics object which is responsible for allowing users to
  * interact with and debug the robot
  */
-class RobotDiagnosticsWrapper : public ThreadedObserver<SensorMsg>
+class RobotDiagnosticsWrapper : public Subject<ConstPrimitiveVectorPtr>,
+                                public ThreadedObserver<SensorMsg>
 {
    public:
     RobotDiagnosticsWrapper() = delete;
@@ -64,9 +66,11 @@ class RobotDiagnosticsWrapper : public ThreadedObserver<SensorMsg>
     // Buffers that are shared with the instance of the RobotDiagnostics so that data can
     // be passed safely
     std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
+    std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer;
 
-    // We don't want to miss any SensorMsg updates so we make the buffer larger
+    // We don't want to miss any updates so we make the buffer larger
     static constexpr std::size_t sensor_msg_buffer_size = 60;
+    static constexpr std::size_t primitive_buffer_size  = 60;
 
     std::atomic_bool application_shutting_down;
 };

@@ -8,6 +8,8 @@ RobotDiagnosticsWrapper::RobotDiagnosticsWrapper(int argc, char** argv)
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorMsg>>(sensor_msg_buffer_size)),
+      primitive_buffer(std::make_shared<ThreadSafeBuffer<std::unique_ptr<Primitive>>>(
+          primitive_buffer_size)),
       application_shutting_down(false)
 {
     run_robot_diagnostics_thread = std::thread(
@@ -36,7 +38,8 @@ void RobotDiagnosticsWrapper::createAndRunRobotDiagnostics(int argc, char** argv
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    RobotDiagnostics* robot_diagnostics = new RobotDiagnostics(sensor_msg_buffer);
+    RobotDiagnostics* robot_diagnostics =
+        new RobotDiagnostics(sensor_msg_buffer, primitive_buffer);
     robot_diagnostics->show();
 
     // Run the QApplication and all windows / widgets. This function will block

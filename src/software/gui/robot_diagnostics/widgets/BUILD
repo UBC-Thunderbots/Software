@@ -16,6 +16,7 @@ qt_cc_library(
         "//software/gui/generic_widgets/robot_status",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",
+        "//software/primitive",
         "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
     ],
