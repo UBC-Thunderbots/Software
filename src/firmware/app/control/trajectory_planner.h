@@ -325,6 +325,12 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
  * parameterization trajectory then uses linear interpolation to calculate the equivalent
  * constant interpolation period trajectory
  *
+ * NOTE: Constant interpolation period means that the duration of time between each point
+ * on the trajectory is CONSTANT. This is different from a constant parameterization
+ * trajectory which has segments defined at constant polynomial evaluation intervals.
+ * Constant arc-length trajectories (not used here) are trajectories where the distance
+ * travelled in each segment in constant.
+ *
  * @pre The elements the trajectory are pre-allocated up to
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
