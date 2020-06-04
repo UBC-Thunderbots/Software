@@ -373,7 +373,7 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
  *
  * @pre path_parameter variables must all be initialised
  *
- * @pre velocity trajectory element array must be pre-allocated up to
+ * @pre velocity_trajectory element array must be pre-allocated up to
  * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
  *
  * @pre interpolation_period must be greater than zero
