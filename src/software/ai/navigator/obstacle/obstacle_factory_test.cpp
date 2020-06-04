@@ -82,7 +82,7 @@ TEST_F(ObstacleFactoryTest, create_rectangle_obstacle)
 {
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
-    ObstaclePtr obstacle = obstacle_factory.createObstacleFromRectangle(rectangle);
+    ObstaclePtr obstacle = obstacle_factory.createInflatedByRobotRadius(rectangle);
 
     try
     {
@@ -100,7 +100,7 @@ TEST_F(ObstacleFactoryTest, create_ball_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.1385);
-    ObstaclePtr obstacle = obstacle_factory.createBallObstacle(origin);
+    ObstaclePtr obstacle = obstacle_factory.createAroundBallPosition(origin);
 
     try
     {
@@ -118,7 +118,7 @@ TEST_F(ObstacleFactoryTest, create_robot_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.207);
-    ObstaclePtr obstacle = obstacle_factory.createRobotObstacle(origin);
+    ObstaclePtr obstacle = obstacle_factory.createAroundRobotPosition(origin);
 
     try
     {
@@ -223,7 +223,7 @@ TEST_F(ObstacleFactoryTest, another_fast_moving_robot_obstacle)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, enemy_robots_collision)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+    auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::ENEMY_ROBOTS_COLLISION, world);
     EXPECT_EQ(2, obstacles.size());
     try
@@ -258,7 +258,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, enemy_robots_collision)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, centre_circle)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+    auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::CENTER_CIRCLE, world);
     EXPECT_EQ(1, obstacles.size());
     try
@@ -276,7 +276,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, centre_circle)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, half_metre_around_ball)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+    auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::HALF_METER_AROUND_BALL, world);
     EXPECT_EQ(1, obstacles.size());
     try
@@ -294,7 +294,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, half_metre_around_ball)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+    auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA, world);
     EXPECT_EQ(1, obstacles.size());
     try
@@ -312,7 +312,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, inflated_enemy_defense_area)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, friendly_defense_area)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+    auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::FRIENDLY_DEFENSE_AREA, world);
     EXPECT_EQ(1, obstacles.size());
     try
@@ -331,7 +331,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, friendly_defense_area)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, enemy_defense_area)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+    auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::ENEMY_DEFENSE_AREA, world);
     EXPECT_EQ(1, obstacles.size());
     try
@@ -349,7 +349,7 @@ TEST_F(ObstacleFactoryMotionConstraintTest, enemy_defense_area)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, friendly_half)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
+    auto obstacles = obstacle_factory.createFromMotionConstraint(
         MotionConstraint::FRIENDLY_HALF, world);
     EXPECT_EQ(1, obstacles.size());
     try
@@ -367,8 +367,8 @@ TEST_F(ObstacleFactoryMotionConstraintTest, friendly_half)
 
 TEST_F(ObstacleFactoryMotionConstraintTest, enemy_half)
 {
-    auto obstacles = obstacle_factory.createObstaclesFromMotionConstraint(
-        MotionConstraint::ENEMY_HALF, world);
+    auto obstacles =
+        obstacle_factory.createFromMotionConstraint(MotionConstraint::ENEMY_HALF, world);
     EXPECT_EQ(1, obstacles.size());
     try
     {

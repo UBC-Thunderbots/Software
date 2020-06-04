@@ -68,7 +68,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our starting location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createInflatedByRobotRadius(
         Rectangle(Point(-0.5, -1), Point(0.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -103,7 +103,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Point start{0, 0}, dest{2.7, 0};
 
     // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createInflatedByRobotRadius(
         Rectangle(Point(2.5, -1), Point(3.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -135,7 +135,7 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createInflatedByRobotRadius(
         Rectangle(Point(1, -1), Point(2, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -168,7 +168,7 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{0, 3};
 
     // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
+    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createInflatedByRobotRadius(
         Rectangle(Point(-1, 1), Point(1, 2)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
@@ -261,24 +261,24 @@ TEST_F(TestThetaStarPathPlanner, DISABLED_performance)
     // improvement
     std::vector<std::vector<ObstaclePtr>> obstacle_sets = {
         {
-            obstacle_factory.createRobotObstacle({0, 0}),
-            obstacle_factory.createRobotObstacle({0, 0.5}),
-            obstacle_factory.createRobotObstacle({0, 1.0}),
-            obstacle_factory.createRobotObstacle({0, 1.5}),
+            obstacle_factory.createAroundRobotPosition({0, 0}),
+            obstacle_factory.createAroundRobotPosition({0, 0.5}),
+            obstacle_factory.createAroundRobotPosition({0, 1.0}),
+            obstacle_factory.createAroundRobotPosition({0, 1.5}),
         },
         {
-            obstacle_factory.createRobotObstacle({0, 0}),
-            obstacle_factory.createRobotObstacle({0, 0.5}),
-            obstacle_factory.createRobotObstacle({0, 1.0}),
-            obstacle_factory.createRobotObstacle({0, 1.5}),
-            obstacle_factory.createRobotObstacle({-0.5, 0}),
-            obstacle_factory.createRobotObstacle({-0.5, 0.5}),
-            obstacle_factory.createRobotObstacle({-0.5, 1.0}),
-            obstacle_factory.createRobotObstacle({-0.5, 1.5}),
-            obstacle_factory.createRobotObstacle({0.5, 0}),
-            obstacle_factory.createRobotObstacle({0.5, 0.5}),
-            obstacle_factory.createRobotObstacle({0.5, 1.0}),
-            obstacle_factory.createRobotObstacle({0.5, 1.5}),
+            obstacle_factory.createAroundRobotPosition({0, 0}),
+            obstacle_factory.createAroundRobotPosition({0, 0.5}),
+            obstacle_factory.createAroundRobotPosition({0, 1.0}),
+            obstacle_factory.createAroundRobotPosition({0, 1.5}),
+            obstacle_factory.createAroundRobotPosition({-0.5, 0}),
+            obstacle_factory.createAroundRobotPosition({-0.5, 0.5}),
+            obstacle_factory.createAroundRobotPosition({-0.5, 1.0}),
+            obstacle_factory.createAroundRobotPosition({-0.5, 1.5}),
+            obstacle_factory.createAroundRobotPosition({0.5, 0}),
+            obstacle_factory.createAroundRobotPosition({0.5, 0.5}),
+            obstacle_factory.createAroundRobotPosition({0.5, 1.0}),
+            obstacle_factory.createAroundRobotPosition({0.5, 1.5}),
         }};
     Field field = ::Test::TestUtil::createSSLDivBField();
 

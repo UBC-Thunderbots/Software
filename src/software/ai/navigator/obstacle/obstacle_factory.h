@@ -31,7 +31,7 @@ class ObstacleFactory
      *
      * @return Obstacles representing the given motion constraints
      */
-    std::vector<ObstaclePtr> createObstaclesFromMotionConstraints(
+    std::vector<ObstaclePtr> createFromMotionConstraints(
         const std::set<MotionConstraint> &motion_constraints, const World &world) const;
 
     /**
@@ -42,7 +42,7 @@ class ObstacleFactory
      *
      * @return Obstacles representing the given motion constraint
      */
-    std::vector<ObstaclePtr> createObstaclesFromMotionConstraint(
+    std::vector<ObstaclePtr> createFromMotionConstraint(
         const MotionConstraint &motion_constraint, const World &world) const;
 
     /**
@@ -76,7 +76,7 @@ class ObstacleFactory
      *
      * @return obstacle around the robot
      */
-    ObstaclePtr createRobotObstacle(const Point &robot_position) const;
+    ObstaclePtr createAroundRobotPosition(const Point &robot_position) const;
 
     /**
      * Create circle obstacle around ball
@@ -85,20 +85,7 @@ class ObstacleFactory
      *
      * @return obstacle around the ball
      */
-    ObstaclePtr createBallObstacle(const Point &ball_position) const;
-
-    /**
-     * Create rectangle-shaped obstacle
-     *
-     * @param rectangle Rectangle to make obstacle with
-     *
-     * @return rectangular obstacle
-     */
-    ObstaclePtr createObstacleFromRectangle(const Rectangle &rectangle) const;
-
-   private:
-    std::shared_ptr<const ObstacleFactoryConfig> config;
-    double robot_radius_expansion_amount;
+    ObstaclePtr createAroundBallPosition(const Point &ball_position) const;
 
     /**
      * Returns an obstacle for the shape expanded on all sides to account for the size of
@@ -110,6 +97,10 @@ class ObstacleFactory
      */
     ObstaclePtr createInflatedByRobotRadius(const Circle &circle) const;
     ObstaclePtr createInflatedByRobotRadius(const Polygon &polygon) const;
+
+   private:
+    std::shared_ptr<const ObstacleFactoryConfig> config;
+    double robot_radius_expansion_amount;
 
     /**
      * Returns an obstacle for the field_rectangle expanded on all sides to account for

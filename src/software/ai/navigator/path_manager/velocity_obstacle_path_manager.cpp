@@ -70,7 +70,7 @@ VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
     {
         if (obj != current_objective)
         {
-            obstacles.push_back(obstacle_factory.createRobotObstacle(obj.start));
+            obstacles.push_back(obstacle_factory.createAroundRobotPosition(obj.start));
         }
     }
     return obstacles;

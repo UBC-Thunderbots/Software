@@ -119,16 +119,15 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromMoveIntents(
         // start with non-MoveIntent robots and then add motion constraints
         auto obstacles = friendly_non_move_intent_robot_obstacles;
 
-        auto motion_constraint_obstacles =
-            obstacle_factory.createObstaclesFromMotionConstraints(
-                intent.getMotionConstraints(), world);
+        auto motion_constraint_obstacles = obstacle_factory.createFromMotionConstraints(
+            intent.getMotionConstraints(), world);
         obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                          motion_constraint_obstacles.end());
 
         if (intent.getBallCollisionType() == BallCollisionType::AVOID)
         {
             auto ball_obstacle =
-                obstacle_factory.createBallObstacle(world.ball().position());
+                obstacle_factory.createAroundBallPosition(world.ball().position());
             obstacles.push_back(ball_obstacle);
         }
 

@@ -7,7 +7,7 @@ ObstacleFactory::ObstacleFactory(std::shared_ptr<const ObstacleFactoryConfig> co
 {
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
+std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraint(
     const MotionConstraint &motion_constraint, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
@@ -63,14 +63,13 @@ std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraint(
     return obstacles;
 }
 
-std::vector<ObstaclePtr> ObstacleFactory::createObstaclesFromMotionConstraints(
+std::vector<ObstaclePtr> ObstacleFactory::createFromMotionConstraints(
     const std::set<MotionConstraint> &motion_constraints, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
-        auto new_obstacles =
-            createObstaclesFromMotionConstraint(motion_constraint, world);
+        auto new_obstacles = createFromMotionConstraint(motion_constraint, world);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 
@@ -132,7 +131,7 @@ ObstaclePtr ObstacleFactory::createVelocityObstacleFromRobot(const Robot &robot)
     }
     else
     {
-        return createRobotObstacle(robot.position());
+        return createAroundRobotPosition(robot.position());
     }
 }
 
@@ -147,19 +146,14 @@ std::vector<ObstaclePtr> ObstacleFactory::createVelocityObstaclesFromTeam(
     return obstacles;
 }
 
-ObstaclePtr ObstacleFactory::createBallObstacle(const Point &ball_position) const
+ObstaclePtr ObstacleFactory::createAroundBallPosition(const Point &ball_position) const
 {
     return createInflatedByRobotRadius(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
-ObstaclePtr ObstacleFactory::createRobotObstacle(const Point &robot_position) const
+ObstaclePtr ObstacleFactory::createAroundRobotPosition(const Point &robot_position) const
 {
     return createInflatedByRobotRadius(Circle(robot_position, ROBOT_MAX_RADIUS_METERS));
-}
-
-ObstaclePtr ObstacleFactory::createObstacleFromRectangle(const Rectangle &rectangle) const
-{
-    return createInflatedByRobotRadius(Polygon(rectangle));
 }
 
 ObstaclePtr ObstacleFactory::createInflatedByRobotRadius(const Circle &circle) const
