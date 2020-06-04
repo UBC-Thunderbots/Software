@@ -135,7 +135,7 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS elements
  *
  * @param trajectory [in/out] The trajectory that contains the path parameters and will be
- * modified max_allowable_speed_profile input array
+ * modified to contain the created trajectory (if a trajectory was successfully created)
  *
  * @param max_allowable_speed_profile [in] The pre-allocated array that will contain all
  * of the maximum allowable velocity values for each point on the curve
