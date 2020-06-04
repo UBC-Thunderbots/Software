@@ -3,7 +3,8 @@
 VelocityObstaclePathManager::VelocityObstaclePathManager(
     std::unique_ptr<PathPlanner> path_planner,
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory)
-    : path_planner(std::move(path_planner)), robot_navigation_obstacle_factory(std::move(robot_navigation_obstacle_factory))
+    : path_planner(std::move(path_planner)),
+      robot_navigation_obstacle_factory(std::move(robot_navigation_obstacle_factory))
 {
 }
 
@@ -71,7 +72,8 @@ VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
     {
         if (obj != current_objective)
         {
-            obstacles.push_back(robot_navigation_obstacle_factory.createFromRobotPosition(obj.start));
+            obstacles.push_back(
+                robot_navigation_obstacle_factory.createFromRobotPosition(obj.start));
         }
     }
     return obstacles;

@@ -24,7 +24,8 @@ class Navigator : public IntentVisitor
      * Create a Navigator
      * @param path_manager The path manager that will be used for path creation for all
      *                     the robots
-     * @param robot_navigation_obstacle_factory Will be used to generate obstacles from various constructs
+     * @param robot_navigation_obstacle_factory Will be used to generate obstacles from
+     * various constructs
      * @param config The navigator config
      */
     explicit Navigator(std::unique_ptr<PathManager> path_manager,

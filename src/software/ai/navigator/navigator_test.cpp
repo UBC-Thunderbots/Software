@@ -18,7 +18,8 @@ class NoPathNavigatorTest : public testing::Test
               Util::DynamicParameters->getAIConfig()
                   ->getRobotNavigationObstacleFactoryConfig())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
-                        std::make_unique<NoPathTestPathPlanner>(), robot_navigation_obstacle_factory),
+                        std::make_unique<NoPathTestPathPlanner>(),
+                        robot_navigation_obstacle_factory),
                     robot_navigation_obstacle_factory,
                     Util::DynamicParameters->getAIConfig()->getNavigatorConfig()),
           current_time(Timestamp::fromSeconds(123)),
@@ -49,7 +50,8 @@ class ThetaStarNavigatorTest : public testing::Test
               Util::DynamicParameters->getAIConfig()
                   ->getRobotNavigationObstacleFactoryConfig())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
-                        std::make_unique<ThetaStarPathPlanner>(), robot_navigation_obstacle_factory),
+                        std::make_unique<ThetaStarPathPlanner>(),
+                        robot_navigation_obstacle_factory),
                     robot_navigation_obstacle_factory,
                     Util::DynamicParameters->getAIConfig()->getNavigatorConfig())
     {

@@ -17,8 +17,9 @@ class RobotNavigationObstacleFactoryTest : public testing::Test
    public:
     RobotNavigationObstacleFactoryTest()
         : current_time(Timestamp::fromSeconds(123)),
-          robot_navigation_obstacle_factory(Util::DynamicParameters->getAIConfig()
-                               ->getRobotNavigationObstacleFactoryConfig())
+          robot_navigation_obstacle_factory(
+              Util::DynamicParameters->getAIConfig()
+                  ->getRobotNavigationObstacleFactoryConfig())
     {
     }
 
@@ -31,8 +32,9 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
    public:
     RobotNavigationObstacleFactoryMotionConstraintTest()
         : current_time(Timestamp::fromSeconds(123)),
-          robot_navigation_obstacle_factory(Util::DynamicParameters->getAIConfig()
-                               ->getRobotNavigationObstacleFactoryConfig()),
+          robot_navigation_obstacle_factory(
+              Util::DynamicParameters->getAIConfig()
+                  ->getRobotNavigationObstacleFactoryConfig()),
           field(),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
@@ -100,7 +102,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_ball_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.1385);
-    ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromBallPosition(origin);
+    ObstaclePtr obstacle =
+        robot_navigation_obstacle_factory.createFromBallPosition(origin);
 
     try
     {
@@ -118,7 +121,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_robot_obstacle)
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Circle expected(origin, 0.207);
-    ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromRobotPosition(origin);
+    ObstaclePtr obstacle =
+        robot_navigation_obstacle_factory.createFromRobotPosition(origin);
 
     try
     {
@@ -367,8 +371,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
 
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
 {
-    auto obstacles =
-        robot_navigation_obstacle_factory.createFromMotionConstraint(MotionConstraint::ENEMY_HALF, world);
+    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
+        MotionConstraint::ENEMY_HALF, world);
     EXPECT_EQ(1, obstacles.size());
     try
     {

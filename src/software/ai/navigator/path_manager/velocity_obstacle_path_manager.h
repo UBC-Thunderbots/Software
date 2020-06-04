@@ -20,8 +20,9 @@ class VelocityObstaclePathManager : public PathManager
         const Rectangle& navigable_area) override;
     const std::vector<ObstaclePtr> getObstacles(void) const override;
 
-    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner,
-                                         RobotNavigationObstacleFactory robot_navigation_obstacle_factory);
+    explicit VelocityObstaclePathManager(
+        std::unique_ptr<PathPlanner> path_planner,
+        RobotNavigationObstacleFactory robot_navigation_obstacle_factory);
 
 
    private:
