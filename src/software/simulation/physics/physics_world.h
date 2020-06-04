@@ -203,7 +203,9 @@ class PhysicsWorld
     std::unique_ptr<SimulationContactListener> contact_listener;
 
     // TODO: is the best way to handle the field? Just check it everywhere to maintain
-    // no nullptr invariant?
+    // no nullptr invariant? Needs to be a pointer so we can destroy the underlying
+    // object when we set a new one, since the PhysicsField has no copy or assignment
+    // operator
     std::shared_ptr<PhysicsField> physics_field;
     std::shared_ptr<PhysicsBall> physics_ball;
     std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
