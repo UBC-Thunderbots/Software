@@ -12,7 +12,8 @@ class SimulatorBallTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        physics_world     = std::make_unique<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
+        physics_world =
+            std::make_unique<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
         physics_world->setBallState(BallState(Point(1.01, -0.4), Vector(0.02, -4.5)));
 
         auto physics_ball = physics_world->getPhysicsBall();

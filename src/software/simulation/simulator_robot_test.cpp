@@ -17,9 +17,11 @@ class SimulatorRobotTest : public testing::Test
                std::shared_ptr<SimulatorBall>>
     createWorld(Robot robot, Ball ball)
     {
-        auto physics_world  = std::make_shared<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
+        auto physics_world =
+            std::make_shared<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
         physics_world->setBallState(ball.currentState().ballState());
-        physics_world->addYellowRobots({PhysicsWorld::RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState().robotState()}});
+        physics_world->addYellowRobots({PhysicsWorld::RobotStateWithId{
+            .id = robot.id(), .robot_state = robot.currentState().robotState()}});
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
         auto physics_robot = physics_world->getFriendlyPhysicsRobots().at(0);

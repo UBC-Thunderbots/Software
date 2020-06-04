@@ -19,7 +19,8 @@ class PhysicsWorld
 {
    public:
     // TODO: where shoudl this go? the world/ folder? here?
-    typedef struct RobotStateWithId_t {
+    typedef struct RobotStateWithId_t
+    {
         unsigned int id;
         RobotState robot_state;
     } RobotStateWithId;
@@ -102,7 +103,8 @@ class PhysicsWorld
 
     /**
      * Adds robots to the yellow team with the given initial states. The robot IDs must
-     * not be duplicated and must not match the ID of any robot already on the yellow team.
+     * not be duplicated and must not match the ID of any robot already on the yellow
+     * team.
      *
      * @throws runtime_error if any of the given robot ids are duplicated, or a
      * yellow robot already exists with the ID
@@ -113,7 +115,8 @@ class PhysicsWorld
 
     /**
      * Adds robots to the yellow team with the given initial states. The robot IDs must
-     * not be duplicated and must not match the ID of any robot already on the yellow team.
+     * not be duplicated and must not match the ID of any robot already on the yellow
+     * team.
      *
      * @throws runtime_error if any of the given robot ids are duplicated, or a
      * yellow robot already exists with the ID

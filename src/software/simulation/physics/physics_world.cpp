@@ -1,114 +1,151 @@
 #include "software/simulation/physics/physics_world.h"
 
-#include "shared/constants.h"
 #include <limits>
 
-PhysicsWorld::PhysicsWorld(const Field& field) :
-    b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
-    current_timestamp(Timestamp::fromSeconds(0)),
-    contact_listener(std::make_unique<SimulationContactListener>()),
-    physics_field(std::make_shared<PhysicsField>(b2_world, field)),
-    physics_ball(nullptr)
+#include "shared/constants.h"
+
+PhysicsWorld::PhysicsWorld(const Field& field)
+    : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
+      current_timestamp(Timestamp::fromSeconds(0)),
+      contact_listener(std::make_unique<SimulationContactListener>()),
+      physics_field(std::make_shared<PhysicsField>(b2_world, field)),
+      physics_ball(nullptr)
 {
     b2_world->SetContactListener(contact_listener.get());
 }
 
-const Field PhysicsWorld::getField() const {
+const Field PhysicsWorld::getField() const
+{
     return physics_field->getField();
 }
 
-const std::optional<BallState> PhysicsWorld::getBallState() const {
+const std::optional<BallState> PhysicsWorld::getBallState() const
+{
     return physics_ball ? std::make_optional(physics_ball->getBallState()) : std::nullopt;
 }
 
-const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getYellowRobotStates() const {
+const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getYellowRobotStates()
+    const
+{
     std::vector<PhysicsWorld::RobotStateWithId> robot_states;
-    for(const auto& robot : yellow_physics_robots) {
-        auto state_with_id = PhysicsWorld::RobotStateWithId{.id = robot->getRobotId(), .robot_state = robot->getRobotState()};
+    for (const auto& robot : yellow_physics_robots)
+    {
+        auto state_with_id = PhysicsWorld::RobotStateWithId{
+            .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
         robot_states.emplace_back(state_with_id);
     }
 
     return robot_states;
 }
 
-const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getBlueRobotStates() const {
+const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getBlueRobotStates() const
+{
     std::vector<PhysicsWorld::RobotStateWithId> robot_states;
-    for(const auto& robot : blue_physics_robots) {
-        auto state_with_id = PhysicsWorld::RobotStateWithId{.id = robot->getRobotId(), .robot_state = robot->getRobotState()};
+    for (const auto& robot : blue_physics_robots)
+    {
+        auto state_with_id = PhysicsWorld::RobotStateWithId{
+            .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
         robot_states.emplace_back(state_with_id);
     }
 
     return robot_states;
 }
 
-const Timestamp PhysicsWorld::getTimestamp() const {
+const Timestamp PhysicsWorld::getTimestamp() const
+{
     return current_timestamp;
 }
 
-void PhysicsWorld::setField(const Field &field) {
-    if(field.isValid()) {
+void PhysicsWorld::setField(const Field& field)
+{
+    if (field.isValid())
+    {
         physics_field = std::make_shared<PhysicsField>(b2_world, field);
     }
 }
 
-void PhysicsWorld::setBallState(const BallState &ball_state) {
-    physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG, acceleration_due_to_gravity);
+void PhysicsWorld::setBallState(const BallState& ball_state)
+{
+    physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG,
+                                                 acceleration_due_to_gravity);
 }
 
-void PhysicsWorld::removeBall() {
+void PhysicsWorld::removeBall()
+{
     physics_ball.reset();
 }
 
-void PhysicsWorld::addYellowRobots(const std::vector<RobotStateWithId>& robots) {
-    for(const auto& state_with_id : robots) {
-        if(isYellowRobotIdAvailable(state_with_id.id)) {
-            yellow_physics_robots.emplace_back(
-                    std::make_shared<PhysicsRobot>(state_with_id.id, b2_world, state_with_id.robot_state, ROBOT_WITH_BATTERY_MASS_KG)
-                    );
-        }else {
+void PhysicsWorld::addYellowRobots(const std::vector<RobotStateWithId>& robots)
+{
+    for (const auto& state_with_id : robots)
+    {
+        if (isYellowRobotIdAvailable(state_with_id.id))
+        {
+            yellow_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
+                state_with_id.id, b2_world, state_with_id.robot_state,
+                ROBOT_WITH_BATTERY_MASS_KG));
+        }
+        else
+        {
             std::stringstream ss;
-            ss << "Yellow robot with id " << state_with_id.id << " already exists in the physics world" << std::endl;
+            ss << "Yellow robot with id " << state_with_id.id
+               << " already exists in the physics world" << std::endl;
             throw std::runtime_error(ss.str());
         }
     }
 }
 
-void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots) {
-    for(const auto& state_with_id : robots) {
-        if(isBlueRobotIdAvailable(state_with_id.id)) {
-            blue_physics_robots.emplace_back(
-                    std::make_shared<PhysicsRobot>(state_with_id.id, b2_world, state_with_id.robot_state, ROBOT_WITH_BATTERY_MASS_KG)
-            );
-        }else {
+void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
+{
+    for (const auto& state_with_id : robots)
+    {
+        if (isBlueRobotIdAvailable(state_with_id.id))
+        {
+            blue_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
+                state_with_id.id, b2_world, state_with_id.robot_state,
+                ROBOT_WITH_BATTERY_MASS_KG));
+        }
+        else
+        {
             std::stringstream ss;
-            ss << "Blue robot with id " << state_with_id.id << " already exists in the physics world" << std::endl;
+            ss << "Blue robot with id " << state_with_id.id
+               << " already exists in the physics world" << std::endl;
             throw std::runtime_error(ss.str());
         }
     }
 }
 
-std::optional<unsigned int> PhysicsWorld::getAvailableYellowRobotId() const {
-    for(unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++) {
-        if(isYellowRobotIdAvailable(i)) {
+std::optional<unsigned int> PhysicsWorld::getAvailableYellowRobotId() const
+{
+    for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
+    {
+        if (isYellowRobotIdAvailable(i))
+        {
             return std::make_optional<unsigned int>(i);
         }
     }
 
-    if(isYellowRobotIdAvailable(std::numeric_limits<unsigned int>::max())) {
+    if (isYellowRobotIdAvailable(std::numeric_limits<unsigned int>::max()))
+    {
         return std::numeric_limits<unsigned int>::max();
     }
 
     return std::nullopt;
 }
 
-bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const {
+bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
+{
     bool id_available = true;
-    for(const auto& robot : yellow_physics_robots) {
-        if(!robot) {
-            throw std::runtime_error("Encountered a nullptr to a yellow physics robot in the physics world");
+    for (const auto& robot : yellow_physics_robots)
+    {
+        if (!robot)
+        {
+            throw std::runtime_error(
+                "Encountered a nullptr to a yellow physics robot in the physics world");
         }
 
-        if(id == robot->getRobotId()) {
+        if (id == robot->getRobotId())
+        {
             id_available = false;
             break;
         }
@@ -117,28 +154,37 @@ bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const {
     return id_available;
 }
 
-std::optional<unsigned int> PhysicsWorld::getAvailableBlueRobotId() const {
-    for(unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++) {
-        if(isBlueRobotIdAvailable(i)) {
+std::optional<unsigned int> PhysicsWorld::getAvailableBlueRobotId() const
+{
+    for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
+    {
+        if (isBlueRobotIdAvailable(i))
+        {
             return std::make_optional<unsigned int>(i);
         }
     }
 
-    if(isBlueRobotIdAvailable(std::numeric_limits<unsigned int>::max())) {
+    if (isBlueRobotIdAvailable(std::numeric_limits<unsigned int>::max()))
+    {
         return std::numeric_limits<unsigned int>::max();
     }
 
     return std::nullopt;
 }
 
-bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const {
+bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
+{
     bool id_available = true;
-    for(const auto& robot : blue_physics_robots) {
-        if(!robot) {
-            throw std::runtime_error("Encountered a nullptr to a blue physics robot in the physics world");
+    for (const auto& robot : blue_physics_robots)
+    {
+        if (!robot)
+        {
+            throw std::runtime_error(
+                "Encountered a nullptr to a blue physics robot in the physics world");
         }
 
-        if(id == robot->getRobotId()) {
+        if (id == robot->getRobotId())
+        {
             id_available = false;
             break;
         }

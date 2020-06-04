@@ -7,11 +7,11 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/util/almost_equal.h"
+#include "software/simulation/physics/physics_world.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
-#include "software/simulation/physics/physics_world.h"
 
 namespace Test
 {
@@ -144,8 +144,9 @@ namespace Test
          *
          * @return AssertionSuccess if the two Angles are within tolerance of each other
          */
-        static ::testing::AssertionResult equalWithinTolerance(
-                const Angle &a1, const Angle &a2, const Angle& tolerance);
+        static ::testing::AssertionResult equalWithinTolerance(const Angle &a1,
+                                                               const Angle &a2,
+                                                               const Angle &tolerance);
 
         /**
          * Checks if two vectors are within tolerance of each other
@@ -159,7 +160,7 @@ namespace Test
          * @return AssertionSuccess if the two points are within tolerance of each other
          */
         static ::testing::AssertionResult equalWithinTolerance(
-                const Vector &v1, const Vector &v2, double tolerance = METERS_PER_MILLIMETER);
+            const Vector &v1, const Vector &v2, double tolerance = METERS_PER_MILLIMETER);
 
         /**
          * Checks if two points are within tolerance of each other
@@ -201,7 +202,8 @@ namespace Test
          * @return AssertionSuccess if the two values are within tolernace of each other
          */
         static ::testing::AssertionResult equalWithinTolerance(
-                const RobotState& state1, const RobotState& state2, double linear_tolerance, const Angle& angular_tolerance);
+            const RobotState &state1, const RobotState &state2, double linear_tolerance,
+            const Angle &angular_tolerance);
 
         /**
          * Checks if two RobotStateWithIds are within tolernace of each other.
@@ -216,7 +218,9 @@ namespace Test
          * @return AssertionSuccess if the two values are within tolernace of each other
          */
         static ::testing::AssertionResult equalWithinTolerance(
-                const PhysicsWorld::RobotStateWithId_t& state1, const PhysicsWorld::RobotStateWithId_t& state2, double linear_tolerance, const Angle& angular_tolerance);
+            const PhysicsWorld::RobotStateWithId_t &state1,
+            const PhysicsWorld::RobotStateWithId_t &state2, double linear_tolerance,
+            const Angle &angular_tolerance);
 
        private:
         /**

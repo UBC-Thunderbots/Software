@@ -5,8 +5,10 @@
 PhysicsField::PhysicsField(std::shared_ptr<b2World> world, const Field &field)
     : field(field)
 {
-    if(!field.isValid()) {
-        throw std::runtime_error("Attempted to create a PhysicsField from an invalid Field");
+    if (!field.isValid())
+    {
+        throw std::runtime_error(
+            "Attempted to create a PhysicsField from an invalid Field");
     }
     // createFieldBody must be called before the setup functions, so that the b2Body is
     // instantiated before fixtures are added to it.
