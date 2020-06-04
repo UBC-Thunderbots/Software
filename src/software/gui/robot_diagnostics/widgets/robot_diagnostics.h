@@ -52,13 +52,6 @@ class RobotDiagnostics : public QMainWindow
     // Indicates which robot we're communicating with
     unsigned int robot_selection;
 
-    // dribbler chicker controls
-    double dribbler_power;
-    double chicker_power;
-    bool chicker_autochick;
-    ChargeMode chicker_charge_mode;
-    ChickMode chicker_chick_mode;
-
     // Callbacks
     std::function<void(double, ChargeMode, ChickMode)> chicker_state_changed_callback;
     std::function<void(double)> dribbler_power_changed_callback;
@@ -67,13 +60,6 @@ class RobotDiagnostics : public QMainWindow
     std::function<void(double, DirectVelocityMode)>
         direct_velocity_power_changed_callback;
 
-    double direct_per_wheel_power_fl;
-    double direct_per_wheel_power_fr;
-    double direct_per_wheel_power_bl;
-    double direct_per_wheel_power_br;
-    double matrix_x_vel;
-    double matrix_y_vel;
-    double matrix_angular_vel;
     std::string led_mode;
     std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer;
