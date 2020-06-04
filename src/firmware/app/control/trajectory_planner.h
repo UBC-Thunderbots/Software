@@ -142,7 +142,7 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
  *
  * @param segment_lengths [in] The length of each corresponding segment [meters]
  *
- * @return The generation status. Can be OK or an error message
+ * @return A status indicating whether or not generation was successful
  * */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
