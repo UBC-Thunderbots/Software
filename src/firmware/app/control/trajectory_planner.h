@@ -163,7 +163,7 @@ app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
  * @param trajectory [in/out] The trajectory that contains the path parameters and will be
  * modified max_allowable_speed_profile input array
  *
- * @param segment_lengths [in] The length of each corresponding segment [meters]
+ * @param segment_lengths [in] The length of each segment in the trajectory [meters]
  *
  * @return The generation status. Can be OK or an error message
  * */
