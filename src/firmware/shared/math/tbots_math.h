@@ -19,7 +19,7 @@
  *
  * @param y0 The lower-bound y value
  *
- * @param x1 The upper-bound y value
+ * @param x1 The upper-bound x value
  *
  * @param y1 The upper-bound y value
  *
