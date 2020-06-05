@@ -188,9 +188,9 @@ class PlannerPerformanceTest
 
 // This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from
 // the test name
-TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
+TEST_P(PlannerPerformanceTest, path_planner_performance)
 {
-    std::string name                     = std::get<0>(GetParam()).first.substr(2);
+    std::string planner_name             = std::get<0>(GetParam()).first.substr(2);
     std::unique_ptr<PathPlanner> planner = std::get<0>(GetParam()).second();
     auto planner_test_case               = std::get<1>(GetParam());
 
@@ -202,20 +202,23 @@ TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
     }
     auto end_time = std::chrono::high_resolution_clock::now();
 
-    double duration_us = static_cast<double>(
-        std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time)
-            .count());
-    double avg_us = duration_us / (static_cast<double>(planner_test_case.num_iterations));
+    double duration_ms =
+        static_cast<double>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time)
+                .count()) /
+        1000000.0;
+    double avg_ms = duration_ms / (static_cast<double>(planner_test_case.num_iterations));
 
-    std::cout << std::endl
-              << name << " | # iterations = " << planner_test_case.num_iterations
+    std::cout << std::endl << planner_test_case.name << ":" << std::endl;
+
+    std::cout << planner_name << " | # iterations = " << planner_test_case.num_iterations
               << " | # obstacles = " << planner_test_case.obstacles.size()
               << " | area = " << planner_test_case.navigable_area.area()
               << " | path length = "
               << (planner_test_case.start - planner_test_case.end).length() << std::endl;
 
-    std::cout << "Total time = " << duration_us / 1000.0
-              << "ms | Average time = " << avg_us / 1000.0 << "ms" << std::endl
+    std::cout << "Total time = " << duration_ms << "ms | Average time = " << avg_ms
+              << "ms" << std::endl
               << std::endl;
 }
 
