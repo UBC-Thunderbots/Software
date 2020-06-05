@@ -277,4 +277,29 @@ namespace Test
 
         return ::testing::AssertionSuccess();
     }
+
+    ::testing::AssertionResult
+    TestUtil::equalWithinTolerance(const BallState &state1, const BallState &state2, double tolerance) {
+        auto position_equality_result = equalWithinTolerance(state1.position(), state2.position(), tolerance);
+        auto velocity_equality_result = equalWithinTolerance(state1.velocity(), state2.velocity(), tolerance);
+
+        auto assertion_result = ::testing::AssertionSuccess();
+
+        if(!position_equality_result || !velocity_equality_result) {
+            assertion_result = ::testing::AssertionFailure();
+
+            if(!position_equality_result) {
+                assertion_result << "The first state's position was " << state1.position()
+                                 << ", the second state's position was " << state2.position();
+            }
+            if (!velocity_equality_result)
+            {
+                assertion_result << std::endl
+                                 << "The first state's velocity was " << state1.velocity()
+                                 << ", the second state's velocity was " << state2.velocity();
+            }
+        }
+
+        return assertion_result;
+    }
 }  // namespace Test

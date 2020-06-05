@@ -189,24 +189,21 @@ namespace Test
             double val1, double val2, double tolerance = METERS_PER_MILLIMETER);
 
         /**
-         * Checks if two RobotStates are within tolernace of each other.
+         * Checks if two RobotStates are within tolerance of each other.
          * Two states are within tolerance if each other if their positions and velocities
-         * are within the linear tolerance, and their oriengations and angular velocities
-         * are within the angular tolerance
+         * are within tolerance of each other
          *
          * @param state1, state2 states to compare
-         * @param linear_tolerance The tolerance to check positions and velocities with
-         * @param angular_tolerance The tolerance to check orientations and angular
-         * velocities with
+         * @param tolerance The tolerance to check equality with
          *
-         * @return AssertionSuccess if the two values are within tolernace of each other
+         * @return AssertionSuccess if the two values are within tolerance of each other
          */
         static ::testing::AssertionResult equalWithinTolerance(
             const RobotState &state1, const RobotState &state2, double linear_tolerance,
             const Angle &angular_tolerance);
 
         /**
-         * Checks if two RobotStateWithIds are within tolernace of each other.
+         * Checks if two RobotStateWithIds are within tolerance of each other.
          * Two states are within tolerance if their states are within tolerance
          * of each other
          *
@@ -215,12 +212,28 @@ namespace Test
          * @param angular_tolerance The tolerance to check orientations and angular
          * velocities with
          *
-         * @return AssertionSuccess if the two values are within tolernace of each other
+         * @return AssertionSuccess if the two values are within tolerance of each other
          */
         static ::testing::AssertionResult equalWithinTolerance(
             const RobotStateWithId &state1,
             const RobotStateWithId &state2, double linear_tolerance,
             const Angle &angular_tolerance);
+
+        /**
+         * Checks if two BallStates are within tolerance of each other.
+         * Two states are within tolerance if their states are within tolerance
+         * of each other
+         *
+         * @param state1, state2 states to compare
+         * @param linear_tolerance The tolerance to check positions and velocities with
+         * @param angular_tolerance The tolerance to check orientations and angular
+         * velocities with
+         *
+         * @return AssertionSuccess if the two values are within tolerance of each other
+         */
+        static ::testing::AssertionResult equalWithinTolerance(
+                const BallState &state1,
+                const BallState &state2, double tolerance);
 
        private:
         /**

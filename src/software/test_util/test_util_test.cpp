@@ -274,3 +274,15 @@ TEST(TestUtilsTest, robot_state_check_if_equal_within_tolerance)
     EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state6, 1e-3,
                                                         Angle::fromDegrees(2.5)));
 }
+
+TEST(TestUtilsTest, ball_state_check_if_equal_within_tolerance)
+{
+    BallState state1(Point(1.01, 2.58), Vector(0.0, -2.06));
+    BallState state2(Point(1.01, 2.59), Vector(0.005, -2.05));
+    BallState state3(Point(1.11, 2.59), Vector(0.0, -2.06));
+    BallState state4(Point(1.01, 2.58), Vector(0.4, -2.58));
+
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(state1, state2, 0.02));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state3, 0.1));
+    EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state4, 0.5));
+}
