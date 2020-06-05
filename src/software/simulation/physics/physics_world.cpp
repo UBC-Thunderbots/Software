@@ -3,6 +3,7 @@
 #include <limits>
 
 #include "shared/constants.h"
+#include "software/logger/logger.h"
 
 PhysicsWorld::PhysicsWorld(const Field& field)
     : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
@@ -140,8 +141,7 @@ bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
     {
         if (!robot)
         {
-            throw std::runtime_error(
-                "Encountered a nullptr to a yellow physics robot in the physics world");
+            LOG(FATAL) << "Encountered a nullptr to a yellow physics robot in the physics world");
         }
 
         if (id == robot->getRobotId())
@@ -179,8 +179,7 @@ bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
     {
         if (!robot)
         {
-            throw std::runtime_error(
-                "Encountered a nullptr to a blue physics robot in the physics world");
+            LOG(FATAL) << "Encountered a nullptr to a blue physics robot in the physics world");
         }
 
         if (id == robot->getRobotId())

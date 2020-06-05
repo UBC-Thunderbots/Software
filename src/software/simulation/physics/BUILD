@@ -141,6 +141,7 @@ cc_library(
         ":box2d_util",
         ":simulation_contact_listener",
         "//shared:constants",
+        "//software/logger",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_field",
         "//software/simulation/physics:physics_robot",
