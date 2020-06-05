@@ -134,7 +134,7 @@ class NetworkClient
 
     // The most up-to-date state of the world components
     std::optional<Field> field;
-    Ball ball;
+    std::optional<Ball> ball;
     Team friendly_team;
     Team enemy_team;
 

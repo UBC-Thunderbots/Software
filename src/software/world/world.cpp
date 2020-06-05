@@ -18,7 +18,7 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateField(const Field &new_field)
+void World::setField(const Field &new_field)
 {
     field_ = new_field;
 }

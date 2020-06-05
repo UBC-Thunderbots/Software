@@ -22,7 +22,7 @@ class PassGeneratorTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        world.updateField(::Test::TestUtil::createSSLDivBField());
+        world.setField(::Test::TestUtil::createSSLDivBField());
         pass_generator = std::make_shared<PassGenerator>(world, Point(0, 0),
                                                          PassType::ONE_TOUCH_SHOT, true);
     }

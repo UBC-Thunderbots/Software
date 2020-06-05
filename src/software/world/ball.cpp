@@ -2,8 +2,6 @@
 
 #include "shared/constants.h"
 
-Ball::Ball() : Ball(Point(), Vector(), Timestamp::fromSeconds(0)) {}
-
 Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
            unsigned int history_size)
     : states_(history_size)

@@ -173,7 +173,14 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                     network_filter.getFilteredBallData({detection});
                 if (ball_state)
                 {
-                    ball.updateState(*ball_state);
+                    if (ball)
+                    {
+                        ball = Ball(*ball_state);
+                    }
+                    else
+                    {
+                        ball->updateState(*ball_state);
+                    }
                 }
 
                 friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
@@ -186,16 +193,16 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             }
         }
 
-        received_world_callback(World(*field, ball, friendly_team, enemy_team));
+        received_world_callback(World(*field, *ball, friendly_team, enemy_team));
     }
 }
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    if (field)
+    if (field && ball)
     {
         RefboxGameState game_state = network_filter.getRefboxGameState(packet);
-        World world(*field, ball, friendly_team, enemy_team);
+        World world(*field, *ball, friendly_team, enemy_team);
         world.updateRefboxGameState(game_state);
         received_world_callback(world);
     }

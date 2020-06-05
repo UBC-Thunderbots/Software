@@ -40,7 +40,7 @@ void PhysicsWorld::initWorld(const World& world)
 std::optional<World> PhysicsWorld::getWorld() const
 {
     std::optional<Field> field;
-    Ball ball;
+    std::optional<Ball> ball;
     Team friendly_team;
     Team enemy_team;
     if (physics_ball)
@@ -72,9 +72,9 @@ std::optional<World> PhysicsWorld::getWorld() const
     }
     enemy_team = Team(enemy_robots);
 
-    if (field)
+    if (field && ball)
     {
-        World new_world(*field, ball, friendly_team, enemy_team);
+        World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateTimestamp(current_timestamp);
         return new_world;
     }

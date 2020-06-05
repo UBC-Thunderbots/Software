@@ -42,7 +42,7 @@ class World final
      *
      * @param new_field A new Field
      */
-    void updateField(const Field& new_field);
+    void setField(const Field& new_field);
 
     /**
      * Updates the state of the ball in the world with the new ball data

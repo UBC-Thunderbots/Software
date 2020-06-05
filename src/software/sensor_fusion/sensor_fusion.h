@@ -52,21 +52,21 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
      *
      * @param new data
      */
-    void updateWorldComponents(const SSL_WrapperPacket &packet);
-    void updateWorldComponents(const Referee &packet);
-    void updateWorldComponents(
+    void updateWorld(const SSL_WrapperPacket &packet);
+    void updateWorld(const Referee &packet);
+    void updateWorld(
         const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
-    void updateWorldComponents(const SSL_GeometryData &geometry_packet);
-    void updateWorldComponents(const SSL_DetectionFrame &ssl_detection_frame);
+    void updateWorld(const SSL_GeometryData &geometry_packet);
+    void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
-     * Get ball from a vision detection
+     * Get state of the ball from a vision detection
      *
      * @param vision_detection
      *
-     * @return ball if found in vision_detection
+     * @return TimestampedBallState if found in vision_detection
      */
-    std::optional<Ball> getBallFromVisionDetection(
+    std::optional<TimestampedBallState> getTimestampedBallStateFromVisionDetection(
         const VisionDetection &vision_detection);
 
     /**
@@ -80,7 +80,7 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     Team getEnemyTeamFromVisionDetection(const VisionDetection &vision_detection);
 
     std::optional<Field> field;
-    Ball ball;
+    std::optional<Ball> ball;
     Team friendly_team;
     Team enemy_team;
     RefboxGameState game_state;
