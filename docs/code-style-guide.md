@@ -62,6 +62,32 @@ The vast majority of the things noted in this document will apply to `C` code as
 
 * Functions that take no arguments must be declared as `foo(void)` **not** `foo()`, as the second option allows `foo` to take anything as it's arguments ([reference](https://softwareengineering.stackexchange.com/questions/286490/what-is-the-difference-between-function-and-functionvoid/286494))
 
+* Functions that return values via argument must have all parameters labelled as `[in]` or `[out]` in the javadoc, with all `[out]` coming after `[in]` if possible
+
+  ``` C
+  // Incorrect
+  /**
+   * Create a trajectory with given max speed
+   * 
+   * @param created_trajectory A pointer that will be set to the created
+   *                           created trajectory.
+   * @param max_speed The maximum speed on the trajectory
+   * @return True if the trajectory was generated succesfully, false otherwise
+   */
+  bool generateTrajectory(Trajectory* created_trajectory, float max_speed)
+
+  // Correct
+  /**
+   * Create a trajectory with given max speed
+   * 
+   * @param max_speed [in] The maximum speed on the trajectory
+   * @param created_trajectory [out] A pointer that will be set to the created
+   *                                 created trajectory.
+   * @return True if the trajectory was generated succesfully, false otherwise
+   */
+  bool generateTrajectory(float max_speed, Trajectory* created_trajectory)
+  ```
+
 ### Names and Variables
 
 * Classes, structures, namespaces, unions, enumerates, "typename"-type template parameters, and typedefs names uses `CamelCase` with a capital letter.
