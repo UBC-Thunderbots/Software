@@ -124,42 +124,42 @@ std::vector<PlannerTestCase> test_cases = {
      .obstacles      = {},
      .num_iterations = 10},
 
-    {.name           = "10 obstacles on full field short path",
+    {.name           = "10 obstacles on divB field short path",
      .start          = Point(-2, 0),
      .end            = Point(2, 0),
      .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
      .obstacles      = obstacles_10,
      .num_iterations = 10},
 
-    {.name           = "20 obstacles on full field short path",
+    {.name           = "20 obstacles on divB field short path",
      .start          = Point(-2, 0),
      .end            = Point(2, 0),
      .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
      .obstacles      = obstacles_20,
      .num_iterations = 10},
 
-    {.name           = "30 obstacles on full field short path",
+    {.name           = "30 obstacles on divB field short path",
      .start          = Point(-2, 0),
      .end            = Point(2, 0),
      .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
      .obstacles      = obstacles_30,
      .num_iterations = 10},
 
-    {.name           = "10 obstacles on full field",
+    {.name           = "10 obstacles on divB field",
      .start          = Point(-4.5, 0),
      .end            = Point(4.5, 0),
      .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
      .obstacles      = obstacles_10,
      .num_iterations = 10},
 
-    {.name           = "20 obstacles on full field",
+    {.name           = "20 obstacles on divB field",
      .start          = Point(-4.5, 0),
      .end            = Point(4.5, 0),
      .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
      .obstacles      = obstacles_20,
      .num_iterations = 10},
 
-    {.name           = "30 obstacles on full field",
+    {.name           = "30 obstacles on divB field",
      .start          = Point(-4.5, 0),
      .end            = Point(4.5, 0),
      .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
@@ -168,7 +168,7 @@ std::vector<PlannerTestCase> test_cases = {
 };
 
 template <typename PlannerT>
-std::pair<std::string, PathPlannerConstructor> name_and_constructor()
+std::pair<std::string, PathPlannerConstructor> nameAndConstructor()
 {
     return std::pair<std::string, PathPlannerConstructor>(
         typeid(PlannerT).name(), []() { return std::make_unique<PlannerT>(); });
@@ -177,8 +177,8 @@ std::pair<std::string, PathPlannerConstructor> name_and_constructor()
 std::vector<std::pair<std::string, PathPlannerConstructor>>
     path_planner_names_and_constructors = {
         // add path planner constructors here
-        name_and_constructor<ThetaStarPathPlanner>(),
-        name_and_constructor<StraightLinePathPlanner>()};
+        nameAndConstructor<ThetaStarPathPlanner>(),
+        nameAndConstructor<StraightLinePathPlanner>()};
 
 class PlannerPerformanceTest
     : public testing::TestWithParam<
@@ -186,7 +186,8 @@ class PlannerPerformanceTest
 {
 };
 
-// This test is disabled, it can be enabled by removing "DISABLED_" from the test name
+// This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from
+// the test name
 TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
 {
     std::string name                     = std::get<0>(GetParam()).first.substr(2);

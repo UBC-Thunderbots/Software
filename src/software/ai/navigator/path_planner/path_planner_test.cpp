@@ -16,9 +16,9 @@
 // length at which to evaluate the spline value and check
 // if it intersects an obstacle
 static constexpr double PATH_CHECK_INTERVAL_M = 0.05;
-// distance to endination before the path is considered to
-// have reached the endination
-static constexpr double DEST_CHECK_EPSILON_M = 1e-3;
+// distance to end before the path is considered to
+// have reached the end
+static constexpr double END_CHECK_EPSILON_M = 1e-3;
 
 using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
 
@@ -119,7 +119,7 @@ std::vector<PlannerTestCase>
 
 
 template <typename PlannerT>
-std::pair<std::string, PathPlannerConstructor> name_and_constructor()
+std::pair<std::string, PathPlannerConstructor> nameAndConstructor()
 {
     return std::pair<std::string, PathPlannerConstructor>(
         typeid(PlannerT).name(), []() { return std::make_unique<PlannerT>(); });
@@ -128,9 +128,9 @@ std::pair<std::string, PathPlannerConstructor> name_and_constructor()
 std::vector<std::pair<std::string, PathPlannerConstructor>>
     path_planner_names_and_constructors = {
         // add path planner constructors here
-        name_and_constructor<ThetaStarPathPlanner>(),
+        nameAndConstructor<ThetaStarPathPlanner>(),
         // uncomment this if you want some tests to fail
-        //        name_and_constructor<StraightLinePathPlanner>()
+        //        nameAndConstructor<StraightLinePathPlanner>()
 };
 
 
@@ -202,8 +202,8 @@ void validatePath(const Path &path, const Point &start, const Point &end,
         std::any_of(obstacles.begin(), obstacles.end(),
                     [&end](const auto &obs) { return obs->contains(end); });
 
-    // check if the specified endination is in an obstacle, and if so, check that the
-    // robot made progress toward the endination we also check for start_obstacle_or_null
+    // check if the specified end is in an obstacle, and if so, check that the
+    // robot made progress toward the end we also check for start_obstacle_or_null
     // because it will only be true at this stage in the case where we start in an
     // obstacle and never exit it
     if (end_in_obstacle || start_obstacle_or_null)
@@ -211,16 +211,16 @@ void validatePath(const Path &path, const Point &start, const Point &end,
         if ((path.getValueAt(1.0) - end).length() >=
             (path.getValueAt(0.0) - end).length())
         {
-            // fail because no progress to endination
+            // fail because no progress to end
             std::stringstream fail_ss;
             fail_ss
-                << "Destination is in obstacle, but path does not make progress toward the endination!";
+                << "End is in obstacle, but path does not make progress toward the end!";
             throw fail_ss.str();
         }
     }
-    else if ((path.getValueAt(1.0) - end).length() >= DEST_CHECK_EPSILON_M)
+    else if ((path.getValueAt(1.0) - end).length() >= END_CHECK_EPSILON_M)
     {
-        // fail because didn't reach endination
+        // fail because didn't reach end
         std::stringstream fail_ss;
         fail_ss << "Path ends at " << path.getValueAt(1.0) << " but end is " << end;
         throw fail_ss.str();
