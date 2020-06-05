@@ -171,7 +171,7 @@ class PlannerPerformanceTest
 
 // This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from
 // the test name
-TEST_P(PlannerPerformanceTest, path_planner_performance)
+TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
 {
     std::string planner_name             = std::get<0>(GetParam()).first.substr(2);
     std::unique_ptr<PathPlanner> planner = std::get<0>(GetParam()).second();
