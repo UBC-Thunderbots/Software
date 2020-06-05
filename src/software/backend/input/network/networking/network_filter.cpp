@@ -27,7 +27,7 @@ NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config)
 
 std::optional<Field> NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
 {
-    if (field_state && geometry_packet.has_field())
+    if (geometry_packet.has_field())
     {
         SSL_GeometryFieldSize field_data = geometry_packet.field();
         Field field                      = createFieldFromPacketGeometry(field_data);

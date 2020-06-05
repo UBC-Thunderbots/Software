@@ -175,11 +175,11 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                 {
                     if (ball)
                     {
-                        ball = Ball(*ball_state);
+                        ball->updateState(*ball_state);
                     }
                     else
                     {
-                        ball->updateState(*ball_state);
+                        ball = Ball(*ball_state);
                     }
                 }
 
@@ -192,7 +192,9 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                 enemy_team.assignGoalie(enemy_goalie_id);
             }
         }
-
+    }
+    if (field && ball)
+    {
         received_world_callback(World(*field, *ball, friendly_team, enemy_team));
     }
 }
