@@ -217,40 +217,49 @@ namespace Test
         const RobotState &state1, const RobotState &state2, const double linear_tolerance,
         const Angle &angular_tolerance)
     {
-        auto position_equality_result = TestUtil::equalWithinTolerance(state1.position(), state2.position(), linear_tolerance);
-        auto velocity_equality_result = TestUtil::equalWithinTolerance(state1.velocity(), state2.velocity(), linear_tolerance);
-        auto orientation_equality_result = TestUtil::equalWithinTolerance(state1.orientation(), state2.orientation(), angular_tolerance);
-        auto angular_velocity_equality_result = TestUtil::equalWithinTolerance(state1.angularVelocity(), state2.angularVelocity(), angular_tolerance);
+        auto position_equality_result = TestUtil::equalWithinTolerance(
+            state1.position(), state2.position(), linear_tolerance);
+        auto velocity_equality_result = TestUtil::equalWithinTolerance(
+            state1.velocity(), state2.velocity(), linear_tolerance);
+        auto orientation_equality_result = TestUtil::equalWithinTolerance(
+            state1.orientation(), state2.orientation(), angular_tolerance);
+        auto angular_velocity_equality_result = TestUtil::equalWithinTolerance(
+            state1.angularVelocity(), state2.angularVelocity(), angular_tolerance);
 
         auto assertion_result = ::testing::AssertionSuccess();
 
-        if(!position_equality_result || !velocity_equality_result || !orientation_equality_result || !angular_velocity_equality_result) {
+        if (!position_equality_result || !velocity_equality_result ||
+            !orientation_equality_result || !angular_velocity_equality_result)
+        {
             assertion_result = ::testing::AssertionFailure();
 
             if (!position_equality_result)
             {
                 assertion_result << "The first state's position was " << state1.position()
-                        << ", the second state's position was " << state2.position();
+                                 << ", the second state's position was "
+                                 << state2.position();
             }
             if (!velocity_equality_result)
             {
                 assertion_result << std::endl
-                        << "The first state's velocity was " << state1.velocity()
-                        << ", the second state's velocity was " << state2.velocity();
+                                 << "The first state's velocity was " << state1.velocity()
+                                 << ", the second state's velocity was "
+                                 << state2.velocity();
             }
             if (!orientation_equality_result)
             {
-                assertion_result << std::endl
-                        << "The first state's orientation was " << state1.orientation()
-                        << ", the second state's orientation was " << state2.orientation();
+                assertion_result
+                    << std::endl
+                    << "The first state's orientation was " << state1.orientation()
+                    << ", the second state's orientation was " << state2.orientation();
             }
             if (!angular_velocity_equality_result)
             {
                 assertion_result << std::endl
-                        << "The first state's angular velocity was "
-                        << state1.angularVelocity()
-                        << ", the second state's angular velocity was "
-                        << state2.angularVelocity();
+                                 << "The first state's angular velocity was "
+                                 << state1.angularVelocity()
+                                 << ", the second state's angular velocity was "
+                                 << state2.angularVelocity();
             }
         }
 
@@ -258,9 +267,8 @@ namespace Test
     }
 
     ::testing::AssertionResult TestUtil::equalWithinTolerance(
-        const RobotStateWithId &state1,
-        const RobotStateWithId &state2, const double linear_tolerance,
-        const Angle &angular_tolerance)
+        const RobotStateWithId &state1, const RobotStateWithId &state2,
+        const double linear_tolerance, const Angle &angular_tolerance)
     {
         if (state1.id != state2.id)
         {
@@ -278,25 +286,33 @@ namespace Test
         return ::testing::AssertionSuccess();
     }
 
-    ::testing::AssertionResult
-    TestUtil::equalWithinTolerance(const BallState &state1, const BallState &state2, double tolerance) {
-        auto position_equality_result = equalWithinTolerance(state1.position(), state2.position(), tolerance);
-        auto velocity_equality_result = equalWithinTolerance(state1.velocity(), state2.velocity(), tolerance);
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(const BallState &state1,
+                                                              const BallState &state2,
+                                                              double tolerance)
+    {
+        auto position_equality_result =
+            equalWithinTolerance(state1.position(), state2.position(), tolerance);
+        auto velocity_equality_result =
+            equalWithinTolerance(state1.velocity(), state2.velocity(), tolerance);
 
         auto assertion_result = ::testing::AssertionSuccess();
 
-        if(!position_equality_result || !velocity_equality_result) {
+        if (!position_equality_result || !velocity_equality_result)
+        {
             assertion_result = ::testing::AssertionFailure();
 
-            if(!position_equality_result) {
+            if (!position_equality_result)
+            {
                 assertion_result << "The first state's position was " << state1.position()
-                                 << ", the second state's position was " << state2.position();
+                                 << ", the second state's position was "
+                                 << state2.position();
             }
             if (!velocity_equality_result)
             {
                 assertion_result << std::endl
                                  << "The first state's velocity was " << state1.velocity()
-                                 << ", the second state's velocity was " << state2.velocity();
+                                 << ", the second state's velocity was "
+                                 << state2.velocity();
             }
         }
 

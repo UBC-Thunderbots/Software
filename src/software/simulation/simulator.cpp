@@ -21,16 +21,16 @@ Simulator::Simulator(const World& world)
     std::vector<RobotStateWithId> yellow_robots;
     for (const auto& robot : world.friendlyTeam().getAllRobots())
     {
-        RobotStateWithId state{
-            .id = robot.id(), .robot_state = robot.currentState().robotState()};
+        RobotStateWithId state{.id          = robot.id(),
+                               .robot_state = robot.currentState().robotState()};
         yellow_robots.emplace_back(state);
     }
     physics_world.addYellowRobots(yellow_robots);
     std::vector<RobotStateWithId> blue_robots;
     for (const auto& robot : world.enemyTeam().getAllRobots())
     {
-        RobotStateWithId state{
-            .id = robot.id(), .robot_state = robot.currentState().robotState()};
+        RobotStateWithId state{.id          = robot.id(),
+                               .robot_state = robot.currentState().robotState()};
         blue_robots.emplace_back(state);
     }
     physics_world.addBlueRobots(blue_robots);

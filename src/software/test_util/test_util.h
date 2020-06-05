@@ -215,9 +215,8 @@ namespace Test
          * @return AssertionSuccess if the two values are within tolerance of each other
          */
         static ::testing::AssertionResult equalWithinTolerance(
-            const RobotStateWithId &state1,
-            const RobotStateWithId &state2, double linear_tolerance,
-            const Angle &angular_tolerance);
+            const RobotStateWithId &state1, const RobotStateWithId &state2,
+            double linear_tolerance, const Angle &angular_tolerance);
 
         /**
          * Checks if two BallStates are within tolerance of each other.
@@ -231,9 +230,9 @@ namespace Test
          *
          * @return AssertionSuccess if the two values are within tolerance of each other
          */
-        static ::testing::AssertionResult equalWithinTolerance(
-                const BallState &state1,
-                const BallState &state2, double tolerance);
+        static ::testing::AssertionResult equalWithinTolerance(const BallState &state1,
+                                                               const BallState &state2,
+                                                               double tolerance);
 
        private:
         /**

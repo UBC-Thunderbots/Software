@@ -94,7 +94,7 @@ TEST(PhysicsWorldTest, test_add_single_yellow_robot_with_valid_id)
 
     ASSERT_EQ(1, physics_world.getYellowRobotStates().size());
     EXPECT_THAT(states, ::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), physics_world.getYellowRobotStates()));
+                            RobotStateWithIdEq(), physics_world.getYellowRobotStates()));
 }
 
 TEST(PhysicsWorldTest, test_add_multiple_yellow_robot_with_valid_ids)
@@ -117,7 +117,7 @@ TEST(PhysicsWorldTest, test_add_multiple_yellow_robot_with_valid_ids)
     auto yellow_robot_states = physics_world.getYellowRobotStates();
     ASSERT_EQ(3, yellow_robot_states.size());
     EXPECT_THAT(states, ::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), physics_world.getYellowRobotStates()));
+                            RobotStateWithIdEq(), physics_world.getYellowRobotStates()));
 }
 
 TEST(PhysicsWorldTest, test_add_yellow_robots_with_duplicate_ids)
@@ -178,7 +178,7 @@ TEST(PhysicsWorldTest, test_add_single_blue_robot_with_valid_id)
 
     ASSERT_EQ(1, physics_world.getBlueRobotStates().size());
     EXPECT_THAT(states, ::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), physics_world.getBlueRobotStates()));
+                            RobotStateWithIdEq(), physics_world.getBlueRobotStates()));
 }
 
 TEST(PhysicsWorldTest, test_add_multiple_blue_robot_with_valid_ids)
@@ -201,7 +201,7 @@ TEST(PhysicsWorldTest, test_add_multiple_blue_robot_with_valid_ids)
     auto blue_robot_states = physics_world.getBlueRobotStates();
     ASSERT_EQ(3, blue_robot_states.size());
     EXPECT_THAT(states, ::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), physics_world.getBlueRobotStates()));
+                            RobotStateWithIdEq(), physics_world.getBlueRobotStates()));
 }
 
 TEST(PhysicsWorldTest, test_add_blue_robots_with_duplicate_ids)
@@ -331,91 +331,102 @@ TEST(PhysicsWorldTest, is_blue_robot_id_available_with_unavailable_id)
     EXPECT_FALSE(physics_world.isBlueRobotIdAvailable(0));
 }
 
- TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
+TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
 {
     BallState ball_state(Point(0, 1), Vector(2, -3));
 
     RobotState yellow_robot_state(Point(1, 0), Vector(3, 0), Angle::quarter(),
-                            AngularVelocity::half());
+                                  AngularVelocity::half());
     std::vector<RobotStateWithId> yellow_robot_states = {
-            RobotStateWithId{.id = 0, .robot_state = yellow_robot_state},
+        RobotStateWithId{.id = 0, .robot_state = yellow_robot_state},
     };
 
     RobotState blue_robot_state(Point(0, 0), Vector(-2, 1), Angle::half(),
                                 AngularVelocity::quarter());
     std::vector<RobotStateWithId> blue_robot_states = {
-            RobotStateWithId{.id = 0, .robot_state = blue_robot_state},
+        RobotStateWithId{.id = 0, .robot_state = blue_robot_state},
     };
 
     PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
 
-    physics_world.setBallState(ball_state) ;
+    physics_world.setBallState(ball_state);
     physics_world.addYellowRobots(yellow_robot_states);
     physics_world.addBlueRobots(blue_robot_states);
 
     physics_world.stepSimulation(Duration::fromSeconds(0));
 
     auto updated_ball_state = physics_world.getBallState();
-    std::vector<RobotStateWithId> updated_yellow_robot_states = physics_world.getYellowRobotStates();
-    std::vector<RobotStateWithId> updated_blue_robot_states = physics_world.getBlueRobotStates();
+    std::vector<RobotStateWithId> updated_yellow_robot_states =
+        physics_world.getYellowRobotStates();
+    std::vector<RobotStateWithId> updated_blue_robot_states =
+        physics_world.getBlueRobotStates();
 
     ASSERT_TRUE(updated_ball_state);
 
-    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(ball_state, updated_ball_state.value(), 1e-6));
-    EXPECT_THAT(yellow_robot_states, ::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), updated_yellow_robot_states));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(ball_state,
+                                                       updated_ball_state.value(), 1e-6));
+    EXPECT_THAT(
+        yellow_robot_states,
+        ::testing::UnorderedPointwise(RobotStateWithIdEq(), updated_yellow_robot_states));
     EXPECT_THAT(blue_robot_states, ::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), updated_blue_robot_states));
+                                       RobotStateWithIdEq(), updated_blue_robot_states));
     EXPECT_EQ(physics_world.getField(), ::Test::TestUtil::createSSLDivBField());
 }
 
- TEST(PhysicsSimulatorTest, test_single_small_time_step)
+TEST(PhysicsSimulatorTest, test_single_small_time_step)
 {
     BallState ball_state(Point(0, 1), Vector(2, -3));
 
     RobotState yellow_robot_state(Point(1, 0), Vector(3, 0), Angle::quarter(),
                                   AngularVelocity::half());
     std::vector<RobotStateWithId> yellow_robot_states = {
-            RobotStateWithId{.id = 0, .robot_state = yellow_robot_state},
+        RobotStateWithId{.id = 0, .robot_state = yellow_robot_state},
     };
 
     RobotState blue_robot_state(Point(0, 0), Vector(-2, 1), Angle::half(),
                                 AngularVelocity::quarter());
     std::vector<RobotStateWithId> blue_robot_states = {
-            RobotStateWithId{.id = 0, .robot_state = blue_robot_state},
+        RobotStateWithId{.id = 0, .robot_state = blue_robot_state},
     };
 
     PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
 
-    physics_world.setBallState(ball_state) ;
+    physics_world.setBallState(ball_state);
     physics_world.addYellowRobots(yellow_robot_states);
     physics_world.addBlueRobots(blue_robot_states);
 
     physics_world.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
 
     auto updated_ball_state = physics_world.getBallState();
-    std::vector<RobotStateWithId> updated_yellow_robot_states = physics_world.getYellowRobotStates();
-    std::vector<RobotStateWithId> updated_blue_robot_states = physics_world.getBlueRobotStates();
+    std::vector<RobotStateWithId> updated_yellow_robot_states =
+        physics_world.getYellowRobotStates();
+    std::vector<RobotStateWithId> updated_blue_robot_states =
+        physics_world.getBlueRobotStates();
 
     ASSERT_TRUE(updated_ball_state);
 
-    BallState expected_ball_state(Point(0.0 + 2.0 / 60, 1 - 3.0/60.0), Vector(2, -3));
-    RobotState expected_yellow_robot_state(Point(1 + 3.0 / 60.0, 0), Vector(3, 0), Angle::quarter() + AngularVelocity::half() / 60.0,
-                                  AngularVelocity::half());
+    BallState expected_ball_state(Point(0.0 + 2.0 / 60, 1 - 3.0 / 60.0), Vector(2, -3));
+    RobotState expected_yellow_robot_state(
+        Point(1 + 3.0 / 60.0, 0), Vector(3, 0),
+        Angle::quarter() + AngularVelocity::half() / 60.0, AngularVelocity::half());
     std::vector<RobotStateWithId> expected_yellow_robot_states = {
-            RobotStateWithId{.id = 0, .robot_state = expected_yellow_robot_state},
+        RobotStateWithId{.id = 0, .robot_state = expected_yellow_robot_state},
     };
 
-    RobotState expected_blue_robot_state(Point(0 - 2.0/60.0, 1.0 / 60.0), Vector(-2, 1), Angle::half() + AngularVelocity::quarter() / 60.0,
-                                AngularVelocity::quarter());
+    RobotState expected_blue_robot_state(
+        Point(0 - 2.0 / 60.0, 1.0 / 60.0), Vector(-2, 1),
+        Angle::half() + AngularVelocity::quarter() / 60.0, AngularVelocity::quarter());
     std::vector<RobotStateWithId> expected_blue_robot_states = {
-            RobotStateWithId{.id = 0, .robot_state = expected_blue_robot_state},
+        RobotStateWithId{.id = 0, .robot_state = expected_blue_robot_state},
     };
 
-    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(expected_ball_state, updated_ball_state.value(), 1e-4));
-    EXPECT_THAT(expected_yellow_robot_states, ::testing::Not(::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), updated_yellow_robot_states)));
-    EXPECT_THAT(expected_blue_robot_states, ::testing::Not(::testing::UnorderedPointwise(
-            RobotStateWithIdEq(), updated_blue_robot_states)));
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(expected_ball_state,
+                                                       updated_ball_state.value(), 1e-4));
+    EXPECT_THAT(expected_yellow_robot_states,
+                ::testing::Not(::testing::UnorderedPointwise(
+                    RobotStateWithIdEq(), updated_yellow_robot_states)));
+    EXPECT_THAT(expected_blue_robot_states,
+                ::testing::Not(::testing::UnorderedPointwise(RobotStateWithIdEq(),
+                                                             updated_blue_robot_states)));
     EXPECT_EQ(physics_world.getField(), ::Test::TestUtil::createSSLDivBField());
 }

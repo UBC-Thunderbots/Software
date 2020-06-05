@@ -9,9 +9,7 @@
 /**
  * The possible team colours of SSL robots
  */
-MAKE_ENUM(TeamColour,
-          YELLOW,
-          BLUE)
+MAKE_ENUM(TeamColour, YELLOW, BLUE)
 /**
  * This class represents the physical state of a robot
  */

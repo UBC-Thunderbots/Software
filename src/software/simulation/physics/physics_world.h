@@ -6,10 +6,10 @@
 #include "software/simulation/physics/physics_field.h"
 #include "software/simulation/physics/physics_robot.h"
 #include "software/simulation/physics/simulation_contact_listener.h"
-#include "software/world/ball_state.h"
-#include "software/world/robot_state.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
+#include "software/world/ball_state.h"
+#include "software/world/robot_state.h"
 #include "software/world/world.h"
 
 /**
