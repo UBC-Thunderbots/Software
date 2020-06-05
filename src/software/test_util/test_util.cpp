@@ -258,8 +258,8 @@ namespace Test
     }
 
     ::testing::AssertionResult TestUtil::equalWithinTolerance(
-        const PhysicsWorld::RobotStateWithId_t &state1,
-        const PhysicsWorld::RobotStateWithId_t &state2, const double linear_tolerance,
+        const RobotStateWithId &state1,
+        const RobotStateWithId &state2, const double linear_tolerance,
         const Angle &angular_tolerance)
     {
         if (state1.id != state2.id)

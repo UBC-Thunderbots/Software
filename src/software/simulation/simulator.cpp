@@ -18,18 +18,18 @@ Simulator::Simulator(const World& world)
     // Note: The simulator currently makes the invariant that friendly robots
     // are yellow robots, and enemies are blue. This will be fixed in
     // https://github.com/UBC-Thunderbots/Software/issues/1325
-    std::vector<PhysicsWorld::RobotStateWithId> yellow_robots;
+    std::vector<RobotStateWithId> yellow_robots;
     for (const auto& robot : world.friendlyTeam().getAllRobots())
     {
-        PhysicsWorld::RobotStateWithId state{
+        RobotStateWithId state{
             .id = robot.id(), .robot_state = robot.currentState().robotState()};
         yellow_robots.emplace_back(state);
     }
     physics_world.addYellowRobots(yellow_robots);
-    std::vector<PhysicsWorld::RobotStateWithId> blue_robots;
+    std::vector<RobotStateWithId> blue_robots;
     for (const auto& robot : world.enemyTeam().getAllRobots())
     {
-        PhysicsWorld::RobotStateWithId state{
+        RobotStateWithId state{
             .id = robot.id(), .robot_state = robot.currentState().robotState()};
         blue_robots.emplace_back(state);
     }

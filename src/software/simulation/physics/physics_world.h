@@ -6,6 +6,8 @@
 #include "software/simulation/physics/physics_field.h"
 #include "software/simulation/physics/physics_robot.h"
 #include "software/simulation/physics/simulation_contact_listener.h"
+#include "software/world/ball_state.h"
+#include "software/world/robot_state.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
@@ -18,13 +20,6 @@
 class PhysicsWorld
 {
    public:
-    // TODO: where shoudl this go? the world/ folder? here?
-    typedef struct RobotStateWithId_t
-    {
-        unsigned int id;
-        RobotState robot_state;
-    } RobotStateWithId;
-
     /**
      * Creates a new PhysicsWorld that will contain no robots and no ball.
      *

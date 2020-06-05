@@ -147,6 +147,8 @@ cc_library(
         "//software/time:duration",
         "//software/time:timestamp",
         "//software/world",
+        "//software/world:ball_state",
+        "//software/world:robot_state",
         "@box2d",
     ],
 )

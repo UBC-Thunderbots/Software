@@ -218,8 +218,8 @@ namespace Test
          * @return AssertionSuccess if the two values are within tolernace of each other
          */
         static ::testing::AssertionResult equalWithinTolerance(
-            const PhysicsWorld::RobotStateWithId_t &state1,
-            const PhysicsWorld::RobotStateWithId_t &state2, double linear_tolerance,
+            const RobotStateWithId &state1,
+            const RobotStateWithId &state2, double linear_tolerance,
             const Angle &angular_tolerance);
 
        private:

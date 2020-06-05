@@ -77,3 +77,12 @@ class RobotState
     Angle orientation_;
     AngularVelocity angular_velocity_;
 };
+
+/**
+ * A light structure for a robot state with an ID
+ */
+struct RobotStateWithId
+{
+    unsigned int id;
+    RobotState robot_state;
+};

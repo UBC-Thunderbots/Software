@@ -24,13 +24,13 @@ const std::optional<BallState> PhysicsWorld::getBallState() const
     return physics_ball ? std::make_optional(physics_ball->getBallState()) : std::nullopt;
 }
 
-const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getYellowRobotStates()
+const std::vector<RobotStateWithId> PhysicsWorld::getYellowRobotStates()
     const
 {
-    std::vector<PhysicsWorld::RobotStateWithId> robot_states;
+    std::vector<RobotStateWithId> robot_states;
     for (const auto& robot : yellow_physics_robots)
     {
-        auto state_with_id = PhysicsWorld::RobotStateWithId{
+        auto state_with_id = RobotStateWithId{
             .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
         robot_states.emplace_back(state_with_id);
     }
@@ -38,12 +38,12 @@ const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getYellowRobotSt
     return robot_states;
 }
 
-const std::vector<PhysicsWorld::RobotStateWithId> PhysicsWorld::getBlueRobotStates() const
+const std::vector<RobotStateWithId> PhysicsWorld::getBlueRobotStates() const
 {
-    std::vector<PhysicsWorld::RobotStateWithId> robot_states;
+    std::vector<RobotStateWithId> robot_states;
     for (const auto& robot : blue_physics_robots)
     {
-        auto state_with_id = PhysicsWorld::RobotStateWithId{
+        auto state_with_id = RobotStateWithId{
             .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
         robot_states.emplace_back(state_with_id);
     }

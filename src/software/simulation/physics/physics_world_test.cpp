@@ -111,8 +111,8 @@ TEST(PhysicsWorldTest, test_add_single_yellow_robot_with_valid_id)
 
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::half());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 0, .robot_state = robot_state}};
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state}};
     physics_world.addYellowRobots(states);
 
     ASSERT_EQ(1, physics_world.getYellowRobotStates().size());
@@ -130,10 +130,10 @@ TEST(PhysicsWorldTest, test_add_multiple_yellow_robot_with_valid_ids)
                             AngularVelocity::quarter());
     RobotState robot_state3(Point(-2, -2), Vector(0, 4), Angle::zero(),
                             AngularVelocity::zero());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
-        PhysicsWorld::RobotStateWithId{.id = 2, .robot_state = robot_state2},
-        PhysicsWorld::RobotStateWithId{.id = 3, .robot_state = robot_state3},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 2, .robot_state = robot_state2},
+        RobotStateWithId{.id = 3, .robot_state = robot_state3},
     };
     physics_world.addYellowRobots(states);
 
@@ -151,9 +151,9 @@ TEST(PhysicsWorldTest, test_add_yellow_robots_with_duplicate_ids)
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state2},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state2},
     };
 
     EXPECT_THROW(physics_world.addYellowRobots(states), std::runtime_error);
@@ -165,16 +165,16 @@ TEST(PhysicsWorldTest, test_add_yellow_robots_to_physics_world_with_existing_ids
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
-    std::vector<PhysicsWorld::RobotStateWithId> states1 = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    std::vector<RobotStateWithId> states1 = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
     };
 
     EXPECT_NO_THROW(physics_world.addYellowRobots(states1));
 
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
-    std::vector<PhysicsWorld::RobotStateWithId> states2 = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    std::vector<RobotStateWithId> states2 = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
     };
 
     EXPECT_THROW(physics_world.addYellowRobots(states2), std::runtime_error);
@@ -195,8 +195,8 @@ TEST(PhysicsWorldTest, test_add_single_blue_robot_with_valid_id)
 
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::half());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 0, .robot_state = robot_state}};
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state}};
     physics_world.addBlueRobots(states);
 
     ASSERT_EQ(1, physics_world.getBlueRobotStates().size());
@@ -214,10 +214,10 @@ TEST(PhysicsWorldTest, test_add_multiple_blue_robot_with_valid_ids)
                             AngularVelocity::quarter());
     RobotState robot_state3(Point(-2, -2), Vector(0, 4), Angle::zero(),
                             AngularVelocity::zero());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
-        PhysicsWorld::RobotStateWithId{.id = 2, .robot_state = robot_state2},
-        PhysicsWorld::RobotStateWithId{.id = 3, .robot_state = robot_state3},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 2, .robot_state = robot_state2},
+        RobotStateWithId{.id = 3, .robot_state = robot_state3},
     };
     physics_world.addBlueRobots(states);
 
@@ -235,9 +235,9 @@ TEST(PhysicsWorldTest, test_add_blue_robots_with_duplicate_ids)
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state2},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state2},
     };
 
     EXPECT_THROW(physics_world.addBlueRobots(states), std::runtime_error);
@@ -249,16 +249,16 @@ TEST(PhysicsWorldTest, test_add_blue_robots_to_physics_world_with_existing_ids)
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
-    std::vector<PhysicsWorld::RobotStateWithId> states1 = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    std::vector<RobotStateWithId> states1 = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
     };
 
     EXPECT_NO_THROW(physics_world.addBlueRobots(states1));
 
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
-    std::vector<PhysicsWorld::RobotStateWithId> states2 = {
-        PhysicsWorld::RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    std::vector<RobotStateWithId> states2 = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
     };
 
     EXPECT_THROW(physics_world.addBlueRobots(states2), std::runtime_error);
@@ -281,9 +281,9 @@ TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 0, .robot_state = robot_state1},
-        PhysicsWorld::RobotStateWithId{.id = 2, .robot_state = robot_state2},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state1},
+        RobotStateWithId{.id = 2, .robot_state = robot_state2},
     };
     physics_world.addYellowRobots(states);
 
@@ -309,9 +309,9 @@ TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 0, .robot_state = robot_state1},
-        PhysicsWorld::RobotStateWithId{.id = 2, .robot_state = robot_state2},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state1},
+        RobotStateWithId{.id = 2, .robot_state = robot_state2},
     };
     physics_world.addBlueRobots(states);
 
@@ -333,8 +333,8 @@ TEST(PhysicsWorldTest, is_yellow_robot_id_available_with_unavailable_id)
 
     RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::zero(),
                            AngularVelocity::zero());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 0, .robot_state = robot_state},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state},
     };
     physics_world.addYellowRobots(states);
 
@@ -354,8 +354,8 @@ TEST(PhysicsWorldTest, is_blue_robot_id_available_with_unavailable_id)
 
     RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::zero(),
                            AngularVelocity::zero());
-    std::vector<PhysicsWorld::RobotStateWithId> states = {
-        PhysicsWorld::RobotStateWithId{.id = 0, .robot_state = robot_state},
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state},
     };
     physics_world.addBlueRobots(states);
 

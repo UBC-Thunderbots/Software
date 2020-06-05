@@ -20,7 +20,7 @@ class SimulatorRobotTest : public testing::Test
         auto physics_world =
             std::make_shared<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
         physics_world->setBallState(ball.currentState().ballState());
-        physics_world->addYellowRobots({PhysicsWorld::RobotStateWithId{
+        physics_world->addYellowRobots({RobotStateWithId{
             .id = robot.id(), .robot_state = robot.currentState().robotState()}});
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
