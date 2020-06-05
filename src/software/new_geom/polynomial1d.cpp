@@ -53,11 +53,11 @@ unsigned int Polynomial1d::getOrder() const
 {
     if (coeffs.size() != 0)
     {
-        for (int i = coeffs.size() - 1; i >= 0; i--)
+        for (unsigned int i = coeffs.size(); i > 0; i--)
         {
-            if (std::abs(coeffs[i]) >= GeomConstants::FIXED_EPSILON)
+            if (std::abs(coeffs[i - 1]) >= GeomConstants::FIXED_EPSILON)
             {
-                return i;
+                return i - 1;
             }
         }
     }
