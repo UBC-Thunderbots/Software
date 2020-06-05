@@ -35,7 +35,7 @@ class RobotDiagnostics : public QMainWindow
 
    public:
     /**
-     * Creates a new Visualizer MainWindow
+     * Creates a new RobotDiagnostics MainWindow
      *
      * @param sensor_msg_buffer The buffer used to receive new SensorMsgs
      * @param primitive_buffer The buffer used to send new Primitives
@@ -52,13 +52,13 @@ class RobotDiagnostics : public QMainWindow
      *
      * @param new values
      */
-    void receiveChickerState(double chicker_power, ChargeMode charge_mode,
-                             ChickMode chick_mode);
-    void receiveDirectPerWheelPower(double direct_per_wheel_power,
-                                    DirectPerWheelMode direct_per_wheel_mode);
-    void receiveDirectVelocityPower(double direct_per_wheel_power,
-                                    DirectVelocityMode direct_velocity_mode);
-    void receiveDribblerPower(double dribbler_power);
+    void onChickerStateChanged(double chicker_power, ChargeMode charge_mode,
+                               ChickMode chick_mode);
+    void onDirectPerWheelPowerChanged(double direct_per_wheel_power,
+                                      DirectPerWheelMode direct_per_wheel_mode);
+    void onDirectVelocityPowerChanged(double direct_per_wheel_power,
+                                      DirectVelocityMode direct_velocity_mode);
+    void onDribblerPowerChanged(double dribbler_power);
 
     /**
      * Setup widgets

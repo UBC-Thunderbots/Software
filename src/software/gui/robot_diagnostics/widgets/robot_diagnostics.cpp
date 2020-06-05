@@ -29,25 +29,25 @@ RobotDiagnostics::RobotDiagnostics(
     update();
 }
 
-void RobotDiagnostics::receiveChickerState(double chicker_power, ChargeMode charge_mode,
-                                           ChickMode chick_mode)
+void RobotDiagnostics::onChickerStateChanged(double chicker_power, ChargeMode charge_mode,
+                                             ChickMode chick_mode)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
 
-void RobotDiagnostics::receiveDirectVelocityPower(double direct_per_wheel_power,
-                                                  DirectVelocityMode direct_velocity_mode)
+void RobotDiagnostics::onDirectVelocityPowerChanged(
+    double direct_per_wheel_power, DirectVelocityMode direct_velocity_mode)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
 
-void RobotDiagnostics::receiveDirectPerWheelPower(
+void RobotDiagnostics::onDirectPerWheelPowerChanged(
     double direct_per_wheel_power, DirectPerWheelMode direct_per_wheel_mode)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
 
-void RobotDiagnostics::receiveDribblerPower(double dribbler_power)
+void RobotDiagnostics::onDribblerPowerChanged(double dribbler_power)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
@@ -55,12 +55,13 @@ void RobotDiagnostics::receiveDribblerPower(double dribbler_power)
 void RobotDiagnostics::setupWidgets()
 {
     setupChicker(main_widget,
-                 boost::bind(&RobotDiagnostics::receiveChickerState, this, _1, _2, _3));
+                 boost::bind(&RobotDiagnostics::onChickerStateChanged, this, _1, _2, _3));
     setupDribbler(main_widget,
-                  boost::bind(&RobotDiagnostics::receiveDribblerPower, this, _1));
-    setupDrive(main_widget,
-               boost::bind(&RobotDiagnostics::receiveDirectPerWheelPower, this, _1, _2),
-               boost::bind(&RobotDiagnostics::receiveDirectVelocityPower, this, _1, _2));
+                  boost::bind(&RobotDiagnostics::onDribblerPowerChanged, this, _1));
+    setupDrive(
+        main_widget,
+        boost::bind(&RobotDiagnostics::onDirectPerWheelPowerChanged, this, _1, _2),
+        boost::bind(&RobotDiagnostics::onDirectVelocityPowerChanged, this, _1, _2));
     setupFeedback(main_widget);
     setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);
