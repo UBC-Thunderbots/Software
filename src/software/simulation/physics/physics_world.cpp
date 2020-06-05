@@ -122,9 +122,9 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
     }
 }
 
-const unsigned int PhysicsWorld::getAvailableRobotId(TeamColour colour) const
+const RobotId PhysicsWorld::getAvailableRobotId(TeamColour colour) const
 {
-    for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
+    for (RobotId i = 0; i < std::numeric_limits<RobotId>::max(); i++)
     {
         if (isRobotIdAvailable(i, colour))
         {
@@ -132,26 +132,26 @@ const unsigned int PhysicsWorld::getAvailableRobotId(TeamColour colour) const
         }
     }
 
-    if (isRobotIdAvailable(std::numeric_limits<unsigned int>::max(), colour))
+    if (isRobotIdAvailable(std::numeric_limits<RobotId>::max(), colour))
     {
-        return std::numeric_limits<unsigned int>::max();
+        return std::numeric_limits<RobotId>::max();
     }
 
     LOG(FATAL) << "Out of available " << toString(colour)
                << " robot IDs in the physics world";
 }
 
-unsigned int PhysicsWorld::getAvailableYellowRobotId() const
+RobotId PhysicsWorld::getAvailableYellowRobotId() const
 {
     return getAvailableRobotId(TeamColour::YELLOW);
 }
 
-unsigned int PhysicsWorld::getAvailableBlueRobotId() const
+RobotId PhysicsWorld::getAvailableBlueRobotId() const
 {
     return getAvailableRobotId(TeamColour::BLUE);
 }
 
-const bool PhysicsWorld::isRobotIdAvailable(unsigned int id, TeamColour colour) const
+const bool PhysicsWorld::isRobotIdAvailable(RobotId id, TeamColour colour) const
 {
     std::vector<std::shared_ptr<PhysicsRobot>> physics_robots;
     switch (colour)

@@ -36,19 +36,11 @@ class SimulatorRobotSingletonTest : public testing::Test
 
         for (const auto& pos : enemy_robot_positions)
         {
-            auto id = physics_world->getAvailableBlueRobotId();
-            if (id)
-            {
-                auto state = RobotStateWithId{
-                    .id          = id.value(),
-                    .robot_state = RobotState(pos, Vector(0, 0), Angle::zero(),
-                                              AngularVelocity::zero())};
-                physics_world->addBlueRobots({state});
-            }
-            else
-            {
-                ADD_FAILURE() << "Not enough available robot IDs";
-            }
+            auto state = RobotStateWithId{
+                .id          = physics_world->getAvailableBlueRobotId(),
+                .robot_state = RobotState(pos, Vector(0, 0), Angle::zero(),
+                                          AngularVelocity::zero())};
+            physics_world->addBlueRobots({state});
         }
 
         std::shared_ptr<SimulatorRobot> simulator_robot;

@@ -6,6 +6,8 @@
 #include "software/new_geom/vector.h"
 #include "software/util/make_enum/make_enum.h"
 
+using RobotId = unsigned int;
+
 /**
  * The possible team colours of SSL robots
  */
