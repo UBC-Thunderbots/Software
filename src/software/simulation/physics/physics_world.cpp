@@ -25,31 +25,37 @@ const std::optional<BallState> PhysicsWorld::getBallState() const
     return physics_ball ? std::make_optional(physics_ball->getBallState()) : std::nullopt;
 }
 
-const std::vector<RobotStateWithId> PhysicsWorld::getYellowRobotStates()
-    const
-{
+const std::vector<RobotStateWithId> PhysicsWorld::getRobotStates(const PhysicsWorld::RobotColour colour) const {
+    std::vector<std::shared_ptr<PhysicsRobot>> physics_robots;
+    switch(colour) {
+        case RobotColour::BLUE:
+            physics_robots = blue_physics_robots;
+            break;
+        case RobotColour ::YELLOW:
+            physics_robots = yellow_physics_robots;
+            break;
+    }
+
     std::vector<RobotStateWithId> robot_states;
-    for (const auto& robot : yellow_physics_robots)
+    for (const auto& robot : physics_robots)
     {
         auto state_with_id = RobotStateWithId{
-            .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
+                .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
         robot_states.emplace_back(state_with_id);
     }
 
     return robot_states;
 }
 
+const std::vector<RobotStateWithId> PhysicsWorld::getYellowRobotStates()
+    const
+{
+    return getRobotStates(RobotColour::YELLOW);
+}
+
 const std::vector<RobotStateWithId> PhysicsWorld::getBlueRobotStates() const
 {
-    std::vector<RobotStateWithId> robot_states;
-    for (const auto& robot : blue_physics_robots)
-    {
-        auto state_with_id = RobotStateWithId{
-            .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
-        robot_states.emplace_back(state_with_id);
-    }
-
-    return robot_states;
+    return getRobotStates(RobotColour::BLUE);
 }
 
 const Timestamp PhysicsWorld::getTimestamp() const

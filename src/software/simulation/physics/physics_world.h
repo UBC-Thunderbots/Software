@@ -168,6 +168,15 @@ class PhysicsWorld
     std::weak_ptr<PhysicsBall> getPhysicsBall() const;
 
    private:
+    enum RobotColour {
+        YELLOW,
+        BLUE
+    };
+
+    // TODO: comment
+    const std::vector<RobotStateWithId> getRobotStates(const RobotColour colour) const;
+
+
     // Note: we declare the b2World first so it is destroyed last. If it is destroyed
     // before the physics objects, segfaults will occur due to pointers internal to Box2D
     // https://stackoverflow.com/questions/2254263/order-of-member-constructor-and-destructor-calls
