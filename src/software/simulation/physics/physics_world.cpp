@@ -116,13 +116,13 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
     }
 }
 
-std::optional<unsigned int> PhysicsWorld::getAvailableYellowRobotId() const
+unsigned int PhysicsWorld::getAvailableYellowRobotId() const
 {
     for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
     {
         if (isYellowRobotIdAvailable(i))
         {
-            return std::make_optional<unsigned int>(i);
+            return i;
         }
     }
 
@@ -131,7 +131,7 @@ std::optional<unsigned int> PhysicsWorld::getAvailableYellowRobotId() const
         return std::numeric_limits<unsigned int>::max();
     }
 
-    return std::nullopt;
+    LOG(FATAL) << "Out of available yellow robot IDs in the physics world";
 }
 
 bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
@@ -141,7 +141,7 @@ bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
     {
         if (!robot)
         {
-            LOG(FATAL) << "Encountered a nullptr to a yellow physics robot in the physics world");
+            LOG(FATAL) << "Encountered a nullptr to a yellow physics robot in the physics world";
         }
 
         if (id == robot->getRobotId())
@@ -154,13 +154,13 @@ bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
     return id_available;
 }
 
-std::optional<unsigned int> PhysicsWorld::getAvailableBlueRobotId() const
+unsigned int PhysicsWorld::getAvailableBlueRobotId() const
 {
     for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
     {
         if (isBlueRobotIdAvailable(i))
         {
-            return std::make_optional<unsigned int>(i);
+            return i;
         }
     }
 
@@ -169,7 +169,7 @@ std::optional<unsigned int> PhysicsWorld::getAvailableBlueRobotId() const
         return std::numeric_limits<unsigned int>::max();
     }
 
-    return std::nullopt;
+    LOG(FATAL) << "Out of available blue robot IDs in the physics world";
 }
 
 bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
@@ -179,7 +179,7 @@ bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
     {
         if (!robot)
         {
-            LOG(FATAL) << "Encountered a nullptr to a blue physics robot in the physics world");
+            LOG(FATAL) << "Encountered a nullptr to a blue physics robot in the physics world";
         }
 
         if (id == robot->getRobotId())

@@ -268,9 +268,7 @@ TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_no_existing_robots)
 {
     PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
 
-    std::optional<unsigned int> id = physics_world.getAvailableYellowRobotId();
-    ASSERT_TRUE(id);
-    EXPECT_EQ(0, id.value());
+    EXPECT_EQ(0, physics_world.getAvailableYellowRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
@@ -287,18 +285,14 @@ TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
     };
     physics_world.addYellowRobots(states);
 
-    std::optional<unsigned int> id = physics_world.getAvailableYellowRobotId();
-    ASSERT_TRUE(id);
-    EXPECT_EQ(1, id.value());
+    EXPECT_EQ(1, physics_world.getAvailableYellowRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_no_existing_robots)
 {
     PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
 
-    std::optional<unsigned int> id = physics_world.getAvailableBlueRobotId();
-    ASSERT_TRUE(id);
-    EXPECT_EQ(0, id.value());
+    EXPECT_EQ(0, physics_world.getAvailableBlueRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
@@ -315,9 +309,7 @@ TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
     };
     physics_world.addBlueRobots(states);
 
-    std::optional<unsigned int> id = physics_world.getAvailableBlueRobotId();
-    ASSERT_TRUE(id);
-    EXPECT_EQ(1, id.value());
+    EXPECT_EQ(1, physics_world.getAvailableBlueRobotId());
 }
 
 TEST(PhysicsWorldTest, is_yellow_robot_id_available_with_available_id)

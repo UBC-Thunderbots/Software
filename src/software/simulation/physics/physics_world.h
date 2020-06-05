@@ -122,12 +122,10 @@ class PhysicsWorld
 
     /**
      * Returns the lowest available robot ID that is not already in use by a yellow robot.
-     * If no ID is available, returns std::nullopt.
      *
-     * @return an available robot ID that is not already in use by a yellow robot.
-     * If no ID is available, returns std::nullopt
+     * @return the lowest available robot ID that is not already in use by a yellow robot.
      */
-    std::optional<unsigned int> getAvailableYellowRobotId() const;
+    unsigned int getAvailableYellowRobotId() const;
 
     /**
      * Returns true if the given id is not already in use by a yellow robot,
@@ -141,12 +139,10 @@ class PhysicsWorld
 
     /**
      * Returns the lowest available robot ID that is not already in use by a blue robot.
-     * If no ID is available, returns std::nullopt.
      *
-     * @return an available robot ID that is not already in use by a blue robot.
-     * If no ID is available, returns std::nullopt
+     * @return the lowest available robot ID that is not already in use by a blue robot.
      */
-    std::optional<unsigned int> getAvailableBlueRobotId() const;
+    unsigned int getAvailableBlueRobotId() const;
 
     /**
      * Returns true if the given id is not already in use by a blue robot,
