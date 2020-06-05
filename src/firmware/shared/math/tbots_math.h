@@ -28,6 +28,5 @@
  *
  * @return The estimated value of the function at xp
  */
-float shared_tbots_math_linearInterpolation(const float x0, const float y0,
-                                            const float x1, const float y1,
-                                            const float xp);
+float shared_tbots_math_linearInterpolation(float x0, float y0, float x1, float y1,
+                                            float xp);
