@@ -18,6 +18,7 @@ qt_cc_library(
         "//software/multithreading:thread_safe_buffer",
         "//software/primitive",
         "//software/proto:sensor_msg_cc_proto",
+        "@boost//:bind",
         "@qt//:qt_widgets",
     ],
 )
