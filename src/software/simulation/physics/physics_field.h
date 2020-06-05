@@ -19,6 +19,8 @@ class PhysicsField
      * bodies representing the field will be automatically added to the Box2D world and
      * updated during world update steps.
      *
+     * @throws runtime_error if the given field is not valid
+     *
      * @param world A shared_ptr to a Box2D World
      * @param field The Field to be created in the Box2D world
      */

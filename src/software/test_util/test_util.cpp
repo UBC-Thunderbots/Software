@@ -217,41 +217,46 @@ namespace Test
         const RobotState &state1, const RobotState &state2, const double linear_tolerance,
         const Angle &angular_tolerance)
     {
-        if (!TestUtil::equalWithinTolerance(state1.position(), state2.position(),
-                                            linear_tolerance))
-        {
-            return ::testing::AssertionFailure()
-                   << "The first state's position was " << state1.position()
-                   << ", the second state's position was " << state2.position();
-        }
-        if (!TestUtil::equalWithinTolerance(state1.velocity(), state2.velocity(),
-                                            linear_tolerance))
-        {
-            return ::testing::AssertionFailure()
-                   << "The first state's velocity was " << state1.velocity()
-                   << ", the second state's velocity was " << state2.velocity();
-        }
-        if (!TestUtil::equalWithinTolerance(state1.orientation(), state2.orientation(),
-                                            angular_tolerance))
-        {
-            return ::testing::AssertionFailure()
-                   << "The first state's orientation was " << state1.orientation()
-                   << ", the second state's orientation was " << state2.orientation();
-        }
-        if (!TestUtil::equalWithinTolerance(state1.angularVelocity(),
-                                            state2.angularVelocity(), angular_tolerance))
-        {
-            return ::testing::AssertionFailure()
-                   << "The first state's angular velocity was "
-                   << state1.angularVelocity()
-                   << ", the second state's angular velocity was "
-                   << state2.angularVelocity();
+        auto position_equality_result = TestUtil::equalWithinTolerance(state1.position(), state2.position(), linear_tolerance);
+        auto velocity_equality_result = TestUtil::equalWithinTolerance(state1.velocity(), state2.velocity(), linear_tolerance);
+        auto orientation_equality_result = TestUtil::equalWithinTolerance(state1.orientation(), state2.orientation(), angular_tolerance);
+        auto angular_velocity_equality_result = TestUtil::equalWithinTolerance(state1.angularVelocity(), state2.angularVelocity(), angular_tolerance);
+
+        auto assertion_result = ::testing::AssertionSuccess();
+
+        if(!position_equality_result || !velocity_equality_result || !orientation_equality_result || !angular_velocity_equality_result) {
+            assertion_result = ::testing::AssertionFailure();
+
+            if (!position_equality_result)
+            {
+                assertion_result << "The first state's position was " << state1.position()
+                        << ", the second state's position was " << state2.position();
+            }
+            if (!velocity_equality_result)
+            {
+                assertion_result << std::endl
+                        << "The first state's velocity was " << state1.velocity()
+                        << ", the second state's velocity was " << state2.velocity();
+            }
+            if (!orientation_equality_result)
+            {
+                assertion_result << std::endl
+                        << "The first state's orientation was " << state1.orientation()
+                        << ", the second state's orientation was " << state2.orientation();
+            }
+            if (!angular_velocity_equality_result)
+            {
+                assertion_result << std::endl
+                        << "The first state's angular velocity was "
+                        << state1.angularVelocity()
+                        << ", the second state's angular velocity was "
+                        << state2.angularVelocity();
+            }
         }
 
-        return ::testing::AssertionSuccess();
+        return assertion_result;
     }
 
-    // TODO: test
     ::testing::AssertionResult TestUtil::equalWithinTolerance(
         const PhysicsWorld::RobotStateWithId_t &state1,
         const PhysicsWorld::RobotStateWithId_t &state2, const double linear_tolerance,
