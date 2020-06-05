@@ -86,7 +86,7 @@ void PhysicsWorld::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     for (const auto& state_with_id : robots)
     {
-        if (isYellowRobotIdAvailable(state_with_id.id))
+        if (isRobotIdAvailable(state_with_id.id, TeamColour::YELLOW))
         {
             yellow_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
                 state_with_id.id, b2_world, state_with_id.robot_state,
@@ -106,7 +106,7 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
     for (const auto& state_with_id : robots)
     {
-        if (isBlueRobotIdAvailable(state_with_id.id))
+        if (isRobotIdAvailable(state_with_id.id, TeamColour::BLUE))
         {
             blue_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
                 state_with_id.id, b2_world, state_with_id.robot_state,
@@ -124,30 +124,15 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 
 const unsigned int PhysicsWorld::getAvailableRobotId(TeamColour colour) const
 {
-    std::function<bool(unsigned int)> available_func;
-    switch (colour)
-    {
-        case TeamColour::BLUE:
-            available_func = [this](unsigned int id) {
-                return this->isBlueRobotIdAvailable(id);
-            };
-            break;
-        case TeamColour::YELLOW:
-            available_func = [this](unsigned int id) {
-                return this->isYellowRobotIdAvailable(id);
-            };
-            break;
-    }
-
     for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
     {
-        if (available_func(i))
+        if (isRobotIdAvailable(i, colour))
         {
             return i;
         }
     }
 
-    if (available_func(std::numeric_limits<unsigned int>::max()))
+    if (isRobotIdAvailable(std::numeric_limits<unsigned int>::max(), colour))
     {
         return std::numeric_limits<unsigned int>::max();
     }
@@ -196,16 +181,6 @@ const bool PhysicsWorld::isRobotIdAvailable(unsigned int id, TeamColour colour) 
     }
 
     return id_available;
-}
-
-bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
-{
-    return isRobotIdAvailable(id, TeamColour::YELLOW);
-}
-
-bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
-{
-    return isRobotIdAvailable(id, TeamColour::BLUE);
 }
 
 void PhysicsWorld::stepSimulation(const Duration& time_step)

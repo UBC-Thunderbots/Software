@@ -120,33 +120,11 @@ class PhysicsWorld
     unsigned int getAvailableYellowRobotId() const;
 
     /**
-     * Returns true if the given id is not already in use by a yellow robot,
-     * and false otherwise.
-     *
-     * @param id The id to check
-     *
-     * @return true if the given id is not already in use by a yellow robot,
-     * and false otherwise
-     */
-    bool isYellowRobotIdAvailable(unsigned int id) const;
-
-    /**
      * Returns the lowest available robot ID that is not already in use by a blue robot.
      *
      * @return the lowest available robot ID that is not already in use by a blue robot.
      */
     unsigned int getAvailableBlueRobotId() const;
-
-    /**
-     * Returns true if the given id is not already in use by a blue robot,
-     * and false otherwise.
-     *
-     * @param id The id to check
-     *
-     * @return true if the given id is not already in use by a blue robot,
-     * and false otherwise
-     */
-    bool isBlueRobotIdAvailable(unsigned int id) const;
 
     /**
      * Advances the physics simulation by the given time step

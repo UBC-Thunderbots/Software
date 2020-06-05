@@ -289,48 +289,6 @@ TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
     EXPECT_EQ(1, physics_world.getAvailableBlueRobotId());
 }
 
-TEST(PhysicsWorldTest, is_yellow_robot_id_available_with_available_id)
-{
-    PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
-
-    EXPECT_TRUE(physics_world.isYellowRobotIdAvailable(0));
-}
-
-TEST(PhysicsWorldTest, is_yellow_robot_id_available_with_unavailable_id)
-{
-    PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
-
-    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::zero(),
-                           AngularVelocity::zero());
-    std::vector<RobotStateWithId> states = {
-        RobotStateWithId{.id = 0, .robot_state = robot_state},
-    };
-    physics_world.addYellowRobots(states);
-
-    EXPECT_FALSE(physics_world.isYellowRobotIdAvailable(0));
-}
-
-TEST(PhysicsWorldTest, is_blue_robot_id_available_with_available_id)
-{
-    PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
-
-    EXPECT_TRUE(physics_world.isBlueRobotIdAvailable(0));
-}
-
-TEST(PhysicsWorldTest, is_blue_robot_id_available_with_unavailable_id)
-{
-    PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());
-
-    RobotState robot_state(Point(0, 0), Vector(0, 0), Angle::zero(),
-                           AngularVelocity::zero());
-    std::vector<RobotStateWithId> states = {
-        RobotStateWithId{.id = 0, .robot_state = robot_state},
-    };
-    physics_world.addBlueRobots(states);
-
-    EXPECT_FALSE(physics_world.isBlueRobotIdAvailable(0));
-}
-
 TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
 {
     BallState ball_state(Point(0, 1), Vector(2, -3));
