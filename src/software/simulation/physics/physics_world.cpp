@@ -9,7 +9,7 @@ PhysicsWorld::PhysicsWorld(const Field& field)
     : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
       current_timestamp(Timestamp::fromSeconds(0)),
       contact_listener(std::make_unique<SimulationContactListener>()),
-      physics_field(std::make_shared<PhysicsField>(b2_world, field)),
+      physics_field(b2_world, field),
       physics_ball(nullptr)
 {
     b2_world->SetContactListener(contact_listener.get());
@@ -17,7 +17,7 @@ PhysicsWorld::PhysicsWorld(const Field& field)
 
 const Field PhysicsWorld::getField() const
 {
-    return physics_field->getField();
+    return physics_field.getField();
 }
 
 const std::optional<BallState> PhysicsWorld::getBallState() const
@@ -55,14 +55,6 @@ const std::vector<RobotStateWithId> PhysicsWorld::getBlueRobotStates() const
 const Timestamp PhysicsWorld::getTimestamp() const
 {
     return current_timestamp;
-}
-
-void PhysicsWorld::setField(const Field& field)
-{
-    if (field.isValid())
-    {
-        physics_field = std::make_shared<PhysicsField>(b2_world, field);
-    }
 }
 
 void PhysicsWorld::setBallState(const BallState& ball_state)

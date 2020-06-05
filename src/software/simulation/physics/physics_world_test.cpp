@@ -26,29 +26,6 @@ TEST(PhysicsWorldTest, default_construct_physics_world)
     EXPECT_EQ(Timestamp::fromSeconds(0), physics_world.getTimestamp());
 }
 
-TEST(PhysicsWorldTest, test_set_field_with_valid_field)
-{
-    Field field1(1, 1, 1, 1, 1, 1, 1);
-    Field field2(2, 2, 2, 2, 2, 2, 2);
-
-    PhysicsWorld physics_world(field1);
-
-    physics_world.setField(field1);
-    EXPECT_EQ(field1, physics_world.getField());
-
-    physics_world.setField(field2);
-    EXPECT_EQ(field2, physics_world.getField());
-}
-
-TEST(PhysicsWorldTest, test_set_field_with_invalid)
-{
-    Field valid_field = ::Test::TestUtil::createSSLDivBField();
-    PhysicsWorld physics_world(valid_field);
-
-    physics_world.setField(Field());
-    EXPECT_EQ(valid_field, physics_world.getField());
-}
-
 TEST(PhysicsWorldTest, test_set_ball_state_when_no_ball_exists)
 {
     PhysicsWorld physics_world(::Test::TestUtil::createSSLDivBField());

@@ -74,14 +74,6 @@ class PhysicsWorld
     const Timestamp getTimestamp() const;
 
     /**
-     * Sets the field in the physics world. The field must be valid. If an invalid
-     * field is provided the field is not updated.
-     *
-     * @param field the new field
-     */
-    void setField(const Field& field);
-
-    /**
      * Sets the state of the ball in the physics world. No more than 1 ball may exist
      * in the physics world at a time. If there is no ball in the physics world, a ball
      * is added with the given state. If a ball already exists, it's state is set to the
@@ -193,11 +185,7 @@ class PhysicsWorld
 
     std::unique_ptr<SimulationContactListener> contact_listener;
 
-    // TODO: is the best way to handle the field? Just check it everywhere to maintain
-    // no nullptr invariant? Needs to be a pointer so we can destroy the underlying
-    // object when we set a new one, since the PhysicsField has no copy or assignment
-    // operator
-    std::shared_ptr<PhysicsField> physics_field;
+    PhysicsField physics_field;
     std::shared_ptr<PhysicsBall> physics_ball;
     std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
     std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
