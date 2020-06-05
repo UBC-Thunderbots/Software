@@ -120,8 +120,8 @@ void SimulatorRobot::kick(float speed_m_per_s)
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
         for (auto ball : this->balls_in_dribbler_area)
         {
-            Vector kick_vector = Vector::createFromAngle(
-                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+            Vector kick_vector =
+                Vector::createFromAngle(robot->getRobotState().orientation());
             kick_vector = kick_vector.normalize(speed_m_per_s);
             ball->kick(kick_vector);
         }
@@ -133,8 +133,8 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         for (auto ball : this->balls_in_dribbler_area)
         {
-            Vector chip_vector = Vector::createFromAngle(
-                robot->getRobotWithTimestamp(Timestamp::fromSeconds(0)).orientation());
+            Vector chip_vector =
+                Vector::createFromAngle(robot->getRobotState().orientation());
             chip_vector = chip_vector.normalize(distance_m);
             ball->chip(chip_vector);
         }
@@ -287,17 +287,15 @@ void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
 {
     if (isAutokickEnabled())
     {
-        Vector kick_vector = Vector::createFromAngle(
-            physics_robot->getRobotWithTimestamp(Timestamp::fromSeconds(0))
-                .orientation());
+        Vector kick_vector =
+            Vector::createFromAngle(physics_robot->getRobotState().orientation());
         kick_vector = kick_vector.normalize(autokick_speed_m_per_s.value());
         physics_ball->kick(kick_vector);
     }
     else if (isAutochipEnabled())
     {
-        Vector chip_vector = Vector::createFromAngle(
-            physics_robot->getRobotWithTimestamp(Timestamp::fromSeconds(0))
-                .orientation());
+        Vector chip_vector =
+            Vector::createFromAngle(physics_robot->getRobotState().orientation());
         chip_vector = chip_vector.normalize(autochip_distance_m.value());
         physics_ball->chip(chip_vector);
     }
@@ -308,8 +306,8 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
 {
     if (dribbler_rpm > 0)
     {
-        auto robot = physics_robot->getRobotWithTimestamp(Timestamp::fromSeconds(0));
-        auto ball  = physics_ball->getBallWithTimestamp(Timestamp::fromSeconds(0));
+        auto robot = physics_robot->getRobotState();
+        auto ball  = physics_ball->getBallState();
 
         // To dribble, we apply a force towards the center and back of the dribbling area,
         // closest to the chicker. We vary the magnitude of the force by how far the ball
@@ -325,7 +323,8 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
                            PhysicsRobot::dribbler_depth);
         Vector dribble_force_vector = dribble_point - ball.position();
         // convert to cm so we operate on a small scale
-        double dist_from_dribble_point_cm = dribble_force_vector.length() * 100;
+        double dist_from_dribble_point_cm =
+            dribble_force_vector.length() * CENTIMETERS_PER_METER;
         // Combine a polynomial with a slightly offset linear function. This shifts the
         // intercept with the x-axis to a small positive x-value, so that there is a small
         // region when the ball is extremely close to the back of the dribbler area (and
