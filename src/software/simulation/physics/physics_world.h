@@ -124,7 +124,7 @@ class PhysicsWorld
      *
      * @return the lowest available robot ID that is not already in use by a blue robot.
      */
-     RobotId getAvailableBlueRobotId() const;
+    RobotId getAvailableBlueRobotId() const;
 
     /**
      * Advances the physics simulation by the given time step
