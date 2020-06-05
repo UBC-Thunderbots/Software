@@ -38,13 +38,6 @@ class World final
                    const Team& enemy_team, unsigned int buffer_size = 20);
 
     /**
-     * Updates the state of the field in the world with the new field
-     *
-     * @param new_field A new Field
-     */
-    void setField(const Field& new_field);
-
-    /**
      * Updates the state of the ball in the world with the new ball data
      *
      * @param new_ball_data A BallState containing new ball information
