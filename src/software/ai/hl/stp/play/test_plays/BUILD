@@ -24,3 +24,13 @@ cc_library(
     ],
     alwayslink = True,
 )
+
+cc_test(
+    name = "play_test",
+    srcs = ["play_test.cpp"],
+    deps = [
+        ":move_test_play",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

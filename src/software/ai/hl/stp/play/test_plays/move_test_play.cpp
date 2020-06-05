@@ -34,6 +34,8 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
             world->field().enemyGoalCenter());
         move_test_tactic_center_field->updateControlParams(Point(0, 0));
 
+        std::cout << world->ball().position() << std::endl;
+
         yield({move_test_tactic_center_field, move_test_tactic_friendly_goal,
                move_test_tactic_enemy_goal});
     } while (!move_test_tactic_center_field->done());
