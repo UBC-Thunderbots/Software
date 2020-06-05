@@ -124,6 +124,7 @@ class PhysicsWorld
      * and false otherwise.
      *
      * @param id The id to check
+     *
      * @return true if the given id is not already in use by a yellow robot,
      * and false otherwise
      */
@@ -141,6 +142,7 @@ class PhysicsWorld
      * and false otherwise.
      *
      * @param id The id to check
+     *
      * @return true if the given id is not already in use by a blue robot,
      * and false otherwise
      */
@@ -168,14 +170,37 @@ class PhysicsWorld
     std::weak_ptr<PhysicsBall> getPhysicsBall() const;
 
    private:
-    enum RobotColour {
-        YELLOW,
-        BLUE
-    };
+    /**
+     * Returns the states and IDs of all robots of the specified colour.
+     * There is no guarantee as to what order the robots are returned in.
+     *
+     * @param colour The colour of robot to return
+     *
+     * @return the states and IDs of all robots of the specified colour
+     */
+    const std::vector<RobotStateWithId> getRobotStates(TeamColour colour) const;
 
-    // TODO: comment
-    const std::vector<RobotStateWithId> getRobotStates(const RobotColour colour) const;
+    /**
+     * Returns the lowest available robot ID that is not already in use
+     * by a robot of the specified colour
+     *
+     * @param colour The team colour
+     *
+     * @return the lowest available robot ID that is not already in use
+     * by a robot of the specified colour
+     */
+    const unsigned int getAvailableRobotId(TeamColour colour) const;
 
+    /**
+     * Returns true if the given id is not already in use by the specified team
+     *
+     * @param id The id to check
+     * @param colour the colour of the team to check against
+     *
+     * @return true if the given id is not already in use by the speciried team,
+     * and false otherwise
+     */
+    const bool isRobotIdAvailable(unsigned int id, TeamColour colour) const;
 
     // Note: we declare the b2World first so it is destroyed last. If it is destroyed
     // before the physics objects, segfaults will occur due to pointers internal to Box2D

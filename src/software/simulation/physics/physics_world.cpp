@@ -25,13 +25,13 @@ const std::optional<BallState> PhysicsWorld::getBallState() const
     return physics_ball ? std::make_optional(physics_ball->getBallState()) : std::nullopt;
 }
 
-const std::vector<RobotStateWithId> PhysicsWorld::getRobotStates(const PhysicsWorld::RobotColour colour) const {
+const std::vector<RobotStateWithId> PhysicsWorld::getRobotStates(const TeamColour colour) const {
     std::vector<std::shared_ptr<PhysicsRobot>> physics_robots;
     switch(colour) {
-        case RobotColour::BLUE:
+        case TeamColour::BLUE:
             physics_robots = blue_physics_robots;
             break;
-        case RobotColour ::YELLOW:
+        case TeamColour ::YELLOW:
             physics_robots = yellow_physics_robots;
             break;
     }
@@ -39,6 +39,10 @@ const std::vector<RobotStateWithId> PhysicsWorld::getRobotStates(const PhysicsWo
     std::vector<RobotStateWithId> robot_states;
     for (const auto& robot : physics_robots)
     {
+        if(!robot) {
+            LOG(FATAL) << "Encountered a nullptr to a " << toString(colour) << " physics robot in the physics world";
+        }
+
         auto state_with_id = RobotStateWithId{
                 .id = robot->getRobotId(), .robot_state = robot->getRobotState()};
         robot_states.emplace_back(state_with_id);
@@ -50,12 +54,12 @@ const std::vector<RobotStateWithId> PhysicsWorld::getRobotStates(const PhysicsWo
 const std::vector<RobotStateWithId> PhysicsWorld::getYellowRobotStates()
     const
 {
-    return getRobotStates(RobotColour::YELLOW);
+    return getRobotStates(TeamColour::YELLOW);
 }
 
 const std::vector<RobotStateWithId> PhysicsWorld::getBlueRobotStates() const
 {
-    return getRobotStates(RobotColour::BLUE);
+    return getRobotStates(TeamColour::BLUE);
 }
 
 const Timestamp PhysicsWorld::getTimestamp() const
@@ -114,70 +118,60 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
     }
 }
 
-unsigned int PhysicsWorld::getAvailableYellowRobotId() const
-{
+const unsigned int PhysicsWorld::getAvailableRobotId(TeamColour colour) const {
+    std::function<bool(unsigned int)> available_func;
+    switch(colour) {
+        case TeamColour::BLUE:
+            available_func = [this](unsigned int id) {return this->isBlueRobotIdAvailable(id);};
+            break;
+        case TeamColour::YELLOW:
+            available_func = [this](unsigned int id) {return this->isYellowRobotIdAvailable(id);};
+            break;
+    }
+
     for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
     {
-        if (isYellowRobotIdAvailable(i))
+        if (available_func(i))
         {
             return i;
         }
     }
 
-    if (isYellowRobotIdAvailable(std::numeric_limits<unsigned int>::max()))
+    if (available_func(std::numeric_limits<unsigned int>::max()))
     {
         return std::numeric_limits<unsigned int>::max();
     }
 
-    LOG(FATAL) << "Out of available yellow robot IDs in the physics world";
+    LOG(FATAL) << "Out of available " << toString(colour) << " robot IDs in the physics world";
 }
 
-bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
+unsigned int PhysicsWorld::getAvailableYellowRobotId() const
 {
-    bool id_available = true;
-    for (const auto& robot : yellow_physics_robots)
-    {
-        if (!robot)
-        {
-            LOG(FATAL) << "Encountered a nullptr to a yellow physics robot in the physics world";
-        }
-
-        if (id == robot->getRobotId())
-        {
-            id_available = false;
-            break;
-        }
-    }
-
-    return id_available;
+    return getAvailableRobotId(TeamColour::YELLOW);
 }
 
 unsigned int PhysicsWorld::getAvailableBlueRobotId() const
 {
-    for (unsigned int i = 0; i < std::numeric_limits<unsigned int>::max(); i++)
-    {
-        if (isBlueRobotIdAvailable(i))
-        {
-            return i;
-        }
-    }
-
-    if (isBlueRobotIdAvailable(std::numeric_limits<unsigned int>::max()))
-    {
-        return std::numeric_limits<unsigned int>::max();
-    }
-
-    LOG(FATAL) << "Out of available blue robot IDs in the physics world";
+    return getAvailableRobotId(TeamColour::BLUE);
 }
 
-bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
-{
+const bool PhysicsWorld::isRobotIdAvailable(unsigned int id, TeamColour colour) const {
+    std::vector<std::shared_ptr<PhysicsRobot>> physics_robots;
+    switch(colour) {
+        case TeamColour::BLUE:
+            physics_robots = blue_physics_robots;
+            break;
+        case TeamColour ::YELLOW:
+            physics_robots = yellow_physics_robots;
+            break;
+    }
+
     bool id_available = true;
-    for (const auto& robot : blue_physics_robots)
+    for (const auto& robot : physics_robots)
     {
         if (!robot)
         {
-            LOG(FATAL) << "Encountered a nullptr to a blue physics robot in the physics world";
+            LOG(FATAL) << "Encountered a nullptr to a " << toString(colour) << " physics robot in the physics world";
         }
 
         if (id == robot->getRobotId())
@@ -188,6 +182,16 @@ bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
     }
 
     return id_available;
+}
+
+bool PhysicsWorld::isYellowRobotIdAvailable(unsigned int id) const
+{
+    return isRobotIdAvailable(id, TeamColour::YELLOW);
+}
+
+bool PhysicsWorld::isBlueRobotIdAvailable(unsigned int id) const
+{
+    return isRobotIdAvailable(id, TeamColour::BLUE);
 }
 
 void PhysicsWorld::stepSimulation(const Duration& time_step)
@@ -201,6 +205,11 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getFriendlyPhysicsRobots(
     std::vector<std::weak_ptr<PhysicsRobot>> robots;
     for (const auto& friendly_physics_robot : yellow_physics_robots)
     {
+        if (!friendly_physics_robot)
+        {
+            LOG(FATAL) << "Encountered a nullptr to a yellow physics robot in the physics world";
+        }
+
         robots.emplace_back(friendly_physics_robot);
     }
     return robots;
