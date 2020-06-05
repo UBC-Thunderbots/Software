@@ -31,7 +31,8 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
 {
    public:
     RobotNavigationObstacleFactoryMotionConstraintTest()
-        : current_time(Timestamp::fromSeconds(123)),
+        : current_time(
+              Timestamp::fromSeconds(123)),  // arbitrary point in time for testing
           robot_navigation_obstacle_factory(
               Util::DynamicParameters->getAIConfig()
                   ->getRobotNavigationObstacleFactoryConfig()),
@@ -45,8 +46,6 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
 
     void SetUp() override
     {
-        // An arbitrary fixed point in time
-        // We use this fixed point in time to make the tests deterministic.
         field = ::Test::TestUtil::createSSLDivBField();
 
         Robot friendly_robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
