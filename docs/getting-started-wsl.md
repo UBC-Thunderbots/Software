@@ -10,13 +10,14 @@
 
 ## Introduction
 
-Windows has a new Windows Subsystem for Linux component that can be used to develop and run code for Linux on Windows. WSL1 was a Windows component that implemented Linux kernel interfaces, and didn't work great with Thunderbots code. WSL2 runs a full-fledged Linux kernel in a VM, and works great with Thunderbots and grSim with the exception that we need to use software rendering instead of GPU-accelerated rendering for grSim.
+Windows has a Windows Subsystem for Linux component that can be used to develop and run code for Linux on Windows. WSL1 was a Windows component that implemented Linux kernel interfaces, and didn't work great with Thunderbots AI software or grSim. WSL2 runs a full-fledged Linux kernel in a VM, and works great with Thunderbots AI software and grSim with the exception that we need to use software rendering instead of GPU-accelerated rendering for grSim and our AI.
+
+Note that this will not work with legacy robots. Due to the lack of USB support in WSL2, we are unable to use the USB dongle used to communicate with them.
 
 ## WSL2 Setup
 
-1. You'll need to be on an Insider build 19041.207 to use WSL2. Navigate to Settings > Windows Update > Windows Insider Program and complete the steps to enrol in the Windows Insider Program if you have not already. 
-    - Being on the 'Slow' or 'Release Preview' ring will get you a new enough build for WSL2. 
-2. When the Insider build finishes installing through Windows Update, you're ready to enable WSL2.
+1. You'll need to be on build 19041 or later to use WSL2. If you have updated to Windows 10 version 2004 or newer, you will be able to use WSL2. 
+2. When you have ensured that your Windows version supports WSL2, do the following to enable it.
     - Enable WSL by opening an Administrator PowerShell window and running command 
     ```
     dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
@@ -42,7 +43,7 @@ Windows has a new Windows Subsystem for Linux component that can be used to deve
     - Choose 'Multiple windows' on the first screen
     - Choose 'Start no client' on the second screen
     - On the third screen, name sure 'Native opengl' is UNCHECKED and 'Disable access control' is CHECKED
-4. Restart WSL with `wsl --shutdown` on the Windows command line. Open WSL again through the Start menu.
+4. Shut down WSL with `wsl --shutdown` on the Windows command line. Open WSL again through the Ubuntu app in the Start menu.
 5. Verify that your system is configured correctly by running `glxgears -info` on the Linux command line. You should see a window pop up with spinning gears and the line `GL_RENDERER   = llvmpipe (LLVM 9.0, 256 bits)` at the top of the output.
 
 Once you have completed all of the above, complete the [Software Setup](./getting-started.md).
