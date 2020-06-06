@@ -18,16 +18,18 @@ WifiBackend::WifiBackend()
                     Util::DynamicParameters->getCameraConfig()),
       io_service()
 {
+    std::string network_interface =
+        Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+
     // connect to current channel
-    joinMulticastChannel(
-        Util::DynamicParameters->getNetworkConfig()->Channel()->value(),
-        Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value());
+    joinMulticastChannel(Util::DynamicParameters->getNetworkConfig()->Channel()->value(),
+                         network_interface);
 
     // add callback to switch channels on param change
     Util::MutableDynamicParameters->getMutableNetworkConfig()
         ->mutableChannel()
         ->registerCallbackFunction(
-            boost::bind(&WifiBackend::joinMulticastChannel, this, _1));
+            boost::bind(&WifiBackend::joinMulticastChannel, this, _1, network_interface));
 
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
@@ -61,14 +63,16 @@ void WifiBackend::receiveTbotsRobotMsg(TbotsRobotMsg robot_msg)
 void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ProtoMulticastSender<VisionMsg>(
-        io_service, MULTICAST_CHANNELS[channel] + "%" + interface, VISION_PORT));
+        io_service, std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
+        VISION_PORT));
 
     primitive_output.reset(new ProtoMulticastSender<PrimitiveMsg>(
-        io_service, MULTICAST_CHANNELS[channel] + "%" + interface, PRIMITIVE_PORT));
+        io_service, std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
+        PRIMITIVE_PORT));
 
-    robot_status_input.reset(new ProtoMulticastListener<TbotsRobotMsg>(
-        io_service, MULTICAST_CHANNELS[channel] + "%" + interface, ROBOT_STATUS_PORT,
-        boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1)));
+    robot_msg_input.reset(new ProtoMulticastListener<TbotsRobotMsg>(
+        io_service, std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
+        ROBOT_STATUS_PORT, boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1)));
 }
 
 // Register this backend in the genericFactory
