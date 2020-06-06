@@ -94,3 +94,14 @@ TEST(TbotsMathTest, test_linear_interp_xp_less_than_x0)
 
     EXPECT_FLOAT_EQ(yp, 0);
 }
+
+TEST(TbotsMathTest, test_linear_interp_x0_equal_to_x1)
+{
+    const float x0 = 0.5;
+    const float y0 = 1;
+    const float x1 = 0.5;
+    const float y1 = 2;
+    const float xp = 0.6;
+
+    EXPECT_DEATH(shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp), "");
+}
