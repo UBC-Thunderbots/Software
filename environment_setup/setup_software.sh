@@ -89,12 +89,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Symlink qt include directory
-# As the Qt Bazel rules depend on an include directory which varies between Linux
-# platforms, we symlink this directory to one place in our source tree
-# and platform-dependent properties stay in the setup script
-ln -snf /usr/include/x86_64-linux-gnu/qt5 $GIT_ROOT/src/external/qt
-
 # Done
 echo "================================================================"
 echo "Done Software Setup"
