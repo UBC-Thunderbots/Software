@@ -1,13 +1,15 @@
 #pragma once
 
+#include <vector>
+
 #include "software/new_geom/point.h"
 #include "software/new_geom/spline2d.h"
-#include <vector>
 
 // TODO: should this extend anything else in the geometry hierarchy?
 // TODO: jdoc
 // TODO: should link to https://www.ibiblio.org/e-notes/Splines/bezier.html and wikipedia
-class BezierCurve2d {
+class BezierCurve2d
+{
    public:
     BezierCurve2d() = delete;
 
@@ -32,21 +34,38 @@ class BezierCurve2d {
     // TODO: `val` is a terrible argument name since we're getting the `value`. Rename.
     const Point getValueAt(double val) const;
 
-    // TODO: consider renaming to `getStartParametrizationVal`? Similarly for `getEndVal`
-
     // TODO: jdoc, make sure to note that parametrization is in [0,1]
     Polynomial2d getPolynomial() const;
 
    private:
-    // TODO: jdoc
-    // TODO: better name
-    // (https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm)
-    static const Point deCasteljauAlgorithm(const std::vector<Point>& points, const double t);
+    /*
+     * Evaluate the point `t` on the bezier curve with control points `points`
+     *
+     * Implementation of the De Casteljau algorithm:
+     * https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm
+     * Assumes the curve is parameterized such that `t=0` is the first point, and
+     * `t=1` is the last point.
+     *
+     * @param points The control points of the bezier curve
+     * @param t The value at which to evaluate the bezier curve
+     *
+     * @throw std::invalid_arguments If `points` is empty
+     *
+     * @return The point on the bezier curve corresponding to the value `t`
+     */
+    static const Point deCasteljauAlgorithm(const std::vector<Point>& points,
+                                            const double t);
 
-    // TODO: jdoc
-    const Vector computePolynomialCoefficients(size_t j) const;
+    /**
+     * Compute the x and y coefficients for the given order on the polynomial
+     * representation of this curve
+     *
+     * @param order The order to get the polynomial coefficients for
+     *
+     * @return The x and y polynomial coefficients
+     */
+    const Vector computePolynomialCoefficients(const size_t order) const;
 
-    const
-
-    std::vector<Point> control_points;
+    // The control points for this bezier curve
+    const std::vector<Point> control_points;
 };

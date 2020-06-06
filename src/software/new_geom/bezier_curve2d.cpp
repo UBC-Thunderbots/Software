@@ -36,10 +36,13 @@ Polynomial2d BezierCurve2d::getPolynomial() const
 const Point BezierCurve2d::deCasteljauAlgorithm(const std::vector<Point>& points,
                                                 const double t)
 {
-    // TODO: points should be const reference!!
-    // TODO: better comment explaining this link here plz
+    // For more information on this algorithm, please see the wikipedia arcticle:
     // (https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm)
-
+    if (points.size() == 0)
+    {
+        throw std::invalid_argument(
+            "Zero points passed to the De Casteljau Algorithm, requires at least one.");
+    }
     if (points.size() == 1)
     {
         return points[0];
@@ -48,7 +51,7 @@ const Point BezierCurve2d::deCasteljauAlgorithm(const std::vector<Point>& points
     std::vector<Point> new_points;
     for (size_t i = 0; i < points.size() - 1; i++)
     {
-        new_points.emplace_back(points[i] + t * (points[1] - points[0]));
+        new_points.emplace_back(points[i] + t * (points[i+1] - points[i]));
     }
 
     return deCasteljauAlgorithm(new_points, t);
@@ -57,9 +60,15 @@ const Point BezierCurve2d::deCasteljauAlgorithm(const std::vector<Point>& points
 
 
 // TODO: weigh naming to match wikipedia article vs maybe something more descriptive?
-const Vector BezierCurve2d::computePolynomialCoefficients(size_t j) const
+const Vector BezierCurve2d::computePolynomialCoefficients(const size_t order) const
 {
-    // TODO: comments about steps here
+    // Algorithm here is effectively taken verbatim from wikipedia
+    // (https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Polynomial_form)
+
+    // This is a convenience re-naming so that we can more closely mirror the
+    // algorithm as described in the above wikipedia article
+    const size_t& j = order;
+
     Vector result(0, 0);
     for (size_t i = 0; i <= j; i++)
     {
@@ -70,10 +79,8 @@ const Vector BezierCurve2d::computePolynomialCoefficients(size_t j) const
 
     for (int m = 0; m <= static_cast<int>(j) - 1; m++)
     {
-        result.setX(result.x() * static_cast<double>(control_points.size() - m -1)
-                    );
-        result.setY(result.y() * static_cast<double>(control_points.size() - m - 1)
-                    );
+        result.setX(result.x() * static_cast<double>(control_points.size() - m - 1));
+        result.setY(result.y() * static_cast<double>(control_points.size() - m - 1));
     }
 
     return result;

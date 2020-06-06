@@ -8,14 +8,14 @@ using namespace Test;
 
 // TODO: these tests are much cleaner if we can scale points with multiplication
 
-TEST(BezierCurveTest, contstruct_with_less_then_two_control_points)
+TEST(BezierCurve2dTest, contstruct_with_less_then_two_control_points)
 {
     std::vector<Point> points = {Point(0, 0)};
 
     EXPECT_THROW(BezierCurve2d curve(points), std::invalid_argument);
 }
 
-TEST(BezierCurveTest, get_value_two_points)
+TEST(BezierCurve2dTest, get_value_two_points)
 {
     // Linear bezier curve
     Point p0(-1, 2);
@@ -30,7 +30,7 @@ TEST(BezierCurveTest, get_value_two_points)
     // too the expected polynomial
     for (int i = 0; i <= 1000; i++)
     {
-        const double t = static_cast<double>(i) / 1000;
+        const double t = static_cast<double>(i) / 1000.0;
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.valueAt(t),
                                                    curve.getValueAt(t), 1e-9));
     }
@@ -38,24 +38,36 @@ TEST(BezierCurveTest, get_value_two_points)
 
 TEST(BezierCurveTest, get_value_four_points)
 {
-    // Quintic bezier curve
+    // Cubic bezier curve
     Vector v0(-1, 2);
-    Vector v1(5, -7);
-    Vector v2(10, 5);
-    Vector v3(-10, 1);
+    Vector v1(5, -1);
+    Vector v2(3, 2);
+    Vector v3(2, 1);
     const std::vector<Point> points = {Point(v0), Point(v1), Point(v2), Point(v3)};
 
     const BezierCurve2d curve(points);
 
-    const Polynomial2d expected_polynomial2d({Point(v0), Point(3.0 * (v1 - v0)),
-                                              Point(3.0 * (v0 - 2.0 * v1 + v2)),
-                                              Point(-v0 - 3.0 * v1 - 3.0 * v2 + v3)});
+    // clang-format off
+    const Polynomial2d expected_polynomial2d(
+        Polynomial1d({
+                         v0.x(),
+                         3.0 * (v1.x() - v0.x()),
+                         3.0 * (v0.x() - 2.0 * v1.x() + v2.x()),
+                         -v0.x() + 3.0 * v1.x() - 3.0 * v2.x() + v3.x()
+                     }),
+        Polynomial1d({
+                         v0.y(),
+                         3.0 * (v1.y() - v0.y()),
+                         3.0 * (v0.y() - 2.0 * v1.y() + v2.y()),
+                         -v0.y() + 3.0 * v1.y() - 3.0 * v2.y() + v3.y()
+                     }));
+    // clang-format on
 
     // We approximate an equality check by sampling at a bunch of points and comparing
     // too the expected polynomial
     for (int i = 0; i <= 1000; i++)
     {
-        const double t = static_cast<double>(i) / 1000;
+        const double t = static_cast<double>(i) / 1000.0;
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.valueAt(t),
                                                    curve.getValueAt(t), 1e-9));
     }
@@ -78,7 +90,7 @@ TEST(BezierCurve2dTest, get_polynomial_two_points)
 
 TEST(BezierCurve2dTest, get_polynomial_four_points)
 {
-    // Test constructing a bezier curve between four points, ie. a quintic bezier curve
+    // Test constructing a bezier curve between four points, ie. a cubic bezier curve
     Vector v0(-1, 2);
     Vector v1(5, -7);
     Vector v2(10, 5);
@@ -90,17 +102,17 @@ TEST(BezierCurve2dTest, get_polynomial_four_points)
     // clang-format off
     const Polynomial2d expected_polynomial2d(
         Polynomial1d({
-            v0.x(),
-            3.0 * (v1.x() - v0.x()),
-            3.0 * (v0.x() - 2.0 * v1.x() + v2.x()),
-            -v0.x() - 3.0 * v1.x() - 3.0 * v2.x() + v3.x()
-            }),
+                         v0.x(),
+                         3.0 * (v1.x() - v0.x()),
+                         3.0 * (v0.x() - 2.0 * v1.x() + v2.x()),
+                         -v0.x() + 3.0 * v1.x() - 3.0 * v2.x() + v3.x()
+                     }),
         Polynomial1d({
-            v0.y(),
-            3.0 * (v1.y() - v0.y()),
-            3.0 * (v0.y() - 2.0 * v1.y() + v2.y()),
-            -v0.y() - 3.0 * v1.y() - 3.0 * v2.y() + v3.y()
-        }));
+                         v0.y(),
+                         3.0 * (v1.y() - v0.y()),
+                         3.0 * (v0.y() - 2.0 * v1.y() + v2.y()),
+                         -v0.y() + 3.0 * v1.y() - 3.0 * v2.y() + v3.y()
+                     }));
     // clang-format on
     const Polynomial2d actual_polynomial2d = curve.getPolynomial();
 
