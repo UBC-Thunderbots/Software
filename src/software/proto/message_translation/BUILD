@@ -13,9 +13,9 @@ cc_library(
 )
 
 cc_library(
-    name = "protobuf_message_translator",
-    srcs = ["protobuf_message_translator.cpp"],
-    hdrs = ["protobuf_message_translator.h"],
+    name = "protobuf_message_translation",
+    hdrs = ["protobuf_message_translation.h"],
+    srcs = ["protobuf_message_translation.cpp"],
     visibility = ["//visibility:public"],
     deps = [
         "//shared/proto:tbots_cc_proto",
@@ -26,5 +26,15 @@ cc_library(
         "//software/primitive:primitive_visitor",
         "//software/proto/message_translation:protobuf_primitive_visitor",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "protobuf_message_translation_test",
+    srcs = ["protobuf_message_translation_test.cpp"],
+    deps = [
+        "//software/proto/message_translation:protobuf_message_translation",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )

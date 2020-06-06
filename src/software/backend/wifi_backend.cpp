@@ -21,7 +21,6 @@ WifiBackend::WifiBackend()
     // connect to current channel
     joinMulticastChannel(Util::DynamicParameters->getNetworkConfig()->Channel()->value());
 
-    // TODO can't register callbacks with the immutable parameters, why?
     // add callback to switch channels on param change
     Util::MutableDynamicParameters->getMutableNetworkConfig()
         ->mutableChannel()
