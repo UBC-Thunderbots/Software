@@ -10,26 +10,51 @@
 #include <memory>
 #include "software/util/make_enum/make_enum.h"
 
-// TODO: comment what each of these is, and where we get them
-// Technically line lenghts / coordinates do not include thickness
+/**
+ * This enum, along with the map of strings below, contain all the different
+ * field lines that can be sent by SSL Vision.
+ * This list can partially be obtained by reading the wiki
+ * https://github.com/RoboCup-SSL/ssl-vision/wiki/camera-calibration#update-field-markings
+ * and the rules https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
+ *
+ * Several values like the various goal lines are not listed in the wiki
+ * and so have been determined "experimentally" by inspecting messages
+ * received from SSL Vision or Grsim
+ *
+ * Conventions and naming from the SSL
+ * - "Top" refers to +y in our coordinate system. "Bottom" refers to -y
+ * - "Left" refers to -x in our coordinate system. "Right" refers to +x
+ * - "Penalty" really refers to the defense area
+ */
 MAKE_ENUM(SSLFieldLines,
  TOP_TOUCH_LINE,
  BOTTOM_TOUCH_LINE,
  LEFT_GOAL_LINE,
  RIGHT_GOAL_LINE,
  HALFWAY_LINE,
+ // Runs perpendicular to the HALFWAY_LINE, from net to net
  CENTER_LINE,
  LEFT_PENALTY_STRETCH,
  RIGHT_PENALTY_STRETCH,
- RIGHT_GOAL_TOP_LINE, //(4.5, 0.5), (4.69, 0.5)
- RIGHT_GOAL_BOTTOM_LINE, // (4.5, -0.5), (4.89, -0.5)
- RIGHT_GOAL_DEPTH_LINE, // (4.685, -0.5), (4.685, 0.5)
- LEFT_GOAL_TOP_LINE, // (-4.5, 0.5), (-4.69, 0.5)
- LEFT_GOAL_BOTTOM_LINE, // (-4.5, -0.5), (-4.7, -0.5)
- LEFT_GOAL_DEPTH_LINE, // (-4.685, -0.5), (-4.685, 0.5)
+ // TOP is +y, BOTTOM is -y
+ RIGHT_GOAL_TOP_LINE,
+ RIGHT_GOAL_BOTTOM_LINE,
+ // The DEPTH_LINE is the back of the net
+ RIGHT_GOAL_DEPTH_LINE,
+ // TOP is +y, BOTTOM is -y
+LEFT_GOAL_TOP_LINE,
+ LEFT_GOAL_BOTTOM_LINE,
+// The DEPTH_LINE is the back of the net
+      LEFT_GOAL_DEPTH_LINE,
+ // For the LEFT_FIELD, LEFT and RIGHT are from the POV of the net
+ // on the left of the field looking in towards the center of the
+ // field. ie. LEFT is +y, RIGHT is -y
  LEFT_FIELD_LEFT_PENALTY_STRETCH,
  LEFT_FIELD_RIGHT_PENALTY_STRETCH, // right is positive y
- RIGHT_FIELD_LEFT_PENALTY_STRETCH,
+// For the RIGHT_FIELD, LEFT and RIGHT are from the POV of the net
+// on the right of the field looking in towards the center of the
+// field. ie. LEFT is +y, RIGHT is -y
+  RIGHT_FIELD_LEFT_PENALTY_STRETCH,
  RIGHT_FIELD_RIGHT_PENALTY_STRETCH,
 )
 
