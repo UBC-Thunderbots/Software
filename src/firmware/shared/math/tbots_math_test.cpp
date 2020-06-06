@@ -57,3 +57,40 @@ TEST(TbotsMathTest, test_linear_interp_mid_point_negative_shifted)
 
     EXPECT_FLOAT_EQ(yp, -1.5);
 }
+
+TEST(TbotsMathTest, test_linear_interp_zeros)
+{
+    const float x0 = 0;
+    const float y0 = 0;
+    const float x1 = 0;
+    const float y1 = 0;
+    const float xp = 0;
+
+    EXPECT_DEATH(shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp), "");
+}
+
+TEST(TbotsMathTest, test_linear_interp_xp_greater_than_x1)
+{
+    const float x0 = 0;
+    const float y0 = 0;
+    const float x1 = 1;
+    const float y1 = 1;
+    const float xp = 2;
+
+    const float yp = shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp);
+
+    EXPECT_FLOAT_EQ(yp, 1.0);
+}
+
+TEST(TbotsMathTest, test_linear_interp_xp_less_than_x0)
+{
+    const float x0 = 0;
+    const float y0 = 0;
+    const float x1 = 1;
+    const float y1 = 1;
+    const float xp = -2;
+
+    const float yp = shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp);
+
+    EXPECT_FLOAT_EQ(yp, 0);
+}
