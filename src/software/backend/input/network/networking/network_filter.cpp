@@ -54,8 +54,8 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     for (int i = 0; i < packet_geometry.field_arcs_size(); i++)
     {
         const SSL_FieldCircularArc &arc = packet_geometry.field_arcs(i);
-        std::string arc_name           = arc.name();
-        ssl_circular_arcs[arc_name]    = arc;
+        std::string arc_name            = arc.name();
+        ssl_circular_arcs[arc_name]     = arc;
     }
 
     // Field Lines
