@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/proto/message_translation/protobuf_message_translator.h"
+#include "software/proto/message_translation/protobuf_message_translation.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string WifiBackend::name = "wifi";
@@ -39,12 +39,12 @@ WifiBackend::~WifiBackend()
 void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
     primitive_output->sendProto(
-        *ProtobufMessageTranslator::getPrimitiveMsgFromPrimitiveVector(primitives_ptr));
+        *ProtobufMessageTranslation::getPrimitiveMsgFromPrimitiveVector(primitives_ptr));
 }
 
 void WifiBackend::receiveWorld(World world)
 {
-    vision_output->sendProto(*ProtobufMessageTranslator::getVisionMsgFromWorld(world));
+    vision_output->sendProto(*ProtobufMessageTranslation::getVisionMsgFromWorld(world));
     Subject<World>::sendValueToObservers(world);
 }
 
