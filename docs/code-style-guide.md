@@ -62,7 +62,7 @@ The vast majority of the things noted in this document will apply to `C` code as
 
 * Functions that take no arguments must be declared as `foo(void)` **not** `foo()`, as the second option allows `foo` to take anything as it's arguments ([reference](https://softwareengineering.stackexchange.com/questions/286490/what-is-the-difference-between-function-and-functionvoid/286494))
 
-* Functions that return values via argument must have all parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**.
+* Functions that return values via argument(s) must have all parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**.
 
   ``` C
   // Incorrect
