@@ -77,6 +77,18 @@ TEST(Polynomial2dTest, constructor_from_list_of_points_valid)
     EXPECT_NEAR(17.6, p.getPolyY().getCoeff(2), 1e-9);
 }
 
+TEST(Polynomial2dTest, constructor_from_initializer_list_of_points){
+    // Here we just check that the initializer list constructor is equivalent to the
+    // vector constructor
+    const std::vector<Point> points = {Point(-1, 1), Point(0, 0), Point(3.3, 7.8)};
+
+    const Polynomial2d initializer_list_poly({Point(-1, 1), Point(0, 0), Point(3.3, 7.8)});
+    const Polynomial2d vector_poly(points);
+
+    EXPECT_EQ(vector_poly.getPolyX(), initializer_list_poly.getPolyX());
+    EXPECT_EQ(vector_poly.getPolyY(), initializer_list_poly.getPolyY());
+}
+
 TEST(Polynomial2dTest, get_poly_x)
 {
     const Polynomial1d p_x({0, 2, 5, 7});
@@ -93,4 +105,33 @@ TEST(Polynomial2dTest, get_poly_y)
     const Polynomial2d p(p_x, p_y);
 
     EXPECT_EQ(p_y, p.getPolyY());
+}
+
+TEST(Polynomial2dTest, equality_operator_equal){
+    const Polynomial1d p_x({0, 2, 5, 7});
+    const Polynomial1d p_y({0, 3, 1, 8});
+    const Polynomial2d p1(p_x, p_y);
+    const Polynomial2d p2(p_x, p_y);
+
+    EXPECT_TRUE(operator==(p1, p2));
+}
+
+TEST(Polynomial2dTest, equality_operator_x_poly_not_equal){
+    const Polynomial1d p_x_1({0, 2, 5, 7});
+    const Polynomial1d p_x_2({0, 1, 5, 7});
+    const Polynomial1d p_y({0, 3, 1, 8});
+    const Polynomial2d p1(p_x_1, p_y);
+    const Polynomial2d p2(p_x_2, p_y);
+
+    EXPECT_FALSE(operator==(p1, p2));
+}
+
+TEST(Polynomial2dTest, equality_operator_y_poly_not_equal){
+    const Polynomial1d p_x({0, 2, 5, 7});
+    const Polynomial1d p_y_1({0, 2, 1, 8});
+    const Polynomial1d p_y_2({0, 3, 1, 8});
+    const Polynomial2d p1(p_x, p_y_1);
+    const Polynomial2d p2(p_x, p_y_2);
+
+    EXPECT_FALSE(operator==(p1, p2));
 }

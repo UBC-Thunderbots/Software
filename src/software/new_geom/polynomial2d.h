@@ -38,6 +38,19 @@ class Polynomial2d
      */
     Polynomial2d(std::vector<Point> points);
 
+    /**
+     * Construct a 2d polynomial that passes through the given points
+     *
+     * The created polynomial will be at the first point at t=0, and at the last point at
+     * t=1, with the other points linearly interpolated in between; ie. if we had three
+     * points, the second point would be at t=0.5
+     *
+     * @param points A series of points the created polynomial will pass through. There
+     *               must be at least two points.
+     * @throw std::invalid_argument If there are less then two points
+     */
+    Polynomial2d(std::initializer_list<Point> points);
+
     // TODO: should this be `getValueAt`? Update here and anywhere else...
     /**
      * Calculates the value of polynomial evaluated at value val
@@ -64,3 +77,15 @@ class Polynomial2d
     Polynomial1d poly_x;
     Polynomial1d poly_y;
 };
+
+/**
+ * Compares two Polynomials for equality
+ *
+ * The two polynomials are equal if both the underlying x and y polynomials are equal
+ *
+ * @param p1 the first Polynomial2d.
+ * @param p2 the second Polynomial2d.
+ *
+ * @return true if p1 is equal to p2, and false otherwise.
+ */
+bool operator==(const Polynomial2d &p1, const Polynomial2d &p2);

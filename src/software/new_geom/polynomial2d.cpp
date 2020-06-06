@@ -20,7 +20,7 @@ Polynomial2d::Polynomial2d(std::vector<Point> points)
         std::vector<std::pair<double, double>> constraints;
         for (size_t i = 0; i < points.size(); i++)
         {
-            double t = static_cast<double>(i) / static_cast<double>(points.size()-1);
+            double t = static_cast<double>(i) / static_cast<double>(points.size() - 1);
             constraints.emplace_back(
                 std::make_pair<double, double>(std::move(t), points[i].x()));
         }
@@ -32,12 +32,17 @@ Polynomial2d::Polynomial2d(std::vector<Point> points)
         std::vector<std::pair<double, double>> constraints;
         for (size_t i = 0; i < points.size(); i++)
         {
-            double t = static_cast<double>(i) / static_cast<double>(points.size()-1);
+            double t = static_cast<double>(i) / static_cast<double>(points.size() - 1);
             constraints.emplace_back(
                 std::make_pair<double, double>(std::move(t), points[i].y()));
         }
         poly_y = Polynomial1d(constraints);
     }
+}
+
+Polynomial2d::Polynomial2d(std::initializer_list<Point> points)
+    : Polynomial2d(std::vector<Point>(points))
+{
 }
 
 Point Polynomial2d::valueAt(double val) const
@@ -53,4 +58,8 @@ Polynomial1d Polynomial2d::getPolyX() const
 Polynomial1d Polynomial2d::getPolyY() const
 {
     return poly_y;
+}
+
+bool operator==(const Polynomial2d &p1, const Polynomial2d &p2){
+    return (p1.getPolyX() == p2.getPolyX()) && (p1.getPolyY() == p2.getPolyY());
 }
