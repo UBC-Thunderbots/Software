@@ -246,7 +246,7 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
  *
  * @param segment_lengths [in] The length of each segment in the trajectory
  *
- * @param desired_segment_duration [in] The desited segment duration in seconds
+ * @param desired_segment_duration [in] The desired segment duration in seconds
  *
  * @param trajectory_index [in] The index of end-point of the segment to be modified
  *
