@@ -22,8 +22,8 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segm
     return std::move(field_line_segment);
 }
 
-std::unique_ptr<SSL_FieldCicularArc> createFieldCircularArc(const Circle& circle, const std::string& name) {
-    auto field_circular_arc = std::make_unique<SSL_FieldCicularArc>();
+std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, const std::string& name) {
+    auto field_circular_arc = std::make_unique<SSL_FieldCircularArc>();
 
     field_circular_arc->set_name(name);
     field_circular_arc->set_allocated_center(createVector2f(circle.getOrigin()).release());
@@ -40,7 +40,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
 
     geometry_field_size->set_field_length(static_cast<int32_t>(field.xLength() * MILLIMETERS_PER_METER));
     geometry_field_size->set_field_width(static_cast<int32_t>(field.yLength() * MILLIMETERS_PER_METER));
-    geometry_field_size->set_goalwidth(static_cast<int32_t>(field.goalYLength() * MILLIMETERS_PER_METER));
+    geometry_field_size->set_goal_width(static_cast<int32_t>(field.goalYLength() * MILLIMETERS_PER_METER));
     geometry_field_size->set_goal_depth(static_cast<int32_t>(field.goalXLength() * MILLIMETERS_PER_METER));
     geometry_field_size->set_boundary_width(static_cast<int32_t>(field.boundaryMargin() * MILLIMETERS_PER_METER));
 
@@ -76,14 +76,23 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment right_penalty_stretch = Segment(field.enemyDefenseArea().negXNegYCorner(), field.enemyDefenseArea().negXPosYCorner());
     *line = *(createFieldLineSegment(right_penalty_stretch, ssl_field_line_names.at(SSLFieldLines::RIGHT_PENALTY_STRETCH)).release());
 
+    // TODO: goal lines
 
+    line = geometry_field_size->add_field_lines();
+    Segment left_field_left_penalty_stretch = Segment(field.friendlyDefenseArea().negXPosYCorner(), field.friendlyDefenseArea().posXPosYCorner());
+    *line = *(createFieldLineSegment(left_field_left_penalty_stretch, ssl_field_line_names.at(SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH)).release());
 
+    line = geometry_field_size->add_field_lines();
+    Segment left_field_right_penalty_stretch = Segment(field.friendlyDefenseArea().negXNegYCorner(), field.friendlyDefenseArea().posXNegYCorner());
+    *line = *(createFieldLineSegment(left_field_right_penalty_stretch, ssl_field_line_names.at(SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH)).release());
 
+    line = geometry_field_size->add_field_lines();
+    Segment right_field_left_penalty_stretch = Segment(field.enemyDefenseArea().negXNegYCorner(), field.enemyDefenseArea().posXNegYCorner());
+    *line = *(createFieldLineSegment(right_field_left_penalty_stretch, ssl_field_line_names.at(SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH)).release());
 
-
-
-
-
+    line = geometry_field_size->add_field_lines();
+    Segment right_field_right_penalty_stretch = Segment(field.enemyDefenseArea().negXPosYCorner(), field.enemyDefenseArea().posXPosYCorner());
+    *line = *(createFieldLineSegment(right_field_right_penalty_stretch, ssl_field_line_names.at(SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH)).release());
 
     return std::move(geometry_field_size);
 }
