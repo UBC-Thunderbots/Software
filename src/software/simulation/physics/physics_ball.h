@@ -2,9 +2,11 @@
 
 #include <Box2D/Box2D.h>
 
+#include <optional>
+
 #include "software/new_geom/point.h"
-#include "software/time/timestamp.h"
-#include "software/world/ball.h"
+#include "software/new_geom/vector.h"
+#include "software/world/ball_state.h"
 
 /**
  * This class represents a ball in a Box2D physics simulation. It provides a convenient
@@ -19,11 +21,11 @@ class PhysicsBall
      * during world update steps.
      *
      * @param world A shared_ptr to a Box2D World
-     * @param ball The Ball to be created in the Box2D world
+     * @param ball_state The initial state of the ball
      * @param mass_kg The mass of the ball in kg
      * @param gravity The acceleration due to gravity on the ball, in m/s^2
      */
-    explicit PhysicsBall(std::shared_ptr<b2World> world, const Ball& ball,
+    explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
                          const double mass_kg, const double gravity);
 
     PhysicsBall() = delete;
@@ -41,19 +43,11 @@ class PhysicsBall
     ~PhysicsBall();
 
     /**
-     * Returns a Ball object representing the current state of the ball object in the
-     * simulated Box2D world the ball was created in. The timestamp is provided as a
-     * parameter so that the caller can control the timestamp of the data being returned,
-     * since the caller will have context about the Box2D world and simulation time step,
-     * and can synchronize the Ball timestamp with other objects.
-     *
-     * @param timestamp The timestamp for the returned Ball to have
-     *
-     * @return A Ball object representing the current state of the ball object in the
-     * simulated Box2D world the ball was originally created in. The returned Ball object
-     * will have the same timestamp as the one provided in the parameter
+     * Returns the current state of the ball
+
+     * @return The current state of the ball
      */
-    Ball getBallWithTimestamp(const Timestamp& timestamp) const;
+    BallState getBallState() const;
 
     /**
      * Returns the current position of the ball, in global field coordinates, in meters
@@ -123,7 +117,7 @@ class PhysicsBall
     b2Body* ball_body;
 
     // The gravity acting on this ball, pulling it towards the ground
-    double gravity;
+    const double gravity;
     // If the ball is currently being chipped, the chip_origin holds the point
     // where the chip was started from
     std::optional<Point> chip_origin;

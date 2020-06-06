@@ -22,6 +22,7 @@ cc_library(
     srcs = ["motion_controller.cpp"],
     hdrs = ["motion_controller.h"],
     deps = [
+        "//software/util/variant_visitor",
         "//software/world:robot",
     ],
 )

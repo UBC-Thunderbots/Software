@@ -1,21 +1,20 @@
 #include "software/simulation/physics/physics_ball.h"
 
-#include <cmath>
-
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 
-PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball, double mass_kg,
-                         const double gravity)
+PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
+                         const double mass_kg, const double gravity)
     : gravity(gravity), chip_origin(std::nullopt), chip_distance_meters(0.0)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
     b2BodyDef ball_body_def;
     ball_body_def.type = b2_dynamicBody;
-    ball_body_def.position.Set(ball.position().x(), ball.position().y());
-    ball_body_def.linearVelocity.Set(ball.velocity().x(), ball.velocity().y());
+    ball_body_def.position.Set(ball_state.position().x(), ball_state.position().y());
+    ball_body_def.linearVelocity.Set(ball_state.velocity().x(),
+                                     ball_state.velocity().y());
     // The ball can potentially move relatively quickly, so treating it as a "bullet"
     // helps prevent tunneling and other collision problems
     // See the "Breakdown of a collision" section of:
@@ -51,9 +50,9 @@ PhysicsBall::~PhysicsBall()
     }
 }
 
-Ball PhysicsBall::getBallWithTimestamp(const Timestamp &timestamp) const
+BallState PhysicsBall::getBallState() const
 {
-    return Ball(position(), velocity(), timestamp);
+    return BallState(position(), velocity());
 }
 
 Point PhysicsBall::position() const
@@ -90,7 +89,7 @@ void PhysicsBall::chip(const Vector &chip_vector)
     double initial_velocity = std::sqrt(numerator / denominator);
     double ground_velocity  = initial_velocity * chip_angle.cos();
     kick(chip_vector.normalize(ground_velocity));
-    chip_origin          = getBallWithTimestamp(Timestamp::fromSeconds(0)).position();
+    chip_origin          = getBallState().position();
     chip_distance_meters = chip_vector.length();
 }
 
@@ -126,9 +125,7 @@ bool PhysicsBall::isInFlight()
     if (chip_in_progress)
     {
         double current_chip_distance_meters =
-            (getBallWithTimestamp(Timestamp::fromSeconds(0)).position() -
-             chip_origin.value())
-                .length();
+            (getBallState().position() - chip_origin.value()).length();
         // Once the ball is in flight, is can only stop being in flight once it has
         // travelled at least the current chip_distance and is simultaneously not touching
         // another object. This prevents the ball from "landing" in another object, and

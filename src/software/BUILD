@@ -9,10 +9,10 @@ cc_binary(
         "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",
+        "//software/gui/visualizer:visualizer_wrapper",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
-        "//software/visualizer:visualizer_wrapper",
         "@boost//:program_options",
     ],
 )

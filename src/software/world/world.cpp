@@ -3,21 +3,6 @@
 #include "boost/circular_buffer.hpp"
 #include "software/parameter/dynamic_parameters.h"
 
-World::World()
-    : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
-            Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
-            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
-                                                ->RobotExpiryBufferMilliseconds()
-                                                ->value())),
-            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
-                                                ->RobotExpiryBufferMilliseconds()
-                                                ->value())))
-{
-    // Set the default Timestamp as this parameter is not caught when using the World
-    // contructor
-    this->last_update_timestamps.push_front(Timestamp::fromSeconds(0.0));
-}
-
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
              const Team &enemy_team, unsigned int buffer_size)
     : field_(field),
@@ -30,12 +15,6 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
 {
     // Grab the most recent timestamp from all of the members used to update the world
     last_update_timestamps.set_capacity(buffer_size);
-    updateTimestamp(getMostRecentTimestampFromMembers());
-}
-
-void World::updateFieldGeometry(const Field &new_field_data)
-{
-    field_.updateDimensions(new_field_data);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -77,11 +56,6 @@ void World::updateTimestamp(Timestamp time_stamp)
 }
 
 const Field &World::field() const
-{
-    return field_;
-}
-
-Field &World::mutableField()
 {
     return field_;
 }
@@ -159,7 +133,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
     // Add all member timestamps to a list
     std::initializer_list<Timestamp> member_timestamps = {
         friendly_team_.getMostRecentTimestamp(), enemy_team_.getMostRecentTimestamp(),
-        ball_.getPreviousStates().front().timestamp(), field_.getMostRecentTimestamp()};
+        ball_.getPreviousStates().front().timestamp()};
     // Return the max
 
     return std::max(member_timestamps);

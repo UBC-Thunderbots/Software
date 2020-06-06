@@ -6,6 +6,7 @@ cc_library(
     deps = [
         "//software/ai/navigator/obstacle",
         "//software/geom",
+        "//software/new_geom:linear_spline2d",
         "//software/new_geom/util:distance",
     ],
 )
@@ -68,6 +69,19 @@ cc_test(
 cc_test(
     name = "path_planner_test",
     srcs = ["path_planner_test.cpp"],
+    deps = [
+        ":path_planner",
+        ":straight_line_path_planner",
+        ":theta_star_path_planner",
+        "//software/ai/navigator/obstacle:obstacle_factory",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "path_planner_performance_test",
+    srcs = ["path_planner_performance_test.cpp"],
     deps = [
         ":path_planner",
         ":straight_line_path_planner",

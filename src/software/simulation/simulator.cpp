@@ -10,7 +10,8 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-Simulator::Simulator(const World& world) : physics_world(world)
+Simulator::Simulator(const World& world)
+    : physics_world(world), friendly_goalie_id(world.friendlyTeam().getGoalieID())
 {
     for (auto physics_robot : physics_world.getFriendlyPhysicsRobots())
     {
@@ -75,9 +76,21 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
     }
 }
 
-World Simulator::getWorld()
+std::optional<World> Simulator::getWorld()
 {
-    return physics_world.getWorld();
+    std::optional<World> world = physics_world.getWorld();
+    if (world)
+    {
+        // TODO: This is a hack to persist goalie ID from the initial test setup
+        // It will be removed as part of
+        // https://github.com/UBC-Thunderbots/Software/issues/1353
+        auto id = friendly_goalie_id;
+        if (id)
+        {
+            world->mutableFriendlyTeam().assignGoalie(*id);
+        }
+    }
+    return world;
 }
 
 primitive_params_t Simulator::getPrimitiveParams(

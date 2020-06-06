@@ -116,7 +116,7 @@ class ShadowFreekickerTacticTest : public testing::Test
                 .orientation();
     }
 
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
     /**
      *

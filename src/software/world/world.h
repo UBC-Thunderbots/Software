@@ -24,10 +24,7 @@
 class World final
 {
    public:
-    /**
-     * Creates an Empty World
-     */
-    explicit World();
+    World() = delete;
 
     /**
      * Creates a new world.
@@ -39,13 +36,6 @@ class World final
      */
     explicit World(const Field& field, const Ball& ball, const Team& friendly_team,
                    const Team& enemy_team, unsigned int buffer_size = 20);
-
-    /**
-     * Updates the state of the field in the world with the new field data
-     *
-     * @param new_field_data A Field containing new field information
-     */
-    void updateFieldGeometry(const Field& new_field_data);
 
     /**
      * Updates the state of the ball in the world with the new ball data
@@ -88,13 +78,6 @@ class World final
      * @return a const reference to the Field in the world
      */
     const Field& field() const;
-
-    /**
-     * Returns a mutable reference to the Field in the world
-     *
-     * @return a mutable reference to the Field in the world
-     */
-    Field& mutableField();
 
     /**
      * Returns a const reference to the Ball in the world
@@ -153,9 +136,11 @@ class World final
     GameState& mutableGameState();
 
     /**
-     * Gets the most recent Timestamp stored in the history of the World
+     * Returns the most recent timestamp value of all timestamped member
+     * objects of the world
      *
-     * @return returns Timestamp : The most recent Timestamp stored in the history
+     * @return the most recent timestamp value of all timestamped member
+     * objects of the world
      */
     const Timestamp getMostRecentTimestamp() const;
 
