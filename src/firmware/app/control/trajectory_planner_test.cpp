@@ -1476,7 +1476,9 @@ TEST_F(TrajectoryPlannerTest, test_generate_maximum_speed_curve_straight_line)
     path_parameters.initial_linear_speed = 1;
     path_parameters.final_linear_speed   = 1;
 
-    path_parameters.path = {.x = {0, 0, 1, 0}, .y = {0, 0, 1, 0}};
+    path_parameters.path    = {.x = {0, 0, 1, 0}, .y = {0, 0, 1, 0}};
+    path_parameters.t_start = 0;
+    path_parameters.t_end   = 1;
 
     app_trajectory_planner_getMaxAllowableSpeedProfile(
         path_parameters.path, path_parameters.num_segments, path_parameters.t_start,
@@ -2396,3 +2398,37 @@ TEST_F(
             .angular_velocity,
         0);
 }
+
+// TEST_F(
+//        TrajectoryPlannerTest,
+//        test_copy_position_trajectory_element)
+//{
+//
+// PositionTrajectory_t from_trajectory;
+// PositionTrajectoryElement_t
+//        from_trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+// from_trajectory.trajectory_elements = from_trajectory_elements;
+//
+// PositionTrajectory_t to_trajectory;
+// PositionTrajectoryElement_t
+// to_trajectory_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+// to_trajectory.trajectory_elements = to_trajectory_elements;
+//
+// from_trajectory.trajectory_elements[12].time = 1;
+// from_trajectory.trajectory_elements[12].linear_speed = 2;
+// from_trajectory.trajectory_elements[12].angular_speed = 3;
+// from_trajectory.trajectory_elements[12].orientation = 4;
+// Vector2d_t position = { .x = 5, .y = 6};
+// from_trajectory.trajectory_elements[12].position = position;
+//
+//
+// app_trajectory_planner_copyPositionTrajectoryElement(&to_trajectory.trajectory_elements[12],
+// &from_trajectory.trajectory_elements[12]);
+//
+// EXPECT_FLOAT_EQ(to_trajectory.trajectory_elements[12].time, 1);
+// EXPECT_FLOAT_EQ(to_trajectory.trajectory_elements[12].linear_speed, 2);
+// EXPECT_FLOAT_EQ(to_trajectory.trajectory_elements[12].angular_speed, 3);
+// EXPECT_FLOAT_EQ(to_trajectory.trajectory_elements[12].orientation, 4);
+// EXPECT_FLOAT_EQ(to_trajectory.trajectory_elements[12].position.x, 5);
+// EXPECT_FLOAT_EQ(to_trajectory.trajectory_elements[12].position.y, 6);
+//}

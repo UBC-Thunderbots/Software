@@ -18,16 +18,9 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         variable_time_trajectory->path_parameters;
 
     // The first point is the same for each trajectory
-    constant_period_trajectory->trajectory_elements[0].time =
-        variable_time_trajectory->trajectory_elements[0].time;
-    constant_period_trajectory->trajectory_elements[0].position =
-        variable_time_trajectory->trajectory_elements[0].position;
-    constant_period_trajectory->trajectory_elements[0].orientation =
-        variable_time_trajectory->trajectory_elements[0].orientation;
-    constant_period_trajectory->trajectory_elements[0].linear_speed =
-        variable_time_trajectory->trajectory_elements[0].linear_speed;
-    constant_period_trajectory->trajectory_elements[0].angular_speed =
-        variable_time_trajectory->trajectory_elements[0].angular_speed;
+    app_trajectory_planner_copyPositionTrajectoryElement(
+        &constant_period_trajectory->trajectory_elements[0],
+        &variable_time_trajectory->trajectory_elements[0]);
 
     // Keep track of the current time we are searching for in the constant
     // parameterization trajectory
@@ -124,16 +117,9 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         variable_time_trajectory->path_parameters.num_segments - 1;
 
     // The last element of both trajectories are also identical
-    constant_period_trajectory->trajectory_elements[time_periods].time =
-        variable_time_trajectory->trajectory_elements[last_element_index].time;
-    constant_period_trajectory->trajectory_elements[time_periods].position =
-        variable_time_trajectory->trajectory_elements[last_element_index].position;
-    constant_period_trajectory->trajectory_elements[time_periods].orientation =
-        variable_time_trajectory->trajectory_elements[last_element_index].orientation;
-    constant_period_trajectory->trajectory_elements[time_periods].linear_speed =
-        variable_time_trajectory->trajectory_elements[last_element_index].linear_speed;
-    constant_period_trajectory->trajectory_elements[time_periods].angular_speed =
-        variable_time_trajectory->trajectory_elements[last_element_index].angular_speed;
+    app_trajectory_planner_copyPositionTrajectoryElement(
+        &constant_period_trajectory->trajectory_elements[time_periods],
+        &variable_time_trajectory->trajectory_elements[last_element_index]);
 
     // Set the new number of time periods
     constant_period_trajectory->path_parameters.num_segments = ++time_periods;
@@ -664,4 +650,15 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
         trajectory_segments[i - 1].linear_segment_length  = linear_segment_length;
         trajectory_segments[i - 1].angular_segment_length = angular_segment_length;
     }
+}
+
+void app_trajectory_planner_copyPositionTrajectoryElement(
+    PositionTrajectoryElement_t* to_trajectory_element,
+    PositionTrajectoryElement_t* from_trajectory_element)
+{
+    to_trajectory_element->time          = from_trajectory_element->time;
+    to_trajectory_element->position      = from_trajectory_element->position;
+    to_trajectory_element->orientation   = from_trajectory_element->orientation;
+    to_trajectory_element->angular_speed = from_trajectory_element->angular_speed;
+    to_trajectory_element->linear_speed  = from_trajectory_element->linear_speed;
 }

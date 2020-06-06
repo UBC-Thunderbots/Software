@@ -391,3 +391,14 @@ TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
     FirmwareRobotPathParameters_t path_parameters,
     VelocityTrajectory_t* velocity_trajectory, const float interpolation_period);
+
+/**
+ * Function copies all trajectory elements from one trajectory to another
+ *
+ * @param to_trajectory [out] The trajectory element that will be copied to
+ *
+ * @param from_trajectory [in] The trajectory element that will be copied from
+ */
+void app_trajectory_planner_copyPositionTrajectoryElement(
+    PositionTrajectoryElement_t* to_trajectory,
+    PositionTrajectoryElement_t* from_trajectory);
