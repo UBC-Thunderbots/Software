@@ -35,25 +35,28 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
         while (variable_time_trajectory->trajectory_elements[i].time > trajectory_time &&
                time_periods < TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS)
         {
+            PositionTrajectoryElement_t* current_element = &variable_time_trajectory->trajectory_elements[i];
+            PositionTrajectoryElement_t* previous_element = &variable_time_trajectory->trajectory_elements[i-1];
+
             // Perform a linear interpolation
             const float delta_time =
-                variable_time_trajectory->trajectory_elements[i].time -
-                variable_time_trajectory->trajectory_elements[i - 1].time;
+                current_element->time -
+                previous_element->time;
             const float delta_x =
-                variable_time_trajectory->trajectory_elements[i].position.x -
-                variable_time_trajectory->trajectory_elements[i - 1].position.x;
+                current_element->position.x -
+                previous_element->position.x;
             const float delta_y =
-                variable_time_trajectory->trajectory_elements[i].position.y -
-                variable_time_trajectory->trajectory_elements[i - 1].position.y;
+                current_element->position.y -
+                previous_element->position.y;
             const float delta_theta =
-                variable_time_trajectory->trajectory_elements[i].orientation -
-                variable_time_trajectory->trajectory_elements[i - 1].orientation;
+                current_element->orientation -
+                previous_element->orientation;
             const float delta_omega =
-                variable_time_trajectory->trajectory_elements[i].angular_speed -
-                variable_time_trajectory->trajectory_elements[i - 1].angular_speed;
+                current_element->angular_speed -
+                previous_element->angular_speed;
             const float delta_linear_speed =
-                variable_time_trajectory->trajectory_elements[i].linear_speed -
-                variable_time_trajectory->trajectory_elements[i - 1].linear_speed;
+                current_element->linear_speed -
+                previous_element->linear_speed;
 
             const float slope_x             = delta_x / delta_time;
             const float slope_y             = delta_y / delta_time;
@@ -61,33 +64,30 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
             const float slope_linear_speed  = delta_linear_speed / delta_time;
             const float slope_angular_speed = delta_omega / delta_time;
 
+            const float interpolation_time = trajectory_time - previous_element->time;
+
             const float interpolated_x =
-                slope_x * (trajectory_time -
-                           variable_time_trajectory->trajectory_elements[i - 1].time) +
-                variable_time_trajectory->trajectory_elements[i - 1].position.x;
+                slope_x * interpolation_time +
+                previous_element->position.x;
 
             const float interpolated_y =
-                slope_y * (trajectory_time -
-                           variable_time_trajectory->trajectory_elements[i - 1].time) +
-                variable_time_trajectory->trajectory_elements[i - 1].position.y;
+                slope_y * interpolation_time +
+                previous_element->position.y;
 
             const float interpolated_theta =
                 slope_theta *
-                    (trajectory_time -
-                     variable_time_trajectory->trajectory_elements[i - 1].time) +
-                variable_time_trajectory->trajectory_elements[i - 1].orientation;
+                    interpolation_time +
+               previous_element->orientation;
 
             const float interpolated_angular_speed =
                 slope_angular_speed *
-                    (trajectory_time -
-                     variable_time_trajectory->trajectory_elements[i - 1].time) +
-                variable_time_trajectory->trajectory_elements[i - 1].angular_speed;
+                    interpolation_time +
+                previous_element->angular_speed;
 
             const float interpolated_linear_speed =
                 slope_linear_speed *
-                    (trajectory_time -
-                     variable_time_trajectory->trajectory_elements[i - 1].time) +
-                variable_time_trajectory->trajectory_elements[i - 1].linear_speed;
+                    interpolation_time +
+                previous_element->linear_speed;
 
             constant_period_trajectory->trajectory_elements[time_periods].position.x =
                 interpolated_x;
