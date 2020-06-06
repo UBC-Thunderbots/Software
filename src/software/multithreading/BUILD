@@ -16,7 +16,7 @@ cc_library(
 
 cc_library(
     name = "thread_safe_buffer",
-    hdrs = ["thread_safe_buffer.h"],
+    hdrs = ["thread_safe_buffer.h", "thread_safe_buffer.tpp",],
     deps = [
         "//software/time:duration",
         "@boost//:circular_buffer",
@@ -25,7 +25,7 @@ cc_library(
 
 cc_library(
     name = "threaded_observer",
-    hdrs = ["threaded_observer.h"],
+    hdrs = ["threaded_observer.h", "threaded_observer.tpp",],
     deps = [
         ":observer",
         ":thread_safe_buffer",
