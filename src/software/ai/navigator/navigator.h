@@ -95,43 +95,39 @@ class Navigator : public IntentVisitor
 
    private:
     /**
-     * Registers this robot id as a robot that is not assigned a MoveIntent
-     *
-     * @param id RobotId to register
-     *
-     */
-    void registerNonMoveIntentRobotId(RobotId id);
-
-    /**
      * Generates path objectives from move intents
      *
      * @param move_intents intents to make into path objectives
+     * @param world World to navigate around
      *
      * @return set of PathObjectives
      */
     std::unordered_set<PathObjective> getPathObjectivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents);
+        const std::vector<MoveIntent> &move_intents, const World &world);
 
     /**
      * Creates a list primitives for the list of MoveIntents
      *
      * @param move_intents intents to make into primitives
+     * @param world World to navigate around
      *
      * @return list of primitives
      */
     std::vector<std::unique_ptr<Primitive>> getPrimitivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents);
+        const std::vector<MoveIntent> &move_intents, const World &world);
 
     /**
      * Creates a primitive for a given path and move intent
      *
      * @param path path to make primitive for
      * @param intent intent to make primitive
+     * @param world World to navigate around
      *
      * @return unique pointer to the primitive
      */
     std::unique_ptr<Primitive> getPrimitiveFromPathAndMoveIntent(std::optional<Path> path,
-                                                                 MoveIntent intent);
+                                                                 MoveIntent intent,
+                                                                 const World &world);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
@@ -148,18 +144,13 @@ class Navigator : public IntentVisitor
 
     std::shared_ptr<const NavigatorConfig> config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
-
-    // Path manager used to navigate around obstacles
     std::unique_ptr<PathManager> path_manager;
-
-    // This navigators knowledge / state of the world
-    World world;
+    std::vector<std::vector<Point>> planned_paths;
 
     // The current Primitive the navigator has created from an Intent.
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
-
-    std::vector<std::vector<Point>> planned_paths;
+    std::optional<RobotId> current_robot_id;
 
     // These are obstacles that represent robots that aren't
     // assigned move intents

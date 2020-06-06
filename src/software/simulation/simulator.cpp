@@ -76,16 +76,19 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
     }
 }
 
-World Simulator::getWorld()
+std::optional<World> Simulator::getWorld()
 {
-    World world = physics_world.getWorld();
-    // TODO: This is a hack to persist goalie ID from the initial test setup
-    // It will be removed as part of
-    // https://github.com/UBC-Thunderbots/Software/issues/1353
-    auto id = friendly_goalie_id;
-    if (id)
+    std::optional<World> world = physics_world.getWorld();
+    if (world)
     {
-        world.mutableFriendlyTeam().assignGoalie(*id);
+        // TODO: This is a hack to persist goalie ID from the initial test setup
+        // It will be removed as part of
+        // https://github.com/UBC-Thunderbots/Software/issues/1353
+        auto id = friendly_goalie_id;
+        if (id)
+        {
+            world->mutableFriendlyTeam().assignGoalie(*id);
+        }
     }
     return world;
 }

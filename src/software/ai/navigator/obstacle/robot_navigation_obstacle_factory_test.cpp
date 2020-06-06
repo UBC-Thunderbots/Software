@@ -36,7 +36,7 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
           robot_navigation_obstacle_factory(
               Util::DynamicParameters->getAIConfig()
                   ->getRobotNavigationObstacleFactoryConfig()),
-          field(),
+          field(::Test::TestUtil::createSSLDivBField()),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
@@ -46,8 +46,6 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
 
     void SetUp() override
     {
-        field = ::Test::TestUtil::createSSLDivBField();
-
         Robot friendly_robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
                                        AngularVelocity::threeQuarter(), current_time);
 

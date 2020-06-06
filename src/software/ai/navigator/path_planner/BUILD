@@ -78,3 +78,16 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "path_planner_performance_test",
+    srcs = ["path_planner_performance_test.cpp"],
+    deps = [
+        ":path_planner",
+        ":straight_line_path_planner",
+        ":theta_star_path_planner",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

@@ -6,8 +6,6 @@
 #include "software/new_geom/rectangle.h"
 #include "software/time/timestamp.h"
 
-Field::Field() : Field(0, 0, 0, 0, 0, 0, 0) {}
-
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
              double defense_y_length, double goal_y_length, double boundary_buffer_size,
              double center_circle_radius)
@@ -22,6 +20,13 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius)
 {
+    if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
+        defense_y_length_ <= 0 || goal_y_length_ <= 0 || boundary_buffer_size_ <= 0 ||
+        center_circle_radius_ <= 0)
+    {
+        throw std::invalid_argument(
+            "At least one field dimension is non-positive - Field is invalid");
+    }
 }
 
 double Field::xLength() const
@@ -118,16 +123,6 @@ Rectangle Field::fieldBoundary() const
     Point neg_x_neg_y_corner(-totalXLength() / 2, -totalYLength() / 2);
     Point pos_x_pos_y_corner(totalXLength() / 2, totalYLength() / 2);
     return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
-}
-
-bool Field::isValid() const
-{
-    if (totalXLength() < GeomConstants::FIXED_EPSILON ||
-        totalYLength() < GeomConstants::FIXED_EPSILON)
-    {
-        return false;
-    }
-    return true;
 }
 
 double Field::centerCircleRadius() const

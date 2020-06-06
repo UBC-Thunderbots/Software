@@ -32,13 +32,8 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
     }
 
    protected:
-    void SetUp() override
-    {
-        world.mutableField() = ::Test::TestUtil::createSSLDivBField();
-    }
-
     STP stp;
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
@@ -204,8 +199,7 @@ class STPRefboxGameStatePlaySelectionTest
             return std::make_unique<HaltPlay>();
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp                  = STP(default_play_constructor, 0);
-        world.mutableField() = ::Test::TestUtil::createSSLDivBField();
+        stp = STP(default_play_constructor, 0);
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
@@ -226,7 +220,7 @@ class STPRefboxGameStatePlaySelectionTest
     }
 
     STP stp;
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTest,

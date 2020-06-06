@@ -16,18 +16,16 @@
 // length at which to evaluate the spline value and check
 // if it intersects an obstacle
 static constexpr double PATH_CHECK_INTERVAL_M = 0.05;
-// distance to destination before the path is considered to
-// have reached the destination
-static constexpr double DEST_CHECK_EPSILON_M = 1e-3;
-
-using namespace Test;
+// distance to end before the path is considered to
+// have reached the end
+static constexpr double END_CHECK_EPSILON_M = 1e-3;
 
 using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
 
 struct PlannerTestCase
 {
     std::string name = "Unnamed test case";
-    Point start, dest;
+    Point start, end;
     Rectangle navigable_area;
     std::vector<ObstaclePtr> obstacles;
     bool should_return_path;
@@ -40,14 +38,14 @@ std::vector<PlannerTestCase>
     test_cases =
         {{.name               = "Empty field straight line",
           .start              = Point(0, 0),
-          .dest               = Point(1, 0),
+          .end                = Point(1, 0),
           .navigable_area     = Rectangle({-1, -1}, {2, 2}),
           .obstacles          = {},
           .should_return_path = true},
 
          {.name           = "Single stationary robot in path",
           .start          = Point(0, 0),
-          .dest           = Point(2, 0),
+          .end            = Point(2, 0),
           .navigable_area = Rectangle({-2, -2}, {2, 2}),
           .obstacles      = {robot_navigation_obstacle_factory.createFromRobotPosition(
               Point({1, 0}))},
@@ -55,7 +53,7 @@ std::vector<PlannerTestCase>
 
          {.name               = "Large rectangle in path",
           .start              = Point(-3, 0),
-          .dest               = Point(4, 0),
+          .end                = Point(4, 0),
           .navigable_area     = Rectangle({-5, -5}, {5, 5}),
           .obstacles          = {robot_navigation_obstacle_factory.createFromShape(
               Rectangle({1, 4}, {2, -4}))},
@@ -63,7 +61,7 @@ std::vector<PlannerTestCase>
 
          {.name           = "Circle of robots surrounding friendly robot at distance 1",
           .start          = Point(0, 0),
-          .dest           = Point(4, 0),
+          .end            = Point(4, 0),
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
           .obstacles =
               {
@@ -88,7 +86,7 @@ std::vector<PlannerTestCase>
 
          {.name           = "Circle of robots surrounding friendly robot at distance 0.2",
           .start          = Point(0, 0),
-          .dest           = Point(4, 0),
+          .end            = Point(4, 0),
           .navigable_area = Rectangle({-5, -5}, {5, 5}),
           .obstacles =
               {
@@ -106,17 +104,17 @@ std::vector<PlannerTestCase>
                       {std::cos(5 * M_PI / 3) * 0.2, std::sin(5 * M_PI / 3) * 0.2})),
               },
           .should_return_path = false},
-         {.name  = "Start inside a rectangular obstacle, dest is outside of obstacle",
+         {.name  = "Start inside a rectangular obstacle, end is outside of obstacle",
           .start = Point(0, 0),
-          .dest  = Point(4, 0),
+          .end   = Point(4, 0),
           .navigable_area     = Rectangle({-5, -5}, {5, 5}),
           .obstacles          = {robot_navigation_obstacle_factory.createFromShape(
               Rectangle({-1, -1}, {1, 1}))},
           .should_return_path = true},
-         {.name = "Start and dest inside same obstacle",
+         {.name = "Start and end inside same obstacle",
           // NOTE: this test is designed specifically to pass the progress check
           .start              = Point(0, 0),
-          .dest               = Point(1.5, 0),
+          .end                = Point(1.5, 0),
           .navigable_area     = Rectangle({-5, -5}, {5, 5}),
           .obstacles          = {robot_navigation_obstacle_factory.createFromShape(
               Rectangle({-1, -1}, {2, 1}))},
@@ -124,7 +122,7 @@ std::vector<PlannerTestCase>
 
 
 template <typename PlannerT>
-std::pair<std::string, PathPlannerConstructor> name_and_constructor()
+std::pair<std::string, PathPlannerConstructor> nameAndConstructor()
 {
     return std::pair<std::string, PathPlannerConstructor>(
         typeid(PlannerT).name(), []() { return std::make_unique<PlannerT>(); });
@@ -133,13 +131,13 @@ std::pair<std::string, PathPlannerConstructor> name_and_constructor()
 std::vector<std::pair<std::string, PathPlannerConstructor>>
     path_planner_names_and_constructors = {
         // add path planner constructors here
-        name_and_constructor<ThetaStarPathPlanner>(),
+        nameAndConstructor<ThetaStarPathPlanner>(),
         // uncomment this if you want some tests to fail
-        //        name_and_constructor<StraightLinePathPlanner>()
+        //        nameAndConstructor<StraightLinePathPlanner>()
 };
 
 
-void validatePath(const Path &path, const Point &start, const Point &dest,
+void validatePath(const Path &path, const Point &start, const Point &end,
                   const Rectangle &navigable_area, std::vector<ObstaclePtr> &obstacles)
 {
     // check for zero length path
@@ -203,31 +201,31 @@ void validatePath(const Path &path, const Point &start, const Point &dest,
         }
     }
 
-    bool dest_in_obstacle =
+    bool end_in_obstacle =
         std::any_of(obstacles.begin(), obstacles.end(),
-                    [&dest](const auto &obs) { return obs->contains(dest); });
+                    [&end](const auto &obs) { return obs->contains(end); });
 
-    // check if the specified destination is in an obstacle, and if so, check that the
-    // robot made progress toward the destination we also check for start_obstacle_or_null
+    // check if the specified end is in an obstacle, and if so, check that the
+    // robot made progress toward the end we also check for start_obstacle_or_null
     // because it will only be true at this stage in the case where we start in an
     // obstacle and never exit it
-    if (dest_in_obstacle || start_obstacle_or_null)
+    if (end_in_obstacle || start_obstacle_or_null)
     {
-        if ((path.getValueAt(1.0) - dest).length() >=
-            (path.getValueAt(0.0) - dest).length())
+        if ((path.getValueAt(1.0) - end).length() >=
+            (path.getValueAt(0.0) - end).length())
         {
-            // fail because no progress to destination
+            // fail because no progress to end
             std::stringstream fail_ss;
             fail_ss
-                << "Destination is in obstacle, but path does not make progress toward the destination!";
+                << "End is in obstacle, but path does not make progress toward the end!";
             throw fail_ss.str();
         }
     }
-    else if ((path.getValueAt(1.0) - dest).length() >= DEST_CHECK_EPSILON_M)
+    else if ((path.getValueAt(1.0) - end).length() >= END_CHECK_EPSILON_M)
     {
-        // fail because didn't reach destination
+        // fail because didn't reach end
         std::stringstream fail_ss;
-        fail_ss << "Path ends at " << path.getValueAt(1.0) << " but dest is " << dest;
+        fail_ss << "Path ends at " << path.getValueAt(1.0) << " but end is " << end;
         throw fail_ss.str();
     }
     // we passed, yay!
@@ -245,7 +243,7 @@ TEST_P(PlannerTest, test_path_planner)
     std::unique_ptr<PathPlanner> planner = std::get<0>(GetParam()).second();
     auto planner_test_case               = std::get<1>(GetParam());
     std::optional<Path> path =
-        planner->findPath(planner_test_case.start, planner_test_case.dest,
+        planner->findPath(planner_test_case.start, planner_test_case.end,
                           planner_test_case.navigable_area, planner_test_case.obstacles);
     if (planner_test_case.should_return_path)
     {
@@ -253,7 +251,7 @@ TEST_P(PlannerTest, test_path_planner)
         {
             try
             {
-                validatePath(*path, planner_test_case.start, planner_test_case.dest,
+                validatePath(*path, planner_test_case.start, planner_test_case.end,
                              planner_test_case.navigable_area,
                              planner_test_case.obstacles);
             }

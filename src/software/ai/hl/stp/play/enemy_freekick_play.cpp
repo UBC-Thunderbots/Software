@@ -29,7 +29,8 @@ bool EnemyFreekickPlay::invariantHolds(const World &world) const
     return world.gameState().isTheirFreeKick();
 }
 
-void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                       const World &world)
 {
     // Init our goalie tactic
     auto goalie_tactic = std::make_shared<GoalieTactic>(
