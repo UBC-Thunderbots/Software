@@ -14,8 +14,8 @@ cc_library(
 
 cc_library(
     name = "protobuf_message_translation",
-    hdrs = ["protobuf_message_translation.h"],
     srcs = ["protobuf_message_translation.cpp"],
+    hdrs = ["protobuf_message_translation.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//shared/proto:tbots_cc_proto",

@@ -1,13 +1,14 @@
+#include "software/proto/message_translation/protobuf_message_translation.h"
+
 #include "shared/proto/geometry.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
 #include "software/primitive/primitive.h"
-#include "software/world/world.h"
 #include "software/proto/message_translation/protobuf_primitive_visitor.h"
-#include "software/proto/message_translation/protobuf_message_translation.h"
+#include "software/world/world.h"
 
-namespace ProtobufMessageTranslation {
-
+namespace ProtobufMessageTranslation
+{
     std::unique_ptr<VisionMsg> getVisionMsgFromWorld(const World& world)
     {
         // create msg and set timestamp
@@ -21,20 +22,22 @@ namespace ProtobufMessageTranslation {
         // For every friendly robot, we create a RobotStateMsg proto. The unique_ptr
         // is dereferenced, and there is an implicit deep copy into robot_states_map
         //
-        // Since the unique_ptr immediately looses scope after the copy, the memory is freed
-        std::for_each(friendly_robots.begin(), friendly_robots.end(),
-                [&](const Robot& robot) {
+        // Since the unique_ptr immediately looses scope after the copy, the memory is
+        // freed
+        std::for_each(
+            friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
                 robot_states_map[robot.id()] = *getRobotStateMsgFromRobot(robot);
-                });
+            });
 
         // set ball state
-        vision_msg->set_allocated_ball_state(getBallStateMsgFromBall(world.ball()).release());
+        vision_msg->set_allocated_ball_state(
+            getBallStateMsgFromBall(world.ball()).release());
 
         return std::move(vision_msg);
     }
 
     std::unique_ptr<PrimitiveMsg> getPrimitiveMsgFromPrimitiveVector(
-            const ConstPrimitiveVectorPtr& primitives)
+        const ConstPrimitiveVectorPtr& primitives)
     {
         // create msg and update timestamp
         auto primitive_msg = std::make_unique<PrimitiveMsg>();
@@ -47,13 +50,14 @@ namespace ProtobufMessageTranslation {
         // For every primitive that is converted, the unique_ptr is dereferenced,
         // and there is an implicit deep copy into the robot_primitives_map
         //
-        // Since the unique_ptr immediately looses scope after the copy, the memory is freed
+        // Since the unique_ptr immediately looses scope after the copy, the memory is
+        // freed
         std::for_each(primitives->begin(), primitives->end(), [&](const auto& primitive) {
-                primitive->accept(primitive_visitor);
+            primitive->accept(primitive_visitor);
 
-                robot_primitives_map[primitive->getRobotId()] =
+            robot_primitives_map[primitive->getRobotId()] =
                 *primitive_visitor.getRadioPrimitiveMsg();
-                });
+        });
 
 
         return std::move(primitive_msg);
@@ -72,7 +76,7 @@ namespace ProtobufMessageTranslation {
         robot_state_msg->set_allocated_global_orientation_radians(orientation.release());
         robot_state_msg->set_allocated_global_velocity_meters_per_sec(velocity.release());
         robot_state_msg->set_allocated_global_angular_velocity_radians_per_sec(
-                angular_velocity.release());
+            angular_velocity.release());
 
         return std::move(robot_state_msg);
     }
@@ -80,9 +84,11 @@ namespace ProtobufMessageTranslation {
     std::unique_ptr<BallStateMsg> getBallStateMsgFromBall(const Ball& ball)
     {
         auto position       = getPointMsgFromPoint(ball.position());
+        auto velocity       = getVectorMsgFromVector(ball.velocity());
         auto ball_state_msg = std::make_unique<BallStateMsg>();
 
         ball_state_msg->set_allocated_global_position_meters(position.release());
+        ball_state_msg->set_allocated_global_velocity_meters_per_sec(velocity.release());
 
         return std::move(ball_state_msg);
     }
@@ -116,4 +122,4 @@ namespace ProtobufMessageTranslation {
         timestamp_msg->set_epoch_timestamp_seconds(std::time(0));
         return std::move(timestamp_msg);
     }
-}
+}  // namespace ProtobufMessageTranslation

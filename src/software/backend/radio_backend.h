@@ -36,4 +36,10 @@ class RadioBackend : public Backend
 
     // The interface that lets us send primitives to the robots over radio
     RadioOutput radio_output;
+
+    std::optional<World> most_recently_received_world;
+    std::mutex most_recently_received_world_mutex;
+
+    ConstPrimitiveVectorPtr most_recently_received_primitives;
+    std::mutex most_recently_received_primitives_mutex;
 };

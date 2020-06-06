@@ -6,8 +6,8 @@
 #include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
-namespace ProtobufMessageTranslation {
-
+namespace ProtobufMessageTranslation
+{
     /**
      * Returns a VisionMsg proto given a World.
      *
@@ -16,25 +16,25 @@ namespace ProtobufMessageTranslation {
      * information
      */
     std::unique_ptr<VisionMsg> getVisionMsgFromWorld(const World& world);
-    
+
     /**
      * Returns a PrimitiveMsg proto given a ConstPrimitiveVectorPtr
      *
      * @param primitives The primitives to include in the PrimitiveMsg
      * @returns The unique_ptr to a PrimitiveMsg proto containing the primitives
      */
-     std::unique_ptr<PrimitiveMsg> getPrimitiveMsgFromPrimitiveVector(
+    std::unique_ptr<PrimitiveMsg> getPrimitiveMsgFromPrimitiveVector(
         const ConstPrimitiveVectorPtr& primitives);
-    
+
     /**
      * Returns (Robot, Ball)StateMsg given a (Robot, Ball)
      *
      * @param The (Robot, Ball) to convert to StateMsg proto
      * @return The unique_ptr to a (Robot, Ball)StateMsg after conversion
      */
-     std::unique_ptr<RobotStateMsg> getRobotStateMsgFromRobot(const Robot& robot);
-     std::unique_ptr<BallStateMsg> getBallStateMsgFromBall(const Ball& ball);
-    
+    std::unique_ptr<RobotStateMsg> getRobotStateMsgFromRobot(const Robot& robot);
+    std::unique_ptr<BallStateMsg> getBallStateMsgFromBall(const Ball& ball);
+
     /**
      * Internal geometry types to protobuf msg conversions
      *
@@ -44,7 +44,7 @@ namespace ProtobufMessageTranslation {
     std::unique_ptr<PointMsg> getPointMsgFromPoint(const Point& point);
     std::unique_ptr<AngleMsg> getAngleMsgFromAngle(const Angle& angle);
     std::unique_ptr<VectorMsg> getVectorMsgFromVector(const Vector& vector);
-    
+
     /**
      * Returns a timestamp msg with the time that this function was called
      *
@@ -52,4 +52,4 @@ namespace ProtobufMessageTranslation {
      */
     std::unique_ptr<TimestampMsg> getCurrentTimestampMsg();
 
-}
+}  // namespace ProtobufMessageTranslation
