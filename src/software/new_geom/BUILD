@@ -123,7 +123,10 @@ cc_library(
     name = "polynomial1d",
     srcs = ["polynomial1d.cpp"],
     hdrs = ["polynomial1d.h"],
-    deps = [":geom_constants"],
+    deps = [
+        ":geom_constants",
+        "@eigen",
+    ],
 )
 
 cc_library(

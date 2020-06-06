@@ -1,5 +1,8 @@
 #include "software/new_geom/polynomial1d.h"
 
+#include <Eigen/Dense>
+#include <Eigen/QR>
+#include <list>
 #include <stdexcept>
 
 #include "software/new_geom/geom_constants.h"
@@ -10,6 +13,49 @@ Polynomial1d::Polynomial1d(const std::vector<double> &coeffs) : coeffs(coeffs) {
 
 Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs) : coeffs(coeffs)
 {
+}
+
+Polynomial1d::Polynomial1d(const std::vector<std::pair<double, double>> constraints)
+{
+    // Check that we have at least two constraints
+    if (constraints.size() < 2)
+    {
+        throw std::invalid_argument(
+            "Less then two constraints given, so no unique polynomial solution.");
+    }
+
+    // Check that all inputs are unique
+    for (size_t i = 0; i < constraints.size(); i++)
+    {
+        for (size_t j = i + 1; j < constraints.size(); j++)
+        {
+            if (constraints[i].first == constraints[j].first)
+            {
+                throw std::invalid_argument(
+                    "At least two inputs were equal, does not define a valid set of constraints");
+            }
+        }
+    }
+
+    // Solve for the coefficients
+    Eigen::MatrixXd A(constraints.size(), constraints.size());
+    Eigen::VectorXd b(constraints.size());
+
+    for (size_t row_index = 0; row_index < constraints.size(); row_index++)
+    {
+        for (size_t col_index = 0; col_index < constraints.size(); col_index++)
+        {
+            A(row_index, col_index) =
+                std::pow(constraints[row_index].first, static_cast<double>(col_index));
+            b(row_index) = constraints[row_index].second;
+        }
+    }
+
+    const Eigen::VectorXd coeff_vector = A.colPivHouseholderQr().solve(b);
+
+    for (size_t i = 0; i < constraints.size(); i++){
+        coeffs.emplace_back(coeff_vector(i));
+    }
 }
 
 Polynomial1d Polynomial1d::constructLinearPolynomialFromConstraints(double input_1,

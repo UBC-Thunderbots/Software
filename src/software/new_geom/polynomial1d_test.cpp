@@ -51,6 +51,40 @@ TEST(Polynomial1dTest, test_polynomial_coeffs_list_constructor)
     EXPECT_DOUBLE_EQ(p.valueAt(3), 34);
 }
 
+TEST(Polynomial1dTest, constructor_from_list_constraints_less_then_two_inputs)
+{
+    const std::vector<std::pair<double, double>> constraints = {
+        {-0.5, -1}};
+
+    EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
+}
+
+TEST(Polynomial1dTest, constructor_from_list_constraints_two_inputs_equal)
+{
+    const std::vector<std::pair<double, double>> constraints = {
+        {-0.5, -1}, {0, 0.1}, {0, 3.4}};
+
+    EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
+}
+
+TEST(Polynomial1dTest, constructor_from_list_constraints_valid)
+{
+    const std::vector<std::pair<double, double>> constraints = {
+        {-0.5, -1}, {0, 0.1}, {2, 3.4}};
+
+    const Polynomial1d p(constraints);
+
+    // We need a 2nd order polynomial to interpolate three points
+    EXPECT_EQ(2, p.getOrder());
+
+    // Check the coefficients are as expected
+    // These were calculated using an online math tool
+    // (https://www.wolframalpha.com/)
+    EXPECT_NEAR(0.1, p.getCoeff(0), 1e-7);
+    EXPECT_NEAR(2.09, p.getCoeff(1), 1e-7);
+    EXPECT_NEAR(-0.22, p.getCoeff(2), 1e-7);
+}
+
 TEST(TestSpline, test_polynomial_linear_constructor)
 {
     Polynomial1d p =

@@ -32,6 +32,20 @@ class Polynomial1d
     explicit Polynomial1d(const std::initializer_list<double> &coeffs);
 
     /**
+     * Construct a polynomial from a series of constraints (input/output pairs)
+     *
+     * @param constraints A series of pairs, where each pair is of the form
+     *                    {input, output}, indicating the output that the created
+     *                    polynomial must have for a given input. Note that all inputs
+     *                    must be unique, and there must be at least two constraints
+     * @throws std::invalid_argument if any two inputs are equal, or if there are less
+     *                               then two constraints
+     */
+    explicit Polynomial1d(const std::vector<std::pair<double, double>> constraints);
+
+    // TODO: we can delete this now and just use the generic constructor we've created
+    //       above
+    /**
      * Construct a linear polynomial from two pairs of input/output
      *
      * @param constraint1 first pair of values: first is the input, second is the output
