@@ -370,6 +370,7 @@ cc_test(
     srcs = ["bezier_curve2d_test.cpp"],
     deps = [
         ":bezier_curve2d",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
