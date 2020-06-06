@@ -1,5 +1,7 @@
 #pragma once
 
+#include "software/logger/logger.h"
+
 template <typename T>
 ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size)
     : buffer(buffer_size), destructor_called(false)
@@ -42,6 +44,10 @@ template <typename T>
 void ThreadSafeBuffer<T>::push(const T& value)
 {
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
+    if (buffer.full())
+    {
+        LOG(DEBUG) << "Pushing to a full ThreadSafeBuffer" << std::endl;
+    }
     buffer.push_back(value);
     received_new_value.notify_all();
 }
