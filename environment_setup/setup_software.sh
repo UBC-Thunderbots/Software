@@ -20,10 +20,7 @@
 # helps prevent bugs and odd behaviour if this script is run through a symlink
 # or from a different directory.
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
-cd $CURR_DIR
-# The root directory of the reopsitory and git tree
-GIT_ROOT="$CURR_DIR/.."
-
+cd "$CURR_DIR" || exit
 
 echo "================================================================"
 echo "Installing Utilities and Dependencies"
@@ -59,9 +56,8 @@ host_software_packages=(
                       # to manually install it ourselves
     kcachegrind # This lets us view the profiles output by callgrind
 )
-sudo apt-get install ${host_software_packages[@]} -y
 
-if [ $? -ne 0 ]; then
+if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     echo "##############################################################"
     echo "Error: Installing utilities and dependencies failed"
     echo "##############################################################"
@@ -82,8 +78,7 @@ sudo apt install curl gnupg
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
 sudo apt update
-sudo apt install bazel -y
-if [ $? -ne 0 ]; then
+if ! sudo apt install bazel -y ; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
     echo "##############################################################"

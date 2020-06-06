@@ -13,7 +13,7 @@
 # helps prevent bugs and odd behaviour if this script is run through a symlink
 # or from a different directory.
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
-cd $CURR_DIR
+cd "$CURR_DIR" || exit
 
 
 # Install required packages
@@ -42,8 +42,7 @@ host_software_packages=(
 sudo apt-get update
 
 # Install the packages
-sudo apt-get install ${host_software_packages[@]} -y
-if [ $? -ne 0 ]; then
+if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     echo "##############################################################"
     echo "Error: Installing grsim dependencies failed"
     echo "##############################################################"
@@ -69,11 +68,11 @@ if [ -d $grSim_path ]; then
     sudo rm -r $grSim_path
 fi
 
-cd $grSim_location
+cd "$grSim_location" || exit
 sudo git clone https://github.com/RoboCup-SSL/grSim
-cd ./grSim
+cd ./grSim || exit
 sudo mkdir build
-cd build
+cd build || exit
 sudo cmake ..
 sudo make
 
