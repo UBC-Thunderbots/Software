@@ -10,5 +10,6 @@ TEST(SSLMessageTranslatorTest, test) {
     for(const auto& foo : field_msg->field_lines()) {
         std::cout << foo.name() << std::endl;
     }
-//    std::cout << field_msg->kFieldLinesFieldNumber << std::endl;
+
+    EXPECT_EQ(ssl_field_line_names.size(), field_msg->field_lines().size());
 }

@@ -76,7 +76,29 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment right_penalty_stretch = Segment(field.enemyDefenseArea().negXNegYCorner(), field.enemyDefenseArea().negXPosYCorner());
     *line = *(createFieldLineSegment(right_penalty_stretch, ssl_field_line_names.at(SSLFieldLines::RIGHT_PENALTY_STRETCH)).release());
 
-    // TODO: goal lines
+    line = geometry_field_size->add_field_lines();
+    Segment right_goal_top_line = Segment(field.enemyGoal().negXPosYCorner(), field.enemyGoal().posXPosYCorner());
+    *line = *(createFieldLineSegment(right_goal_top_line, ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_TOP_LINE)).release());
+
+    line = geometry_field_size->add_field_lines();
+    Segment right_goal_bottom_line = Segment(field.enemyGoal().negXNegYCorner(), field.enemyGoal().posXNegYCorner());
+    *line = *(createFieldLineSegment(right_goal_bottom_line, ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE)).release());
+
+    line = geometry_field_size->add_field_lines();
+    Segment right_goal_depth_line = Segment(field.enemyGoal().posXPosYCorner(), field.enemyGoal().posXNegYCorner());
+    *line = *(createFieldLineSegment(right_goal_depth_line, ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_DEPTH_LINE)).release());
+
+    line = geometry_field_size->add_field_lines();
+    Segment left_goal_top_line = Segment(field.friendlyGoal().negXPosYCorner(), field.friendlyGoal().posXPosYCorner());
+    *line = *(createFieldLineSegment(left_goal_top_line, ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_TOP_LINE)).release());
+
+    line = geometry_field_size->add_field_lines();
+    Segment left_goal_bottom_line = Segment(field.friendlyGoal().negXNegYCorner(), field.friendlyGoal().posXNegYCorner());
+    *line = *(createFieldLineSegment(left_goal_bottom_line, ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_BOTTOM_LINE)).release());
+
+    line = geometry_field_size->add_field_lines();
+    Segment left_goal_depth_line = Segment(field.friendlyGoal().negXPosYCorner(), field.friendlyGoal().negXNegYCorner());
+    *line = *(createFieldLineSegment(left_goal_depth_line, ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_DEPTH_LINE)).release());
 
     line = geometry_field_size->add_field_lines();
     Segment left_field_left_penalty_stretch = Segment(field.friendlyDefenseArea().negXPosYCorner(), field.friendlyDefenseArea().posXPosYCorner());
