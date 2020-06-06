@@ -38,7 +38,8 @@ bool ShootOrPassPlay::invariantHolds(const World &world) const
             Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
-void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     /**
      * There are two main stages to this Play:
@@ -54,37 +55,37 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Setup the goalie and crease defenders
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world->ball(), world->field(), world->friendlyTeam(), world->enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world->field(), world->ball(),
-                                               world->friendlyTeam(), world->enemyTeam(),
+        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
+                                               world.friendlyTeam(), world.enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world->field(), world->ball(),
-                                               world->friendlyTeam(), world->enemyTeam(),
+        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
+                                               world.friendlyTeam(), world.enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region = world->field().enemyPositiveYQuadrant();
-    Rectangle cherry_pick_2_target_region = world->field().enemyNegativeYQuadrant();
+    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
+    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
-    if (world->ball().position().x() > -1)
+    if (world.ball().position().x() > -1)
     {
         double y_offset =
-            -std::copysign(world->field().yLength() / 2, world->ball().position().y());
+            -std::copysign(world.field().yLength() / 2, world.ball().position().y());
         cherry_pick_1_target_region =
-            Rectangle(Point(0, world->field().xLength() / 4),
-                      Point(world->field().xLength() / 2, y_offset));
+            Rectangle(Point(0, world.field().xLength() / 4),
+                      Point(world.field().xLength() / 2, y_offset));
         cherry_pick_2_target_region =
-            Rectangle(Point(0, world->field().xLength() / 4), Point(0, y_offset));
+            Rectangle(Point(0, world.field().xLength() / 4), Point(0, y_offset));
     }
 
     std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {
-        std::make_shared<CherryPickTactic>(*world, cherry_pick_1_target_region),
-        std::make_shared<CherryPickTactic>(*world, cherry_pick_2_target_region)};
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region),
+        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region)};
 
 
     // Have a robot keep trying to take a shot
@@ -95,21 +96,21 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                ->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
-        world->field(), world->friendlyTeam(), world->enemyTeam(), world->ball(),
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
         min_open_angle_for_shot, std::nullopt, false);
 
     // Start a PassGenerator that will continuously optimize passes into the enemy half
     // of the field
-    PassGenerator pass_generator(*world, world->ball().position(),
+    PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(world->field().enemyHalf());
+    pass_generator.setTargetRegion(world.field().enemyHalf());
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
     // score of 1) and decreasing this threshold over time
     double min_pass_score_threshold = 1.0;
     // TODO: change this to use the world timestamp (Issue #423)
-    Timestamp pass_optimization_start_time = world->ball().lastUpdateTimestamp();
+    Timestamp pass_optimization_start_time = world.ball().lastUpdateTimestamp();
     // This boolean indicates if we're ready to perform a pass
     bool ready_to_pass = false;
     // Whether or not we've set the passer robot in the PassGenerator
@@ -125,7 +126,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                ->value();
     do
     {
-        updatePassGenerator(pass_generator);
+        updatePassGenerator(pass_generator, world);
 
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
@@ -155,7 +156,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
         if (set_passer_robot_in_passgenerator)
         {
             Duration time_since_commit_stage_start =
-                world->getMostRecentTimestamp() - pass_optimization_start_time;
+                world.getMostRecentTimestamp() - pass_optimization_start_time;
             min_pass_score_threshold =
                 1 - std::min(time_since_commit_stage_start.getSeconds() /
                                  pass_score_ramp_down_duration,
@@ -178,10 +179,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                    << best_pass_and_score_so_far.rating;
 
         // Perform the pass and wait until the receiver is finished
-        auto passer   = std::make_shared<PasserTactic>(pass, world->ball(), false);
+        auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);
         auto receiver = std::make_shared<ReceiverTactic>(
-            world->field(), world->friendlyTeam(), world->enemyTeam(), pass,
-            world->ball(), false);
+            world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
+            false);
         do
         {
             passer->updateControlParams(pass);
@@ -198,10 +199,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished";
 }
 
-void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
+void ShootOrPassPlay::updatePassGenerator(Passing::PassGenerator &pass_generator,
+                                          const World &world)
 {
-    pass_generator.setWorld(*world);
-    pass_generator.setPasserPoint(world->ball().position());
+    pass_generator.setWorld(world);
+    pass_generator.setPasserPoint(world.ball().position());
 }
 
 

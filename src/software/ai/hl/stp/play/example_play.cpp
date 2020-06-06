@@ -22,7 +22,7 @@ bool ExamplePlay::invariantHolds(const World &world) const
     return true;
 }
 
-void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
+void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // Create MoveTactics that will loop forever
     auto move_tactic_1 = std::make_shared<MoveTactic>(true);
@@ -36,26 +36,26 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         // The angle between each robot spaced out in a circle around the ball
-        Angle angle_between_robots = Angle::full() / world->friendlyTeam().numRobots();
+        Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
 
         // Move the robots in a circle around the ball, facing the ball
         move_tactic_1->updateControlParams(
-            world->ball().position() + Vector::createFromAngle(angle_between_robots * 1),
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 1),
             (angle_between_robots * 1) + Angle::half(), 0);
         move_tactic_2->updateControlParams(
-            world->ball().position() + Vector::createFromAngle(angle_between_robots * 2),
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 2),
             (angle_between_robots * 2) + Angle::half(), 0);
         move_tactic_3->updateControlParams(
-            world->ball().position() + Vector::createFromAngle(angle_between_robots * 3),
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 3),
             (angle_between_robots * 3) + Angle::half(), 0);
         move_tactic_4->updateControlParams(
-            world->ball().position() + Vector::createFromAngle(angle_between_robots * 4),
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 4),
             (angle_between_robots * 4) + Angle::half(), 0);
         move_tactic_5->updateControlParams(
-            world->ball().position() + Vector::createFromAngle(angle_between_robots * 5),
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 5),
             (angle_between_robots * 5) + Angle::half(), 0);
         move_tactic_6->updateControlParams(
-            world->ball().position() + Vector::createFromAngle(angle_between_robots * 6),
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 6),
             (angle_between_robots * 6) + Angle::half(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority

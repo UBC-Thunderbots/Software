@@ -28,30 +28,31 @@ bool KickoffEnemyPlay::invariantHolds(const World &world) const
     return !world.gameState().isPlaying();
 }
 
-void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                      const World &world)
 {
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world->ball(), world->field(), world->friendlyTeam(), world->enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(world->field(), world->friendlyTeam(),
-                                            world->enemyTeam(), true, world->ball(),
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, world.ball(),
                                             Util::DynamicParameters->getAIConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
                                                 ->BallStealSpeed()
                                                 ->value(),
                                             false, true),
-        std::make_shared<ShadowEnemyTactic>(world->field(), world->friendlyTeam(),
-                                            world->enemyTeam(), true, world->ball(),
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, world.ball(),
                                             Util::DynamicParameters->getAIConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
                                                 ->BallStealSpeed()
                                                 ->value(),
                                             false, true),
-        std::make_shared<ShadowEnemyTactic>(world->field(), world->friendlyTeam(),
-                                            world->enemyTeam(), true, world->ball(),
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, world.ball(),
                                             Util::DynamicParameters->getAIConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
                                                 ->BallStealSpeed()
@@ -86,19 +87,19 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // 		+--------------------+--------------------+
 
     std::vector<Point> defense_positions = {
-        Point(world->field().friendlyGoalpostNeg().x() +
-                  world->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              -world->field().defenseAreaYLength() / 2.0),
-        Point(world->field().friendlyGoalpostPos().x() +
-                  world->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world->field().defenseAreaYLength() / 2.0),
-        Point(world->field().friendlyGoalCenter().x() +
-                  world->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world->field().friendlyGoalCenter().y()),
-        Point(-(world->field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              world->field().defenseAreaYLength() / 2.0),
-        Point(-(world->field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              -world->field().defenseAreaYLength() / 2.0),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              -world.field().defenseAreaYLength() / 2.0),
+        Point(world.field().friendlyGoalpostPos().x() +
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world.field().defenseAreaYLength() / 2.0),
+        Point(world.field().friendlyGoalCenter().x() +
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world.field().friendlyGoalCenter().y()),
+        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
+              world.field().defenseAreaYLength() / 2.0),
+        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
+              -world.field().defenseAreaYLength() / 2.0),
     };
     // these move tactics will be used to go to those positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
@@ -110,9 +111,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         // TODO: (Mathew): Minor instability with defenders and goalie when the ball and
         // attacker are in the middle of the net
-        auto enemy_threats =
-            Evaluation::getAllEnemyThreats(world->field(), world->friendlyTeam(),
-                                           world->enemyTeam(), world->ball(), false);
+        auto enemy_threats = Evaluation::getAllEnemyThreats(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 

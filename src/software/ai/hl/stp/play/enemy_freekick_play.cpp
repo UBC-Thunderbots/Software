@@ -29,29 +29,30 @@ bool EnemyFreekickPlay::invariantHolds(const World &world) const
     return world.gameState().isTheirFreeKick();
 }
 
-void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                       const World &world)
 {
     // Init our goalie tactic
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world->ball(), world->field(), world->friendlyTeam(), world->enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        world->field(), world->ball(), world->friendlyTeam(), world->enemyTeam(),
+        world.field(), world.ball(), world.friendlyTeam(), world.enemyTeam(),
         CreaseDefenderTactic::LeftOrRight::RIGHT);
 
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
     // a free kick (at most we will have 2
     auto shadow_freekicker_1 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::LEFT, world->enemyTeam(), world->ball(), world->field(),
+        ShadowFreekickerTactic::LEFT, world.enemyTeam(), world.ball(), world.field(),
         true);
     auto shadow_freekicker_2 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::RIGHT, world->enemyTeam(), world->ball(), world->field(),
+        ShadowFreekickerTactic::RIGHT, world.enemyTeam(), world.ball(), world.field(),
         true);
 
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
-        world->field(), world->friendlyTeam(), world->enemyTeam(), true, world->ball(),
+        world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
         Util::DynamicParameters->getAIConfig()
             ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
@@ -59,7 +60,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(),
         true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
-        world->field(), world->friendlyTeam(), world->enemyTeam(), true, world->ball(),
+        world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
         Util::DynamicParameters->getAIConfig()
             ->getDefenseShadowEnemyTacticConfig()
             ->BallStealSpeed()
@@ -78,9 +79,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::vector<std::shared_ptr<Tactic>> tactics_to_run = {goalie_tactic};
 
         // Get all enemy threats
-        auto enemy_threats =
-            Evaluation::getAllEnemyThreats(world->field(), world->friendlyTeam(),
-                                           world->enemyTeam(), world->ball(), false);
+        auto enemy_threats = Evaluation::getAllEnemyThreats(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
         // Add Freekick shadower tactics
         tactics_to_run.emplace_back(shadow_freekicker_1);
@@ -94,15 +94,15 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         if (enemy_threats.size() == 0)
         {
             move_tactic_main->updateControlParams(
-                world->field().friendlyGoalCenter() +
+                world.field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world->ball().position() - world->field().friendlyGoalCenter())
+                (world.ball().position() - world.field().friendlyGoalCenter())
                     .orientation(),
                 0);
             move_tactic_main->updateControlParams(
-                world->field().friendlyGoalCenter() +
+                world.field().friendlyGoalCenter() +
                     Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
-                (world->ball().position() - world->field().friendlyGoalCenter())
+                (world.ball().position() - world.field().friendlyGoalCenter())
                     .orientation(),
                 0);
 
@@ -114,9 +114,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             shadow_tactic_main->updateControlParams(enemy_threats.at(1),
                                                     ROBOT_MAX_RADIUS_METERS * 3);
             move_tactic_main->updateControlParams(
-                world->field().friendlyGoalCenter() +
+                world.field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world->ball().position() - world->field().friendlyGoalCenter())
+                (world.ball().position() - world.field().friendlyGoalCenter())
                     .orientation(),
                 0);
 
