@@ -1,7 +1,6 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/polynomial2d.h"
 
-// TODO: should this extend anything else in the geometry hierarchy?
 // Pre-declaration so we can make this a friend class of SplineSegment2d
 class Spline2d;
 
@@ -9,8 +8,6 @@ class Spline2d;
  * A segment of a spline, defined by a 2d polynomial, and the start and end values that
  * define the section of the 2d polynomial that is part of the spline
  */
-// TODO: should this be in it's own file?
-// TODO: this should be made a virtual class so that we can have different implementations
 class SplineSegment2d
 {
    public:
@@ -20,15 +17,13 @@ class SplineSegment2d
      * Get the first input to the polynomial that falls on the spline
      * @return The first input to the polynomial that falls on the spline
      */
-    // TODO: consider renaming to `getStartParametrizationVal`? Similarly for `getEndVal`
-    double getStartVal() const;
+    double getParametrizationStartVal() const;
 
     /**
      * Get the last input to the polynomial that falls on the spline
      * @return The last input to the polynomial that falls on the spline
      */
-    // TODO: consider renaming to `getStartParametrizationVal`? Similarly for `getEndVal`
-    double getEndVal() const;
+    double getParametrizationEndVal() const;
 
     /**
      * Get the polynomial underlying this spline segment
@@ -69,17 +64,16 @@ class Spline2d
 {
    public:
     /**
-     * Calculates the value of spline evaluated at value val
+     * Calculates the value of spline evaluated at value t
      *
-     * @param val A value in [0,1] to get the value of the spline at.
-     *            0 is one endpoint of the spline
-     *            1 is the other endpoint of the spline
+     * @param t A value in [0,1] to get the value of the spline at.
+     *          0 is one endpoint of the spline
+     *          1 is the other endpoint of the spline
      *
-     * @return value of spline evaluated at value val. If val not in [0,1]
-     *         then the closest endpoint
+     * @return Value of spline evaluated at t. If t not in [0,1], then the closest
+     *         endpoint
      */
-    // TODO: `val` is a terrible argument name since we're getting the `value`. Rename.
-    virtual const Point getValueAt(double val) const = 0;
+    virtual const Point getValueAt(double t) const = 0;
 
     /**
      * Get the knots of this spline, including the start and end points
@@ -87,11 +81,6 @@ class Spline2d
      * @return The knots of this spline, including the start and end points
      */
     virtual const std::vector<Point> getKnots() const = 0;
-
-    // TODO: jdoc for this function
-    // TODO: better name for this function. It's mathematically accurate but not
-    //       intuitively obvious
-    virtual const std::vector<double> getKnotVector();
 
     /**
      * Gets the number of knots in the spline including start and end points

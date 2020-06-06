@@ -10,10 +10,15 @@ BezierCurve2d::BezierCurve2d(std::vector<Point> control_points)
     }
 }
 
-const Point BezierCurve2d::getValueAt(double val) const
+const Point BezierCurve2d::getValueAt(double t) const
 {
-    // Here we use De Casteljau's algorithm
-    return deCasteljauAlgorithm(control_points, val);
+    if (t < 0){
+        return control_points.front();
+    }
+    if (t > 1){
+        return control_points.back();
+    }
+    return deCasteljauAlgorithm(control_points, t);
 }
 
 Polynomial2d BezierCurve2d::getPolynomial() const
@@ -59,7 +64,6 @@ const Point BezierCurve2d::deCasteljauAlgorithm(const std::vector<Point>& points
 
 
 
-// TODO: weigh naming to match wikipedia article vs maybe something more descriptive?
 const Vector BezierCurve2d::computePolynomialCoefficients(const size_t order) const
 {
     // Algorithm here is effectively taken verbatim from wikipedia
@@ -72,7 +76,11 @@ const Vector BezierCurve2d::computePolynomialCoefficients(const size_t order) co
     Vector result(0, 0);
     for (size_t i = 0; i <= j; i++)
     {
-        // TODO: maybe comment about tgamma <-> factorial relationship here?
+        // The C++ std lib does not provide a factorial function directly, so we use the
+        // gamma function (essentially the extension of factorial to non-integer,
+        // potentially complex values):
+        // https://www.intmath.com/blog/mathematics/factorials-and-the-gamma-function-4350
+        // https://www.cplusplus.com/reference/cmath/tgamma/
         result += std::pow(-1, i + j) / (std::tgamma(i + 1) * std::tgamma(j - i + 1)) *
                   control_points[i].toVector();
     }

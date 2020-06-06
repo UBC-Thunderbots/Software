@@ -5,9 +5,13 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/spline2d.h"
 
-// TODO: should this extend anything else in the geometry hierarchy?
-// TODO: jdoc
-// TODO: should link to https://www.ibiblio.org/e-notes/Splines/bezier.html and wikipedia
+/**
+ * A 2D bezier curve, parametrized on [0,1]
+ *
+ * More info:
+ * https://www.ibiblio.org/e-notes/Splines/bezier.html
+ * https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+ */
 class BezierCurve2d
 {
    public:
@@ -22,17 +26,16 @@ class BezierCurve2d
     explicit BezierCurve2d(std::vector<Point> control_points);
 
     /**
-     * Calculates the value of the curve evaluated at value val
+     * Calculates the value of the curve evaluated at value t
      *
-     * @param val A value in [0,1] to get the value of the curve at.
-     *            0 is one endpoint of the curve
-     *            1 is the other endpoint of the curve
+     * @param t A value in [0,1] to get the value of the curve at.
+     *          0 is one endpoint of the curve
+     *          1 is the other endpoint of the curve
      *
-     * @return value of curve evaluated at value val. If val not in [0,1]
-     *         then the closest endpoint
+     * @return value of curve evaluated at t. If t not in [0,1]
+     *         then the closest endpoint.
      */
-    // TODO: `val` is a terrible argument name since we're getting the `value`. Rename.
-    const Point getValueAt(double val) const;
+    const Point getValueAt(double t) const;
 
     // TODO: jdoc, make sure to note that parametrization is in [0,1]
     Polynomial2d getPolynomial() const;

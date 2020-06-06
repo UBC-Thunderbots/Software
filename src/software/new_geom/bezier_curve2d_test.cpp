@@ -29,9 +29,35 @@ TEST(BezierCurve2dTest, get_value_two_points)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.valueAt(t),
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
                                                    curve.getValueAt(t), 1e-9));
     }
+}
+
+TEST(BezierCurve2dTest, get_value_below_zero)
+{
+    // Linear bezier curve
+    Point p0(-1, 2);
+    Point p1(5, -7);
+    const std::vector<Point> points = {p0, p1};
+
+    const BezierCurve2d curve(points);
+
+    // Check that getting a value below zero just returns the first point
+    EXPECT_EQ(p0, curve.getValueAt(-0.1));
+}
+
+TEST(BezierCurve2dTest, get_value_above_one)
+{
+    // Linear bezier curve
+    Point p0(-1, 2);
+    Point p1(5, -7);
+    const std::vector<Point> points = {p0, p1};
+
+    const BezierCurve2d curve(points);
+
+    // Check that getting a value just above one just returns the last point
+    EXPECT_EQ(p1, curve.getValueAt(1.1));
 }
 
 TEST(BezierCurveTest, get_value_four_points)
@@ -66,7 +92,7 @@ TEST(BezierCurveTest, get_value_four_points)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.valueAt(t),
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
                                                    curve.getValueAt(t), 1e-9));
     }
 }

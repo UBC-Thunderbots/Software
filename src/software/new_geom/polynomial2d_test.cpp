@@ -10,11 +10,11 @@ TEST(Polynomial2dTest, default_constructor)
 {
     const Polynomial2d p;
 
-    EXPECT_EQ(Point(0, 0), p.valueAt(0));
-    EXPECT_EQ(Point(0, 0), p.valueAt(10));
-    EXPECT_EQ(Point(0, 0), p.valueAt(-10));
-    EXPECT_EQ(Point(0, 0), p.valueAt(10000000000));
-    EXPECT_EQ(Point(0, 0), p.valueAt(-10000000000));
+    EXPECT_EQ(Point(0, 0), p.getValueAt(0));
+    EXPECT_EQ(Point(0, 0), p.getValueAt(10));
+    EXPECT_EQ(Point(0, 0), p.getValueAt(-10));
+    EXPECT_EQ(Point(0, 0), p.getValueAt(10000000000));
+    EXPECT_EQ(Point(0, 0), p.getValueAt(-10000000000));
 
     Polynomial1d p_x = p.getPolyX();
     Polynomial1d p_y = p.getPolyY();
@@ -38,7 +38,7 @@ TEST(Polynomial2dTest, constructor_from_two_1d_polynomials_and_value_at)
 
     const double t_val = 0.33;
     const Point expected_point(p_x.valueAt(t_val), p_y.valueAt(t_val));
-    EXPECT_EQ(expected_point, p.valueAt(t_val));
+    EXPECT_EQ(expected_point, p.getValueAt(t_val));
 }
 
 TEST(Polynomial2dTest, constructor_from_list_of_points_less_then_two_points)
@@ -60,11 +60,11 @@ TEST(Polynomial2dTest, constructor_from_list_of_points_valid)
     EXPECT_EQ(2, p.getPolyY().getOrder());
 
     // Check that we interpolate the start and end points at the expected t-values
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(-1, 1), p.valueAt(0), 1e-9));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(3.3, 7.8), p.valueAt(1), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(-1, 1), p.getValueAt(0), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(3.3, 7.8), p.getValueAt(1), 1e-9));
 
     // Check that the intermediate point was interpolated correctly
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(0, 0), p.valueAt(0.5), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(0, 0), p.getValueAt(0.5), 1e-9));
 
     // Check the coefficients are as expected
     // These were calculated using an online math tool

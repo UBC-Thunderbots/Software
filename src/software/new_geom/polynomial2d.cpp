@@ -45,7 +45,7 @@ Polynomial2d::Polynomial2d(std::initializer_list<Point> points)
 {
 }
 
-Point Polynomial2d::valueAt(double val) const
+Point Polynomial2d::getValueAt(double val) const
 {
     return Point(poly_x.valueAt(val), poly_y.valueAt(val));
 }

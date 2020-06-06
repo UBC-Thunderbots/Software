@@ -51,7 +51,6 @@ class Polynomial2d
      */
     Polynomial2d(std::initializer_list<Point> points);
 
-    // TODO: should this be `getValueAt`? Update here and anywhere else...
     /**
      * Calculates the value of polynomial evaluated at value val
      *
@@ -59,7 +58,7 @@ class Polynomial2d
      *
      * @return value of polynomial evaluated at value val
      */
-    Point valueAt(double val) const;
+    Point getValueAt(double val) const;
 
     /**
      * Get the polynomial x(t) underlying this 2d Polynomial
@@ -77,9 +76,6 @@ class Polynomial2d
     Polynomial1d poly_x;
     Polynomial1d poly_y;
 };
-
-// TODO: file ticket to implement the rest of the operators for Polynomial2d, should be
-//       pretty easy to copy over from Polynomial1d
 
 /**
  * Compares two Polynomials for equality

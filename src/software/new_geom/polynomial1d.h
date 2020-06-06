@@ -43,25 +43,6 @@ class Polynomial1d
      */
     explicit Polynomial1d(const std::vector<std::pair<double, double>> constraints);
 
-    // TODO: we can delete this now and just use the generic constructor we've created
-    //       above
-    /**
-     * Construct a linear polynomial from two pairs of input/output
-     *
-     * @param constraint1 first pair of values: first is the input, second is the output
-     * @param constraint2 second pair of values: first is the input, second is the output
-     * @param input_1 The first input
-     * @param output_1 The value the created polynomial must output if given input_1
-     * @param input_2 The second input
-     * @param output_2 The value the created polynomial must output if given input_2
-     *
-     * @throws std::invalid_argument if input_1 == input_2
-     */
-    static Polynomial1d constructLinearPolynomialFromConstraints(double input_1,
-                                                                 double output_1,
-                                                                 double input_2,
-                                                                 double output_2);
-
     /**
      * Returns the coefficient of the term of given order
      *

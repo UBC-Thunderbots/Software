@@ -66,7 +66,28 @@ TEST(Polynomial1dTest, constructor_from_list_constraints_two_inputs_equal)
     EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
 }
 
-TEST(Polynomial1dTest, constructor_from_list_constraints_valid)
+TEST(TestSpline, test_polynomial_linear_constructor)
+{
+    Polynomial1d p({{2.0,3.0}, {6.0, 4.0}});
+    EXPECT_EQ(1, p.getOrder());
+    EXPECT_EQ(p.getCoeff(0), 2.5);
+    EXPECT_EQ(p.getCoeff(1), 0.25);
+    EXPECT_EQ(p.valueAt(2.0), 3.0);
+    EXPECT_EQ(p.valueAt(6.0), 4.0);
+}
+
+TEST(TestSpline, test_zero_polynomial_linear_constructor)
+{
+    Polynomial1d p({{2.0, 0.0}, {6.0, 0.0}});
+    EXPECT_EQ(0, p.getOrder());
+    EXPECT_EQ(p.getCoeff(0), 0.0);
+    EXPECT_EQ(p.getCoeff(1), 0.0);
+    EXPECT_EQ(p.valueAt(2.0), 0.0);
+    EXPECT_EQ(p.valueAt(6.0), 0.0);
+}
+
+
+TEST(Polynomial1dTest, constructor_from_list_constraints_quadratic)
 {
     const std::vector<std::pair<double, double>> constraints = {
         {-0.5, -1}, {0, 0.1}, {2, 3.4}};
@@ -86,44 +107,6 @@ TEST(Polynomial1dTest, constructor_from_list_constraints_valid)
     EXPECT_DOUBLE_EQ(0.1, p.getCoeff(0));
     EXPECT_DOUBLE_EQ(2.09, p.getCoeff(1));
     EXPECT_DOUBLE_EQ(-0.22, p.getCoeff(2));
-}
-
-TEST(TestSpline, test_polynomial_linear_constructor)
-{
-    Polynomial1d p =
-        Polynomial1d::constructLinearPolynomialFromConstraints(2.0, 3.0, 6.0, 4.0);
-    EXPECT_EQ(1, p.getOrder());
-    EXPECT_EQ(p.getCoeff(0), 2.5);
-    EXPECT_EQ(p.getCoeff(1), 0.25);
-    EXPECT_EQ(p.valueAt(2.0), 3.0);
-    EXPECT_EQ(p.valueAt(6.0), 4.0);
-}
-
-TEST(TestSpline, test_zero_polynomial_linear_constructor)
-{
-    Polynomial1d p =
-        Polynomial1d::constructLinearPolynomialFromConstraints(2.0, 0.0, 6.0, 0.0);
-    EXPECT_EQ(0, p.getOrder());
-    EXPECT_EQ(p.getCoeff(0), 0.0);
-    EXPECT_EQ(p.getCoeff(1), 0.0);
-    EXPECT_EQ(p.valueAt(2.0), 0.0);
-    EXPECT_EQ(p.valueAt(6.0), 0.0);
-}
-
-TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
-{
-    std::pair<double, double> constraint1, constraint2;
-    try
-    {
-        Polynomial1d p =
-            Polynomial1d::constructLinearPolynomialFromConstraints(2.0, -3.0, 2.0, -4.0);
-    }
-    catch (std::invalid_argument &e)
-    {
-        SUCCEED();
-        return;
-    }
-    ADD_FAILURE() << "Successfully able to build a polynomial that isn't a function";
 }
 
 TEST(Polynomial1dTest, test_set_coeff)
