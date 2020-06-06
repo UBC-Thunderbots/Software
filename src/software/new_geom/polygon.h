@@ -34,9 +34,9 @@ class Polygon : public virtual Shape
     bool contains(const Point& p) const override;
 
     /**
-     * Returns the centroid of this convex polygon
+     * Returns the centroid of this polygon
      *
-     * @return The centroid of this convex polygon
+     * @return The centroid of this polygon
      */
     Point centroid() const;
 
