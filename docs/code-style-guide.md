@@ -78,7 +78,9 @@ The vast majority of the things noted in this document will apply to `C` code as
    *                  trajectory.
    * @return true if the trajectory was generated successfully, false otherwise
    */
-  bool generateTrajectory(Trajectory* created_trajectory, float max_speed)
+  bool generateTrajectory(float* max_acceleration, 
+                          Trajectory* created_trajectory, 
+                          float max_speed);
 
   // Correct
   /**
@@ -93,7 +95,9 @@ The vast majority of the things noted in this document will apply to `C` code as
    *                           created trajectory.
    * @return true if the trajectory was generated successfully, false otherwise
    */
-  bool generateTrajectory(float max_speed, Trajectory* created_trajectory)
+  bool generateTrajectory(float max_speed, 
+                          float* max_acceleration, 
+                          Trajectory* created_trajectory);
   ```
 
 ### Names and Variables
