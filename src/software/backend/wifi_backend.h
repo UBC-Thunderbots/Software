@@ -26,7 +26,7 @@ class WifiBackend : public Backend
     void receiveWorld(World world);
 
     /**
-     * This is registered as an async callback function on the robot_status_input
+     * This is registered as an async callback function on the robot_msg_input
      * to receive msgs from the robot.
      *
      * @param robot_msg The robot_msg from a robot
@@ -43,7 +43,7 @@ class WifiBackend : public Backend
 
     /**
      * Joins the specified multicast group on the vision_output, primitive_output
-     * and robot_status_input. Multicast Channel and Multicast Group are used
+     * and robot_msg_input. Multicast Channel and Multicast Group are used
      * interchangably.
      *
      * NOTE: This will terminate the existing connection on the previous channel
@@ -51,8 +51,10 @@ class WifiBackend : public Backend
      *
      * @param channel The channel to join, index of MULTICAST_CHANNELS in
      * shared/constants.h
+     * @param interface The interface to join the multicast group on (lo, eth0, enp3s0f1,
+     * etc.)
      */
-    void joinMulticastChannel(int channel);
+    void joinMulticastChannel(int channel, const std::string& interface);
 
 
     // The interface with the network that lets us get new information about the world
@@ -61,7 +63,7 @@ class WifiBackend : public Backend
     // ProtoMulticast** to communicate with robots
     std::unique_ptr<ProtoMulticastSender<VisionMsg>> vision_output;
     std::unique_ptr<ProtoMulticastSender<PrimitiveMsg>> primitive_output;
-    std::unique_ptr<ProtoMulticastListener<TbotsRobotMsg>> robot_status_input;
+    std::unique_ptr<ProtoMulticastListener<TbotsRobotMsg>> robot_msg_input;
 
     // The io_service that will be used to serivce all network requests
     boost::asio::io_service io_service;

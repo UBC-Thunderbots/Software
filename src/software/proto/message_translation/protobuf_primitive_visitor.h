@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "shared/proto/radio_primitive.pb.h"
+#include "software/primitive/primitive.h"
 #include "software/primitive/primitive_visitor.h"
 
 /**
@@ -36,12 +37,12 @@ class ProtobufPrimitiveVisitor : public PrimitiveVisitor
     void visit(const StopPrimitive &stop_primitive) override;
 
     /**
-     * Returns a unique_ptr RadioPrimitiveMsg
+     * Converts a primitive to a RadioPrimitiveMsg
      *
-     * @return The unique_ptr to most recently constructed msg
-     * created by this ProtobufPrimitiveVisitor
+     * @param The primitive to visit and convert
+     * @return A unique_ptr to the respective RadioPrimitiveMsg
      */
-    std::unique_ptr<RadioPrimitiveMsg> getRadioPrimitiveMsg();
+    std::unique_ptr<RadioPrimitiveMsg> getRadioPrimitiveMsg(const Primitive &primitive);
 
    private:
     std::unique_ptr<RadioPrimitiveMsg> prim_msg_ptr;

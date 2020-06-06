@@ -4,17 +4,10 @@
 #include "shared/proto/radio_primitive.pb.h"
 #include "software/primitive/all_primitives.h"
 
-std::unique_ptr<RadioPrimitiveMsg> ProtobufPrimitiveVisitor::getRadioPrimitiveMsg()
+std::unique_ptr<RadioPrimitiveMsg> ProtobufPrimitiveVisitor::getRadioPrimitiveMsg(
+    const Primitive &primitive)
 {
-    // If we've never visited a primitive (and so have never populated the
-    // `prim_msg_ptr`) then throw an exception
-    if (!prim_msg_ptr)
-    {
-        std::string err_msg = std::string(typeid(this).name()) + ": " + __func__ +
-                              " called without ever having visited anything";
-        throw std::runtime_error(err_msg);
-    }
-
+    primitive.accept(*this);
     return std::move(prim_msg_ptr);
 }
 

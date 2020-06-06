@@ -21,7 +21,7 @@ WifiBackend::WifiBackend()
     // connect to current channel
     joinMulticastChannel(
         Util::DynamicParameters->getNetworkConfig()->Channel()->value(),
-        Util::DynamicParameters->getNetworkConfig()->NetworkInteface()->value());
+        Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value());
 
     // add callback to switch channels on param change
     Util::MutableDynamicParameters->getMutableNetworkConfig()

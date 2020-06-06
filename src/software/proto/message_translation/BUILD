@@ -7,6 +7,7 @@ cc_library(
         "//shared:constants",
         "//shared:firmware_primitive_type",
         "//shared/proto:tbots_cc_proto",
+        "//software/primitive",
         "//software/primitive:all_primitives",
         "//software/primitive:primitive_visitor",
     ],

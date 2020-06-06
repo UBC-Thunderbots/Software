@@ -53,12 +53,9 @@ namespace ProtobufMessageTranslation
         // Since the unique_ptr immediately looses scope after the copy, the memory is
         // freed
         std::for_each(primitives->begin(), primitives->end(), [&](const auto& primitive) {
-            primitive->accept(primitive_visitor);
-
             robot_primitives_map[primitive->getRobotId()] =
-                *primitive_visitor.getRadioPrimitiveMsg();
+                *primitive_visitor.getRadioPrimitiveMsg(*primitive);
         });
-
 
         return std::move(primitive_msg);
     }
