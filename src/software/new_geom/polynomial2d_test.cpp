@@ -69,12 +69,16 @@ TEST(Polynomial2dTest, constructor_from_list_of_points_valid)
     // Check the coefficients are as expected
     // These were calculated using an online math tool
     // (https://www.wolframalpha.com/)
-    EXPECT_NEAR(-1, p.getPolyX().getCoeff(0), 1e-9);
-    EXPECT_NEAR(-0.3, p.getPolyX().getCoeff(1), 1e-9);
-    EXPECT_NEAR(4.6, p.getPolyX().getCoeff(2), 1e-9);
-    EXPECT_NEAR(1, p.getPolyY().getCoeff(0), 1e-9);
-    EXPECT_NEAR(-10.8, p.getPolyY().getCoeff(1), 1e-9);
-    EXPECT_NEAR(17.6, p.getPolyY().getCoeff(2), 1e-9);
+    // NOTE: The tolerances used here are very tight because several many commonly used
+    //       methods for solving for these polynomials can have significant numerical
+    //       error. Please do not loosen the tolerance unless you really know what you're
+    //       doing.
+    EXPECT_DOUBLE_EQ(-1, p.getPolyX().getCoeff(0));
+    EXPECT_DOUBLE_EQ(-0.3, p.getPolyX().getCoeff(1));
+    EXPECT_DOUBLE_EQ(4.6, p.getPolyX().getCoeff(2));
+    EXPECT_DOUBLE_EQ(1, p.getPolyY().getCoeff(0));
+    EXPECT_DOUBLE_EQ(-10.8, p.getPolyY().getCoeff(1));
+    EXPECT_DOUBLE_EQ(17.6, p.getPolyY().getCoeff(2));
 }
 
 TEST(Polynomial2dTest, constructor_from_initializer_list_of_points){
@@ -134,4 +138,44 @@ TEST(Polynomial2dTest, equality_operator_y_poly_not_equal){
     const Polynomial2d p2(p_x, p_y_2);
 
     EXPECT_FALSE(operator==(p1, p2));
+}
+
+TEST(Polynomial2dTest, addition_operator){
+    const Polynomial2d p1(
+        Polynomial1d({1, 2, 3}),
+        Polynomial1d({1, 1, 1})
+        );
+
+    const Polynomial2d p2(
+        Polynomial1d({2, 4, 6}),
+        Polynomial1d({1, 2, 4})
+    );
+
+    const Polynomial2d expected(
+        Polynomial1d({3, 6, 9}),
+        Polynomial1d({2, 3, 5})
+        );
+
+    EXPECT_EQ(expected, p1 + p2);
+}
+
+TEST(Polynomial2dTest, addition_assignment_operator){
+    const Polynomial2d p1(
+        Polynomial1d({1, 2, 3}),
+        Polynomial1d({1, 1, 1})
+    );
+
+    Polynomial2d p2(
+        Polynomial1d({2, 4, 6}),
+        Polynomial1d({1, 2, 4})
+    );
+
+    const Polynomial2d expected(
+        Polynomial1d({3, 6, 9}),
+        Polynomial1d({2, 3, 5})
+    );
+
+    p2 += p1;
+
+    EXPECT_EQ(expected, p2);
 }

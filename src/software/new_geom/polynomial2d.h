@@ -78,6 +78,9 @@ class Polynomial2d
     Polynomial1d poly_y;
 };
 
+// TODO: file ticket to implement the rest of the operators for Polynomial2d, should be
+//       pretty easy to copy over from Polynomial1d
+
 /**
  * Compares two Polynomials for equality
  *
@@ -89,3 +92,23 @@ class Polynomial2d
  * @return true if p1 is equal to p2, and false otherwise.
  */
 bool operator==(const Polynomial2d &p1, const Polynomial2d &p2);
+
+/**
+ * Adds two Polynomials
+ *
+ * @param p1 the first Polynomial2d
+ * @param p2 the second Polynomial2d
+ *
+ * @return the sum of the Polynomials
+ */
+Polynomial2d operator+(const Polynomial2d &p1, const Polynomial2d &p2);
+
+/**
+ * Adds a Polynomial2d to another Polynomial2d
+ *
+ * @param p1 the Polynomial2d to add to.
+ * @param p2 the Polynomial2d to add.
+ *
+ * @return the new Polynomial2d
+ */
+Polynomial2d &operator+=(Polynomial2d &p1, const Polynomial2d &p2);
