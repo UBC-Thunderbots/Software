@@ -14,6 +14,7 @@ cc_library(
     deps = [
         "//firmware/shared/math:polynomial_1d",
         "//firmware/shared/math:polynomial_2d",
+        "//firmware/shared/math:tbots_math",
         "//firmware/shared/math:vector_2d",
     ],
 )
