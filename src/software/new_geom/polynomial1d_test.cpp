@@ -80,9 +80,13 @@ TEST(Polynomial1dTest, constructor_from_list_constraints_valid)
     // Check the coefficients are as expected
     // These were calculated using an online math tool
     // (https://www.wolframalpha.com/)
-    EXPECT_NEAR(0.1, p.getCoeff(0), 1e-7);
-    EXPECT_NEAR(2.09, p.getCoeff(1), 1e-7);
-    EXPECT_NEAR(-0.22, p.getCoeff(2), 1e-7);
+    // NOTE: The tolerances used here are very tight because several many commonly used
+    //       methods for solving for these polynomials can have significant numerical
+    //       error. Please do not loosen the tolerance unless you really know what you're
+    //       doing.
+    EXPECT_DOUBLE_EQ(0.1, p.getCoeff(0));
+    EXPECT_DOUBLE_EQ(2.09, p.getCoeff(1));
+    EXPECT_DOUBLE_EQ(-0.22, p.getCoeff(2));
 }
 
 TEST(TestSpline, test_polynomial_linear_constructor)

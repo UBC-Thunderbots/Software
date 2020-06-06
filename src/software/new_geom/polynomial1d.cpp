@@ -52,7 +52,7 @@ Polynomial1d::Polynomial1d(const std::vector<std::pair<double, double>> constrai
         }
     }
 
-    const Eigen::VectorXd coeff_vector = A.colPivHouseholderQr().solve(b);
+    const Eigen::VectorXd coeff_vector = A.fullPivLu().solve(b);
 
     for (size_t i = 0; i < constraints.size(); i++)
     {
