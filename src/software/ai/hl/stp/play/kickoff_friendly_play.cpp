@@ -27,7 +27,8 @@ bool KickoffFriendlyPlay::invariantHolds(const World &world) const
             world.gameState().isStopped());
 }
 
-void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                         const World &world)
 {
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most

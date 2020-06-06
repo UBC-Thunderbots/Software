@@ -18,8 +18,9 @@ TEST(SimulatorTest, test_simulation_step_updates_the_ball)
 
     Simulator simulator(world);
     simulator.stepSimulation(Duration::fromSeconds(0.1));
-    World new_world = simulator.getWorld();
-    Point p         = new_world.ball().position();
+    std::optional<World> new_world = simulator.getWorld();
+    EXPECT_TRUE(new_world);
+    Point p = new_world->ball().position();
     EXPECT_NE(Point(0.4, 0), p);
 }
 
@@ -37,8 +38,9 @@ TEST(SimulatorTest, test_simulate_robots_with_no_primitives)
     }
 
     // Robots have not been assigned primitives and so should not move
-    World new_world                = simulator.getWorld();
-    std::optional<Robot> new_robot = new_world.friendlyTeam().getRobotById(0);
+    std::optional<World> new_world = simulator.getWorld();
+    EXPECT_TRUE(new_world);
+    std::optional<Robot> new_robot = new_world->friendlyTeam().getRobotById(0);
     ASSERT_TRUE(new_robot);
     EXPECT_LT((new_robot->position() - Point(0, 0)).length(), 0.01);
 }
@@ -73,8 +75,9 @@ TEST(SimulatorTest, test_simulate_single_robot_with_primitive)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    World new_world                = simulator.getWorld();
-    std::optional<Robot> new_robot = new_world.friendlyTeam().getRobotById(0);
+    std::optional<World> new_world = simulator.getWorld();
+    EXPECT_TRUE(new_world);
+    std::optional<Robot> new_robot = new_world->friendlyTeam().getRobotById(0);
     ASSERT_TRUE(new_robot);
     EXPECT_LT((new_robot->position() - Point(1, 0)).length(), 0.2);
 }
@@ -120,14 +123,15 @@ TEST(SimulatorTest, test_simulate_multiple_robots_with_primitives)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    World new_world = simulator.getWorld();
+    std::optional<World> new_world = simulator.getWorld();
+    EXPECT_TRUE(new_world);
 
-    std::optional<Robot> new_robot_0 = new_world.friendlyTeam().getRobotById(0);
+    std::optional<Robot> new_robot_0 = new_world->friendlyTeam().getRobotById(0);
     ASSERT_TRUE(new_robot_0);
     EXPECT_LT((new_robot_0->position() - Point(1, 0)).length(), 0.2);
     EXPECT_LT((new_robot_0->orientation().minDiff(Angle::zero())), Angle::fromDegrees(2));
 
-    std::optional<Robot> new_robot_1 = new_world.friendlyTeam().getRobotById(1);
+    std::optional<Robot> new_robot_1 = new_world->friendlyTeam().getRobotById(1);
     ASSERT_TRUE(new_robot_1);
     EXPECT_LT((new_robot_1->position() - Point(0, -2)).length(), 0.2);
     EXPECT_LT((new_robot_1->orientation().minDiff(Angle::half())), Angle::fromDegrees(5));

@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 
 TacticWorldParamsUpdateVisitor::TacticWorldParamsUpdateVisitor(const World &world)
+    : world(world)
 {
-    this->world = world;
 }
 
 void TacticWorldParamsUpdateVisitor::visit(CherryPickTactic &tactic)

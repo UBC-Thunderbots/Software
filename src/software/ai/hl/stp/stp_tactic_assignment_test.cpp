@@ -54,7 +54,7 @@ class STPTacticAssignmentTest : public ::testing::Test
     }
 
     STP stp;
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 };
 
 TEST_F(STPTacticAssignmentTest,

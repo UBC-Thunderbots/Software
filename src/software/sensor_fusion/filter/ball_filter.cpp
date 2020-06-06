@@ -329,7 +329,7 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
     }
 }
 
-std::optional<Ball> BallFilter::getFilteredData(
+std::optional<TimestampedBallState> BallFilter::getFilteredData(
     const std::vector<BallDetection> &new_ball_detections, const Field &field)
 {
     addNewDetectionsToBuffer(new_ball_detections, field);
@@ -340,21 +340,21 @@ std::optional<Ball> BallFilter::getFilteredData(
             estimateBallState(ball_detection_buffer);
         if (filtered_ball)
         {
-            return Ball(*filtered_ball);
+            return *filtered_ball;
         }
         else
         {
-            return Ball(ball_detection_buffer.front().position, Vector(0, 0),
-                        ball_detection_buffer.front().timestamp);
+            return TimestampedBallState(ball_detection_buffer.front().position,
+                                        Vector(0, 0),
+                                        ball_detection_buffer.front().timestamp);
         }
     }
     else if (ball_detection_buffer.size() == 1)
     {
         // If there is only 1 entry in the buffer, we can't calculate a velocity so
         // just set it to 0
-        Ball filtered_ball = Ball(ball_detection_buffer.front().position, Vector(0, 0),
-                                  ball_detection_buffer.front().timestamp);
-        return filtered_ball;
+        return TimestampedBallState(ball_detection_buffer.front().position, Vector(0, 0),
+                                    ball_detection_buffer.front().timestamp);
     }
     else
     {
