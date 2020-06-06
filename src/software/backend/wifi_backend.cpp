@@ -19,7 +19,9 @@ WifiBackend::WifiBackend()
       io_service()
 {
     // connect to current channel
-    joinMulticastChannel(Util::DynamicParameters->getNetworkConfig()->Channel()->value());
+    joinMulticastChannel(
+        Util::DynamicParameters->getNetworkConfig()->Channel()->value(),
+        Util::DynamicParameters->getNetworkConfig()->NetworkInteface()->value());
 
     // add callback to switch channels on param change
     Util::MutableDynamicParameters->getMutableNetworkConfig()
@@ -56,16 +58,16 @@ void WifiBackend::receiveTbotsRobotMsg(TbotsRobotMsg robot_msg)
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 
-void WifiBackend::joinMulticastChannel(int channel)
+void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ProtoMulticastSender<VisionMsg>(
-        io_service, MULTICAST_CHANNELS[channel], VISION_PORT));
+        io_service, MULTICAST_CHANNELS[channel] + "%" + interface, VISION_PORT));
 
     primitive_output.reset(new ProtoMulticastSender<PrimitiveMsg>(
-        io_service, MULTICAST_CHANNELS[channel], PRIMITIVE_PORT));
+        io_service, MULTICAST_CHANNELS[channel] + "%" + interface, PRIMITIVE_PORT));
 
     robot_status_input.reset(new ProtoMulticastListener<TbotsRobotMsg>(
-        io_service, MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
+        io_service, MULTICAST_CHANNELS[channel] + "%" + interface, ROBOT_STATUS_PORT,
         boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1)));
 }
 

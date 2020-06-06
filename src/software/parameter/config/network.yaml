@@ -6,3 +6,9 @@ NetworkConfig:
       type: "int"
       description: >-
           The multicast channel to join to communicate with the robots
+    NetworkInterface:
+      default: "eth0"
+      type: "std::string"
+      description: >-
+          The network interface that is connected to the thunberbots router.
+          Can be found using ifconfig on ubuntu.
