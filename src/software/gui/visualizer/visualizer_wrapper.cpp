@@ -9,6 +9,7 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
     : ThreadedObserver<World>(),
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
+      ThreadedObserver<SensorMsg>(),
       ThreadedObserver<RobotStatus>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
