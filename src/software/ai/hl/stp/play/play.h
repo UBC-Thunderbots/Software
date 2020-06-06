@@ -117,9 +117,6 @@ class Play
     void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
 
     /**
-     * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
-     * order of priority
-     *
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
      *
