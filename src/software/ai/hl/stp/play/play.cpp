@@ -57,6 +57,6 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     // to the updated world as well.
     if (world)
     {
-        getNextTactics(yield);
+        getNextTactics(yield, world.value());
     }
 }

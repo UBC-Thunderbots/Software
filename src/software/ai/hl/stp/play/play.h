@@ -93,11 +93,9 @@ class Play
 
     virtual ~Play() = default;
 
-   protected:
-    // The Play's knowledge of the most up-to-date World
+   private:
     std::optional<World> world;
 
-   private:
     /**
      * A wrapper function for the getNextTactics function.
      *
@@ -129,7 +127,7 @@ class Play
      *
      * @param yield The coroutine push_type for the Play
      */
-    virtual void getNextTactics(TacticCoroutine::push_type& yield) = 0;
+    virtual void getNextTactics(TacticCoroutine::push_type& yield, const World& world) = 0;
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;

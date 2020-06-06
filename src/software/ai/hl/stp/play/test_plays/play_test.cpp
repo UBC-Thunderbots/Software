@@ -16,6 +16,8 @@ TEST(PlayTest, test) {
     world = ::Test::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
 
     for(unsigned int i = 0; i < 10; i++) {
+        // Update the ball's position. It will be printed in the move_test_play
+        // so we can see if world state is updated properly
         ball_position += Vector(1, 0);
         world = ::Test::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
         play.getTactics(world);
