@@ -250,6 +250,7 @@ cc_test(
     ],
     deps = [
         ":polynomial2d",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

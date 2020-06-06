@@ -2,6 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include "software/test_util/test_util.h"
+
+using namespace ::Test;
+
 TEST(Polynomial2dTest, default_constructor)
 {
     const Polynomial2d p;
@@ -35,6 +39,42 @@ TEST(Polynomial2dTest, constructor_from_two_1d_polynomials_and_value_at)
     const double t_val = 0.33;
     const Point expected_point(p_x.valueAt(t_val), p_y.valueAt(t_val));
     EXPECT_EQ(expected_point, p.valueAt(t_val));
+}
+
+TEST(Polynomial2dTest, constructor_from_list_of_points_less_then_two_points)
+{
+    const std::vector<Point> points = {Point(-1, 1)};
+
+    EXPECT_THROW(Polynomial2d p(points), std::invalid_argument);
+}
+
+TEST(Polynomial2dTest, constructor_from_list_of_points_valid)
+{
+    const std::vector<Point> points = {Point(-1, 1), Point(0, 0), Point(3.3, 7.8)};
+
+    const Polynomial2d p(points);
+
+    // We should only need a second order polynomial in x and y to interpolate three
+    // points
+    EXPECT_EQ(2, p.getPolyX().getOrder());
+    EXPECT_EQ(2, p.getPolyY().getOrder());
+
+    // Check that we interpolate the start and end points at the expected t-values
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(-1, 1), p.valueAt(0), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(3.3, 7.8), p.valueAt(1), 1e-9));
+
+    // Check that the intermediate point was interpolated correctly
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(0, 0), p.valueAt(0.5), 1e-9));
+
+    // Check the coefficients are as expected
+    // These were calculated using an online math tool
+    // (https://www.wolframalpha.com/)
+    EXPECT_NEAR(-1, p.getPolyX().getCoeff(0), 1e-9);
+    EXPECT_NEAR(-0.3, p.getPolyX().getCoeff(1), 1e-9);
+    EXPECT_NEAR(4.6, p.getPolyX().getCoeff(2), 1e-9);
+    EXPECT_NEAR(1, p.getPolyY().getCoeff(0), 1e-9);
+    EXPECT_NEAR(-10.8, p.getPolyY().getCoeff(1), 1e-9);
+    EXPECT_NEAR(17.6, p.getPolyY().getCoeff(2), 1e-9);
 }
 
 TEST(Polynomial2dTest, get_poly_x)
