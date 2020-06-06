@@ -239,14 +239,14 @@ void app_trajectory_planner_getMaxAllowableSpeedProfile(
  * @pre segment_lengths has been allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @pre trajectory has pre allocated trajectory_elements array up to
+ * @pre trajectory has pre-allocated trajectory_elements array up to
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
  * @param trajectory [in/out] The trajectory to be modified
  *
  * @param segment_lengths [in] The length of each segment in the trajectory
  *
- * @param desired_segment_duration [in] The desited segment duration in seconds
+ * @param desired_segment_duration [in] The desired segment duration in seconds
  *
  * @param trajectory_index [in] The index of end-point of the segment to be modified
  *
