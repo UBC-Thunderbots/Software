@@ -40,11 +40,18 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     void onValueReceived(SensorMsg sensor_msg) override;
 
     /**
-     * Updates world based on a new data
+     * Updates components of world based on a new data and sends World to observers if
+     * complete
      *
      * @param new data
      */
     void updateWorld(const SensorMsg &sensor_msg);
+
+    /**
+     * Updates relevant components of world based on a new data
+     *
+     * @param new data
+     */
     void updateWorld(const SSL_WrapperPacket &packet);
     void updateWorld(const Referee &packet);
     void updateWorld(
@@ -53,13 +60,13 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
-     * Get ball from a vision detection
+     * Get state of the ball from a vision detection
      *
      * @param vision_detection
      *
-     * @return ball if found in vision_detection
+     * @return TimestampedBallState if found in vision_detection
      */
-    std::optional<Ball> getBallFromVisionDetection(
+    std::optional<TimestampedBallState> getTimestampedBallStateFromVisionDetection(
         const VisionDetection &vision_detection);
 
     /**
@@ -72,7 +79,13 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     Team getFriendlyTeamFromVisionDetection(const VisionDetection &vision_detection);
     Team getEnemyTeamFromVisionDetection(const VisionDetection &vision_detection);
 
-    World world;
+    std::optional<Field> field;
+    std::optional<Ball> ball;
+    Team friendly_team;
+    Team enemy_team;
+    RefboxGameState game_state;
+    RefboxStage refbox_stage;
+
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;

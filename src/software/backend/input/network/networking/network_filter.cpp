@@ -25,7 +25,7 @@ NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config)
 {
 }
 
-Field NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
+std::optional<Field> NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
 {
     if (geometry_packet.has_field())
     {
@@ -44,7 +44,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     // We can't guarantee the order that any geometry elements are passed to us in, so
     // We map the name of each line/arc to the actual object so we can refer to them
     // consistently
-    std::map<std::string, SSL_FieldCicularArc> ssl_circular_arcs;
+    std::map<std::string, SSL_FieldCircularArc> ssl_circular_arcs;
     std::map<std::string, SSL_FieldLineSegment> ssl_field_lines;
 
     // Circular arcs
@@ -53,9 +53,9 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     // CenterCircle
     for (int i = 0; i < packet_geometry.field_arcs_size(); i++)
     {
-        const SSL_FieldCicularArc &arc = packet_geometry.field_arcs(i);
-        std::string arc_name           = arc.name();
-        ssl_circular_arcs[arc_name]    = arc;
+        const SSL_FieldCircularArc &arc = packet_geometry.field_arcs(i);
+        std::string arc_name            = arc.name();
+        ssl_circular_arcs[arc_name]     = arc;
     }
 
     // Field Lines
@@ -89,7 +89,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     // Extract the data we care about and convert all units to meters
     double field_length   = packet_geometry.field_length() * METERS_PER_MILLIMETER;
     double field_width    = packet_geometry.field_width() * METERS_PER_MILLIMETER;
-    double goal_width     = packet_geometry.goalwidth() * METERS_PER_MILLIMETER;
+    double goal_width     = packet_geometry.goal_width() * METERS_PER_MILLIMETER;
     double boundary_width = packet_geometry.boundary_width() * METERS_PER_MILLIMETER;
     double center_circle_radius =
         ssl_circular_arcs["CenterCircle"].radius() * METERS_PER_MILLIMETER;
@@ -117,7 +117,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     return field;
 }
 
-TimestampedBallState NetworkFilter::getFilteredBallData(
+std::optional<TimestampedBallState> NetworkFilter::getFilteredBallData(
     const std::vector<SSL_DetectionFrame> &detections)
 {
     auto ball_detections = std::vector<BallDetection>();
@@ -144,11 +144,14 @@ TimestampedBallState NetworkFilter::getFilteredBallData(
         }
     }
 
-    std::optional<Ball> new_ball =
-        ball_filter.getFilteredData(ball_detections, field_state);
-    if (new_ball)
+    if (field_state)
     {
-        ball_state = new_ball->currentState();
+        std::optional<Ball> new_ball =
+            ball_filter.getFilteredData(ball_detections, *field_state);
+        if (new_ball)
+        {
+            ball_state = new_ball->currentState();
+        }
     }
 
     return ball_state;

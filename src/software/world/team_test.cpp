@@ -54,7 +54,7 @@ TEST_F(TeamTest, construction_with_expiry_duration_and_team_robots)
 
     std::vector<Robot> robot_list = {robot_0, robot_1, robot_2};
 
-    Team team = Team(Duration::fromMilliseconds(1000), robot_list);
+    Team team = Team(robot_list, Duration::fromMilliseconds(1000));
 
     EXPECT_EQ(Duration::fromMilliseconds(1000), team.getRobotExpiryBufferDuration());
 

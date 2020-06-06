@@ -160,13 +160,6 @@ AIConfig:
       type: "double"
       description: "Factor for robot obstacle size"
 
-  RobotExpiryBufferMilliseconds:
-    min: 0
-    max: 100
-    default: 50
-    type: "int"
-    description: "TODO: Add description as part of #149"
-
   GoalieTacticConfig:
     BlockConeBuffer:
         min: 0.0
