@@ -4,8 +4,8 @@ package(default_visibility = ["//software/gui/robot_diagnostics:__subpackages__"
 
 qt_cc_library(
     name = "robot_diagnostics_widget",
-    src = "main_widget.cpp",
-    hdr = "main_widget.h",
+    src = "robot_diagnostics.cpp",
+    hdr = "robot_diagnostics.h",
     deps = [
         ":chicker",
         ":dribbler",
@@ -15,6 +15,10 @@ qt_cc_library(
         ":robot_selection",
         "//software/gui/generic_widgets/robot_status",
         "//software/gui/robot_diagnostics/ui:main_widget",
+        "//software/multithreading:thread_safe_buffer",
+        "//software/primitive",
+        "//software/proto:sensor_msg_cc_proto",
+        "@boost//:bind",
         "@qt//:qt_widgets",
     ],
 )
@@ -26,6 +30,7 @@ qt_cc_library(
     deps = [
         ":slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
+        "//software/util/make_enum",
         "@qt//:qt_widgets",
     ],
 )
@@ -48,6 +53,7 @@ qt_cc_library(
     deps = [
         ":slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
+        "//software/util/make_enum",
         "@qt//:qt_widgets",
     ],
 )

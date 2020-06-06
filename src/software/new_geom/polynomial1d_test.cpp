@@ -96,6 +96,17 @@ TEST(TestSpline, test_polynomial_linear_constructor)
     EXPECT_EQ(p.valueAt(6.0), 4.0);
 }
 
+TEST(TestSpline, test_zero_polynomial_linear_constructor)
+{
+    Polynomial1d p =
+        Polynomial1d::constructLinearPolynomialFromConstraints(2.0, 0.0, 6.0, 0.0);
+    EXPECT_EQ(0, p.getOrder());
+    EXPECT_EQ(p.getCoeff(0), 0.0);
+    EXPECT_EQ(p.getCoeff(1), 0.0);
+    EXPECT_EQ(p.valueAt(2.0), 0.0);
+    EXPECT_EQ(p.valueAt(6.0), 0.0);
+}
+
 TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
 {
     std::pair<double, double> constraint1, constraint2;
