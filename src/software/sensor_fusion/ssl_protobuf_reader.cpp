@@ -9,7 +9,7 @@ std::optional<Field> SSLProtobufReader::getField(
     // We can't guarantee the order that any geometry elements are passed to us in, so
     // We map the name of each line/arc to the actual object so we can refer to them
     // consistently
-    std::map<std::string, SSL_FieldCicularArc> ssl_circular_arcs;
+    std::map<std::string, SSL_FieldCircularArc> ssl_circular_arcs;
     std::map<std::string, SSL_FieldLineSegment> ssl_field_lines;
 
     // Circular arcs
@@ -57,7 +57,7 @@ std::optional<Field> SSLProtobufReader::getField(
     // Extract the data we care about and convert all units to meters
     double field_length   = field_data.field_length() * METERS_PER_MILLIMETER;
     double field_width    = field_data.field_width() * METERS_PER_MILLIMETER;
-    double goal_width     = field_data.goalwidth() * METERS_PER_MILLIMETER;
+    double goal_width     = field_data.goal_width() * METERS_PER_MILLIMETER;
     double boundary_width = field_data.boundary_width() * METERS_PER_MILLIMETER;
     double center_circle_radius =
         ssl_center_circle->second.radius() * METERS_PER_MILLIMETER;
