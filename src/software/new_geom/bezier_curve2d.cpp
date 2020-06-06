@@ -51,7 +51,7 @@ const Point BezierCurve2d::deCasteljauAlgorithm(const std::vector<Point>& points
     std::vector<Point> new_points;
     for (size_t i = 0; i < points.size() - 1; i++)
     {
-        new_points.emplace_back(points[i] + t * (points[i+1] - points[i]));
+        new_points.emplace_back(points[i] + t * (points[i + 1] - points[i]));
     }
 
     return deCasteljauAlgorithm(new_points, t);

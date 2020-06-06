@@ -6,8 +6,6 @@
 
 using namespace Test;
 
-// TODO: these tests are much cleaner if we can scale points with multiplication
-
 TEST(BezierCurve2dTest, contstruct_with_less_then_two_control_points)
 {
     std::vector<Point> points = {Point(0, 0)};

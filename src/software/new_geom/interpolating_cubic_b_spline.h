@@ -24,8 +24,7 @@ class InterpolatingCubicBSpline : public Spline2d
      * @param intermediate_knots The intermediate points between `start` and
      *                                    `end` that this spline will interpolate
      */
-    InterpolatingCubicBSpline(Ray start, Ray end,
-                              std::vector<Point> intermediate_knots);
+    InterpolatingCubicBSpline(Ray start, Ray end, std::vector<Point> intermediate_knots);
 
     const Point getValueAt(double val) const override;
 
@@ -41,5 +40,4 @@ class InterpolatingCubicBSpline : public Spline2d
     const Point getEndPoint() const override;
 
     const std::vector<SplineSegment2d> getSplineSegments() const override;
-
 };

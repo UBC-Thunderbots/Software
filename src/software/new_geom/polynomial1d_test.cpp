@@ -53,8 +53,7 @@ TEST(Polynomial1dTest, test_polynomial_coeffs_list_constructor)
 
 TEST(Polynomial1dTest, constructor_from_list_constraints_less_then_two_inputs)
 {
-    const std::vector<std::pair<double, double>> constraints = {
-        {-0.5, -1}};
+    const std::vector<std::pair<double, double>> constraints = {{-0.5, -1}};
 
     EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
 }

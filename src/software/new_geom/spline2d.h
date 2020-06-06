@@ -9,8 +9,8 @@ class Spline2d;
  * A segment of a spline, defined by a 2d polynomial, and the start and end values that
  * define the section of the 2d polynomial that is part of the spline
  */
- // TODO: should this be in it's own file?
- // TODO: this should be made a virtual class so that we can have different implementations
+// TODO: should this be in it's own file?
+// TODO: this should be made a virtual class so that we can have different implementations
 class SplineSegment2d
 {
    public:
@@ -20,12 +20,14 @@ class SplineSegment2d
      * Get the first input to the polynomial that falls on the spline
      * @return The first input to the polynomial that falls on the spline
      */
+    // TODO: consider renaming to `getStartParametrizationVal`? Similarly for `getEndVal`
     double getStartVal() const;
 
     /**
      * Get the last input to the polynomial that falls on the spline
      * @return The last input to the polynomial that falls on the spline
      */
+    // TODO: consider renaming to `getStartParametrizationVal`? Similarly for `getEndVal`
     double getEndVal() const;
 
     /**
@@ -76,7 +78,7 @@ class Spline2d
      * @return value of spline evaluated at value val. If val not in [0,1]
      *         then the closest endpoint
      */
-     // TODO: `val` is a terrible argument name since we're getting the `value`. Rename.
+    // TODO: `val` is a terrible argument name since we're getting the `value`. Rename.
     virtual const Point getValueAt(double val) const = 0;
 
     /**

@@ -139,23 +139,24 @@ TEST_F(InterpolatingCubicBSplineTest, check_c2_continuous_at_knots)
     }
 }
 
-TEST_F(InterpolatingCubicBSplineTest, check_control_points_no_intermediate_knots){
-    const Ray start(Point(0,0), Vector(0,1));
-    const Ray end(Point(2,0), Vector(1,0));
+TEST_F(InterpolatingCubicBSplineTest, check_control_points_no_intermediate_knots)
+{
+    const Ray start(Point(0, 0), Vector(0, 1));
+    const Ray end(Point(2, 0), Vector(1, 0));
     InterpolatingCubicBSpline spline(start, end, {});
 
-    std::vector<Point> expected_control_points = {
-        Point(0,0), Point(0,1), Point(2, 1), Point(2, 0)
-    };
+    std::vector<Point> expected_control_points = {Point(0, 0), Point(0, 1), Point(2, 1),
+                                                  Point(2, 0)};
     EXPECT_EQ(expected_control_points, spline.getControlPoints());
 }
 
-TEST_F(InterpolatingCubicBSplineTest, check_control_points_single_intermediate_knot){
+TEST_F(InterpolatingCubicBSplineTest, check_control_points_single_intermediate_knot)
+{
     // TODO: ascii art here? This is effectively the first example from
     //       https://www.ibiblio.org/e-notes/Splines/b-int.html, at least want to
     //       link to this example
 
-    Point p_0(0,0);
+    Point p_0(0, 0);
     Point p_1(1, 0);
     Point p_2(1.5, -1.5);
     Vector d_0(0.4, 0.4);
@@ -167,21 +168,20 @@ TEST_F(InterpolatingCubicBSplineTest, check_control_points_single_intermediate_k
     Ray end(p_2, d_2);
     InterpolatingCubicBSpline spline(start, end, {p_1});
 
-    std::vector<Point> expected_control_points = {
-        p_0, p_0 + d_0, p_1 - d_1, p_1 + d_1, p_2 - d_2, p_2
-    };
+    std::vector<Point> expected_control_points = {p_0,       p_0 + d_0, p_1 - d_1,
+                                                  p_1 + d_1, p_2 - d_2, p_2};
 
     EXPECT_EQ(expected_control_points, spline.getControlPoints());
 }
 
-TEST_F(InterpolatingCubicBSplineTest, getSplineSegments_no_intermediate_knots){
-    const Ray start(Point(0,0), Vector(0,1));
-    const Ray end(Point(2,0), Vector(1,0));
+TEST_F(InterpolatingCubicBSplineTest, getSplineSegments_no_intermediate_knots)
+{
+    const Ray start(Point(0, 0), Vector(0, 1));
+    const Ray end(Point(2, 0), Vector(1, 0));
     InterpolatingCubicBSpline spline(start, end, {});
 
-    std::vector<Point> expected_control_points = {
-        Point(0,0), Point(0,1), Point(2, 1), Point(2, 0)
-    };
+    std::vector<Point> expected_control_points = {Point(0, 0), Point(0, 1), Point(2, 1),
+                                                  Point(2, 0)};
     EXPECT_EQ(expected_control_points, spline.getControlPoints());
 }
 
