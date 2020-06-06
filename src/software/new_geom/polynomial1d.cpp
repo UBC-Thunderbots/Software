@@ -11,7 +11,8 @@ Polynomial1d::Polynomial1d() {}
 
 Polynomial1d::Polynomial1d(const std::vector<double> &coeffs) : coeffs(coeffs) {}
 
-Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs) : coeffs(coeffs)
+Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs)
+    : coeffs(std::vector<double>(coeffs))
 {
 }
 
@@ -53,7 +54,8 @@ Polynomial1d::Polynomial1d(const std::vector<std::pair<double, double>> constrai
 
     const Eigen::VectorXd coeff_vector = A.colPivHouseholderQr().solve(b);
 
-    for (size_t i = 0; i < constraints.size(); i++){
+    for (size_t i = 0; i < constraints.size(); i++)
+    {
         coeffs.emplace_back(coeff_vector(i));
     }
 }
