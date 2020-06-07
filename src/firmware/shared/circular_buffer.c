@@ -1,6 +1,5 @@
 #include "firmware/shared/circular_buffer.h"
 
-// TODO is it better to initialize size or simply do it through CIRCULAR_BUFFER_MAX_NUM_ELEMENTS
 void circular_buffer_init(struct circular_buffer *cbuff)
 {
     cbuff->head = 0;
