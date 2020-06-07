@@ -1,7 +1,5 @@
 #pragma once
 
-#include <unistd.h>
-
 #include <map>
 #include <set>
 
@@ -25,34 +23,37 @@ class ThetaStarPathPlanner : public PathPlanner
     ThetaStarPathPlanner();
 
     /**
-     * Returns a path that is an optimized path between start and destination.
+     * Returns a path that is an optimized path between start and end.
      *
      * @param start start point
-     * @param destination destination point
+     * @param end end point
      * @param navigable_area Rectangle representing the navigable area
      * @param obstacles obstacles to avoid
      *
      * @return a vector of points that is the optimal path avoiding obstacles
      *         if no valid path then return empty vector
      */
-    std::optional<Path> findPath(const Point &start, const Point &destination,
+    std::optional<Path> findPath(const Point &start, const Point &end,
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &obstacles) override;
 
-   private:
-    class Coordinate : public std::pair<int, int>
+   protected:
+    class Coordinate : public std::pair<unsigned int, unsigned int>
     {
        public:
-        Coordinate(int row, int col) : std::pair<int, int>(row, col) {}
+        Coordinate(unsigned int row, unsigned int col)
+            : std::pair<unsigned int, unsigned int>(row, col)
+        {
+        }
 
-        Coordinate() : std::pair<int, int>() {}
+        Coordinate() : std::pair<unsigned int, unsigned int>() {}
 
-        int row(void)
+        unsigned int row(void) const
         {
             return this->first;
         }
 
-        int col(void)
+        unsigned int col(void) const
         {
             return this->second;
         }
@@ -61,7 +62,7 @@ class ThetaStarPathPlanner : public PathPlanner
     class CellHeuristic
     {
        public:
-        CellHeuristic() : parent_(0, 0), f_(0), g_(0), initialized_(false) {}
+        CellHeuristic() : parent_(0, 0), f_(0), best_path_cost_(0), initialized_(false) {}
 
         /**
          * Updates CellHeuristics internal variables
@@ -69,14 +70,14 @@ class ThetaStarPathPlanner : public PathPlanner
          *
          * @param parent parent
          * @param f f value
-         * @param g g value
+         * @param best_path_cost best_path_cost
          */
-        void update(Coordinate parent, double f, double g)
+        void update(Coordinate parent, double f, double best_path_cost)
         {
-            parent_      = parent;
-            f_           = f;
-            g_           = g;
-            initialized_ = true;
+            parent_         = parent;
+            f_              = f;
+            best_path_cost_ = best_path_cost;
+            initialized_    = true;
         }
 
         /**
@@ -100,13 +101,13 @@ class ThetaStarPathPlanner : public PathPlanner
         }
 
         /**
-         * Gets g value
+         * Gets best_path_cost
          *
-         * @return g value
+         * @return best_path_cost
          */
-        double g() const
+        double bestPathCost() const
         {
-            return g_;
+            return best_path_cost_;
         }
 
         /**
@@ -121,73 +122,71 @@ class ThetaStarPathPlanner : public PathPlanner
 
        private:
         Coordinate parent_;
-        double f_, g_;
+        double f_, best_path_cost_;
         bool initialized_;
     };
 
     /**
      * Returns if a cell is within bounds of grid
      *
-     * @param test_coord Coordinate to consider
+     * @param coord Coordinate to consider
      *
      * @return true if cell is valid
      */
-    bool isCoordValid(Coordinate test_coord);
+    bool isCoordValid(const Coordinate &coord) const;
 
     /**
      * Returns if a cell is unblocked
      *
-     * @param test_coord Coordinate to consider
+     * @param coord Coordinate to consider
      *
      * @return true if cell is unblocked
      */
-    bool isUnBlocked(Coordinate test_coord);
+    bool isUnblocked(const Coordinate &coord);
 
     /**
-     * Returns heuristic value of a cell,
-     * currently the Euclidean distance to the destination
+     * Computes distance from coord1 to coord2
      *
-     * @param test_coord Coordinate to consider
-     * @param dest destination Coordinate
+     * @param coord1 The first Coordinate
+     * @param coord2 The second Coordinate
      *
-     * @return Euclidean distance to dest
+     * @return distance between coord1 to coord2
      */
-    double calculateHValue(Coordinate test_coord, Coordinate dest);
+    double coordDistance(const Coordinate &coord1, const Coordinate &coord2) const;
 
     /**
-     * Traces a path from the destination back to the start
+     * Traces a path from the end back to the start
      * and populates a vector of points with that path
      *
-     * @param dest destination cell
+     * @param end end cell
      *
-     * @return vector of points with the path from start to dest
+     * @return vector of points with the path from start to end
      */
-    std::vector<Point> tracePath(Coordinate dest);
+    std::vector<Point> tracePath(const Coordinate &end) const;
 
     /**
-     * Updates the new node's fields based on the current node, destination
-     * and the distance to the next node
-     * and checks if destination is reached
+     * Updates the new node's fields based on the current node, end and the
+     * distance to the next node and checks if end is reached
      *
-     * @param current_coord         current cell
-     * @param new_coord                 next cell to be updated
-     * @param dest                  destination cell
-     * @param curr_to_new_dist    Euclidean distance between current_coord and new_coord
+     * @param current The current cell
+     * @param next    The next cell to be updated
+     * @param end     The end cell
+     * @param marginal_dist The distance between current and next
      *
-     * @return                      true if new_coord is destination
+     * @return true if next is the end
      */
-    bool updateVertex(Coordinate current_coord, Coordinate new_coord, Coordinate dest,
-                      double curr_to_new_dist);
+    bool updateVertex(const Coordinate &current, const Coordinate &next,
+                      const Coordinate &end, double marginal_dist);
 
     /**
      * Checks for line of sight between parent cell and new cell
      *
-     * @param current_parent        parent cell
-     * @param new_pair              cell to check line of sight to
+     * @param coord1 The first Coordinate
+     * @param coord2 The second Coordinate
      *
-     * @return                      true if line of sight from parent to new cell
+     * @return true if line of sight from coord1 to coord2
      */
-    bool hasLineOfSight(Coordinate current_parent, Coordinate new_pair);
+    bool lineOfSight(const Coordinate &coord1, const Coordinate &coord2);
 
     /**
      * Finds closest unblocked cell to current_cell
@@ -197,7 +196,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return          closest unblocked cell to current_cell
      *                  if none found, return nullopt
      */
-    std::optional<Coordinate> findClosestUnblockedCell(Coordinate current_cell);
+    std::optional<Coordinate> findClosestUnblockedCell(const Coordinate &current_cell);
 
     /**
      * Finds closest valid point that's not in an obstacle to p
@@ -207,7 +206,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return          closest free point to currCell
      *                  if not blocked then return p
      */
-    Point findClosestFreePoint(Point p);
+    Point findClosestFreePoint(const Point &p);
 
     /**
      * Checks if a point is valid and doesn't exist in any obstacles
@@ -216,7 +215,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return      if p is valid and isn't in an obstacle
      * */
-    bool isPointValidAndFreeOfObstacles(Point p);
+    bool isPointValidAndFreeOfObstacles(const Point &p);
 
     /**
      * Checks if a point is valid
@@ -225,7 +224,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return      if p is valid
      * */
-    bool isPointValid(Point p);
+    bool isPointValid(const Point &p) const;
 
     /**
      * Converts a cell in grid to a point on navigable area
@@ -234,7 +233,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return Point on navigable area
      */
-    Point coordinateToPoint(Coordinate coord);
+    Point convertCoordToPoint(const Coordinate &coord) const;
 
     /**
      * Converts a point on navigable area to a cell in grid
@@ -243,50 +242,59 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return cell in grid
      */
-    Coordinate pointToCoordinate(Point p);
+    Coordinate convertPointToCoord(const Point &p) const;
 
     /**
-     * Try to find a path to destination and leave
+     * Try to find a path to end and leave
      * trail markers along the way
      *
-     * @param dest_coord destination coordinates
+     * @param end_coord end coordinates
      *
-     * @return if path to destination was found
+     * @return if path to end was found
      */
-    bool findPathToDestination(Coordinate dest_coord);
+    bool findPathToEnd(const Coordinate &end_coord);
 
     /**
-     * Check for invalid or blocked src_coord and dest_coord and
+     * Update vertex for all successors of current_coord
+     *
+     * @param current_coord The current coordinate
+     * @param end_coord end coordinates
+     *
+     * @return if path to end was found among successors
+     */
+    bool visitSuccessors(const Coordinate &current_coord, const Coordinate &end_coord);
+
+    /**
+     * Check for invalid or blocked start_coord and end_coord and
      * adjust parameters accordingly
      *
-     * @param src_coord source coordinate
-     * @param dest_coord destination coordinate
+     * @param [in/out] start_coord source coordinate
+     * @param [in/out] end_coord end coordinate
      *
-     * @return true if there is no path to destination
+     * @return true if there is no path to end
      */
-    bool checkForInvalidOrBlockedCases(Coordinate &src_coord, Coordinate &dest_coord);
+    bool checkForInvalidOrBlockedCases(Coordinate &start_coord, Coordinate &end_coord);
 
     /**
-     * Check if start to destination is at least a grid cell away
+     * Check if start to end is at least a grid cell away
      *
      * @param start start point
-     * @param destination destination point
+     * @param end end point
      *
-     * @return true start to destination is within threshold
+     * @return true start to end is within threshold
      */
-    bool isStartToDestinationWithinThreshold(const Point &start,
-                                             const Point &destination);
+    bool isStartToEndWithinThreshold(const Point &start, const Point &end) const;
 
     /**
-     * Check if start to closest destination is at least a grid cell away
+     * Check if start to closest end is at least a grid cell away
      *
      * @param start start point
-     * @param closest_destination closest destination point
+     * @param closest_end closest end point
      *
-     * @return true start to closest destination is within threshold
+     * @return true start to closest end is within threshold
      */
-    bool isStartToClosestDestinationWithinThreshold(const Point &start,
-                                                    const Point &closest_destination);
+    bool isStartToClosestEndWithinThreshold(const Point &start,
+                                            const Point &closest_end) const;
 
     /**
      * Resets and initializes member variables to prepare for planning a new path
@@ -297,26 +305,48 @@ class ThetaStarPathPlanner : public PathPlanner
     void resetAndInitializeMemberVariables(const Rectangle &navigable_area,
                                            const std::vector<ObstaclePtr> &obstacles);
 
-    // if close to destination then return no path
+    /**
+     * Returns a collision-free hash for the given Coordinate
+     *
+     * @param coord Coordinate to hash
+     *
+     * @return hash of the Coordinate
+     */
+    unsigned long hashCoordinate(const Coordinate &coord) const;
+
+    /**
+     * Returns a collision-free hash for the given a pair of Coordinate
+     *
+     * @param coord1 Coordinate 1 of pair to hash
+     * @param coord2 Coordinate 2 of pair to hash
+     *
+     * @return hash of the pair of Coordinates
+     */
+    unsigned long hashCoordinatePair(
+        const ThetaStarPathPlanner::Coordinate &coord1,
+        const ThetaStarPathPlanner::Coordinate &coord2) const;
+
+    // if close to end then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
 
     // increase in threshold to reduce oscillation
-    static constexpr int BLOCKED_DESINATION_OSCILLATION_MITIGATION =
+    static constexpr unsigned int BLOCKED_DESINATION_OSCILLATION_MITIGATION =
         2;  // multiples of CLOSE_TO_DEST_THRESHOLD to ignore to control oscillation
 
-    // resolution for searching for unblocked point around a blocked destination
+    // resolution for searching for unblocked point around a blocked end
     static constexpr double BLOCKED_DESTINATION_SEARCH_RESOLUTION =
         50.0;  // number of fractions to divide 1m
 
     // only change this value
-    static constexpr int GRID_DIVISION_FACTOR = 1;  // the n in the O(n^2) algorithm :p
+    static constexpr unsigned int GRID_DIVISION_FACTOR =
+        1;  // the n in the O(n^2) algorithm :p
     // don't change this calculation
     const double SIZE_OF_GRID_CELL_IN_METERS =
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
     std::vector<ObstaclePtr> obstacles;
-    int num_grid_rows;
-    int num_grid_cols;
+    unsigned int num_grid_rows;
+    unsigned int num_grid_cols;
     double max_navigable_x_coord;
     double max_navigable_y_coord;
 
@@ -331,10 +361,15 @@ class ThetaStarPathPlanner : public PathPlanner
     // of that CellHeuristic
     std::vector<std::vector<CellHeuristic>> cell_heuristics;
 
-
+    // The following data structures improve performance by caching the results of
+    // isUnblocked and lineOfSight.
+    // They are indexed with a hash for performance
     // Description of the Grid-
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<Coordinate, bool> unblocked_grid;
+    std::map<unsigned long, bool> unblocked_grid;
+    // Cache of line of sight that maps a hash of a pair of coordinates to whether those
+    // two Coordinates have line of sight between them
+    std::map<unsigned long, bool> line_of_sight_cache;
 };

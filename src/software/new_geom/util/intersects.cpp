@@ -3,15 +3,9 @@
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
-#define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
-#include "software/new_geom/point_boost_geometry_compatability.h"
 
 bool intersects(const Polygon &first, const Segment &second)
 {
-    if (first.contains(second.getSegStart()) || first.contains(second.getEnd()))
-    {
-        return true;
-    }
     for (const auto &seg : first.getSegments())
     {
         if (intersects(seg, second))
@@ -73,13 +67,12 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Segment &first, const Circle &second)
 {
-    bool segment_endpoint_inside_circle =
-        second.contains(first.getSegStart()) || second.contains(first.getEnd());
+    if (distance(first, second.getOrigin()) < second.getRadius())
+    {
+        return true;
+    }
 
-    bool segment_crosses_circle =
-        distance(first, second.getOrigin()) < second.getRadius();
-
-    return segment_endpoint_inside_circle || segment_crosses_circle;
+    return false;
 }
 
 bool intersects(const Circle &first, const Segment &second)
@@ -89,10 +82,62 @@ bool intersects(const Circle &first, const Segment &second)
 
 bool intersects(const Segment &first, const Segment &second)
 {
-    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> CD(second.getSegStart(), second.getEnd());
+    // Using the FASTER LINE SEGMENT INTERSECTION algorithm from p.199 of Graphics Gems
+    // III (IBM Version)
+    // https://www.sciencedirect.com/science/article/pii/B9780080507552500452.
 
-    return boost::geometry::intersects(AB, CD);
+    // Values are pre-computed to improve performance
+    const double p1x(first.getSegStart().x());
+    const double p1y(first.getSegStart().y());
+    const double p2x(first.getEnd().x());
+    const double p2y(first.getEnd().y());
+    const double p3x(second.getEnd().x());
+    const double p3y(second.getEnd().y());
+    const double p4x(second.getSegStart().x());
+    const double p4y(second.getSegStart().y());
+
+    const double ax = p2x - p1x;
+    const double ay = p2y - p1y;
+    const double bx = p3x - p4x;
+    const double by = p3y - p4y;
+    const double cx = p1x - p3x;
+    const double cy = p1y - p3y;
+
+    double denominator = ay * bx - ax * by;
+    double numerator1  = by * cx - bx * cy;
+    if (denominator > 0)
+    {
+        if (numerator1 < 0 || numerator1 > denominator)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (numerator1 > 0 || numerator1 < denominator)
+        {
+            return false;
+        }
+    }
+
+    // Only compute numerator2 once we're sure we need it
+    double numerator2 = ax * cy - ay * cx;
+    if (denominator > 0)
+    {
+        if (numerator2 < 0 || numerator2 > denominator)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (numerator2 > 0 || numerator2 < denominator)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool intersects(const Ray &first, const Segment &second)

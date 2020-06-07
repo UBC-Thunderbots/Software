@@ -53,12 +53,15 @@ TEST(IntersectsTest, segment_overlapping_polygon_edge)
     EXPECT_TRUE(intersects(s, p));
 }
 
-TEST(IntersectsTest, segment_contained_in_polygon)
+// This tests undefined behaviour so it is DISABLED_, but can be useful for debugging
+TEST(IntersectsTest, DISABLED_segment_contained_in_polygon)
 {
     Polygon p({{-6, 2}, {-1, 1}, {10, 7}, {5, -6}, {-5, -3}});
     Segment s({0, -2}, {4, 1});
     EXPECT_TRUE(intersects(p, s));
     EXPECT_TRUE(intersects(s, p));
+    EXPECT_FALSE(intersects(p, s));
+    EXPECT_FALSE(intersects(s, p));
 }
 
 TEST(IntersectsTest, ray_inside_polygon)
@@ -216,6 +219,17 @@ TEST(IntersectsTest, segment_with_points_on_circle_edge)
     Circle c({-6, 2}, 4);
     EXPECT_TRUE(intersects(s, c));
     EXPECT_TRUE(intersects(c, s));
+}
+
+// This tests undefined behaviour so it is DISABLED_, but can be useful for debugging
+TEST(IntersectsTest, DISABLED_segment_contained_in_circle)
+{
+    Segment s({-7, 3}, {-7, 4});
+    Circle c({-6, 2}, 4);
+    EXPECT_TRUE(intersects(s, c));
+    EXPECT_TRUE(intersects(c, s));
+    EXPECT_FALSE(intersects(s, c));
+    EXPECT_FALSE(intersects(c, s));
 }
 
 TEST(IntersectsTest, segment_circle_intersecting)

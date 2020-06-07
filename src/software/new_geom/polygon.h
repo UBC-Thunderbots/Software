@@ -53,7 +53,7 @@ class Polygon : public virtual Shape
      * Returns the line segments that form this polygon.
      * @return the line segments that form this polygon.
      */
-    const std::vector<Segment> getSegments() const;
+    const std::vector<Segment>& getSegments() const;
 
     /**
      * Returns the points that form the polygon.
@@ -61,8 +61,23 @@ class Polygon : public virtual Shape
      */
     const std::vector<Point>& getPoints() const;
 
+    /**
+     * Debug function that determines whether the polygon invariant holds,
+     * which is that the segments connect all the points
+     *
+     * @return whether invariants hold
+     */
+    bool invariantsHold() const;
+
    protected:
+    /**
+     * Returns the line segments that connect a list of points.
+     * @return the line segments
+     */
+    static std::vector<Segment> initSegments(std::vector<Point> points);
+
     std::vector<Point> points_;
+    std::vector<Segment> segments_;
 };
 
 bool operator==(const Polygon& poly1, const Polygon& poly2);

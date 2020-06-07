@@ -2,9 +2,33 @@
 
 #include <unordered_set>
 
-Polygon::Polygon(const std::vector<Point>& points) : points_(points) {}
+Polygon::Polygon(const std::vector<Point>& points)
+    : points_(points), segments_(initSegments(points_))
+{
+    // we pre-compute the segments_ in the constructor to improve performance
+}
 
-Polygon::Polygon(const std::initializer_list<Point>& points) : points_(points) {}
+Polygon::Polygon(const std::initializer_list<Point>& points)
+    : Polygon(std::vector(points))
+{
+}
+
+std::vector<Segment> Polygon::initSegments(std::vector<Point> points)
+{
+    std::vector<Segment> segments;
+    for (unsigned i = 0; i < points.size(); i++)
+    {
+        // add a segment between consecutive points, but wrap index
+        // to draw a segment from the last point to first point.
+        segments.emplace_back(Segment{points[i], points[(i + 1) % points.size()]});
+    }
+    return segments;
+}
+
+bool Polygon::invariantsHold() const
+{
+    return initSegments(points_) == segments_;
+}
 
 bool Polygon::contains(const Point& p) const
 {
@@ -139,18 +163,9 @@ Polygon Polygon::expand(const Vector& expansion_vector) const
     return Polygon(expanded_points);
 }
 
-const std::vector<Segment> Polygon::getSegments() const
+const std::vector<Segment>& Polygon::getSegments() const
 {
-    std::vector<Segment> segments;
-
-    for (unsigned i = 0; i < points_.size(); i++)
-    {
-        // add a segment between consecutive points, but wrap index
-        // to draw a segment from the last point to first point.
-        segments.emplace_back(Segment{points_[i], points_[(i + 1) % points_.size()]});
-    }
-
-    return segments;
+    return segments_;
 }
 
 const std::vector<Point>& Polygon::getPoints() const
