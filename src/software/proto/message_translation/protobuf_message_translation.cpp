@@ -22,7 +22,7 @@ namespace ProtobufMessageTranslation
         // For every friendly robot, we create a RobotStateMsg proto. The unique_ptr
         // is dereferenced, and there is an implicit deep copy into robot_states_map
         //
-        // Since the unique_ptr immediately looses scope after the copy, the memory is
+        // Since the unique_ptr immediately loses scope after the copy, the memory is
         // freed
         std::for_each(
             friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
@@ -50,7 +50,7 @@ namespace ProtobufMessageTranslation
         // For every primitive that is converted, the unique_ptr is dereferenced,
         // and there is an implicit deep copy into the robot_primitives_map
         //
-        // Since the unique_ptr immediately looses scope after the copy, the memory is
+        // Since the unique_ptr immediately loses scope after the copy, the memory is
         // freed
         std::for_each(primitives->begin(), primitives->end(), [&](const auto& primitive) {
             robot_primitives_map[primitive->getRobotId()] =

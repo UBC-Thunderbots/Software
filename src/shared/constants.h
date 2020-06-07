@@ -87,7 +87,9 @@ const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
-const char MULTICAST_CHANNELS[16][21] = {
+#define MAX_MULTICAST_CHANNELS 16
+#define MULTICAST_CHANNEL_LENGTH 21
+const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
     "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
     "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
     "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
