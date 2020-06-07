@@ -5,8 +5,8 @@
 #include "software/logger/logger.h"
 
 template <typename T>
-ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size)
-    : buffer(buffer_size), destructor_called(false)
+ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size, bool log_buffer_full)
+    : buffer(buffer_size), log_buffer_full(log_buffer_full), destructor_called(false)
 {
 }
 
@@ -46,10 +46,10 @@ template <typename T>
 void ThreadSafeBuffer<T>::push(const T& value)
 {
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
-    if (buffer.full())
+    if (log_buffer_full && buffer.full())
     {
-        LOG(DEBUG) << "Pushing to a full ThreadSafeBuffer of type: " << typeid(T).name()
-                   << std::endl;
+        LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << typeid(T).name()
+                     << std::endl;
     }
     buffer.push_back(value);
     received_new_value.notify_all();

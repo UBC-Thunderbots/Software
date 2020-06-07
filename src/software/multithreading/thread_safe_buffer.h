@@ -24,7 +24,7 @@ class ThreadSafeBuffer
     // Force the user to specify a size
     explicit ThreadSafeBuffer() = delete;
 
-    explicit ThreadSafeBuffer(std::size_t buffer_size);
+    explicit ThreadSafeBuffer(std::size_t buffer_size, bool log_buffer_full = true);
 
     // Copying this class is not permitted
     ThreadSafeBuffer(const ThreadSafeBuffer&) = delete;
@@ -96,6 +96,7 @@ class ThreadSafeBuffer
 
     std::mutex destructor_called_mutex;
     bool destructor_called;
+    bool log_buffer_full;
 };
 
 #include "software/multithreading/thread_safe_buffer.tpp"

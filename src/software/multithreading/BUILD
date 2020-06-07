@@ -2,13 +2,19 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "observer",
-    hdrs = ["observer.h"],
+    hdrs = [
+        "observer.h",
+        "observer.tpp",
+    ],
     deps = [":thread_safe_buffer"],
 )
 
 cc_library(
     name = "subject",
-    hdrs = ["subject.h"],
+    hdrs = [
+        "subject.h",
+        "subject.tpp",
+    ],
     deps = [
         ":observer",
     ],
