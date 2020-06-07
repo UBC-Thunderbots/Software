@@ -111,5 +111,6 @@ cc_library(
         ":grsim_backend",
         ":radio_backend",
         ":simulator_backend",
+        ":wifi_backend",
     ],
 )

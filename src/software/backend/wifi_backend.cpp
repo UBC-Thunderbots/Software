@@ -20,16 +20,10 @@ WifiBackend::WifiBackend()
 {
     std::string network_interface =
         Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+    int channel = Util::DynamicParameters->getNetworkConfig()->Channel()->value();
 
     // connect to current channel
-    joinMulticastChannel(Util::DynamicParameters->getNetworkConfig()->Channel()->value(),
-                         network_interface);
-
-    // add callback to switch channels on param change
-    Util::MutableDynamicParameters->getMutableNetworkConfig()
-        ->mutableChannel()
-        ->registerCallbackFunction(
-            boost::bind(&WifiBackend::joinMulticastChannel, this, _1, network_interface));
+    joinMulticastChannel(channel, network_interface);
 
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
