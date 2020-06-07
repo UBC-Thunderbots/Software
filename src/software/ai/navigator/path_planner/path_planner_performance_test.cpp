@@ -4,7 +4,7 @@
 #include <typeinfo>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
@@ -29,51 +29,54 @@ class PathPlannerTestCaseFactory
    public:
     static std::vector<PlannerTestCase> getTestCases()
     {
-        ObstacleFactory obstacle_factory(
-            Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig());
+        RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
+            Util::DynamicParameters->getAIConfig()
+                ->getRobotNavigationObstacleFactoryConfig());
 
         std::vector<ObstaclePtr> obstacles_10 = {
-            obstacle_factory.createRobotObstacle({0, 0}),
-            obstacle_factory.createRobotObstacle({0, 0.5}),
-            obstacle_factory.createRobotObstacle({0, 1.0}),
-            obstacle_factory.createRobotObstacle({0, 1.5}),
-            obstacle_factory.createRobotObstacle({-0.5, 0}),
-            obstacle_factory.createRobotObstacle({-0.5, 0.5}),
-            obstacle_factory.createRobotObstacle({-0.5, 1.0}),
-            obstacle_factory.createRobotObstacle({-0.5, 1.5}),
-            obstacle_factory.createRobotObstacle({0.5, 1.0}),
-            obstacle_factory.createRobotObstacle({0.5, 1.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, 0}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, 0.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, 1.0}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, 1.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 0}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 0.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 1.0}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 1.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0.5, 1.0}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0.5, 1.5}),
         };
 
         std::vector<ObstaclePtr> obstacles_20 = obstacles_10;
-        obstacles_20.insert(obstacles_20.end(),
-                            {
-                                obstacle_factory.createRobotObstacle({1, 0}),
-                                obstacle_factory.createRobotObstacle({1, 0.5}),
-                                obstacle_factory.createRobotObstacle({1, 1.0}),
-                                obstacle_factory.createRobotObstacle({1, 1.5}),
-                                obstacle_factory.createRobotObstacle({-1.5, 0}),
-                                obstacle_factory.createRobotObstacle({-1.5, 0.5}),
-                                obstacle_factory.createRobotObstacle({-1.5, 1.0}),
-                                obstacle_factory.createRobotObstacle({-1.5, 1.5}),
-                                obstacle_factory.createRobotObstacle({1.5, 0}),
-                                obstacle_factory.createRobotObstacle({1.5, 0.5}),
-                            });
+        obstacles_20.insert(
+            obstacles_20.end(),
+            {
+                robot_navigation_obstacle_factory.createFromRobotPosition({1, 0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({1, 0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({1, 1.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({1, 1.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 1.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 1.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({1.5, 0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({1.5, 0.5}),
+            });
 
         std::vector<ObstaclePtr> obstacles_30 = obstacles_20;
-        obstacles_30.insert(obstacles_30.end(),
-                            {
-                                obstacle_factory.createRobotObstacle({2, 0}),
-                                obstacle_factory.createRobotObstacle({2, 0.5}),
-                                obstacle_factory.createRobotObstacle({2, 2.0}),
-                                obstacle_factory.createRobotObstacle({2, 2.5}),
-                                obstacle_factory.createRobotObstacle({-2.5, 0}),
-                                obstacle_factory.createRobotObstacle({-2.5, 0.5}),
-                                obstacle_factory.createRobotObstacle({-2.5, 2.0}),
-                                obstacle_factory.createRobotObstacle({-2.5, 2.5}),
-                                obstacle_factory.createRobotObstacle({2.5, 0}),
-                                obstacle_factory.createRobotObstacle({2.5, 0.5}),
-                            });
+        obstacles_30.insert(
+            obstacles_30.end(),
+            {
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, 0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, 0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, 2.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, 2.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 2.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 2.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2.5, 0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2.5, 0.5}),
+            });
 
         std::vector<PlannerTestCase> test_cases = {
             {.name           = "Empty small area short path",

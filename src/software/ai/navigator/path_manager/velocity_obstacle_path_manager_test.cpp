@@ -10,7 +10,8 @@ TEST(TestVelocityObstaclePathManager, test_no_obstacles)
     Point start{0, 0}, dest{1, 1};
     auto path_manager = std::make_unique<VelocityObstaclePathManager>(
         std::make_unique<StraightLinePathPlanner>(),
-        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()));
+        RobotNavigationObstacleFactory(
+            std::make_shared<RobotNavigationObstacleFactoryConfig>()));
     std::vector<ObstaclePtr> obstacles;
 
     Rectangle navigable_area = Rectangle(Point(0, 0), Point(1, 1));
