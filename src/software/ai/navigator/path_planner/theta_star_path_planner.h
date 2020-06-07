@@ -8,11 +8,13 @@
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
  * the PathPlanner interface.
- * It is a grid-based graph algorithm, but it allows any two nodes to be connected to each
+ * It is a grid-based graph algorithm, but it allows any two cells to be connected to each
  * other, as long as there's line of sight. It will optimize for the shortest total path
  * length. Theta Star (Theta*) is closely related to A Star (A*) (see
  * https://www.geeksforgeeks.org/a-search-algorithm/), but it will implicitly smooth paths
- * as it explores the graph. Read
+ * as it explores the graph.
+ *
+ * Read
  * https://web.archive.org/web/20190218161704/http://aigamedev.com/open/tutorial/theta-star-any-angle-paths/
  * for an explanation of how that works, including pseudocode and diagrams.
  */
@@ -37,7 +39,7 @@ class ThetaStarPathPlanner : public PathPlanner
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &obstacles) override;
 
-   protected:
+   private:
     class Coordinate : public std::pair<unsigned int, unsigned int>
     {
        public:
@@ -62,22 +64,29 @@ class ThetaStarPathPlanner : public PathPlanner
     class CellHeuristic
     {
        public:
-        CellHeuristic() : parent_(0, 0), f_(0), best_path_cost_(0), initialized_(false) {}
+        CellHeuristic()
+            : parent_(0, 0),
+              path_cost_and_end_dist_heuristic_(0),
+              best_path_cost_(0),
+              initialized_(false)
+        {
+        }
 
         /**
          * Updates CellHeuristics internal variables
          * Once updated, a CellHeuristic is considered intialized
          *
          * @param parent parent
-         * @param f f value
+         * @param path_cost_and_end_dist_heuristic The path cost and end dist heuristic
          * @param best_path_cost best_path_cost
          */
-        void update(Coordinate parent, double f, double best_path_cost)
+        void update(Coordinate parent, double path_cost_and_end_dist_heuristic,
+                    double best_path_cost)
         {
-            parent_         = parent;
-            f_              = f;
-            best_path_cost_ = best_path_cost;
-            initialized_    = true;
+            parent_                           = parent;
+            path_cost_and_end_dist_heuristic_ = path_cost_and_end_dist_heuristic;
+            best_path_cost_                   = best_path_cost;
+            initialized_                      = true;
         }
 
         /**
@@ -91,19 +100,20 @@ class ThetaStarPathPlanner : public PathPlanner
         }
 
         /**
-         * Gets f value
+         * Gets path cost and end dist heuristic, which is the sum of the best path cost
+         * from the cell to end plus the Euclidean distance between the cell and end
          *
-         * @return f value
+         * @return path cost and end dist heuristic
          */
-        double f() const
+        double pathCostAndEndDistHeuristic() const
         {
-            return f_;
+            return path_cost_and_end_dist_heuristic_;
         }
 
         /**
-         * Gets best_path_cost
+         * Gets best_path_cost, the best path cost from the cell to end
          *
-         * @return best_path_cost
+         * @return the best path cost
          */
         double bestPathCost() const
         {
@@ -122,7 +132,8 @@ class ThetaStarPathPlanner : public PathPlanner
 
        private:
         Coordinate parent_;
-        double f_, best_path_cost_;
+        double path_cost_and_end_dist_heuristic_;
+        double best_path_cost_;
         bool initialized_;
     };
 
@@ -165,8 +176,8 @@ class ThetaStarPathPlanner : public PathPlanner
     std::vector<Point> tracePath(const Coordinate &end) const;
 
     /**
-     * Updates the new node's fields based on the current node, end and the
-     * distance to the next node and checks if end is reached
+     * Updates the next cell's fields based on the current cell, end and the
+     * distance to the next cell and checks if end is reached
      *
      * @param current The current cell
      * @param next    The next cell to be updated
@@ -179,7 +190,7 @@ class ThetaStarPathPlanner : public PathPlanner
                       const Coordinate &end, double marginal_dist);
 
     /**
-     * Checks for line of sight between parent cell and new cell
+     * Checks for line of sight between Coordinates
      *
      * @param coord1 The first Coordinate
      * @param coord2 The second Coordinate

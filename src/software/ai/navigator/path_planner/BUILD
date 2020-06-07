@@ -7,7 +7,6 @@ cc_library(
         "//software/ai/navigator/obstacle",
         "//software/geom",
         "//software/new_geom:linear_spline2d",
-        "//software/new_geom/util:distance",
     ],
 )
 
@@ -33,6 +32,8 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
+        "//software/new_geom/util:distance",
+        "//software/new_geom/util:intersects",
     ],
 )
 

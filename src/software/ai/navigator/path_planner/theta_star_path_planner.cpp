@@ -4,6 +4,7 @@
 
 #include "software/logger/logger.h"
 #include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/intersects.h"
 
 ThetaStarPathPlanner::ThetaStarPathPlanner()
     : num_grid_rows(0),
@@ -87,7 +88,7 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(const Coordinate &end) const
     std::vector<Point> path_points;
     std::stack<Coordinate> path;
 
-    // loop until parent is self
+    // loop until parent equals current
     while (!(cell_heuristics[current.row()][current.col()].parent() == current))
     {
         path.push(current);
@@ -116,25 +117,25 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
         if (closed_list.find(next) == closed_list.end() && isUnblocked(next) == true)
         {
             double updated_best_path_cost;
-            Coordinate parent_new;
+            Coordinate next_parent;
             Coordinate parent = cell_heuristics[current.row()][current.col()].parent();
             if (lineOfSight(parent, next))
             {
-                parent_new = parent;
+                next_parent = parent;
                 updated_best_path_cost =
                     cell_heuristics[parent.row()][parent.col()].bestPathCost() +
                     coordDistance(parent, next);
             }
             else
             {
-                parent_new = current;
+                next_parent = current;
                 updated_best_path_cost =
                     cell_heuristics[current.row()][current.col()].bestPathCost() +
                     marginal_dist;
             }
 
-            double h_new = coordDistance(next, end);
-            double f_new = updated_best_path_cost + h_new;
+            double next_path_cost_and_end_dist_heuristic =
+                updated_best_path_cost + coordDistance(next, end);
 
             // If it isn’t on the open list, add it to the open list. Make the current
             // square the parent of this square. Record f, and best_path_cost of the
@@ -143,13 +144,15 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
             // If it is on the open list already, check to see if this path to that square
             // is better, using 'f' cost as the measure.
             if (!cell_heuristics[next.row()][next.col()].isInitialized() ||
-                cell_heuristics[next.row()][next.col()].f() > f_new)
+                cell_heuristics[next.row()][next.col()].pathCostAndEndDistHeuristic() >
+                    next_path_cost_and_end_dist_heuristic)
             {
                 open_list.insert(next);
 
                 // Update the details of this CellHeuristic
-                cell_heuristics[next.row()][next.col()].update(parent_new, f_new,
-                                                               updated_best_path_cost);
+                cell_heuristics[next.row()][next.col()].update(
+                    next_parent, next_path_cost_and_end_dist_heuristic,
+                    updated_best_path_cost);
             }
             // If the end is the same as the current successor
             if (next == end)
@@ -188,7 +191,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
         return Path(std::vector<Point>({start, closest_end}));
     }
 
-    // Initialising the parameters of the starting node
+    // Initialising the parameters of the starting cell
     cell_heuristics[start_coord.row()][start_coord.col()].update(start_coord, 0.0, 0.0);
     open_list.insert(start_coord);
 
@@ -318,7 +321,7 @@ bool ThetaStarPathPlanner::visitSuccessors(const Coordinate &current_coord,
         <-x,-y>     --> (i+1, j-1)
         */
 
-    Coordinate new_coord;
+    Coordinate next_coord;
     unsigned int i = current_coord.row();
     unsigned int j = current_coord.col();
 
@@ -328,11 +331,11 @@ bool ThetaStarPathPlanner::visitSuccessors(const Coordinate &current_coord,
         {
             double dist_to_neighbour =
                 std::sqrt(std::pow(x_offset, 2) + std::pow(y_offset, 2));
-            new_coord = Coordinate(i + x_offset, j + y_offset);
+            next_coord = Coordinate(i + x_offset, j + y_offset);
             // check for clipping obstacles
-            if (lineOfSight(current_coord, new_coord))
+            if (lineOfSight(current_coord, next_coord))
             {
-                if (updateVertex(current_coord, new_coord, end_coord, dist_to_neighbour))
+                if (updateVertex(current_coord, next_coord, end_coord, dist_to_neighbour))
                 {
                     return true;
                 }
