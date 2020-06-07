@@ -27,7 +27,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
-#include "udp_multicast.h"
 
 /* USER CODE END Includes */
 
@@ -75,6 +74,7 @@ void StartDefaultTask(void *argument);
 
 static void initIoLayer(void);
 static void initIoDrivetrain(void);
+static void initIoAICommunicator(void);
 
 /* USER CODE END PFP */
 
@@ -84,6 +84,7 @@ static void initIoDrivetrain(void);
 static void initIoLayer(void)
 {
     initIoDrivetrain();
+    initIoAICommunicator();
 }
 
 void initIoDrivetrain(void)
@@ -129,6 +130,11 @@ void initIoDrivetrain(void)
 
     io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
+}
+
+void initIoAICommunicator()
+{
+    io_ai_communicator_init(
 }
 
 /* USER CODE END 0 */

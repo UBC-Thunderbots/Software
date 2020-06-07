@@ -1,5 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("//firmware_new:nanopb.bzl", "nanopb_proto_library")
+load("//shared/proto:nanopb.bzl", "nanopb_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -22,7 +22,7 @@ cc_proto_library(
 )
 
 nanopb_proto_library(
-    name = "fw_c_proto",
+    name = "tbots_c_proto",
     restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = [":fw_proto"],
+    deps = [":tbots_proto"],
 )

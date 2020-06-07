@@ -95,17 +95,17 @@ void io_ai_communicator_destroy(AICommunicator_t* io_ai_communicator)
     free(io_ai_communicator);
 }
 
-void io_ai_communicator_sendRobotStatus(AICommunicator_t* io_ai_communicator,
-                                        RobotStatus& status)
+void io_ai_communicator_sendTbotsRobotMsg(AICommunicator_t* io_ai_communicator,
+                                         TbotsRobotMsg& robot_msg)
 {
     tx_buf = netbuf_new();
 
     // TODO make sure sizeof(status) works
-    netbuf_alloc(tx_buf, sizeof(status));
+    netbuf_alloc(tx_buf, sizeof(robot_msg));
 
     // serialize proto
-    pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-    pb_encode(&stream, RobotAck_fields, &ack);
+    pb_ostream_t stream = pb_ostream_from_buffer(protobuf_send_buffer, MAXIMUM_TRANSFER_UNIT_BYTES);
+    pb_encode(&stream, TbotsRobotMsg_fields, &ack);
 
     tx_buf->p->payload = buffer;
 

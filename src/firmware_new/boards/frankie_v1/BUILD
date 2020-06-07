@@ -50,7 +50,7 @@ cc_library(
     deps = [
         ":hal",
         ":lwip",
-        "//firmware_new/proto:fw_c_proto",
+        "//shared/proto:tbots_c_proto",
         "@com_github_nanopb_nanopb//:nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
