@@ -1,7 +1,3 @@
-// https://github.com/dhess/c-ringbuf/blob/master/ringbuf.c
-// https://github.com/dhess/c-ringbuf/blob/master/ringbuf.h
-// https://stackoverflow.com/questions/42903600/ring-buffer-on-c
-
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
