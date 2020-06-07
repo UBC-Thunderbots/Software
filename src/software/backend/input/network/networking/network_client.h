@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "software/backend/input/network/networking/network_filter.h"
-#include "software/backend/input/network/networking/proto_multicast_listener.h"
+#include "software/networking/proto_multicast_listener.h"
 #include "software/parameter/config.hpp"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
@@ -132,8 +132,11 @@ class NetworkClient
     // gamecontroller data
     std::unique_ptr<ProtoMulticastListener<Referee>> ssl_gamecontroller_client;
 
-    // The most up-to-date state of the world
-    World world;
+    // The most up-to-date state of the world components
+    std::optional<Field> field;
+    std::optional<Ball> ball;
+    Team friendly_team;
+    Team enemy_team;
 
     // The io_service that will be used to serivce all network requests
     boost::asio::io_service io_service;

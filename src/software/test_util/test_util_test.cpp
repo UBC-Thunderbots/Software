@@ -15,10 +15,10 @@ TEST(TestUtilsTest, create_testing_field)
     // SSL Division B field according to the rules
     EXPECT_DOUBLE_EQ(9.6, field.totalXLength());
     EXPECT_DOUBLE_EQ(6.6, field.totalYLength());
-    EXPECT_DOUBLE_EQ(0.3, field.boundaryYLength());
+    EXPECT_DOUBLE_EQ(0.3, field.boundaryMargin());
 
-    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoal());
-    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoal());
+    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoalCenter());
+    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoalCenter());
 
     EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
     EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
@@ -68,11 +68,12 @@ TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_positive_number_of_r
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     world = ::Test::TestUtil::setEnemyRobotPositions(
-        world, {world.field().enemyGoal(), world.field().friendlyCornerPos()},
+        world, {world.field().enemyGoalCenter(), world.field().friendlyCornerPos()},
         Timestamp::fromSeconds(0));
 
     EXPECT_EQ(2, world.enemyTeam().numRobots());
-    EXPECT_EQ(world.field().enemyGoal(), (*world.enemyTeam().getRobotById(0)).position());
+    EXPECT_EQ(world.field().enemyGoalCenter(),
+              (*world.enemyTeam().getRobotById(0)).position());
     EXPECT_EQ(world.field().friendlyCornerPos(),
               (*world.enemyTeam().getRobotById(1)).position());
     EXPECT_EQ(Vector(), (*world.enemyTeam().getRobotById(0)).velocity());

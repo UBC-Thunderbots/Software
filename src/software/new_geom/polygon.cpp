@@ -45,6 +45,100 @@ bool Polygon::contains(const Point& p) const
     return point_is_contained;
 }
 
+Point Polygon::centroid() const
+{
+    // Explanation of the math/geometry behind this:
+    // https://fotino.me/calculating-centroids/
+    double x_centre    = 0;
+    double y_centre    = 0;
+    double signed_area = 0;
+
+    for (unsigned i = 0; i < points_.size(); i++)
+    {
+        double x0 = points_[i].x();
+        double y0 = points_[i].y();
+        double x1 = points_[(i + 1) % points_.size()].x();
+        double y1 = points_[(i + 1) % points_.size()].y();
+        double a  = (x0 * y1) - (x1 * y0);
+
+        x_centre += (x0 + x1) * a;
+        y_centre += (y0 + y1) * a;
+        signed_area += a;
+    }
+
+    return Point((Vector(x_centre, y_centre) / (3 * signed_area)));
+}
+
+Polygon Polygon::expand(const Vector& expansion_vector) const
+{
+    // ASCII art showing an expanded Polygon
+    //
+    // Original Polygon:
+    //
+    //            B---------C
+    //            |         |
+    //            |         |
+    //            A---------D
+    //
+    //                 |
+    //                 V
+    //          expansion vector
+    //
+    // Expanded Polygon (A and D are shifted down):
+    //
+    //            B---------C
+    //            |         |
+    //            |         |
+    //            |         |
+    //            A'--------D'
+    //
+
+    std::vector<Point> expanded_points;
+    Point centroid_point = centroid();
+
+    // left and right is with respect to the vector pointing straight up
+    enum SideOfDividingLine
+    {
+        LEFT,
+        RIGHT,
+        ON_THE_LINE
+    };
+
+    // For a dividing line through centroid_point and perpendicular to the
+    // expansion_vector, returns which side of the line the point p is on
+    auto side_of_dividing_line = [&](const Point& p) {
+        double d = (p - centroid_point).cross(expansion_vector.perpendicular());
+        if (d == 0)
+        {
+            return SideOfDividingLine::ON_THE_LINE;
+        }
+        else if (d < 0)
+        {
+            return SideOfDividingLine::LEFT;
+        }
+        else
+        {
+            return SideOfDividingLine::RIGHT;
+        }
+    };
+
+    SideOfDividingLine side_of_dividing_line_of_expansion_vector =
+        side_of_dividing_line(centroid_point + expansion_vector);
+
+    for (const auto& point : points_)
+    {
+        if (side_of_dividing_line(point) == side_of_dividing_line_of_expansion_vector)
+        {
+            expanded_points.push_back(point + expansion_vector);
+        }
+        else
+        {
+            expanded_points.push_back(point);
+        }
+    }
+    return Polygon(expanded_points);
+}
+
 const std::vector<Segment> Polygon::getSegments() const
 {
     std::vector<Segment> segments;

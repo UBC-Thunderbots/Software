@@ -16,18 +16,7 @@
 #include <algorithm>
 
 #include "software/logger/logger.h"
-
-// Creates a struct which inherits all lambda function given to it and uses their
-// Ts::operator(). This can be passed to std::visit to easily write multiple different
-// lambdas for each type of motion controller commands below. See
-// https://en.cppreference.com/w/cpp/utility/variant/visit for more details.
-template <class... Ts>
-struct overload : Ts...
-{
-    using Ts::operator()...;
-};
-template <class... Ts>
-overload(Ts...)->overload<Ts...>;
+#include "software/util/variant_visitor/variant_visitor.h"
 
 using MotionControllerCommand =
     std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;
@@ -248,8 +237,8 @@ AngularVelocity MotionController::determineAngularVelocityFromVelocity(
     }
 
     new_angular_velocity =
-        std::clamp(new_angular_velocity, -abs(angular_velocity.toRadians()),
-                   abs(angular_velocity.toRadians()));
+        std::clamp(new_angular_velocity, -std::abs(angular_velocity.toRadians()),
+                   std::abs(angular_velocity.toRadians()));
     new_angular_velocity = std::clamp(new_angular_velocity,
                                       -max_angular_acceleration_meters_per_second_squared,
                                       max_angular_acceleration_meters_per_second_squared);

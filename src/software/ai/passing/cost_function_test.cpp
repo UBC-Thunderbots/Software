@@ -69,42 +69,42 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
 
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world.updateEnemyTeamState(
-        Team(Duration::fromSeconds(10),
-             {
-                 Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(3, {1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(4, {0, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(5, {2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(6, {3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-             }));
-    world.updateFriendlyTeamState(
-        Team(Duration::fromSeconds(10),
-             {
-                 Robot(0, {-0.2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(1, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(3, {-1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(4, {0, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(5, {-2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(6, {-3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-             }));
+    world.updateEnemyTeamState(Team(
+        {
+            Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(3, {1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(4, {0, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(5, {2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(6, {3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+        },
+        Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team(
+        {
+            Robot(0, {-0.2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(1, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(3, {-1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(4, {0, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(5, {-2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(6, {-3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+        },
+        Duration::fromSeconds(10)));
 
     std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
                                                   world.field().xLength() / 2);
@@ -306,7 +306,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
-        Robot(0, world.field().enemyGoal() + Vector(0, 0.5), {0, 0}, Angle::zero(),
+        Robot(0, world.field().enemyGoalCenter() + Vector(0, 0.5), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateEnemyTeamState(enemy_team);
@@ -367,22 +367,23 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
     // time to make space to receive the pass and one-time shoot it into the net.
 
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Team friendly_team(Duration::fromSeconds(10),
-                       {// Robot doing corner kick
-                        Robot(0, world.field().enemyCornerPos(), {0, 0}, Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                        // Robot at center field
-                        Robot(1, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                              Timestamp::fromSeconds(0))});
+    Team friendly_team(
+        {// Robot doing corner kick
+         Robot(0, world.field().enemyCornerPos(), {0, 0}, Angle::zero(),
+               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+         // Robot at center field
+         Robot(1, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))},
+        Duration::fromSeconds(10));
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(
-        Duration::fromSeconds(10),
         {// Enemy goalie
-         Robot(0, world.field().enemyGoal() + Vector(-0.1, 0.5), {0, 0}, Angle::quarter(),
-               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+         Robot(0, world.field().enemyGoalCenter() + Vector(-0.1, 0.5), {0, 0},
+               Angle::quarter(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
          // Enemy marking friendly in the center
          Robot(1, {2.4, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
-               Timestamp::fromSeconds(0))});
+               Timestamp::fromSeconds(0))},
+        Duration::fromSeconds(10));
     world.updateEnemyTeamState(enemy_team);
 
     Pass pass(world.field().enemyCornerPos(), {1.8, 0.8}, 4.8,
@@ -542,7 +543,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
     Robot passer = Robot(13, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                          Timestamp::fromSeconds(0));
     unsigned int passer_robot_id = passer.id();
-    Team friendly_team(Duration::fromSeconds(10), {passer});
+    Team friendly_team({passer}, Duration::fromSeconds(10));
     world.updateFriendlyTeamState(friendly_team);
 
     Pass pass({0, 0}, {0.1, 0.1}, avg_desired_pass_speed, Timestamp::fromSeconds(10));
@@ -563,11 +564,11 @@ TEST_F(PassingEvaluationTest, ratePass_attempting_to_pass_and_receive_no_shot)
               Timestamp::fromSeconds(0)),
     });
     world.mutableEnemyTeam().updateRobots({
-        Robot(0, world.field().enemyGoal(), {0, 0}, Angle::zero(),
+        Robot(0, world.field().enemyGoalCenter(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(1, world.field().enemyGoal() - Vector(0, 0.2), {0, 0}, Angle::zero(),
+        Robot(1, world.field().enemyGoalCenter() - Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(2, world.field().enemyGoal() + Vector(0, 0.2), {0, 0}, Angle::zero(),
+        Robot(2, world.field().enemyGoalCenter() + Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
 
@@ -949,7 +950,7 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
         Robot(1, {-3, 3}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::fromDegrees(0),
               Timestamp::fromSeconds(0));
 
-    Team team(Duration::fromSeconds(10), {passer, potential_receiver});
+    Team team({passer, potential_receiver}, Duration::fromSeconds(10));
     Pass pass({2, -2}, {0, 0}, 10, Timestamp::fromSeconds(1));
 
     double friendly_capability = ratePassFriendlyCapability(team, pass, passer_robot_id);

@@ -7,7 +7,6 @@
 #include "software/sensor_fusion/ball_detection.h"
 #include "software/sensor_fusion/robot_detection.h"
 #include "software/time/timestamp.h"
-#include "software/world/field.h"
 #include "software/world/world.h"
 
 /**
@@ -23,14 +22,12 @@ class VisionDetection
      * @param ball_detections list of ball detections
      * @param friendly_team_detections list of robot detections for friendly team
      * @param enemy_team_detections list of robot detections for enemy team
-     * @param field_detection field detection
      * @param latest_timestamp latest timestamp
      *
      */
     VisionDetection(const std::vector<BallDetection> &ball_detections,
                     const std::vector<RobotDetection> &friendly_team_detections,
                     const std::vector<RobotDetection> &enemy_team_detections,
-                    const std::optional<Field> &field_detection,
                     const Timestamp latest_timestamp);
 
     /**
@@ -55,13 +52,6 @@ class VisionDetection
     const std::vector<RobotDetection> getEnemyTeamDetections(void) const;
 
     /**
-     * Gets field detection
-     *
-     * @return field detection
-     */
-    const std::optional<Field> getFieldDetection(void) const;
-
-    /**
      * Gets latest timestamp
      *
      * @return latest timestamp
@@ -72,6 +62,5 @@ class VisionDetection
     std::vector<BallDetection> ball_detections;
     std::vector<RobotDetection> friendly_team_detections;
     std::vector<RobotDetection> enemy_team_detections;
-    std::optional<Field> field_detection;
     Timestamp latest_timestamp;
 };

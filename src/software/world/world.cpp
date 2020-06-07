@@ -3,39 +3,18 @@
 #include "boost/circular_buffer.hpp"
 #include "software/parameter/dynamic_parameters.h"
 
-World::World()
-    : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
-            Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
-            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
-                                                ->RobotExpiryBufferMilliseconds()
-                                                ->value())),
-            Team(Duration::fromMilliseconds(Util::DynamicParameters->getAIConfig()
-                                                ->RobotExpiryBufferMilliseconds()
-                                                ->value())))
-{
-    // Set the default Timestamp as this parameter is not caught when using the World
-    // contructor
-    this->last_update_timestamps.push_front(Timestamp::fromSeconds(0.0));
-}
-
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
              const Team &enemy_team, unsigned int buffer_size)
     : field_(field),
       ball_(ball),
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
-      game_state_(),
+      current_refbox_game_state_(),
       // Store a small buffer of previous refbox game states so we can filter out noise
       refbox_game_state_history(3)
 {
     // Grab the most recent timestamp from all of the members used to update the world
     last_update_timestamps.set_capacity(buffer_size);
-    updateTimestamp(getMostRecentTimestampFromMembers());
-}
-
-void World::updateFieldGeometry(const Field &new_field_data)
-{
-    field_.updateDimensions(new_field_data);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -81,11 +60,6 @@ const Field &World::field() const
     return field_;
 }
 
-Field &World::mutableField()
-{
-    return field_;
-}
-
 const Ball &World::ball() const
 {
     return ball_;
@@ -126,19 +100,28 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
                         return gamestate == refbox_game_state_history.front();
                     }))
     {
-        game_state_.updateRefboxGameState(game_state);
-        game_state_.updateBall(ball_);
+        current_refbox_game_state_.updateRefboxGameState(game_state);
+        current_refbox_game_state_.updateBall(ball_);
     }
     else
     {
-        game_state_.updateRefboxGameState(game_state_.getRefboxGameState());
-        game_state_.updateBall(ball_);
+        current_refbox_game_state_.updateRefboxGameState(
+            current_refbox_game_state_.getRefboxGameState());
+        current_refbox_game_state_.updateBall(ball_);
     }
 }
 
-void World::updateRefboxData(const RefboxData &refbox_data)
+void World::updateRefboxStage(const RefboxStage &stage)
 {
-    updateRefboxGameState(refbox_data.getGameState());
+    // TODO (Issue #1369): Clean this up
+    refbox_stage_history.push_back(stage);
+    // Take the consensus of the previous refbox messages
+    if (!refbox_stage_history.empty() &&
+        std::all_of(refbox_stage_history.begin(), refbox_stage_history.end(),
+                    [&](auto stage) { return stage == refbox_stage_history.front(); }))
+    {
+        current_refbox_stage_ = stage;
+    }
 }
 
 Timestamp World::getMostRecentTimestampFromMembers()
@@ -150,7 +133,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
     // Add all member timestamps to a list
     std::initializer_list<Timestamp> member_timestamps = {
         friendly_team_.getMostRecentTimestamp(), enemy_team_.getMostRecentTimestamp(),
-        ball_.getPreviousStates().front().timestamp(), field_.getMostRecentTimestamp()};
+        ball_.getPreviousStates().front().timestamp()};
     // Return the max
 
     return std::max(member_timestamps);
@@ -168,12 +151,12 @@ boost::circular_buffer<Timestamp> World::getTimestampHistory()
 
 const GameState &World::gameState() const
 {
-    return game_state_;
+    return current_refbox_game_state_;
 }
 
 GameState &World::mutableGameState()
 {
-    return game_state_;
+    return current_refbox_game_state_;
 }
 
 bool World::operator==(const World &other) const

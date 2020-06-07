@@ -47,5 +47,16 @@ cc_library(
 
 cc_library(
     name = "tbots_math",
+    srcs = ["tbots_math.c"],
     hdrs = ["tbots_math.h"],
+    deps = [],
+)
+
+cc_test(
+    name = "tbots_math_test",
+    srcs = ["tbots_math_test.cpp"],
+    deps = [
+        ":tbots_math",
+        "@gtest//:gtest_main",
+    ],
 )

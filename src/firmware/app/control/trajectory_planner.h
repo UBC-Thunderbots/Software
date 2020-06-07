@@ -7,27 +7,6 @@
     9000  // The maximum size of the array containing trajectory elements. Assuming the
           // longest possible path is 9 meters with 1mm segments
 
-// Struct that defines a single point on a trajectory
-// Includes the Position and Time data corresponding to that point
-typedef struct TrajectoryElement
-{
-    Vector2d_t position;
-    float time;
-} TrajectoryElement_t;
-
-typedef struct Trajectory
-{
-    TrajectoryElement_t* trajectory_elements;
-    unsigned int num_elements;
-} Trajectory_t;
-
-typedef enum TrajectoryPlannerGenerationStatus
-{
-    OK                        = 0,
-    FINAL_VELOCITY_TOO_HIGH   = 1,
-    INITIAL_VELOCITY_TOO_HIGH = 2,
-} TrajectoryPlannerGenerationStatus;
-
 typedef struct FirmwareRobotPathParameters
 {
     // The 2D polynomial representation of the path to be followed
@@ -56,6 +35,49 @@ typedef struct FirmwareRobotPathParameters
     float final_speed;
 } FirmwareRobotPathParameters_t;
 
+// Struct that defines a single point on a trajectory
+// Includes the Position and Time data corresponding to that point
+typedef struct PositionTrajectoryElement
+{
+    Vector2d_t position;
+    float time;
+} PositionTrajectoryElement_t;
+
+typedef struct PositionTrajectory
+{
+    PositionTrajectoryElement_t* trajectory_elements;
+    FirmwareRobotPathParameters_t path_parameters;
+    float* speed_profile;
+} PositionTrajectory_t;
+
+// Struct that defines a single point on a velocity trajectory
+// Includes the velocity and Time data corresponding to that point
+typedef struct VelocityTrajectoryElement
+{
+    Vector2d_t linear_velocity;
+    float angular_velocity;
+    float time;
+} VelocityTrajectoryElement_t;
+
+typedef struct VelocityTrajectory
+{
+    VelocityTrajectoryElement_t* trajectory_elements;
+    FirmwareRobotPathParameters_t path_parameters;
+} VelocityTrajectory_t;
+
+typedef enum TrajectoryPlannerGenerationStatus
+{
+    OK,
+    FINAL_VELOCITY_TOO_HIGH,
+    INITIAL_VELOCITY_TOO_HIGH,
+
+    // INTERPOLATION_ELEMENT_MAXED_OUT is returned when the constant time interpolation
+    // function uses up all the avaiable array space provided to it. This can happen
+    // because constant interpolation period trajectories do not necessarily have the same
+    // number of elements as their constant arc-length counterparts
+    INTERPOLATION_ELEMENT_MAXED_OUT,
+} TrajectoryPlannerGenerationStatus_t;
+
 /**
  * Returns a planned trajectory with the list of guarantees based on the assumptions below
  *
@@ -71,7 +93,7 @@ typedef struct FirmwareRobotPathParameters
  * point on the path can the sum of centripetal and acceleration force be greater than
  * 'max_allowable_acceleration'
  *
- *  Trajectory generation is done by assuming constant acceleration capability.
+ *  PositionTrajectory generation is done by assuming constant acceleration capability.
  *      - The generator will assume maximum acceleration for the robot between each
  * segment on the path. If using max acceleration breaches either the speed limit of the
  * robot, or the centripetal acceleration limit defined by the curvature and robot speed -
@@ -99,9 +121,9 @@ typedef struct FirmwareRobotPathParameters
  *
  * @return The outcome of the trajectory generation. Returns OK if trajectory is valid.
  */
-TrajectoryPlannerGenerationStatus
-app_trajectory_planner_generateConstantArcLengthTrajectory(
-    FirmwareRobotPathParameters_t path_parameters, Trajectory_t* trajectory);
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateConstantArcLengthPositionTrajectory(
+    PositionTrajectory_t* trajectory);
 
 /**
  * Returns a constant interpolation period (time) trajectory based on an input trajectory
@@ -124,9 +146,10 @@ app_trajectory_planner_generateConstantArcLengthTrajectory(
  * each trajectory segment.
  *
  */
-void app_trajectory_planner_interpolateConstantTimeTrajectory(
-    Trajectory_t* constant_period_trajectory, Trajectory_t* variable_time_trajectory,
-    const float interpolation_period);
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
+    PositionTrajectory_t* constant_period_trajectory,
+    PositionTrajectory_t* variable_time_trajectory, const float interpolation_period);
 
 /**
  * Generates the X/Y points for each position on the constant arc length trajectory
@@ -146,7 +169,7 @@ void app_trajectory_planner_interpolateConstantTimeTrajectory(
  *
  */
 static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
-    TrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    PositionTrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, const unsigned int num_elements,
     ArcLengthParametrization_t arc_length_parameterization,
     const float arc_segment_length);
@@ -250,10 +273,9 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  * @param velocity_profile [in] The forwards and backwards continuous velocity profile of
  * the trajectory
  */
-void static app_trajectory_planner_generateTimeProfile(
-    TrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float num_segments, const float arc_segment_length,
-    float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+void static app_trajectory_planner_generatePositionTrajectoryTimeProfile(
+    PositionTrajectoryElement_t* traj_elements, const float num_segments,
+    const float arc_segment_length, float* velocity_profile);
 
 /***
  *  This function takes in a forwards trajectory annd modifies it in place to become a
@@ -261,11 +283,21 @@ void static app_trajectory_planner_generateTimeProfile(
  *
  *  TODO: Remove when #1322 is merged.
  *
- * @pre forwards is pre-allocated up to at least TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
- * @param forwards This is the trajectory that will be modified in place to become a
- * reverse trajectory
- * @param num_segments The number of segements(elements) in the forwards array
+ * @param forwards_trajectory This is the trajectory that will be modified in place to
+ * become a reverse trajectory
  */
-void static app_trajectory_planner_reverseTrajectoryDirection(
-    TrajectoryElement_t forwards[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const unsigned int num_segments);
+void static app_trajectory_planner_reversePositionTrajectoryDirection(
+    PositionTrajectory_t* forwards_trajectory);
+
+/**
+ * This function generates a velocity trajectory that corresponds to the time-optimal
+ * velocity to follow a specified path. This profile is based on the input position
+ * trajectory
+ *
+ * @param position_trajectory [in] The position trajectory to build the velocity
+ * trajectory from
+ * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
+ * time-optimal velocity to follow a specified path
+ */
+void app_trajectory_planner_generateVelocityTrajectory(
+    PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory);

@@ -23,18 +23,20 @@ class Team
      * @param buffer_size The number of elements in the Timestamp history buffer of the
      * Team object
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration,
-                  unsigned int buffer_size = 20);
+    explicit Team(
+        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50),
+        unsigned int buffer_size                     = 20);
 
     /**
      * Create a new team
      *
+     * @param team_robots The robots on the team
      * @param robot_expiry_buffer_duration The Duration for which a robot must not
      * have been updated for before it is removed from the team
-     * @param team_robots The robots on the team
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration,
-                  const std::vector<Robot>& team_robots);
+    explicit Team(
+        const std::vector<Robot>& team_robots,
+        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50));
 
     /**
      * Updates this team with new robots.

@@ -4,7 +4,6 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
@@ -85,7 +84,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
             field, friendly_team, enemy_team, enemy_robot, ROBOT_MAX_RADIUS_METERS,
             robots_to_ignore);
 
-        Vector enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
+        Vector enemy_shot_vector = field.friendlyGoalCenter() - enemy_robot.position();
         Point position_to_block_shot =
             enemy_robot.position() + enemy_shot_vector.normalize(shadow_distance);
         if (best_enemy_shot_opt)

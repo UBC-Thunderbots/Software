@@ -1,6 +1,6 @@
 #include "udp_multicast.h"
 
-#include "firmware_new/proto/control_fw.pb.h"
+#include "firmware_new/proto/control.pb.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
 #include "lwip/ip_addr.h"

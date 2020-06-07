@@ -8,8 +8,7 @@
 
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
              double defense_y_length, double goal_y_length, double boundary_buffer_size,
-             double center_circle_radius, const Timestamp &timestamp,
-             unsigned int buffer_size)
+             double center_circle_radius)
     : field_x_length_(field_x_length),
       field_y_length_(field_y_length),
       defense_x_length_(defense_x_length),
@@ -21,37 +20,13 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius)
 {
-    // Set the size of the Timestamp history buffer
-    last_update_timestamps.set_capacity(buffer_size);
-
-    updateTimestamp(timestamp);
-}
-
-void Field::updateDimensions(const Field &new_field_data)
-{
-    field_x_length_        = new_field_data.xLength();
-    field_y_length_        = new_field_data.yLength();
-    defense_y_length_      = new_field_data.defenseAreaYLength();
-    defense_x_length_      = new_field_data.defenseAreaXLength();
-    goal_y_length_         = new_field_data.goalYLength();
-    boundary_buffer_size_  = new_field_data.boundaryYLength();
-    center_circle_radius_  = new_field_data.centerCircleRadius();
-    last_update_timestamps = new_field_data.getTimestampHistory();
-}
-
-void Field::updateDimensions(double field_x_length, double field_y_length,
-                             double defense_x_length, double defense_y_length,
-                             double goal_y_length, double boundary_buffer_size,
-                             double center_circle_radius, const Timestamp &timestamp)
-{
-    field_x_length_       = field_x_length;
-    field_y_length_       = field_y_length;
-    defense_y_length_     = defense_y_length;
-    defense_x_length_     = defense_x_length;
-    goal_y_length_        = goal_y_length;
-    boundary_buffer_size_ = boundary_buffer_size;
-    center_circle_radius_ = center_circle_radius;
-    updateTimestamp(timestamp);
+    if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
+        defense_y_length_ <= 0 || goal_y_length_ <= 0 || boundary_buffer_size_ <= 0 ||
+        center_circle_radius_ <= 0)
+    {
+        throw std::invalid_argument(
+            "At least one field dimension is non-positive - Field is invalid");
+    }
 }
 
 double Field::xLength() const
@@ -115,12 +90,12 @@ Rectangle Field::friendlyHalf() const
 
 Rectangle Field::friendlyPositiveYQuadrant() const
 {
-    return Rectangle(friendlyGoal(), Point(0, friendlyCornerPos().y()));
+    return Rectangle(friendlyGoalCenter(), Point(0, friendlyCornerPos().y()));
 }
 
 Rectangle Field::friendlyNegativeYQuadrant() const
 {
-    return Rectangle(friendlyGoal(), Point(0, friendlyCornerNeg().y()));
+    return Rectangle(friendlyGoalCenter(), Point(0, friendlyCornerNeg().y()));
 }
 
 Rectangle Field::enemyHalf() const
@@ -150,16 +125,6 @@ Rectangle Field::fieldBoundary() const
     return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
 }
 
-bool Field::isValid() const
-{
-    if (totalXLength() < GeomConstants::FIXED_EPSILON ||
-        totalYLength() < GeomConstants::FIXED_EPSILON)
-    {
-        return false;
-    }
-    return true;
-}
-
 double Field::centerCircleRadius() const
 {
     return center_circle_radius_;
@@ -175,77 +140,99 @@ Point Field::centerPoint() const
     return Point(0, 0);
 }
 
-Point Field::friendlyGoal() const
+Segment Field::halfwayLine() const
+{
+    return Segment({0, friendlyCornerPos().y()}, {0, friendlyCornerNeg().y()});
+}
+
+Point Field::friendlyGoalCenter() const
 {
     return Point(-xLength() / 2.0, 0.0);
 }
 
-Point Field::enemyGoal() const
+Point Field::enemyGoalCenter() const
 {
     return Point(xLength() / 2.0, 0.0);
 }
 
+Rectangle Field::friendlyGoal() const
+{
+    Point friendly_goal_top_left(friendlyGoalCenter().x() - goalXLength(),
+                                 friendlyGoalpostPos().y());
+    Point friendly_goal_bottom_right(friendlyGoalCenter().x(), friendlyGoalpostNeg().y());
+    return Rectangle(friendly_goal_top_left, friendly_goal_bottom_right);
+}
+
+Rectangle Field::enemyGoal() const
+{
+    Point enemy_goal_top_left(enemyGoalCenter().x(), enemyGoalpostPos().y());
+    Point enemy_goal_bottom_right(enemyGoalCenter().x() + goalXLength(),
+                                  enemyGoalpostNeg().y());
+    return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
+}
+
 Point Field::penaltyEnemy() const
 {
-    return Point(enemyGoal().x() - defenseAreaXLength(), enemyGoal().y());
+    return Point(enemyGoalCenter().x() - defenseAreaXLength(), enemyGoalCenter().y());
 }
 
 Point Field::penaltyFriendly() const
 {
-    return Point(friendlyGoal().x() + defenseAreaXLength(), friendlyGoal().y());
+    return Point(friendlyGoalCenter().x() + defenseAreaXLength(),
+                 friendlyGoalCenter().y());
 }
 
 Point Field::friendlyCornerPos() const
 {
-    return Point(friendlyGoal().x(), yLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), yLength() / 2.0);
 }
 
 Point Field::friendlyCornerNeg() const
 {
-    return Point(friendlyGoal().x(), -yLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), -yLength() / 2.0);
 }
 
 Point Field::enemyCornerPos() const
 {
-    return Point(enemyGoal().x(), yLength() / 2);
+    return Point(enemyGoalCenter().x(), yLength() / 2);
 }
 
 Point Field::enemyCornerNeg() const
 {
-    return Point(enemyGoal().x(), -yLength() / 2);
+    return Point(enemyGoalCenter().x(), -yLength() / 2);
 }
 
 Point Field::friendlyGoalpostPos() const
 {
-    return Point(friendlyGoal().x(), goalYLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), goalYLength() / 2.0);
 }
 
 Point Field::friendlyGoalpostNeg() const
 {
-    return Point(friendlyGoal().x(), -goalYLength() / 2.0);
+    return Point(friendlyGoalCenter().x(), -goalYLength() / 2.0);
 }
 
 Point Field::enemyGoalpostPos() const
 {
-    return Point(enemyGoal().x(), goalYLength() / 2.0);
+    return Point(enemyGoalCenter().x(), goalYLength() / 2.0);
 }
 
 Point Field::enemyGoalpostNeg() const
 {
-    return Point(enemyGoal().x(), -goalYLength() / 2.0);
+    return Point(enemyGoalCenter().x(), -goalYLength() / 2.0);
 }
 
-double Field::boundaryYLength() const
+double Field::boundaryMargin() const
 {
     return boundary_buffer_size_;
 }
 
-bool Field::pointInFriendlyDefenseArea(const Point p) const
+bool Field::pointInFriendlyDefenseArea(const Point &p) const
 {
     return friendlyDefenseArea().contains(p);
 }
 
-bool Field::pointInEnemyDefenseArea(const Point p) const
+bool Field::pointInEnemyDefenseArea(const Point &p) const
 {
     return enemyDefenseArea().contains(p);
 }
@@ -253,35 +240,6 @@ bool Field::pointInEnemyDefenseArea(const Point p) const
 bool Field::pointInFieldLines(const Point &p) const
 {
     return fieldLines().contains(p);
-}
-
-boost::circular_buffer<Timestamp> Field::getTimestampHistory() const
-{
-    return last_update_timestamps;
-}
-
-Timestamp Field::getMostRecentTimestamp() const
-{
-    return last_update_timestamps.front();
-}
-
-void Field::updateTimestamp(Timestamp time_stamp)
-{
-    // Check if the timestamp buffer is empty
-    if (last_update_timestamps.empty())
-    {
-        last_update_timestamps.push_front(time_stamp);
-    }
-    // Check that the new timestamp is not older than the most recent timestamp
-    else if (time_stamp < Field::getMostRecentTimestamp())
-    {
-        throw std::invalid_argument(
-            "Error: Attempt tp update Field state with old Timestamp");
-    }
-    else
-    {
-        last_update_timestamps.push_front(time_stamp);
-    }
 }
 
 bool Field::pointInEntireField(const Point &p) const

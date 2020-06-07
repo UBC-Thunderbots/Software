@@ -4,8 +4,6 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
                                      const Team &enemy_team, bool ignore_goalie,
@@ -106,7 +104,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             }
             else
             {
-                enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
+                enemy_shot_vector = field.friendlyGoalCenter() - enemy_robot.position();
             }
 
             Point position_to_block_shot =

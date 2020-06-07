@@ -25,7 +25,7 @@ else
     cd $CUBEMX_TMP_DIR
 
     # create auto install xml
-    AUTO_INSTALL_XML="\
+    AUTO_INSTALL_XML="
         <?xml version='1.0' encoding='UTF-8' standalone='no'?>
         <AutomatedInstallation langpack='eng'>
             <com.st.microxplorer.install.MXHTMLHelloPanel id='readme'/>
@@ -43,7 +43,7 @@ else
     # create script to cd and run STM32CubeMX
     STM32_SCRIPT="pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd"
 
-    echo -n $STM32_SCRIPT > cuberunner.sh
+    echo -n "$STM32_SCRIPT" > cuberunner.sh
     
     curl -O $CUBE_LINK
     unzip en.stm32cubemx_v5.4.0.zip

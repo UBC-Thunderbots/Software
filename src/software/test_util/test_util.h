@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gtest/gtest.h>
+
 #include "shared/constants.h"
 #include "software/new_geom/geom_constants.h"
 #include "software/new_geom/point.h"
@@ -113,10 +115,11 @@ namespace Test
          * @param tolerance tolerance to check equality with, default is
          * METERS_PER_MILLIMETER
          *
-         * @return true if the two polygons are within tolerance of each other
+         * @return AssertionSuccess if the two polygons are within tolerance of each other
          */
-        static bool equalWithinTolerance(const Polygon &poly1, const Polygon &poly2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+        static ::testing::AssertionResult equalWithinTolerance(
+            const Polygon &poly1, const Polygon &poly2,
+            double tolerance = METERS_PER_MILLIMETER);
 
         /**
          * Checks if two circles are within tolerance of each other
@@ -127,10 +130,10 @@ namespace Test
          * @param tolerance tolerance to check equality with, default is
          * METERS_PER_MILLIMETER
          *
-         * @return true if the two circles are within tolerance of each other
+         * @return AssertionSuccess if the two circles are within tolerance of each other
          */
-        static bool equalWithinTolerance(const Circle &c1, const Circle &c2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+        static ::testing::AssertionResult equalWithinTolerance(
+            const Circle &c1, const Circle &c2, double tolerance = METERS_PER_MILLIMETER);
 
         /**
          * Checks if two points are within tolerance of each other
@@ -141,10 +144,10 @@ namespace Test
          * @param tolerance tolerance to check equality with, default is
          * METERS_PER_MILLIMETER
          *
-         * @return true if the two points are within tolerance of each other
+         * @return AssertionSuccess if the two points are within tolerance of each other
          */
-        static bool equalWithinTolerance(const Point &pt1, const Point &pt2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+        static ::testing::AssertionResult equalWithinTolerance(
+            const Point &pt1, const Point &pt2, double tolerance = METERS_PER_MILLIMETER);
 
         /**
          * Checks if two values are within tolerance of each other
@@ -153,10 +156,10 @@ namespace Test
          * @param tolerance tolerance to check equality with, default is
          * METERS_PER_MILLIMETER
          *
-         * @return true if the two values are within tolerance of each other
+         * @return AssertionSuccess if the two values are within tolerance of each other
          */
-        static bool equalWithinTolerance(double val1, double val2,
-                                         double tolerance = METERS_PER_MILLIMETER);
+        static ::testing::AssertionResult equalWithinTolerance(
+            double val1, double val2, double tolerance = METERS_PER_MILLIMETER);
 
        private:
         /**

@@ -12,6 +12,7 @@ cc_library(
         "//software/new_geom:polygon",
         "//software/new_geom/util:almost_equal",
         "//software/world",
+        "@gtest//:gtest_main",
     ],
 )
 

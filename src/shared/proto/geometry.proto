@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+message PointMsg
+{
+    // x coordinate
+    double x = 1;
+
+    // y coordinate
+    double y = 2;
+}
+
+message VectorMsg
+{
+    // x component
+    double x_component = 1;
+
+    // y component
+    double y_component = 2;
+}
+
+message AngleMsg
+{
+    // the angle in radians
+    double radians = 1;
+}

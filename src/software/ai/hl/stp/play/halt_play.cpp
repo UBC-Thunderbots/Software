@@ -20,7 +20,7 @@ bool HaltPlay::invariantHolds(const World &world) const
     return world.gameState().isHalted();
 }
 
-void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // Create Stop Tactics that will loop forever
     auto stop_tactic_1 = std::make_shared<StopTactic>(false);
