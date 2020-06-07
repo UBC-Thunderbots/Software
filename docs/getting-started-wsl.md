@@ -12,7 +12,9 @@
 
 Windows has a Windows Subsystem for Linux component that can be used to develop and run code for Linux on Windows. WSL1 was a Windows component that implemented Linux kernel interfaces, and didn't work great with Thunderbots AI software or grSim. WSL2 runs a full-fledged Linux kernel in a VM, and works great with Thunderbots AI software and grSim with the exception that we need to use software rendering instead of GPU-accelerated rendering for grSim and our AI.
 
-Note that this will not work with legacy robots. Due to the lack of USB support in WSL2, we are unable to use the USB dongle used to communicate with them.
+**Support for WSL is experimental and requires some effort to get going. Because we use software rendering, the experience will also be degraded on computers with weak or old CPUs.**
+
+**Note that this will not work with legacy robots. Due to the lack of USB support in WSL2, we are unable to use the USB dongle used to communicate with them.**
 
 ## WSL2 Setup
 
