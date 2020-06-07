@@ -79,8 +79,43 @@ static const std::map<SSLFieldLines, const std::string> ssl_field_line_names = {
         {SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH, "RightFieldRightPenaltyStretch"},
 };
 
+MAKE_ENUM(SSLCircularArcs,
+        CENTER_CIRCLE)
+
+static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names = {
+        {SSLCircularArcs::CENTER_CIRCLE, "CenterCircle"},
+};
+
+/**
+ *
+ * @param point
+ * @return
+ */
 std::unique_ptr<Vector2f> createVector2f(const Point& point);
-std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segment, const std::string& name);
-std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, const std::string& name);
-std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& field);
+
+/**
+ *
+ * @param segment
+ * @param thickness The thickness of the line in metres. Must be >= 0
+ * @param name
+ * @return
+ */
+std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segment, float thickness, const std::string& name);
+
+/**
+ *
+ * @param circle
+ * @param thickness
+ * @param name
+ * @return
+ */
+std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, float thickness, const std::string& name);
+
+/**
+ *
+ * @param field
+ * @param thickness
+ * @return
+ */
+std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& field, float thickness);
 std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field);
