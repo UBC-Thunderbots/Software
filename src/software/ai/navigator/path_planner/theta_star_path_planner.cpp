@@ -164,7 +164,6 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
     return false;
 }
 
-// top level function
 std::optional<Path> ThetaStarPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
@@ -204,11 +203,13 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     auto path_points = tracePath(end_coord);
 
-    // replace end with actual end
+    // The last point of path_points is the closest point on the grid to the end point, so
+    // we need to replace that point with actual end point
     path_points.pop_back();
     path_points.push_back(closest_end);
 
-    // replace start with actual start
+    // The first point of path_points is the closest unblocked point on the grid to the
+    // start point, so we need to replace that point with actual start point
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
 
