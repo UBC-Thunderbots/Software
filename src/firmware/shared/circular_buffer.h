@@ -2,11 +2,17 @@
 // https://github.com/dhess/c-ringbuf/blob/master/ringbuf.h
 // https://stackoverflow.com/questions/42903600/ring-buffer-on-c
 
+#include "shared/constants.h"
+#include <stdlib.h>
+#include <math.h>
+#include <stdbool.h>
+
 struct circular_buffer
 {
     float *bufferData;
     int head;
     int tail;
+    bool isFull;
 };
 
 // TODO comment headers
