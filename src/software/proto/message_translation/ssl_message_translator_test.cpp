@@ -161,7 +161,9 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_division_b
     ASSERT_TRUE(right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_penalty_stretch.value(), Segment(Point(3.5, 1), Point(3.5, -1)), thickness, tolerance));
 
-
+    // TODO: you are here. Working on adding tests, you can do it
+    // Need to add goal_depth to the field class now that SSL provides it before can
+    // properly write the goal tests
 
 
 
