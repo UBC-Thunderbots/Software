@@ -63,9 +63,6 @@ const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
 
 const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
 
-// The maximum number of elements in the circular buffer for the motion controller
-const size_t CIRCULAR_BUFFER_MAX_NUM_ELEMENTS = 10;
-
 /** absolute angle to each of the front wheels as
  * measured from the front of the robots in degrees
  * For 3rd generation robot 2015 CAD model
