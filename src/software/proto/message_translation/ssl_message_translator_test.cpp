@@ -157,7 +157,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names) {
     EXPECT_FLOAT_EQ(2.0, result->p1().y());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_fine_circular_arc_with_no_arcs) {
+TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_no_arcs) {
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
     auto result = findCircularArc(arcs, "arbitrary name");
     EXPECT_FALSE(result);
@@ -273,10 +273,10 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_valid_value
 
 TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_negative_thickness) {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
-    const float thickness = -0.1f;
+    const float thickness = -0.005f;
     const std::string name = "MySegment";
 
-    ASSERT_DEATH(createFieldLineSegment(segment, thickness, name), "");
+    EXPECT_THROW(createFieldLineSegment(segment, thickness, name), std::invalid_argument);
 }
 
 TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_valid_values) {
@@ -298,7 +298,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_negative_th
     const float thickness = -0.005f;
     const std::string name = "MyCircle";
 
-    ASSERT_DEATH(createFieldCircularArc(circle, thickness, name), "");
+    EXPECT_THROW(createFieldCircularArc(circle, thickness, name), std::invalid_argument);
 }
 
 TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size) {

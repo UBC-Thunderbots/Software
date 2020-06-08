@@ -114,27 +114,43 @@ std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPt
 std::optional<SSL_FieldCircularArc> findCircularArc(google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> circular_arcs, const std::string& name);
 
 /**
+ * Creates a Vector2f proto message from the given point
  *
- * @param point
- * @return
+ * @param point The point to convert to a Vector2f
+ *
+ * @return A Vector2f message with the same coordinates as the given point
  */
 std::unique_ptr<Vector2f> createVector2f(const Point& point);
 
 /**
+ * Creates an SSL_FieldLineSegment proto message
  *
- * @param segment
- * @param thickness The thickness of the line in metres. Must be >= 0
- * @param name
- * @return
+ * @pre thickness must be >= 0
+ *
+ * @throws std::invalid_argument if thickness < 0
+ *
+ * @param segment The segment geometry the message with contain
+ * @param thickness The thickness of the line in metres
+ * @param name The name of the line segment
+ *
+ * @return an SSL_FieldLineSegment representing the given segment with the
+ * given thickness
  */
 std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segment, float thickness, const std::string& name);
 
 /**
+ * Creates an SSL_FieldCircularArc proto message
  *
- * @param circle
- * @param thickness
- * @param name
- * @return
+ * @pre thickness must be >= 0
+ *
+ * @throws std::invalid_argument if thickness < 0
+ *
+ * @param circle The circle to represent in the message
+ * @param thickness The thickness of the arc in metres
+ * @param name The aname of the arc
+ *
+ * @return an SSL_FieldCircularArc representing the given circle with the
+ * given thickness
  */
 std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, float thickness, const std::string& name);
 

@@ -32,7 +32,7 @@ std::unique_ptr<Vector2f> createVector2f(const Point& point) {
 
 std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segment, const float thickness, const std::string& name) {
     if(thickness < 0) {
-        LOG(FATAL) << "Creating SSL_FieldLineSegment with negative thickness";
+        throw std::invalid_argument("SSL_FieldLineSegment thickness must be >= 0");
     }
 
     auto field_line_segment = std::make_unique<SSL_FieldLineSegment>();
@@ -47,7 +47,7 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segm
 
 std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, float thickness, const std::string& name) {
     if(thickness < 0) {
-        LOG(FATAL) << "Creating SSL_FieldCircularArc with negative thickness";
+        throw std::invalid_argument("SSL_FieldCircularArc thickness must be >= 0");
     }
 
     auto field_circular_arc = std::make_unique<SSL_FieldCircularArc>();
