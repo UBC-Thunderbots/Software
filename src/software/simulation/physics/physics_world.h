@@ -89,9 +89,10 @@ class PhysicsWorld
     void removeBall();
 
     /**
-     * Adds robots to the yellow team with the given initial states. The robot IDs must
-     * not be duplicated and must not match the ID of any robot already on the yellow
-     * team.
+     * Adds robots to the yellow team with the given initial states.
+     *
+     * @pre The robot IDs must not be duplicated and must not match the ID
+     * of any robot already on the yellow team.
      *
      * @throws runtime_error if any of the given robot ids are duplicated, or a
      * yellow robot already exists with the ID
@@ -101,9 +102,10 @@ class PhysicsWorld
     void addYellowRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Adds robots to the yellow team with the given initial states. The robot IDs must
-     * not be duplicated and must not match the ID of any robot already on the yellow
-     * team.
+     * Adds robots to the yellow team with the given initial states.
+     *
+     * @pre The robot IDs must not be duplicated and must not match the ID
+     * of any robot already on the blue team.
      *
      * @throws runtime_error if any of the given robot ids are duplicated, or a
      * yellow robot already exists with the ID

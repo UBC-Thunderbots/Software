@@ -34,7 +34,7 @@ const std::vector<RobotStateWithId> PhysicsWorld::getRobotStates(
         case TeamColour::BLUE:
             physics_robots = blue_physics_robots;
             break;
-        case TeamColour ::YELLOW:
+        case TeamColour::YELLOW:
             physics_robots = yellow_physics_robots;
             break;
     }
