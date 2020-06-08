@@ -68,7 +68,7 @@ TEST(Polynomial1dTest, constructor_from_list_constraints_two_inputs_equal)
 
 TEST(TestSpline, test_polynomial_linear_constructor)
 {
-    Polynomial1d p({{2.0,3.0}, {6.0, 4.0}});
+    Polynomial1d p({{2.0, 3.0}, {6.0, 4.0}});
     EXPECT_EQ(1, p.getOrder());
     EXPECT_EQ(p.getCoeff(0), 2.5);
     EXPECT_EQ(p.getCoeff(1), 0.25);
