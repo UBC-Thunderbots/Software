@@ -23,6 +23,22 @@ class CircularBufferTest : public testing::Test
     CircularBuffer_t* circular_buffer;
 };
 
+class CircularBufferTestInitZero : public testing::Test
+{
+   protected:
+    virtual void SetUp(void)
+    {
+        circular_buffer = circular_buffer_create(0);
+    }
+
+    virtual void TearDown(void)
+    {
+        circular_buffer_destroy(circular_buffer);
+    }
+
+    CircularBuffer_t* circular_buffer;
+};
+
 TEST_F(CircularBufferTest, circular_buffer_exact_full)
 {
     float mock_data[]     = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
@@ -35,7 +51,7 @@ TEST_F(CircularBufferTest, circular_buffer_exact_full)
         circular_buffer_push(circular_buffer, mock_data[i]);
     }
 
-    EXPECT_EQ(true, circular_buffer_isFull(circular_buffer));
+    EXPECT_TRUE(circular_buffer_isFull(circular_buffer));
 
     for (int i = 0; i < mock_data_size; i++)
     {
@@ -57,7 +73,7 @@ TEST_F(CircularBufferTest, circular_buffer_overfill)
         circular_buffer_push(circular_buffer, mock_data[i]);
     }
 
-    EXPECT_EQ(true, circular_buffer_isFull(circular_buffer));
+    EXPECT_TRUE(circular_buffer_isFull(circular_buffer));
 
     for (int i = 0; i < expected_data_size; i++)
     {
@@ -77,12 +93,30 @@ TEST_F(CircularBufferTest, circular_buffer_not_full)
         circular_buffer_push(circular_buffer, mock_data[i]);
     }
 
-    EXPECT_EQ(false, circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isEmpty(circular_buffer));
 
     for (int i = 0; i < mock_data_size; i++)
     {
         EXPECT_EQ(expected_data[i], circular_buffer_getAtIndex(circular_buffer, i));
     }
+}
+
+TEST_F(CircularBufferTestInitZero, circular_buffer_init_zero)
+{
+    float mock_data[]   = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+    float expected_data = 10.0;
+    int mock_data_size  = sizeof(mock_data) / sizeof(mock_data[0]);
+
+    // Populate circular buffer with mock data
+    for (int i = 0; i < mock_data_size; i++)
+    {
+        circular_buffer_push(circular_buffer, mock_data[i]);
+    }
+
+    EXPECT_TRUE(circular_buffer_isFull(circular_buffer));
+
+    EXPECT_EQ(expected_data, circular_buffer_getAtIndex(circular_buffer, 0));
 }
 
 TEST_F(CircularBufferTest, circular_buffer_get_at_index_larger_buffer_size)
@@ -96,7 +130,8 @@ TEST_F(CircularBufferTest, circular_buffer_get_at_index_larger_buffer_size)
         circular_buffer_push(circular_buffer, mock_data[i]);
     }
 
-    EXPECT_EQ(false, circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isEmpty(circular_buffer));
 
     ASSERT_DEATH(circular_buffer_getAtIndex(circular_buffer, 12);
                  , "index <= cbuffer->max_size");
@@ -113,7 +148,8 @@ TEST_F(CircularBufferTest, circular_buffer_get_at_index_unpopulated_not_full)
         circular_buffer_push(circular_buffer, mock_data[i]);
     }
 
-    EXPECT_EQ(false, circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isEmpty(circular_buffer));
 
     ASSERT_DEATH(circular_buffer_getAtIndex(circular_buffer, 5);
                  , "circular_buffer_isFull(cbuffer) == true || index <= cbuffer->head");
@@ -131,7 +167,8 @@ TEST_F(CircularBufferTest, circular_buffer_front_exact_full)
         circular_buffer_push(circular_buffer, mock_data[i]);
     }
 
-    EXPECT_EQ(true, circular_buffer_isFull(circular_buffer));
+    EXPECT_TRUE(circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isEmpty(circular_buffer));
 
     EXPECT_EQ(expected_data, circular_buffer_front(circular_buffer));
 }
@@ -149,7 +186,8 @@ TEST_F(CircularBufferTest, circular_buffer_front_overfill)
         circular_buffer_push(circular_buffer, mock_data[i]);
     }
 
-    EXPECT_EQ(true, circular_buffer_isFull(circular_buffer));
+    EXPECT_TRUE(circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isEmpty(circular_buffer));
 
     EXPECT_EQ(expected_data, circular_buffer_front(circular_buffer));
 }
@@ -164,16 +202,19 @@ TEST_F(CircularBufferTest, circular_buffer_front_not_full)
     for (int i = 0; i < mock_data_size; i++)
     {
         circular_buffer_push(circular_buffer, mock_data[i]);
+        EXPECT_FALSE(circular_buffer_isFull(circular_buffer));
     }
 
-    EXPECT_EQ(false, circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isEmpty(circular_buffer));
 
     EXPECT_EQ(expected_data, circular_buffer_front(circular_buffer));
 }
 
 TEST_F(CircularBufferTest, circular_buffer_front_empty)
 {
-    EXPECT_EQ(false, circular_buffer_isFull(circular_buffer));
+    EXPECT_FALSE(circular_buffer_isFull(circular_buffer));
+    EXPECT_TRUE(circular_buffer_isEmpty(circular_buffer));
 
     ASSERT_DEATH(circular_buffer_front(circular_buffer);
                  , "circular_buffer_isFull(cbuffer) == true || cbuffer->head > 0");

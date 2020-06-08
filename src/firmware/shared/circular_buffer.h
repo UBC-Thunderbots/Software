@@ -11,6 +11,8 @@ typedef struct CircularBuffer CircularBuffer_t;
  * Initialize the circular_buffer struct members
  * @param  size Size of the circular_buffer to set
  *
+ * NOTE: If `size` is 0, it will be set to 1 to create a valid circular_buffer
+ *
  * @return A pointer to the created circular_buffer, ownership is given to the caller
  */
 CircularBuffer_t *circular_buffer_create(size_t size);
@@ -62,3 +64,11 @@ float circular_buffer_front(CircularBuffer_t *cbuffer);
  * @return A boolean indicating if the circular_buffer is full
  */
 bool circular_buffer_isFull(CircularBuffer_t *cbuffer);
+
+/**
+ * Return if the circular_buffer is empty
+ * @param  cbuffer The circular_buffer
+ *
+ * @return A boolean indicating if the circular_buffer is empty
+ */
+bool circular_buffer_isEmpty(CircularBuffer_t *cbuffer);
