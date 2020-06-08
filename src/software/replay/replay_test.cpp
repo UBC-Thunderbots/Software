@@ -25,18 +25,18 @@ class ReplayTest : public ::testing::Test
 };
 
 // hahaha test subject because it's a subject but also a test subject
-class TestSubject : public Subject<TbotsSensorProto>
+class TestSubject : public Subject<SensorMsg>
 {
    public:
-    void sendValue(TbotsSensorProto val)
+    void sendValue(SensorMsg val)
     {
         sendValueToObservers(val);
     }
 };
 
-TbotsSensorProto generateTestFrame(int value)
+SensorMsg generateTestFrame(int value)
 {
-    TbotsSensorProto test_frame = TbotsSensorProto::default_instance();
+    SensorMsg test_frame = SensorMsg::default_instance();
     SSL_DetectionBall test_ball = SSL_DetectionBall::default_instance();
     test_ball.set_area(value);
     test_ball.set_confidence(0.5);
@@ -45,20 +45,20 @@ TbotsSensorProto generateTestFrame(int value)
     test_ball.set_x(123);
     test_ball.set_y(456);
     test_ball.set_z(789);
-    *test_frame.mutable_ssl_wrapperpacket() = SSL_WrapperPacket::default_instance();
-    test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->mutable_balls()->Add(
+    *test_frame.mutable_ssl_vision_msg() = SSL_WrapperPacket::default_instance();
+    test_frame.mutable_ssl_vision_msg()->mutable_detection()->mutable_balls()->Add(
         dynamic_cast<SSL_DetectionBall&&>(test_ball));
-    test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_frame_number(value);
-    test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_t_capture(value);
-    test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_t_sent(value);
-    test_frame.mutable_ssl_wrapperpacket()->mutable_detection()->set_camera_id(value);
-    assert(test_frame.has_ssl_wrapperpacket());
+    test_frame.mutable_ssl_vision_msg()->mutable_detection()->set_frame_number(value);
+    test_frame.mutable_ssl_vision_msg()->mutable_detection()->set_t_capture(value);
+    test_frame.mutable_ssl_vision_msg()->mutable_detection()->set_t_sent(value);
+    test_frame.mutable_ssl_vision_msg()->mutable_detection()->set_camera_id(value);
+    assert(test_frame.has_ssl_vision_msg());
     return test_frame;
 }
 
 TEST_F(ReplayTest, test_single_segment_single_message)
 {
-    TbotsSensorProto test_frame = generateTestFrame(5);
+    SensorMsg test_frame = generateTestFrame(5);
 
     {
         TestSubject subject;
@@ -74,9 +74,9 @@ TEST_F(ReplayTest, test_single_segment_single_message)
         auto frame = reader.getNextFrame();
         if (!frame)
             FAIL();
-        EXPECT_TRUE(frame->has_ssl_wrapperpacket());
+        EXPECT_TRUE(frame->has_ssl_vision_msg());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
-            test_frame.ssl_wrapperpacket(), frame->ssl_wrapperpacket()));
+            test_frame.ssl_vision_msg(), frame->ssl_vision_msg()));
     }
 }
 
@@ -84,7 +84,7 @@ TEST_F(ReplayTest, test_single_segment_multiple_message)
 {
     constexpr int FRAME_COUNT = 5;
 
-    std::vector<TbotsSensorProto> test_messages;
+    std::vector<SensorMsg> test_messages;
     for (int i = 0; i < FRAME_COUNT; i++)
     {
         test_messages.push_back(generateTestFrame(i));
@@ -108,13 +108,13 @@ TEST_F(ReplayTest, test_single_segment_multiple_message)
         {
             auto actual_message_or_null = reader.getNextFrame();
             if (!actual_message_or_null) {
-                FAIL() << "failed on idx " << expected_message.ssl_wrapperpacket().detection().t_sent();
+                FAIL() << "failed on idx " << expected_message.ssl_vision_msg().detection().t_sent();
             }
-            EXPECT_TRUE(actual_message_or_null->has_ssl_wrapperpacket());
+            EXPECT_TRUE(actual_message_or_null->has_ssl_vision_msg());
             EXPECT_TRUE(
                 google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
-                    expected_message.ssl_wrapperpacket(), actual_message_or_null->ssl_wrapperpacket()));
-            std::cout << "idx " << expected_message.ssl_wrapperpacket().detection().t_sent() << " passed"
+                    expected_message.ssl_vision_msg(), actual_message_or_null->ssl_vision_msg()));
+            std::cout << "idx " << expected_message.ssl_vision_msg().detection().t_sent() << " passed"
                       << std::endl;
         }
     }
@@ -124,7 +124,7 @@ TEST_F(ReplayTest, test_multiple_segment_multiple_message)
 {
     constexpr int FRAME_COUNT = 200;
 
-    std::vector<TbotsSensorProto> test_messages;
+    std::vector<SensorMsg> test_messages;
     for (int i = 0; i < FRAME_COUNT; i++)
     {
         test_messages.push_back(generateTestFrame(i));
@@ -150,10 +150,10 @@ TEST_F(ReplayTest, test_multiple_segment_multiple_message)
             if (!actual_message_or_null)
                 FAIL();
 
-            EXPECT_TRUE(actual_message_or_null->has_ssl_wrapperpacket());
+            EXPECT_TRUE(actual_message_or_null->has_ssl_vision_msg());
             EXPECT_TRUE(google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
-                        expected_message.ssl_wrapperpacket(), actual_message_or_null->ssl_wrapperpacket()));
-            std::cout << "idx " << expected_message.ssl_wrapperpacket().detection().t_sent() << " passed"
+                        expected_message.ssl_vision_msg(), actual_message_or_null->ssl_vision_msg()));
+            std::cout << "idx " << expected_message.ssl_vision_msg().detection().t_sent() << " passed"
                       << std::endl;
         }
     }

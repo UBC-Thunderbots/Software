@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/multithreading:ordered_threaded_observer",
-        "//software/proto:tbots_cc_proto",
+        "//software/proto:sensor_msg_cc_proto",
         "//software/time:timestamp",
         "//software/world",
     ],
@@ -23,7 +23,7 @@ cc_library(
     ],
     deps = [
         "//software/geom",
-        "//software/proto:tbots_cc_proto",
+        "//software/proto:sensor_msg_cc_proto",
         "//software/time:timestamp",
         "//software/world",
     ],
@@ -36,7 +36,7 @@ cc_test(
         "replay_logger",
         "replay_reader",
         "//software/multithreading:subject",
-        "//software/proto:tbots_cc_proto",
+        "//software/proto:sensor_msg_cc_proto",
         "@gtest//:gtest_main",
     ],
 )

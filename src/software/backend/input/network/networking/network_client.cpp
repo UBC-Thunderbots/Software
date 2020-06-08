@@ -90,8 +90,8 @@ NetworkClient::~NetworkClient()
 
 void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
 {
-    TbotsSensorProto frame;
-    *frame.mutable_ssl_wrapperpacket() = packet;
+    SensorMsg frame;
+    *frame.mutable_ssl_vision_msg() = packet;
     sendValueToObservers(frame);
     // We analyze the first 60 packets we receive to find the "real" starting time.
     // The real starting time is the smaller value of the ones we receive
@@ -196,8 +196,8 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    TbotsSensorProto frame;
-    *frame.mutable_referee() = packet;
+    SensorMsg frame;
+    *frame.mutable_ssl_refbox_msg() = packet;
     sendValueToObservers(frame);
     RefboxGameState game_state = network_filter.getRefboxGameState(packet);
     world.updateRefboxGameState(game_state);

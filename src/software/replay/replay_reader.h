@@ -2,12 +2,12 @@
 #include <experimental/filesystem>
 
 #include "software/proto/tbots_replay.pb.h"
-#include "software/proto/tbots_sensor_proto.pb.h"
+#include "software/proto/sensor_msg.pb.h"
 
 class ReplayReader {
    public:
     explicit ReplayReader(const std::string& _replay_dir);
-    std::optional<TbotsSensorProto> getNextFrame();
+    std::optional<SensorMsg> getNextFrame();
    private:
     void nextChunk();
     size_t cur_chunk_idx;

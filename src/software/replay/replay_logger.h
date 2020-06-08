@@ -1,11 +1,11 @@
 #pragma once
 #include <experimental/filesystem>
 #include "software/multithreading/ordered_threaded_observer.h"
-#include "software/proto/tbots_sensor_proto.pb.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/proto/tbots_replay.pb.h"
 
 
-class ReplayLogger : public OrderedThreadedObserver<TbotsSensorProto>
+class ReplayLogger : public OrderedThreadedObserver<SensorMsg>
 {
    public:
     explicit ReplayLogger(const std::string& output_directory,
@@ -13,7 +13,7 @@ class ReplayLogger : public OrderedThreadedObserver<TbotsSensorProto>
     ReplayLogger(const ReplayLogger&) = delete;
     ~ReplayLogger() override;
    private:
-    void onValueReceived(TbotsSensorProto frame) override;
+    void onValueReceived(SensorMsg frame) override;
     void nextChunk();
     void saveCurrentChunk();
 

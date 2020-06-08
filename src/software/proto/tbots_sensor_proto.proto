@@ -1,9 +1,0 @@
-syntax = 'proto2';
-
-import "software/proto/ssl_referee.proto";
-import "software/proto/messages_robocup_ssl_wrapper.proto";
-
-// this is just a placeholder until the real sensorproto is introduced
-message TbotsSensorProto {
-    optional SSL_WrapperPacket ssl_wrapperpacket = 1;
-}

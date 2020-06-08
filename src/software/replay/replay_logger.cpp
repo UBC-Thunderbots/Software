@@ -44,9 +44,9 @@ ReplayLogger::~ReplayLogger() {
 }
 
 
-void ReplayLogger::onValueReceived(TbotsSensorProto frame)
+void ReplayLogger::onValueReceived(SensorMsg frame)
 {
-    current_chunk.mutable_replay_frames()->Add(dynamic_cast<TbotsSensorProto &&>(frame));
+    current_chunk.mutable_replay_frames()->Add(dynamic_cast<SensorMsg &&>(frame));
     LOG(INFO) << "Logging to chunk " << current_chunk_idx;
     if (current_chunk.replay_frames_size() >= frames_per_chunk) {
         saveCurrentChunk();

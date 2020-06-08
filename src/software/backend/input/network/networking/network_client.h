@@ -9,7 +9,7 @@
 #include "software/parameter/config.hpp"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/proto/tbots_sensor_proto.pb.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/multithreading/subject.h"
 #include "software/world/world.h"
 
@@ -20,7 +20,7 @@
  * member functions rather than large lambda functions. Overall, this helps keep our
  * main.cpp file shorter and more readable.
  */
-class NetworkClient : public Subject<TbotsSensorProto>
+class NetworkClient : public Subject<SensorMsg>
 {
    public:
     /**

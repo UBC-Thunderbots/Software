@@ -31,6 +31,7 @@ proto_library(
     name = "sensor_msg_proto",
     srcs = [
         "sensor_msg.proto",
+        "tbots_replay.proto",
     ],
     visibility = ["//visibility:private"],
     deps = [
@@ -50,6 +51,6 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "tbots_cc_proto",
-    deps = [":tbots_proto"],
+    name = "sensor_msg_cc_proto",
+    deps = [":sensor_msg_proto"],
 )

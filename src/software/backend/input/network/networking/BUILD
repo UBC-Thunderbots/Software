@@ -51,8 +51,8 @@ cc_library(
         "//software/logger",
         "//software/multithreading:subject",
         "//software/parameter:dynamic_parameters",
+        "//software/proto:sensor_msg_cc_proto",
         "//software/proto:ssl_cc_proto",
-        "//software/proto:tbots_cc_proto",
         "//software/world",
     ],
 )

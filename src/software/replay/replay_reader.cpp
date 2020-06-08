@@ -52,7 +52,7 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     cur_chunk.ParseFromIstream(&cur_chunk_ifstream);
 }
 
-std::optional<TbotsSensorProto> ReplayReader::getNextFrame()
+std::optional<SensorMsg> ReplayReader::getNextFrame()
 {
     if (cur_frame_idx >= cur_chunk.replay_frames_size()) {
         try {
