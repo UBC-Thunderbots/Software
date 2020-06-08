@@ -36,3 +36,12 @@ cc_library(
         "//shared:constants",
     ],
 )
+
+cc_test(
+    name = "circular_buffer_test",
+    srcs = ["circular_buffer_test.cpp"],
+    deps = [
+        ":circular_buffer",
+        "@gtest//:gtest_main",
+    ],
+)
