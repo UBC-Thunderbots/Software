@@ -24,6 +24,12 @@ CircularBuffer_t *circular_buffer_create(size_t size)
     return new_cbuffer;
 }
 
+void circular_buffer_destroy(CircularBuffer_t *cbuffer)
+{
+    free(cbuffer->buffer_data);
+    free(cbuffer);
+}
+
 void circular_buffer_push(CircularBuffer_t *cbuffer, float data)
 {
     cbuffer->buffer_data[cbuffer->head] = data;

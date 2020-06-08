@@ -15,6 +15,11 @@ class CircularBufferTest : public testing::Test
         circular_buffer = circular_buffer_create(10);
     }
 
+    virtual void TearDown(void)
+    {
+        circular_buffer_destroy(circular_buffer);
+    }
+
     CircularBuffer_t* circular_buffer;
 };
 

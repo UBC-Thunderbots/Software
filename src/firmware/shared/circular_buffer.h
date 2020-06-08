@@ -16,6 +16,13 @@ typedef struct CircularBuffer CircularBuffer_t;
 CircularBuffer_t *circular_buffer_create(size_t size);
 
 /**
+ * Destroy the circular_buffer, freeing any memory allocated for it
+ *
+ * @param  cbuffer The circular_buffer to destroy
+ */
+void circular_buffer_destroy(CircularBuffer_t *cbuffer);
+
+/**
  * Push data into the circular_buffer
  * If full, will overwrite the oldest value
  * @param  cbuffer The circular_buffer
