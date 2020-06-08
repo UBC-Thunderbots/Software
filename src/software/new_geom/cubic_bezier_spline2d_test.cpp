@@ -168,27 +168,6 @@ TEST_F(CubicBezierSplineTest, check_control_points_no_intermediate_knots)
     EXPECT_EQ(expected_control_points, spline.getControlPoints());
 }
 
-TEST_F(CubicBezierSplineTest, check_control_points_single_intermediate_knot)
-{
-    // TODO: ascii art here? This is effectively the first example from
-    //       https://www.ibiblio.org/e-notes/Splines/b-int.html, at least want to
-    //       link to this example
-
-    Point p_0(0, 0);
-    Point p_1(1, 0);
-    Point p_2(1.5, -1.5);
-    Vector d_0(0.4, 0.4);
-    Vector d_2(0.1, -0.1);
-    Vector d_1 = (p_2 - p_0 - d_2 - d_0) / 4.0;
-
-    CubicBezierSpline2d spline(p_0, d_0, p_2, d_2, {p_1});
-
-    std::vector<Point> expected_control_points = {p_0,       p_0 + d_0, p_1 - d_1,
-                                                  p_1 + d_1, p_2 - d_2, p_2};
-
-    EXPECT_EQ(expected_control_points, spline.getControlPoints());
-}
-
 TEST_F(CubicBezierSplineTest, getControlPoints_no_intermediate_knots)
 {
     CubicBezierSpline2d spline(Point(0, 0), Vector(0, 1), Point(2, 0), Vector(1, 0), {});
@@ -197,6 +176,28 @@ TEST_F(CubicBezierSplineTest, getControlPoints_no_intermediate_knots)
                                                   Point(2, 0)};
     EXPECT_EQ(expected_control_points, spline.getControlPoints());
 }
+
+TEST_F(CubicBezierSplineTest, getControlPoints_single_intermediate_knot)
+{
+    // TODO: ascii art here? This is effectively the first example from
+    //       https://www.ibiblio.org/e-notes/Splines/b-int.html, at least want to
+    //       link to this example
+
+    Point p0(0, 0);
+    Point p1(1, 0);
+    Point p2(1.5, -1.5);
+    Vector d0(0.4, 0.4);
+    Vector d2(0.1, -0.1);
+    Vector d1 = (p2 - p0 - d2 - d0) / 4.0;
+
+    CubicBezierSpline2d spline(p0, d0, p2, d2, {p1});
+
+    std::vector<Point> expected_control_points = {p0,        p0 + d0,  p1 - d1,
+                                                  p1 + d1, p2 - d2, p2};
+
+    EXPECT_EQ(expected_control_points, spline.getControlPoints());
+}
+
 
 TEST_F(CubicBezierSplineTest, getSplineSegments_no_intermediate_knots)
 {
@@ -215,8 +216,12 @@ TEST_F(CubicBezierSplineTest, getSplineSegments_no_intermediate_knots)
     EXPECT_EQ(BezierCurve2d({p0, p1, p2, p3}), spline_segments[0]);
 }
 
-TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot)
+TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot_simple_case)
 {
+    // This spline is symmetric which makes it easy to figure out what our
+    // expected control points for the bezier curve representations of both segments
+    // should be
+
     const Point p0(0, 0);
     const Point p1(0, 1);
     const Point p2(1, 1);
@@ -236,4 +241,30 @@ TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot)
     EXPECT_EQ(BezierCurve2d({p3, p4, p5, p6}), spline_segments[1]);
 }
 
-// TODO: more complex example
+TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot_complex_case)
+{
+    // TODO: ascii art here? This is effectively the first example from
+    //       https://www.ibiblio.org/e-notes/Splines/b-int.html, at least want to
+    //       link to this example
+
+    Point p0(0, 0);
+    Point p1(1, 0);
+    Point p2(1.5, -1.5);
+    Vector d0(0.4, 0.4);
+    Vector d2(0.1, -0.1);
+    Vector d1 = (p2 - p0 - d2 - d0) / 4.0;
+
+    CubicBezierSpline2d spline(p0, d0, p2, d2, {p1});
+
+    std::vector<Point> expected_control_points = {p0,        p0 + d0,  p1 - d1,
+                                                  p1 + d1, p2 - d2, p2};
+
+    // TODO: rename `getSplineSegments` to just `getSegments`
+    auto spline_segments = spline.getSplineSegments();
+
+    ASSERT_EQ(2, spline_segments.size());
+
+    EXPECT_EQ(BezierCurve2d({p0, p0 + d0, p1 - d1, p1}), spline_segments[0]);
+    EXPECT_EQ(BezierCurve2d({p1, p1 + d1, p2 - d2, p2}), spline_segments[1]);
+}
+
