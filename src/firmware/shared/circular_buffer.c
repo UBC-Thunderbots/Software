@@ -8,7 +8,7 @@ struct CircularBuffer
     int tail;
     size_t max_size;
     float *buffer_data;
-    bool isFull;
+    bool is_full;
 };
 
 CircularBuffer_t *circular_buffer_create(size_t size)
@@ -19,7 +19,7 @@ CircularBuffer_t *circular_buffer_create(size_t size)
     new_cbuffer->tail        = 0;
     new_cbuffer->max_size    = size;
     new_cbuffer->buffer_data = (float *)malloc(sizeof(float) * new_cbuffer->max_size);
-    new_cbuffer->isFull      = false;
+    new_cbuffer->is_full     = false;
 
     return new_cbuffer;
 }
@@ -36,14 +36,14 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data)
     // Implementation assumes head and tail are equal when full
     if (cbuffer->head == cbuffer->tail)
     {
-        cbuffer->isFull = true;
+        cbuffer->is_full = true;
     }
 }
 
 float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, uint8_t index)
 {
-    // Check if index is less than or equal to 0
-    assert(index > 0);
+    // Check if index is less than 0
+    assert(index > -1);
 
     // Check if index is larger than the maximum buffer size
     assert(index <= cbuffer->max_size);
@@ -51,18 +51,27 @@ float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, uint8_t index)
     // Check if enough items are in the buffer for index
     assert(circular_buffer_isFull(cbuffer) == true || index <= cbuffer->head);
 
-    int requestedIndex = (cbuffer->head % cbuffer->max_size) - index;
+    int requested_index = (cbuffer->head % cbuffer->max_size) - index - 1;
 
     // Check if requestedIndex needs to be looped
-    if (requestedIndex < 0)
+    if (requested_index < 0)
     {
-        requestedIndex = cbuffer->max_size + requestedIndex;
+        requested_index = cbuffer->max_size + requested_index;
     }
-    float res = cbuffer->buffer_data[requestedIndex];
+    float res = cbuffer->buffer_data[requested_index];
+    return res;
+}
+
+float circular_buffer_front(CircularBuffer_t *cbuffer)
+{
+    // Check if buffer is empty
+    assert(circular_buffer_isFull(cbuffer) == true || cbuffer->head > 0);
+
+    float res = circular_buffer_getAtIndex(cbuffer, 0);
     return res;
 }
 
 bool circular_buffer_isFull(CircularBuffer_t *cbuffer)
 {
-    return cbuffer->isFull;
+    return cbuffer->is_full;
 }

@@ -24,9 +24,9 @@ CircularBuffer_t *circular_buffer_create(size_t size);
 void circular_buffer_push(CircularBuffer_t *cbuffer, float data);
 
 /**
- * Retrieve the most recent value in the circular_buffer
+ * Retrieve a relative recent value in the circular_buffer
  * The index is relative to the most recent value in the buffer.
- * Eg. 1 is the most recent value, 2 is the second most recent, etc
+ * Eg. 0 is the most recent value, 1 is the second most recent, etc
  *
  * NOTE: `index` must be less than the max_size of the circular_buffer
  *
@@ -36,6 +36,17 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data);
  * @return Data at the index of the most recent value
  */
 float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, uint8_t index);
+
+/**
+ * Retrieve the most recent value in the circular_buffer
+ *
+ * NOTE: At least one item must be in the circular_buffer
+ *
+ * @param  cbuffer The circular_buffer
+ *
+ * @return The most recent value
+ */
+float circular_buffer_front(CircularBuffer_t *cbuffer);
 
 /**
  * Return if the circular_buffer is full
