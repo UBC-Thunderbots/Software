@@ -22,7 +22,7 @@ cd $OPENOCD_TMP_DIR
 
 # Set permissions to allow this user to access USB devices
 sudo cp contrib/60-openocd.rules /etc/udev/rules.d/
-sudo adduser $USER plugdev
+sudo adduser "$USER" plugdev
 
 # Build and Install Openocd
 ./bootstrap
@@ -32,4 +32,6 @@ sudo make install
 
 echo "================================================================"
 echo "Done Installing OpenOCD"
+echo ""
+echo "Make sure to logout or restart your computer for permissions changes to take effect!"
 echo "================================================================"

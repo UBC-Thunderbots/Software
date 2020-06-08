@@ -128,8 +128,8 @@ World Simulator::getWorld()
         enemy_team_robots.emplace_back(robot);
     }
 
-    Team friendly_team(Duration::fromSeconds(0.5), friendly_team_robots);
-    Team enemy_team(Duration::fromSeconds(0.5), enemy_team_robots);
+    Team friendly_team(friendly_team_robots, Duration::fromSeconds(0.5));
+    Team enemy_team(enemy_team_robots, Duration::fromSeconds(0.5));
 
     World world(physics_world.getField(), ball, friendly_team, enemy_team);
 

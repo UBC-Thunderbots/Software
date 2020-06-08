@@ -34,6 +34,22 @@ class Polygon : public virtual Shape
     bool contains(const Point& p) const override;
 
     /**
+     * Returns the centroid of this polygon
+     *
+     * @return The centroid of this polygon
+     */
+    Point centroid() const;
+
+    /**
+     * Returns the Polygon expanded in the direction of expansion_vector
+     * The Polygon is split in half perpendicular to expansion_vector and points on
+     * the half that expansion_vector is pointing are translated by expansion_vector
+     *
+     * @return a Polygon expanded in the direction of expansion_vector
+     */
+    Polygon expand(const Vector& expansion_vector) const;
+
+    /**
      * Returns the line segments that form this polygon.
      * @return the line segments that form this polygon.
      */

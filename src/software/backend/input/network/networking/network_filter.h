@@ -28,26 +28,26 @@ class NetworkFilter
 
     /**
      * Filters the ball data contained in the list of DetectionFrames and returns the most
-     * up to date state of the ball
+     * up to date state of the ball if available
      *
      * @param detections A list of new DetectionFrames containing ball data
      *
      * @return The most up to date state of the ball given the new DetectionFrame
      * information
      */
-    TimestampedBallState getFilteredBallData(
+    std::optional<TimestampedBallState> getFilteredBallData(
         const std::vector<SSL_DetectionFrame> &detections);
 
     /**
      * Returns a new Field object containing the most up to date state of the field given
-     * the new GeometryData information
+     * the new GeometryData information if available
      *
      * @param geometry_packet The SSL_GeometryData packet containing new field data
      *
      * @return a Field object containing the most up to date state of the field given the
      * new GeometryData information
      */
-    Field getFieldData(const SSL_GeometryData &geometry_packet);
+    std::optional<Field> getFieldData(const SSL_GeometryData &geometry_packet);
 
     /**
      * Filters the robot data for the friendly team contained in the list of
@@ -89,7 +89,7 @@ class NetworkFilter
     // Objects used to aggregate and store state. We use these to aggregate the state
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
-    Field field_state;
+    std::optional<Field> field_state;
     TimestampedBallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;

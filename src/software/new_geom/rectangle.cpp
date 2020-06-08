@@ -54,6 +54,23 @@ Point Rectangle::posXNegYCorner() const
     return points_[3];
 }
 
+double Rectangle::xMax() const
+{
+    return posXPosYCorner().x();
+}
+double Rectangle::xMin() const
+{
+    return negXNegYCorner().x();
+}
+double Rectangle::yMax() const
+{
+    return posXPosYCorner().y();
+}
+double Rectangle::yMin() const
+{
+    return negXNegYCorner().y();
+}
+
 bool Rectangle::contains(const Point &p) const
 {
     return p.x() >= negXNegYCorner().x() && p.y() >= negXNegYCorner().y() &&

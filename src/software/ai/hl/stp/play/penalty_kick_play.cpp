@@ -26,7 +26,8 @@ bool PenaltyKickPlay::invariantHolds(const World &world) const
            !world.gameState().isHalted();
 }
 
-void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>(
         world.ball(), world.field(), world.enemyTeam().goalie(), true);

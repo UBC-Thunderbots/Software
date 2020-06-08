@@ -39,7 +39,8 @@ bool ShootOrChipPlay::invariantHolds(const World &world) const
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
-void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     /**
      * Our general strategy here is:

@@ -283,6 +283,7 @@ cc_test(
     ],
     deps = [
         ":polygon",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

@@ -41,7 +41,7 @@ bool FreeKickPlay::invariantHolds(const World &world) const
             Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
-void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     /**
      * This play is basically:
@@ -102,8 +102,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic);
-        updatePassGenerator(pass_generator);
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updatePassGenerator(pass_generator, world);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -120,8 +120,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Aligning to ball";
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        updatePassGenerator(pass_generator);
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updatePassGenerator(pass_generator, world);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -143,7 +143,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
     shootOrFindPassStage(yield, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                          cherry_pick_tactic_2, crease_defender_tactics, goalie_tactic,
-                         pass_generator, best_pass_and_score_so_far);
+                         pass_generator, best_pass_and_score_so_far, world);
 
     if (shoot_tactic->done())
     {
@@ -152,7 +152,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     else if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
         performPassStage(yield, crease_defender_tactics, goalie_tactic,
-                         best_pass_and_score_so_far);
+                         best_pass_and_score_so_far, world);
     }
     else
     {
@@ -160,7 +160,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                    << " which is below our threshold of" << MIN_ACCEPTABLE_PASS_SCORE
                    << ", so chipping at enemy net";
 
-        chipAtGoalStage(yield, crease_defender_tactics, goalie_tactic);
+        chipAtGoalStage(yield, crease_defender_tactics, goalie_tactic, world);
     }
 
 
@@ -168,7 +168,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 void FreeKickPlay::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic, const World &world)
 {
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
@@ -179,7 +179,7 @@ void FreeKickPlay::updateAlignToBallTactic(
         ball_to_center_vec.orientation(), 0);
 }
 
-void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
+void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator, const World &world)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());
@@ -188,7 +188,7 @@ void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
 void FreeKickPlay::chipAtGoalStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-    std::shared_ptr<GoalieTactic> goalie_tactic)
+    std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
 {
     auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), false);
 
@@ -214,7 +214,7 @@ void FreeKickPlay::performPassStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic,
-    PassWithRating best_pass_and_score_so_far)
+    PassWithRating best_pass_and_score_so_far, const World &world)
 {
     // Commit to a pass
     Pass pass = best_pass_and_score_so_far.pass;
@@ -247,7 +247,7 @@ void FreeKickPlay::shootOrFindPassStage(
     std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic, PassGenerator &pass_generator,
-    PassWithRating &best_pass_and_score_so_far)
+    PassWithRating &best_pass_and_score_so_far, const World &world)
 {
     // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
@@ -256,8 +256,8 @@ void FreeKickPlay::shootOrFindPassStage(
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        updatePassGenerator(pass_generator);
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updatePassGenerator(pass_generator, world);
 
         yield({goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),

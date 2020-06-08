@@ -32,7 +32,7 @@ class STPTest : public ::testing::Test
     }
 
     STP stp;
-    World world;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 };
 
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
