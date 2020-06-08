@@ -142,9 +142,9 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @param coord Coordinate to consider
      *
-     * @return true if cell is valid
+     * @return true if cell is navigable
      */
-    bool isCoordValid(const Coordinate &coord) const;
+    bool isCoordNavigable(const Coordinate &coord) const;
 
     /**
      * Returns if a cell is unblocked
@@ -210,7 +210,7 @@ class ThetaStarPathPlanner : public PathPlanner
     std::optional<Coordinate> findClosestUnblockedCell(const Coordinate &current_cell);
 
     /**
-     * Finds closest valid point that's not in an obstacle to p
+     * Finds closest navigable point that's not in an obstacle to p
      *
      * @param p     a given point
      *
@@ -220,22 +220,22 @@ class ThetaStarPathPlanner : public PathPlanner
     Point findClosestFreePoint(const Point &p);
 
     /**
-     * Checks if a point is valid and doesn't exist in any obstacles
+     * Checks if a point is navigable and doesn't exist in any obstacles
      *
      * @param p     a given point
      *
-     * @return      if p is valid and isn't in an obstacle
+     * @return      if p is navigable and isn't in an obstacle
      * */
-    bool isPointValidAndFreeOfObstacles(const Point &p);
+    bool isPointNavigableAndFreeOfObstacles(const Point &p);
 
     /**
-     * Checks if a point is valid
+     * Checks if a point is navigable
      *
      * @param p     a given point
      *
-     * @return      if p is valid
+     * @return      if p is navigable
      * */
-    bool isPointValid(const Point &p) const;
+    bool isPointNavigable(const Point &p) const;
 
     /**
      * Converts a cell in grid to a point on navigable area
@@ -276,7 +276,7 @@ class ThetaStarPathPlanner : public PathPlanner
     bool visitSuccessors(const Coordinate &current_coord, const Coordinate &end_coord);
 
     /**
-     * Check for invalid or blocked start_coord and end_coord and
+     * Check for non-navigable or blocked start_coord and end_coord and
      * adjust parameters accordingly
      *
      * @param [in/out] start_coord source coordinate
@@ -284,7 +284,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if there is no path to end
      */
-    bool checkForInvalidOrBlockedCases(Coordinate &start_coord, Coordinate &end_coord);
+    bool nonNavigableOrBlockedCases(Coordinate &start_coord, Coordinate &end_coord);
 
     /**
      * Check if start to end is at least a grid cell away

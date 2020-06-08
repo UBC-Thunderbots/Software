@@ -113,7 +113,7 @@ std::vector<PlannerTestCase>
 
 
 template <typename PlannerT>
-std::pair<std::string, PathPlannerConstructor> name_and_constructor()
+std::pair<std::string, PathPlannerConstructor> nameAndConstructor()
 {
     return std::pair<std::string, PathPlannerConstructor>(
         typeid(PlannerT).name(), []() { return std::make_unique<PlannerT>(); });
@@ -122,7 +122,7 @@ std::pair<std::string, PathPlannerConstructor> name_and_constructor()
 std::vector<std::pair<std::string, PathPlannerConstructor>>
     path_planner_names_and_constructors = {
         // add path planner constructors here
-        name_and_constructor<ThetaStarPathPlanner>(),
+        nameAndConstructor<ThetaStarPathPlanner>(),
         // uncomment this if you want some tests to fail
         //        name_and_constructor<StraightLinePathPlanner>()
 };

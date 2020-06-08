@@ -14,7 +14,7 @@ ThetaStarPathPlanner::ThetaStarPathPlanner()
 {
 }
 
-bool ThetaStarPathPlanner::isCoordValid(const Coordinate &coord) const
+bool ThetaStarPathPlanner::isCoordNavigable(const Coordinate &coord) const
 {
     // Returns true if row number and column number is in range
     return (coord.row() < num_grid_rows) && (coord.col() < num_grid_cols);
@@ -109,8 +109,8 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(const Coordinate &end) const
 bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordinate &next,
                                         const Coordinate &end, double marginal_dist)
 {
-    // Only process this CellHeuristic if this is a valid one
-    if (isCoordValid(next) == true)
+    // Only process this CellHeuristic if this is a navigable one
+    if (isCoordNavigable(next) == true)
     {
         // If the successor is already on the closed list or if it is blocked, then ignore
         // it.  Else do the following
@@ -174,8 +174,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     Coordinate start_coord = convertPointToCoord(start);
     Coordinate end_coord   = convertPointToCoord(closest_end);
 
-    bool isInvalidOrBlocked = checkForInvalidOrBlockedCases(start_coord, end_coord);
-    if (isInvalidOrBlocked)
+    if (nonNavigableOrBlockedCases(start_coord, end_coord))
     {
         return std::nullopt;
     }
@@ -216,22 +215,22 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     return Path(path_points);
 }
 
-bool ThetaStarPathPlanner::checkForInvalidOrBlockedCases(Coordinate &start_coord,
-                                                         Coordinate &end_coord)
+bool ThetaStarPathPlanner::nonNavigableOrBlockedCases(Coordinate &start_coord,
+                                                      Coordinate &end_coord)
 {
     bool ret_no_path = false;
 
     // If the source is out of range
-    if (isCoordValid(start_coord) == false)
+    if (isCoordNavigable(start_coord) == false)
     {
-        LOG(WARNING) << "Source is not valid; no path found" << std::endl;
+        LOG(WARNING) << "Source is not within navigable area; no path found" << std::endl;
         ret_no_path = true;
     }
 
     // If the end is out of range
-    if (isCoordValid(end_coord) == false)
+    if (isCoordNavigable(end_coord) == false)
     {
-        LOG(WARNING) << "End is not valid; no path found" << std::endl;
+        LOG(WARNING) << "End is not within navigable area; no path found" << std::endl;
         ret_no_path = true;
     }
 
@@ -361,7 +360,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
         i += next_increment[next_index] * depth;
         j += next_increment[curr_index] * depth;
         test_coord = Coordinate(i, j);
-        if (isCoordValid(test_coord) && isUnblocked(test_coord))
+        if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
         {
             return test_coord;
         }
@@ -371,7 +370,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
         i += next_increment[next_index] * depth;
         j += next_increment[curr_index] * depth;
         test_coord = Coordinate(i, j);
-        if (isCoordValid(test_coord) && isUnblocked(test_coord))
+        if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
         {
             return test_coord;
         }
@@ -384,7 +383,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
 Point ThetaStarPathPlanner::findClosestFreePoint(const Point &p)
 {
     // expanding a circle to search for free points
-    if (!isPointValidAndFreeOfObstacles(p))
+    if (!isPointNavigableAndFreeOfObstacles(p))
     {
         int xc = static_cast<int>(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
         int yc = static_cast<int>(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
@@ -407,11 +406,11 @@ Point ThetaStarPathPlanner::findClosestFreePoint(const Point &p)
                                          BLOCKED_DESTINATION_SEARCH_RESOLUTION,
                                      static_cast<double>(yc + inner * x) /
                                          BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-                    if (isPointValidAndFreeOfObstacles(p1))
+                    if (isPointNavigableAndFreeOfObstacles(p1))
                     {
                         return p1;
                     }
-                    if (isPointValidAndFreeOfObstacles(p2))
+                    if (isPointNavigableAndFreeOfObstacles(p2))
                     {
                         return p2;
                     }
@@ -445,11 +444,11 @@ Point ThetaStarPathPlanner::findClosestFreePoint(const Point &p)
                         Point p2 = Point(
                             (xc + outer * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
                             (yc + inner * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-                        if (isPointValidAndFreeOfObstacles(p1))
+                        if (isPointNavigableAndFreeOfObstacles(p1))
                         {
                             return p1;
                         }
-                        if (isPointValidAndFreeOfObstacles(p2))
+                        if (isPointNavigableAndFreeOfObstacles(p2))
                         {
                             return p2;
                         }
@@ -461,9 +460,9 @@ Point ThetaStarPathPlanner::findClosestFreePoint(const Point &p)
     return p;
 }
 
-bool ThetaStarPathPlanner::isPointValidAndFreeOfObstacles(const Point &p)
+bool ThetaStarPathPlanner::isPointNavigableAndFreeOfObstacles(const Point &p)
 {
-    if (!isPointValid(p))
+    if (!isPointNavigable(p))
     {
         return false;
     }
@@ -479,7 +478,7 @@ bool ThetaStarPathPlanner::isPointValidAndFreeOfObstacles(const Point &p)
     return true;
 }
 
-bool ThetaStarPathPlanner::isPointValid(const Point &p) const
+bool ThetaStarPathPlanner::isPointNavigable(const Point &p) const
 {
     return ((p.x() > -max_navigable_x_coord) && (p.x() < max_navigable_x_coord) &&
             (p.y() > -max_navigable_y_coord) && (p.y() < max_navigable_y_coord));
