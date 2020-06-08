@@ -6,8 +6,9 @@
 #include "software/new_geom/rectangle.h"
 #include "software/time/timestamp.h"
 
-Field::Field(double field_x_length, double field_y_length, double defense_x_length, double defense_y_length,
-             double goal_x_length, double goal_y_length, double boundary_buffer_size, double center_circle_radius)
+Field::Field(double field_x_length, double field_y_length, double defense_x_length,
+             double defense_y_length, double goal_x_length, double goal_y_length,
+             double boundary_buffer_size, double center_circle_radius)
     : field_x_length_(field_x_length),
       field_y_length_(field_y_length),
       defense_x_length_(defense_x_length),
@@ -18,8 +19,8 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       center_circle_radius_(center_circle_radius)
 {
     if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
-        defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 || boundary_buffer_size_ <= 0 ||
-        center_circle_radius_ <= 0)
+        defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||
+        boundary_buffer_size_ <= 0 || center_circle_radius_ <= 0)
     {
         throw std::invalid_argument(
             "At least one field dimension is non-positive - Field is invalid");
@@ -250,7 +251,7 @@ bool Field::operator==(const Field &other) const
 {
     return this->field_y_length_ == other.field_y_length_ &&
            this->field_x_length_ == other.field_x_length_ &&
-            this->goal_x_length_ == other.goal_x_length_ &&
+           this->goal_x_length_ == other.goal_x_length_ &&
            this->goal_y_length_ == other.goal_y_length_ &&
            this->defense_y_length_ == other.defense_y_length_ &&
            this->defense_x_length_ == other.defense_x_length_ &&

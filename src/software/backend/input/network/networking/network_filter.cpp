@@ -90,7 +90,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     double field_length   = packet_geometry.field_length() * METERS_PER_MILLIMETER;
     double field_width    = packet_geometry.field_width() * METERS_PER_MILLIMETER;
     double goal_width     = packet_geometry.goal_width() * METERS_PER_MILLIMETER;
-    double goal_depth = packet_geometry.goal_depth() * METERS_PER_MILLIMETER;
+    double goal_depth     = packet_geometry.goal_depth() * METERS_PER_MILLIMETER;
     double boundary_width = packet_geometry.boundary_width() * METERS_PER_MILLIMETER;
     double center_circle_radius =
         ssl_circular_arcs["CenterCircle"].radius() * METERS_PER_MILLIMETER;
@@ -113,8 +113,8 @@ Field NetworkFilter::createFieldFromPacketGeometry(
     double defense_width =
         (defense_width_p1 - defense_width_p2).length() * METERS_PER_MILLIMETER;
 
-    Field field = Field(field_length, field_width, defense_length, defense_width, goal_depth,
-                        goal_width, boundary_width, center_circle_radius);
+    Field field = Field(field_length, field_width, defense_length, defense_width,
+                        goal_depth, goal_width, boundary_width, center_circle_radius);
     return field;
 }
 

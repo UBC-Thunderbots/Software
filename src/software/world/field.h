@@ -54,9 +54,9 @@ class Field
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      */
-    explicit Field(double field_x_length, double field_y_length, double defense_x_length, double defense_y_length,
-                   double goal_x_length, double goal_y_length, double boundary_buffer_size,
-                   double center_circle_radius);
+    explicit Field(double field_x_length, double field_y_length, double defense_x_length,
+                   double defense_y_length, double goal_x_length, double goal_y_length,
+                   double boundary_buffer_size, double center_circle_radius);
 
     /**
      * Gets the x-axis length of the field from goal-line to goal-line in metres.
