@@ -1,54 +1,63 @@
 #include "firmware/shared/circular_buffer.h"
 
-void circular_buffer_init(struct circular_buffer *cbuff)
+#include <assert.h>
+
+struct CircularBuffer
 {
-    cbuff->head   = 0;
-    cbuff->tail   = 0;
-    cbuff->isFull = false;
-    // Initialize buffer size to CIRCULAR_BUFFER_MAX_NUM_ELEMENTS
-    cbuff->bufferData = (float *)malloc(sizeof(float) * CIRCULAR_BUFFER_MAX_NUM_ELEMENTS);
+    int head;
+    int tail;
+    int size;
+    float *bufferData;
+    bool isFull;
+};
+
+CircularBuffer_t *circular_buffer_create(CircularBuffer_t *cbuffer, int size)
+{
+    CircularBuffer_t *new_cbuffer = malloc(sizeof(CircularBuffer_t));
+
+    new_cbuffer->head       = 0;
+    new_cbuffer->tail       = 0;
+    new_cbuffer->size       = size;
+    new_cbuffer->bufferData = (float *)malloc(sizeof(float) * size);
+    new_cbuffer->isFull     = false;
+
+    return new_cbuffer;
 }
 
-void circular_buffer_free(struct circular_buffer *cbuff)
+void circular_buffer_free(CircularBuffer_t *cbuffer)
 {
-    free(cbuff->bufferData);
+    free(cbuffer);
 }
 
-// Note: Implementation assumes head and tail are equal when full
-void circular_buffer_push(struct circular_buffer *cbuff, float data)
+void circular_buffer_push(CircularBuffer_t *cbuffer, float data)
 {
-    cbuff->bufferData[cbuff->head % CIRCULAR_BUFFER_MAX_NUM_ELEMENTS] = data;
-    cbuff->head++;
-    if (cbuff->head > CIRCULAR_BUFFER_MAX_NUM_ELEMENTS)
+    cbuffer->bufferData[cbuffer->head] = data;
+    cbuffer->head                      = (++cbuffer->head) % cbuffer->size;
+    if (cbuffer->isFull == true)
     {
-        cbuff->tail++;
+        cbuffer->tail = (++cbuffer->tail) % cbuffer->size;
     }
-    if (cbuff->head == cbuff->tail)
+
+    // Implementation assumes head and tail are equal when full
+    if (cbuffer->head == cbuffer->tail)
     {
-        cbuff->isFull = true;
+        cbuffer->isFull = true;
     }
 }
 
-// Note: Index is starting from 1 for most recent
-float circular_buffer_get_index(struct circular_buffer *cbuff, int index)
+float circular_buffer_get_index(CircularBuffer_t *cbuffer, int index)
 {
     // Check if index is larger than the maximum buffer size
-    if (index > CIRCULAR_BUFFER_MAX_NUM_ELEMENTS)
-    {
-        return NAN;
-    }
+    assert(index > cbuffer->size);
 
     // Check if enough items are in the buffer for index
-    if (cbuff->isFull == false && index > cbuff->head)
-    {
-        return NAN;
-    }
+    assert(cbuffer->isFull == false && index > cbuffer->head);
 
-    int requestedIndex = (cbuff->head % CIRCULAR_BUFFER_MAX_NUM_ELEMENTS - index);
+    int requestedIndex = (cbuffer->head % cbuffer->size - index);
     if (requestedIndex < 0)
     {
-        requestedIndex = CIRCULAR_BUFFER_MAX_NUM_ELEMENTS + requestedIndex;
+        requestedIndex = cbuffer->size + requestedIndex;
     }
-    float res = cbuff->bufferData[requestedIndex];
+    float res = cbuffer->bufferData[requestedIndex];
     return res;
 }
