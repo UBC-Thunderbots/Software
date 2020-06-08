@@ -6,9 +6,9 @@
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
-// A matcher used to compare RobotStateWitId_t structs with enough tolernace
+// A matcher used to compare RobotStateWitId_t structs with enough tolerance
 // for floating point error introduced by PhysicsWorld and the underlying
-// physics libraru
+// physics library
 MATCHER(RobotStateWithIdEq, "Robot State with Id Equal")
 {
     return ::Test::TestUtil::equalWithinTolerance(::std::get<0>(arg), ::std::get<1>(arg),
