@@ -160,3 +160,9 @@ float dot2D(float vec1[2], float vec2[2])
 {
     return vec1[0] * vec2[0] + vec1[1] * vec2[1];
 }
+
+float shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
+    const float initial_speed, const float displacement, const float acceleration)
+{
+    return (float)sqrt(pow(initial_speed, 2) + 2 * displacement * acceleration);
+}

@@ -12,6 +12,7 @@ cc_library(
     srcs = ["trajectory_planner.c"],
     hdrs = ["trajectory_planner.h"],
     deps = [
+        "//firmware/shared:physics",
         "//firmware/shared/math:polynomial_1d",
         "//firmware/shared/math:polynomial_2d",
         "//firmware/shared/math:tbots_math",

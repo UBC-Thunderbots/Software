@@ -9,6 +9,7 @@
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/tbots_math.h"
+#include "firmware/shared/physics.h"
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
@@ -125,11 +126,13 @@ app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
 
     for (unsigned int i = 1; i < num_segments; i++)
     {
+        const float speed        = trajectory->trajectory_elements[i - 1].linear_speed;
+        const float displacement = segment_lengths[i - 1].linear_segment_length;
+
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
         float temp_vel =
-            (float)sqrt(pow(trajectory->trajectory_elements[i - 1].linear_speed, 2) +
-                        2 * segment_lengths[i - 1].linear_segment_length *
-                            max_allowable_acceleration);
+            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
+                speed, displacement, max_allowable_acceleration);
 
         // Pick  the lowest of the maximum the available speeds
         const float lowest_speed =
@@ -164,11 +167,13 @@ void app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(
 
     for (unsigned int i = 1; i < num_segments; i++)
     {
+        const float speed        = trajectory->trajectory_elements[i - 1].angular_speed;
+        const float displacement = segment_lengths[i - 1].angular_segment_length;
+
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
         float temp_vel =
-            (float)sqrt(pow(trajectory->trajectory_elements[i - 1].angular_speed, 2) +
-                        2 * segment_lengths[i - 1].angular_segment_length *
-                            max_allowable_acceleration);
+            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
+                speed, displacement, max_allowable_acceleration);
 
         // Pick  the lowest of the maximum the available speeds
         const float speed_to_set = fmin(max_allowable_speed, temp_vel);
@@ -208,12 +213,13 @@ app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
 
         // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
         float temp_vel_linear =
-            (float)sqrt(pow(current_speed_linear, 2) +
-                        2 * segment_length_linear * max_allowable_acceleration_linear);
+            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
+                current_speed_linear, segment_length_linear,
+                max_allowable_acceleration_linear);
         float temp_vel_angular =
-            (float)sqrt(pow(current_speed_angular, 2) +
-                        2 * segment_length_angular * max_allowable_acceleration_angular);
-
+            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
+                current_speed_angular, segment_length_angular,
+                max_allowable_acceleration_angular);
 
         // If the velocity at [i-1] is larger than it physically possible to decelerate
         // from, pull the speed at [i-1] lower
