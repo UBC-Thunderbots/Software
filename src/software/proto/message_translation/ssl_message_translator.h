@@ -90,18 +90,26 @@ static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names
 // TODO: need to set and check optional field shape type
 
 /**
+ * Find an SSL FieldLineSegment by name. Returns the first instance of a line segment
+ * with the given name if it exists, otherwise returns std::nullopt
  *
- * @param line_segments
- * @param name
- * @return
+ * @param line_segments The line segments to search
+ * @param name The name of the segment to find
+ *
+ * @return The first line segment with the given name if it exists, otherwise
+ * returns std::nullopt
  */
 std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> line_segments, const std::string& name);
 
 /**
+ * Find an SSL FieldCircularArc by name. Returns the first instance of a field arc
+ * with the given name if it exists, otherwise returns std::nullopt
  *
- * @param circular_arcs
- * @param name
- * @return
+ * @param circular_arcs The arcs to search
+ * @param name The name of the arc to find
+ *
+ * @return The first arc with the given name if it exists, otherwise
+ * returns std::nullopt
  */
 std::optional<SSL_FieldCircularArc> findCircularArc(google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> circular_arcs, const std::string& name);
 

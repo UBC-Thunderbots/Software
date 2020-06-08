@@ -60,6 +60,196 @@ protected:
     const float tolerance = 1e-6;
 };
 
+TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_no_segments) {
+    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+    auto result = findLineSegment(segments, "arbitrary name");
+    EXPECT_FALSE(result);
+}
+
+TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_nonexistent_name) {
+    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+
+    auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
+    segment_1->set_name("segment_1");
+    auto segment_1_p1 = std::make_unique<Vector2f>();
+    segment_1_p1->set_x(1.0);
+    segment_1_p1->set_y(2.0);
+    segment_1->set_allocated_p1(segment_1_p1.release());
+    auto segment_1_p2 = std::make_unique<Vector2f>();
+    segment_1_p2->set_x(2.0);
+    segment_1_p2->set_y(2.5);
+    segment_1->set_allocated_p2(segment_1_p2.release());
+    segment_1->set_thickness(0.01);
+    segments.AddAllocated(segment_1.release());
+
+    auto result = findLineSegment(segments, "invalid name");
+    EXPECT_FALSE(result);
+}
+
+TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_valid_name) {
+    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+
+    auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
+    segment_1->set_name("segment_1");
+    auto segment_1_p1 = std::make_unique<Vector2f>();
+    segment_1_p1->set_x(1.0);
+    segment_1_p1->set_y(2.0);
+    segment_1->set_allocated_p1(segment_1_p1.release());
+    auto segment_1_p2 = std::make_unique<Vector2f>();
+    segment_1_p2->set_x(2.0);
+    segment_1_p2->set_y(2.5);
+    segment_1->set_allocated_p2(segment_1_p2.release());
+    segment_1->set_thickness(0.01);
+    segments.AddAllocated(segment_1.release());
+
+    auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
+    segment_2->set_name("segment_2");
+    auto segment_2_p1 = std::make_unique<Vector2f>();
+    segment_2_p1->set_x(1.0);
+    segment_2_p1->set_y(2.0);
+    segment_2->set_allocated_p1(segment_2_p1.release());
+    auto segment_2_p2 = std::make_unique<Vector2f>();
+    segment_2_p2->set_x(2.0);
+    segment_2_p2->set_y(2.5);
+    segment_2->set_allocated_p2(segment_2_p2.release());
+    segment_2->set_thickness(0.01);
+    segments.AddAllocated(segment_2.release());
+
+    auto result = findLineSegment(segments, "segment_2");
+    ASSERT_TRUE(result);
+    EXPECT_EQ("segment_2", result->name());
+}
+
+TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names) {
+    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+
+    auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
+    segment_1->set_name("segment");
+    auto segment_1_p1 = std::make_unique<Vector2f>();
+    segment_1_p1->set_x(1.0);
+    segment_1_p1->set_y(2.0);
+    segment_1->set_allocated_p1(segment_1_p1.release());
+    auto segment_1_p2 = std::make_unique<Vector2f>();
+    segment_1_p2->set_x(2.0);
+    segment_1_p2->set_y(2.5);
+    segment_1->set_allocated_p2(segment_1_p2.release());
+    segment_1->set_thickness(0.01);
+    segments.AddAllocated(segment_1.release());
+
+    auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
+    segment_2->set_name("segment");
+    auto segment_2_p1 = std::make_unique<Vector2f>();
+    segment_2_p1->set_x(5.0);
+    segment_2_p1->set_y(5.0);
+    segment_2->set_allocated_p1(segment_2_p1.release());
+    auto segment_2_p2 = std::make_unique<Vector2f>();
+    segment_2_p2->set_x(5.0);
+    segment_2_p2->set_y(6.0);
+    segment_2->set_allocated_p2(segment_2_p2.release());
+    segment_2->set_thickness(0.05);
+    segments.AddAllocated(segment_2.release());
+
+    auto result = findLineSegment(segments, "segment");
+    ASSERT_TRUE(result);
+    EXPECT_EQ("segment", result->name());
+    // Sanity check we got the first segment
+    EXPECT_FLOAT_EQ(1.0, result->p1().x());
+    EXPECT_FLOAT_EQ(2.0, result->p1().y());
+}
+
+TEST_F(SSLMessageTranslatorTest, test_fine_circular_arc_with_no_arcs) {
+    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+    auto result = findCircularArc(arcs, "arbitrary name");
+    EXPECT_FALSE(result);
+}
+
+TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_nonexistent_name) {
+    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+
+    auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
+    arc_1->set_name("arc_1");
+    auto arc_1_center = std::make_unique<Vector2f>();
+    arc_1_center->set_x(1.0);
+    arc_1_center->set_y(2.0);
+    arc_1->set_allocated_center(arc_1_center.release());
+    arc_1->set_radius(0.5);
+    arc_1->set_a1(0.0);
+    arc_1->set_a2(5.0);
+    arc_1->set_thickness(0.01);
+    arcs.AddAllocated(arc_1.release());
+
+    auto result = findCircularArc(arcs, "invalid name");
+    EXPECT_FALSE(result);
+}
+
+TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_valid_name) {
+    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+
+    auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
+    arc_1->set_name("arc_1");
+    auto arc_1_center = std::make_unique<Vector2f>();
+    arc_1_center->set_x(1.0);
+    arc_1_center->set_y(2.0);
+    arc_1->set_allocated_center(arc_1_center.release());
+    arc_1->set_radius(0.5);
+    arc_1->set_a1(0.0);
+    arc_1->set_a2(5.0);
+    arc_1->set_thickness(0.01);
+    arcs.AddAllocated(arc_1.release());
+
+    auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
+    arc_2->set_name("arc_2");
+    auto arc_2_center = std::make_unique<Vector2f>();
+    arc_2_center->set_x(1.0);
+    arc_2_center->set_y(2.0);
+    arc_2->set_allocated_center(arc_2_center.release());
+    arc_2->set_radius(0.5);
+    arc_2->set_a1(0.0);
+    arc_2->set_a2(5.0);
+    arc_2->set_thickness(0.01);
+    arcs.AddAllocated(arc_2.release());
+
+    auto result = findCircularArc(arcs, "arc_2");
+    ASSERT_TRUE(result);
+    EXPECT_EQ("arc_2", result->name());
+}
+
+TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_duplicate_names) {
+    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+
+    auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
+    arc_1->set_name("arc");
+    auto arc_1_center = std::make_unique<Vector2f>();
+    arc_1_center->set_x(1.0);
+    arc_1_center->set_y(2.0);
+    arc_1->set_allocated_center(arc_1_center.release());
+    arc_1->set_radius(0.5);
+    arc_1->set_a1(0.0);
+    arc_1->set_a2(5.0);
+    arc_1->set_thickness(0.01);
+    arcs.AddAllocated(arc_1.release());
+
+    auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
+    arc_2->set_name("arc");
+    auto arc_2_center = std::make_unique<Vector2f>();
+    arc_2_center->set_x(-2.0);
+    arc_2_center->set_y(3.0);
+    arc_2->set_allocated_center(arc_2_center.release());
+    arc_2->set_radius(0.2);
+    arc_2->set_a1(0.5);
+    arc_2->set_a2(3.0);
+    arc_2->set_thickness(0.5);
+    arcs.AddAllocated(arc_2.release());
+
+    auto result = findCircularArc(arcs, "arc");
+    ASSERT_TRUE(result);
+    EXPECT_EQ("arc", result->name());
+    // Sanity check we got the first arc
+    EXPECT_FLOAT_EQ(1.0, result->center().x());
+    EXPECT_FLOAT_EQ(2.0, result->center().y());
+    EXPECT_FLOAT_EQ(0.5, result->radius());
+}
+
 TEST_F(SSLMessageTranslatorTest, test_create_vector_2f_message) {
     Point point(-1.5, 6);
     auto vector_msg = createVector2f(point);
