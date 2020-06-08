@@ -86,9 +86,6 @@ static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names
         {SSLCircularArcs::CENTER_CIRCLE, "CenterCircle"},
 };
 
-
-// TODO: need to set and check optional field shape type
-
 /**
  * Find an SSL FieldLineSegment by name. Returns the first instance of a line segment
  * with the given name if it exists, otherwise returns std::nullopt
@@ -132,11 +129,12 @@ std::unique_ptr<Vector2f> createVector2f(const Point& point);
  * @param segment The segment geometry the message with contain
  * @param thickness The thickness of the line in metres
  * @param name The name of the line segment
+ * @param shape_type The type of field shape this segment represents
  *
  * @return an SSL_FieldLineSegment representing the given segment with the
  * given thickness
  */
-std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segment, float thickness, const std::string& name);
+std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segment, float thickness, const std::string& name, const SSL_FieldShapeType& shape_type);
 
 /**
  * Creates an SSL_FieldCircularArc proto message
@@ -148,11 +146,12 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segm
  * @param circle The circle to represent in the message
  * @param thickness The thickness of the arc in metres
  * @param name The aname of the arc
+ * @param shape_type The type of field shape this arc represents
  *
  * @return an SSL_FieldCircularArc representing the given circle with the
  * given thickness
  */
-std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, float thickness, const std::string& name);
+std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, float thickness, const std::string& name, const SSL_FieldShapeType& shape_type);
 
 /**
  * Creates an SSL_GeometryFieldSize proto message from the given Field
