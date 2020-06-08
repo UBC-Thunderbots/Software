@@ -3,6 +3,26 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
+std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> line_segments, const std::string& name) {
+    for(const auto& segment : line_segments) {
+        if(segment.name() == name) {
+            return segment;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<SSL_FieldCircularArc> findCircularArc(google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> circular_arcs, const std::string& name) {
+    for(const auto& arc : circular_arcs) {
+        if(arc.name() == name) {
+            return arc;
+        }
+    }
+
+    return std::nullopt;
+}
+
 std::unique_ptr<Vector2f> createVector2f(const Point& point) {
     auto vector2f = std::make_unique<Vector2f>();
     vector2f->set_x(static_cast<float>(point.x()));

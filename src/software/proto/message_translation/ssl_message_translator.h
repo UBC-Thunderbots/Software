@@ -86,6 +86,25 @@ static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names
         {SSLCircularArcs::CENTER_CIRCLE, "CenterCircle"},
 };
 
+
+// TODO: need to set and check optional field shape type
+
+/**
+ *
+ * @param line_segments
+ * @param name
+ * @return
+ */
+std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> line_segments, const std::string& name);
+
+/**
+ *
+ * @param circular_arcs
+ * @param name
+ * @return
+ */
+std::optional<SSL_FieldCircularArc> findCircularArc(google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> circular_arcs, const std::string& name);
+
 /**
  *
  * @param point

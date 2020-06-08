@@ -6,16 +6,6 @@
 class SSLMessageTranslatorTest : public ::testing::Test
 {
 protected:
-    std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> line_segments, const std::string name) {
-        for(const auto& segment : line_segments) {
-            if(segment.name() == name) {
-                return segment;
-            }
-        }
-
-        return std::nullopt;
-    }
-
     ::testing::AssertionResult equalWithinTolerance(const Point& point, const Vector2f& vector, const float tolerance) {
         auto result = ::testing::AssertionSuccess();
 
@@ -26,13 +16,6 @@ protected:
         }
 
         return result;
-    }
-
-    // TOOD: remove
-    void expectEq(const Point& point, const Vector2f& vector)
-    {
-        EXPECT_FLOAT_EQ(vector.x(), static_cast<float>(point.x()));
-        EXPECT_FLOAT_EQ(vector.y(), static_cast<float>(point.y()));
     }
 
     ::testing::AssertionResult equalWithinTolerance(const SSL_FieldLineSegment& field_segment, const Segment& segment, const float thickness, const float tolerance) {
@@ -50,13 +33,38 @@ protected:
 
         return ::testing::AssertionSuccess();
     }
+
+    ::testing::AssertionResult equalWithinTolerance(const SSL_FieldCircularArc& field_arc, const Circle& circle, const float thickness, const float tolerance) {
+        EXPECT_FLOAT_EQ(thickness, field_arc.thickness());
+        EXPECT_FLOAT_EQ(circle.getRadius(), field_arc.radius());
+
+        auto center_eq = equalWithinTolerance(circle.getOrigin(), field_arc.center(), tolerance);
+
+        // TODO: use eqWithinTolerance for angles
+        auto result = ::testing::AssertionSuccess();
+
+        if(!center_eq) {
+            return ::testing::AssertionFailure();
+            if(!center_eq) {
+                result << "Arc center was (" << field_arc.center().x() << ", " << field_arc.center().y()
+                       << "), expected " << circle.getOrigin();
+            }
+        }
+
+        return result;
+    }
+
+    // An approximate epsilon tolerance for floating point values. This corresponds
+    // to micrometer precision on the field, which is much more precise than the data
+    // we get in real life
+    const float tolerance = 1e-6;
 };
 
 TEST_F(SSLMessageTranslatorTest, test_create_vector_2f_message) {
     Point point(-1.5, 6);
     auto vector_msg = createVector2f(point);
     ASSERT_TRUE(vector_msg);
-    expectEq(point, *vector_msg);
+    EXPECT_TRUE(equalWithinTolerance(point, *vector_msg, tolerance));
 }
 
 TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_valid_values) {
@@ -69,8 +77,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_valid_value
     ASSERT_TRUE(field_line_msg);
     EXPECT_EQ(name, field_line_msg->name());
     EXPECT_FLOAT_EQ(thickness, field_line_msg->thickness());
-    expectEq(segment.getSegStart(), field_line_msg->p1());
-    expectEq(segment.getEnd(), field_line_msg->p2());
+    EXPECT_TRUE(equalWithinTolerance(segment.getSegStart(), field_line_msg->p1(), tolerance));
+    EXPECT_TRUE(equalWithinTolerance(segment.getEnd(), field_line_msg->p2(), tolerance));
 }
 
 TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_negative_thickness) {
@@ -91,7 +99,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_valid_value
     ASSERT_TRUE(circular_arc_msg);
     EXPECT_EQ(name, circular_arc_msg->name());
     EXPECT_FLOAT_EQ(thickness, circular_arc_msg->thickness());
-    expectEq(circle.getOrigin(), circular_arc_msg->center());
+    EXPECT_TRUE(equalWithinTolerance(circle.getOrigin(), circular_arc_msg->center(), tolerance));
     EXPECT_FLOAT_EQ(circle.getRadius(), circular_arc_msg->radius());
 }
 
@@ -112,22 +120,17 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size) {
     EXPECT_EQ(9000, field_msg->field_length());
     EXPECT_EQ(6000, field_msg->field_width());
     EXPECT_EQ(1000, field_msg->goal_width());
-    EXPECT_EQ(180, field_msg->goal_depth()); // TODO: add goal depth to field
+    EXPECT_EQ(200, field_msg->goal_depth());
     EXPECT_EQ(300, field_msg->boundary_width());
     ASSERT_TRUE(field_msg->has_penalty_area_width());
     EXPECT_EQ(2000, field_msg->penalty_area_width());
     ASSERT_TRUE(field_msg->has_penalty_area_depth());
     EXPECT_EQ(1000, field_msg->penalty_area_depth());
 
-    // Field lines and arcs
+    // Field lines
 
     // Every single line we know about should be populated
     EXPECT_EQ(ssl_field_line_names.size(), field_msg->field_lines().size());
-
-    // TODO: need to set and check optional field shape type
-
-    // float tolerance. TODO comment
-    const float tolerance = 1e-6;
 
     auto top_touch_line = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::TOP_TOUCH_LINE));
     ASSERT_TRUE(top_touch_line);
@@ -161,31 +164,52 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size) {
     ASSERT_TRUE(right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_penalty_stretch.value(), Segment(Point(3.5, 1), Point(3.5, -1)), thickness, tolerance));
 
-    // TODO: you are here. Working on adding tests, you can do it
-    // Need to add goal_depth to the field class now that SSL provides it before can
-    // properly write the goal tests
+    auto right_goal_top_line = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_TOP_LINE));
+    ASSERT_TRUE(right_goal_top_line);
+    EXPECT_TRUE(equalWithinTolerance(right_goal_top_line.value(), Segment(Point(4.5, 0.5), Point(4.7, 0.5)), thickness, tolerance));
 
+    auto right_goal_bottom_line = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE));
+    ASSERT_TRUE(right_goal_bottom_line);
+    EXPECT_TRUE(equalWithinTolerance(right_goal_bottom_line.value(), Segment(Point(4.5, -0.5), Point(4.7, -0.5)), thickness, tolerance));
 
+    auto right_goal_depth_line = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_DEPTH_LINE));
+    ASSERT_TRUE(right_goal_depth_line);
+    EXPECT_TRUE(equalWithinTolerance(right_goal_depth_line.value(), Segment(Point(4.7, 0.5), Point(4.7, -0.5)), thickness, tolerance));
 
+    auto left_goal_top_line = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_TOP_LINE));
+    ASSERT_TRUE(left_goal_top_line);
+    EXPECT_TRUE(equalWithinTolerance(left_goal_top_line.value(), Segment(Point(-4.5, 0.5), Point(-4.7, 0.5)), thickness, tolerance));
 
+    auto left_goal_bottom_line = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_BOTTOM_LINE));
+    ASSERT_TRUE(left_goal_bottom_line);
+    EXPECT_TRUE(equalWithinTolerance(left_goal_bottom_line.value(), Segment(Point(-4.5, -0.5), Point(-4.7, -0.5)), thickness, tolerance));
 
+    auto left_goal_depth_line = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_DEPTH_LINE));
+    ASSERT_TRUE(left_goal_depth_line);
+    EXPECT_TRUE(equalWithinTolerance(left_goal_depth_line.value(), Segment(Point(-4.7, 0.5), Point(-4.7, -0.5)), thickness, tolerance));
 
+    auto left_field_left_penalty_stretch = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH));
+    ASSERT_TRUE(left_field_left_penalty_stretch);
+    EXPECT_TRUE(equalWithinTolerance(left_field_left_penalty_stretch.value(), Segment(Point(-4.5, 1), Point(-3.5, 1)), thickness, tolerance));
 
+    auto left_field_right_penalty_stretch = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH));
+    ASSERT_TRUE(left_field_right_penalty_stretch);
+    EXPECT_TRUE(equalWithinTolerance(left_field_right_penalty_stretch.value(), Segment(Point(-4.5, -1), Point(-3.5, -1)), thickness, tolerance));
+
+    auto right_field_left_penalty_stretch = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH));
+    ASSERT_TRUE(right_field_left_penalty_stretch);
+    EXPECT_TRUE(equalWithinTolerance(right_field_left_penalty_stretch.value(), Segment(Point(4.5, -1), Point(3.5, -1)), thickness, tolerance));
+
+    auto right_field_right_penalty_stretch = findLineSegment(field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH));
+    ASSERT_TRUE(right_field_right_penalty_stretch);
+    EXPECT_TRUE(equalWithinTolerance(right_field_right_penalty_stretch.value(), Segment(Point(4.5, 1), Point(3.5, 1)), thickness, tolerance));
+
+    // Field arcs
 
     // Every single arc we know about should be populated
     EXPECT_EQ(ssl_circular_arc_names.size(), field_msg->field_arcs().size());
-//    auto center_circle_arc = find
-}
 
-
-
-TEST_F(SSLMessageTranslatorTest, test) {
-    Field field = ::Test::TestUtil::createSSLDivBField();
-
-    auto field_msg = createGeometryFieldSize(field, 0.005);
-    for(const auto& foo : field_msg->field_lines()) {
-        std::cout << foo.name() << std::endl;
-    }
-
-    EXPECT_EQ(ssl_field_line_names.size(), field_msg->field_lines().size());
+    auto center_circle = findCircularArc(field_msg->field_arcs(), ssl_circular_arc_names.at(SSLCircularArcs::CENTER_CIRCLE));
+    ASSERT_TRUE(center_circle);
+    EXPECT_TRUE(equalWithinTolerance(center_circle.value(), Circle(Point(0, 0), 0.5),thickness, tolerance));
 }
