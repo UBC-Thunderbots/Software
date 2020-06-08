@@ -37,7 +37,13 @@ class BezierCurve2d
      */
     const Point getValueAt(double t) const;
 
-    // TODO: jdoc, make sure to note that parametrization is in [0,1]
+    /**
+     * Get the polynomial representation of this curve
+     *
+     * @return The polynomial representation of this curve, parametrized such that the
+     *         value at t=0 is the start of the curve, and the value at t=1 is the
+     *         end of the curve
+     */
     Polynomial2d getPolynomial() const;
 
    private:
