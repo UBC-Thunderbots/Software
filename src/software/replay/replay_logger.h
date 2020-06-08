@@ -17,7 +17,7 @@ class ReplayLogger : public OrderedThreadedObserver<SensorMsg>
     void nextChunk();
     void saveCurrentChunk();
 
-    static constexpr int DEFAULT_FRAMES_PER_CHUNK = 300;
+    static constexpr int DEFAULT_FRAMES_PER_CHUNK = 1000;
 
     TbotsReplay current_chunk;
     size_t current_chunk_idx;

@@ -46,8 +46,11 @@ ReplayLogger::~ReplayLogger() {
 
 void ReplayLogger::onValueReceived(SensorMsg frame)
 {
-    current_chunk.mutable_replay_frames()->Add(dynamic_cast<SensorMsg &&>(frame));
-    LOG(INFO) << "Logging to chunk " << current_chunk_idx;
+    if (frame.has_ssl_vision_msg()) {
+        LOG(INFO) << "Logging vision frame with t_sent=" << frame.ssl_vision_msg().detection().t_sent();
+    }
+    current_chunk.mutable_replay_frames()->Add();
+    (current_chunk.mutable_replay_frames()->end() - 1)->CopyFrom(frame);
     if (current_chunk.replay_frames_size() >= frames_per_chunk) {
         saveCurrentChunk();
         nextChunk();

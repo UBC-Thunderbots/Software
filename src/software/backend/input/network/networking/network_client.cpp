@@ -91,7 +91,7 @@ NetworkClient::~NetworkClient()
 void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
 {
     SensorMsg frame;
-    *frame.mutable_ssl_vision_msg() = packet;
+    frame.mutable_ssl_vision_msg()->CopyFrom(packet);
     sendValueToObservers(frame);
     // We analyze the first 60 packets we receive to find the "real" starting time.
     // The real starting time is the smaller value of the ones we receive
