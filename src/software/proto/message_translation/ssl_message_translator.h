@@ -155,10 +155,17 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(const Segment& segm
 std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circle, float thickness, const std::string& name);
 
 /**
+ * Creates an SSL_GeometryFieldSize proto message from the given Field
  *
- * @param field
- * @param thickness
- * @return
+ * @pre thickness muct be >= 0
+ *
+ * @throws std::invalid_argument if thickness < 0
+ *
+ * @param field The field to create the message from
+ * @param thickness The thickness of the field lines in metres
+ *
+ * @return an SSL_GeometryFieldSize proto message representing the given field
  */
 std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& field, float thickness);
+
 std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field);

@@ -301,7 +301,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_negative_th
     EXPECT_THROW(createFieldCircularArc(circle, thickness, name), std::invalid_argument);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size) {
+TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_values) {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = 0.005f;
 
@@ -402,4 +402,11 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size) {
     auto center_circle = findCircularArc(field_msg->field_arcs(), ssl_circular_arc_names.at(SSLCircularArcs::CENTER_CIRCLE));
     ASSERT_TRUE(center_circle);
     EXPECT_TRUE(equalWithinTolerance(center_circle.value(), Circle(Point(0, 0), 0.5),thickness, tolerance));
+}
+
+TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_negative_thickness) {
+    Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
+    const float thickness = -0.005f;
+
+    EXPECT_THROW(createGeometryFieldSize(field, thickness), std::invalid_argument);
 }
