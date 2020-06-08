@@ -42,9 +42,6 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data)
 
 float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, uint8_t index)
 {
-    // Check if index is less than 0
-    assert(index > -1);
-
     // Check if index is larger than the maximum buffer size
     assert(index <= cbuffer->max_size);
 
