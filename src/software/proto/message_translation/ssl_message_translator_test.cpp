@@ -103,8 +103,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_negative_th
     ASSERT_DEATH(createFieldCircularArc(circle, thickness, name), "");
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_division_b_field) {
-    Field field(9, 6, 1, 2, 1, 0.3, 0.5);
+TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size) {
+    Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = 0.005f;
 
     auto field_msg = createGeometryFieldSize(field, thickness);

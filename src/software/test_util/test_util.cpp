@@ -7,7 +7,8 @@ namespace Test
     Field TestUtil::createSSLDivBField()
     {
         // Using the dimensions of a standard Division B SSL field
-        Field field = Field(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5);
+        // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
+        Field field = Field(9.0, 6.0, 1.0, 2.0, 0.18, 1.0, 0.3, 0.5);
         return field;
     }
 

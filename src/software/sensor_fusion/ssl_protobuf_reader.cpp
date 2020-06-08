@@ -58,6 +58,7 @@ std::optional<Field> SSLProtobufReader::getField(
     double field_length   = field_data.field_length() * METERS_PER_MILLIMETER;
     double field_width    = field_data.field_width() * METERS_PER_MILLIMETER;
     double goal_width     = field_data.goal_width() * METERS_PER_MILLIMETER;
+    double goal_depth     = field_data.goal_depth() * METERS_PER_MILLIMETER;
     double boundary_width = field_data.boundary_width() * METERS_PER_MILLIMETER;
     double center_circle_radius =
         ssl_center_circle->second.radius() * METERS_PER_MILLIMETER;
@@ -93,7 +94,7 @@ std::optional<Field> SSLProtobufReader::getField(
     double defense_width =
         (defense_width_p1 - defense_width_p2).length() * METERS_PER_MILLIMETER;
 
-    Field field = Field(field_length, field_width, defense_length, defense_width,
+    Field field = Field(field_length, field_width, defense_length, defense_width, goal_depth,
                         goal_width, boundary_width, center_circle_radius);
     return field;
 }
