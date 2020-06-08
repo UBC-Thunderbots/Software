@@ -410,3 +410,34 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_negative_t
 
     EXPECT_THROW(createGeometryFieldSize(field, thickness), std::invalid_argument);
 }
+
+TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_valid_values) {
+    Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
+    const float thickness = 0.005f;
+
+    auto geometry_data = createGeometryData(field, thickness);
+    EXPECT_EQ(0, geometry_data->calib_size());
+    EXPECT_TRUE(geometry_data->has_field());
+
+    auto field_size = geometry_data->field();
+
+    // Sanity checks to make sure the right field was constructed and that we
+    // don't just have an emtpy / default constructed message. Full validation
+    // of SSL_GeometryFieldSize creation is in other tests
+    EXPECT_EQ(9000, field_size.field_length());
+    EXPECT_EQ(6000, field_size.field_width());
+    EXPECT_EQ(1000, field_size.goal_width());
+    EXPECT_EQ(200, field_size.goal_depth());
+    EXPECT_EQ(300, field_size.boundary_width());
+    ASSERT_TRUE(field_size.has_penalty_area_width());
+    EXPECT_EQ(2000, field_size.penalty_area_width());
+    ASSERT_TRUE(field_size.has_penalty_area_depth());
+    EXPECT_EQ(1000, field_size.penalty_area_depth());
+}
+
+TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_negative_thickness) {
+    Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
+    const float thickness = -0.005f;
+
+    EXPECT_THROW(createGeometryData(field, thickness), std::invalid_argument);
+}

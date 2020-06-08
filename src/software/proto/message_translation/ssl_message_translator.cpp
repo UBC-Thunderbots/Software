@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> line_segments, const std::string& name) {
+std::optional<SSL_FieldLineSegment> findLineSegment(const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments, const std::string& name) {
     for(const auto& segment : line_segments) {
         if(segment.name() == name) {
             return segment;
@@ -13,7 +13,7 @@ std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPt
     return std::nullopt;
 }
 
-std::optional<SSL_FieldCircularArc> findCircularArc(google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> circular_arcs, const std::string& name) {
+std::optional<SSL_FieldCircularArc> findCircularArc(const google::protobuf::RepeatedPtrField<SSL_FieldCircularArc>& circular_arcs, const std::string& name) {
     for(const auto& arc : circular_arcs) {
         if(arc.name() == name) {
             return arc;
@@ -63,6 +63,10 @@ std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circl
 }
 
 std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& field, const float thickness) {
+    if(thickness < 0) {
+        throw std::invalid_argument("SSL_GeometryFieldSize thickness must be >= 0");
+    }
+
     auto geometry_field_size = std::make_unique<SSL_GeometryFieldSize>() ;
 
     geometry_field_size->set_field_length(static_cast<int32_t>(field.xLength() * MILLIMETERS_PER_METER));
@@ -152,6 +156,18 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     return std::move(geometry_field_size);
 }
 
-std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field) {
- return nullptr;
+std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field, const float thickness) {
+    if(thickness < 0) {
+        throw std::invalid_argument("SSL_GeometryData thickness must be >= 0");
+    }
+
+    auto geometry_data = std::make_unique<SSL_GeometryData>();
+    auto geometry_field_size = createGeometryFieldSize(field, thickness);
+    geometry_data->set_allocated_field(geometry_field_size.release());
+    // We do not set any of the calibration data because that information is
+    // specific to real-life cameras, and we can't reasonably get or mock that
+    // information from the Field class
+    geometry_data->clear_calib();
+
+    return std::move(geometry_data);
 }

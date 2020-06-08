@@ -99,7 +99,7 @@ static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names
  * @return The first line segment with the given name if it exists, otherwise
  * returns std::nullopt
  */
-std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> line_segments, const std::string& name);
+std::optional<SSL_FieldLineSegment> findLineSegment(const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments, const std::string& name);
 
 /**
  * Find an SSL FieldCircularArc by name. Returns the first instance of a field arc
@@ -111,7 +111,7 @@ std::optional<SSL_FieldLineSegment> findLineSegment(google::protobuf::RepeatedPt
  * @return The first arc with the given name if it exists, otherwise
  * returns std::nullopt
  */
-std::optional<SSL_FieldCircularArc> findCircularArc(google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> circular_arcs, const std::string& name);
+std::optional<SSL_FieldCircularArc> findCircularArc(const google::protobuf::RepeatedPtrField<SSL_FieldCircularArc>& circular_arcs, const std::string& name);
 
 /**
  * Creates a Vector2f proto message from the given point
@@ -168,4 +168,16 @@ std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(const Circle& circl
  */
 std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& field, float thickness);
 
-std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field);
+/**
+ * Creates an SSL_GeometryData proto message from the given field
+ *
+ * @pre thickness muct be >= 0
+ *
+ * @throws std::invalid_argument if thickness < 0
+ *
+ * @param field The field to create the message from
+ * @param thickness The thickness of the field lines in metres
+ *
+ * @return an SSL_GeometryData proto message representing the given field
+ */
+std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field, float thickness);
