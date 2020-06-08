@@ -89,6 +89,10 @@ class Spline2d
      */
     virtual size_t getNumKnots() const = 0;
 
+    // TODO: jdoc
+    // TODO: better name for this?
+    virtual std::vector<double> getKnotVector() const = 0;
+
     /**
      * Gets start point of spline
      *
