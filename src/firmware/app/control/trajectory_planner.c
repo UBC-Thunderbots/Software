@@ -288,9 +288,8 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     {
         return status;
     }
-    // Generate the time duration of each segment,
-    // and re-balance the angular and linear trajectories so that they are of equivalent
-    // duration over each segment
+
+    // Calculate the time duration of the trajectory at each segment node
     app_trajectory_planner_generatePositionTrajectoryTimeProfile(position_trajectory,
                                                                  segment_lengths);
 
@@ -403,6 +402,7 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile(
     }
 }
 
+
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentDuration(
     PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths,
@@ -499,22 +499,19 @@ void app_trajectory_planner_generateVelocityTrajectory(
         const float delta_theta =
             (position_elements[i + 1].orientation - position_elements[i].orientation);
 
-        float x_velocity_component = 0;
-        float y_velocity_component = 0;
-
         // The unit vector of the direction is 1/magnitide(vector) *vector
         const float vector_magnitude_inverse =
             (1 / sqrt(pow(delta_x, 2) + pow(delta_y, 2)));
-        if (delta_x != 0)
-        {
-            x_velocity_component =
-                vector_magnitude_inverse * delta_x * position_elements[i].linear_speed;
-        }
-        if (delta_y != 0)
-        {
-            y_velocity_component =
-                vector_magnitude_inverse * delta_y * position_elements[i].linear_speed;
-        }
+
+        const float x_velocity_component =
+            delta_x == 0
+                ? 0
+                : vector_magnitude_inverse * delta_x * position_elements[i].linear_speed;
+        const float y_velocity_component =
+            delta_y == 0
+                ? 0
+                : vector_magnitude_inverse * delta_y * position_elements[i].linear_speed;
+
 
         // Use the sign of the change in orientation to calculate the direction of the
         // angular velocity
@@ -564,8 +561,8 @@ void app_trajectory_planner_generateVelocityTrajectory(
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
-    FirmwareRobotPathParameters_t path_parameters,
-    VelocityTrajectory_t* velocity_trajectory, const float interpolation_period)
+    FirmwareRobotPathParameters_t path_parameters, const float interpolation_period,
+    VelocityTrajectory_t* velocity_trajectory)
 {
     PositionTrajectoryElement_t position_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t position_trajectory;
@@ -619,12 +616,12 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
 
     for (unsigned int i = 1; i < trajectory->path_parameters.num_segments; i++)
     {
+        const float current_t = t_start + i * t_segment_size;
         // Grab the states at each 't' value
         trajectory_elements[i].orientation = shared_polynomial1d_getValueOrder3(
-            trajectory->path_parameters.orientation_profile,
-            t_start + i * t_segment_size);
+            trajectory->path_parameters.orientation_profile, current_t);
         trajectory_elements[i].position = shared_polynomial2d_getValueOrder3(
-            trajectory->path_parameters.path, t_start + i * t_segment_size);
+            trajectory->path_parameters.path, current_t);
 
         // Calculate the length of each segment and store it
         const float delta_x =

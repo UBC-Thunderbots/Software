@@ -2323,7 +2323,7 @@ TEST_F(TrajectoryPlannerTest,
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
-            path_parameters, &velocity_trajectory, 0.010);
+            path_parameters, 0.010, &velocity_trajectory);
     EXPECT_EQ(status, OK);
 
     for (unsigned int i = 0; i < velocity_trajectory.path_parameters.num_segments; i++)
@@ -2370,7 +2370,7 @@ TEST_F(
     velocity_trajectory.trajectory_elements = elements;
 
     status = app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
-        path_parameters, &velocity_trajectory, 0.010);
+        path_parameters, 0.010, &velocity_trajectory);
     EXPECT_EQ(status, OK);
 
     std::vector<Vector> directions =

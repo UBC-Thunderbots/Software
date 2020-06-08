@@ -380,17 +380,18 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
  *
  * @param path_parameters [in] The path parameters that define the trajectory
  *
+ * @param interpolation_period [in] ; The interpolation period of the trajectory in
+ * seconds
+ *
  * @param velocity_trajectory [out] The constant interpolation period velocity trajectory
  * generated
- *
- * @param interpolation_period ; The interpolation period of the trajectory in seconds
  *
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
-    FirmwareRobotPathParameters_t path_parameters,
-    VelocityTrajectory_t* velocity_trajectory, const float interpolation_period);
+    FirmwareRobotPathParameters_t path_parameters, const float interpolation_period,
+    VelocityTrajectory_t* velocity_trajectory);
 
 /**
  * Function copies all trajectory elements from one trajectory to another
