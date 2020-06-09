@@ -23,48 +23,10 @@ class CircularBufferTest : public testing::Test
     CircularBuffer_t* circular_buffer;
 };
 
-class CircularBufferTestInit0 : public testing::Test
+TEST(CircularBufferInit0Test, circular_buffer_init_0)
 {
-   protected:
-    virtual void SetUp(void)
-    {
-        ASSERT_DEATH(circular_buffer_create(0), "size > 0 && size < 256");
-    }
-
-    virtual void TearDown(void)
-    {
-        circular_buffer_destroy(circular_buffer);
-    }
-
-    CircularBuffer_t* circular_buffer;
-};
-
-class CircularBufferTestInit256 : public testing::Test
-{
-   protected:
-    virtual void SetUp(void)
-    {
-        ASSERT_DEATH(circular_buffer_create(999), "size > 0 && size < 256");
-    }
-
-    virtual void TearDown(void)
-    {
-        circular_buffer_destroy(circular_buffer);
-    }
-
-    CircularBuffer_t* circular_buffer;
-};
-
-// TODO add tests
-// TEST_F(CircularBufferTestInit0, circular_buffer_init_0)
-//{
-//    EXPECT_EQ(6, 6);
-//}
-//
-// TEST_F(CircularBufferTestInit256, circular_buffer_init_256)
-//{
-//    EXPECT_EQ(6, 6);
-//}
+    ASSERT_DEATH(circular_buffer_create(0), "size > 0");
+}
 
 TEST_F(CircularBufferTest, circular_buffer_exact_full)
 {

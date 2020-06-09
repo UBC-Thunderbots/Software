@@ -13,8 +13,8 @@ struct CircularBuffer
 
 CircularBuffer_t *circular_buffer_create(size_t size)
 {
-    // Check if size is in uint8_t range
-    assert(size > 0 && size < 256);
+    // Check if size is greater than 0
+    assert(size > 0);
 
     CircularBuffer_t *new_cbuffer = malloc(sizeof(CircularBuffer_t));
 

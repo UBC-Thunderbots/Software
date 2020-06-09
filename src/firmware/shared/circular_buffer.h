@@ -11,7 +11,7 @@ typedef struct CircularBuffer CircularBuffer_t;
  * Initialize the circular_buffer struct members
  * @param  size Size of the circular_buffer to set
  *
- * NOTE: If `size` is 0, it will be set to 1 to create a valid circular_buffer
+ * NOTE: `size` must be larger than 0
  *
  * @return A pointer to the created circular_buffer, ownership is given to the caller
  */
