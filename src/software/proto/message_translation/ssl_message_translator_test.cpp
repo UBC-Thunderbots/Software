@@ -62,19 +62,25 @@ class SSLMessageTranslatorTest : public ::testing::Test
         EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_arc.thickness());
         EXPECT_FLOAT_EQ(circle.getRadius() * MILLIMETERS_PER_METER, field_arc.radius());
 
-        auto center_eq =
-            equalWithinTolerance(circle.getOrigin(), field_arc.center(), tolerance);
-
-        // TODO: use eqWithinTolerance for angles
         auto result = ::testing::AssertionSuccess();
 
-        if (!center_eq)
+        auto center_eq =
+            equalWithinTolerance(circle.getOrigin(), field_arc.center(), tolerance);
+        auto a1_eq = ::Test::TestUtil::equalWithinTolerance(Angle::zero().toRadians(), field_arc.a1(), tolerance);
+        auto a2_eq = ::Test::TestUtil::equalWithinTolerance(Angle::full().toRadians(), field_arc.a2(), tolerance);
+        if (!center_eq || !a1_eq || !a2_eq)
         {
-            return ::testing::AssertionFailure();
-            if (!center_eq)
-            {
+            result = ::testing::AssertionFailure();
+
+            if(!center_eq) {
                 result << "Arc center was (" << field_arc.center().x() << ", "
                        << field_arc.center().y() << "), expected " << circle.getOrigin();
+            }
+            if(!a1_eq) {
+                result << "Arc angle a1 was " << field_arc.a1() << " radians, expected 0";
+            }
+            if(!a1_eq) {
+                result << "Arc angle a2 was " << field_arc.a1() << " radians, expected " << Angle::full().toRadians();
             }
         }
 
