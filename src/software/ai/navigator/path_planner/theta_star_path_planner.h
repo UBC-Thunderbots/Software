@@ -324,25 +324,25 @@ class ThetaStarPathPlanner : public PathPlanner
                                            const std::vector<ObstaclePtr> &obstacles);
 
     /**
-     * Returns a collision-free hash for the given Coordinate
+     * Computes a key from the given Coordinate for collision-free access to
+     * unblocked_grid
      *
-     * @param coord Coordinate to hash
+     * @param coord Coordinate to compute
      *
-     * @return hash of the Coordinate
+     * @return key for the Coordinate
      */
-    unsigned long hashCoordinate(const Coordinate &coord) const;
+    unsigned long computeMapKey(const Coordinate &coord) const;
 
     /**
-     * Returns a collision-free hash for the given a pair of Coordinate
-     *
+     * Computes a key from the given pair of Coordinates for collision-free access to
+     * line_of_sight_cache
      * @param coord1 Coordinate 1 of pair to hash
      * @param coord2 Coordinate 2 of pair to hash
      *
-     * @return hash of the pair of Coordinates
+     * @return key for the Coordinate pair
      */
-    unsigned long hashCoordinatePair(
-        const ThetaStarPathPlanner::Coordinate &coord1,
-        const ThetaStarPathPlanner::Coordinate &coord2) const;
+    unsigned long computeMapKey(const ThetaStarPathPlanner::Coordinate &coord1,
+                                const ThetaStarPathPlanner::Coordinate &coord2) const;
 
     // if close to end then return direct path to end point
     static constexpr double CLOSE_TO_END_THRESHOLD = 0.01;  // in metres
@@ -382,13 +382,13 @@ class ThetaStarPathPlanner : public PathPlanner
 
     // The following data structures improve performance by caching the results of
     // isUnblocked and lineOfSight.
-    // They are indexed with a hash for performance
+    // They are indexed with an unsigned long key for performance
     // Description of the Grid-
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
     std::map<unsigned long, bool> unblocked_grid;
-    // Cache of line of sight that maps a hash of a pair of coordinates to whether those
-    // two Coordinates have line of sight between them
+    // Cache of line of sight that maps a unsigned long key computed from a pair of
+    // coordinates to whether those two Coordinates have line of sight between them
     std::map<unsigned long, bool> line_of_sight_cache;
 };

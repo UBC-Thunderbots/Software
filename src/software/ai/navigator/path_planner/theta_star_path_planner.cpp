@@ -23,8 +23,8 @@ bool ThetaStarPathPlanner::isCoordNavigable(const Coordinate &coord) const
 bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
 {
     // If we haven't checked this Coordinate for obstacles before, check it now
-    unsigned long coord_hash = hashCoordinate(coord);
-    auto unblocked_grid_it   = unblocked_grid.find(coord_hash);
+    unsigned long coord_key = computeMapKey(coord);
+    auto unblocked_grid_it  = unblocked_grid.find(coord_key);
     if (unblocked_grid_it == unblocked_grid.end())
     {
         bool blocked = false;
@@ -40,7 +40,7 @@ bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
         }
 
         // We use the opposite convention to indicate blocked or not
-        unblocked_grid[coord_hash] = !blocked;
+        unblocked_grid[coord_key] = !blocked;
         return !blocked;
     }
 
@@ -57,10 +57,10 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
 
 bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinate &coord2)
 {
-    unsigned long coordinate_pair_hash = hashCoordinatePair(coord1, coord2);
+    unsigned long coordinate_pair_key = computeMapKey(coord1, coord2);
 
     // If we haven't checked this Coordinate pair for intersects before, check it now
-    auto line_of_sight_cache_it = line_of_sight_cache.find(coordinate_pair_hash);
+    auto line_of_sight_cache_it = line_of_sight_cache.find(coordinate_pair_key);
     if (line_of_sight_cache_it == line_of_sight_cache.end())
     {
         Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
@@ -75,7 +75,7 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinat
         }
 
         // We use the opposite convention to indicate blocked or not
-        line_of_sight_cache[coordinate_pair_hash] = has_line_of_sight;
+        line_of_sight_cache[coordinate_pair_key] = has_line_of_sight;
         return has_line_of_sight;
     }
 
@@ -529,24 +529,24 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
 }
 
 
-unsigned long ThetaStarPathPlanner::hashCoordinate(const Coordinate &coord) const
+unsigned long ThetaStarPathPlanner::computeMapKey(const Coordinate &coord) const
 {
     return coord.row() + coord.col() * (num_grid_rows + 1);
 }
 
-unsigned long ThetaStarPathPlanner::hashCoordinatePair(
+unsigned long ThetaStarPathPlanner::computeMapKey(
     const ThetaStarPathPlanner::Coordinate &coord1,
     const ThetaStarPathPlanner::Coordinate &coord2) const
 {
-    unsigned long hash1 = hashCoordinate(coord1);
-    unsigned long hash2 = hashCoordinate(coord2);
+    unsigned long key1 = computeMapKey(coord1);
+    unsigned long key2 = computeMapKey(coord2);
     if (coord1.row() < coord2.row() ||
         (coord1.row() == coord2.row() && coord1.col() < coord2.col()))
     {
-        return hash1 + hash2 * (num_grid_cols + num_grid_rows + 1);
+        return key1 + key2 * (num_grid_cols + num_grid_rows + 1);
     }
     else
     {
-        return hash2 + hash1 * (num_grid_cols + num_grid_rows + 1);
+        return key2 + key1 * (num_grid_cols + num_grid_rows + 1);
     }
 }
