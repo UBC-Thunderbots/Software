@@ -61,14 +61,6 @@ class Polygon : public virtual Shape
      */
     const std::vector<Point>& getPoints() const;
 
-    /**
-     * Debug function that determines whether the polygon invariant holds,
-     * which is that the segments connect all the points
-     *
-     * @return whether invariants hold
-     */
-    bool invariantsHold() const;
-
    protected:
     /**
      * Returns the line segments that connect a list of points.

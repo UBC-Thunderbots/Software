@@ -25,11 +25,6 @@ std::vector<Segment> Polygon::initSegments(std::vector<Point> points)
     return segments;
 }
 
-bool Polygon::invariantsHold() const
-{
-    return initSegments(points_) == segments_;
-}
-
 bool Polygon::contains(const Point& p) const
 {
     // This algorithm is from https://stackoverflow.com/a/16391873
