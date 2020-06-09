@@ -297,13 +297,13 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_valid_value
 {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
     const float thickness  = 0.005f;
-    const std::string name = "MySegment";
+    const SSLFieldLines line_type = SSLFieldLines::TOP_TOUCH_LINE;
 
     auto field_line_msg =
-        createFieldLineSegment(segment, thickness, name, SSL_FieldShapeType::CenterLine);
+        createFieldLineSegment(segment, thickness, line_type, SSL_FieldShapeType::CenterLine);
 
     ASSERT_TRUE(field_line_msg);
-    EXPECT_EQ(name, field_line_msg->name());
+    EXPECT_EQ("TopTouchLine", field_line_msg->name());
     EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_line_msg->thickness());
     EXPECT_TRUE(
         equalWithinTolerance(segment.getSegStart(), field_line_msg->p1(), tolerance));
@@ -315,10 +315,10 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_negative_th
 {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
     const float thickness  = -0.005f;
-    const std::string name = "MySegment";
+    const SSLFieldLines line_type = SSLFieldLines::TOP_TOUCH_LINE;
 
     EXPECT_THROW(
-        createFieldLineSegment(segment, thickness, name, SSL_FieldShapeType::Undefined),
+        createFieldLineSegment(segment, thickness, line_type, SSL_FieldShapeType::Undefined),
         std::invalid_argument);
 }
 
@@ -326,13 +326,13 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_valid_value
 {
     const Circle circle(Point(0.0, 0.5), 3);
     const float thickness  = 0.005f;
-    const std::string name = "MyCircle";
+    const SSLCircularArcs arc_type = SSLCircularArcs::CENTER_CIRCLE;
 
     auto circular_arc_msg =
-        createFieldCircularArc(circle, thickness, name, SSL_FieldShapeType::CenterCircle);
+        createFieldCircularArc(circle, thickness, arc_type, SSL_FieldShapeType::CenterCircle);
 
     ASSERT_TRUE(circular_arc_msg);
-    EXPECT_EQ(name, circular_arc_msg->name());
+    EXPECT_EQ("CenterCircle", circular_arc_msg->name());
     EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, circular_arc_msg->thickness());
     EXPECT_TRUE(
         equalWithinTolerance(circle.getOrigin(), circular_arc_msg->center(), tolerance));
@@ -345,10 +345,10 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_negative_th
 {
     const Circle circle(Point(0.0, 0.5), 3);
     const float thickness  = -0.005f;
-    const std::string name = "MyCircle";
+    const SSLCircularArcs arc_type = SSLCircularArcs::CENTER_CIRCLE;
 
     EXPECT_THROW(
-        createFieldCircularArc(circle, thickness, name, SSL_FieldShapeType::Undefined),
+        createFieldCircularArc(circle, thickness, arc_type, SSL_FieldShapeType::Undefined),
         std::invalid_argument);
 }
 
