@@ -91,8 +91,8 @@ The vast majority of the things noted in this document will apply to `C` code as
    * @param max_acceleration [in/out] The maximum acceleration permitted. This 
    *                                  will be updated to the maximum acceleration 
    *                                  actually seen on the generated trajectory.
-   * @param created_trajectory A pointer that will be set to the created 
-   *                           created trajectory.
+   * @param created_trajectory [out] A pointer that will be set to the created 
+   *                                 created trajectory.
    * @return true if the trajectory was generated successfully, false otherwise
    */
   bool generateTrajectory(float max_speed, 
