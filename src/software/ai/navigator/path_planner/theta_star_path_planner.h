@@ -344,10 +344,11 @@ class ThetaStarPathPlanner : public PathPlanner
         const ThetaStarPathPlanner::Coordinate &coord1,
         const ThetaStarPathPlanner::Coordinate &coord2) const;
 
-    // if close to end then return no path
+    // if close to end then return direct path to end point
     static constexpr double CLOSE_TO_END_THRESHOLD = 0.01;  // in metres
 
-    // increase in threshold to reduce oscillation
+    // TODO(Issue #1448): Test and revise this value and the associated approach
+    // increase in threshold to reduce oscillation for when the end of the path is blocked
     static constexpr unsigned int BLOCKED_END_OSCILLATION_MITIGATION =
         2;  // multiples of CLOSE_TO_END_THRESHOLD to ignore to control oscillation
 
