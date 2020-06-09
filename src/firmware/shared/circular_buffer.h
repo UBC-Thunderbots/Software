@@ -11,7 +11,7 @@ typedef struct CircularBuffer CircularBuffer_t;
  * Initialize the circular_buffer struct members
  * @param  size Size of the circular_buffer to set
  *
- * NOTE: `size` must be larger than 0
+ * @pre: `size` must be larger than 0
  *
  * @return A pointer to the created circular_buffer, ownership is given to the caller
  */
@@ -37,7 +37,7 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data);
  * The index is relative to the most recent value in the buffer.
  * Eg. 0 is the most recent value, 1 is the second most recent, etc
  *
- * NOTE: `index` must be less than the max_size of the circular_buffer
+ * @pre: `index` must be less than the max_size of the circular_buffer
  *
  * @param  cbuffer The circular_buffer
  * @param  index Index of most recent value
@@ -49,7 +49,7 @@ float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, size_t index);
 /**
  * Retrieve the most recent value in the circular_buffer
  *
- * NOTE: At least one item must be in the circular_buffer
+ * @pre: At least one item must be in the circular_buffer
  *
  * @param  cbuffer The circular_buffer
  *
