@@ -4,8 +4,8 @@
 
 struct CircularBuffer
 {
-    uint8_t head;
-    uint8_t tail;
+    size_t head;
+    size_t tail;
     size_t max_size;
     float *buffer_data;
     bool is_full;
@@ -13,11 +13,8 @@ struct CircularBuffer
 
 CircularBuffer_t *circular_buffer_create(size_t size)
 {
-    // Set to a valid length if size is 0
-    if (size < 1)
-    {
-        size = 1;
-    }
+    // Check if size is in uint8_t range
+    assert(size > 0 && size < 256);
 
     CircularBuffer_t *new_cbuffer = malloc(sizeof(CircularBuffer_t));
 
@@ -52,7 +49,7 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data)
     }
 }
 
-float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, uint8_t index)
+float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, size_t index)
 {
     // Check if index is larger than the maximum buffer size
     assert(index <= cbuffer->max_size);

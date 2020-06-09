@@ -23,12 +23,12 @@ class CircularBufferTest : public testing::Test
     CircularBuffer_t* circular_buffer;
 };
 
-class CircularBufferTestInitZero : public testing::Test
+class CircularBufferTestInit0 : public testing::Test
 {
    protected:
     virtual void SetUp(void)
     {
-        circular_buffer = circular_buffer_create(0);
+        ASSERT_DEATH(circular_buffer_create(0), "size > 0 && size < 256");
     }
 
     virtual void TearDown(void)
@@ -38,6 +38,33 @@ class CircularBufferTestInitZero : public testing::Test
 
     CircularBuffer_t* circular_buffer;
 };
+
+class CircularBufferTestInit256 : public testing::Test
+{
+   protected:
+    virtual void SetUp(void)
+    {
+        ASSERT_DEATH(circular_buffer_create(999), "size > 0 && size < 256");
+    }
+
+    virtual void TearDown(void)
+    {
+        circular_buffer_destroy(circular_buffer);
+    }
+
+    CircularBuffer_t* circular_buffer;
+};
+
+// TODO add tests
+// TEST_F(CircularBufferTestInit0, circular_buffer_init_0)
+//{
+//    EXPECT_EQ(6, 6);
+//}
+//
+// TEST_F(CircularBufferTestInit256, circular_buffer_init_256)
+//{
+//    EXPECT_EQ(6, 6);
+//}
 
 TEST_F(CircularBufferTest, circular_buffer_exact_full)
 {
@@ -100,23 +127,6 @@ TEST_F(CircularBufferTest, circular_buffer_not_full)
     {
         EXPECT_EQ(expected_data[i], circular_buffer_getAtIndex(circular_buffer, i));
     }
-}
-
-TEST_F(CircularBufferTestInitZero, circular_buffer_init_zero)
-{
-    float mock_data[]   = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
-    float expected_data = 10.0;
-    int mock_data_size  = sizeof(mock_data) / sizeof(mock_data[0]);
-
-    // Populate circular buffer with mock data
-    for (int i = 0; i < mock_data_size; i++)
-    {
-        circular_buffer_push(circular_buffer, mock_data[i]);
-    }
-
-    EXPECT_TRUE(circular_buffer_isFull(circular_buffer));
-
-    EXPECT_EQ(expected_data, circular_buffer_getAtIndex(circular_buffer, 0));
 }
 
 TEST_F(CircularBufferTest, circular_buffer_get_at_index_larger_buffer_size)
@@ -198,11 +208,14 @@ TEST_F(CircularBufferTest, circular_buffer_front_not_full)
     int mock_data_size  = sizeof(mock_data) / sizeof(mock_data[0]);
     float expected_data = 5.0;
 
-    // Populate circular buffer with mock data
-    for (int i = 0; i < mock_data_size; i++)
+    circular_buffer_push(circular_buffer, mock_data[0]);
+
+    // Populate rest of circular buffer with mock data
+    for (int i = 1; i < mock_data_size; i++)
     {
         circular_buffer_push(circular_buffer, mock_data[i]);
         EXPECT_FALSE(circular_buffer_isFull(circular_buffer));
+        EXPECT_FALSE(circular_buffer_isEmpty(circular_buffer));
     }
 
     EXPECT_FALSE(circular_buffer_isFull(circular_buffer));

@@ -44,7 +44,7 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data);
  *
  * @return Data at the index of the most recent value
  */
-float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, uint8_t index);
+float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, size_t index);
 
 /**
  * Retrieve the most recent value in the circular_buffer
