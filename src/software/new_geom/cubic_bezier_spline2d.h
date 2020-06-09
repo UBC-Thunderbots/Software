@@ -30,12 +30,12 @@ class CubicBezierSpline2d : public Spline2d
                         const Point& end_point, const Vector& end_vector,
                         std::vector<Point> intermediate_knots);
 
-    const Point getValueAt(double val) const override;
+    const Point getValueAt(double t) const override;
 
     const std::vector<Point> getKnots() const override;
 
     // TODO: jdoc for this
-    const std::vector<Point> getControlPoints() const;
+    const std::vector<Point>& getControlPoints() const;
 
     size_t getNumKnots() const override;
 
@@ -46,4 +46,13 @@ class CubicBezierSpline2d : public Spline2d
     const Point getEndPoint() const override;
 
     const std::vector<SplineSegment2d> getSplineSegments() const override;
+
+   private:
+
+    // TODO: jdoc
+    std::vector<Point> computeControlPoints(const Point& start_point, const Vector& start_vector,
+                                            const Point& end_point, const Vector& end_vector,
+                                            std::vector<Point> intermediate_knots);
+
+    std::vector<Point> control_points;
 };
