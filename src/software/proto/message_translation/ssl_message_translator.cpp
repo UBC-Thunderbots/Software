@@ -45,9 +45,9 @@ static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names
 
 std::optional<SSL_FieldLineSegment> findLineSegment(
     const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments,
-    const SSLFieldLines line)
+    const SSLFieldLines line_type)
 {
-    const std::string line_name = ssl_field_line_names.at(line);
+    const std::string line_name = ssl_field_line_names.at(line_type);
     for (const auto& segment : line_segments)
     {
         if (segment.name() == line_name)
@@ -61,9 +61,9 @@ std::optional<SSL_FieldLineSegment> findLineSegment(
 
 std::optional<SSL_FieldCircularArc> findCircularArc(
     const google::protobuf::RepeatedPtrField<SSL_FieldCircularArc>& circular_arcs,
-    SSLCircularArcs arc)
+    SSLCircularArcs arc_type)
 {
-    const std::string arc_name = ssl_circular_arc_names.at(arc);
+    const std::string arc_name = ssl_circular_arc_names.at(arc_type);
     for (const auto& circular_arc : circular_arcs)
     {
         if (circular_arc.name() == arc_name)

@@ -67,28 +67,28 @@ MAKE_ENUM(SSLCircularArcs, CENTER_CIRCLE)
  * with the given name if it exists, otherwise returns std::nullopt
  *
  * @param line_segments The line segments to search
- * @param line The segment to find
+ * @param line_type The segment to find
  *
  * @return The first line segment with the given name if it exists, otherwise
  * returns std::nullopt
  */
 std::optional<SSL_FieldLineSegment> findLineSegment(
     const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments,
-    SSLFieldLines line);
+    SSLFieldLines line_type);
 
 /**
  * Find an SSL FieldCircularArc by name. Returns the first instance of a field arc
  * with the given name if it exists, otherwise returns std::nullopt
  *
  * @param circular_arcs The arcs to search
- * @param arc The arc to find
+ * @param arc_type The arc to find
  *
  * @return The first arc with the given name if it exists, otherwise
  * returns std::nullopt
  */
 std::optional<SSL_FieldCircularArc> findCircularArc(
     const google::protobuf::RepeatedPtrField<SSL_FieldCircularArc>& circular_arcs,
-    SSLCircularArcs arc);
+    SSLCircularArcs arc_type);
 
 /**
  * Creates a Vector2f proto message from the given point
