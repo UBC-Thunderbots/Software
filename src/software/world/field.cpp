@@ -20,7 +20,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
 {
     if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
         defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||
-        boundary_buffer_size_ <= 0 || center_circle_radius_ <= 0)
+        boundary_buffer_size_ < 0 || center_circle_radius_ <= 0)
     {
         throw std::invalid_argument(
             "At least one field dimension is non-positive - Field is invalid");

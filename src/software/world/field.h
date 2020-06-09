@@ -40,7 +40,8 @@ class Field
     /**
      * Constructs a new field with the given dimensions
      *
-     * @pre all dimensions must be > 0
+     * @pre all dimensions (except for the boundary buffer) must be > 0.
+     * @pre the boundary buffer must be >= 0
      *
      * @throws invalid_argument if at least one dimension is <= 0
      *
