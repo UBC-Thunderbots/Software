@@ -36,6 +36,8 @@ std::optional<SSL_FieldCircularArc> findCircularArc(
 std::unique_ptr<Vector2f> createVector2f(const Point& point)
 {
     auto vector2f = std::make_unique<Vector2f>();
+    // SSL Vision publishes all units in millimeters (even though the datatype
+    // is a float), so we need to convert units
     vector2f->set_x(static_cast<float>(point.x() * MILLIMETERS_PER_METER));
     vector2f->set_y(static_cast<float>(point.y() * MILLIMETERS_PER_METER));
     return std::move(vector2f);
@@ -55,6 +57,8 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(
     field_line_segment->set_name(name);
     field_line_segment->set_allocated_p1(createVector2f(segment.getSegStart()).release());
     field_line_segment->set_allocated_p2(createVector2f(segment.getEnd()).release());
+    // SSL Vision publishes all units in millimeters (even though the datatype
+    // is a float), so we need to convert units
     field_line_segment->set_thickness(
         static_cast<float>(thickness * MILLIMETERS_PER_METER));
     field_line_segment->set_type(shape_type);
@@ -76,6 +80,8 @@ std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(
     field_circular_arc->set_name(name);
     field_circular_arc->set_allocated_center(
         createVector2f(circle.getOrigin()).release());
+    // SSL Vision publishes all units in millimeters (even though the datatype
+    // is a float), so we need to convert units
     field_circular_arc->set_radius(
         static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER));
     field_circular_arc->set_a1(static_cast<float>(Angle::zero().toRadians()));
@@ -97,6 +103,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
 
     auto geometry_field_size = std::make_unique<SSL_GeometryFieldSize>();
 
+    // SSL Vision publishes all units in millimeters so we need to convert units
     geometry_field_size->set_field_length(
         static_cast<int32_t>(field.xLength() * MILLIMETERS_PER_METER));
     geometry_field_size->set_field_width(
