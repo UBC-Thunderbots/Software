@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
+#include "software/sensor_fusion/ssl_protobuf_reader.h"
 
 class SSLMessageTranslatorTest : public ::testing::Test
 {
@@ -13,12 +14,14 @@ class SSLMessageTranslatorTest : public ::testing::Test
     {
         auto result = ::testing::AssertionSuccess();
 
-        bool x_eq = std::fabs(static_cast<float>(point.x()) - vector.x()) < tolerance;
-        bool y_eq = std::fabs(static_cast<float>(point.y()) - vector.y()) < tolerance;
+        float x_dist = static_cast<float>(point.x() * MILLIMETERS_PER_METER - vector.x());
+        bool x_eq = std::fabs(x_dist) < tolerance;
+        float y_dist = static_cast<float>(point.y() * MILLIMETERS_PER_METER - vector.y());
+        bool y_eq = std::fabs(y_dist) < tolerance;
         if (!x_eq || !y_eq)
         {
             result = ::testing::AssertionFailure()
-                     << "Expected " << point << ", got (" << vector.x() << ", "
+                     << "Expected " << point.toVector() * MILLIMETERS_PER_METER << ", got (" << vector.x() << ", "
                      << vector.y() << ")";
         }
 
@@ -29,7 +32,7 @@ class SSLMessageTranslatorTest : public ::testing::Test
         const SSL_FieldLineSegment& field_segment, const Segment& segment,
         const float thickness, const float tolerance)
     {
-        EXPECT_FLOAT_EQ(thickness, field_segment.thickness());
+        EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_segment.thickness());
 
         auto segment_eq =
             equalWithinTolerance(segment.getSegStart(), field_segment.p1(), tolerance) &&
@@ -56,8 +59,8 @@ class SSLMessageTranslatorTest : public ::testing::Test
                                                     const float thickness,
                                                     const float tolerance)
     {
-        EXPECT_FLOAT_EQ(thickness, field_arc.thickness());
-        EXPECT_FLOAT_EQ(circle.getRadius(), field_arc.radius());
+        EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_arc.thickness());
+        EXPECT_FLOAT_EQ(circle.getRadius() * MILLIMETERS_PER_METER, field_arc.radius());
 
         auto center_eq =
             equalWithinTolerance(circle.getOrigin(), field_arc.center(), tolerance);
@@ -301,7 +304,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_valid_value
 
     ASSERT_TRUE(field_line_msg);
     EXPECT_EQ(name, field_line_msg->name());
-    EXPECT_FLOAT_EQ(thickness, field_line_msg->thickness());
+    EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_line_msg->thickness());
     EXPECT_TRUE(
         equalWithinTolerance(segment.getSegStart(), field_line_msg->p1(), tolerance));
     EXPECT_TRUE(equalWithinTolerance(segment.getEnd(), field_line_msg->p2(), tolerance));
@@ -330,10 +333,10 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_valid_value
 
     ASSERT_TRUE(circular_arc_msg);
     EXPECT_EQ(name, circular_arc_msg->name());
-    EXPECT_FLOAT_EQ(thickness, circular_arc_msg->thickness());
+    EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, circular_arc_msg->thickness());
     EXPECT_TRUE(
         equalWithinTolerance(circle.getOrigin(), circular_arc_msg->center(), tolerance));
-    EXPECT_FLOAT_EQ(circle.getRadius(), circular_arc_msg->radius());
+    EXPECT_FLOAT_EQ(circle.getRadius() * MILLIMETERS_PER_METER, circular_arc_msg->radius());
     EXPECT_EQ(SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
 }
 
@@ -603,4 +606,15 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_negative_thickne
     const float thickness = -0.005f;
 
     EXPECT_THROW(createGeometryData(field, thickness), std::invalid_argument);
+}
+
+TEST_F(SSLMessageTranslatorTest, test_convert_field_to_proto_and_back) {
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    const float thickness = 0.005f;
+
+    auto field_proto = createGeometryData(field, thickness);
+    auto new_field = SSLProtobufReader().getField(*field_proto);
+
+    ASSERT_TRUE(new_field);
+    EXPECT_EQ(field, new_field.value());
 }

@@ -36,8 +36,8 @@ std::optional<SSL_FieldCircularArc> findCircularArc(
 std::unique_ptr<Vector2f> createVector2f(const Point& point)
 {
     auto vector2f = std::make_unique<Vector2f>();
-    vector2f->set_x(static_cast<float>(point.x()));
-    vector2f->set_y(static_cast<float>(point.y()));
+    vector2f->set_x(static_cast<float>(point.x() * MILLIMETERS_PER_METER));
+    vector2f->set_y(static_cast<float>(point.y() * MILLIMETERS_PER_METER));
     return std::move(vector2f);
 }
 
@@ -55,7 +55,7 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(
     field_line_segment->set_name(name);
     field_line_segment->set_allocated_p1(createVector2f(segment.getSegStart()).release());
     field_line_segment->set_allocated_p2(createVector2f(segment.getEnd()).release());
-    field_line_segment->set_thickness(thickness);
+    field_line_segment->set_thickness(static_cast<float>(thickness * MILLIMETERS_PER_METER));
     field_line_segment->set_type(shape_type);
 
     return std::move(field_line_segment);
@@ -75,10 +75,10 @@ std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(
     field_circular_arc->set_name(name);
     field_circular_arc->set_allocated_center(
         createVector2f(circle.getOrigin()).release());
-    field_circular_arc->set_radius(static_cast<float>(circle.getRadius()));
+    field_circular_arc->set_radius(static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER));
     field_circular_arc->set_a1(static_cast<float>(Angle::zero().toRadians()));
     field_circular_arc->set_a2(static_cast<float>(Angle::full().toRadians()));
-    field_circular_arc->set_thickness(thickness);
+    field_circular_arc->set_thickness(static_cast<float>(thickness * MILLIMETERS_PER_METER));
     field_circular_arc->set_type(shape_type);
 
     return std::move(field_circular_arc);

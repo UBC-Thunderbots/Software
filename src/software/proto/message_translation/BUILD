@@ -17,6 +17,7 @@ cc_test(
     srcs = ["ssl_message_translator_test.cpp"],
     deps = [
         ":ssl_message_translator",
+        "//software/sensor_fusion:ssl_protobuf_reader",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
