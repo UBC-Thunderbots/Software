@@ -90,7 +90,7 @@ class SSLMessageTranslatorTest : public ::testing::Test
 TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_no_segments)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
-    auto result = findLineSegment(segments, "arbitrary name");
+    auto result = findLineSegment(segments, SSLFieldLines::LEFT_PENALTY_STRETCH);
     EXPECT_FALSE(result);
 }
 
@@ -111,7 +111,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_nonexistent_name)
     segment_1->set_thickness(0.01);
     segments.AddAllocated(segment_1.release());
 
-    auto result = findLineSegment(segments, "invalid name");
+    auto result = findLineSegment(segments, SSLFieldLines::CENTER_LINE);
     EXPECT_FALSE(result);
 }
 
@@ -120,7 +120,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_valid_name)
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
 
     auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
-    segment_1->set_name("segment_1");
+    segment_1->set_name("TopTouchLine");
     auto segment_1_p1 = std::make_unique<Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
@@ -133,7 +133,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_valid_name)
     segments.AddAllocated(segment_1.release());
 
     auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
-    segment_2->set_name("segment_2");
+    segment_2->set_name("BottomTouchLine");
     auto segment_2_p1 = std::make_unique<Vector2f>();
     segment_2_p1->set_x(1.0);
     segment_2_p1->set_y(2.0);
@@ -145,9 +145,9 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_valid_name)
     segment_2->set_thickness(0.01);
     segments.AddAllocated(segment_2.release());
 
-    auto result = findLineSegment(segments, "segment_2");
+    auto result = findLineSegment(segments, SSLFieldLines::BOTTOM_TOUCH_LINE);
     ASSERT_TRUE(result);
-    EXPECT_EQ("segment_2", result->name());
+    EXPECT_EQ("BottomTouchLine", result->name());
 }
 
 TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
@@ -155,7 +155,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
 
     auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
-    segment_1->set_name("segment");
+    segment_1->set_name("TopTouchLine");
     auto segment_1_p1 = std::make_unique<Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
@@ -168,7 +168,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
     segments.AddAllocated(segment_1.release());
 
     auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
-    segment_2->set_name("segment");
+    segment_2->set_name("TopTouchLine");
     auto segment_2_p1 = std::make_unique<Vector2f>();
     segment_2_p1->set_x(5.0);
     segment_2_p1->set_y(5.0);
@@ -180,9 +180,9 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
     segment_2->set_thickness(0.05);
     segments.AddAllocated(segment_2.release());
 
-    auto result = findLineSegment(segments, "segment");
+    auto result = findLineSegment(segments, SSLFieldLines::TOP_TOUCH_LINE);
     ASSERT_TRUE(result);
-    EXPECT_EQ("segment", result->name());
+    EXPECT_EQ("TopTouchLine", result->name());
     // Sanity check we got the first segment
     EXPECT_FLOAT_EQ(1.0, result->p1().x());
     EXPECT_FLOAT_EQ(2.0, result->p1().y());
@@ -191,7 +191,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
 TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_no_arcs)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
-    auto result = findCircularArc(arcs, "arbitrary name");
+    auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     EXPECT_FALSE(result);
 }
 
@@ -200,7 +200,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_nonexistent_name)
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
 
     auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
-    arc_1->set_name("arc_1");
+    arc_1->set_name("nonexistent_name");
     auto arc_1_center = std::make_unique<Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
@@ -211,7 +211,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_nonexistent_name)
     arc_1->set_thickness(0.01);
     arcs.AddAllocated(arc_1.release());
 
-    auto result = findCircularArc(arcs, "invalid name");
+    auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     EXPECT_FALSE(result);
 }
 
@@ -220,7 +220,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_valid_name)
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
 
     auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
-    arc_1->set_name("arc_1");
+    arc_1->set_name("SomeNameThatDoesn'tExist");
     auto arc_1_center = std::make_unique<Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
@@ -232,7 +232,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_valid_name)
     arcs.AddAllocated(arc_1.release());
 
     auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
-    arc_2->set_name("arc_2");
+    arc_2->set_name("CenterCircle");
     auto arc_2_center = std::make_unique<Vector2f>();
     arc_2_center->set_x(1.0);
     arc_2_center->set_y(2.0);
@@ -243,9 +243,9 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_valid_name)
     arc_2->set_thickness(0.01);
     arcs.AddAllocated(arc_2.release());
 
-    auto result = findCircularArc(arcs, "arc_2");
+    auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     ASSERT_TRUE(result);
-    EXPECT_EQ("arc_2", result->name());
+    EXPECT_EQ("CenterCircle", result->name());
 }
 
 TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_duplicate_names)
@@ -253,7 +253,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_duplicate_names)
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
 
     auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
-    arc_1->set_name("arc");
+    arc_1->set_name("CenterCircle");
     auto arc_1_center = std::make_unique<Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
@@ -265,7 +265,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_duplicate_names)
     arcs.AddAllocated(arc_1.release());
 
     auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
-    arc_2->set_name("arc");
+    arc_2->set_name("CenterCircle");
     auto arc_2_center = std::make_unique<Vector2f>();
     arc_2_center->set_x(-2.0);
     arc_2_center->set_y(3.0);
@@ -276,9 +276,9 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_duplicate_names)
     arc_2->set_thickness(0.5);
     arcs.AddAllocated(arc_2.release());
 
-    auto result = findCircularArc(arcs, "arc");
+    auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     ASSERT_TRUE(result);
-    EXPECT_EQ("arc", result->name());
+    EXPECT_EQ("CenterCircle", result->name());
     // Sanity check we got the first arc
     EXPECT_FLOAT_EQ(1.0, result->center().x());
     EXPECT_FLOAT_EQ(2.0, result->center().y());
@@ -371,11 +371,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
 
     // Field lines
 
-    // Every single line we know about should be populated
-    EXPECT_EQ(ssl_field_line_names.size(), field_msg->field_lines().size());
-
     auto top_touch_line = findLineSegment(
-        field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::TOP_TOUCH_LINE));
+        field_msg->field_lines(), SSLFieldLines::TOP_TOUCH_LINE);
     ASSERT_TRUE(top_touch_line);
     EXPECT_TRUE(equalWithinTolerance(top_touch_line.value(),
                                      Segment(Point(-4.5, 3), Point(4.5, 3)), thickness,
@@ -384,8 +381,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::TopTouchLine, top_touch_line->type());
 
     auto bottom_touch_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::BOTTOM_TOUCH_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::BOTTOM_TOUCH_LINE);
     ASSERT_TRUE(bottom_touch_line);
     EXPECT_TRUE(equalWithinTolerance(bottom_touch_line.value(),
                                      Segment(Point(-4.5, -3), Point(4.5, -3)), thickness,
@@ -393,8 +389,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     ASSERT_TRUE(bottom_touch_line->has_type());
     EXPECT_EQ(SSL_FieldShapeType::BottomTouchLine, bottom_touch_line->type());
 
-    auto left_goal_line = findLineSegment(
-        field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_LINE));
+    auto left_goal_line = findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_LINE);
     ASSERT_TRUE(left_goal_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_line.value(),
                                      Segment(Point(-4.5, 3), Point(-4.5, -3)), thickness,
@@ -403,8 +398,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::LeftGoalLine, left_goal_line->type());
 
     auto right_goal_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_LINE);
     ASSERT_TRUE(right_goal_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_line.value(),
                                      Segment(Point(4.5, 3), Point(4.5, -3)), thickness,
@@ -412,16 +406,14 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     ASSERT_TRUE(right_goal_line->has_type());
     EXPECT_EQ(SSL_FieldShapeType::RightGoalLine, right_goal_line->type());
 
-    auto halfway_line = findLineSegment(
-        field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::HALFWAY_LINE));
+    auto halfway_line = findLineSegment(field_msg->field_lines(), SSLFieldLines::HALFWAY_LINE);
     ASSERT_TRUE(halfway_line);
     EXPECT_TRUE(equalWithinTolerance(
         halfway_line.value(), Segment(Point(0, 3), Point(0, -3)), thickness, tolerance));
     ASSERT_TRUE(halfway_line->has_type());
     EXPECT_EQ(SSL_FieldShapeType::HalfwayLine, halfway_line->type());
 
-    auto center_line = findLineSegment(
-        field_msg->field_lines(), ssl_field_line_names.at(SSLFieldLines::CENTER_LINE));
+    auto center_line = findLineSegment(field_msg->field_lines(), SSLFieldLines::CENTER_LINE);
     ASSERT_TRUE(center_line);
     EXPECT_TRUE(equalWithinTolerance(center_line.value(),
                                      Segment(Point(-4.5, 0), Point(4.5, 0)), thickness,
@@ -430,8 +422,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::CenterLine, center_line->type());
 
     auto left_penalty_stretch =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::LEFT_PENALTY_STRETCH));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_PENALTY_STRETCH);
     ASSERT_TRUE(left_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(left_penalty_stretch.value(),
                                      Segment(Point(-3.5, 1), Point(-3.5, -1)), thickness,
@@ -440,8 +431,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::LeftPenaltyStretch, left_penalty_stretch->type());
 
     auto right_penalty_stretch =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::RIGHT_PENALTY_STRETCH));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_PENALTY_STRETCH);
     ASSERT_TRUE(right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_penalty_stretch.value(),
                                      Segment(Point(3.5, 1), Point(3.5, -1)), thickness,
@@ -450,8 +440,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::RightPenaltyStretch, right_penalty_stretch->type());
 
     auto right_goal_top_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_TOP_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_TOP_LINE);
     ASSERT_TRUE(right_goal_top_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_top_line.value(),
                                      Segment(Point(4.5, 0.5), Point(4.7, 0.5)), thickness,
@@ -460,8 +449,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::Undefined, right_goal_top_line->type());
 
     auto right_goal_bottom_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE);
     ASSERT_TRUE(right_goal_bottom_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_bottom_line.value(),
                                      Segment(Point(4.5, -0.5), Point(4.7, -0.5)),
@@ -470,8 +458,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::Undefined, right_goal_bottom_line->type());
 
     auto right_goal_depth_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::RIGHT_GOAL_DEPTH_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_DEPTH_LINE);
     ASSERT_TRUE(right_goal_depth_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_depth_line.value(),
                                      Segment(Point(4.7, 0.5), Point(4.7, -0.5)),
@@ -480,8 +467,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::Undefined, right_goal_depth_line->type());
 
     auto left_goal_top_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_TOP_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_TOP_LINE);
     ASSERT_TRUE(left_goal_top_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_top_line.value(),
                                      Segment(Point(-4.5, 0.5), Point(-4.7, 0.5)),
@@ -490,8 +476,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::Undefined, left_goal_top_line->type());
 
     auto left_goal_bottom_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_BOTTOM_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_BOTTOM_LINE);
     ASSERT_TRUE(left_goal_bottom_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_bottom_line.value(),
                                      Segment(Point(-4.5, -0.5), Point(-4.7, -0.5)),
@@ -500,8 +485,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::Undefined, left_goal_bottom_line->type());
 
     auto left_goal_depth_line =
-        findLineSegment(field_msg->field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::LEFT_GOAL_DEPTH_LINE));
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_DEPTH_LINE);
     ASSERT_TRUE(left_goal_depth_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_depth_line.value(),
                                      Segment(Point(-4.7, 0.5), Point(-4.7, -0.5)),
@@ -510,8 +494,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::Undefined, left_goal_depth_line->type());
 
     auto left_field_left_penalty_stretch = findLineSegment(
-        field_msg->field_lines(),
-        ssl_field_line_names.at(SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH));
+        field_msg->field_lines(), SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH);
     ASSERT_TRUE(left_field_left_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(left_field_left_penalty_stretch.value(),
                                      Segment(Point(-4.5, 1), Point(-3.5, 1)), thickness,
@@ -521,8 +504,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
               left_field_left_penalty_stretch->type());
 
     auto left_field_right_penalty_stretch = findLineSegment(
-        field_msg->field_lines(),
-        ssl_field_line_names.at(SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH));
+        field_msg->field_lines(), SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH);
     ASSERT_TRUE(left_field_right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(left_field_right_penalty_stretch.value(),
                                      Segment(Point(-4.5, -1), Point(-3.5, -1)), thickness,
@@ -532,8 +514,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
               left_field_right_penalty_stretch->type());
 
     auto right_field_left_penalty_stretch = findLineSegment(
-        field_msg->field_lines(),
-        ssl_field_line_names.at(SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH));
+        field_msg->field_lines(), SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH);
     ASSERT_TRUE(right_field_left_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_field_left_penalty_stretch.value(),
                                      Segment(Point(4.5, -1), Point(3.5, -1)), thickness,
@@ -543,8 +524,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
               right_field_left_penalty_stretch->type());
 
     auto right_field_right_penalty_stretch = findLineSegment(
-        field_msg->field_lines(),
-        ssl_field_line_names.at(SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH));
+        field_msg->field_lines(), SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH);
     ASSERT_TRUE(right_field_right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_field_right_penalty_stretch.value(),
                                      Segment(Point(4.5, 1), Point(3.5, 1)), thickness,
@@ -555,12 +535,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
 
     // Field arcs
 
-    // Every single arc we know about should be populated
-    EXPECT_EQ(ssl_circular_arc_names.size(), field_msg->field_arcs().size());
-
-    auto center_circle =
-        findCircularArc(field_msg->field_arcs(),
-                        ssl_circular_arc_names.at(SSLCircularArcs::CENTER_CIRCLE));
+    auto center_circle = findCircularArc(field_msg->field_arcs(), SSLCircularArcs::CENTER_CIRCLE);
     ASSERT_TRUE(center_circle);
     EXPECT_TRUE(equalWithinTolerance(center_circle.value(), Circle(Point(0, 0), 0.5),
                                      thickness, tolerance));

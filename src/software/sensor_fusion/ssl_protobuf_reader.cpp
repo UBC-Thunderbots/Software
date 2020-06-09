@@ -10,8 +10,7 @@ std::optional<Field> SSLProtobufReader::getField(
     SSL_GeometryFieldSize field_data = geometry_packet.field();
 
     auto ssl_center_circle =
-        findCircularArc(field_data.field_arcs(),
-                        ssl_circular_arc_names.at(SSLCircularArcs::CENTER_CIRCLE));
+        findCircularArc(field_data.field_arcs(), SSLCircularArcs::CENTER_CIRCLE);
     if (!ssl_center_circle)
     {
         return std::nullopt;
@@ -26,8 +25,7 @@ std::optional<Field> SSLProtobufReader::getField(
     double center_circle_radius = ssl_center_circle->radius() * METERS_PER_MILLIMETER;
 
     auto ssl_left_field_left_penalty_stretch = findLineSegment(
-        field_data.field_lines(),
-        ssl_field_line_names.at(SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH));
+        field_data.field_lines(), SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH);
     if (!ssl_left_field_left_penalty_stretch)
     {
         return std::nullopt;
@@ -42,8 +40,7 @@ std::optional<Field> SSLProtobufReader::getField(
         (defense_length_p2 - defense_length_p1).length() * METERS_PER_MILLIMETER;
 
     auto ssl_left_penalty_stretch =
-        findLineSegment(field_data.field_lines(),
-                        ssl_field_line_names.at(SSLFieldLines::LEFT_PENALTY_STRETCH));
+        findLineSegment(field_data.field_lines(), SSLFieldLines::LEFT_PENALTY_STRETCH);
     if (!ssl_left_penalty_stretch)
     {
         return std::nullopt;
