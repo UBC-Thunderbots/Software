@@ -20,8 +20,8 @@ class TestThetaStarPathPlanner : public testing::Test
     {
     }
 
-    std::unique_ptr<PathPlanner> planner;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
+    std::unique_ptr<PathPlanner> planner;
 };
 
 void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,

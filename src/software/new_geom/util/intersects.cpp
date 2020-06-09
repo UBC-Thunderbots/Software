@@ -67,7 +67,7 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Segment &first, const Circle &second)
 {
-    if (distance(first, second.getOrigin()) < second.getRadius())
+    if (distance(first, second.getOrigin()) <= second.getRadius())
     {
         return true;
     }

@@ -35,9 +35,9 @@ class Segment final
      *
      * @param o new end point of segment
      */
-    void setEnd(Point f)
+    void setEnd(Point o)
     {
-        end = f;
+        end = o;
     }
 
     /**

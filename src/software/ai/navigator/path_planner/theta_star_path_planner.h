@@ -273,7 +273,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if path to end was found among successors
      */
-    bool visitSuccessors(const Coordinate &current_coord, const Coordinate &end_coord);
+    bool visitNeighbours(const Coordinate &current_coord, const Coordinate &end_coord);
 
     /**
      * Adjusts start and end points for navigability and determines if a path cannot be
@@ -292,27 +292,6 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return true if there is no path to end
      */
     bool adjustEndPointsAndCheckForNoPath(Coordinate &start_coord, Coordinate &end_coord);
-
-    /**
-     * Check if start to end is within a grid cell or within a constant threshold
-     *
-     * @param start start point
-     * @param end end point
-     *
-     * @return true start to end is within threshold
-     */
-    bool isStartToEndWithinThreshold(const Point &start, const Point &end) const;
-
-    /**
-     * Check if start to closest end point is at least a grid cell away
-     *
-     * @param start start point
-     * @param closest_end closest end point
-     *
-     * @return true start to closest end is within threshold
-     */
-    bool isStartToClosestEndWithinThreshold(const Point &start,
-                                            const Point &closest_end) const;
 
     /**
      * Resets and initializes member variables to prepare for planning a new path
@@ -356,12 +335,8 @@ class ThetaStarPathPlanner : public PathPlanner
     static constexpr double BLOCKED_END_SEARCH_RESOLUTION =
         50.0;  // number of fractions to divide 1m
 
-    // only change this value
-    static constexpr unsigned int GRID_DIVISION_FACTOR =
-        1;  // the n in the O(n^2) algorithm :p
-    // don't change this calculation
     const double SIZE_OF_GRID_CELL_IN_METERS =
-        (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
+        ROBOT_MAX_RADIUS_METERS;  // this is the n in the O(n^2) algorithm :p
 
     std::vector<ObstaclePtr> obstacles;
     unsigned int num_grid_rows;

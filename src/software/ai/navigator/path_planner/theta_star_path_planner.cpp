@@ -180,12 +180,14 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
         return std::nullopt;
     }
 
-    if (isStartToEndWithinThreshold(start, end))
+    // if the start and end points are close enough, then return a straightline path
+    if ((start - end).length() < CLOSE_TO_END_THRESHOLD ||
+        ((start - end).length() < SIZE_OF_GRID_CELL_IN_METERS))
     {
         return Path(std::vector<Point>({start, end}));
     }
-
-    if (isStartToClosestEndWithinThreshold(start, closest_end))
+    if ((start - closest_end).length() <
+        (CLOSE_TO_END_THRESHOLD * BLOCKED_END_OSCILLATION_MITIGATION))
     {
         return Path(std::vector<Point>({start, closest_end}));
     }
@@ -266,21 +268,6 @@ bool ThetaStarPathPlanner::adjustEndPointsAndCheckForNoPath(Coordinate &start_co
     return ret_no_path;
 }
 
-bool ThetaStarPathPlanner::isStartToEndWithinThreshold(const Point &start,
-                                                       const Point &end) const
-{
-    // If the end CellHeuristic is within one grid size of start
-    return ((start - end).length() < CLOSE_TO_END_THRESHOLD ||
-            ((start - end).length() < SIZE_OF_GRID_CELL_IN_METERS));
-}
-
-bool ThetaStarPathPlanner::isStartToClosestEndWithinThreshold(
-    const Point &start, const Point &closest_end) const
-{
-    return ((start - closest_end).length() <
-            (CLOSE_TO_END_THRESHOLD * BLOCKED_END_OSCILLATION_MITIGATION));
-}
-
 bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
 {
     while (!open_list.empty())
@@ -293,7 +280,7 @@ bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
         // Add this vertex to the closed list
         closed_list.insert(current_coord);
 
-        if (visitSuccessors(current_coord, end_coord))
+        if (visitNeighbours(current_coord, end_coord))
         {
             return true;
         }
@@ -305,7 +292,7 @@ bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
     return false;
 }
 
-bool ThetaStarPathPlanner::visitSuccessors(const Coordinate &current_coord,
+bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
                                            const Coordinate &end_coord)
 {
     /*
