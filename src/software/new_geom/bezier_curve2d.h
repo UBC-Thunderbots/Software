@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-
 #include "software/new_geom/point.h"
 #include "software/new_geom/spline2d.h"
 
@@ -46,6 +45,13 @@ class BezierCurve2d
      */
     Polynomial2d getPolynomial() const;
 
+    /**
+     * The equality operator for BezierCurve2d
+     * @param other The other BezierCurve2d to compare this one to for equality.
+     * @return True if this curve is equal to
+     */
+    bool operator==(const BezierCurve2d& other) const;
+
    private:
     /*
      * Evaluate the point `t` on the bezier curve with control points `points`
@@ -78,3 +84,4 @@ class BezierCurve2d
     // The control points for this bezier curve
     const std::vector<Point> control_points;
 };
+

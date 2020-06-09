@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/new_geom/point.h"
 #include "software/new_geom/polynomial2d.h"
 
