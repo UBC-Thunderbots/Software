@@ -83,11 +83,11 @@ class Simulator
     void setPrimitives(ConstPrimitiveVectorPtr primitives);
 
     /**
-     * Returns the current state of the world in the simulation if available
+     * Returns the current state of the world in the simulation
      *
      * @return the current state of the world in the simulation
      */
-    std::optional<World> getWorld();
+    World getWorld();
 
    private:
     /**
