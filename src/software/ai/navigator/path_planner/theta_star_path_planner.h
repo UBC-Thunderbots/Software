@@ -80,7 +80,7 @@ class ThetaStarPathPlanner : public PathPlanner
          * @param path_cost_and_end_dist_heuristic The path cost and end dist heuristic
          * @param best_path_cost best_path_cost
          */
-        void update(Coordinate parent, double path_cost_and_end_dist_heuristic,
+        void update(const Coordinate &parent, double path_cost_and_end_dist_heuristic,
                     double best_path_cost)
         {
             parent_                           = parent;
@@ -92,7 +92,7 @@ class ThetaStarPathPlanner : public PathPlanner
         /**
          * Checks if this is initialized
          *
-         * @return if CellHeuristic is initialized
+         * @return true if CellHeuristic is initialized
          */
         bool isInitialized(void) const
         {
@@ -138,7 +138,7 @@ class ThetaStarPathPlanner : public PathPlanner
     };
 
     /**
-     * Returns if a cell is within bounds of grid
+     * Returns whether or not a cell is within bounds of grid
      *
      * @param coord Coordinate to consider
      *
@@ -147,7 +147,7 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isCoordNavigable(const Coordinate &coord) const;
 
     /**
-     * Returns if a cell is unblocked
+     * Returns whether or not a cell is unblocked
      *
      * @param coord Coordinate to consider
      *
@@ -156,7 +156,7 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isUnblocked(const Coordinate &coord);
 
     /**
-     * Computes distance from coord1 to coord2
+     * Computes Euclidean distance from coord1 to coord2
      *
      * @param coord1 The first Coordinate
      * @param coord2 The second Coordinate
@@ -261,33 +261,40 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @param end_coord end coordinates
      *
-     * @return if path to end was found
+     * @return true if path to end was found
      */
     bool findPathToEnd(const Coordinate &end_coord);
 
     /**
-     * Update vertex for all successors of current_coord
+     * Update vertex for all neighbours (all 8 directions) of current_coord
      *
      * @param current_coord The current coordinate
      * @param end_coord end coordinates
      *
-     * @return if path to end was found among successors
+     * @return true if path to end was found among successors
      */
     bool visitSuccessors(const Coordinate &current_coord, const Coordinate &end_coord);
 
     /**
-     * Check for non-navigable or blocked start_coord and end_coord and
-     * adjust parameters accordingly
+     * Adjusts start and end points for navigability and determines if a path cannot be
+     * found
+     *
+     * If start or end are non-navigable, then no path exists
+     *
+     * If start or end are blocked by obstacle(s), then try to find a nearby point that
+     * isn't blocked
+     * - If a point can be found then set the endpoint to that nearest point
+     * - If no nearby points are unblocked, then no path exists
      *
      * @param [in/out] start_coord source coordinate
      * @param [in/out] end_coord end coordinate
      *
      * @return true if there is no path to end
      */
-    bool nonNavigableOrBlockedCases(Coordinate &start_coord, Coordinate &end_coord);
+    bool adjustEndPointsAndCheckForNoPath(Coordinate &start_coord, Coordinate &end_coord);
 
     /**
-     * Check if start to end is at least a grid cell away
+     * Check if start to end is within a grid cell or within a constant threshold
      *
      * @param start start point
      * @param end end point
@@ -297,7 +304,7 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isStartToEndWithinThreshold(const Point &start, const Point &end) const;
 
     /**
-     * Check if start to closest end is at least a grid cell away
+     * Check if start to closest end point is at least a grid cell away
      *
      * @param start start point
      * @param closest_end closest end point
@@ -338,14 +345,14 @@ class ThetaStarPathPlanner : public PathPlanner
         const ThetaStarPathPlanner::Coordinate &coord2) const;
 
     // if close to end then return no path
-    static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
+    static constexpr double CLOSE_TO_END_THRESHOLD = 0.01;  // in metres
 
     // increase in threshold to reduce oscillation
-    static constexpr unsigned int BLOCKED_DESINATION_OSCILLATION_MITIGATION =
-        2;  // multiples of CLOSE_TO_DEST_THRESHOLD to ignore to control oscillation
+    static constexpr unsigned int BLOCKED_END_OSCILLATION_MITIGATION =
+        2;  // multiples of CLOSE_TO_END_THRESHOLD to ignore to control oscillation
 
     // resolution for searching for unblocked point around a blocked end
-    static constexpr double BLOCKED_DESTINATION_SEARCH_RESOLUTION =
+    static constexpr double BLOCKED_END_SEARCH_RESOLUTION =
         50.0;  // number of fractions to divide 1m
 
     // only change this value

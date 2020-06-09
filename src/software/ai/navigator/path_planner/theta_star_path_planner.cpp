@@ -110,11 +110,11 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
                                         const Coordinate &end, double marginal_dist)
 {
     // Only process this CellHeuristic if this is a navigable one
-    if (isCoordNavigable(next) == true)
+    if (isCoordNavigable(next))
     {
         // If the successor is already on the closed list or if it is blocked, then ignore
         // it.  Else do the following
-        if (closed_list.find(next) == closed_list.end() && isUnblocked(next) == true)
+        if (closed_list.find(next) == closed_list.end() && isUnblocked(next))
         {
             double updated_best_path_cost;
             Coordinate next_parent;
@@ -174,7 +174,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     Coordinate start_coord = convertPointToCoord(start);
     Coordinate end_coord   = convertPointToCoord(closest_end);
 
-    if (nonNavigableOrBlockedCases(start_coord, end_coord))
+    bool no_path_exists = adjustEndPointsAndCheckForNoPath(start_coord, end_coord);
+    if (no_path_exists)
     {
         return std::nullopt;
     }
@@ -215,8 +216,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     return Path(path_points);
 }
 
-bool ThetaStarPathPlanner::nonNavigableOrBlockedCases(Coordinate &start_coord,
-                                                      Coordinate &end_coord)
+bool ThetaStarPathPlanner::adjustEndPointsAndCheckForNoPath(Coordinate &start_coord,
+                                                            Coordinate &end_coord)
 {
     bool ret_no_path = false;
 
@@ -269,7 +270,7 @@ bool ThetaStarPathPlanner::isStartToEndWithinThreshold(const Point &start,
                                                        const Point &end) const
 {
     // If the end CellHeuristic is within one grid size of start
-    return ((start - end).length() < CLOSE_TO_DEST_THRESHOLD ||
+    return ((start - end).length() < CLOSE_TO_END_THRESHOLD ||
             ((start - end).length() < SIZE_OF_GRID_CELL_IN_METERS));
 }
 
@@ -277,7 +278,7 @@ bool ThetaStarPathPlanner::isStartToClosestEndWithinThreshold(
     const Point &start, const Point &closest_end) const
 {
     return ((start - closest_end).length() <
-            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION));
+            (CLOSE_TO_END_THRESHOLD * BLOCKED_END_OSCILLATION_MITIGATION));
 }
 
 bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
@@ -385,11 +386,11 @@ Point ThetaStarPathPlanner::findClosestFreePoint(const Point &p)
     // expanding a circle to search for free points
     if (!isPointNavigableAndFreeOfObstacles(p))
     {
-        int xc = static_cast<int>(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-        int yc = static_cast<int>(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+        int xc = static_cast<int>(p.x() * BLOCKED_END_SEARCH_RESOLUTION);
+        int yc = static_cast<int>(p.y() * BLOCKED_END_SEARCH_RESOLUTION);
 
-        for (int r = 1;
-             r < max_navigable_x_coord * 2.0 * BLOCKED_DESTINATION_SEARCH_RESOLUTION; r++)
+        for (int r = 1; r < max_navigable_x_coord * 2.0 * BLOCKED_END_SEARCH_RESOLUTION;
+             r++)
         {
             int x = 0, y = r;
             int d = 3 - 2 * r;
@@ -399,13 +400,13 @@ Point ThetaStarPathPlanner::findClosestFreePoint(const Point &p)
                 for (int inner : {-1, 1})
                 {
                     Point p1 = Point(static_cast<double>(xc + outer * x) /
-                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                                         BLOCKED_END_SEARCH_RESOLUTION,
                                      static_cast<double>(yc + inner * y) /
-                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+                                         BLOCKED_END_SEARCH_RESOLUTION);
                     Point p2 = Point(static_cast<double>(xc + outer * y) /
-                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                                         BLOCKED_END_SEARCH_RESOLUTION,
                                      static_cast<double>(yc + inner * x) /
-                                         BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+                                         BLOCKED_END_SEARCH_RESOLUTION);
                     if (isPointNavigableAndFreeOfObstacles(p1))
                     {
                         return p1;
@@ -438,12 +439,12 @@ Point ThetaStarPathPlanner::findClosestFreePoint(const Point &p)
                 {
                     for (int inner : {-1, 1})
                     {
-                        Point p1 = Point(
-                            (xc + outer * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
-                            (yc + inner * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
-                        Point p2 = Point(
-                            (xc + outer * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
-                            (yc + inner * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+                        Point p1 =
+                            Point((xc + outer * x) / BLOCKED_END_SEARCH_RESOLUTION,
+                                  (yc + inner * y) / BLOCKED_END_SEARCH_RESOLUTION);
+                        Point p2 =
+                            Point((xc + outer * y) / BLOCKED_END_SEARCH_RESOLUTION,
+                                  (yc + inner * x) / BLOCKED_END_SEARCH_RESOLUTION);
                         if (isPointNavigableAndFreeOfObstacles(p1))
                         {
                             return p1;

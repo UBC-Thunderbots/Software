@@ -123,8 +123,6 @@ std::vector<std::pair<std::string, PathPlannerConstructor>>
     path_planner_names_and_constructors = {
         // add path planner constructors here
         nameAndConstructor<ThetaStarPathPlanner>(),
-        // uncomment this if you want some tests to fail
-        //        name_and_constructor<StraightLinePathPlanner>()
 };
 
 
