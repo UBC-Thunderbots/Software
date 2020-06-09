@@ -153,6 +153,82 @@ app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
     return OK;
 }
 
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_createForwardsContinuousSpeedProfile(
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const float max_allowable_acceleration, const float initial_speed,
+    const float final_speed, const unsigned int num_segments)
+{
+    // Set the initial speed
+    speeds[0] = initial_speed;
+
+    for (unsigned int i = 1; i < num_segments; i++)
+    {
+        // 'i' represents the next speed, where [i-1] is the current speed
+        const float speed        = speeds[i - 1];
+        const float displacement = segment_lengths[i - 1];
+
+        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
+        float temp_vel =
+            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
+                speed, displacement, max_allowable_acceleration);
+
+        // Pick  the lowest of the maximum the available speeds
+        const float lowest_speed = fmin(max_allowable_speed_profile[i], temp_vel);
+
+        speeds[i] = lowest_speed;
+    }
+
+    if (speeds[num_segments - 1] < final_speed)
+    {
+        return FINAL_VELOCITY_TOO_HIGH;
+    }
+
+    speeds[num_segments - 1] = final_speed;
+    return OK;
+}
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_modifySpeedsToBackwardsContinuous(
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const float max_allowable_acceleration, const float initial_speed,
+    const float final_speed, const unsigned int num_segments)
+{
+    for (unsigned int i = num_segments - 1; i > 0; i--)
+    {
+        const float current_speed  = speeds[i];
+        const float previous_speed = speeds[i - 1];
+        const float segment_length = segment_lengths[i - 1];
+
+        // Vf = sqrt( Vi^2 + 2*constant_segment_length*max_acceleration)
+        float temp_speed =
+            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
+                current_speed, segment_length, max_allowable_acceleration);
+
+        // If the velocity at [i-1] is larger than it physically possible to decelerate
+        // from, pull the speed at [i-1] lower
+        if (previous_speed > temp_speed)
+        {
+            speeds[i - 1] = temp_speed;
+        }
+    }
+
+    // Check that we are able to decelerate fast enough that the initial velocity allows
+    // for the path to be followed
+    // Note: The initial speed of an angular profile is always assumed to be zero
+    TrajectoryPlannerGenerationStatus_t status = OK;
+
+    if (speeds[0] < initial_speed)
+    {
+        speeds[0] = initial_speed;
+        status    = INITIAL_VELOCITY_TOO_HIGH;
+    }
+
+    return status;
+}
 
 void app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(
     PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths)
@@ -635,6 +711,35 @@ void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
 
         trajectory_segments[i - 1].linear_segment_length  = linear_segment_length;
         trajectory_segments[i - 1].angular_segment_length = angular_segment_length;
+    }
+}
+
+void app_trajectory_planner_generateSegmentNodesAndLengths(
+    const float t_start, const float t_end, Polynomial1dOrder3_t poly,
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const unsigned int num_elements)
+{
+    // Check that the pre conditions are met
+    assert(num_elements > 2);
+    assert(num_elements <= TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
+    assert(t_start != t_end);
+
+    node_values[0] = shared_polynomial1d_getValueOrder3(poly, t_start);
+
+    const float t_segment_size = (t_end - t_start) / (num_elements - 1);
+
+    for (unsigned int i = 1; i < num_elements; i++)
+    {
+        const float current_t = t_start + i * t_segment_size;
+
+        // Grab the states at each 't' value
+        node_values[i] = shared_polynomial1d_getValueOrder3(poly, current_t);
+
+        // Calculate the length of each segment and store it
+        const float segment_length = node_values[i] - node_values[i - 1];
+
+        segment_lengths[i - 1] = segment_length;
     }
 }
 

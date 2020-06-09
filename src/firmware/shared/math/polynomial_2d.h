@@ -165,3 +165,5 @@ GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(3);
  */
 float shared_polynomial2d_getTotalArcLength(
     ArcLengthParametrization_t arc_length_paramameterization);
+
+// float shared_polynomial2d_getCurvature(Pol)
