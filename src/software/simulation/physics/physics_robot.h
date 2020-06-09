@@ -40,7 +40,7 @@ class PhysicsRobot
      * @param robot_state The initial robot state
      * @param mass_kg The mass of the robot in kg
      */
-    explicit PhysicsRobot(const unsigned int id, std::shared_ptr<b2World> world,
+    explicit PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
                           const RobotState &robot_state, const double mass_kg);
 
     PhysicsRobot() = delete;
@@ -62,7 +62,7 @@ class PhysicsRobot
      *
      * @return the id of this physics robot
      */
-    unsigned int getRobotId() const;
+    RobotId getRobotId() const;
 
     /**
      * Adds the given function to this PhysicsRobot's list of dribbler-ball contact
@@ -246,7 +246,7 @@ class PhysicsRobot
     // Bodies, and Fixtures
     b2Body *robot_body;
 
-    unsigned int robot_id;
+    RobotId robot_id;
 
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         dribbler_ball_contact_callbacks;
