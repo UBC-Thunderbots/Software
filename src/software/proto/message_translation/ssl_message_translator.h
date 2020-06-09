@@ -73,8 +73,8 @@ MAKE_ENUM(SSLCircularArcs, CENTER_CIRCLE)
  * returns std::nullopt
  */
 std::optional<SSL_FieldLineSegment> findLineSegment(
-        const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments,
-        SSLFieldLines line);
+    const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments,
+    SSLFieldLines line);
 
 /**
  * Find an SSL FieldCircularArc by name. Returns the first instance of a field arc
@@ -87,8 +87,8 @@ std::optional<SSL_FieldLineSegment> findLineSegment(
  * returns std::nullopt
  */
 std::optional<SSL_FieldCircularArc> findCircularArc(
-        const google::protobuf::RepeatedPtrField<SSL_FieldCircularArc>& circular_arcs,
-        SSLCircularArcs arc);
+    const google::protobuf::RepeatedPtrField<SSL_FieldCircularArc>& circular_arcs,
+    SSLCircularArcs arc);
 
 /**
  * Creates a Vector2f proto message from the given point
@@ -115,8 +115,8 @@ std::unique_ptr<Vector2f> createVector2f(const Point& point);
  * given thickness
  */
 std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(
-        const Segment& segment, float thickness, SSLFieldLines line_type,
-        const SSL_FieldShapeType& shape_type);
+    const Segment& segment, float thickness, SSLFieldLines line_type,
+    const SSL_FieldShapeType& shape_type);
 
 /**
  * Creates an SSL_FieldCircularArc proto message
@@ -134,8 +134,8 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(
  * given thickness
  */
 std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(
-        const Circle& circle, float thickness, SSLCircularArcs arc_type,
-        const SSL_FieldShapeType& shape_type);
+    const Circle& circle, float thickness, SSLCircularArcs arc_type,
+    const SSL_FieldShapeType& shape_type);
 
 /**
  * Creates an SSL_GeometryFieldSize proto message from the given Field
