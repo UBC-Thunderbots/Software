@@ -130,23 +130,12 @@
 # easy to define some passing parameters in one location, and share those parameters
 # with the subset of Plays that need them.
 #
-# All that needs to be specified is the name the config will be reference as, and the
-# path to the file to include. The include paths follow the same concepts at Bazel:
-# - Files in the same directory can be specified with a colon preceding the filename
-#   Eg. include: ":SomeFile.yaml"
-# - Otherwise, the absolute filepath relative to the root of the config directory
-#   (ie. the top-level directory containing all the config files) must be provided.
-#   The name of the file to be included must be the last component of the path, and
-#   separated by a colon.
-#   Eg. include: "Config/examples:Example.yaml"
+# All included config files need to be listed under a single `include` section.
+# Because all config filenames must be unique, just the filename needs to be
+# specified (not the path).
 #
 # In the generated code, included configs and their attributes can be accessed by
 # the name of the included config.
-# Eg. example_included_config_in_the_same_directory.foo_bool
-
-- config:
-    name: example_included_config_in_the_same_directory
-    path: ":Foo.yaml"
-- config:
-    name: example_included_config_with_absolute_path
-    path: "config/examples:Foo.yaml"
+# Eg. foo.foo_bool
+include:
+  - "foo.yaml"
