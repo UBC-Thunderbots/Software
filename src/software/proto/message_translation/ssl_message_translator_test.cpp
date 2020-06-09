@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test_util/test_util.h"
 #include "software/sensor_fusion/ssl_protobuf_reader.h"
+#include "software/test_util/test_util.h"
 
 class SSLMessageTranslatorTest : public ::testing::Test
 {
@@ -15,14 +15,14 @@ class SSLMessageTranslatorTest : public ::testing::Test
         auto result = ::testing::AssertionSuccess();
 
         float x_dist = static_cast<float>(point.x() * MILLIMETERS_PER_METER - vector.x());
-        bool x_eq = std::fabs(x_dist) < tolerance;
+        bool x_eq    = std::fabs(x_dist) < tolerance;
         float y_dist = static_cast<float>(point.y() * MILLIMETERS_PER_METER - vector.y());
-        bool y_eq = std::fabs(y_dist) < tolerance;
+        bool y_eq    = std::fabs(y_dist) < tolerance;
         if (!x_eq || !y_eq)
         {
             result = ::testing::AssertionFailure()
-                     << "Expected " << point.toVector() * MILLIMETERS_PER_METER << ", got (" << vector.x() << ", "
-                     << vector.y() << ")";
+                     << "Expected " << point.toVector() * MILLIMETERS_PER_METER
+                     << ", got (" << vector.x() << ", " << vector.y() << ")";
         }
 
         return result;
@@ -336,7 +336,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_valid_value
     EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, circular_arc_msg->thickness());
     EXPECT_TRUE(
         equalWithinTolerance(circle.getOrigin(), circular_arc_msg->center(), tolerance));
-    EXPECT_FLOAT_EQ(circle.getRadius() * MILLIMETERS_PER_METER, circular_arc_msg->radius());
+    EXPECT_FLOAT_EQ(circle.getRadius() * MILLIMETERS_PER_METER,
+                    circular_arc_msg->radius());
     EXPECT_EQ(SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
 }
 
@@ -608,12 +609,13 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_negative_thickne
     EXPECT_THROW(createGeometryData(field, thickness), std::invalid_argument);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_convert_field_to_proto_and_back) {
-    Field field = ::Test::TestUtil::createSSLDivBField();
+TEST_F(SSLMessageTranslatorTest, test_convert_field_to_proto_and_back)
+{
+    Field field           = ::Test::TestUtil::createSSLDivBField();
     const float thickness = 0.005f;
 
     auto field_proto = createGeometryData(field, thickness);
-    auto new_field = SSLProtobufReader().getField(*field_proto);
+    auto new_field   = SSLProtobufReader().getField(*field_proto);
 
     ASSERT_TRUE(new_field);
     EXPECT_EQ(field, new_field.value());
