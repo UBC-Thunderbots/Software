@@ -2,6 +2,46 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
+/**
+ * These maps, along with the enums in the .h file, contain all the different
+ * field lines and arcs that can be sent by SSL Vision.
+ * This list can partially be obtained by reading the wiki
+ * https://github.com/RoboCup-SSL/ssl-vision/wiki/camera-calibration#update-field-markings
+ * and the rules https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
+ *
+ * Several values like the various goal lines are not listed in the wiki
+ * and so have been determined "experimentally" by inspecting messages
+ * received from SSL Vision or Grsim
+ *
+ * Conventions and naming from the SSL
+ * - "Top" refers to +y in our coordinate system. "Bottom" refers to -y
+ * - "Left" refers to -x in our coordinate system. "Right" refers to +x
+ * - "Penalty" really refers to the defense area
+ */
+static const std::map<SSLFieldLines, const std::string> ssl_field_line_names = {
+        {SSLFieldLines::TOP_TOUCH_LINE, "TopTouchLine"},
+        {SSLFieldLines::BOTTOM_TOUCH_LINE, "BottomTouchLine"},
+        {SSLFieldLines::LEFT_GOAL_LINE, "LeftGoalLine"},
+        {SSLFieldLines::RIGHT_GOAL_LINE, "RightGoalLine"},
+        {SSLFieldLines::HALFWAY_LINE, "HalfwayLine"},
+        {SSLFieldLines::CENTER_LINE, "CenterLine"},
+        {SSLFieldLines::LEFT_PENALTY_STRETCH, "LeftPenaltyStretch"},
+        {SSLFieldLines::RIGHT_PENALTY_STRETCH, "RightPenaltyStretch"},
+        {SSLFieldLines::RIGHT_GOAL_TOP_LINE, "RightGoalTopLine"},
+        {SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE, "RightGoalBottomLine"},
+        {SSLFieldLines::RIGHT_GOAL_DEPTH_LINE, "RightGoalDepthLine"},
+        {SSLFieldLines::LEFT_GOAL_TOP_LINE, "LeftGoalTopLine"},
+        {SSLFieldLines::LEFT_GOAL_BOTTOM_LINE, "LeftGoalBottomLine"},
+        {SSLFieldLines::LEFT_GOAL_DEPTH_LINE, "LeftGoalDepthLine"},
+        {SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH, "LeftFieldLeftPenaltyStretch"},
+        {SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH, "LeftFieldRightPenaltyStretch"},
+        {SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH, "RightFieldLeftPenaltyStretch"},
+        {SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH, "RightFieldRightPenaltyStretch"},
+};
+
+static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names = {
+        {SSLCircularArcs::CENTER_CIRCLE, "CenterCircle"},
+};
 
 std::optional<SSL_FieldLineSegment> findLineSegment(
     const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments,
