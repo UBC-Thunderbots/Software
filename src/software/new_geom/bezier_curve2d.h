@@ -69,14 +69,14 @@ class BezierCurve2d
                                             const double t);
 
     /**
-     * Compute the x and y coefficients for the given order on the polynomial
+     * Compute the x and y coefficients for the given order_of_coefficients on the polynomial
      * representation of this curve
      *
-     * @param order The order to get the polynomial coefficients for
+     * @param order_of_coefficients The order to get the polynomial coefficients for
      *
      * @return The x and y polynomial coefficients
      */
-    const Vector computePolynomialCoefficients(const size_t order) const;
+    const Vector computePolynomialCoefficients(const size_t order_of_coefficients) const;
 
     // The control points for this bezier curve
     const std::vector<Point> control_points;

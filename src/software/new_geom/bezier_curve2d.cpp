@@ -64,14 +64,14 @@ const Point BezierCurve2d::deCasteljauAlgorithm(const std::vector<Point>& points
     return deCasteljauAlgorithm(new_points, t);
 }
 
-const Vector BezierCurve2d::computePolynomialCoefficients(const size_t order) const
+const Vector BezierCurve2d::computePolynomialCoefficients(const size_t order_of_coefficients) const
 {
     // Algorithm here is effectively taken verbatim from wikipedia
     // (https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Polynomial_form)
 
     // This is a convenience re-naming so that we can more closely mirror the
     // algorithm as described in the above wikipedia article
-    const size_t& j = order;
+    const size_t& j = order_of_coefficients;
 
     Vector result(0, 0);
     for (size_t i = 0; i <= j; i++)
