@@ -78,7 +78,19 @@ void SimulatorBackend::runSimulationLoop(World world)
     unsigned int num_physics_steps_per_world_published = static_cast<unsigned int>(
         std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
 
-    Simulator simulator(world);
+    Simulator simulator(world.field());
+    simulator.setBallState(world.ball().currentState().ballState());
+    // Note: The SimulatorBackend currently maintains the invariant that the
+    // friendly team is the yellow team
+    // TODO: when will this be fixed?
+    for(const auto& robot : world.friendlyTeam().getAllRobots()) {
+        RobotStateWithId state = {.id = robot.id(), .robot_state = robot.currentState().robotState()};
+        simulator.addYellowRobots({state});
+    }
+    for(const auto& robot : world.enemyTeam().getAllRobots()) {
+        RobotStateWithId state = {.id = robot.id(), .robot_state = robot.currentState().robotState()};
+        simulator.addBlueRobots({state});
+    }
 
     auto world_publish_timestamp = std::chrono::steady_clock::now();
 
@@ -129,7 +141,7 @@ void SimulatorBackend::runSimulationLoop(World world)
         auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
         if (primitives)
         {
-            simulator.setPrimitives(primitives.value());
+            simulator.setYellowRobotPrimitives(primitives.value());
         }
         else
         {
