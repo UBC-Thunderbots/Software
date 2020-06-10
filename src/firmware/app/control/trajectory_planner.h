@@ -61,6 +61,11 @@ typedef struct PositionTrajectory
 {
     PositionTrajectoryElement_t* trajectory_elements;
     FirmwareRobotPathParameters_t path_parameters;
+    float x_position[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float y_position[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float orientation[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float linear_speed[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float angular_speed[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 } PositionTrajectory_t;
 
 // Struct that defines a single point on a velocity trajectory
@@ -403,3 +408,28 @@ app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
 void app_trajectory_planner_copyPositionTrajectoryElement(
     PositionTrajectoryElement_t* to_trajectory,
     PositionTrajectoryElement_t* from_trajectory);
+
+void app_trajectory_planner_generateSegmentNodesAndLengths(
+        const float t_start, const float t_end, Polynomial1dOrder3_t poly,
+        float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+        float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+        const unsigned int num_elements);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
+        PositionTrajectory_t* position_trajectory, FirmwareRobotPathParameters_t path_parameters);
+
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_modifySpeedsToBackwardsContinuous(
+        float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+        float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+        const float max_allowable_acceleration, const float initial_speed,
+        const float final_speed, const unsigned int num_segments);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_createForwardsContinuousSpeedProfile(
+        float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+        float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+        const float max_allowable_acceleration, const float initial_speed,
+        const float final_speed, const unsigned int num_segments);

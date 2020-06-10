@@ -156,7 +156,6 @@ app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_createForwardsContinuousSpeedProfile(
     float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     const float max_allowable_acceleration, const float initial_speed,
     const float final_speed, const unsigned int num_segments)
@@ -325,6 +324,69 @@ app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
     }
 
     return status;
+}
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
+        PositionTrajectory_t* position_trajectory, FirmwareRobotPathParameters_t path_parameters)
+{
+    // Assign all of the path parameter data to local variables
+    const unsigned int num_elements = path_parameters.num_segments;
+    const float t_end = path_parameters.t_end;
+    const float t_start = path_parameters.t_start;
+    float* x_profile = position_trajectory->x_position;
+    float* y_profile = position_trajectory->y_position;
+    float* orientation_profile = position_trajectory->orientation;
+    float* angular_speed = position_trajectory->angular_speed;
+    float* linear_speed = position_trajectory->linear_speed;
+    Polynomial1dOrder3_t x_poly = path_parameters.path.x;
+    Polynomial1dOrder3_t y_poly = path_parameters.path.y;
+
+    float x_segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float y_segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float angular_segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    // Generate the states and segment lengths for each dimension
+    app_trajectory_planner_generateSegmentNodesAndLengths(t_start, t_end, x_poly, x_segment_lengths, x_profile, num_elements);
+    app_trajectory_planner_generateSegmentNodesAndLengths(t_start, t_end, y_poly, y_segment_lengths, y_profile, num_elements);
+    app_trajectory_planner_generateSegmentNodesAndLengths(t_start, t_end, orientation_profile, angular_segment_lengths, num_elements);
+
+    // Generate the max allowable speed profile for the linear segments
+    //float max_allowable[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+//
+//    app_trajectory_planner_getMaxAllowableSpeedProfile(
+//            position_trajectory->path_parameters.path,
+//            position_trajectory->path_parameters.num_segments,
+//            position_trajectory->path_parameters.t_start,
+//            position_trajectory->path_parameters.t_end,
+//            position_trajectory->path_parameters.max_allowable_linear_acceleration,
+//            max_allowable_speed_profile);
+//
+//    // Generate the forwards continuous angular and linear profiles
+//    TrajectoryPlannerGenerationStatus_t status = OK;
+//    status = app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
+//            position_trajectory, max_allowable_speed_profile, segment_lengths);
+//    if (status != OK)
+//    {
+//        return status;
+//    }
+//
+//    app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(
+//            position_trajectory, segment_lengths);
+//
+//    // Modify the forwards continuous profiles to be backwards continuous
+//    status = app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
+//            position_trajectory, segment_lengths);
+//    if (status != OK)
+//    {
+//        return status;
+//    }
+//
+//    // Calculate the time duration of the trajectory at each segment node
+//    app_trajectory_planner_generatePositionTrajectoryTimeProfile(position_trajectory,
+//                                                                 segment_lengths);
+//
+//    return OK;
 }
 
 TrajectoryPlannerGenerationStatus_t
