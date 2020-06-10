@@ -5,6 +5,7 @@
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/world.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
  * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
@@ -64,8 +65,58 @@ class Simulator
      *
      * @param world The world to initialize the simulation with
      */
-    explicit Simulator(const World& world);
+    explicit Simulator(const Field& field);
     Simulator() = delete;
+
+    /**
+     * Sets the state of the ball in the simulation. No more than 1 ball may exist
+     * in the simulation at a time. If a ball does not already exist, a ball
+     * is added with the given state. If a ball already exists, it's state is set to the
+     * given state.
+     *
+     * @param ball_state The new ball state
+     */
+    void setBallState(const BallState& ball_state);
+
+    /**
+     * Removes the ball from the physics world
+     */
+    void removeBall();
+
+    /**
+     * Adds robots to the yellow team with the given initial states.
+     *
+     * @pre The robot IDs must not be duplicated and must not match the ID
+     * of any robot already on the yellow team.
+     *
+     * @throws runtime_error if any of the given robot ids are duplicated, or a
+     * yellow robot already exists with the ID
+     *
+     * @param robots the robots to add
+     */
+    void addYellowRobots(const std::vector<RobotStateWithId>& robots);
+
+    /**
+     * Adds robots to the yellow team with the given initial states.
+     *
+     * @pre The robot IDs must not be duplicated and must not match the ID
+     * of any robot already on the blue team.
+     *
+     * @throws runtime_error if any of the given robot ids are duplicated, or a
+     * yellow robot already exists with the ID
+     *
+     * @param robots the robots to add
+     */
+    void addBlueRobots(const std::vector<RobotStateWithId>& robots);
+
+    /**
+     * Sets the primitives being simulated by the robots in simulation
+     *
+     * @param primitives The primitives to simulate
+     */
+    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
+
+    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -76,18 +127,11 @@ class Simulator
     void stepSimulation(const Duration& time_step);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
-     *
-     * @param primitives The primitives to simulate
-     */
-    void setPrimitives(ConstPrimitiveVectorPtr primitives);
-
-    /**
      * Returns the current state of the world in the simulation
      *
      * @return the current state of the world in the simulation
      */
-    World getWorld();
+    World getWorld() const;
 
    private:
     /**
@@ -108,9 +152,11 @@ class Simulator
      */
     unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
 
-    std::optional<unsigned int> friendly_goalie_id;
+//    std::optional<unsigned int> friendly_goalie_id;
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-        simulator_robots;
+        yellow_simulator_robots;
+    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
+            blue_simulator_robots;
 };
