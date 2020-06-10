@@ -7,7 +7,7 @@ Polynomial2d::Polynomial2d(Polynomial1d poly_x, Polynomial1d poly_y)
 {
 }
 
-Polynomial2d::Polynomial2d(std::vector<Point> points)
+Polynomial2d::Polynomial2d(const std::vector<Point>& points)
 {
     if (points.size() < 2)
     {
