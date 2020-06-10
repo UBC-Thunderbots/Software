@@ -203,6 +203,7 @@ GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
     {                                                                                    \
         Polynomial2dOrder##ORDER_MINUS_ONE##_t first_deriv =                             \
             shared_polynomial2d_differentiateOrder##ORDER(p);                            \
+                                                                                         \
         Polynomial2dOrder##ORDER_MINUS_TWO##_t second_deriv =                            \
             shared_polynomial2d_differentiateOrder##ORDER_MINUS_ONE(first_deriv);        \
         /*                                                                               \

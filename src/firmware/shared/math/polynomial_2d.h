@@ -170,7 +170,7 @@ float shared_polynomial2d_getTotalArcLength(
  * Get value of the radius of curvature at any point along the 't' parameterized
  * polynomial2s
  *
- * NOTE: If the radius of curvature is infinite the FLT_MAX will be returned. No radius of
+ * NOTE: If the radius of curvature is infinite, FLT_MAX will be returned. No radius of
  * curvature greater than FLT_MAX can be calculated.
  *
  * @param p [in] The polynomial to be evaluated for radius of curvature
