@@ -34,6 +34,30 @@ TEST(BezierCurve2dTest, get_value_two_points)
     }
 }
 
+TEST(BezierCurve2dTest, get_value_two_points_x_unchanged)
+{
+    // Check for potential edge cases where one of x/y is unchanged over the length
+    // of the curve
+
+    // Linear bezier curve
+    Point p0(0, 2);
+    Point p1(0, -7);
+    const std::vector<Point> points = {p0, p1};
+
+    const BezierCurve2d curve(points);
+
+    const Polynomial2d expected_polynomial2d({p0, p1});
+
+    // We approximate an equality check by sampling at a bunch of points and comparing
+    // to the expected polynomial
+    for (int i = 0; i <= 1000; i++)
+    {
+        const double t = static_cast<double>(i) / 1000.0;
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
+                                                   curve.getValueAt(t), 1e-9));
+    }
+}
+
 TEST(BezierCurve2dTest, get_value_below_zero)
 {
     // Linear bezier curve
