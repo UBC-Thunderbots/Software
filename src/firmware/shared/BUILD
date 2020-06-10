@@ -27,3 +27,21 @@ cc_library(
         "//firmware/shared/math:tbots_math",
     ],
 )
+
+cc_library(
+    name = "circular_buffer",
+    srcs = ["circular_buffer.c"],
+    hdrs = ["circular_buffer.h"],
+    deps = [
+        "//shared:constants",
+    ],
+)
+
+cc_test(
+    name = "circular_buffer_test",
+    srcs = ["circular_buffer_test.cpp"],
+    deps = [
+        ":circular_buffer",
+        "@gtest//:gtest_main",
+    ],
+)
