@@ -216,18 +216,20 @@ GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
          *                                                                               \
          *                                                                               \
          */                                                                              \
-        const float numerator = fabs(                                                    \
-            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, t) *       \
-                shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.y, t) -  \
-            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y, t) *       \
-                shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.x, t));  \
-        const float denominator = pow(                                                   \
-            pow(shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, t),    \
-                2) +                                                                     \
-                pow(shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y,    \
-                                                                       t),               \
-                    2),                                                                  \
-            3.0f / 2.0f);                                                                \
+                                                                                         \
+        const float x_first_deriv_value =                                                \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, t);        \
+        const float x_second_deriv_value =                                               \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.x, t);       \
+        const float y_first_deriv_value =                                                \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y, t);        \
+        const float y_second_deriv_value =                                               \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.y, t);       \
+                                                                                         \
+        const float numerator = fabs(x_first_deriv_value * y_second_deriv_value -        \
+                                     y_first_deriv_value * x_second_deriv_value);        \
+        const float denominator =                                                        \
+            pow(pow(x_first_deriv_value, 2) + pow(y_first_deriv_value, 2), 3.0f / 2.0f); \
                                                                                          \
         if (numerator == 0)                                                              \
         {                                                                                \
