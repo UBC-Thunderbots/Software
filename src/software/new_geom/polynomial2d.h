@@ -36,7 +36,7 @@ class Polynomial2d
      *               must be at least two points.
      * @throw std::invalid_argument If there are less then two points
      */
-    explicit Polynomial2d(const std::vector<Point>& points);
+    explicit Polynomial2d(const std::vector<Point> &points);
 
     /**
      * Construct a 2d polynomial that passes through the given points

@@ -10,9 +10,9 @@
 class Polynomial1d
 {
    public:
-
     // A helper struct used to represent constraints
-    typedef struct {
+    typedef struct
+    {
         double input;
         double output;
     } Constraint;

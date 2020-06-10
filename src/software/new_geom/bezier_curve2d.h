@@ -69,8 +69,8 @@ class BezierCurve2d
                                             const double t);
 
     /**
-     * Compute the x and y coefficients for the given order_of_coefficients on the polynomial
-     * representation of this curve
+     * Compute the x and y coefficients for the given order_of_coefficients on the
+     * polynomial representation of this curve
      *
      * @param order_of_coefficients The order to get the polynomial coefficients for
      *
