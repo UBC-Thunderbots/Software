@@ -1,6 +1,7 @@
 #include "firmware/shared/math/polynomial_2d.h"
 
 #include <assert.h>
+#include <float.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -194,6 +195,47 @@ GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
 GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(3)
 GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(2)
 GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
+
+#define GENERATE_2D_POLYNOMIAL_GET_CURVATURE_AT_POSITION_FUNCTION_DEFINITION(            \
+    ORDER, ORDER_MINUS_ONE, ORDER_MINUS_TWO)                                             \
+    float shared_polynomial2d_getCurvatureAtPositionOrder##ORDER(                        \
+        Polynomial2dOrder##ORDER##_t p, float s)                                         \
+    {                                                                                    \
+        Polynomial2dOrder##ORDER_MINUS_ONE##_t first_deriv =                             \
+            shared_polynomial2d_differentiateOrder##ORDER(p);                            \
+        Polynomial2dOrder##ORDER_MINUS_TWO##_t second_deriv =                            \
+            shared_polynomial2d_differentiateOrder##ORDER_MINUS_ONE(first_deriv);        \
+        /*                                                                               \
+            // Create the polynomial representing path curvature                         \
+            //                                              1                            \
+            //                              ---------------------------------            \
+            //                                     abs(x'y'' - y'x'')                    \
+            //        radius of curvature =      ----------------------                  \
+            //                                     (x'^2 + y'^2)^(3/2)                   \
+            //                                                                           \
+        */                                                                               \
+        const float numerator = fabs(                                                    \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, s) *       \
+                shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.y, s) -  \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y, s) *       \
+                shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.x, s));  \
+        const float denominator = pow(                                                   \
+            pow(shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, s),    \
+                2) +                                                                     \
+                pow(shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y,    \
+                                                                       s),               \
+                    2),                                                                  \
+            3.0f / 2.0f);                                                                \
+                                                                                         \
+        if (numerator == 0)                                                              \
+        {                                                                                \
+            return FLT_MAX;                                                              \
+        }                                                                                \
+        const float radius_of_curvature = 1 / (numerator / denominator);                 \
+        return radius_of_curvature;                                                      \
+    }
+
+GENERATE_2D_POLYNOMIAL_GET_CURVATURE_AT_POSITION_FUNCTION_DEFINITION(3, 2, 1);
 
 float shared_polynomial2d_getTotalArcLength(
     ArcLengthParametrization_t arc_length_paramameterization)
