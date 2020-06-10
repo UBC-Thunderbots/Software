@@ -23,6 +23,12 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
 
     // TODO: consider edge case where t is _exactly_ 1
 
+    // The below algorithm does not handle the case where t is exactly 1, so we
+    // check explicitly for that here
+    if (t == 1){
+        return control_points.back();
+    }
+
     const double t_constrained = std::clamp(t, 0.0, 1.0);
 
     // TODO: comment here
@@ -37,10 +43,19 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
 
     // TODO: comment here
     // TODO: better name for this var
-    const size_t i = static_cast<size_t>(segment_index) * 4;
+    const size_t i = static_cast<size_t>(segment_index) * 3;
     return BezierCurve2d({control_points[i], control_points[i + 1], control_points[i + 2],
                           control_points[i + 3]})
         .getValueAt(t_on_segment);
+}
+
+const std::vector<Point> CubicBezierSpline2d::getKnots() const {
+    std::vector<Point> knots;
+    for (size_t i = 0; i < control_points.size(); i += 3){
+        knots.emplace_back(control_points[i]);
+    }
+
+    return knots;
 }
 
 const std::vector<Point>& CubicBezierSpline2d::getControlPoints() const
@@ -50,7 +65,7 @@ const std::vector<Point>& CubicBezierSpline2d::getControlPoints() const
 
 size_t CubicBezierSpline2d::getNumKnots() const
 {
-    return static_cast<size_t>(control_points.size() / 4);
+    return static_cast<size_t>((control_points.size()-1)/3 + 1);
 }
 
 std::vector<double> CubicBezierSpline2d::getKnotVector() const
@@ -62,6 +77,7 @@ std::vector<double> CubicBezierSpline2d::getKnotVector() const
     {
         knot_vector.emplace_back(i * 1.0 / static_cast<double>(num_knots));
     }
+    return knot_vector;
 }
 
 const Point CubicBezierSpline2d::getStartPoint() const
@@ -129,9 +145,7 @@ std::vector<Point> CubicBezierSpline2d::computeControlPoints(
     }
 
     std::vector<Point> control_points;
-    control_points.emplace_back(all_knots[0]);
-    control_points.emplace_back(start_point + d[0]);
-    for (size_t i = 0; i < intermediate_knots.size(); i++)
+    for (size_t i = 0; i < all_knots.size(); i++)
     {
         if (i > 0)
         {
@@ -144,7 +158,8 @@ std::vector<Point> CubicBezierSpline2d::computeControlPoints(
         }
     }
 
-    assert(control_points.size() % 4 == 0);
+    // TODO: figure out what this should be
+//    assert(control_points.size()-1 % 3 == 0);
 
     return control_points;
 }

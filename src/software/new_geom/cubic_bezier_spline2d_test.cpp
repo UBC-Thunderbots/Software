@@ -5,6 +5,7 @@
 #include "software/new_geom/bezier_curve2d.h"
 #include "software/test_util/test_util.h"
 
+using namespace Test;
 
 class CubicBezierSplineTest : public ::testing::Test
 {
@@ -59,47 +60,45 @@ TEST_F(CubicBezierSplineTest, getValueAt__start_point)
 {
     // Check that the start point is at the correct position
     const Point start_point = test_spline_1.getValueAt(0);
-    EXPECT_TRUE(start_point.isClose(Point(1, -1), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(start_point, Point(1,-1), 1e-9));
 
     // Check that the tangent at the start is (approximately) what we expected
     const Point just_after_start_point   = test_spline_1.getValueAt(1e-8);
     const Vector approx_tangent_at_start = just_after_start_point - start_point;
-    const Vector tangent_error           = approx_tangent_at_start - Vector(-3, -4);
+    const Angle tangent_error_angle           = approx_tangent_at_start.angleWith(Vector(-3,-4));
 
-    EXPECT_NEAR(tangent_error.x(), 0, 1e-9);
-    EXPECT_NEAR(tangent_error.y(), 0, 1e-9);
+    EXPECT_NEAR(0, tangent_error_angle.toRadians(), 1e-9);
 }
 
 TEST_F(CubicBezierSplineTest, getValueAt__end_point)
 {
     // Check that the end point is at the correct position
     const Point end_point = test_spline_1.getValueAt(1);
-    EXPECT_TRUE(end_point.isClose(Point(1, -2), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(end_point, Point(1,-2), 1e-9));
 
     // Check that the tangent at the end is (approximately) what we expected
-    const Point just_before_end_point  = test_spline_1.getValueAt(1e-8);
+    const Point just_before_end_point  = test_spline_1.getValueAt(1 - 1e-9);
     const Vector approx_tangent_at_end = just_before_end_point - end_point;
-    const Vector tangent_error         = approx_tangent_at_end - Vector(-2, -5);
+    const Angle tangent_error_angle           = approx_tangent_at_end.angleWith(Vector(-2,-5));
 
-    EXPECT_NEAR(tangent_error.x(), 0, 1e-9);
-    EXPECT_NEAR(tangent_error.y(), 0, 1e-9);
+    EXPECT_NEAR(0, tangent_error_angle.toRadians(), 1e-9);
 }
 
 TEST_F(CubicBezierSplineTest, getStartPoint)
 {
-    EXPECT_TRUE(test_spline_1.getStartPoint().isClose(Point(1, -1), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(test_spline_1.getStartPoint(), Point(1,-1), 1e-9));
 }
 
 TEST_F(CubicBezierSplineTest, getEndPoint)
 {
-    EXPECT_TRUE(test_spline_1.getEndPoint().isClose(Point(1, -2), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(test_spline_1.getEndPoint(), Point(1,-2), 1e-9));
 }
 
 // Get the value at the knots (probably looking at individual segments and checking
 // start and end point)
 TEST_F(CubicBezierSplineTest, getKnots)
 {
-    std::vector<Point> expected_knots = {Point(1, -1), Point(5, 5), Point(10, 10),
+    std::vector<Point> expected_knots = {Point(1, -1), Point(5, 5), Point(10, -10),
                                          Point(1, -2)};
     EXPECT_EQ(expected_knots, test_spline_1.getKnots());
 }
@@ -161,7 +160,7 @@ TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
 
 TEST_F(CubicBezierSplineTest, check_control_points_no_intermediate_knots)
 {
-    CubicBezierSpline2d spline(Point(0, 0), Vector(0, 1), Point(2, 0), Vector(1, 0), {});
+    CubicBezierSpline2d spline(Point(0, 0), Vector(0, 1), Point(2, 0), Vector(0, 1), {});
 
     std::vector<Point> expected_control_points = {Point(0, 0), Point(0, 1), Point(2, 1),
                                                   Point(2, 0)};
