@@ -180,15 +180,6 @@ World Simulator::getWorld() const
     Team enemy_team(enemy_team_robots, Duration::fromSeconds(0.5));
 
     World world(physics_world.getField(), ball, friendly_team, enemy_team);
-
-    // TODO: This is a hack to persist goalie ID from the initial test setup
-    // It will be removed as part of
-    // https://github.com/UBC-Thunderbots/Software/issues/1325
-    //    auto id = friendly_goalie_id;
-    //    if (id)
-    //    {
-    //        world.mutableFriendlyTeam().assignGoalie(*id);
-    //    }
     return world;
 }
 

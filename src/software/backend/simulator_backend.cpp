@@ -82,7 +82,8 @@ void SimulatorBackend::runSimulationLoop(World world)
     simulator.setBallState(world.ball().currentState().ballState());
     // Note: The SimulatorBackend currently maintains the invariant that the
     // friendly team is the yellow team
-    // TODO: when will this be fixed?
+    // This should be resolved along with
+    // https://github.com/UBC-Thunderbots/Software/issues/1439
     for (const auto& robot : world.friendlyTeam().getAllRobots())
     {
         RobotStateWithId state = {.id          = robot.id(),
