@@ -43,15 +43,17 @@ bool Polygon::contains(const Point& p) const
     bool point_is_contained = false;
     unsigned i              = 0;
     unsigned j              = points_.size() - 1;
+    double px               = p.x();
+    double py               = p.y();
     while (i < points_.size())
     {
-        bool p_within_edge_y_range =
-            (points_.at(i).y() > p.y()) != (points_.at(j).y() > p.y());
+        double pix                 = points_[i].x();
+        double piy                 = points_[i].y();
+        double pjx                 = points_[j].x();
+        double pjy                 = points_[j].y();
+        bool p_within_edge_y_range = (piy > py) != (pjy > py);
         bool p_in_half_plane_to_left_of_extended_edge =
-            (p.x() < (points_.at(j).x() - points_.at(i).x()) *
-                             (p.y() - points_.at(i).y()) /
-                             (points_.at(j).y() - points_.at(i).y()) +
-                         points_.at(i).x());
+            (px < (pjx - pix) * (py - piy) / (pjy - piy) + pix);
 
         if (p_within_edge_y_range && p_in_half_plane_to_left_of_extended_edge)
         {

@@ -13,6 +13,10 @@ bool intersects(const Polygon &first, const Segment &second)
             return true;
         }
     }
+    if (first.contains(second.getSegStart()))
+    {
+        return true;
+    }
     return false;
 }
 
