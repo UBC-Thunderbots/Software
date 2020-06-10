@@ -205,15 +205,14 @@ GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
             shared_polynomial2d_differentiateOrder##ORDER(p);                            \
         Polynomial2dOrder##ORDER_MINUS_TWO##_t second_deriv =                            \
             shared_polynomial2d_differentiateOrder##ORDER_MINUS_ONE(first_deriv);        \
-        /*                                                                               \
-            // Create the polynomial representing path curvature                         \
-            //                                              1                            \
-            //                              ---------------------------------            \
-            //                                     abs(x'y'' - y'x'')                    \
-            //        radius of curvature =      ----------------------                  \
-            //                                     (x'^2 + y'^2)^(3/2)                   \
-            //                                                                           \
-        */                                                                               \
+        // Create the polynomial representing path curvature                             \
+        //                                              1                                \
+        //   radius of curvature =       ---------------------------------               \
+        //                                     abs(x'y'' - y'x'')                        \
+        //                                   ----------------------                      \
+        //                                     (x'^2 + y'^2)^(3/2)                       \
+        //                                                                               \
+
         const float numerator = fabs(                                                    \
             shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, s) *       \
                 shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.y, s) -  \
