@@ -63,16 +63,9 @@ include:
     value: 4.04
     description: >
       Can be any value in the range [min, max]
-- double:
-    name: example_double_param
-    min: 0
-    max: 5.4
-    value: 0.2
-    description: >
-      Can be any value in the range [min, max]
 
-      Will not be generated for C code, because we assume that is firmware code
-      that cannot represent doubles.
+      For C code, this will be generated as a float.
+      For C++ code, this will be generated as a double.
 - string:
     name: example_string_param
     value: "Hello World"
@@ -86,6 +79,13 @@ include:
       Accepts enum values from the specified enum. For example if there was an enum defined as
 
       enum TeamColour {
+        YELLOW,
+        BLUE
+      }
+
+      or
+
+      MAKE_ENUM(TeamColour,
         YELLOW,
         BLUE
       }
