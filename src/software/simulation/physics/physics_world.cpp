@@ -189,18 +189,34 @@ void PhysicsWorld::stepSimulation(const Duration& time_step)
     current_timestamp = current_timestamp + time_step;
 }
 
-std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getFriendlyPhysicsRobots() const
+std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getYellowPhysicsRobots() const
 {
     std::vector<std::weak_ptr<PhysicsRobot>> robots;
-    for (const auto& friendly_physics_robot : yellow_physics_robots)
+    for (const auto& yellow_physics_robot : yellow_physics_robots)
     {
-        if (!friendly_physics_robot)
+        if (!yellow_physics_robot)
         {
             LOG(FATAL)
                 << "Encountered a nullptr to a yellow physics robot in the physics world";
         }
 
-        robots.emplace_back(friendly_physics_robot);
+        robots.emplace_back(yellow_physics_robot);
+    }
+    return robots;
+}
+
+std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getBluePhysicsRobots() const
+{
+    std::vector<std::weak_ptr<PhysicsRobot>> robots;
+    for (const auto& blue_physics_robot : blue_physics_robots)
+    {
+        if (!blue_physics_robot)
+        {
+            LOG(FATAL)
+                << "Encountered a nullptr to a blue physics robot in the physics world";
+        }
+
+        robots.emplace_back(blue_physics_robot);
     }
     return robots;
 }
