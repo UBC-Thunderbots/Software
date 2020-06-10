@@ -29,7 +29,7 @@ class Polynomial2d
      * Construct a 2d polynomial that passes through the given points
      *
      * The created polynomial will be at the first point at t=0, and at the last point at
-     * t=1, with the other points linearly interpolated in between; ie. if we had three
+     * t=1, with the other points linearly interpolated in-between; ie. if we had three
      * points, the second point would be at t=0.5
      *
      * @param points A series of points the created polynomial will pass through. There
@@ -42,7 +42,7 @@ class Polynomial2d
      * Construct a 2d polynomial that passes through the given points
      *
      * The created polynomial will be at the first point at t=0, and at the last point at
-     * t=1, with the other points linearly interpolated in between; ie. if we had three
+     * t=1, with the other points linearly interpolated in-between; ie. if we had three
      * points, the second point would be at t=0.5
      *
      * @param points A series of points the created polynomial will pass through. There
