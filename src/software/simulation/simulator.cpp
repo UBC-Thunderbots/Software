@@ -13,23 +13,26 @@ extern "C"
 
 Simulator::Simulator(const Field& field) : physics_world(field) {}
 
-void Simulator::setBallState(const BallState &ball_state) {
+void Simulator::setBallState(const BallState& ball_state)
+{
     physics_world.setBallState(ball_state);
     simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
 }
 
-void Simulator::removeBall() {
+void Simulator::removeBall()
+{
     simulator_ball.reset();
     physics_world.removeBall();
 }
 
-void Simulator::addYellowRobots(const std::vector<RobotStateWithId> &robots) {
+void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
+{
     physics_world.addYellowRobots(robots);
     for (auto physics_robot : physics_world.getYellowPhysicsRobots())
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-        auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
-        auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+        auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         // Release ownership of the pointers so the firmware_world can take ownership
         FirmwareWorld_t* firmware_world_raw =
             app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
@@ -40,18 +43,19 @@ void Simulator::addYellowRobots(const std::vector<RobotStateWithId> &robots) {
     }
 }
 
-void Simulator::addBlueRobots(const std::vector<RobotStateWithId> &robots) {
+void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
+{
     physics_world.addBlueRobots(robots);
     for (auto physics_robot : physics_world.getBluePhysicsRobots())
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-        auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
-        auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+        auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         // Release ownership of the pointers so the firmware_world can take ownership
         FirmwareWorld_t* firmware_world_raw =
-                app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
+            app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
         auto firmware_world =
-                std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
+            std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 
         blue_simulator_robots.insert(std::make_pair(simulator_robot, firmware_world));
     }
@@ -102,11 +106,11 @@ void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
         unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
 
         auto simulator_robots_iter =
-                std::find_if(blue_simulator_robots.begin(), blue_simulator_robots.end(),
-                             [&primitive_ptr](const auto& robot_world_pair) {
-                                 return robot_world_pair.first->getRobotId() ==
-                                        primitive_ptr->getRobotId();
-                             });
+            std::find_if(blue_simulator_robots.begin(), blue_simulator_robots.end(),
+                         [&primitive_ptr](const auto& robot_world_pair) {
+                             return robot_world_pair.first->getRobotId() ==
+                                    primitive_ptr->getRobotId();
+                         });
 
         if (simulator_robots_iter != blue_simulator_robots.end())
         {
@@ -114,7 +118,7 @@ void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
             auto firmware_world  = (*simulator_robots_iter).second;
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
             SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-                    firmware_world, primitive_index, primitive_params);
+                firmware_world, primitive_index, primitive_params);
         }
     }
 }
@@ -180,11 +184,11 @@ World Simulator::getWorld() const
     // TODO: This is a hack to persist goalie ID from the initial test setup
     // It will be removed as part of
     // https://github.com/UBC-Thunderbots/Software/issues/1325
-//    auto id = friendly_goalie_id;
-//    if (id)
-//    {
-//        world.mutableFriendlyTeam().assignGoalie(*id);
-//    }
+    //    auto id = friendly_goalie_id;
+    //    if (id)
+    //    {
+    //        world.mutableFriendlyTeam().assignGoalie(*id);
+    //    }
     return world;
 }
 

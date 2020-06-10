@@ -1,11 +1,11 @@
 #pragma once
 
 #include "software/primitive/primitive.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/world.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
  * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
@@ -152,11 +152,11 @@ class Simulator
      */
     unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
 
-//    std::optional<unsigned int> friendly_goalie_id;
+    //    std::optional<unsigned int> friendly_goalie_id;
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         yellow_simulator_robots;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-            blue_simulator_robots;
+        blue_simulator_robots;
 };

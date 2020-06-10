@@ -11,7 +11,7 @@
 const std::string SimulatorBackend::name = "simulator";
 
 SimulatorBackend::SimulatorBackend(
-    const Duration &physics_time_step, const Duration &world_time_increment,
+    const Duration& physics_time_step, const Duration& world_time_increment,
     SimulatorBackend::SimulationSpeed simulation_speed_mode)
     : simulation_thread_started(false),
       in_destructor(false),
@@ -83,12 +83,16 @@ void SimulatorBackend::runSimulationLoop(World world)
     // Note: The SimulatorBackend currently maintains the invariant that the
     // friendly team is the yellow team
     // TODO: when will this be fixed?
-    for(const auto& robot : world.friendlyTeam().getAllRobots()) {
-        RobotStateWithId state = {.id = robot.id(), .robot_state = robot.currentState().robotState()};
+    for (const auto& robot : world.friendlyTeam().getAllRobots())
+    {
+        RobotStateWithId state = {.id          = robot.id(),
+                                  .robot_state = robot.currentState().robotState()};
         simulator.addYellowRobots({state});
     }
-    for(const auto& robot : world.enemyTeam().getAllRobots()) {
-        RobotStateWithId state = {.id = robot.id(), .robot_state = robot.currentState().robotState()};
+    for (const auto& robot : world.enemyTeam().getAllRobots())
+    {
+        RobotStateWithId state = {.id          = robot.id(),
+                                  .robot_state = robot.currentState().robotState()};
         simulator.addBlueRobots({state});
     }
 
