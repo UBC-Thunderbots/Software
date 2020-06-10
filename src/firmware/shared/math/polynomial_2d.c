@@ -199,33 +199,37 @@ GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
 #define GENERATE_2D_POLYNOMIAL_GET_CURVATURE_AT_POSITION_FUNCTION_DEFINITION(            \
     ORDER, ORDER_MINUS_ONE, ORDER_MINUS_TWO)                                             \
     float shared_polynomial2d_getCurvatureAtPositionOrder##ORDER(                        \
-        Polynomial2dOrder##ORDER##_t p, float s)                                         \
+        Polynomial2dOrder##ORDER##_t p, float t)                                         \
     {                                                                                    \
         Polynomial2dOrder##ORDER_MINUS_ONE##_t first_deriv =                             \
             shared_polynomial2d_differentiateOrder##ORDER(p);                            \
+                                                                                         \
         Polynomial2dOrder##ORDER_MINUS_TWO##_t second_deriv =                            \
             shared_polynomial2d_differentiateOrder##ORDER_MINUS_ONE(first_deriv);        \
         /*                                                                               \
-            // Create the polynomial representing path curvature                         \
-            //                                              1                            \
-            //                              ---------------------------------            \
-            //                                     abs(x'y'' - y'x'')                    \
-            //        radius of curvature =      ----------------------                  \
-            //                                     (x'^2 + y'^2)^(3/2)                   \
-            //                                                                           \
-        */                                                                               \
-        const float numerator = fabs(                                                    \
-            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, s) *       \
-                shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.y, s) -  \
-            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y, s) *       \
-                shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.x, s));  \
-        const float denominator = pow(                                                   \
-            pow(shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, s),    \
-                2) +                                                                     \
-                pow(shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y,    \
-                                                                       s),               \
-                    2),                                                                  \
-            3.0f / 2.0f);                                                                \
+         *   Create the polynomial representing path curvature                           \
+         *                                              1                                \
+         *   radius of curvature =       ---------------------------------               \
+         *                                     abs(x'y'' - y'x'')                        \
+         *                                   ----------------------                      \
+         *                                     (x'^2 + y'^2)^(3/2)                       \
+         *                                                                               \
+         *                                                                               \
+         */                                                                              \
+                                                                                         \
+        const float x_first_deriv_value =                                                \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.x, t);        \
+        const float x_second_deriv_value =                                               \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.x, t);       \
+        const float y_first_deriv_value =                                                \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_ONE(first_deriv.y, t);        \
+        const float y_second_deriv_value =                                               \
+            shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.y, t);       \
+                                                                                         \
+        const float numerator = fabs(x_first_deriv_value * y_second_deriv_value -        \
+                                     y_first_deriv_value * x_second_deriv_value);        \
+        const float denominator =                                                        \
+            pow(pow(x_first_deriv_value, 2) + pow(y_first_deriv_value, 2), 3.0f / 2.0f); \
                                                                                          \
         if (numerator == 0)                                                              \
         {                                                                                \
