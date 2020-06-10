@@ -12,11 +12,11 @@ BezierCurve2d::BezierCurve2d(std::vector<Point> control_points)
 
 const Point BezierCurve2d::getValueAt(double t) const
 {
-    if (t < 0)
+    if (t <= 0)
     {
         return control_points.front();
     }
-    if (t > 1)
+    if (t >= 1)
     {
         return control_points.back();
     }

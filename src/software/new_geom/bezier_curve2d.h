@@ -8,6 +8,9 @@
 /**
  * A 2D bezier curve, parametrized on [0,1]
  *
+ * A bezier curve is a curve defined by a series of control points, that interpolates
+ * the start end point, with the middle points "dragging" the curve to change it's shape.
+ *
  * More info:
  * https://www.ibiblio.org/e-notes/Splines/bezier.html
  * https://en.wikipedia.org/wiki/B%C3%A9zier_curve
@@ -29,10 +32,10 @@ class BezierCurve2d
      * Calculates the value of the curve evaluated at value t
      *
      * @param t A value in [0,1] to get the value of the curve at.
-     *          0 is one endpoint of the curve
-     *          1 is the other endpoint of the curve
+     *          0 is first control point
+     *          1 is last control point
      *
-     * @return value of curve evaluated at t. If t not in [0,1]
+     * @return value of curve evaluated at t. If t is not in [0,1]
      *         then the closest endpoint.
      */
     const Point getValueAt(double t) const;
@@ -41,8 +44,8 @@ class BezierCurve2d
      * Get the polynomial representation of this curve
      *
      * @return The polynomial representation of this curve, parametrized such that the
-     *         value at t=0 is the start of the curve, and the value at t=1 is the
-     *         end of the curve
+     *         value at t=0 is the first control point, and the value at t=1 is the
+     *         last control point
      */
     Polynomial2d getPolynomial() const;
 

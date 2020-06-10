@@ -10,6 +10,13 @@
 class Polynomial1d
 {
    public:
+
+    // A helper struct used to represent constraints
+    typedef struct {
+        double input;
+        double output;
+    } Constraint;
+
     /**
      * Construct a zero polynomial
      */
@@ -36,12 +43,14 @@ class Polynomial1d
      *
      * @param constraints A series of pairs, where each pair is of the form
      *                    {input, output}, indicating the output that the created
-     *                    polynomial must have for a given input. Note that all inputs
-     *                    must be unique, and there must be at least two constraints
+     *                    polynomial must have for a given input.
+     * @param constraints A series of constraints that define the polynomial. Note that
+     *                    all inputs must be unique, and there must be at least two
+     *                    constraints.
      * @throws std::invalid_argument if any two inputs are equal, or if there are less
      *                               then two constraints
      */
-    explicit Polynomial1d(const std::vector<std::pair<double, double>> constraints);
+    explicit Polynomial1d(const std::vector<Constraint> constraints);
 
     /**
      * Returns the coefficient of the term of given order

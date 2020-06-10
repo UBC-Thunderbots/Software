@@ -16,7 +16,7 @@ Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs)
 {
 }
 
-Polynomial1d::Polynomial1d(const std::vector<std::pair<double, double>> constraints)
+Polynomial1d::Polynomial1d(const std::vector<Polynomial1d::Constraint> constraints)
 {
     // Check that we have at least two constraints
     if (constraints.size() < 2)
@@ -30,7 +30,7 @@ Polynomial1d::Polynomial1d(const std::vector<std::pair<double, double>> constrai
     {
         for (size_t j = i + 1; j < constraints.size(); j++)
         {
-            if (constraints[i].first == constraints[j].first)
+            if (constraints[i].input == constraints[j].input)
             {
                 throw std::invalid_argument(
                     "At least two inputs were equal, does not define a valid set of constraints");
@@ -47,8 +47,8 @@ Polynomial1d::Polynomial1d(const std::vector<std::pair<double, double>> constrai
         for (size_t col_index = 0; col_index < constraints.size(); col_index++)
         {
             A(row_index, col_index) =
-                std::pow(constraints[row_index].first, static_cast<double>(col_index));
-            b(row_index) = constraints[row_index].second;
+                std::pow(constraints[row_index].input, static_cast<double>(col_index));
+            b(row_index) = constraints[row_index].output;
         }
     }
 

@@ -53,14 +53,14 @@ TEST(Polynomial1dTest, test_polynomial_coeffs_list_constructor)
 
 TEST(Polynomial1dTest, constructor_from_list_constraints_less_then_two_inputs)
 {
-    const std::vector<std::pair<double, double>> constraints = {{-0.5, -1}};
+    const std::vector<Polynomial1d::Constraint> constraints = {{-0.5, -1}};
 
     EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
 }
 
 TEST(Polynomial1dTest, constructor_from_list_constraints_two_inputs_equal)
 {
-    const std::vector<std::pair<double, double>> constraints = {
+    const std::vector<Polynomial1d::Constraint> constraints = {
         {-0.5, -1}, {0, 0.1}, {0, 3.4}};
 
     EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
@@ -89,7 +89,7 @@ TEST(TestSpline, test_zero_polynomial_linear_constructor)
 
 TEST(Polynomial1dTest, constructor_from_list_constraints_quadratic)
 {
-    const std::vector<std::pair<double, double>> constraints = {
+    const std::vector<Polynomial1d::Constraint> constraints = {
         {-0.5, -1}, {0, 0.1}, {2, 3.4}};
 
     const Polynomial1d p(constraints);

@@ -17,24 +17,24 @@ Polynomial2d::Polynomial2d(std::vector<Point> points)
 
     // Setup x polynomial
     {
-        std::vector<std::pair<double, double>> constraints;
+        std::vector<Polynomial1d::Constraint> constraints;
         for (size_t i = 0; i < points.size(); i++)
         {
             double t = static_cast<double>(i) / static_cast<double>(points.size() - 1);
             constraints.emplace_back(
-                std::make_pair<double, double>(std::move(t), points[i].x()));
+                Polynomial1d::Constraint{.input = t, .output = points[i].x()});
         }
         poly_x = Polynomial1d(constraints);
     }
 
     // Setup y polynomial
     {
-        std::vector<std::pair<double, double>> constraints;
+        std::vector<Polynomial1d::Constraint> constraints;
         for (size_t i = 0; i < points.size(); i++)
         {
             double t = static_cast<double>(i) / static_cast<double>(points.size() - 1);
             constraints.emplace_back(
-                std::make_pair<double, double>(std::move(t), points[i].y()));
+                Polynomial1d::Constraint{.input = t, .output = points[i].y()});
         }
         poly_y = Polynomial1d(constraints);
     }
