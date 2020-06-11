@@ -96,13 +96,7 @@ void SimulatorBackend::runSimulationLoop(World world)
             simulator.stepSimulation(physics_time_step);
         }
 
-        std::optional<World> world = simulator.getWorld();
-
-        if (!world)
-        {
-            LOG(WARNING) << "World from simulator was null";
-            continue;
-        }
+        World world = simulator.getWorld();
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {
@@ -124,7 +118,7 @@ void SimulatorBackend::runSimulationLoop(World world)
             }
         }
 
-        Subject<World>::sendValueToObservers(*world);
+        Subject<World>::sendValueToObservers(world);
 
         world_publish_timestamp = std::chrono::steady_clock::now();
 

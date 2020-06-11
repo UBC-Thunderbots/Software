@@ -20,6 +20,8 @@
 class BallFilterTest : public ::testing::Test
 {
    protected:
+    BallFilterTest() {}
+
     void SetUp() override
     {
         // Initialize the time

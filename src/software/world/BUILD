@@ -162,6 +162,7 @@ cc_library(
         "//software/new_geom:angular_velocity",
         "//software/new_geom:point",
         "//software/new_geom:vector",
+        "//software/util/make_enum",
     ],
 )
 

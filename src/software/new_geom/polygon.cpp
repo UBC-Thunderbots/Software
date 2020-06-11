@@ -2,9 +2,28 @@
 
 #include <unordered_set>
 
-Polygon::Polygon(const std::vector<Point>& points) : points_(points) {}
+Polygon::Polygon(const std::vector<Point>& points)
+    : points_(points), segments_(initSegments(points_))
+{
+    // we pre-compute the segments_ in the constructor to improve performance
+}
 
-Polygon::Polygon(const std::initializer_list<Point>& points) : points_(points) {}
+Polygon::Polygon(const std::initializer_list<Point>& points)
+    : Polygon(std::vector(points))
+{
+}
+
+std::vector<Segment> Polygon::initSegments(std::vector<Point> points)
+{
+    std::vector<Segment> segments;
+    for (unsigned i = 0; i < points.size(); i++)
+    {
+        // add a segment between consecutive points, but wrap index
+        // to draw a segment from the last point to first point.
+        segments.emplace_back(Segment{points[i], points[(i + 1) % points.size()]});
+    }
+    return segments;
+}
 
 bool Polygon::contains(const Point& p) const
 {
@@ -24,15 +43,17 @@ bool Polygon::contains(const Point& p) const
     bool point_is_contained = false;
     unsigned i              = 0;
     unsigned j              = points_.size() - 1;
+    double px               = p.x();
+    double py               = p.y();
     while (i < points_.size())
     {
-        bool p_within_edge_y_range =
-            (points_.at(i).y() > p.y()) != (points_.at(j).y() > p.y());
+        double pix                 = points_[i].x();
+        double piy                 = points_[i].y();
+        double pjx                 = points_[j].x();
+        double pjy                 = points_[j].y();
+        bool p_within_edge_y_range = (piy > py) != (pjy > py);
         bool p_in_half_plane_to_left_of_extended_edge =
-            (p.x() < (points_.at(j).x() - points_.at(i).x()) *
-                             (p.y() - points_.at(i).y()) /
-                             (points_.at(j).y() - points_.at(i).y()) +
-                         points_.at(i).x());
+            (px < (pjx - pix) * (py - piy) / (pjy - piy) + pix);
 
         if (p_within_edge_y_range && p_in_half_plane_to_left_of_extended_edge)
         {
@@ -139,18 +160,9 @@ Polygon Polygon::expand(const Vector& expansion_vector) const
     return Polygon(expanded_points);
 }
 
-const std::vector<Segment> Polygon::getSegments() const
+const std::vector<Segment>& Polygon::getSegments() const
 {
-    std::vector<Segment> segments;
-
-    for (unsigned i = 0; i < points_.size(); i++)
-    {
-        // add a segment between consecutive points, but wrap index
-        // to draw a segment from the last point to first point.
-        segments.emplace_back(Segment{points_[i], points_[(i + 1) % points_.size()]});
-    }
-
-    return segments;
+    return segments_;
 }
 
 const std::vector<Point>& Polygon::getPoints() const
