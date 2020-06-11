@@ -71,58 +71,6 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     return ans;
 }
 
-
-Point closestPointOnSeg(const Point &p, const Segment &segment)
-{
-    return closestPointOnSeg(p, segment.getStart(), segment.getEnd());
-}
-Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB)
-{
-    // if one of the end-points is extremely close to the centre point
-    // then return 0.0
-    if ((segB - centre).lengthSquared() < EPS2)
-    {
-        return segB;
-    }
-
-    if ((segA - centre).lengthSquared() < EPS2)
-    {
-        return segA;
-    }
-
-    // take care of 0 length segments
-    if ((segB - segA).lengthSquared() < EPS2)
-    {
-        return segA;
-    }
-
-    // find point C
-    // which is the projection onto the line
-    double lenseg = (segB - segA).dot(centre - segA) / (segB - segA).length();
-    Point C       = segA + lenseg * (segB - segA).normalize();
-
-    // check if C is in the line seg range
-    double AC     = (segA - C).lengthSquared();
-    double BC     = (segB - C).lengthSquared();
-    double AB     = (segA - segB).lengthSquared();
-    bool in_range = AC <= AB && BC <= AB;
-
-    // if so return C
-    if (in_range)
-    {
-        return C;
-    }
-    double lenA = (centre - segA).length();
-    double lenB = (centre - segB).length();
-
-    // otherwise return closest end of line-seg
-    if (lenA < lenB)
-    {
-        return segA;
-    }
-    return segB;
-}
-
 bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d)
 {
     return std::abs((d - c).cross(b - a)) > EPS;

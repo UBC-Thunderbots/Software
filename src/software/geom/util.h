@@ -28,20 +28,6 @@ double length(const Segment &segment);
 double lengthSquared(const Segment &segment);
 
 /**
- * Finds the Point on line segment closest to point.
- *
- * @param centre the point.
- *
- * @param segA one end of the line segment.
- *
- * @param segB the other end of the line segment.
- *
- * @return the Point on line segment closest to centre point.
- */
-Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
-Point closestPointOnSeg(const Point &p, const Segment &segment);
-
-/**
  * Finds the points of intersection between a circle and a line.
  * There may be zero, one, or two such points.
  *

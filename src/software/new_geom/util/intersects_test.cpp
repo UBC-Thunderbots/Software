@@ -234,55 +234,6 @@ TEST(IntersectsTest, segment_circle_intersecting_middle)
     EXPECT_TRUE(intersects(c, s));
 }
 
-TEST(IntersectsTest, segments_overlapping)
-{
-    Segment s1({-8, 2}, {-10, 6});
-    Segment s2({-9, 4}, {-8.5, 3});
-    EXPECT_TRUE(intersects(s1, s2));
-    EXPECT_TRUE(intersects(s1, s2));
-}
-
-TEST(IntersectsTest, segments_end_points_overlapping)
-{
-    Segment s1({-8, 2}, {-10, 6});
-    Segment s2({-10, 6}, {10, 3});
-    EXPECT_TRUE(intersects(s1, s2));
-    EXPECT_TRUE(intersects(s2, s1));
-}
-
-TEST(IntersectsTest, segments_parallel)
-{
-    Segment s1({-8, 2}, {-10, 6});
-    Segment s2({-9, 6}, {-7.5, 3});
-    EXPECT_TRUE(!intersects(s1, s2));
-    EXPECT_TRUE(!intersects(s2, s1));
-}
-
-TEST(IntersectsTest, segments_intersecting)
-{
-    Segment s1({-8, 2}, {-10, 6});
-    Segment s2({-10, 0}, {-6, 8});
-    EXPECT_TRUE(intersects(s1, s2));
-    EXPECT_TRUE(intersects(s2, s1));
-}
-
-TEST(IntersectsTest, segments_far_from_each_other)
-{
-    Segment s1({-8, 2}, {-10, 6});
-    Segment s2({20000, 100000}, {40000, -20000});
-    EXPECT_FALSE(intersects(s1, s2));
-    EXPECT_FALSE(intersects(s2, s1));
-}
-
-TEST(IntersectsTest, close_parallel_segments_not_intersecting)
-{
-    // This is a test from a bug found
-    Segment s1({1.049, -1.049}, {1.95, -1.049});
-    Segment s2({2, -1}, {1, -1});
-    EXPECT_FALSE(intersects(s1, s2));
-    EXPECT_FALSE(intersects(s2, s1));
-}
-
 TEST(IntersectsTest,
      test_ray_intersect_position_and_direction_intersect_not_just_direction)
 {

@@ -50,24 +50,13 @@ constexpr int sign(double n)
                : (n < -GeomConstants::FIXED_EPSILON ? -1 : 0);
 }
 
-std::vector<Point> intersection(const Segment &first, const Segment &second)
-{
-    std::vector<Point> output;
-
-    boost::geometry::model::segment<Point> seg_1(first.getStart(), first.getEnd());
-    boost::geometry::model::segment<Point> seg_2(second.getStart(), second.getEnd());
-    boost::geometry::intersection(seg_1, seg_2, output);
-
-    return output;
-}
-
 std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment)
 {
     std::unordered_set<Point> intersections;
 
     for (const Segment &seg : polygon.getSegments())
     {
-        for (const Point &p : intersection(seg, segment))
+        for (const Point &p : seg.intersection(segment))
         {
             intersections.insert(p);
         }
