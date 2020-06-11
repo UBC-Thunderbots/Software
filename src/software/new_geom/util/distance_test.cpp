@@ -91,14 +91,6 @@ TEST(DistanceTest, non_intersecting_segments)
     EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
 }
 
-TEST(DistanceTest, degenerate_segments)
-{
-    Segment s1(Point(-4, 4), Point(-4, 4));
-    Segment s2(Point(1, 9), Point(1, 9));
-    double expected = std::hypot(5, 5);
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
 TEST(DistanceTest, point_on_segment_end)
 {
     Point p(12, 5);
@@ -144,10 +136,10 @@ TEST(DistanceTest, point_off_segment_closest_to_segment_end)
     EXPECT_DOUBLE_EQ(distance(s, p), expected);
 }
 
-TEST(DistanceTest, point_off_degenerate_segment)
+TEST(DistanceTest, point_off_nearly_degenerate_segment)
 {
     Point p(5, 3);
-    Segment s(Point(-2, 2), Point(-2, 2));
+    Segment s(Point(-2, 1.99), Point(-2, 2));
     double expected = std::hypot(7, 1);
     EXPECT_DOUBLE_EQ(distance(p, s), expected);
     EXPECT_DOUBLE_EQ(distance(s, p), expected);
