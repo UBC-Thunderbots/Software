@@ -63,3 +63,26 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "ssl_detection_message_translator",
+    srcs = ["ssl_detection_message_translator.cpp"],
+    hdrs = ["ssl_detection_message_translator.h"],
+    deps = [
+        "//shared:constants",
+        "//software/proto:ssl_cc_proto",
+        "//software/time:timestamp",
+        "//software/world:ball_state",
+        "//software/world:robot_state",
+    ],
+)
+
+cc_test(
+    name = "ssl_detection_message_translator_test",
+    srcs = ["ssl_detection_message_translator_test.cpp"],
+    deps = [
+        ":ssl_detection_message_translator",
+        "//software/sensor_fusion:ssl_protobuf_reader",
+        "@gtest//:gtest_main",
+    ],
+)
