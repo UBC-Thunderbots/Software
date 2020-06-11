@@ -113,7 +113,12 @@ std::unique_ptr<VectorMsg> convertVectorToVectorMsgProto(const Vector& vector)
 
 std::unique_ptr<TimestampMsg> getCurrentTimestampMsg()
 {
+    const auto clock_now         = std::chrono::system_clock::now();
+    uint64_t now_in_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                       clock_now.time_since_epoch())
+                                       .count();
+
     auto timestamp_msg = std::make_unique<TimestampMsg>();
-    timestamp_msg->set_epoch_timestamp_seconds(std::time(0));
+    timestamp_msg->set_epoch_timestamp_milliseconds(now_in_milliseconds);
     return std::move(timestamp_msg);
 }

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "shared/proto/vision.proto";
 import "shared/proto/radio_primitive.proto";
+import "shared/proto/tbots_timestamp_msg.proto";
 
 message VisionMsg
 {
@@ -22,10 +23,4 @@ message PrimitiveMsg
 
     // Robot ID to RadioPrimitive map
     map<uint32, RadioPrimitiveMsg> robot_primitives = 2;
-}
-
-message TimestampMsg
-{
-    // Total seconds of UTC time since Unix epoch
-    uint64 epoch_timestamp_seconds = 1;
 }

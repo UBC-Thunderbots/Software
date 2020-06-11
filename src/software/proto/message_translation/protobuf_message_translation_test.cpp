@@ -57,7 +57,12 @@ class ProtobufTranslationTest : public ::testing::Test
     {
         // time will only move forward
         // we make sure the number that the timestamp is from the past
-        ASSERT_TRUE(timestamp.epoch_timestamp_seconds() <= std::time(0));
+        const auto clock_now = std::chrono::system_clock::now();
+        uint64_t now_in_milliseconds =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                clock_now.time_since_epoch())
+                .count();
+        ASSERT_TRUE(timestamp.epoch_timestamp_milliseconds() <= now_in_milliseconds);
     }
 };
 
