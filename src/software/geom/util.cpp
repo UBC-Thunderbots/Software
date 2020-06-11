@@ -214,20 +214,6 @@ std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point referenc
                           Ray(reference, (tangent_point2 - reference)));
 }
 
-Point getPointsMean(const std::vector<Point> &points)
-{
-    Point average = Point(0, 0);
-    for (unsigned int i = 0; i < points.size(); i++)
-    {
-        average += points[i].toVector();
-    }
-
-    Vector averageVector = average.toVector();
-
-    averageVector /= static_cast<double>(points.size());
-    return Point(averageVector);
-}
-
 std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2)
 {
     // Create rays located at the extremes of the segment, that point in the direction

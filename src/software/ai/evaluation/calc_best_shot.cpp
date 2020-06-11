@@ -152,6 +152,7 @@ namespace Evaluation
 
         return calcMostOpenDirectionFromCircleObstacles(origin, segment, obstacles);
     }
+
     std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
         Point origin, Segment segment, std::vector<Circle> obstacles)
     {
@@ -160,8 +161,7 @@ namespace Evaluation
         // If there are no obstacles, return the center of the Segment and the shot angle
         if (obstacles.size() == 0)
         {
-            const Point center_of_segment =
-                getPointsMean({segment.getStart(), segment.getEnd()});
+            const Point center_of_segment = segment.midPoint();
             const Angle angle_of_entire_segment =
                 ((segment.getStart() - origin)
                      .orientation()
@@ -185,8 +185,7 @@ namespace Evaluation
         else if (obstacle_segment_projections.size() == 0)
         {
             // If there are no blocking Segments, just shoot at the center of the goal
-            const Point center_of_segment =
-                getPointsMean({segment.getStart(), segment.getEnd()});
+            const Point center_of_segment = segment.midPoint();
             const Angle angle_of_entire_segment =
                 ((segment.getStart() - origin)
                      .orientation()
@@ -200,8 +199,12 @@ namespace Evaluation
         open_segs =
             getEmptySpaceWithinParentSegment(obstacle_segment_projections, segment);
 
-        Segment largest_segment;
+        if (open_segs.size() == 0)
+        {
+            return std::nullopt;
+        }
 
+        Segment largest_segment = open_segs.front();
         if (open_segs.size() >= 2)
         {
             largest_segment = *std::max_element(open_segs.begin(), open_segs.end(),
@@ -209,15 +212,6 @@ namespace Evaluation
                                                     return s1.length() < s2.length();
                                                 });
         }
-        else if (open_segs.size() == 1)
-        {
-            largest_segment = open_segs.front();
-        }
-        else
-        {
-            return std::nullopt;
-        }
-
 
         const Point most_open_point =
             Point((largest_segment.getStart().x() + largest_segment.getEnd().x()) / 2,

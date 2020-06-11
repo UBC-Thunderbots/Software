@@ -155,14 +155,6 @@ std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point referenc
                                                             const Circle circle);
 
 /**
- * Returns the mean of a list of points
- *
- * @param points the vector of points
- * @return the mean point of points
- */
-Point getPointsMean(const std::vector<Point> &points);
-
-/**
  * Function returns the segment defined by the segment between the intersections of two
  * Rays on a segment
  *
