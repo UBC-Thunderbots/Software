@@ -15,11 +15,13 @@ class TestThetaStarPathPlanner : public testing::Test
     TestThetaStarPathPlanner()
         : robot_navigation_obstacle_factory(
               Util::DynamicParameters->getAIConfig()
-                  ->getRobotNavigationObstacleFactoryConfig())
+                  ->getRobotNavigationObstacleFactoryConfig()),
+          planner(std::make_unique<ThetaStarPathPlanner>())
     {
     }
 
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
+    std::unique_ptr<PathPlanner> planner;
 };
 
 void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
@@ -73,8 +75,6 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
         robot_navigation_obstacle_factory.createFromShape(
             Rectangle(Point(-0.5, -1), Point(0.5, 1)))};
 
-    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-
     Rectangle navigable_area = field.fieldBoundary();
 
     auto path = planner->findPath(start, dest, navigable_area, obstacles);
@@ -88,7 +88,9 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({0, 0.1}, {3.1, -0.1});
+    // bounding box is expanded around the src because the path planner needs to find a
+    // way out of the obstacle
+    Rectangle bounding_box({-1, 1.3}, {3.2, -1.3});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure the path does not go through any obstacles, except for the
@@ -108,8 +110,6 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromShape(
             Rectangle(Point(2.5, -1), Point(3.5, 1)))};
-
-    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -131,6 +131,37 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
 }
 
 TEST_F(TestThetaStarPathPlanner,
+       test_theta_star_path_planner_single_obstacle_to_navigate_around)
+{
+    // Test where we need to navigate around a single obstacle along the x-axis
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{-3, 0}, dest{3, 0};
+
+    // Place a rectangle over our destination location
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(-1, -1), Point(1, 1)))};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
+
+    // The path should start at exactly the start point and end at exactly the dest
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+    // Make sure the path does not exceed a bounding box
+    Rectangle bounding_box({-3.1, 1.2}, {3.1, -1.2});
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+
+    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+}
+
+TEST_F(TestThetaStarPathPlanner,
        test_theta_star_path_planner_single_obstacle_along_x_axis)
 {
     // Test where we need to navigate around a single obstacle along the x-axis
@@ -141,8 +172,6 @@ TEST_F(TestThetaStarPathPlanner,
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromShape(
             Rectangle(Point(1, -1), Point(2, 1)))};
-
-    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -160,8 +189,7 @@ TEST_F(TestThetaStarPathPlanner,
     Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
-    // Can't make sure the path does not go through any obstacles
-    // since start is blocked
+    checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestThetaStarPathPlanner,
@@ -176,8 +204,6 @@ TEST_F(TestThetaStarPathPlanner,
         robot_navigation_obstacle_factory.createFromShape(
             Rectangle(Point(-1, 1), Point(1, 2)))};
 
-    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-
     Rectangle navigable_area = field.fieldBoundary();
 
     auto path = planner->findPath(start, dest, navigable_area, obstacles);
@@ -191,16 +217,10 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box(
-        {
-            1.2,
-            -0.1,
-        },
-        {-1.2, 3.1});
+    Rectangle bounding_box({1.3, -0.1}, {-1.3, 3.1});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
-    // Can't make sure the path does not go through any obstacles
-    // since start is blocked
+    checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
@@ -209,8 +229,6 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     Point start{2, 2}, dest{-3, -3};
 
     std::vector<ObstaclePtr> obstacles = {};
-
-    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -232,8 +250,6 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
 
-    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-
     Rectangle navigable_area = field.fieldBoundary();
 
     auto path = planner->findPath(start, dest, navigable_area, obstacles);
@@ -254,7 +270,7 @@ TEST_F(TestThetaStarPathPlanner, no_navigable_area)
 
     std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
     Rectangle navigable_area({0, 0}, {1, 1});
-    auto path = ThetaStarPathPlanner().findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_EQ(std::nullopt, path);
 }

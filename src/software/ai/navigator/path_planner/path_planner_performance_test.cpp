@@ -33,49 +33,123 @@ class PathPlannerTestCaseFactory
             Util::DynamicParameters->getAIConfig()
                 ->getRobotNavigationObstacleFactoryConfig());
 
-        std::vector<ObstaclePtr> obstacles_10 = {
+        std::vector<ObstaclePtr> circle_obstacles_10 = {
             robot_navigation_obstacle_factory.createFromRobotPosition({0, 0}),
             robot_navigation_obstacle_factory.createFromRobotPosition({0, 0.5}),
             robot_navigation_obstacle_factory.createFromRobotPosition({0, 1.0}),
             robot_navigation_obstacle_factory.createFromRobotPosition({0, 1.5}),
-            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 0}),
-            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 0.5}),
-            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 1.0}),
-            robot_navigation_obstacle_factory.createFromRobotPosition({-0.5, 1.5}),
-            robot_navigation_obstacle_factory.createFromRobotPosition({0.5, 1.0}),
-            robot_navigation_obstacle_factory.createFromRobotPosition({0.5, 1.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, 2}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, 2.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, -0.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, -1.0}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, -1.5}),
+            robot_navigation_obstacle_factory.createFromRobotPosition({0, -2.0}),
         };
 
-        std::vector<ObstaclePtr> obstacles_20 = obstacles_10;
-        obstacles_20.insert(
-            obstacles_20.end(),
-            {
-                robot_navigation_obstacle_factory.createFromRobotPosition({1, 0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({1, 0.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({1, 1.0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({1, 1.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 0.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 1.0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-1.5, 1.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({1.5, 0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({1.5, 0.5}),
-            });
-
-        std::vector<ObstaclePtr> obstacles_30 = obstacles_20;
-        obstacles_30.insert(
-            obstacles_30.end(),
+        std::vector<ObstaclePtr> circle_obstacles_20 = circle_obstacles_10;
+        circle_obstacles_20.insert(
+            circle_obstacles_20.end(),
             {
                 robot_navigation_obstacle_factory.createFromRobotPosition({2, 0}),
                 robot_navigation_obstacle_factory.createFromRobotPosition({2, 0.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({2, 2.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, 1.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, 1.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, 2}),
                 robot_navigation_obstacle_factory.createFromRobotPosition({2, 2.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 0.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 2.0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({-2.5, 2.5}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({2.5, 0}),
-                robot_navigation_obstacle_factory.createFromRobotPosition({2.5, 0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, -0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, -1.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, -1.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({2, -2.0}),
+            });
+
+        std::vector<ObstaclePtr> circle_obstacles_30 = circle_obstacles_20;
+        circle_obstacles_30.insert(
+            circle_obstacles_30.end(),
+            {
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, 0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, 0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, 1.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, 1.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, 2}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, 2.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, -0.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, -1.0}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, -1.5}),
+                robot_navigation_obstacle_factory.createFromRobotPosition({-3, -2.0}),
+            });
+
+        std::vector<ObstaclePtr> rectangle_obstacles_10 = {
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, 0.5})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, 1.0})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, 1.5})),
+            robot_navigation_obstacle_factory.createFromShape(Rectangle({-1, 0}, {0, 2})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, 2.5})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, -0.5})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, -1.0})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, -1.5})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, -2.0})),
+            robot_navigation_obstacle_factory.createFromShape(
+                Rectangle({-1, 0}, {0, -2.5})),
+        };
+
+        std::vector<ObstaclePtr> rectangle_obstacles_20 = rectangle_obstacles_10;
+        rectangle_obstacles_20.insert(
+            rectangle_obstacles_20.end(),
+            {
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, 0.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, 1.0})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, 1.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, 2})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, 2.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, -0.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, -1.0})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, -1.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, -2.0})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({1, 0}, {2, -2.5})),
+            });
+
+        std::vector<ObstaclePtr> rectangle_obstacles_30 = rectangle_obstacles_20;
+        rectangle_obstacles_30.insert(
+            rectangle_obstacles_30.end(),
+            {
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, 0.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, 1.0})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, 1.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, 2})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, 2.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, -0.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, -1.0})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, -1.5})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, -2.0})),
+                robot_navigation_obstacle_factory.createFromShape(
+                    Rectangle({-4, 0}, {-3, -2.5})),
             });
 
         std::vector<PlannerTestCase> test_cases = {
@@ -107,46 +181,88 @@ class PathPlannerTestCaseFactory
              .obstacles      = {},
              .num_iterations = 10},
 
-            {.name           = "10 obstacles on divB field short path",
+            {.name           = "10 circle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
              .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
-             .obstacles      = obstacles_10,
+             .obstacles      = circle_obstacles_10,
              .num_iterations = 10},
 
-            {.name           = "20 obstacles on divB field short path",
+            {.name           = "20 circle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
              .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
-             .obstacles      = obstacles_20,
+             .obstacles      = circle_obstacles_20,
              .num_iterations = 10},
 
-            {.name           = "30 obstacles on divB field short path",
+            {.name           = "30 circle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
              .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
-             .obstacles      = obstacles_30,
+             .obstacles      = circle_obstacles_30,
              .num_iterations = 10},
 
-            {.name           = "10 obstacles on divB field",
+            {.name           = "10 circle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
              .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
-             .obstacles      = obstacles_10,
+             .obstacles      = circle_obstacles_10,
              .num_iterations = 10},
 
-            {.name           = "20 obstacles on divB field",
+            {.name           = "20 circle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
              .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
-             .obstacles      = obstacles_20,
+             .obstacles      = circle_obstacles_20,
              .num_iterations = 10},
 
-            {.name           = "30 obstacles on divB field",
+            {.name           = "30 circle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
              .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
-             .obstacles      = obstacles_30,
+             .obstacles      = circle_obstacles_30,
+             .num_iterations = 10},
+
+            {.name           = "10 rectangle obstacles on divB field short path",
+             .start          = Point(-2, 0),
+             .end            = Point(2, 0),
+             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .obstacles      = rectangle_obstacles_10,
+             .num_iterations = 10},
+
+            {.name           = "20 rectangle obstacles on divB field short path",
+             .start          = Point(-2, 0),
+             .end            = Point(2, 0),
+             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .obstacles      = rectangle_obstacles_20,
+             .num_iterations = 10},
+
+            {.name           = "30 rectangle obstacles on divB field short path",
+             .start          = Point(-2, 0),
+             .end            = Point(2, 0),
+             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .obstacles      = rectangle_obstacles_30,
+             .num_iterations = 10},
+
+            {.name           = "10 rectangle obstacles on divB field long path",
+             .start          = Point(-4.5, 0),
+             .end            = Point(4.5, 0),
+             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .obstacles      = rectangle_obstacles_10,
+             .num_iterations = 10},
+
+            {.name           = "20 rectangle obstacles on divB field long path",
+             .start          = Point(-4.5, 0),
+             .end            = Point(4.5, 0),
+             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .obstacles      = rectangle_obstacles_20,
+             .num_iterations = 10},
+
+            {.name           = "30 rectangle obstacles on divB field long path",
+             .start          = Point(-4.5, 0),
+             .end            = Point(4.5, 0),
+             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .obstacles      = rectangle_obstacles_30,
              .num_iterations = 10},
         };
         return test_cases;
@@ -164,7 +280,8 @@ std::vector<std::pair<std::string, PathPlannerConstructor>>
     path_planner_names_and_constructors = {
         // add path planner constructors here
         nameAndConstructor<ThetaStarPathPlanner>(),
-        nameAndConstructor<StraightLinePathPlanner>()};
+        nameAndConstructor<StraightLinePathPlanner>(),
+};
 
 class PlannerPerformanceTest
     : public testing::TestWithParam<
