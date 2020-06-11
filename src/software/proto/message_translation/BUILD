@@ -32,18 +32,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "ssl_message_translator",
-    srcs = ["ssl_message_translator.cpp"],
-    hdrs = ["ssl_message_translator.h"],
-    deps = [
-        "//shared:constants",
-        "//software/proto:ssl_cc_proto",
-        "//software/util/make_enum",
-        "//software/world:field",
-    ],
-)
-
 cc_test(
     name = "protobuf_message_translation_test",
     srcs = ["protobuf_message_translation_test.cpp"],
@@ -53,11 +41,23 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "ssl_message_translator_test",
-    srcs = ["ssl_message_translator_test.cpp"],
+cc_library(
+    name = "ssl_geometry_message_translator",
+    srcs = ["ssl_geometry_message_translator.cpp"],
+    hdrs = ["ssl_geometry_message_translator.h"],
     deps = [
-        ":ssl_message_translator",
+        "//shared:constants",
+        "//software/proto:ssl_cc_proto",
+        "//software/util/make_enum",
+        "//software/world:field",
+    ],
+)
+
+cc_test(
+    name = "ssl_geometry_message_translator_test",
+    srcs = ["ssl_geometry_message_translator_test.cpp"],
+    deps = [
+        ":ssl_geometry_message_translator",
         "//software/sensor_fusion:ssl_protobuf_reader",
         "//software/test_util",
         "@gtest//:gtest_main",
