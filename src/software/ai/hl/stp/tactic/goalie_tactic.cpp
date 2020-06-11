@@ -212,8 +212,8 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // the final speed is a dynamic parameter so that if the goalie needs
             // to dive for the shot instead of stop when reaching the intersection
             // point it can do so.
-            Point goalie_pos = closestPointOnSeg(
-                (*robot).position(), Segment(ball.position(), intersections[0]));
+            Point goalie_pos = Segment(ball.position(), intersections[0])
+                                   .closestPointOnSeg(robot->position());
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             move_action->updateControlParams(
