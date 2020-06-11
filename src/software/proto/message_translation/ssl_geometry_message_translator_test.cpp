@@ -323,7 +323,8 @@ TEST_F(SSLGeometryMessageTranslatorTest, test_create_field_line_segment_with_val
     EXPECT_EQ(SSL_FieldShapeType::CenterLine, field_line_msg->type());
 }
 
-TEST_F(SSLGeometryMessageTranslatorTest, test_create_field_line_segment_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_field_line_segment_with_negative_thickness)
 {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
     const float thickness         = -0.005f;
@@ -353,7 +354,8 @@ TEST_F(SSLGeometryMessageTranslatorTest, test_create_field_circular_arc_with_val
     EXPECT_EQ(SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
 }
 
-TEST_F(SSLGeometryMessageTranslatorTest, test_create_field_circular_arc_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_field_circular_arc_with_negative_thickness)
 {
     const Circle circle(Point(0.0, 0.5), 3);
     const float thickness          = -0.005f;
@@ -364,7 +366,8 @@ TEST_F(SSLGeometryMessageTranslatorTest, test_create_field_circular_arc_with_neg
                  std::invalid_argument);
 }
 
-TEST_F(SSLGeometryMessageTranslatorTest, test_create_geometry_field_size_with_valid_values)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_geometry_field_size_with_valid_values)
 {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = 0.005f;
@@ -559,7 +562,8 @@ TEST_F(SSLGeometryMessageTranslatorTest, test_create_geometry_field_size_with_va
     EXPECT_EQ(SSL_FieldShapeType::CenterCircle, center_circle->type());
 }
 
-TEST_F(SSLGeometryMessageTranslatorTest, test_create_geometry_field_size_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_geometry_field_size_with_negative_thickness)
 {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = -0.005f;
@@ -592,7 +596,8 @@ TEST_F(SSLGeometryMessageTranslatorTest, test_create_geometry_data_with_valid_va
     EXPECT_EQ(1000, field_size.penalty_area_depth());
 }
 
-TEST_F(SSLGeometryMessageTranslatorTest, test_create_geometry_data_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_geometry_data_with_negative_thickness)
 {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = -0.005f;

@@ -1,7 +1,8 @@
 #include "software/world/robot_state.h"
 
 RobotState::RobotState(const Point &position, const Vector &velocity,
-                       const Angle &orientation, const AngularVelocity &angular_velocity, const double height)
+                       const Angle &orientation, const AngularVelocity &angular_velocity,
+                       const double height)
     : position_(position),
       velocity_(velocity),
       orientation_(orientation),
@@ -30,7 +31,8 @@ AngularVelocity RobotState::angularVelocity() const
     return angular_velocity_;
 }
 
-double RobotState::height() const {
+double RobotState::height() const
+{
     return height_;
 }
 

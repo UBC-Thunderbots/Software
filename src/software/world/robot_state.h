@@ -1,11 +1,11 @@
 #pragma once
 
+#include "shared/constants.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
 #include "software/util/make_enum/make_enum.h"
-#include "shared/constants.h"
 
 using RobotId = unsigned int;
 
@@ -30,8 +30,8 @@ class RobotState
      * @param height The height of the robot in metres
      */
     explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation,
-                        const AngularVelocity &angular_velocity, double height = ROBOT_MAX_HEIGHT_METERS);
+                        const Angle &orientation, const AngularVelocity &angular_velocity,
+                        double height = ROBOT_MAX_HEIGHT_METERS);
 
     /**
      * Returns the position of the robot represented by this state

@@ -15,13 +15,15 @@ Vector BallState::velocity() const
     return velocity_;
 }
 
-double BallState::height() const {
+double BallState::height() const
+{
     return height_;
 }
 
 bool BallState::operator==(const BallState& other) const
 {
-    return this->position() == other.position() && this->velocity() == other.velocity() && this->height() == other.height();
+    return this->position() == other.position() && this->velocity() == other.velocity() &&
+           this->height() == other.height();
 }
 
 bool BallState::operator!=(const BallState& other) const

@@ -17,7 +17,8 @@ class BallState
      * @param height The height of the bottom of the ball from the ground.
      * For example, a ball rolling along the ground has a height of 0
      */
-    explicit BallState(const Point& position, const Vector& velocity, double height = 0.0);
+    explicit BallState(const Point& position, const Vector& velocity,
+                       double height = 0.0);
     BallState() = delete;
 
     /**
