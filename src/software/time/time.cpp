@@ -1,7 +1,6 @@
 #include "software/time/time.h"
 
 #include <cmath>
-#include <stdexcept>
 
 #include "shared/constants.h"
 
@@ -23,3 +22,29 @@ double Time::getMilliseconds() const
 }
 
 Time::~Time() {}
+
+double Time::now()
+{
+    const auto clock_now = std::chrono::system_clock::now();
+    return static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
+                                   clock_now.time_since_epoch())
+                                   .count()) /
+           1000000.0;
+}
+
+double Time::secondsSince(std::chrono::time_point<std::chrono::system_clock> start_time)
+{
+    return millisecondsSince(start_time) / 1000.0;
+}
+
+double Time::millisecondsSince(
+    std::chrono::time_point<std::chrono::system_clock> start_time)
+{
+    auto end_time = std::chrono::system_clock::now();
+
+    double duration_ms =
+        static_cast<double>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time)
+                .count()) /
+        1000000.0;
+}

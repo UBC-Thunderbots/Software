@@ -2,6 +2,7 @@
 
 #include <time.h>
 
+#include <chrono>
 #include <cstdlib>
 
 /**
@@ -51,6 +52,33 @@ class Time
      * be abstract.
      */
     virtual ~Time() = 0;
+
+    /**
+     * Gets the current time in seconds with up to microsecond precision
+     *
+     * @return current time in seconds
+     */
+    static double now();
+
+    /**
+     * Gets the number of milliseconds since the start_time
+     *
+     * @param start_time time point to calculate time since
+     *
+     * @return milliseconds since start time
+     */
+    static double millisecondsSince(
+        std::chrono::time_point<std::chrono::system_clock> start_time);
+
+    /**
+     * Gets the number of seconds since the start_time
+     *
+     * @param start_time time point to calculate time since
+     *
+     * @return seconds since start time
+     */
+    static double secondsSince(
+        std::chrono::time_point<std::chrono::system_clock> start_time);
 
    protected:
     /**
