@@ -308,7 +308,7 @@ TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
 
     std::cout << std::endl << planner_test_case.name << ":" << std::endl;
 
-    // Performance was optimized in PR ##1443
+    // Performance was optimized in PR #1443
     std::cout << planner_name << " | # iterations = " << planner_test_case.num_iterations
               << " | # obstacles = " << planner_test_case.obstacles.size()
               << " | area = " << planner_test_case.navigable_area.area()

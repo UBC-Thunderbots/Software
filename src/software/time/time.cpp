@@ -1,7 +1,5 @@
 #include "software/time/time.h"
 
-#include <cmath>
-
 #include "shared/constants.h"
 
 Time::Time() : time_in_seconds(0) {}
@@ -40,11 +38,9 @@ double Time::secondsSince(std::chrono::time_point<std::chrono::system_clock> sta
 double Time::millisecondsSince(
     std::chrono::time_point<std::chrono::system_clock> start_time)
 {
-    auto end_time = std::chrono::system_clock::now();
-
-    double duration_ms =
-        static_cast<double>(
-            std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time)
-                .count()) /
-        1000000.0;
+    const auto end_time = std::chrono::system_clock::now();
+    return static_cast<double>(
+               std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time)
+                   .count()) /
+           1000000.0;
 }

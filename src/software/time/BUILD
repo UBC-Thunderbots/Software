@@ -19,6 +19,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "time_test",
+    srcs = ["time_test.cpp"],
+    deps = [
+        ":time",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "timestamp",
     srcs = ["timestamp.cpp"],

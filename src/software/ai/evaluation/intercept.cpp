@@ -1,6 +1,3 @@
-/**
- * Implementation for STP intercept-related evaluation functions
- */
 #include "software/ai/evaluation/intercept.h"
 
 #include "shared/constants.h"

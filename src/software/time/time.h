@@ -3,7 +3,6 @@
 #include <time.h>
 
 #include <chrono>
-#include <cstdlib>
 
 /**
  * A simple Time class that represents some amount of Time
