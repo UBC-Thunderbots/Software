@@ -28,7 +28,8 @@ void Simulator::removeBall()
 void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addYellowRobots(robots);
-    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(), yellow_simulator_robots);
+    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(),
+                          yellow_simulator_robots);
 }
 
 void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
@@ -37,17 +38,20 @@ void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
     updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots);
 }
 
-void Simulator::updateSimulatorRobots(const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
-                                      std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>> &simulator_robots) {
+void Simulator::updateSimulatorRobots(
+    const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
+    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+        simulator_robots)
+{
     for (const auto& physics_robot : physics_robots)
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
         auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         FirmwareWorld_t* firmware_world_raw =
-                app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
+            app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
         auto firmware_world =
-                std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
+            std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 
         simulator_robots.insert(std::make_pair(simulator_robot, firmware_world));
     }
@@ -63,8 +67,12 @@ void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
     setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball);
 }
 
-void Simulator::setRobotPrimitives(ConstPrimitiveVectorPtr primitives,
-                                   std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>> &simulator_robots, const std::shared_ptr<SimulatorBall>& simulator_ball) {
+void Simulator::setRobotPrimitives(
+    ConstPrimitiveVectorPtr primitives,
+    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+        simulator_robots,
+    const std::shared_ptr<SimulatorBall>& simulator_ball)
+{
     if (!primitives)
     {
         return;
@@ -77,11 +85,11 @@ void Simulator::setRobotPrimitives(ConstPrimitiveVectorPtr primitives,
         unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
 
         auto simulator_robots_iter =
-                std::find_if(simulator_robots.begin(), simulator_robots.end(),
-                             [&primitive_ptr](const auto& robot_world_pair) {
-                                 return robot_world_pair.first->getRobotId() ==
-                                        primitive_ptr->getRobotId();
-                             });
+            std::find_if(simulator_robots.begin(), simulator_robots.end(),
+                         [&primitive_ptr](const auto& robot_world_pair) {
+                             return robot_world_pair.first->getRobotId() ==
+                                    primitive_ptr->getRobotId();
+                         });
 
         if (simulator_robots_iter != simulator_robots.end())
         {
@@ -89,7 +97,7 @@ void Simulator::setRobotPrimitives(ConstPrimitiveVectorPtr primitives,
             auto firmware_world  = (*simulator_robots_iter).second;
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
             SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-                    firmware_world, primitive_index, primitive_params);
+                firmware_world, primitive_index, primitive_params);
         }
     }
 }

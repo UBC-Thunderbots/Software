@@ -128,7 +128,10 @@ class Simulator
      * @param physics_robots The physics robots to add to the simulator robots
      * @param simulator_robots The simulator robots to add the physics robots to
      */
-    static void updateSimulatorRobots(const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots, std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>& simulator_robots);
+    static void updateSimulatorRobots(
+        const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
+        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+            simulator_robots);
 
     /**
      * Sets the given primitives on the given simulator robots
@@ -137,7 +140,11 @@ class Simulator
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
      */
-    static void setRobotPrimitives(ConstPrimitiveVectorPtr primitives, std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>& simulator_robots, const std::shared_ptr<SimulatorBall>& simulator_ball);
+    static void setRobotPrimitives(
+        ConstPrimitiveVectorPtr primitives,
+        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+            simulator_robots,
+        const std::shared_ptr<SimulatorBall>& simulator_ball);
 
     /**
      * Returns the encoded primitive parameters for the given Primitive
@@ -146,7 +153,8 @@ class Simulator
      *
      * @return The encoded primitive parameters for the given Primitive
      */
-    static primitive_params_t getPrimitiveParams(const std::unique_ptr<Primitive>& primitive);
+    static primitive_params_t getPrimitiveParams(
+        const std::unique_ptr<Primitive>& primitive);
 
     /**
      * Returns the primitive index for the given Primitive
