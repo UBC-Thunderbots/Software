@@ -12,7 +12,7 @@ void Circle::setOrigin(const Point &o)
     origin_ = o;
 }
 
-Point Circle::getOrigin() const
+const Point &Circle::getOrigin() const
 {
     return origin_;
 }
@@ -35,7 +35,7 @@ double Circle::getRadius() const
 
 bool Circle::contains(const Point &p) const
 {
-    return p.distanceFromPoint(origin_) <= radius_;
+    return (p - origin_).lengthSquared() <= radius_ * radius_;
 }
 
 double Circle::area() const

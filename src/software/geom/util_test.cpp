@@ -14,20 +14,6 @@
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
 
-TEST(GeomUtilTest, test_collinear)
-{
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-        Vector v = Vector::createFromAngle(
-            Angle::fromDegrees((std::rand() % 360)));  // should be random number here
-        Point pointA((std::rand() % 100) / 100.0, (std::rand() % 100) / 100.0);
-        Point pointB = pointA + v * (std::rand() % 100) / 100.0;
-        Point pointC = pointA - v * (std::rand() % 100) / 100.0;
-        bool val     = collinear(pointA, pointB, pointC);
-        EXPECT_TRUE(val);
-    }
-}
-
 TEST(GeomUtilTest, test_closest_lineseg_point)
 {
     Point l1(-1, 1);
@@ -603,8 +589,8 @@ TEST(GeomUtilTest, test_project_circles_origin_inside_circle)
 
     EXPECT_EQ(proj_segments.size(), 1);
     EXPECT_EQ(proj_segments.front().length(), 10);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().x(), 5.0);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().x(), 5.0);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().x(), -5.0);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 }
@@ -620,8 +606,8 @@ TEST(GeomUtilTest, test_project_circles_one_circle)
 
     EXPECT_EQ(proj_segments.size(), 1);
     EXPECT_NEAR(proj_segments.front().length(), 1.26, 0.01);
-    EXPECT_NEAR(proj_segments.front().getSegStart().x(), 0.63, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getStart().x(), 0.63, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.front().getEnd().x(), -0.63, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 }
@@ -640,15 +626,15 @@ TEST(GeomUtilTest, test_project_circles_multiple_circles)
     EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
 
     // Circle 1
-    EXPECT_NEAR(proj_segments.front().getSegStart().x(), -0.62, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getStart().x(), -0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.front().getEnd().x(), -1.92, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 
 
     // Circle 2
-    EXPECT_NEAR(proj_segments.back().getSegStart().x(), 1.92, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.back().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.back().getStart().x(), 1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.back().getEnd().x(), 0.62, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.back().getEnd().y(), 5.0);
 }
@@ -668,15 +654,15 @@ TEST(GeomUtilTest, test_project_circles_multiple_circles_one_has_zero_projection
     EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
 
     // Circle 1
-    EXPECT_NEAR(proj_segments.front().getSegStart().x(), -0.62, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getStart().x(), -0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.front().getEnd().x(), -1.92, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 
 
     // Circle 2
-    EXPECT_NEAR(proj_segments.back().getSegStart().x(), 1.92, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.back().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.back().getStart().x(), 1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.back().getEnd().x(), 0.62, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.back().getEnd().y(), 5.0);
 }

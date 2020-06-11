@@ -93,7 +93,6 @@ cc_library(
     ],
     deps = [
         ":almost_equal",
-        ":collinear",
         "//software/new_geom:line",
         "//software/new_geom:point_boost_geometry_compatability",
         "//software/new_geom:polygon",
@@ -110,31 +109,6 @@ cc_test(
     deps = [
         ":intersection",
         "//software/new_geom:rectangle",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "collinear",
-    srcs = [
-        "collinear.cpp",
-    ],
-    hdrs = [
-        "collinear.h",
-    ],
-    deps = [
-        ":almost_equal",
-        "//software/new_geom:point",
-    ],
-)
-
-cc_test(
-    name = "collinear_test",
-    srcs = [
-        "collinear_test.cpp",
-    ],
-    deps = [
-        ":collinear",
         "@gtest//:gtest_main",
     ],
 )

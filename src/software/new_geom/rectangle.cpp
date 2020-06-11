@@ -34,22 +34,22 @@ Point Rectangle::centre() const
     return Point(negXNegYCorner() + (diagonal() / 2));
 }
 
-Point Rectangle::posXPosYCorner() const
+const Point &Rectangle::posXPosYCorner() const
 {
     return points_[2];
 }
 
-Point Rectangle::negXPosYCorner() const
+const Point &Rectangle::negXPosYCorner() const
 {
     return points_[1];
 }
 
-Point Rectangle::negXNegYCorner() const
+const Point &Rectangle::negXNegYCorner() const
 {
     return points_[0];
 }
 
-Point Rectangle::posXNegYCorner() const
+const Point &Rectangle::posXNegYCorner() const
 {
     return points_[3];
 }
@@ -78,14 +78,14 @@ bool Rectangle::contains(const Point &p) const
            p.y() <= negXNegYCorner().y() + diagonal().y();
 }
 
-Point Rectangle::furthestCorner(const Point &p)
+Point Rectangle::furthestCorner(const Point &p) const
 {
     std::vector<Point> corners = points_;
 
-    return *std::max_element(
-        corners.begin(), corners.end(), [&](const Point &corner1, const Point &corner2) {
-            return p.distanceFromPoint(corner1) < p.distanceFromPoint(corner2);
-        });
+    return *std::max_element(corners.begin(), corners.end(),
+                             [&](const Point &corner1, const Point &corner2) {
+                                 return (p - corner1).length() < (p - corner2).length();
+                             });
 }
 
 bool Rectangle::inflate(double amount)

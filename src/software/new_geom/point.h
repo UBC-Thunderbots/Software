@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cmath>
-#include <iostream>
+#include <optional>
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/vector.h"
@@ -83,13 +83,6 @@ class Point final
     double distanceFromOrigin() const;
 
     /**
-     * Returns the distance between this Point and the given point p
-     *
-     * @return the distance
-     */
-    double distanceFromPoint(const Point &p) const;
-
-    /**
      * Returns a new Vector from this Point
      *
      * @return A new vector from this Point
@@ -105,6 +98,38 @@ class Point final
      * @return the new Point rotated by rot
      */
     Point rotate(const Angle &rot) const;
+
+    /**
+     * Returns true if the given points are collinear, false otherwise.
+     *
+     * @params a, b, c the given points
+     * @param fixed_epsilon the epsilon value for near zero double comparisons
+     * @param ulps_epsilon the epsilon value for double comparisons based on ULPs distance
+     *
+     * @return true if the given points are collinear, false otherwise
+     */
+    static bool collinear(const Point &a, const Point &b, const Point &c,
+                          double fixed_epsilon = GeomConstants::FIXED_EPSILON,
+                          int ulps_epsilon     = GeomConstants::ULPS_EPSILON_TEN);
+
+    /**
+     * Computes the point of intersection between two lines.
+     * Note: this computes the intersection of two lines, not line segments.
+     *
+     * Overlapping lines are considered parallel and not intersecting.
+     *
+     * See:
+     * https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
+     *
+     * @params a, b points that represent the first line
+     * @params c, d points that represent the second line
+     *
+     * @return the point of intersection, if it exists
+     */
+    static std::optional<Point> intersection(
+        const Point &a, const Point &b, const Point &c, const Point &d,
+        double fixed_epsilon = GeomConstants::FIXED_EPSILON,
+        int ulps_epsilon     = GeomConstants::ULPS_EPSILON_TEN);
 
     /**
      * Checks whether this Point is close to another Point

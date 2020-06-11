@@ -8,11 +8,11 @@ cc_library(
 
 cc_library(
     name = "segment",
+    srcs = ["segment.cpp"],
     hdrs = ["segment.h"],
     deps = [
         ":point",
         "//software/new_geom/util:almost_equal",
-        "//software/new_geom/util:collinear",
     ],
 )
 
@@ -106,6 +106,7 @@ cc_library(
         ":angle",
         ":geom_constants",
         ":vector",
+        "//software/new_geom/util:almost_equal",
     ],
 )
 
@@ -142,7 +143,6 @@ cc_library(
     hdrs = ["ray.h"],
     deps = [
         ":point",
-        "//software/new_geom/util:collinear",
     ],
 )
 

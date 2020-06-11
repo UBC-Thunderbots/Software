@@ -97,7 +97,7 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(
     auto field_line_segment = std::make_unique<SSL_FieldLineSegment>();
 
     field_line_segment->set_name(ssl_field_line_names.at(line_type));
-    field_line_segment->set_allocated_p1(createVector2f(segment.getSegStart()).release());
+    field_line_segment->set_allocated_p1(createVector2f(segment.getStart()).release());
     field_line_segment->set_allocated_p2(createVector2f(segment.getEnd()).release());
     // SSL Vision publishes all units in millimeters (even though the datatype
     // is a float), so we need to convert units

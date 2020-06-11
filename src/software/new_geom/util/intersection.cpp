@@ -1,7 +1,6 @@
 #include "software/new_geom/util/intersection.h"
 
 #include "software/new_geom/util/almost_equal.h"
-#include "software/new_geom/util/collinear.h"
 #define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
 #include "software/new_geom/point_boost_geometry_compatability.h"
 
@@ -55,8 +54,8 @@ std::vector<Point> intersection(const Segment &first, const Segment &second)
 {
     std::vector<Point> output;
 
-    boost::geometry::model::segment<Point> seg_1(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> seg_2(second.getSegStart(), second.getEnd());
+    boost::geometry::model::segment<Point> seg_1(first.getStart(), first.getEnd());
+    boost::geometry::model::segment<Point> seg_2(second.getStart(), second.getEnd());
     boost::geometry::intersection(seg_1, seg_2, output);
 
     return output;
@@ -84,7 +83,7 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     Point second = ray.getStart() + ray.toUnitVector();
 
     std::optional<Point> point_of_intersection =
-        intersection(ray.getStart(), second, segment.getSegStart(), segment.getEnd());
+        intersection(ray.getStart(), second, segment.getStart(), segment.getEnd());
 
     // If there exists a single intersection, and it exists on the ray and within the
     // segment
@@ -97,13 +96,13 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     }
     // If no intersection was found and the ray and segment are parallel, and collinear
     else if (!point_of_intersection.has_value() &&
-             collinear(ray.getStart(), segment.getSegStart(), segment.getEnd()))
+             Point::collinear(ray.getStart(), segment.getStart(), segment.getEnd()))
     {
         // Check if ray passes through both segment start and end
-        if (ray.toUnitVector() == (segment.getSegStart() - ray.getStart()).normalize() &&
+        if (ray.toUnitVector() == (segment.getStart() - ray.getStart()).normalize() &&
             ray.toUnitVector() == (segment.getEnd() - ray.getStart()).normalize())
         {
-            intersections = {segment.getSegStart(), segment.getEnd()};
+            intersections = {segment.getStart(), segment.getEnd()};
             return intersections;
         }
         // Ray origin within the segment, return the ray start position and the segment
@@ -111,10 +110,9 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
         else
         {
             Point overlapping_segment_end =
-                ray.toUnitVector() ==
-                        (segment.getEnd() - segment.getSegStart()).normalize()
+                ray.toUnitVector() == (segment.getEnd() - segment.getStart()).normalize()
                     ? segment.getEnd()
-                    : segment.getSegStart();
+                    : segment.getStart();
             intersections = {ray.getStart(), overlapping_segment_end};
             return intersections;
         }

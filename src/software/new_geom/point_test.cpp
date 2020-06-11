@@ -51,13 +51,6 @@ TEST(PointLogicTests, point_dist_from_origin_test)
     EXPECT_EQ(5, p.distanceFromOrigin());
 }
 
-TEST(PointLogicTests, point_dist_from_other_point_test)
-{
-    Point p = Point(3, 4);
-    Point q = Point(-3, -4);
-    EXPECT_EQ(10, p.distanceFromPoint(q));
-}
-
 TEST(PointLogicTests, rotate_point_test)
 {
     Point p = Point(3, 4);
@@ -126,4 +119,73 @@ TEST(PointOperatorTests, point_equality_inequality_test)
 
     EXPECT_FALSE(p == q);
     EXPECT_TRUE(p != q);
+}
+
+TEST(CollinearPointsTest, test_collinear_points)
+{
+    Point p(0, 0);
+    Point q(1, 1);
+    Point r(5, 5);
+
+    EXPECT_TRUE(Point::collinear(p, q, r));
+}
+
+TEST(CollinearPointsTest, test_not_collinear_points)
+{
+    Point p(0, 0);
+    Point q(-2, 5);
+    Point r(3, -9);
+
+    EXPECT_FALSE(Point::collinear(p, q, r));
+}
+
+TEST(CollinearPointsTest, test_points_collinear_two_identical)
+{
+    EXPECT_TRUE(Point::collinear(Point(), Point(5, 1), Point(5, 1)));
+}
+
+TEST(CollinearPointsTest, test_points_collinear_all_identical)
+{
+    EXPECT_TRUE(Point::collinear(Point(-4, 3), Point(-4, 3), Point(-4, 3)));
+}
+
+TEST(CollinearPointsTest, small_double_precision_error_collinear)
+{
+    // Make sure small double precision error does not affect collinear
+    Point p(7.0 + 1.0 / 3.0, 2);
+    Point q(5, -5);
+    Point r(8, 4);
+    EXPECT_TRUE(Point::collinear(p, q, r));
+}
+
+TEST(CollinearPointsTest, vertically_collinear_points)
+{
+    Point p(202, 15);
+    Point q(202, -15);
+    Point r(202.00000000000003, -0.5);
+    EXPECT_TRUE(Point::collinear(p, q, r));
+}
+
+TEST(PointsIntersectionTest, test_intersection)
+{
+    auto point_of_intersection =
+        Point::intersection(Point(0, -3), Point(3, 6), Point(0, 4), Point(1, 8));
+
+    EXPECT_EQ(point_of_intersection.value(), Point(-7, -24));
+}
+
+TEST(PointsIntersectionTest, test_overlapping_not_intersecting)
+{
+    auto point_of_intersection =
+        Point::intersection(Point(0, -3), Point(3, 6), Point(1, 0), Point(2, 3));
+
+    EXPECT_FALSE(point_of_intersection.has_value());
+}
+
+TEST(PointsIntersectionTest, test_other_intersection)
+{
+    auto point_of_intersection =
+        Point::intersection(Point(-1, -1), Point(5, -1), Point(0, 2), Point(10, 8));
+
+    EXPECT_EQ(point_of_intersection.value(), Point(-5, -1));
 }

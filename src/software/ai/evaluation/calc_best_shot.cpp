@@ -161,9 +161,9 @@ namespace Evaluation
         if (obstacles.size() == 0)
         {
             const Point center_of_segment =
-                getPointsMean({segment.getSegStart(), segment.getEnd()});
+                getPointsMean({segment.getStart(), segment.getEnd()});
             const Angle angle_of_entire_segment =
-                ((segment.getSegStart() - origin)
+                ((segment.getStart() - origin)
                      .orientation()
                      .minDiff((segment.getEnd() - origin).orientation()))
                     .abs();
@@ -186,9 +186,9 @@ namespace Evaluation
         {
             // If there are no blocking Segments, just shoot at the center of the goal
             const Point center_of_segment =
-                getPointsMean({segment.getSegStart(), segment.getEnd()});
+                getPointsMean({segment.getStart(), segment.getEnd()});
             const Angle angle_of_entire_segment =
-                ((segment.getSegStart() - origin)
+                ((segment.getStart() - origin)
                      .orientation()
                      .minDiff((segment.getEnd() - origin).orientation()))
                     .abs();
@@ -220,10 +220,10 @@ namespace Evaluation
 
 
         const Point most_open_point =
-            Point((largest_segment.getSegStart().x() + largest_segment.getEnd().x()) / 2,
-                  (largest_segment.getSegStart().y() + largest_segment.getEnd().y()) / 2);
+            Point((largest_segment.getStart().x() + largest_segment.getEnd().x()) / 2,
+                  (largest_segment.getStart().y() + largest_segment.getEnd().y()) / 2);
         const Angle largest_open_angle =
-            ((largest_segment.getSegStart() - origin)
+            ((largest_segment.getStart() - origin)
                  .orientation()
                  .minDiff((largest_segment.getEnd() - origin).orientation()))
                 .abs();

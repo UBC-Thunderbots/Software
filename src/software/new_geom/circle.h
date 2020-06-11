@@ -35,7 +35,7 @@ class Circle final : public ConvexShape
      *
      * @return the origin of this Circle.
      */
-    Point getOrigin() const;
+    const Point &getOrigin() const;
 
     /**
      * Sets the radius of this Circle.

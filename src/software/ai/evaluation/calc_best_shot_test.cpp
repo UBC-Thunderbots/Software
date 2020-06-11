@@ -293,10 +293,10 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_no_obstacles)
     auto open_shot =
         Evaluation::calcMostOpenDirectionFromCircleObstacles(origin, ref_segment, obs);
 
-    EXPECT_EQ((ref_segment.getSegStart() - origin).orientation() -
+    EXPECT_EQ((ref_segment.getStart() - origin).orientation() -
                   (ref_segment.getEnd() - origin).orientation(),
               open_shot->getOpenAngle());
-    EXPECT_EQ(getPointsMean({ref_segment.getSegStart(), ref_segment.getEnd()}),
+    EXPECT_EQ(getPointsMean({ref_segment.getStart(), ref_segment.getEnd()}),
               open_shot->getPointToShootAt());
 }
 
@@ -432,7 +432,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_obstacles_behind)
     auto open_shot =
         Evaluation::calcMostOpenDirectionFromCircleObstacles(reference, ref_seg, obs);
     EXPECT_EQ(open_shot->getOpenAngle(),
-              (ref_seg.getSegStart() - reference)
+              (ref_seg.getStart() - reference)
                   .orientation()
                   .minDiff((ref_seg.getEnd() - reference).orientation())
                   .abs());

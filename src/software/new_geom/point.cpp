@@ -1,5 +1,7 @@
 #include "software/new_geom/point.h"
 
+#include "software/new_geom/util/almost_equal.h"
+
 Point::Point() : x_(0.0), y_(0.0) {}
 
 Point::Point(double x, double y) : x_(x), y_(y) {}
@@ -39,11 +41,6 @@ double Point::distanceFromOrigin() const
     return std::hypot(x_, y_);
 }
 
-double Point::distanceFromPoint(const Point &p) const
-{
-    return sqrt(pow((x_ - p.x()), 2) + pow((y_ - p.y()), 2));
-}
-
 Vector Point::toVector() const
 {
     return Vector(x_, y_);
@@ -54,9 +51,66 @@ Point Point::rotate(const Angle &rot) const
     return Point(x_ * rot.cos() - y_ * rot.sin(), x_ * rot.sin() + y_ * rot.cos());
 }
 
+bool Point::collinear(const Point &a, const Point &b, const Point &c,
+                      double fixed_epsilon, int ulps_epsilon)
+{
+    if ((a - b).lengthSquared() < fixed_epsilon ||
+        (b - c).lengthSquared() < fixed_epsilon ||
+        (a - c).lengthSquared() < fixed_epsilon)
+    {
+        return true;
+    }
+
+    if ((almostEqual(a.x(), b.x(), fixed_epsilon, ulps_epsilon) &&
+         almostEqual(a.x(), c.x(), fixed_epsilon, ulps_epsilon)) ||
+        (almostEqual(a.y(), b.y(), fixed_epsilon, ulps_epsilon) &&
+         almostEqual(a.y(), c.y(), fixed_epsilon, ulps_epsilon)))
+    {
+        // Explicit check for the vectors being near vertical or horizontal to avoid
+        // near zero comparisons
+        return true;
+    }
+
+    Vector v1 = b - a;
+    Vector v2 = c - a;
+    return almostEqual(v1.x() * v2.y(), v1.y() * v2.x(), fixed_epsilon, ulps_epsilon);
+}
+
+std::optional<Point> Point::intersection(const Point &a, const Point &b, const Point &c,
+                                         const Point &d, double fixed_epsilon,
+                                         int ulps_epsilon)
+{
+    double x1 = a.x();
+    double y1 = a.y();
+    double x2 = b.x();
+    double y2 = b.y();
+    double x3 = c.x();
+    double y3 = c.y();
+    double x4 = d.x();
+    double y4 = d.y();
+
+    double denominatorTermA = (x1 - x2) * (y3 - y4);
+    double denominatorTermB = (y1 - y2) * (x3 - x4);
+    double denominator      = denominatorTermA - denominatorTermB;
+
+    if (almostEqual(denominatorTermA, denominatorTermB, fixed_epsilon, ulps_epsilon))
+    {
+        return std::nullopt;
+    }
+
+    double determinantA = x1 * y2 - y1 * x2;
+    double determinantB = x3 * y4 - y3 * x4;
+
+    Point intersection(
+        (determinantA * (x3 - x4) - (x1 - x2) * determinantB) / denominator,
+        (determinantA * (y3 - y4) - (y1 - y2) * determinantB) / denominator);
+
+    return std::make_optional(intersection);
+}
+
 bool Point::isClose(const Point &other, double dist) const
 {
-    return distanceFromPoint(other) < dist;
+    return (*this - other).length() < dist;
 }
 
 Point &Point::operator=(const Point &q)

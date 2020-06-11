@@ -22,7 +22,6 @@ cc_library(
         "//software/new_geom:ray",
         "//software/new_geom:rectangle",
         "//software/new_geom:triangle",
-        "//software/new_geom/util:collinear",
         "//software/new_geom/util:distance",
         "//software/new_geom/util:intersection",
         "//software/new_geom/util:intersects",

@@ -185,7 +185,7 @@ namespace Test
                                                               const Point &pt2,
                                                               double tolerance)
     {
-        double distance = pt1.distanceFromPoint(pt2);
+        double distance = (pt1 - pt2).length();
         if (equalWithinTolerance(distance, 0, tolerance))
         {
             return ::testing::AssertionSuccess();

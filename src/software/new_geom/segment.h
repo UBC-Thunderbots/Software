@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "software/geom/point.h"
-#include "software/geom/util/almost_equal.h"
+#include "software/new_geom/point.h"
+#include "software/new_geom/util/almost_equal.h"
 
 class Segment final
 {
@@ -50,7 +50,7 @@ class Segment final
      *
      * @return reversed segment
      */
-    const Segment& reverse() const;
+    Segment reverse() const;
 
     /**
      * Makes a Vector out of this Segment.

@@ -107,7 +107,7 @@ class BallFilterTest : public ::testing::Test
                                     double expected_velocity_magnitude_tolerance,
                                     unsigned int num_steps_to_ignore)
     {
-        Point ball_starting_position = ball_path.getSegStart();
+        Point ball_starting_position = ball_path.getStart();
         Vector ball_velocity = ball_path.toVector().normalize(ball_velocity_magnitude);
         // Check for division by 0
         if (ball_velocity_magnitude == 0)

@@ -2,5 +2,5 @@
 
 bool containsNew(const Circle &out, const Segment &in)
 {
-    return out.contains(in.getSegStart()) && out.contains(in.getEnd());
+    return out.contains(in.getStart()) && out.contains(in.getEnd());
 }

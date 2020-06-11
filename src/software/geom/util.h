@@ -28,19 +28,6 @@ double length(const Segment &segment);
 double lengthSquared(const Segment &segment);
 
 /**
- * Checks if 2 Segments are collinear.
- *
- * @param segment1 : The first Segment
- *
- * @param segment2 : The second Segment
- *
- * @return true : If the Segment1 and Segment2 are collinear within EPS disance
- *
- * @return false : If Segment1 and Segment2 are NOT collinear within EPS distance
- */
-bool collinear(const Segment &segment1, const Segment &segment2);
-
-/**
  * Finds the Point on line segment closest to point.
  *
  * @param centre the point.

@@ -13,7 +13,7 @@ bool intersects(const Polygon &first, const Segment &second)
             return true;
         }
     }
-    if (first.contains(second.getSegStart()))
+    if (first.contains(second.getStart()))
     {
         return true;
     }
@@ -91,14 +91,14 @@ bool intersects(const Segment &first, const Segment &second)
     // https://www.sciencedirect.com/science/article/pii/B9780080507552500452.
 
     // Values are pre-computed to improve performance
-    const double p1x(first.getSegStart().x());
-    const double p1y(first.getSegStart().y());
+    const double p1x(first.getStart().x());
+    const double p1y(first.getStart().y());
     const double p2x(first.getEnd().x());
     const double p2y(first.getEnd().y());
     const double p3x(second.getEnd().x());
     const double p3y(second.getEnd().y());
-    const double p4x(second.getSegStart().x());
-    const double p4y(second.getSegStart().y());
+    const double p4x(second.getStart().x());
+    const double p4y(second.getStart().y());
 
     const double ax = p2x - p1x;
     const double ay = p2y - p1y;
@@ -148,7 +148,7 @@ bool intersects(const Ray &first, const Segment &second)
 {
     auto intersectionValue =
         intersection(first.getStart(), first.getStart() + first.toUnitVector(),
-                     second.getSegStart(), second.getEnd());
+                     second.getStart(), second.getEnd());
     // If the infinitely long vectors defined by ray and segment intersect, check that the
     // intersection is within their definitions
     if (intersectionValue.has_value())
@@ -158,7 +158,7 @@ bool intersects(const Ray &first, const Segment &second)
     }
     // If there is no intersection, the ray and segment may be parallel, check if they are
     // overlapped
-    return first.contains(second.getSegStart()) || first.contains(second.getEnd());
+    return first.contains(second.getStart()) || first.contains(second.getEnd());
 }
 
 bool intersects(const Segment &first, const Ray &second)

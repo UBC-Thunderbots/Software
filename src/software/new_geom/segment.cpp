@@ -1,4 +1,4 @@
-#include "software/geom/segment.h"
+#include "software/new_geom/segment.h"
 
 Segment::Segment(const Point& start, const Point& end) : start(start), end(end)
 {
@@ -28,7 +28,7 @@ const Point& Segment::getEnd() const
     return end;
 }
 
-const Segment& Segment::reverse() const
+Segment Segment::reverse() const
 {
     return Segment(end, start);
 }

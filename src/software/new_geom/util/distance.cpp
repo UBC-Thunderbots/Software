@@ -22,17 +22,17 @@ double distance(const Point &first, const Point &second)
 
 double distance(const Segment &first, const Segment &second)
 {
-    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> CD(second.getSegStart(),
+    boost::geometry::model::segment<Point> AB(first.getStart(), first.getEnd());
+    boost::geometry::model::segment<Point> CD(second.getStart(),
                                               second.getEnd());  // similar code
     bool intersects = boost::geometry::intersects(AB, CD);
     if (intersects)
     {
         return 0.0;
     }
-    double first_to_second_start_distsq = distanceSquared(first, second.getSegStart());
+    double first_to_second_start_distsq = distanceSquared(first, second.getStart());
     double first_to_second_end_distsq   = distanceSquared(first, second.getEnd());
-    double second_to_first_start_distsq = distanceSquared(second, first.getSegStart());
+    double second_to_first_start_distsq = distanceSquared(second, first.getStart());
     double second_to_first_end_distsq   = distanceSquared(second, first.getEnd());
     return std::sqrt(
         std::min({first_to_second_start_distsq, first_to_second_end_distsq,
@@ -90,7 +90,7 @@ double distance(const Circle &first, const Point &second)
 double distanceSquared(const Point &first, const Segment &second)
 {
     Vector seg_vec            = second.toVector();
-    Vector seg_start_to_point = first - second.getSegStart();
+    Vector seg_start_to_point = first - second.getStart();
 
     if (seg_vec.dot(seg_start_to_point) <= 0)
     {
