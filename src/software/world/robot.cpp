@@ -145,6 +145,11 @@ AngularVelocity Robot::angularVelocity() const
     return states_.front().robotState().angularVelocity();
 }
 
+bool Robot::ballInBreakBeam() const
+{
+    return states_.front().robotState().ballInBreakBeam();
+}
+
 AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
     const Duration &duration_in_future) const
 {

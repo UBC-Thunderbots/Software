@@ -29,6 +29,16 @@ AngularVelocity RobotState::angularVelocity() const
     return angular_velocity_;
 }
 
+bool RobotState::ballInBreakBeam() const
+{
+    return ball_in_break_beam_;
+}
+
+void RobotState::updateBallInBreakBeam(bool ball_in_break_beam)
+{
+    ball_in_break_beam_ = ball_in_break_beam;
+}
+
 bool RobotState::operator==(const RobotState &other) const
 {
     return this->position() == other.position() && this->velocity() == other.velocity() &&

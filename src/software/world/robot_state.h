@@ -60,6 +60,20 @@ class RobotState
     AngularVelocity angularVelocity() const;
 
     /**
+     * Returns if the ball is in the break beam
+     *
+     * @return ball in break beam
+     */
+    bool ballInBreakBeam() const;
+
+    /**
+     * Update ball in break beam
+     *
+     * @param new ball in break beam
+     */
+    void updateBallInBreakBeam(bool ball_in_break_beam);
+
+    /**
      * Defines the equality operator for a RobotState. RobotStates are equal if their
      * positions, velocities, orientation, and angular velocity are the same
      *
@@ -83,6 +97,7 @@ class RobotState
     Vector velocity_;
     Angle orientation_;
     AngularVelocity angular_velocity_;
+    bool ball_in_break_beam_;
 };
 
 /**

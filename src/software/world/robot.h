@@ -175,6 +175,13 @@ class Robot
     AngularVelocity angularVelocity() const;
 
     /**
+     * Returns if the ball is in the break beam
+     *
+     * @return ball in break beam
+     */
+    bool ballInBreakBeam() const;
+
+    /**
      * Returns the estimated angular velocity of the robot at a future time, relative to
      * when the robot was last updated
      *
