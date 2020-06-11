@@ -16,6 +16,8 @@ class ProtoMulticastListener
      * @param io_service The io_service to use to service incoming ReceiveProto data
      * @param ip_address The ip address of the multicast group on which to listen for
      * the given ReceiveProto packets (IPv4 in dotted decimal or IPv6 in hex string)
+     *  example IPv4: 192.168.0.2
+     *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen for ReceiveProto packets
      * @param receive_callback The function to run for every ReceiveProto packet received
      * from the network
