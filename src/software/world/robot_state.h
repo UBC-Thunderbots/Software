@@ -5,6 +5,7 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
 #include "software/util/make_enum/make_enum.h"
+#include "shared/constants.h"
 
 using RobotId = unsigned int;
 
@@ -26,10 +27,11 @@ class RobotState
      * @param velocity The velocity of the robot, in metres per second
      * @param orientation The orientation of the robot
      * @param angular_velocity The angular velocity of the robot
+     * @param height The height of the robot in metres
      */
     explicit RobotState(const Point &position, const Vector &velocity,
                         const Angle &orientation,
-                        const AngularVelocity &angular_velocity);
+                        const AngularVelocity &angular_velocity, double height = ROBOT_MAX_HEIGHT_METERS);
 
     /**
      * Returns the position of the robot represented by this state
@@ -60,8 +62,15 @@ class RobotState
     AngularVelocity angularVelocity() const;
 
     /**
-     * Defines the equality operator for a RobotState. RobotStates are equal if their
-     * positions, velocities, orientation, and angular velocity are the same
+     * Returns the height of the robot in metres
+     *
+     * @return the height of the robot in metres
+     */
+    double height() const;
+
+    /**
+     * Defines the equality operator for a RobotState. RobotStates are equal if
+     * all their members are equal
      *
      * @param other The robot state to compare against for equality
      * @return True if the other robot state is equal to this robot state, and false
@@ -83,6 +92,7 @@ class RobotState
     Vector velocity_;
     Angle orientation_;
     AngularVelocity angular_velocity_;
+    double height_;
 };
 
 /**
