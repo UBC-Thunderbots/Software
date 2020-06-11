@@ -15,5 +15,5 @@ message TbotsRobotMsg
     NetworkStatus network_status              = 8;
     PowerStatus power_status                  = 9;
     TemperatureStatus temperature_status      = 10;
-    TimestampMsg timestamp                    = 11;
+    TimestampMsg time_sent                    = 11;
 }
