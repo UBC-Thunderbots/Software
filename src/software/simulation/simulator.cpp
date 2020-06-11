@@ -3,6 +3,7 @@
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
+
 extern "C"
 {
 #include "firmware/app/world/firmware_ball.h"
@@ -11,8 +12,29 @@ extern "C"
 }
 
 Simulator::Simulator(const World& world)
-    : physics_world(world), friendly_goalie_id(world.friendlyTeam().getGoalieID())
+    : physics_world(world.field()), friendly_goalie_id(world.friendlyTeam().getGoalieID())
 {
+    physics_world.setBallState(world.ball().currentState().ballState());
+    // Note: The simulator currently makes the invariant that friendly robots
+    // are yellow robots, and enemies are blue. This will be fixed in
+    // https://github.com/UBC-Thunderbots/Software/issues/1325
+    std::vector<RobotStateWithId> yellow_robots;
+    for (const auto& robot : world.friendlyTeam().getAllRobots())
+    {
+        RobotStateWithId state{.id          = robot.id(),
+                               .robot_state = robot.currentState().robotState()};
+        yellow_robots.emplace_back(state);
+    }
+    physics_world.addYellowRobots(yellow_robots);
+    std::vector<RobotStateWithId> blue_robots;
+    for (const auto& robot : world.enemyTeam().getAllRobots())
+    {
+        RobotStateWithId state{.id          = robot.id(),
+                               .robot_state = robot.currentState().robotState()};
+        blue_robots.emplace_back(state);
+    }
+    physics_world.addBlueRobots(blue_robots);
+
     for (auto physics_robot : physics_world.getFriendlyPhysicsRobots())
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
@@ -78,10 +100,42 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
 
 World Simulator::getWorld()
 {
-    World world = physics_world.getWorld();
+    Timestamp timestamp = physics_world.getTimestamp();
+    // The world currently must contain a ball. The ability to represent no ball
+    // will be fixed in https://github.com/UBC-Thunderbots/Software/issues/1325
+    Ball ball = Ball(Point(0, 0), Vector(0, 0), timestamp);
+    if (physics_world.getBallState())
+    {
+        ball =
+            Ball(TimestampedBallState(physics_world.getBallState().value(), timestamp));
+    }
+
+    // Note: The simulator currently makes the invariant that friendly robots
+    // are yellow robots, and enemies are blue. This will be fixed in
+    // https://github.com/UBC-Thunderbots/Software/issues/1325
+    std::vector<Robot> friendly_team_robots;
+    for (const auto& robot_state : physics_world.getYellowRobotStates())
+    {
+        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
+        Robot robot(robot_state.id, timestamped_robot_state);
+        friendly_team_robots.emplace_back(robot);
+    }
+    std::vector<Robot> enemy_team_robots;
+    for (const auto& robot_state : physics_world.getBlueRobotStates())
+    {
+        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
+        Robot robot(robot_state.id, timestamped_robot_state);
+        enemy_team_robots.emplace_back(robot);
+    }
+
+    Team friendly_team(friendly_team_robots, Duration::fromSeconds(0.5));
+    Team enemy_team(enemy_team_robots, Duration::fromSeconds(0.5));
+
+    World world(physics_world.getField(), ball, friendly_team, enemy_team);
+
     // TODO: This is a hack to persist goalie ID from the initial test setup
     // It will be removed as part of
-    // https://github.com/UBC-Thunderbots/Software/issues/1353
+    // https://github.com/UBC-Thunderbots/Software/issues/1325
     auto id = friendly_goalie_id;
     if (id)
     {

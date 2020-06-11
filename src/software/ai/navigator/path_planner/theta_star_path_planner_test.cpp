@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/new_geom/point.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
@@ -13,12 +13,13 @@ class TestThetaStarPathPlanner : public testing::Test
 {
    public:
     TestThetaStarPathPlanner()
-        : obstacle_factory(
-              Util::DynamicParameters->getAIConfig()->getObstacleFactoryConfig())
+        : robot_navigation_obstacle_factory(
+              Util::DynamicParameters->getAIConfig()
+                  ->getRobotNavigationObstacleFactoryConfig())
     {
     }
 
-    ObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 };
 
 void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
@@ -68,8 +69,9 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our starting location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
-        Rectangle(Point(-0.5, -1), Point(0.5, 1)))};
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(-0.5, -1), Point(0.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
@@ -103,8 +105,9 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Point start{0, 0}, dest{2.7, 0};
 
     // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
-        Rectangle(Point(2.5, -1), Point(3.5, 1)))};
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(2.5, -1), Point(3.5, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
@@ -135,8 +138,9 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
-        Rectangle(Point(1, -1), Point(2, 1)))};
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(1, -1), Point(2, 1)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 
@@ -168,8 +172,9 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{0, 3};
 
     // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {obstacle_factory.createObstacleFromRectangle(
-        Rectangle(Point(-1, 1), Point(1, 2)))};
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(-1, 1), Point(1, 2)))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
 

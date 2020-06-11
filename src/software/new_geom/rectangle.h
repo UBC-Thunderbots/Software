@@ -72,6 +72,34 @@ class Rectangle : public ConvexPolygon
     Point posXNegYCorner() const;
 
     /**
+     * Gets the maximum x value of the rectangle
+     *
+     * return max x value
+     */
+    double xMax() const;
+
+    /**
+     * Gets the minimum x value of the rectangle
+     *
+     * return min x value
+     */
+    double xMin() const;
+
+    /**
+     * Gets the maximum y value of the rectangle
+     *
+     * return max y value
+     */
+    double yMax() const;
+
+    /**
+     * Gets the minimum y value of the rectangle
+     *
+     * return min y value
+     */
+    double yMin() const;
+
+    /**
      * Determines whether the given Point is contained within this Rectangle.
      *
      * @return whether the Point p is contained within this Rectangle.

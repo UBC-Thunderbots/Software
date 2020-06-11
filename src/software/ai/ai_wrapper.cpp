@@ -19,10 +19,10 @@ void AIWrapper::onValueReceived(World world)
 
 void AIWrapper::runAIAndSendPrimitives()
 {
-    if (control_config->RunAI()->value())
+    if (most_recent_world && control_config->RunAI()->value())
     {
         std::vector<std::unique_ptr<Primitive>> new_primitives =
-            ai.getPrimitives(most_recent_world);
+            ai.getPrimitives(*most_recent_world);
 
         PlayInfo play_info = ai.getPlayInfo();
         Subject<PlayInfo>::sendValueToObservers(play_info);

@@ -69,7 +69,7 @@ class BallFilter
      *
      * @return The updated state of the ball given the new data
      */
-    std::optional<Ball> getFilteredData(
+    std::optional<TimestampedBallState> getFilteredData(
         const std::vector<BallDetection> &new_ball_detections, const Field &field);
 
     /**

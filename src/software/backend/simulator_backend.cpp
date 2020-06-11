@@ -96,7 +96,7 @@ void SimulatorBackend::runSimulationLoop(World world)
             simulator.stepSimulation(physics_time_step);
         }
 
-        world = simulator.getWorld();
+        World world = simulator.getWorld();
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {

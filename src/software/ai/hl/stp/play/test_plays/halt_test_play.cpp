@@ -22,7 +22,7 @@ bool HaltTestPlay::invariantHolds(const World &world) const
         .contains(world.ball().position());
 }
 
-void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     auto stop_test_tactic_1 = std::make_shared<StopTestTactic>();
     auto stop_test_tactic_2 = std::make_shared<StopTestTactic>();
