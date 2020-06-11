@@ -64,7 +64,7 @@ class ProtobufTranslationTest : public ::testing::Test
 TEST(ProtobufTranslationTest, point_msg_test)
 {
     auto point     = Point(420, 420);
-    auto point_msg = ProtobufMessageTranslation::getPointMsgFromPoint(point);
+    auto point_msg = convertPointToPointMsgProto(point);
 
     ProtobufTranslationTest::assertPointMessageEqual(point, *point_msg);
 }
@@ -72,7 +72,7 @@ TEST(ProtobufTranslationTest, point_msg_test)
 TEST(ProtobufTranslationTest, angle_msg_test)
 {
     auto angle     = Angle::fromRadians(420);
-    auto angle_msg = ProtobufMessageTranslation::getAngleMsgFromAngle(angle);
+    auto angle_msg = convertAngleToAngleMsgProto(angle);
 
     ProtobufTranslationTest::assertAngleMessageEqual(angle, *angle_msg);
 }
@@ -80,14 +80,14 @@ TEST(ProtobufTranslationTest, angle_msg_test)
 TEST(ProtobufTranslationTest, vector_msg_test)
 {
     auto vector     = Vector(420, 420);
-    auto vector_msg = ProtobufMessageTranslation::getVectorMsgFromVector(vector);
+    auto vector_msg = convertVectorToVectorMsgProto(vector);
 
     ProtobufTranslationTest::assertVectorMessageEqual(vector, *vector_msg);
 }
 
 TEST(ProtobufTranslationTest, timestamp_msg_test)
 {
-    auto timestamp_msg = ProtobufMessageTranslation::getCurrentTimestampMsg();
+    auto timestamp_msg = getCurrentTimestampMsg();
     ProtobufTranslationTest::assertSaneTimestamp(*timestamp_msg);
 }
 
@@ -100,7 +100,7 @@ TEST(ProtobufTranslationTest, robot_state_msg_test)
 
     Robot robot(0, position, velocity, orientation, angular_velocity,
                 Timestamp::fromSeconds(0));
-    auto robot_state_msg = ProtobufMessageTranslation::getRobotStateMsgFromRobot(robot);
+    auto robot_state_msg = convertRobotToRobotStateMsgProto(robot);
 
     ProtobufTranslationTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
@@ -111,7 +111,7 @@ TEST(ProtobufTranslationTest, ball_state_msg_test)
     auto velocity = Vector(420, 420);
 
     Ball ball(position, velocity, Timestamp::fromSeconds(0));
-    auto ball_state_msg = ProtobufMessageTranslation::getBallStateMsgFromBall(ball);
+    auto ball_state_msg = convertBallToBallStateMsgProto(ball);
 
     ProtobufTranslationTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }
@@ -123,7 +123,7 @@ TEST(ProtobufTranslationTest, vision_msg_test)
         world, {Point(420, 420), Point(420, 420), Point(420, 420), Point(420, 420)},
         Timestamp::fromSeconds(0));
 
-    auto vision_msg = ProtobufMessageTranslation::getVisionMsgFromWorld(world);
+    auto vision_msg = convertWorldToVisionMsgProto(world);
 
     ProtobufTranslationTest::assertBallStateMessageFromBall(world.ball(),
                                                             vision_msg->ball_state());
