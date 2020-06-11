@@ -70,7 +70,16 @@ void SensorFusion::updateWorld(const Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
 {
-    // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
+    for (const auto &tbots_robot_msg : tbots_robot_msgs)
+    {
+        auto robot_ptr = friendly_team.getRobotById(tbots_robot_msg.robot_id());
+        if (robot_ptr && tbots_robot_msg.has_break_beam_status())
+        {
+            // TODO: check timestamp
+            robot_ptr->currentState().robotState().updateBallInBreakBeam(
+                tbots_robot_msg.break_beam_status().ball_in_beam());
+        }
+    }
 }
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
