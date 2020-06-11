@@ -11,7 +11,7 @@ std::unique_ptr<VisionMsg> convertWorldToVisionMsgProto(const World& world)
 {
     // create msg and set timestamp
     auto vision_msg = std::make_unique<VisionMsg>();
-    vision_msg->set_allocated_timestamp(getCurrentTimestampMsg().release());
+    vision_msg->set_allocated_time_sent(getCurrentTimestampMsg().release());
 
     // set robot_states map
     auto& robot_states_map = *vision_msg->mutable_robot_states();
@@ -39,7 +39,7 @@ std::unique_ptr<PrimitiveMsg> convertPrimitiveVectortoPrimitiveMsgProto(
 {
     // create msg and update timestamp
     auto primitive_msg = std::make_unique<PrimitiveMsg>();
-    primitive_msg->set_allocated_timestamp(getCurrentTimestampMsg().release());
+    primitive_msg->set_allocated_time_sent(getCurrentTimestampMsg().release());
 
     // set robot primitives
     auto& robot_primitives_map = *primitive_msg->mutable_robot_primitives();
@@ -113,12 +113,14 @@ std::unique_ptr<VectorMsg> convertVectorToVectorMsgProto(const Vector& vector)
 
 std::unique_ptr<TimestampMsg> getCurrentTimestampMsg()
 {
-    const auto clock_now         = std::chrono::system_clock::now();
-    uint64_t now_in_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                       clock_now.time_since_epoch())
-                                       .count();
+    const auto clock_now = std::chrono::system_clock::now();
+    double now =
+        static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
+                                clock_now.time_since_epoch())
+                                .count()) /
+        1000000.0;
 
     auto timestamp_msg = std::make_unique<TimestampMsg>();
-    timestamp_msg->set_epoch_timestamp_milliseconds(now_in_milliseconds);
+    timestamp_msg->set_epoch_timestamp(now);
     return std::move(timestamp_msg);
 }
