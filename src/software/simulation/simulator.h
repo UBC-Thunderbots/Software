@@ -60,10 +60,10 @@ class Simulator
 {
    public:
     /**
-     * Creates a new Simulator with the given world. The starting state of the simulation
-     * will match the state of the given world
+     * Creates a new Simulator. The starting state of the simulation
+     * will have the given field, with no robots or ball.
      *
-     * @param world The world to initialize the simulation with
+     * @param field The field to initialize the simulation with
      */
     explicit Simulator(const Field& field);
     Simulator() = delete;
@@ -79,34 +79,23 @@ class Simulator
     void setBallState(const BallState& ball_state);
 
     /**
-     * Removes the ball from the physics world
+     * Removes the ball from the physics world. If a ball does not already exist,
+     * this has no effect.
      */
     void removeBall();
 
     /**
-     * Adds robots to the yellow team with the given initial states.
+     * Adds robots to the specified team with the given initial states.
      *
      * @pre The robot IDs must not be duplicated and must not match the ID
-     * of any robot already on the yellow team.
+     * of any robot already on the specified team.
      *
      * @throws runtime_error if any of the given robot ids are duplicated, or a
-     * yellow robot already exists with the ID
+     * robot already exists on the specified team with one of the new IDs
      *
      * @param robots the robots to add
      */
     void addYellowRobots(const std::vector<RobotStateWithId>& robots);
-
-    /**
-     * Adds robots to the yellow team with the given initial states.
-     *
-     * @pre The robot IDs must not be duplicated and must not match the ID
-     * of any robot already on the blue team.
-     *
-     * @throws runtime_error if any of the given robot ids are duplicated, or a
-     * yellow robot already exists with the ID
-     *
-     * @param robots the robots to add
-     */
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
@@ -115,7 +104,6 @@ class Simulator
      * @param primitives The primitives to simulate
      */
     void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-
     void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
 
     /**

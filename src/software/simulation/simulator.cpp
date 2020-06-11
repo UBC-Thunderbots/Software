@@ -33,7 +33,6 @@ void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
         auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
-        // Release ownership of the pointers so the firmware_world can take ownership
         FirmwareWorld_t* firmware_world_raw =
             app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
         auto firmware_world =
@@ -51,7 +50,6 @@ void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
         auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
-        // Release ownership of the pointers so the firmware_world can take ownership
         FirmwareWorld_t* firmware_world_raw =
             app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
         auto firmware_world =
@@ -68,6 +66,9 @@ void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
         return;
     }
 
+    // Set the ball being referenced in each firmware_world.
+    // We only need to do this a single time since all robots
+    // can see and interact with the same ball
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
     for (const auto& primitive_ptr : *primitives)
     {
@@ -125,6 +126,9 @@ void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 
 void Simulator::stepSimulation(const Duration& time_step)
 {
+    // Set the ball being referenced in each firmware_world.
+    // We only need to do this a single time since all robots
+    // can see and interact with the same ball
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
 
     for (auto& iter : yellow_simulator_robots)
