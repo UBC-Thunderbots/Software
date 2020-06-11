@@ -86,3 +86,23 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "ssl_wrapper_message_translator",
+    srcs = ["ssl_wrapper_message_translator.cpp"],
+    hdrs = ["ssl_wrapper_message_translator.h"],
+    deps = [
+        ":ssl_detection_message_translator",
+        ":ssl_geometry_message_translator",
+        "//software/proto:ssl_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "ssl_wrapper_message_translator_test",
+    srcs = ["ssl_wrapper_message_translator_test.cpp"],
+    deps = [
+        ":ssl_wrapper_message_translator",
+        "@gtest//:gtest_main",
+    ],
+)
