@@ -179,7 +179,7 @@ class Robot
      *
      * @return ball in break beam
      */
-    bool ballInBreakBeam() const;
+    bool ballInBeam() const;
 
     /**
      * Returns the estimated angular velocity of the robot at a future time, relative to

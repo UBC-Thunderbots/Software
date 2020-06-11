@@ -29,14 +29,14 @@ AngularVelocity RobotState::angularVelocity() const
     return angular_velocity_;
 }
 
-bool RobotState::ballInBreakBeam() const
+bool RobotState::ballInBeam() const
 {
-    return ball_in_break_beam_;
+    return ball_in_beam_;
 }
 
-void RobotState::updateBallInBreakBeam(bool ball_in_break_beam)
+void RobotState::updateBallInBeam(bool ball_in_beam)
 {
-    ball_in_break_beam_ = ball_in_break_beam;
+    ball_in_beam_ = ball_in_beam;
 }
 
 bool RobotState::operator==(const RobotState &other) const

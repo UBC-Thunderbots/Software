@@ -73,11 +73,15 @@ void SensorFusion::updateWorld(
     for (const auto &tbots_robot_msg : tbots_robot_msgs)
     {
         auto robot_ptr = friendly_team.getRobotById(tbots_robot_msg.robot_id());
-        if (robot_ptr && tbots_robot_msg.has_break_beam_status())
+        if (robot_ptr)
         {
             // TODO: check timestamp
-            robot_ptr->currentState().robotState().updateBallInBreakBeam(
-                tbots_robot_msg.break_beam_status().ball_in_beam());
+            RobotState state_to_update = robot_ptr->currentState().robotState();
+            if (tbots_robot_msg.has_break_beam_status())
+            {
+                state_to_update.updateBallInBeam(
+                    tbots_robot_msg.break_beam_status().ball_in_beam());
+            }
         }
     }
 }
