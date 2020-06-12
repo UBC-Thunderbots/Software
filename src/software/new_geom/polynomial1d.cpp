@@ -1,5 +1,8 @@
 #include "software/new_geom/polynomial1d.h"
 
+#include <Eigen/Dense>
+#include <Eigen/QR>
+#include <list>
 #include <stdexcept>
 
 #include "software/new_geom/geom_constants.h"
@@ -8,24 +11,53 @@ Polynomial1d::Polynomial1d() {}
 
 Polynomial1d::Polynomial1d(const std::vector<double> &coeffs) : coeffs(coeffs) {}
 
-Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs) : coeffs(coeffs)
+Polynomial1d::Polynomial1d(const std::initializer_list<double> &coeffs)
+    : coeffs(std::vector<double>(coeffs))
 {
 }
 
-Polynomial1d Polynomial1d::constructLinearPolynomialFromConstraints(double input_1,
-                                                                    double output_1,
-                                                                    double input_2,
-                                                                    double output_2)
+Polynomial1d::Polynomial1d(const std::vector<Polynomial1d::Constraint> constraints)
 {
-    if (input_1 == input_2)
+    // Check that we have at least two constraints
+    if (constraints.size() < 2)
     {
-        throw std::invalid_argument("Both inputs are equal - does not define a function");
+        throw std::invalid_argument(
+            "Less then two constraints given, so no unique polynomial solution.");
     }
-    double slope = (output_2 - output_1) / (input_2 - input_1);
-    std::vector<double> coeffs;
-    coeffs.push_back(output_1 - (input_1 * slope));
-    coeffs.push_back(slope);
-    return Polynomial1d(coeffs);
+
+    // Check that all inputs are unique
+    for (size_t i = 0; i < constraints.size(); i++)
+    {
+        for (size_t j = i + 1; j < constraints.size(); j++)
+        {
+            if (constraints[i].input == constraints[j].input)
+            {
+                throw std::invalid_argument(
+                    "At least two inputs were equal, does not define a valid set of constraints");
+            }
+        }
+    }
+
+    // Solve for the coefficients
+    Eigen::MatrixXd A(constraints.size(), constraints.size());
+    Eigen::VectorXd b(constraints.size());
+
+    for (size_t row_index = 0; row_index < constraints.size(); row_index++)
+    {
+        for (size_t col_index = 0; col_index < constraints.size(); col_index++)
+        {
+            A(row_index, col_index) =
+                std::pow(constraints[row_index].input, static_cast<double>(col_index));
+            b(row_index) = constraints[row_index].output;
+        }
+    }
+
+    const Eigen::VectorXd coeff_vector = A.fullPivLu().solve(b);
+
+    for (size_t i = 0; i < constraints.size(); i++)
+    {
+        coeffs.emplace_back(coeff_vector(i));
+    }
 }
 
 double Polynomial1d::getCoeff(unsigned int order) const
