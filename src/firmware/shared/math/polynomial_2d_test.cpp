@@ -481,3 +481,42 @@ TEST_F(Polynomial2dTest, get_t_value_at_arc_length_on_complex_line_multiple_divi
     EXPECT_FLOAT_EQ(-4.3125, shared_polynomial2d_getTValueAtArcLengthOrder3(
                                  poly, 345.12, arc_length_parametrization));
 }
+
+TEST_F(Polynomial2dTest, get_radius_of_curvature_straight_line)
+{
+    Polynomial2dOrder3_t poly = {
+        .x = {.coefficients = {0, 0, 1, 0}},
+        .y = {.coefficients = {0, 0, 1, 0}},
+    };
+
+    float t_values[] = {-2, -1, 0, 1, 2};
+
+    float expected_curvature_values[] = {FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX};
+
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        const float output =
+            shared_polynomial2d_getCurvatureAtPositionOrder3(poly, t_values[i]);
+        EXPECT_FLOAT_EQ(expected_curvature_values[i], output);
+    }
+}
+
+TEST_F(Polynomial2dTest, get_radius_of_curvature_curved_line)
+{
+    Polynomial2dOrder3_t poly = {
+        .x = {.coefficients = {2, 0, 1, 0}},
+        .y = {.coefficients = {6, 1, 1, 0}},
+    };
+
+    float t_values[] = {-2, -1, 0, 1, 2};
+
+    float expected_curvature_values[] = {4205.05469, 182.766296, 1.41421354, 774.758057,
+                                         265295.375};
+
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        const float output =
+            shared_polynomial2d_getCurvatureAtPositionOrder3(poly, t_values[i]);
+        EXPECT_FLOAT_EQ(expected_curvature_values[i], output);
+    }
+}

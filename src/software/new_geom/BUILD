@@ -124,7 +124,10 @@ cc_library(
     name = "polynomial1d",
     srcs = ["polynomial1d.cpp"],
     hdrs = ["polynomial1d.h"],
-    deps = [":geom_constants"],
+    deps = [
+        ":geom_constants",
+        "@eigen",
+    ],
 )
 
 cc_library(
@@ -172,6 +175,16 @@ cc_library(
     srcs = ["linear_spline2d.cpp"],
     hdrs = ["linear_spline2d.h"],
     deps = [
+        ":spline2d",
+    ],
+)
+
+cc_library(
+    name = "bezier_curve2d",
+    srcs = ["bezier_curve2d.cpp"],
+    hdrs = ["bezier_curve2d.h"],
+    deps = [
+        ":point",
         ":spline2d",
     ],
 )
@@ -227,6 +240,7 @@ cc_test(
     ],
     deps = [
         ":polynomial2d",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -329,6 +343,16 @@ cc_test(
     ],
     deps = [
         ":linear_spline2d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "bezier_curve2d_test",
+    srcs = ["bezier_curve2d_test.cpp"],
+    deps = [
+        ":bezier_curve2d",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

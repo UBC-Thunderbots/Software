@@ -51,10 +51,24 @@ TEST(Polynomial1dTest, test_polynomial_coeffs_list_constructor)
     EXPECT_DOUBLE_EQ(p.valueAt(3), 34);
 }
 
+TEST(Polynomial1dTest, constructor_from_list_constraints_less_then_two_inputs)
+{
+    const std::vector<Polynomial1d::Constraint> constraints = {{-0.5, -1}};
+
+    EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
+}
+
+TEST(Polynomial1dTest, constructor_from_list_constraints_two_inputs_equal)
+{
+    const std::vector<Polynomial1d::Constraint> constraints = {
+        {-0.5, -1}, {0, 0.1}, {0, 3.4}};
+
+    EXPECT_THROW(Polynomial1d p(constraints), std::invalid_argument);
+}
+
 TEST(TestSpline, test_polynomial_linear_constructor)
 {
-    Polynomial1d p =
-        Polynomial1d::constructLinearPolynomialFromConstraints(2.0, 3.0, 6.0, 4.0);
+    Polynomial1d p({{2.0, 3.0}, {6.0, 4.0}});
     EXPECT_EQ(1, p.getOrder());
     EXPECT_EQ(p.getCoeff(0), 2.5);
     EXPECT_EQ(p.getCoeff(1), 0.25);
@@ -64,8 +78,7 @@ TEST(TestSpline, test_polynomial_linear_constructor)
 
 TEST(TestSpline, test_zero_polynomial_linear_constructor)
 {
-    Polynomial1d p =
-        Polynomial1d::constructLinearPolynomialFromConstraints(2.0, 0.0, 6.0, 0.0);
+    Polynomial1d p({{2.0, 0.0}, {6.0, 0.0}});
     EXPECT_EQ(0, p.getOrder());
     EXPECT_EQ(p.getCoeff(0), 0.0);
     EXPECT_EQ(p.getCoeff(1), 0.0);
@@ -73,20 +86,27 @@ TEST(TestSpline, test_zero_polynomial_linear_constructor)
     EXPECT_EQ(p.valueAt(6.0), 0.0);
 }
 
-TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
+
+TEST(Polynomial1dTest, constructor_from_list_constraints_quadratic)
 {
-    std::pair<double, double> constraint1, constraint2;
-    try
-    {
-        Polynomial1d p =
-            Polynomial1d::constructLinearPolynomialFromConstraints(2.0, -3.0, 2.0, -4.0);
-    }
-    catch (std::invalid_argument &e)
-    {
-        SUCCEED();
-        return;
-    }
-    ADD_FAILURE() << "Successfully able to build a polynomial that isn't a function";
+    const std::vector<Polynomial1d::Constraint> constraints = {
+        {-0.5, -1}, {0, 0.1}, {2, 3.4}};
+
+    const Polynomial1d p(constraints);
+
+    // We need a 2nd order polynomial to interpolate three points
+    EXPECT_EQ(2, p.getOrder());
+
+    // Check the coefficients are as expected
+    // These were calculated using an online math tool
+    // (https://www.wolframalpha.com/)
+    // NOTE: The tolerances used here are very tight because several many commonly used
+    //       methods for solving for these polynomials can have significant numerical
+    //       error. Please do not loosen the tolerance unless you really know what you're
+    //       doing.
+    EXPECT_DOUBLE_EQ(0.1, p.getCoeff(0));
+    EXPECT_DOUBLE_EQ(2.09, p.getCoeff(1));
+    EXPECT_DOUBLE_EQ(-0.22, p.getCoeff(2));
 }
 
 TEST(Polynomial1dTest, test_set_coeff)

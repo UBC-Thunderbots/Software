@@ -73,7 +73,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
             Angle shot_angle = (target_position - robot->position()).orientation();
 
-            // If we do have a valid shot on net, orient the robot to face in between
+            // If we do have a valid shot on net, orient the robot to face in-between
             // the pass vector and shot vector, so the robot can quickly orient itself
             // to either receive the pass, or take the shot. Also, not directly facing
             // where we plan on kicking may throw off the enemy AI

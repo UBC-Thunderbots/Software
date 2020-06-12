@@ -6,12 +6,12 @@ SplineSegment2d::SplineSegment2d(double start_val, double end_val,
 {
 }
 
-double SplineSegment2d::getStartVal() const
+double SplineSegment2d::getParametrizationStartVal() const
 {
     return start_val;
 }
 
-double SplineSegment2d::getEndVal() const
+double SplineSegment2d::getParametrizationEndVal() const
 {
     return end_val;
 }
