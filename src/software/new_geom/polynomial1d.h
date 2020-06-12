@@ -10,6 +10,13 @@
 class Polynomial1d
 {
    public:
+    // A helper struct used to represent constraints
+    typedef struct
+    {
+        double input;
+        double output;
+    } Constraint;
+
     /**
      * Construct a zero polynomial
      */
@@ -32,21 +39,18 @@ class Polynomial1d
     explicit Polynomial1d(const std::initializer_list<double> &coeffs);
 
     /**
-     * Construct a linear polynomial from two pairs of input/output
+     * Construct a polynomial from a series of constraints (input/output pairs)
      *
-     * @param constraint1 first pair of values: first is the input, second is the output
-     * @param constraint2 second pair of values: first is the input, second is the output
-     * @param input_1 The first input
-     * @param output_1 The value the created polynomial must output if given input_1
-     * @param input_2 The second input
-     * @param output_2 The value the created polynomial must output if given input_2
-     *
-     * @throws std::invalid_argument if input_1 == input_2
+     * @param constraints A series of pairs, where each pair is of the form
+     *                    {input, output}, indicating the output that the created
+     *                    polynomial must have for a given input.
+     * @param constraints A series of constraints that define the polynomial. Note that
+     *                    all inputs must be unique, and there must be at least two
+     *                    constraints.
+     * @throws std::invalid_argument if any two inputs are equal, or if there are less
+     *                               then two constraints
      */
-    static Polynomial1d constructLinearPolynomialFromConstraints(double input_1,
-                                                                 double output_1,
-                                                                 double input_2,
-                                                                 double output_2);
+    explicit Polynomial1d(const std::vector<Constraint> constraints);
 
     /**
      * Returns the coefficient of the term of given order
