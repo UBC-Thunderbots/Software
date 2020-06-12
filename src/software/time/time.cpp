@@ -20,12 +20,3 @@ double Time::getMilliseconds() const
 }
 
 Time::~Time() {}
-
-double Time::now()
-{
-    const auto clock_now = std::chrono::system_clock::now();
-    return static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
-                                   clock_now.time_since_epoch())
-                                   .count()) /
-           1000000.0;
-}

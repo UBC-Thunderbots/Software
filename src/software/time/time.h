@@ -2,8 +2,6 @@
 
 #include <time.h>
 
-#include <chrono>
-
 /**
  * A simple Time class that represents some amount of Time
  *
@@ -51,13 +49,6 @@ class Time
      * be abstract.
      */
     virtual ~Time() = 0;
-
-    /**
-     * Gets the current time in seconds with up to microsecond precision
-     *
-     * @return current time in seconds
-     */
-    static double now();
 
    protected:
     /**

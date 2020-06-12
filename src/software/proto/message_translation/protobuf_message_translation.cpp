@@ -1,5 +1,6 @@
 #include "software/proto/message_translation/protobuf_message_translation.h"
 
+#include "shared/constants.h"
 #include "shared/proto/geometry.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
@@ -113,7 +114,14 @@ std::unique_ptr<VectorMsg> convertVectorToVectorMsgProto(const Vector& vector)
 
 std::unique_ptr<TimestampMsg> getCurrentTimestampMsg()
 {
-    auto timestamp_msg = std::make_unique<TimestampMsg>();
-    timestamp_msg->set_epoch_timestamp_seconds(Time::now());
+    auto timestamp_msg    = std::make_unique<TimestampMsg>();
+    const auto clock_time = std::chrono::system_clock::now();
+    double time_in_seconds =
+        static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
+                                clock_time.time_since_epoch())
+                                .count()) /
+        MICROSECONDS_PER_SECOND;
+
+    timestamp_msg->set_epoch_timestamp_seconds(time_in_seconds);
     return std::move(timestamp_msg);
 }
