@@ -2,7 +2,6 @@
 
 #include "software/ai/passing/pass.h"
 
-using namespace Passing;
 
 struct PassWithRating
 {

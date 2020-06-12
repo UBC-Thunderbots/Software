@@ -9,9 +9,8 @@
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 
-using namespace Passing;
 
-PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever)
+PasserTactic::PasserTactic(Pass pass, const Ball& ball, bool loop_forever)
     : Tactic(loop_forever, {RobotCapabilities::Capability::Kick}),
       pass(std::move(pass)),
       ball(ball)

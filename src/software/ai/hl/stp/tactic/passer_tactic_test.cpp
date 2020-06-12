@@ -10,7 +10,6 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
 
-using namespace Passing;
 
 TEST(PasserTacticTest,
      passer_already_at_pass_start_position_but_oriented_incorrectly_pass_not_yet_started)

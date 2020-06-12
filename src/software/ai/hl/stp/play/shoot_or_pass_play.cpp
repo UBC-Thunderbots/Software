@@ -14,7 +14,6 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 
-using namespace Passing;
 
 const std::string ShootOrPassPlay::name = "Shoot Or Pass Play";
 
@@ -199,7 +198,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     LOG(DEBUG) << "Finished";
 }
 
-void ShootOrPassPlay::updatePassGenerator(Passing::PassGenerator &pass_generator,
+void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator,
                                           const World &world)
 {
     pass_generator.setWorld(world);

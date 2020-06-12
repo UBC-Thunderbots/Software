@@ -23,7 +23,6 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 
-using namespace Passing;
 
 class PassingEvaluationTest : public testing::Test
 {

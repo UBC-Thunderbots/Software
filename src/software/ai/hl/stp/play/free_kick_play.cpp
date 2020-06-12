@@ -12,7 +12,6 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-using namespace Passing;
 
 const std::string FreeKickPlay::name = "Direct Free Kick Play";
 

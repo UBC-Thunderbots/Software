@@ -40,5 +40,5 @@ class ShootOrPassPlay : public Play
      * @param pass_generator
      * @param world The current state of the world
      */
-    void updatePassGenerator(Passing::PassGenerator &pass_generator, const World &world);
+    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
 };

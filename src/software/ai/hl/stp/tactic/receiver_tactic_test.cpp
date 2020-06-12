@@ -11,7 +11,6 @@
 #include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
 
-using namespace Passing;
 
 TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 {
