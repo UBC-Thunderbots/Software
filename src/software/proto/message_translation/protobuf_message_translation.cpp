@@ -114,6 +114,6 @@ std::unique_ptr<VectorMsg> convertVectorToVectorMsgProto(const Vector& vector)
 std::unique_ptr<TimestampMsg> getCurrentTimestampMsg()
 {
     auto timestamp_msg = std::make_unique<TimestampMsg>();
-    timestamp_msg->set_epoch_timestamp(Time::now());
+    timestamp_msg->set_epoch_timestamp_seconds(Time::now());
     return std::move(timestamp_msg);
 }

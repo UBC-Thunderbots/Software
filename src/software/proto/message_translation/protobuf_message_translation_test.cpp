@@ -57,7 +57,7 @@ class ProtobufTranslationTest : public ::testing::Test
     {
         // time will only move forward
         // we make sure the number that the timestamp is from the past
-        ASSERT_TRUE(timestamp.epoch_timestamp() <= Time::now());
+        ASSERT_TRUE(timestamp.epoch_timestamp_seconds() <= Time::now());
     }
 };
 
