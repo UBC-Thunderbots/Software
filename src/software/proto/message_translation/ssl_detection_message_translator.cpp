@@ -17,8 +17,8 @@ std::unique_ptr<SSL_DetectionBall> createSslDetectionBall(const BallState& ball)
     detection_ball->set_x(x_position_mm);
     detection_ball->set_y(y_position_mm);
     detection_ball->set_z(static_cast<float>(ball.height() * MILLIMETERS_PER_METER));
-    // grSim uses the ball's position as its pixel values, so we do the same thing here
-    // since we don't have the information to simulate a camera
+    // We don't have the information to simulate a camera, so we use the position values
+    // as pixel values
     detection_ball->set_pixel_x(x_position_mm);
     detection_ball->set_pixel_y(y_position_mm);
 
@@ -41,8 +41,8 @@ std::unique_ptr<SSL_DetectionRobot> createSslDetectionRobot(const RobotStateWith
     detection_robot->set_y(y_position_mm);
     detection_robot->set_orientation(
         static_cast<float>(robot.robot_state.orientation().toRadians()));
-    // grSim uses the robot's position as its pixel values, so we do the same thing here
-    // since we don't have the information to simulate a camera
+    // We don't have the information to simulate a camera, so we use the position values
+    // as pixel values
     detection_robot->set_pixel_x(x_position_mm);
     detection_robot->set_pixel_y(y_position_mm);
     detection_robot->set_height(
