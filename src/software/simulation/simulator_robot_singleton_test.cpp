@@ -44,7 +44,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         }
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
-        auto physics_robot = physics_world->getFriendlyPhysicsRobots().at(0);
+        auto physics_robot = physics_world->getYellowPhysicsRobots().at(0);
         if (physics_robot.lock())
         {
             simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
@@ -1050,7 +1050,7 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
                                       Angle::fromRadians(0.3), AngularVelocity::half())}};
     physics_world->addYellowRobots(robot_states);
 
-    auto friendly_physics_robots = physics_world->getFriendlyPhysicsRobots();
+    auto friendly_physics_robots = physics_world->getYellowPhysicsRobots();
     ASSERT_EQ(2, friendly_physics_robots.size());
     auto simulator_robot_7 =
         std::make_shared<SimulatorRobot>(friendly_physics_robots.at(0));
