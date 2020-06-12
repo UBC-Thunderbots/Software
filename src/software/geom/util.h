@@ -23,10 +23,6 @@ constexpr int sign(double n)
     return n > EPS ? 1 : (n < -EPS ? -1 : 0);
 }
 
-double length(const Segment &segment);
-
-double lengthSquared(const Segment &segment);
-
 /**
  * Finds the points of intersection between a circle and a line.
  * There may be zero, one, or two such points.

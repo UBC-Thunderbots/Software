@@ -25,16 +25,6 @@ bool isDegenerate(const Segment &segment)
     return distanceSquared(segment.getStart(), segment.getEnd()) < EPS2;
 }
 
-double length(const Segment &segment)
-{
-    return distance(segment.getStart(), segment.getEnd());
-}
-
-double lengthSquared(const Segment &segment)
-{
-    return distanceSquared(segment.getStart(), segment.getEnd());
-}
-
 std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
                                        const Point &segA, const Point &segB)
 {

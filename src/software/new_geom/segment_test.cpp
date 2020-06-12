@@ -140,6 +140,15 @@ TEST(SegmentIntersectionsTest, test_segments_single_point_intersection)
     EXPECT_EQ(intersections[0], Point());
 }
 
+TEST(SegmentIntersectionsTest, test_same_segments)
+{
+    Segment a                        = Segment(Point(2, 2), Point(-2, -2));
+    std::vector<Point> intersections = a.intersection(a);
+    EXPECT_EQ(intersections.size(), 2);
+    EXPECT_EQ(intersections[0], Point(2, 2));
+    EXPECT_EQ(intersections[1], Point(-2, -2));
+}
+
 TEST(SegmentIntersectionsTest, test_segments_no_intersection)
 {
     Segment a                        = Segment(Point(5, 2), Point(-2, -2));

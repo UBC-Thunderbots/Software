@@ -18,9 +18,9 @@ const Point& Segment::getStart() const
     return start;
 }
 
-void Segment::setEnd(const Point& f)
+void Segment::setEnd(const Point& o)
 {
-    end = f;
+    end = o;
 }
 
 const Point& Segment::getEnd() const
@@ -148,6 +148,11 @@ bool Segment::intersects(const Segment& other) const
 
 std::vector<Point> Segment::intersection(const Segment& other) const
 {
+    if (*this == other)
+    {
+        return {start, end};
+    }
+
     std::vector<Point> output;
 
     Point a = getStart();

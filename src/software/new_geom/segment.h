@@ -13,6 +13,9 @@ class Segment final
     /**
      * Creates a Segment that starts and ends at the given points
      *
+     * @param start start point
+     * @param end end point
+     *
      * @throws std::invalid_argument if start==end
      */
     explicit Segment(const Point& start, const Point& end);
@@ -36,7 +39,7 @@ class Segment final
      *
      * @param o new end point of segment
      */
-    void setEnd(const Point& f);
+    void setEnd(const Point& o);
 
     /**
      * Gets the end point of the segment
