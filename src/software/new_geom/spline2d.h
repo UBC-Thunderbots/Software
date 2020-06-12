@@ -17,13 +17,13 @@ class SplineSegment2d
      * Get the first input to the polynomial that falls on the spline
      * @return The first input to the polynomial that falls on the spline
      */
-    double getStartVal() const;
+    double getParametrizationStartVal() const;
 
     /**
      * Get the last input to the polynomial that falls on the spline
      * @return The last input to the polynomial that falls on the spline
      */
-    double getEndVal() const;
+    double getParametrizationEndVal() const;
 
     /**
      * Get the polynomial underlying this spline segment
@@ -31,7 +31,7 @@ class SplineSegment2d
      */
     Polynomial2d getPolynomial() const;
 
-   private:
+   protected:
     friend class Spline2d;
 
     /**
@@ -48,6 +48,7 @@ class SplineSegment2d
      */
     SplineSegment2d(double start_val, double end_val, Polynomial2d polynomial);
 
+   private:
     const double start_val;
     const double end_val;
     const Polynomial2d polynomial;
@@ -63,16 +64,16 @@ class Spline2d
 {
    public:
     /**
-     * Calculates the value of spline evaluated at value val
+     * Calculates the value of spline evaluated at value t
      *
-     * @param val A value in [0,1] to get the value of the spline at.
-     *            0 is one endpoint of the spline
-     *            1 is the other endpoint of the spline
+     * @param t A value in [0,1] to get the value of the spline at.
+     *          0 is one endpoint of the spline
+     *          1 is the other endpoint of the spline
      *
-     * @return value of spline evaluated at value val. If val not in [0,1]
-     *         then the closest endpoint
+     * @return Value of spline evaluated at t. If t not in [0,1], then the closest
+     *         endpoint
      */
-    virtual const Point getValueAt(double val) const = 0;
+    virtual const Point getValueAt(double t) const = 0;
 
     /**
      * Get the knots of this spline, including the start and end points

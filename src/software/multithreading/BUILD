@@ -2,13 +2,19 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "observer",
-    hdrs = ["observer.h"],
+    hdrs = [
+        "observer.h",
+        "observer.tpp",
+    ],
     deps = [":thread_safe_buffer"],
 )
 
 cc_library(
     name = "subject",
-    hdrs = ["subject.h"],
+    hdrs = [
+        "subject.h",
+        "subject.tpp",
+    ],
     deps = [
         ":observer",
     ],
@@ -16,8 +22,12 @@ cc_library(
 
 cc_library(
     name = "thread_safe_buffer",
-    hdrs = ["thread_safe_buffer.h"],
+    hdrs = [
+        "thread_safe_buffer.h",
+        "thread_safe_buffer.tpp",
+    ],
     deps = [
+        "//software/logger",
         "//software/time:duration",
         "@boost//:circular_buffer",
     ],
@@ -25,7 +35,10 @@ cc_library(
 
 cc_library(
     name = "threaded_observer",
-    hdrs = ["threaded_observer.h"],
+    hdrs = [
+        "threaded_observer.h",
+        "threaded_observer.tpp",
+    ],
     deps = [
         ":observer",
         ":thread_safe_buffer",

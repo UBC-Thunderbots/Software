@@ -39,21 +39,24 @@ class Field
 
     /**
      * Constructs a new field with the given dimensions
-     * Note: All dimensions must be positive
+     *
+     * @pre all dimensions (except for the boundary buffer) must be > 0.
+     * @pre the boundary buffer must be >= 0
+     *
+     * @throws invalid_argument if at least one dimension is <= 0
      *
      * @param field_x_length the length of the playing area (along the x-axis)
      * @param field_y_length the length of the playing area (along the y-axis)
      * @param defense_x_length the length of the defense area (along the x-axis)
      * @param defense_y_length the length of the defense area (along the y-axis)
+     * @param goal_x_length the length of the goal (along the x-axis)
      * @param goal_y_length the length of the goal (along the y-axis)
      * @param boundary_buffer_size the size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
-     *
-     * @throws invalid_argument if at least one dimension is non-positive
      */
     explicit Field(double field_x_length, double field_y_length, double defense_x_length,
-                   double defense_y_length, double goal_y_length,
+                   double defense_y_length, double goal_x_length, double goal_y_length,
                    double boundary_buffer_size, double center_circle_radius);
 
     /**
