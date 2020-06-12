@@ -12,7 +12,7 @@ TEST(SimulatorTest, test_simulation_step_updates_the_ball)
     // A sanity test to make sure stepping the simulation actually updates\
     // the state of the world
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     world.mutableBall() =
         Ball(Point(0.4, 0), Vector(-1.3, 2.01), Timestamp::fromSeconds(0));
 
@@ -26,7 +26,7 @@ TEST(SimulatorTest, test_simulation_step_updates_the_ball)
 
 TEST(SimulatorTest, test_simulate_robots_with_no_primitives)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
@@ -52,7 +52,7 @@ TEST(SimulatorTest, test_simulate_single_robot_with_primitive)
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     // Move the ball away from (0, 0) so it doesn't interfere with the robot
     world.mutableBall() = Ball(Point(6, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -89,7 +89,7 @@ TEST(SimulatorTest, test_simulate_multiple_robots_with_primitives)
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     // Move the ball away from (0, 0) so it doesn't interfere with the robots
     world.mutableBall() = Ball(Point(6, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     Robot robot_0(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),

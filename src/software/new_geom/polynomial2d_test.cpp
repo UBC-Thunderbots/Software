@@ -4,8 +4,6 @@
 
 #include "software/test_util/test_util.h"
 
-using namespace ::Test;
-
 TEST(Polynomial2dTest, default_constructor)
 {
     const Polynomial2d p;
