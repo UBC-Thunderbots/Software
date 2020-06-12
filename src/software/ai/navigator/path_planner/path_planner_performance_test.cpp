@@ -303,7 +303,7 @@ TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
         planner->findPath(planner_test_case.start, planner_test_case.end,
                           planner_test_case.navigable_area, planner_test_case.obstacles);
     }
-    double duration_ms = Time::millisecondsSince(start_time);
+    double duration_ms = ::Test::TestUtil::millisecondsSince(start_time);
     double avg_ms = duration_ms / (static_cast<double>(planner_test_case.num_iterations));
 
     std::cout << std::endl << planner_test_case.name << ":" << std::endl;

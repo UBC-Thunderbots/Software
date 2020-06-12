@@ -157,7 +157,7 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
         ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     }
 
-    double duration_ms = Time::millisecondsSince(start_time);
+    double duration_ms = ::Test::TestUtil::millisecondsSince(start_time);
     double avg_ms      = duration_ms / static_cast<double>(num_passes_to_gen);
 
     // At the time of this test's creation (PR #695), ratePass ran at an average 0.105ms

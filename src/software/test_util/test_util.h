@@ -234,6 +234,26 @@ namespace Test
                                                                const BallState &state2,
                                                                double tolerance);
 
+        /**
+         * Gets the number of milliseconds since the start_time
+         *
+         * @param start_time time point to calculate time since
+         *
+         * @return milliseconds since start time
+         */
+        static double millisecondsSince(
+            std::chrono::time_point<std::chrono::system_clock> start_time);
+
+        /**
+         * Gets the number of seconds since the start_time
+         *
+         * @param start_time time point to calculate time since
+         *
+         * @return seconds since start time
+         */
+        static double secondsSince(
+            std::chrono::time_point<std::chrono::system_clock> start_time);
+
        private:
         /**
          * Returns a new team with robots placed at the given positions. Robots in the

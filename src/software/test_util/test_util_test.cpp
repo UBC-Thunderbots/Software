@@ -286,3 +286,15 @@ TEST(TestUtilsTest, ball_state_check_if_equal_within_tolerance)
     EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state3, 0.1));
     EXPECT_FALSE(::Test::TestUtil::equalWithinTolerance(state1, state4, 0.5));
 }
+
+TEST(TestUtilsTest, test_seconds_since)
+{
+    const auto start_time = std::chrono::system_clock::now();
+    EXPECT_TRUE(::Test::TestUtil::secondsSince(start_time) > 0);
+}
+
+TEST(TestUtilsTest, test_milliseconds_since)
+{
+    const auto start_time = std::chrono::system_clock::now();
+    EXPECT_TRUE(::Test::TestUtil::millisecondsSince(start_time) > 0);
+}
