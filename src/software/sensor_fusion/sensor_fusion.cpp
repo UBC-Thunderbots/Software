@@ -7,8 +7,7 @@ SensorFusion::SensorFusion()
     : ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
-      enemy_team_filter(),
-      ssl_protobuf_reader()
+      enemy_team_filter()
 {
 }
 
@@ -52,7 +51,7 @@ void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
 
 void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
 {
-    field = ssl_protobuf_reader.getField(geometry_packet);
+    field = getField(geometry_packet);
     if (!field)
     {
         LOG(WARNING)
@@ -63,8 +62,8 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
 
 void SensorFusion::updateWorld(const Referee &packet)
 {
-    game_state   = ssl_protobuf_reader.getRefboxGameState(packet);
-    refbox_stage = ssl_protobuf_reader.getRefboxStage(packet);
+    game_state   = getRefboxGameState(packet);
+    refbox_stage = getRefboxStage(packet);
 }
 
 void SensorFusion::updateWorld(
@@ -75,9 +74,8 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
-    VisionDetection vision_detection =
-        ssl_protobuf_reader.getVisionDetection(ssl_detection_frame);
-    enemy_team    = getEnemyTeamFromVisionDetection(vision_detection);
+    VisionDetection vision_detection = getVisionDetection(ssl_detection_frame);
+    enemy_team                       = getEnemyTeamFromVisionDetection(vision_detection);
     friendly_team = getFriendlyTeamFromVisionDetection(vision_detection);
     std::optional<TimestampedBallState> new_ball_state =
         getTimestampedBallStateFromVisionDetection(vision_detection);

@@ -2,10 +2,7 @@
 
 #include "software/proto/message_translation/ssl_message_translator.h"
 
-SSLProtobufReader::SSLProtobufReader() {}
-
-std::optional<Field> SSLProtobufReader::getField(
-    const SSL_GeometryData &geometry_packet) const
+std::optional<Field> getField(const SSL_GeometryData &geometry_packet)
 {
     SSL_GeometryFieldSize field_data = geometry_packet.field();
 
@@ -59,7 +56,7 @@ std::optional<Field> SSLProtobufReader::getField(
     return field;
 }
 
-std::vector<BallDetection> SSLProtobufReader::getBallDetections(
+std::vector<BallDetection> getBallDetections(
     const std::vector<SSL_DetectionFrame> &detections)
 {
     auto ball_detections = std::vector<BallDetection>();
@@ -100,7 +97,7 @@ std::vector<BallDetection> SSLProtobufReader::getBallDetections(
     return ball_detections;
 }
 
-std::vector<RobotDetection> SSLProtobufReader::getTeamDetections(
+std::vector<RobotDetection> getTeamDetections(
     const std::vector<SSL_DetectionFrame> &detections, TeamType team_type)
 {
     std::vector<RobotDetection> robot_detections = std::vector<RobotDetection>();
@@ -163,8 +160,7 @@ std::vector<RobotDetection> SSLProtobufReader::getTeamDetections(
     return robot_detections;
 }
 
-VisionDetection SSLProtobufReader::getVisionDetection(
-    const SSL_DetectionFrame &detection_frame)
+VisionDetection getVisionDetection(const SSL_DetectionFrame &detection_frame)
 {
     std::vector<BallDetection> ball_detections;
     std::vector<RobotDetection> friendly_team_detections;
@@ -247,7 +243,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
         {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
         {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
-RefboxGameState SSLProtobufReader::getRefboxGameState(const Referee &packet)
+RefboxGameState getRefboxGameState(const Referee &packet)
 {
     if (!Util::DynamicParameters->getAIControlConfig()
              ->getRefboxConfig()
@@ -279,12 +275,12 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
     {Referee_Stage_PENALTY_SHOOTOUT, RefboxStage::PENALTY_SHOOTOUT},
     {Referee_Stage_POST_GAME, RefboxStage::POST_GAME}};
 
-RefboxStage SSLProtobufReader::getRefboxStage(const Referee &packet)
+RefboxStage getRefboxStage(const Referee &packet)
 {
     return refbox_stage_map.at(packet.stage());
 }
 
-void SSLProtobufReader::invertFieldSide(SSL_DetectionFrame &frame)
+void invertFieldSide(SSL_DetectionFrame &frame)
 {
     for (SSL_DetectionBall &ball : *frame.mutable_balls())
     {
@@ -302,7 +298,7 @@ void SSLProtobufReader::invertFieldSide(SSL_DetectionFrame &frame)
     }
 }
 
-bool SSLProtobufReader::isCameraEnabled(const SSL_DetectionFrame &detection)
+bool isCameraEnabled(const SSL_DetectionFrame &detection)
 {
     bool camera_disabled = false;
     switch (detection.camera_id())

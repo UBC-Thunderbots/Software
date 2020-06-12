@@ -89,5 +89,4 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
-    SSLProtobufReader ssl_protobuf_reader;
 };
