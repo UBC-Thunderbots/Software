@@ -73,6 +73,7 @@ class RobotState
      * all their members are equal
      *
      * @param other The robot state to compare against for equality
+     *
      * @return True if the other robot state is equal to this robot state, and false
      * otherwise
      */
@@ -82,6 +83,7 @@ class RobotState
      * Defines the inequality operator for a RobotState.
      *
      * @param other The robot state to compare against for inequality
+     *
      * @return True if the other robot state is not equal to this robot state, and false
      * otherwise
      */
