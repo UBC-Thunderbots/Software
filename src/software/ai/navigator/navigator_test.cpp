@@ -366,6 +366,28 @@ TEST_F(NoPathNavigatorTest,
 }
 
 TEST_F(NoPathNavigatorTest,
+       calculateTransitionSpeedBetweenSegments_tests_opposite_segments)
+{
+    Point testp1, testp2, testp3;
+    double final_speed;
+    // case 1
+    testp1      = Point(1, 0);
+    testp2      = Point(2, 0);
+    testp3      = Point(0, 0);
+    final_speed = 0;
+    EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
+                                      testp1, testp2, testp3, final_speed));
+
+    // case 2
+    testp1      = Point(1, 1);
+    testp2      = Point(1, 2);
+    testp3      = Point(1, 1);
+    final_speed = 0;
+    EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
+                                      testp1, testp2, testp3, final_speed));
+}
+
+TEST_F(NoPathNavigatorTest,
        calculateTransitionSpeedBetweenSegments_tests_perpendicular_segments)
 {
     Point testp1, testp2, testp3;
