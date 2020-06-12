@@ -23,7 +23,7 @@ TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
     test_world.mutableEnemyTeam().updateRobots(enemy_robots);
     TestUtil::setBallPosition(test_world, Point(-1, 0), Timestamp::fromMilliseconds(0));
 
-    Point p = Evaluation::deflect_off_enemy_target(test_world);
+    Point p = deflect_off_enemy_target(test_world);
 
     EXPECT_EQ(p, Point(-3, -0.0675));
 }

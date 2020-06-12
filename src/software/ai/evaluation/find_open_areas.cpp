@@ -3,7 +3,7 @@
 #include "software/geom/util.h"
 #include "software/parameter/dynamic_parameters.h"
 
-std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
+std::vector<Circle> findGoodChipTargets(const World& world)
 {
     double inset     = 0.3;  // Determined experimentally to be a reasonable value
     double ballX     = world.ball().position().x();

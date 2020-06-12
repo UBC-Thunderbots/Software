@@ -16,7 +16,6 @@
 #include "software/world/game_state.h"
 
 
-using namespace Evaluation;
 
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
@@ -30,13 +29,13 @@ std::string ShootOrChipPlay::getName() const
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+           teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+           teamHasPossession(world, world.friendlyTeam());
 }
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,

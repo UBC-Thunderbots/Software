@@ -1,8 +1,3 @@
-/**
- * This file contains the unit tests for evaluation functions
- * in detect_threat.cpp
- */
-
 #include "software/ai/evaluation/detect_threat.h"
 
 #include <gtest/gtest.h>
@@ -22,8 +17,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)
 
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    std::optional<Point> intersection =
-        Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
+    std::optional<Point> intersection = calcBallVelIntersectFriendlyNet(ball, field);
 
     EXPECT_EQ(Point(-4.5, -0.145), intersection.value());
 }
@@ -39,8 +33,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_friendly_net)
 
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    std::optional<Point> intersection =
-        Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
+    std::optional<Point> intersection = calcBallVelIntersectFriendlyNet(ball, field);
 
 
     EXPECT_EQ(std::nullopt, intersection);
@@ -57,8 +50,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_enemy_net)
 
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    std::optional<Point> intersection =
-        Evaluation::calcBallVelIntersectEnemyNet(ball, field);
+    std::optional<Point> intersection = calcBallVelIntersectEnemyNet(ball, field);
 
     EXPECT_EQ(Point(4.5, -0.165), intersection.value());
 }
@@ -74,8 +66,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_enemy_net)
 
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    std::optional<Point> intersection =
-        Evaluation::calcBallVelIntersectEnemyNet(ball, field);
+    std::optional<Point> intersection = calcBallVelIntersectEnemyNet(ball, field);
 
 
     EXPECT_EQ(std::nullopt, intersection);

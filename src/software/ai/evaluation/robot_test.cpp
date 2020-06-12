@@ -1,8 +1,3 @@
-/**
- * This file contains the unit tests for evaluation functions
- * in robot.cpp
- */
-
 #include "software/ai/evaluation/robot.h"
 
 #include <gtest/gtest.h>
@@ -17,8 +12,8 @@ TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_45_threshold_
     Point target      = Point(1, 1);
     Angle threshold   = Angle::fromDegrees(60);
 
-    EXPECT_TRUE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
-        position, orientation, target, threshold));
+    EXPECT_TRUE(robotOrientationWithinAngleThresholdOfTarget(position, orientation,
+                                                             target, threshold));
 }
 
 
@@ -29,8 +24,8 @@ TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_thresh
     Point target      = Point(1, 1);
     Angle threshold   = Angle::fromDegrees(30);
 
-    EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
-        position, orientation, target, threshold));
+    EXPECT_FALSE(robotOrientationWithinAngleThresholdOfTarget(position, orientation,
+                                                              target, threshold));
 }
 
 TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_threshold_45)
@@ -40,8 +35,8 @@ TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_thresh
     Point target      = Point(1, 1);
     Angle threshold   = Angle::fromDegrees(45);
 
-    EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
-        position, orientation, target, threshold));
+    EXPECT_FALSE(robotOrientationWithinAngleThresholdOfTarget(position, orientation,
+                                                              target, threshold));
 }
 
 TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_135_threshold_150)
@@ -51,8 +46,8 @@ TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_135_threshold
     Point target      = Point(-1, 1);
     Angle threshold   = Angle::fromDegrees(150);
 
-    EXPECT_TRUE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
-        position, orientation, target, threshold));
+    EXPECT_TRUE(robotOrientationWithinAngleThresholdOfTarget(position, orientation,
+                                                             target, threshold));
 }
 
 TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_135_threshold_90)
@@ -62,8 +57,8 @@ TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_135_thres
     Point target      = Point(-1, 1);
     Angle threshold   = Angle::fromDegrees(90);
 
-    EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
-        position, orientation, target, threshold));
+    EXPECT_FALSE(robotOrientationWithinAngleThresholdOfTarget(position, orientation,
+                                                              target, threshold));
 }
 
 TEST(RobotEvaluationTest,
@@ -74,8 +69,8 @@ TEST(RobotEvaluationTest,
     Point target      = Point(-2, -1);
     Angle threshold   = Angle::fromDegrees(90);
 
-    EXPECT_TRUE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
-        position, orientation, target, threshold));
+    EXPECT_TRUE(robotOrientationWithinAngleThresholdOfTarget(position, orientation,
+                                                             target, threshold));
 }
 
 TEST(RobotEvaluationTest,
@@ -86,8 +81,8 @@ TEST(RobotEvaluationTest,
     Point target      = Point(-2, -1);
     Angle threshold   = Angle::fromDegrees(30);
 
-    EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
-        position, orientation, target, threshold));
+    EXPECT_FALSE(robotOrientationWithinAngleThresholdOfTarget(position, orientation,
+                                                              target, threshold));
 }
 
 TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot)
@@ -100,7 +95,7 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    auto result = Evaluation::robotHasPossession(ball, robot);
+    auto result = robotHasPossession(ball, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -116,8 +111,7 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot_at_future_ti
                         timestamp);
 
     // we dont have data for future timestamps, should return nullopt
-    EXPECT_FALSE(Evaluation::robotHasPossession(ball, robot, Timestamp::fromSeconds(2))
-                     .has_value());
+    EXPECT_FALSE(robotHasPossession(ball, robot, Timestamp::fromSeconds(2)).has_value());
 }
 
 TEST(RobotEvaluationTest, has_possession_ball_to_side_of_robot)
@@ -129,7 +123,7 @@ TEST(RobotEvaluationTest, has_possession_ball_to_side_of_robot)
 
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::half(), AngularVelocity::zero(),
                         timestamp);
-    auto result = Evaluation::robotHasPossession(ball, robot);
+    auto result = robotHasPossession(ball, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -144,7 +138,7 @@ TEST(RobotEvaluationTest, has_possession_robot_moving_ball_in_dribbler)
     Robot robot = Robot(0, Point(0, 0), Vector(1, 1), Angle::zero(),
                         AngularVelocity::zero(), timestamp);
 
-    auto result = Evaluation::robotHasPossession(ball, robot);
+    auto result = robotHasPossession(ball, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -159,7 +153,7 @@ TEST(RobotEvaluationTest, has_possession_ball_far_away_from_robot)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    auto result = Evaluation::robotHasPossession(ball, robot);
+    auto result = robotHasPossession(ball, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -174,7 +168,7 @@ TEST(RobotEvaluationTest, has_possession_ball_slightly_off_center_but_still_on_d
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    auto result = Evaluation::robotHasPossession(ball, robot);
+    auto result = robotHasPossession(ball, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -189,7 +183,7 @@ TEST(RobotEvaluationTest, has_possession_robot_on_angle_with_ball_in_dribbler)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
 
-    auto result = Evaluation::robotHasPossession(ball, robot);
+    auto result = robotHasPossession(ball, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -203,8 +197,7 @@ TEST(RobotEvaluationTest, possession_robot_timestamp_too_far_past)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    auto result =
-        Evaluation::robotHasPossession(ball, robot, Timestamp::fromSeconds(1000));
+    auto result = robotHasPossession(ball, robot, Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());
 }
 
@@ -217,8 +210,7 @@ TEST(RobotEvaluationTest, possession_ball_timestamp_too_far_past)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(1000));
 
-    auto result =
-        Evaluation::robotHasPossession(ball, robot, Timestamp::fromSeconds(1000));
+    auto result = robotHasPossession(ball, robot, Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());
 }
 
@@ -237,7 +229,7 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = Evaluation::robotBeingPassedTo(world, robot);
+    auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -256,7 +248,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = Evaluation::robotBeingPassedTo(world, robot);
+    auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -275,7 +267,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast_at_future_timestamp)
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = Evaluation::robotBeingPassedTo(world, robot);
+    auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -294,7 +286,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_slow)
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = Evaluation::robotBeingPassedTo(world, robot);
+    auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -313,7 +305,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_wrong_way)
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = Evaluation::robotBeingPassedTo(world, robot);
+    auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -332,7 +324,7 @@ TEST(RobotEvaluationTest, pass_with_ball_slightly_off)
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = Evaluation::robotBeingPassedTo(world, robot);
+    auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -351,7 +343,6 @@ TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
                         AngularVelocity::zero(), timestamp);
     world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result =
-        Evaluation::robotBeingPassedTo(world, robot, Timestamp::fromSeconds(1000));
+    auto result = robotBeingPassedTo(world, robot, Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());
 }

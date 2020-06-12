@@ -10,8 +10,8 @@ TEST(FindAllPasserReceiverPairsTest, robot_passing_to_itself)
     Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::findAllReceiverPasserPairs(
-        {friendly_robot_0}, {friendly_robot_0}, {friendly_robot_0});
+    auto result = findAllReceiverPasserPairs({friendly_robot_0}, {friendly_robot_0},
+                                             {friendly_robot_0});
 
     std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> expected_result = {
         std::make_pair(friendly_robot_0, std::vector<Robot>{friendly_robot_0})};
@@ -27,8 +27,8 @@ TEST(FindAllPasserReceiverPairsTest, one_passer_one_receiver_with_no_obstacles)
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0));
     std::vector<Robot> all_robots{friendly_robot_0, friendly_robot_1};
 
-    auto result = Evaluation::findAllReceiverPasserPairs({friendly_robot_0},
-                                                         {friendly_robot_1}, all_robots);
+    auto result =
+        findAllReceiverPasserPairs({friendly_robot_0}, {friendly_robot_1}, all_robots);
 
     std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> expected_result = {
         std::make_pair(friendly_robot_1, std::vector<Robot>{friendly_robot_0})};
@@ -53,8 +53,8 @@ TEST(FindAllPasserReceiverPairsTest,
     std::vector<Robot> all_robots{friendly_robot_0, friendly_robot_1, friendly_robot_2,
                                   enemy_robot_0};
 
-    auto result = Evaluation::findAllReceiverPasserPairs(
-        {friendly_robot_0, friendly_robot_1}, {friendly_robot_2}, all_robots);
+    auto result = findAllReceiverPasserPairs({friendly_robot_0, friendly_robot_1},
+                                             {friendly_robot_2}, all_robots);
 
     std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> expected_result = {
         std::make_pair(friendly_robot_2, std::vector<Robot>{friendly_robot_1})};
@@ -75,8 +75,8 @@ TEST(FindAllPasserReceiverPairsTest, all_passes_blocked)
 
     std::vector<Robot> all_robots{friendly_robot_0, friendly_robot_1, enemy_robot_0};
 
-    auto result = Evaluation::findAllReceiverPasserPairs({friendly_robot_0},
-                                                         {friendly_robot_1}, all_robots);
+    auto result =
+        findAllReceiverPasserPairs({friendly_robot_0}, {friendly_robot_1}, all_robots);
 
     EXPECT_TRUE(result.empty());
 }
@@ -92,8 +92,8 @@ TEST(FindAllPasserReceiverPairsTest, receiver_with_multiple_passers)
 
     std::vector<Robot> all_robots{friendly_robot_0, friendly_robot_1, friendly_robot_2};
 
-    auto result = Evaluation::findAllReceiverPasserPairs(
-        {friendly_robot_0, friendly_robot_1}, {friendly_robot_2}, all_robots);
+    auto result = findAllReceiverPasserPairs({friendly_robot_0, friendly_robot_1},
+                                             {friendly_robot_2}, all_robots);
 
     std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> expected_result = {
         std::make_pair(friendly_robot_2,
@@ -113,8 +113,8 @@ TEST(GetNumPassesToRobotTest, robot_passing_to_itself)
 
     Team enemy_team = Team(Duration::fromSeconds(1));
 
-    auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_0,
-                                                  friendly_team, enemy_team);
+    auto result = getNumPassesToRobot(friendly_robot_0, friendly_robot_0, friendly_team,
+                                      enemy_team);
 
     // A valid result should have been found
     ASSERT_TRUE(result);
@@ -138,8 +138,8 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
     Team enemy_team = Team(Duration::fromSeconds(1));
 
     // Robot 0 should be able to pass to robot 1 in a single pass
-    auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_1,
-                                                  friendly_team, enemy_team);
+    auto result = getNumPassesToRobot(friendly_robot_0, friendly_robot_1, friendly_team,
+                                      enemy_team);
 
     // A valid result should have been found
     ASSERT_TRUE(result);
@@ -171,7 +171,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 //
 //    // The enemy robot is blocking the pass from robot 0 to robot 2, so we expect an
 //    // intermediate pass via robot 1
-//    auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_2,
+//    auto result = getNumPassesToRobot(friendly_robot_0, friendly_robot_2,
 //                                                  friendly_team, enemy_team);
 //
 //    // A valid result should have been found
@@ -214,7 +214,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 //
 //    // The only way for robot 3 to get the ball is to receive a pass from
 //    // robot 0 -> robot 1 -> robot 2 -> robot 3
-//    auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_3,
+//    auto result = getNumPassesToRobot(friendly_robot_0, friendly_robot_3,
 //                                                  friendly_team, enemy_team);
 //
 //    // A valid result should have been found
@@ -244,7 +244,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 //    Team enemy_team     = Team(Duration::fromSeconds(1));
 //    enemy_team.updateRobots({enemy_robot_0});
 //
-//    auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_1,
+//    auto result = getNumPassesToRobot(friendly_robot_0, friendly_robot_1,
 //                                                  friendly_team, enemy_team);
 //
 //    // We don't expect any pass info to be returned
@@ -276,7 +276,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 //    // or
 //    // robot 0 -> robot 2 -> robot 3
 //    // Robot 2 is closer to robot 3 so we expect it to be the most likely passer
-//    auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_3,
+//    auto result = getNumPassesToRobot(friendly_robot_0, friendly_robot_3,
 //                                                  friendly_team, enemy_team);
 //
 //    // A valid result should have been found
@@ -299,20 +299,20 @@ TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
     Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                          Timestamp::fromSeconds(0));
 
-    auto threat1 = Evaluation::EnemyThreat{
+    auto threat1 = EnemyThreat{
         robot1, true,        Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
         0,      std::nullopt};
 
-    auto threat2 = Evaluation::EnemyThreat{
+    auto threat2 = EnemyThreat{
         robot2, false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         1,      robot1};
 
     // Despite robot2 having better shooting and scoring opporunity, robot1 has the ball
     // so should be more threatening
-    std::vector<Evaluation::EnemyThreat> expected_result = {threat1, threat2};
+    std::vector<EnemyThreat> expected_result = {threat1, threat2};
 
-    std::vector<Evaluation::EnemyThreat> threats = {threat2, threat1};
-    Evaluation::sortThreatsInDecreasingOrder(threats);
+    std::vector<EnemyThreat> threats = {threat2, threat1};
+    sortThreatsInDecreasingOrder(threats);
     EXPECT_EQ(threats, expected_result);
 }
 
@@ -325,20 +325,20 @@ TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
     Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                          Timestamp::fromSeconds(0));
 
-    auto threat1 = Evaluation::EnemyThreat{
+    auto threat1 = EnemyThreat{
         robot1, true,        Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
         0,      std::nullopt};
 
-    auto threat2 = Evaluation::EnemyThreat{
+    auto threat2 = EnemyThreat{
         robot2, true,  Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         1,      robot1};
 
     // Both robots have posession but robot2 has a better shot on the friendly goal, so
     // it should be more threatening
-    std::vector<Evaluation::EnemyThreat> expected_result = {threat2, threat1};
+    std::vector<EnemyThreat> expected_result = {threat2, threat1};
 
-    std::vector<Evaluation::EnemyThreat> threats = {threat1, threat2};
-    Evaluation::sortThreatsInDecreasingOrder(threats);
+    std::vector<EnemyThreat> threats = {threat1, threat2};
+    sortThreatsInDecreasingOrder(threats);
     EXPECT_EQ(threats, expected_result);
 }
 
@@ -352,19 +352,19 @@ TEST(SortEnemyThreatsTest,
     Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                          Timestamp::fromSeconds(0));
 
-    auto threat1 = Evaluation::EnemyThreat{
+    auto threat1 = EnemyThreat{
         robot1, false,       Angle::fromDegrees(50), Angle::fromDegrees(20), Point(-4, 0),
         1,      std::nullopt};
 
-    auto threat2 = Evaluation::EnemyThreat{
+    auto threat2 = EnemyThreat{
         robot2, false, Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         2,      robot1};
 
     // robot1 can be reached in fewer passes, so it should be more threatening
-    std::vector<Evaluation::EnemyThreat> expected_result = {threat1, threat2};
+    std::vector<EnemyThreat> expected_result = {threat1, threat2};
 
-    std::vector<Evaluation::EnemyThreat> threats = {threat2, threat1};
-    Evaluation::sortThreatsInDecreasingOrder(threats);
+    std::vector<EnemyThreat> threats = {threat2, threat1};
+    sortThreatsInDecreasingOrder(threats);
     EXPECT_EQ(threats, expected_result);
 }
 
@@ -378,7 +378,7 @@ TEST(SortEnemyThreatsTest,
     Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                          Timestamp::fromSeconds(0));
 
-    auto threat1 = Evaluation::EnemyThreat{
+    auto threat1 = EnemyThreat{
         robot1,       false, Angle::fromDegrees(50), Angle::fromDegrees(20),
         Point(-4, 0), 2,
         std::nullopt  // The passer doesn't matter since it doesn't affect the threat
@@ -386,7 +386,7 @@ TEST(SortEnemyThreatsTest,
                       // evaluations
     };
 
-    auto threat2 = Evaluation::EnemyThreat{
+    auto threat2 = EnemyThreat{
         robot2,       false, Angle::fromDegrees(60), Angle::fromDegrees(30),
         Point(-4, 0), 2,
         std::nullopt  // The passer doesn't matter since it doesn't affect the threat
@@ -395,10 +395,10 @@ TEST(SortEnemyThreatsTest,
     };
 
     // Robot 2 has a better view of the goal so it's more threatening
-    std::vector<Evaluation::EnemyThreat> expected_result = {threat2, threat1};
+    std::vector<EnemyThreat> expected_result = {threat2, threat1};
 
-    std::vector<Evaluation::EnemyThreat> threats = {threat1, threat2};
-    Evaluation::sortThreatsInDecreasingOrder(threats);
+    std::vector<EnemyThreat> threats = {threat1, threat2};
+    sortThreatsInDecreasingOrder(threats);
     EXPECT_EQ(threats, expected_result);
 }
 
@@ -411,8 +411,8 @@ TEST(EnemyThreatTest, no_enemies_on_field)
                                                   Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
                                               Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                 world.enemyTeam(), world.ball(), false);
+    auto result = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                     world.enemyTeam(), world.ball(), false);
 
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 0);
@@ -434,8 +434,8 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
                                                   Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
                                               Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                 world.enemyTeam(), world.ball(), false);
+    auto result = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                     world.enemyTeam(), world.ball(), false);
 
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 1);
@@ -510,8 +510,8 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
         world, enemy_robot_1.position() + Vector(-ROBOT_MAX_RADIUS_METERS, 0),
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                 world.enemyTeam(), world.ball(), false);
+    auto result = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                     world.enemyTeam(), world.ball(), false);
 
     // Make sure we got the correct number of results
     EXPECT_EQ(result.size(), 3);
