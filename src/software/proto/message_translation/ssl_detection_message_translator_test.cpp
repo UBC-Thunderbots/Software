@@ -71,8 +71,8 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_frame)
     };
 
     auto detection_frame =
-            createSslDetectionFrame(camera_id, t_capture, frame_number, {ball_state},
-                                    yellow_robot_states, blue_robot_states);
+        createSslDetectionFrame(camera_id, t_capture, frame_number, {ball_state},
+                                yellow_robot_states, blue_robot_states);
     ASSERT_TRUE(detection_frame);
 
     EXPECT_EQ(40391, detection_frame->frame_number());
@@ -92,7 +92,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_convert_ball_state_to_proto_and_bac
     const BallState ball_state(Point(-1.2, 0), Vector(0.01, 3), 0.2);
 
     auto detection_frame =
-            createSslDetectionFrame(camera_id, t_capture, frame_number, {ball_state}, {}, {});
+        createSslDetectionFrame(camera_id, t_capture, frame_number, {ball_state}, {}, {});
     ASSERT_TRUE(detection_frame);
 
     std::vector<BallDetection> ball_detections =

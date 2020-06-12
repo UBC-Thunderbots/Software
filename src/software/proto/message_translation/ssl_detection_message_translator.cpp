@@ -52,10 +52,10 @@ std::unique_ptr<SSL_DetectionRobot> createSslDetectionRobot(const RobotStateWith
 }
 
 std::unique_ptr<SSL_DetectionFrame> createSslDetectionFrame(
-        uint32_t camera_id, const Timestamp& t_capture, uint32_t frame_number,
-        const std::vector<BallState>& balls,
-        const std::vector<RobotStateWithId>& yellow_robots,
-        const std::vector<RobotStateWithId>& blue_robots)
+    uint32_t camera_id, const Timestamp& t_capture, uint32_t frame_number,
+    const std::vector<BallState>& balls,
+    const std::vector<RobotStateWithId>& yellow_robots,
+    const std::vector<RobotStateWithId>& blue_robots)
 {
     auto detection_frame = std::make_unique<SSL_DetectionFrame>();
 
