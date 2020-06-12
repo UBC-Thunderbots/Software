@@ -24,7 +24,7 @@ class SimulatorRobotTest : public testing::Test
             .id = robot.id(), .robot_state = robot.currentState().robotState()}});
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
-        auto physics_robot = physics_world->getFriendlyPhysicsRobots().at(0);
+        auto physics_robot = physics_world->getYellowPhysicsRobots().at(0);
         if (physics_robot.lock())
         {
             simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
