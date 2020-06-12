@@ -3,6 +3,9 @@
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
+#include "software/proto/message_translation/ssl_wrapper_message_translator.h"
+#include "software/proto/message_translation/ssl_detection_message_translator.h"
+#include "software/proto/message_translation/ssl_geometry_message_translator.h"
 
 extern "C"
 {
@@ -11,7 +14,7 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-Simulator::Simulator(const Field& field) : physics_world(field) {}
+Simulator::Simulator(const Field& field) : physics_world(field), frame_number(0) {}
 
 void Simulator::setBallState(const BallState& ball_state)
 {
@@ -126,6 +129,8 @@ void Simulator::stepSimulation(const Duration& time_step)
     }
 
     physics_world.stepSimulation(time_step);
+
+    frame_number++;
 }
 
 World Simulator::getWorld() const
@@ -163,6 +168,15 @@ World Simulator::getWorld() const
 
     World world(physics_world.getField(), ball, friendly_team, enemy_team);
     return world;
+}
+
+std::unique_ptr<SSL_WrapperPacket> Simulator::getSslWrapperPacket() const {
+    auto ball_state = physics_world.getBallState();
+    auto ball_states = ball_state.has_value() ? std::vector<BallState>({ball_state.value()}) : std::vector<BallState>();
+    auto detection_frame = createSslDetectionFrame(CAMERA_ID, physics_world.getTimestamp(), frame_number, ball_states, physics_world.getYellowRobotStates(), physics_world.getBlueRobotStates());
+    auto geometry_data = createGeometryData(physics_world.getField(), FIELD_LINE_THICKNESS_METRES);
+    auto wrapper_packet = createWrapperPacket(std::move(geometry_data), std::move(detection_frame));
+    return std::move(wrapper_packet);
 }
 
 primitive_params_t Simulator::getPrimitiveParams(

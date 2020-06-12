@@ -5,59 +5,88 @@
 #include "software/primitive/move_primitive.h"
 #include "software/primitive/primitive.h"
 #include "software/test_util/test_util.h"
-#include "software/world/world.h"
 
-// TODO: Add more specific tests for adding a ball when there is / isn't
-// already a ball. Need to wait until the world output is replaced with
-// proto in https://github.com/UBC-Thunderbots/Software/issues/1244
-
-TEST(SimulatorTest, test_set_ball_state)
+TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
 
-    World world = simulator.getWorld();
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
-        ball_state, world.ball().currentState().ballState(), 1e-6));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.balls_size());
+    auto ball = detection_frame.balls(0);
+    EXPECT_FLOAT_EQ(1000.0f, ball.x());
+    EXPECT_FLOAT_EQ(2000.0f, ball.y());
 }
 
-TEST(SimulatorTest, test_remove_ball)
+TEST(SimulatorTest, set_ball_state_when_ball_already_exists)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
 
-    World world = simulator.getWorld();
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
-        ball_state, world.ball().currentState().ballState(), 1e-6));
+    BallState new_ball_state(Point(-3.5, 0.02), Vector(1, 1));
+    simulator.setBallState(new_ball_state);
+
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.balls_size());
+    auto ball = detection_frame.balls(0);
+    EXPECT_FLOAT_EQ(-3500.0f, ball.x());
+    EXPECT_FLOAT_EQ(20.0f, ball.y());
+}
+
+TEST(SimulatorTest, remove_ball_when_no_ball_exists)
+{
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     simulator.removeBall();
-    world = simulator.getWorld();
 
-    // TODO: Check the ball is actually removed once we have proto output
-    // https://github.com/UBC-Thunderbots/Software/issues/1244
-    // The World can't represent "no ball"
-    BallState expected_ball_state(Point(0, 0), Vector(0, 0));
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
-        expected_ball_state, world.ball().currentState().ballState(), 1e-6));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    EXPECT_EQ(0, detection_frame.balls_size());
+}
+
+TEST(SimulatorTest, remove_ball_when_the_ball_already_exists)
+{
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+
+    BallState ball_state(Point(1, 2), Vector(0, -3));
+    simulator.setBallState(ball_state);
+    simulator.removeBall();
+
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    EXPECT_EQ(0, detection_frame.balls_size());
 }
 
 TEST(SimualtorTest, add_zero_yellow_robots)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     simulator.addYellowRobots({});
 
-    World world = simulator.getWorld();
-    EXPECT_EQ(0, world.friendlyTeam().numRobots());
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    EXPECT_EQ(0, detection_frame.robots_yellow_size());
 }
 
 TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -72,13 +101,16 @@ TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
     };
     simulator.addYellowRobots(states);
 
-    World world = simulator.getWorld();
-    EXPECT_EQ(3, world.friendlyTeam().numRobots());
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    EXPECT_EQ(3, detection_frame.robots_yellow_size());
 }
 
 TEST(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -94,7 +126,7 @@ TEST(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 
 TEST(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulation)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -107,7 +139,7 @@ TEST(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulat
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
     std::vector<RobotStateWithId> states2 = {
-        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state2},
     };
 
     EXPECT_THROW(simulator.addYellowRobots(states2), std::runtime_error);
@@ -115,17 +147,20 @@ TEST(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulat
 
 TEST(SimualtorTest, add_zero_blue_robots)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     simulator.addBlueRobots({});
 
-    World world = simulator.getWorld();
-    EXPECT_EQ(0, world.enemyTeam().numRobots());
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    EXPECT_EQ(0, detection_frame.robots_blue_size());
 }
 
 TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -140,13 +175,16 @@ TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
     };
     simulator.addBlueRobots(states);
 
-    World world = simulator.getWorld();
-    EXPECT_EQ(3, world.enemyTeam().numRobots());
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    EXPECT_EQ(3, detection_frame.robots_blue_size());
 }
 
 TEST(SimulatorTest, add_blue_robots_with_duplicate_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -162,7 +200,7 @@ TEST(SimulatorTest, add_blue_robots_with_duplicate_ids)
 
 TEST(SimulatorTest, add_blue_robots_with_ids_that_already_exist_in_the_simulation)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -175,33 +213,35 @@ TEST(SimulatorTest, add_blue_robots_with_ids_that_already_exist_in_the_simulatio
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
                             AngularVelocity::quarter());
     std::vector<RobotStateWithId> states2 = {
-        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state2},
     };
 
     EXPECT_THROW(simulator.addBlueRobots(states2), std::runtime_error);
 }
 
-TEST(SimulatorTest, test_simulation_step_updates_the_ball)
+TEST(SimulatorTest, simulation_step_updates_the_ball)
 {
     // A sanity test to make sure stepping the simulation actually updates
     // the state of the world
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
     simulator.setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
 
     simulator.stepSimulation(Duration::fromSeconds(0.1));
-    World world = simulator.getWorld();
 
-    Point ball_position = world.ball().position();
-    EXPECT_NE(Point(0.4, 0), ball_position);
-    Vector ball_velocity = world.ball().velocity();
-    EXPECT_TRUE(
-        ::TestUtil::equalWithinTolerance(Vector(-1.3, 2.01), ball_velocity, 1e-4));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.balls_size());
+    auto ball = detection_frame.balls(0);
+    EXPECT_NEAR(270.0f, ball.x(), 10);
+    EXPECT_NEAR(201.0f, ball.y(), 10);
 }
 
-TEST(SimulatorTest, test_simulate_yellow_robots_with_no_primitives)
+TEST(SimulatorTest, simulate_yellow_robots_with_no_primitives)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -216,20 +256,24 @@ TEST(SimulatorTest, test_simulate_yellow_robots_with_no_primitives)
     }
 
     // Robots have not been assigned primitives and so should not move
-    World world                = simulator.getWorld();
-    std::optional<Robot> robot = world.friendlyTeam().getRobotById(1);
-    ASSERT_TRUE(robot);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(robot->position(), Point(0, 0), 0.01));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_yellow_size());
+    auto yellow_robot = detection_frame.robots_yellow(0);
+    EXPECT_FLOAT_EQ(0.0f, yellow_robot.x());
+    EXPECT_FLOAT_EQ(0.0f, yellow_robot.y());
 }
 
-TEST(SimulatorTest, test_simulate_single_yellow_robot_with_primitive)
+TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
 {
     // Simulate a robot with a primitive to sanity check that everything is connected
     // properly and we can properly simulate robot firmware. We use the MovePrimitve
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -252,15 +296,19 @@ TEST(SimulatorTest, test_simulate_single_yellow_robot_with_primitive)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    World world                = simulator.getWorld();
-    std::optional<Robot> robot = world.friendlyTeam().getRobotById(1);
-    ASSERT_TRUE(robot);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(robot->position(), Point(1, 0), 0.2));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_yellow_size());
+    auto yellow_robot = detection_frame.robots_yellow(0);
+    EXPECT_NEAR(1000.0f, yellow_robot.x(), 200);
+    EXPECT_NEAR(0.0f, yellow_robot.y(), 200);
 }
 
-TEST(SimulatorTest, test_simulate_blue_robots_with_no_primitives)
+TEST(SimulatorTest, simulate_blue_robots_with_no_primitives)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -275,20 +323,24 @@ TEST(SimulatorTest, test_simulate_blue_robots_with_no_primitives)
     }
 
     // Robots have not been assigned primitives and so should not move
-    World world                = simulator.getWorld();
-    std::optional<Robot> robot = world.enemyTeam().getRobotById(1);
-    ASSERT_TRUE(robot);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(robot->position(), Point(0, 0), 0.01));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_blue_size());
+    auto blue_robot = detection_frame.robots_blue(0);
+    EXPECT_FLOAT_EQ(0.0f, blue_robot.x());
+    EXPECT_FLOAT_EQ(0.0f, blue_robot.y());
 }
 
-TEST(SimulatorTest, test_simulate_single_blue_robot_with_primitive)
+TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
 {
     // Simulate a robot with a primitive to sanity check that everything is connected
     // properly and we can properly simulate robot firmware. We use the MovePrimitve
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -311,13 +363,17 @@ TEST(SimulatorTest, test_simulate_single_blue_robot_with_primitive)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    World world                = simulator.getWorld();
-    std::optional<Robot> robot = world.enemyTeam().getRobotById(1);
-    ASSERT_TRUE(robot);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(robot->position(), Point(1, 0), 0.2));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_blue_size());
+    auto blue_robot = detection_frame.robots_blue(0);
+    EXPECT_NEAR(1000.0f, blue_robot.x(), 200);
+    EXPECT_NEAR(0.0f, blue_robot.y(), 200);
 }
 
-TEST(SimulatorTest, test_simulate_multiple_blue_and_yellow_robots_with_primitives)
+TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
 {
     // Simulate multiple robots with primitives to sanity check that everything is
     // connected properly and we can properly simulate multiple instances of the robot
@@ -325,7 +381,7 @@ TEST(SimulatorTest, test_simulate_multiple_blue_and_yellow_robots_with_primitive
     // unlikely to be significantly changed or removed, and its behaviour is easy to
     // validate
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(::Test::TestUtil::createSSLDivBField());
 
     RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero());
@@ -380,8 +436,6 @@ TEST(SimulatorTest, test_simulate_multiple_blue_and_yellow_robots_with_primitive
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    World world = simulator.getWorld();
-
     // TODO: These tests are currently very lenient, and don't test final velocities.
     //  This is because they currently rely on controller dynamics, and the existing
     //  bang-bang controller tends to overshoot with the current physics damping
@@ -390,31 +444,52 @@ TEST(SimulatorTest, test_simulate_multiple_blue_and_yellow_robots_with_primitive
     //  new controller is implemented.
     //  https://github.com/UBC-Thunderbots/Software/issues/1187
 
-    std::optional<Robot> yellow_robot_1 = world.friendlyTeam().getRobotById(1);
-    ASSERT_TRUE(yellow_robot_1);
-    EXPECT_TRUE(
-        (::TestUtil::equalWithinTolerance(Point(1, 1), yellow_robot_1->position(), 0.2)));
-    EXPECT_TRUE((::TestUtil::equalWithinTolerance(
-        Angle::zero(), yellow_robot_1->orientation(), Angle::fromDegrees(10))));
+    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(2, detection_frame.robots_yellow_size());
+    ASSERT_EQ(2, detection_frame.robots_blue_size());
 
-    std::optional<Robot> yellow_robot_2 = world.friendlyTeam().getRobotById(2);
-    ASSERT_TRUE(yellow_robot_2);
-    EXPECT_TRUE((
-        ::TestUtil::equalWithinTolerance(Point(3, -2), yellow_robot_2->position(), 0.2)));
-    EXPECT_TRUE((::TestUtil::equalWithinTolerance(
-        Angle::zero(), yellow_robot_2->orientation(), Angle::fromDegrees(10))));
+    auto yellow_robots = detection_frame.robots_yellow();
+    auto yellow_robot_1 =
+        std::find_if(yellow_robots.begin(), yellow_robots.end(),
+                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    ASSERT_NE(yellow_robot_1, yellow_robots.end());
+    EXPECT_NEAR(1000.0f, yellow_robot_1->x(), 200);
+    EXPECT_NEAR(1000.0f, yellow_robot_1->y(), 200);
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+        Angle::zero(), Angle::fromRadians(yellow_robot_1->orientation()),
+        Angle::fromDegrees(10)));
 
-    std::optional<Robot> blue_robot_1 = world.enemyTeam().getRobotById(1);
-    ASSERT_TRUE(blue_robot_1);
-    EXPECT_TRUE(
-        (::TestUtil::equalWithinTolerance(Point(-1, -1), blue_robot_1->position(), 0.3)));
-    EXPECT_TRUE((::TestUtil::equalWithinTolerance(
-        Angle::zero(), blue_robot_1->orientation(), Angle::fromDegrees(10))));
+    auto yellow_robot_2 =
+        std::find_if(yellow_robots.begin(), yellow_robots.end(),
+                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    ASSERT_NE(yellow_robot_2, yellow_robots.end());
+    EXPECT_NEAR(3000.0f, yellow_robot_2->x(), 200);
+    EXPECT_NEAR(-2000.0f, yellow_robot_2->y(), 200);
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+        Angle::zero(), Angle::fromRadians(yellow_robot_2->orientation()),
+        Angle::fromDegrees(10)));
 
-    std::optional<Robot> blue_robot_2 = world.enemyTeam().getRobotById(2);
-    ASSERT_TRUE(blue_robot_2);
-    EXPECT_TRUE(
-        (::TestUtil::equalWithinTolerance(Point(-3, 0), blue_robot_2->position(), 0.3)));
-    EXPECT_TRUE((::TestUtil::equalWithinTolerance(
-        Angle::half(), blue_robot_2->orientation(), Angle::fromDegrees(10))));
+    auto blue_robots = detection_frame.robots_blue();
+    auto blue_robot_1 =
+        std::find_if(blue_robots.begin(), blue_robots.end(),
+                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    ASSERT_NE(blue_robot_1, blue_robots.end());
+    EXPECT_NEAR(-1000.0f, blue_robot_1->x(), 300);
+    EXPECT_NEAR(-1000.0f, blue_robot_1->y(), 300);
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+        Angle::zero(), Angle::fromRadians(blue_robot_1->orientation()),
+        Angle::fromDegrees(10)));
+
+    auto blue_robot_2 =
+        std::find_if(blue_robots.begin(), blue_robots.end(),
+                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    ASSERT_NE(blue_robot_2, blue_robots.end());
+    EXPECT_NEAR(-3000.0f, blue_robot_2->x(), 300);
+    EXPECT_NEAR(0.0f, blue_robot_2->y(), 300);
+    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+        Angle::half(), Angle::fromRadians(blue_robot_2->orientation()),
+        Angle::fromDegrees(10)));
 }

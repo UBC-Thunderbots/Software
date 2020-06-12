@@ -121,6 +121,8 @@ class Simulator
      */
     World getWorld() const;
 
+    std::unique_ptr<SSL_WrapperPacket> getSslWrapperPacket() const;
+
    private:
     /**
      * Updates the given simulator_robots to contain and control the given physics_robots
@@ -171,4 +173,11 @@ class Simulator
         yellow_simulator_robots;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         blue_simulator_robots;
+
+    unsigned int frame_number;
+
+    // The camera ID of all SSLDetectionFrames published by the simulator.
+    // This simulates having a single camera that can see the entire field
+    static constexpr unsigned int CAMERA_ID = 0;
+    static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01;
 };
