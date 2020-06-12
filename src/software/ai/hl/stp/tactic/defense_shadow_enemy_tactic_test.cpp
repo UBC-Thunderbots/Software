@@ -15,7 +15,7 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
+                             std::nullopt, 0,     std::nullopt};
     Field field        = ::Test::TestUtil::createSSLDivBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
@@ -48,7 +48,7 @@ TEST(DefenseShadowEnemyTacticTest,
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
+                             std::nullopt, 0,     std::nullopt};
     Field field        = ::Test::TestUtil::createSSLDivBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
@@ -85,7 +85,7 @@ TEST(
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
+                             std::nullopt, 0,     std::nullopt};
     Field field        = ::Test::TestUtil::createSSLDivBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
