@@ -14,17 +14,16 @@
 #include "software/world/world.h"
 
 /**
- * This util class is to provide utility functions to our unit test suite,
- * primarily for assisting with test setup (such as creating World or Field objects)
+ * Utility functions to our unit test suite, primarily for assisting with test setup (such
+ * as creating World or Field objects)
  */
-class TestUtil
+namespace TestUtil
 {
-   public:
     /**
      * Creates a field with the standard SSL Division B dimensions
      * @return a field with the standard SSL Division B dimensions
      */
-    static Field createSSLDivBField();
+    Field createSSLDivBField();
 
     /**
      * Creates a World object with a normal SSL Division B field, default (empty)
@@ -35,7 +34,7 @@ class TestUtil
      * with 1000 millisecond expiry buffers, and the Ball at the center of the field
      * with no velocity.
      */
-    static World createBlankTestingWorld();
+    World createBlankTestingWorld();
 
     /**
      * Returns a new World object with friendly robots in the positions specified
@@ -47,9 +46,8 @@ class TestUtil
      * @param robot_positions The positions to place friendly robots in
      * @return A new world object with friendly robots in the given positions
      */
-    static World setFriendlyRobotPositions(World world,
-                                           std::vector<Point> robot_positions,
-                                           const Timestamp &timestamp);
+    World setFriendlyRobotPositions(World world, std::vector<Point> robot_positions,
+                                    const Timestamp &timestamp);
 
     /**
      * Returns a new World object with enemy robots in the positions specified
@@ -61,8 +59,8 @@ class TestUtil
      * @param robot_positions The positions to place enemy robots in
      * @return A new world object with enemy robots in the given positions
      */
-    static World setEnemyRobotPositions(World world, std::vector<Point> robot_positions,
-                                        const Timestamp &timestamp);
+    World setEnemyRobotPositions(World world, std::vector<Point> robot_positions,
+                                 const Timestamp &timestamp);
 
     /**
      * Returns a new World object with the Ball placed in the new position
@@ -72,7 +70,7 @@ class TestUtil
      * @param ball_position The new position for the ball
      * @return A new World object with the ball placed in the given position
      */
-    static World setBallPosition(World world, Point ball_position, Timestamp timestamp);
+    World setBallPosition(World world, Point ball_position, Timestamp timestamp);
 
     /**
      * Returns a new World object with the Ball's velocity set to the new velocity
@@ -81,7 +79,7 @@ class TestUtil
      * @param ball_velocity The new velocity for the ball
      * @return A new World object with the ball's velocity set to the new velocity
      */
-    static World setBallVelocity(World world, Vector ball_velocity, Timestamp timestamp);
+    World setBallVelocity(World world, Vector ball_velocity, Timestamp timestamp);
 
     /**
      * Returns a vector containing all Refbox game states except for
@@ -90,7 +88,7 @@ class TestUtil
      * @return A vector containing all Refbox game states except for
      * LAST_ENUM_ITEM_UNUSED
      */
-    static std::vector<RefboxGameState> getAllRefboxGameStates();
+    std::vector<RefboxGameState> getAllRefboxGameStates();
 
     /**
      * Returns a robot at the given position with zero velocity,
@@ -100,7 +98,7 @@ class TestUtil
      * @param pt the point
      * @return a robot at the point
      */
-    static Robot createRobotAtPos(const Point &pt);
+    Robot createRobotAtPos(const Point &pt);
 
     /**
      * Checks if two polygons are within tolerance of each other
@@ -113,7 +111,7 @@ class TestUtil
      *
      * @return AssertionSuccess if the two polygons are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(
+    ::testing::AssertionResult equalWithinTolerance(
         const Polygon &poly1, const Polygon &poly2,
         double tolerance = METERS_PER_MILLIMETER);
 
@@ -128,7 +126,7 @@ class TestUtil
      *
      * @return AssertionSuccess if the two circles are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(
+    ::testing::AssertionResult equalWithinTolerance(
         const Circle &c1, const Circle &c2, double tolerance = METERS_PER_MILLIMETER);
 
     /**
@@ -139,9 +137,8 @@ class TestUtil
      *
      * @return AssertionSuccess if the two Angles are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(const Angle &a1,
-                                                           const Angle &a2,
-                                                           const Angle &tolerance);
+    ::testing::AssertionResult equalWithinTolerance(const Angle &a1, const Angle &a2,
+                                                    const Angle &tolerance);
 
     /**
      * Checks if two vectors are within tolerance of each other
@@ -154,7 +151,7 @@ class TestUtil
      *
      * @return AssertionSuccess if the two points are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(
+    ::testing::AssertionResult equalWithinTolerance(
         const Vector &v1, const Vector &v2, double tolerance = METERS_PER_MILLIMETER);
 
     /**
@@ -168,7 +165,7 @@ class TestUtil
      *
      * @return AssertionSuccess if the two points are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(
+    ::testing::AssertionResult equalWithinTolerance(
         const Point &pt1, const Point &pt2, double tolerance = METERS_PER_MILLIMETER);
 
     /**
@@ -180,7 +177,7 @@ class TestUtil
      *
      * @return AssertionSuccess if the two values are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(
+    ::testing::AssertionResult equalWithinTolerance(
         double val1, double val2, double tolerance = METERS_PER_MILLIMETER);
 
     /**
@@ -193,9 +190,10 @@ class TestUtil
      *
      * @return AssertionSuccess if the two values are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(
-        const RobotState &state1, const RobotState &state2, double linear_tolerance,
-        const Angle &angular_tolerance);
+    ::testing::AssertionResult equalWithinTolerance(const RobotState &state1,
+                                                    const RobotState &state2,
+                                                    double linear_tolerance,
+                                                    const Angle &angular_tolerance);
 
     /**
      * Checks if two RobotStateWithIds are within tolerance of each other.
@@ -209,9 +207,10 @@ class TestUtil
      *
      * @return AssertionSuccess if the two values are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(
-        const RobotStateWithId &state1, const RobotStateWithId &state2,
-        double linear_tolerance, const Angle &angular_tolerance);
+    ::testing::AssertionResult equalWithinTolerance(const RobotStateWithId &state1,
+                                                    const RobotStateWithId &state2,
+                                                    double linear_tolerance,
+                                                    const Angle &angular_tolerance);
 
     /**
      * Checks if two BallStates are within tolerance of each other.
@@ -225,11 +224,10 @@ class TestUtil
      *
      * @return AssertionSuccess if the two values are within tolerance of each other
      */
-    static ::testing::AssertionResult equalWithinTolerance(const BallState &state1,
-                                                           const BallState &state2,
-                                                           double tolerance);
+    ::testing::AssertionResult equalWithinTolerance(const BallState &state1,
+                                                    const BallState &state2,
+                                                    double tolerance);
 
-   private:
     /**
      * Returns a new team with robots placed at the given positions. Robots in the
      * given team are removed before new ones are placed at the given positions,
@@ -239,7 +237,6 @@ class TestUtil
      * @param robot_positions The positions of the robots
      * @return A new team with robots placed at the given positions
      */
-    static Team setRobotPositionsHelper(Team team,
-                                        const std::vector<Point> &robot_positions,
-                                        const Timestamp &timestamp);
-};
+    Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
+                                 const Timestamp &timestamp);
+};  // namespace TestUtil
