@@ -30,13 +30,6 @@ TEST(RobotStateTest, get_angular_velocity)
     EXPECT_EQ(AngularVelocity::half(), state.angularVelocity());
 }
 
-TEST(RobotStateTest, get_default_constructed_height)
-{
-    RobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
-                     AngularVelocity::half());
-    EXPECT_EQ(ROBOT_MAX_HEIGHT_METERS, state.height());
-}
-
 TEST(RobotStateTest, compare_identical_states)
 {
     RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
@@ -83,16 +76,6 @@ TEST(RobotStateTest, compare_states_with_different_angular_velocity)
                        AngularVelocity::zero());
     RobotState state_2(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                        AngularVelocity::half());
-    EXPECT_FALSE(state_1 == state_2);
-    EXPECT_TRUE(state_1 != state_2);
-}
-
-TEST(RobotStateTest, compare_states_with_different_height)
-{
-    RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
-                       AngularVelocity::zero(), 0.15);
-    RobotState state_2(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
-                       AngularVelocity::zero(), 0.2);
     EXPECT_FALSE(state_1 == state_2);
     EXPECT_TRUE(state_1 != state_2);
 }

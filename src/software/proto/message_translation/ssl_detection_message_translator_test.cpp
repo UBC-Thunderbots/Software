@@ -24,7 +24,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_ball)
 TEST(SSLDetectionMessageTranslatorTest, test_create_detection_robot)
 {
     const RobotState state(Point(0.0, -0.5), Vector(1, 2), Angle::quarter(),
-                           AngularVelocity::threeQuarter(), 0.15);
+                           AngularVelocity::threeQuarter());
     const RobotStateWithId state_with_id{.id = 2, .robot_state = state};
 
     auto detection_robot = createSslDetectionRobot(state_with_id);
@@ -39,7 +39,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_robot)
     EXPECT_FLOAT_EQ(0.0f, detection_robot->pixel_x());
     EXPECT_FLOAT_EQ(-500.0f, detection_robot->pixel_y());
     ASSERT_TRUE(detection_robot->has_height());
-    EXPECT_FLOAT_EQ(150.0f, detection_robot->height());
+    EXPECT_FLOAT_EQ(ROBOT_MAX_HEIGHT_METERS * MILLIMETERS_PER_METER, detection_robot->height());
 }
 
 TEST(SSLDetectionMessageTranslatorTest, test_create_detection_frame)

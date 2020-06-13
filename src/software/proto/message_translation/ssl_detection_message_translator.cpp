@@ -46,7 +46,7 @@ std::unique_ptr<SSL_DetectionRobot> createSslDetectionRobot(const RobotStateWith
     detection_robot->set_pixel_x(x_position_mm);
     detection_robot->set_pixel_y(y_position_mm);
     detection_robot->set_height(
-        static_cast<float>(robot.robot_state.height() * MILLIMETERS_PER_METER));
+        static_cast<float>(ROBOT_MAX_HEIGHT_METERS * MILLIMETERS_PER_METER));
 
     return std::move(detection_robot);
 }
