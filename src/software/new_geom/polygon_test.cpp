@@ -267,28 +267,25 @@ TEST(PolygonTest, test_polygon_triangle_contains_point_with_point_on_side)
 TEST(PolygonCentroidTest, test_triangle)
 {
     Polygon poly({{1, 2}, {2, 3}, {1, 3}});
-    EXPECT_TRUE(
-        ::Test::TestUtil::equalWithinTolerance(Point(1.333, 2.666), poly.centroid()));
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(Point(1.333, 2.666), poly.centroid()));
 }
 
 TEST(PolygonCentroidTest, test_rectangle)
 {
     Polygon poly({{-1, -1}, {-1, 3}, {5, 3}, {5, -1}});
-    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(Point(2, 1), poly.centroid()));
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(Point(2, 1), poly.centroid()));
 }
 
 TEST(PolygonCentroidTest, test_irregular_shape)
 {
     Polygon poly({{-1, -1}, {-8, 4}, {-2, 4}, {-2, 2}, {2, 0}});
-    EXPECT_TRUE(
-        ::Test::TestUtil::equalWithinTolerance(Point(-2.895, 1.842), poly.centroid()));
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(Point(-2.895, 1.842), poly.centroid()));
 }
 
 TEST(PolygonCentroidTest, test_non_convex_five_points_up_left)
 {
     Polygon poly({{1, 1}, {1, 3}, {2, 2}, {5, 3}, {5, 1}});
-    EXPECT_TRUE(
-        ::Test::TestUtil::equalWithinTolerance(Point(3.111, 1.778), poly.centroid()));
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(Point(3.111, 1.778), poly.centroid()));
 }
 
 

@@ -16,9 +16,8 @@ void compareChipActions(std::shared_ptr<ChipAction> chip_action,
 
 TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(-0.3, 0), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -46,9 +45,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 
 TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -76,9 +74,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 
 TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(-0.5, 1.3), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -106,9 +103,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 
 TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(-1.2, 2.1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -136,9 +132,8 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 
 TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_positive_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(0.3, 0), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -166,9 +161,8 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
 
 TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_positive_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(1.1, 0.2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -196,9 +190,8 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
 
 TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_negative_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(0.7, 2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -226,9 +219,8 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
 
 TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_negative_y)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     Robot robot = Robot(0, Point(1.3, 1.2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
