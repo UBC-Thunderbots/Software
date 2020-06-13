@@ -51,6 +51,18 @@ size_t LinearSpline2d::getNumKnots(void) const
     return knots.size();
 }
 
+std::vector<double> LinearSpline2d::getKnotParametrizationValues() const
+{
+    // Knots are linearly interpolated from 0 to 1
+    std::vector<double> knot_parametrization_values;
+    for (size_t i = 0; i < knots.size(); i++)
+    {
+        knot_parametrization_values.emplace_back(static_cast<double>(i) /
+                                                 static_cast<double>(knots.size() - 1));
+    }
+    return knot_parametrization_values;
+}
+
 const std::vector<Point> LinearSpline2d::getKnots(void) const
 {
     return knots;
