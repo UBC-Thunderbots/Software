@@ -15,9 +15,9 @@ class KickoffFriendlyPlayTest : public SimulatedTest
 
 TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
+    world = ::TestUtil::setEnemyRobotPositions(
         world,
         {
             Point(0.6, 0),
@@ -29,16 +29,16 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
         },
         Timestamp::fromSeconds(0));
 
-    world = ::Test::TestUtil::setFriendlyRobotPositions(world,
-                                                        {
-                                                            Point(-3, 2.5),
-                                                            Point(-3, 1.5),
-                                                            Point(-3, 0.5),
-                                                            Point(-3, -0.5),
-                                                            Point(-3, -1.5),
-                                                            Point(-3, -2.5),
-                                                        },
-                                                        Timestamp::fromSeconds(0));
+    world = ::TestUtil::setFriendlyRobotPositions(world,
+                                                  {
+                                                      Point(-3, 2.5),
+                                                      Point(-3, 1.5),
+                                                      Point(-3, 0.5),
+                                                      Point(-3, -0.5),
+                                                      Point(-3, -1.5),
+                                                      Point(-3, -2.5),
+                                                  },
+                                                  Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().assignGoalie(0);
 
     world.mutableBall() = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));

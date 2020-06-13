@@ -45,7 +45,7 @@ class GoalieRestrainTest : public ::testing::TestWithParam<Point>
 
 TEST_P(GoalieRestrainTest, goalie_position_safe)
 {
-    World world         = ::Test::TestUtil::createBlankTestingWorld();
+    World world         = ::TestUtil::createBlankTestingWorld();
     GoalieTactic tactic = GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
                                        world.enemyTeam());
 
@@ -87,7 +87,7 @@ class GoalieTacticTest : public testing::Test
    protected:
     void expectMoveAction(Ball ball, Point destination)
     {
-        World world         = ::Test::TestUtil::createBlankTestingWorld();
+        World world         = ::TestUtil::createBlankTestingWorld();
         world.mutableBall() = std::move(ball);
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
@@ -110,7 +110,7 @@ class GoalieTacticTest : public testing::Test
 
     void expectStopAction(Ball ball)
     {
-        World world         = ::Test::TestUtil::createBlankTestingWorld();
+        World world         = ::TestUtil::createBlankTestingWorld();
         world.mutableBall() = std::move(ball);
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
@@ -131,7 +131,7 @@ class GoalieTacticTest : public testing::Test
 
     void expectChipAction(Ball ball)
     {
-        World world         = ::Test::TestUtil::createBlankTestingWorld();
+        World world         = ::TestUtil::createBlankTestingWorld();
         world.mutableBall() = std::move(ball);
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),

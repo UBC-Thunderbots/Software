@@ -23,7 +23,7 @@ class NoPathNavigatorTest : public testing::Test
                     robot_navigation_obstacle_factory,
                     Util::DynamicParameters->getAIConfig()->getNavigatorConfig()),
           current_time(Timestamp::fromSeconds(123)),
-          field(::Test::TestUtil::createSSLDivBField()),
+          field(::TestUtil::createSSLDivBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
           friendly_team(Team(Duration::fromMilliseconds(1000))),
           enemy_team(Team(Duration::fromMilliseconds(1000)))
@@ -64,7 +64,7 @@ class ThetaStarNavigatorTest : public testing::Test
 
 TEST_F(ThetaStarNavigatorTest, convert_catch_intent_to_catch_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<CatchIntent>(1, 0, 10, 0.3, 0));
@@ -81,7 +81,7 @@ TEST_F(ThetaStarNavigatorTest, convert_catch_intent_to_catch_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -100,7 +100,7 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
 TEST_F(ThetaStarNavigatorTest,
        convert_direct_velocity_intent_to_direct_velocity_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<DirectVelocityIntent>(3, 1, -2, 0.4, 1000, 4));
@@ -117,7 +117,7 @@ TEST_F(ThetaStarNavigatorTest,
 
 TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -135,7 +135,7 @@ TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_pri
 
 TEST_F(ThetaStarNavigatorTest, convert_dribble_intent_to_dribble_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -153,7 +153,7 @@ TEST_F(ThetaStarNavigatorTest, convert_dribble_intent_to_dribble_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -171,7 +171,7 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -189,7 +189,7 @@ TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_pivot_intent_to_pivot_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
@@ -208,7 +208,7 @@ TEST_F(ThetaStarNavigatorTest, convert_pivot_intent_to_pivot_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
@@ -225,7 +225,7 @@ TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
@@ -256,7 +256,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     // An arbitrary fixed point in time
     // We use this fixed point in time to make the tests deterministic.
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
 
     Robot friendly_robot_0 = Robot(0, poi, Vector(-1, -2), Angle::half(),
                                    AngularVelocity::threeQuarter(), current_time);

@@ -136,11 +136,18 @@ class PhysicsWorld
     void stepSimulation(const Duration& time_step);
 
     /**
-     * Returns the friendly PhysicsRobots currently in the world
+     * Returns the yellow PhysicsRobots currently in the world
      *
-     * @return the friendly PhysicsRobots in the world
+     * @return the yellow PhysicsRobots in the world
      */
-    std::vector<std::weak_ptr<PhysicsRobot>> getFriendlyPhysicsRobots() const;
+    std::vector<std::weak_ptr<PhysicsRobot>> getYellowPhysicsRobots() const;
+
+    /**
+     * Returns the blue PhysicsRobots currently in the world
+     *
+     * @return the blue PhysicsRobots in the world
+     */
+    std::vector<std::weak_ptr<PhysicsRobot>> getBluePhysicsRobots() const;
 
     /**
      * Returns the PhysicsBall currently in the world
