@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <stdexcept>
-
 TEST(TimestampTest, default_constructor)
 {
     Timestamp t;

@@ -45,7 +45,7 @@ class DefenseShadowEnemyTactic : public Tactic
      *
      * @param enemy_threat The EnemyThread this Tactic is shadowing
      */
-    void updateControlParams(const Evaluation::EnemyThreat &enemy_threat);
+    void updateControlParams(const EnemyThreat &enemy_threat);
 
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
@@ -62,7 +62,7 @@ class DefenseShadowEnemyTactic : public Tactic
 
     // Tactic parameters
     // The Enemy Threat indicating which enemy to shadow
-    std::optional<Evaluation::EnemyThreat> enemy_threat;
+    std::optional<EnemyThreat> enemy_threat;
     // The field being played on
     Field field;
     // The friendly team

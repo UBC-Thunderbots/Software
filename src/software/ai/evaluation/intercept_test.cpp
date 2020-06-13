@@ -1,8 +1,3 @@
-/**
- * This file contains the unit tests for evaluation functions
- * in pass.cpp
- */
-
 #include "software/ai/evaluation/intercept.h"
 
 #include <gtest/gtest.h>
@@ -18,7 +13,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
@@ -44,7 +39,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_6
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
@@ -71,7 +66,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_p
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2.25,
@@ -97,7 +92,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_chasing_ball)
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect the intercept will occur somewhere in x:[1,2], y:[1,2], t:[0, 3]
@@ -119,7 +114,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajecto
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect the intercept will occur somewhere in x:[1,2], y:[1,2], t:[0, 3]
@@ -141,7 +136,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // Since the ball is not moving, the only way to intercept it is to move to where
@@ -164,7 +159,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // Since the ball is not moving, the only way to intercept it is to move to where
@@ -189,7 +184,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_
                 Timestamp::fromSeconds(5));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
@@ -211,7 +206,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_r
                 Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
@@ -233,7 +228,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_t
                 Timestamp::fromSeconds(7));
 
     // We should be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
@@ -255,6 +250,6 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_too_fast_to_i
                 Timestamp::fromSeconds(0));
 
     // We don't expect to be able to find an intercept
-    auto best_intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_FALSE(best_intercept);
 }
