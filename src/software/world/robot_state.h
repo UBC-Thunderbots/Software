@@ -74,6 +74,34 @@ class RobotState
     void updateBallInBeam(bool ball_in_beam);
 
     /**
+     * Returns time in milliseconds since last chip
+     *
+     * @return ms since last chip
+     */
+    unsigned long timeSinceLastChip() const;
+
+    /**
+     * Update time in milliseconds since last chip
+     *
+     * @param time ms since last chip
+     */
+    void updateTimeSinceLastChip(unsigned long time);
+
+    /**
+     * Returns time in milliseconds since last kick
+     *
+     * @return ms since last kick
+     */
+    unsigned long timeSinceLastKick() const;
+
+    /**
+     * Update time in milliseconds since last kick
+     *
+     * @param time ms since last kick
+     */
+    void updateTimeSinceLastKick(unsigned long time);
+
+    /**
      * Defines the equality operator for a RobotState. RobotStates are equal if their
      * positions, velocities, orientation, and angular velocity are the same
      *
@@ -98,6 +126,8 @@ class RobotState
     Angle orientation_;
     AngularVelocity angular_velocity_;
     bool ball_in_beam_;
+    unsigned long time_since_last_chip_ms_;
+    unsigned long time_since_last_kick_ms_;
 };
 
 /**

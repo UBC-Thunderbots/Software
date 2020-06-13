@@ -39,6 +39,26 @@ void RobotState::updateBallInBeam(bool ball_in_beam)
     ball_in_beam_ = ball_in_beam;
 }
 
+unsigned long RobotState::timeSinceLastChip() const
+{
+    return time_since_last_chip_ms_;
+}
+
+void RobotState::updateTimeSinceLastChip(unsigned long time)
+{
+    time_since_last_chip_ms_ = time;
+}
+
+unsigned long RobotState::timeSinceLastKick() const
+{
+    return time_since_last_kick_ms_;
+}
+
+void RobotState::updateTimeSinceLastKick(unsigned long time)
+{
+    time_since_last_kick_ms_ = time;
+}
+
 bool RobotState::operator==(const RobotState &other) const
 {
     return this->position() == other.position() && this->velocity() == other.velocity() &&
