@@ -1,13 +1,13 @@
 #include "software/ai/evaluation/team.h"
 
 
-std::optional<Robot> Evaluation::nearestRobot(const Team &team, const Point &ref_point)
+std::optional<Robot> nearestRobot(const Team &team, const Point &ref_point)
 {
     return nearestRobot(team.getAllRobots(), ref_point);
 }
 
-std::optional<Robot> Evaluation::nearestRobot(const std::vector<Robot> &robots,
-                                              const Point &ref_point)
+std::optional<Robot> nearestRobot(const std::vector<Robot> &robots,
+                                  const Point &ref_point)
 {
     if (robots.empty())
     {

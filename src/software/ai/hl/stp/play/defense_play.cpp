@@ -26,13 +26,13 @@ std::string DefensePlay::getName() const
 bool DefensePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world, world.friendlyTeam());
+           !teamHasPossession(world, world.friendlyTeam());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world, world.friendlyTeam());
+           !teamHasPossession(world, world.friendlyTeam());
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -73,8 +73,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
     do
     {
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
@@ -121,7 +121,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         else
         {
             auto nearest_enemy_robot =
-                Evaluation::nearestRobot(world.enemyTeam(), world.ball().position());
+                nearestRobot(world.enemyTeam(), world.ball().position());
             if (nearest_enemy_robot)
             {
                 Point block_point =
@@ -147,8 +147,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWithBall(
     std::vector<std::shared_ptr<MoveTactic>> move_tactics, const World &world)
 {
-    auto nearest_enemy_robot =
-        Evaluation::nearestRobot(world.enemyTeam(), world.ball().position());
+    auto nearest_enemy_robot = nearestRobot(world.enemyTeam(), world.ball().position());
     if (nearest_enemy_robot)
     {
         Point block_point = nearest_enemy_robot->position() +

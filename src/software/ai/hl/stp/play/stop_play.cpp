@@ -72,8 +72,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
     do
     {
         // goalie tactic
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
