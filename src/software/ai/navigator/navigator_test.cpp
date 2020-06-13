@@ -370,7 +370,7 @@ TEST_F(NoPathNavigatorTest,
 {
     Point testp1, testp2, testp3;
     double final_speed;
-    // case 1
+    // unequal segment length
     testp1      = Point(1, 0);
     testp2      = Point(2, 0);
     testp3      = Point(0, 0);
@@ -378,7 +378,7 @@ TEST_F(NoPathNavigatorTest,
     EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
                                       testp1, testp2, testp3, final_speed));
 
-    // case 2
+    // equal segment length
     testp1      = Point(1, 1);
     testp2      = Point(1, 2);
     testp3      = Point(1, 1);
