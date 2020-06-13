@@ -1,6 +1,3 @@
-/**
- * Interface of the ReceiverTactic
- */
 #pragma once
 
 #include "software/ai/evaluation/shot.h"

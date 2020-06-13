@@ -1,6 +1,3 @@
-/**
- * Implementation of the PasserTactic
- */
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
 #include "shared/constants.h"

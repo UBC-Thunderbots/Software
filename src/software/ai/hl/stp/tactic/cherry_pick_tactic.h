@@ -1,6 +1,3 @@
-/**
- * Declaration for the CherryPickTactic class
- */
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"

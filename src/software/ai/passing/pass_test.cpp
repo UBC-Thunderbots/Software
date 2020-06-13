@@ -1,11 +1,6 @@
-/**
- * Tests for the "Pass" class
- */
-
 #include "software/ai/passing/pass.h"
 
 #include <gtest/gtest.h>
-
 
 TEST(PassTest, constructing_pass_with_negative_speed)
 {

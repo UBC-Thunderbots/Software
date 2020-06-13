@@ -1,7 +1,3 @@
-/**
- * Declaration for the "Pass" Class
- */
-
 #pragma once
 
 #include <array>

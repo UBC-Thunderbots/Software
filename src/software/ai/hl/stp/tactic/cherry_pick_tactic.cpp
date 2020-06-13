@@ -1,7 +1,3 @@
-/**
- * Definition for the CherryPickTactic class
- */
-
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "software/ai/hl/stp/action/move_action.h"

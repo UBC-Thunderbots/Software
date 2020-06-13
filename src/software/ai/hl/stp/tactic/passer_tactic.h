@@ -1,6 +1,3 @@
-/**
- * Interface of the PasserTactic
- */
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"

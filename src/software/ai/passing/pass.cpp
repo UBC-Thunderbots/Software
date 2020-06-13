@@ -1,7 +1,3 @@
-/**
- * Implementation of the "Pass" class
- */
-
 #include "software/ai/passing/pass.h"
 
 #include "software/geom/util.h"
