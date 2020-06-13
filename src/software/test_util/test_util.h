@@ -229,6 +229,25 @@ namespace TestUtil
                                                     double tolerance);
 
     /**
+     * Gets the number of milliseconds since the start_time
+     *
+     * @param start_time time point to calculate time since
+     *
+     * @return milliseconds since start time
+     */
+    double millisecondsSince(
+        std::chrono::time_point<std::chrono::system_clock> start_time);
+
+    /**
+     * Gets the number of seconds since the start_time
+     *
+     * @param start_time time point to calculate time since
+     *
+     * @return seconds since start time
+     */
+    double secondsSince(std::chrono::time_point<std::chrono::system_clock> start_time);
+
+    /**
      * Returns a new team with robots placed at the given positions. Robots in the
      * given team are removed before new ones are placed at the given positions,
      * so pre-existing robots to not persist.
