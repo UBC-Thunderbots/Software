@@ -8,11 +8,11 @@
 #include "software/proto/message_translation/protobuf_primitive_visitor.h"
 #include "software/world/world.h"
 
-std::unique_ptr<VisionMsg> convertWorldToVisionMsgProto(const World& world)
+std::unique_ptr<VisionMsg> createVisionMsgProto(const World& world)
 {
     // create msg and set timestamp
     auto vision_msg = std::make_unique<VisionMsg>();
-    vision_msg->set_allocated_time_sent(getCurrentTimestampMsg().release());
+    vision_msg->set_allocated_time_sent(createCurrentTimestampMsg().release());
 
     // set robot_states map
     auto& robot_states_map = *vision_msg->mutable_robot_states();
@@ -23,24 +23,23 @@ std::unique_ptr<VisionMsg> convertWorldToVisionMsgProto(const World& world)
     //
     // Since the unique_ptr immediately loses scope after the copy, the memory is
     // freed
-    std::for_each(
-        friendly_robots.begin(), friendly_robots.end(), [&](const Robot& robot) {
-            robot_states_map[robot.id()] = *convertRobotToRobotStateMsgProto(robot);
-        });
+    std::for_each(friendly_robots.begin(), friendly_robots.end(),
+                  [&](const Robot& robot) {
+                      robot_states_map[robot.id()] = *createRobotStateMsgProto(robot);
+                  });
 
     // set ball state
-    vision_msg->set_allocated_ball_state(
-        convertBallToBallStateMsgProto(world.ball()).release());
+    vision_msg->set_allocated_ball_state(createBallStateMsgProto(world.ball()).release());
 
     return std::move(vision_msg);
 }
 
-std::unique_ptr<PrimitiveMsg> convertPrimitiveVectortoPrimitiveMsgProto(
+std::unique_ptr<PrimitiveMsg> createPrimitiveMsgProto(
     const ConstPrimitiveVectorPtr& primitives)
 {
     // create msg and update timestamp
     auto primitive_msg = std::make_unique<PrimitiveMsg>();
-    primitive_msg->set_allocated_time_sent(getCurrentTimestampMsg().release());
+    primitive_msg->set_allocated_time_sent(createCurrentTimestampMsg().release());
 
     // set robot primitives
     auto& robot_primitives_map = *primitive_msg->mutable_robot_primitives();
@@ -59,12 +58,12 @@ std::unique_ptr<PrimitiveMsg> convertPrimitiveVectortoPrimitiveMsgProto(
     return std::move(primitive_msg);
 }
 
-std::unique_ptr<RobotStateMsg> convertRobotToRobotStateMsgProto(const Robot& robot)
+std::unique_ptr<RobotStateMsg> createRobotStateMsgProto(const Robot& robot)
 {
-    auto position         = convertPointToPointMsgProto(robot.position());
-    auto orientation      = convertAngleToAngleMsgProto(robot.orientation());
-    auto velocity         = convertVectorToVectorMsgProto(robot.velocity());
-    auto angular_velocity = convertAngleToAngleMsgProto(robot.angularVelocity());
+    auto position         = createPointMsgProto(robot.position());
+    auto orientation      = createAngleMsgProto(robot.orientation());
+    auto velocity         = createVectorMsgProto(robot.velocity());
+    auto angular_velocity = createAngleMsgProto(robot.angularVelocity());
 
     auto robot_state_msg = std::make_unique<RobotStateMsg>();
 
@@ -77,10 +76,10 @@ std::unique_ptr<RobotStateMsg> convertRobotToRobotStateMsgProto(const Robot& rob
     return std::move(robot_state_msg);
 }
 
-std::unique_ptr<BallStateMsg> convertBallToBallStateMsgProto(const Ball& ball)
+std::unique_ptr<BallStateMsg> createBallStateMsgProto(const Ball& ball)
 {
-    auto position       = convertPointToPointMsgProto(ball.position());
-    auto velocity       = convertVectorToVectorMsgProto(ball.velocity());
+    auto position       = createPointMsgProto(ball.position());
+    auto velocity       = createVectorMsgProto(ball.velocity());
     auto ball_state_msg = std::make_unique<BallStateMsg>();
 
     ball_state_msg->set_allocated_global_position_meters(position.release());
@@ -89,7 +88,7 @@ std::unique_ptr<BallStateMsg> convertBallToBallStateMsgProto(const Ball& ball)
     return std::move(ball_state_msg);
 }
 
-std::unique_ptr<PointMsg> convertPointToPointMsgProto(const Point& point)
+std::unique_ptr<PointMsg> createPointMsgProto(const Point& point)
 {
     auto point_msg = std::make_unique<PointMsg>();
     point_msg->set_x(point.x());
@@ -97,14 +96,14 @@ std::unique_ptr<PointMsg> convertPointToPointMsgProto(const Point& point)
     return std::move(point_msg);
 }
 
-std::unique_ptr<AngleMsg> convertAngleToAngleMsgProto(const Angle& angle)
+std::unique_ptr<AngleMsg> createAngleMsgProto(const Angle& angle)
 {
     auto angle_msg = std::make_unique<AngleMsg>();
     angle_msg->set_radians(angle.toRadians());
     return std::move(angle_msg);
 }
 
-std::unique_ptr<VectorMsg> convertVectorToVectorMsgProto(const Vector& vector)
+std::unique_ptr<VectorMsg> createVectorMsgProto(const Vector& vector)
 {
     auto vector_msg = std::make_unique<VectorMsg>();
     vector_msg->set_x_component(vector.x());
@@ -112,7 +111,7 @@ std::unique_ptr<VectorMsg> convertVectorToVectorMsgProto(const Vector& vector)
     return std::move(vector_msg);
 }
 
-std::unique_ptr<TimestampMsg> getCurrentTimestampMsg()
+std::unique_ptr<TimestampMsg> createCurrentTimestampMsg()
 {
     auto timestamp_msg    = std::make_unique<TimestampMsg>();
     const auto clock_time = std::chrono::system_clock::now();

@@ -8,7 +8,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_ball)
 {
     const BallState ball_state(Point(-1.2, 0), Vector(0.01, 3), 0.2);
 
-    auto detection_ball = createSslDetectionBall(ball_state);
+    auto detection_ball = createSSLDetectionBall(ball_state);
     ASSERT_TRUE(detection_ball);
 
     EXPECT_FLOAT_EQ(1.0, detection_ball->confidence());
@@ -27,7 +27,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_robot)
                            AngularVelocity::threeQuarter());
     const RobotStateWithId state_with_id{.id = 2, .robot_state = state};
 
-    auto detection_robot = createSslDetectionRobot(state_with_id);
+    auto detection_robot = createSSLDetectionRobot(state_with_id);
     ASSERT_TRUE(detection_robot);
 
     EXPECT_FLOAT_EQ(1.0, detection_robot->confidence());
@@ -72,7 +72,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_frame)
     };
 
     auto detection_frame =
-        createSslDetectionFrame(camera_id, t_capture, frame_number, {ball_state},
+        createSSLDetectionFrame(camera_id, t_capture, frame_number, {ball_state},
                                 yellow_robot_states, blue_robot_states);
     ASSERT_TRUE(detection_frame);
 
@@ -93,7 +93,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_convert_ball_state_to_proto_and_bac
     const BallState ball_state(Point(-1.2, 0), Vector(0.01, 3), 0.2);
 
     auto detection_frame =
-        createSslDetectionFrame(camera_id, t_capture, frame_number, {ball_state}, {}, {});
+        createSSLDetectionFrame(camera_id, t_capture, frame_number, {ball_state}, {}, {});
     ASSERT_TRUE(detection_frame);
 
     std::vector<BallDetection> ball_detections = getBallDetections({*detection_frame});

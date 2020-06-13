@@ -14,7 +14,7 @@
  *
  * @return A DetectionBall representing the given BallState
  */
-std::unique_ptr<SSL_DetectionBall> createSslDetectionBall(const BallState& ball);
+std::unique_ptr<SSL_DetectionBall> createSSLDetectionBall(const BallState& ball);
 
 /**
  * Creates a DetectionRobot from the given robot state.
@@ -23,7 +23,7 @@ std::unique_ptr<SSL_DetectionBall> createSslDetectionBall(const BallState& ball)
  *
  * @return A DetectionRobot representing the given robot state
  */
-std::unique_ptr<SSL_DetectionRobot> createSslDetectionRobot(
+std::unique_ptr<SSL_DetectionRobot> createSSLDetectionRobot(
     const RobotStateWithId& robot);
 
 /**
@@ -38,7 +38,7 @@ std::unique_ptr<SSL_DetectionRobot> createSslDetectionRobot(
  *
  * @return A DetectionFrame representing the given data
  */
-std::unique_ptr<SSL_DetectionFrame> createSslDetectionFrame(
+std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
     uint32_t camera_id, const Timestamp& t_capture, uint32_t frame_number,
     const std::vector<BallState>& balls,
     const std::vector<RobotStateWithId>& yellow_robots,

@@ -36,13 +36,12 @@ WifiBackend::~WifiBackend()
 
 void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
-    primitive_output->sendProto(
-        *convertPrimitiveVectortoPrimitiveMsgProto(primitives_ptr));
+    primitive_output->sendProto(*createPrimitiveMsgProto(primitives_ptr));
 }
 
 void WifiBackend::receiveWorld(World world)
 {
-    vision_output->sendProto(*convertWorldToVisionMsgProto(world));
+    vision_output->sendProto(*createVisionMsgProto(world));
     Subject<World>::sendValueToObservers(world);
 }
 

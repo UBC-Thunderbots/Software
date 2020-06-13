@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 
-std::unique_ptr<SSL_DetectionBall> createSslDetectionBall(const BallState& ball)
+std::unique_ptr<SSL_DetectionBall> createSSLDetectionBall(const BallState& ball)
 {
     auto detection_ball = std::make_unique<SSL_DetectionBall>();
 
@@ -25,7 +25,7 @@ std::unique_ptr<SSL_DetectionBall> createSslDetectionBall(const BallState& ball)
     return std::move(detection_ball);
 }
 
-std::unique_ptr<SSL_DetectionRobot> createSslDetectionRobot(const RobotStateWithId& robot)
+std::unique_ptr<SSL_DetectionRobot> createSSLDetectionRobot(const RobotStateWithId& robot)
 {
     auto detection_robot = std::make_unique<SSL_DetectionRobot>();
 
@@ -51,7 +51,7 @@ std::unique_ptr<SSL_DetectionRobot> createSslDetectionRobot(const RobotStateWith
     return std::move(detection_robot);
 }
 
-std::unique_ptr<SSL_DetectionFrame> createSslDetectionFrame(
+std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
     uint32_t camera_id, const Timestamp& t_capture, uint32_t frame_number,
     const std::vector<BallState>& balls,
     const std::vector<RobotStateWithId>& yellow_robots,
@@ -68,19 +68,19 @@ std::unique_ptr<SSL_DetectionFrame> createSslDetectionFrame(
     for (const auto& ball_state : balls)
     {
         auto ball = detection_frame->add_balls();
-        *ball     = *(createSslDetectionBall(ball_state).release());
+        *ball     = *(createSSLDetectionBall(ball_state).release());
     }
 
     for (const auto& yellow_robot : yellow_robots)
     {
         auto robot = detection_frame->add_robots_yellow();
-        *robot     = *(createSslDetectionRobot(yellow_robot).release());
+        *robot     = *(createSSLDetectionRobot(yellow_robot).release());
     }
 
     for (const auto& blue_robot : blue_robots)
     {
         auto robot = detection_frame->add_robots_blue();
-        *robot     = *(createSslDetectionRobot(blue_robot).release());
+        *robot     = *(createSSLDetectionRobot(blue_robot).release());
     }
 
     return std::move(detection_frame);
