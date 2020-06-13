@@ -9,7 +9,7 @@
 
 TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)
 {
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
@@ -19,7 +19,7 @@ TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)
 
 TEST(PossessionEvaluationTest, get_team_baller_robots_and_ball_stationary)
 {
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
@@ -40,7 +40,7 @@ TEST(PossessionEvaluationTest, get_team_baller_robots_and_ball_stationary)
 
 TEST(PossessionEvaluationTest, get_team_baller_robot_already_has_ball)
 {
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({-2 + DIST_TO_FRONT_OF_ROBOT_METERS, 1}, {0, 0}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
@@ -61,7 +61,7 @@ TEST(PossessionEvaluationTest, get_team_baller_robot_already_has_ball)
 
 TEST(PossessionEvaluationTest, get_team_baller_ball_moving_towards_robot)
 {
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({-2, 4}, {0, -2}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
@@ -84,7 +84,7 @@ TEST(PossessionEvaluationTest, get_team_baller_ball_moving_towards_robot)
 
 TEST(PossessionEvaluationTest, get_team_baller_robot_chasing_ball)
 {
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 3}, {0, -0.5}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
@@ -107,7 +107,7 @@ TEST(PossessionEvaluationTest, get_team_baller_robot_chasing_ball)
 
 TEST(PossessionEvaluationTest, get_team_baller_ball_moving_extremely_fast_out_of_field)
 {
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 10}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
@@ -132,7 +132,7 @@ TEST(PossessionEvaluationTest, team_has_possession_robot_in_control)
 {
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
     Team team   = Team(Duration::fromSeconds(1));
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
@@ -152,7 +152,7 @@ TEST(PossessionEvaluationTest, team_does_not_have_posession)
 {
     Ball ball({-2, 3}, {0, 10}, Timestamp::fromSeconds(0));
     Team team   = Team(Duration::fromSeconds(1));
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
@@ -173,7 +173,7 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
 {
     Team team = Team(Duration::fromSeconds(1));
     Ball ball({-0.9, 3}, {0, 10}, Timestamp::fromSeconds(2));
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(2, Point(1.5, 2.3), Vector(), Angle::zero(),
@@ -206,7 +206,7 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 {
     Team team = Team(Duration::fromSeconds(1));
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),

@@ -8,7 +8,7 @@
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
 {
-    World world          = ::Test::TestUtil::createBlankTestingWorld();
+    World world          = ::TestUtil::createBlankTestingWorld();
     Team team            = Team(Duration::fromSeconds(1));
     Robot shooting_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -28,7 +28,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
 
 TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
 {
-    World world          = ::Test::TestUtil::createBlankTestingWorld();
+    World world          = ::TestUtil::createBlankTestingWorld();
     Team team            = Team(Duration::fromSeconds(1));
     Robot shooting_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -49,7 +49,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
 TEST(CalcBestShotTest,
      calc_best_shot_on_enemy_goal_with_obstacles_and_no_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -57,7 +57,7 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
+    world = ::TestUtil::setEnemyRobotPositions(
         world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
@@ -75,7 +75,7 @@ TEST(CalcBestShotTest,
 TEST(CalcBestShotTest,
      calc_best_shot_on_friendly_goal_with_obstacles_and_no_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(-1, world.field().friendlyGoalpostNeg().y()), Vector(0, 0),
@@ -83,7 +83,7 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateEnemyTeamState(team);
 
-    world = ::Test::TestUtil::setFriendlyRobotPositions(
+    world = ::TestUtil::setFriendlyRobotPositions(
         world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
@@ -101,7 +101,7 @@ TEST(CalcBestShotTest,
 TEST(CalcBestShotTest,
      calc_best_shot_on_enemy_goal_with_obstacles_and_some_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -112,7 +112,7 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
+    world = ::TestUtil::setEnemyRobotPositions(
         world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
@@ -130,7 +130,7 @@ TEST(CalcBestShotTest,
 TEST(CalcBestShotTest,
      calc_best_shot_on_friendly_goal_with_obstacles_and_some_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(-1, world.field().friendlyGoalpostNeg().y()), Vector(0, 0),
@@ -141,7 +141,7 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateEnemyTeamState(team);
 
-    world = ::Test::TestUtil::setFriendlyRobotPositions(
+    world = ::TestUtil::setFriendlyRobotPositions(
         world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
@@ -158,7 +158,7 @@ TEST(CalcBestShotTest,
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_obstacles)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -166,7 +166,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_ob
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
+    world = ::TestUtil::setEnemyRobotPositions(
         world, {shooting_robot.position() + Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
@@ -180,7 +180,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_ob
 TEST(CalcBestShotTest,
      calc_best_shot_on_friendly_goal_with_all_shots_blocked_by_obstacles)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(-1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -188,7 +188,7 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
+    world = ::TestUtil::setEnemyRobotPositions(
         world, {shooting_robot.position() - Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
@@ -201,8 +201,8 @@ TEST(CalcBestShotTest,
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = ::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
@@ -214,8 +214,8 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = ::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
                  Angle::fromDegrees(45)};
@@ -228,8 +228,8 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = ::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
 
@@ -241,8 +241,8 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
 
 TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = ::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
@@ -254,8 +254,8 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
 
 TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = ::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
                  Angle::fromDegrees(45)};
@@ -268,8 +268,8 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
 
 TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_fully_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = ::TestUtil::createSSLDivBField();
     Point shot_origin = world.field().enemyGoalCenter() + Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
 

@@ -16,7 +16,6 @@ TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
     std::vector<Robot> enemy_robots;
     friendly_robots.emplace_back(friendly_robot);
     enemy_robots.emplace_back(enemy_robot);
-    using namespace Test;
 
     World test_world = TestUtil::createBlankTestingWorld();
     test_world.mutableFriendlyTeam().updateRobots(friendly_robots);
