@@ -1,11 +1,11 @@
 #include "software/simulation/simulator.h"
 
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/simulation/simulator_ball_singleton.h"
-#include "software/simulation/simulator_robot_singleton.h"
-#include "software/proto/message_translation/ssl_wrapper_message_translator.h"
 #include "software/proto/message_translation/ssl_detection_message_translator.h"
 #include "software/proto/message_translation/ssl_geometry_message_translator.h"
+#include "software/proto/message_translation/ssl_wrapper_message_translator.h"
+#include "software/simulation/simulator_ball_singleton.h"
+#include "software/simulation/simulator_robot_singleton.h"
 
 extern "C"
 {
@@ -170,12 +170,19 @@ World Simulator::getWorld() const
     return world;
 }
 
-std::unique_ptr<SSL_WrapperPacket> Simulator::getSslWrapperPacket() const {
-    auto ball_state = physics_world.getBallState();
-    auto ball_states = ball_state.has_value() ? std::vector<BallState>({ball_state.value()}) : std::vector<BallState>();
-    auto detection_frame = createSslDetectionFrame(CAMERA_ID, physics_world.getTimestamp(), frame_number, ball_states, physics_world.getYellowRobotStates(), physics_world.getBlueRobotStates());
-    auto geometry_data = createGeometryData(physics_world.getField(), FIELD_LINE_THICKNESS_METRES);
-    auto wrapper_packet = createWrapperPacket(std::move(geometry_data), std::move(detection_frame));
+std::unique_ptr<SSL_WrapperPacket> Simulator::getSslWrapperPacket() const
+{
+    auto ball_state  = physics_world.getBallState();
+    auto ball_states = ball_state.has_value()
+                           ? std::vector<BallState>({ball_state.value()})
+                           : std::vector<BallState>();
+    auto detection_frame = createSslDetectionFrame(
+        CAMERA_ID, physics_world.getTimestamp(), frame_number, ball_states,
+        physics_world.getYellowRobotStates(), physics_world.getBlueRobotStates());
+    auto geometry_data =
+        createGeometryData(physics_world.getField(), FIELD_LINE_THICKNESS_METRES);
+    auto wrapper_packet =
+        createWrapperPacket(std::move(geometry_data), std::move(detection_frame));
     return std::move(wrapper_packet);
 }
 
