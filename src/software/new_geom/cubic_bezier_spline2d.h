@@ -1,8 +1,8 @@
 #pragma once
 
+#include "software/new_geom/bezier_curve2d.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/spline2d.h"
-#include "software/new_geom/bezier_curve2d.h"
 
 /**
  * A Cubic Bezier spline is a C2 continuous spline that is formed by a series of bezier

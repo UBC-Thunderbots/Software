@@ -241,9 +241,8 @@ TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate)
 
     // We expect the spline segments to be bezier curves with the above points as
     // control points, and symmetric about the intermediate knot
-    EXPECT_EQ(BezierCurve2d({p0, p0 + d0, p1- d1, p1}).getPolynomial(),
+    EXPECT_EQ(BezierCurve2d({p0, p0 + d0, p1 - d1, p1}).getPolynomial(),
               spline_segments[0].getPolynomial());
     EXPECT_EQ(BezierCurve2d({p1, p1 + d1, p2 - d2, p2}).getPolynomial(),
               spline_segments[1].getPolynomial());
 }
-

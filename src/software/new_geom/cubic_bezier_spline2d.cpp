@@ -35,8 +35,7 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
     const double t_on_segment = (t_mapped - static_cast<double>(segment_index));
 
     // Generate the bezier curve for the segment and evaluate it at the segment t-value
-    const BezierCurve2d segment =
-     getSegmentAtIndex(segment_index);
+    const BezierCurve2d segment = getSegmentAtIndex(segment_index);
     return segment.getValueAt(t_on_segment);
 }
 
@@ -103,10 +102,10 @@ const std::vector<SplineSegment2d> CubicBezierSpline2d::getSplineSegments() cons
     return segments;
 }
 
-BezierCurve2d CubicBezierSpline2d::getSegmentAtIndex(size_t index) const {
-    return BezierCurve2d(
-        {control_points[index * 3], control_points[index * 3 + 1], control_points[index * 3 + 2],
-         control_points[index * 3 + 3]});
+BezierCurve2d CubicBezierSpline2d::getSegmentAtIndex(size_t index) const
+{
+    return BezierCurve2d({control_points[index * 3], control_points[index * 3 + 1],
+                          control_points[index * 3 + 2], control_points[index * 3 + 3]});
 }
 
 std::vector<Point> CubicBezierSpline2d::computeControlPoints(
