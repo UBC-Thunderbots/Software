@@ -313,4 +313,19 @@ namespace TestUtil
 
         return assertion_result;
     }
+
+    double secondsSince(std::chrono::time_point<std::chrono::system_clock> start_time)
+    {
+        return millisecondsSince(start_time) / MILLISECONDS_PER_SECOND;
+    }
+
+    double millisecondsSince(
+        std::chrono::time_point<std::chrono::system_clock> start_time)
+    {
+        const auto end_time = std::chrono::system_clock::now();
+        return static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       end_time - start_time)
+                                       .count()) /
+               NANOSECONDS_PER_MILLISECOND;
+    }
 };  // namespace TestUtil

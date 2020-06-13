@@ -44,7 +44,9 @@ class PassingEvaluationTest : public testing::Test
     double avg_time_offset_for_pass_seconds;
 };
 
-TEST_F(PassingEvaluationTest, ratePass_speed_test)
+// This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from
+// the test name
+TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
 {
     // This test does not assert anything. Rather, It can be used to guage how
     // fast ratePass is running, and can be profiled in order to find areas
@@ -140,25 +142,13 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
         ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     }
 
-    auto end_time = std::chrono::system_clock::now();
+    double duration_ms = ::TestUtil::millisecondsSince(start_time);
+    double avg_ms      = duration_ms / static_cast<double>(num_passes_to_gen);
 
-    std::chrono::duration<double> duration = end_time - start_time;
-
-    std::chrono::duration<double> avg;
-    avg = duration / static_cast<double>(num_passes_to_gen);
-
-    // At the time of this tests creation, ratePass ran at an average 0.105ms
+    // At the time of this test's creation (PR #695), ratePass ran at an average 0.105ms
     // in debug on an i7
-    //    std::cout << "Took "
-    //              <<
-    //              std::chrono::duration_cast<std::chrono::microseconds>(duration).count()
-    //              /
-    //                     1000.0
-    //              << "ms to run, average time of "
-    //              << std::chrono::duration_cast<std::chrono::microseconds>(avg).count()
-    //              /
-    //                     1000.0
-    //              << "ms" << std::endl;
+    std::cout << "Took " << duration_ms << "ms to run, average time of " << avg_ms << "ms"
+              << std::endl;
 }
 
 TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
