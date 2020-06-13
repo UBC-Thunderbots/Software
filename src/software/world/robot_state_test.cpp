@@ -79,3 +79,64 @@ TEST(RobotStateTest, compare_states_with_different_angular_velocity)
     EXPECT_FALSE(state_1 == state_2);
     EXPECT_TRUE(state_1 != state_2);
 }
+
+TEST(RobotStateTest, compare_states_with_different_ball_in_beam)
+{
+    RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
+                       AngularVelocity::zero());
+    RobotState state_2(state_1);
+    state_2.updateBallInBeam(true);
+    EXPECT_FALSE(state_1 == state_2);
+    EXPECT_TRUE(state_1 != state_2);
+}
+
+TEST(RobotStateTest, compare_states_with_same_ball_in_beam)
+{
+    RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
+                       AngularVelocity::zero());
+    RobotState state_2(state_1);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+    state_1.updateBallInBeam(true);
+    state_2.updateBallInBeam(true);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+}
+
+TEST(RobotStateTest, compare_states_with_same_time_since)
+{
+    RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
+                       AngularVelocity::zero());
+    RobotState state_2(state_1);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+    state_1.updateTimeSinceLastChip(5);
+    state_2.updateTimeSinceLastChip(5);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+    state_1.updateTimeSinceLastKick(5);
+    state_2.updateTimeSinceLastKick(5);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+}
+
+TEST(RobotStateTest, compare_states_with_different_time_since)
+{
+    RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
+                       AngularVelocity::zero());
+    RobotState state_2(state_1);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+    state_2.updateTimeSinceLastChip(5);
+    EXPECT_FALSE(state_1 == state_2);
+    EXPECT_TRUE(state_1 != state_2);
+    state_2.updateTimeSinceLastChip(UINT32_MAX);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+    state_1.updateTimeSinceLastKick(5);
+    EXPECT_FALSE(state_1 == state_2);
+    EXPECT_TRUE(state_1 != state_2);
+    state_1.updateTimeSinceLastKick(UINT32_MAX);
+    EXPECT_TRUE(state_1 == state_2);
+    EXPECT_FALSE(state_1 != state_2);
+}

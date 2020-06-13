@@ -5,7 +5,10 @@ RobotState::RobotState(const Point &position, const Vector &velocity,
     : position_(position),
       velocity_(velocity),
       orientation_(orientation),
-      angular_velocity_(angular_velocity)
+      angular_velocity_(angular_velocity),
+      ball_in_beam_(false),
+      time_since_last_chip_ms_(UINT32_MAX),
+      time_since_last_kick_ms_(UINT32_MAX)
 {
 }
 
@@ -63,6 +66,9 @@ bool RobotState::operator==(const RobotState &other) const
 {
     return this->position() == other.position() && this->velocity() == other.velocity() &&
            this->orientation() == other.orientation() &&
+           this->ballInBeam() == other.ballInBeam() &&
+           this->timeSinceLastChip() == other.timeSinceLastChip() &&
+           this->timeSinceLastKick() == other.timeSinceLastKick() &&
            this->angularVelocity() == other.angularVelocity();
 }
 
