@@ -134,5 +134,5 @@ class Spline2d
      * @return A SplineSegment2d created from the given parameters
      */
     static SplineSegment2d createSplineSegment2d(double start_val, double end_val,
-                                          Polynomial2d polynomial);
+                                                 Polynomial2d polynomial);
 };

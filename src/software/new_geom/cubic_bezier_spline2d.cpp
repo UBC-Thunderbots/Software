@@ -25,7 +25,8 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
 
     // The below algorithm does not handle the case where t is exactly 1, so we
     // check explicitly for that here
-    if (t == 1){
+    if (t == 1)
+    {
         return control_points.back();
     }
 
@@ -49,9 +50,11 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
         .getValueAt(t_on_segment);
 }
 
-const std::vector<Point> CubicBezierSpline2d::getKnots() const {
+const std::vector<Point> CubicBezierSpline2d::getKnots() const
+{
     std::vector<Point> knots;
-    for (size_t i = 0; i < control_points.size(); i += 3){
+    for (size_t i = 0; i < control_points.size(); i += 3)
+    {
         knots.emplace_back(control_points[i]);
     }
 
@@ -65,7 +68,7 @@ const std::vector<Point>& CubicBezierSpline2d::getControlPoints() const
 
 size_t CubicBezierSpline2d::getNumKnots() const
 {
-    return static_cast<size_t>((control_points.size()-1)/3 + 1);
+    return static_cast<size_t>((control_points.size() - 1) / 3 + 1);
 }
 
 std::vector<double> CubicBezierSpline2d::getKnotVector() const
@@ -159,7 +162,7 @@ std::vector<Point> CubicBezierSpline2d::computeControlPoints(
     }
 
     // TODO: figure out what this should be
-//    assert(control_points.size()-1 % 3 == 0);
+    //    assert(control_points.size()-1 % 3 == 0);
 
     return control_points;
 }

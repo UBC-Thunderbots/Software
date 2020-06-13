@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "software/new_geom/point.h"
 #include "software/new_geom/spline2d.h"
 
@@ -87,4 +88,3 @@ class BezierCurve2d
     // The control points for this bezier curve
     const std::vector<Point> control_points;
 };
-
