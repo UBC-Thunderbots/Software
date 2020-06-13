@@ -28,7 +28,8 @@ bool KickoffEnemyPlay::invariantHolds(const World &world) const
     return !world.gameState().isPlaying();
 }
 
-void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                      const World &world)
 {
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());

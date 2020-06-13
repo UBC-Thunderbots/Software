@@ -23,7 +23,7 @@ const double PhysicsRobot::chicker_thickness = 0.005;
 const double PhysicsRobot::total_chicker_depth =
     PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
-PhysicsRobot::PhysicsRobot(unsigned int id, std::shared_ptr<b2World> world,
+PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
                            const RobotState& robot_state, const double mass_kg)
     : robot_id(id)
 {
@@ -156,7 +156,7 @@ void PhysicsRobot::setupChickerFixture(const RobotState& robot_state,
     robot_body->CreateFixture(&robot_chicker_fixture_def);
 }
 
-unsigned int PhysicsRobot::getRobotId() const
+RobotId PhysicsRobot::getRobotId() const
 {
     return robot_id;
 }

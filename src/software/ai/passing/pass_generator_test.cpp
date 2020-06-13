@@ -22,8 +22,6 @@ class PassGeneratorTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        world = ::Test::TestUtil::createBlankTestingWorld();
-        world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
         pass_generator = std::make_shared<PassGenerator>(world, Point(0, 0),
                                                          PassType::ONE_TOUCH_SHOT, true);
     }
@@ -64,7 +62,7 @@ class PassGeneratorTest : public testing::Test
         EXPECT_LE(std::abs(curr_score - prev_score), min_score_diff);
     }
 
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
     std::shared_ptr<PassGenerator> pass_generator;
 };
 
@@ -189,22 +187,23 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     Robot receiver = Robot(1, {3.7, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                            Timestamp::fromSeconds(0));
 
-    Team friendly_team(Duration::fromSeconds(10), {passer, receiver});
+    Team friendly_team({passer, receiver}, Duration::fromSeconds(10));
     world.updateFriendlyTeamState(friendly_team);
 
     pass_generator->setPasserRobotId(passer.id());
 
     // We put a few enemies in to force the pass generator to make a decision,
     // otherwise most of the field would be a valid point to pass to
-    Team enemy_team(Duration::fromSeconds(10),
-                    {
-                        Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                              Timestamp::fromSeconds(0)),
-                        Robot(1, {0, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                              Timestamp::fromSeconds(0)),
-                        Robot(2, {2, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                              Timestamp::fromSeconds(0)),
-                    });
+    Team enemy_team(
+        {
+            Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(1, {0, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(2, {2, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+        },
+        Duration::fromSeconds(10));
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);

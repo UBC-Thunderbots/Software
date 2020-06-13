@@ -1,5 +1,7 @@
 #include "software/new_geom/bezier_curve2d.h"
 
+#include <algorithm>
+
 BezierCurve2d::BezierCurve2d(std::vector<Point> control_points)
     : control_points(control_points)
 {
@@ -12,15 +14,8 @@ BezierCurve2d::BezierCurve2d(std::vector<Point> control_points)
 
 const Point BezierCurve2d::getValueAt(double t) const
 {
-    if (t <= 0)
-    {
-        return control_points.front();
-    }
-    if (t >= 1)
-    {
-        return control_points.back();
-    }
-    return deCasteljauAlgorithm(control_points, t);
+    const double clamped_t = std::clamp(t, 0.0, 1.0);
+    return deCasteljauAlgorithm(control_points, clamped_t);
 }
 
 Polynomial2d BezierCurve2d::getPolynomial() const

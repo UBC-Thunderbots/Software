@@ -12,7 +12,7 @@
 TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3_m_per_s)
 {
     // Test where the robot is just sitting on the path the ball is travelling along
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -38,7 +38,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3
 TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_6_m_per_s)
 {
     // This is the max speed the ball should ever be traveling at
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {6, 0}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -65,7 +65,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_p
 {
     // Test where the robot is sitting just off to the side of the path the ball
     // is travelling along
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {1, 0}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 0.2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -91,7 +91,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_chasing_ball)
     // Test where the ball starts ahead of the robot, but moving slowly so that
     // the robot can catch up to it. Both the robot and the ball start at one
     // end of the field moving towards the other end
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 3}, {0, -0.5}, Timestamp::fromSeconds(0));
     Robot robot(0, {0, 4}, {0, -1}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -113,7 +113,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajecto
 {
     // Test where the robot is sitting just off to the side of the path the ball
     // is travelling along
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0.5, 0.5}, {0.5, 0.5}, Timestamp::fromSeconds(0));
     Robot robot(0, {3, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -135,7 +135,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajecto
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
 {
     // Test where the ball is not moving
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({-2, -1}, {0, 0}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -158,7 +158,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
 {
     // Test where the ball is moving very slowly
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({-2, -1}, {0.000001, 0.000001}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -183,7 +183,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_
 {
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(5));
@@ -205,7 +205,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_r
 {
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -227,7 +227,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_t
 {
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(7));
@@ -249,7 +249,7 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_too_fast_to_i
 {
     // Test where we cannot get to the ball before it leaves the field, but if we ignore
     // field boundaries we could eventually catch it
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Ball ball({3, 3}, {1, 1}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));

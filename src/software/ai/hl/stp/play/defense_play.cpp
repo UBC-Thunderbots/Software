@@ -35,7 +35,7 @@ bool DefensePlay::invariantHolds(const World &world) const
            !Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
-void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
+void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     bool enemy_team_can_pass =
         Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
@@ -107,7 +107,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         else
         {
-            auto swarm_ball_tactics = moveRobotsToSwarmEnemyWithBall(move_tactics);
+            auto swarm_ball_tactics = moveRobotsToSwarmEnemyWithBall(move_tactics, world);
             result.insert(result.end(), swarm_ball_tactics.begin(),
                           swarm_ball_tactics.end());
         }
@@ -145,7 +145,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWithBall(
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics)
+    std::vector<std::shared_ptr<MoveTactic>> move_tactics, const World &world)
 {
     auto nearest_enemy_robot =
         Evaluation::nearestRobot(world.enemyTeam(), world.ball().position());

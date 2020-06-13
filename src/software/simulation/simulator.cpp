@@ -3,6 +3,7 @@
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
+
 extern "C"
 {
 #include "firmware/app/world/firmware_ball.h"
@@ -10,16 +11,43 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-Simulator::Simulator(const World& world)
-    : physics_world(world), friendly_goalie_id(world.friendlyTeam().getGoalieID())
+Simulator::Simulator(const Field& field) : physics_world(field) {}
+
+void Simulator::setBallState(const BallState& ball_state)
 {
-    for (auto physics_robot : physics_world.getFriendlyPhysicsRobots())
+    physics_world.setBallState(ball_state);
+    simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
+}
+
+void Simulator::removeBall()
+{
+    simulator_ball.reset();
+    physics_world.removeBall();
+}
+
+void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
+{
+    physics_world.addYellowRobots(robots);
+    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(),
+                          yellow_simulator_robots);
+}
+
+void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
+{
+    physics_world.addBlueRobots(robots);
+    updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots);
+}
+
+void Simulator::updateSimulatorRobots(
+    const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
+    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+        simulator_robots)
+{
+    for (const auto& physics_robot : physics_robots)
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-
-        auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
-        auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
-        // Release ownership of the pointers so the firmware_world can take ownership
+        auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         FirmwareWorld_t* firmware_world_raw =
             app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
         auto firmware_world =
@@ -27,25 +55,23 @@ Simulator::Simulator(const World& world)
 
         simulator_robots.insert(std::make_pair(simulator_robot, firmware_world));
     }
-
-    simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
 }
 
-void Simulator::stepSimulation(const Duration& time_step)
+void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
-    for (auto& iter : simulator_robots)
-    {
-        auto simulator_robot = iter.first;
-        auto firmware_world  = iter.second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
-    }
-
-    physics_world.stepSimulation(time_step);
+    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball);
 }
 
-void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
+void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
+{
+    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball);
+}
+
+void Simulator::setRobotPrimitives(
+    ConstPrimitiveVectorPtr primitives,
+    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+        simulator_robots,
+    const std::shared_ptr<SimulatorBall>& simulator_ball)
 {
     if (!primitives)
     {
@@ -76,17 +102,66 @@ void Simulator::setPrimitives(ConstPrimitiveVectorPtr primitives)
     }
 }
 
-World Simulator::getWorld()
+void Simulator::stepSimulation(const Duration& time_step)
 {
-    World world = physics_world.getWorld();
-    // TODO: This is a hack to persist goalie ID from the initial test setup
-    // It will be removed as part of
-    // https://github.com/UBC-Thunderbots/Software/issues/1353
-    auto id = friendly_goalie_id;
-    if (id)
+    // Set the ball being referenced in each firmware_world.
+    // We only need to do this a single time since all robots
+    // can see and interact with the same ball
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+
+    for (auto& iter : yellow_simulator_robots)
     {
-        world.mutableFriendlyTeam().assignGoalie(*id);
+        auto simulator_robot = iter.first;
+        auto firmware_world  = iter.second;
+        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
     }
+
+    for (auto& iter : blue_simulator_robots)
+    {
+        auto simulator_robot = iter.first;
+        auto firmware_world  = iter.second;
+        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+    }
+
+    physics_world.stepSimulation(time_step);
+}
+
+World Simulator::getWorld() const
+{
+    Timestamp timestamp = physics_world.getTimestamp();
+    // The world currently must contain a ball. The ability to represent no ball
+    // will be fixed in https://github.com/UBC-Thunderbots/Software/issues/1325
+    Ball ball = Ball(Point(0, 0), Vector(0, 0), timestamp);
+    if (physics_world.getBallState())
+    {
+        ball =
+            Ball(TimestampedBallState(physics_world.getBallState().value(), timestamp));
+    }
+
+    // Note: The simulator currently makes the invariant that friendly robots
+    // are yellow robots, and enemies are blue. This will be fixed in
+    // https://github.com/UBC-Thunderbots/Software/issues/1325
+    std::vector<Robot> friendly_team_robots;
+    for (const auto& robot_state : physics_world.getYellowRobotStates())
+    {
+        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
+        Robot robot(robot_state.id, timestamped_robot_state);
+        friendly_team_robots.emplace_back(robot);
+    }
+    std::vector<Robot> enemy_team_robots;
+    for (const auto& robot_state : physics_world.getBlueRobotStates())
+    {
+        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
+        Robot robot(robot_state.id, timestamped_robot_state);
+        enemy_team_robots.emplace_back(robot);
+    }
+
+    Team friendly_team(friendly_team_robots, Duration::fromSeconds(0.5));
+    Team enemy_team(enemy_team_robots, Duration::fromSeconds(0.5));
+
+    World world(physics_world.getField(), ball, friendly_team, enemy_team);
     return world;
 }
 

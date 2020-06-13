@@ -229,13 +229,13 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
     Vector ball_velocity = Vector(0, 0);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::Test::TestUtil::createSSLDivBField();
+    Field field          = ::TestUtil::createSSLDivBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = Evaluation::robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -248,13 +248,13 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
     Vector ball_velocity = Vector(5, 5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::Test::TestUtil::createSSLDivBField();
+    Field field          = ::TestUtil::createSSLDivBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = Evaluation::robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -267,13 +267,13 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast_at_future_timestamp)
     Vector ball_velocity = Vector(5, 5);
     Timestamp timestamp  = Timestamp::fromSeconds(1);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::Test::TestUtil::createSSLDivBField();
+    Field field          = ::TestUtil::createSSLDivBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = Evaluation::robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -286,13 +286,13 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_slow)
     Vector ball_velocity = Vector(0.1, 0.1);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::Test::TestUtil::createSSLDivBField();
+    Field field          = ::TestUtil::createSSLDivBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = Evaluation::robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -305,13 +305,13 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_wrong_way)
     Vector ball_velocity = Vector(-5, -5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::Test::TestUtil::createSSLDivBField();
+    Field field          = ::TestUtil::createSSLDivBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = Evaluation::robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -324,13 +324,13 @@ TEST(RobotEvaluationTest, pass_with_ball_slightly_off)
     Vector ball_velocity = Vector(4, 4.5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::Test::TestUtil::createSSLDivBField();
+    Field field          = ::TestUtil::createSSLDivBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = Evaluation::robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -343,13 +343,13 @@ TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
     Vector ball_velocity = Vector(4, 4.5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::Test::TestUtil::createSSLDivBField();
+    Field field          = ::TestUtil::createSSLDivBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result =
         Evaluation::robotBeingPassedTo(world, robot, Timestamp::fromSeconds(1000));

@@ -38,7 +38,8 @@ bool ShootOrPassPlay::invariantHolds(const World &world) const
             Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
-void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     /**
      * There are two main stages to this Play:
@@ -125,7 +126,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                ->value();
     do
     {
-        updatePassGenerator(pass_generator);
+        updatePassGenerator(pass_generator, world);
 
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
@@ -198,7 +199,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished";
 }
 
-void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
+void ShootOrPassPlay::updatePassGenerator(Passing::PassGenerator &pass_generator,
+                                          const World &world)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());

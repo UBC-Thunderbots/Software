@@ -24,7 +24,7 @@ bool StopPlay::invariantHolds(const World &world) const
     return world.gameState().isStopped();
 }
 
-void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // Robot assignments for the Stop Play
     //  - 1 robot will be the goalie

@@ -6,22 +6,25 @@
 #include "software/new_geom/rectangle.h"
 #include "software/time/timestamp.h"
 
-Field::Field() : Field(0, 0, 0, 0, 0, 0, 0) {}
-
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
-             double defense_y_length, double goal_y_length, double boundary_buffer_size,
-             double center_circle_radius)
+             double defense_y_length, double goal_x_length, double goal_y_length,
+             double boundary_buffer_size, double center_circle_radius)
     : field_x_length_(field_x_length),
       field_y_length_(field_y_length),
       defense_x_length_(defense_x_length),
       defense_y_length_(defense_y_length),
+      goal_x_length_(goal_x_length),
       goal_y_length_(goal_y_length),
-      // While not explicitly given by SSL-Vision, the goals are typically
-      // deep enough to fit a single robot
-      goal_x_length_(ROBOT_MAX_RADIUS_METERS * 2),
       boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius)
 {
+    if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
+        defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||
+        boundary_buffer_size_ < 0 || center_circle_radius_ <= 0)
+    {
+        throw std::invalid_argument(
+            "At least one field dimension is non-positive - Field is invalid");
+    }
 }
 
 double Field::xLength() const
@@ -118,16 +121,6 @@ Rectangle Field::fieldBoundary() const
     Point neg_x_neg_y_corner(-totalXLength() / 2, -totalYLength() / 2);
     Point pos_x_pos_y_corner(totalXLength() / 2, totalYLength() / 2);
     return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
-}
-
-bool Field::isValid() const
-{
-    if (totalXLength() < GeomConstants::FIXED_EPSILON ||
-        totalYLength() < GeomConstants::FIXED_EPSILON)
-    {
-        return false;
-    }
-    return true;
 }
 
 double Field::centerCircleRadius() const
@@ -258,6 +251,7 @@ bool Field::operator==(const Field &other) const
 {
     return this->field_y_length_ == other.field_y_length_ &&
            this->field_x_length_ == other.field_x_length_ &&
+           this->goal_x_length_ == other.goal_x_length_ &&
            this->goal_y_length_ == other.goal_y_length_ &&
            this->defense_y_length_ == other.defense_y_length_ &&
            this->defense_x_length_ == other.defense_x_length_ &&

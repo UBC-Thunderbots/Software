@@ -64,7 +64,6 @@ cc_library(
         ":intersection",
         "//software/new_geom:circle",
         "//software/new_geom:line",
-        "//software/new_geom:point_boost_geometry_compatability",
         "//software/new_geom:polygon",
         "//software/new_geom:ray",
         "//software/new_geom:segment",

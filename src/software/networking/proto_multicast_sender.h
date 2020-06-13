@@ -15,9 +15,8 @@ class ProtoMulticastSender
      * @param io_service The io_service to use to service outgoing SendProto data
      * @param ip_address The ip address of the multicast group to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
-     * example IPv4: 192.168.0.2
-     * example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is usually specified after
-     * %)
+     *  example IPv4: 192.168.0.2
+     *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port to send SendProto data on
      */
     ProtoMulticastSender(boost::asio::io_service& io_service,

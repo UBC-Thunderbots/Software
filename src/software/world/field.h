@@ -35,26 +35,28 @@ typedef enum
 class Field
 {
    public:
-    /**
-     * Default constructs a field with all dimensions set to 0. This default
-     * field will be invalid (ie. isValid() returns false)
-     */
-    explicit Field();
+    Field() = delete;
 
     /**
      * Constructs a new field with the given dimensions
+     *
+     * @pre all dimensions (except for the boundary buffer) must be > 0.
+     * @pre the boundary buffer must be >= 0
+     *
+     * @throws invalid_argument if at least one dimension is <= 0
      *
      * @param field_x_length the length of the playing area (along the x-axis)
      * @param field_y_length the length of the playing area (along the y-axis)
      * @param defense_x_length the length of the defense area (along the x-axis)
      * @param defense_y_length the length of the defense area (along the y-axis)
+     * @param goal_x_length the length of the goal (along the x-axis)
      * @param goal_y_length the length of the goal (along the y-axis)
      * @param boundary_buffer_size the size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      */
     explicit Field(double field_x_length, double field_y_length, double defense_x_length,
-                   double defense_y_length, double goal_y_length,
+                   double defense_y_length, double goal_x_length, double goal_y_length,
                    double boundary_buffer_size, double center_circle_radius);
 
     /**
@@ -163,7 +165,7 @@ class Field
     Rectangle enemyDefenseArea() const;
 
     /**
-     * Gets the friendly half of the field
+     * Gets the friendly half of the field within field lines
      *
      * @return the friendly half of the field
      */
@@ -184,7 +186,7 @@ class Field
     Rectangle friendlyNegativeYQuadrant() const;
 
     /**
-     * Gets the enemy half of the field
+     * Gets the enemy half of the field within field lines
      *
      * @return the enemy half of the field
      */
@@ -220,13 +222,6 @@ class Field
      * @return The area within the field boundary as a rectangle
      */
     Rectangle fieldBoundary() const;
-
-    /**
-     * Returns true if field x and y total lengths are valid, false otherwise
-     *
-     * @return true if field x and y total lengths are valid, false otherwise
-     */
-    bool isValid() const;
 
     /**
      * Gets the position of the centre of the friendly goal.

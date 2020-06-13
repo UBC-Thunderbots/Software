@@ -4,7 +4,14 @@
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
+#include "software/util/make_enum/make_enum.h"
 
+using RobotId = unsigned int;
+
+/**
+ * The possible team colours of SSL robots
+ */
+MAKE_ENUM(TeamColour, YELLOW, BLUE)
 /**
  * This class represents the physical state of a robot
  */
@@ -76,4 +83,13 @@ class RobotState
     Vector velocity_;
     Angle orientation_;
     AngularVelocity angular_velocity_;
+};
+
+/**
+ * A light structure for a robot state with an ID
+ */
+struct RobotStateWithId
+{
+    unsigned int id;
+    RobotState robot_state;
 };
