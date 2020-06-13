@@ -6,6 +6,10 @@ set -e
 # download version 5.6.1 (change the following three variables to change versions)
 CUBE_VERSION="5.6.1"
 CUBE_ZIP_FILENAME="en.stm32cubemx_v5-6-1.zip"
+
+# this link can be found here: https://www.st.com/en/development-tools/stm32cubemx.html
+# use the guest download feature (i.e do NOT log in). ST will send out an email that has
+# a link that doesn't need to be authenticated
 CUBE_LINK="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/01/9e/e3/0c/3d/ff/41/7b/stm32cubemx_v5-6-1/files/stm32cubemx_v5-6-1.zip/jcr:content/translations/en.stm32cubemx_v5-6-1.zip"
 
 CUBEMX_TMP_DIR="/tmp/cubemx"
