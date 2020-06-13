@@ -33,14 +33,13 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
     const double t_constrained = std::clamp(t, 0.0, 1.0);
 
     // TODO: comment here
-    const double t_mapped = t_constrained * static_cast<double>(getNumKnots());
+    const double t_mapped = t_constrained * static_cast<double>(getNumSegments());
 
     // TODO: comment here
     const int segment_index = std::floor(t_mapped);
 
     // TODO: comment here
-    const double t_on_segment = (t_mapped - static_cast<double>(segment_index)) /
-                                static_cast<double>(getNumKnots());
+    const double t_on_segment = (t_mapped - static_cast<double>(segment_index));
 
     // TODO: comment here
     // TODO: better name for this var
@@ -71,6 +70,12 @@ size_t CubicBezierSpline2d::getNumKnots() const
     return static_cast<size_t>((control_points.size() - 1) / 3 + 1);
 }
 
+size_t CubicBezierSpline2d::getNumSegments() const
+{
+    return getNumKnots() - 1;
+}
+
+
 std::vector<double> CubicBezierSpline2d::getKnotVector() const
 {
     // We assume a linear spacing of all the knots from 0 to 1
@@ -78,7 +83,7 @@ std::vector<double> CubicBezierSpline2d::getKnotVector() const
     const double num_knots = getNumKnots();
     for (size_t i = 0; i < num_knots; i++)
     {
-        knot_vector.emplace_back(i * 1.0 / static_cast<double>(num_knots));
+        knot_vector.emplace_back(i * 1.0 / static_cast<double>(num_knots-1));
     }
     return knot_vector;
 }
@@ -102,8 +107,8 @@ const std::vector<SplineSegment2d> CubicBezierSpline2d::getSplineSegments() cons
     for (size_t i = 0; i < num_knots - 1; i++)
     {
         const BezierCurve2d bezier_curve(
-            {control_points[i * 4], control_points[i * 4 + 1], control_points[i * 4 + 2],
-             control_points[i * 4 + 3]});
+            {control_points[i * 3], control_points[i * 3 + 1], control_points[i * 3 + 2],
+             control_points[i * 3 + 3]});
         segments.emplace_back(createSplineSegment2d(0, 1, bezier_curve.getPolynomial()));
     }
     return segments;

@@ -5,8 +5,6 @@
 #include "software/new_geom/bezier_curve2d.h"
 #include "software/test_util/test_util.h"
 
-using namespace Test;
-
 class CubicBezierSplineTest : public ::testing::Test
 {
    protected:
@@ -63,8 +61,10 @@ TEST_F(CubicBezierSplineTest, getValueAt__start_point)
     const Point start_point = test_spline_1.getValueAt(0);
     EXPECT_TRUE(TestUtil::equalWithinTolerance(start_point, Point(1, -1), 1e-9));
 
-    // Check that the tangent at the start is (approximately) what we expected
-    const Point just_after_start_point   = test_spline_1.getValueAt(1e-8);
+    // Check that the tangent at the start is (approximately) what we expected. This
+    // serves to check that we're getting the value for intermediate points correctly
+    // as well.
+    const Point just_after_start_point   = test_spline_1.getValueAt(1e-9);
     const Vector approx_tangent_at_start = just_after_start_point - start_point;
     const Angle tangent_error_angle = approx_tangent_at_start.angleWith(Vector(-3, -4));
 
@@ -77,7 +77,9 @@ TEST_F(CubicBezierSplineTest, getValueAt__end_point)
     const Point end_point = test_spline_1.getValueAt(1);
     EXPECT_TRUE(TestUtil::equalWithinTolerance(end_point, Point(1, -2), 1e-9));
 
-    // Check that the tangent at the end is (approximately) what we expected
+    // Check that the tangent at the end is (approximately) what we expected. This
+    // serves to check that we're getting the value for intermediate points correctly
+    // as well.
     const Point just_before_end_point  = test_spline_1.getValueAt(1 - 1e-9);
     const Vector approx_tangent_at_end = just_before_end_point - end_point;
     const Angle tangent_error_angle    = approx_tangent_at_end.angleWith(Vector(-2, -5));
@@ -121,9 +123,9 @@ TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
         // TODO: fix the variable naming scheme here, very difficult to read
 
         // Check C1 continuity
-        const Point just_before_knot = test_spline_1.getValueAt(knot_input_value - 1e-8);
+        const Point just_before_knot = test_spline_1.getValueAt(knot_input_value - 1e-9);
         const Point knot             = test_spline_1.getValueAt(knot_input_value);
-        const Point just_after_knot  = test_spline_1.getValueAt(knot_input_value - 1e-8);
+        const Point just_after_knot  = test_spline_1.getValueAt(knot_input_value - 1e-9);
 
         const Vector first_derivative_just_before_knot = knot - just_before_knot;
         const Vector first_derivative_just_after_knot  = just_after_knot - knot;
@@ -132,13 +134,13 @@ TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
         // derivative before and after the knot
         const Vector first_derivative_change =
             first_derivative_just_after_knot - first_derivative_just_before_knot;
-        EXPECT_NEAR(first_derivative_change.x(), 0, 1e-9);
-        EXPECT_NEAR(first_derivative_change.y(), 0, 1e-9);
+        EXPECT_NEAR(first_derivative_change.x(), 0, 1e-7);
+        EXPECT_NEAR(first_derivative_change.y(), 0, 1e-7);
 
         const Point just_before_just_before_knot =
-            test_spline_1.getValueAt(knot_input_value - 2 * 1e-8);
+            test_spline_1.getValueAt(knot_input_value - 2 * 1e-9);
         const Point just_after_just_after_knot =
-            test_spline_1.getValueAt(knot_input_value - 2 * 1e-8);
+            test_spline_1.getValueAt(knot_input_value - 2 * 1e-9);
 
         const Vector first_derivative_just_before_just_before_knot =
             just_before_knot - just_before_just_before_knot;
@@ -172,7 +174,7 @@ TEST_F(CubicBezierSplineTest, check_control_points_no_intermediate_knots)
 
 TEST_F(CubicBezierSplineTest, getControlPoints_no_intermediate_knots)
 {
-    CubicBezierSpline2d spline(Point(0, 0), Vector(0, 1), Point(2, 0), Vector(1, 0), {});
+    CubicBezierSpline2d spline(Point(0, 0), Vector(0, 1), Point(2, 0), Vector(0, 1), {});
 
     std::vector<Point> expected_control_points = {Point(0, 0), Point(0, 1), Point(2, 1),
                                                   Point(2, 0)};
@@ -192,14 +194,16 @@ TEST_F(CubicBezierSplineTest, getControlPoints_single_intermediate_knot)
     Vector d2(0.1, -0.1);
     Vector d1 = (p2 - p0 - d2 - d0) / 4.0;
 
-    CubicBezierSpline2d spline(p0, d0, p2, d2, {p1});
+    // We negate d2 here so that we can look at this like it's represented on the
+    // website linked above, since our convention is that the final vector is pointing
+    // back "towards the start" of the spline, rather then "off then end" of it
+    CubicBezierSpline2d spline(p0, d0, p2, -d2, {p1});
 
-    std::vector<Point> expected_control_points = {p0,      p0 + d0, p1 - d1,
+    std::vector<Point> expected_control_points = {p0,      p0 + d0, p1 - d1, p1,
                                                   p1 + d1, p2 - d2, p2};
 
     EXPECT_EQ(expected_control_points, spline.getControlPoints());
 }
-
 
 TEST_F(CubicBezierSplineTest, getSplineSegments_no_intermediate_knots)
 {
@@ -219,35 +223,9 @@ TEST_F(CubicBezierSplineTest, getSplineSegments_no_intermediate_knots)
               spline_segments[0].getPolynomial());
 }
 
-TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot_simple_case)
+TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate)
 {
-    // This spline is symmetric which makes it easy to figure out what our
-    // expected control points for the bezier curve representations of both segments
-    // should be
 
-    const Point p0(0, 0);
-    const Point p1(0, 1);
-    const Point p2(1, 1);
-    const Point p3(1, 0);
-    const Point p4(1, -1);
-    const Point p5(2, -1);
-    const Point p6(2, 0);
-    CubicBezierSpline2d spline(p0, p1 - p0, p6, p5 - p6, {p3});
-
-    auto spline_segments = spline.getSplineSegments();
-
-    ASSERT_EQ(2, spline_segments.size());
-
-    // We expect the spline segments to be bezier curves with the above points as
-    // control points, and symmetric about the intermediate knot
-    EXPECT_EQ(BezierCurve2d({p0, p1, p2, p3}).getPolynomial(),
-              spline_segments[0].getPolynomial());
-    EXPECT_EQ(BezierCurve2d({p3, p4, p5, p6}).getPolynomial(),
-              spline_segments[1].getPolynomial());
-}
-
-TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot_complex_case)
-{
     // TODO: ascii art here? This is effectively the first example from
     //       https://www.ibiblio.org/e-notes/Splines/b-int.html, at least want to
     //       link to this example
@@ -259,18 +237,20 @@ TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot_complex
     Vector d2(0.1, -0.1);
     Vector d1 = (p2 - p0 - d2 - d0) / 4.0;
 
-    CubicBezierSpline2d spline(p0, d0, p2, d2, {p1});
+    // We negate d2 here so that we can look at this like it's represented on the
+    // website linked above, since our convention is that the final vector is pointing
+    // back "towards the start" of the spline, rather then "off then end" of it
+    CubicBezierSpline2d spline(p0, d0, p2, -d2, {p1});
 
-    std::vector<Point> expected_control_points = {p0,      p0 + d0, p1 - d1,
-                                                  p1 + d1, p2 - d2, p2};
-
-    // TODO: rename `getSplineSegments` to just `getSegments`
     auto spline_segments = spline.getSplineSegments();
 
     ASSERT_EQ(2, spline_segments.size());
 
-    EXPECT_EQ(BezierCurve2d({p0, p0 + d0, p1 - d1, p1}).getPolynomial(),
+    // We expect the spline segments to be bezier curves with the above points as
+    // control points, and symmetric about the intermediate knot
+    EXPECT_EQ(BezierCurve2d({p0, p0 + d0, p1- d1, p1}).getPolynomial(),
               spline_segments[0].getPolynomial());
     EXPECT_EQ(BezierCurve2d({p1, p1 + d1, p2 - d2, p2}).getPolynomial(),
               spline_segments[1].getPolynomial());
 }
+
