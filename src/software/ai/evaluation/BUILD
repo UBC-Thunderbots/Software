@@ -148,6 +148,7 @@ cc_library(
     hdrs = ["find_open_areas.h"],
     deps = [
         ":shot",
+        "//software/new_geom/util:find_open_circles",
         "//software/parameter:dynamic_parameters",
         "//software/world",
     ],

@@ -1,4 +1,4 @@
-#include "software/geom/voronoi_diagram.h"
+#include "software/new_geom/util/voronoi_diagram.h"
 
 #include <gtest/gtest.h>
 
