@@ -79,8 +79,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::vector<std::shared_ptr<Tactic>> tactics_to_run = {goalie_tactic};
 
         // Get all enemy threats
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         // Add Freekick shadower tactics
         tactics_to_run.emplace_back(shadow_freekicker_1);

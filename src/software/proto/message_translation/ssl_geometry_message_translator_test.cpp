@@ -1,11 +1,11 @@
-#include "software/proto/message_translation/ssl_message_translator.h"
+#include "software/proto/message_translation/ssl_geometry_message_translator.h"
 
 #include <gtest/gtest.h>
 
 #include "software/sensor_fusion/ssl_protobuf_reader.h"
 #include "software/test_util/test_util.h"
 
-class SSLMessageTranslatorTest : public ::testing::Test
+class SSLGeometryMessageTranslatorTest : public ::testing::Test
 {
    protected:
     ::testing::AssertionResult equalWithinTolerance(const Point& point,
@@ -66,10 +66,10 @@ class SSLMessageTranslatorTest : public ::testing::Test
 
         auto center_eq =
             equalWithinTolerance(circle.getOrigin(), field_arc.center(), tolerance);
-        auto a1_eq = ::Test::TestUtil::equalWithinTolerance(Angle::zero().toRadians(),
-                                                            field_arc.a1(), tolerance);
-        auto a2_eq = ::Test::TestUtil::equalWithinTolerance(Angle::full().toRadians(),
-                                                            field_arc.a2(), tolerance);
+        auto a1_eq = ::TestUtil::equalWithinTolerance(Angle::zero().toRadians(),
+                                                      field_arc.a1(), tolerance);
+        auto a2_eq = ::TestUtil::equalWithinTolerance(Angle::full().toRadians(),
+                                                      field_arc.a2(), tolerance);
         if (!center_eq || !a1_eq || !a2_eq)
         {
             result = ::testing::AssertionFailure();
@@ -99,14 +99,14 @@ class SSLMessageTranslatorTest : public ::testing::Test
     const float tolerance = 1e-6;
 };
 
-TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_no_segments)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_line_segment_with_no_segments)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
     auto result = findLineSegment(segments, SSLFieldLines::LEFT_PENALTY_STRETCH);
     EXPECT_FALSE(result);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_nonexistent_name)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_line_segment_with_nonexistent_name)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
 
@@ -127,7 +127,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_nonexistent_name)
     EXPECT_FALSE(result);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_valid_name)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_line_segment_with_valid_name)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
 
@@ -162,7 +162,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_valid_name)
     EXPECT_EQ("BottomTouchLine", result->name());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
 
@@ -200,14 +200,14 @@ TEST_F(SSLMessageTranslatorTest, test_find_line_segment_with_duplicate_names)
     EXPECT_FLOAT_EQ(2.0, result->p1().y());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_no_arcs)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_circular_arc_with_no_arcs)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
     auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     EXPECT_FALSE(result);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_nonexistent_name)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_circular_arc_with_nonexistent_name)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
 
@@ -227,7 +227,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_nonexistent_name)
     EXPECT_FALSE(result);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_valid_name)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_circular_arc_with_valid_name)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
 
@@ -260,7 +260,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_valid_name)
     EXPECT_EQ("CenterCircle", result->name());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_duplicate_names)
+TEST_F(SSLGeometryMessageTranslatorTest, test_find_circular_arc_with_duplicate_names)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
 
@@ -297,7 +297,7 @@ TEST_F(SSLMessageTranslatorTest, test_find_circular_arc_with_duplicate_names)
     EXPECT_FLOAT_EQ(0.5, result->radius());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_vector_2f_message)
+TEST_F(SSLGeometryMessageTranslatorTest, test_create_vector_2f_message)
 {
     Point point(-1.5, 6);
     auto vector_msg = createVector2f(point);
@@ -305,7 +305,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_vector_2f_message)
     EXPECT_TRUE(equalWithinTolerance(point, *vector_msg, tolerance));
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_valid_values)
+TEST_F(SSLGeometryMessageTranslatorTest, test_create_field_line_segment_with_valid_values)
 {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
     const float thickness         = 0.005f;
@@ -323,7 +323,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_valid_value
     EXPECT_EQ(SSL_FieldShapeType::CenterLine, field_line_msg->type());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_field_line_segment_with_negative_thickness)
 {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
     const float thickness         = -0.005f;
@@ -334,7 +335,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_line_segment_with_negative_th
                  std::invalid_argument);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_valid_values)
+TEST_F(SSLGeometryMessageTranslatorTest, test_create_field_circular_arc_with_valid_values)
 {
     const Circle circle(Point(0.0, 0.5), 3);
     const float thickness          = 0.005f;
@@ -353,7 +354,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_valid_value
     EXPECT_EQ(SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_field_circular_arc_with_negative_thickness)
 {
     const Circle circle(Point(0.0, 0.5), 3);
     const float thickness          = -0.005f;
@@ -364,7 +366,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_field_circular_arc_with_negative_th
                  std::invalid_argument);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_values)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_geometry_field_size_with_valid_values)
 {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = 0.005f;
@@ -559,7 +562,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_valid_valu
     EXPECT_EQ(SSL_FieldShapeType::CenterCircle, center_circle->type());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_geometry_field_size_with_negative_thickness)
 {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = -0.005f;
@@ -567,7 +571,7 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_field_size_with_negative_t
     EXPECT_THROW(createGeometryFieldSize(field, thickness), std::invalid_argument);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_valid_values)
+TEST_F(SSLGeometryMessageTranslatorTest, test_create_geometry_data_with_valid_values)
 {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = 0.005f;
@@ -592,7 +596,8 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_valid_values)
     EXPECT_EQ(1000, field_size.penalty_area_depth());
 }
 
-TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_negative_thickness)
+TEST_F(SSLGeometryMessageTranslatorTest,
+       test_create_geometry_data_with_negative_thickness)
 {
     Field field(9, 6, 1, 2, 0.2, 1, 0.3, 0.5);
     const float thickness = -0.005f;
@@ -600,9 +605,9 @@ TEST_F(SSLMessageTranslatorTest, test_create_geometry_data_with_negative_thickne
     EXPECT_THROW(createGeometryData(field, thickness), std::invalid_argument);
 }
 
-TEST_F(SSLMessageTranslatorTest, test_convert_field_to_proto_and_back)
+TEST_F(SSLGeometryMessageTranslatorTest, test_convert_field_to_proto_and_back)
 {
-    Field field           = ::Test::TestUtil::createSSLDivBField();
+    Field field           = ::TestUtil::createSSLDivBField();
     const float thickness = 0.005f;
 
     auto field_proto = createGeometryData(field, thickness);

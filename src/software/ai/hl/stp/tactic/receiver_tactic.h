@@ -3,9 +3,9 @@
  */
 #pragma once
 
+#include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
-#include "software/geom/shot.h"
 #include "software/new_geom/ray.h"
 
 /**

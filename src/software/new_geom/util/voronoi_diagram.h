@@ -21,7 +21,7 @@ namespace boost::polygon
 class VoronoiDiagram
 {
    public:
-    explicit VoronoiDiagram(std::vector<Point> points);
+    explicit VoronoiDiagram(const std::vector<Point> &points);
 
     VoronoiDiagram() = delete;
 
@@ -38,7 +38,7 @@ class VoronoiDiagram
      * @param bounding_box The bounding rectangle
      * @return
      */
-    std::vector<Point> findVoronoiEdgeRecIntersects(Rectangle bounding_box);
+    std::vector<Point> findVoronoiEdgeRecIntersects(const Rectangle &bounding_box);
 
     /**
      * Find the set of open circles whose origin lies within the given rectangle, and that

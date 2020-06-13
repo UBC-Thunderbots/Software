@@ -14,9 +14,9 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    Evaluation::EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
-    Field field        = ::Test::TestUtil::createSSLDivBField();
+    EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
+                             std::nullopt, 0,     std::nullopt};
+    Field field        = ::TestUtil::createSSLDivBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -47,9 +47,9 @@ TEST(DefenseShadowEnemyTacticTest,
     Robot friendly_robot(0, Point(-1, -1), Vector(0, 0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    Evaluation::EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
-    Field field        = ::Test::TestUtil::createSSLDivBField();
+    EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
+                             std::nullopt, 0,     std::nullopt};
+    Field field        = ::TestUtil::createSSLDivBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
@@ -84,9 +84,9 @@ TEST(
     Robot friendly_robot(0, Point(-1, -1), Vector(0, 0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    Evaluation::EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
-    Field field        = ::Test::TestUtil::createSSLDivBField();
+    EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
+                             std::nullopt, 0,     std::nullopt};
+    Field field        = ::TestUtil::createSSLDivBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),

@@ -27,7 +27,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 
     Ball ball({1, 1}, {0, 0}, Timestamp::fromSeconds(0));
 
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
@@ -61,7 +61,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
 
     Ball ball({1, 1}, {0, 0}, Timestamp::fromSeconds(0));
 
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
@@ -105,7 +105,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
 
     Ball ball({1, -3}, {-1, 3}, Timestamp::fromSeconds(5));
 
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
@@ -150,8 +150,8 @@ TEST(ReceiverTacticTest,
 
     Ball ball({-1, -1}, {1, 1}, Timestamp::fromSeconds(5));
 
-    ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
-                          enemy_team, pass, ball, false);
+    ReceiverTactic tactic(::TestUtil::createSSLDivBField(), friendly_team, enemy_team,
+                          pass, ball, false);
 
     tactic.updateRobot(receiver);
 
@@ -195,8 +195,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
 
     Ball ball({0.5, 0.5}, {-0.5, -0.5}, Timestamp::fromSeconds(5));
 
-    ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
-                          enemy_team, pass, ball, false);
+    ReceiverTactic tactic(::TestUtil::createSSLDivBField(), friendly_team, enemy_team,
+                          pass, ball, false);
 
     tactic.updateRobot(receiver);
 
@@ -232,8 +232,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     // Ball is travelling towards the robot
     Ball ball({-0.5, 0.5}, {-1, 1}, Timestamp::fromSeconds(5));
 
-    ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
-                          enemy_team, pass, ball, false);
+    ReceiverTactic tactic(::TestUtil::createSSLDivBField(), friendly_team, enemy_team,
+                          pass, ball, false);
 
     tactic.updateRobot(receiver);
 
@@ -271,8 +271,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
     // The ball is travelling away from the origin towards the enemy net
     Ball ball({1, 0}, {4, 0}, Timestamp::fromSeconds(5));
 
-    ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
-                          enemy_team, pass, ball, false);
+    ReceiverTactic tactic(::TestUtil::createSSLDivBField(), friendly_team, enemy_team,
+                          pass, ball, false);
 
     tactic.updateRobot(receiver);
 

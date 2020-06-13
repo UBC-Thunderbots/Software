@@ -25,14 +25,14 @@ std::string ShootOrPassPlay::getName() const
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+           teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
-            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
+           (!teamHasPossession(world, world.enemyTeam()) ||
+            teamPassInProgress(world, world.friendlyTeam()));
 }
 
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,

@@ -61,7 +61,7 @@ class PassGeneratorTest : public testing::Test
         EXPECT_LE(std::abs(curr_score - prev_score), min_score_diff);
     }
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     std::shared_ptr<PassGenerator> pass_generator;
 };
 

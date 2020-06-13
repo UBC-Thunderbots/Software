@@ -1,7 +1,3 @@
-/**
- * Declaration of evaluation functions for passing
- */
-
 #pragma once
 
 #include <functional>
