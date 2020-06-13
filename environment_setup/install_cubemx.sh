@@ -63,6 +63,6 @@ else
 
     echo "================================================================"
     echo "Done Installing CubeMX to $CUBEMX_INSTALL_DIR"
-    echo "NOTE: if you are upgrading vesions, can delete old version in the /opt dir"
+    echo "NOTE: if you are upgrading versions, you can delete older versions in the /opt directory"
     echo "================================================================"
 fi
