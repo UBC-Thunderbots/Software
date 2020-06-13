@@ -66,10 +66,10 @@ class SSLGeometryMessageTranslatorTest : public ::testing::Test
 
         auto center_eq =
             equalWithinTolerance(circle.getOrigin(), field_arc.center(), tolerance);
-        auto a1_eq = ::Test::TestUtil::equalWithinTolerance(Angle::zero().toRadians(),
-                                                            field_arc.a1(), tolerance);
-        auto a2_eq = ::Test::TestUtil::equalWithinTolerance(Angle::full().toRadians(),
-                                                            field_arc.a2(), tolerance);
+        auto a1_eq = ::TestUtil::equalWithinTolerance(Angle::zero().toRadians(),
+                                                      field_arc.a1(), tolerance);
+        auto a2_eq = ::TestUtil::equalWithinTolerance(Angle::full().toRadians(),
+                                                      field_arc.a2(), tolerance);
         if (!center_eq || !a1_eq || !a2_eq)
         {
             result = ::testing::AssertionFailure();
@@ -607,7 +607,7 @@ TEST_F(SSLGeometryMessageTranslatorTest,
 
 TEST_F(SSLGeometryMessageTranslatorTest, test_convert_field_to_proto_and_back)
 {
-    Field field           = ::Test::TestUtil::createSSLDivBField();
+    Field field           = ::TestUtil::createSSLDivBField();
     const float thickness = 0.005f;
 
     auto field_proto = createGeometryData(field, thickness);

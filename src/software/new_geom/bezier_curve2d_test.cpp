@@ -4,8 +4,6 @@
 
 #include "software/test_util/test_util.h"
 
-using namespace Test;
-
 TEST(BezierCurve2dTest, contstruct_with_less_then_two_control_points)
 {
     std::vector<Point> points = {Point(0, 0)};
