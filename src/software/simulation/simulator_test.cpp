@@ -8,7 +8,7 @@
 
 TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
@@ -25,7 +25,7 @@ TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 
 TEST(SimulatorTest, set_ball_state_when_ball_already_exists)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
@@ -45,7 +45,7 @@ TEST(SimulatorTest, set_ball_state_when_ball_already_exists)
 
 TEST(SimulatorTest, remove_ball_when_no_ball_exists)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     simulator.removeBall();
 
@@ -58,7 +58,7 @@ TEST(SimulatorTest, remove_ball_when_no_ball_exists)
 
 TEST(SimulatorTest, remove_ball_when_the_ball_already_exists)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
@@ -73,7 +73,7 @@ TEST(SimulatorTest, remove_ball_when_the_ball_already_exists)
 
 TEST(SimualtorTest, add_zero_yellow_robots)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     simulator.addYellowRobots({});
 
@@ -86,7 +86,7 @@ TEST(SimualtorTest, add_zero_yellow_robots)
 
 TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -110,7 +110,7 @@ TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
 
 TEST(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -126,7 +126,7 @@ TEST(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 
 TEST(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulation)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -147,7 +147,7 @@ TEST(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulat
 
 TEST(SimualtorTest, add_zero_blue_robots)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     simulator.addBlueRobots({});
 
@@ -160,7 +160,7 @@ TEST(SimualtorTest, add_zero_blue_robots)
 
 TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -184,7 +184,7 @@ TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
 
 TEST(SimulatorTest, add_blue_robots_with_duplicate_ids)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -200,7 +200,7 @@ TEST(SimulatorTest, add_blue_robots_with_duplicate_ids)
 
 TEST(SimulatorTest, add_blue_robots_with_ids_that_already_exist_in_the_simulation)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -224,7 +224,7 @@ TEST(SimulatorTest, simulation_step_updates_the_ball)
     // A sanity test to make sure stepping the simulation actually updates
     // the state of the world
 
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
     simulator.setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
 
     simulator.stepSimulation(Duration::fromSeconds(0.1));
@@ -241,7 +241,7 @@ TEST(SimulatorTest, simulation_step_updates_the_ball)
 
 TEST(SimulatorTest, simulate_yellow_robots_with_no_primitives)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -273,7 +273,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -308,7 +308,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
 
 TEST(SimulatorTest, simulate_blue_robots_with_no_primitives)
 {
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -340,7 +340,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -381,7 +381,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     // unlikely to be significantly changed or removed, and its behaviour is easy to
     // validate
 
-    Simulator simulator(::Test::TestUtil::createSSLDivBField());
+    Simulator simulator(::TestUtil::createSSLDivBField());
 
     RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero());
@@ -458,7 +458,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(yellow_robot_1, yellow_robots.end());
     EXPECT_NEAR(1000.0f, yellow_robot_1->x(), 200);
     EXPECT_NEAR(1000.0f, yellow_robot_1->y(), 200);
-    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(yellow_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
@@ -468,7 +468,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(yellow_robot_2, yellow_robots.end());
     EXPECT_NEAR(3000.0f, yellow_robot_2->x(), 200);
     EXPECT_NEAR(-2000.0f, yellow_robot_2->y(), 200);
-    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(yellow_robot_2->orientation()),
         Angle::fromDegrees(10)));
 
@@ -479,7 +479,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(blue_robot_1, blue_robots.end());
     EXPECT_NEAR(-1000.0f, blue_robot_1->x(), 300);
     EXPECT_NEAR(-1000.0f, blue_robot_1->y(), 300);
-    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(blue_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
@@ -489,7 +489,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(blue_robot_2, blue_robots.end());
     EXPECT_NEAR(-3000.0f, blue_robot_2->x(), 300);
     EXPECT_NEAR(0.0f, blue_robot_2->y(), 300);
-    EXPECT_TRUE(::Test::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
         Angle::half(), Angle::fromRadians(blue_robot_2->orientation()),
         Angle::fromDegrees(10)));
 }
