@@ -46,7 +46,7 @@ TEST(StopTacticTest, robot_stopping_while_already_stopped)
 
 TEST(StopTacticTest, test_calculate_robot_cost)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));

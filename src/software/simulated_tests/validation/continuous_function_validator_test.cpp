@@ -13,7 +13,7 @@ TEST(ContinuousFunctionValidatorTest,
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {};
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world           = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     world->mutableBall() = Ball(Point(-0.1, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     ContinuousFunctionValidator function_validator(validation_function, world);
 
@@ -45,7 +45,7 @@ TEST(ContinuousFunctionValidatorTest,
         return;
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     ContinuousFunctionValidator function_validator(validation_function, world);
 
     world->mutableBall() = Ball(Point(-2, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -105,7 +105,7 @@ TEST(ContinuousFunctionValidatorTest,
         throw std::runtime_error("coroutine reached end of yield statements");
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     ContinuousFunctionValidator function_validator(validation_function, world);
 
     function_validator.executeAndCheckForFailures();

@@ -224,7 +224,7 @@ class GameStatePredicateTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        allRefboxGameStates = ::Test::TestUtil::getAllRefboxGameStates();
+        allRefboxGameStates = ::TestUtil::getAllRefboxGameStates();
     }
     std::vector<RefboxGameState> allRefboxGameStates;
 };
