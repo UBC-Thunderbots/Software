@@ -46,3 +46,17 @@ cc_library(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":allegro_a3931_motor_driver"],
 )
+
+cc_library(
+    name = "ai_communicator",
+    srcs = ["ai_communicator.c"],
+    hdrs = ["ai_communicator.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware_new/boards/frankie_v1:hal",
+        "//firmware_new/boards/frankie_v1:lwip",
+        "//shared:constants",
+        "//shared/proto:tbots_c_proto",
+        "@com_github_nanopb_nanopb//:nanopb",
+    ],
+)

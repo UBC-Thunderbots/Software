@@ -26,6 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "firmware_new/boards/frankie_v1/io/ai_communicator.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 
 /* USER CODE END Includes */
@@ -55,9 +56,14 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
+typedef StaticTask_t osStaticThreadDef_t;
 osThreadId_t defaultTaskHandle;
-/* USER CODE BEGIN PV */
+osThreadId_t networkingTaskHandle;
+uint32_t sendRobotMsgBuffer[1024];
+osStaticThreadDef_t sendRobotMsgControlBlock;
 
+/* USER CODE BEGIN PV */
+AICommunicator_t *ai_communicator;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,6 +75,7 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM4_Init(void);
 void StartDefaultTask(void *argument);
+extern void io_ai_communicator_taskHandler(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -134,7 +141,7 @@ void initIoDrivetrain(void)
 
 void initIoAICommunicator()
 {
-    io_ai_communicator_init(
+    /*io_ai_communicator_init(*/
 }
 
 /* USER CODE END 0 */
@@ -211,6 +218,18 @@ int main(void)
         .priority   = (osPriority_t)osPriorityNormal,
         .stack_size = 1024};
     defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+    /* definition and creation of networkingTask */
+    const osThreadAttr_t networkingTask_attributes = {
+        .name       = "networkingTask",
+        .stack_mem  = &sendRobotMsgBuffer[0],
+        .stack_size = sizeof(sendRobotMsgBuffer),
+        .cb_mem     = &sendRobotMsgControlBlock,
+        .cb_size    = sizeof(sendRobotMsgControlBlock),
+        .priority   = (osPriority_t)osPriorityHigh7,
+    };
+    networkingTaskHandle = osThreadNew(io_ai_communicator_networkingTaskHandler,
+                                       "ai_communicator", &networkingTask_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */

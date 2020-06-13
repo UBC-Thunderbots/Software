@@ -104,3 +104,6 @@ const unsigned PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
 const unsigned ROBOT_STATUS_PORT = 42071;
+
+// maximum transfer unit size in bytes
+const unsigned MAXIMUM_TRANSFER_UNIT_BYTES = 9000;

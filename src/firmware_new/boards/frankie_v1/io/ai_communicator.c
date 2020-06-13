@@ -2,9 +2,19 @@
 
 #include <stdlib.h>
 
+#include "lwip/api.h"
+#include "lwip/inet.h"
+#include "lwip/ip_addr.h"
+#include "lwip/memp.h"
+#include "lwip/opt.h"
+#include "lwip/pbuf.h"
+#include "lwip/sys.h"
+#include "lwip/tcp.h"
+#include "lwip/udp.h"
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+#include "shared/constants.h"
 
 typedef struct AICommunicator
 {
@@ -24,7 +34,7 @@ typedef struct AICommunicator
     vision_callback_t vision_callback;
 
     // buffers
-    uint8_t protobuf_send_buffer[MAXIMUM_TRANSFER_UNIT_BYTES];
+    uint8_t protobuf_send_buffer;
     struct netbuf* tx_buf;
     struct netbuf* rx_buf;
 
@@ -38,6 +48,9 @@ AICommunicator_t* io_ai_communicator_create(const char* multicast_address,
 {
     AICommunicator_t* ai_communicator =
         (AICommunicator_t*)malloc(sizeof(AICommunicator_t));
+
+    ai_communicator->protobuf_send_buffer =
+        (uint8_t*)malloc(sizeof(uint8_t) * MAXIMUM_TRANSFER_UNIT_BYTES);
 
     // store the multicast address in the correct format
     ip_addr_t* multicast_address_ptr = (ip_addr_t*)malloc(sizeof(ip_addr_t));
@@ -55,15 +68,15 @@ AICommunicator_t* io_ai_communicator_create(const char* multicast_address,
     netconn_bind(robot_status_multicast_conn, multicast_address_ptr, robot_status_port);
 
     // join multicast groups
-    netconn_join_leave_group(primitive_multicast_conn, multicast_address, NULL,
+    netconn_join_leave_group(primitive_multicast_conn, multicast_address_ptr, NULL,
                              NETCONN_JOIN);
-    netconn_join_leave_group(vision_multicast_conn, multicast_address, NULL,
+    netconn_join_leave_group(vision_multicast_conn, multicast_address_ptr, NULL,
                              NETCONN_JOIN);
-    netconn_join_leave_group(robot_status_multicast_conn, multicast_address, NULL,
+    netconn_join_leave_group(robot_status_multicast_conn, multicast_address_ptr, NULL,
                              NETCONN_JOIN);
 
     // store
-    ai_communicator->multicast_address           = multicast_address;
+    ai_communicator->multicast_address           = multicast_address_ptr;
     ai_communicator->primitive_multicast_conn    = primitive_multicast_conn;
     ai_communicator->vision_multicast_conn       = vision_multicast_conn;
     ai_communicator->robot_status_multicast_conn = robot_status_multicast_conn;
@@ -80,11 +93,11 @@ void io_ai_communicator_destroy(AICommunicator_t* io_ai_communicator)
 {
     // leave multicast groups
     netconn_join_leave_group(io_ai_communicator->primitive_multicast_conn,
-                             multicast_address, NULL, NETCONN_LEAVE);
-    netconn_join_leave_group(io_ai_communicator->vision_multicast_conn, multicast_address,
-                             NULL, NETCONN_LEAVE);
+                             io_ai_communicator->multicast_address, NULL, NETCONN_LEAVE);
+    netconn_join_leave_group(io_ai_communicator->vision_multicast_conn,
+                             io_ai_communicator->multicast_address, NULL, NETCONN_LEAVE);
     netconn_join_leave_group(io_ai_communicator->robot_status_multicast_conn,
-                             multicast_address, NULL, NETCONN_LEAVE);
+                             io_ai_communicator->multicast_address, NULL, NETCONN_LEAVE);
 
     // delete all netconns
     netconn_delete(io_ai_communicator->primitive_multicast_conn);
@@ -96,22 +109,32 @@ void io_ai_communicator_destroy(AICommunicator_t* io_ai_communicator)
 }
 
 void io_ai_communicator_sendTbotsRobotMsg(AICommunicator_t* io_ai_communicator,
-                                         TbotsRobotMsg& robot_msg)
+                                          TbotsRobotMsg robot_msg)
 {
-    tx_buf = netbuf_new();
+    io_ai_communicator->tx_buf = netbuf_new();
 
     // TODO make sure sizeof(status) works
-    netbuf_alloc(tx_buf, sizeof(robot_msg));
+    netbuf_alloc(io_ai_communicator->tx_buf, sizeof(robot_msg));
 
     // serialize proto
-    pb_ostream_t stream = pb_ostream_from_buffer(protobuf_send_buffer, MAXIMUM_TRANSFER_UNIT_BYTES);
-    pb_encode(&stream, TbotsRobotMsg_fields, &ack);
+    pb_ostream_t stream = pb_ostream_from_buffer(io_ai_communicator->protobuf_send_buffer,
+                                                 MAXIMUM_TRANSFER_UNIT_BYTES);
+    /*pb_encode(&stream, TbotsRobotMsg_fields, &ack);*/
 
-    tx_buf->p->payload = buffer;
+    io_ai_communicator->tx_buf->p->payload = io_ai_communicator->protobuf_send_buffer;
 
     // send robot status
     netconn_sendto(io_ai_communicator->robot_status_port, io_ai_communicator->tx_buf,
-                   io_ai_communicator->multicast_address io_ai_communicator->send_port);
+                   io_ai_communicator->multicast_address,
+                   io_ai_communicator->robot_status_port);
 
-    netbuf_delete(tx_buf);
+    netbuf_delete(io_ai_communicator->tx_buf);
+}
+
+void io_ai_communicator_networkingTaskHandler(void* parameters)
+{
+    for (;;)
+    {
+        // TODO TASK HANDLING
+    }
 }

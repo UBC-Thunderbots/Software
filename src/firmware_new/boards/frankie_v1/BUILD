@@ -24,6 +24,7 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":frankie_v1_main_lib",
+        "//firmware_new/boards/frankie_v1/io:ai_communicator",
         "//firmware_new/boards/frankie_v1/io:drivetrain",
         "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
@@ -57,11 +58,6 @@ cc_library(
     # interrupt handling code, which *will not* cause an error, and *will* cause
     # interrupts to stop working
     alwayslink = True,
-)
-
-cc_library(
-    name = "constants",
-    hdrs = ["constants.h"],
 )
 
 stm32h7_hal_library_files_genrule("hal_library_files")
