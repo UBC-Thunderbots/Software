@@ -26,8 +26,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/ai_communicator.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication.h"
 
 /* USER CODE END Includes */
 
@@ -56,13 +56,8 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-typedef StaticTask_t osStaticThreadDef_t;
 osThreadId_t defaultTaskHandle;
-osThreadId_t networkingTaskHandle;
-uint32_t sendRobotMsgBuffer[1024];
-osStaticThreadDef_t sendRobotMsgControlBlock;
 /* USER CODE BEGIN PV */
-AICommunicator_t *ai_communicator;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -74,13 +69,12 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM4_Init(void);
 void StartDefaultTask(void *argument);
-extern void io_ai_communicator_networkingTaskHandler(void *argument);
 
 /* USER CODE BEGIN PFP */
 
 static void initIoLayer(void);
 static void initIoDrivetrain(void);
-static void initIoAICommunicator(void);
+static void initIoNetworking(void);
 
 /* USER CODE END PFP */
 
@@ -90,9 +84,8 @@ static void initIoAICommunicator(void);
 static void initIoLayer(void)
 {
     initIoDrivetrain();
-    initIoAICommunicator();
+    initIoNetworking();
 }
-
 
 void initIoDrivetrain(void)
 {
@@ -139,9 +132,9 @@ void initIoDrivetrain(void)
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
-void initIoAICommunicator()
+void initIoNetworking()
 {
-    /*io_ai_communicator_init(*/
+    // TODO create profiles here
 }
 
 /* USER CODE END 0 */
@@ -219,20 +212,8 @@ int main(void)
         .stack_size = 1024};
     defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-    /* definition and creation of networkingTask */
-    const osThreadAttr_t networkingTask_attributes = {
-        .name       = "networkingTask",
-        .stack_mem  = &sendRobotMsgBuffer[0],
-        .stack_size = sizeof(sendRobotMsgBuffer),
-        .cb_mem     = &sendRobotMsgControlBlock,
-        .cb_size    = sizeof(sendRobotMsgControlBlock),
-        .priority   = (osPriority_t)osPriorityHigh7,
-    };
-    networkingTaskHandle = osThreadNew(io_ai_communicator_networkingTaskHandler, NULL,
-                                       &networkingTask_attributes);
-
     /* USER CODE BEGIN RTOS_THREADS */
-    /* add threads, ... */
+
     /* USER CODE END RTOS_THREADS */
 
     /* Start scheduler */

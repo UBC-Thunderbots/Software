@@ -48,9 +48,9 @@ cc_library(
 )
 
 cc_library(
-    name = "ai_communicator",
-    srcs = ["ai_communicator.c"],
-    hdrs = ["ai_communicator.h"],
+    name = "proto_multicast_communication",
+    srcs = ["proto_multicast_communication.c"],
+    hdrs = ["proto_multicast_communication.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         "//firmware_new/boards/frankie_v1:hal",

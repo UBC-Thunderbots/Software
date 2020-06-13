@@ -18,80 +18,89 @@
 
 typedef struct ProtoMulticastConnectionProfile
 {
-    // the multicast group to join and the port to bind to
     ip_addr_t* multicast_address;
     uint16_t port;
-
-    // nanopb generates an array containing the order of the
-    // fields in the protobuf, that the pb_encode/pb_decode
-    // functions need to understand the connects of the msg
-    const pb_field_t[] message_fields;
-
-    // the maximum known size of the protobuf. if the
-    // maaximum size is undeterminable (i.e repated fields)
-    // this value should be set to MAXIMUM_TRANSFER_UNIT of the network packet
+    const pb_field_t* message_fields;
     uint16_t message_max_size;
 
 } ProtoMulticastConnectionProfile_t;
 
-
 typedef struct ProtoMulticastSenderProfile
 {
-    ProtoMulticastConnectionProfile_t connection_profile;
-
+    ProtoMulticastConnectionProfile_t* connection_profile;
     const void* protobuf_struct;
-
     uint16_t sending_rate_hertz;
 
 } ProtoMulticastSenderProfile_t;
 
 typedef struct ProtoMulticastListenerProfile
 {
-    ProtoMulticastConnectionProfile_t connection_profile;
-
+    ProtoMulticastConnectionProfile_t* connection_profile;
     const void* protobuf_struct;
+    uint16_t timeout_milliseconds;
+    void (*timeout_callback)(void);
 
-    uint16_t timeout_period_seconds;
-    void (*timeout_callback)(void):
-    
 } ProtoMulticastListenerProfile_t;
 
-ProtoMulticastCommunicationProfile_t* io_proto_multicast_profile_create(
+ProtoMulticastConnectionProfile_t* io_proto_multicast_connection_profile_create(
     const char* multicast_address, uint16_t port, const void* protobuf_struct,
-    const pb_field_t[] message_fields, uint16_t message_max_size)
+    const pb_field_t* message_fields, uint16_t message_max_size)
 {
-    ProtoMulticastCommunicationProfile_t* connection_profile =
-        (ProtoMulticastCommunicationProfile_t*)malloc(
-            sizeof(ProtoMulticastCommunicationProfile_t));
+    ProtoMulticastConnectionProfile_t* connection_profile =
+        (ProtoMulticastConnectionProfile_t*)malloc(
+            sizeof(ProtoMulticastConnectionProfile_t));
 
     connection_profile->multicast_address = (ip_addr_t*)malloc(sizeof(ip_addr_t));
     ip6addr_aton(multicast_address, multicast_address);
 
     connection_profile->port             = port;
-    connection_profile->protobuf_struct  = protobuf_struct;
     connection_profile->message_fields   = message_fields;
     connection_profile->message_max_size = message_max_size;
 }
 
 ProtoMulticastListenerProfile_t* io_proto_multicast_listener_profile_create(
     const char* multicast_address, uint16_t port, const void* protobuf_struct,
-    const pb_field_t[] message_fields, uint16_t message_max_size,
-    uint16_t timeout_millisecoonds, void (*timeout_callback)(void))
+    const pb_field_t* message_fields, uint16_t message_max_size,
+    uint16_t timeout_milliseconds, void (*timeout_callback)(void))
 {
+    ProtoMulticastListenerProfile_t* listener_profile =
+        (ProtoMulticastListenerProfile_t*)malloc(sizeof(ProtoMulticastListenerProfile_t));
 
+    listener_profile->connection_profile = io_proto_multicast_connection_profile_create(
+        multicast_address, port, protobuf_struct, message_fields, message_max_size);
 
+    listener_profile->protobuf_struct      = protobuf_struct;
+    listener_profile->timeout_milliseconds = timeout_milliseconds;
+    listener_profile->timeout_callback     = timeout_callback;
 }
 
-void io_proto_multicast_sender_profile_destroy(
-    ProtoMulticastCommunicationProfile_t* connection_profile)
+ProtoMulticastSenderProfile_t* io_proto_multicast_sender_profile_create(
+    const char* multicast_address, uint16_t port, const void* protobuf_struct,
+    const pb_field_t* message_fields, uint16_t message_max_size,
+    uint16_t sending_rate_hertz)
 {
-    free(connection_profile->multicast_address);
-    free(connection_profile);
+    ProtoMulticastSenderProfile_t* sender_profile =
+        (ProtoMulticastSenderProfile_t*)malloc(sizeof(ProtoMulticastSenderProfile_t));
+
+    sender_profile->connection_profile = io_proto_multicast_connection_profile_create(
+        multicast_address, port, protobuf_struct, message_fields, message_max_size);
+
+    sender_profile->protobuf_struct    = protobuf_struct;
+    sender_profile->sending_rate_hertz = sending_rate_hertz;
 }
 
 void io_proto_multicast_listener_profile_destroy(
-    ProtoMulticastCommunicationProfile_t* connection_profile)
+    ProtoMulticastListenerProfile_t* listener_profile)
 {
-    free(connection_profile->multicast_address);
-    free(connection_profile);
+    free(listener_profile->connection_profile->multicast_address);
+    free(listener_profile->connection_profile);
+    free(listener_profile);
+}
+
+void io_proto_multicast_sender_profile_destroy(
+    ProtoMulticastSenderProfile_t* sender_profile)
+{
+    free(sender_profile->connection_profile->multicast_address);
+    free(sender_profile->connection_profile);
+    free(sender_profile);
 }

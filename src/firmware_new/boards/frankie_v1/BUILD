@@ -24,10 +24,10 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":frankie_v1_main_lib",
-        "//firmware_new/boards/frankie_v1/io:ai_communicator",
         "//firmware_new/boards/frankie_v1/io:drivetrain",
         "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
+        "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
     ],
 )
