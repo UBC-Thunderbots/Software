@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/new_geom/bezier_curve2d.h"
-#include "software/new_geom/ray.h"
 #include "software/new_geom/spline2d.h"
 
 /**
@@ -21,6 +20,26 @@ class CubicBezierSpline2d : public Spline2d
      * Create a CubicBezierSpline2d that:
      *  - starts from `start` and is tangent to `start_vector` at the start
      *  - ends at `end` and is tangent to `end_vector` at the end
+     *
+     *    ** EXAMPLE: **
+     *
+     *                           XXXXXXXXX
+     *        start_vector  XXXXX         XXXXX   end_vector
+     *              ^     XXX                 XXX     ^
+     *              |    XX                     XX    |
+     *              |   XX                       XX   |
+     *              |  XX                         XX  |
+     *              |  X                           X  |
+     *              | XX                           XX |
+     *              | X                             X |
+     *              | X                             X |
+     *              |XX                             XX|
+     *              |X                               X|
+     *              |X                               X|
+     *              |X                               X|
+     *       start  +                                 +  end
+     *
+     *
      * @param start_point The first point on the spline
      * @param start_vector The tangent vector at the start of the spline
      * @param end_point The last point on the spline
@@ -31,13 +50,17 @@ class CubicBezierSpline2d : public Spline2d
      * @param intermediate_knots The intermediate points between `start_point` and
      *                                    `end_point` that this spline will interpolate
      */
-    CubicBezierSpline2d(const Point& start_point, const Vector& start_vector,
-                        const Point& end_point, const Vector& end_vector,
-                        std::vector<Point> intermediate_knots);
+    explicit CubicBezierSpline2d(const Point& start_point, const Vector& start_vector,
+                                 const Point& end_point, const Vector& end_vector,
+                                 const std::vector<Point>& intermediate_knots);
 
     const Point getValueAt(double t) const override;
-
     const std::vector<Point> getKnots() const override;
+    size_t getNumKnots() const override;
+    std::vector<double> getKnotParametrizationValues() const override;
+    const Point getStartPoint() const override;
+    const Point getEndPoint() const override;
+    const std::vector<SplineSegment2d> getSplineSegments() const override;
 
     /**
      * Get the control points that are the implicit representation of the bezier
@@ -48,21 +71,13 @@ class CubicBezierSpline2d : public Spline2d
      */
     const std::vector<Point>& getControlPoints() const;
 
-    size_t getNumKnots() const override;
-
     /**
      * Get the number of segments on this spline.
+     *
      * @return The number of segments on this spline.
      */
     size_t getNumSegments() const;
 
-    std::vector<double> getKnotParametrizationValues() const override;
-
-    const Point getStartPoint() const override;
-
-    const Point getEndPoint() const override;
-
-    const std::vector<SplineSegment2d> getSplineSegments() const override;
 
    private:
     /**
@@ -98,7 +113,7 @@ class CubicBezierSpline2d : public Spline2d
                                             const Vector& start_vector,
                                             const Point& end_point,
                                             const Vector& end_vector,
-                                            std::vector<Point> intermediate_knots);
+                                            const std::vector<Point>& intermediate_knots);
 
     // The control points that are the implicit representation of the bezier curves that
     // form this splines.

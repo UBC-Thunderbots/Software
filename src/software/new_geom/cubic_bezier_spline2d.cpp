@@ -7,7 +7,7 @@
 CubicBezierSpline2d::CubicBezierSpline2d(const Point& start_point,
                                          const Vector& start_vector,
                                          const Point& end_point, const Vector& end_vector,
-                                         std::vector<Point> intermediate_knots)
+                                         const std::vector<Point>& intermediate_knots)
     : control_points(computeControlPoints(start_point, start_vector, end_point,
                                           end_vector, intermediate_knots))
 {
@@ -50,21 +50,12 @@ const std::vector<Point> CubicBezierSpline2d::getKnots() const
     return knots;
 }
 
-const std::vector<Point>& CubicBezierSpline2d::getControlPoints() const
-{
-    return control_points;
-}
-
 size_t CubicBezierSpline2d::getNumKnots() const
 {
+    // We are guaranteed to have 3*n + 1 control points (where `n` is some integer) so
+    // we can safely do integer division here.
     return static_cast<size_t>((control_points.size() - 1) / 3 + 1);
 }
-
-size_t CubicBezierSpline2d::getNumSegments() const
-{
-    return getNumKnots() - 1;
-}
-
 
 std::vector<double> CubicBezierSpline2d::getKnotParametrizationValues() const
 {
@@ -80,26 +71,38 @@ std::vector<double> CubicBezierSpline2d::getKnotParametrizationValues() const
 
 const Point CubicBezierSpline2d::getStartPoint() const
 {
-    // We are guaranteed to at least have two control points, the start and end points
+    // We are guaranteed to at least have four control points, the start and end points,
+    // along with `start + start_vector` and `end + end_vector`
     return control_points.front();
 }
 
 const Point CubicBezierSpline2d::getEndPoint() const
 {
-    // We are guaranteed to at least have two control points, the start and end points
+    // We are guaranteed to at least have four control points, the start and end points,
+    // along with `start + start_vector` and `end + end_vector`
     return control_points.back();
 }
 
 const std::vector<SplineSegment2d> CubicBezierSpline2d::getSplineSegments() const
 {
     std::vector<SplineSegment2d> segments;
-    const double num_knots = getNumKnots();
-    for (size_t i = 0; i < num_knots - 1; i++)
+    const double num_segments = getNumSegments();
+    for (size_t i = 0; i < num_segments; i++)
     {
         const BezierCurve2d curve = getSegmentAtIndex(i);
         segments.emplace_back(createSplineSegment2d(0, 1, curve.getPolynomial()));
     }
     return segments;
+}
+
+const std::vector<Point>& CubicBezierSpline2d::getControlPoints() const
+{
+    return control_points;
+}
+
+size_t CubicBezierSpline2d::getNumSegments() const
+{
+    return getNumKnots() - 1;
 }
 
 BezierCurve2d CubicBezierSpline2d::getSegmentAtIndex(size_t index) const
@@ -110,7 +113,7 @@ BezierCurve2d CubicBezierSpline2d::getSegmentAtIndex(size_t index) const
 
 std::vector<Point> CubicBezierSpline2d::computeControlPoints(
     const Point& start_point, const Vector& start_vector, const Point& end_point,
-    const Vector& end_vector, std::vector<Point> intermediate_knots)
+    const Vector& end_vector, const std::vector<Point>& intermediate_knots)
 {
     // The math here is based off of: https://www.ibiblio.org/e-notes/Splines/b-int.html
     // And the variable names have been maintained (where reasonably possible) to match

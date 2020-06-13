@@ -98,8 +98,6 @@ TEST_F(CubicBezierSplineTest, getEndPoint)
         TestUtil::equalWithinTolerance(test_spline_1.getEndPoint(), Point(1, -2), 1e-9));
 }
 
-// Get the value at the knots (probably looking at individual segments and checking
-// start and end point)
 TEST_F(CubicBezierSplineTest, getKnots)
 {
     std::vector<Point> expected_knots = {Point(1, -1), Point(5, 5), Point(10, -10),
@@ -107,7 +105,6 @@ TEST_F(CubicBezierSplineTest, getKnots)
     EXPECT_EQ(expected_knots, test_spline_1.getKnots());
 }
 
-// Check that the spline is C_2 continuous at knots (get individual segments and check)
 TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
 {
     std::vector<double> parametrization_values =
@@ -115,9 +112,9 @@ TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
 
     ASSERT_EQ(4, parametrization_values.size());
 
-    for (size_t i = 0; i < 2; i++)
+    for (size_t i = 0; i < test_spline_1.getNumKnots() - 2; i++)
     {
-        const double knot_input_value = parametrization_values[i + 1];
+        const double knot_input_value = parametrization_values.at(i + 1);
 
         // Check C1 continuity
         const Point just_before_knot = test_spline_1.getValueAt(knot_input_value - 1e-9);
@@ -158,15 +155,6 @@ TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
         EXPECT_NEAR(second_derivative_change.x(), 0, 1e-9);
         EXPECT_NEAR(second_derivative_change.y(), 0, 1e-9);
     }
-}
-
-TEST_F(CubicBezierSplineTest, check_control_points_no_intermediate_knots)
-{
-    CubicBezierSpline2d spline(Point(0, 0), Vector(0, 1), Point(2, 0), Vector(0, 1), {});
-
-    std::vector<Point> expected_control_points = {Point(0, 0), Point(0, 1), Point(2, 1),
-                                                  Point(2, 0)};
-    EXPECT_EQ(expected_control_points, spline.getControlPoints());
 }
 
 TEST_F(CubicBezierSplineTest, getControlPoints_no_intermediate_knots)
@@ -218,7 +206,7 @@ TEST_F(CubicBezierSplineTest, getSplineSegments_no_intermediate_knots)
               spline_segments[0].getPolynomial());
 }
 
-TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate)
+TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate_knot)
 {
     // This spline is effectively the first one shown on this page:
     // https://www.ibiblio.org/e-notes/Splines/b-int.html

@@ -195,7 +195,6 @@ cc_library(
     hdrs = ["cubic_bezier_spline2d.h"],
     deps = [
         ":bezier_curve2d",
-        ":ray",
         ":spline2d",
     ],
 )
