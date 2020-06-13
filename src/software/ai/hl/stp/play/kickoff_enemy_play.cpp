@@ -111,8 +111,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         // TODO: (Mathew): Minor instability with defenders and goalie when the ball and
         // attacker are in the middle of the net
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 

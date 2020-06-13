@@ -15,11 +15,11 @@ message ChipperKickerStatus
 {
     // Indicates the time elapsed since chipper was last fired in ms
     // UINT64_MAX indicates chipper was never fired
-    uint64 time_since_chipper_fired = 1;
+    uint32 ms_since_chipper_fired = 1;
 
     // Indicates the time elapsed since kicker was last fired in ms
     // UINT64_MAX indicates kicker was never fired
-    uint64 time_since_kicker_fired = 2;
+    uint32 ms_since_kicker_fired = 2;
 }
 
 /* Data about the status of the dribbler
@@ -106,16 +106,13 @@ message DriveUnits
 /* Data about the network connection with the robots, including network-derived values */
 message NetworkStatus
 {
-    // When the proto was created according to lwIP SNTP time
-    uint64 time_created = 1;
-
     // Indicates the time elapsed since the last vision packet was received in ms
     // UINT64_MAX indicates no vision packet was ever received
-    uint64 time_since_last_vision_received = 2;
+    uint32 ms_since_last_vision_received = 1;
 
     // Indicates the time elapsed since the last primitive packet was received in ms
     // UINT64_MAX indicates no primitive packet was ever received
-    uint64 time_since_last_primitive_received = 3;
+    uint32 ms_since_last_primitive_received = 2;
 }
 
 /* Battery and capacitor voltages */

@@ -12,7 +12,7 @@ TEST(FunctionValidatorTest, test_validation_function_that_does_nothing_reports_s
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {};
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
@@ -29,7 +29,7 @@ TEST(FunctionValidatorTest,
         baz++;
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
@@ -43,7 +43,7 @@ TEST(FunctionValidatorTest,
         yield();
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
@@ -63,7 +63,7 @@ TEST(FunctionValidatorTest,
         yield();
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
 
     for (unsigned int i = 0; i < 5; i++)
@@ -86,7 +86,7 @@ TEST(FunctionValidatorTest,
         yield();
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
 
     bool result = function_validator.executeAndCheckForSuccess();
@@ -107,7 +107,7 @@ TEST(FunctionValidatorTest,
         }
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
 
     world->mutableBall() = Ball(Point(-1, 0), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -141,7 +141,7 @@ TEST(FunctionValidatorTest,
         }
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
 
     world->mutableBall() = Ball(Point(-1, -1), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -173,7 +173,7 @@ TEST(FunctionValidatorTest, test_validation_function_with_gtest_statements)
         }
     };
 
-    auto world = std::make_shared<World>(::Test::TestUtil::createBlankTestingWorld());
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     FunctionValidator function_validator(validation_function, world);
 
     world->mutableGameState().updateRefboxGameState(RefboxGameState::STOP);

@@ -8,7 +8,6 @@
 #include "software/new_geom/util/closest_point.h"
 
 using namespace Passing;
-using namespace Evaluation;
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
                                const Team& enemy_team, const Passing::Pass pass,

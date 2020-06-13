@@ -50,7 +50,7 @@ class Shot
                          XXXX    |
                              XXXXO - Obstacle
 
-        The angle formed by '|' in-between the obstacles
+        The angle formed by '|' in between the obstacles
         '=' represents the shot vector
      *
      */

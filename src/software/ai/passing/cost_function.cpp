@@ -1,8 +1,3 @@
-/**
- * Implementation of evaluation functions for passing
- */
-
-
 #include "software/ai/passing/cost_function.h"
 
 #include <numeric>
@@ -15,7 +10,6 @@
 #include "software/parameter/dynamic_parameters.h"
 
 using namespace Passing;
-using namespace AI::Evaluation;
 
 double Passing::ratePass(const World& world, const Passing::Pass& pass,
                          const std::optional<Rectangle>& target_region,
@@ -99,8 +93,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
-    auto shot_opt =
-        Evaluation::calcBestShotOnGoal(field.enemyGoalpostNeg(), field.enemyGoalpostPos(),
+    auto shot_opt = calcBestShotOnGoal(field.enemyGoalpostNeg(), field.enemyGoalpostPos(),
                                        pass.receiverPoint(), enemy_team.getAllRobots());
 
     Angle open_angle_to_goal = Angle::zero();

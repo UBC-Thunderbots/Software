@@ -170,98 +170,98 @@ class PathPlannerTestCaseFactory
             {.name           = "Empty divB area short path",
              .start          = Point(-1, 0),
              .end            = Point(1, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = {},
              .num_iterations = 10},
 
             {.name           = "Empty divB area long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = {},
              .num_iterations = 10},
 
             {.name           = "10 circle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = circle_obstacles_10,
              .num_iterations = 10},
 
             {.name           = "20 circle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = circle_obstacles_20,
              .num_iterations = 10},
 
             {.name           = "30 circle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = circle_obstacles_30,
              .num_iterations = 10},
 
             {.name           = "10 circle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = circle_obstacles_10,
              .num_iterations = 10},
 
             {.name           = "20 circle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = circle_obstacles_20,
              .num_iterations = 10},
 
             {.name           = "30 circle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = circle_obstacles_30,
              .num_iterations = 10},
 
             {.name           = "10 rectangle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = rectangle_obstacles_10,
              .num_iterations = 10},
 
             {.name           = "20 rectangle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = rectangle_obstacles_20,
              .num_iterations = 10},
 
             {.name           = "30 rectangle obstacles on divB field short path",
              .start          = Point(-2, 0),
              .end            = Point(2, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = rectangle_obstacles_30,
              .num_iterations = 10},
 
             {.name           = "10 rectangle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = rectangle_obstacles_10,
              .num_iterations = 10},
 
             {.name           = "20 rectangle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = rectangle_obstacles_20,
              .num_iterations = 10},
 
             {.name           = "30 rectangle obstacles on divB field long path",
              .start          = Point(-4.5, 0),
              .end            = Point(4.5, 0),
-             .navigable_area = ::Test::TestUtil::createSSLDivBField().fieldBoundary(),
+             .navigable_area = ::TestUtil::createSSLDivBField().fieldBoundary(),
              .obstacles      = rectangle_obstacles_30,
              .num_iterations = 10},
         };
@@ -297,23 +297,18 @@ TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
     std::unique_ptr<PathPlanner> planner = std::get<0>(GetParam()).second();
     auto planner_test_case               = std::get<1>(GetParam());
 
-    auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::system_clock::now();
     for (unsigned int i = 0; i < planner_test_case.num_iterations; i++)
     {
         planner->findPath(planner_test_case.start, planner_test_case.end,
                           planner_test_case.navigable_area, planner_test_case.obstacles);
     }
-    auto end_time = std::chrono::high_resolution_clock::now();
-
-    double duration_ms =
-        static_cast<double>(
-            std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time)
-                .count()) /
-        1000000.0;
+    double duration_ms = ::TestUtil::millisecondsSince(start_time);
     double avg_ms = duration_ms / (static_cast<double>(planner_test_case.num_iterations));
 
     std::cout << std::endl << planner_test_case.name << ":" << std::endl;
 
+    // Performance was optimized in PR #1443
     std::cout << planner_name << " | # iterations = " << planner_test_case.num_iterations
               << " | # obstacles = " << planner_test_case.obstacles.size()
               << " | area = " << planner_test_case.navigable_area.area()

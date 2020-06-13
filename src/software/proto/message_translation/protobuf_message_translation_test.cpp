@@ -57,7 +57,13 @@ class ProtobufTranslationTest : public ::testing::Test
     {
         // time will only move forward
         // we make sure the number that the timestamp is from the past
-        ASSERT_TRUE(timestamp.epoch_timestamp_seconds() <= std::time(0));
+        const auto clock_time = std::chrono::system_clock::now();
+        double time_in_seconds =
+            static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
+                                    clock_time.time_since_epoch())
+                                    .count()) /
+            MICROSECONDS_PER_SECOND;
+        ASSERT_TRUE(timestamp.epoch_timestamp_seconds() <= time_in_seconds);
     }
 };
 
@@ -118,8 +124,8 @@ TEST(ProtobufTranslationTest, ball_state_msg_test)
 
 TEST(ProtobufTranslationTest, vision_msg_test)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world       = ::Test::TestUtil::setFriendlyRobotPositions(
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setFriendlyRobotPositions(
         world, {Point(420, 420), Point(420, 420), Point(420, 420), Point(420, 420)},
         Timestamp::fromSeconds(0));
 
@@ -127,7 +133,7 @@ TEST(ProtobufTranslationTest, vision_msg_test)
 
     ProtobufTranslationTest::assertBallStateMessageFromBall(world.ball(),
                                                             vision_msg->ball_state());
-    ProtobufTranslationTest::assertSaneTimestamp(vision_msg->timestamp());
+    ProtobufTranslationTest::assertSaneTimestamp(vision_msg->time_sent());
 
     auto friendly_robots   = world.friendlyTeam().getAllRobots();
     auto& robot_states_map = *vision_msg->mutable_robot_states();
