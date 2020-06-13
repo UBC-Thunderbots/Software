@@ -8,6 +8,8 @@
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
 const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
+// The max allowed height of the robots, in metres
+const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
 const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
