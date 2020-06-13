@@ -39,12 +39,11 @@ TEST_F(CubicBezierSplineTest, get_knots)
     EXPECT_EQ(expected_knots, test_spline_1.getKnots());
 }
 
-// TODO: rename this test if the function name changes
-TEST_F(CubicBezierSplineTest, get_knot_vector)
+TEST_F(CubicBezierSplineTest, get_knot_parametrization_values)
 {
     const std::vector<Point> expected_knots = {Point(1, -1), Point(5, 5), Point(10, -10),
                                                Point(1, -2)};
-    const std::vector<double> knot_vector   = test_spline_1.getKnotVector();
+    const std::vector<double> knot_vector = test_spline_1.getKnotParametrizationValues();
 
     ASSERT_EQ(4, knot_vector.size());
 
@@ -111,14 +110,14 @@ TEST_F(CubicBezierSplineTest, getKnots)
 // Check that the spline is C_2 continuous at knots (get individual segments and check)
 TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
 {
-    // TODO: rename this once we figure out a better name for the function
-    std::vector<double> knot_vector = test_spline_1.getKnotVector();
+    std::vector<double> parametrization_values =
+        test_spline_1.getKnotParametrizationValues();
 
-    ASSERT_EQ(4, knot_vector.size());
+    ASSERT_EQ(4, parametrization_values.size());
 
     for (size_t i = 0; i < 2; i++)
     {
-        const double knot_input_value = knot_vector[i + 1];
+        const double knot_input_value = parametrization_values[i + 1];
 
         // Check C1 continuity
         const Point just_before_knot = test_spline_1.getValueAt(knot_input_value - 1e-9);

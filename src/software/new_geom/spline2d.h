@@ -91,9 +91,15 @@ class Spline2d
      */
     virtual size_t getNumKnots() const = 0;
 
-    // TODO: jdoc
-    // TODO: better name for this?
-    virtual std::vector<double> getKnotVector() const = 0;
+    /**
+     * Get the parametrization values corresponding to the knots of this spline
+     *
+     * So for example, if we had a 3-knot spline that is linearly interpolated, this
+     * function would return {0, 0.5, 1}
+     *
+     * @return The parametrization values corresponding to the knots of this spline
+     */
+    virtual std::vector<double> getKnotParametrizationValues() const = 0;
 
     /**
      * Gets start point of spline

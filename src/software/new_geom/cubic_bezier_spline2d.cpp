@@ -66,7 +66,7 @@ size_t CubicBezierSpline2d::getNumSegments() const
 }
 
 
-std::vector<double> CubicBezierSpline2d::getKnotVector() const
+std::vector<double> CubicBezierSpline2d::getKnotParametrizationValues() const
 {
     // We assume a linear spacing of all the knots from 0 to 1
     std::vector<double> knot_vector;

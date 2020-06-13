@@ -56,7 +56,7 @@ class CubicBezierSpline2d : public Spline2d
      */
     size_t getNumSegments() const;
 
-    std::vector<double> getKnotVector() const override;
+    std::vector<double> getKnotParametrizationValues() const override;
 
     const Point getStartPoint() const override;
 
