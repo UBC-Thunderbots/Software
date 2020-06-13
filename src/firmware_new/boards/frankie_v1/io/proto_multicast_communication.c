@@ -14,7 +14,6 @@
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
-#include "shared/constants.h"
 
 typedef struct ProtoMulticastConnectionProfile
 {
@@ -56,6 +55,7 @@ ProtoMulticastConnectionProfile_t* io_proto_multicast_connection_profile_create(
     connection_profile->port             = port;
     connection_profile->message_fields   = message_fields;
     connection_profile->message_max_size = message_max_size;
+    return connection_profile;
 }
 
 ProtoMulticastListenerProfile_t* io_proto_multicast_listener_profile_create(
@@ -72,6 +72,7 @@ ProtoMulticastListenerProfile_t* io_proto_multicast_listener_profile_create(
     listener_profile->protobuf_struct      = protobuf_struct;
     listener_profile->timeout_milliseconds = timeout_milliseconds;
     listener_profile->timeout_callback     = timeout_callback;
+    return listener_profile;
 }
 
 ProtoMulticastSenderProfile_t* io_proto_multicast_sender_profile_create(
@@ -87,6 +88,7 @@ ProtoMulticastSenderProfile_t* io_proto_multicast_sender_profile_create(
 
     sender_profile->protobuf_struct    = protobuf_struct;
     sender_profile->sending_rate_hertz = sending_rate_hertz;
+    return sender_profile;
 }
 
 void io_proto_multicast_listener_profile_destroy(
@@ -103,4 +105,22 @@ void io_proto_multicast_sender_profile_destroy(
     free(sender_profile->connection_profile->multicast_address);
     free(sender_profile->connection_profile);
     free(sender_profile);
+}
+
+void io_proto_multicast_sender_Task(void* sender_profile)
+{
+    ProtoMulticastSenderProfile_t* proto_multicast_sender =
+        (ProtoMulticastSenderProfile_t*)sender_profile;
+    for (;;)
+    {
+    }
+}
+
+void io_proto_multicast_listener_Task(void* listener_profile)
+{
+    ProtoMulticastListenerProfile_t* proto_multicast_listener =
+        (ProtoMulticastListenerProfile_t*)listener_profile;
+    for (;;)
+    {
+    }
 }

@@ -29,6 +29,7 @@ cc_binary(
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
         "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
+        "//shared:constants",
     ],
 )
 

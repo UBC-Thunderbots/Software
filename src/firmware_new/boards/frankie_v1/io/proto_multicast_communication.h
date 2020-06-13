@@ -4,8 +4,7 @@
  * This file is an abstraction around LwIP to communicate with AI
  */
 
-#include "shared/proto/tbots_robot_msg.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "pb.h"
 
 typedef struct ProtoMulticastListenerProfile ProtoMulticastListenerProfile_t;
 typedef struct ProtoMulticastSenderProfile ProtoMulticastSenderProfile_t;
@@ -13,9 +12,8 @@ typedef struct ProtoMulticastSenderProfile ProtoMulticastSenderProfile_t;
 /**
  * TASKS
  */
-void io_proto_multicast_sender_Task(ProtoMulticastSenderProfile_t* sender_profile);
-
-void io_proto_multicast_listener_Task(ProtoMulticastListenerProfile_t* listener_profile);
+void io_proto_multicast_sender_Task(void* sender_profile);
+void io_proto_multicast_listener_Task(void* listener_profile);
 
 /**
  * Create an ProtoMulticastListener/SenderProfile_t
