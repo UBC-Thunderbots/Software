@@ -49,7 +49,7 @@ void WifiBackend::receiveWorld(World world)
 void WifiBackend::receiveTbotsRobotMsg(TbotsRobotMsg robot_msg)
 {
     SensorMsg sensor_msg;
-    TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
+    TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msgs();
     *added_robot_msg               = robot_msg;
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
