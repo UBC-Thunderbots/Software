@@ -120,8 +120,6 @@ TEST_F(CubicBezierSplineTest, check_c2_continuous_at_knots)
     {
         const double knot_input_value = knot_vector[i + 1];
 
-        // TODO: fix the variable naming scheme here, very difficult to read
-
         // Check C1 continuity
         const Point just_before_knot = test_spline_1.getValueAt(knot_input_value - 1e-9);
         const Point knot             = test_spline_1.getValueAt(knot_input_value);
@@ -183,10 +181,8 @@ TEST_F(CubicBezierSplineTest, getControlPoints_no_intermediate_knots)
 
 TEST_F(CubicBezierSplineTest, getControlPoints_single_intermediate_knot)
 {
-    // TODO: ascii art here? This is effectively the first example from
-    //       https://www.ibiblio.org/e-notes/Splines/b-int.html, at least want to
-    //       link to this example
-
+    // This spline is effectively the first one shown on this page:
+    // https://www.ibiblio.org/e-notes/Splines/b-int.html
     Point p0(0, 0);
     Point p1(1, 0);
     Point p2(1.5, -1.5);
@@ -225,11 +221,8 @@ TEST_F(CubicBezierSplineTest, getSplineSegments_no_intermediate_knots)
 
 TEST_F(CubicBezierSplineTest, getSplineSegments_single_intermediate)
 {
-
-    // TODO: ascii art here? This is effectively the first example from
-    //       https://www.ibiblio.org/e-notes/Splines/b-int.html, at least want to
-    //       link to this example
-
+    // This spline is effectively the first one shown on this page:
+    // https://www.ibiblio.org/e-notes/Splines/b-int.html
     Point p0(0, 0);
     Point p1(1, 0);
     Point p2(1.5, -1.5);

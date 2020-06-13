@@ -4,8 +4,6 @@
 
 #include <algorithm>
 
-#include "software/new_geom/bezier_curve2d.h"
-
 CubicBezierSpline2d::CubicBezierSpline2d(const Point& start_point,
                                          const Vector& start_vector,
                                          const Point& end_point, const Vector& end_vector,
@@ -21,32 +19,25 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
     // the first segment is t=0, the end of the last segment is t=1, and the
     // the knots are evenly distributed in between 0 and 1
 
-    // TODO: consider edge case where t is _exactly_ 1
-
-    // The below algorithm does not handle the case where t is exactly 1, so we
-    // check explicitly for that here
-    if (t == 1)
-    {
-        return control_points.back();
-    }
 
     const double t_constrained = std::clamp(t, 0.0, 1.0);
 
-    // TODO: comment here
+    // Scale t from [0,1] -> [0,n] where n is the number segments
     const double t_mapped = t_constrained * static_cast<double>(getNumSegments());
 
-    // TODO: comment here
-    const int segment_index = std::floor(t_mapped);
+    // In most cases the segment index is just the floor of the mapped t, but we
+    // also need to have extra handling for the case where t=1, in which case
+    // we need to just use the last segment
+    const size_t segment_index =
+        std::min(static_cast<size_t>(std::floor(t_mapped)), getNumSegments() - 1);
 
-    // TODO: comment here
+    // Figure out what the t-value on the segment is going to be
     const double t_on_segment = (t_mapped - static_cast<double>(segment_index));
 
-    // TODO: comment here
-    // TODO: better name for this var
-    const size_t i = static_cast<size_t>(segment_index) * 3;
-    return BezierCurve2d({control_points[i], control_points[i + 1], control_points[i + 2],
-                          control_points[i + 3]})
-        .getValueAt(t_on_segment);
+    // Generate the bezier curve for the segment and evaluate it at the segment t-value
+    const BezierCurve2d segment =
+     getSegmentAtIndex(segment_index);
+    return segment.getValueAt(t_on_segment);
 }
 
 const std::vector<Point> CubicBezierSpline2d::getKnots() const
@@ -83,7 +74,7 @@ std::vector<double> CubicBezierSpline2d::getKnotVector() const
     const double num_knots = getNumKnots();
     for (size_t i = 0; i < num_knots; i++)
     {
-        knot_vector.emplace_back(i * 1.0 / static_cast<double>(num_knots-1));
+        knot_vector.emplace_back(i * 1.0 / static_cast<double>(num_knots - 1));
     }
     return knot_vector;
 }
@@ -106,20 +97,25 @@ const std::vector<SplineSegment2d> CubicBezierSpline2d::getSplineSegments() cons
     const double num_knots = getNumKnots();
     for (size_t i = 0; i < num_knots - 1; i++)
     {
-        const BezierCurve2d bezier_curve(
-            {control_points[i * 3], control_points[i * 3 + 1], control_points[i * 3 + 2],
-             control_points[i * 3 + 3]});
-        segments.emplace_back(createSplineSegment2d(0, 1, bezier_curve.getPolynomial()));
+        const BezierCurve2d curve = getSegmentAtIndex(i);
+        segments.emplace_back(createSplineSegment2d(0, 1, curve.getPolynomial()));
     }
     return segments;
+}
+
+BezierCurve2d CubicBezierSpline2d::getSegmentAtIndex(size_t index) const {
+    return BezierCurve2d(
+        {control_points[index * 3], control_points[index * 3 + 1], control_points[index * 3 + 2],
+         control_points[index * 3 + 3]});
 }
 
 std::vector<Point> CubicBezierSpline2d::computeControlPoints(
     const Point& start_point, const Vector& start_vector, const Point& end_point,
     const Vector& end_vector, std::vector<Point> intermediate_knots)
 {
-    // TODO: cleanup, better naming, better comments
-    // Link to https://www.ibiblio.org/e-notes/Splines/b-int.html
+    // The math here is based off of: https://www.ibiblio.org/e-notes/Splines/b-int.html
+    // And the variable names have been maintained (where reasonably possible) to match
+    // those found at this aforementioned link.
 
     std::vector<Point> all_knots;
     all_knots.emplace_back(start_point);
@@ -166,8 +162,7 @@ std::vector<Point> CubicBezierSpline2d::computeControlPoints(
         }
     }
 
-    // TODO: figure out what this should be
-    //    assert(control_points.size()-1 % 3 == 0);
+    assert((control_points.size() - 1) % 3 == 0);
 
     return control_points;
 }

@@ -2,29 +2,34 @@
 
 #include "software/new_geom/ray.h"
 #include "software/new_geom/spline2d.h"
+#include "software/new_geom/bezier_curve2d.h"
 
-// TODO: class-wide jdoc, should roughly explain math, guarantees, etc.? Or maybe links
-//       below are enough
-// TODO: link to https://www.ibiblio.org/e-notes/Splines/Intro.htm
-// TODO: link to https://www.ibiblio.org/e-notes/Splines/b-int.html
+/**
+ * A Cubic Bezier spline is a C2 continuous spline that is formed by a series of bezier
+ * curves.
+ *
+ * Some useful resources:
+ * https://www.ibiblio.org/e-notes/Splines/Intro.htm
+ * https://www.ibiblio.org/e-notes/Splines/b-int.html
+ */
 class CubicBezierSpline2d : public Spline2d
 {
    public:
     CubicBezierSpline2d() = delete;
 
-    // TODO: better names then `start` and `end`
-    // TODO: finish this jdoc. Referencing a diagram here would probably really help,
-    //       maybe ascii??
-    // TODO: need to make sure you're explicit about the directions of the start and
-    //       end vectors (ie. they're symmetric)
     /**
      * Create a CubicBezierSpline2d that:
-     *  - starts from the start point of `start` and is tangent to it
-     *  - end from the start point of `end` and is tangent to it
-     * @param start
-     * @param end
-     * @param intermediate_knots The intermediate points between `start` and
-     *                                    `end` that this spline will interpolate
+     *  - starts from `start` and is tangent to `start_vector` at the start
+     *  - ends at `end` and is tangent to `end_vector` at the end
+     * @param start_point The first point on the spline
+     * @param start_vector The tangent vector at the start of the spline
+     * @param end_point The last point on the spline
+     * @param end_vector The tangent vector at the end of the spline.
+     *                   NOTE: this points "back towards" the start of the spline, instead
+     *                         of "off the end" of the spline. ie. this vector is
+     *                         "symmetric" with `start_vector`
+     * @param intermediate_knots The intermediate points between `start_point` and
+     *                                    `end_point` that this spline will interpolate
      */
     CubicBezierSpline2d(const Point& start_point, const Vector& start_vector,
                         const Point& end_point, const Vector& end_vector,
@@ -34,7 +39,13 @@ class CubicBezierSpline2d : public Spline2d
 
     const std::vector<Point> getKnots() const override;
 
-    // TODO: jdoc for this
+    /**
+     * Get the control points that are the implicit representation of the bezier
+     * curves that form this spline.
+     *
+     * @return The control points that represent the the bezier curves that form this
+     *         spline.
+     */
     const std::vector<Point>& getControlPoints() const;
 
     size_t getNumKnots() const override;
@@ -54,12 +65,45 @@ class CubicBezierSpline2d : public Spline2d
     const std::vector<SplineSegment2d> getSplineSegments() const override;
 
    private:
-    // TODO: jdoc
+    /**
+     * Get the segment of this spline at the given index
+     *
+     * @param index The index of the segment on this spline. Must be in
+     *              [0, getNumSegments()-1]
+     *
+     * @return The segment of this spline at the given index
+     */
+    BezierCurve2d getSegmentAtIndex(size_t index) const;
+
+    /**
+     * Compute the control points that represent the bezier curves that satisfy the
+     * constraints of this spline
+     *
+     * @param start_point The first point on the spline
+     * @param start_vector The tangent vector at the start of the spline
+     * @param end_point The last point on the spline
+     * @param end_vector The tangent vector at the end of the spline.
+     *                   NOTE: this points "back towards" the start of the spline, instead
+     *                         of "off the end" of the spline. ie. this vector is
+     *                         "symmetric" with `start_vector`
+     * @param intermediate_knots The intermediate points between `start_point` and
+     *                                    `end_point` that this spline will interpolate
+     * @return A vector of control points that are the implicit representation of the
+     *         bezier curves that make up the spline represented by the given args. ie.
+     *         0th-3rd (inclusive) points are the control points of the first bezier
+     *         curve, 3rd-6th (inclusive) points are the control points of the second
+     *         bezier curve, etc.
+     */
     std::vector<Point> computeControlPoints(const Point& start_point,
                                             const Vector& start_vector,
                                             const Point& end_point,
                                             const Vector& end_vector,
                                             std::vector<Point> intermediate_knots);
 
+    // The control points that are the implicit representation of the bezier curves that
+    // form this splines.
+    // 0th-3rd (inclusive) points are the control points of the first bezier curve
+    // 3rd-6th (inclusive) points are the control points of the second bezier curve
+    // etc.
     std::vector<Point> control_points;
 };
