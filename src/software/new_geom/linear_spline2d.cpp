@@ -26,11 +26,11 @@ const Point LinearSpline2d::getValueAt(double val) const
     else
     {
         // Note: this could be more performant with binary search
-        auto seg_it = std::find_if(segments.begin(), segments.end(),
-                                   [clamped_val](const SplineSegment2d& sseg) {
-                                       return (clamped_val >= sseg.getStartVal() &&
-                                               clamped_val <= sseg.getEndVal());
-                                   });
+        auto seg_it = std::find_if(
+            segments.begin(), segments.end(), [clamped_val](const SplineSegment2d& sseg) {
+                return (clamped_val >= sseg.getParametrizationStartVal() &&
+                        clamped_val <= sseg.getParametrizationEndVal());
+            });
 
         if (seg_it == segments.end())
         {
@@ -40,7 +40,7 @@ const Point LinearSpline2d::getValueAt(double val) const
             throw std::runtime_error(ss.str());
         }
 
-        retval = seg_it->getPolynomial().valueAt(clamped_val);
+        retval = seg_it->getPolynomial().getValueAt(clamped_val);
     }
 
     return retval;
@@ -87,10 +87,10 @@ void LinearSpline2d::initLinearSegments(const std::vector<Point>& points)
             double input_end =
                 static_cast<double>(i) / static_cast<double>(points.size() - 1);
 
-            Polynomial1d poly_x = Polynomial1d::constructLinearPolynomialFromConstraints(
-                input_start, points[i - 1].x(), input_end, points[i].x());
-            Polynomial1d poly_y = Polynomial1d::constructLinearPolynomialFromConstraints(
-                input_start, points[i - 1].y(), input_end, points[i].y());
+            const Polynomial1d poly_x(
+                {{input_start, points[i - 1].x()}, {input_end, points[i].x()}});
+            const Polynomial1d poly_y(
+                {{input_start, points[i - 1].y()}, {input_end, points[i].y()}});
             Polynomial2d poly2d(poly_x, poly_y);
             segments.push_back(createSplineSegment2d(input_start, input_end, poly2d));
         }

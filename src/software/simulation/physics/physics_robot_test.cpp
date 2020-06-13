@@ -303,7 +303,7 @@ TEST_F(PhysicsRobotTest,
 
     // Create a new body and roll it the opposite way to check we collide with the front
     // of the robot from both directions, since it's made of 2 separate pieces with a bap
-    // in between, and we need to make sure we can collide with both pieces
+    // in-between, and we need to make sure we can collide with both pieces
     auto ball_body_2 = createBallBody(
         Point(DIST_TO_FRONT_OF_ROBOT_METERS + radius - 0.005, -0.5), radius);
     ball_body_2->SetLinearVelocity({0, 2});

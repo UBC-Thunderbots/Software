@@ -6,9 +6,8 @@
 
 TEST(KickoffChipTacticTest, constructor_test)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world =
-        ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     KickoffChipTactic tactic = KickoffChipTactic(world.ball(), true);
 

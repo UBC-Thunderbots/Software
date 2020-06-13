@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/primitive/primitive.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
@@ -59,13 +60,51 @@ class Simulator
 {
    public:
     /**
-     * Creates a new Simulator with the given world. The starting state of the simulation
-     * will match the state of the given world
+     * Creates a new Simulator. The starting state of the simulation
+     * will have the given field, with no robots or ball.
      *
-     * @param world The world to initialize the simulation with
+     * @param field The field to initialize the simulation with
      */
-    explicit Simulator(const World& world);
+    explicit Simulator(const Field& field);
     Simulator() = delete;
+
+    /**
+     * Sets the state of the ball in the simulation. No more than 1 ball may exist
+     * in the simulation at a time. If a ball does not already exist, a ball
+     * is added with the given state. If a ball already exists, it's state is set to the
+     * given state.
+     *
+     * @param ball_state The new ball state
+     */
+    void setBallState(const BallState& ball_state);
+
+    /**
+     * Removes the ball from the physics world. If a ball does not already exist,
+     * this has no effect.
+     */
+    void removeBall();
+
+    /**
+     * Adds robots to the specified team with the given initial states.
+     *
+     * @pre The robot IDs must not be duplicated and must not match the ID
+     * of any robot already on the specified team.
+     *
+     * @throws runtime_error if any of the given robot ids are duplicated, or a
+     * robot already exists on the specified team with one of the new IDs
+     *
+     * @param robots the robots to add
+     */
+    void addYellowRobots(const std::vector<RobotStateWithId>& robots);
+    void addBlueRobots(const std::vector<RobotStateWithId>& robots);
+
+    /**
+     * Sets the primitives being simulated by the robots in simulation
+     *
+     * @param primitives The primitives to simulate
+     */
+    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
+    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -76,20 +115,37 @@ class Simulator
     void stepSimulation(const Duration& time_step);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
-     *
-     * @param primitives The primitives to simulate
-     */
-    void setPrimitives(ConstPrimitiveVectorPtr primitives);
-
-    /**
      * Returns the current state of the world in the simulation
      *
      * @return the current state of the world in the simulation
      */
-    World getWorld();
+    World getWorld() const;
 
    private:
+    /**
+     * Updates the given simulator_robots to contain and control the given physics_robots
+     *
+     * @param physics_robots The physics robots to add to the simulator robots
+     * @param simulator_robots The simulator robots to add the physics robots to
+     */
+    static void updateSimulatorRobots(
+        const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
+        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+            simulator_robots);
+
+    /**
+     * Sets the given primitives on the given simulator robots
+     *
+     * @param primitives The primitives to set
+     * @param simulator_robots The robots to set the primitives on
+     * @param simulator_ball The simulator ball to use in the primitives
+     */
+    static void setRobotPrimitives(
+        ConstPrimitiveVectorPtr primitives,
+        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+            simulator_robots,
+        const std::shared_ptr<SimulatorBall>& simulator_ball);
+
     /**
      * Returns the encoded primitive parameters for the given Primitive
      *
@@ -97,7 +153,8 @@ class Simulator
      *
      * @return The encoded primitive parameters for the given Primitive
      */
-    primitive_params_t getPrimitiveParams(const std::unique_ptr<Primitive>& primitive);
+    static primitive_params_t getPrimitiveParams(
+        const std::unique_ptr<Primitive>& primitive);
 
     /**
      * Returns the primitive index for the given Primitive
@@ -106,11 +163,12 @@ class Simulator
      *
      * @return The index for the given Primitive
      */
-    unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
+    static unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
 
-    std::optional<unsigned int> friendly_goalie_id;
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-        simulator_robots;
+        yellow_simulator_robots;
+    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
+        blue_simulator_robots;
 };

@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 {
     std::cout << BANNER << std::endl;
 
-    Util::Logger::LoggerSingleton::initializeLogger();
+    LoggerSingleton::initializeLogger();
 
     commandLineArgs args = parseCommandLineArgs(argc, argv);
 
