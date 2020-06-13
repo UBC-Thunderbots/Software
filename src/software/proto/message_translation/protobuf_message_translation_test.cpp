@@ -118,8 +118,8 @@ TEST(ProtobufTranslationTest, ball_state_msg_test)
 
 TEST(ProtobufTranslationTest, vision_msg_test)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world       = ::Test::TestUtil::setFriendlyRobotPositions(
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setFriendlyRobotPositions(
         world, {Point(420, 420), Point(420, 420), Point(420, 420), Point(420, 420)},
         Timestamp::fromSeconds(0));
 

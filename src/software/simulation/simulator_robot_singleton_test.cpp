@@ -28,7 +28,7 @@ class SimulatorRobotSingletonTest : public testing::Test
                                std::vector<Point> enemy_robot_positions)
     {
         auto physics_world =
-            std::make_shared<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
+            std::make_shared<PhysicsWorld>(::TestUtil::createSSLDivBField());
         physics_world->setBallState(ball.currentState().ballState());
         RobotStateWithId robot_state{.id          = robot.id(),
                                      .robot_state = robot.currentState().robotState()};
@@ -44,7 +44,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         }
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
-        auto physics_robot = physics_world->getFriendlyPhysicsRobots().at(0);
+        auto physics_robot = physics_world->getYellowPhysicsRobots().at(0);
         if (physics_robot.lock())
         {
             simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
@@ -1037,9 +1037,8 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spin
 
 TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
 {
-    auto physics_world =
-        std::make_unique<PhysicsWorld>(::Test::TestUtil::createSSLDivBField());
-    auto robot_states = std::vector<RobotStateWithId>{
+    auto physics_world = std::make_unique<PhysicsWorld>(::TestUtil::createSSLDivBField());
+    auto robot_states  = std::vector<RobotStateWithId>{
         RobotStateWithId{.id          = 7,
                          .robot_state = RobotState(Point(1.2, 0), Vector(-2.3, 0.2),
                                                    Angle::fromRadians(-1.2),
@@ -1050,7 +1049,7 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
                                       Angle::fromRadians(0.3), AngularVelocity::half())}};
     physics_world->addYellowRobots(robot_states);
 
-    auto friendly_physics_robots = physics_world->getFriendlyPhysicsRobots();
+    auto friendly_physics_robots = physics_world->getYellowPhysicsRobots();
     ASSERT_EQ(2, friendly_physics_robots.size());
     auto simulator_robot_7 =
         std::make_shared<SimulatorRobot>(friendly_physics_robots.at(0));
