@@ -61,7 +61,7 @@ cc_library(
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
-        "//software/proto/message_translation:ssl_message_translator",
+        "//software/proto/message_translation:ssl_geometry_message_translator",
         "//software/sensor_fusion:refbox_data",
         "//software/sensor_fusion:vision_detection",
         "//software/world:ball",

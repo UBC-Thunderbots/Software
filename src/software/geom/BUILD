@@ -3,14 +3,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "geom",
     srcs = [
-        "shot.cpp",
         "util.cpp",
-        "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "shot.h",
         "util.h",
-        "voronoi_diagram.h",
     ],
     deps = [
         "//software/logger",
@@ -35,18 +31,6 @@ cc_test(
     name = "util_test",
     srcs = [
         "util_test.cpp",
-    ],
-    deps = [
-        ":geom",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "voronoi_util_test",
-    srcs = [
-        "voronoi_diagram_test.cpp",
     ],
     deps = [
         ":geom",

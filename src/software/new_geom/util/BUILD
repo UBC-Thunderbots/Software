@@ -208,3 +208,65 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "find_open_circles",
+    srcs = [
+        "find_open_circles.cpp",
+    ],
+    hdrs = [
+        "find_open_circles.h",
+    ],
+    deps = [
+        ":distance",
+        ":intersection",
+        ":voronoi_diagram",
+        "//software/logger",
+        "//software/new_geom:circle",
+        "//software/new_geom:point",
+        "//software/new_geom:rectangle",
+    ],
+)
+
+cc_test(
+    name = "find_open_circles_test",
+    srcs = [
+        "find_open_circles_test.cpp",
+    ],
+    deps = [
+        ":find_open_circles",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "voronoi_diagram",
+    srcs = [
+        "voronoi_diagram.cpp",
+    ],
+    hdrs = [
+        "voronoi_diagram.h",
+    ],
+    deps = [
+        ":distance",
+        ":intersection",
+        "//software/logger",
+        "//software/new_geom:circle",
+        "//software/new_geom:point",
+        "//software/new_geom:point_boost_geometry_compatability",
+        "//software/new_geom:rectangle",
+    ],
+)
+
+cc_test(
+    name = "voronoi_diagram_test",
+    srcs = [
+        "voronoi_diagram_test.cpp",
+    ],
+    deps = [
+        ":voronoi_diagram",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

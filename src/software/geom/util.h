@@ -4,7 +4,6 @@
 #include <optional>
 #include <vector>
 
-#include "software/geom/shot.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
@@ -316,28 +315,3 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
  */
 std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
                                                Vector direction);
-
-/**
- * Finds all circles which do not contain a point in them within the given rectangle.
- *
- * NOTE: this only guarantees that the center of each circle is within the
- *       rectangle, some portion of the circle may extend outside the rectangle
- *
- * @param bounding_box The rectangle in which to look for open circles
- * @param points The points that must not lie within the circles
- *
- * @return A list of circles, sorted in descending order of radius. If no points were
- * provided, returns an empty list. Any points outside the bounding_box are ommitted.
- */
-std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
-
-/**
- *
- * Finds the point in the testPoints vector that is closest to the originPoint.
- *
- * @param originPoint
- * @param testPoints
- * @return The point in testPoints closest to testPoints.
- */
-std::optional<Point> findClosestPoint(const Point &origin_point,
-                                      std::vector<Point> test_points);
