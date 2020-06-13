@@ -37,3 +37,14 @@ cc_library(
         "//software/world",
     ],
 )
+
+cc_library(
+    name = "threaded_sensor_fusion",
+    srcs = ["threaded_sensor_fusion.cpp"],
+    hdrs = ["threaded_sensor_fusion.h"],
+    deps = [
+        ":sensor_fusion",
+        "//software/multithreading:subject",
+        "//software/multithreading:threaded_observer",
+    ],
+)

@@ -19,12 +19,10 @@
 
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
- * need to perform. It produces Worlds that may be used, and consumes SensorMsgs
- *
- * This produce/consume pattern is performed by extending both "Observer" and
- * "Subject". Please see the implementation of those classes for details.
+ * need to perform. It produces Worlds that may be used, and consumes vision detections,
+ * refbox data, and robot statuses
  */
-class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
+class SensorFusion
 {
    public:
     SensorFusion();
@@ -37,17 +35,21 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     SensorFusion &operator=(const SensorFusion &) = delete;
     SensorFusion(const SensorFusion &)            = delete;
 
-   private:
-    void onValueReceived(SensorMsg sensor_msg) override;
-
     /**
-     * Updates components of world based on a new data and sends World to observers if
-     * complete
+     * Updates components of world based on a new data
      *
      * @param new data
      */
     void updateWorld(const SensorMsg &sensor_msg);
 
+    /**
+     * Returns the most up to date state of the world if all data is valid
+     *
+     * @return the most up to date state of the world if all data is valid
+     */
+    std::optional<World> getWorld() const;
+
+   private:
     /**
      * Updates relevant components of world based on a new data
      *

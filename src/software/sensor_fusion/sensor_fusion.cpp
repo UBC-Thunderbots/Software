@@ -11,13 +11,10 @@ SensorFusion::SensorFusion()
 {
 }
 
-void SensorFusion::onValueReceived(SensorMsg sensor_msg)
-{
-    updateWorld(sensor_msg);
+std::optional<World> SensorFusion::getWorld() const {
     if (field && ball)
     {
-        Subject<World>::sendValueToObservers(
-            World(*field, *ball, friendly_team, enemy_team));
+        return World(*field, *ball, friendly_team, enemy_team);
     }
 }
 
