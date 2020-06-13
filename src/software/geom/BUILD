@@ -3,12 +3,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "geom",
     srcs = [
-        "shot.cpp",
         "util.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
-        "shot.h",
         "util.h",
         "voronoi_diagram.h",
     ],

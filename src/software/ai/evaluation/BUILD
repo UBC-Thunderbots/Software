@@ -95,7 +95,7 @@ cc_library(
     hdrs = ["detect_threat.h"],
     deps = [
         "//shared:constants",
-        "//software/geom/util:intersection",
+        "//software/new_geom/util:intersection",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -126,7 +126,7 @@ cc_library(
         ":shot",
         ":team",
         "//shared:constants",
-        "//software/geom/util:intersects",
+        "//software/new_geom/util:intersects",
         "//software/world",
     ],
 )
@@ -148,7 +148,6 @@ cc_library(
     hdrs = ["find_open_areas.h"],
     deps = [
         ":shot",
-        "//software/geom/util:find_open_circles",
         "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
@@ -251,5 +250,5 @@ cc_library(
     name = "shot",
     srcs = ["shot.cpp"],
     hdrs = ["shot.h"],
-    deps = ["//software/geom:point"],
+    deps = ["//software/new_geom:point"],
 )
