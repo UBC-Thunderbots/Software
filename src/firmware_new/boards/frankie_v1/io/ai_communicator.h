@@ -37,7 +37,7 @@ void io_ai_communicator_destroy(AICommunicator_t* io_ai_communicator);
  * Handles all the networking componenets needed to communicate with AI
  *
  */
-void io_ai_communicator_networkingTaskHandler(AICommunicator_t* io_ai_communicator);
+void io_ai_communicator_networkingTaskHandler(void* io_ai_communicator);
 
 /**
  * Send a TbotsRobotMsg to AI
@@ -53,4 +53,3 @@ void io_ai_communicator_receiveVisionMsg(AICommunicator_t* io_ai_communicator,
 
 void io_ai_communicator_receivePrimitiveMsg(AICommunicator_t* io_ai_communicator,
                                             const PrimitiveMsg vision_msg);
-

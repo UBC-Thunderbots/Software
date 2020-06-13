@@ -131,10 +131,11 @@ void io_ai_communicator_sendTbotsRobotMsg(AICommunicator_t* io_ai_communicator,
     netbuf_delete(io_ai_communicator->tx_buf);
 }
 
-void io_ai_communicator_networkingTaskHandler(void* parameters)
+void io_ai_communicator_networkingTaskHandler(void* io_ai_communicator)
 {
     for (;;)
     {
         // TODO TASK HANDLING
+        printf("test/n");
     }
 }
