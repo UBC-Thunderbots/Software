@@ -1,7 +1,5 @@
 #include "software/test_util/test_util.h"
 
-#include <iostream>
-
 namespace TestUtil
 {
     Field createSSLDivBField()

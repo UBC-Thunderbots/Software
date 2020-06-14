@@ -6,9 +6,9 @@ cc_library(
         "vision_detection.h",
     ],
     deps = [
-        "//software/geom",
+        "//software/new_geom:angle",
+        "//software/new_geom:point",
         "//software/time:timestamp",
-        "//software/world",
     ],
 )
 
@@ -16,19 +16,7 @@ cc_library(
     name = "refbox_data",
     hdrs = ["refbox_data.h"],
     deps = [
-        ":team_info",
-        "//software/geom",
-        "//software/proto:ssl_cc_proto",
-        "//software/time:timestamp",
         "//software/util/make_enum",
-    ],
-)
-
-cc_library(
-    name = "team_info",
-    srcs = ["team_info.cpp"],
-    hdrs = ["team_info.h"],
-    deps = [
     ],
 )
 
