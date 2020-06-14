@@ -170,13 +170,13 @@ World Simulator::getWorld() const
     return world;
 }
 
-std::unique_ptr<SSL_WrapperPacket> Simulator::getSslWrapperPacket() const
+std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
 {
     auto ball_state  = physics_world.getBallState();
     auto ball_states = ball_state.has_value()
                            ? std::vector<BallState>({ball_state.value()})
                            : std::vector<BallState>();
-    auto detection_frame = createSslDetectionFrame(
+    auto detection_frame = createSSLDetectionFrame(
         CAMERA_ID, physics_world.getTimestamp(), frame_number, ball_states,
         physics_world.getYellowRobotStates(), physics_world.getBlueRobotStates());
     auto geometry_data =
