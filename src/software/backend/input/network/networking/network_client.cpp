@@ -1,10 +1,10 @@
 #include "software/backend/input/network/networking/network_client.h"
 
 #include <boost/bind.hpp>
-#include <g3log/g3log.hpp>
 #include <limits>
 
 #include "software/constants.h"
+#include "software/logger/logger.h"
 #include "software/parameter/config.hpp"
 #include "software/parameter/dynamic_parameters.h"
 
@@ -36,7 +36,7 @@ void NetworkClient::setupVisionClient(std::string vision_address, int vision_por
     // Set up our connection over udp to receive vision packets
     try
     {
-        ssl_vision_client = std::make_unique<SSLVisionClient>(
+        ssl_vision_client = std::make_unique<ProtoMulticastListener<SSL_WrapperPacket>>(
             io_service, vision_address, vision_port,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
     }
@@ -55,7 +55,7 @@ void NetworkClient::setupGameControllerClient(std::string gamecontroller_address
     // Set up our connection over udp to receive gamecontroller packets
     try
     {
-        ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
+        ssl_gamecontroller_client = std::make_unique<ProtoMulticastListener<Referee>>(
             io_service, gamecontroller_address, gamecontroller_port,
             boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
     }
@@ -125,11 +125,10 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     if (packet.has_geometry())
     {
         const auto& latest_geometry_data = packet.geometry();
-        Field field = network_filter.getFieldData(latest_geometry_data);
-        world.updateFieldGeometry(field);
+        field = network_filter.getFieldData(latest_geometry_data);
     }
 
-    if (world.field().isValid())
+    if (field)
     {
         if (packet.has_detection())
         {
@@ -170,33 +169,43 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
             if (!camera_disabled)
             {
-                BallState ball_state = network_filter.getFilteredBallData({detection});
-                world.updateBallState(ball_state);
+                std::optional<TimestampedBallState> ball_state =
+                    network_filter.getFilteredBallData({detection});
+                if (ball_state)
+                {
+                    if (ball)
+                    {
+                        ball->updateState(*ball_state);
+                    }
+                    else
+                    {
+                        ball = Ball(*ball_state);
+                    }
+                }
 
-                Team friendly_team =
-                    network_filter.getFilteredFriendlyTeamData({detection});
+                friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
                 int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
                 friendly_team.assignGoalie(friendly_goalie_id);
-                world.mutableFriendlyTeam() = friendly_team;
 
-                Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
+                enemy_team = network_filter.getFilteredEnemyTeamData({detection});
                 int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
                 enemy_team.assignGoalie(enemy_goalie_id);
-                world.mutableEnemyTeam() = enemy_team;
             }
         }
-
-        received_world_callback(world);
+    }
+    if (field && ball)
+    {
+        received_world_callback(World(*field, *ball, friendly_team, enemy_team));
     }
 }
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    RefboxGameState game_state = network_filter.getRefboxGameState(packet);
-    world.updateRefboxGameState(game_state);
-
-    if (world.field().isValid())
+    if (field && ball)
     {
+        RefboxGameState game_state = network_filter.getRefboxGameState(packet);
+        World world(*field, *ball, friendly_team, enemy_team);
+        world.updateRefboxGameState(game_state);
         received_world_callback(world);
     }
 }

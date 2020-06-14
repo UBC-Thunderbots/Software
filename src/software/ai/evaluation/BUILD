@@ -24,8 +24,8 @@ cc_library(
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
+        ":shot",
         "//shared:constants",
-        "//software/geom",
         "//software/world",
     ],
 )
@@ -45,6 +45,7 @@ cc_library(
     srcs = ["calc_best_shot.cpp"],
     hdrs = ["calc_best_shot.h"],
     deps = [
+        ":shot",
         "//shared:constants",
         "//software/geom",
         "//software/new_geom:segment",
@@ -57,8 +58,8 @@ cc_test(
     srcs = ["calc_best_shot_test.cpp"],
     deps = [
         ":calc_best_shot",
+        ":shot",
         "//shared:constants",
-        "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -69,6 +70,7 @@ cc_library(
     srcs = ["deflect_off_enemy_target.cpp"],
     hdrs = ["deflect_off_enemy_target.h"],
     deps = [
+        ":shot",
         "//shared:constants",
         "//software/geom",
         "//software/new_geom:triangle",
@@ -81,7 +83,7 @@ cc_test(
     srcs = ["deflect_off_enemy_target_test.cpp"],
     deps = [
         ":deflect_off_enemy_target",
-        "//software/geom",
+        ":shot",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -104,7 +106,7 @@ cc_test(
     srcs = ["detect_threat_test.cpp"],
     deps = [
         ":detect_threat",
-        "//software/geom",
+        ":shot",
         "//software/test_util",
         "//software/time:timestamp",
         "//software/world:ball",
@@ -121,9 +123,9 @@ cc_library(
         ":intercept",
         ":possession",
         ":robot",
+        ":shot",
         ":team",
         "//shared:constants",
-        "//software/geom",
         "//software/new_geom/util:intersects",
         "//software/world",
     ],
@@ -145,35 +147,10 @@ cc_library(
     srcs = ["find_open_areas.cpp"],
     hdrs = ["find_open_areas.h"],
     deps = [
-        ":indirect_chip",
-        "//software/geom",
+        ":shot",
+        "//software/new_geom/util:find_open_circles",
         "//software/parameter:dynamic_parameters",
         "//software/world",
-    ],
-)
-
-cc_library(
-    name = "indirect_chip",
-    srcs = ["indirect_chip.cpp"],
-    hdrs = ["indirect_chip.h"],
-    deps = [
-        "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:triangle",
-        "//software/parameter:dynamic_parameters",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "indirect_chip_test",
-    srcs = ["indirect_chip_test.cpp"],
-    deps = [
-        ":indirect_chip",
-        "//software/geom",
-        "//software/test_util",
-        "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -182,9 +159,9 @@ cc_library(
     srcs = ["intercept.cpp"],
     hdrs = ["intercept.h"],
     deps = [
+        ":shot",
         "//shared:constants",
         "//software/ai/evaluation:pass",
-        "//software/geom",
         "//software/optimization:gradient_descent",
         "//software/world:ball",
         "//software/world:field",
@@ -209,8 +186,8 @@ cc_library(
     deps = [
         ":intercept",
         ":robot",
+        ":shot",
         ":team",
-        "//software/geom",
         "//software/parameter:dynamic_parameters",
         "//software/world:ball",
         "//software/world:field",
@@ -234,8 +211,8 @@ cc_library(
     srcs = ["robot.cpp"],
     hdrs = ["robot.h"],
     deps = [
+        ":shot",
         "//shared:constants",
-        "//software/geom",
         "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
@@ -268,4 +245,11 @@ cc_test(
         ":team",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "shot",
+    srcs = ["shot.cpp"],
+    hdrs = ["shot.h"],
+    deps = ["//software/new_geom:point"],
 )

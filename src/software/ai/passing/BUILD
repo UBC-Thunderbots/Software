@@ -8,9 +8,9 @@ cc_library(
         ":pass",
         "//software/ai/evaluation:pass",
         "//software/geom",
+        "//software/logger",
         "//software/math:math_functions",
         "//software/world",
-        "@g3log",
     ],
 )
 

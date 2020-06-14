@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "shared/proto/robot_component_status.proto";
+import "shared/proto/tbots_timestamp_msg.proto";
+
+message TbotsRobotMsg
+{
+    uint32 robot_id                           = 1;
+    repeated ErrorCode error_code             = 2;
+    BreakBeamStatus break_beam_status         = 3;
+    ChipperKickerStatus chipper_kicker_status = 4;
+    DriveUnits drive_units                    = 5;
+    FirmwareStatus firmware_status            = 6;
+    DribblerStatus dribbler_status            = 7;
+    NetworkStatus network_status              = 8;
+    PowerStatus power_status                  = 9;
+    TemperatureStatus temperature_status      = 10;
+    TimestampMsg time_sent                    = 11;
+}

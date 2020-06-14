@@ -24,7 +24,7 @@ class FreeKickPlay : public Play
 
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
     // The maximum time that we will wait before committing to a pass
@@ -39,11 +39,12 @@ class FreeKickPlay : public Play
      * @param yield The coroutine to yield to
      * @param crease_defender_tactics The crease defender tactics to use
      * @param goalie_tactic The goalie tactic to use
+     * @param world The current state of the world
      */
     void chipAtGoalStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        std::shared_ptr<GoalieTactic> goalie_tactic);
+        std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
 
     /**
      * Given a pass, coordinates and executes the pass with a Passer and Receiver
@@ -52,12 +53,13 @@ class FreeKickPlay : public Play
      * @param crease_defender_tactics The crease defender tactics to use
      * @param goalie_tactic The goalie tactic to use
      * @param best_pass_and_score_so_far The Pass to execute
+     * @param world The current state of the world
      */
     void performPassStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         std::shared_ptr<GoalieTactic> goalie_tactic,
-        PassWithRating best_pass_and_score_so_far);
+        PassWithRating best_pass_and_score_so_far, const World &world);
 
     /**
      * Tries to find a good pass on the field. This function starts with a high threshold
@@ -72,6 +74,7 @@ class FreeKickPlay : public Play
      * @param goalie_tactic The goalie tactic
      * @param pass_generator The pass generator that will generate passes
      * @param best_pass_and_score_so_far The best pass and score so far
+     * @param world The current state of the world
      */
     void shootOrFindPassStage(
         TacticCoroutine::push_type &yield,
@@ -81,19 +84,22 @@ class FreeKickPlay : public Play
         std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         std::shared_ptr<GoalieTactic> goalie_tactic, PassGenerator &pass_generator,
-        PassWithRating &best_pass_and_score_so_far);
+        PassWithRating &best_pass_and_score_so_far, const World &world);
 
     /**
      * Update the tactic that aligns the robot to the ball in preperation to pass
      *
      * @param align_to_ball_tactic
+     * @param world The current state of the world
      */
-    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic);
+    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                 const World &world);
 
     /**
      * Updates the pass generator
      *
      * @param pass_generator
+     * @param world The current state of the world
      */
-    void updatePassGenerator(Passing::PassGenerator &pass_generator);
+    void updatePassGenerator(Passing::PassGenerator &pass_generator, const World &world);
 };

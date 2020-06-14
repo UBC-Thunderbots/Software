@@ -26,14 +26,13 @@ cc_test(
 
 cc_library(
     name = "refbox_data",
-    srcs = ["refbox_data.cpp"],
     hdrs = ["refbox_data.h"],
     deps = [
         ":team_info",
         "//software/geom",
         "//software/proto:ssl_cc_proto",
         "//software/time:timestamp",
-        "//software/util/printable_enum_macro",
+        "//software/util/make_enum",
     ],
 )
 
@@ -55,17 +54,36 @@ cc_test(
 )
 
 cc_library(
+    name = "ssl_protobuf_reader",
+    srcs = ["ssl_protobuf_reader.cpp"],
+    hdrs = ["ssl_protobuf_reader.h"],
+    deps = [
+        "//software/logger",
+        "//software/parameter:dynamic_parameters",
+        "//software/proto:ssl_cc_proto",
+        "//software/proto/message_translation:ssl_geometry_message_translator",
+        "//software/sensor_fusion:refbox_data",
+        "//software/sensor_fusion:vision_detection",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:team",
+    ],
+)
+
+cc_library(
     name = "sensor_fusion",
     srcs = ["sensor_fusion.cpp"],
     hdrs = ["sensor_fusion.h"],
     deps = [
         ":refbox_data",
+        ":ssl_protobuf_reader",
         ":vision_detection",
-        "//software/ai/primitive",
         "//software/backend:robot_status",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/parameter:dynamic_parameters",
+        "//software/primitive",
+        "//software/proto:sensor_msg_cc_proto",
         "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/world",
     ],

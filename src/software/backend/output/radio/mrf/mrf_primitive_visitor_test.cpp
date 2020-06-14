@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/primitive/all_primitives.h"
+#include "software/primitive/all_primitives.h"
 
 /**
  * Check whether the two given radio primitives are equal
@@ -240,11 +240,4 @@ TEST(MRFPrimitiveVisitorTest, visit_stop_primitive)
     primitive.accept(prim_visitor);
     RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
-}
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

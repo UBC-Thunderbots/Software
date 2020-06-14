@@ -24,7 +24,8 @@ bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
            !world.gameState().isHalted();
 }
 
-void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                          const World &world)
 {
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
@@ -42,19 +43,19 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
-            Point(0, 0), world.field().enemyGoal().toVector().orientation(), 0);
+            Point(0, 0), world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_3->updateControlParams(
             Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_4->updateControlParams(
             Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_5->updateControlParams(
             Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_6->updateControlParams(
             Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoal().toVector().orientation(), 0);
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield({goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,

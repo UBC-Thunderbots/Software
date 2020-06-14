@@ -22,9 +22,9 @@ cc_binary(
     deps = [
         "//firmware_new/boards/frankie_v1:constants",
         "//firmware_new/proto:fw_cc_proto",
-        "//firmware_new/tools/communication:robot_communicator",
-        "//firmware_new/tools/communication/transfer_media:network_medium",
-        "//firmware_new/tools/communication/transfer_media:transfer_medium",
+        "//software/logger",
+        "//software/networking:proto_multicast_listener",
+        "//software/networking:proto_multicast_sender",
         "@boost//:asio",
         "@com_google_protobuf//:protobuf",
     ],

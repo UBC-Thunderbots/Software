@@ -32,23 +32,17 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
     }
 
    protected:
-    void SetUp() override
-    {
-        world.mutableField() = ::Test::TestUtil::createSSLDivBField();
-    }
-
     STP stp;
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
        test_play_selection_for_states_and_positions)
 {
     // set up the friendly team
-    ::Test::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
-                                                Timestamp());
-    ::Test::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions,
-                                             Timestamp());
+    ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
+                                          Timestamp());
+    ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
     world.mutableBall() = Ball(GetParam().ball_position, Vector(), Timestamp());
 
     // to set restart reason, etc. properly
@@ -182,6 +176,7 @@ std::vector<PlaySelectionTestParams> test_params = {
      .first_game_state   = RefboxGameState::PREPARE_PENALTY_THEM,
      .second_game_state  = RefboxGameState::NORMAL_START}};
 
+// TODO (Issue #1330): Reenable these tests
 // INSTANTIATE_TEST_CASE_P(TestPositions,
 // STPRefboxGameStatePlaySelectionTestWithPositions,
 //                        ::testing::ValuesIn(test_params.begin(), test_params.end()));
@@ -203,8 +198,7 @@ class STPRefboxGameStatePlaySelectionTest
             return std::make_unique<HaltPlay>();
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp                  = STP(default_play_constructor, 0);
-        world.mutableField() = ::Test::TestUtil::createSSLDivBField();
+        stp = STP(default_play_constructor, 0);
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
@@ -225,13 +219,13 @@ class STPRefboxGameStatePlaySelectionTest
     }
 
     STP stp;
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTest,
        test_play_selection_for_all_refbox_game_states)
 {
-    // TODO: replace the ball with real parameterized values
+    // TODO (Issue #1330): replace the ball with real parameterized values
     world.mutableGameState().updateRefboxGameState(GetParam());
     world.mutableGameState().updateBall(
         Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
@@ -246,15 +240,9 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
     }
 }
 
-auto all_refbox_game_states = ::Test::TestUtil::getAllRefboxGameStates();
+auto all_refbox_game_states = ::TestUtil::getAllRefboxGameStates();
 
+// TODO (Issue #1330): Reenable these tests
 // INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
 //                        ::testing::ValuesIn(all_refbox_game_states.begin(),
 //                                            all_refbox_game_states.end()));
-
-int main(int argc, char** argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
-#include "software/ai/primitive/move_primitive.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
+#include "software/primitive/move_primitive.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 
@@ -69,5 +68,4 @@ class InterceptBallAction : public Action
     // Action parameters
     Field field;
     Ball ball;
-    bool loop_forever;
 };

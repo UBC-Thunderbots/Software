@@ -59,7 +59,9 @@ class PassingEvaluationTest : public testing::Test
     double avg_time_offset_for_pass_seconds;
 };
 
-TEST_F(PassingEvaluationTest, ratePass_speed_test)
+// This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from
+// the test name
+TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
 {
     // This test does not assert anything. Rather, It can be used to guage how
     // fast ratePass is running, and can be profiled in order to find areas
@@ -67,44 +69,44 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
 
     const int num_passes_to_gen = 1000;
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
-    world.updateEnemyTeamState(
-        Team(Duration::fromSeconds(10),
-             {
-                 Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(3, {1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(4, {0, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(5, {2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(6, {3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-             }));
-    world.updateFriendlyTeamState(
-        Team(Duration::fromSeconds(10),
-             {
-                 Robot(0, {-0.2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(1, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(3, {-1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(4, {0, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(5, {-2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-                 Robot(6, {-3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(0)),
-             }));
+    world.updateEnemyTeamState(Team(
+        {
+            Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(3, {1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(4, {0, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(5, {2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(6, {3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+        },
+        Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team(
+        {
+            Robot(0, {-0.2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(1, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(3, {-1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(4, {0, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(5, {-2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+            Robot(6, {-3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0)),
+        },
+        Duration::fromSeconds(10)));
 
     std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
                                                   world.field().xLength() / 2);
@@ -155,25 +157,13 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
         ratePass(world, pass, std::nullopt, std::nullopt, PassType::ONE_TOUCH_SHOT);
     }
 
-    auto end_time = std::chrono::system_clock::now();
+    double duration_ms = ::TestUtil::millisecondsSince(start_time);
+    double avg_ms      = duration_ms / static_cast<double>(num_passes_to_gen);
 
-    std::chrono::duration<double> duration = end_time - start_time;
-
-    std::chrono::duration<double> avg;
-    avg = duration / static_cast<double>(num_passes_to_gen);
-
-    // At the time of this tests creation, ratePass ran at an average 0.105ms
+    // At the time of this test's creation (PR #695), ratePass ran at an average 0.105ms
     // in debug on an i7
-    //    std::cout << "Took "
-    //              <<
-    //              std::chrono::duration_cast<std::chrono::microseconds>(duration).count()
-    //              /
-    //                     1000.0
-    //              << "ms to run, average time of "
-    //              << std::chrono::duration_cast<std::chrono::microseconds>(avg).count()
-    //              /
-    //                     1000.0
-    //              << "ms" << std::endl;
+    std::cout << "Took " << duration_ms << "ms to run, average time of " << avg_ms << "ms"
+              << std::endl;
 }
 
 TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
@@ -183,7 +173,7 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
     Pass pass({2, 2}, {0, 0}, max_pass_speed_param - 0.2,
               Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(),
@@ -211,7 +201,7 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     Pass pass({2, 2}, {0, 0}, max_pass_speed_param - 0.2,
               Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {3, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
@@ -241,7 +231,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     Pass pass({2, 2}, {1, -1}, max_pass_speed_param - 0.2,
               Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
@@ -269,7 +259,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     Pass pass({2, 2}, {1, -1}, max_pass_speed_param - 0.2,
               Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
@@ -297,7 +287,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     Pass pass({2, 2}, {1, -1}, avg_desired_pass_speed,
               Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
@@ -306,7 +296,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
-        Robot(0, world.field().enemyGoal() + Vector(0, 0.5), {0, 0}, Angle::zero(),
+        Robot(0, world.field().enemyGoalCenter() + Vector(0, 0.5), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateEnemyTeamState(enemy_team);
@@ -321,7 +311,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net)
 {
     // A pass from the +y side of the field to the -y side of the field,
     // roughly 1/2 way up the enemy half of the field
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {2, -1.8}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -342,7 +332,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
 {
     // A pass from the positive enemy corner to a robot at the center of the field with
     // no enemies
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -366,23 +356,24 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
     // but it has enough space that it should be able to break away from it's marker in
     // time to make space to receive the pass and one-time shoot it into the net.
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    Team friendly_team(Duration::fromSeconds(10),
-                       {// Robot doing corner kick
-                        Robot(0, world.field().enemyCornerPos(), {0, 0}, Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                        // Robot at center field
-                        Robot(1, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                              Timestamp::fromSeconds(0))});
+    World world = ::TestUtil::createBlankTestingWorld();
+    Team friendly_team(
+        {// Robot doing corner kick
+         Robot(0, world.field().enemyCornerPos(), {0, 0}, Angle::zero(),
+               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+         // Robot at center field
+         Robot(1, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))},
+        Duration::fromSeconds(10));
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(
-        Duration::fromSeconds(10),
         {// Enemy goalie
-         Robot(0, world.field().enemyGoal() + Vector(-0.1, 0.5), {0, 0}, Angle::quarter(),
-               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+         Robot(0, world.field().enemyGoalCenter() + Vector(-0.1, 0.5), {0, 0},
+               Angle::quarter(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
          // Enemy marking friendly in the center
          Robot(1, {2.4, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
-               Timestamp::fromSeconds(0))});
+               Timestamp::fromSeconds(0))},
+        Duration::fromSeconds(10));
     world.updateEnemyTeamState(enemy_team);
 
     Pass pass(world.field().enemyCornerPos(), {1.8, 0.8}, 4.8,
@@ -398,7 +389,7 @@ TEST_F(PassingEvaluationTest, ratePass_no_target_region)
 {
     // This should be a really good pass, and since there is no target region it should
     // be highly scored
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -420,7 +411,7 @@ TEST_F(PassingEvaluationTest, ratePass_with_target_region)
 {
     // This should be a really good pass, but it's outside our target region, so it
     // should be rate poorly
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -443,7 +434,7 @@ TEST_F(PassingEvaluationTest, ratePass_with_target_region)
 TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
 {
     // We should very poorly rate a pass that has occurred in the past
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -453,10 +444,11 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    // We update the the ball state because that's what is used as a reference for the
+    // We update the ball state because that's what is used as a reference for the
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
-    world.updateBallState(BallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
@@ -468,7 +460,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
 
 TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -478,12 +470,12 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    // We update the the ball state because that's what is used as a reference for the
+    // We update the ball state because that's what is used as a reference for the
     // current time by the evaluation function
     // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
-    world.updateBallState(
-        BallState({0, 0}, {0, 0},
-                  Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
+    world.updateBallStateWithTimestamp(TimestampedBallState(
+        {0, 0}, {0, 0},
+        Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 
@@ -495,7 +487,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
 
 TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -515,7 +507,7 @@ TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
 
 TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -536,12 +528,12 @@ TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
 TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
 {
     // If there is only a passer on the field, no pass is possible
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     Robot passer = Robot(13, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                          Timestamp::fromSeconds(0));
     unsigned int passer_robot_id = passer.id();
-    Team friendly_team(Duration::fromSeconds(10), {passer});
+    Team friendly_team({passer}, Duration::fromSeconds(10));
     world.updateFriendlyTeamState(friendly_team);
 
     Pass pass({0, 0}, {0.1, 0.1}, avg_desired_pass_speed, Timestamp::fromSeconds(10));
@@ -556,17 +548,17 @@ TEST_F(PassingEvaluationTest, ratePass_attempting_to_pass_and_receive_no_shot)
     // Test that a pass which does NOT result in a good shot on goal is rated
     // highly if we are rating it as a pass which is intended to be received
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     world.mutableFriendlyTeam().updateRobots({
         Robot(0, {1, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
     world.mutableEnemyTeam().updateRobots({
-        Robot(0, world.field().enemyGoal(), {0, 0}, Angle::zero(),
+        Robot(0, world.field().enemyGoalCenter(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(1, world.field().enemyGoal() - Vector(0, 0.2), {0, 0}, Angle::zero(),
+        Robot(1, world.field().enemyGoalCenter() - Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(2, world.field().enemyGoal() + Vector(0, 0.2), {0, 0}, Angle::zero(),
+        Robot(2, world.field().enemyGoalCenter() + Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
 
@@ -587,7 +579,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_g
     // and are right in front of it
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Pass pass({4, 0}, {3.5, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -602,7 +594,7 @@ TEST_F(PassingEvaluationTest,
     // goal
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Pass pass({-1, 0}, {0, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -621,7 +613,7 @@ TEST_F(PassingEvaluationTest,
         Robot(1, {1, -10}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Pass pass({3.5, 0}, {3, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -638,7 +630,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
         Robot(0, {0.2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Pass pass({1, 1}, {0, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
@@ -649,7 +641,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
 TEST_F(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
 {
     // As we decrease the open angle to the goal, the shot score should also decrease
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Pass pass({3.5, 0.0}, {3, 0}, 1, Timestamp::fromSeconds(1));
     Team enemy_team(Duration::fromSeconds(10));
 
@@ -948,7 +940,7 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
         Robot(1, {-3, 3}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::fromDegrees(0),
               Timestamp::fromSeconds(0));
 
-    Team team(Duration::fromSeconds(10), {passer, potential_receiver});
+    Team team({passer, potential_receiver}, Duration::fromSeconds(10));
     Pass pass({2, -2}, {0, 0}, 10, Timestamp::fromSeconds(1));
 
     double friendly_capability = ratePassFriendlyCapability(team, pass, passer_robot_id);
@@ -1021,7 +1013,7 @@ TEST_F(PassingEvaluationTest,
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
 {
-    Field f = ::Test::TestUtil::createSSLDivBField();
+    Field f = ::TestUtil::createSSLDivBField();
 
     // Check that the static quality is basically 0 at the edge of the field
     EXPECT_LE(getStaticPositionQuality(f, Point(-4.5, 0)), 0.13);
@@ -1032,7 +1024,7 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
 {
-    Field f = ::Test::TestUtil::createSSLDivBField();
+    Field f = ::TestUtil::createSSLDivBField();
 
     // Check that we have a static quality of almost 0 near our goal
     EXPECT_LE(getStaticPositionQuality(f, Point(-4.0, 0)), 0.14);
@@ -1040,7 +1032,7 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
 {
-    Field f = ::Test::TestUtil::createSSLDivBField();
+    Field f = ::TestUtil::createSSLDivBField();
 
     // Check that we have a large static quality near the enemy goal
     EXPECT_GE(getStaticPositionQuality(f, Point(3.0, 0)), 0.80);

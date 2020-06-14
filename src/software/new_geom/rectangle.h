@@ -3,7 +3,8 @@
 #include "software/new_geom/convex_polygon.h"
 
 /**
- * A rectangle that cannot be rotated.
+ * A rectangle is a ConvexPolygon of four Points with the invariant that two sides are
+ * parallel to the x axis and two sides are parallel to the y axis
  */
 class Rectangle : public ConvexPolygon
 {
@@ -47,28 +48,56 @@ class Rectangle : public ConvexPolygon
      *
      * @return The <+x,+y> corner of the rectangle
      */
-    Point posXPosYCorner() const;
+    const Point &posXPosYCorner() const;
 
     /**
      * Returns the <-x,+y> corner of the rectangle
      *
      * @return The <-x,+y> corner of the rectangle
      */
-    Point negXPosYCorner() const;
+    const Point &negXPosYCorner() const;
 
     /**
      * Returns the <-x,-y> corner of the rectangle
      *
      * @return The <-x,-y> corner of the rectangle
      */
-    Point negXNegYCorner() const;
+    const Point &negXNegYCorner() const;
 
     /**
      * Returns the <+x,-y> corner of the rectangle
      *
      * @return The <+x,-y> corner of the rectangle
      */
-    Point posXNegYCorner() const;
+    const Point &posXNegYCorner() const;
+
+    /**
+     * Gets the maximum x value of the rectangle
+     *
+     * return max x value
+     */
+    double xMax() const;
+
+    /**
+     * Gets the minimum x value of the rectangle
+     *
+     * return min x value
+     */
+    double xMin() const;
+
+    /**
+     * Gets the maximum y value of the rectangle
+     *
+     * return max y value
+     */
+    double yMax() const;
+
+    /**
+     * Gets the minimum y value of the rectangle
+     *
+     * return min y value
+     */
+    double yMin() const;
 
     /**
      * Determines whether the given Point is contained within this Rectangle.
@@ -84,7 +113,7 @@ class Rectangle : public ConvexPolygon
      * @param p The point to test
      * @return The corner point that is furthest from the test point
      */
-    Point furthestCorner(const Point &p);
+    Point furthestCorner(const Point &p) const;
 
     /**
      * Returns a vector from negXNegY point of the rectangle to the posXPosY point
@@ -98,13 +127,27 @@ class Rectangle : public ConvexPolygon
      * the centre by an "amount" while maintaining the same location for the center of the
      * rectangle. The rectangle will not shrink to anything smaller than a point.
      *
+     * NOTE: this is a deprecated function that will be removed in #1331 or #1332
+     *
      * @param amount The amount to expand or shrink the rectangle by on all sides, can be
      * positive or negative
      *
      * @return bool Whether it was possible to expand/shrink the rectangle by
      * amount requested, rectangle remains unchanged if impossible to expand/shrink
      */
-    bool expand(double amount);
+    bool inflate(double amount);
+
+    /**
+     * Returns the Rectangle expanded in the direction of v
+     * To maintain the Rectangle invariant, this is done in two steps:
+     * 1. The Rectangle is split in half perpendicular to v*(1,0) and points on the half
+     * that v*(1,0) is pointing are translated by v*(1,0)
+     * 2. The Rectangle is split in half perpendicular to v*(0,1) and points on the half
+     * that v*(0,1) is pointing are translated by v*(0,1)
+     *
+     * @return a Rectangle expanded in the direction of v
+     */
+    Rectangle expand(const Vector &v) const;
 
     bool operator==(const Rectangle &p) const;
 };

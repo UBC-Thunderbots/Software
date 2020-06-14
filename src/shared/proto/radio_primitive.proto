@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+// We call this a RadioPrimitiveMsg and not just a "Primitive"
+// because the contents of this message are a 1-1 mapping
+// with the existing `RadioPrimitive` we send over radio
+// using the MRF-Dongle.
+message RadioPrimitiveMsg
+{
+    // A numeric id representing the primitive for firmware
+    FirmwarePrimitiveType prim_type = 1;
+
+    // The parameters to be encoded into the packet
+    double parameter1 = 2;
+    double parameter2 = 3;
+    double parameter3 = 4;
+    double parameter4 = 5;
+
+    // Extra bits used for flags and/or additional information
+    uint32 extra_bits = 6;
+
+    // Indicates whether the robot should move slowly (<1.5 m/s)
+    bool slow = 7;
+}
+
+/*
+ * This enum represents the IDs of the primitives implemented in firmware.
+ *
+ * TODO remove duplication w/ firmware_primitive_type.h and radio msgs once radio backend
+ * is on proto https://github.com/UBC-Thunderbots/Software/issues/1216
+ *
+ */
+enum FirmwarePrimitiveType
+{
+    /**
+     * Stop Primitive
+     *
+     * The parameters are unused.
+     *
+     * The extra field is 0 for coasting or 1 for braking.
+     */
+    STOP = 0;
+
+    /**
+     * Move Primitive
+     *
+     * The parameters are:
+     * - relative position (x, y)(mm, mm)
+     * - relative orientation (centiradians)
+     * - final speed (mm/s)
+     *
+     * The extra field is 0 if the caller doesn’t care about orientation,
+     * or 1 if it does.
+     */
+    MOVE = 1;
+
+    /**
+     * Dribble Primitive
+     *
+     * The parameters are:
+     * - relative position (x, y)(mm, mm)
+     * - relative orientation (centiradians)
+     *
+     * The extra field is 0 if small kicks are prohibited or 1 if they are
+     * allowed.
+     */
+    DRIBBLE = 2;
+
+    /**
+     * Shoot Primitive
+     *
+     * Note that in HL, this is split into kick and chip.
+     *
+     * The parameters are:
+     * - relative position (x, y)(mm, mm)
+     * - relative orientation (centiradians)
+     * - power (either m/s or m).
+     *
+     * The extra field has bit 0 clear to kick or set to chip, and bit 1
+     * set if the caller cares about orientation.
+     */
+    SHOOT = 3;
+
+    /**
+     * Catch Primitive
+     *
+     * The parameters are:
+     * - The velocity (mm/s)
+     * - dribble speed (rpm)
+     * - margin (no unit)
+     */
+    CATCH = 4;
+
+    /**
+     * Pivot Primitive
+     *
+     * The parameters are:
+     * - The relative centre point (x, y)(mm, mm)
+     * - The radius to pivot around (mm)
+     * - The angle to pivot to (centiradians)
+     * orientation.
+     */
+    PIVOT = 5;
+
+    /**
+     * Spin Primitive
+     *
+     * The parameters are
+     * - relative x position (mm)
+     * - relative y position (mm)
+     * - angular velocity (centiradians/s)
+     * - final speed (mm/s)
+     */
+    SPIN = 6;
+
+    /**
+     * Specifies that direct control is in use and wheels are being
+     * driven with individual power levels.
+     */
+    DIRECT_WHEELS = 7;
+
+    /**
+     * Specifies that direct control is in use and robot-relative
+     * linear and angular velocities are being sent.
+     */
+    DIRECT_VELOCITY = 8;
+};

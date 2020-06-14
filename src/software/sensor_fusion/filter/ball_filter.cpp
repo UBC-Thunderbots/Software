@@ -261,7 +261,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     return results;
 }
 
-std::optional<BallState> BallFilter::estimateBallState(
+std::optional<TimestampedBallState> BallFilter::estimateBallState(
     boost::circular_buffer<BallDetection> ball_detections)
 {
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
@@ -324,36 +324,37 @@ std::optional<BallState> BallFilter::estimateBallState(
         Vector filtered_velocity = velocity_direction_along_regression_line.normalize(
             velocity_estimate->average_velocity_magnitude);
 
-        return BallState(filtered_ball_position, filtered_velocity,
-                         latest_ball_detection.timestamp);
+        return TimestampedBallState(filtered_ball_position, filtered_velocity,
+                                    latest_ball_detection.timestamp);
     }
 }
 
-std::optional<Ball> BallFilter::getFilteredData(
+std::optional<TimestampedBallState> BallFilter::getFilteredData(
     const std::vector<BallDetection> &new_ball_detections, const Field &field)
 {
     addNewDetectionsToBuffer(new_ball_detections, field);
 
     if (ball_detection_buffer.size() >= 2)
     {
-        std::optional<BallState> filtered_ball = estimateBallState(ball_detection_buffer);
+        std::optional<TimestampedBallState> filtered_ball =
+            estimateBallState(ball_detection_buffer);
         if (filtered_ball)
         {
-            return Ball(*filtered_ball);
+            return *filtered_ball;
         }
         else
         {
-            return Ball(ball_detection_buffer.front().position, Vector(0, 0),
-                        ball_detection_buffer.front().timestamp);
+            return TimestampedBallState(ball_detection_buffer.front().position,
+                                        Vector(0, 0),
+                                        ball_detection_buffer.front().timestamp);
         }
     }
     else if (ball_detection_buffer.size() == 1)
     {
         // If there is only 1 entry in the buffer, we can't calculate a velocity so
         // just set it to 0
-        Ball filtered_ball = Ball(ball_detection_buffer.front().position, Vector(0, 0),
-                                  ball_detection_buffer.front().timestamp);
-        return filtered_ball;
+        return TimestampedBallState(ball_detection_buffer.front().position, Vector(0, 0),
+                                    ball_detection_buffer.front().timestamp);
     }
     else
     {

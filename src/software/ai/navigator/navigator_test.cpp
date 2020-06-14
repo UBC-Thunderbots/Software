@@ -7,26 +7,30 @@
 #include "software/ai/navigator/path_planner/no_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/one_point_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/ai/primitive/all_primitives.h"
+#include "software/primitive/all_primitives.h"
 #include "software/test_util/test_util.h"
 
 class NoPathNavigatorTest : public testing::Test
 {
    public:
     NoPathNavigatorTest()
-        : navigator(std::make_unique<VelocityObstaclePathManager>(
+        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
+              Util::DynamicParameters->getAIConfig()
+                  ->getRobotNavigationObstacleFactoryConfig())),
+          navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<NoPathTestPathPlanner>(),
-                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                        std::make_shared<VelocityObstaclePathManagerConfig>()),
-                    ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                    std::make_shared<NavigatorConfig>()),
+                        robot_navigation_obstacle_factory),
+                    robot_navigation_obstacle_factory,
+                    Util::DynamicParameters->getAIConfig()->getNavigatorConfig()),
           current_time(Timestamp::fromSeconds(123)),
-          field(::Test::TestUtil::createSSLDivBField()),
+          field(::TestUtil::createSSLDivBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
           friendly_team(Team(Duration::fromMilliseconds(1000))),
           enemy_team(Team(Duration::fromMilliseconds(1000)))
     {
     }
+
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 
     // The navigator under test
     Navigator navigator;
@@ -42,21 +46,25 @@ class ThetaStarNavigatorTest : public testing::Test
 {
    public:
     ThetaStarNavigatorTest()
-        : navigator(std::make_unique<VelocityObstaclePathManager>(
+        : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
+              Util::DynamicParameters->getAIConfig()
+                  ->getRobotNavigationObstacleFactoryConfig())),
+          navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<ThetaStarPathPlanner>(),
-                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                        std::make_shared<VelocityObstaclePathManagerConfig>()),
-                    ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                    std::make_shared<NavigatorConfig>())
+                        robot_navigation_obstacle_factory),
+                    robot_navigation_obstacle_factory,
+                    Util::DynamicParameters->getAIConfig()->getNavigatorConfig())
     {
     }
+
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 
     Navigator navigator;
 };
 
 TEST_F(ThetaStarNavigatorTest, convert_catch_intent_to_catch_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<CatchIntent>(1, 0, 10, 0.3, 0));
@@ -73,7 +81,7 @@ TEST_F(ThetaStarNavigatorTest, convert_catch_intent_to_catch_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -92,7 +100,7 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
 TEST_F(ThetaStarNavigatorTest,
        convert_direct_velocity_intent_to_direct_velocity_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<DirectVelocityIntent>(3, 1, -2, 0.4, 1000, 4));
@@ -109,7 +117,7 @@ TEST_F(ThetaStarNavigatorTest,
 
 TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -127,7 +135,7 @@ TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_pri
 
 TEST_F(ThetaStarNavigatorTest, convert_dribble_intent_to_dribble_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -145,7 +153,7 @@ TEST_F(ThetaStarNavigatorTest, convert_dribble_intent_to_dribble_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -163,7 +171,7 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
@@ -181,7 +189,7 @@ TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_pivot_intent_to_pivot_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
@@ -200,7 +208,7 @@ TEST_F(ThetaStarNavigatorTest, convert_pivot_intent_to_pivot_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
@@ -217,14 +225,12 @@ TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
 
 TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
                                                        Angle::fromRadians(2.2), true, 1));
-    //    intents.emplace_back(
-    //        std::make_unique<MoveIntent>(0, Point(), Angle::quarter(), 0, 1));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
@@ -250,7 +256,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     // An arbitrary fixed point in time
     // We use this fixed point in time to make the tests deterministic.
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
 
     Robot friendly_robot_0 = Robot(0, poi, Vector(-1, -2), Angle::half(),
                                    AngularVelocity::threeQuarter(), current_time);
@@ -273,12 +279,15 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     // Construct the world with arguments
     World world = World(field, ball, friendly_team, enemy_team);
 
-    Navigator navigator(std::make_unique<VelocityObstaclePathManager>(
-                            std::make_unique<OnePointPathTestPathPlanner>(),
-                            ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                            std::make_shared<VelocityObstaclePathManagerConfig>()),
-                        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-                        std::make_shared<NavigatorConfig>());
+    Navigator navigator(
+        std::make_unique<VelocityObstaclePathManager>(
+            std::make_unique<OnePointPathTestPathPlanner>(),
+            RobotNavigationObstacleFactory(
+                Util::DynamicParameters->getAIConfig()
+                    ->getRobotNavigationObstacleFactoryConfig())),
+        RobotNavigationObstacleFactory(Util::DynamicParameters->getAIConfig()
+                                           ->getRobotNavigationObstacleFactoryConfig()),
+        std::make_shared<NavigatorConfig>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
@@ -352,6 +361,28 @@ TEST_F(NoPathNavigatorTest,
     testp2      = Point(1, 2);
     testp3      = Point(1, 3);
     final_speed = -2.2;
+    EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
+                                      testp1, testp2, testp3, final_speed));
+}
+
+TEST_F(NoPathNavigatorTest,
+       calculateTransitionSpeedBetweenSegments_tests_opposite_segments)
+{
+    Point testp1, testp2, testp3;
+    double final_speed;
+    // unequal segment length
+    testp1      = Point(1, 0);
+    testp2      = Point(2, 0);
+    testp3      = Point(0, 0);
+    final_speed = 0;
+    EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
+                                      testp1, testp2, testp3, final_speed));
+
+    // equal segment length
+    testp1      = Point(1, 1);
+    testp2      = Point(1, 2);
+    testp3      = Point(1, 1);
+    final_speed = 0;
     EXPECT_DOUBLE_EQ(final_speed, navigator.calculateTransitionSpeedBetweenSegments(
                                       testp1, testp2, testp3, final_speed));
 }

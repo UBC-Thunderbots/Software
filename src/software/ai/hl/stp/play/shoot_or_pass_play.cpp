@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/play/shoot_or_pass_play.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
@@ -11,9 +9,9 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
-#include "src/g3log/loglevels.hpp"
 
 
 using namespace Passing;
@@ -29,24 +27,19 @@ std::string ShootOrPassPlay::getName() const
 
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
-    bool use_shoot_or_pass_instead_of_shoot_or_chip =
-        Util::DynamicParameters->getAIConfig()
-            ->getHighLevelStrategyConfig()
-            ->UseShootOrPassInsteadOfShootOrChip()
-            ->value();
-
-    return use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+    return world.gameState().isPlaying() &&
+           teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
-            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
+           (!teamHasPossession(world, world.enemyTeam()) ||
+            teamPassInProgress(world, world.friendlyTeam()));
 }
 
-void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     /**
      * There are two main stages to this Play:
@@ -133,7 +126,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                ->value();
     do
     {
-        updatePassGenerator(pass_generator);
+        updatePassGenerator(pass_generator, world);
 
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
@@ -206,7 +199,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished";
 }
 
-void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
+void ShootOrPassPlay::updatePassGenerator(Passing::PassGenerator &pass_generator,
+                                          const World &world)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());

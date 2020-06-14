@@ -1,13 +1,22 @@
 #pragma once
 
+#include "shared/constants.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
-#include "software/time/timestamp.h"
-#include "software/world/robot_capabilities.h"
+#include "software/new_geom/vector.h"
+#include "software/util/make_enum/make_enum.h"
 
-// This class represents the state of a Robot at a single point in time
-class RobotState final
+using RobotId = unsigned int;
+
+/**
+ * The possible team colours of SSL robots
+ */
+MAKE_ENUM(TeamColour, YELLOW, BLUE)
+/**
+ * This class represents the physical state of a robot
+ */
+class RobotState
 {
    public:
     /**
@@ -16,15 +25,12 @@ class RobotState final
      *
      * @param position The position of the robot, with coordinates in metres
      * @param velocity The velocity of the robot, in metres per second
-     * @param orientation The orientation of the robot, in Radians.
-     * @param angular_velocity The angular velocity of the robot, in Radians
-     * per second
-     * @param timestamp The timestamp at which the ball was observed to be at the
-     * given position and velocity
+     * @param orientation The orientation of the robot
+     * @param angular_velocity The angular velocity of the robot
      */
     explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation, const AngularVelocity &angular_velocity,
-                        const Timestamp &timestamp);
+                        const Angle &orientation,
+                        const AngularVelocity &angular_velocity);
 
     /**
      * Returns the position of the robot represented by this state
@@ -55,17 +61,11 @@ class RobotState final
     AngularVelocity angularVelocity() const;
 
     /**
-     * Returns the timestamp of the robot represented by this state
-     *
-     * @return the timestamp of the robot represented by this state
-     */
-    Timestamp timestamp() const;
-
-    /**
-     * Defines the equality operator for a RobotState. RobotStates are equal if their
-     * positions, velocities, orientation, and angular velocity are the same
+     * Defines the equality operator for a RobotState. RobotStates are equal if
+     * all their members are equal
      *
      * @param other The robot state to compare against for equality
+     *
      * @return True if the other robot state is equal to this robot state, and false
      * otherwise
      */
@@ -75,6 +75,7 @@ class RobotState final
      * Defines the inequality operator for a RobotState.
      *
      * @param other The robot state to compare against for inequality
+     *
      * @return True if the other robot state is not equal to this robot state, and false
      * otherwise
      */
@@ -82,12 +83,16 @@ class RobotState final
 
    private:
     Point position_;
-
     Vector velocity_;
-
     Angle orientation_;
-
     AngularVelocity angular_velocity_;
+};
 
-    Timestamp timestamp_;
+/**
+ * A light structure for a robot state with an ID
+ */
+struct RobotStateWithId
+{
+    unsigned int id;
+    RobotState robot_state;
 };

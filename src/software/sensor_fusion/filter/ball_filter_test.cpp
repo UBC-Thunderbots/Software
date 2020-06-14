@@ -20,11 +20,13 @@
 class BallFilterTest : public ::testing::Test
 {
    protected:
+    BallFilterTest() {}
+
     void SetUp() override
     {
         // Initialize the time
         current_timestamp = Timestamp::fromSeconds(123);
-        field             = ::Test::TestUtil::createSSLDivBField();
+        field             = ::TestUtil::createSSLDivBField();
         ball_filter       = BallFilter(4, 10);
         time_step         = Duration::fromSeconds(1.0 / 60.0);
         // Use a constant seed to results are deterministic
@@ -210,7 +212,7 @@ class BallFilterTest : public ::testing::Test
 
             ASSERT_TRUE(filtered_ball);
             double ball_position_difference =
-                (filtered_ball->position() - current_ball_position).length();
+                (filtered_ball->ballState().position() - current_ball_position).length();
             EXPECT_LT(ball_position_difference, expected_position_tolerance);
             // Only check the velocity once we have more than 1 data entry in the filter
             // since the filter can't return a realistic velocity with only a single
@@ -219,25 +221,27 @@ class BallFilterTest : public ::testing::Test
             {
                 // Check the direction of the velocity
                 double velocity_orientation_difference =
-                    std::fabs(filtered_ball->velocity()
+                    std::fabs(filtered_ball->ballState()
+                                  .velocity()
                                   .orientation()
                                   .minDiff(ball_velocity.orientation())
                                   .toDegrees());
                 EXPECT_LE(velocity_orientation_difference,
                           expected_velocity_angle_tolerance.toDegrees());
                 // Check the magnitude of the velocity
-                double velocity_magnitude_difference = std::fabs(
-                    filtered_ball->velocity().length() - ball_velocity.length());
+                double velocity_magnitude_difference =
+                    std::fabs(filtered_ball->ballState().velocity().length() -
+                              ball_velocity.length());
                 EXPECT_LE(velocity_magnitude_difference,
                           expected_velocity_magnitude_tolerance);
             }
 
             // Make sure the timestamps are always increasing
-            EXPECT_GE(filtered_ball->lastUpdateTimestamp(), current_timestamp);
+            EXPECT_GE(filtered_ball->timestamp(), current_timestamp);
         }
     }
 
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     BallFilter ball_filter;
     Duration time_step;
     std::mt19937 random_generator;

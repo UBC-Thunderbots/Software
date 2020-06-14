@@ -10,6 +10,7 @@ class ConvexPolygon : public Polygon, public ConvexShape
 {
    public:
     ConvexPolygon() = delete;
+
     /**
      * Returns the area of this convex polygon
      *

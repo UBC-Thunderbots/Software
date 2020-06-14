@@ -1,16 +1,13 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/util/closest_point.h"
 
 using namespace Passing;
-using namespace Evaluation;
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
                                const Team& enemy_team, const Passing::Pass pass,
@@ -75,7 +72,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
             Angle shot_angle = (target_position - robot->position()).orientation();
 
-            // If we do have a valid shot on net, orient the robot to face in between
+            // If we do have a valid shot on net, orient the robot to face in-between
             // the pass vector and shot vector, so the robot can quickly orient itself
             // to either receive the pass, or take the shot. Also, not directly facing
             // where we plan on kicking may throw off the enemy AI
@@ -194,7 +191,7 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
             best_shot_opt->getPointToShootAt() - robot->position();
         abs_angle_between_pass_and_shot_vectors =
             (robot_to_ball.orientation() - robot_to_shot_target.orientation())
-                .angleMod()
+                .clamp()
                 .abs();
 
         Angle goal_angle =

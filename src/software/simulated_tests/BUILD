@@ -5,9 +5,9 @@ cc_library(
     srcs = ["mock_ai_wrapper.cpp"],
     hdrs = ["mock_ai_wrapper.h"],
     deps = [
-        "//software/ai/primitive",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/primitive",
         "//software/world",
     ],
 )
@@ -19,10 +19,10 @@ cc_library(
     deps = [
         "//software/ai:ai_wrapper",
         "//software/backend:simulator_backend",
+        "//software/gui/visualizer:visualizer_wrapper",
         "//software/logger",
         "//software/simulated_tests/validation:world_state_validator",
         "//software/time:duration",
-        "//software/visualizer:visualizer_wrapper",
         "@gtest",
     ],
 )
@@ -48,6 +48,36 @@ cc_test(
     deps = [
         ":simulated_test_fixture",
         "//software/ai/hl/stp/play:example_play",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/time:timestamp",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "kickoff_friendly_play_test",
+    srcs = ["kickoff_friendly_play_test.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:kickoff_friendly_play",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/time:timestamp",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "kickoff_enemy_play_test",
+    srcs = ["kickoff_enemy_play_test.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:kickoff_enemy_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",

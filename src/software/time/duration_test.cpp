@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <stdexcept>
-
 TEST(DurationTest, default_constructor)
 {
     Duration d;

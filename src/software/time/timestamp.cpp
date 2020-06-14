@@ -1,8 +1,6 @@
 #include "software/time/timestamp.h"
 
-#include <cmath>
 #include <iomanip>
-#include <stdexcept>
 
 #include "shared/constants.h"
 

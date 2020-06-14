@@ -10,8 +10,10 @@
 * [Exceptions](#exceptions)
 * [Tests](#tests)
 * [Getter And Setter Functions](#getter-and-setter-functions)
+* [Static Creators](#static-creators)
 * [Spelling](#spelling)
 * [Miscellaneous](#miscellaneous)
+* [Protobuf](#protobuf)
 
 
 Our C++ coding style is based off of [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html). We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce most of the nit-picky parts of the style, such as brackets and alignment, so this document highlights the important rules to follow that clang-format cannot enforce.
@@ -56,6 +58,46 @@ The vast majority of the things noted in this document will apply to `C` code as
 
   // Correct
   typedef struct MyDog MyDog_t;
+  ```
+
+* Functions that take no arguments must be declared as `foo(void)` **not** `foo()`, as the second option allows `foo` to take anything as it's arguments ([reference](https://softwareengineering.stackexchange.com/questions/286490/what-is-the-difference-between-function-and-functionvoid/286494))
+
+* Functions that return values via argument(s) must have all parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**.
+
+  ``` C
+  // Incorrect
+  /**
+   * Create a trajectory with given max speed
+   * 
+   * @param max_acceleration The maximum acceleration permitted. This will be
+   *                         updated to the maximum acceleration actually seen
+   *                         on the generated trajectory.
+   * @param created_trajectory A pointer that will be set to the created 
+   *                           created trajectory.
+   * @param max_speed The maximum speed on the trajectory permitted on the 
+   *                  trajectory.
+   * @return true if the trajectory was generated successfully, false otherwise
+   */
+  bool generateTrajectory(float* max_acceleration, 
+                          Trajectory* created_trajectory, 
+                          float max_speed);
+
+  // Correct
+  /**
+   * Create a trajectory with given max speed
+   * 
+   * @param max_speed [in] The maximum speed on the trajectory permitted on the 
+   *                       trajectory.
+   * @param max_acceleration [in/out] The maximum acceleration permitted. This 
+   *                                  will be updated to the maximum acceleration 
+   *                                  actually seen on the generated trajectory.
+   * @param created_trajectory [out] A pointer that will be set to the created 
+   *                                 created trajectory.
+   * @return true if the trajectory was generated successfully, false otherwise
+   */
+  bool generateTrajectory(float max_speed, 
+                          float* max_acceleration, 
+                          Trajectory* created_trajectory);
   ```
 
 ### Names and Variables
@@ -160,6 +202,33 @@ If you think some ASCII art will help explain something better, go for it! [asci
    */
   float power(float a, float b);
   ```
+    * Functions that perform similar tasks should be commented as a group if it improves clarity. 
+    
+    Example 1: functions with different ordering on arguments
+    ```cpp
+    /**
+     * Returns true if the polygon intersects the circle, false otherwise.
+     *
+     * @param first
+     * @param second
+     * @return true if the polygon intersects the circle, false otherwise
+     */
+    bool intersects(const Polygon &first, const Circle &second);
+    bool intersects(const Circle &first, const Polygon &second);
+    ```
+    Example 2: visitor functions
+    ```cpp
+    /**
+     * Serializes the given Primitive into a radio packet
+     *
+     * @param The Primitive to serialize
+     */
+    void visit(const CatchPrimitive &catch_primitive) override;
+    void visit(const ChipPrimitive &chip_primitive) override;
+    void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
+    etc...
+    ```
+
 
 
 ### Headers
@@ -222,6 +291,11 @@ Some general guidelines when writing tests are:
 * in general, getter and setter methods on classes should be written like `getName()`, `setName(string name)`, with the following exceptions
   * getters with the return type `bool` may be prefixed with `is` instead of `get`, ie. `bool isActive()`
   * getters that are used _incredibly_ frequently and are _incredibly_ obvious may not require the `get` prefix. For example `Point::x()` and `Point::y()` 
+  * getters that return specific units should be written as `toUnit()`. For example `Angle::toDegrees()`
+
+
+### Static Creators
+* static creators that take an argument of a specific unit should be written as `fromUnit(datatype unit)`. For example `Angle::fromDegrees(double deg)`
 
 
 ### Spelling
@@ -313,3 +387,6 @@ Some general guidelines when writing tests are:
   c[i] = i + 1;
   ```
 
+### Protobuf
+
+Protobufs that we define should follow [Google's Protobuf Style Guide](https://developers.google.com/protocol-buffers/docs/style).

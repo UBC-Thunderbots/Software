@@ -1,6 +1,6 @@
 #include "software/simulated_tests/validation/world_state_validator.h"
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/simulated_tests/validation/continuous_function_validator.h"
 #include "software/simulated_tests/validation/function_validator.h"
 

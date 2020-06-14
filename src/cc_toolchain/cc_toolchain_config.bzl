@@ -109,7 +109,6 @@ def _make_common_features(ctx):
 
     result["static_link_cpp_runtimes"] = feature(
         name = "static_link_cpp_runtimes",
-        implies = ["no-unused-command-line-argument"],
     )
 
     result["unfiltered_compile_flags_feature"] = feature(
@@ -194,6 +193,21 @@ def _make_common_features(ctx):
                     flag_group(
                         flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion", "-Werror"] +
                                 ctx.attr.host_compiler_warnings,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    result["colour_feature"] = feature(
+        name = "colour",
+        # the compiler will highlight warnings and errors with colour
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-fdiagnostics-color=always"],
                     ),
                 ],
             ),
@@ -364,16 +378,6 @@ def _make_common_features(ctx):
         ],
     )
 
-    result["no-unused-command-line-argument"] = feature(
-        name = "no-unused-command-line-argument",
-        flag_sets = [
-            flag_set(
-                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = ["-Wno-unused-command-line-argument"])],
-            ),
-        ],
-    )
-
     return result
 
 def _linux_gcc_impl(ctx):
@@ -539,7 +543,9 @@ def _linux_gcc_impl(ctx):
         implies = [
             "builtin_include_directories",
             "c++17",
+            "colour",
             "determinism",
+            "warnings",
             "hardening",
             "warnings",
             "build-id",
@@ -715,6 +721,7 @@ def _stm32_impl(ctx):
         implies = [
             "stdlib",
             "c++17",
+            "colour",
             "determinism",
             "warnings",
             "no-canonical-prefixes",

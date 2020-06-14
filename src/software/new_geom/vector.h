@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/geometry.hpp>
 #include <cmath>
 #include <iostream>
 

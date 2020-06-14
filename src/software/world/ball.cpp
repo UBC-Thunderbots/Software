@@ -1,9 +1,8 @@
 #include "software/world/ball.h"
 
 #include "shared/constants.h"
-#include "software/world/ball_state.h"
 
-Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
+Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
            unsigned int history_size)
     : states_(history_size)
 {
@@ -12,25 +11,26 @@ Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateState(BallState(position, velocity, timestamp));
+    updateState(TimestampedBallState(position, velocity, timestamp));
 }
 
-Ball::Ball(BallState &ball_state, unsigned int history_size) : states_(history_size)
+Ball::Ball(const TimestampedBallState &initial_state, unsigned int history_size)
+    : states_(history_size)
 {
     if (history_size <= 0)
     {
         throw std::invalid_argument("Error: history_size must be greater than 0");
     }
 
-    updateState(ball_state);
+    updateState(initial_state);
 }
 
-BallState Ball::currentState() const
+TimestampedBallState Ball::currentState() const
 {
     return states_.front();
 }
 
-void Ball::updateState(const BallState &new_state)
+void Ball::updateState(const TimestampedBallState &new_state)
 {
     if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
     {
@@ -53,7 +53,7 @@ void Ball::updateStateToPredictedState(const Timestamp &timestamp)
     Point new_position      = estimatePositionAtFutureTime(duration_in_future);
     Vector new_velocity     = estimateVelocityAtFutureTime(duration_in_future);
 
-    updateState(BallState(new_position, new_velocity, timestamp));
+    updateState(TimestampedBallState(new_position, new_velocity, timestamp));
 }
 
 Timestamp Ball::lastUpdateTimestamp() const
@@ -63,7 +63,7 @@ Timestamp Ball::lastUpdateTimestamp() const
 
 Point Ball::position() const
 {
-    return states_.front().position();
+    return states_.front().ballState().position();
 }
 
 Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) const
@@ -83,7 +83,7 @@ Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) con
 
 Vector Ball::velocity() const
 {
-    return states_.front().velocity();
+    return states_.front().ballState().velocity();
 }
 
 Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) const
@@ -101,12 +101,12 @@ Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) co
     return velocity() * exp(-0.1 * seconds_in_future);
 }
 
-boost::circular_buffer<BallState> Ball::getPreviousStates() const
+boost::circular_buffer<TimestampedBallState> Ball::getPreviousStates() const
 {
     return states_;
 }
 
-std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
+std::optional<int> Ball::getHistoryIndexFromTimestamp(const Timestamp &timestamp) const
 {
     for (unsigned i = 0; i < states_.size(); i++)
     {

@@ -4,10 +4,9 @@
 #include "software/parameter/dynamic_parameters.h"
 
 
-bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,
-                                                              const Angle orientation,
-                                                              const Point target,
-                                                              Angle threshold)
+bool robotOrientationWithinAngleThresholdOfTarget(const Point position,
+                                                  const Angle orientation,
+                                                  const Point target, Angle threshold)
 {
     // Calculate the target orientation, then calculate the difference between facing
     // orientation and target orientation. The difference in angle will be in the range of
@@ -17,8 +16,8 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
-                                                   std::optional<Timestamp> timestamp)
+std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos_at_time;
     Angle robot_ori_at_time;
@@ -33,9 +32,11 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     {
         robot_pos_at_time = robot.getPreviousStates()
                                 .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
+                                .robotState()
                                 .position();
         robot_ori_at_time = robot.getPreviousStates()
                                 .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
+                                .robotState()
                                 .orientation();
     }
     else
@@ -53,6 +54,7 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     {
         ball_pos_at_time = ball.getPreviousStates()
                                .at(*ball.getHistoryIndexFromTimestamp(*timestamp))
+                               .ballState()
                                .position();
     }
     else
@@ -64,12 +66,8 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
 
 
     // check if the ball is within a certain distance of the robot
-    auto max_dist_to_robot =
-        ROBOT_MAX_RADIUS_METERS + Util::DynamicParameters->getAIConfig()
-                                      ->getEvaluationConfig()
-                                      ->getPossessionConfig()
-                                      ->PossessionDist()
-                                      ->value();
+    // this is experimentally determined to be a reasonable value
+    auto max_dist_to_robot = ROBOT_MAX_RADIUS_METERS + 0.2;
     if ((ball_pos_at_time - robot_pos_at_time).length() > max_dist_to_robot)
     {
         return false;
@@ -83,8 +81,8 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     }
 }
 
-std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Robot& robot,
-                                                   std::optional<Timestamp> timestamp)
+std::optional<bool> robotBeingPassedTo(const World& world, const Robot& robot,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos, ball_pos;
     Vector ball_velocity;
@@ -99,14 +97,17 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
     {
         robot_pos = robot.getPreviousStates()
                         .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
+                        .robotState()
                         .position();
         ball_pos = world.ball()
                        .getPreviousStates()
                        .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
+                       .ballState()
                        .position();
         ball_velocity = world.ball()
                             .getPreviousStates()
                             .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
+                            .ballState()
                             .velocity();
     }
     else
@@ -123,15 +124,8 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
     // pass axis velocity
     double pass_axis_speed =
         ball_velocity.project(ball_to_robot_vector.normalize()).length();
-    return std::make_optional<bool>(
-        (ball_angle_deviation < Angle::fromDegrees(Util::DynamicParameters->getAIConfig()
-                                                       ->getEvaluationConfig()
-                                                       ->getPossessionConfig()
-                                                       ->PassedToAngleTolerance()
-                                                       ->value())) &&
-        pass_axis_speed > Util::DynamicParameters->getAIConfig()
-                              ->getEvaluationConfig()
-                              ->getPossessionConfig()
-                              ->MinPassSpeed()
-                              ->value());
+    Angle pass_angle_tolerance = Angle::fromDegrees(15);
+    double min_pass_speed_m_s  = 1.0;
+    return std::make_optional<bool>(ball_angle_deviation < pass_angle_tolerance &&
+                                    pass_axis_speed > min_pass_speed_m_s);
 };

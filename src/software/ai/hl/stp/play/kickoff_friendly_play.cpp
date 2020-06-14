@@ -27,7 +27,8 @@ bool KickoffFriendlyPlay::invariantHolds(const World &world) const
             world.gameState().isStopped());
 }
 
-void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                         const World &world)
 {
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most
@@ -95,8 +96,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
     {
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
@@ -119,8 +120,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Part 2: not normal play, currently ready state (chip the ball)
     while (!world.gameState().isPlaying())
     {
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 

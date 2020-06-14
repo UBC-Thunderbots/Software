@@ -54,6 +54,7 @@ cc_test(
     deps = [
         ":dynamic_parameters",
         ":parameter",
+        "//software/util/variant_visitor",
         "@boost//:filesystem",
         "@gtest//:gtest_main",
         "@yaml-cpp",

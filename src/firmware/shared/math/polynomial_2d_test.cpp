@@ -1,20 +1,19 @@
 extern "C"
 {
-#include "firmware/main/math/polynomial_2d.h"
+#include "firmware/shared/math/polynomial_2d.h"
+
+#include "firmware/shared/math/polynomial_1d.h"
 }
 
 #include <gtest/gtest.h>
-
-#include "math.h"
-#include "polynomial_1d.h"
-#include "polynomial_2d.h"
+#include <math.h>
 
 class Polynomial2dTest : public testing::Test
 {
    protected:
-    virtual void SetUp() {}
+    virtual void SetUp(void) {}
 
-    virtual void TearDown() {}
+    virtual void TearDown(void) {}
 
     static void expectRawArraysEq(float* expected, float* actual, size_t num_elements,
                                   double tolerance = 10e-10)
@@ -411,6 +410,28 @@ TEST_F(Polynomial2dTest, get_t_value_on_arc_length_above_arc_lengths_in_parametr
                            poly, 5, arc_length_parametrization));
 }
 
+
+TEST_F(Polynomial2dTest, get_total_arc_length)
+{
+    Polynomial2dOrder1_t poly = {.x = {.coefficients = {4, 0}},
+                                 .y = {.coefficients = {2, 0}}};
+
+    // Create the parmeterization to contain the desired number of segments
+    ArcLengthParametrization_t arc_length_parameterization;
+    arc_length_parameterization.num_values = 3;
+
+    float t_values[]          = {0, 1, 2};
+    float arc_length_values[] = {0, 2, 20};
+
+    arc_length_parameterization.t_values          = t_values;
+    arc_length_parameterization.arc_length_values = arc_length_values;
+
+    float total_arc_length =
+        shared_polynomial2d_getTotalArcLength(arc_length_parameterization);
+
+    EXPECT_EQ(total_arc_length, arc_length_values[2]);
+}
+
 TEST_F(Polynomial2dTest, get_t_value_on_arc_length_below_arc_lengths_in_parametrization)
 {
     Polynomial2dOrder1_t poly = {
@@ -459,4 +480,43 @@ TEST_F(Polynomial2dTest, get_t_value_at_arc_length_on_complex_line_multiple_divi
                                     poly, 126.38, arc_length_parametrization));
     EXPECT_FLOAT_EQ(-4.3125, shared_polynomial2d_getTValueAtArcLengthOrder3(
                                  poly, 345.12, arc_length_parametrization));
+}
+
+TEST_F(Polynomial2dTest, get_radius_of_curvature_straight_line)
+{
+    Polynomial2dOrder3_t poly = {
+        .x = {.coefficients = {0, 0, 1, 0}},
+        .y = {.coefficients = {0, 0, 1, 0}},
+    };
+
+    float t_values[] = {-2, -1, 0, 1, 2};
+
+    float expected_curvature_values[] = {FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX};
+
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        const float output =
+            shared_polynomial2d_getCurvatureAtPositionOrder3(poly, t_values[i]);
+        EXPECT_FLOAT_EQ(expected_curvature_values[i], output);
+    }
+}
+
+TEST_F(Polynomial2dTest, get_radius_of_curvature_curved_line)
+{
+    Polynomial2dOrder3_t poly = {
+        .x = {.coefficients = {2, 0, 1, 0}},
+        .y = {.coefficients = {6, 1, 1, 0}},
+    };
+
+    float t_values[] = {-2, -1, 0, 1, 2};
+
+    float expected_curvature_values[] = {4205.05469, 182.766296, 1.41421354, 774.758057,
+                                         265295.375};
+
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        const float output =
+            shared_polynomial2d_getCurvatureAtPositionOrder3(poly, t_values[i]);
+        EXPECT_FLOAT_EQ(expected_curvature_values[i], output);
+    }
 }

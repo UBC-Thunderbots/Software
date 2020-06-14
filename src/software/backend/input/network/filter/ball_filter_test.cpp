@@ -20,11 +20,13 @@
 class BallFilterTest : public ::testing::Test
 {
    protected:
+    BallFilterTest() {}
+
     void SetUp() override
     {
         // Initialize the time
         current_timestamp = Timestamp::fromSeconds(123);
-        field             = ::Test::TestUtil::createSSLDivBField();
+        field             = ::TestUtil::createSSLDivBField();
         ball_filter       = BallFilter(4, 10);
         time_step         = Duration::fromSeconds(1.0 / 60.0);
         // Use a constant seed to results are deterministic
@@ -237,7 +239,7 @@ class BallFilterTest : public ::testing::Test
         }
     }
 
-    Field field = ::Test::TestUtil::createSSLDivBField();
+    Field field = ::TestUtil::createSSLDivBField();
     BallFilter ball_filter;
     Duration time_step;
     std::mt19937 random_generator;

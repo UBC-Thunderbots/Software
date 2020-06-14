@@ -24,7 +24,8 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":frankie_v1_main_lib",
-        "//firmware_new/boards/frankie_v1/io:allegro_a3931_motor_driver",
+        "//firmware_new/boards/frankie_v1/io:drivetrain",
+        "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
     ],
@@ -50,7 +51,7 @@ cc_library(
         ":hal",
         ":lwip",
         "//firmware_new/proto:fw_c_proto",
-        "@nanopb",
+        "@com_github_nanopb_nanopb//:nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause

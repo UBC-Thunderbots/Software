@@ -1,7 +1,7 @@
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/simulated_tests/mock_ai_wrapper.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -26,7 +26,7 @@ class MockSimulatedTest : public SimulatedTest
    protected:
     void SetUp() override
     {
-        Util::Logger::LoggerSingleton::initializeLogger();
+        LoggerSingleton::initializeLogger();
         backend = std::make_shared<SimulatorBackend>(
             Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
             SimulatorBackend::SimulationSpeed::FAST_SIMULATION);
@@ -48,7 +48,7 @@ class MockSimulatedTest : public SimulatedTest
 
 TEST_F(MockSimulatedTest, test_single_validation_function_passes_before_timeout)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -68,7 +68,7 @@ TEST_F(MockSimulatedTest, test_single_validation_function_passes_before_timeout)
 
 TEST_F(MockSimulatedTest, test_single_validation_function_fails_if_it_times_out)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -89,7 +89,7 @@ TEST_F(MockSimulatedTest, test_single_validation_function_fails_if_it_times_out)
 TEST_F(MockSimulatedTest,
        test_gtest_expect_statement_in_validation_function_causes_test_to_fail)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -113,7 +113,7 @@ TEST_F(MockSimulatedTest,
 
 TEST_F(MockSimulatedTest, test_multiple_validation_function_pass_before_timeout)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -139,7 +139,7 @@ TEST_F(MockSimulatedTest, test_multiple_validation_function_pass_before_timeout)
 
 TEST_F(MockSimulatedTest, test_should_fail_if_not_all_validation_functions_pass)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -165,7 +165,7 @@ TEST_F(MockSimulatedTest, test_should_fail_if_not_all_validation_functions_pass)
 
 TEST_F(MockSimulatedTest, test_single_continuous_validation_function_passes)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {};
 
@@ -182,7 +182,7 @@ TEST_F(MockSimulatedTest, test_single_continuous_validation_function_passes)
 
 TEST_F(MockSimulatedTest, test_multiple_continuous_validation_function_passes)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {};
 
@@ -203,7 +203,7 @@ TEST_F(MockSimulatedTest, test_multiple_continuous_validation_function_passes)
 TEST_F(MockSimulatedTest,
        test_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     // Because the EXPECT_NONFATAL_FAILURE macro only captures a single failure, we have
     // to write this failing function in such a way that it will only fail once during the
@@ -240,7 +240,7 @@ TEST_F(
     MockSimulatedTest,
     test_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail_with_different_test_order)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     // Because the EXPECT_NONFATAL_FAILURE macro only captures a single failure, we have
     // to write this failing function in such a way that it will only fail once during the
@@ -272,7 +272,7 @@ TEST_F(
 TEST_F(MockSimulatedTest,
        test_validation_and_continuous_validation_functions_pass_together)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

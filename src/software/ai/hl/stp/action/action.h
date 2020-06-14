@@ -3,15 +3,9 @@
 #include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/robot.h"
-
-// We forward-declare the MutableActionVisitor interface (pure virtual class) because we
-// need to know about the existence of this class in order to accept visitors with the
-// accept() function. We cannot use an #include statement because this creates a cyclic
-// dependency
-//
-class MutableActionVisitor;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
@@ -27,8 +21,9 @@ class Action
    public:
     /**
      * Creates a new Action for the given robot.
+     * @param loop_forever: whether action should continuously restart once its done
      */
-    explicit Action();
+    explicit Action(bool loop_forever);
 
     /**
      * Returns true if the Action is done and false otherwise. The Action is considered
@@ -38,6 +33,11 @@ class Action
      * @return true if the Action is done and false otherwise
      */
     bool done() const;
+
+    /**
+     * Restarts the action logic
+     */
+    void restart();
 
     /**
      * Runs the coroutine and get the next Intent to run from the calculateNextIntent
@@ -111,4 +111,7 @@ class Action
      * @param yield The coroutine push_type for the Action
      */
     virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
+
+    // Whether or not this action should loop forever by restarting each time it is done
+    bool loop_forever;
 };

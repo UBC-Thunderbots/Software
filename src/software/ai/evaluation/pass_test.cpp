@@ -1,14 +1,9 @@
-/**
- * Tests for the pass evaluation functions
- */
-
 #include "software/ai/evaluation/pass.h"
 
 #include <gtest/gtest.h>
 
 #include "software/../shared/constants.h"
 
-using namespace AI::Evaluation;
 
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
 {
@@ -23,7 +18,7 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desired_angle)
 {
     // Because we can't guarantee that the robot angular acceleration isn't going to
-    // increase to the point where we can't reach the the max angular speed within
+    // increase to the point where we can't reach the max angular speed within
     // a half rotation, this is just a more loose test that checks if we got there
     // within roughly the expected time. Any more strict test would have to
     // basically re-write the function, which would be a bit pointless

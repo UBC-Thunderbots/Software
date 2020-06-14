@@ -1,11 +1,11 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/time/duration.h"
 
 void SimulatedTest::SetUp()
 {
-    Util::Logger::LoggerSingleton::initializeLogger();
+    LoggerSingleton::initializeLogger();
     backend = std::make_shared<SimulatorBackend>(
         Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
         SimulatorBackend::SimulationSpeed::FAST_SIMULATION);

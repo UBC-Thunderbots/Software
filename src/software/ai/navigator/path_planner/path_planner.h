@@ -1,8 +1,10 @@
 #pragma once
+
+#include <optional>
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/geom/spline.h"
+#include "software/new_geom/linear_spline2d.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
 
@@ -13,7 +15,7 @@
  * from start to the destination
  */
 
-using Path = Spline;
+using Path = LinearSpline2d;
 
 class PathPlanner
 {
@@ -32,7 +34,7 @@ class PathPlanner
      */
     virtual std::optional<Path> findPath(const Point &start, const Point &destination,
                                          const Rectangle &navigable_area,
-                                         const std::vector<Obstacle> &obstacles) = 0;
+                                         const std::vector<ObstaclePtr> &obstacles) = 0;
 
     virtual ~PathPlanner() = default;
 };

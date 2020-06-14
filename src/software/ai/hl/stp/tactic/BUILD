@@ -5,15 +5,14 @@ cc_library(
     srcs = ["cherry_pick_tactic.cpp"],
     hdrs = ["cherry_pick_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util:distance",
         "//software/world",
-        "@g3log",
     ],
 )
 
@@ -32,12 +31,11 @@ cc_library(
     srcs = ["chip_tactic.cpp"],
     hdrs = ["chip_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -77,11 +75,10 @@ cc_library(
     hdrs = ["kickoff_chip_tactic.h"],
     deps = [
         ":chip_tactic",
-        ":mutable_tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -90,15 +87,14 @@ cc_library(
     srcs = ["crease_defender_tactic.cpp"],
     hdrs = ["crease_defender_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util:intersection",
-        "@g3log",
     ],
 )
 
@@ -119,7 +115,6 @@ cc_library(
     srcs = ["defense_shadow_enemy_tactic.cpp"],
     hdrs = ["defense_shadow_enemy_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
@@ -147,7 +142,6 @@ cc_library(
     srcs = ["goalie_tactic.cpp"],
     hdrs = ["goalie_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
@@ -155,8 +149,9 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
+        "//software/logger",
+        "//software/new_geom:line",
         "//software/new_geom/util:intersection",
-        "@g3log",
     ],
 )
 
@@ -165,6 +160,9 @@ cc_test(
     srcs = ["goalie_tactic_test.cpp"],
     deps = [
         ":goalie_tactic",
+        "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
@@ -176,12 +174,11 @@ cc_library(
     srcs = ["move_tactic.cpp"],
     hdrs = ["move_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -200,14 +197,13 @@ cc_library(
     srcs = ["passer_tactic.cpp"],
     hdrs = ["passer_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -226,13 +222,12 @@ cc_library(
     srcs = ["patrol_tactic.cpp"],
     hdrs = ["patrol_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -251,7 +246,6 @@ cc_library(
     srcs = ["penalty_kick_tactic.cpp"],
     hdrs = ["penalty_kick_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
@@ -259,8 +253,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util:intersection",
-        "@g3log",
     ],
 )
 
@@ -270,14 +264,13 @@ cc_library(
     hdrs = ["penalty_setup_tactic.h"],
     deps = [
         ":move_tactic",
-        ":mutable_tactic_visitor",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:dribble_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -286,15 +279,14 @@ cc_library(
     srcs = ["receiver_tactic.cpp"],
     hdrs = ["receiver_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util",
-        "@g3log",
     ],
 )
 
@@ -314,14 +306,13 @@ cc_library(
     srcs = ["shadow_enemy_tactic.cpp"],
     hdrs = ["shadow_enemy_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -340,15 +331,14 @@ cc_library(
     srcs = ["shadow_freekicker_tactic.cpp"],
     hdrs = ["shadow_freekicker_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
+        "//software/logger",
         "//software/new_geom/util:distance",
         "//software/parameter:dynamic_parameters",
-        "@g3log",
     ],
 )
 
@@ -368,7 +358,6 @@ cc_library(
     srcs = ["shoot_goal_tactic.cpp"],
     hdrs = ["shoot_goal_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
@@ -377,8 +366,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
+        "//software/logger",
         "//software/parameter:dynamic_parameters",
-        "@g3log",
     ],
 )
 
@@ -397,13 +386,12 @@ cc_library(
     srcs = ["stop_tactic.cpp"],
     hdrs = ["stop_tactic.h"],
     deps = [
-        ":mutable_tactic_visitor",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
-        "@g3log",
+        "//software/logger",
     ],
 )
 
@@ -446,6 +434,7 @@ cc_library(
     srcs = ["tactic.cpp"],
     hdrs = ["tactic.h"],
     deps = [
+        "mutable_tactic_visitor",
         "//software/ai/hl/stp/action",
         "//software/world",
     ],
@@ -465,7 +454,6 @@ cc_test(
 cc_library(
     name = "mutable_tactic_visitor",
     hdrs = ["mutable_tactic_visitor.h"],
-    deps = [":tactic"],
 )
 
 cc_library(

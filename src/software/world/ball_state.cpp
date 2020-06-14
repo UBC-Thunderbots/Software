@@ -1,10 +1,8 @@
 #include "software/world/ball_state.h"
 
-BallState::BallState(Point position, Vector velocity, const Timestamp &timestamp)
+BallState::BallState(const Point& position, const Vector& velocity, const double height)
+    : position_(position), velocity_(velocity), height_(height)
 {
-    this->position_  = position;
-    this->velocity_  = velocity;
-    this->timestamp_ = timestamp;
 }
 
 Point BallState::position() const
@@ -17,17 +15,18 @@ Vector BallState::velocity() const
     return velocity_;
 }
 
-Timestamp BallState::timestamp() const
+double BallState::height() const
 {
-    return timestamp_;
+    return height_;
 }
 
-bool BallState::operator==(const BallState &other) const
+bool BallState::operator==(const BallState& other) const
 {
-    return this->position() == other.position() && this->velocity() == other.velocity();
+    return this->position() == other.position() && this->velocity() == other.velocity() &&
+           this->height() == other.height();
 }
 
-bool BallState::operator!=(const BallState &other) const
+bool BallState::operator!=(const BallState& other) const
 {
     return !(*this == other);
 }

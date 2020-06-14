@@ -5,6 +5,7 @@
 #include <unordered_set>
 
 #include "software/new_geom/point.h"
+#include "software/test_util/test_util.h"
 
 TEST(ConvexPolygonConstructorTest, test_construct_from_vector)
 {

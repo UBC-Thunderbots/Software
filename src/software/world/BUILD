@@ -5,9 +5,11 @@ cc_library(
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
-        "//software/geom",
+        "//shared:constants",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
         "//software/time:timestamp",
-        "//software/world:ball_state",
+        "//software/world:timestamped_ball_state",
         "@boost//:circular_buffer",
     ],
 )
@@ -17,7 +19,28 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
+        ":timestamped_ball_state",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "timestamped_ball_state",
+    srcs = ["timestamped_ball_state.cpp"],
+    hdrs = ["timestamped_ball_state.h"],
+    deps = [
         ":ball_state",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/time:timestamp",
+    ],
+)
+
+cc_test(
+    name = "timestamped_ball_state_test",
+    srcs = ["timestamped_ball_state_test.cpp"],
+    deps = [
+        ":timestamped_ball_state",
         "@gtest//:gtest_main",
     ],
 )
@@ -27,8 +50,17 @@ cc_library(
     srcs = ["ball_state.cpp"],
     hdrs = ["ball_state.h"],
     deps = [
-        "//software/geom",
-        "//software/time:timestamp",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+    ],
+)
+
+cc_test(
+    name = "ball_state_test",
+    srcs = ["ball_state_test.cpp"],
+    deps = [
+        ":ball_state",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -61,8 +93,8 @@ cc_library(
     hdrs = ["game_state.h"],
     deps = [
         ":ball",
+        "//software/logger",
         "//software/sensor_fusion:refbox_data",
-        "@g3log",
     ],
 )
 
@@ -82,22 +114,10 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
-        ":robot_state",
+        ":timestamped_robot_state",
         "//software/geom",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
-    ],
-)
-
-cc_library(
-    name = "robot_state",
-    srcs = ["robot_state.cpp"],
-    hdrs = ["robot_state.h"],
-    deps = [
-        ":robot_capabilities",
-        "//software/geom",
-        "//software/new_geom:angular_velocity",
-        "//software/time:timestamp",
     ],
 )
 
@@ -106,6 +126,52 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "timestamped_robot_state",
+    srcs = ["timestamped_robot_state.cpp"],
+    hdrs = ["timestamped_robot_state.h"],
+    deps = [
+        ":robot_state",
+        "//software/new_geom:angle",
+        "//software/new_geom:angular_velocity",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/time:timestamp",
+    ],
+)
+
+cc_test(
+    name = "timestamped_robot_state_test",
+    srcs = ["timestamped_robot_state_test.cpp"],
+    deps = [
+        ":timestamped_robot_state",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "robot_state",
+    srcs = ["robot_state.cpp"],
+    hdrs = ["robot_state.h"],
+    deps = [
+        "//shared:constants",
+        "//software/new_geom:angle",
+        "//software/new_geom:angular_velocity",
+        "//software/new_geom:point",
+        "//software/new_geom:vector",
+        "//software/util/make_enum",
+    ],
+)
+
+cc_test(
+    name = "robot_state_test",
+    srcs = ["robot_state_test.cpp"],
+    deps = [
+        ":robot_state",
         "@gtest//:gtest_main",
     ],
 )

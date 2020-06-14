@@ -6,6 +6,8 @@
 
 # The version of the clang executable to use
 export CLANG_VERSION=7.0
+# The version of black to use
+export BLACK_VERSION=19-10b0
 
 # The directory this script is in
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -14,7 +16,7 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BAZEL_ROOT_DIR="$CURR_DIR/../src"
 
 # Extensions to check formatting for clang-format
-CLANG_FORMAT_EXTENSIONS=(h cpp c hpp tpp)
+CLANG_FORMAT_EXTENSIONS=(h cpp c hpp tpp proto)
 
 # Function to run clang format
 function run_clang_format () {
@@ -52,8 +54,19 @@ function run_bazel_formatting () {
     fi
 }
 
+# Function to run black python formatting
+function run_black_formatting () {
+    echo "Running black to format Python files..."
+    $CURR_DIR/black_$BLACK_VERSION $BAZEL_ROOT_DIR
+
+    if [[ "$?" != 0 ]]; then
+        exit 1
+    fi
+}
+
 # Run formatting
 run_clang_format
 run_bazel_formatting
+run_black_formatting
 
 exit 0

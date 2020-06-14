@@ -19,8 +19,8 @@ cc_library(
         "//software/ai/hl/stp/tactic:passer_tactic",
         "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/passing:pass_generator",
+        "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -47,7 +47,6 @@ cc_library(
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -66,10 +65,10 @@ cc_library(
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shadow_freekicker_tactic",
         "//software/ai/hl/stp/tactic:stop_tactic",
+        "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -82,8 +81,8 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -109,8 +108,8 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:stop_tactic",
+        "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -148,7 +147,6 @@ cc_library(
         "//software/ai/passing:pass_generator",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -167,7 +165,6 @@ cc_library(
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -182,8 +179,8 @@ cc_library(
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -197,8 +194,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -213,8 +210,8 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
         "//software/ai/hl/stp/tactic:penalty_setup_tactic",
+        "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -228,7 +225,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
-        "//software/ai/evaluation:indirect_chip",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
@@ -237,10 +233,10 @@ cc_library(
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/hl/stp/tactic:stop_tactic",
+        "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -263,9 +259,9 @@ cc_library(
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/passing:pass_generator",
+        "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )
@@ -279,8 +275,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@g3log",
     ],
     alwayslink = True,
 )

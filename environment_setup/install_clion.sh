@@ -5,7 +5,7 @@ echo "Installing CLion"
 echo "================================================================"
 
 clion_version_year="2019"
-clion_version_major="2"
+clion_version_major="3"
 clion_version_minor="5"
 clion_version="${clion_version_year}.${clion_version_major}.${clion_version_minor}"
 clion_executable_path="/usr/local/bin/clion"
@@ -43,9 +43,9 @@ echo "Installing Bazel Plugin"
 echo "================================================================"
 
 clion_plugin_dir="${HOME}/.CLion${clion_version_year}.${clion_version_major}/config/plugins"
-bazel_plugin_version_year="2019"
-bazel_plugin_version_major="12"
-bazel_plugin_version_minor="16"
+bazel_plugin_version_year="2020"
+bazel_plugin_version_major="04"
+bazel_plugin_version_minor="13"
 bazel_plugin_version="v${bazel_plugin_version_year}.${bazel_plugin_version_major}.${bazel_plugin_version_minor}"
 
 if [ -d "${clion_plugin_dir}/clwb" ]
@@ -61,12 +61,12 @@ else
     # Unpack and build the plugin from the source
     mkdir -p /tmp/bazelbuild-${bazel_plugin_version} 
     tar xfz /tmp/bazelbuild-${bazel_plugin_version}.tar.gz -C /tmp/bazelbuild-${bazel_plugin_version}
-    cd /tmp/bazelbuild-${bazel_plugin_version}/intellij*
+    cd /tmp/bazelbuild-${bazel_plugin_version}/intellij* || exit
     bazel build //clwb:clwb_bazel_zip --define=ij_product=clion-${clion_version_year}.${clion_version_major}
 
     # Copy the compiled plugin to the CLion directory
-    mkdir -p ~/.CLion${clion_version_year}.{$clion_version_major}/config/plugins
-    unzip bazel-bin/clwb/clwb_bazel.zip -d $clion_plugin_dir
+    mkdir -p "$clion_plugin_dir"
+    unzip bazel-bin/clwb/clwb_bazel.zip -d "$clion_plugin_dir"
 
     # Cleanup
     rm -rf /tmp/bazelbuild

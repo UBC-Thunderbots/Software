@@ -1,6 +1,6 @@
 #include "software/new_geom/convex_polygon.h"
 
-#include <string>
+#include <algorithm>
 
 ConvexPolygon::ConvexPolygon(const std::vector<Point>& points) : Polygon(points)
 {

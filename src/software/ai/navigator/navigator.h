@@ -6,11 +6,11 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
-#include "software/ai/primitive/all_primitives.h"
-#include "software/ai/primitive/primitive.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/primitive/all_primitives.h"
+#include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
 /**
@@ -24,11 +24,12 @@ class Navigator : public IntentVisitor
      * Create a Navigator
      * @param path_manager The path manager that will be used for path creation for all
      *                     the robots
-     * @param obstacle_factory Will be used to generate obstacles from various constructs
+     * @param robot_navigation_obstacle_factory Will be used to generate obstacles from
+     * various constructs
      * @param config The navigator config
      */
     explicit Navigator(std::unique_ptr<PathManager> path_manager,
-                       ObstacleFactory obstacle_factory,
+                       RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
                        std::shared_ptr<const NavigatorConfig> config);
 
     /**
@@ -50,73 +51,26 @@ class Navigator : public IntentVisitor
     std::vector<std::vector<Point>> getPlannedPathPoints();
 
     /**
-     * Visits a CatchIntent to perform an operation.
+     * Get the obstacles for navigation
      *
-     * @param catch_intent The CatchIntent to visit
+     * @return obstacles
+     */
+    std::vector<ObstaclePtr> getObstacles();
+
+    /**
+     * Registers the given Intent for navigation
+     *
+     * @param The Intent to register
      */
     void visit(const CatchIntent &catch_intent) override;
-
-    /**
-     * Visits a ChipIntent to perform an operation.
-     *
-     * @param chip_intent The ChipIntent to visit
-     */
     void visit(const ChipIntent &chip_intent) override;
-
-    /**
-     * Visits a DirectVelocityIntent to perform an operation.
-     *
-     * @param direct_velocity_intent The DirectVelocityIntent to visit
-     */
     void visit(const DirectVelocityIntent &direct_velocity_intent) override;
-
-    /**
-     * Visits a DirectWheelsIntent to perform an operation.
-     *
-     * @param direct_wheels_intent The DirectWheelsIntent to visit
-     */
     void visit(const DirectWheelsIntent &direct_wheels_intent) override;
-
-    /**
-     * Visits a DribbleIntent to perform an operation.
-     *
-     * @param dribble The DribbleIntent to visit
-     */
     void visit(const DribbleIntent &dribble_intent) override;
-
-    /**
-     * Visits a KickIntent to perform an operation.
-     *
-     * @param kick_intent The KickIntent to visit
-     */
     void visit(const KickIntent &kick_intent) override;
-
-    /**
-     * Visits a MoveIntent to perform an operation.
-     *
-     * @param move_intent The MoveIntent to visit
-     */
     void visit(const MoveIntent &move_intent) override;
-
-    /**
-     * Visits a MoveSpinIntent to perform an operation.
-     *
-     * @param move_spin_intent The MoveSpinIntent to visit
-     */
     void visit(const MoveSpinIntent &move_spin_intent) override;
-
-    /**
-     * Visits a PivotIntent to perform an operation.
-     *
-     * @param pivot_intent The PivotIntent to visit
-     */
     void visit(const PivotIntent &pivot_intent) override;
-
-    /**
-     * Visits a StopIntent to perform an operation.
-     *
-     * @param stop_intent The StopIntent to visit
-     */
     void visit(const StopIntent &stop_intent) override;
 
     /**
@@ -141,43 +95,39 @@ class Navigator : public IntentVisitor
 
    private:
     /**
-     * Registers this robot id as a robot that is not assigned a MoveIntent
-     *
-     * @param id RobotId to register
-     *
-     */
-    void registerNonMoveIntentRobotId(RobotId id);
-
-    /**
      * Generates path objectives from move intents
      *
      * @param move_intents intents to make into path objectives
+     * @param world World to navigate around
      *
      * @return set of PathObjectives
      */
     std::unordered_set<PathObjective> getPathObjectivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents);
+        const std::vector<MoveIntent> &move_intents, const World &world);
 
     /**
      * Creates a list primitives for the list of MoveIntents
      *
      * @param move_intents intents to make into primitives
+     * @param world World to navigate around
      *
      * @return list of primitives
      */
     std::vector<std::unique_ptr<Primitive>> getPrimitivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents);
+        const std::vector<MoveIntent> &move_intents, const World &world);
 
     /**
      * Creates a primitive for a given path and move intent
      *
      * @param path path to make primitive for
      * @param intent intent to make primitive
+     * @param world World to navigate around
      *
      * @return unique pointer to the primitive
      */
     std::unique_ptr<Primitive> getPrimitiveFromPathAndMoveIntent(std::optional<Path> path,
-                                                                 MoveIntent intent);
+                                                                 MoveIntent intent,
+                                                                 const World &world);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
@@ -193,26 +143,20 @@ class Navigator : public IntentVisitor
     double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
 
     std::shared_ptr<const NavigatorConfig> config;
-    ObstacleFactory obstacle_factory;
-
-    // Path manager used to navigate around obstacles
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     std::unique_ptr<PathManager> path_manager;
-
-    // This navigators knowledge / state of the world
-    World world;
+    std::vector<std::vector<Point>> planned_paths;
 
     // The current Primitive the navigator has created from an Intent.
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
-
-    // This is used by the visualizer to see the planned paths
-    std::vector<std::vector<Point>> planned_paths;
+    std::optional<RobotId> current_robot_id;
 
     // These are obstacles that represent robots that aren't
     // assigned move intents
     // When move intents are processed to path plan,
     // we can avoid these non-"moving" robots
-    std::vector<Obstacle> friendly_non_move_intent_robot_obstacles;
+    std::vector<ObstaclePtr> friendly_non_move_intent_robot_obstacles;
 
     // intents that need path planning
     std::vector<MoveIntent> move_intents_for_path_planning;

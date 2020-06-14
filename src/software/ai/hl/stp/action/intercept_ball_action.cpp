@@ -6,7 +6,7 @@
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/util.h"
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/util/closest_point.h"
 #include "software/new_geom/util/distance.h"
@@ -14,7 +14,7 @@
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
                                          bool loop_forever)
-    : Action(), field(field), ball(ball), loop_forever(loop_forever)
+    : Action(loop_forever), field(field), ball(ball)
 {
 }
 
@@ -76,7 +76,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // We add 1e-6 to avoid division by 0 without affecting the result significantly
         Duration ball_time_to_position = Duration::fromSeconds(
             distance(closest_point, ball.position()) / (ball.velocity().length() + 1e-6));
-        Duration robot_time_to_pos = AI::Evaluation::getTimeToPositionForRobot(
+        Duration robot_time_to_pos = getTimeToPositionForRobot(
             *robot, closest_point, ROBOT_MAX_SPEED_METERS_PER_SECOND,
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
@@ -121,7 +121,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                 DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
                 BallCollisionType::ALLOW));
         }
-    } while (!Evaluation::robotHasPossession(ball, *robot) || loop_forever);
+    } while (!robotHasPossession(ball, *robot));
 }
 
 void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yield,

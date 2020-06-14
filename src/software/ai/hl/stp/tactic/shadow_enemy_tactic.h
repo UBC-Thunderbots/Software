@@ -51,8 +51,7 @@ class ShadowEnemyTactic : public Tactic
      * distance between the center of the enemy robot and the center of the robot
      * shadowing it
      */
-    void updateControlParams(const Evaluation::EnemyThreat &enemy_threat,
-                             double shadow_distance);
+    void updateControlParams(const EnemyThreat &enemy_threat, double shadow_distance);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -77,7 +76,7 @@ class ShadowEnemyTactic : public Tactic
 
     // Tactic parameters
     // The Enemy Threat indicating which enemy to shadow
-    std::optional<Evaluation::EnemyThreat> enemy_threat;
+    std::optional<EnemyThreat> enemy_threat;
     // The field being played on
     Field field;
     // The friendly team

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/primitive/movespin_primitive.h"
+#include "software/primitive/movespin_primitive.h"
 
 class MoveSpinIntent : public MoveSpinPrimitive, public Intent
 {

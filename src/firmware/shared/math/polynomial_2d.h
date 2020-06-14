@@ -1,10 +1,9 @@
 #pragma once
 
-// Need this for size_t
 #include <stddef.h>
 
-#include "firmware/main/math/polynomial_1d.h"
-#include "firmware/main/math/vector_2d.h"
+#include "firmware/shared/math/polynomial_1d.h"
+#include "firmware/shared/math/vector_2d.h"
 
 /**
  * This represents an arc length parametrization of a 2D polynomial via a list of t values
@@ -156,3 +155,34 @@ GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DECLARATION(3);
 GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(1);
 GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(2);
 GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DECLARATION(3);
+
+/**
+ * Returns a the total length of any arc specified by an arc parameterizaton
+ *
+ * @param arc_length_param [in] Arc length parameterization
+ *
+ * @return [out] The arc length in meters
+ */
+float shared_polynomial2d_getTotalArcLength(
+    ArcLengthParametrization_t arc_length_paramameterization);
+
+/**
+ * Get value of the radius of curvature at any point along the 't' parameterized
+ * polynomial2s
+ *
+ * NOTE: If the radius of curvature is infinite, FLT_MAX will be returned. No radius of
+ * curvature greater than FLT_MAX can be calculated.
+ *
+ * @param p [in] The polynomial to be evaluated for radius of curvature
+ *
+ * @param t [in] The parameterizaton value the polynomial will be evaluated at
+ *
+ * @return The radius of curvature of the polynomial at 't' [units of distance]
+ */
+#define GENERATE_2D_POLYNOMIAL_GET_CURVATURE_AT_POSITION(ORDER, ORDER_MINUS_ONE,         \
+                                                         ORDER_MINUS_TWO)                \
+    float shared_polynomial2d_getCurvatureAtPositionOrder##ORDER(                        \
+        Polynomial2dOrder##ORDER##_t p, float t)
+
+GENERATE_2D_POLYNOMIAL_GET_CURVATURE_AT_POSITION(2, 1, 0);
+GENERATE_2D_POLYNOMIAL_GET_CURVATURE_AT_POSITION(3, 2, 1);

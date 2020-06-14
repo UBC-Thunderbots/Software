@@ -28,7 +28,7 @@ class STPTacticAssignmentTest : public ::testing::Test
         };
         // Give an explicit seed to STP so that our tests are deterministic
         stp   = STP(default_play_constructor, 0);
-        world = ::Test::TestUtil::createBlankTestingWorld();
+        world = ::TestUtil::createBlankTestingWorld();
     }
 
     /**
@@ -54,7 +54,7 @@ class STPTacticAssignmentTest : public ::testing::Test
     }
 
     STP stp;
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_F(STPTacticAssignmentTest,

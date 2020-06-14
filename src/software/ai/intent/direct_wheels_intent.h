@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/primitive/direct_wheels_primitive.h"
+#include "software/primitive/direct_wheels_primitive.h"
 
 class DirectWheelsIntent : public DirectWheelsPrimitive, public Intent
 {

@@ -72,7 +72,7 @@
  * Implementation of pvPortMalloc() and vPortFree() that relies on the
  * compilers own malloc() and free() implementations.
  *
- * This file can only be used if the linker is configured to to generate
+ * This file can only be used if the linker is configured to generate
  * a heap memory area.
  *
  * See heap_1.c, heap_2.c and heap_4.c for alternative implementations, and the

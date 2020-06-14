@@ -144,7 +144,7 @@ AIConfig:
       type: "double"
       description: "Distance to nearest robot when we stop slowing down to avoid collisions"
 
-  ObstacleFactoryConfig:
+  RobotNavigationObstacleFactoryConfig:
     SpeedScalingFactor:
       min: 0.0
       max: 1.0
@@ -160,154 +160,6 @@ AIConfig:
       type: "double"
       description: "Factor for robot obstacle size"
 
-  VelocityObstaclePathManagerConfig:
-    OtherPathObjectiveStartInflationFactor:
-      min: 1.0
-      max: 3.0
-      default: 1.3
-      type: "double"
-      description: >-
-        Used to inflate an obstacle around the start of every path *except* the current one
-        being planned, so that the current path does not plan through the start of another
-        path
-
-  RobotExpiryBufferMilliseconds:
-    min: 0
-    max: 100
-    default: 50
-    type: "int"
-    description: "TODO: Add description as part of #149"
-
-  EvaluationConfig:
-      PossessionConfig:
-        PossessionDist:
-          min: 0.0
-          max: 1.0
-          default: 0.2
-          type: "double"
-          description: How close the ball has to be to the robot for the robot to have the ball
-        PassedToAngleTolerance:
-          min: 0.0
-          max: 90.0
-          default: 15.0
-          type: "double"
-          description: "angle in degrees that the ball velocity can deviate from the axis between
-                        the ball and the robot before it doesn't count as a pass"
-        MinPassSpeed:
-          min: 0.0
-          max: 10.0
-          default: 1.0
-          type: "double"
-          description: minimum speed along the pass axis for it to count as a pass
-        PossessionBufferTimeSeconds:
-          min: 0.0
-          max: 5.0
-          default: 1.5
-          type: "double"
-          description: how far back in time to check if a robot has possession
-        PassBufferTimeSeconds:
-          min: 0.0
-          max: 5.0
-          default: 1.0
-          type: "double"
-          description: how far back in time to check if a robot is receiving a pass
-      IndirectChipConfig:
-        ChipTargetFraction:
-          min: 0.0
-          max: 100.0
-          default: 0.5
-          type: "double"
-          description: Adjusts how far between ball and target the robot will chip
-        ChipPowerBounceThreshold:
-          min: 0.0
-          max: 5.0
-          default: 0.75
-          type: "double"
-          description: Maximum fraction of distance between chipper and target the first bounce should be, so ball is rolling when it reaches the target
-        MaxChipPower:
-          min: 0.0
-          max: 100.0
-          default: 8.0
-          type: "double"
-          description: Maximum power the robot can chip the ball at without malfunctions
-        ChipTargetAreaInset:
-          min: 0.0
-          max: 100.0
-          default: 0.3
-          type: "double"
-          description: Closest distance to edge of field that the robot could chip and chase to
-        MinChipTriArea:
-          min: 0.0
-          max: 100.0
-          default: 0.5
-          type: "double"
-          description: Minimum area of chip target triangle
-        MinChipTriEdgeLen:
-          min: 0.0
-          max: 100.0
-          default: 0.8
-          type: "double"
-          description: Minimum edge length of chip target triangle
-        MinChipTriEdgeAngle:
-          min: 0.0
-          max: 180.0
-          default: 20
-          type: "double"
-          description: Minimum angle in degrees between chip triangle edges
-        ChipCherryPowerDownscale:
-          min: 0.0
-          max: 100.0
-          default: 0.85
-          type: "double"
-          description: Percentage of distance to center of triangle to return as target
-  DefenderCreaseTacticConfig:
-    MaxDefenderSeperationDeg:
-      min: 0.0
-      max: 50
-      default: 13.0
-      type: "double"
-      description: The maximum angle the crease defenders will seperate by, in degrees.
-    MinDefenderSeperationDeg:
-      min: 0.0
-      max: 50
-      default: 3.0
-      type: "double"
-      description: The minimum angle the crease defenders will seperate by, in degrees.
-    BallDistForMaxDefenderSeperation:
-      min: 0.0
-      max: 5
-      default: 3
-      type: "double"
-      description: >-
-        The distance between the ball and the defenders at which they will have their
-        maximum seperation.
-    BallDistForMinDefenderSeperation:
-      min: 0.0
-      max: 5
-      default: 1
-      type: "double"
-      description: >-
-        The distance between the ball and the defenders at which they will have their
-        minimum seperation.
-  PivotActionConfig:
-    Experimental:
-        type: "bool"
-        default: false
-        description: If toggled, then loose ball will attempt to pivot with bottom parameters
-    ArbScaling:
-        min: 0.0
-        max: 10.0
-        type: "double"
-        default: 1.0
-        description: How quickly to pivot
-    FinishAngleThreshold:
-        min: 0.0
-        max: 360.0
-        type: "double"
-        default: 5.0
-        description: >-
-            How much tolerance in degrees we allow for the final angle before annoucing
-            pivot has finished
   GoalieTacticConfig:
     BlockConeBuffer:
         min: 0.0
@@ -391,15 +243,6 @@ AIConfig:
       default: 3.0
       type: "double"
       description: The maximum time that we will wait before committing to a pass
-  ShootOrChipPlayConfig:
-    FallbackChipTargetEnemyGoalOffset:
-      min: 0.0
-      max: 4.0
-      default: 1.5
-      type: double
-      description: >-
-        The x offset from the enemy goal for the fallback chip target, ie. where we will
-        chip if any enemy approches us before we have a good shot or a robot to chip to
   ShootOrPassPlayConfig:
     AbsMinPassScore:
       min: 0.0
@@ -422,17 +265,3 @@ AIConfig:
       default: 6
       type: double
       description: The minimum open angle to the goal that we require before taking a shot
-  ShadowFreekickerTacticConfig:
-    RobotSeparationScalingFactor:
-      min: 1.0
-      max: 5.0
-      default: 1.1
-      type: double
-      description: >-
-        How much to scale the separation distance between the two robots shadowing
-        an enemy freekicker
-  HighLevelStrategyConfig:
-    UseShootOrPassInsteadOfShootOrChip:
-      default: true
-      type: bool
-      description: Use the ShootOrPassPlay instead of the ShootOrChipPlay

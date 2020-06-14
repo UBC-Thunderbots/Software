@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 
@@ -44,5 +43,4 @@ class StopAction : public Action
     bool coast;
     // The maximum speed the robot may be moving at to be considered stopped
     double stopped_speed_threshold;
-    bool loop_forever;
 };
