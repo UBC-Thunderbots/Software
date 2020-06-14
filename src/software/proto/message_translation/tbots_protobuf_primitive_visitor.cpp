@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/protobuf_primitive_visitor.h"
+#include "software/proto/message_translation/tbots_protobuf_primitive_visitor.h"
 
 #include "shared/constants.h"
 #include "shared/proto/radio_primitive.pb.h"

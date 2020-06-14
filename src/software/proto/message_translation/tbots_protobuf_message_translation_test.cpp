@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/protobuf_message_translation.h"
+#include "software/proto/message_translation/tbots_protobuf_message_translation.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
@@ -70,7 +70,7 @@ class ProtobufTranslationTest : public ::testing::Test
 TEST(ProtobufTranslationTest, point_msg_test)
 {
     auto point     = Point(420, 420);
-    auto point_msg = createPointMsgProto(point);
+    auto point_msg = createPointMsg(point);
 
     ProtobufTranslationTest::assertPointMessageEqual(point, *point_msg);
 }
@@ -78,7 +78,7 @@ TEST(ProtobufTranslationTest, point_msg_test)
 TEST(ProtobufTranslationTest, angle_msg_test)
 {
     auto angle     = Angle::fromRadians(420);
-    auto angle_msg = createAngleMsgProto(angle);
+    auto angle_msg = createAngleMsg(angle);
 
     ProtobufTranslationTest::assertAngleMessageEqual(angle, *angle_msg);
 }
@@ -86,7 +86,7 @@ TEST(ProtobufTranslationTest, angle_msg_test)
 TEST(ProtobufTranslationTest, vector_msg_test)
 {
     auto vector     = Vector(420, 420);
-    auto vector_msg = createVectorMsgProto(vector);
+    auto vector_msg = createVectorMsg(vector);
 
     ProtobufTranslationTest::assertVectorMessageEqual(vector, *vector_msg);
 }
@@ -106,7 +106,7 @@ TEST(ProtobufTranslationTest, robot_state_msg_test)
 
     Robot robot(0, position, velocity, orientation, angular_velocity,
                 Timestamp::fromSeconds(0));
-    auto robot_state_msg = createRobotStateMsgProto(robot);
+    auto robot_state_msg = createRobotStateMsg(robot);
 
     ProtobufTranslationTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
@@ -117,7 +117,7 @@ TEST(ProtobufTranslationTest, ball_state_msg_test)
     auto velocity = Vector(420, 420);
 
     Ball ball(position, velocity, Timestamp::fromSeconds(0));
-    auto ball_state_msg = createBallStateMsgProto(ball);
+    auto ball_state_msg = createBallStateMsg(ball);
 
     ProtobufTranslationTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }
@@ -129,7 +129,7 @@ TEST(ProtobufTranslationTest, vision_msg_test)
         world, {Point(420, 420), Point(420, 420), Point(420, 420), Point(420, 420)},
         Timestamp::fromSeconds(0));
 
-    auto vision_msg = createVisionMsgProto(world);
+    auto vision_msg = createVisionMsg(world);
 
     ProtobufTranslationTest::assertBallStateMessageFromBall(world.ball(),
                                                             vision_msg->ball_state());

@@ -1,14 +1,14 @@
-#include "software/proto/message_translation/protobuf_message_translation.h"
+#include "software/proto/message_translation/tbots_protobuf_message_translation.h"
 
 #include "shared/constants.h"
 #include "shared/proto/geometry.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
 #include "software/primitive/primitive.h"
-#include "software/proto/message_translation/protobuf_primitive_visitor.h"
+#include "software/proto/message_translation/tbots_protobuf_primitive_visitor.h"
 #include "software/world/world.h"
 
-std::unique_ptr<VisionMsg> createVisionMsgProto(const World& world)
+std::unique_ptr<VisionMsg> createVisionMsg(const World& world)
 {
     // create msg and set timestamp
     auto vision_msg = std::make_unique<VisionMsg>();
@@ -25,16 +25,16 @@ std::unique_ptr<VisionMsg> createVisionMsgProto(const World& world)
     // freed
     std::for_each(friendly_robots.begin(), friendly_robots.end(),
                   [&](const Robot& robot) {
-                      robot_states_map[robot.id()] = *createRobotStateMsgProto(robot);
+                      robot_states_map[robot.id()] = *createRobotStateMsg(robot);
                   });
 
     // set ball state
-    vision_msg->set_allocated_ball_state(createBallStateMsgProto(world.ball()).release());
+    vision_msg->set_allocated_ball_state(createBallStateMsg(world.ball()).release());
 
     return std::move(vision_msg);
 }
 
-std::unique_ptr<PrimitiveMsg> createPrimitiveMsgProto(
+std::unique_ptr<PrimitiveMsg> createPrimitiveMsg(
     const ConstPrimitiveVectorPtr& primitives)
 {
     // create msg and update timestamp
@@ -58,12 +58,12 @@ std::unique_ptr<PrimitiveMsg> createPrimitiveMsgProto(
     return std::move(primitive_msg);
 }
 
-std::unique_ptr<RobotStateMsg> createRobotStateMsgProto(const Robot& robot)
+std::unique_ptr<RobotStateMsg> createRobotStateMsg(const Robot& robot)
 {
-    auto position         = createPointMsgProto(robot.position());
-    auto orientation      = createAngleMsgProto(robot.orientation());
-    auto velocity         = createVectorMsgProto(robot.velocity());
-    auto angular_velocity = createAngleMsgProto(robot.angularVelocity());
+    auto position         = createPointMsg(robot.position());
+    auto orientation      = createAngleMsg(robot.orientation());
+    auto velocity         = createVectorMsg(robot.velocity());
+    auto angular_velocity = createAngleMsg(robot.angularVelocity());
 
     auto robot_state_msg = std::make_unique<RobotStateMsg>();
 
@@ -76,10 +76,10 @@ std::unique_ptr<RobotStateMsg> createRobotStateMsgProto(const Robot& robot)
     return std::move(robot_state_msg);
 }
 
-std::unique_ptr<BallStateMsg> createBallStateMsgProto(const Ball& ball)
+std::unique_ptr<BallStateMsg> createBallStateMsg(const Ball& ball)
 {
-    auto position       = createPointMsgProto(ball.position());
-    auto velocity       = createVectorMsgProto(ball.velocity());
+    auto position       = createPointMsg(ball.position());
+    auto velocity       = createVectorMsg(ball.velocity());
     auto ball_state_msg = std::make_unique<BallStateMsg>();
 
     ball_state_msg->set_allocated_global_position_meters(position.release());
@@ -88,7 +88,7 @@ std::unique_ptr<BallStateMsg> createBallStateMsgProto(const Ball& ball)
     return std::move(ball_state_msg);
 }
 
-std::unique_ptr<PointMsg> createPointMsgProto(const Point& point)
+std::unique_ptr<PointMsg> createPointMsg(const Point& point)
 {
     auto point_msg = std::make_unique<PointMsg>();
     point_msg->set_x(point.x());
@@ -96,14 +96,14 @@ std::unique_ptr<PointMsg> createPointMsgProto(const Point& point)
     return std::move(point_msg);
 }
 
-std::unique_ptr<AngleMsg> createAngleMsgProto(const Angle& angle)
+std::unique_ptr<AngleMsg> createAngleMsg(const Angle& angle)
 {
     auto angle_msg = std::make_unique<AngleMsg>();
     angle_msg->set_radians(angle.toRadians());
     return std::move(angle_msg);
 }
 
-std::unique_ptr<VectorMsg> createVectorMsgProto(const Vector& vector)
+std::unique_ptr<VectorMsg> createVectorMsg(const Vector& vector)
 {
     auto vector_msg = std::make_unique<VectorMsg>();
     vector_msg->set_x_component(vector.x());
