@@ -10,7 +10,7 @@
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 
-class ProtobufTranslationTest : public ::testing::Test
+class TbotsProtobufTest : public ::testing::Test
 {
    public:
     static void assertPointMessageEqual(const Point& point, const PointMsg& point_msg)
@@ -67,37 +67,37 @@ class ProtobufTranslationTest : public ::testing::Test
     }
 };
 
-TEST(ProtobufTranslationTest, point_msg_test)
+TEST(TbotsProtobufTest, point_msg_test)
 {
     auto point     = Point(420, 420);
     auto point_msg = createPointMsg(point);
 
-    ProtobufTranslationTest::assertPointMessageEqual(point, *point_msg);
+    TbotsProtobufTest::assertPointMessageEqual(point, *point_msg);
 }
 
-TEST(ProtobufTranslationTest, angle_msg_test)
+TEST(TbotsProtobufTest, angle_msg_test)
 {
     auto angle     = Angle::fromRadians(420);
     auto angle_msg = createAngleMsg(angle);
 
-    ProtobufTranslationTest::assertAngleMessageEqual(angle, *angle_msg);
+    TbotsProtobufTest::assertAngleMessageEqual(angle, *angle_msg);
 }
 
-TEST(ProtobufTranslationTest, vector_msg_test)
+TEST(TbotsProtobufTest, vector_msg_test)
 {
     auto vector     = Vector(420, 420);
     auto vector_msg = createVectorMsg(vector);
 
-    ProtobufTranslationTest::assertVectorMessageEqual(vector, *vector_msg);
+    TbotsProtobufTest::assertVectorMessageEqual(vector, *vector_msg);
 }
 
-TEST(ProtobufTranslationTest, timestamp_msg_test)
+TEST(TbotsProtobufTest, timestamp_msg_test)
 {
     auto timestamp_msg = createCurrentTimestampMsg();
-    ProtobufTranslationTest::assertSaneTimestamp(*timestamp_msg);
+    TbotsProtobufTest::assertSaneTimestamp(*timestamp_msg);
 }
 
-TEST(ProtobufTranslationTest, robot_state_msg_test)
+TEST(TbotsProtobufTest, robot_state_msg_test)
 {
     auto position         = Point(420, 420);
     auto velocity         = Vector(420, 420);
@@ -108,10 +108,10 @@ TEST(ProtobufTranslationTest, robot_state_msg_test)
                 Timestamp::fromSeconds(0));
     auto robot_state_msg = createRobotStateMsg(robot);
 
-    ProtobufTranslationTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
+    TbotsProtobufTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
 
-TEST(ProtobufTranslationTest, ball_state_msg_test)
+TEST(TbotsProtobufTest, ball_state_msg_test)
 {
     auto position = Point(420, 420);
     auto velocity = Vector(420, 420);
@@ -119,10 +119,10 @@ TEST(ProtobufTranslationTest, ball_state_msg_test)
     Ball ball(position, velocity, Timestamp::fromSeconds(0));
     auto ball_state_msg = createBallStateMsg(ball);
 
-    ProtobufTranslationTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
+    TbotsProtobufTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }
 
-TEST(ProtobufTranslationTest, vision_msg_test)
+TEST(TbotsProtobufTest, vision_msg_test)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     world       = ::TestUtil::setFriendlyRobotPositions(
@@ -131,9 +131,9 @@ TEST(ProtobufTranslationTest, vision_msg_test)
 
     auto vision_msg = createVisionMsg(world);
 
-    ProtobufTranslationTest::assertBallStateMessageFromBall(world.ball(),
-                                                            vision_msg->ball_state());
-    ProtobufTranslationTest::assertSaneTimestamp(vision_msg->time_sent());
+    TbotsProtobufTest::assertBallStateMessageFromBall(world.ball(),
+                                                      vision_msg->ball_state());
+    TbotsProtobufTest::assertSaneTimestamp(vision_msg->time_sent());
 
     auto friendly_robots   = world.friendlyTeam().getAllRobots();
     auto& robot_states_map = *vision_msg->mutable_robot_states();
@@ -141,7 +141,7 @@ TEST(ProtobufTranslationTest, vision_msg_test)
     std::for_each(friendly_robots.begin(), friendly_robots.end(),
                   [&](const Robot& robot) {
                       ASSERT_TRUE(robot_states_map.count(robot.id()));
-                      ProtobufTranslationTest::assertRobotStateMessageFromRobot(
+                      TbotsProtobufTest::assertRobotStateMessageFromRobot(
                           robot, robot_states_map[robot.id()]);
                   });
 }

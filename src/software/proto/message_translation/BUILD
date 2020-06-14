@@ -82,6 +82,7 @@ cc_test(
     srcs = ["ssl_detection_test.cpp"],
     deps = [
         ":ssl_detection",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -117,11 +118,11 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "ssl_referee_test",
-#    srcs = ["ssl_referee_test.cpp"],
-#    deps = [
-#        ":ssl_referee",
-#        "@gtest//:gtest_main",
-#    ],
-#)
+cc_test(
+    name = "ssl_referee_test",
+    srcs = ["ssl_referee_test.cpp"],
+    deps = [
+        ":ssl_referee",
+        "@gtest//:gtest_main",
+    ],
+)
