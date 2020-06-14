@@ -2,8 +2,7 @@
 
 #include "software/proto/ssl_referee.pb.h"
 #include "software/sensor_fusion/refbox_data.h"
-// TODO: Move TeamColour to a shared file
-#include "software/world/robot_state.h"
+#include "software/world/team_colour.h"
 
 /**
  * Converts a Referee packet into a RefboxGameState for the Refbox command contained

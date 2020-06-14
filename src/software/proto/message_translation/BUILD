@@ -113,7 +113,7 @@ cc_library(
     deps = [
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion:refbox_data",
-        "//software/world:robot_state",
+        "//software/world:team_colour",
     ],
 )
 
