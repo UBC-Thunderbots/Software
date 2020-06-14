@@ -607,7 +607,7 @@ TEST_F(SSLGeometryMessageTranslatorTest,
 
 TEST_F(SSLGeometryMessageTranslatorTest, test_convert_field_to_proto_and_back)
 {
-    Field field           = ::TestUtil::createSSLDivBField();
+    Field field           = Field::createSSLDivisionBField();
     const float thickness = 0.005f;
 
     auto field_proto = createGeometryData(field, thickness);
