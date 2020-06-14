@@ -35,6 +35,13 @@ typedef enum
 class Field
 {
    public:
+    /**
+     * Creates a field with the standard SSL Division B dimensions
+     *
+     * @return a field with the standard SSL Division B dimensions
+     */
+    static Field createSSLDivisionBField();
+
     Field() = delete;
 
     /**
