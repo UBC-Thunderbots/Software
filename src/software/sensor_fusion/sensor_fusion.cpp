@@ -11,7 +11,8 @@ SensorFusion::SensorFusion()
 {
 }
 
-std::optional<World> SensorFusion::getWorld() const {
+std::optional<World> SensorFusion::getWorld() const
+{
     if (field && ball)
     {
         return World(*field, *ball, friendly_team, enemy_team);
