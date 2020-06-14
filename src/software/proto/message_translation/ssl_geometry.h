@@ -163,3 +163,13 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
  * @return an SSL_GeometryData proto message representing the given field
  */
 std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field, float thickness);
+
+/**
+ * Returns a Field object given geometry data from a protobuf packet
+ *
+ * @param geometry_packet The SSL_GeometryData packet containing new field data
+ *
+ * @return A Field object representing the field specified with the provided geometry
+ *      If packet_geometry is not a valid packet, then will return std::nullopt
+ */
+std::optional<Field> createField(const SSL_GeometryData& geometry_packet);

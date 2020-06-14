@@ -85,3 +85,70 @@ std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
 
     return std::move(detection_frame);
 }
+
+std::vector<BallDetection> createBallDetections(
+    const std::vector<SSL_DetectionFrame>& detections, double min_valid_x,
+    double max_valid_x, bool ignore_invalid_camera_data)
+{
+    auto ball_detections = std::vector<BallDetection>();
+
+    for (const auto& detection : detections)
+    {
+        for (const SSL_DetectionBall& ball : detection.balls())
+        {
+            // Convert all data to meters and radians
+            BallDetection ball_detection{
+                .position   = Point(ball.x() * METERS_PER_MILLIMETER,
+                                  ball.y() * METERS_PER_MILLIMETER),
+                .timestamp  = Timestamp::fromSeconds(detection.t_capture()),
+                .confidence = ball.confidence()};
+
+            bool ignore_ball = ignore_invalid_camera_data &&
+                               (min_valid_x > ball_detection.position.x() ||
+                                max_valid_x < ball_detection.position.x());
+            if (!ignore_ball)
+            {
+                ball_detections.push_back(ball_detection);
+            }
+        }
+    }
+
+    return ball_detections;
+}
+
+std::vector<RobotDetection> createTeamDetection(
+    const std::vector<SSL_DetectionFrame>& detections, TeamColour team_colour,
+    double min_valid_x, double max_valid_x, bool ignore_invalid_camera_data)
+{
+    std::vector<RobotDetection> robot_detections = std::vector<RobotDetection>();
+
+    // Collect all the visible robots from all camera frames
+    for (const auto& detection : detections)
+    {
+        auto ssl_robots = detection.robots_blue();
+        if (team_colour == TeamColour::YELLOW)
+        {
+            ssl_robots = detection.robots_yellow();
+        }
+
+        for (const auto& ssl_robot_detection : ssl_robots)
+        {
+            RobotDetection robot_detection{
+                .id          = ssl_robot_detection.robot_id(),
+                .position    = Point(ssl_robot_detection.x() * METERS_PER_MILLIMETER,
+                                  ssl_robot_detection.y() * METERS_PER_MILLIMETER),
+                .orientation = Angle::fromRadians(ssl_robot_detection.orientation()),
+                .confidence  = ssl_robot_detection.confidence(),
+                .timestamp   = Timestamp::fromSeconds(detection.t_capture())};
+
+            bool ignore_robot = ignore_invalid_camera_data &&
+                                (min_valid_x > robot_detection.position.x() ||
+                                 max_valid_x < robot_detection.position.x());
+            if (!ignore_robot)
+            {
+                robot_detections.push_back(robot_detection);
+            }
+        }
+    }
+    return robot_detections;
+}

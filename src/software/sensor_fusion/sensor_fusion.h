@@ -5,7 +5,9 @@
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/proto/message_translation/ssl_protobuf_reader.h"
+#include "software/proto/message_translation/ssl_detection.h"
+#include "software/proto/message_translation/ssl_geometry.h"
+#include "software/proto/message_translation/ssl_referee.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
@@ -77,6 +79,22 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
      */
     Team createFriendlyTeam(const std::vector<RobotDetection> &robot_detections);
     Team createEnemyTeam(const std::vector<RobotDetection> &robot_detections);
+
+    /**
+     * Inverts all positions and orientations across the x and y axis of the field
+     *
+     * @param frame The frame to invert. It will be mutated in-place
+     */
+    void invertFieldSide(SSL_DetectionFrame &frame);
+
+    /**
+     * Given a detection, figures out if the camera is enabled
+     *
+     * @param detection SSL_DetectionFrame to consider
+     *
+     * @return whether the camera is enabled
+     */
+    bool isCameraEnabled(const SSL_DetectionFrame &detection);
 
     std::optional<Field> field;
     std::optional<Ball> ball;

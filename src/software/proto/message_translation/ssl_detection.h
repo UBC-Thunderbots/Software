@@ -1,8 +1,10 @@
 #pragma once
 
+#include <limits>
 #include <memory>
 
 #include "software/proto/messages_robocup_ssl_detection.pb.h"
+#include "software/sensor_fusion/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball_state.h"
 #include "software/world/robot_state.h"
@@ -43,3 +45,48 @@ std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
     const std::vector<BallState>& balls,
     const std::vector<RobotStateWithId>& yellow_robots,
     const std::vector<RobotStateWithId>& blue_robots);
+
+/**
+ * Reads the ball data contained in the list of SSL detection frames and returns the
+ * ball detections
+ *
+ * Filters out ball detections that are less than min_valid_x and greater than max_valid_x
+ * if ignore_invalid_camera_data is true
+ *
+ * @param detections A list of new DetectionFrames containing ball data
+ * @param min_valid_x min valid x value
+ * @param max_valid_x max valid x value
+ * @param ignore_invalid_camera_data whether or not to ignore ball outside of valid x
+ * range
+ *
+ * @return all the valid ball detections contained in the ssl detection frames
+ */
+std::vector<BallDetection> createBallDetections(
+    const std::vector<SSL_DetectionFrame>& detections,
+    double min_valid_x              = std::numeric_limits<double>::min(),
+    double max_valid_x              = std::numeric_limits<double>::max(),
+    bool ignore_invalid_camera_data = false);
+
+/**
+ * Reads the robot data for the given team contained in the list of DetectionFrames
+ * and returns the most up to date detections of the given colour team
+ *
+ * Filters out robot detections that are less than min_valid_x and greater than
+ * max_valid_x if ignore_invalid_camera_data is true
+ *
+ * @param detections A list of new DetectionFrames containing given team robot data
+ * @param team_colour the team colour to get detections for
+ * @param min_valid_x min valid x value
+ * @param max_valid_x max valid x value
+ * @param ignore_invalid_camera_data whether or not to ignore robot outside of valid x
+ * range
+ *
+ *
+ * @return The most up to date detections of the given team given the new
+ * DetectionFrame information
+ */
+std::vector<RobotDetection> createTeamDetection(
+    const std::vector<SSL_DetectionFrame>& detections, TeamColour team_colour,
+    double min_valid_x              = std::numeric_limits<double>::min(),
+    double max_valid_x              = std::numeric_limits<double>::max(),
+    bool ignore_invalid_camera_data = false);

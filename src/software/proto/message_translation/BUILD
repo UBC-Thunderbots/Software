@@ -58,7 +58,6 @@ cc_test(
     srcs = ["ssl_geometry_test.cpp"],
     deps = [
         ":ssl_geometry",
-        ":ssl_protobuf_reader",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -71,6 +70,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/proto:ssl_cc_proto",
+        "//software/sensor_fusion:vision_detection",
         "//software/time:timestamp",
         "//software/world:ball_state",
         "//software/world:robot_state",
@@ -82,7 +82,6 @@ cc_test(
     srcs = ["ssl_detection_test.cpp"],
     deps = [
         ":ssl_detection",
-        ":ssl_protobuf_reader",
         "@gtest//:gtest_main",
     ],
 )
@@ -108,18 +107,21 @@ cc_test(
 )
 
 cc_library(
-    name = "ssl_protobuf_reader",
-    srcs = ["ssl_protobuf_reader.cpp"],
-    hdrs = ["ssl_protobuf_reader.h"],
+    name = "ssl_referee",
+    srcs = ["ssl_referee.cpp"],
+    hdrs = ["ssl_referee.h"],
     deps = [
-        "//software/logger",
-        "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
-        "//software/proto/message_translation:ssl_geometry",
         "//software/sensor_fusion:refbox_data",
-        "//software/sensor_fusion:vision_detection",
-        "//software/world:ball",
-        "//software/world:field",
-        "//software/world:team",
+        "//software/world:robot_state",
     ],
 )
+
+#cc_test(
+#    name = "ssl_referee_test",
+#    srcs = ["ssl_referee_test.cpp"],
+#    deps = [
+#        ":ssl_referee",
+#        "@gtest//:gtest_main",
+#    ],
+#)

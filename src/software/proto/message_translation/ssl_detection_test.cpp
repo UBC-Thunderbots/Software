@@ -2,9 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/proto/message_translation/ssl_protobuf_reader.h"
-
-TEST(SSLDetectionMessageTranslatorTest, test_create_detection_ball)
+TEST(SSLDetectionTest, test_create_detection_ball)
 {
     const BallState ball_state(Point(-1.2, 0), Vector(0.01, 3), 0.2);
 
@@ -21,7 +19,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_ball)
     EXPECT_FLOAT_EQ(0.0f, detection_ball->pixel_y());
 }
 
-TEST(SSLDetectionMessageTranslatorTest, test_create_detection_robot)
+TEST(SSLDetectionTest, test_create_detection_robot)
 {
     const RobotState state(Point(0.0, -0.5), Vector(1, 2), Angle::quarter(),
                            AngularVelocity::threeQuarter());
@@ -43,7 +41,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_robot)
                     detection_robot->height());
 }
 
-TEST(SSLDetectionMessageTranslatorTest, test_create_detection_frame)
+TEST(SSLDetectionTest, test_create_detection_frame)
 {
     const uint32_t camera_id    = 0;
     const Timestamp t_capture   = Timestamp::fromSeconds(8.03);
@@ -85,7 +83,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_create_detection_frame)
     EXPECT_EQ(3, detection_frame->robots_blue_size());
 }
 
-TEST(SSLDetectionMessageTranslatorTest, test_convert_ball_state_to_proto_and_back)
+TEST(SSLDetectionTest, test_convert_ball_state_to_proto_and_back)
 {
     const uint32_t camera_id    = 0;
     const Timestamp t_capture   = Timestamp::fromSeconds(8.03);
