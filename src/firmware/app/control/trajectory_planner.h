@@ -66,6 +66,7 @@ typedef struct PositionTrajectory
     float orientation[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float linear_speed[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float angular_speed[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 } PositionTrajectory_t;
 
 // Struct that defines a single point on a velocity trajectory
@@ -81,6 +82,10 @@ typedef struct VelocityTrajectory
 {
     VelocityTrajectoryElement_t* trajectory_elements;
     FirmwareRobotPathParameters_t path_parameters;
+    float x_velocity[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float y_velocity[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float angular_velocity[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float time[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 } VelocityTrajectory_t;
 
 typedef struct TrajectorySegment
@@ -410,26 +415,72 @@ void app_trajectory_planner_copyPositionTrajectoryElement(
     PositionTrajectoryElement_t* from_trajectory);
 
 void app_trajectory_planner_generateSegmentNodesAndLengths(
-        const float t_start, const float t_end, Polynomial1dOrder3_t poly,
-        float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-        float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-        const unsigned int num_elements);
+    const float t_start, const float t_end, Polynomial1dOrder3_t poly,
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const unsigned int num_elements);
+
+void app_trajectory_planner_generateLinearSegmentNodesAndLengths(
+    const float t_start, const float t_end, Polynomial2dOrder3_t poly,
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], const unsigned int num_elements);
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
-        PositionTrajectory_t* position_trajectory, FirmwareRobotPathParameters_t path_parameters);
-
+    PositionTrajectory_t* position_trajectory,
+    FirmwareRobotPathParameters_t path_parameters);
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_modifySpeedsToBackwardsContinuous(
-        float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-        float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-        const float max_allowable_acceleration, const float initial_speed,
-        const float final_speed, const unsigned int num_segments);
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const float max_allowable_acceleration, const float initial_speed,
+    const unsigned int num_segments);
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_createForwardsContinuousSpeedProfile(
-        float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-        float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-        const float max_allowable_acceleration, const float initial_speed,
-        const float final_speed, const unsigned int num_segments);
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const float max_allowable_acceleration, const float initial_speed,
+    const float final_speed, const unsigned int num_segments);
+
+void app_trajectory_planner_getAbsoluteMaximumSpeedProfile(
+    Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
+    const float t_end, const float max_allowable_acceleration, const float speed_cap,
+    float* max_allowable_speed_profile);
+
+void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float trajectory_duration[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const unsigned int num_elements);
+
+TrajectoryPlannerGenerationStatus_t app_trajectory_planner_modifySpeedsToMatchDuration(
+    float speeds1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float complete_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    const float num_elements);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_interpolateConstantPeriodPositionTrajectory_2(
+    PositionTrajectory_t* constant_period_trajectory,
+    PositionTrajectory_t* variable_period_trajectory,
+    FirmwareRobotPathParameters_t* path_parameters, const float interpolation_period);
+
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory_2(
+    PositionTrajectory_t* constant_period_trajectory,
+    FirmwareRobotPathParameters_t* path_parameters, float interpolation_period);
+
+void app_trajectory_planner_generateVelocityTrajectory_2(
+    PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory,
+    FirmwareRobotPathParameters_t path_parameters);
+
+TrajectoryPlannerGenerationStatus_t app_trajectory_planner_modifySpeedToMatchDuration(
+    float initial_speed, float* final_speed, float duration, float displacement);
