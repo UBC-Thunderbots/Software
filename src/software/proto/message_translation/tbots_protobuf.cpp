@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/tbots_protobuf_message_translation.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 
 #include "shared/constants.h"
 #include "shared/proto/geometry.pb.h"

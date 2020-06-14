@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/ssl_geometry_message_translator.h"
+#include "software/proto/message_translation/ssl_geometry.h"
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"

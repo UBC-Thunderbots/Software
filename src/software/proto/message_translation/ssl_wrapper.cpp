@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/ssl_wrapper_message_translator.h"
+#include "software/proto/message_translation/ssl_wrapper.h"
 
 std::unique_ptr<SSL_WrapperPacket> createWrapperPacket(
     std::unique_ptr<SSL_GeometryData> geometry_data,

@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/proto/message_translation/tbots_protobuf_message_translation.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string WifiBackend::name = "wifi";

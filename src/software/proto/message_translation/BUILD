@@ -16,9 +16,9 @@ cc_library(
 )
 
 cc_library(
-    name = "tbots_protobuf_message_translation",
-    srcs = ["tbots_protobuf_message_translation.cpp"],
-    hdrs = ["tbots_protobuf_message_translation.h"],
+    name = "tbots_protobuf",
+    srcs = ["tbots_protobuf.cpp"],
+    hdrs = ["tbots_protobuf.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//shared/proto:tbots_cc_proto",
@@ -33,18 +33,18 @@ cc_library(
 )
 
 cc_test(
-    name = "tbots_protobuf_message_translation_test",
-    srcs = ["tbots_protobuf_message_translation_test.cpp"],
+    name = "tbots_protobuf_test",
+    srcs = ["tbots_protobuf_test.cpp"],
     deps = [
-        "//software/proto/message_translation:tbots_protobuf_message_translation",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/test_util",
     ],
 )
 
 cc_library(
-    name = "ssl_geometry_message_translator",
-    srcs = ["ssl_geometry_message_translator.cpp"],
-    hdrs = ["ssl_geometry_message_translator.h"],
+    name = "ssl_geometry",
+    srcs = ["ssl_geometry.cpp"],
+    hdrs = ["ssl_geometry.h"],
     deps = [
         "//shared:constants",
         "//software/proto:ssl_cc_proto",
@@ -54,20 +54,20 @@ cc_library(
 )
 
 cc_test(
-    name = "ssl_geometry_message_translator_test",
-    srcs = ["ssl_geometry_message_translator_test.cpp"],
+    name = "ssl_geometry_test",
+    srcs = ["ssl_geometry_test.cpp"],
     deps = [
-        ":ssl_geometry_message_translator",
-        "//software/sensor_fusion:ssl_protobuf_reader",
+        ":ssl_geometry",
+        ":ssl_protobuf_reader",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "ssl_detection_message_translator",
-    srcs = ["ssl_detection_message_translator.cpp"],
-    hdrs = ["ssl_detection_message_translator.h"],
+    name = "ssl_detection",
+    srcs = ["ssl_detection.cpp"],
+    hdrs = ["ssl_detection.h"],
     deps = [
         "//shared:constants",
         "//software/proto:ssl_cc_proto",
@@ -78,31 +78,48 @@ cc_library(
 )
 
 cc_test(
-    name = "ssl_detection_message_translator_test",
-    srcs = ["ssl_detection_message_translator_test.cpp"],
+    name = "ssl_detection_test",
+    srcs = ["ssl_detection_test.cpp"],
     deps = [
-        ":ssl_detection_message_translator",
-        "//software/sensor_fusion:ssl_protobuf_reader",
+        ":ssl_detection",
+        ":ssl_protobuf_reader",
         "@gtest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "ssl_wrapper_message_translator",
-    srcs = ["ssl_wrapper_message_translator.cpp"],
-    hdrs = ["ssl_wrapper_message_translator.h"],
+    name = "ssl_wrapper",
+    srcs = ["ssl_wrapper.cpp"],
+    hdrs = ["ssl_wrapper.h"],
     deps = [
-        ":ssl_detection_message_translator",
-        ":ssl_geometry_message_translator",
+        ":ssl_detection",
+        ":ssl_geometry",
         "//software/proto:ssl_cc_proto",
     ],
 )
 
 cc_test(
-    name = "ssl_wrapper_message_translator_test",
-    srcs = ["ssl_wrapper_message_translator_test.cpp"],
+    name = "ssl_wrapper_test",
+    srcs = ["ssl_wrapper_test.cpp"],
     deps = [
-        ":ssl_wrapper_message_translator",
+        ":ssl_wrapper",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "ssl_protobuf_reader",
+    srcs = ["ssl_protobuf_reader.cpp"],
+    hdrs = ["ssl_protobuf_reader.h"],
+    deps = [
+        "//software/logger",
+        "//software/parameter:dynamic_parameters",
+        "//software/proto:ssl_cc_proto",
+        "//software/proto/message_translation:ssl_geometry",
+        "//software/sensor_fusion:refbox_data",
+        "//software/sensor_fusion:vision_detection",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:team",
     ],
 )

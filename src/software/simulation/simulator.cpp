@@ -1,9 +1,9 @@
 #include "software/simulation/simulator.h"
 
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/proto/message_translation/ssl_detection_message_translator.h"
-#include "software/proto/message_translation/ssl_geometry_message_translator.h"
-#include "software/proto/message_translation/ssl_wrapper_message_translator.h"
+#include "software/proto/message_translation/ssl_detection.h"
+#include "software/proto/message_translation/ssl_geometry.h"
+#include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
 

@@ -1,6 +1,6 @@
-#include "software/sensor_fusion/ssl_protobuf_reader.h"
+#include "software/proto/message_translation/ssl_protobuf_reader.h"
 
-#include "software/proto/message_translation/ssl_geometry_message_translator.h"
+#include "software/proto/message_translation/ssl_geometry.h"
 
 std::optional<Field> createField(const SSL_GeometryData &geometry_packet)
 {

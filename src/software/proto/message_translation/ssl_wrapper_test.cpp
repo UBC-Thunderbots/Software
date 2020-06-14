@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/ssl_wrapper_message_translator.h"
+#include "software/proto/message_translation/ssl_wrapper.h"
 
 #include <gtest/gtest.h>
 

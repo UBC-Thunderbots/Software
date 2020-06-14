@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/ssl_detection_message_translator.h"
+#include "software/proto/message_translation/ssl_detection.h"
 
 #include "shared/constants.h"
 

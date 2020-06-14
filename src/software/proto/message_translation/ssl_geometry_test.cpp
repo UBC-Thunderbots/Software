@@ -1,8 +1,8 @@
-#include "software/proto/message_translation/ssl_geometry_message_translator.h"
+#include "software/proto/message_translation/ssl_geometry.h"
 
 #include <gtest/gtest.h>
 
-#include "software/sensor_fusion/ssl_protobuf_reader.h"
+#include "software/proto/message_translation/ssl_protobuf_reader.h"
 #include "software/test_util/test_util.h"
 
 class SSLGeometryMessageTranslatorTest : public ::testing::Test

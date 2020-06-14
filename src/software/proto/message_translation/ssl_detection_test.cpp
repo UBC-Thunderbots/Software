@@ -1,8 +1,8 @@
-#include "software/proto/message_translation/ssl_detection_message_translator.h"
+#include "software/proto/message_translation/ssl_detection.h"
 
 #include <gtest/gtest.h>
 
-#include "software/sensor_fusion/ssl_protobuf_reader.h"
+#include "software/proto/message_translation/ssl_protobuf_reader.h"
 
 TEST(SSLDetectionMessageTranslatorTest, test_create_detection_ball)
 {

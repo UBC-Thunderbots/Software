@@ -6,7 +6,7 @@
 
 /**
  * A lightweight datatype used to input new data into the filter.
- * We do this rather than taking the SSL_Detection data directly
+ * We do this rather than taking the SSL_DetectionRobot data directly
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
@@ -17,6 +17,11 @@ struct RobotDetection
     Angle orientation;
     double confidence;
     Timestamp timestamp;
+
+    bool operator<(const RobotDetection &r) const
+    {
+        return timestamp < r.timestamp;
+    }
 };
 
 /**
@@ -32,6 +37,7 @@ struct BallDetection
     // The timestamp of the detection. This is the timestamp for when the camera frame
     // containing the detection was captured
     Timestamp timestamp;
+    double confidence;
 
     bool operator<(const BallDetection &b) const
     {
