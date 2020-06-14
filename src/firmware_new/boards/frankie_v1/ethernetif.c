@@ -81,8 +81,7 @@
 #if defined(__ICCARM__) /*!< IAR Compiler */
 
 #pragma location = 0x30040000
-        ETH_DMADescTypeDef
-            DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location = 0x30040060
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 #pragma location = 0x30040200

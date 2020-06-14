@@ -1,30 +1,23 @@
 #pragma once
-
-/**
- * This file is an abstraction around LwIP to communicate with AI
- */
-
 #include "pb.h"
 
 typedef struct ProtoMulticastListenerProfile ProtoMulticastListenerProfile_t;
 typedef struct ProtoMulticastSenderProfile ProtoMulticastSenderProfile_t;
 
-/**
- * TASKS
- */
-void io_proto_multicast_sender_Task(void* sender_profile);
-void io_proto_multicast_listener_Task(void* listener_profile);
+// TODO docs
+void io_proto_multicast_sender_Task(void* arg);
+void io_proto_multicast_listener_Task(void* arg);
 
 /**
- * Create an ProtoMulticastListener/SenderProfile_t
+ * Create an ProtoMulticastSender/ListenerProfile
  *
- * contains all the networking and protobuf profiles required to join a multicast group
+ * contains all the networking and protobuf information required to join a multicast group
  * and receive/send proto
  *
  * @param multicast_address [in] The multicast channel the robot should join
  * @param port [in] The port to bind to
- * @param message_fields [in] The nanopb message fields used to seriallize/deserialize msg
- *        example: if the msg type is TestMsg, the fields are defined as TestMsg_fields
+ * @param message_fields [in] The nanopb message fields used to seriallize/deserialize the
+ * msg example: if the msg type is TestMsg, the fields are defined as TestMsg_fields
  * @param message_max_size [in] The maximum known size of the protobuf. If the maximum
  *        size is undeterminable (i.e repated fields), this value is recommended to be
  *        set at MAXIMUM_TRANSFER_UNIT (MTU) of the network packet.
@@ -38,7 +31,6 @@ void io_proto_multicast_listener_Task(void* listener_profile);
  * @param sending_rate_hertz [in] How frequently should the protobuf_struct be
  * deserialized and sent
  * @param protobuf_struct [out] This struct to serialized and send over the network.
- * @return A ProtoMulticastSenderProfile_t for a proto_multicast_sender_Task
  *
  * listener_profile_create specific:
  *
@@ -46,7 +38,8 @@ void io_proto_multicast_listener_Task(void* listener_profile);
  * @param timeout_callback [in] The calllback to trigger when the timeout occurs.
  * @param protobuf_struct [out] The serialized proto in the incoming network packet, will
  * get deserialized into this struct.
- * @return A ProtoMulticastListenerProfile_t for a proto_multicast_Listener_Task
+ *
+ * @return ProtoMulticastSender/ListenerProfile_t the profile to provide to the task
  *
  */
 ProtoMulticastSenderProfile_t* io_proto_multicast_sender_profile_create(
@@ -60,17 +53,17 @@ ProtoMulticastListenerProfile_t* io_proto_multicast_listener_profile_create(
     uint16_t timeout_milliseconds, void (*timeout_callback)(void));
 
 /**
- * Destroy the given ProtoMulticastListenerProfile
+ * Destroy the given ProtoMulticastListenerProfile_t
  *
- * @param connection_profile The profile to delete
+ * @param listener_profile The profile to delete
  */
 void io_proto_multicast_listener_profile_destroy(
     ProtoMulticastListenerProfile_t* listener_profile);
 
 /**
- * Destroy the given ProtoMulticastSenderProfile
+ * Destroy the given ProtoMulticastSenderProfile_t
  *
- * @param connection_profile The profile to delete
+ * @param sender_profile The profile to delete
  */
 void io_proto_multicast_sender_profile_destroy(
     ProtoMulticastSenderProfile_t* sender_profile);
