@@ -26,6 +26,11 @@ RobotState TimestampedRobotState::robotState() const
     return robot_state_;
 }
 
+RobotState &TimestampedRobotState::mutableRobotState()
+{
+    return robot_state_;
+}
+
 bool TimestampedRobotState::operator==(const TimestampedRobotState &other) const
 {
     return this->robotState() == other.robotState();

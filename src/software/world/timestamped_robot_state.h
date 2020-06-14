@@ -52,6 +52,14 @@ class TimestampedRobotState
      */
     RobotState robotState() const;
 
+
+    /**
+     * Returns a mutable reference to the robot state without any timestamp information.
+     *
+     * @return mutable robot state
+     */
+    RobotState &mutableRobotState();
+
     /**
      * Defines the equality operator for a TimestampedRobotState.
      * RobotStateWithTimestamps are equal if their positions, velocities,
@@ -73,6 +81,6 @@ class TimestampedRobotState
     bool operator!=(const TimestampedRobotState &other) const;
 
    private:
-    Timestamp timestamp_;
     RobotState robot_state_;
+    Timestamp timestamp_;
 };

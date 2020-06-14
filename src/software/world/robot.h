@@ -182,6 +182,20 @@ class Robot
     bool ballInBeam() const;
 
     /**
+     * Returns time in milliseconds since last chip
+     *
+     * @return ms since last chip
+     */
+    unsigned long timeSinceLastChip() const;
+
+    /**
+     * Returns time in milliseconds since last kick
+     *
+     * @return ms since last kick
+     */
+    unsigned long timeSinceLastKick() const;
+
+    /**
      * Returns the estimated angular velocity of the robot at a future time, relative to
      * when the robot was last updated
      *

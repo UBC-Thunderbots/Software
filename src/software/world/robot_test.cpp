@@ -67,6 +67,33 @@ TEST_F(RobotTest, update_state_with_all_params)
     EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
 }
 
+
+TEST_F(RobotTest, update_state_with_optional_params)
+{
+    Robot robot =
+        Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
+
+    TimestampedRobotState new_timestamped_robot_state(
+        Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+        AngularVelocity::fromRadians(1.1), half_second_future);
+
+    new_timestamped_robot_state.mutableRobotState().updateBallInBeam(true);
+    new_timestamped_robot_state.mutableRobotState().updateTimeSinceLastChip(11);
+    new_timestamped_robot_state.mutableRobotState().updateTimeSinceLastKick(5);
+
+    robot.updateState(new_timestamped_robot_state);
+
+    EXPECT_EQ(0, robot.id());
+    EXPECT_EQ(Point(-1.2, 3), robot.position());
+    EXPECT_EQ(Vector(2.2, -0.05), robot.velocity());
+    EXPECT_EQ(Angle::quarter(), robot.orientation());
+    EXPECT_EQ(AngularVelocity::fromRadians(1.1), robot.angularVelocity());
+    EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
+    EXPECT_EQ(true, robot.ballInBeam());
+    EXPECT_EQ(11, robot.timeSinceLastChip());
+    EXPECT_EQ(5, robot.timeSinceLastKick());
+}
+
 TEST_F(RobotTest, update_state_with_new_robot)
 {
     Robot robot =
@@ -427,7 +454,7 @@ TEST_F(RobotTest, get_position_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Point> previous_positions{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_positions.push_back(previous_states.at(i).robotState().position());
     }
@@ -450,7 +477,7 @@ TEST_F(RobotTest, get_velocity_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Vector> previous_velocities{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_velocities.push_back(previous_states.at(i).robotState().velocity());
     }
@@ -474,7 +501,7 @@ TEST_F(RobotTest, get_orientation_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Angle> previous_orientations{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_orientations.push_back(previous_states.at(i).robotState().orientation());
     }
@@ -501,7 +528,7 @@ TEST_F(RobotTest, get_angular_velocity_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<AngularVelocity> previous_angular_velocities{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_angular_velocities.push_back(
             previous_states.at(i).robotState().angularVelocity());
@@ -525,7 +552,7 @@ TEST_F(RobotTest, get_timestamp_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Timestamp> previous_timestamps{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_timestamps.push_back(previous_states.at(i).timestamp());
     }

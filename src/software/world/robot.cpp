@@ -150,6 +150,16 @@ bool Robot::ballInBeam() const
     return states_.front().robotState().ballInBeam();
 }
 
+unsigned long Robot::timeSinceLastChip() const
+{
+    return states_.front().robotState().timeSinceLastChip();
+}
+
+unsigned long Robot::timeSinceLastKick() const
+{
+    return states_.front().robotState().timeSinceLastKick();
+}
+
 AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
     const Duration &duration_in_future) const
 {
