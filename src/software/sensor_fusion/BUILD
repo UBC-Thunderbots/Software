@@ -2,25 +2,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "vision_detection",
-    srcs = ["vision_detection.cpp"],
     hdrs = [
-        "ball_detection.h",
-        "robot_detection.h",
         "vision_detection.h",
     ],
     deps = [
         "//software/geom",
         "//software/time:timestamp",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "vision_detection_test",
-    srcs = ["vision_detection_test.cpp"],
-    deps = [
-        ":vision_detection",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -58,12 +46,12 @@ cc_library(
     srcs = ["ssl_protobuf_reader.cpp"],
     hdrs = ["ssl_protobuf_reader.h"],
     deps = [
+        ":vision_detection",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
         "//software/proto/message_translation:ssl_geometry_message_translator",
         "//software/sensor_fusion:refbox_data",
-        "//software/sensor_fusion:vision_detection",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:team",

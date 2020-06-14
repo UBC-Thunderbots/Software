@@ -96,7 +96,7 @@ TEST(SSLDetectionMessageTranslatorTest, test_convert_ball_state_to_proto_and_bac
         createSSLDetectionFrame(camera_id, t_capture, frame_number, {ball_state}, {}, {});
     ASSERT_TRUE(detection_frame);
 
-    std::vector<BallDetection> ball_detections = getBallDetections({*detection_frame});
+    std::vector<BallDetection> ball_detections = createBallDetections({*detection_frame});
     ASSERT_EQ(1, ball_detections.size());
     BallDetection ball_detection = ball_detections.at(0);
     EXPECT_FLOAT_EQ(-1.2f, ball_detection.position.x());

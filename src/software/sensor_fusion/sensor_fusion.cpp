@@ -51,7 +51,7 @@ void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
 
 void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
 {
-    field = getField(geometry_packet);
+    field = createField(geometry_packet);
     if (!field)
     {
         LOG(WARNING)
@@ -62,8 +62,8 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
 
 void SensorFusion::updateWorld(const Referee &packet)
 {
-    game_state   = getRefboxGameState(packet);
-    refbox_stage = getRefboxStage(packet);
+    game_state   = createRefboxGameState(packet);
+    refbox_stage = createRefboxStage(packet);
 }
 
 void SensorFusion::updateWorld(
@@ -74,11 +74,34 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
-    VisionDetection vision_detection = getVisionDetection(ssl_detection_frame);
-    enemy_team                       = getEnemyTeamFromVisionDetection(vision_detection);
-    friendly_team = getFriendlyTeamFromVisionDetection(vision_detection);
-    std::optional<TimestampedBallState> new_ball_state =
-        getTimestampedBallStateFromVisionDetection(vision_detection);
+    SSL_DetectionFrame detection_frame = ssl_detection_frame;
+    // We invert the field side if we explicitly choose to override the values
+    // provided by refbox. The 'defending_positive_side' parameter dictates the side
+    // we are defending if we are overriding the value
+    // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
+    if (Util::DynamicParameters->getAIControlConfig()
+            ->getRefboxConfig()
+            ->OverrideRefboxDefendingSide()
+            ->value() &&
+        Util::DynamicParameters->getAIControlConfig()
+            ->getRefboxConfig()
+            ->DefendingPositiveSide()
+            ->value())
+    {
+        invertFieldSide(detection_frame);
+    }
+
+    std::optional<TimestampedBallState> new_ball_state;
+    if (isCameraEnabled(detection_frame))
+    {
+        new_ball_state =
+            createTimestampedBallState(createBallDetections({detection_frame}));
+        friendly_team = createFriendlyTeam(
+            createTeamDetection({detection_frame}, TeamType::FRIENDLY));
+        enemy_team =
+            createEnemyTeam(createTeamDetection({detection_frame}, TeamType::ENEMY));
+    }
+
     if (new_ball_state)
     {
         if (ball)
@@ -92,13 +115,11 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     }
 }
 
-std::optional<TimestampedBallState>
-SensorFusion::getTimestampedBallStateFromVisionDetection(
-    const VisionDetection &vision_detection)
+std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
+    const std::vector<BallDetection> &ball_detections)
 {
     if (field)
     {
-        std::vector<BallDetection> ball_detections = vision_detection.getBallDetections();
         std::optional<TimestampedBallState> new_ball =
             ball_filter.getFilteredData(ball_detections, *field);
         return new_ball;
@@ -106,32 +127,25 @@ SensorFusion::getTimestampedBallStateFromVisionDetection(
     return std::nullopt;
 }
 
-Team SensorFusion::getFriendlyTeamFromVisionDetection(
-    const VisionDetection &vision_detection)
+Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    std::vector<RobotDetection> friendly_robot_detections =
-        vision_detection.getFriendlyTeamDetections();
     Team new_friendly_team =
-        friendly_team_filter.getFilteredData(friendly_team, friendly_robot_detections);
-    int friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
-                                 ->getRefboxConfig()
-                                 ->FriendlyGoalieId()
-                                 ->value();
+        friendly_team_filter.getFilteredData(friendly_team, robot_detections);
+    RobotId friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
+                                     ->getRefboxConfig()
+                                     ->FriendlyGoalieId()
+                                     ->value();
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
 
-Team SensorFusion::getEnemyTeamFromVisionDetection(
-    const VisionDetection &vision_detection)
+Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    std::vector<RobotDetection> enemy_robot_detections =
-        vision_detection.getEnemyTeamDetections();
-    Team new_enemy_team =
-        enemy_team_filter.getFilteredData(enemy_team, enemy_robot_detections);
-    int enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
-                              ->getRefboxConfig()
-                              ->EnemyGoalieId()
-                              ->value();
+    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
+    RobotId enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
+                                  ->getRefboxConfig()
+                                  ->EnemyGoalieId()
+                                  ->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }

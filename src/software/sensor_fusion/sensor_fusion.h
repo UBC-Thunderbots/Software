@@ -17,8 +17,7 @@
 
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
- * need to perform. It produces Worlds that may be used, and consumes vision detections,
- * refbox data, and robot statuses
+ * need to perform. It produces Worlds that may be used, and consumes SensorMsgs
  *
  * This produce/consume pattern is performed by extending both "Observer" and
  * "Subject". Please see the implementation of those classes for details.
@@ -60,24 +59,24 @@ class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
     void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
-     * Get state of the ball from a vision detection
+     * Create state of the ball from a list of ball detections
      *
-     * @param vision_detection
+     * @param ball_detections list of ball detections to filter
      *
-     * @return TimestampedBallState if found in vision_detection
+     * @return TimestampedBallState if filtered from ball detections
      */
-    std::optional<TimestampedBallState> getTimestampedBallStateFromVisionDetection(
-        const VisionDetection &vision_detection);
+    std::optional<TimestampedBallState> createTimestampedBallState(
+        const std::vector<BallDetection> &ball_detections);
 
     /**
-     * Get team from a vision detection
+     * Create team from a list of robot detections
      *
-     * @param vision_detection
+     * @param robot_detections The robot detections to filter
      *
-     * @return team from vision_detection
+     * @return team
      */
-    Team getFriendlyTeamFromVisionDetection(const VisionDetection &vision_detection);
-    Team getEnemyTeamFromVisionDetection(const VisionDetection &vision_detection);
+    Team createFriendlyTeam(const std::vector<RobotDetection> &robot_detections);
+    Team createEnemyTeam(const std::vector<RobotDetection> &robot_detections);
 
     std::optional<Field> field;
     std::optional<Ball> ball;

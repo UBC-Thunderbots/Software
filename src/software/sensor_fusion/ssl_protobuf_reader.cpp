@@ -2,7 +2,7 @@
 
 #include "software/proto/message_translation/ssl_geometry_message_translator.h"
 
-std::optional<Field> getField(const SSL_GeometryData &geometry_packet)
+std::optional<Field> createField(const SSL_GeometryData &geometry_packet)
 {
     SSL_GeometryFieldSize field_data = geometry_packet.field();
 
@@ -56,7 +56,7 @@ std::optional<Field> getField(const SSL_GeometryData &geometry_packet)
     return field;
 }
 
-std::vector<BallDetection> getBallDetections(
+std::vector<BallDetection> createBallDetections(
     const std::vector<SSL_DetectionFrame> &detections)
 {
     auto ball_detections = std::vector<BallDetection>();
@@ -97,7 +97,7 @@ std::vector<BallDetection> getBallDetections(
     return ball_detections;
 }
 
-std::vector<RobotDetection> getTeamDetections(
+std::vector<RobotDetection> createTeamDetection(
     const std::vector<SSL_DetectionFrame> &detections, TeamType team_type)
 {
     std::vector<RobotDetection> robot_detections = std::vector<RobotDetection>();
@@ -156,46 +156,7 @@ std::vector<RobotDetection> getTeamDetections(
             }
         }
     }
-
     return robot_detections;
-}
-
-VisionDetection getVisionDetection(const SSL_DetectionFrame &detection_frame)
-{
-    std::vector<BallDetection> ball_detections;
-    std::vector<RobotDetection> friendly_team_detections;
-    std::vector<RobotDetection> enemy_team_detections;
-    Timestamp latest_timestamp;
-    SSL_DetectionFrame detection = detection_frame;
-
-    // We invert the field side if we explicitly choose to override the values
-    // provided by refbox. The 'defending_positive_side' parameter dictates the side
-    // we are defending if we are overriding the value
-    // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    if (Util::DynamicParameters->getAIControlConfig()
-            ->getRefboxConfig()
-            ->OverrideRefboxDefendingSide()
-            ->value() &&
-        Util::DynamicParameters->getAIControlConfig()
-            ->getRefboxConfig()
-            ->DefendingPositiveSide()
-            ->value())
-    {
-        invertFieldSide(detection);
-    }
-
-    if (isCameraEnabled(detection))
-    {
-        // filter protos into internal data structures
-        ball_detections          = getBallDetections({detection});
-        friendly_team_detections = getTeamDetections({detection}, TeamType::FRIENDLY);
-        enemy_team_detections    = getTeamDetections({detection}, TeamType::ENEMY);
-    }
-
-    latest_timestamp = Timestamp::fromSeconds(detection.t_capture());
-
-    return VisionDetection(ball_detections, friendly_team_detections,
-                           enemy_team_detections, latest_timestamp);
 }
 
 // this maps a protobuf Referee_Command enum to its equivalent internal type
@@ -243,7 +204,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
         {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
         {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
-RefboxGameState getRefboxGameState(const Referee &packet)
+RefboxGameState createRefboxGameState(const Referee &packet)
 {
     if (!Util::DynamicParameters->getAIControlConfig()
              ->getRefboxConfig()
@@ -275,7 +236,7 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
     {Referee_Stage_PENALTY_SHOOTOUT, RefboxStage::PENALTY_SHOOTOUT},
     {Referee_Stage_POST_GAME, RefboxStage::POST_GAME}};
 
-RefboxStage getRefboxStage(const Referee &packet)
+RefboxStage createRefboxStage(const Referee &packet)
 {
     return refbox_stage_map.at(packet.stage());
 }

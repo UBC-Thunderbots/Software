@@ -9,9 +9,7 @@
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/sensor_fusion/ball_detection.h"
 #include "software/sensor_fusion/refbox_data.h"
-#include "software/sensor_fusion/robot_detection.h"
 #include "software/sensor_fusion/vision_detection.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
@@ -29,7 +27,7 @@
  * @return A Field object representing the field specified with the provided geometry
  *      If packet_geometry is not a valid packet, then will return std::nullopt
  */
-std::optional<Field> getField(const SSL_GeometryData &geometry_packet);
+std::optional<Field> createField(const SSL_GeometryData &geometry_packet);
 
 /**
  * Reads the ball data contained in the list of SSL detection frames and returns the
@@ -39,7 +37,7 @@ std::optional<Field> getField(const SSL_GeometryData &geometry_packet);
  *
  * @return all the ball detections contained in the ssl detection frames
  */
-std::vector<BallDetection> getBallDetections(
+std::vector<BallDetection> createBallDetections(
     const std::vector<SSL_DetectionFrame> &detections);
 
 /**
@@ -52,17 +50,8 @@ std::vector<BallDetection> getBallDetections(
  * @return The most up to date detections of the given team given the new
  * DetectionFrame information
  */
-std::vector<RobotDetection> getTeamDetections(
+std::vector<RobotDetection> createTeamDetection(
     const std::vector<SSL_DetectionFrame> &detections, TeamType team_type);
-
-/**
- * Reads a VisionDetection from a SSL_DetectionFrame
- *
- * @param detection The SSL_DetectionFrame to process
- *
- * @return Vision from the given SSL_DetectionFrame
- */
-VisionDetection getVisionDetection(const SSL_DetectionFrame &detection_frame);
 
 /**
  * Converts a Referee packet into a RefboxGameState for the Refbox command contained
@@ -72,7 +61,7 @@ VisionDetection getVisionDetection(const SSL_DetectionFrame &detection_frame);
  *
  * @return RefboxGameState from command
  */
-RefboxGameState getRefboxGameState(const Referee &packet);
+RefboxGameState createRefboxGameState(const Referee &packet);
 
 /**
  * Converts a Referee protobuf Stage contained in the Referee packet into a
@@ -82,7 +71,7 @@ RefboxGameState getRefboxGameState(const Referee &packet);
  *
  * @return RefboxStage from stage
  */
-RefboxStage getRefboxStage(const Referee &packet);
+RefboxStage createRefboxStage(const Referee &packet);
 
 /**
  * Inverts all positions and orientations across the x and y axis of the field
