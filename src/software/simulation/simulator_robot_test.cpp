@@ -13,9 +13,7 @@
 class SimulatorRobotTest : public testing::Test
 {
    protected:
-    std::tuple<std::shared_ptr<PhysicsWorld>, std::shared_ptr<SimulatorRobot>,
-               std::shared_ptr<SimulatorBall>>
-    createWorld(Robot robot, Ball ball)
+    std::tuple<std::shared_ptr<SimulatorRobot>> createWorld(Robot robot, Ball ball)
     {
         auto physics_world =
             std::make_shared<PhysicsWorld>(::TestUtil::createSSLDivBField());
@@ -49,7 +47,7 @@ class SimulatorRobotTest : public testing::Test
                 << std::endl;
         }
 
-        return std::make_tuple(physics_world, simulator_robot, simulator_ball);
+        return std::make_tuple(simulator_robot);
     }
 
     const Robot robot_non_zero_state =
@@ -61,7 +59,6 @@ class SimulatorRobotTest : public testing::Test
 
 TEST_F(SimulatorRobotTest, test_robot_id)
 {
-    auto [world, simulator_robot, simulator_ball] =
-        createWorld(robot_non_zero_state, ball_zero_state);
+    auto [simulator_robot] = createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_EQ(simulator_robot->getRobotId(), 7);
 }

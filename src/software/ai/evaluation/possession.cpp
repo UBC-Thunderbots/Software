@@ -52,7 +52,7 @@ bool teamHasPossession(const World &world, const Team &team)
         boost::circular_buffer<TimestampedRobotState> previous_states =
             robot.getPreviousStates();
         std::vector<Timestamp> robot_history_timestamps{};
-        for (int i = 0; i < previous_states.size(); i++)
+        for (size_t i = 0; i < previous_states.size(); i++)
         {
             robot_history_timestamps.push_back(previous_states.at(i).timestamp());
         }
@@ -81,7 +81,7 @@ bool teamPassInProgress(const World &world, const Team &team)
         boost::circular_buffer<TimestampedRobotState> previous_states =
             robot.getPreviousStates();
         std::vector<Timestamp> robot_history_timestamps{};
-        for (int i = 0; i < previous_states.size(); i++)
+        for (size_t i = 0; i < previous_states.size(); i++)
         {
             robot_history_timestamps.push_back(previous_states.at(i).timestamp());
         }

@@ -36,9 +36,9 @@ void RadioBackend::receiveWorld(World world)
 void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
 {
     SensorMsg sensor_msg;
-    auto robot_msg                 = convertRobotStatusToTbotsRobotMsg(robot_status);
-    TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
-    added_robot_msg                = robot_msg.release();
+    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    // TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
+    *(sensor_msg.add_tbots_robot_msg()) = *robot_msg;
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 

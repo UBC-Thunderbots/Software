@@ -139,6 +139,8 @@ const RobotId PhysicsWorld::getAvailableRobotId(TeamColour colour) const
 
     LOG(FATAL) << "Out of available " << toString(colour)
                << " robot IDs in the physics world";
+
+    return std::numeric_limits<RobotId>::max();
 }
 
 RobotId PhysicsWorld::getAvailableYellowRobotId() const
