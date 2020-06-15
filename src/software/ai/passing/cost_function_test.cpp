@@ -1,16 +1,3 @@
-/**
- * This file contains unit tests passing evaluation functions
- *
- * These tests effectively test the PassGenerator as well, as the PassGenerator
- * basically just tries to maximize `ratePass`.
- *
- * These tests are also testing our configuration values for passing, as they dictate
- * how certain scenarios should be rated. As such, if configuration changes cause tests
- * here to fail, please please please carefully consider if the configuration change is
- * correct (ie. is the testing showing a scenario which the configuration change has
- * now broken?).
- */
-
 #include "software/ai/passing/cost_function.h"
 
 #include <gtest/gtest.h>
@@ -22,8 +9,6 @@
 #include "software/math/math_functions.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
-
-using namespace Passing;
 
 class PassingEvaluationTest : public testing::Test
 {
