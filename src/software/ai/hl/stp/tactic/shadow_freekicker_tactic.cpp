@@ -44,7 +44,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
     do
     {
         std::optional<Robot> enemy_with_ball =
-            Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
 
         if (enemy_with_ball.has_value())
         {

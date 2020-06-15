@@ -15,7 +15,7 @@
 // This namespace contains all the test parameters
 namespace
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29, Timestamp::fromSeconds(5));
 
 

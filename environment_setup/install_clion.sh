@@ -61,12 +61,12 @@ else
     # Unpack and build the plugin from the source
     mkdir -p /tmp/bazelbuild-${bazel_plugin_version} 
     tar xfz /tmp/bazelbuild-${bazel_plugin_version}.tar.gz -C /tmp/bazelbuild-${bazel_plugin_version}
-    cd /tmp/bazelbuild-${bazel_plugin_version}/intellij*
+    cd /tmp/bazelbuild-${bazel_plugin_version}/intellij* || exit
     bazel build //clwb:clwb_bazel_zip --define=ij_product=clion-${clion_version_year}.${clion_version_major}
 
     # Copy the compiled plugin to the CLion directory
     mkdir -p "$clion_plugin_dir"
-    unzip bazel-bin/clwb/clwb_bazel.zip -d $clion_plugin_dir
+    unzip bazel-bin/clwb/clwb_bazel.zip -d "$clion_plugin_dir"
 
     # Cleanup
     rm -rf /tmp/bazelbuild

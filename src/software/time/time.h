@@ -2,8 +2,6 @@
 
 #include <time.h>
 
-#include <cstdlib>
-
 /**
  * A simple Time class that represents some amount of Time
  *

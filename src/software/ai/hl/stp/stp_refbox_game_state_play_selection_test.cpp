@@ -33,17 +33,16 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
 
    protected:
     STP stp;
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
        test_play_selection_for_states_and_positions)
 {
     // set up the friendly team
-    ::Test::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
-                                                Timestamp());
-    ::Test::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions,
-                                             Timestamp());
+    ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
+                                          Timestamp());
+    ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
     world.mutableBall() = Ball(GetParam().ball_position, Vector(), Timestamp());
 
     // to set restart reason, etc. properly
@@ -220,7 +219,7 @@ class STPRefboxGameStatePlaySelectionTest
     }
 
     STP stp;
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTest,
@@ -241,7 +240,7 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
     }
 }
 
-auto all_refbox_game_states = ::Test::TestUtil::getAllRefboxGameStates();
+auto all_refbox_game_states = ::TestUtil::getAllRefboxGameStates();
 
 // TODO (Issue #1330): Reenable these tests
 // INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,

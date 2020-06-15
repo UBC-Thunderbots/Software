@@ -10,7 +10,7 @@ class WorldTest : public ::testing::Test
    protected:
     WorldTest()
         : current_time(Timestamp::fromSeconds(123)),
-          field(::Test::TestUtil::createSSLDivBField()),
+          field(::TestUtil::createSSLDivBField()),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
@@ -115,7 +115,7 @@ TEST_F(WorldTest, equality_different_ball)
 TEST_F(WorldTest, equality_different_field)
 {
     Field field1       = field;
-    Field field2       = Field(2, 5, 3, 1, 1, 2, 8);
+    Field field2       = Field(2, 5, 3, 1, 3, 1, 2, 8);
     Ball ball          = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     Team friendly_team = Team(Duration::fromMilliseconds(0));
     Team enemy_team    = Team(Duration::fromMilliseconds(0));

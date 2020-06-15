@@ -1,9 +1,9 @@
 #include "software/ai/evaluation/pass.h"
 
-Duration AI::Evaluation::getTimeToOrientationForRobot(const Robot& robot,
-                                                      const Angle& desired_orientation,
-                                                      const double& max_velocity,
-                                                      const double& max_acceleration)
+Duration getTimeToOrientationForRobot(const Robot& robot,
+                                      const Angle& desired_orientation,
+                                      const double& max_velocity,
+                                      const double& max_acceleration)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
@@ -42,10 +42,10 @@ Duration AI::Evaluation::getTimeToOrientationForRobot(const Robot& robot,
     return Duration::fromSeconds(travel_time);
 }
 
-Duration AI::Evaluation::getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                                   const double& max_velocity,
-                                                   const double& max_acceleration,
-                                                   const double& tolerance_meters)
+Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
+                                   const double& max_velocity,
+                                   const double& max_acceleration,
+                                   const double& tolerance_meters)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time

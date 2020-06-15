@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message TimestampMsg
+{
+    // Total seconds of UTC time since Unix epoch
+    double epoch_timestamp_seconds = 1;
+}

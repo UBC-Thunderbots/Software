@@ -18,9 +18,9 @@ cc_library(
 )
 
 cc_library(
-    name = "obstacle_factory",
-    srcs = ["obstacle_factory.cpp"],
-    hdrs = ["obstacle_factory.h"],
+    name = "robot_navigation_obstacle_factory",
+    srcs = ["robot_navigation_obstacle_factory.cpp"],
+    hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
         ":obstacle",
         "//software/ai/motion_constraint",
@@ -44,10 +44,10 @@ cc_test(
 )
 
 cc_test(
-    name = "obstacle_factory_test",
-    srcs = ["obstacle_factory_test.cpp"],
+    name = "robot_navigation_obstacle_factory_test",
+    srcs = ["robot_navigation_obstacle_factory_test.cpp"],
     deps = [
-        ":obstacle_factory",
+        ":robot_navigation_obstacle_factory",
         "//software/new_geom:point",
         "//software/new_geom:rectangle",
         "//software/test_util",

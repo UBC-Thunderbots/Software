@@ -1,8 +1,5 @@
 #include "software/time/time.h"
 
-#include <cmath>
-#include <stdexcept>
-
 #include "shared/constants.h"
 
 Time::Time() : time_in_seconds(0) {}

@@ -9,27 +9,43 @@
 // TODO (Issue #1098): Refactor this to fit the new_geom hierarchy
 class Segment final
 {
-   private:
-    Point start;
-    Point end;
-
    public:
+    /**
+     * Sets the start point of the segment to o
+     *
+     * @param o new start point of segment
+     */
     void setSegStart(Point o)
     {
         start = o;
     }
 
-    Point getSegStart() const
+    /**
+     * Gets the start point of the segment
+     *
+     * @return start point of segment
+     */
+    const Point& getSegStart() const
     {
         return start;
     }
 
-    void setEnd(Point f)
+    /**
+     * Sets the end point of the segment to o
+     *
+     * @param o new end point of segment
+     */
+    void setEnd(Point o)
     {
-        end = f;
+        end = o;
     }
 
-    Point getEnd() const
+    /**
+     * Gets the end point of the segment
+     *
+     * @return end point of segment
+     */
+    const Point& getEnd() const
     {
         return end;
     }
@@ -109,6 +125,10 @@ class Segment final
 
         return false;
     }
+
+   private:
+    Point start;
+    Point end;
 };
 
 template <>

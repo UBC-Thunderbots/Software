@@ -1,7 +1,3 @@
-/**
- * Definition for the CherryPickTactic class
- */
-
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "software/ai/hl/stp/action/move_action.h"
@@ -10,7 +6,7 @@
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
     : Tactic(true),
-      pass_generator(world, world.ball().position(), Passing::PassType::ONE_TOUCH_SHOT),
+      pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT),
       world(world),
       target_region(target_region)
 {

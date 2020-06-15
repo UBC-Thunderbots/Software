@@ -34,24 +34,41 @@ Point Rectangle::centre() const
     return Point(negXNegYCorner() + (diagonal() / 2));
 }
 
-Point Rectangle::posXPosYCorner() const
+const Point &Rectangle::posXPosYCorner() const
 {
     return points_[2];
 }
 
-Point Rectangle::negXPosYCorner() const
+const Point &Rectangle::negXPosYCorner() const
 {
     return points_[1];
 }
 
-Point Rectangle::negXNegYCorner() const
+const Point &Rectangle::negXNegYCorner() const
 {
     return points_[0];
 }
 
-Point Rectangle::posXNegYCorner() const
+const Point &Rectangle::posXNegYCorner() const
 {
     return points_[3];
+}
+
+double Rectangle::xMax() const
+{
+    return posXPosYCorner().x();
+}
+double Rectangle::xMin() const
+{
+    return negXNegYCorner().x();
+}
+double Rectangle::yMax() const
+{
+    return posXPosYCorner().y();
+}
+double Rectangle::yMin() const
+{
+    return negXNegYCorner().y();
 }
 
 bool Rectangle::contains(const Point &p) const
@@ -61,7 +78,7 @@ bool Rectangle::contains(const Point &p) const
            p.y() <= negXNegYCorner().y() + diagonal().y();
 }
 
-Point Rectangle::furthestCorner(const Point &p)
+Point Rectangle::furthestCorner(const Point &p) const
 {
     std::vector<Point> corners = points_;
 

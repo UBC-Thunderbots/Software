@@ -1,8 +1,7 @@
-#include "software/geom/voronoi_diagram.h"
+#include "software/new_geom/util/voronoi_diagram.h"
 
 #include <boost/polygon/voronoi.hpp>
 
-#include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
@@ -12,14 +11,15 @@
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_vertex;
 
-VoronoiDiagram::VoronoiDiagram(std::vector<Point> points)
+VoronoiDiagram::VoronoiDiagram(const std::vector<Point> &points)
     : diagram(std::make_shared<boost::polygon::voronoi_diagram<double>>())
 {
     construct_voronoi(points.begin(), points.end(), diagram.get());
     this->points = points;
 }
 
-std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle bounding_box)
+std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(
+    const Rectangle &bounding_box)
 {
     std::vector<Point> intersects;
 
@@ -54,7 +54,7 @@ std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle boundi
                 // Extend the edge out to beyond the rectangle to ensure interception
                 // functions work.
                 Point end = Point(Vector(endX, endY) *
-                                  distance(bounding_box.furthestCorner(p2), p2));
+                                  (bounding_box.furthestCorner(p2) - p2).length());
 
                 std::unordered_set<Point> edgeIntersects = intersection(
                     bounding_box, Segment(Point(start->x(), start->y()), end));

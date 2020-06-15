@@ -11,7 +11,7 @@
 const std::string SimulatorBackend::name = "simulator";
 
 SimulatorBackend::SimulatorBackend(
-    const Duration &physics_time_step, const Duration &world_time_increment,
+    const Duration& physics_time_step, const Duration& world_time_increment,
     SimulatorBackend::SimulationSpeed simulation_speed_mode)
     : simulation_thread_started(false),
       in_destructor(false),
@@ -78,7 +78,24 @@ void SimulatorBackend::runSimulationLoop(World world)
     unsigned int num_physics_steps_per_world_published = static_cast<unsigned int>(
         std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
 
-    Simulator simulator(world);
+    Simulator simulator(world.field());
+    simulator.setBallState(world.ball().currentState().ballState());
+    // Note: The SimulatorBackend currently maintains the invariant that the
+    // friendly team is the yellow team
+    // This should be resolved along with
+    // https://github.com/UBC-Thunderbots/Software/issues/1439
+    for (const auto& robot : world.friendlyTeam().getAllRobots())
+    {
+        RobotStateWithId state = {.id          = robot.id(),
+                                  .robot_state = robot.currentState().robotState()};
+        simulator.addYellowRobots({state});
+    }
+    for (const auto& robot : world.enemyTeam().getAllRobots())
+    {
+        RobotStateWithId state = {.id          = robot.id(),
+                                  .robot_state = robot.currentState().robotState()};
+        simulator.addBlueRobots({state});
+    }
 
     auto world_publish_timestamp = std::chrono::steady_clock::now();
 
@@ -96,13 +113,7 @@ void SimulatorBackend::runSimulationLoop(World world)
             simulator.stepSimulation(physics_time_step);
         }
 
-        std::optional<World> world = simulator.getWorld();
-
-        if (!world)
-        {
-            LOG(WARNING) << "World from simulator was null";
-            continue;
-        }
+        World world = simulator.getWorld();
 
         if (simulation_speed_mode.load() == SimulationSpeed::REALTIME_SIMULATION)
         {
@@ -124,7 +135,7 @@ void SimulatorBackend::runSimulationLoop(World world)
             }
         }
 
-        Subject<World>::sendValueToObservers(*world);
+        Subject<World>::sendValueToObservers(world);
 
         world_publish_timestamp = std::chrono::steady_clock::now();
 
@@ -135,7 +146,7 @@ void SimulatorBackend::runSimulationLoop(World world)
         auto primitives = primitive_buffer.popMostRecentlyAddedValue(primitive_timeout);
         if (primitives)
         {
-            simulator.setPrimitives(primitives.value());
+            simulator.setYellowRobotPrimitives(primitives.value());
         }
         else
         {

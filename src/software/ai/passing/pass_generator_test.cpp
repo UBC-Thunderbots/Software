@@ -1,11 +1,3 @@
-/**
- * This file contains unit tests for the GradientDescent class
- *
- * NOTE: A lot of the testing for the PassGenerator should be done in the `ratePass`
- *       function, as the PassGenerator essentially just maximizes the value returned
- *       by `ratePass`
- */
-
 #include "software/ai/passing/pass_generator.h"
 
 #include <gtest/gtest.h>
@@ -13,9 +5,6 @@
 
 #include "software/ai/passing/cost_function.h"
 #include "software/test_util/test_util.h"
-
-using namespace Passing;
-using namespace std::chrono_literals;
 
 class PassGeneratorTest : public testing::Test
 {
@@ -62,7 +51,7 @@ class PassGeneratorTest : public testing::Test
         EXPECT_LE(std::abs(curr_score - prev_score), min_score_diff);
     }
 
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     std::shared_ptr<PassGenerator> pass_generator;
 };
 

@@ -1,7 +1,3 @@
-/*
- * Implementation for the Duration class
- */
-
 #include "software/time/duration.h"
 
 #include <cmath>

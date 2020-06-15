@@ -11,8 +11,6 @@
 #include "software/world/robot_capabilities.h"
 #include "software/world/timestamped_robot_state.h"
 
-using RobotId = unsigned int;
-
 /**
  * Defines an SSL robot
  */
