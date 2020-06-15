@@ -191,8 +191,10 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wno-implicit-fallthrough", "-Wno-unused-parameter", "-Werror"]
-                        + ctx.attr.host_compiler_warnings,
+                        flags = ["-Werror", "-Wall"] +
+                                ["-Wextra", "-Wno-error=implicit-fallthrough", "-Wno-error=unused-parameter"] +
+                                ["-Wconversion", "-Wno-error=conversion", "-Wno-error=float-conversion", "-Wno-error=sign-conversion"] +
+                                ctx.attr.host_compiler_warnings,
                     ),
                 ],
             ),
