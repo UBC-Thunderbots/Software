@@ -40,8 +40,10 @@
 /* Private define ------------------------------------------------------------*/
 /* The time to block waiting for input. */
 #define TIME_WAITING_FOR_INPUT (portMAX_DELAY)
+/* USER CODE BEGIN OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Stack size of the interface thread */
 #define INTERFACE_THREAD_STACK_SIZE (350)
+/* USER CODE END OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Network interface name */
 #define IFNAME0 's'
 #define IFNAME1 't'
@@ -272,7 +274,9 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
 static void low_level_init(struct netif *netif)
 {
     HAL_StatusTypeDef hal_eth_init_status;
+    /* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
     osThreadAttr_t attributes;
+    /* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
     uint32_t idx = 0;
     ETH_MACConfigTypeDef MACConf;
     int32_t PHYLinkState;
@@ -346,11 +350,13 @@ static void low_level_init(struct netif *netif)
     RxPktSemaphore = osSemaphoreNew(1, 1, NULL);
 
     /* create the task that handles the ETH_MAC */
+    /* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
     memset(&attributes, 0x0, sizeof(osThreadAttr_t));
     attributes.name       = "EthIf";
     attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
     attributes.priority   = osPriorityRealtime;
     osThreadNew(ethernetif_input, netif, &attributes);
+    /* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
     /* USER CODE BEGIN PHY_PRE_CONFIG */
 
     /* USER CODE END PHY_PRE_CONFIG */
@@ -402,12 +408,13 @@ static void low_level_init(struct netif *netif)
             MACConf.Speed      = speed;
             HAL_ETH_SetMACConfig(&heth, &MACConf);
 
+            HAL_ETH_Start_IT(&heth);
+            netif_set_up(netif);
+            netif_set_link_up(netif);
+
             /* USER CODE BEGIN PHY_POST_CONFIG */
             /* USER CODE END PHY_POST_CONFIG */
         }
-        HAL_ETH_Start_IT(&heth);
-        netif_set_up(netif);
-        netif_set_link_up(netif);
     }
     else
     {
@@ -534,7 +541,6 @@ void ethernetif_input(void *argument)
             do
             {
                 LOCK_TCPIP_CORE();
-
                 p = low_level_input(netif);
                 if (p != NULL)
                 {
@@ -543,9 +549,7 @@ void ethernetif_input(void *argument)
                         pbuf_free(p);
                     }
                 }
-
                 UNLOCK_TCPIP_CORE();
-
             } while (p != NULL);
         }
     }
@@ -752,6 +756,10 @@ void ethernet_link_thread(void *argument)
 
     struct netif *netif = (struct netif *)argument;
 
+    /* USER CODE BEGIN ETH link init */
+
+    /* USER CODE END ETH link init */
+
     for (;;)
     {
         PHYLinkState = LAN8742_GetLinkState(&LAN8742);
@@ -797,17 +805,19 @@ void ethernet_link_thread(void *argument)
                 MACConf.DuplexMode = duplex;
                 MACConf.Speed      = speed;
                 HAL_ETH_SetMACConfig(&heth, &MACConf);
+
+                HAL_ETH_Start_IT(&heth);
+                netif_set_up(netif);
+                netif_set_link_up(netif);
             }
         }
-        HAL_ETH_Start_IT(&heth);
-        netif_set_up(netif);
-        netif_set_link_up(netif);
+
+        /* USER CODE BEGIN ETH link Thread core code for User BSP */
+
+        /* USER CODE END ETH link Thread core code for User BSP */
+
         osDelay(100);
     }
-
-    /* USER CODE BEGIN ETH link code for User BSP */
-
-    /* USER CODE END ETH link code for User BSP */
 }
 /* USER CODE BEGIN 8 */
 

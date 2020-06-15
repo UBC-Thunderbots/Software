@@ -7,11 +7,9 @@
 #include "software/logger/logger.h"
 #include "software/new_geom/util/closest_point.h"
 
-using namespace Passing;
-
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
-                               const Team& enemy_team, const Passing::Pass pass,
-                               const Ball& ball, bool loop_forever)
+                               const Team& enemy_team, const Pass pass, const Ball& ball,
+                               bool loop_forever)
     : Tactic(loop_forever),
       field(field),
       pass(pass),
@@ -35,7 +33,7 @@ void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
     this->ball          = updated_ball;
 }
 
-void ReceiverTactic::updateControlParams(const Passing::Pass& updated_pass)
+void ReceiverTactic::updateControlParams(const Pass& updated_pass)
 {
     this->pass = updated_pass;
 }

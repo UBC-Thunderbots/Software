@@ -56,7 +56,11 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
+/* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {.name     = "defaultTask",
+                                               .priority = (osPriority_t)osPriorityNormal,
+                                               .stack_size = 1024 * 4};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -180,6 +184,7 @@ int main(void)
 
     /* USER CODE END 2 */
 
+    /* Init scheduler */
     osKernelInitialize();
 
     /* USER CODE BEGIN RTOS_MUTEX */
@@ -199,11 +204,7 @@ int main(void)
     /* USER CODE END RTOS_QUEUES */
 
     /* Create the thread(s) */
-    /* definition and creation of defaultTask */
-    const osThreadAttr_t defaultTask_attributes = {
-        .name       = "defaultTask",
-        .priority   = (osPriority_t)osPriorityNormal,
-        .stack_size = 1024};
+    /* creation of defaultTask */
     defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
@@ -214,7 +215,6 @@ int main(void)
     osKernelStart();
 
     /* We should never get here as control is now taken by the scheduler */
-
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1)

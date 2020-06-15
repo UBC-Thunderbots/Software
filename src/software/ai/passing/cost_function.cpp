@@ -9,11 +9,9 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
-using namespace Passing;
-
-double Passing::ratePass(const World& world, const Passing::Pass& pass,
-                         const std::optional<Rectangle>& target_region,
-                         std::optional<unsigned int> passer_robot_id, PassType pass_type)
+double ratePass(const World& world, const Pass& pass,
+                const std::optional<Rectangle>& target_region,
+                std::optional<unsigned int> passer_robot_id, PassType pass_type)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
@@ -82,8 +80,7 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
     return pass_quality;
 }
 
-double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
-                                   const Passing::Pass& pass)
+double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass)
 {
     // TODO: You don't even use this first parameter, but stuff is hardcoded below
     double ideal_max_rotation_to_shoot_degrees = Util::DynamicParameters->getAIConfig()
@@ -128,7 +125,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
     return shot_openness_score * required_rotation_for_shot_score;
 }
 
-double Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
+double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
 {
     double enemy_proximity_importance = Util::DynamicParameters->getAIConfig()
                                             ->getPassingConfig()
@@ -157,7 +154,7 @@ double Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
     return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
 }
 
-double Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
+double calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
 {
     // Return the highest risk for all the enemy robots, if there are any
     const std::vector<Robot>& enemy_robots = enemy_team.getAllRobots();
@@ -172,7 +169,7 @@ double Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
+double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
@@ -234,8 +231,8 @@ double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pas
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
-                                           std::optional<unsigned int> passer_robot_id)
+double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+                                  std::optional<unsigned int> passer_robot_id)
 {
     // Remove the passer robot from the friendly team before evaluating, as we assume
     // the passer is not passing to itself
@@ -299,7 +296,7 @@ double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
                    latest_time_to_reciever_state.getSeconds() + 0.25, 0.5);
 }
 
-double Passing::getStaticPositionQuality(const Field& field, const Point& position)
+double getStaticPositionQuality(const Field& field, const Point& position)
 {
     // This constant is used to determine how steep the sigmoid slopes below are
     static const double sig_width = 0.1;
