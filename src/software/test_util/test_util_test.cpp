@@ -90,15 +90,12 @@ TEST(TestUtilsTest, create_division_a_field)
 
     EXPECT_DOUBLE_EQ(3.6, field.defenseAreaYLength());
     EXPECT_DOUBLE_EQ(1.8, field.defenseAreaXLength());
-    EXPECT_EQ(Rectangle(Point(-6, 1.8), Point(-4.2, -1.8)),
-              field.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-6, 1.8), Point(-4.2, -1.8)), field.friendlyDefenseArea());
     EXPECT_EQ(Rectangle(Point(6, 1.8), Point(4.2, -1.8)), field.enemyDefenseArea());
 
     EXPECT_EQ(Rectangle(Point(-6, -4.5), Point(0, 4.5)), field.friendlyHalf());
-    EXPECT_EQ(Rectangle(Point(-6, 0), Point(0, 4.5)),
-              field.friendlyPositiveYQuadrant());
-    EXPECT_EQ(Rectangle(Point(-6, 0), Point(0, -4.5)),
-              field.friendlyNegativeYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-6, 0), Point(0, 4.5)), field.friendlyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-6, 0), Point(0, -4.5)), field.friendlyNegativeYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, -4.5), Point(6, 4.5)), field.enemyHalf());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(6, 4.5)), field.enemyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(6, -4.5)), field.enemyNegativeYQuadrant());
