@@ -1,6 +1,3 @@
-/**
- * Declaration for the CherryPickTactic class
- */
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -54,7 +51,7 @@ class CherryPickTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // The pass optimizer being used to figure out the best position for the robot
-    Passing::PassGenerator pass_generator;
+    PassGenerator pass_generator;
 
     // Tactic parameters
     // The current state of the world

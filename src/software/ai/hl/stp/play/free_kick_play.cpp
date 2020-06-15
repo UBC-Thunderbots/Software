@@ -12,8 +12,6 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-using namespace Passing;
-
 const std::string FreeKickPlay::name = "Direct Free Kick Play";
 
 FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}

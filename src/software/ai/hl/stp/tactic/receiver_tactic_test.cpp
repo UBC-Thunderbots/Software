@@ -1,6 +1,3 @@
-/**
- * Tests for the Reciever Tactic
- */
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 
 #include <gtest/gtest.h>
@@ -10,8 +7,6 @@
 #include "software/geom/util.h"
 #include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
-
-using namespace Passing;
 
 TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 {
