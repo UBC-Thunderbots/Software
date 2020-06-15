@@ -53,6 +53,7 @@ SensorMsg generateTestFrame(int value)
     test_frame.mutable_ssl_vision_msg()->mutable_detection()->set_t_sent(value);
     test_frame.mutable_ssl_vision_msg()->mutable_detection()->set_camera_id(value);
     assert(test_frame.has_ssl_vision_msg());
+    assert(!test_frame.has_ssl_refbox_msg());
     return test_frame;
 }
 

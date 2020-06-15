@@ -1,8 +1,11 @@
 //
 // Created by jordan on 5/2/20.
 //
+
 #include "software/replay/replay_logger.h"
+
 #include <fstream>
+#include <google/protobuf/util/delimited_message_util.h>
 
 #include "software/logger/logger.h"
 
@@ -64,8 +67,8 @@ void ReplayLogger::nextChunk() {
 }
 void ReplayLogger::saveCurrentChunk() {
     fs::path chunk_path = output_dir_path / std::to_string(current_chunk_idx);
-    std::ofstream chunk_ofstream(chunk_path, std::ios_base::out | std::ios_base::binary);
-    bool result = current_chunk.SerializeToOstream(&chunk_ofstream);
+    std::ofstream chunk_ofstream(chunk_path);
+    auto result = google::protobuf::util::SerializeDelimitedToOstream(current_chunk, &chunk_ofstream);
     if (!result) {
         LOG(WARNING) << "Failed to log chunk!";
     }

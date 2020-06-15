@@ -1,5 +1,10 @@
 #include "replay_reader.h"
 #include <fstream>
+#include <google/protobuf/util/delimited_message_util.h>
+extern "C" {
+#include <unistd.h>
+#include <fcntl.h>
+}
 
 namespace fs = std::experimental::filesystem;
 
@@ -48,8 +53,17 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     // TODO: timestamp functionality, including seeking by timestamp
     // std::set::begin() is guaranteed to point to the smallest item
     cur_chunk_idx = *chunk_indices.begin();
-    auto cur_chunk_ifstream = std::ifstream(replay_dir / std::to_string(cur_chunk_idx));
-    cur_chunk.ParseFromIstream(&cur_chunk_ifstream);
+    auto chunk_path = replay_dir / std::to_string(cur_chunk_idx);
+
+    // imagine having to write caveman code to read protobuf msgs from files
+    int fd = open(chunk_path.c_str(), O_RDONLY);
+    auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
+    auto coded_input = std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
+    bool result = google::protobuf::util::ParseDelimitedFromCodedStream(&cur_chunk, coded_input.get(), nullptr);
+    if (!result) {
+        throw std::invalid_argument("Failed to parse protobuf from file " + chunk_path.string());
+    }
+    close(fd);
 }
 
 std::optional<SensorMsg> ReplayReader::getNextFrame()
@@ -70,11 +84,21 @@ std::optional<SensorMsg> ReplayReader::getNextFrame()
 
 void ReplayReader::nextChunk() {
     cur_chunk_idx++;
-    auto cur_chunk_ifstream = std::ifstream(replay_dir / std::to_string(cur_chunk_idx));
-    bool success = cur_chunk.ParseFromIstream(&cur_chunk_ifstream);
-    if (!success) {
-        std::string error_msg = "Reached end of replay at idx " + std::to_string(cur_chunk_idx);
-        throw std::out_of_range(error_msg);
+    auto chunk_path = replay_dir / std::to_string(cur_chunk_idx);
+
+    if (!fs::is_regular_file(chunk_path)) {
+        throw std::out_of_range("Reached end of replay!");
     }
+
+    // TODO: move this monstrosity into its own function
+    // imagine having to write caveman code to read protobuf msgs from files
+    int fd = open(chunk_path.c_str(), O_RDONLY);
+    auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
+    auto coded_input = std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
+    bool result = google::protobuf::util::ParseDelimitedFromCodedStream(&cur_chunk, coded_input.get(), nullptr);
+    if (!result) {
+        throw std::invalid_argument("Failed to parse protobuf from file " + chunk_path.string());
+    }
+    close(fd);
     cur_frame_idx = 0;
 }
