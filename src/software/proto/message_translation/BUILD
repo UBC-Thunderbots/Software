@@ -70,7 +70,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/proto:ssl_cc_proto",
-        "//software/sensor_fusion:vision_detection",
+        "//software/sensor_fusion/filter:vision_detection",
         "//software/time:timestamp",
         "//software/world:ball_state",
         "//software/world:robot_state",
