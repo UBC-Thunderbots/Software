@@ -83,6 +83,13 @@ class Point final
     double distanceFromOrigin() const;
 
     /**
+     * Returns the distance between this Point and the given point p
+     *
+     * @return the distance
+     */
+    double distance(const Point &p) const;
+
+    /**
      * Returns a new Vector from this Point
      *
      * @return A new vector from this Point

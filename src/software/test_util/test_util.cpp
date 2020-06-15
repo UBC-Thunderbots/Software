@@ -177,7 +177,7 @@ namespace TestUtil
     ::testing::AssertionResult equalWithinTolerance(const Point &pt1, const Point &pt2,
                                                     double tolerance)
     {
-        double distance = (pt1 - pt2).length();
+        double distance = pt1.distance(pt2);
         if (equalWithinTolerance(distance, 0, tolerance))
         {
             return ::testing::AssertionSuccess();

@@ -41,6 +41,11 @@ double Point::distanceFromOrigin() const
     return std::hypot(x_, y_);
 }
 
+double Point::distance(const Point &p) const
+{
+    return (*this - p).length();
+}
+
 Vector Point::toVector() const
 {
     return Vector(x_, y_);
@@ -110,7 +115,7 @@ std::optional<Point> Point::intersection(const Point &a, const Point &b, const P
 
 bool Point::isClose(const Point &other, double dist) const
 {
-    return (*this - other).length() < dist;
+    return distance(other) < dist;
 }
 
 Point &Point::operator=(const Point &q)

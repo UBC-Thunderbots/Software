@@ -51,6 +51,13 @@ TEST(PointLogicTests, point_dist_from_origin_test)
     EXPECT_EQ(5, p.distanceFromOrigin());
 }
 
+TEST(PointLogicTests, point_dist_from_other_point_test)
+{
+    Point p = Point(3, 4);
+    Point q = Point(-3, -4);
+    EXPECT_EQ(10, p.distance(q));
+}
+
 TEST(PointLogicTests, rotate_point_test)
 {
     Point p = Point(3, 4);

@@ -84,7 +84,7 @@ Point Rectangle::furthestCorner(const Point &p) const
 
     return *std::max_element(corners.begin(), corners.end(),
                              [&](const Point &corner1, const Point &corner2) {
-                                 return (p - corner1).length() < (p - corner2).length();
+                                 return p.distance(corner1) < p.distance(corner2);
                              });
 }
 

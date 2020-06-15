@@ -35,7 +35,7 @@ double Circle::getRadius() const
 
 bool Circle::contains(const Point &p) const
 {
-    return (p - origin_).lengthSquared() <= radius_ * radius_;
+    return p.distance(origin_) <= radius_;
 }
 
 double Circle::area() const
