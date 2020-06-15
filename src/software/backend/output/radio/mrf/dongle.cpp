@@ -119,8 +119,8 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     // Switch to configuration mode and configure the radio parameters.
     device.set_interface_alt_setting(radio_interface, configuration_altsetting);
     {
-        if (config < 0 || static_cast<std::size_t>(config) >=
-                              sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
+        if (static_cast<std::size_t>(config) >=
+            sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
         {
             throw std::out_of_range("Config index must be between 0 and " +
                                     std::to_string(NUM_DEFAULT_CONFIGS - 1));

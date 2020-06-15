@@ -122,7 +122,7 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
     }
 }
 
-const RobotId PhysicsWorld::getAvailableRobotId(TeamColour colour) const
+RobotId PhysicsWorld::getAvailableRobotId(TeamColour colour) const
 {
     for (RobotId i = 0; i < std::numeric_limits<RobotId>::max(); i++)
     {
@@ -153,7 +153,7 @@ RobotId PhysicsWorld::getAvailableBlueRobotId() const
     return getAvailableRobotId(TeamColour::BLUE);
 }
 
-const bool PhysicsWorld::isRobotIdAvailable(RobotId id, TeamColour colour) const
+bool PhysicsWorld::isRobotIdAvailable(RobotId id, TeamColour colour) const
 {
     std::vector<std::shared_ptr<PhysicsRobot>> physics_robots;
     switch (colour)
