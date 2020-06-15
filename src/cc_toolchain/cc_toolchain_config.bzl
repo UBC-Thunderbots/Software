@@ -191,9 +191,24 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Werror", "-Wall"] +
-                                ["-Wextra", "-Wno-error=implicit-fallthrough", "-Wno-error=unused-parameter"] +
-                                ["-Wconversion", "-Wno-error=conversion", "-Wno-error=float-conversion", "-Wno-error=sign-conversion"] +
+                        flags = ["-Wall", "-Wextra", "-Wconversion"] +
+                                ctx.attr.host_compiler_warnings,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    result["warnings_as_errors_feature"] = feature(
+        name = "warnings_as_errors",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-Werror"] +
+                                ["-Wno-error=implicit-fallthrough", "-Wno-error=unused-parameter"] +
+                                ["-Wno-error=conversion", "-Wno-error=float-conversion", "-Wno-error=sign-conversion"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -548,8 +563,8 @@ def _linux_gcc_impl(ctx):
             "colour",
             "determinism",
             "warnings",
+            "warnings_as_errors",
             "hardening",
-            "warnings",
             "build-id",
             "no-canonical-prefixes",
             "stdlib",
