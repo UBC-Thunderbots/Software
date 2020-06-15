@@ -127,6 +127,13 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
         new_ball_state = createTimestampedBallState(createBallDetections(
             {detection_frame}, min_valid_x, max_valid_x, ignore_invalid_camera_data));
 
+        auto yellow_team =
+            createTeamDetection({detection_frame}, TeamColour::YELLOW, min_valid_x,
+                                max_valid_x, ignore_invalid_camera_data);
+        auto blue_team =
+            createTeamDetection({detection_frame}, TeamColour::BLUE, min_valid_x,
+                                max_valid_x, ignore_invalid_camera_data);
+
         // TODO remove Util::DynamicParameters as part of
         // https://github.com/UBC-Thunderbots/Software/issues/960
         if (Util::DynamicParameters->getAIControlConfig()
@@ -134,21 +141,13 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
                 ->FriendlyColorYellow()
                 ->value())
         {
-            friendly_team = createFriendlyTeam(
-                createTeamDetection({detection_frame}, TeamColour::YELLOW, min_valid_x,
-                                    max_valid_x, ignore_invalid_camera_data));
-            enemy_team = createEnemyTeam(
-                createTeamDetection({detection_frame}, TeamColour::BLUE, min_valid_x,
-                                    max_valid_x, ignore_invalid_camera_data));
+            friendly_team = createFriendlyTeam(yellow_team);
+            enemy_team    = createEnemyTeam(blue_team);
         }
         else
         {
-            friendly_team = createFriendlyTeam(
-                createTeamDetection({detection_frame}, TeamColour::BLUE, min_valid_x,
-                                    max_valid_x, ignore_invalid_camera_data));
-            enemy_team = createEnemyTeam(
-                createTeamDetection({detection_frame}, TeamColour::YELLOW, min_valid_x,
-                                    max_valid_x, ignore_invalid_camera_data));
+            friendly_team = createFriendlyTeam(blue_team);
+            enemy_team    = createEnemyTeam(yellow_team);
         }
     }
 
