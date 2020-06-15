@@ -7,6 +7,7 @@
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot.h"
+#include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 
@@ -60,7 +61,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_contact)
 
     ASSERT_TRUE(result);
     EXPECT_EQ(result, physics_ball.get());
-    (void)physics_world;
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_contact_with_reversed_args)
@@ -80,7 +81,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_contact_with_reversed_args)
 
     ASSERT_TRUE(result);
     EXPECT_EQ(result, physics_ball.get());
-    (void)physics_world;
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact)
@@ -103,7 +104,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact)
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
-    (void)physics_world;
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact_with_reversed_args)
@@ -126,7 +127,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact_with_reversed
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
-    (void)physics_world;
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact)
@@ -149,7 +150,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact)
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
-    (void)physics_world;
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact_with_reversed_args)
@@ -172,5 +173,5 @@ TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact_with_reverse
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
-    (void)physics_world;
+    UNUSED(physics_world);
 }

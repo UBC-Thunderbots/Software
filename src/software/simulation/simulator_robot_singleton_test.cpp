@@ -119,8 +119,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_position)
         createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_FLOAT_EQ(app_firmware_robot_getPositionX(firmware_robot.get()), 1.04);
     EXPECT_FLOAT_EQ(app_firmware_robot_getPositionY(firmware_robot.get()), -0.8);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_orientation)
@@ -128,8 +128,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_orientation)
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_FLOAT_EQ(app_firmware_robot_getOrientation(firmware_robot.get()), 2.12);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_linear_velocity)
@@ -138,8 +138,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_linear_velocity)
         createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_NEAR(app_firmware_robot_getVelocityX(firmware_robot.get()), -1.5, 0.01);
     EXPECT_NEAR(app_firmware_robot_getVelocityY(firmware_robot.get()), 0.0, 0.01);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_angular_velocity)
@@ -147,8 +147,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_angular_velocity)
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_FLOAT_EQ(app_firmware_robot_getVelocityAngular(firmware_robot.get()), -1.0);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_battery_voltage)
@@ -156,8 +156,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_battery_voltage)
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_FLOAT_EQ(app_firmware_robot_getBatteryVoltage(firmware_robot.get()), 16.0);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_dribbler_temperature)
@@ -166,8 +166,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_dribbler_temperature)
         createWorld(robot_non_zero_state, ball_zero_state);
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     EXPECT_EQ(app_dribbler_getTemperature(dribbler), 25);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 class SimulatorRobotSingletonKickTest : public SimulatorRobotSingletonTest,
@@ -686,8 +686,8 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_drive_forward)
     EXPECT_GT(app_firmware_robot_getPositionY(firmware_robot.get()), 0.15);
     EXPECT_NEAR(app_firmware_robot_getOrientation(firmware_robot.get()), M_PI_2,
                 1 * M_PI / 180.0);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_robot_drive_backwards)
@@ -725,8 +725,8 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_drive_backwards)
     EXPECT_NEAR(app_firmware_robot_getPositionY(firmware_robot.get()), 0, 1e-5);
     EXPECT_NEAR(app_firmware_robot_getOrientation(firmware_robot.get()), 0,
                 1 * M_PI / 180.0);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_robot_spin_clockwise)
@@ -766,8 +766,8 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_spin_clockwise)
                                    static_cast<double>(robot_velocity_y));
     EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.05);
     EXPECT_LT(app_firmware_robot_getVelocityAngular(firmware_robot.get()), -8);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
@@ -807,8 +807,8 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
                                    static_cast<double>(robot_velocity_y));
     EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.05);
     EXPECT_GT(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 8);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
@@ -834,8 +834,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
     EXPECT_EQ(motor_speed_back_left, 0.0);
     EXPECT_EQ(motor_speed_back_right, 0.0);
     EXPECT_EQ(motor_speed_front_right, 0.0);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_moving_forwards)
@@ -866,8 +866,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_moving_forw
     EXPECT_GT(motor_speed_front_right, motor_speed_back_right);
     EXPECT_FLOAT_EQ(motor_speed_front_left, -motor_speed_front_right);
     EXPECT_FLOAT_EQ(motor_speed_back_left, -motor_speed_back_right);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest,
@@ -899,8 +899,8 @@ TEST_F(SimulatorRobotSingletonTest,
     EXPECT_LT(motor_speed_back_left, -1.0);
     EXPECT_LT(motor_speed_back_right, -0.1);
     EXPECT_GT(motor_speed_front_right, 1.0);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
@@ -927,8 +927,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
     EXPECT_GT(motor_speed_back_left, 1.0);
     EXPECT_GT(motor_speed_back_right, 1.0);
     EXPECT_GT(motor_speed_front_right, 1.0);
-    (void)world;
-    (void)simulator_ball;
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest,
@@ -960,7 +960,7 @@ TEST_F(SimulatorRobotSingletonTest,
 
     EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
                 1.0 * M_PI / 180.0);
-    (void)simulator_ball;
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest,
@@ -992,7 +992,7 @@ TEST_F(SimulatorRobotSingletonTest,
 
     EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
                 1.0 * M_PI / 180.0);
-    (void)simulator_ball;
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_linearly)
@@ -1028,7 +1028,7 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_linearly
     EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.01);
     EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
                 1.0 * M_PI / 180.0);
-    (void)simulator_ball;
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spinning)
@@ -1064,7 +1064,7 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spin
     EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.01);
     EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
                 1.0 * M_PI / 180.0);
-    (void)simulator_ball;
+    UNUSED(simulator_ball);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)

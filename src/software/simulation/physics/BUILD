@@ -185,6 +185,7 @@ cc_test(
     deps = [
         ":physics_object_user_data",
         ":simulation_contact_listener",
+        "//software/test_util",
         "//software/world:ball",
         "//software/world:robot",
         "@box2d",
