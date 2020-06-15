@@ -46,21 +46,8 @@ typedef struct FirmwareRobotPathParameters
 
 } FirmwareRobotPathParameters_t;
 
-// Struct that defines a single point on a trajectory
-// Includes the Position and Time data corresponding to that point
-typedef struct PositionTrajectoryElement
-{
-    Vector2d_t position;
-    float linear_speed;
-    float angular_speed;
-    float orientation;
-    float time;
-} PositionTrajectoryElement_t;
-
 typedef struct PositionTrajectory
 {
-    PositionTrajectoryElement_t* trajectory_elements;
-    FirmwareRobotPathParameters_t path_parameters;
     float x_position[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float y_position[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float orientation[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -69,30 +56,13 @@ typedef struct PositionTrajectory
     float time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 } PositionTrajectory_t;
 
-// Struct that defines a single point on a velocity trajectory
-// Includes the velocity and Time data corresponding to that point
-typedef struct VelocityTrajectoryElement
-{
-    Vector2d_t linear_velocity;
-    float angular_velocity;
-    float time;
-} VelocityTrajectoryElement_t;
-
 typedef struct VelocityTrajectory
 {
-    VelocityTrajectoryElement_t* trajectory_elements;
-    FirmwareRobotPathParameters_t path_parameters;
     float x_velocity[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float y_velocity[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float angular_velocity[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float time[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 } VelocityTrajectory_t;
-
-typedef struct TrajectorySegment
-{
-    float linear_segment_length;
-    float angular_segment_length;
-} TrajectorySegment_t;
 
 typedef enum TrajectoryPlannerGenerationStatus
 {
@@ -108,184 +78,65 @@ typedef enum TrajectoryPlannerGenerationStatus
 } TrajectoryPlannerGenerationStatus_t;
 
 /**
- * Returns a constant interpolation period (time) trajectory based on an input trajectory
+ * Function generates the segment lengths and the states at each node along the specified
+ * constant-parameterization segments
  *
- * This function is intended to take a variable time trajectory (which is easier to
- * calculate) then interpolate a constant period trajectory. This is valuable for discrete
- * time motion controllers that operate only at constant delta-time intervals
+ * @pre All arrays must be pre-allocated up to TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * NOTE: This function does not modify the real trajectory. It will output a physically
- * invalid trajectory if the input trajectory is invalid
+ * @param t_start [in] The starting parameterization value
  *
- * @pre constant_period_trajectory is pre-allocated up the the limit specified by
+ * @param t_end  [in] The ending parameterization value
+ *
+ * @param poly  [in] The 1d polynomial representing the path along the trajectory
+ *
+ * @param segment_lengths [out] The length of segments between each node specified by the
+ * constant parameterization
+ *
+ * @param node_values [out] The evaluation of the polynomial at each value of the constant
+ * parameterization
+ *
+ * @param num_elements [in] The number of elements (nodes) to be in the trajectory
+ *
+ * Node1  |--segment length---| Node2
+ *   ->   *-------------------*  <-
+ */
+void app_trajectory_planner_generateSegmentNodesAndLengths(
+    float t_start, float t_end, Polynomial1dOrder3_t poly,
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], unsigned int num_elements);
+
+/**
+ * Function generates the length of segments in a 2d polynomial. It works as an wrapper
+ * for the euclidean distance and values of 2d polynomials.
+ *
+ * @pre All arrays must be pre-allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @param constant_period_trajectory [out] The array to be filled with the constant time
- * interpolation period equivalent of the input trajectory
+ * @param t_start [in] The starting value of polynomial parameterization
  *
- * @param variable_time_trajectory [in] The valid trajectory used as
- * reference for a constant interpolation period trajectory
+ * @param t_end [in] The final value of polynomial parameterization
  *
- * @param interpolation_period [in] The constant change in time [s] that corresponds to
- * each trajectory segment.
+ * @param poly [in] The polynomial representing the trajectory in space
  *
- * @return A status indicating whether or not generation was successful
+ * @param segment_lengths [out] The length of each trajectory segment (euclidean of the XY
+ * 2d polynomial)
+ *
+ * @param x_values [out] The x value of each trajectory node
+ *
+ * @param y_values [out] The y value of each trajectory node
+ *
+ * @param num_elements [in] The number of nodes(elements) of the generated trajectory
  */
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
-    PositionTrajectory_t* constant_period_trajectory,
-    PositionTrajectory_t* variable_time_trajectory, const float interpolation_period);
+void app_trajectory_planner_generateLinearSegmentNodesAndLengths(
+    float t_start, float t_end, Polynomial2dOrder3_t poly,
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], unsigned int num_elements);
 
 /**
- * Builds the forwards continuous linear velocity profile for the given parameters.
- * NOTE: The velocity profile returned by this function is NOT reverse continuous and does
- * not guarantee a feasible path to follow.
- *
- * @pre The velocity_profile array is pre-allocated to contain up to at least
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS elements
- *
- * @param trajectory [in/out] The trajectory that contains the path parameters and will be
- * modified to contain the created trajectory (if a trajectory was successfully created)
- *
- * @param max_allowable_speed_profile [in] The pre-allocated array that will contain all
- * of the maximum allowable velocity values for each point on the curve
- *
- * @param segment_lengths [in] The length of each corresponding segment [meters]
- *
- * @return A status indicating whether or not generation was successful
- * */
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_createForwardsContinuousLinearSpeedProfile(
-    PositionTrajectory_t* trajectory, float* max_allowable_speed_profile,
-    TrajectorySegment_t* segment_lengths);
-
-/**
- * Builds the forwards continuous linear velocity profile for the given parameters.
- * NOTE: The velocity profile returned by this function is NOT reverse continuous and does
- * not guarantee a feasible path to follow.
- *
- * @pre The velocity_profile array is pre-allocated to contain up to at least
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS elements
- *
- * @param trajectory [in/out] The trajectory that contains the path parameters and array
- * of trajectory elements
- *
- * @param segment_lengths [in] The length of each segment in the trajectory [meters]
- *
- * @return A status indicating whether or not generation was successful
- * */
-void app_trajectory_planner_createForwardsContinuousAngularSpeedProfile(
-    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths);
-
-/**
- * Function modifies an existing trajectory speed profile to be backwards continuous -
- * meaning that it is possible to decelerate fast enough to reach each point on the
- * trajectory
- *
- * @pre trajectory has initialized path parameters
- *
- * @pre trajectory has pre-allocated arrays up to TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
- *
- * @param trajectory [in/out] The trajectory to be have it's element speed profiles
- * modified to be backwards continuous
- *
- * @param segment_lengths [in] The length of each segment in the trajectory
- *
- * @return A status indicating whether or not generation was successful
- */
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifyTrajectoryToBackwardsContinuous(
-    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths);
-
-/**
- * Function uses the speed profiles specified by the trajectory to calculate the
- * cumulative duration of time required to reach each point
- *
- * @pre arrays are pre-allocated up to TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
- *
- * @pre trajectory has existing speed profiles for linear and angular motion
- *
- * @param trajectory [in/out] Trajectory containing the speed profiles to be used to
- * calculate the time profile of the trajectory
- *
- * @param segment_lengths [in] The length of each segment in the trajectory
- */
-void app_trajectory_planner_generatePositionTrajectoryTimeProfile(
-    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths);
-
-/**
- * Returns the maximum velocity profile for a given curve based on curvature and maximum
- * allowable acceleration
- *
- * @pre max_allowable_speed_profile is pre-allocated up at least the limit specified by
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
- *
- * @param path [in] The polynomial that defines the path of the trajectory
- *
- * @param num_elements [in] The number of elements in the trajectory
- *
- * @param t_start [in] The starting parameterization value of the path
- *
- * @param t_end [in] The final parameterization value of the path
- *
- * @param max_allowable_acceleration [in] The max allowable acceleration at any discrete
- * point on the trajectory
- *
- * @param max_allowable_speed_profile [out] The pre-allocated array that will contain all
- * of the maximum allowable velocity values for each point on the curve
- *
- */
-void app_trajectory_planner_getMaxAllowableSpeedProfile(
-    Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
-    const float t_end, const float max_allowable_acceleration,
-    float* max_allowable_speed_profile);
-
-
-/**
- * Function rebalances the specified linear or angular segment of a trajectory to have the
- * specified duration. The final speed at the end of the segment will be modified to reach
- * the specified value
- *
- * @pre segment_lengths has been allocated up to at least
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
- *
- * @pre trajectory has pre-allocated trajectory_elements array up to
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
- *
- * @param trajectory [in/out] The trajectory to be modified
- *
- * @param segment_lengths [in] The length of each segment in the trajectory
- *
- * @param desired_segment_duration [in] The desired segment duration in seconds
- *
- * @param trajectory_index [in] The index of end-point of the segment to be modified
- *
- * @param rebalance_angular [in] Boolean to select if the angular or linear segment is to
- * be modified. rebalance_angular == true means that the angular segment will be modified
- *
- * @return A status indicating whether or not generation was successful
- */
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_rebalanceAngularAndLinearTrajectorySegmentsForEquivalentDuration(
-    PositionTrajectory_t* trajectory, TrajectorySegment_t* segment_lengths,
-    const float desired_segment_duration, unsigned int trajectory_index,
-    bool rebalance_angular);
-
-/**
- * This function generates a velocity trajectory that corresponds to the time-optimal
- * velocity to follow a specified path. This profile is based on the input position
- * trajectory
- *
- * @param position_trajectory [in] The position trajectory to build the velocity
- * trajectory from
- * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
- * time-optimal velocity to follow a specified path
- */
-void app_trajectory_planner_generateVelocityTrajectory(
-    PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory);
-
-/**
- * Returns a planned trajectory with the list of guarantees based on the assumptions below
+ * Function generates a constant parameterization position trajectory (each node is
+ * defined by X,Y,Theta coordinates. Returns a planned trajectory with the list of
+ * guarantees based on the assumptions below
  *
  *  Key assumptions & guarantees of this planner are:
  *  - Trajectories are time-optimal assuming INFINITE JERK capability of the robot
@@ -311,23 +162,216 @@ void app_trajectory_planner_generateVelocityTrajectory(
  * NOTE: The following function is based on an algorithm described in page 18 of
  * http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf
  *
- * @pre path_parameters.num_segments > 2 and <=
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
- * @pre path_parameters.max_allowable_linear_acceleration > 0
- * @pre path_parameters.max_allowable_linear_speed > 0
- * @pre path_parameters.init_speed >= 0
- * @pre path_parameters.final_linear_speed >= 0
- * @pre The trajectory.trajectory_elements[] array is pre-allocated to handle up to the
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS limit
+ * @pre path_parameters members have been completely initialized and have values
  *
- * @param trajectory [in/out] The trajectory with pre-initialized path parameters. Will be
- *   modified in-place
+ * @param position_trajectory [out] The trajectory data struct to be modified to contain
+ * the position trajectory
+ *
+ * @param path_parameters [in] The path parameters that define the physical limitations
+ * and profile of the trajectory.
  *
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
-    PositionTrajectory_t* trajectory);
+app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
+    PositionTrajectory_t* position_trajectory,
+    FirmwareRobotPathParameters_t path_parameters);
+
+/**
+ * Function that modifies an existing speed profile to be backwards continuous. This means
+ * that it is possible to reach every speed node within the limits of deceleration
+ *
+ * @pre All arrays are pre-allocated up to at least TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+ *
+ * @param speeds [in/out] The existing speed profile to be modified in-place to be
+ * backwards continuous
+ *
+ * @param segment_lengths [in] The length of each segment in the trajectory
+ *
+ * @param max_allowable_acceleration [in] The maximum acceleration that can occur anywhere
+ * on the trajectory
+ *
+ * @param initial_speed [in] The initial speed at the beggining of the trajectory
+ *
+ * @param num_segments [in] The number of nodes(elements) in the trajectory
+ *
+ * @return A status indicating whether or not generation was successful
+ */
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_modifySpeedsToBackwardsContinuous(
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_acceleration, float initial_speed, unsigned int num_segments);
+
+/**
+ * Function creates a forwards continuous speed profile based on the specified parameters.
+ * The profile will never exceed the maximums speeds specified by the
+ * max_allowable_speed_profile
+ *
+ * @pre All arrays must be pre-allocated up to at least
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+ *
+ * @param speeds [out] The pre-allocated array that will be modified to contain a forwards
+ * continuous speed profile that obeys the initial and final speeds and the
+ * max_allowable_speed_profile that limits the speed at each point on the trajectory. In
+ * m/s.
+ *
+ * @param segment_lengths [in] The length of each segment between data points on the speed
+ * profile/ In meters.
+ *
+ * @param max_allowable_speed_profile [in] An array that limits the max speed at each
+ * point on the profile. In m/s.
+ *
+ * @param max_allowable_acceleration [in] The maximum allowable acceleration along any
+ * segment in the profile In m/s^2.
+ *
+ * @param initial_speed [in] The initial speed at the first element of the profile. In
+ * m/s.
+ *
+ * @param final_speed  [in] The final speed at the last element of the profile. In m/s.
+ *
+ * @param num_elements [in] The number of elements in the speed profile
+ *
+ * @return A status indicating whether or not generation was successful
+ */
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_createForwardsContinuousSpeedProfile(
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_acceleration, float initial_speed, float final_speed,
+    unsigned int num_elements);
+
+/**
+ * Function generates the absolute maximum speed that can occur at any points along the
+ * trajectory. This maximum speed is determined by the limit of grip (in acceleration)
+ * along any curved path, along with imposed speed limits of the user.
+ *
+ * @pre All arrays must be pre-allocated up to at least
+ * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
+ *
+ * @param path [in] The 2d polynomial that defines the path in 2d space.
+ *
+ * @param num_elements [in] The number of elements that will make up the trajectory
+ *
+ * @param t_start [in] The starting value of the parameterization
+ *
+ * @param t_end [in] The ending value of the parameterization
+ *
+ * @param max_allowable_acceleration [in] The maximum allowable acceleration along the
+ * trajectory. In m/s^2.
+ *
+ * @param speed_cap [in' The maximum allowable speed at any point on the trajectory. This
+ * value is defined by the user and this speed limit will not be exceeded even if possible
+ * given the physical possibility. In m/s.
+ *
+ * @param max_allowable_speed_profile [in] The array that will be modified in-place to
+ * contain the absolute maximum allowable speed profile. In m/s.
+ */
+void app_trajectory_planner_getAbsoluteMaximumSpeedProfile(
+    Polynomial2dOrder3_t path, unsigned int num_elements, float t_start, float t_end,
+    float max_allowable_acceleration, float speed_cap,
+    float* max_allowable_speed_profile);
+
+/**
+ * Function generates the time profile for a speed profile with given segment lengths and
+ * start and end velocities. This is done using a constant acceleration assumption over
+ * the total displacement of each segment
+ *
+ * @pre All arrays must be pre-allocated up to at least
+ * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+ *
+ * @param segment_lengths [in] The length of each segment in meters. The segment length is
+ * the distance travelled between successive speed elements.
+ *
+ * @param speeds [in] The speed profile defining the current speed at each element. In
+ * m/s.
+ *
+ * @param trajectory_duration [in] The duration between successive speed elements in the
+ * profile. In seconds.
+ *
+ * @param num_elements [in] The number of elements in the speed profile.
+ */
+void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float trajectory_duration[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    unsigned int num_elements);
+
+/**
+ * Function balances the segment time durations of 2 separate speed profiles. The segment
+ * durations of profile1 and profile2 will be made equal - to the LONGEST duration at each
+ * point along the profiles. This is done by modifying the final speed elements.
+ *
+ * @pre The profile must have the same number of elements. Other than the displacement
+ * arrays that must have 1 fewer element.
+ *
+ * @pre The arrays must be pre-allocated up to at least
+ * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS.
+ *
+ * @param speeds1 [in] The speed profile corresponding to trajectory 1. In m/s.
+ *
+ * @param speeds2 [in] The speed profile corresponding to trajectory 2. In m/s.
+ *
+ * @param durations1 [in] The time durations corresponding to the length of time between
+ * successive speed points in trajectory 1. In seconds.
+ *
+ * @param durations2 [in] The time durations corresponding to the length of time between
+ * successive speed points in trajectory 2. In seconds.
+ *
+ * @param displacement1 [in] The total displacement corresponding to the distance between
+ * successive speed elements in trajectory 1. In meters.
+ *
+ * @param displacement2 [in] The total displacement corresponding to the distance between
+ * successive speed elements in trajectory 2. In meters.
+ *
+ * @param complete_time_profile [out] The complete time profile of the two balances
+ * trajectories. This profile is absolute time to each point on the profile starting from
+ * zero. In seconds.
+ *
+ * @param num_elements [in] The number of elements in both trajectory 1 and 2.
+ *
+ * @return A status indicating whether or not generation was successful
+ */
+TrajectoryPlannerGenerationStatus_t app_trajectory_planner_modifySpeedsToMatchDuration(
+    float speeds1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float complete_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float num_elements);
+
+/**
+ * Returns a constant interpolation period (time) trajectory based on an input trajectory
+ *
+ * This function is intended to take a variable time trajectory (which is easier to
+ * calculate) then interpolate a constant period trajectory. This is valuable for discrete
+ * time motion controllers that operate only at constant delta-time intervals
+ *
+ * NOTE: This function does not modify the real trajectory. It will output a physically
+ * invalid trajectory if the input trajectory is invalid
+ * @param constant_period_trajectory [out] The generated constant-period trajectory that
+ * will be linearly interpolated from a variable-period trajectory.
+ *
+ * @param variable_period_trajectory [in] The variable-period trajectory that will be used
+ * to generate the constant-period trajectory.
+ *
+ * @param num_elements [in/out] The number of elements in the trajectory. The num_elements
+ * parameter will be modified to contain the num_elements of the new constant-period
+ * trajectory generated.
+ *
+ * @param interpolation_period [in] The interpolation period of the constant-period
+ * trajectory. This parameter defines the length of time between successive elements in
+ * the trajectory. In seconds.
+ *
+ * @return A status indicating whether or not generation was successful
+ */
+TrajectoryPlannerGenerationStatus_t
+app_trajectory_planner_interpolateConstantPeriodPositionTrajectory_2(
+    PositionTrajectory_t* constant_period_trajectory,
+    PositionTrajectory_t* variable_period_trajectory, unsigned int* num_elements,
+    float interpolation_period);
 
 /**
  * Function generates a constant interpolation period trajectory from the path parameters
@@ -341,146 +385,55 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
  * Constant arc-length trajectories (not used here) are trajectories where the distance
  * travelled in each segment in constant.
  *
- * @pre The elements the trajectory are pre-allocated up to
- * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+ * @param constant_period_trajectory [out] A constant interpolation period trajectory
+ * generated by the specified path parameters.
  *
- * @pre The path parameters of the variable_time_trajectory are all initialized
+ * @param path_parameters [in/out] The path parameters that define the trajectory. The
+ * input path_parameters.num_elements defines the number of constant-parameterization
+ * elements, and the returned path_parameters.num_elements defines the number of
+ * constant-period elements in the trajectory,
  *
- * @param path_parameters [in] The path parameters for the trajectory
- *
- * @param constant_period_trajectory [in/out] Pre-allocated trajectory that will be
- * modified to represent a constant interpolation trajectory
- *
- * @param interpolation_period [in] The interpolation period desired of the constant
- * interpolation period trajectory
+ * @param interpolation_period  [in] The duration of time between successive trajectory
+ * elements. In seconds.
  *
  * @return A status indicating whether or not generation was successful
  */
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
-    FirmwareRobotPathParameters_t path_parameters,
-    PositionTrajectory_t* constant_period_trajectory, const float interpolation_period);
-
-/**
- * This function calculates the robot state at every point along the trajectory (X/Y amd
- * orientation) along with the physical length of these segments (meters, radians)
- *
- * @pre All arrays in the Trajectory must be pre-allocated up to at least
- * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
- *
- * @param trajectory [in] The trajectory with pre-allocated arrays to contain trajectory
- * data
- * @param velocity_trajectory [out] The velocity trajectory that corresponds to the
- * time-optimal velocity to follow a specified path
- */
-void app_trajectory_planner_generateStatesAndReturnSegmentLengths(
-    PositionTrajectory_t* trajectory,
-    TrajectorySegment_t trajectory_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
-
-/**
- * Function generates a constant interpolation period trajectory based on the input path
- * parameters and interpolation period
- *
- * @pre path_parameter variables must all be initialised
- *
- * @pre velocity_trajectory element array must be pre-allocated up to
- * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
- *
- * @pre interpolation_period must be greater than zero
- *
- * @param path_parameters [in] The path parameters that define the trajectory
- *
- * @param interpolation_period [in] ; The interpolation period of the trajectory in
- * seconds
- *
- * @param velocity_trajectory [out] The constant interpolation period velocity trajectory
- * generated
- *
- * @return A status indicating whether or not generation was successful
- */
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantInterpolationVelocityTrajectory(
-    FirmwareRobotPathParameters_t path_parameters, const float interpolation_period,
-    VelocityTrajectory_t* velocity_trajectory);
-
-/**
- * Function copies all trajectory elements from one trajectory to another
- *
- * @param to_trajectory [out] The trajectory element that will be copied to
- *
- * @param from_trajectory [in] The trajectory element that will be copied from
- */
-void app_trajectory_planner_copyPositionTrajectoryElement(
-    PositionTrajectoryElement_t* to_trajectory,
-    PositionTrajectoryElement_t* from_trajectory);
-
-void app_trajectory_planner_generateSegmentNodesAndLengths(
-    const float t_start, const float t_end, Polynomial1dOrder3_t poly,
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const unsigned int num_elements);
-
-void app_trajectory_planner_generateLinearSegmentNodesAndLengths(
-    const float t_start, const float t_end, Polynomial2dOrder3_t poly,
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], const unsigned int num_elements);
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
-    PositionTrajectory_t* position_trajectory,
-    FirmwareRobotPathParameters_t path_parameters);
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToBackwardsContinuous(
-    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float max_allowable_acceleration, const float initial_speed,
-    const unsigned int num_segments);
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_createForwardsContinuousSpeedProfile(
-    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float max_allowable_acceleration, const float initial_speed,
-    const float final_speed, const unsigned int num_segments);
-
-void app_trajectory_planner_getAbsoluteMaximumSpeedProfile(
-    Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
-    const float t_end, const float max_allowable_acceleration, const float speed_cap,
-    float* max_allowable_speed_profile);
-
-void app_trajectory_planner_generatePositionTrajectoryTimeProfile_2(
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float trajectory_duration[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const unsigned int num_elements);
-
-TrajectoryPlannerGenerationStatus_t app_trajectory_planner_modifySpeedsToMatchDuration(
-    float speeds1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float speeds2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float durations2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float complete_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    const float num_elements);
-
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_interpolateConstantPeriodPositionTrajectory_2(
-    PositionTrajectory_t* constant_period_trajectory,
-    PositionTrajectory_t* variable_period_trajectory,
-    FirmwareRobotPathParameters_t* path_parameters, const float interpolation_period);
-
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory_2(
     PositionTrajectory_t* constant_period_trajectory,
     FirmwareRobotPathParameters_t* path_parameters, float interpolation_period);
 
+/**
+ * Function generates a velocity trajectory composed of X/Y/angular velocities and their
+ * time dependence.
+ *
+ * @param position_trajectory [in] A completely defined position trajectory.
+ *
+ * @param velocity_trajectory [out] A completely defined velocity trajectory that has
+ * equally time-spaced elements.
+ *
+ * @param num_elements [in] The number of elements in the trajectory.
+ */
 void app_trajectory_planner_generateVelocityTrajectory_2(
     PositionTrajectory_t* position_trajectory, VelocityTrajectory_t* velocity_trajectory,
-    FirmwareRobotPathParameters_t path_parameters);
+    unsigned int num_elements);
 
-TrajectoryPlannerGenerationStatus_t app_trajectory_planner_modifySpeedToMatchDuration(
-    float initial_speed, float* final_speed, float duration, float displacement);
+/**
+ * Function modifies the value of the argument final speed so that the time duration
+ * between the initial and final speeds is equal to the parameter duration. This is done
+ * assuming constant acceleration over the given displacement.
+ *
+ * @param initial_speed [in] The initial speed at the start of a segment. In m/s.
+ *
+ * @param final_speed [in/out] A pointer to the final speed at the end of the segment. In
+ * m/s.
+ *
+ * @param duration [in] The duration of time between the initial and final speed points.
+ * This is also the time required to traverse the displacement parameter. In seconds.
+ *
+ * @param displacement [in] The distance between the initial and final velocity points. In
+ * meters.
+ */
+void app_trajectory_planner_modifySpeedToMatchDuration(float initial_speed,
+                                                       float* final_speed, float duration,
+                                                       float displacement);

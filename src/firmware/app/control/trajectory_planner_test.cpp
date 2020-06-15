@@ -21,43 +21,6 @@ class TrajectoryPlannerTest : public testing::Test
     virtual void TearDown() {}
 
     static std::vector<Vector> getDirectionVectorsFromPositionTrajectory(
-        PositionTrajectory_t* position_trajectory)
-    {
-        PositionTrajectoryElement_t* position_elements =
-            position_trajectory->trajectory_elements;
-        std::vector<Vector> unit_vectors;
-
-        for (unsigned int i = 0;
-             i < position_trajectory->path_parameters.num_segments - 1; i++)
-        {
-            const float delta_x =
-                position_elements[i + 1].position.x - position_elements[i].position.x;
-            const float delta_y =
-                position_elements[i + 1].position.y - position_elements[i].position.y;
-
-            // Copy data into the Vector
-            Vector direction = Vector(delta_x, delta_y).normalize(1);
-            unit_vectors.push_back(direction);
-        }
-
-        // Assume that the velocity of the final segment is in the direction of the
-        // previous
-        const float delta_x =
-            position_elements[position_trajectory->path_parameters.num_segments - 1]
-                .position.x -
-            position_elements[position_trajectory->path_parameters.num_segments - 2]
-                .position.x;
-        const float delta_y =
-            position_elements[position_trajectory->path_parameters.num_segments - 1]
-                .position.y -
-            position_elements[position_trajectory->path_parameters.num_segments - 2]
-                .position.y;
-
-        unit_vectors.push_back(Vector(delta_x, delta_y).normalize(1));
-        return unit_vectors;
-    }
-
-    static std::vector<Vector> getDirectionVectorsFromPositionTrajectory(
         PositionTrajectory_t* position_trajectory,
         FirmwareRobotPathParameters_t path_parameters)
     {
@@ -113,9 +76,7 @@ TEST_F(TrajectoryPlannerTest, check_end_points_match_path)
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
+    PositionTrajectory_t trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
@@ -167,11 +128,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterizat
         .final_linear_speed                 = 0,
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
-
+    PositionTrajectory_t trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
@@ -181,7 +138,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_path_length_reverse_parameterizat
 
     // Test by checking the length between points
     // and the length of the total path
-    for (uint i = 0; i < trajectory.path_parameters.num_segments - 1; i++)
+    for (uint i = 0; i < path_parameters.num_segments - 1; i++)
     {
         float length = static_cast<float>(
             sqrt(pow(trajectory.x_position[i + 1] - trajectory.x_position[i], 2) +
@@ -216,20 +173,16 @@ TEST_F(TrajectoryPlannerTest,
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
-
+    PositionTrajectory_t trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
             &trajectory, path_parameters);
     EXPECT_EQ(OK, status);
 
-    EXPECT_NEAR(trajectory.x_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.x_position[path_parameters.num_segments - 1],
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_end).x, 0.01);
-    EXPECT_NEAR(trajectory.y_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.y_position[path_parameters.num_segments - 1],
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_end).y, 0.01);
 
     EXPECT_NEAR(trajectory.x_position[0],
@@ -264,10 +217,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_speed_profile_reverse_parameteriz
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
+    PositionTrajectory_t trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
@@ -300,7 +250,7 @@ TEST_F(TrajectoryPlannerTest, check_trajectory_speed_profile_reverse_parameteriz
         &trajectory, path_parameters);
     EXPECT_EQ(OK, status);
 
-    for (unsigned int i = 0; i < trajectory.path_parameters.num_segments; i++)
+    for (unsigned int i = 0; i < path_parameters.num_segments; i++)
     {
         EXPECT_NEAR(forwards_linear_speed[i],
                     trajectory.linear_speed[path_parameters.num_segments - 1 - i],
@@ -342,9 +292,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
+    PositionTrajectory_t trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
@@ -362,9 +310,9 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
 
     EXPECT_FLOAT_EQ(trajectory.linear_speed[0], path_parameters.initial_linear_speed);
 
-    EXPECT_NEAR(trajectory.x_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.x_position[path_parameters.num_segments - 1],
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_end).x, 0.025);
-    EXPECT_NEAR(trajectory.y_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.y_position[path_parameters.num_segments - 1],
                 shared_polynomial2d_getValueOrder3(path, path_parameters.t_end).y, 0.025);
 
     EXPECT_NEAR(trajectory.x_position[0],
@@ -375,7 +323,7 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
                 0.025);
 }
 
-TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_straight_line)
+TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -399,36 +347,30 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_straight_line)
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
+    PositionTrajectory_t trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
             &trajectory, path_parameters);
+    const unsigned int variable_period_num_segments = path_parameters.num_segments;
 
     EXPECT_EQ(status, OK);
 
-    PositionTrajectoryElement_t
-        const_interp_traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     PositionTrajectory_t const_interp_trajectory;
-    const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
-    const_interp_trajectory.path_parameters     = path_parameters;
 
     status =
         app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory_2(
-            &const_interp_trajectory, &path_parameters, 0.001);
+            &const_interp_trajectory, &path_parameters, 0.001f);
 
     EXPECT_EQ(OK, status);
 
-    EXPECT_NEAR(trajectory.x_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.x_position[variable_period_num_segments - 1],
                 const_interp_trajectory.x_position[path_parameters.num_segments - 1],
                 0.001);
-    EXPECT_NEAR(trajectory.y_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.y_position[variable_period_num_segments - 1],
                 const_interp_trajectory.y_position[path_parameters.num_segments - 1],
                 0.001);
-    EXPECT_NEAR(trajectory.time_profile[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.time_profile[variable_period_num_segments - 1],
                 const_interp_trajectory.time_profile[path_parameters.num_segments - 1],
                 0.001);
 
@@ -438,7 +380,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_straight_line)
                 0.001);
 }
 
-TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_curved_line)
+TEST_F(TrajectoryPlannerTest, test_get_constant_time_iteration_curved_line)
 {
     Polynomial2dOrder3_t path = {
         .x = {.coefficients = {2, 0, 1, 0}},
@@ -464,36 +406,26 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_curved_line)
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
-
+    PositionTrajectory_t trajectory;
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
             &trajectory, path_parameters);
-
     EXPECT_EQ(status, OK);
-
-    PositionTrajectoryElement_t
-        const_interp_traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    EXPECT_EQ(OK, status);
+    const unsigned int variable_period_num_segments = path_parameters.num_segments;
 
     PositionTrajectory_t const_interp_trajectory;
-    const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
-    const_interp_trajectory.path_parameters     = path_parameters;
-
     status =
         app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory_2(
             &const_interp_trajectory, &path_parameters, 0.001);
 
-    EXPECT_EQ(OK, status);
-
-    EXPECT_NEAR(trajectory.x_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.x_position[variable_period_num_segments - 1],
                 const_interp_trajectory.x_position[path_parameters.num_segments - 1],
                 0.001);
-    EXPECT_NEAR(trajectory.y_position[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.y_position[variable_period_num_segments - 1],
                 const_interp_trajectory.y_position[path_parameters.num_segments - 1],
                 0.001);
-    EXPECT_NEAR(trajectory.time_profile[trajectory.path_parameters.num_segments - 1],
+    EXPECT_NEAR(trajectory.time_profile[variable_period_num_segments - 1],
                 const_interp_trajectory.time_profile[path_parameters.num_segments - 1],
                 0.001);
 
@@ -535,10 +467,6 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_too_many_elements)
     };
 
     PositionTrajectory_t const_interp_trajectory;
-    PositionTrajectoryElement_t
-        const_interp_traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    const_interp_trajectory.path_parameters     = path_parameters;
-    const_interp_trajectory.trajectory_elements = const_interp_traj_elements;
 
     // Calculate the constant-tion period equivalent of the trajectory
     TrajectoryPlannerGenerationStatus_t status =
@@ -572,9 +500,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_cannot_reach_final_velocity)
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
+    PositionTrajectory_t trajectory;
 
 
     TrajectoryPlannerGenerationStatus_t status =
@@ -610,9 +536,7 @@ TEST_F(TrajectoryPlannerTest, test_assert_initial_velocity_too_high)
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t trajectory = {.trajectory_elements = const_param_elements,
-                                       .path_parameters     = path_parameters};
+    PositionTrajectory_t trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
@@ -646,30 +570,21 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t position_trajectory = {
-        .trajectory_elements = const_param_elements, .path_parameters = path_parameters};
+    PositionTrajectory_t position_trajectory;
 
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    app_trajectory_planner_getMaxAllowableSpeedProfile(
-        position_trajectory.path_parameters.path,
-        position_trajectory.path_parameters.num_segments,
-        position_trajectory.path_parameters.t_start,
-        position_trajectory.path_parameters.t_end,
-        position_trajectory.path_parameters.max_allowable_linear_acceleration,
-        max_allowable_speed_profile);
+    app_trajectory_planner_getAbsoluteMaximumSpeedProfile(
+        path_parameters.path, path_parameters.num_segments, path_parameters.t_start,
+        path_parameters.t_end, path_parameters.max_allowable_linear_acceleration,
+        path_parameters.max_allowable_linear_speed, max_allowable_speed_profile);
 
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
         &position_trajectory, path_parameters);
 
     VelocityTrajectory_t velocity_trajectory;
-    VelocityTrajectoryElement_t velocity_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    velocity_trajectory.trajectory_elements = velocity_elements;
 
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
 
     // Run test class function to get all the unit vectors for the velocity at each
     // point on the trajectory
@@ -714,22 +629,16 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_parabola_path_high_acceleratio
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t position_trajectory = {
-        .trajectory_elements = const_param_elements, .path_parameters = path_parameters};
-
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    PositionTrajectory_t position_trajectory;
 
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
         &position_trajectory, path_parameters);
 
     VelocityTrajectory_t velocity_trajectory;
-    VelocityTrajectoryElement_t velocity_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    velocity_trajectory.trajectory_elements = velocity_elements;
 
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
 
     // Run test class function to get all the unit vectors for the velocity at each point
     // on the trajectory
@@ -776,21 +685,15 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_curved_path_low_acceleration)
 
     };
 
-    PositionTrajectoryElement_t const_param_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    PositionTrajectory_t position_trajectory = {
-        .trajectory_elements = const_param_elements, .path_parameters = path_parameters};
+    PositionTrajectory_t position_trajectory;
 
     VelocityTrajectory_t velocity_trajectory;
-    VelocityTrajectoryElement_t velocity_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    velocity_trajectory.trajectory_elements = velocity_elements;
-
-    TrajectorySegment_t segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory_2(
         &position_trajectory, path_parameters);
 
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
 
 
     // Run test class function to get all the unit vectors for the velocity at each
@@ -1796,7 +1699,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_velocity_trajectory_zeros)
             &position_trajectory, path_parameters);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
 
     for (unsigned int i = 0; i < path_parameters.num_segments; i++)
     {
@@ -1838,7 +1741,7 @@ TEST_F(TrajectoryPlannerTest,
             &position_trajectory, path_parameters);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
@@ -1883,7 +1786,7 @@ TEST_F(TrajectoryPlannerTest,
             &position_trajectory, path_parameters);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
@@ -1935,7 +1838,7 @@ TEST_F(TrajectoryPlannerTest,
             &position_trajectory, path_parameters);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
@@ -1988,7 +1891,7 @@ TEST_F(TrajectoryPlannerTest,
             &position_trajectory, &path_parameters, 0.01f);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
     EXPECT_EQ(status, OK);
 
     for (unsigned int i = 0; i < path_parameters.num_segments; i++)
@@ -2032,7 +1935,7 @@ TEST_F(
             &position_trajectory, &path_parameters, 0.01f);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory_2(
-        &position_trajectory, &velocity_trajectory, path_parameters);
+        &position_trajectory, &velocity_trajectory, path_parameters.num_segments);
     EXPECT_EQ(status, OK);
 
     std::vector<Vector> directions =
