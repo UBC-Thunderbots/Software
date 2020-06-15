@@ -126,7 +126,6 @@ TEST(TestUtilsTest, create_division_a_field)
     EXPECT_DOUBLE_EQ(0.3, field.boundaryMargin());
 }
 
-
 TEST(TestUtilsTest, create_testing_world)
 {
     World world = ::TestUtil::createBlankTestingWorld();
