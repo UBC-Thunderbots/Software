@@ -117,4 +117,4 @@ float dot2D(float vec1[2], float vec2[2]);
  * @return The final speed in meters/second
  */
 float shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
-    const float initial_speed, const float displacement, const float acceleration);
+    float initial_speed, float displacement, float acceleration);
