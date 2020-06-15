@@ -269,8 +269,7 @@ TEST_F(FieldTest, degenerate_field_neg_lengths)
     EXPECT_THROW(Field(2, 2, 3, -2, 0, 2, 3, 4), std::invalid_argument);
 }
 
-TEST_F(FieldTest, create_ssl_division_b_field)
-{
+TEST_F(FieldTest, create_ssl_division_b_field) {
     Field field = Field::createSSLDivisionBField();
 
     // Check that the field has the correct dimensions for a
@@ -290,10 +289,8 @@ TEST_F(FieldTest, create_ssl_division_b_field)
     EXPECT_EQ(Rectangle(Point(-4.5, 3.0), Point(0, -3)), field.friendlyHalf());
     EXPECT_EQ(Rectangle(Point(4.5, 3.0), Point(0, -3)), field.enemyHalf());
 
-    EXPECT_EQ(Rectangle(Point(-4.5, 3.0), Point(0, 0)),
-              field.friendlyPositiveYQuadrant());
-    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 0)),
-              field.friendlyNegativeYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-4.5, 3.0), Point(0, 0)), field.friendlyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 0)), field.friendlyNegativeYQuadrant());
     EXPECT_EQ(Rectangle(Point(4.5, 3.0), Point(0, 0)), field.enemyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(4.5, -3.0), Point(0, 0)), field.enemyNegativeYQuadrant());
 
