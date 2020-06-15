@@ -9,7 +9,7 @@
  */
 TEST(TestUtilsTest, create_testing_field)
 {
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
 
     // Check that the field has the correct dimensions for a
     // SSL Division B field according to the rules
@@ -42,7 +42,7 @@ TEST(TestUtilsTest, create_testing_world)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
-    EXPECT_EQ(Field::createSSLDivisionBField(), world.field());
+    EXPECT_EQ(::TestUtil::createSSLDivBField(), world.field());
     EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world.friendlyTeam());
     EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world.enemyTeam());
     EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());

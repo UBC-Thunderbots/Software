@@ -15,7 +15,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)
 
     Ball ball(position, velocity, timestamp);
 
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection = calcBallVelIntersectFriendlyNet(ball, field);
 
@@ -31,7 +31,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_friendly_net)
 
     Ball ball(position, velocity, timestamp);
 
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection = calcBallVelIntersectFriendlyNet(ball, field);
 
@@ -48,7 +48,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_enemy_net)
 
     Ball ball(position, velocity, timestamp);
 
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection = calcBallVelIntersectEnemyNet(ball, field);
 
@@ -64,7 +64,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_enemy_net)
 
     Ball ball(position, velocity, timestamp);
 
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection = calcBallVelIntersectEnemyNet(ball, field);
 

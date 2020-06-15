@@ -67,7 +67,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
 {
     // Test where we start in an obstacle. We should find the closest edge of
     // the obstacle and start our path planning there
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our starting location
@@ -103,7 +103,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
 {
     // Test where we try to end in an obstacle. We should navigate to the closest point
     // on the edge of the destination
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{2.7, 0};
 
     // Place a rectangle over our destination location
@@ -134,7 +134,7 @@ TEST_F(TestThetaStarPathPlanner,
        test_theta_star_path_planner_single_obstacle_to_navigate_around)
 {
     // Test where we need to navigate around a single obstacle along the x-axis
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Point start{-3, 0}, dest{3, 0};
 
     // Place a rectangle over our destination location
@@ -165,7 +165,7 @@ TEST_F(TestThetaStarPathPlanner,
        test_theta_star_path_planner_single_obstacle_along_x_axis)
 {
     // Test where we need to navigate around a single obstacle along the x-axis
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{3, 0};
 
     // Place a rectangle over our destination location
@@ -196,7 +196,7 @@ TEST_F(TestThetaStarPathPlanner,
        test_theta_star_path_planner_single_obstacle_along_y_axis)
 {
     // Test where we need to navigate around a single obstacle along the x-axis
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{0, 3};
 
     // Place a rectangle over our destination location
@@ -225,7 +225,7 @@ TEST_F(TestThetaStarPathPlanner,
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 {
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Point start{2, 2}, dest{-3, -3};
 
     std::vector<ObstaclePtr> obstacles = {};
@@ -245,7 +245,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 {
-    Field field = Field::createSSLDivisionBField();
+    Field field = ::TestUtil::createSSLDivBField();
     Point start{2.29, 2.29}, dest{2.3, 2.3};
 
     std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
