@@ -4,10 +4,9 @@
 #include "software/parameter/dynamic_parameters.h"
 
 
-bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,
-                                                              const Angle orientation,
-                                                              const Point target,
-                                                              Angle threshold)
+bool robotOrientationWithinAngleThresholdOfTarget(const Point position,
+                                                  const Angle orientation,
+                                                  const Point target, Angle threshold)
 {
     // Calculate the target orientation, then calculate the difference between facing
     // orientation and target orientation. The difference in angle will be in the range of
@@ -17,8 +16,8 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
-                                                   std::optional<Timestamp> timestamp)
+std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos_at_time;
     Angle robot_ori_at_time;
@@ -82,8 +81,8 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     }
 }
 
-std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Robot& robot,
-                                                   std::optional<Timestamp> timestamp)
+std::optional<bool> robotBeingPassedTo(const World& world, const Robot& robot,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos, ball_pos;
     Vector ball_velocity;

@@ -158,6 +158,7 @@ cc_library(
     srcs = ["robot_state.cpp"],
     hdrs = ["robot_state.h"],
     deps = [
+        "//shared:constants",
         "//software/new_geom:angle",
         "//software/new_geom:angular_velocity",
         "//software/new_geom:point",

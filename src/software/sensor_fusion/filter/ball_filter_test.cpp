@@ -1,7 +1,3 @@
-/**
- * Tests for the Ball Filter
- */
-
 #include "software/sensor_fusion/filter/ball_filter.h"
 
 #include <gtest/gtest.h>

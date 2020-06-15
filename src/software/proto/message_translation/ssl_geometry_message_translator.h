@@ -4,9 +4,7 @@
 
 #include "software/new_geom/circle.h"
 #include "software/new_geom/segment.h"
-#include "software/proto/messages_robocup_ssl_detection.pb.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/util/make_enum/make_enum.h"
 #include "software/world/field.h"
 

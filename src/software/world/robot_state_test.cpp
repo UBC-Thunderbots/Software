@@ -6,28 +6,28 @@ TEST(RobotStateTest, get_position)
 {
     RobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                      AngularVelocity::half());
-    EXPECT_EQ(state.position(), Point(1.1, -0.5));
+    EXPECT_EQ(Point(1.1, -0.5), state.position());
 }
 
 TEST(RobotStateTest, get_velocity)
 {
     RobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                      AngularVelocity::half());
-    EXPECT_EQ(state.velocity(), Vector(3, 0));
+    EXPECT_EQ(Vector(3, 0), state.velocity());
 }
 
 TEST(RobotStateTest, get_orientation)
 {
     RobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                      AngularVelocity::half());
-    EXPECT_EQ(state.orientation(), Angle::quarter());
+    EXPECT_EQ(Angle::quarter(), state.orientation());
 }
 
 TEST(RobotStateTest, get_angular_velocity)
 {
     RobotState state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                      AngularVelocity::half());
-    EXPECT_EQ(state.angularVelocity(), AngularVelocity::half());
+    EXPECT_EQ(AngularVelocity::half(), state.angularVelocity());
 }
 
 TEST(RobotStateTest, compare_identical_states)

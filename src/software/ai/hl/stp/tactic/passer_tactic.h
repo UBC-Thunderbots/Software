@@ -1,6 +1,3 @@
-/**
- * Interface of the PasserTactic
- */
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -24,7 +21,7 @@ class PasserTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever);
+    explicit PasserTactic(Pass pass, const Ball& ball, bool loop_forever);
 
     std::string getName() const override;
 
@@ -40,7 +37,7 @@ class PasserTactic : public Tactic
      *
      * @param updated_pass The pass to perform
      */
-    void updateControlParams(const Passing::Pass& updated_pass);
+    void updateControlParams(const Pass& updated_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -61,6 +58,6 @@ class PasserTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // Tactic parameters
-    Passing::Pass pass;
+    Pass pass;
     Ball ball;
 };

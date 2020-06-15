@@ -1,7 +1,3 @@
-/**
- * Tests for the Ball Filter
- */
-
 #include "software/backend/input/network/filter/ball_filter.h"
 
 #include <gtest/gtest.h>

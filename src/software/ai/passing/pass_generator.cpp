@@ -6,8 +6,6 @@
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_generator.h"
 
-using namespace Passing;
-
 PassGenerator::PassGenerator(const World& world, const Point& passer_point,
                              const PassType& pass_type, bool running_deterministically)
     : running_deterministically(running_deterministically),
@@ -355,7 +353,7 @@ bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
     return ratePass(pass1) > ratePass(pass2);
 }
 
-bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
+bool PassGenerator::passesEqual(Pass pass1, Pass pass2)
 {
     double max_position_difference_meters =
         Util::DynamicParameters->getAIConfig()

@@ -1,7 +1,3 @@
-/**
- * Tests for the `GradientDescentOptimizer`
- */
-
 #include <gtest/gtest.h>
 
 #include <cmath>
