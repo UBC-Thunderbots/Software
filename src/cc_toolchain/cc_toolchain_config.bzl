@@ -741,7 +741,7 @@ def _stm32_impl(ctx):
             "c++17",
             "colour",
             "determinism",
-            #TODO: enable warning_as_errors when we remove legacy_robot_stm32f4
+            #TODO (Issue #1475): enable warning_as_errors when we remove legacy_robot_stm32f4
             "no-canonical-prefixes",
         ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
             "stm32f4",
