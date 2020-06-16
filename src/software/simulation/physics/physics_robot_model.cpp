@@ -50,14 +50,14 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_chick
     // The shape is added relative to the body, so we do not need to rotate these points
     // to match the robot's orientation
 
-    b2Vec2 vertices[shape_points.size()];
+    std::vector<b2Vec2> vertices(shape_points.size());
     for (unsigned int i = 0; i < shape_points.size(); i++)
     {
         vertices[i] = createVec2(shape_points.at(i));
     }
 
     b2PolygonShape* shape = new b2PolygonShape();
-    shape->Set(vertices, shape_points.size());
+    shape->Set(vertices.data(), shape_points.size());
 
     return shape;
 }
@@ -78,14 +78,14 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_chic
     // The shape is added relative to the body, so we do not need to rotate these points
     // to match the robot's orientation
 
-    b2Vec2 vertices[shape_points.size()];
+    std::vector<b2Vec2> vertices(shape_points.size());
     for (unsigned int i = 0; i < shape_points.size(); i++)
     {
         vertices[i] = createVec2(shape_points.at(i));
     }
 
     b2PolygonShape* shape = new b2PolygonShape();
-    shape->Set(vertices, shape_points.size());
+    shape->Set(vertices.data(), shape_points.size());
 
     return shape;
 }

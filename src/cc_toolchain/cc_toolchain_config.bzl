@@ -184,21 +184,6 @@ def _make_common_features(ctx):
         enabled = True,
     )
 
-    result["warnings_feature"] = feature(
-        name = "warnings",
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(
-                        flags = ["-Wall", "-Wextra"] +
-                                ctx.attr.host_compiler_warnings,
-                    ),
-                ],
-            ),
-        ],
-    )
-
     result["warnings_as_errors_feature"] = feature(
         name = "warnings_as_errors",
         flag_sets = [
@@ -206,8 +191,25 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Werror"] +
+                        flags = ["-Wall", "-Wextra", "-Werror"] +
+                                # disable warnings that occur in external libraries
                                 ["-Wno-implicit-fallthrough", "-Wno-unused-parameter"] +
+                                ctx.attr.host_compiler_warnings,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    result["warnings_cpp_feature"] = feature(
+        name = "warnings_cpp",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        # warn variable length arrays only when compiling cpp
+                        flags = ["-Wvla"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -561,8 +563,8 @@ def _linux_gcc_impl(ctx):
             "c++17",
             "colour",
             "determinism",
-            "warnings",
             "warnings_as_errors",
+            "warnings_cpp",
             "hardening",
             "build-id",
             "no-canonical-prefixes",
@@ -739,7 +741,7 @@ def _stm32_impl(ctx):
             "c++17",
             "colour",
             "determinism",
-            "warnings",
+            #TODO: enable warning_as_errors when we remove legacy_robot_stm32f4
             "no-canonical-prefixes",
         ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
             "stm32f4",
