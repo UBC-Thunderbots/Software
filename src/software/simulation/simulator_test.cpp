@@ -13,7 +13,7 @@ TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -33,7 +33,7 @@ TEST(SimulatorTest, set_ball_state_when_ball_already_exists)
     BallState new_ball_state(Point(-3.5, 0.02), Vector(1, 1));
     simulator.setBallState(new_ball_state);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -49,7 +49,7 @@ TEST(SimulatorTest, remove_ball_when_no_ball_exists)
 
     simulator.removeBall();
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -64,7 +64,7 @@ TEST(SimulatorTest, remove_ball_when_the_ball_already_exists)
     simulator.setBallState(ball_state);
     simulator.removeBall();
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -77,7 +77,7 @@ TEST(SimualtorTest, add_zero_yellow_robots)
 
     simulator.addYellowRobots({});
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -101,7 +101,7 @@ TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
     };
     simulator.addYellowRobots(states);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -151,7 +151,7 @@ TEST(SimualtorTest, add_zero_blue_robots)
 
     simulator.addBlueRobots({});
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -175,7 +175,7 @@ TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
     };
     simulator.addBlueRobots(states);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -229,7 +229,7 @@ TEST(SimulatorTest, simulation_step_updates_the_ball)
 
     simulator.stepSimulation(Duration::fromSeconds(0.1));
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -256,7 +256,7 @@ TEST(SimulatorTest, simulate_yellow_robots_with_no_primitives)
     }
 
     // Robots have not been assigned primitives and so should not move
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -296,7 +296,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -323,7 +323,7 @@ TEST(SimulatorTest, simulate_blue_robots_with_no_primitives)
     }
 
     // Robots have not been assigned primitives and so should not move
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -363,7 +363,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -444,7 +444,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     //  new controller is implemented.
     //  https://github.com/UBC-Thunderbots/Software/issues/1187
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();

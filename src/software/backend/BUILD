@@ -56,7 +56,7 @@ cc_library(
         "//software/backend/input/network/networking:network_client",
         "//software/networking:proto_multicast_listener",
         "//software/networking:proto_multicast_sender",
-        "//software/proto/message_translation:protobuf_message_translation",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"

@@ -7,27 +7,50 @@
 /*
  * Unit tests for the unit test utilities
  */
-TEST(TestUtilsTest, create_testing_field)
+TEST(TestUtilsTest, create_division_b_field)
 {
     Field field = ::TestUtil::createSSLDivBField();
 
     // Check that the field has the correct dimensions for a
     // SSL Division B field according to the rules
+    EXPECT_DOUBLE_EQ(9.0, field.xLength());
+    EXPECT_DOUBLE_EQ(6.0, field.yLength());
     EXPECT_DOUBLE_EQ(9.6, field.totalXLength());
     EXPECT_DOUBLE_EQ(6.6, field.totalYLength());
-    EXPECT_DOUBLE_EQ(0.3, field.boundaryMargin());
 
-    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoalCenter());
-    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoalCenter());
+    EXPECT_DOUBLE_EQ(1.0, field.goalYLength());
+    EXPECT_DOUBLE_EQ(0.18, field.goalXLength());
 
-    EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
-    EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
-    EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
-    EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
+    EXPECT_DOUBLE_EQ(0.5, field.centerCircleRadius());
+    EXPECT_EQ(Point(0, 0), field.centerPoint());
+    EXPECT_EQ(Circle(Point(0, 0), 0.5), field.centerCircle());
 
+    EXPECT_EQ(Segment(Point(0, 3), Point(0, -3)), field.halfwayLine());
+
+    EXPECT_DOUBLE_EQ(2.0, field.defenseAreaYLength());
+    EXPECT_DOUBLE_EQ(1.0, field.defenseAreaXLength());
     EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
               field.friendlyDefenseArea());
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
+
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(0, 3.0)), field.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, 3.0)),
+              field.friendlyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-4.5, 0), Point(0, -3.0)),
+              field.friendlyNegativeYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, -3.0), Point(4.5, 3.0)), field.enemyHalf());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)), field.enemyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)), field.enemyNegativeYQuadrant());
+
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)), field.fieldLines());
+    EXPECT_EQ(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3)), field.fieldBoundary());
+
+    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoalCenter());
+    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoalCenter());
+    EXPECT_EQ(Rectangle(Point(-4.68, -0.5), Point(-4.5, 0.5)).getPoints(),
+              field.friendlyGoal().getPoints());
+    EXPECT_EQ(Rectangle(Point(4.68, -0.5), Point(4.5, 0.5)).getPoints(),
+              field.enemyGoal().getPoints());
 
     EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
@@ -36,6 +59,71 @@ TEST(TestUtilsTest, create_testing_field)
     EXPECT_EQ(Point(-4.5, -3.0), field.friendlyCornerNeg());
     EXPECT_EQ(Point(4.5, 3.0), field.enemyCornerPos());
     EXPECT_EQ(Point(4.5, -3.0), field.enemyCornerNeg());
+
+    EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
+    EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
+    EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
+    EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
+
+    EXPECT_DOUBLE_EQ(0.3, field.boundaryMargin());
+}
+
+TEST(TestUtilsTest, create_division_a_field)
+{
+    Field field = ::TestUtil::createSSLDivAField();
+
+    // Check that the field has the correct dimensions for a
+    // SSL Division A field according to the rules
+    EXPECT_DOUBLE_EQ(12.0, field.xLength());
+    EXPECT_DOUBLE_EQ(9.0, field.yLength());
+    EXPECT_DOUBLE_EQ(12.6, field.totalXLength());
+    EXPECT_DOUBLE_EQ(9.6, field.totalYLength());
+
+    EXPECT_DOUBLE_EQ(1.8, field.goalYLength());
+    EXPECT_DOUBLE_EQ(0.18, field.goalXLength());
+
+    EXPECT_DOUBLE_EQ(0.5, field.centerCircleRadius());
+    EXPECT_EQ(Point(0, 0), field.centerPoint());
+    EXPECT_EQ(Circle(Point(0, 0), 0.5), field.centerCircle());
+
+    EXPECT_EQ(Segment(Point(0, 4.5), Point(0, -4.5)), field.halfwayLine());
+
+    EXPECT_DOUBLE_EQ(3.6, field.defenseAreaYLength());
+    EXPECT_DOUBLE_EQ(1.8, field.defenseAreaXLength());
+    EXPECT_EQ(Rectangle(Point(-6, 1.8), Point(-4.2, -1.8)), field.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(6, 1.8), Point(4.2, -1.8)), field.enemyDefenseArea());
+
+    EXPECT_EQ(Rectangle(Point(-6, -4.5), Point(0, 4.5)), field.friendlyHalf());
+    EXPECT_EQ(Rectangle(Point(-6, 0), Point(0, 4.5)), field.friendlyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(-6, 0), Point(0, -4.5)), field.friendlyNegativeYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, -4.5), Point(6, 4.5)), field.enemyHalf());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(6, 4.5)), field.enemyPositiveYQuadrant());
+    EXPECT_EQ(Rectangle(Point(0, 0), Point(6, -4.5)), field.enemyNegativeYQuadrant());
+
+    EXPECT_EQ(Rectangle(Point(-6, -4.5), Point(6, 4.5)), field.fieldLines());
+    EXPECT_EQ(Rectangle(Point(-6.3, -4.8), Point(6.3, 4.8)), field.fieldBoundary());
+
+    EXPECT_EQ(Point(-6, 0.0), field.friendlyGoalCenter());
+    EXPECT_EQ(Point(6, 0.0), field.enemyGoalCenter());
+    EXPECT_EQ(Rectangle(Point(-6.18, -0.9), Point(-6, 0.9)).getPoints(),
+              field.friendlyGoal().getPoints());
+    EXPECT_EQ(Rectangle(Point(6.18, -0.9), Point(6, 0.9)).getPoints(),
+              field.enemyGoal().getPoints());
+
+    EXPECT_EQ(Point(-4.2, 0.0), field.penaltyFriendly());
+    EXPECT_EQ(Point(4.2, 0.0), field.penaltyEnemy());
+
+    EXPECT_EQ(Point(-6, 4.5), field.friendlyCornerPos());
+    EXPECT_EQ(Point(-6, -4.5), field.friendlyCornerNeg());
+    EXPECT_EQ(Point(6, 4.5), field.enemyCornerPos());
+    EXPECT_EQ(Point(6, -4.5), field.enemyCornerNeg());
+
+    EXPECT_EQ(Point(-6, 0.9), field.friendlyGoalpostPos());
+    EXPECT_EQ(Point(-6, -0.9), field.friendlyGoalpostNeg());
+    EXPECT_EQ(Point(6, 0.9), field.enemyGoalpostPos());
+    EXPECT_EQ(Point(6, -0.9), field.enemyGoalpostNeg());
+
+    EXPECT_DOUBLE_EQ(0.3, field.boundaryMargin());
 }
 
 TEST(TestUtilsTest, create_testing_world)

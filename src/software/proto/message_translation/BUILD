@@ -1,9 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "protobuf_primitive_visitor",
-    srcs = ["protobuf_primitive_visitor.cpp"],
-    hdrs = ["protobuf_primitive_visitor.h"],
+    name = "tbots_protobuf_primitive_visitor",
+    srcs = ["tbots_protobuf_primitive_visitor.cpp"],
+    hdrs = ["tbots_protobuf_primitive_visitor.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//shared:constants",
@@ -16,9 +16,9 @@ cc_library(
 )
 
 cc_library(
-    name = "protobuf_message_translation",
-    srcs = ["protobuf_message_translation.cpp"],
-    hdrs = ["protobuf_message_translation.h"],
+    name = "tbots_protobuf",
+    srcs = ["tbots_protobuf.cpp"],
+    hdrs = ["tbots_protobuf.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//shared/proto:tbots_cc_proto",
@@ -27,24 +27,24 @@ cc_library(
         "//software/new_geom:vector",
         "//software/primitive:all_primitives",
         "//software/primitive:primitive_visitor",
-        "//software/proto/message_translation:protobuf_primitive_visitor",
+        "//software/proto/message_translation:tbots_protobuf_primitive_visitor",
         "//software/world",
     ],
 )
 
 cc_test(
-    name = "protobuf_message_translation_test",
-    srcs = ["protobuf_message_translation_test.cpp"],
+    name = "tbots_protobuf_test",
+    srcs = ["tbots_protobuf_test.cpp"],
     deps = [
-        "//software/proto/message_translation:protobuf_message_translation",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/test_util",
     ],
 )
 
 cc_library(
-    name = "ssl_geometry_message_translator",
-    srcs = ["ssl_geometry_message_translator.cpp"],
-    hdrs = ["ssl_geometry_message_translator.h"],
+    name = "ssl_geometry",
+    srcs = ["ssl_geometry.cpp"],
+    hdrs = ["ssl_geometry.h"],
     deps = [
         "//shared:constants",
         "//software/proto:ssl_cc_proto",
@@ -54,23 +54,23 @@ cc_library(
 )
 
 cc_test(
-    name = "ssl_geometry_message_translator_test",
-    srcs = ["ssl_geometry_message_translator_test.cpp"],
+    name = "ssl_geometry_test",
+    srcs = ["ssl_geometry_test.cpp"],
     deps = [
-        ":ssl_geometry_message_translator",
-        "//software/sensor_fusion:ssl_protobuf_reader",
+        ":ssl_geometry",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "ssl_detection_message_translator",
-    srcs = ["ssl_detection_message_translator.cpp"],
-    hdrs = ["ssl_detection_message_translator.h"],
+    name = "ssl_detection",
+    srcs = ["ssl_detection.cpp"],
+    hdrs = ["ssl_detection.h"],
     deps = [
         "//shared:constants",
         "//software/proto:ssl_cc_proto",
+        "//software/sensor_fusion/filter:vision_detection",
         "//software/time:timestamp",
         "//software/world:ball_state",
         "//software/world:robot_state",
@@ -78,31 +78,51 @@ cc_library(
 )
 
 cc_test(
-    name = "ssl_detection_message_translator_test",
-    srcs = ["ssl_detection_message_translator_test.cpp"],
+    name = "ssl_detection_test",
+    srcs = ["ssl_detection_test.cpp"],
     deps = [
-        ":ssl_detection_message_translator",
-        "//software/sensor_fusion:ssl_protobuf_reader",
+        ":ssl_detection",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "ssl_wrapper_message_translator",
-    srcs = ["ssl_wrapper_message_translator.cpp"],
-    hdrs = ["ssl_wrapper_message_translator.h"],
+    name = "ssl_wrapper",
+    srcs = ["ssl_wrapper.cpp"],
+    hdrs = ["ssl_wrapper.h"],
     deps = [
-        ":ssl_detection_message_translator",
-        ":ssl_geometry_message_translator",
+        ":ssl_detection",
+        ":ssl_geometry",
         "//software/proto:ssl_cc_proto",
     ],
 )
 
 cc_test(
-    name = "ssl_wrapper_message_translator_test",
-    srcs = ["ssl_wrapper_message_translator_test.cpp"],
+    name = "ssl_wrapper_test",
+    srcs = ["ssl_wrapper_test.cpp"],
     deps = [
-        ":ssl_wrapper_message_translator",
+        ":ssl_wrapper",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "ssl_referee",
+    srcs = ["ssl_referee.cpp"],
+    hdrs = ["ssl_referee.h"],
+    deps = [
+        "//software/proto:ssl_cc_proto",
+        "//software/sensor_fusion:refbox_data",
+        "//software/world:team_colour",
+    ],
+)
+
+cc_test(
+    name = "ssl_referee_test",
+    srcs = ["ssl_referee_test.cpp"],
+    deps = [
+        ":ssl_referee",
         "@gtest//:gtest_main",
     ],
 )

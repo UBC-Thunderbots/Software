@@ -1,7 +1,5 @@
 #include "software/test_util/test_util.h"
 
-#include <iostream>
-
 namespace TestUtil
 {
     Field createSSLDivBField()
@@ -9,6 +7,14 @@ namespace TestUtil
         // Using the dimensions of a standard Division B SSL field
         // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
         Field field = Field(9.0, 6.0, 1.0, 2.0, 0.18, 1.0, 0.3, 0.5);
+        return field;
+    }
+
+    Field createSSLDivAField()
+    {
+        // Using the dimensions of a standard Division A SSL field
+        // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
+        Field field = Field(12.0, 9.0, 1.8, 3.6, 0.18, 1.8, 0.3, 0.5);
         return field;
     }
 
