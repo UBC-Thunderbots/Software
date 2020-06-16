@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+
 #include "shared/constants.h"
 #include "software/new_geom/geom_constants.h"
 #include "software/new_geom/point.h"

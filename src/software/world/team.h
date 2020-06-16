@@ -98,7 +98,7 @@ class Team
      * @param new_goalie_id The id of the new goalie for this team
      *
      */
-    void assignGoalie(unsigned int new_goalie_id);
+    void assignGoalie(RobotId new_goalie_id);
 
     /**
      * Clears the goalie for this team. There will be no goalie assigned after
@@ -112,7 +112,7 @@ class Team
      *
      * @return the number of robots on this team
      */
-    std::size_t numRobots() const;
+    size_t numRobots() const;
 
     /**
      * Returns the Duration for which a Robot must not have been updated for before
