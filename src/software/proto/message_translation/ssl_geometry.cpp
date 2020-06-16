@@ -1,4 +1,4 @@
-#include "software/proto/message_translation/ssl_geometry_message_translator.h"
+#include "software/proto/message_translation/ssl_geometry.h"
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
@@ -332,4 +332,58 @@ std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field,
     geometry_data->clear_calib();
 
     return std::move(geometry_data);
+}
+
+std::optional<Field> createField(const SSL_GeometryData& geometry_packet)
+{
+    SSL_GeometryFieldSize field_data = geometry_packet.field();
+
+    auto ssl_center_circle =
+        findCircularArc(field_data.field_arcs(), SSLCircularArcs::CENTER_CIRCLE);
+    if (!ssl_center_circle)
+    {
+        return std::nullopt;
+    }
+
+    // Extract the data we care about and convert all units to meters
+    double field_length         = field_data.field_length() * METERS_PER_MILLIMETER;
+    double field_width          = field_data.field_width() * METERS_PER_MILLIMETER;
+    double goal_width           = field_data.goal_width() * METERS_PER_MILLIMETER;
+    double goal_depth           = field_data.goal_depth() * METERS_PER_MILLIMETER;
+    double boundary_width       = field_data.boundary_width() * METERS_PER_MILLIMETER;
+    double center_circle_radius = ssl_center_circle->radius() * METERS_PER_MILLIMETER;
+
+    auto ssl_left_field_left_penalty_stretch = findLineSegment(
+        field_data.field_lines(), SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH);
+    if (!ssl_left_field_left_penalty_stretch)
+    {
+        return std::nullopt;
+    }
+
+    // We arbitraily use the left side here since the left and right sides are identical
+    Point defense_length_p1 = Point(ssl_left_field_left_penalty_stretch->p1().x(),
+                                    ssl_left_field_left_penalty_stretch->p1().y());
+    Point defense_length_p2 = Point(ssl_left_field_left_penalty_stretch->p2().x(),
+                                    ssl_left_field_left_penalty_stretch->p2().y());
+    double defense_length =
+        (defense_length_p2 - defense_length_p1).length() * METERS_PER_MILLIMETER;
+
+    auto ssl_left_penalty_stretch =
+        findLineSegment(field_data.field_lines(), SSLFieldLines::LEFT_PENALTY_STRETCH);
+    if (!ssl_left_penalty_stretch)
+    {
+        return std::nullopt;
+    }
+
+    // We arbitraily use the left side here since the left and right sides are identical
+    Point defense_width_p1 =
+        Point(ssl_left_penalty_stretch->p1().x(), ssl_left_penalty_stretch->p1().y());
+    Point defense_width_p2 =
+        Point(ssl_left_penalty_stretch->p2().x(), ssl_left_penalty_stretch->p2().y());
+    double defense_width =
+        (defense_width_p1 - defense_width_p2).length() * METERS_PER_MILLIMETER;
+
+    Field field = Field(field_length, field_width, defense_length, defense_width,
+                        goal_depth, goal_width, boundary_width, center_circle_radius);
+    return field;
 }

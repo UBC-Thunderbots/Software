@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+
 #include "shared/constants.h"
 #include "software/new_geom/geom_constants.h"
 #include "software/new_geom/point.h"
@@ -21,9 +23,17 @@ namespace TestUtil
 {
     /**
      * Creates a field with the standard SSL Division B dimensions
+     *
      * @return a field with the standard SSL Division B dimensions
      */
     Field createSSLDivBField();
+
+    /**
+     * Creates a field with the standard SSL Division A dimensions
+     *
+     * @return a field with the standard SSL Division A dimensions
+     */
+    Field createSSLDivAField();
 
     /**
      * Creates a World object with a normal SSL Division B field, default (empty)

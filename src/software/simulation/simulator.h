@@ -121,7 +121,7 @@ class Simulator
      */
     World getWorld() const;
 
-    std::unique_ptr<SSL_WrapperPacket> getSslWrapperPacket() const;
+    std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
 
    private:
     /**
