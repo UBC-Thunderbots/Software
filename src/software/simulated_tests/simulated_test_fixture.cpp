@@ -4,35 +4,62 @@
 #include "software/time/duration.h"
 #include "software/test_util/test_util.h"
 
+SimulatedTest::SimulatedTest() : simulator(std::make_unique<Simulator>(::TestUtil::createSSLDivBField())),
+                                 ai(Util::DynamicParameters->getAIConfig(), Util::DynamicParameters->getAIControlConfig()), run_simulation_in_realtime(false)
+{
+}
+
 void SimulatedTest::SetUp()
 {
     LoggerSingleton::initializeLogger();
-    backend = std::make_shared<SimulatorBackend>(
-        Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
-        SimulatorBackend::SimulationSpeed::FAST_SIMULATION);
-    world_state_validator = std::make_shared<WorldStateValidator>();
-    ai_wrapper =
-        std::make_shared<AIWrapper>(Util::DynamicParameters->getAIConfig(),
-                                    Util::DynamicParameters->getAIControlConfig());
 
-    // The world_state_observer observes the World from the backend, and then the ai
-    // observes the World from the WorldStateObserver. Because we know the AI will not
-    // run until it gets a new World, and the SimulatorBackend will not pubish another
-    // world until it has received primitives, we can guarantee that each step in the
-    // test pipeline will complete before the next. The steps are:
-    // 1. Simulate and publish new world
-    // 2. Validate World
-    // 3. AI makes decisions based on new world
-    // Overall this makes the tests deterministic because one step will not asynchronously
-    // run way faster than another and lose data.
-    backend->Subject<World>::registerObserver(world_state_validator);
-    world_state_validator->Subject<World>::registerObserver(ai_wrapper);
-    ai_wrapper->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+    // Re-create all objects for each test so we start from a clean setup
+    // every time. Because the simulator is created initially in the constructor's
+    // initialization list, and before every test in this SetUp function, we can
+    // guarantee the pointer will never be null / empty
+    simulator = std::make_unique<Simulator>(::TestUtil::createSSLDivBField());
+    ai = AI(Util::DynamicParameters->getAIConfig(), Util::DynamicParameters->getAIControlConfig());
+    sensor_fusion = SensorFusion();
+
+    // The simulated test abstracts and maintains the invariant that the friendly team
+    // is always the yellow team
+    Util::MutableDynamicParameters->getMutableAIControlConfig()->getMutableRefboxConfig()->mutableOverrideRefboxDefendingSide()->setValue(true);
+    Util::MutableDynamicParameters->getMutableAIControlConfig()->getMutableRefboxConfig()->mutableDefendingPositiveSide()->setValue(false);
+
+    // The simulated test abstracts and maintains the invariant that the friendly team
+    // is always defending the "negative" side of the field. This is so that the
+    // coordinates given when setting up tests is from the perspective of the friendly team
+    Util::MutableDynamicParameters->getMutableAIControlConfig()->getMutableRefboxConfig()->mutableOverrideRefboxFriendlyTeamColor()->setValue(true);
+    Util::MutableDynamicParameters->getMutableAIControlConfig()->getMutableRefboxConfig()->mutableFriendlyColorYellow()->setValue(true);
 }
 
-void SimulatedTest::TearDown()
-{
-    backend->stopSimulation();
+void SimulatedTest::setBallState(const BallState &ball) {
+    simulator->setBallState(ball);
+}
+
+void SimulatedTest::addFriendlyRobots(const std::vector<RobotStateWithId> &robots) {
+    simulator->addYellowRobots(robots);
+}
+
+void SimulatedTest::addEnemyRobots(const std::vector<RobotStateWithId> &robots) {
+    simulator->addBlueRobots(robots);
+}
+
+void SimulatedTest::setFriendlyGoalie(RobotId goalie_id) {
+    Util::MutableDynamicParameters->getMutableAIControlConfig()->getMutableRefboxConfig()->mutableFriendlyGoalieId()->setValue(static_cast<int>(goalie_id));
+}
+
+void SimulatedTest::setEnemyGoalie(RobotId goalie_id) {
+    Util::MutableDynamicParameters->getMutableAIControlConfig()->getMutableRefboxConfig()->mutableEnemyGoalieId()->setValue(static_cast<int>(goalie_id));
+}
+
+void SimulatedTest::setPlay(const std::string& play_name) {
+    Util::MutableDynamicParameters->getMutableAIControlConfig()
+            ->mutableOverrideAIPlay()
+            ->setValue(true);
+    Util::MutableDynamicParameters->getMutableAIControlConfig()
+            ->mutableCurrentAIPlay()
+            ->setValue(play_name);
 }
 
 void SimulatedTest::enableVisualizer()
@@ -41,15 +68,8 @@ void SimulatedTest::enableVisualizer()
     // tests These arguments do not matter for simply running the Visualizer
     char *argv[] = {NULL};
     int argc     = sizeof(argv) / sizeof(char *) - 1;
-    visualizer   = std::make_shared<VisualizerWrapper>(argc, argv);
-    backend->Subject<World>::registerObserver(visualizer);
-    backend->Subject<RobotStatus>::registerObserver(visualizer);
-    ai_wrapper->Subject<AIDrawFunction>::registerObserver(visualizer);
-    ai_wrapper->Subject<PlayInfo>::registerObserver(visualizer);
-
-    // Simulate in realtime if we are using the Visualizer so we can actually see
-    // things at a reasonably realistic speed
-    backend->setSimulationSpeed(SimulatorBackend::SimulationSpeed::REALTIME_SIMULATION);
+//    visualizer   = std::make_shared<VisualizerWrapper>(argc, argv);
+    run_simulation_in_realtime = true;
 }
 
 bool SimulatedTest::validateWorld(std::shared_ptr<World> world_ptr,
@@ -67,16 +87,25 @@ bool SimulatedTest::validateWorld(std::shared_ptr<World> world_ptr,
     return function_validators.empty() ? false : validation_successful;
 }
 
-SimulatedTest::SimulatedTest() : world(nullptr), simulator(::TestUtil::createSSLDivBField()),
-    ai(Util::DynamicParameters->getAIConfig(), Util::DynamicParameters->getAIControlConfig())
-{
-}
-
 void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_functions,
                             const std::vector<ValidationFunction> &continuous_validation_functions,
                             const Duration &timeout) {
-    // Setup function validators
-    for (ValidationFunction validation_function : validation_functions)
+    // Set up initial world state
+    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
+    assert(ssl_wrapper_packet);
+    auto sensor_msg = SensorMsg();
+    sensor_msg.set_allocated_ssl_vision_msg(ssl_wrapper_packet.release());
+    sensor_fusion.updateWorld(sensor_msg);
+    std::optional<World> world_opt = sensor_fusion.getWorld();
+    std::shared_ptr<World> world;
+    if(world_opt) {
+        world = std::make_shared<World>(world_opt.value());
+    }else {
+        ADD_FAILURE() << "initial world was invalid";
+    }
+
+    // Set up function validators
+    for (const auto& validation_function : validation_functions)
     {
         function_validators.emplace_back(
                 FunctionValidator(validation_function, world));
@@ -91,9 +120,10 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
     Timestamp current_time = Timestamp::fromSeconds(0.0);
     Timestamp timeout_time = current_time + timeout;
     Duration dt = Duration::fromSeconds(1.0 / 60.0);
+    auto wall_clock_start_time = std::chrono::steady_clock::now();
     while(current_time < timeout_time) {
-        simulator.stepSimulation(dt);
-        auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
+        simulator->stepSimulation(dt);
+        auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
         assert(ssl_wrapper_packet);
 
         auto sensor_msg = SensorMsg();
@@ -107,12 +137,7 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
             continue;
         }
 
-        // TODO: You are here. Just got super hacky skeleton of new synchronous test fixture working
-        // * need to check if the world member variable gets updated without its address changing
-        //   so that validation functions work
-
-        world = std::make_shared<World>(world_opt.value());
-//        *world = world_opt.value();
+        *world = world_opt.value();
 
         bool stop_test = SimulatedTest::validateWorld(world, function_validators, continuous_function_validators);
         if(stop_test) {
@@ -125,9 +150,42 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
                 std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
                         std::move(p));
 
-        simulator.setYellowRobotPrimitives(new_primitives_ptr);
+        simulator->setYellowRobotPrimitives(new_primitives_ptr);
 
         current_time = current_time + dt;
+
+        if (run_simulation_in_realtime)
+        {
+            // How long to wait for sim time to match wall clock time
+            auto timestamp_now = std::chrono::steady_clock::now();
+            auto milliseconds_since_test_start =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                            timestamp_now - wall_clock_start_time);
+            auto ms_to_sleep = std::chrono::milliseconds(static_cast<int>(
+                    current_time.getMilliseconds())) - milliseconds_since_test_start;
+            if (ms_to_sleep > std::chrono::milliseconds(0))
+            {
+                std::this_thread::sleep_for(ms_to_sleep);
+            }
+//
+//
+//            // Calculate how much wall-clock time has passed since we last published a
+//            // world, and sleep for as much time as necessary for it to have been
+//            // world_time_increment seconds in wall-clock time since the last world was
+//            // published.
+//            auto timestamp_now = std::chrono::steady_clock::now();
+//            auto milliseconds_since_world_publish =
+//                    std::chrono::duration_cast<std::chrono::milliseconds>(
+//                            timestamp_now - world_publish_timestamp);
+//            auto remaining_milliseconds = std::chrono::milliseconds(std::lrint(
+//                    world_time_increment.getMilliseconds())) -
+//                                          milliseconds_since_world_publish;
+//
+//            if (remaining_milliseconds > std::chrono::milliseconds(0))
+//            {
+//                std::this_thread::sleep_for(remaining_milliseconds);
+//            }
+        }
     }
 
 //    if (!validation_successful && !function_validators.empty())

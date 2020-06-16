@@ -22,16 +22,19 @@ class SimulatedTest : public ::testing::Test
 {
 public:
     explicit SimulatedTest();
+
+    void setBallState(const BallState& ball);
+    void addFriendlyRobots(const std::vector<RobotStateWithId>& robots);
+    void addEnemyRobots(const std::vector<RobotStateWithId>& robots);
+    void setFriendlyGoalie(RobotId goalie_id);
+    void setEnemyGoalie(RobotId goalie_id);
+    void setPlay(const std::string& play_name);
+
    protected:
     /**
      * The setup function that will run before each test case
      */
     void SetUp() override;
-
-    /**
-     * The teardown function that will run after each test case
-     */
-    void TearDown() override;
 
     /**
      * This function enables the Visualizer while a test is running, so that the test can
@@ -47,22 +50,26 @@ public:
             const Duration& timeout
             );
 
+private:
     // True means stop the test, false means keep going
     static bool validateWorld(std::shared_ptr<World> world_ptr,
-                       std::vector<FunctionValidator>& function_validators,
-                       std::vector<ContinuousFunctionValidator>& continuous_function_validators);
+                              std::vector<FunctionValidator>& function_validators,
+                              std::vector<ContinuousFunctionValidator>& continuous_function_validators);
 
-    Simulator simulator;
-
-private:
-    std::shared_ptr<World> world;
-    std::vector<ContinuousFunctionValidator> continuous_function_validators;
-    std::vector<FunctionValidator> function_validators;
+    // The simulator needs to be a pointer so that we can destroy and re-create
+    // the object in the SetUp function. Because the simulator has no
+    // copy assignment operator, we have to make it a dynamically-allocated
+    // object so we can assign new instances to this variable
+    std::unique_ptr<Simulator> simulator;
     SensorFusion sensor_fusion;
     AI ai;
 
-    std::shared_ptr<SimulatorBackend> backend;
-    std::shared_ptr<VisualizerWrapper> visualizer;
-    std::shared_ptr<AIWrapper> ai_wrapper;
-    std::shared_ptr<WorldStateValidator> world_state_validator;
+    std::vector<ContinuousFunctionValidator> continuous_function_validators;
+    std::vector<FunctionValidator> function_validators;
+
+    // If false, runs the simulation as fast as possible.
+    // If true, introduces artifical delay so that simulation
+    // time passes at the same speed a real life time
+    bool run_simulation_in_realtime;
+//    std::shared_ptr<VisualizerWrapper> visualizer;
 };

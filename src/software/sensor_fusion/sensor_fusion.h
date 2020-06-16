@@ -29,12 +29,6 @@ class SensorFusion
 
     virtual ~SensorFusion() = default;
 
-    // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal
-    // multithreading this class potentially uses
-    SensorFusion &operator=(const SensorFusion &) = delete;
-    SensorFusion(const SensorFusion &)            = delete;
-
     /**
      * Updates components of world based on a new data
      *
