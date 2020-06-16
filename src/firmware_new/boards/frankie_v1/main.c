@@ -83,9 +83,9 @@ const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
                                                .stack_size = 1024 * 4};
 /* USER CODE BEGIN PV */
 
-ProtoMulticastSenderProfile_t *tbots_robot_msg_sender_profile;
-ProtoMulticastListenerProfile_t *vision_msg_listener_profile;
-ProtoMulticastListenerProfile_t *primitive_msg_listener_profile;
+ProtoMulticastCommunicationProfile_t *tbots_robot_msg_sender_profile;
+ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
+ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
 
 TbotsRobotMsg tbots_robot_msg;
 VisionMsg vision_msg;
@@ -167,24 +167,22 @@ void initIoDrivetrain(void)
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
-void timeout() {}
-
 void initIoNetworking()
 {
     // TODO this needs to be hooked up to the channel dial on the robot, when available
     unsigned channel = 0;
 
-    primitive_msg_listener_profile = io_proto_multicast_listener_profile_create(
-        MULTICAST_CHANNELS[channel], PRIMITIVE_PORT, &primitive_msg, PrimitiveMsg_fields,
-        MAXIMUM_TRANSFER_UNIT_BYTES, 1000, &timeout);
+    primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
+        "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
+        &primitive_msg, PrimitiveMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
-    vision_msg_listener_profile = io_proto_multicast_listener_profile_create(
-        MULTICAST_CHANNELS[channel], VISION_PORT, &vision_msg, VisionMsg_fields,
-        MAXIMUM_TRANSFER_UNIT_BYTES, 1000, &timeout);
+    vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
+        "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
+        &vision_msg, VisionMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
-    tbots_robot_msg_sender_profile = io_proto_multicast_sender_profile_create(
-        MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT, &tbots_robot_msg,
-        TbotsRobotMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES, 30);
+    tbots_robot_msg_sender_profile = io_proto_multicast_communication_profile_create(
+        "tbots_robot_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
+        &tbots_robot_msg, TbotsRobotMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 }
 
 
