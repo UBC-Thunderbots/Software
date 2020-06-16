@@ -152,6 +152,9 @@ float dot_product(const float vec1[], const float vec2[], const int size)
 /**
  * Dot product for 2D vectors.
  *
+ * Source:
+ * https://www.khanacademy.org/science/physics/one-dimensional-motion/kinematic-formulas/a/what-are-the-kinematic-formulas
+ *
  * @param vec1 the first vector in the dot product
  * @param vec2 the second vector in the dot product
  * @return the dot product result of the vectors
@@ -164,5 +167,6 @@ float dot2D(float vec1[2], float vec2[2])
 float shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
     const float initial_speed, const float displacement, const float acceleration)
 {
-    return (float)sqrt(pow(initial_speed, 2) + 2 * displacement * acceleration);
+    // vf^2 = vi^2 + 2ad
+    return sqrtf(powf(initial_speed, 2) + 2 * displacement * acceleration);
 }
