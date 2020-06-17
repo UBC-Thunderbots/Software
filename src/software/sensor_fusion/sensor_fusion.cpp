@@ -18,7 +18,14 @@ void SensorFusion::onValueReceived(SensorMsg sensor_msg)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateRefboxStage(refbox_stage);
-        new_world.updateGameState(refbox_game_state);
+        if (ball_placement_point)
+        {
+            new_world.updateGameState(refbox_game_state, *ball_placement_point);
+        }
+        else
+        {
+            new_world.updateGameState(refbox_game_state);
+        }
         Subject<World>::sendValueToObservers(new_world);
     }
 }
