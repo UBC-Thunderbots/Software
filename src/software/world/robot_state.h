@@ -66,7 +66,7 @@ class RobotState
     /**
      * Update ball in break beam
      *
-     * @param new ball in break beam
+     * @param ball_in_beam whether ball is in beam
      */
     void updateBallInBeam(bool ball_in_beam);
 
