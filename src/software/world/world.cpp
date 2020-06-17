@@ -9,7 +9,7 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       ball_(ball),
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
-      current_refbox_game_state_(),
+      current_game_state_(),
       // Store a small buffer of previous refbox game states so we can filter out noise
       refbox_game_state_history(3)
 {
@@ -22,6 +22,7 @@ void World::updateBallStateWithTimestamp(const TimestampedBallState &new_ball_st
 {
     ball_.updateState(new_ball_state);
     updateTimestamp(getMostRecentTimestampFromMembers());
+    current_game_state_.updateBall(ball_);
 }
 
 void World::updateFriendlyTeamState(const Team &new_friendly_team_data)
@@ -80,7 +81,7 @@ const Team &World::enemyTeam() const
     return enemy_team_;
 }
 
-void World::updateRefboxGameState(const RefboxGameState &game_state)
+void World::updateGameState(const RefboxGameState &game_state)
 {
     refbox_game_state_history.push_back(game_state);
     // Take the consensus of the previous refbox messages
@@ -90,15 +91,19 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
                         return gamestate == refbox_game_state_history.front();
                     }))
     {
-        current_refbox_game_state_.updateRefboxGameState(game_state);
-        current_refbox_game_state_.updateBall(ball_);
+        current_game_state_.updateRefboxGameState(game_state);
     }
     else
     {
-        current_refbox_game_state_.updateRefboxGameState(
-            current_refbox_game_state_.getRefboxGameState());
-        current_refbox_game_state_.updateBall(ball_);
+        current_game_state_.updateRefboxGameState(
+            current_game_state_.getRefboxGameState());
     }
+}
+
+void World::updateGameState(const RefboxGameState &game_state, Point ball_placement_point)
+{
+    updateGameState(game_state);
+    current_game_state_.setBallPlacementPoint(ball_placement_point);
 }
 
 void World::updateRefboxStage(const RefboxStage &stage)
@@ -141,12 +146,12 @@ boost::circular_buffer<Timestamp> World::getTimestampHistory()
 
 const GameState &World::gameState() const
 {
-    return current_refbox_game_state_;
+    return current_game_state_;
 }
 
 GameState &World::mutableGameState()
 {
-    return current_refbox_game_state_;
+    return current_game_state_;
 }
 
 bool World::operator==(const World &other) const

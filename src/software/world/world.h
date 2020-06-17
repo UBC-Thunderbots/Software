@@ -63,7 +63,15 @@ class World final
      *
      * @param game_state the game state sent by refbox
      */
-    void updateRefboxGameState(const RefboxGameState& game_state);
+    void updateGameState(const RefboxGameState& game_state);
+
+    /**
+     * Updates the refbox game state
+     *
+     * @param game_state the game state sent by refbox
+     * @param ball_placement_point ball placement point
+     */
+    void updateGameState(const RefboxGameState& game_state, Point ball_placement_point);
 
     /**
      * Updates the refbox stage
@@ -176,7 +184,7 @@ class World final
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
-    GameState current_refbox_game_state_;
+    GameState current_game_state_;
     RefboxStage current_refbox_stage_;
     // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,

@@ -78,3 +78,16 @@ RefboxStage createRefboxStage(const Referee &packet)
 {
     return refbox_stage_map.at(packet.stage());
 }
+
+std::optional<Point> createBallPlacementPoint(const Referee &packet)
+{
+    if (packet.has_designated_position())
+    {
+        return Point(static_cast<double>(packet.designated_position().x()),
+                     static_cast<double>(packet.designated_position().y()));
+    }
+    else
+    {
+        return std::nullopt;
+    }
+}
