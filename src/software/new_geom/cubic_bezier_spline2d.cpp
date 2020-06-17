@@ -17,19 +17,19 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
 {
     // Find which segment of this spline `t` falls on, assuming the start of
     // the first segment is t=0, the end of the last segment is t=1, and the
-    // the knots are evenly distributed in between 0 and 1
-
+    // the knots are evenly distributed in-between 0 and 1
 
     const double t_constrained = std::clamp(t, 0.0, 1.0);
 
-    // Scale t from [0,1] -> [0,n] where n is the number segments
+    // Scale t from [0,1] -> [0,n] where n is the number of segments
     const double t_mapped = t_constrained * static_cast<double>(getNumSegments());
 
     // In most cases the segment index is just the floor of the mapped t, but we
-    // also need to have extra handling for the case where t=1, in which case
-    // we need to just use the last segment
+    // also need to have extra handling for the case where t=1, in which case if we
+    // took the floor we'd be accessing a segment that doesn't exist (ie. one that
+    // _starts_ at the end of the spline). So for this case we just use the last segment
     const size_t segment_index =
-        std::min(static_cast<size_t>(std::floor(t_mapped)), getNumSegments() - 1);
+        t < 1 ? static_cast<size_t>(std::floor(t_mapped)) : getNumSegments() - 1;
 
     // Figure out what the t-value on the segment is going to be
     const double t_on_segment = (t_mapped - static_cast<double>(segment_index));
@@ -52,7 +52,7 @@ const std::vector<Point> CubicBezierSpline2d::getKnots() const
 
 size_t CubicBezierSpline2d::getNumKnots() const
 {
-    // We are guaranteed to have 3*n + 1 control points (where `n` is some integer) so
+    // We are guaranteed to have 3*n + 1 control points (where `n` is some integer > 0) so
     // we can safely do integer division here.
     return static_cast<size_t>((control_points.size() - 1) / 3 + 1);
 }
@@ -61,7 +61,7 @@ std::vector<double> CubicBezierSpline2d::getKnotParametrizationValues() const
 {
     // We assume a linear spacing of all the knots from 0 to 1
     std::vector<double> knot_vector;
-    const double num_knots = getNumKnots();
+    const size_t num_knots = getNumKnots();
     for (size_t i = 0; i < num_knots; i++)
     {
         knot_vector.emplace_back(i * 1.0 / static_cast<double>(num_knots - 1));
@@ -86,7 +86,7 @@ const Point CubicBezierSpline2d::getEndPoint() const
 const std::vector<SplineSegment2d> CubicBezierSpline2d::getSplineSegments() const
 {
     std::vector<SplineSegment2d> segments;
-    const double num_segments = getNumSegments();
+    const size_t num_segments = getNumSegments();
     for (size_t i = 0; i < num_segments; i++)
     {
         const BezierCurve2d curve = getSegmentAtIndex(i);

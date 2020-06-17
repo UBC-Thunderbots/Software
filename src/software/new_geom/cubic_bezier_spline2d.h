@@ -44,11 +44,11 @@ class CubicBezierSpline2d : public Spline2d
      * @param start_vector The tangent vector at the start of the spline
      * @param end_point The last point on the spline
      * @param end_vector The tangent vector at the end of the spline.
-     *                   NOTE: this points "back towards" the start of the spline, instead
+     *                   NOTE: this points back along the body of the spline, instead
      *                         of "off the end" of the spline. ie. this vector is
      *                         "symmetric" with `start_vector`
      * @param intermediate_knots The intermediate points between `start_point` and
-     *                                    `end_point` that this spline will interpolate
+     *                                    `end_point` that this spline will pass through
      */
     explicit CubicBezierSpline2d(const Point& start_point, const Vector& start_vector,
                                  const Point& end_point, const Vector& end_vector,
@@ -98,11 +98,11 @@ class CubicBezierSpline2d : public Spline2d
      * @param start_vector The tangent vector at the start of the spline
      * @param end_point The last point on the spline
      * @param end_vector The tangent vector at the end of the spline.
-     *                   NOTE: this points "back towards" the start of the spline, instead
+     *                   NOTE: this points back along the body of the spline, instead
      *                         of "off the end" of the spline. ie. this vector is
      *                         "symmetric" with `start_vector`
      * @param intermediate_knots The intermediate points between `start_point` and
-     *                                    `end_point` that this spline will interpolate
+     *                                    `end_point` that this spline will pass through
      * @return A vector of control points that are the implicit representation of the
      *         bezier curves that make up the spline represented by the given args. ie.
      *         0th-3rd (inclusive) points are the control points of the first bezier
