@@ -66,11 +66,6 @@ const Ball &World::ball() const
     return ball_;
 }
 
-Ball &World::mutableBall()
-{
-    return ball_;
-}
-
 const Team &World::friendlyTeam() const
 {
     return friendly_team_;

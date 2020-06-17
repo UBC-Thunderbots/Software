@@ -43,7 +43,8 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
     ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
                                           Timestamp());
     ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
-    world.mutableBall() = Ball(GetParam().ball_position, Vector(), Timestamp());
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState(GetParam().ball_position, Vector(), Timestamp()));
 
     // to set restart reason, etc. properly
     world.mutableGameState().updateRefboxGameState(GetParam().first_game_state);

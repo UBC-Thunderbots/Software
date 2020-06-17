@@ -21,7 +21,8 @@ TEST_F(ExamplePlayTest, test_example_play)
                                               {Point(4, 0), Point(0.5, 0), Point(-3, 1),
                                                Point(-1, -3), Point(2, 0), Point(3.5, 3)},
                                               Timestamp::fromSeconds(0));
-    world.mutableBall() = Ball(Point(-0.8, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState(Point(-0.8, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

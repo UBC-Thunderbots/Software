@@ -13,8 +13,9 @@ TEST(ContinuousFunctionValidatorTest,
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {};
 
-    auto world           = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
-    world->mutableBall() = Ball(Point(-0.1, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    world->updateBallStateWithTimestamp(
+        TimestampedBallState(Point(-0.1, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
     ContinuousFunctionValidator function_validator(validation_function, world);
 
     for (unsigned int i = 0; i < 10; i++)
@@ -47,8 +48,8 @@ TEST(ContinuousFunctionValidatorTest,
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     ContinuousFunctionValidator function_validator(validation_function, world);
-
-    world->mutableBall() = Ball(Point(-2, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    world->updateBallStateWithTimestamp(
+        TimestampedBallState(Point(-2, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
     try
     {
         function_validator.executeAndCheckForFailures();
@@ -70,7 +71,8 @@ TEST(ContinuousFunctionValidatorTest,
         EXPECT_STREQ("x < -1", e.what());
     }
 
-    world->mutableBall() = Ball(Point(0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    world->updateBallStateWithTimestamp(
+        TimestampedBallState(Point(0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
     try
     {
         function_validator.executeAndCheckForFailures();
@@ -81,7 +83,8 @@ TEST(ContinuousFunctionValidatorTest,
         EXPECT_STREQ("x < 1", e.what());
     }
 
-    world->mutableBall() = Ball(Point(-0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    world->updateBallStateWithTimestamp(
+        TimestampedBallState(Point(-0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
     try
     {
         function_validator.executeAndCheckForFailures();

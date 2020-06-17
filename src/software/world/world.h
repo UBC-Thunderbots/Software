@@ -95,13 +95,6 @@ class World final
     const Ball& ball() const;
 
     /**
-     * Returns a mutable reference to the Ball in the world
-     *
-     * @return a mutable reference to the Ball in the world
-     */
-    Ball& mutableBall();
-
-    /**
      * Returns a const reference to the Friendly Team in the world
      *
      * @return a const reference to the Friendly Team in the world
