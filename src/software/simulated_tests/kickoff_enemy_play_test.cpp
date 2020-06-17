@@ -29,7 +29,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
         },
         Timestamp::fromSeconds(0));
 
-    world = ::TestUtil::setFriendlyRobotPositions(world,
+    world         = ::TestUtil::setFriendlyRobotPositions(world,
                                                   {
                                                       Point(-3, 2.5),
                                                       Point(-3, 1.5),
@@ -39,7 +39,9 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                                                       Point(-3, 2.5),
                                                   },
                                                   Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().assignGoalie(0);
+    Team new_team = world.friendlyTeam();
+    new_team.assignGoalie(0);
+    world.updateFriendlyTeamState(new_team);
 
     world.mutableBall() = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
 

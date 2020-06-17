@@ -206,7 +206,7 @@ class STPRefboxGameStatePlaySelectionTest
                       Timestamp::fromSeconds(0));
         Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({robot_0, robot_1, robot_2});
+        world.updateFriendlyTeamState(Team({robot_0, robot_1, robot_2}));
 
         Robot enemy_robot_0(0, Point(1.1, 1), Vector(), Angle::zero(),
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -214,8 +214,7 @@ class STPRefboxGameStatePlaySelectionTest
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
         Robot enemy_robot_2(2, Point(0, -5.0), Vector(), Angle::zero(),
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableEnemyTeam().updateRobots(
-            {enemy_robot_0, enemy_robot_1, enemy_robot_2});
+        world.updateEnemyTeamState(Team({enemy_robot_0, enemy_robot_1, enemy_robot_2}));
     }
 
     STP stp;

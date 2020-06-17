@@ -101,25 +101,11 @@ class World final
     const Team& friendlyTeam() const;
 
     /**
-     * Returns a mutable reference to the Friendly Team in the world
-     *
-     * @return a mutable reference to the Friendly Team in the world
-     */
-    Team& mutableFriendlyTeam();
-
-    /**
      * Returns a const reference to the Enemy Team in the world
      *
      * @return a const reference to the Enemy Team in the world
      */
     const Team& enemyTeam() const;
-
-    /**
-     * Returns a mutable reference to the Enemy Team in the world
-     *
-     * @return a mutable reference to the Enemy Team in the world
-     */
-    Team& mutableEnemyTeam();
 
     /**
      * Returns a const reference to the Game State

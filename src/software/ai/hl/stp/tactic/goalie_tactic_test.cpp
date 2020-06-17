@@ -92,8 +92,10 @@ class GoalieTacticTest : public testing::Test
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({goalie});
-        world.mutableFriendlyTeam().assignGoalie(0);
+
+        Team new_team({goalie});
+        new_team.assignGoalie(0);
+        world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
                                            world.friendlyTeam(), world.enemyTeam());
@@ -115,8 +117,9 @@ class GoalieTacticTest : public testing::Test
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({goalie});
-        world.mutableFriendlyTeam().assignGoalie(0);
+        Team new_team({goalie});
+        new_team.assignGoalie(0);
+        world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
                                            world.friendlyTeam(), world.enemyTeam());
@@ -136,8 +139,9 @@ class GoalieTacticTest : public testing::Test
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({goalie});
-        world.mutableFriendlyTeam().assignGoalie(0);
+        Team new_team({goalie});
+        new_team.assignGoalie(0);
+        world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
                                            world.friendlyTeam(), world.enemyTeam());

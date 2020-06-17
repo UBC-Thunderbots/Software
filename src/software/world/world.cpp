@@ -75,17 +75,7 @@ const Team &World::friendlyTeam() const
     return friendly_team_;
 }
 
-Team &World::mutableFriendlyTeam()
-{
-    return friendly_team_;
-}
-
 const Team &World::enemyTeam() const
-{
-    return enemy_team_;
-}
-
-Team &World::mutableEnemyTeam()
 {
     return enemy_team_;
 }

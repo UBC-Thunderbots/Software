@@ -55,7 +55,6 @@ namespace TestUtil
     {
         Team new_friendly_team =
             setRobotPositionsHelper(world.friendlyTeam(), robot_positions, timestamp);
-        world.mutableFriendlyTeam().clearAllRobots();
         world.updateFriendlyTeamState(new_friendly_team);
 
         return world;
@@ -66,7 +65,6 @@ namespace TestUtil
     {
         Team new_enemy_team =
             setRobotPositionsHelper(world.enemyTeam(), robot_positions, timestamp);
-        world.mutableEnemyTeam().clearAllRobots();
         world.updateEnemyTeamState(new_enemy_team);
 
         return world;
