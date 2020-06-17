@@ -106,7 +106,7 @@ extern "C"
 #if !defined(HSE_VALUE)
 #define HSE_VALUE                                                                        \
     ((uint32_t)8000000) /*!< Value of the External oscillator in Hz : FPGA case fixed to \
-                           \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 60MHZ */
+                           \ \ \ \ 60MHZ */
 #endif                  /* HSE_VALUE */
 
 #if !defined(HSE_STARTUP_TIMEOUT)
@@ -201,7 +201,7 @@ extern "C"
 #define USE_HAL_SAI_REGISTER_CALLBACKS 0U    /* SAI register callback disabled     */
 #define USE_HAL_SD_REGISTER_CALLBACKS 0U     /* SD register callback disabled      */
 #define USE_HAL_SMARTCARD_REGISTER_CALLBACKS                                             \
-    0U /* SMARTCARD register callback disabled  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \                                                                                       \
+    0U /* SMARTCARD register callback disabled  \ \ \ \                                                                                       \
         */
 #define USE_HAL_SPDIFRX_REGISTER_CALLBACKS 0U /* SPDIFRX register callback disabled */
 #define USE_HAL_SMBUS_REGISTER_CALLBACKS 0U   /* SMBUS register callback disabled   */

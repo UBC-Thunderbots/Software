@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+#include "lwip.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
 #include "lwip/ip_addr.h"
@@ -14,6 +15,9 @@
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+
+static osEventFlagsId_t networking_event;
+static uint32_t NETIF_CONFIGURED = 1 << 0;
 
 /**
  * ProtoMulticastCommunicationProfile_t contains the common information
@@ -37,6 +41,7 @@ typedef struct ProtoMulticastCommunicationProfile
     // communication_event: these events will be used to control when the networking
     // tasks run. The networking tasks will also signal certain events
     osEventFlagsId_t communication_event;
+    osEventFlagsId_t netif_event;
 
     // mutex to protect the protobuf struct
     osMutexId_t profile_mutex;
@@ -51,12 +56,8 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
         (ProtoMulticastCommunicationProfile_t*)malloc(
             sizeof(ProtoMulticastCommunicationProfile_t));
 
-    const osMutexAttr_t mutex_attr = {
-        profile_name, 
-        osMutexPrioInherit,
-        NULL, 0U
-    };
- 
+    const osMutexAttr_t mutex_attr = {profile_name, osMutexPrioInherit, NULL, 0U};
+
     profile->profile_name        = profile_name;
     profile->port                = port;
     profile->message_fields      = message_fields;
@@ -72,6 +73,8 @@ void io_proto_multicast_sender_Task(void* arg)
 {
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
+
+    osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny, osWaitForever);
 
     // Bind the socket to the multicast address and port we then use that
     // communication profile to join the specified multicast group.
@@ -89,8 +92,9 @@ void io_proto_multicast_sender_Task(void* arg)
 
     for (;;)
     {
-        // WAIT FOR PROTOBUF UPDATE EVENT
+        osEventFlagsWait(comm_profile, UPDATED_PROTO, osFlagsWaitAny, osWaitForever);
         tx_buf = netbuf_new();
+
         netbuf_alloc(tx_buf, comm_profile->message_max_size);
 
         // serialize proto
@@ -101,8 +105,8 @@ void io_proto_multicast_sender_Task(void* arg)
         tx_buf->p->payload = buffer;
         netconn_sendto(conn, tx_buf, comm_profile->multicast_address, comm_profile->port);
 
+        osThreadYield();
         netbuf_delete(tx_buf);
-        osDelay(100);
     }
 }
 
@@ -111,8 +115,7 @@ void io_proto_multicast_listener_Task(void* arg)
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
 
-    /*osEventFlagsWait(comm_profile->lwip_event, LWIP_INTERFACE_CONFIGURED,*/
-    /*osEventFlagsWaitAll, osWaitForever);*/
+    osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny, osWaitForever);
 
     // Bind the socket to the multicast address and port we then use that comm_profile
     // profile to join the specified multicast group.
@@ -146,6 +149,14 @@ void io_proto_multicast_listener_Task(void* arg)
 
         netbuf_delete(rx_buf);
     }
+}
+
+void io_proto_multicast_startNetworkingTask(void* arg)
+{
+    networking_event = osEventFlagsNew(NULL);
+    MX_LWIP_Init();
+    osEventFlagsSet(networking_event, NETIF_CONFIGURED);
+    osThreadExit();
 }
 
 void io_proto_multicast_communication_profile_destroy(

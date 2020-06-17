@@ -7,13 +7,12 @@ typedef struct ProtoMulticastCommunicationProfile ProtoMulticastCommunicationPro
 /**
  * EVENTS
  */
-typedef enum 
+typedef enum
 {
-    LWIP_NETIF_UP   = 1 << 0,  // network interface link up
-    UPDATED_PROTO   = 1 << 1,  // protobuf struct has been updated
-    RECEIVED_PROTO  = 1 << 2,  // new protobuf has been received
-    RECEIVE_TIMEOUT = 1 << 3,  // waiting takes longer than NETWORK_TIMEOUT_MILLISECONDS
-} ProtofMulticastCommunicationEvent_t ;
+    UPDATED_PROTO   = 1 << 0,  // protobuf struct has been updated
+    RECEIVED_PROTO  = 1 << 1,  // new protobuf has been received
+    RECEIVE_TIMEOUT = 1 << 2,  // blocking takes longer than NETWORK_TIMEOUT_MILLISECONDS
+} ProtoMulticastCommunicationEvent_t;
 
 /***
  * TASKS:
@@ -33,13 +32,28 @@ typedef enum
  *     |   |                               |     |   |                              |
  *     |   |  release lock                 |     |   |  release lock                |
  *     |   |                               |     |   |                              |
- *     +----+ send buffer to group         |     +----+ notify PROTO_RECEIVED       |
+ *     +----+ send buffer to group         |     +----+ notify PROTO_RECEIVED event |
  *         |                               |         |                              |
  *         +-------------------------------+         +------------------------------+
  *
  */
 void io_proto_multicast_sender_Task(void* arg);
 void io_proto_multicast_listener_Task(void* arg);
+
+/**
+ * LWIP automatically places MX_LWIP_Init() in a default task. That function
+ * call internally creates another tcpip task, and the default task just loops
+ * forever.
+ *
+ * Cube forces us to generate this function, in main.c we mark it as __weak and define
+ * the implementation in this library (proto_mutlicast_communication). When the proto
+ * communication library is linked w/ the main frankie_v1 binary, the __weak reference
+ * is resolved to the "stronger" reference to the function defined below.
+ *
+ * We take over control so we can signal other networking tasks when MX_LWIP_Init()
+ * has been called and the network link is configured and up.
+ */
+void io_proto_multicast_startNetworkingTask(void* arg);
 
 /**
  * Create an ProtoMulticastCommunicationProfile
@@ -95,7 +109,7 @@ void io_proto_multicast_communication_profile_releaseLock(
  */
 void io_proto_multicast_communication_profile_notifyEvent(
     ProtoMulticastCommunicationProfile_t* communication_profile,
-    ProtofMulticastCommunicationEvent_t event);
+    ProtoMulticastCommunicationEvent_t event);
 
 /**
  * Block the calling function/task until a new protobuf value has been
@@ -107,7 +121,7 @@ void io_proto_multicast_communication_profile_notifyEvent(
  */
 void io_proto_multicast_communication_profile_blockUntilEvent(
     ProtoMulticastCommunicationProfile_t* communication_profile,
-    ProtofMulticastCommunicationEvent_t event);
+    ProtoMulticastCommunicationEvent_t event);
 
 /**
  * Destroy the given ProtoMulticastCommunicationProfile_t

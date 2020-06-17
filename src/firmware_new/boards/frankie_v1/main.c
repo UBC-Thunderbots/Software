@@ -59,11 +59,12 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {.name     = "defaultTask",
-                                               .priority = (osPriority_t)osPriorityNormal,
-                                               .stack_size = 1024 * 4};
+/* Definitions for NetStartTask */
+osThreadId_t NetStartTaskHandle;
+const osThreadAttr_t NetStartTask_attributes = {
+    .name       = "NetStartTask",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for RobotStatusTask */
 osThreadId_t RobotStatusTaskHandle;
 const osThreadAttr_t RobotStatusTask_attributes = {
@@ -101,7 +102,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM4_Init(void);
-void StartDefaultTask(void *argument);
+void io_proto_multicast_startNetworkingTask(void *argument);
 extern void io_proto_multicast_sender_Task(void *argument);
 extern void io_proto_multicast_listener_Task(void *argument);
 
@@ -255,8 +256,9 @@ int main(void)
     /* USER CODE END RTOS_QUEUES */
 
     /* Create the thread(s) */
-    /* creation of defaultTask */
-    defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+    /* creation of NetStartTask */
+    NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL,
+                                     &NetStartTask_attributes);
 
     /* creation of RobotStatusTask */
     RobotStatusTaskHandle =
@@ -667,14 +669,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_io_proto_multicast_startNetworkingTask */
 /**
- * @brief  Function implementing the defaultTask thread.
+ * @brief  Function implementing the NetStartTask thread.
  * @param  argument: Not used
  * @retval None
  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_io_proto_multicast_startNetworkingTask */
+__weak void io_proto_multicast_startNetworkingTask(void *argument)
 {
     /* init code for LWIP */
     MX_LWIP_Init();

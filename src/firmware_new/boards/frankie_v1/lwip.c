@@ -77,8 +77,6 @@ void MX_LWIP_Init(void)
     }
 
     /* USER CODE BEGIN 3 */
-    /*udp_multicast_init(AI_MULTICAST_ADDRESS, ROBOT_MULTICAST_LISTEN_PORT,*/
-    /*ROBOT_UNICAST_SEND_PORT);*/
     /* USER CODE END 3 */
 }
 

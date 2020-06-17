@@ -53,6 +53,7 @@ cc_library(
     hdrs = ["proto_multicast_communication.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
+        "//firmware_new/boards/frankie_v1:frankie_v1_lwip",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:lwip",
         "//shared:constants",
