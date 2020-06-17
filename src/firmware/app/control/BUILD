@@ -40,6 +40,15 @@ cc_library(
 )
 
 cc_library(
+    name = "controller",
+    srcs = ["controller.c"],
+    hdrs = ["controller.h"],
+    deps = [
+        "//firmware/shared:circular_buffer",
+    ],
+)
+
+cc_library(
     name = "physbot",
     srcs = ["physbot.c"],
     hdrs = ["physbot.h"],

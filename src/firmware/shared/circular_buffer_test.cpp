@@ -50,6 +50,41 @@ TEST_F(CircularBufferTest, circular_buffer_exact_full)
     }
 }
 
+TEST_F(CircularBufferTest, circular_buffer_exact_full_clear)
+{
+    float mock_data[]     = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+    int mock_data_size    = sizeof(mock_data) / sizeof(mock_data[0]);
+
+    EXPECT_TRUE(circular_buffer_isEmpty(circular_buffer));
+
+    // Populate circular buffer with mock data
+    for (int i = 0; i < mock_data_size; i++)
+    {
+        circular_buffer_push(circular_buffer, mock_data[i]);
+    }
+
+    circular_buffer_clear(circular_buffer);
+    EXPECT_TRUE(circular_buffer_isEmpty(circular_buffer));
+}
+
+TEST_F(CircularBufferTest, circular_buffer_overfill_clear)
+{
+    float mock_data[]      = {1.0, 2.0,  3.0,  4.0,  5.0,  6.0,  7.0, 8.0,
+                              9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0};
+    int mock_data_size    = sizeof(mock_data) / sizeof(mock_data[0]);
+
+    EXPECT_TRUE(circular_buffer_isEmpty(circular_buffer));
+
+    // Populate circular buffer with mock data
+    for (int i = 0; i < mock_data_size; i++)
+    {
+        circular_buffer_push(circular_buffer, mock_data[i]);
+    }
+
+    circular_buffer_clear(circular_buffer);
+    EXPECT_TRUE(circular_buffer_isEmpty(circular_buffer));
+}
+
 TEST_F(CircularBufferTest, circular_buffer_overfill)
 {
     float mock_data[]      = {1.0, 2.0,  3.0,  4.0,  5.0,  6.0,  7.0, 8.0,
