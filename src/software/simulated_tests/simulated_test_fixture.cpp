@@ -3,6 +3,7 @@
 #include "software/logger/logger.h"
 #include "software/time/duration.h"
 #include "software/test_util/test_util.h"
+#include "software/gui/visualizer/drawing/navigator.h"
 
 SimulatedTest::SimulatedTest() : simulator(std::make_unique<Simulator>(::TestUtil::createSSLDivBField())),
                                  ai(Util::DynamicParameters->getAIConfig(), Util::DynamicParameters->getAIControlConfig()), run_simulation_in_realtime(false)
@@ -12,6 +13,12 @@ SimulatedTest::SimulatedTest() : simulator(std::make_unique<Simulator>(::TestUti
 void SimulatedTest::SetUp()
 {
     LoggerSingleton::initializeLogger();
+
+    // Reset all DynamicParameters for each test. The
+    // (const) DynamicParameters will be updated automatically since they reference
+    // the mutable ones
+    // TODO: this causes a sigabrt in the visiaulizer, probably because the address changes
+//    *(Util::MutableDynamicParameters) = ThunderbotsConfig();
 
     // Re-create all objects for each test so we start from a clean setup
     // every time. Because the simulator is created initially in the constructor's
@@ -68,12 +75,11 @@ void SimulatedTest::enableVisualizer()
     // tests These arguments do not matter for simply running the Visualizer
     char *argv[] = {NULL};
     int argc     = sizeof(argv) / sizeof(char *) - 1;
-//    visualizer   = std::make_shared<VisualizerWrapper>(argc, argv);
+    visualizer   = std::make_shared<VisualizerWrapper>(argc, argv);
     run_simulation_in_realtime = true;
 }
 
-bool SimulatedTest::validateWorld(std::shared_ptr<World> world_ptr,
-                                  std::vector<FunctionValidator> &function_validators,
+bool SimulatedTest::validateWorld(std::vector<FunctionValidator> &function_validators,
                                   std::vector<ContinuousFunctionValidator> &continuous_function_validators) {
     for (auto &continuous_function_validator : continuous_function_validators)
     {
@@ -87,24 +93,43 @@ bool SimulatedTest::validateWorld(std::shared_ptr<World> world_ptr,
     return function_validators.empty() ? false : validation_successful;
 }
 
+std::optional<World> SimulatedTest::getSensorFusionWorld() {
+    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
+    assert(ssl_wrapper_packet);
+
+    auto sensor_msg = SensorMsg();
+    sensor_msg.set_allocated_ssl_vision_msg(ssl_wrapper_packet.release());
+
+    sensor_fusion.updateWorld(sensor_msg);
+    return sensor_fusion.getWorld();
+}
+
+void SimulatedTest::sleep(const std::chrono::steady_clock::time_point &wall_start_time,
+                          const Timestamp &current_time) {
+    // How long to wait for the wall-clock time to match the
+    // current simulation time
+    auto wall_time_now = std::chrono::steady_clock::now();
+    auto wall_time_since_sim_start =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                    wall_time_now - wall_start_time);
+    auto ms_to_sleep = std::chrono::milliseconds(static_cast<int>(
+                                                         current_time.getMilliseconds())) - wall_time_since_sim_start;
+    if (ms_to_sleep > std::chrono::milliseconds(0))
+    {
+        std::this_thread::sleep_for(ms_to_sleep);
+    }
+}
+
 void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_functions,
                             const std::vector<ValidationFunction> &continuous_validation_functions,
                             const Duration &timeout) {
-    // Set up initial world state
-    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
-    assert(ssl_wrapper_packet);
-    auto sensor_msg = SensorMsg();
-    sensor_msg.set_allocated_ssl_vision_msg(ssl_wrapper_packet.release());
-    sensor_fusion.updateWorld(sensor_msg);
-    std::optional<World> world_opt = sensor_fusion.getWorld();
     std::shared_ptr<World> world;
-    if(world_opt) {
+    if(auto world_opt = getSensorFusionWorld()) {
         world = std::make_shared<World>(world_opt.value());
     }else {
-        ADD_FAILURE() << "initial world was invalid";
+        FAIL() << "Invalid initial world state";
     }
 
-    // Set up function validators
     for (const auto& validation_function : validation_functions)
     {
         function_validators.emplace_back(
@@ -120,82 +145,45 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
     Timestamp current_time = Timestamp::fromSeconds(0.0);
     Timestamp timeout_time = current_time + timeout;
     Duration dt = Duration::fromSeconds(1.0 / 60.0);
-    auto wall_clock_start_time = std::chrono::steady_clock::now();
+    auto wall_start_time = std::chrono::steady_clock::now();
+    bool validation_passed = false;
     while(current_time < timeout_time) {
         simulator->stepSimulation(dt);
-        auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
-        assert(ssl_wrapper_packet);
 
-        auto sensor_msg = SensorMsg();
-        sensor_msg.set_allocated_ssl_vision_msg(ssl_wrapper_packet.release());
+        if(auto world_opt = getSensorFusionWorld()) {
+            *world = world_opt.value();
 
-        sensor_fusion.updateWorld(sensor_msg);
-        std::optional<World> world_opt = sensor_fusion.getWorld();
+            validation_passed = validateWorld(function_validators, continuous_function_validators);
+            if(validation_passed) {
+                break;
+            }
 
-        if(!world_opt) {
-            // TODO: log
-            continue;
+            auto primitives = ai.getPrimitives(*world);
+            auto primitives_ptr =
+                    std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
+                            std::move(primitives));
+            simulator->setYellowRobotPrimitives(primitives_ptr);
+
+            if(visualizer) {
+                visualizer->onValueReceived(*world);
+                visualizer->onValueReceived(ai.getPlayInfo());
+                visualizer->onValueReceived(drawNavigator(ai.getNavigator()));
+            }
+        }else {
+            LOG(WARNING) << "SensorFusion did not output a valid World";
         }
-
-        *world = world_opt.value();
-
-        bool stop_test = SimulatedTest::validateWorld(world, function_validators, continuous_function_validators);
-        if(stop_test) {
-            // TODO: log
-            break;
-        }
-
-        auto p = ai.getPrimitives(*world);
-        auto new_primitives_ptr =
-                std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-                        std::move(p));
-
-        simulator->setYellowRobotPrimitives(new_primitives_ptr);
 
         current_time = current_time + dt;
 
         if (run_simulation_in_realtime)
         {
-            // How long to wait for sim time to match wall clock time
-            auto timestamp_now = std::chrono::steady_clock::now();
-            auto milliseconds_since_test_start =
-                    std::chrono::duration_cast<std::chrono::milliseconds>(
-                            timestamp_now - wall_clock_start_time);
-            auto ms_to_sleep = std::chrono::milliseconds(static_cast<int>(
-                    current_time.getMilliseconds())) - milliseconds_since_test_start;
-            if (ms_to_sleep > std::chrono::milliseconds(0))
-            {
-                std::this_thread::sleep_for(ms_to_sleep);
-            }
-//
-//
-//            // Calculate how much wall-clock time has passed since we last published a
-//            // world, and sleep for as much time as necessary for it to have been
-//            // world_time_increment seconds in wall-clock time since the last world was
-//            // published.
-//            auto timestamp_now = std::chrono::steady_clock::now();
-//            auto milliseconds_since_world_publish =
-//                    std::chrono::duration_cast<std::chrono::milliseconds>(
-//                            timestamp_now - world_publish_timestamp);
-//            auto remaining_milliseconds = std::chrono::milliseconds(std::lrint(
-//                    world_time_increment.getMilliseconds())) -
-//                                          milliseconds_since_world_publish;
-//
-//            if (remaining_milliseconds > std::chrono::milliseconds(0))
-//            {
-//                std::this_thread::sleep_for(remaining_milliseconds);
-//            }
+            sleep(wall_start_time, current_time);
         }
     }
 
-//    if (!validation_successful && !function_validators.empty())
-//    {
-//        LOG(WARNING)
-//            << "Validation failed. Not all validation functions passed within the timeout duration";
-//        return false;
-//    }
-//    else
-//    {
-//        return true;
-//    }
+    if (validation_passed) {
+        SUCCEED();
+    }else {
+        ADD_FAILURE() << "Not all validation functions passed within the timeout duration";
+    }
 }

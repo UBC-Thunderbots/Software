@@ -2,15 +2,16 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/ai_wrapper.h"
+//#include "software/ai/ai_wrapper.h"
 #include "software/ai/ai.h"
-#include "software/backend/simulator_backend.h"
+//#include "software/backend/simulator_backend.h"
 #include "software/gui/visualizer/visualizer_wrapper.h"
-#include "software/simulated_tests/validation/world_state_validator.h"
+//#include "software/simulated_tests/validation/world_state_validator.h"
 #include "software/simulated_tests/validation/continuous_function_validator.h"
 #include "software/simulated_tests/validation/function_validator.h"
 #include "software/simulation/simulator.h"
 #include "software/sensor_fusion/sensor_fusion.h"
+#include <memory>
 
 /**
  * This is a test fixture designed to make it easy to write integration tests with the
@@ -51,10 +52,15 @@ public:
             );
 
 private:
+
+
     // True means stop the test, false means keep going
-    static bool validateWorld(std::shared_ptr<World> world_ptr,
-                              std::vector<FunctionValidator>& function_validators,
+    static bool validateWorld(std::vector<FunctionValidator>& function_validators,
                               std::vector<ContinuousFunctionValidator>& continuous_function_validators);
+
+    std::optional<World> getSensorFusionWorld();
+
+    static void sleep(const std::chrono::steady_clock::time_point& wall_start_time, const Timestamp& current_time);
 
     // The simulator needs to be a pointer so that we can destroy and re-create
     // the object in the SetUp function. Because the simulator has no
@@ -71,5 +77,5 @@ private:
     // If true, introduces artifical delay so that simulation
     // time passes at the same speed a real life time
     bool run_simulation_in_realtime;
-//    std::shared_ptr<VisualizerWrapper> visualizer;
+    std::shared_ptr<VisualizerWrapper> visualizer;
 };
