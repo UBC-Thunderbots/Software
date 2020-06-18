@@ -20,8 +20,8 @@ cc_library(
 )
 
 cc_test(
-    name = "simulated_tests_test",
-    srcs = ["simulated_tests_test.cpp"],
+    name = "simulated_test_fixture_test",
+    srcs = ["simulated_test_fixture_test.cpp"],
     deps = [
         ":simulated_test_fixture",
         "//software/simulated_tests/validation:validation_function",
