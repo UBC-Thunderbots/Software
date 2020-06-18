@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "simulated_test_fixture",
+    testonly = True,
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
     deps = [
