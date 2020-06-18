@@ -12,6 +12,7 @@ cc_library(
     srcs = ["trajectory_planner.c"],
     hdrs = ["trajectory_planner.h"],
     deps = [
+        "//firmware/app/control:trajectory_planner_impl",
         "//firmware/shared:physics",
         "//firmware/shared/math:polynomial_1d",
         "//firmware/shared/math:polynomial_2d",
@@ -20,11 +21,24 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_planner_impl",
+    srcs = ["trajectory_planner_impl.c"],
+    hdrs = ["trajectory_planner_impl.h"],
+    deps = [
+        "//firmware/shared:physics",
+        "//firmware/shared/math:polynomial_1d",
+        "//firmware/shared/math:polynomial_2d",
+        "//firmware/shared/math:tbots_math",
+    ],
+)
+
 cc_test(
     name = "trajectory_planner_test",
     srcs = ["trajectory_planner_test.cpp"],
     deps = [
         ":trajectory_planner",
+        ":trajectory_planner_impl",
         "//software/new_geom:vector",
         "@gtest//:gtest_main",
     ],
