@@ -1,5 +1,10 @@
 load(":parameter.bzl", "c_dynamic_parameters", "cpp_dynamic_parameters")
 
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
+
 cpp_dynamic_parameters(
     name = "cpp_params",
     enum_deps = [

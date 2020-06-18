@@ -1,3 +1,8 @@
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
+
 filegroup(
     name = "example_configs",
     srcs = glob([

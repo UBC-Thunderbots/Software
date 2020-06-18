@@ -1,6 +1,9 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
 
 proto_library(
     name = "tbots_proto",
