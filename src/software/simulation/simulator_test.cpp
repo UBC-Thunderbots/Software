@@ -6,6 +6,13 @@
 #include "software/primitive/primitive.h"
 #include "software/test_util/test_util.h"
 
+TEST(SimulatorTest, get_field)
+{
+    Field field = ::TestUtil::createSSLDivBField();
+    Simulator simulator(field);
+    EXPECT_EQ(field, simulator.getField());
+}
+
 TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 {
     Simulator simulator(::TestUtil::createSSLDivBField());
