@@ -99,9 +99,10 @@ typedef enum TrajectoryPlannerGenerationStatus
  * Node1  |--segment length---| Node2
  *   ->   *-------------------*  <-
  */
-void app_trajectory_planner_generateSegmentNodesAndLengths(float t_start, float t_end, Polynomial1dOrder3_t poly,
-                                                           unsigned int num_elements, float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                           float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+void app_trajectory_planner_generateSegmentNodesAndLengths(
+    float t_start, float t_end, Polynomial1dOrder3_t poly, unsigned int num_elements,
+    float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function generates the length of segments in a 2d polynomial. It works as an wrapper
@@ -125,10 +126,11 @@ void app_trajectory_planner_generateSegmentNodesAndLengths(float t_start, float 
  * @param segment_lengths [out] The length of each trajectory segment (euclidean of the XY
  * 2d polynomial)
  */
-void app_trajectory_planner_generateLinearSegmentNodesAndLengths(float t_start,float t_end,
-                                                                 Polynomial2dOrder3_t poly,
-                                                                 unsigned int num_elements, float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                                 float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+void app_trajectory_planner_generateLinearSegmentNodesAndLengths(
+    float t_start, float t_end, Polynomial2dOrder3_t poly, unsigned int num_elements,
+    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function generates a constant parameterization position trajectory (each node is
@@ -174,8 +176,9 @@ void app_trajectory_planner_generateLinearSegmentNodesAndLengths(float t_start,f
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantParameterizationPositionTrajectory(FirmwareRobotPathParameters_t path_parameters,
-                                                                          PositionTrajectory_t *position_trajectory);
+app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
+    FirmwareRobotPathParameters_t path_parameters,
+    PositionTrajectory_t *position_trajectory);
 
 /**
  * Function that modifies an existing speed profile to be backwards continuous. This means
@@ -198,9 +201,10 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(Firmwa
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToBackwardsContinuous(unsigned int num_segments, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                         float max_allowable_acceleration, float initial_speed,
-                                                         float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+app_trajectory_planner_modifySpeedsToBackwardsContinuous(
+    unsigned int num_segments, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_acceleration, float initial_speed,
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function creates a forwards continuous speed profile based on the specified parameters.
@@ -234,10 +238,11 @@ app_trajectory_planner_modifySpeedsToBackwardsContinuous(unsigned int num_segmen
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_createForwardsContinuousSpeedProfile(unsigned int num_elements, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                            float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                            float max_allowable_acceleration, float initial_speed,
-                                                            float final_speed, float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+app_trajectory_planner_createForwardsContinuousSpeedProfile(
+    unsigned int num_elements, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_acceleration, float initial_speed, float final_speed,
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function generates the absolute maximum speed that can occur at any points along the
@@ -266,9 +271,9 @@ app_trajectory_planner_createForwardsContinuousSpeedProfile(unsigned int num_ele
  * contain the absolute maximum allowable speed profile. In m/s.
  */
 void app_trajectory_planner_getMaximumSpeedProfile(
-        Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start, const float t_end,
-        const float max_allowable_acceleration, const float speed_cap,
-        float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+    Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
+    const float t_end, const float max_allowable_acceleration, const float speed_cap,
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function generates the time profile for a speed profile with given segment lengths and
@@ -289,9 +294,10 @@ void app_trajectory_planner_getMaximumSpeedProfile(
  * @param trajectory_durations [out] The duration between successive speed elements in the
  * profile. In seconds.
  */
-void app_trajectory_planner_generatePositionTrajectoryTimeProfile(float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                                  unsigned int num_elements,
-                                                                  float trajectory_durations[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+void app_trajectory_planner_generatePositionTrajectoryTimeProfile(
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], unsigned int num_elements,
+    float trajectory_durations[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function balances the segment time durations of 2 separate speed profiles. The segment
@@ -318,11 +324,11 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile(float segment_
  *
  * @param num_elements [in] The number of elements in both trajectory 1 and 2.
  *
- * @param speeds1 [in/out] The speed profile corresponding to trajectory 1. Speed must have a
- * denominator value of seconds.
+ * @param speeds1 [in/out] The speed profile corresponding to trajectory 1. Speed must
+ * have a denominator value of seconds.
  *
- * @param speeds2 [in/out] The speed profile corresponding to trajectory 2. Speed must have a
- * denominator value of seconds.
+ * @param speeds2 [in/out] The speed profile corresponding to trajectory 2. Speed must
+ * have a denominator value of seconds.
  *
  * @param complete_time_profile [out] The complete time profile of the two balanced
  * trajectories. This profile is absolute time to each point on the profile starting from
@@ -330,11 +336,14 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile(float segment_
  *
  * @return A status indicating whether or not generation was successful
  */
-TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToMatchDuration(float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                   float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float durations2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float num_elements,
-                                                   float speeds1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float speeds2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-                                                   float complete_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
+TrajectoryPlannerGenerationStatus_t app_trajectory_planner_modifySpeedsToMatchDuration(
+    float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float num_elements,
+    float speeds1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float complete_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Returns a constant interpolation period (time) trajectory based on an input trajectory
@@ -363,10 +372,9 @@ app_trajectory_planner_modifySpeedsToMatchDuration(float displacement1[TRAJECTOR
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(PositionTrajectory_t *variable_period_trajectory,
-                                                                   float interpolation_period,
-                                                                   unsigned int *num_elements,
-                                                                   PositionTrajectory_t *constant_period_trajectory);
+app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
+    PositionTrajectory_t *variable_period_trajectory, float interpolation_period,
+    unsigned int *num_elements, PositionTrajectory_t *constant_period_trajectory);
 
 /**
  * Function generates a constant interpolation period trajectory from the path parameters
@@ -394,9 +402,9 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(PositionTraje
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(float interpolation_period,
-                                                                             FirmwareRobotPathParameters_t *path_parameters,
-                                                                             PositionTrajectory_t *constant_period_trajectory);
+app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+    float interpolation_period, FirmwareRobotPathParameters_t *path_parameters,
+    PositionTrajectory_t *constant_period_trajectory);
 
 /**
  * Function generates a velocity trajectory composed of X/Y/angular velocities and their
@@ -410,9 +418,9 @@ app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(flo
  * equally time-spaced elements. The velocity trajectory has the name number of elements
  * as the input position trajectory.
  */
-void
-app_trajectory_planner_generateVelocityTrajectory(PositionTrajectory_t *position_trajectory, unsigned int num_elements,
-                                                  VelocityTrajectory_t *velocity_trajectory);
+void app_trajectory_planner_generateVelocityTrajectory(
+    PositionTrajectory_t *position_trajectory, unsigned int num_elements,
+    VelocityTrajectory_t *velocity_trajectory);
 
 /**
  * Function modifies the value of the argument final speed so that the time duration
@@ -430,5 +438,6 @@ app_trajectory_planner_generateVelocityTrajectory(PositionTrajectory_t *position
  * @param final_speed [in/out] A pointer to the final speed at the end of the segment. In
  * m/s.
  */
-void app_trajectory_planner_modifySpeedToMatchDuration(float initial_speed, float duration, float displacement,
+void app_trajectory_planner_modifySpeedToMatchDuration(float initial_speed,
+                                                       float duration, float displacement,
                                                        float *final_speed);
