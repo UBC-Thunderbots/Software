@@ -112,8 +112,8 @@ void Simulator::stepSimulation(const Duration& time_step)
     // can see and interact with the same ball
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
 
-    auto physics_iterations = static_cast<unsigned int>(std::lrint(time_step.getSeconds() / physics_time_step.getSeconds()));
-    for(size_t i = 0; i < physics_iterations; i++) {
+    Duration remaining_time = time_step;
+    while(remaining_time > Duration::fromSeconds(0)) {
         for (auto& iter : yellow_simulator_robots)
         {
             auto simulator_robot = iter.first;
@@ -130,7 +130,11 @@ void Simulator::stepSimulation(const Duration& time_step)
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 
-        physics_world.stepSimulation(physics_time_step);
+        // We take as many steps of `physics_time_step` as possible, and then
+        // simulate the remainder of the time
+        Duration dt = std::min(remaining_time, physics_time_step);
+        physics_world.stepSimulation(dt);
+        remaining_time = remaining_time - physics_time_step;
     }
 
     frame_number++;
@@ -191,6 +195,10 @@ std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
 
 Field Simulator::getField() const {
     return physics_world.getField();
+}
+
+Timestamp Simulator::getTimestamp() const {
+    return physics_world.getTimestamp();
 }
 
 primitive_params_t Simulator::getPrimitiveParams(

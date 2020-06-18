@@ -13,6 +13,19 @@ TEST(SimulatorTest, get_field)
     EXPECT_EQ(field, simulator.getField());
 }
 
+TEST(SimulatorTest, get_initial_timestamp)
+{
+    Simulator simulator(::TestUtil::createSSLDivBField());
+    EXPECT_EQ(Timestamp::fromSeconds(0), simulator.getTimestamp());
+}
+
+TEST(SimulatorTest, timestamp_updates_with_simulation_steps)
+{
+    Simulator simulator(::TestUtil::createSSLDivBField());
+    simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    EXPECT_EQ(Timestamp::fromSeconds(1.0 / 60.0), simulator.getTimestamp());
+}
+
 TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 {
     Simulator simulator(::TestUtil::createSSLDivBField());

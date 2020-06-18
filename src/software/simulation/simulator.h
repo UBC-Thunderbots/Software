@@ -140,6 +140,13 @@ class Simulator
      */
     Field getField() const;
 
+    /**
+     * Returns the current time in the simulation
+     *
+     * @return the current time in the simulation
+     */
+    Timestamp getTimestamp() const;
+
    private:
     /**
      * Updates the given simulator_robots to contain and control the given physics_robots

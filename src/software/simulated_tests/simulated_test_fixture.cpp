@@ -146,12 +146,11 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
                 ContinuousFunctionValidator(continuous_validation_function, world));
     }
 
-    Timestamp current_time = Timestamp::fromSeconds(0.0);
-    Timestamp timeout_time = current_time + timeout;
+    Timestamp timeout_time = simulator->getTimestamp() + timeout;
     Duration time_step = Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
     auto wall_start_time = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
-    while(current_time < timeout_time) {
+    while(simulator->getTimestamp() < timeout_time) {
         for(size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++) {
             simulator->stepSimulation(time_step);
             updateSensorFusion();
@@ -159,7 +158,6 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
 
         if(auto world_opt = sensor_fusion.getWorld()) {
             *world = world_opt.value();
-            std::cout << world->getMostRecentTimestamp() << std::endl;
 
             validation_functions_done = validate(function_validators, continuous_function_validators);
             if(validation_functions_done) {
@@ -181,11 +179,9 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
             LOG(WARNING) << "SensorFusion did not output a valid World";
         }
 
-        current_time = current_time + time_step;
-
         if (run_simulation_in_realtime)
         {
-            sleep(wall_start_time, current_time);
+            sleep(wall_start_time, simulator->getTimestamp());
         }
     }
 
