@@ -1,3 +1,8 @@
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
+
 cc_library(
     name = "mrf_primitive_visitor",
     srcs = ["mrf_primitive_visitor.cpp"],

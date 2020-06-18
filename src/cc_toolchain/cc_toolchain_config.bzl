@@ -454,8 +454,6 @@ def _linux_gcc_impl(ctx):
         ],
     )
 
-    supports_pic_feature = feature(name = "supports_pic", enabled = True)
-
     stdlib_feature = feature(
         name = "stdlib",
         flag_sets = [
@@ -577,7 +575,6 @@ def _linux_gcc_impl(ctx):
     features = common.values() + [
         static_libgcc,
         pic_feature,
-        supports_pic_feature,
         builtin_include_directories_feature,
         common_feature,
         stdlib_feature,
