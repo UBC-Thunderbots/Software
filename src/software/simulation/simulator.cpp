@@ -14,7 +14,10 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-Simulator::Simulator(const Field& field, const Duration& physics_time_step) : physics_world(field), frame_number(0), physics_time_step(physics_time_step) {}
+Simulator::Simulator(const Field& field, const Duration& physics_time_step)
+    : physics_world(field), frame_number(0), physics_time_step(physics_time_step)
+{
+}
 
 void Simulator::setBallState(const BallState& ball_state)
 {
@@ -113,7 +116,8 @@ void Simulator::stepSimulation(const Duration& time_step)
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
 
     Duration remaining_time = time_step;
-    while(remaining_time > Duration::fromSeconds(0)) {
+    while (remaining_time > Duration::fromSeconds(0))
+    {
         for (auto& iter : yellow_simulator_robots)
         {
             auto simulator_robot = iter.first;
@@ -193,11 +197,13 @@ std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
     return std::move(wrapper_packet);
 }
 
-Field Simulator::getField() const {
+Field Simulator::getField() const
+{
     return physics_world.getField();
 }
 
-Timestamp Simulator::getTimestamp() const {
+Timestamp Simulator::getTimestamp() const
+{
     return physics_world.getTimestamp();
 }
 

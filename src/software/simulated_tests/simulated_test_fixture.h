@@ -4,10 +4,10 @@
 
 #include "software/ai/ai.h"
 #include "software/gui/visualizer/visualizer_wrapper.h"
+#include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/continuous_function_validator.h"
 #include "software/simulated_tests/validation/function_validator.h"
 #include "software/simulation/simulator.h"
-#include "software/sensor_fusion/sensor_fusion.h"
 
 /**
  * This is a test fixture designed to make it easy to write integration tests. It provides
@@ -17,7 +17,7 @@
  */
 class SimulatedTest : public ::testing::Test
 {
-public:
+   public:
     explicit SimulatedTest();
 
    protected:
@@ -53,11 +53,9 @@ public:
      * If the test has not passed by the time this timeout is exceeded, the test
      * will fail.
      */
-    void runTest(
-            const std::vector<ValidationFunction> &validation_functions,
-            const std::vector<ValidationFunction> &continuous_validation_functions,
-            const Duration& timeout
-            );
+    void runTest(const std::vector<ValidationFunction>& validation_functions,
+                 const std::vector<ValidationFunction>& continuous_validation_functions,
+                 const Duration& timeout);
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -106,7 +104,7 @@ public:
      */
     Field field() const;
 
-private:
+   private:
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator
      */
@@ -123,18 +121,20 @@ private:
      * @return true if there is at least one FunctionValidator and all FunctionValidators
      * have completed, and false otherwise
      */
-    static bool validate(std::vector<FunctionValidator>& function_validators,
-                         std::vector<ContinuousFunctionValidator>& continuous_function_validators);
+    static bool validate(
+        std::vector<FunctionValidator>& function_validators,
+        std::vector<ContinuousFunctionValidator>& continuous_function_validators);
 
     /**
-     * Puts the current thread to sleep until the difference between the current wall time and the
-     * wall_start_time is >= the difference between current_time and zero. This "synchronizes"
-     * wall time with simulation time by slowing down execution if needed.
+     * Puts the current thread to sleep until the difference between the current wall time
+     * and the wall_start_time is >= the difference between current_time and zero. This
+     * "synchronizes" wall time with simulation time by slowing down execution if needed.
      *
      * @param wall_start_time The time at which the simulated test started, in wall time
      * @param current_time The current time in the simulated test
      */
-    static void sleep(const std::chrono::steady_clock::time_point& wall_start_time, const Timestamp& current_time);
+    static void sleep(const std::chrono::steady_clock::time_point& wall_start_time,
+                      const Timestamp& current_time);
 
     // The simulator needs to be a pointer so that we can destroy and re-create
     // the object in the SetUp function. Because the simulator has no

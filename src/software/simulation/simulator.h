@@ -68,7 +68,9 @@ class Simulator
      * and robot primitives. The default value is approximately how often
      * the robot firmware updates.
      */
-    explicit Simulator(const Field& field, const Duration& physics_time_step = Duration::fromSeconds(1.0 / 200.0));
+    explicit Simulator(const Field& field,
+                       const Duration& physics_time_step = Duration::fromSeconds(1.0 /
+                                                                                 200.0));
     Simulator() = delete;
 
     /**

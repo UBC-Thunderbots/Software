@@ -1,7 +1,8 @@
+#include "software/simulated_tests/simulated_test_fixture.h"
+
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
@@ -37,7 +38,8 @@ TEST_F(SimulatedTestFixtureTest, test_single_validation_function_passes_before_t
 
     std::vector<ValidationFunction> continous_validation_functions = {};
 
-    runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(1.0));
+    runTest(validation_functions, continous_validation_functions,
+            Duration::fromSeconds(1.0));
 }
 
 TEST_F(SimulatedTestFixtureTest, test_single_validation_function_fails_if_it_times_out)
@@ -54,7 +56,9 @@ TEST_F(SimulatedTestFixtureTest, test_single_validation_function_fails_if_it_tim
 
     std::vector<ValidationFunction> continous_validation_functions = {};
 
-    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5)), "timeout duration");
+    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions,
+                                    Duration::fromSeconds(0.5)),
+                            "timeout duration");
 }
 
 TEST_F(SimulatedTestFixtureTest,
@@ -74,7 +78,9 @@ TEST_F(SimulatedTestFixtureTest,
 
     std::vector<ValidationFunction> continous_validation_functions = {};
 
-    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(1.0)), "Timestamp");
+    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions,
+                                    Duration::fromSeconds(1.0)),
+                            "Timestamp");
 }
 
 TEST_F(SimulatedTestFixtureTest, test_multiple_validation_function_pass_before_timeout)
@@ -97,7 +103,8 @@ TEST_F(SimulatedTestFixtureTest, test_multiple_validation_function_pass_before_t
 
     std::vector<ValidationFunction> continous_validation_functions = {};
 
-    runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.7));
+    runTest(validation_functions, continous_validation_functions,
+            Duration::fromSeconds(0.7));
 }
 
 TEST_F(SimulatedTestFixtureTest, test_should_fail_if_not_all_validation_functions_pass)
@@ -120,7 +127,9 @@ TEST_F(SimulatedTestFixtureTest, test_should_fail_if_not_all_validation_function
 
     std::vector<ValidationFunction> continous_validation_functions = {};
 
-    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.6)), "timeout duration");
+    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions,
+                                    Duration::fromSeconds(0.6)),
+                            "timeout duration");
 }
 
 TEST_F(SimulatedTestFixtureTest, test_single_continuous_validation_function_passes)
@@ -134,7 +143,8 @@ TEST_F(SimulatedTestFixtureTest, test_single_continuous_validation_function_pass
             EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
         }};
 
-    runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5));
+    runTest(validation_functions, continous_validation_functions,
+            Duration::fromSeconds(0.5));
 }
 
 TEST_F(SimulatedTestFixtureTest, test_multiple_continuous_validation_function_passes)
@@ -151,11 +161,13 @@ TEST_F(SimulatedTestFixtureTest, test_multiple_continuous_validation_function_pa
             EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(100));
         }};
 
-    runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5));
+    runTest(validation_functions, continous_validation_functions,
+            Duration::fromSeconds(0.5));
 }
 
-TEST_F(SimulatedTestFixtureTest,
-       test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail)
+TEST_F(
+    SimulatedTestFixtureTest,
+    test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -177,19 +189,21 @@ TEST_F(SimulatedTestFixtureTest,
     std::vector<ValidationFunction> continous_validation_functions = {
         passing_validation_function, failing_validation_function};
 
-    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5)), "Timestamp");
+    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions,
+                                    Duration::fromSeconds(0.5)),
+                            "Timestamp");
 }
 
 TEST_F(
-        SimulatedTestFixtureTest,
-        test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail_with_different_test_order)
+    SimulatedTestFixtureTest,
+    test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail_with_different_test_order)
 {
     // This test is basically the same as
     // "test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail"
-    // but exists as a regression test because there was a bug with the FunctionValidator and
-    // ContinuousFunctionValidator that caused only the last validation_function in the
-    // vectors to be run, so we re-order the validation_functions in this test to catch future
-    // failures of this type
+    // but exists as a regression test because there was a bug with the FunctionValidator
+    // and ContinuousFunctionValidator that caused only the last validation_function in
+    // the vectors to be run, so we re-order the validation_functions in this test to
+    // catch future failures of this type
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
     // Because the EXPECT_NONFATAL_FAILURE macro only captures a single failure, we have
@@ -212,7 +226,9 @@ TEST_F(
         passing_validation_function,
     };
 
-    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5)), "Timestamp");
+    EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions,
+                                    Duration::fromSeconds(0.5)),
+                            "Timestamp");
 }
 
 TEST_F(SimulatedTestFixtureTest,
@@ -234,5 +250,6 @@ TEST_F(SimulatedTestFixtureTest,
             EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(100));
         }};
 
-    runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5));
+    runTest(validation_functions, continous_validation_functions,
+            Duration::fromSeconds(0.5));
 }
