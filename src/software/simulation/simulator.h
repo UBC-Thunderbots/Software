@@ -121,7 +121,11 @@ class Simulator
      */
     World getWorld() const;
 
+    // TODO
     std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
+
+    // TODO
+    Field getField() const;
 
    private:
     /**

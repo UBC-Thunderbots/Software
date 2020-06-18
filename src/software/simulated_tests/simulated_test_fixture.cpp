@@ -52,6 +52,10 @@ void SimulatedTest::addEnemyRobots(const std::vector<RobotStateWithId> &robots) 
     simulator->addBlueRobots(robots);
 }
 
+Field SimulatedTest::field() const {
+    return simulator->getField();
+}
+
 void SimulatedTest::setFriendlyGoalie(RobotId goalie_id) {
     Util::MutableDynamicParameters->getMutableAIControlConfig()->getMutableRefboxConfig()->mutableFriendlyGoalieId()->setValue(static_cast<int>(goalie_id));
 }

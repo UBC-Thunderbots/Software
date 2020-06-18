@@ -30,6 +30,7 @@ public:
     void setFriendlyGoalie(RobotId goalie_id);
     void setEnemyGoalie(RobotId goalie_id);
     void setPlay(const std::string& play_name);
+    Field field() const;
 
    protected:
     /**

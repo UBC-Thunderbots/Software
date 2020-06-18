@@ -4,9 +4,7 @@
 
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/test_util/test_util.h"
 #include "software/time/duration.h"
-#include "software/time/timestamp.h"
 #include "software/world/world.h"
 
 class KickoffEnemyPlayTest : public SimulatedTest
@@ -15,33 +13,49 @@ class KickoffEnemyPlayTest : public SimulatedTest
 
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    world = ::TestUtil::setEnemyRobotPositions(
-        world,
-        {
-            Point(1, 0),
-            Point(1, 2.5),
-            Point(1, -2.5),
-            world.field().enemyGoalCenter(),
-            world.field().enemyDefenseArea().negXNegYCorner(),
-            world.field().enemyDefenseArea().negXPosYCorner(),
-        },
-        Timestamp::fromSeconds(0));
-
-    world = ::TestUtil::setFriendlyRobotPositions(world,
-                                                  {
-                                                      Point(-3, 2.5),
-                                                      Point(-3, 1.5),
-                                                      Point(-3, 0.5),
-                                                      Point(-3, -0.5),
-                                                      Point(-3, -1.5),
-                                                      Point(-3, 2.5),
-                                                  },
-                                                  Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().assignGoalie(0);
-
-    world.mutableBall() = Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    addFriendlyRobots({
+                              RobotStateWithId{.id = 0, .robot_state = RobotState(Point(-3, 2.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 1, .robot_state = RobotState(Point(-3, 1.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 2, .robot_state = RobotState(Point(-3, 0.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 3, .robot_state = RobotState(Point(-3, -0.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 4, .robot_state = RobotState(Point(-3, -1.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 5, .robot_state = RobotState(Point(-3, -2.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                      });
+    setFriendlyGoalie(0);
+    addEnemyRobots({
+                              RobotStateWithId{.id = 0, .robot_state = RobotState(Point(1, 0), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 1, .robot_state = RobotState(Point(1, 2.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 2, .robot_state = RobotState(Point(1, -2.5), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 3, .robot_state = RobotState(field().enemyGoalCenter(), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 4, .robot_state = RobotState(field().enemyDefenseArea().negXNegYCorner(), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 5, .robot_state = RobotState(field().enemyDefenseArea().negXPosYCorner(), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                      });
+    setPlay(KickoffEnemyPlay::name);
 
     std::vector<ValidationFunction> validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
@@ -57,19 +71,5 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 
     std::vector<ValidationFunction> continous_validation_functions = {};
 
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideAIPlay()
-        ->setValue(true);
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentAIPlay()
-        ->setValue(KickoffEnemyPlay::name);
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
-        ->getMutableRefboxConfig()
-        ->mutableFriendlyGoalieId()
-        ->setValue(0);
-
-    backend->startSimulation(world);
-    bool test_passed = world_state_validator->waitForValidationToPass(
-        validation_functions, continous_validation_functions, Duration::fromSeconds(10));
-    EXPECT_TRUE(test_passed);
+    runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(10));
 }

@@ -186,6 +186,10 @@ std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
     return std::move(wrapper_packet);
 }
 
+Field Simulator::getField() const {
+    return physics_world.getField();
+}
+
 primitive_params_t Simulator::getPrimitiveParams(
     const std::unique_ptr<Primitive>& primitive)
 {
