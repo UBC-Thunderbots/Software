@@ -148,9 +148,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
                     next_path_cost_and_end_dist_heuristic)
             {
                 open_list.insert(
-                    CoordinateWithHeuristic{.coordinate = next,
-                                            .path_cost_and_end_dist_heuristic =
-                                                next_path_cost_and_end_dist_heuristic});
+                    std::make_pair(next_path_cost_and_end_dist_heuristic, next));
 
                 // Update the details of this CellHeuristic
                 cell_heuristics[next.row()][next.col()].update(
@@ -197,8 +195,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     // Initialising the parameters of the starting cell
     cell_heuristics[start_coord.row()][start_coord.col()].update(start_coord, 0.0, 0.0);
-    open_list.insert(CoordinateWithHeuristic{.coordinate = start_coord,
-                                             .path_cost_and_end_dist_heuristic = 0.0});
+    open_list.insert(std::make_pair(0.0, start_coord));
 
     bool found_end = findPathToEnd(end_coord);
 
@@ -276,7 +273,7 @@ bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
 {
     while (!open_list.empty())
     {
-        Coordinate current_coord(open_list.begin()->coordinate);
+        Coordinate current_coord(open_list.begin()->second);
 
         // Remove this vertex from the open list
         open_list.erase(open_list.begin());
