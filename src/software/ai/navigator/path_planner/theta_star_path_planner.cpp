@@ -138,11 +138,11 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
                 updated_best_path_cost + coordDistance(next, end);
 
             // If it isn’t on the open list, add it to the open list. Make the current
-            // square the parent of this square. Record f, and best_path_cost of the
-            // square CellHeuristic
-            //             OR
+            // square the parent of this square. Record path_cost_and_end_dist_heuristic,
+            // and best_path_cost of the square CellHeuristic
+            //                               OR
             // If it is on the open list already, check to see if this path to that square
-            // is better, using 'f' cost as the measure.
+            // is better, using path_cost_and_end_dist_heuristic as the measure.
             if (!cell_heuristics[next.row()][next.col()].isInitialized() ||
                 cell_heuristics[next.row()][next.col()].pathCostAndEndDistHeuristic() >
                     next_path_cost_and_end_dist_heuristic)
