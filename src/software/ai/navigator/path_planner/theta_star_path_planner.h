@@ -343,7 +343,10 @@ class ThetaStarPathPlanner : public PathPlanner
     double max_navigable_x_coord;
     double max_navigable_y_coord;
 
-    // open_list represents Coordinates that we'd like to visit
+    // open_list represents Coordinates that we'd like to visit. Elements are pairs of
+    // path_cost_and_end_dist_heuristic and Coordinate, so the set is implicitly ordered
+    // by path_cost_and_end_dist_heuristic. This ensures that open_list.begin() is the
+    // Coordinate with the lowest path_cost_and_end_dist_heuristic
     std::set<std::pair<double, Coordinate>> open_list;
 
     // closed_list represent coords we've already visited so
