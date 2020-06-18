@@ -1,6 +1,9 @@
-package(default_visibility = ["//visibility:public"])
-
 load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
+
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
 
 cc_binary(
     name = "frankie_v1_main",

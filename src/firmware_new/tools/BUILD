@@ -1,3 +1,8 @@
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
+
 sh_binary(
     name = "debug_firmware_on_arm_board",
     srcs = ["debug_firmware_on_arm_board.sh"],

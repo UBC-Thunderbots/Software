@@ -1,3 +1,8 @@
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
+
 sh_binary(
     name = "legacy_flash_firmware",
     srcs = ["legacy_flash_firmware.sh"],
