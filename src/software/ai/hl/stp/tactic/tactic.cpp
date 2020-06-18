@@ -38,8 +38,8 @@ std::shared_ptr<Action> Tactic::getNextAction(void)
     std::shared_ptr<Action> next_action = nullptr;
     if (!robot)
     {
-//        LOG(WARNING) << "Requesting the next Action for a Tactic without a Robot assigned"
-//                     << std::endl;
+        LOG(WARNING) << "Requesting the next Action for a Tactic without a Robot assigned"
+                     << std::endl;
     }
     else
     {
