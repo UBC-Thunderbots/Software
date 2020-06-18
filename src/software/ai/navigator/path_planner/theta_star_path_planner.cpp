@@ -107,7 +107,7 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(const Coordinate &end) const
 }
 
 bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordinate &next,
-                                        const Coordinate &end, double marginal_dist)
+                                        const Coordinate &end)
 {
     // Only process this CellHeuristic if this is a navigable one
     if (isCoordNavigable(next))
@@ -131,7 +131,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
                 next_parent = current;
                 updated_best_path_cost =
                     cell_heuristics[current.row()][current.col()].bestPathCost() +
-                    marginal_dist;
+                    coordDistance(current, next);
             }
 
             double next_path_cost_and_end_dist_heuristic =
@@ -147,7 +147,10 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
                 cell_heuristics[next.row()][next.col()].pathCostAndEndDistHeuristic() >
                     next_path_cost_and_end_dist_heuristic)
             {
-                open_list.insert(next);
+                open_list.insert(
+                    CoordinateWithHeuristic{.coordinate = next,
+                                            .path_cost_and_end_dist_heuristic =
+                                                next_path_cost_and_end_dist_heuristic});
 
                 // Update the details of this CellHeuristic
                 cell_heuristics[next.row()][next.col()].update(
@@ -194,7 +197,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     // Initialising the parameters of the starting cell
     cell_heuristics[start_coord.row()][start_coord.col()].update(start_coord, 0.0, 0.0);
-    open_list.insert(start_coord);
+    open_list.insert(CoordinateWithHeuristic{.coordinate = start_coord,
+                                             .path_cost_and_end_dist_heuristic = 0.0});
 
     bool found_end = findPathToEnd(end_coord);
 
@@ -272,7 +276,7 @@ bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
 {
     while (!open_list.empty())
     {
-        Coordinate current_coord(*open_list.begin());
+        Coordinate current_coord(open_list.begin()->coordinate);
 
         // Remove this vertex from the open list
         open_list.erase(open_list.begin());
@@ -317,13 +321,11 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
     {
         for (int y_offset : {-1, 0, 1})
         {
-            double dist_to_neighbour =
-                std::sqrt(std::pow(x_offset, 2) + std::pow(y_offset, 2));
             next_coord = Coordinate(i + x_offset, j + y_offset);
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
             {
-                if (updateVertex(current_coord, next_coord, end_coord, dist_to_neighbour))
+                if (updateVertex(current_coord, next_coord, end_coord))
                 {
                     return true;
                 }

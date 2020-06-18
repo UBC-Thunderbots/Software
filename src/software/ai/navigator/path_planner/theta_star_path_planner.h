@@ -61,6 +61,17 @@ class ThetaStarPathPlanner : public PathPlanner
         }
     };
 
+    struct CoordinateWithHeuristic
+    {
+        Coordinate coordinate;
+        double path_cost_and_end_dist_heuristic;
+        bool operator<(const CoordinateWithHeuristic other) const
+        {
+            return path_cost_and_end_dist_heuristic <
+                   other.path_cost_and_end_dist_heuristic;
+        }
+    };
+
     class CellHeuristic
     {
        public:
@@ -182,12 +193,11 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param current The current cell
      * @param next    The next cell to be updated
      * @param end     The end cell
-     * @param marginal_dist The distance between current and next
      *
      * @return true if next is the end
      */
     bool updateVertex(const Coordinate &current, const Coordinate &next,
-                      const Coordinate &end, double marginal_dist);
+                      const Coordinate &end);
 
     /**
      * Checks for line of sight between Coordinates
@@ -345,7 +355,7 @@ class ThetaStarPathPlanner : public PathPlanner
     double max_navigable_y_coord;
 
     // open_list represents Coordinates that we'd like to visit
-    std::set<Coordinate> open_list;
+    std::set<CoordinateWithHeuristic> open_list;
 
     // closed_list represent coords we've already visited so
     // it contains coords for which we calculated the CellHeuristic
