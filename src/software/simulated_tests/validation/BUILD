@@ -52,20 +52,3 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
-
-cc_library(
-    name = "world_state_validator",
-    srcs = ["world_state_validator.cpp"],
-    hdrs = ["world_state_validator.h"],
-    deps = [
-        ":continuous_function_validator",
-        ":function_validator",
-        ":validation_function",
-        "//software/logger",
-        "//software/multithreading:subject",
-        "//software/multithreading:thread_safe_buffer",
-        "//software/multithreading:threaded_observer",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)

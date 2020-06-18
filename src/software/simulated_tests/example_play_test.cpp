@@ -13,7 +13,6 @@ class ExamplePlayTest : public SimulatedTest
 
 TEST_F(ExamplePlayTest, test_example_play)
 {
-    enableVisualizer();
     setBallState(BallState(Point(-0.8, 0), Vector(0, 0)));
     addFriendlyRobots({
                               RobotStateWithId{.id = 0, .robot_state = RobotState(Point(4, 0), Vector(0, 0),
@@ -49,7 +48,7 @@ TEST_F(ExamplePlayTest, test_example_play)
                     {
                         double abs_error =
                             std::fabs((robot.position() - ball_position).length() - 1.0);
-                        if (abs_error > 0.1)
+                        if (abs_error > 0.05)
                         {
                             return false;
                         }

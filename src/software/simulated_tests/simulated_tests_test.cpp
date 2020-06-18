@@ -1,52 +1,29 @@
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
-#include "software/logger/logger.h"
-#include "software/simulated_tests/mock_ai_wrapper.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
 /**
- * This class replaces the AIWrapper from the SimulatedTest with a MockAIWrapper,
- * so that any AI logic does not affect these tests.
- *
  * These tests are designed to validate that all the components of the simulated testing
- * system work together as expected. This includes the SimulatorBackend simulating and
- * publishing the world correctly, the WorldStateValidator performing checks as expected,
- * and the flow of control going through the AI and then back to the SimulatedBackend. We
- * use the MockAIWrapper so that we are not testing any behaviour relating to the AI,
- * just the testing infrastructure.
+ * system work together as expected. This includes
+ * - The simulation updating SensorFusion and the AI as expected
+ * - The validation functions correctly validating the state of the
+ *   world and failing when expected.
+ *
+ * NOTE: All these tests use validation functions that assert various things about the
+ * timestamp of the world. There is no physics or AI directly involved in these tests,
+ * they are as simple as possible and only test the behavior of the validation
+ * functions and test pipeline
  */
-class MockSimulatedTest : public SimulatedTest
+class SimulatedTestFixtureTest : public SimulatedTest
 {
-   protected:
-//    void SetUp() override
-//    {
-//        LoggerSingleton::initializeLogger();
-//        backend = std::make_shared<SimulatorBackend>(
-//            Duration::fromMilliseconds(5), Duration::fromSeconds(1.0 / 30.0),
-//            SimulatorBackend::SimulationSpeed::FAST_SIMULATION);
-//        world_state_validator = std::make_shared<WorldStateValidator>();
-//        mock_ai_wrapper       = std::make_shared<MockAIWrapper>();
-//
-//        backend->Subject<World>::registerObserver(world_state_validator);
-//        world_state_validator->Subject<World>::registerObserver(mock_ai_wrapper);
-//        mock_ai_wrapper->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
-//    }
-
-//    std::shared_ptr<MockAIWrapper> mock_ai_wrapper;
 };
 
-// NOTE: All these tests use validation functions that assert various things about the
-// timestamp of the world. There is no physics or AI directly involved in these tests,
-// they are as simple as possible and only test the behavior of the validation
-// functions and test pipeline
-
-TEST_F(MockSimulatedTest, test_single_validation_function_passes_before_timeout)
+TEST_F(SimulatedTestFixtureTest, test_single_validation_function_passes_before_timeout)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -63,7 +40,7 @@ TEST_F(MockSimulatedTest, test_single_validation_function_passes_before_timeout)
     runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(1.0));
 }
 
-TEST_F(MockSimulatedTest, test_single_validation_function_fails_if_it_times_out)
+TEST_F(SimulatedTestFixtureTest, test_single_validation_function_fails_if_it_times_out)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -80,7 +57,7 @@ TEST_F(MockSimulatedTest, test_single_validation_function_fails_if_it_times_out)
     EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5)), "timeout duration");
 }
 
-TEST_F(MockSimulatedTest,
+TEST_F(SimulatedTestFixtureTest,
        test_gtest_expect_statement_in_validation_function_causes_test_to_fail)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -100,7 +77,7 @@ TEST_F(MockSimulatedTest,
     EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(1.0)), "Timestamp");
 }
 
-TEST_F(MockSimulatedTest, test_multiple_validation_function_pass_before_timeout)
+TEST_F(SimulatedTestFixtureTest, test_multiple_validation_function_pass_before_timeout)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -123,7 +100,7 @@ TEST_F(MockSimulatedTest, test_multiple_validation_function_pass_before_timeout)
     runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.7));
 }
 
-TEST_F(MockSimulatedTest, test_should_fail_if_not_all_validation_functions_pass)
+TEST_F(SimulatedTestFixtureTest, test_should_fail_if_not_all_validation_functions_pass)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -146,7 +123,7 @@ TEST_F(MockSimulatedTest, test_should_fail_if_not_all_validation_functions_pass)
     EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.6)), "timeout duration");
 }
 
-TEST_F(MockSimulatedTest, test_single_continuous_validation_function_passes)
+TEST_F(SimulatedTestFixtureTest, test_single_continuous_validation_function_passes)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -160,7 +137,7 @@ TEST_F(MockSimulatedTest, test_single_continuous_validation_function_passes)
     runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5));
 }
 
-TEST_F(MockSimulatedTest, test_multiple_continuous_validation_function_passes)
+TEST_F(SimulatedTestFixtureTest, test_multiple_continuous_validation_function_passes)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -177,7 +154,7 @@ TEST_F(MockSimulatedTest, test_multiple_continuous_validation_function_passes)
     runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5));
 }
 
-TEST_F(MockSimulatedTest,
+TEST_F(SimulatedTestFixtureTest,
        test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -204,8 +181,8 @@ TEST_F(MockSimulatedTest,
 }
 
 TEST_F(
-    MockSimulatedTest,
-    test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail_with_different_test_order)
+        SimulatedTestFixtureTest,
+        test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail_with_different_test_order)
 {
     // This test is basically the same as
     // "test_failing_gtest_expect_statement_in_continuous_validation_function_causes_test_to_fail"
@@ -238,7 +215,7 @@ TEST_F(
     EXPECT_NONFATAL_FAILURE(runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(0.5)), "Timestamp");
 }
 
-TEST_F(MockSimulatedTest,
+TEST_F(SimulatedTestFixtureTest,
        test_validation_and_continuous_validation_functions_pass_together)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
