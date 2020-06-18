@@ -1,4 +1,7 @@
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
 
 # We force linking for all plays so that the static variables required for the
 # "factory" design pattern to work are linked in

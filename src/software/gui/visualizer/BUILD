@@ -1,6 +1,9 @@
 load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
 
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
 
 cc_library(
     name = "visualizer_wrapper",

@@ -1,6 +1,9 @@
 load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
 
-package(default_visibility = ["//software/gui/robot_diagnostics:__subpackages__"])
+package(
+    default_visibility = ["//software/gui/robot_diagnostics:__subpackages__"],
+    features = ["warnings_as_errors"],
+)
 
 qt_cc_library(
     name = "robot_diagnostics_widget",

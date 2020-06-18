@@ -1,4 +1,7 @@
-package(default_visibility = ["//software/ai/hl/stp/action:__subpackages__"])
+package(
+    default_visibility = ["//software/ai/hl/stp/action:__subpackages__"],
+    features = ["warnings_as_errors"],
+)
 
 cc_library(
     name = "move_test_action",

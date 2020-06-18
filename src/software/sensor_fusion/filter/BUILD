@@ -1,4 +1,7 @@
-package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
+package(
+    default_visibility = ["//software/sensor_fusion:__subpackages__"],
+    features = ["warnings_as_errors"],
+)
 
 cc_library(
     name = "vision_detection",

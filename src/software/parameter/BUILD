@@ -1,4 +1,7 @@
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
 
 filegroup(
     name = "yaml_config_descriptions",

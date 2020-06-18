@@ -1,4 +1,7 @@
-package(default_visibility = ["//software/gui/visualizer:__subpackages__"])
+package(
+    default_visibility = ["//software/gui/visualizer:__subpackages__"],
+    features = ["warnings_as_errors"],
+)
 
 cc_library(
     name = "geometry_conversion",

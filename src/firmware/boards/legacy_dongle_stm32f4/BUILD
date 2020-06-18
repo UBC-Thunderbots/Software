@@ -1,4 +1,7 @@
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
 
 load("//firmware/boards/shared:rules.bzl", "legacy_freertos_and_stm32_lib")
 load("//firmware/boards/shared/legacy_usb:rules.bzl", "legacy_usb_lib")

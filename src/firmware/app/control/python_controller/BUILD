@@ -1,4 +1,7 @@
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["warnings_as_errors"],
+)
 
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@python_control_deps//:requirements.bzl", "requirement")

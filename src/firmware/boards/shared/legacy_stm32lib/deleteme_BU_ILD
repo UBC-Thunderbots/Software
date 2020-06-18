@@ -1,4 +1,4 @@
-package(default_visibility = ["//visibility:public"])
+package(features=["warnings_as_errors"],default_visibility = ["//visibility:public"])
 
 exports_files([
     "stm32f405.ld",
