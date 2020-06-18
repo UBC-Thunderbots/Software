@@ -14,11 +14,9 @@ void SimulatedTest::SetUp()
 {
     LoggerSingleton::initializeLogger();
 
-    // Reset all DynamicParameters for each test. The
-    // (const) DynamicParameters will be updated automatically since they reference
-    // the mutable ones
-    // TODO: this causes a sigabrt in the visiaulizer, probably because the address changes
-//    *(Util::MutableDynamicParameters) = ThunderbotsConfig();
+    // TODO: Ideally we should reset all DynamicParameters for each test. However
+    // because DynamicParameters are still partially global, this can't be done
+    // until https://github.com/UBC-Thunderbots/Software/issues/1483 is complete
 
     // Re-create all objects for each test so we start from a clean setup
     // every time. Because the simulator is created initially in the constructor's
@@ -27,6 +25,8 @@ void SimulatedTest::SetUp()
     simulator = std::make_unique<Simulator>(::TestUtil::createSSLDivBField());
     ai = AI(Util::DynamicParameters->getAIConfig(), Util::DynamicParameters->getAIControlConfig());
     sensor_fusion = SensorFusion();
+
+    Util::MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
@@ -83,8 +83,8 @@ void SimulatedTest::enableVisualizer()
     run_simulation_in_realtime = true;
 }
 
-bool SimulatedTest::validateWorld(std::vector<FunctionValidator> &function_validators,
-                                  std::vector<ContinuousFunctionValidator> &continuous_function_validators) {
+bool SimulatedTest::validate(std::vector<FunctionValidator> &function_validators,
+                             std::vector<ContinuousFunctionValidator> &continuous_function_validators) {
     for (auto &continuous_function_validator : continuous_function_validators)
     {
         continuous_function_validator.executeAndCheckForFailures();
@@ -97,7 +97,7 @@ bool SimulatedTest::validateWorld(std::vector<FunctionValidator> &function_valid
     return function_validators.empty() ? false : validation_successful;
 }
 
-std::optional<World> SimulatedTest::getSensorFusionWorld() {
+void SimulatedTest::updateSensorFusion() {
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
 
@@ -105,7 +105,6 @@ std::optional<World> SimulatedTest::getSensorFusionWorld() {
     sensor_msg.set_allocated_ssl_vision_msg(ssl_wrapper_packet.release());
 
     sensor_fusion.updateWorld(sensor_msg);
-    return sensor_fusion.getWorld();
 }
 
 void SimulatedTest::sleep(const std::chrono::steady_clock::time_point &wall_start_time,
@@ -127,8 +126,9 @@ void SimulatedTest::sleep(const std::chrono::steady_clock::time_point &wall_star
 void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_functions,
                             const std::vector<ValidationFunction> &continuous_validation_functions,
                             const Duration &timeout) {
+    updateSensorFusion();
     std::shared_ptr<World> world;
-    if(auto world_opt = getSensorFusionWorld()) {
+    if(auto world_opt = sensor_fusion.getWorld()) {
         world = std::make_shared<World>(world_opt.value());
     }else {
         FAIL() << "Invalid initial world state";
@@ -148,16 +148,19 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
 
     Timestamp current_time = Timestamp::fromSeconds(0.0);
     Timestamp timeout_time = current_time + timeout;
-    Duration dt = Duration::fromSeconds(1.0 / 60.0);
+    Duration time_step = Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
     auto wall_start_time = std::chrono::steady_clock::now();
     bool validation_passed = false;
     while(current_time < timeout_time) {
-        simulator->stepSimulation(dt);
+        for(size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++) {
+            simulator->stepSimulation(time_step);
+            updateSensorFusion();
+        }
 
-        if(auto world_opt = getSensorFusionWorld()) {
+        if(auto world_opt = sensor_fusion.getWorld()) {
             *world = world_opt.value();
 
-            validation_passed = validateWorld(function_validators, continuous_function_validators);
+            validation_passed = validate(function_validators, continuous_function_validators);
             if(validation_passed) {
                 break;
             }
@@ -177,7 +180,7 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
             LOG(WARNING) << "SensorFusion did not output a valid World";
         }
 
-        current_time = current_time + dt;
+        current_time = current_time + time_step;
 
         if (run_simulation_in_realtime)
         {
@@ -185,7 +188,7 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
         }
     }
 
-    if (validation_passed) {
+    if (validation_passed || validation_functions.empty()) {
         SUCCEED();
     }else {
         ADD_FAILURE() << "Not all validation functions passed within the timeout duration";

@@ -64,8 +64,11 @@ class Simulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param physics_time_step The time step used to simulated physics
+     * and robot primitives. The default value is approximately how often
+     * the robot firmware updates.
      */
-    explicit Simulator(const Field& field);
+    explicit Simulator(const Field& field, const Duration& physics_time_step = Duration::fromSeconds(1.0 / 200.0));
     Simulator() = delete;
 
     /**
@@ -108,7 +111,7 @@ class Simulator
 
     /**
      * Advances the simulation by the given time step. This will simulate
-     * physics and primitives
+     * one "camera frame" of data and increase the camera_frame value by 1.
      *
      * @param time_step how much to advance the simulation by
      */
@@ -121,10 +124,20 @@ class Simulator
      */
     World getWorld() const;
 
-    // TODO
+    /**
+     * Returns an SSL_WrapperPacket representing the most recent state
+     * of the simulation
+     *
+     * @return an SSL_WrapperPacket represetnging the most recent state
+     * of the simulation
+     */
     std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
 
-    // TODO
+    /**
+     * Returns the field in the simulation
+     *
+     * @return the field in the simulation
+     */
     Field getField() const;
 
    private:
@@ -179,6 +192,9 @@ class Simulator
         blue_simulator_robots;
 
     unsigned int frame_number;
+
+    // The time step used to simulate physics and primitives
+    const Duration physics_time_step;
 
     // The camera ID of all SSLDetectionFrames published by the simulator.
     // This simulates having a single camera that can see the entire field

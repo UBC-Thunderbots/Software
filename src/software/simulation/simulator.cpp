@@ -14,7 +14,7 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-Simulator::Simulator(const Field& field) : physics_world(field), frame_number(0) {}
+Simulator::Simulator(const Field& field, const Duration& physics_time_step) : physics_world(field), frame_number(0), physics_time_step(physics_time_step) {}
 
 void Simulator::setBallState(const BallState& ball_state)
 {
@@ -112,23 +112,26 @@ void Simulator::stepSimulation(const Duration& time_step)
     // can see and interact with the same ball
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
 
-    for (auto& iter : yellow_simulator_robots)
-    {
-        auto simulator_robot = iter.first;
-        auto firmware_world  = iter.second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
-    }
+    auto physics_iterations = static_cast<unsigned int>(std::lrint(time_step.getSeconds() / physics_time_step.getSeconds()));
+    for(size_t i = 0; i < physics_iterations; i++) {
+        for (auto& iter : yellow_simulator_robots)
+        {
+            auto simulator_robot = iter.first;
+            auto firmware_world  = iter.second;
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+        }
 
-    for (auto& iter : blue_simulator_robots)
-    {
-        auto simulator_robot = iter.first;
-        auto firmware_world  = iter.second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
-    }
+        for (auto& iter : blue_simulator_robots)
+        {
+            auto simulator_robot = iter.first;
+            auto firmware_world  = iter.second;
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+        }
 
-    physics_world.stepSimulation(time_step);
+        physics_world.stepSimulation(physics_time_step);
+    }
 
     frame_number++;
 }

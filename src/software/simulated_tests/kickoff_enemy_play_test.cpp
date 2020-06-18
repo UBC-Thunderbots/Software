@@ -55,6 +55,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                                                                                   Angle::zero(),
                                                                                   AngularVelocity::zero())},
                       });
+    setEnemyGoalie(0);
     setPlay(KickoffEnemyPlay::name);
 
     std::vector<ValidationFunction> validation_functions = {
