@@ -26,6 +26,7 @@ TEST_F(NewPlayTest, FooTest)
 //        RobotStateWithId{.id = 5, .robot_state = RobotState(Point(4, -3), Vector(0, 0), Angle::zero(), AngularVelocity::zero())},
     });
     setPlay(ExamplePlay::name);
+    setFriendlyGoalie(99);
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

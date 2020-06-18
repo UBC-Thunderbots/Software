@@ -4,9 +4,7 @@
 
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/test_util/test_util.h"
 #include "software/time/duration.h"
-#include "software/time/timestamp.h"
 #include "software/world/world.h"
 
 class ExamplePlayTest : public SimulatedTest
@@ -15,13 +13,32 @@ class ExamplePlayTest : public SimulatedTest
 
 TEST_F(ExamplePlayTest, test_example_play)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
-    world =
-        ::TestUtil::setFriendlyRobotPositions(world,
-                                              {Point(4, 0), Point(0.5, 0), Point(-3, 1),
-                                               Point(-1, -3), Point(2, 0), Point(3.5, 3)},
-                                              Timestamp::fromSeconds(0));
-    world.mutableBall() = Ball(Point(-0.8, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    enableVisualizer();
+    setBallState(BallState(Point(-0.8, 0), Vector(0, 0)));
+    addFriendlyRobots({
+                              RobotStateWithId{.id = 0, .robot_state = RobotState(Point(4, 0), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 1, .robot_state = RobotState(Point(0.5, 0), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 2, .robot_state = RobotState(Point(-3, 1), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 3, .robot_state = RobotState(Point(-1, -3), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 4, .robot_state = RobotState(Point(2, 0), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                              RobotStateWithId{.id = 5, .robot_state = RobotState(Point(3.5, 3), Vector(0, 0),
+                                                                                  Angle::zero(),
+                                                                                  AngularVelocity::zero())},
+                      });
+    // Set the goalie ID to that of a non-existent robot so that all robots
+    // take on non-goalie roles
+    setFriendlyGoalie(99);
+    setPlay(ExamplePlay::name);
 
     std::vector<ValidationFunction> validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -32,7 +49,7 @@ TEST_F(ExamplePlayTest, test_example_play)
                     {
                         double abs_error =
                             std::fabs((robot.position() - ball_position).length() - 1.0);
-                        if (abs_error > 0.01)
+                        if (abs_error > 0.1)
                         {
                             return false;
                         }
@@ -48,15 +65,5 @@ TEST_F(ExamplePlayTest, test_example_play)
 
     std::vector<ValidationFunction> continous_validation_functions = {};
 
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideAIPlay()
-        ->setValue(true);
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentAIPlay()
-        ->setValue(ExamplePlay::name);
-
-    backend->startSimulation(world);
-    bool test_passed = world_state_validator->waitForValidationToPass(
-        validation_functions, continous_validation_functions, Duration::fromSeconds(8));
-    EXPECT_TRUE(test_passed);
+    runTest(validation_functions, continous_validation_functions, Duration::fromSeconds(8));
 }
