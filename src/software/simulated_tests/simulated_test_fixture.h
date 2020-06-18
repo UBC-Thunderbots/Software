@@ -113,15 +113,15 @@ private:
     void updateSensorFusion();
 
     /**
-     * Runs the given function validators and returns whether or not the validation passed.
-     * Validation only passes if there is at least one FunctionValidator, and all
-     * FunctionValidators pass.
+     * Runs the given function validators and returns whether or not the
+     * FunctionValidators have completed (Note completed does not necessarily
+     * mean passed).
      *
      * @param function_validators The FunctionValidators to check
      * @param continuous_function_validators The ContinuousFunctionValidators to check
      *
      * @return true if there is at least one FunctionValidator and all FunctionValidators
-     * pass, and false otherwise
+     * have completed, and false otherwise
      */
     static bool validate(std::vector<FunctionValidator>& function_validators,
                          std::vector<ContinuousFunctionValidator>& continuous_function_validators);

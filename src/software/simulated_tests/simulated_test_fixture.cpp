@@ -150,7 +150,7 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
     Timestamp timeout_time = current_time + timeout;
     Duration time_step = Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
     auto wall_start_time = std::chrono::steady_clock::now();
-    bool validation_passed = false;
+    bool validation_functions_done = false;
     while(current_time < timeout_time) {
         for(size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++) {
             simulator->stepSimulation(time_step);
@@ -159,9 +159,10 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
 
         if(auto world_opt = sensor_fusion.getWorld()) {
             *world = world_opt.value();
+            std::cout << world->getMostRecentTimestamp() << std::endl;
 
-            validation_passed = validate(function_validators, continuous_function_validators);
-            if(validation_passed) {
+            validation_functions_done = validate(function_validators, continuous_function_validators);
+            if(validation_functions_done) {
                 break;
             }
 
@@ -188,9 +189,7 @@ void SimulatedTest::runTest(const std::vector<ValidationFunction> &validation_fu
         }
     }
 
-    if (validation_passed || validation_functions.empty()) {
-        SUCCEED();
-    }else {
+    if(!validation_functions_done && !validation_functions.empty()) {
         ADD_FAILURE() << "Not all validation functions passed within the timeout duration";
     }
 }
