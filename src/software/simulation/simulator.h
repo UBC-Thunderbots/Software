@@ -69,7 +69,7 @@ class Simulator
      */
     explicit Simulator(const Field& field,
                        const Duration& physics_time_step =
-                           Duration::fromSeconds(PHYSICS_TIME_STEP_SECONDS));
+                           Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
 
     /**
@@ -210,5 +210,5 @@ class Simulator
     static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
     // 200Hz is approximately how fast our robot firmware runs, so we
     // mimic that here for physics and primitive updates
-    static constexpr double PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
+    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
 };
