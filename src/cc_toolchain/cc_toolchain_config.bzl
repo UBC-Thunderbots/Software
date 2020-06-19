@@ -191,25 +191,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Werror"] +
-                                # disable warnings that occur in external libraries
-                                ["-Wno-implicit-fallthrough", "-Wno-unused-parameter"] +
-                                ctx.attr.host_compiler_warnings,
-                    ),
-                ],
-            ),
-        ],
-    )
-
-    result["warnings_cpp_feature"] = feature(
-        name = "warnings_cpp",
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(
-                        # warn variable length arrays only when compiling cpp
-                        flags = ["-Wvla"] +
+                        flags = ["-Werror"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -564,7 +546,6 @@ def _linux_gcc_impl(ctx):
             "colour",
             "determinism",
             "warnings_as_errors",
-            "warnings_cpp",
             "hardening",
             "build-id",
             "no-canonical-prefixes",
@@ -740,8 +721,8 @@ def _stm32_impl(ctx):
             "stdlib",
             "c++17",
             "colour",
+            "warnings_as_errors",
             "determinism",
-            #TODO (Issue #1475): enable warning_as_errors when we remove legacy_robot_stm32f4
             "no-canonical-prefixes",
         ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
             "stm32f4",
