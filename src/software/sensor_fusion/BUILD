@@ -24,6 +24,7 @@ cc_library(
     deps = [
         ":refbox_data",
         "//software/backend:robot_status",
+        "//software/logger",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/parameter:dynamic_parameters",

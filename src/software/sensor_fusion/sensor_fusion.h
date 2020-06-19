@@ -3,8 +3,6 @@
 #include <google/protobuf/repeated_field.h>
 
 #include "software/backend/robot_status.h"
-#include "software/multithreading/subject.h"
-#include "software/multithreading/threaded_observer.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_referee.h"
