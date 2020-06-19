@@ -7,19 +7,22 @@ ThreadedSimulator::~ThreadedSimulator() {
 }
 
 void ThreadedSimulator::registerOnSSLWrapperPacketReadyCallback(const std::function<void (SSL_WrapperPacket)>& callback) {
+    std::scoped_lock lock(callback_mutex);
     ssl_wrapper_packet_callbacks.emplace_back(callback);
 }
 
 void ThreadedSimulator::startSimulation() {
+    std::scoped_lock lock(simulation_thread_started_mutex);
     // Start the thread to do the simulation in the background
-    if(!simulation_thread_started.load()) {
+    if(!simulation_thread_started) {
         simulation_thread_started = true;
         simulation_thread = std::thread(&ThreadedSimulator::runSimulationLoop, this);
     }
 }
 
 void ThreadedSimulator::stopSimulation() {
-    if (simulation_thread_started.load())
+    std::scoped_lock lock(simulation_thread_started_mutex);
+    if (simulation_thread_started)
     {
         simulation_thread_started = false;
 
@@ -77,11 +80,17 @@ void ThreadedSimulator::runSimulationLoop() {
         assert(ssl_wrapper_packet_ptr);
         SSL_WrapperPacket ssl_wrapper_packet = *(ssl_wrapper_packet_ptr.release());
 
-        for(const auto& callback : ssl_wrapper_packet_callbacks) {
-            callback(ssl_wrapper_packet);
+        {
+            std::scoped_lock lock(callback_mutex);
+            for(const auto& callback : ssl_wrapper_packet_callbacks) {
+                callback(ssl_wrapper_packet);
+            }
         }
 
+
         auto simulation_step_end_time = simulation_step_start_time + std::chrono::microseconds(static_cast<unsigned int>(TIME_STEP_SECONDS * MICROSECONDS_PER_SECOND));
+        // TODO: Warn or indicate if we are running slower than real-time
+        // https://github.com/UBC-Thunderbots/Software/issues/1491
         std::this_thread::sleep_until(simulation_step_end_time);
     }
 }

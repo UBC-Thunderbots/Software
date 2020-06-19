@@ -25,6 +25,8 @@ public:
      * called each time the simulation updates and a new SSL_WrapperPacket
      * is generated.
      *
+     * Note: This function is threadsafe
+     *
      * @param callback The callback function to register
      */
     void registerOnSSLWrapperPacketReadyCallback(const std::function<void(SSL_WrapperPacket)>& callback);
@@ -32,12 +34,16 @@ public:
     /**
      * Starts running the simulator in a new thread. This is a non-blocking call.
      * If the simulator is already running, this function does nothing.
+     *
+     * Note: This function is threadsafe
      */
     void startSimulation();
 
     /**
      * Stops the simulation if it is running. If the simulation is not already
      * running, this function does nothing.
+     *
+     * Note: This function is threadsafe
      */
     void stopSimulation();
 
@@ -47,6 +53,8 @@ public:
      * is added with the given state. If a ball already exists, it's state is set to the
      * given state.
      *
+     * Note: This function is threadsafe.
+     *
      * @param ball_state The new ball state
      */
     void setBallState(const BallState& ball_state);
@@ -54,11 +62,15 @@ public:
     /**
      * Removes the ball from the physics world. If a ball does not already exist,
      * this has no effect.
+     *
+     * Note: This function is threadsafe.
      */
     void removeBall();
 
     /**
      * Adds robots to the specified team with the given initial states.
+     *
+     * Note: These functions are threadsafe.
      *
      * @pre The robot IDs must not be duplicated and must not match the ID
      * of any robot already on the specified team.
@@ -74,6 +86,8 @@ public:
     /**
      * Sets the primitives being simulated by the robots in simulation
      *
+     * Note: These functions are threadsafe.
+     *
      * @param primitives The primitives to simulate
      */
     void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
@@ -82,16 +96,24 @@ public:
 private:
     /**
      * The function that runs inside the simulation thread, handling
-     * updating the simulation and calling the callback functions
+     * updating the simulation and calling the callback functions.
+     *
+     * Note that because this function puts the simulation thread to
+     * sleep in order to simulate real-time simulation (ie. simulation
+     * time passes at the same speed as wall time), this means we will
+     * always run at realtime or slightly slower because of timing jitter
+     * due to the thread scheduler.
      */
     void runSimulationLoop();
 
     std::vector<std::function<void(SSL_WrapperPacket)>> ssl_wrapper_packet_callbacks;
+    std::mutex callback_mutex;
 
     Simulator simulator;
     std::mutex simulator_mutex;
     std::thread simulation_thread;
-    std::atomic_bool simulation_thread_started;
+    bool simulation_thread_started;
+    std::mutex simulation_thread_started_mutex;
     std::atomic_bool stopping_simulation;
 
     // 60HZ is approximately the framerate of the real-life cameras
