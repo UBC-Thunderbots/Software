@@ -25,6 +25,9 @@ cc_library(
     name = "trajectory_planner_impl",
     srcs = ["trajectory_planner_impl.c"],
     hdrs = ["trajectory_planner_impl.h"],
+    visibility = [
+        "//visibility:private",
+    ],
     deps = [
         "//firmware/shared:physics",
         "//firmware/shared/math:polynomial_1d",

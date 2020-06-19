@@ -27,16 +27,16 @@ void app_trajectory_planner_getMaximumSpeedProfile_impl(
     }
 }
 
-void app_trajectory_planner_generateSegmentNodesAndLengths_impl(
-    float t_start, float t_end, Polynomial1dOrder3_t poly, unsigned int num_elements,
-    float *node_values, float *segment_lengths)
+void app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+        float t_start, float t_end, Polynomial1dOrder3_t path_1d, unsigned int num_elements,
+        float *node_values, float *segment_lengths)
 {
     // Check that the pre conditions are met
     assert(num_elements > 2);
     assert(num_elements <= TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS);
     assert(t_start != t_end);
 
-    node_values[0] = shared_polynomial1d_getValueOrder3(poly, t_start);
+    node_values[0] = shared_polynomial1d_getValueOrder3(path_1d, t_start);
 
     const float t_segment_size = (t_end - t_start) / (num_elements - 1);
 
@@ -45,7 +45,7 @@ void app_trajectory_planner_generateSegmentNodesAndLengths_impl(
         const float current_t = t_start + i * t_segment_size;
 
         // Grab the states at each 't' value
-        node_values[i] = shared_polynomial1d_getValueOrder3(poly, current_t);
+        node_values[i] = shared_polynomial1d_getValueOrder3(path_1d, current_t);
 
         // Calculate the length of each segment and store it
         const float segment_length = node_values[i] - node_values[i - 1];
@@ -54,18 +54,18 @@ void app_trajectory_planner_generateSegmentNodesAndLengths_impl(
     }
 }
 
-void app_trajectory_planner_generateLinearSegmentNodesAndLengths_impl(
-    float t_start, float t_end, Polynomial2dOrder3_t poly, unsigned int num_elements,
-    float *x_values, float *y_values, float *segment_lengths)
+void app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
+        float t_start, float t_end, Polynomial2dOrder3_t path_2d, unsigned int num_elements,
+        float *x_values, float *y_values, float *segment_lengths)
 {
     // Hold into the x and y segment lengths to calculate the combined segment length
     float x_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float y_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
-    app_trajectory_planner_generateSegmentNodesAndLengths_impl(
-        t_start, t_end, poly.x, num_elements, x_values, x_lengths);
-    app_trajectory_planner_generateSegmentNodesAndLengths_impl(
-        t_start, t_end, poly.y, num_elements, y_values, y_lengths);
+    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+            t_start, t_end, path_2d.x, num_elements, x_values, x_lengths);
+    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+            t_start, t_end, path_2d.y, num_elements, y_values, y_lengths);
 
     // total length is the root sum-squared of the individual values
     for (unsigned int i = 0; i < num_elements; i++)
@@ -101,20 +101,18 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
     }
 }
 
-void app_trajectory_planner_modifySpeedToMatchDuration_impl(float initial_speed,
+float app_trajectory_planner_modifySpeedToMatchDuration_impl(float initial_speed,
                                                             float duration,
-                                                            float displacement,
-                                                            float *final_speed)
+                                                            float displacement)
 {
     // Calculate the new final speed based on the initial speed, displacement, and
     // the desired duration in time
-    const float new_speed = (2 * displacement / duration) + initial_speed;
-    *final_speed          = new_speed;
+    return (2 * displacement / duration) + initial_speed;
 }
 
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToMatchDuration_impl(
+app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
     float *displacement1, float *displacement2, float *durations1, float *durations2,
     float num_elements, float *speeds1, float *speeds2, float *complete_time_profile)
 {
@@ -132,8 +130,8 @@ app_trajectory_planner_modifySpeedsToMatchDuration_impl(
             const float desired_duration = durations1[i];
             float *final_speed_to_change = &speeds2[i + 1];
 
-            app_trajectory_planner_modifySpeedToMatchDuration_impl(
-                current_speed, desired_duration, displacement, final_speed_to_change);
+            *final_speed_to_change = app_trajectory_planner_modifySpeedToMatchDuration_impl(
+                current_speed, desired_duration, displacement);
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else if (durations2[i] > durations1[i] && displacement2[i] != 0)
@@ -143,8 +141,8 @@ app_trajectory_planner_modifySpeedsToMatchDuration_impl(
             const float desired_duration = durations2[i];
             float *final_speed_to_change = &speeds1[i + 1];
 
-            app_trajectory_planner_modifySpeedToMatchDuration_impl(
-                current_speed, desired_duration, displacement, final_speed_to_change);
+            *final_speed_to_change = app_trajectory_planner_modifySpeedToMatchDuration_impl(
+                current_speed, desired_duration, displacement);
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else
@@ -192,7 +190,7 @@ app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
 }
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToBackwardsContinuous_impl(
+app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
     unsigned int num_segments, float *segment_lengths, float max_allowable_acceleration,
     float initial_speed, float *speeds)
 {

@@ -40,13 +40,13 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     float angular_segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     // Generate the states and segment lengths for each dimension
-    app_trajectory_planner_generateLinearSegmentNodesAndLengths_impl(
-        t_start, t_end, path_parameters.path, num_elements, x_profile, y_profile,
-        linear_segment_lengths);
+    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
+            t_start, t_end, path_parameters.path, num_elements, x_profile, y_profile,
+            linear_segment_lengths);
 
-    app_trajectory_planner_generateSegmentNodesAndLengths_impl(
-        t_start, t_end, theta_poly, num_elements, orientation_profile,
-        angular_segment_lengths);
+    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+            t_start, t_end, theta_poly, num_elements, orientation_profile,
+            angular_segment_lengths);
 
     // Generate the max allowable speed profile for linear and angular profile
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -85,17 +85,17 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     }
 
     // Make the speed profiles backwards continuous
-    status = app_trajectory_planner_modifySpeedsToBackwardsContinuous_impl(
-        num_elements, linear_segment_lengths, max_linear_acceleration,
-        initial_linear_speed, linear_speed);
+    status = app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
+            num_elements, linear_segment_lengths, max_linear_acceleration,
+            initial_linear_speed, linear_speed);
     if (status != OK)
     {
         return status;
     }
 
-    status = app_trajectory_planner_modifySpeedsToBackwardsContinuous_impl(
-        num_elements, angular_segment_lengths, max_angular_acceleration,
-        initial_angular_speed, angular_speed);
+    status = app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
+            num_elements, angular_segment_lengths, max_angular_acceleration,
+            initial_angular_speed, angular_speed);
     if (status != OK)
     {
         return status;
@@ -111,10 +111,10 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
         angular_segment_lengths, angular_speed, num_elements, angular_time_profile);
 
     // Calculate the time duration of the trajectory at each segment node
-    app_trajectory_planner_modifySpeedsToMatchDuration_impl(
-        linear_segment_lengths, angular_segment_lengths, linear_time_profile,
-        angular_time_profile, num_elements, linear_speed, angular_speed,
-        position_trajectory->time_profile);
+    app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
+            linear_segment_lengths, angular_segment_lengths, linear_time_profile,
+            angular_time_profile, num_elements, linear_speed, angular_speed,
+            position_trajectory->time_profile);
 
     return OK;
 }
