@@ -108,7 +108,8 @@ typedef struct VelocityTrajectory
  * and profile of the trajectory.
  *
  * @param position_trajectory [out] The trajectory data struct to be modified to contain
- * the position trajectory. path_parameters.num_elements number of elements will be assigned to each of the trajectory member array.
+ * the position trajectory. path_parameters.num_elements number of elements will be
+ * assigned to each of the trajectory member array.
  *
  * @return A status indicating whether or not generation was successful
  */
@@ -124,8 +125,8 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
  * calculate) then interpolate a constant period trajectory. This is valuable for discrete
  * time motion controllers that operate only at constant delta-time intervals
  *
- * NOTE: This function does not make any modifications to the dynamics of the trajectory. It will output a physically
- * invalid trajectory if the input trajectory is invalid
+ * NOTE: This function does not make any modifications to the dynamics of the trajectory.
+ * It will output a physically invalid trajectory if the input trajectory is invalid
  *
  * @param variable_period_trajectory [in] The variable-period trajectory that will be used
  * to generate the constant-period trajectory.

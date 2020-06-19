@@ -28,8 +28,8 @@ void app_trajectory_planner_getMaximumSpeedProfile_impl(
 }
 
 void app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
-        float t_start, float t_end, Polynomial1dOrder3_t path_1d, unsigned int num_elements,
-        float *node_values, float *segment_lengths)
+    float t_start, float t_end, Polynomial1dOrder3_t path_1d, unsigned int num_elements,
+    float *node_values, float *segment_lengths)
 {
     // Check that the pre conditions are met
     assert(num_elements > 2);
@@ -55,17 +55,17 @@ void app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
 }
 
 void app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
-        float t_start, float t_end, Polynomial2dOrder3_t path_2d, unsigned int num_elements,
-        float *x_values, float *y_values, float *segment_lengths)
+    float t_start, float t_end, Polynomial2dOrder3_t path_2d, unsigned int num_elements,
+    float *x_values, float *y_values, float *segment_lengths)
 {
     // Hold into the x and y segment lengths to calculate the combined segment length
     float x_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float y_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
-            t_start, t_end, path_2d.x, num_elements, x_values, x_lengths);
+        t_start, t_end, path_2d.x, num_elements, x_values, x_lengths);
     app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
-            t_start, t_end, path_2d.y, num_elements, y_values, y_lengths);
+        t_start, t_end, path_2d.y, num_elements, y_values, y_lengths);
 
     // total length is the root sum-squared of the individual values
     for (unsigned int i = 0; i < num_elements; i++)
@@ -102,8 +102,8 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
 }
 
 float app_trajectory_planner_modifySpeedToMatchDuration_impl(float initial_speed,
-                                                            float duration,
-                                                            float displacement)
+                                                             float duration,
+                                                             float displacement)
 {
     // Calculate the new final speed based on the initial speed, displacement, and
     // the desired duration in time
@@ -130,8 +130,9 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
             const float desired_duration = durations1[i];
             float *final_speed_to_change = &speeds2[i + 1];
 
-            *final_speed_to_change = app_trajectory_planner_modifySpeedToMatchDuration_impl(
-                current_speed, desired_duration, displacement);
+            *final_speed_to_change =
+                app_trajectory_planner_modifySpeedToMatchDuration_impl(
+                    current_speed, desired_duration, displacement);
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else if (durations2[i] > durations1[i] && displacement2[i] != 0)
@@ -141,8 +142,9 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
             const float desired_duration = durations2[i];
             float *final_speed_to_change = &speeds1[i + 1];
 
-            *final_speed_to_change = app_trajectory_planner_modifySpeedToMatchDuration_impl(
-                current_speed, desired_duration, displacement);
+            *final_speed_to_change =
+                app_trajectory_planner_modifySpeedToMatchDuration_impl(
+                    current_speed, desired_duration, displacement);
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else
@@ -171,8 +173,7 @@ app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
 
         // Vf = sqrtf( Vi^2 + 2*constant_segment_length*max_acceleration)
         float temp_vel =
-            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
-                speed, displacement, max_allowable_acceleration);
+            shared_physics_getFinalSpeed(speed, displacement, max_allowable_acceleration);
 
         // Pick  the lowest of the maximum the available speeds
         const float lowest_speed = fmin(max_allowable_speed_profile[i], temp_vel);
@@ -200,9 +201,8 @@ app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
         const float previous_speed = speeds[i - 1];
         const float segment_length = segment_lengths[i - 1];
 
-        float temp_speed =
-            shared_physics_calculateFinalSpeedFromDisplacementInitialSpeedAndAcceleration(
-                current_speed, segment_length, max_allowable_acceleration);
+        float temp_speed = shared_physics_getFinalSpeed(current_speed, segment_length,
+                                                        max_allowable_acceleration);
 
         // If the velocity at [i-1] is larger than it physically possible to decelerate
         // from, pull the speed at [i-1] lower
