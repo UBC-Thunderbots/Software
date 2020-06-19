@@ -87,7 +87,6 @@ void io_proto_multicast_sender_Task(void* arg)
     //
     // We use IP6_ADDR_ANY which will default to the ethernet interface on the STM32H7
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
-    netconn_bind(conn, IP6_ADDR_ANY, comm_profile->port);
     netconn_join_leave_group(conn, comm_profile->multicast_address, NULL, NETCONN_JOIN);
 
     // this buffer is used to hold serialized proto
@@ -111,7 +110,7 @@ void io_proto_multicast_sender_Task(void* arg)
 
         // package payload and send over udp
         tx_buf->p->payload = buffer;
-        netconn_send(conn, tx_buf);
+        netconn_sendto(conn, tx_buf, comm_profile->multicast_address, comm_profile->port);
 
         netbuf_delete(tx_buf);
     }
