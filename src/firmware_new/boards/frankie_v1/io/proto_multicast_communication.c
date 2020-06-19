@@ -16,8 +16,8 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 
-static osEventFlagsId_t networking_event;
 static uint32_t NETIF_CONFIGURED = 1 << 0;
+static osEventFlagsId_t networking_event;
 
 /**
  * ProtoMulticastCommunicationProfile_t contains the common information
@@ -41,12 +41,16 @@ typedef struct ProtoMulticastCommunicationProfile
     // communication_event: these events will be used to control when the networking
     // tasks run. The networking tasks will also signal certain events
     osEventFlagsId_t communication_event;
-    osEventFlagsId_t netif_event;
 
     // mutex to protect the protobuf struct
     osMutexId_t profile_mutex;
 
 } ProtoMulticastCommunicationProfile_t;
+
+void io_proto_multicast_communication_init(void)
+{
+    networking_event = osEventFlagsNew(NULL);
+}
 
 ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_create(
     const char* profile_name, const char* multicast_address, uint16_t port,
@@ -67,6 +71,8 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
     profile->communication_event = osEventFlagsNew(NULL);
     profile->multicast_address   = (ip_addr_t*)malloc(sizeof(ip_addr_t));
     ip6addr_aton(multicast_address, profile->multicast_address);
+
+    return profile;
 }
 
 void io_proto_multicast_sender_Task(void* arg)
@@ -92,9 +98,11 @@ void io_proto_multicast_sender_Task(void* arg)
 
     for (;;)
     {
-        osEventFlagsWait(comm_profile, UPDATED_PROTO, osFlagsWaitAny, osWaitForever);
-        tx_buf = netbuf_new();
+        /*osEventFlagsWait(comm_profile->communication_event, UPDATED_PROTO, osFlagsWaitAny,*/
+                         /*osWaitForever);*/
+        osDelay(100);
 
+        tx_buf = netbuf_new();
         netbuf_alloc(tx_buf, comm_profile->message_max_size);
 
         // serialize proto
@@ -103,9 +111,8 @@ void io_proto_multicast_sender_Task(void* arg)
 
         // package payload and send over udp
         tx_buf->p->payload = buffer;
-        netconn_sendto(conn, tx_buf, comm_profile->multicast_address, comm_profile->port);
+        netconn_send(conn, tx_buf);
 
-        osThreadYield();
         netbuf_delete(tx_buf);
     }
 }
@@ -120,6 +127,7 @@ void io_proto_multicast_listener_Task(void* arg)
     // Bind the socket to the multicast address and port we then use that comm_profile
     // profile to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
+    netconn_set_ipv6only(conn, true);
     netconn_bind(conn, comm_profile->multicast_address, comm_profile->port);
     netconn_join_leave_group(conn, comm_profile->multicast_address, NULL, NETCONN_JOIN);
 
@@ -153,7 +161,6 @@ void io_proto_multicast_listener_Task(void* arg)
 
 void io_proto_multicast_startNetworkingTask(void* arg)
 {
-    networking_event = osEventFlagsNew(NULL);
     MX_LWIP_Init();
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
     osThreadExit();

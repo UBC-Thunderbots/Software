@@ -36,6 +36,8 @@ typedef enum
  *         |                               |         |                              |
  *         +-------------------------------+         +------------------------------+
  *
+ * @param arg The pointer to the allocated communication profile to use for the Task
+ * NOTE: These functions must run as a new Task
  */
 void io_proto_multicast_sender_Task(void* arg);
 void io_proto_multicast_listener_Task(void* arg);
@@ -54,6 +56,11 @@ void io_proto_multicast_listener_Task(void* arg);
  * has been called and the network link is configured and up.
  */
 void io_proto_multicast_startNetworkingTask(void* arg);
+
+/**
+ * Initiallizes the proto_multicast_communication library
+ */
+void io_proto_multicast_communication_init(void);
 
 /**
  * Create an ProtoMulticastCommunicationProfile

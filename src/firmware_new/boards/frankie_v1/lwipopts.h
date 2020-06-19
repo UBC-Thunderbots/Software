@@ -50,6 +50,8 @@ extern "C"
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
 /*----- Default Value for LWIP_IGMP: 0 ---*/
 #define LWIP_IGMP 1
+/*----- Default Value for LWIP_TCPIP_CORE_LOCKING: 0 ---*/
+#define LWIP_TCPIP_CORE_LOCKING 1
 /*----- Default Value for MEM_LIBC_MALLOC: 0 ---*/
 #define MEM_LIBC_MALLOC 1
 /*----- Default Value for MEMP_MEM_MALLOC: 0 ---*/

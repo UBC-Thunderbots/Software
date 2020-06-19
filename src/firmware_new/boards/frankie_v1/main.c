@@ -88,8 +88,8 @@ ProtoMulticastCommunicationProfile_t *tbots_robot_msg_sender_profile;
 ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
 ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
 
-TbotsRobotMsg tbots_robot_msg;
 VisionMsg vision_msg;
+TbotsRobotMsg tbots_robot_msg;
 PrimitiveMsg primitive_msg;
 
 /* USER CODE END PV */
@@ -172,6 +172,8 @@ void initIoNetworking()
 {
     // TODO this needs to be hooked up to the channel dial on the robot, when available
     unsigned channel = 0;
+
+    io_proto_multicast_communication_init();
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,

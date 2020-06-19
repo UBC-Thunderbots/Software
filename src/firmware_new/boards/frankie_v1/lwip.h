@@ -40,7 +40,8 @@ extern "C"
 #include "lwip/tcpip.h"
 #endif /* WITH_RTOS */
 
-    /* USER CODE BEGIN 0 */
+/* USER CODE BEGIN 0 */
+#define SYS_LIGHTWEIGHT_PROT 1
 
     /* USER CODE END 0 */
 
