@@ -134,26 +134,24 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
                     coordDistance(current, next);
             }
 
-            double next_path_cost_and_end_dist_heuristic =
+            double next_start_to_end_cost_estimate =
                 updated_best_path_cost + coordDistance(next, end);
 
             // If it isn’t on the open list, add it to the open list. Make the current
-            // square the parent of this square. Record path_cost_and_end_dist_heuristic,
+            // square the parent of this square. Record start_to_end_cost_estimate,
             // and best_path_cost of the square CellHeuristic
             //                               OR
             // If it is on the open list already, check to see if this path to that square
-            // is better, using path_cost_and_end_dist_heuristic as the measure.
+            // is better, using start_to_end_cost_estimate as the measure.
             if (!cell_heuristics[next.row()][next.col()].isInitialized() ||
                 cell_heuristics[next.row()][next.col()].pathCostAndEndDistHeuristic() >
-                    next_path_cost_and_end_dist_heuristic)
+                    next_start_to_end_cost_estimate)
             {
-                open_list.insert(
-                    std::make_pair(next_path_cost_and_end_dist_heuristic, next));
+                open_list.insert(std::make_pair(next_start_to_end_cost_estimate, next));
 
                 // Update the details of this CellHeuristic
                 cell_heuristics[next.row()][next.col()].update(
-                    next_parent, next_path_cost_and_end_dist_heuristic,
-                    updated_best_path_cost);
+                    next_parent, next_start_to_end_cost_estimate, updated_best_path_cost);
             }
             // If the end is the same as the current successor
             if (next == end)

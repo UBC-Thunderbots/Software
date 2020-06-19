@@ -66,7 +66,7 @@ class ThetaStarPathPlanner : public PathPlanner
        public:
         CellHeuristic()
             : parent_(0, 0),
-              path_cost_and_end_dist_heuristic_(0),
+              start_to_end_cost_estimate_(0),
               best_path_cost_(0),
               initialized_(false)
         {
@@ -77,16 +77,16 @@ class ThetaStarPathPlanner : public PathPlanner
          * Once updated, a CellHeuristic is considered intialized
          *
          * @param parent parent
-         * @param path_cost_and_end_dist_heuristic The path cost and end dist heuristic
+         * @param start_to_end_cost_estimate The start to end_cost estimate
          * @param best_path_cost best_path_cost
          */
-        void update(const Coordinate &parent, double path_cost_and_end_dist_heuristic,
+        void update(const Coordinate &parent, double start_to_end_cost_estimate,
                     double best_path_cost)
         {
-            parent_                           = parent;
-            path_cost_and_end_dist_heuristic_ = path_cost_and_end_dist_heuristic;
-            best_path_cost_                   = best_path_cost;
-            initialized_                      = true;
+            parent_                     = parent;
+            start_to_end_cost_estimate_ = start_to_end_cost_estimate;
+            best_path_cost_             = best_path_cost;
+            initialized_                = true;
         }
 
         /**
@@ -100,14 +100,15 @@ class ThetaStarPathPlanner : public PathPlanner
         }
 
         /**
-         * Gets path cost and end dist heuristic, which is the sum of the best path cost
-         * from the cell to end plus the Euclidean distance between the cell and end
+         * Gets start to end cost estimate, which is the sum of the best known real path
+         * cost from the cell to start plus the Euclidean distance between the cell and
+         * end
          *
-         * @return path cost and end dist heuristic
+         * @return start_to_end_cost_estimate
          */
         double pathCostAndEndDistHeuristic() const
         {
-            return path_cost_and_end_dist_heuristic_;
+            return start_to_end_cost_estimate_;
         }
 
         /**
@@ -132,7 +133,7 @@ class ThetaStarPathPlanner : public PathPlanner
 
        private:
         Coordinate parent_;
-        double path_cost_and_end_dist_heuristic_;
+        double start_to_end_cost_estimate_;
         double best_path_cost_;
         bool initialized_;
     };
@@ -344,17 +345,16 @@ class ThetaStarPathPlanner : public PathPlanner
     double max_navigable_y_coord;
 
     // open_list represents Coordinates that we'd like to visit. Elements are pairs of
-    // path_cost_and_end_dist_heuristic and Coordinate, so the set is implicitly ordered
-    // by path_cost_and_end_dist_heuristic. This ensures that open_list.begin() is the
-    // Coordinate with the lowest path_cost_and_end_dist_heuristic
+    // start_to_end_cost_estimate and Coordinate, so the set is implicitly ordered by
+    // start_to_end_cost_estimate (and then by Coordinate to break ties). This ensures
+    // that open_list.begin() is the Coordinate with the lowest start_to_end_cost_estimate
     std::set<std::pair<double, Coordinate>> open_list;
 
     // closed_list represent coords we've already visited so
     // it contains coords for which we calculated the CellHeuristic
     std::set<Coordinate> closed_list;
 
-    // Declare a 2D array of structure to hold the details
-    // of that CellHeuristic
+    // Declare a 2D array of structure to hold the details of that CellHeuristic
     std::vector<std::vector<CellHeuristic>> cell_heuristics;
 
     // The following data structures improve performance by caching the results of
