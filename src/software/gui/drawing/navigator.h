@@ -2,13 +2,13 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "../../ai/navigator/navigator.h"
-#include "../../ai/navigator/obstacle/obstacle.h"
-#include "../geometry_conversion/geometry_conversion.h"
-#include "colors.h"
-#include "draw_functions.h"
-#include "geom.h"
-#include "obstacle_artist.h"
+#include "software/ai/navigator/navigator.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/gui/geometry_conversion/geometry_conversion.h"
+#include "software/gui/drawing/colors.h"
+#include "software/gui/drawing/draw_functions.h"
+#include "software/gui/drawing/geom.h"
+#include "software/gui/drawing/obstacle_artist.h"
 
 /**
  * Gets the draw function for drawing the navigator

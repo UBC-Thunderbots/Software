@@ -1,4 +1,7 @@
-package(default_visibility = ["//software/gui:__subpackages__"])
+package(default_visibility = [
+    "//software/ai:__pkg__",
+    "//software/gui:__subpackages__",
+])
 
 cc_library(
     name = "colors",
