@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation/continuous_function_validator.h"
+#include "software/simulated_tests/validation/non_terminating_function_validator.h"
 
 #include <gtest/gtest.h>
 
@@ -15,7 +15,7 @@ TEST(ContinuousFunctionValidatorTest,
 
     auto world           = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     world->mutableBall() = Ball(Point(-0.1, 0), Vector(0, 0), Timestamp::fromSeconds(0));
-    ContinuousFunctionValidator function_validator(validation_function, world);
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
 
     for (unsigned int i = 0; i < 10; i++)
     {
@@ -46,7 +46,7 @@ TEST(ContinuousFunctionValidatorTest,
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
-    ContinuousFunctionValidator function_validator(validation_function, world);
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
 
     world->mutableBall() = Ball(Point(-2, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     try
@@ -106,7 +106,7 @@ TEST(ContinuousFunctionValidatorTest,
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
-    ContinuousFunctionValidator function_validator(validation_function, world);
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
 
     function_validator.executeAndCheckForFailures();
     function_validator.executeAndCheckForFailures();

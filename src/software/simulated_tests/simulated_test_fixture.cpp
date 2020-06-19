@@ -115,8 +115,8 @@ void SimulatedTestFixture::enableVisualizer()
 }
 
 bool SimulatedTestFixture::validateAndCheckCompletion(
-    std::vector<FunctionValidator> &function_validators,
-    std::vector<ContinuousFunctionValidator> &continuous_function_validators)
+    std::vector<TerminatingFunctionValidator> &function_validators,
+    std::vector<NonTerminatingFunctionValidator> &continuous_function_validators)
 {
     for (auto &continuous_function_validator : continuous_function_validators)
     {
@@ -125,7 +125,7 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
 
     bool validation_successful =
         std::all_of(function_validators.begin(), function_validators.end(),
-                    [](FunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
+                    [](TerminatingFunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
 
     return function_validators.empty() ? false : validation_successful;
 }
@@ -177,13 +177,13 @@ void SimulatedTestFixture::runTest(
 
     for (const auto &validation_function : validation_functions)
     {
-        function_validators.emplace_back(FunctionValidator(validation_function, world));
+        function_validators.emplace_back(TerminatingFunctionValidator(validation_function, world));
     }
 
     for (const auto &continuous_validation_function : continuous_validation_functions)
     {
         continuous_function_validators.emplace_back(
-            ContinuousFunctionValidator(continuous_validation_function, world));
+                NonTerminatingFunctionValidator(continuous_validation_function, world));
     }
 
     Timestamp timeout_time         = simulator->getTimestamp() + timeout;

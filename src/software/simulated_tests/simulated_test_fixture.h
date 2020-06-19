@@ -5,8 +5,8 @@
 #include "software/ai/ai.h"
 #include "software/gui/visualizer/visualizer_wrapper.h"
 #include "software/sensor_fusion/sensor_fusion.h"
-#include "software/simulated_tests/validation/continuous_function_validator.h"
-#include "software/simulated_tests/validation/function_validator.h"
+#include "software/simulated_tests/validation/non_terminating_function_validator.h"
+#include "software/simulated_tests/validation/terminating_function_validator.h"
 #include "software/simulation/simulator.h"
 
 /**
@@ -122,8 +122,8 @@ class SimulatedTestFixture : public ::testing::Test
      * have completed, and false otherwise
      */
     static bool validateAndCheckCompletion(
-        std::vector<FunctionValidator>& function_validators,
-        std::vector<ContinuousFunctionValidator>& continuous_function_validators);
+        std::vector<TerminatingFunctionValidator>& function_validators,
+        std::vector<NonTerminatingFunctionValidator>& continuous_function_validators);
 
     /**
      * Puts the current thread to sleep until the difference between the current wall time
@@ -146,8 +146,8 @@ class SimulatedTestFixture : public ::testing::Test
     // The AI being tested and used in simulation
     AI ai;
 
-    std::vector<ContinuousFunctionValidator> continuous_function_validators;
-    std::vector<FunctionValidator> function_validators;
+    std::vector<NonTerminatingFunctionValidator> continuous_function_validators;
+    std::vector<TerminatingFunctionValidator> function_validators;
 
     std::shared_ptr<VisualizerWrapper> visualizer;
     // If false, runs the simulation as fast as possible.

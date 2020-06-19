@@ -10,7 +10,7 @@
  * This class will run the provided coroutine continuously by restarting it every time the
  * coroutine has completed.
  */
-class ContinuousFunctionValidator
+class NonTerminatingFunctionValidator
 {
    public:
     /**
@@ -21,8 +21,8 @@ class ContinuousFunctionValidator
      * @param world The world that will be given to the ValidationFunction in order to run
      * it
      */
-    explicit ContinuousFunctionValidator(ValidationFunction validation_function,
-                                         std::shared_ptr<World> world);
+    explicit NonTerminatingFunctionValidator(ValidationFunction validation_function,
+                                             std::shared_ptr<World> world);
 
     /**
      * Runs the ValidationFunction that was given to this FunctionValidator on

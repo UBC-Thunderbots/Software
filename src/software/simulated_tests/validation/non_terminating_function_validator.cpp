@@ -1,29 +1,29 @@
-#include "software/simulated_tests/validation/continuous_function_validator.h"
+#include "software/simulated_tests/validation/non_terminating_function_validator.h"
 
 #include <boost/bind.hpp>
 
-ContinuousFunctionValidator::ContinuousFunctionValidator(
+NonTerminatingFunctionValidator::NonTerminatingFunctionValidator(
     ValidationFunction validation_function, std::shared_ptr<World> world)
     :  // We need to provide the world and validation_function in the coroutine function
        // binding so that the wrapper function has access to the correct variable context,
        // otherwise the World inside the coroutine will not update properly when the
        // pointer is updated, and the wrong validation_function may be run.
       validation_sequence(
-          boost::bind(&ContinuousFunctionValidator::executeAndCheckForFailuresWrapper,
+          boost::bind(&NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper,
                       this, _1, world, validation_function)),
       world_(world),
       validation_function_(validation_function)
 {
 }
 
-void ContinuousFunctionValidator::executeAndCheckForFailures()
+void NonTerminatingFunctionValidator::executeAndCheckForFailures()
 {
     // Check the coroutine status to see if it has any more work to do.
     if (!validation_sequence)
     {
         // Re-start the coroutine by re-creating it
         validation_sequence = ValidationCoroutine::pull_type(
-            boost::bind(&ContinuousFunctionValidator::executeAndCheckForFailuresWrapper,
+            boost::bind(&NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper,
                         this, _1, world_, validation_function_));
     }
 
@@ -32,7 +32,7 @@ void ContinuousFunctionValidator::executeAndCheckForFailures()
     validation_sequence();
 }
 
-void ContinuousFunctionValidator::executeAndCheckForFailuresWrapper(
+void NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper(
     ValidationCoroutine::push_type &yield, std::shared_ptr<World> world,
     ValidationFunction validation_function)
 {

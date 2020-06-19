@@ -10,7 +10,7 @@
  * This class will run the provided coroutine a single time and stop once it has
  * completed. The coroutine will NOT be restarted upon completion.
  */
-class FunctionValidator
+class TerminatingFunctionValidator
 {
    public:
     /**
@@ -21,8 +21,8 @@ class FunctionValidator
      * @param world The world that will be given to the ValidationFunction in order to run
      * it
      */
-    explicit FunctionValidator(ValidationFunction validation_function,
-                               std::shared_ptr<World> world);
+    explicit TerminatingFunctionValidator(ValidationFunction validation_function,
+                                          std::shared_ptr<World> world);
 
     /**
      * Runs the ValidationFunction that was given to this FunctionValidator on
