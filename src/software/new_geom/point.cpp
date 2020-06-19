@@ -81,37 +81,6 @@ bool Point::collinear(const Point &a, const Point &b, const Point &c,
     return almostEqual(v1.x() * v2.y(), v1.y() * v2.x(), fixed_epsilon, ulps_epsilon);
 }
 
-std::optional<Point> Point::intersection(const Point &a, const Point &b, const Point &c,
-                                         const Point &d, double fixed_epsilon,
-                                         int ulps_epsilon)
-{
-    double x1 = a.x();
-    double y1 = a.y();
-    double x2 = b.x();
-    double y2 = b.y();
-    double x3 = c.x();
-    double y3 = c.y();
-    double x4 = d.x();
-    double y4 = d.y();
-
-    double denominatorTermA = (x1 - x2) * (y3 - y4);
-    double denominatorTermB = (y1 - y2) * (x3 - x4);
-    double denominator      = denominatorTermA - denominatorTermB;
-
-    if (almostEqual(denominatorTermA, denominatorTermB, fixed_epsilon, ulps_epsilon))
-    {
-        return std::nullopt;
-    }
-
-    double determinantA = x1 * y2 - y1 * x2;
-    double determinantB = x3 * y4 - y3 * x4;
-
-    Point intersection(
-        (determinantA * (x3 - x4) - (x1 - x2) * determinantB) / denominator,
-        (determinantA * (y3 - y4) - (y1 - y2) * determinantB) / denominator);
-
-    return std::make_optional(intersection);
-}
 
 bool Point::isClose(const Point &other, double dist) const
 {

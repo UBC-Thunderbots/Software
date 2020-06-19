@@ -172,27 +172,3 @@ TEST(CollinearPointsTest, vertically_collinear_points)
     Point r(202.00000000000003, -0.5);
     EXPECT_TRUE(Point::collinear(p, q, r));
 }
-
-TEST(PointsIntersectionTest, test_intersection)
-{
-    auto point_of_intersection =
-        Point::intersection(Point(0, -3), Point(3, 6), Point(0, 4), Point(1, 8));
-
-    EXPECT_EQ(point_of_intersection.value(), Point(-7, -24));
-}
-
-TEST(PointsIntersectionTest, test_overlapping_not_intersecting)
-{
-    auto point_of_intersection =
-        Point::intersection(Point(0, -3), Point(3, 6), Point(1, 0), Point(2, 3));
-
-    EXPECT_FALSE(point_of_intersection.has_value());
-}
-
-TEST(PointsIntersectionTest, test_other_intersection)
-{
-    auto point_of_intersection =
-        Point::intersection(Point(-1, -1), Point(5, -1), Point(0, 2), Point(10, 8));
-
-    EXPECT_EQ(point_of_intersection.value(), Point(-5, -1));
-}

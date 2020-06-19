@@ -4,6 +4,43 @@
 
 #include "software/new_geom/rectangle.h"
 
+TEST(SegmentSegmentIntersectionsTest, test_segments_single_point_intersection)
+{
+    Segment a                        = Segment(Point(2, 2), Point(-2, -2));
+    Segment b                        = Segment(Point(-2, 2), Point(2, -2));
+    std::vector<Point> intersections = intersection(a, b);
+    EXPECT_EQ(intersections.size(), 1);
+    EXPECT_EQ(intersections[0], Point());
+}
+
+TEST(SegmentSegmentIntersectionsTest, test_segments_no_intersection)
+{
+    Segment a                        = Segment(Point(5, 2), Point(-2, -2));
+    Segment b                        = Segment(Point(-3, -3), Point(-9, 10));
+    std::vector<Point> intersections = intersection(a, b);
+    EXPECT_EQ(intersections.size(), 0);
+}
+
+TEST(SegmentSegmentIntersectionsTest, test_segments_overlapping)
+{
+    Segment a                        = Segment(Point(0, 3), Point(5, 3));
+    Segment b                        = Segment(Point(1, 3), Point(4, 3));
+    std::vector<Point> intersections = intersection(a, b);
+    EXPECT_EQ(intersections.size(), 2);
+    EXPECT_EQ(intersections[0], Point(1, 3));
+    EXPECT_EQ(intersections[1], Point(4, 3));
+}
+
+TEST(SegmentIntersectionsTest, test_same_segments)
+{
+    Segment a                        = Segment(Point(2, 2), Point(-2, -2));
+    std::vector<Point> intersections = intersection(a, a);
+    EXPECT_EQ(intersections.size(), 2);
+    EXPECT_TRUE((intersections[0] == Point(2, 2)) || (intersections[1] == Point(2, 2)));
+    EXPECT_TRUE((intersections[0] == Point(-2, -2)) ||
+                (intersections[1] == Point(-2, -2)));
+}
+
 TEST(RectangleSegmentIntersectionsTest, test_no_intersections_segment_inside)
 {
     Rectangle r                             = Rectangle(Point(), Point(5, 5));

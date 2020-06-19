@@ -31,6 +31,20 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
                                   int ulps_epsilon     = GeomConstants::ULPS_EPSILON_TEN);
 
 /**
+ * Computes the intersection of two segments.
+ *
+ * @param first
+ * @param second
+ *
+ * @return  one of:
+ *          - an empty vector if no intersections
+ *          - a vector containing a single point of intersection
+ *          - a vector containing two points representing the line segment of the overlap
+ * if both segments are collinear and overlapping
+ */
+std::vector<Point> intersection(const Segment &first, const Segment &second);
+
+/**
  * Computes the points of intersection between a polygon and a line segment.
  *
  * @param polygon

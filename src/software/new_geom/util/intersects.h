@@ -66,6 +66,15 @@ bool intersects(const Segment &first, const Circle &second);
 bool intersects(const Circle &first, const Segment &second);
 
 /**
+ * Returns true if the segments intersect each other, false otherwise
+ *
+ * @param first
+ * @param second
+ * @return true if the segments intersect each other, false otherwise
+ */
+bool intersects(const Segment &first, const Segment &second);
+
+/**
  * Returns true if the ray intersects the segment, false otherwise
  *
  * @param first

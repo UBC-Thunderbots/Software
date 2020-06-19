@@ -50,13 +50,61 @@ constexpr int sign(double n)
                : (n < -GeomConstants::FIXED_EPSILON ? -1 : 0);
 }
 
+std::vector<Point> intersection(const Segment &first, const Segment &second)
+{
+    if (first == second)
+    {
+        return {first.getStart(), first.getEnd()};
+    }
+
+    std::vector<Point> output;
+
+    Point a = first.getStart();
+    Point b = first.getEnd();
+    Point c = second.getStart();
+    Point d = second.getEnd();
+
+    // check for overlaps
+    if (second.contains(a))
+    {
+        output.emplace_back(a);
+    }
+    if (second.contains(b))
+    {
+        output.emplace_back(b);
+    }
+    if (first.contains(c))
+    {
+        output.emplace_back(c);
+    }
+    if (first.contains(d))
+    {
+        output.emplace_back(d);
+    }
+    if (output.size() > 0)
+    {
+        return output;
+    }
+
+    auto intersection_value = intersection(a, b, c, d);
+    if (intersection_value)
+    {
+        if (first.contains(*intersection_value) && second.contains(*intersection_value))
+        {
+            output.emplace_back(*intersection_value);
+        }
+    }
+
+    return output;
+}
+
 std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment)
 {
     std::unordered_set<Point> intersections;
 
     for (const Segment &seg : polygon.getSegments())
     {
-        for (const Point &p : seg.intersection(segment))
+        for (const Point &p : intersection(seg, segment))
         {
             intersections.insert(p);
         }

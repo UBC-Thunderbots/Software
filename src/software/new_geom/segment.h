@@ -95,27 +95,6 @@ class Segment final
                    int ulps_distance    = GeomConstants::ULPS_EPSILON_TEN) const;
 
     /**
-     * Determines whether the other segment intersects this segment each other
-     *
-     * @param other The other segment
-     * @return true if the segments intersect each other, false otherwise
-     */
-    bool intersects(const Segment& other) const;
-
-    /**
-     * Computes the intersection of this segment with another one
-     *
-     * @param other The other segment
-     *
-     * @return  one of:
-     *          - an empty vector if no intersections
-     *          - a vector containing a single point of intersection
-     *          - a vector containing two points representing the line segment of the
-     * overlap if both segments are collinear and overlapping
-     */
-    std::vector<Point> intersection(const Segment& other) const;
-
-    /**
      * Finds the closest point on this line segment to p.
      *
      * @param p The point
