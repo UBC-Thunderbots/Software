@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/widgets/zoomable_qgraphics_view.h"
+#include "software/gui/generic_widgets/world_view/zoomable_qgraphics_view.h"
 
 #include <QtCore/QtMath>
 
