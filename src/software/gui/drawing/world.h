@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/gui/visualizer/drawing/draw_functions.h"
-#include "software/world/world.h"
+#include "draw_functions.h"
+#include "../../world/world.h"
 
 /**
  * This file contains all the functions that allow us to draw a Robot in a

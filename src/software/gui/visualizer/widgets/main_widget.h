@@ -11,7 +11,7 @@
 #include "software/backend/robot_status.h"
 #include "software/gui/generic_widgets/robot_status/robot_status.h"
 #include "software/gui/generic_widgets/world_view/world_view.h"
-#include "software/gui/visualizer/drawing/draw_functions.h"
+#include "software/gui/drawing/draw_functions.h"
 #include "software/gui/visualizer/ui/ui_main_widget.h"
 #include "software/gui/visualizer/widgets/ai_control.h"
 #include "software/gui/visualizer/widgets/parameters.h"

@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/gui/visualizer/drawing/colors.h"
-#include "software/gui/visualizer/drawing/geom.h"
+#include "software/gui/drawing/colors.h"
+#include "software/gui/drawing/geom.h"
 #include "software/gui/geometry_conversion/geometry_conversion.h"
 #include "software/new_geom/segment.h"
 #include "software/world/ball.h"
