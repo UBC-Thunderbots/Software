@@ -48,7 +48,7 @@ class PassingEvaluationTest : public testing::Test
 // the test name
 TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
 {
-    // This test does not assert anything. Rather, It can be used to guage how
+    // This test does not assert anything. Rather, It can be used to gauge how
     // fast ratePass is running, and can be profiled in order to find areas
     // of improvement for ratePass
 

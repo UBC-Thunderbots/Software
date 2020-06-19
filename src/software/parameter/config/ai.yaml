@@ -115,7 +115,7 @@ AIConfig:
       default: 0.05
       type: "double"
       description: >-
-        The maximum allowed difference between the reciever and passer
+        The maximum allowed difference between the receiver and passer
         point of two passes for which they are considered equal
     PassEqualityMaxStartTimeDifferenceSeconds:
       min: 0
