@@ -4,9 +4,9 @@
 #include "boost/array.hpp"
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
+#include "google/protobuf/message.h"
 #include "shared/constants.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
-#include "google/protobuf/message.h"
 #include "software/logger/logger.h"
 #include "software/networking/proto_multicast_listener.h"
 
@@ -26,8 +26,7 @@ using google::protobuf::Message;
  * bazel run //firmware_new/tools:send_proto_over_udp -- your_interface_here
  *
  */
-void callback(VisionMsg test){
-}
+void callback(VisionMsg test) {}
 
 int main(int argc, char* argv[])
 {
@@ -52,7 +51,7 @@ int main(int argc, char* argv[])
 
     while (1)
     {
-        //sender->sendProto(control_req);
+        // sender->sendProto(control_req);
 
         // 4000 hz test
         std::this_thread::sleep_for(std::chrono::nanoseconds(250000));

@@ -97,8 +97,9 @@ void io_proto_multicast_sender_Task(void* arg)
 
     for (;;)
     {
-        /*osEventFlagsWait(comm_profile->communication_event, UPDATED_PROTO, osFlagsWaitAny,*/
-                         /*osWaitForever);*/
+        /*osEventFlagsWait(comm_profile->communication_event, UPDATED_PROTO,
+         * osFlagsWaitAny,*/
+        /*osWaitForever);*/
         osDelay(100);
 
         tx_buf = netbuf_new();
