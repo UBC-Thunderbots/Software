@@ -10,14 +10,7 @@ class ThreadedSensorFusion : public Subject<World>, public ThreadedObserver<Sens
 {
    public:
     ThreadedSensorFusion();
-
     virtual ~ThreadedSensorFusion() = default;
-
-    // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal
-    // multithreading this class potentially uses
-    ThreadedSensorFusion &operator=(const ThreadedSensorFusion &) = delete;
-    ThreadedSensorFusion(const ThreadedSensorFusion &)            = delete;
 
    private:
     void onValueReceived(SensorMsg sensor_msg) override;
