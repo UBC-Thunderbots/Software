@@ -33,4 +33,4 @@ RefboxStage createRefboxStage(const Referee &packet);
  *
  * @return ball placement point if found
  */
-std::optional<Point> createBallPlacementPoint(const Referee &packet);
+std::optional<Point> getBallPlacementPoint(const Referee &packet);

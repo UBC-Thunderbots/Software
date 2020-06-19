@@ -87,7 +87,7 @@ void SensorFusion::updateWorld(const Referee &packet)
 
     if (refbox_game_state == RefboxGameState::BALL_PLACEMENT_US)
     {
-        auto pt = createBallPlacementPoint(packet);
+        auto pt = getBallPlacementPoint(packet);
         if (pt)
         {
             ball_placement_point = pt;
