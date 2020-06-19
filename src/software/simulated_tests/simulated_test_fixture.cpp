@@ -5,7 +5,7 @@
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 
-SimulatedTest::SimulatedTest()
+SimulatedTestFixture::SimulatedTestFixture()
     : simulator(std::make_unique<Simulator>(::TestUtil::createSSLDivBField())),
       ai(Util::DynamicParameters->getAIConfig(),
          Util::DynamicParameters->getAIControlConfig()),
@@ -13,7 +13,7 @@ SimulatedTest::SimulatedTest()
 {
 }
 
-void SimulatedTest::SetUp()
+void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger();
 
@@ -58,27 +58,27 @@ void SimulatedTest::SetUp()
         ->setValue(true);
 }
 
-void SimulatedTest::setBallState(const BallState &ball)
+void SimulatedTestFixture::setBallState(const BallState &ball)
 {
     simulator->setBallState(ball);
 }
 
-void SimulatedTest::addFriendlyRobots(const std::vector<RobotStateWithId> &robots)
+void SimulatedTestFixture::addFriendlyRobots(const std::vector<RobotStateWithId> &robots)
 {
     simulator->addYellowRobots(robots);
 }
 
-void SimulatedTest::addEnemyRobots(const std::vector<RobotStateWithId> &robots)
+void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &robots)
 {
     simulator->addBlueRobots(robots);
 }
 
-Field SimulatedTest::field() const
+Field SimulatedTestFixture::field() const
 {
     return simulator->getField();
 }
 
-void SimulatedTest::setFriendlyGoalie(RobotId goalie_id)
+void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
     Util::MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
@@ -86,7 +86,7 @@ void SimulatedTest::setFriendlyGoalie(RobotId goalie_id)
         ->setValue(static_cast<int>(goalie_id));
 }
 
-void SimulatedTest::setEnemyGoalie(RobotId goalie_id)
+void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
     Util::MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
@@ -94,7 +94,7 @@ void SimulatedTest::setEnemyGoalie(RobotId goalie_id)
         ->setValue(static_cast<int>(goalie_id));
 }
 
-void SimulatedTest::setPlay(const std::string &play_name)
+void SimulatedTestFixture::setPlay(const std::string &play_name)
 {
     Util::MutableDynamicParameters->getMutableAIControlConfig()
         ->mutableOverrideAIPlay()
@@ -104,7 +104,7 @@ void SimulatedTest::setPlay(const std::string &play_name)
         ->setValue(play_name);
 }
 
-void SimulatedTest::enableVisualizer()
+void SimulatedTestFixture::enableVisualizer()
 {
     // We mock empty argc and argv since we don't have access to them when running
     // tests These arguments do not matter for simply running the Visualizer
@@ -114,7 +114,7 @@ void SimulatedTest::enableVisualizer()
     run_simulation_in_realtime = true;
 }
 
-bool SimulatedTest::validate(
+bool SimulatedTestFixture::validateAndCheckCompletion(
     std::vector<FunctionValidator> &function_validators,
     std::vector<ContinuousFunctionValidator> &continuous_function_validators)
 {
@@ -130,7 +130,7 @@ bool SimulatedTest::validate(
     return function_validators.empty() ? false : validation_successful;
 }
 
-void SimulatedTest::updateSensorFusion()
+void SimulatedTestFixture::updateSensorFusion()
 {
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
@@ -141,8 +141,8 @@ void SimulatedTest::updateSensorFusion()
     sensor_fusion.updateWorld(sensor_msg);
 }
 
-void SimulatedTest::sleep(const std::chrono::steady_clock::time_point &wall_start_time,
-                          const Timestamp &current_time)
+void SimulatedTestFixture::sleep(const std::chrono::steady_clock::time_point &wall_start_time,
+                                 const Timestamp &current_time)
 {
     // How long to wait for the wall-clock time to match the
     // current simulation time
@@ -159,7 +159,7 @@ void SimulatedTest::sleep(const std::chrono::steady_clock::time_point &wall_star
     }
 }
 
-void SimulatedTest::runTest(
+void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &validation_functions,
     const std::vector<ValidationFunction> &continuous_validation_functions,
     const Duration &timeout)
@@ -203,7 +203,7 @@ void SimulatedTest::runTest(
             *world = world_opt.value();
 
             validation_functions_done =
-                validate(function_validators, continuous_function_validators);
+                validateAndCheckCompletion(function_validators, continuous_function_validators);
             if (validation_functions_done)
             {
                 break;

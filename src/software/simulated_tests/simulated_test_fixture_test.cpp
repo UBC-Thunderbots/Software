@@ -20,7 +20,7 @@
  * they are as simple as possible and only test the behavior of the validation
  * functions and test pipeline
  */
-class SimulatedTestFixtureTest : public SimulatedTest
+class SimulatedTestFixtureTest : public SimulatedTestFixture
 {
 };
 

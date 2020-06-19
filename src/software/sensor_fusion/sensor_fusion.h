@@ -37,9 +37,11 @@ class SensorFusion
     void updateWorld(const SensorMsg &sensor_msg);
 
     /**
-     * Returns the most up to date state of the world if all data is valid
+     * Returns the most up-to-date world if enough data has been received
+     * to create one.
      *
-     * @return the most up to date state of the world if all data is valid
+     * @return the most up-to-date world if enough data has been received
+     * to create one.
      */
     std::optional<World> getWorld() const;
 

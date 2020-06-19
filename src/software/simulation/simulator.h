@@ -65,12 +65,10 @@ class Simulator
      *
      * @param field The field to initialize the simulation with
      * @param physics_time_step The time step used to simulated physics
-     * and robot primitives. The default value is approximately how often
-     * the robot firmware updates.
+     * and robot primitives.
      */
     explicit Simulator(const Field& field,
-                       const Duration& physics_time_step = Duration::fromSeconds(1.0 /
-                                                                                 200.0));
+                       const Duration& physics_time_step = Duration::fromSeconds(PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
 
     /**
@@ -130,7 +128,7 @@ class Simulator
      * Returns an SSL_WrapperPacket representing the most recent state
      * of the simulation
      *
-     * @return an SSL_WrapperPacket represetnging the most recent state
+     * @return an SSL_WrapperPacket representing the most recent state
      * of the simulation
      */
     std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
@@ -208,5 +206,8 @@ class Simulator
     // The camera ID of all SSLDetectionFrames published by the simulator.
     // This simulates having a single camera that can see the entire field
     static constexpr unsigned int CAMERA_ID            = 0;
-    static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01;
+    static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
+    // 200Hz is approximately how fast our robot firmware runs, so we
+    // mimic that here for physics and primitive updates
+    static constexpr double PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
 };

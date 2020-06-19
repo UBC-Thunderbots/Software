@@ -15,10 +15,10 @@
  * changes over time during simulation. This allows us to easily write tests for
  * the AI's behaviour.
  */
-class SimulatedTest : public ::testing::Test
+class SimulatedTestFixture : public ::testing::Test
 {
    public:
-    explicit SimulatedTest();
+    explicit SimulatedTestFixture();
 
    protected:
     void SetUp() override;
@@ -112,7 +112,7 @@ class SimulatedTest : public ::testing::Test
 
     /**
      * Runs the given function validators and returns whether or not the
-     * FunctionValidators have completed (Note completed does not necessarily
+     * FunctionValidators have completed (Note: completed does not necessarily
      * mean passed).
      *
      * @param function_validators The FunctionValidators to check
@@ -121,7 +121,7 @@ class SimulatedTest : public ::testing::Test
      * @return true if there is at least one FunctionValidator and all FunctionValidators
      * have completed, and false otherwise
      */
-    static bool validate(
+    static bool validateAndCheckCompletion(
         std::vector<FunctionValidator>& function_validators,
         std::vector<ContinuousFunctionValidator>& continuous_function_validators);
 
@@ -141,7 +141,9 @@ class SimulatedTest : public ::testing::Test
     // copy assignment operator, we have to make it a dynamically-allocated
     // object so we can assign new instances to this variable
     std::unique_ptr<Simulator> simulator;
+    // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
+    // The AI being tested and used in simulation
     AI ai;
 
     std::vector<ContinuousFunctionValidator> continuous_function_validators;

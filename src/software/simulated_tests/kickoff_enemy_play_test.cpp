@@ -7,7 +7,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class KickoffEnemyPlayTest : public SimulatedTest
+class KickoffEnemyPlayTest : public SimulatedTestFixture
 {
 };
 
