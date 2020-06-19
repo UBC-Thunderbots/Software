@@ -115,19 +115,19 @@ void SimulatedTestFixture::enableVisualizer()
 }
 
 bool SimulatedTestFixture::validateAndCheckCompletion(
-    std::vector<TerminatingFunctionValidator> &function_validators,
-    std::vector<NonTerminatingFunctionValidator> &continuous_function_validators)
+    std::vector<TerminatingFunctionValidator> &terminating_function_validators,
+    std::vector<NonTerminatingFunctionValidator> &non_terminating_function_validators)
 {
-    for (auto &continuous_function_validator : continuous_function_validators)
+    for (auto &function_validator : non_terminating_function_validators)
     {
-        continuous_function_validator.executeAndCheckForFailures();
+        function_validator.executeAndCheckForFailures();
     }
 
     bool validation_successful =
-        std::all_of(function_validators.begin(), function_validators.end(),
+        std::all_of(terminating_function_validators.begin(), terminating_function_validators.end(),
                     [](TerminatingFunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
 
-    return function_validators.empty() ? false : validation_successful;
+    return terminating_function_validators.empty() ? false : validation_successful;
 }
 
 void SimulatedTestFixture::updateSensorFusion()
@@ -160,8 +160,8 @@ void SimulatedTestFixture::sleep(const std::chrono::steady_clock::time_point &wa
 }
 
 void SimulatedTestFixture::runTest(
-    const std::vector<ValidationFunction> &validation_functions,
-    const std::vector<ValidationFunction> &continuous_validation_functions,
+    const std::vector<ValidationFunction> &terminating_validation_functions,
+    const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
     updateSensorFusion();
@@ -175,15 +175,15 @@ void SimulatedTestFixture::runTest(
         FAIL() << "Invalid initial world state";
     }
 
-    for (const auto &validation_function : validation_functions)
+    for (const auto &validation_function : terminating_validation_functions)
     {
-        function_validators.emplace_back(TerminatingFunctionValidator(validation_function, world));
+        terminating_function_validators.emplace_back(TerminatingFunctionValidator(validation_function, world));
     }
 
-    for (const auto &continuous_validation_function : continuous_validation_functions)
+    for (const auto &validation_function : non_terminating_validation_functions)
     {
-        continuous_function_validators.emplace_back(
-                NonTerminatingFunctionValidator(continuous_validation_function, world));
+        non_terminating_function_validators.emplace_back(
+                NonTerminatingFunctionValidator(validation_function, world));
     }
 
     Timestamp timeout_time         = simulator->getTimestamp() + timeout;
@@ -203,7 +203,7 @@ void SimulatedTestFixture::runTest(
             *world = world_opt.value();
 
             validation_functions_done =
-                validateAndCheckCompletion(function_validators, continuous_function_validators);
+                validateAndCheckCompletion(terminating_function_validators, non_terminating_function_validators);
             if (validation_functions_done)
             {
                 break;
@@ -233,7 +233,7 @@ void SimulatedTestFixture::runTest(
         }
     }
 
-    if (!validation_functions_done && !validation_functions.empty())
+    if (!validation_functions_done && !terminating_validation_functions.empty())
     {
         ADD_FAILURE()
             << "Not all validation functions passed within the timeout duration";

@@ -14,10 +14,10 @@ class TerminatingFunctionValidator
 {
    public:
     /**
-     * Creates a new FunctionValidator.
+     * Creates a new TerminatingFunctionValidator.
      *
-     * @param validation_function The ValidationFunction this FunctionValidator should
-     * manage and run
+     * @param validation_function The ValidationFunction this
+     * TerminatingFunctionValidator should manage and run
      * @param world The world that will be given to the ValidationFunction in order to run
      * it
      */
@@ -25,7 +25,7 @@ class TerminatingFunctionValidator
                                           std::shared_ptr<World> world);
 
     /**
-     * Runs the ValidationFunction that was given to this FunctionValidator on
+     * Runs the ValidationFunction that was given to this TerminatingFunctionValidator on
      * construction and returns true if the ValidationFunction has succeeded / passed.
      * Returns false otherwise. Once the ValidationFunction has succeeded (returned true
      * once), the coroutine will not be restarted and this function will always return

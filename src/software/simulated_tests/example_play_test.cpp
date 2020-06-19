@@ -45,7 +45,7 @@ TEST_F(ExamplePlayTest, test_example_play)
     setFriendlyGoalie(99);
     setPlay(ExamplePlay::name);
 
-    std::vector<ValidationFunction> validation_functions = {
+    std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             auto friendly_robots_1_meter_from_ball =
                 [](std::shared_ptr<World> world_ptr) {
@@ -68,8 +68,8 @@ TEST_F(ExamplePlayTest, test_example_play)
             }
         }};
 
-    std::vector<ValidationFunction> continous_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(validation_functions, continous_validation_functions,
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(8));
 }

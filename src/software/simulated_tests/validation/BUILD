@@ -10,7 +10,7 @@ cc_library(
 )
 
 cc_library(
-    name = "function_validator",
+    name = "terminating_function_validator",
     srcs = ["terminating_function_validator.cpp"],
     hdrs = ["terminating_function_validator.h"],
     deps = [
@@ -20,10 +20,10 @@ cc_library(
 )
 
 cc_test(
-    name = "function_validator_test",
+    name = "terminating_function_validator_test",
     srcs = ["terminating_function_validator_test.cpp"],
     deps = [
-        ":function_validator",
+        ":terminating_function_validator",
         ":validation_function",
         "//software/test_util",
         "//software/world",
@@ -32,7 +32,7 @@ cc_test(
 )
 
 cc_library(
-    name = "continuous_function_validator",
+    name = "non_terminating_function_validator",
     srcs = ["non_terminating_function_validator.cpp"],
     hdrs = ["non_terminating_function_validator.h"],
     deps = [
@@ -42,10 +42,10 @@ cc_library(
 )
 
 cc_test(
-    name = "continuous_function_validator_test",
+    name = "non_terminating_function_validator_test",
     srcs = ["non_terminating_function_validator_test.cpp"],
     deps = [
-        ":continuous_function_validator",
+        ":non_terminating_function_validator",
         ":validation_function",
         "//software/test_util",
         "//software/world",

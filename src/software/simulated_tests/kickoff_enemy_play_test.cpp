@@ -70,7 +70,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
     setEnemyGoalie(0);
     setPlay(KickoffEnemyPlay::name);
 
-    std::vector<ValidationFunction> validation_functions = {
+    std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
@@ -82,8 +82,8 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
             }
         }};
 
-    std::vector<ValidationFunction> continous_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(validation_functions, continous_validation_functions,
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

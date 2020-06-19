@@ -34,27 +34,27 @@ class SimulatedTestFixture : public ::testing::Test
      * Starts the simulation using the current state of the simulator, and runs
      * the given ValidationFunctions on each new state of the World. The test
      * will succeed if
-     * - There are no validation_functions and all continuous_validation_functions
-     *   pass for the duration of the test. In this case the test will run for the
-     *   duration of the timeout.
-     * - There is at least one validation_function, and all validation functions
-     *   continuous and non-continuous) pass. In this case the test will run until
-     *   all validation_functions have passed or the timeout is exceeded, whichever
-     *   comes first
+     * - There are no terminating validation functions and all non-terminating
+     *   validation functions pass for the duration of the test. In this case
+     *   the test will run for the duration of the timeout.
+     * - There is at least one terminating validation function, and all
+     *   validation functions (terminating and non-terminating) pass. In this case
+     *   the test will run until all terminating validation functions have
+     *   completed or the timeout is exceeded, whichever comes first
      *
      * This function will block until the test has either succeeded or encounters
      * a fatal failure.
      *
-     * @param validation_functions The validation functions to validate each
-     * state of the World
-     * @param continuous_validation_functions The continuous validation functions
-     * to validate each state of the world
+     * @param terminating_validation_functions The terminating validation functions
+     * to check during the test
+     * @param non_terminating_validation_functions The non-terminating validation
+     * functions to check during the test
      * @param timeout The maximum duration of simulated time to run the test for.
      * If the test has not passed by the time this timeout is exceeded, the test
      * will fail.
      */
-    void runTest(const std::vector<ValidationFunction>& validation_functions,
-                 const std::vector<ValidationFunction>& continuous_validation_functions,
+    void runTest(const std::vector<ValidationFunction>& terminating_validation_functions,
+                 const std::vector<ValidationFunction>& non_terminating_validation_functions,
                  const Duration& timeout);
 
     /**
@@ -115,15 +115,15 @@ class SimulatedTestFixture : public ::testing::Test
      * FunctionValidators have completed (Note: completed does not necessarily
      * mean passed).
      *
-     * @param function_validators The FunctionValidators to check
-     * @param continuous_function_validators The ContinuousFunctionValidators to check
+     * @param terminating_function_validators The TerminatingFunctionValidators to check
+     * @param non_terminating_function_validators The NonTerminatingFunctionValidators to check
      *
-     * @return true if there is at least one FunctionValidator and all FunctionValidators
-     * have completed, and false otherwise
+     * @return true if there is at least one TerminatingFunctionValidator and all
+     * TerminatingFunctionValidators have completed, and false otherwise
      */
     static bool validateAndCheckCompletion(
-        std::vector<TerminatingFunctionValidator>& function_validators,
-        std::vector<NonTerminatingFunctionValidator>& continuous_function_validators);
+        std::vector<TerminatingFunctionValidator>& terminating_function_validators,
+        std::vector<NonTerminatingFunctionValidator>& non_terminating_function_validators);
 
     /**
      * Puts the current thread to sleep until the difference between the current wall time
@@ -146,8 +146,8 @@ class SimulatedTestFixture : public ::testing::Test
     // The AI being tested and used in simulation
     AI ai;
 
-    std::vector<NonTerminatingFunctionValidator> continuous_function_validators;
-    std::vector<TerminatingFunctionValidator> function_validators;
+    std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
+    std::vector<TerminatingFunctionValidator> terminating_function_validators;
 
     std::shared_ptr<VisualizerWrapper> visualizer;
     // If false, runs the simulation as fast as possible.

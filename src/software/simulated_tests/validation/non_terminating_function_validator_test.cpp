@@ -7,7 +7,7 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-TEST(ContinuousFunctionValidatorTest,
+TEST(NonTerminatingFunctionValidatorTest,
      test_validation_function_that_does_nothing_does_not_report_failure)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
@@ -23,7 +23,7 @@ TEST(ContinuousFunctionValidatorTest,
     }
 }
 
-TEST(ContinuousFunctionValidatorTest,
+TEST(NonTerminatingFunctionValidatorTest,
      test_world_updated_correctly_between_validation_function_restarts)
 {
     // This validation_functions uses exceptions as a way for the test to observe it's
@@ -93,7 +93,7 @@ TEST(ContinuousFunctionValidatorTest,
     }
 }
 
-TEST(ContinuousFunctionValidatorTest,
+TEST(NonTerminatingFunctionValidatorTest,
      test_coroutines_yield_correctly_in_validation_function)
 {
     // This validation_functions uses exceptions as a way for the test to observe it's

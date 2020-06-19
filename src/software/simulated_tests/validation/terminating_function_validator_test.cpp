@@ -7,7 +7,7 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-TEST(FunctionValidatorTest, test_validation_function_that_does_nothing_reports_success)
+TEST(TerminatingFunctionValidatorTest, test_validation_function_that_does_nothing_reports_success)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {};
@@ -18,7 +18,7 @@ TEST(FunctionValidatorTest, test_validation_function_that_does_nothing_reports_s
     EXPECT_TRUE(result);
 }
 
-TEST(FunctionValidatorTest,
+TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_has_code_but_does_not_yield_reports_success)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
@@ -35,7 +35,7 @@ TEST(FunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(FunctionValidatorTest,
+TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_yields_once_succeeds_on_the_second_execution)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
@@ -51,7 +51,7 @@ TEST(FunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(FunctionValidatorTest,
+TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_yields_five_time_succeeds_on_the_sixth_execution)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
@@ -76,7 +76,7 @@ TEST(FunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(FunctionValidatorTest,
+TEST(TerminatingFunctionValidatorTest,
      test_validation_function_with_early_return_reports_success_after_return)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
@@ -96,7 +96,7 @@ TEST(FunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(FunctionValidatorTest,
+TEST(TerminatingFunctionValidatorTest,
      test_validation_function_with_single_loop_succeeds_after_loop_termination)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
@@ -123,7 +123,7 @@ TEST(FunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(FunctionValidatorTest,
+TEST(TerminatingFunctionValidatorTest,
      test_validation_function_with_two_loops_succeeds_after_both_loops_terminate_in_order)
 {
     // This validation function will only pass if the ball's x-coordinate becomes positive
@@ -157,7 +157,7 @@ TEST(FunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(FunctionValidatorTest, test_validation_function_with_gtest_statements)
+TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_statements)
 {
     // This shows an example of using GoogleTest statements within a validation function.
     // Just like regular unit tests, if the condition is not met the test will fail.
