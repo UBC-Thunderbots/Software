@@ -175,25 +175,25 @@ class Robot
     AngularVelocity angularVelocity() const;
 
     /**
-     * Returns if the ball is in the break beam
+     * Returns if the ball is in the mouth of the robot, i.e. near the dribbler
      *
-     * @return ball in break beam
+     * @return ball in mouth
      */
-    bool ballInBeam() const;
+    bool ballInMouth() const;
 
     /**
-     * Returns time in milliseconds since last chip
+     * Returns time in milliseconds since last chip if available
      *
      * @return ms since last chip
      */
-    unsigned long timeSinceLastChip() const;
+    std::optional<unsigned long> timeSinceLastChip() const;
 
     /**
-     * Returns time in milliseconds since last kick
+     * Returns time in milliseconds since last kick if available
      *
      * @return ms since last kick
      */
-    unsigned long timeSinceLastKick() const;
+    std::optional<unsigned long> timeSinceLastKick() const;
 
     /**
      * Returns the estimated angular velocity of the robot at a future time, relative to

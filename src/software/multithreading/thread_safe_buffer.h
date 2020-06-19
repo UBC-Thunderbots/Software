@@ -101,8 +101,8 @@ class ThreadSafeBuffer
     std::condition_variable received_new_value;
 
     std::mutex destructor_called_mutex;
-    bool log_buffer_full;
     bool destructor_called;
+    bool log_buffer_full;
 };
 
 #include "software/multithreading/thread_safe_buffer.tpp"

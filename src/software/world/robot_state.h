@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "shared/constants.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
@@ -57,46 +59,46 @@ class RobotState
     AngularVelocity angularVelocity() const;
 
     /**
-     * Returns if the ball is in the break beam
+     * Returns if the ball is in the mouth of the robot, i.e. near the dribbler
      *
-     * @return ball in break beam
+     * @return ball in mouth
      */
-    bool ballInBeam() const;
+    bool ballInMouth() const;
 
     /**
-     * Update ball in break beam
+     * Set ball in mouth
      *
-     * @param ball_in_beam whether ball is in beam
+     * @param ball_in_mouth whether ball is in beam
      */
-    void updateBallInBeam(bool ball_in_beam);
+    void setBallInMouth(bool ball_in_beam);
 
     /**
-     * Returns time in milliseconds since last chip
+     * Returns time in milliseconds since last chip if available
      *
      * @return ms since last chip
      */
-    unsigned long timeSinceLastChip() const;
+    std::optional<unsigned long> timeSinceLastChip() const;
 
     /**
-     * Update time in milliseconds since last chip
+     * Set time in milliseconds since last chip
      *
      * @param time ms since last chip
      */
-    void updateTimeSinceLastChip(unsigned long time);
+    void setTimeSinceLastChip(unsigned long time_ms);
 
     /**
-     * Returns time in milliseconds since last kick
+     * Returns time in milliseconds since last kick if available
      *
      * @return ms since last kick
      */
-    unsigned long timeSinceLastKick() const;
+    std::optional<unsigned long> timeSinceLastKick() const;
 
     /**
-     * Update time in milliseconds since last kick
+     * Set time in milliseconds since last kick
      *
      * @param time ms since last kick
      */
-    void updateTimeSinceLastKick(unsigned long time);
+    void setTimeSinceLastKick(unsigned long time_ms);
 
     /**
      * Defines the equality operator for a RobotState. RobotStates are equal if
@@ -125,8 +127,8 @@ class RobotState
     Angle orientation_;
     AngularVelocity angular_velocity_;
     bool ball_in_beam_;
-    unsigned long time_since_last_chip_ms_;
-    unsigned long time_since_last_kick_ms_;
+    std::optional<unsigned long> time_since_last_chip_ms_;
+    std::optional<unsigned long> time_since_last_kick_ms_;
 };
 
 /**

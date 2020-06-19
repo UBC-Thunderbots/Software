@@ -7,8 +7,8 @@ RobotState::RobotState(const Point &position, const Vector &velocity,
       orientation_(orientation),
       angular_velocity_(angular_velocity),
       ball_in_beam_(false),
-      time_since_last_chip_ms_(UINT32_MAX),
-      time_since_last_kick_ms_(UINT32_MAX)
+      time_since_last_chip_ms_(std::nullopt),
+      time_since_last_kick_ms_(std::nullopt)
 {
 }
 
@@ -32,41 +32,41 @@ AngularVelocity RobotState::angularVelocity() const
     return angular_velocity_;
 }
 
-bool RobotState::ballInBeam() const
+bool RobotState::ballInMouth() const
 {
     return ball_in_beam_;
 }
 
-void RobotState::updateBallInBeam(bool ball_in_beam)
+void RobotState::setBallInMouth(bool ball_in_beam)
 {
     ball_in_beam_ = ball_in_beam;
 }
 
-unsigned long RobotState::timeSinceLastChip() const
+std::optional<unsigned long> RobotState::timeSinceLastChip() const
 {
     return time_since_last_chip_ms_;
 }
 
-void RobotState::updateTimeSinceLastChip(unsigned long time)
+void RobotState::setTimeSinceLastChip(unsigned long time_ms)
 {
-    time_since_last_chip_ms_ = time;
+    time_since_last_chip_ms_ = time_ms;
 }
 
-unsigned long RobotState::timeSinceLastKick() const
+std::optional<unsigned long> RobotState::timeSinceLastKick() const
 {
     return time_since_last_kick_ms_;
 }
 
-void RobotState::updateTimeSinceLastKick(unsigned long time)
+void RobotState::setTimeSinceLastKick(unsigned long time_ms)
 {
-    time_since_last_kick_ms_ = time;
+    time_since_last_kick_ms_ = time_ms;
 }
 
 bool RobotState::operator==(const RobotState &other) const
 {
     return this->position() == other.position() && this->velocity() == other.velocity() &&
            this->orientation() == other.orientation() &&
-           this->ballInBeam() == other.ballInBeam() &&
+           this->ballInMouth() == other.ballInMouth() &&
            this->timeSinceLastChip() == other.timeSinceLastChip() &&
            this->timeSinceLastKick() == other.timeSinceLastKick() &&
            this->angularVelocity() == other.angularVelocity();

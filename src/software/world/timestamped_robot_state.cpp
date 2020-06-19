@@ -26,9 +26,9 @@ RobotState TimestampedRobotState::robotState() const
     return robot_state_;
 }
 
-RobotState &TimestampedRobotState::mutableRobotState()
+void TimestampedRobotState::setRobotState(const RobotState &state)
 {
-    return robot_state_;
+    robot_state_ = state;
 }
 
 bool TimestampedRobotState::operator==(const TimestampedRobotState &other) const

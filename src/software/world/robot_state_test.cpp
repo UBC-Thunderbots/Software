@@ -85,9 +85,13 @@ TEST(RobotStateTest, compare_states_with_different_ball_in_beam)
     RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                        AngularVelocity::zero());
     RobotState state_2(state_1);
-    state_2.updateBallInBeam(true);
+    EXPECT_FALSE(state_1.ballInMouth());
+    EXPECT_FALSE(state_2.ballInMouth());
+    state_2.setBallInMouth(true);
     EXPECT_FALSE(state_1 == state_2);
     EXPECT_TRUE(state_1 != state_2);
+    EXPECT_FALSE(state_1.ballInMouth());
+    EXPECT_TRUE(state_2.ballInMouth());
 }
 
 TEST(RobotStateTest, compare_states_with_same_ball_in_beam)
@@ -95,12 +99,16 @@ TEST(RobotStateTest, compare_states_with_same_ball_in_beam)
     RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                        AngularVelocity::zero());
     RobotState state_2(state_1);
+    EXPECT_FALSE(state_1.ballInMouth());
+    EXPECT_FALSE(state_2.ballInMouth());
     EXPECT_TRUE(state_1 == state_2);
     EXPECT_FALSE(state_1 != state_2);
-    state_1.updateBallInBeam(true);
-    state_2.updateBallInBeam(true);
+    state_1.setBallInMouth(true);
+    state_2.setBallInMouth(true);
     EXPECT_TRUE(state_1 == state_2);
     EXPECT_FALSE(state_1 != state_2);
+    EXPECT_TRUE(state_1.ballInMouth());
+    EXPECT_TRUE(state_2.ballInMouth());
 }
 
 TEST(RobotStateTest, compare_states_with_same_time_since)
@@ -108,14 +116,30 @@ TEST(RobotStateTest, compare_states_with_same_time_since)
     RobotState state_1(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
                        AngularVelocity::zero());
     RobotState state_2(state_1);
+    EXPECT_FALSE(state_1.timeSinceLastChip());
+    EXPECT_FALSE(state_1.timeSinceLastKick());
+    EXPECT_FALSE(state_2.timeSinceLastChip());
+    EXPECT_FALSE(state_2.timeSinceLastKick());
     EXPECT_TRUE(state_1 == state_2);
     EXPECT_FALSE(state_1 != state_2);
-    state_1.updateTimeSinceLastChip(5);
-    state_2.updateTimeSinceLastChip(5);
+    state_1.setTimeSinceLastChip(5);
+    state_2.setTimeSinceLastChip(5);
+    EXPECT_TRUE(state_1.timeSinceLastChip());
+    EXPECT_FALSE(state_1.timeSinceLastKick());
+    EXPECT_TRUE(state_2.timeSinceLastChip());
+    EXPECT_FALSE(state_2.timeSinceLastKick());
+    EXPECT_EQ(*state_1.timeSinceLastChip(), 5);
+    EXPECT_EQ(*state_2.timeSinceLastChip(), 5);
     EXPECT_TRUE(state_1 == state_2);
     EXPECT_FALSE(state_1 != state_2);
-    state_1.updateTimeSinceLastKick(5);
-    state_2.updateTimeSinceLastKick(5);
+    state_1.setTimeSinceLastKick(5);
+    state_2.setTimeSinceLastKick(5);
+    EXPECT_TRUE(state_1.timeSinceLastChip());
+    EXPECT_TRUE(state_1.timeSinceLastKick());
+    EXPECT_TRUE(state_2.timeSinceLastChip());
+    EXPECT_TRUE(state_2.timeSinceLastKick());
+    EXPECT_EQ(*state_1.timeSinceLastKick(), 5);
+    EXPECT_EQ(*state_2.timeSinceLastKick(), 5);
     EXPECT_TRUE(state_1 == state_2);
     EXPECT_FALSE(state_1 != state_2);
 }
@@ -127,16 +151,17 @@ TEST(RobotStateTest, compare_states_with_different_time_since)
     RobotState state_2(state_1);
     EXPECT_TRUE(state_1 == state_2);
     EXPECT_FALSE(state_1 != state_2);
-    state_2.updateTimeSinceLastChip(5);
+    state_2.setTimeSinceLastChip(5);
+    EXPECT_TRUE(state_2.timeSinceLastChip());
+    EXPECT_EQ(*state_2.timeSinceLastChip(), 5);
     EXPECT_FALSE(state_1 == state_2);
     EXPECT_TRUE(state_1 != state_2);
-    state_2.updateTimeSinceLastChip(UINT32_MAX);
+    state_2 = state_1;
     EXPECT_TRUE(state_1 == state_2);
     EXPECT_FALSE(state_1 != state_2);
-    state_1.updateTimeSinceLastKick(5);
+    state_1.setTimeSinceLastKick(5);
+    EXPECT_TRUE(state_1.timeSinceLastKick());
+    EXPECT_EQ(*state_1.timeSinceLastKick(), 5);
     EXPECT_FALSE(state_1 == state_2);
     EXPECT_TRUE(state_1 != state_2);
-    state_1.updateTimeSinceLastKick(UINT32_MAX);
-    EXPECT_TRUE(state_1 == state_2);
-    EXPECT_FALSE(state_1 != state_2);
 }

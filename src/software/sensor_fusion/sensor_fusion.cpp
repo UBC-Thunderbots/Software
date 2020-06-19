@@ -89,15 +89,15 @@ void SensorFusion::updateWorld(
             RobotState state_to_update = robot_ptr->currentState().robotState();
             if (tbots_robot_msg.has_break_beam_status())
             {
-                state_to_update.updateBallInBeam(
+                state_to_update.setBallInMouth(
                     tbots_robot_msg.break_beam_status().ball_in_beam());
             }
             if (tbots_robot_msg.has_chipper_kicker_status())
             {
                 auto chipper_kicker_status = tbots_robot_msg.chipper_kicker_status();
-                state_to_update.updateTimeSinceLastChip(
+                state_to_update.setTimeSinceLastChip(
                     tbots_robot_msg.chipper_kicker_status().ms_since_chipper_fired());
-                state_to_update.updateTimeSinceLastKick(
+                state_to_update.setTimeSinceLastKick(
                     tbots_robot_msg.chipper_kicker_status().ms_since_kicker_fired());
             }
         }

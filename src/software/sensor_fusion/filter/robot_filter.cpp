@@ -8,11 +8,9 @@ RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_durat
 
 RobotFilter::RobotFilter(RobotDetection current_robot_state,
                          Duration expiry_buffer_duration)
-    : current_robot_state(
-          current_robot_state.id,
-          TimestampedRobotState(current_robot_state.position, Vector(0, 0),
-                                current_robot_state.orientation, AngularVelocity::zero(),
-                                current_robot_state.timestamp)),
+    : current_robot_state(current_robot_state.id, current_robot_state.position,
+                          Vector(0, 0), current_robot_state.orientation,
+                          AngularVelocity::zero(), current_robot_state.timestamp),
       expiry_buffer_duration(expiry_buffer_duration)
 {
 }
@@ -93,11 +91,10 @@ std::optional<Robot> RobotFilter::getFilteredData(
              current_robot_state.lastUpdateTimestamp().getSeconds());
 
         // update current_robot_state
-        this->current_robot_state = Robot(
-            this->getRobotId(),
-            TimestampedRobotState(
-                filtered_data.position, filtered_data.velocity, filtered_data.orientation,
-                filtered_data.angular_velocity, filtered_data.timestamp));
+        this->current_robot_state =
+            Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
+                  filtered_data.orientation, filtered_data.angular_velocity,
+                  filtered_data.timestamp);
 
         return std::make_optional(this->current_robot_state);
     }

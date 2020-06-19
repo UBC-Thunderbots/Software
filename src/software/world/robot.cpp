@@ -145,17 +145,17 @@ AngularVelocity Robot::angularVelocity() const
     return states_.front().robotState().angularVelocity();
 }
 
-bool Robot::ballInBeam() const
+bool Robot::ballInMouth() const
 {
-    return states_.front().robotState().ballInBeam();
+    return states_.front().robotState().ballInMouth();
 }
 
-unsigned long Robot::timeSinceLastChip() const
+std::optional<unsigned long> Robot::timeSinceLastChip() const
 {
     return states_.front().robotState().timeSinceLastChip();
 }
 
-unsigned long Robot::timeSinceLastKick() const
+std::optional<unsigned long> Robot::timeSinceLastKick() const
 {
     return states_.front().robotState().timeSinceLastKick();
 }

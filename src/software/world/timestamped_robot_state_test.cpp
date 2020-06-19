@@ -79,7 +79,7 @@ TEST(RobotStateWithTimestampTest, compare_states_with_different_timestamps)
     EXPECT_FALSE(state_1 != state_2);
 }
 
-TEST(RobotStateWithTimestampTest, update_with_mutable_robot_state)
+TEST(RobotStateWithTimestampTest, update_with_set_robot_state)
 {
     TimestampedRobotState timestamped_robot_state_1(
         Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
@@ -89,14 +89,16 @@ TEST(RobotStateWithTimestampTest, update_with_mutable_robot_state)
         AngularVelocity::fromRadians(1.1), Timestamp::fromSeconds(123));
     EXPECT_EQ(timestamped_robot_state_1, timestamped_robot_state_2);
 
-    timestamped_robot_state_2.robotState().updateBallInBeam(true);
-    timestamped_robot_state_2.robotState().updateTimeSinceLastChip(11);
-    timestamped_robot_state_2.robotState().updateTimeSinceLastKick(5);
+    timestamped_robot_state_2.robotState().setBallInMouth(true);
+    timestamped_robot_state_2.robotState().setTimeSinceLastChip(11);
+    timestamped_robot_state_2.robotState().setTimeSinceLastKick(5);
     EXPECT_EQ(timestamped_robot_state_1, timestamped_robot_state_2);
 
-    timestamped_robot_state_2.mutableRobotState().updateBallInBeam(true);
-    timestamped_robot_state_2.mutableRobotState().updateTimeSinceLastChip(11);
-    timestamped_robot_state_2.mutableRobotState().updateTimeSinceLastKick(5);
+    RobotState updated_state = timestamped_robot_state_2.robotState();
+    updated_state.setBallInMouth(true);
+    updated_state.setTimeSinceLastChip(11);
+    updated_state.setTimeSinceLastKick(5);
+    timestamped_robot_state_2.setRobotState(updated_state);
 
     EXPECT_NE(timestamped_robot_state_1, timestamped_robot_state_2);
 }

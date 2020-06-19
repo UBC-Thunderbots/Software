@@ -52,13 +52,12 @@ class TimestampedRobotState
      */
     RobotState robotState() const;
 
-
     /**
-     * Returns a mutable reference to the robot state without any timestamp information.
+     * Set RobotState to a new value
      *
-     * @return mutable robot state
+     * @param state new robot state
      */
-    RobotState &mutableRobotState();
+    void setRobotState(const RobotState &state);
 
     /**
      * Defines the equality operator for a TimestampedRobotState.
