@@ -1,16 +1,18 @@
 #pragma once
 
-#include "software/simulation/simulator.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
-#include <thread>
 #include <atomic>
+#include <thread>
+
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/simulation/simulator.h"
 
 /**
  * A simulator that runs in a separate thread and publishes protobuf
  * data asynchronously.
  */
-class ThreadedSimulator {
-public:
+class ThreadedSimulator
+{
+   public:
     /**
      * Creates a new ThreadedSimulator. The starting state of the simulation
      * will have the given field, with no robots or ball.
@@ -29,7 +31,8 @@ public:
      *
      * @param callback The callback function to register
      */
-    void registerOnSSLWrapperPacketReadyCallback(const std::function<void(SSL_WrapperPacket)>& callback);
+    void registerOnSSLWrapperPacketReadyCallback(
+        const std::function<void(SSL_WrapperPacket)>& callback);
 
     /**
      * Starts running the simulator in a new thread. This is a non-blocking call.
@@ -93,7 +96,7 @@ public:
     void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
     void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
 
-private:
+   private:
     /**
      * The function that runs inside the simulation thread, handling
      * updating the simulation and calling the callback functions.

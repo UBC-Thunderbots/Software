@@ -6,40 +6,48 @@
 #include "software/primitive/primitive.h"
 #include "software/test_util/test_util.h"
 
-class ThreadedSimulatorTest : public ::testing::Test {
-protected:
+class ThreadedSimulatorTest : public ::testing::Test
+{
+   protected:
     ThreadedSimulatorTest() : threaded_simulator(::TestUtil::createSSLDivBField()) {}
 
-    void SetUp() override {
+    void SetUp() override
+    {
         most_recent_wrapper_packet = std::nullopt;
-        callback_called = false;
-        auto callback = [&](SSL_WrapperPacket packet) {
-            callback_called = true;
+        callback_called            = false;
+        auto callback              = [&](SSL_WrapperPacket packet) {
+            callback_called            = true;
             most_recent_wrapper_packet = packet;
         };
 
         threaded_simulator.registerOnSSLWrapperPacketReadyCallback(callback);
     }
 
-    void runSimulation(const Duration& duration) {
+    void runSimulation(const Duration& duration)
+    {
         threaded_simulator.startSimulation();
         // yield and sleep to give the simulation thread the best chance of running
         std::this_thread::yield();
-        std::this_thread::sleep_for(std::chrono::milliseconds (static_cast<unsigned int>(duration.getMilliseconds())));
+        std::this_thread::sleep_for(std::chrono::milliseconds(
+            static_cast<unsigned int>(duration.getMilliseconds())));
         threaded_simulator.stopSimulation();
     }
 
-    std::optional<Point> getBallPosition() {
-        if(!most_recent_wrapper_packet) {
+    std::optional<Point> getBallPosition()
+    {
+        if (!most_recent_wrapper_packet)
+        {
             return std::nullopt;
         }
 
-        if(!most_recent_wrapper_packet->has_detection()) {
+        if (!most_recent_wrapper_packet->has_detection())
+        {
             return std::nullopt;
         }
 
         auto detection = most_recent_wrapper_packet->detection();
-        if(detection.balls_size() < 1) {
+        if (detection.balls_size() < 1)
+        {
             return std::nullopt;
         }
 
@@ -52,23 +60,27 @@ protected:
     std::optional<SSL_WrapperPacket> most_recent_wrapper_packet;
 };
 
-TEST_F(ThreadedSimulatorTest, callbacks_triggered_during_simulation) {
+TEST_F(ThreadedSimulatorTest, callbacks_triggered_during_simulation)
+{
     runSimulation(Duration::fromSeconds(1));
     EXPECT_TRUE(callback_called);
 }
 
-TEST_F(ThreadedSimulatorTest, stop_simulation_when_not_running) {
+TEST_F(ThreadedSimulatorTest, stop_simulation_when_not_running)
+{
     threaded_simulator.stopSimulation();
     EXPECT_FALSE(callback_called);
 }
 
-TEST_F(ThreadedSimulatorTest, start_simulation_when_already_running) {
+TEST_F(ThreadedSimulatorTest, start_simulation_when_already_running)
+{
     threaded_simulator.startSimulation();
     runSimulation(Duration::fromSeconds(1));
     EXPECT_TRUE(callback_called);
 }
 
-TEST_F(ThreadedSimulatorTest, start_and_stop_simulation_several_times) {
+TEST_F(ThreadedSimulatorTest, start_and_stop_simulation_several_times)
+{
     BallState ball_state(Point(0, 0), Vector(1, 0));
     threaded_simulator.setBallState(ball_state);
 
@@ -94,7 +106,8 @@ TEST_F(ThreadedSimulatorTest, start_and_stop_simulation_several_times) {
     EXPECT_GT(ball_x_3, ball_x_2);
 }
 
-TEST_F(ThreadedSimulatorTest, add_and_remove_ball_during_simulation) {
+TEST_F(ThreadedSimulatorTest, add_and_remove_ball_during_simulation)
+{
     threaded_simulator.startSimulation();
 
     BallState ball_state(Point(0, 0), Vector(1, 0));
@@ -102,7 +115,7 @@ TEST_F(ThreadedSimulatorTest, add_and_remove_ball_during_simulation) {
 
     // yield and sleep to give the simulation thread the best chance of running
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::seconds (1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     EXPECT_TRUE(callback_called);
 
@@ -118,17 +131,18 @@ TEST_F(ThreadedSimulatorTest, add_and_remove_ball_during_simulation) {
 
     // yield and sleep to give the simulation thread the best chance of running
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::seconds (1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     threaded_simulator.stopSimulation();
     ASSERT_FALSE(getBallPosition());
 }
 
-TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running) {
+TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running)
+{
     threaded_simulator.startSimulation();
     // yield and sleep to give the simulation thread the best chance of running
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds (1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     // Simulate multiple robots with primitives to sanity check that everything is
     // connected properly and we can properly simulate multiple instances of the robot
@@ -184,7 +198,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     threaded_simulator.setYellowRobotPrimitives(yellow_primitives_ptr);
 
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds (2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.
