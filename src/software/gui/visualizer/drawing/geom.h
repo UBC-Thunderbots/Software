@@ -6,7 +6,7 @@
 #include <QtGui/QPolygonF>
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/gui/visualizer/geom/geometry_conversion.h"
+#include "software/gui/geom/geometry_conversion.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/rectangle.h"
