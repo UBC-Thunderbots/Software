@@ -123,9 +123,9 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
         function_validator.executeAndCheckForFailures();
     }
 
-    bool validation_successful =
-        std::all_of(terminating_function_validators.begin(), terminating_function_validators.end(),
-                    [](TerminatingFunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
+    bool validation_successful = std::all_of(
+        terminating_function_validators.begin(), terminating_function_validators.end(),
+        [](TerminatingFunctionValidator &fv) { return fv.executeAndCheckForSuccess(); });
 
     return terminating_function_validators.empty() ? false : validation_successful;
 }
@@ -141,8 +141,9 @@ void SimulatedTestFixture::updateSensorFusion()
     sensor_fusion.updateWorld(sensor_msg);
 }
 
-void SimulatedTestFixture::sleep(const std::chrono::steady_clock::time_point &wall_start_time,
-                                 const Timestamp &current_time)
+void SimulatedTestFixture::sleep(
+    const std::chrono::steady_clock::time_point &wall_start_time,
+    const Timestamp &current_time)
 {
     // How long to wait for the wall-clock time to match the
     // current simulation time
@@ -177,13 +178,14 @@ void SimulatedTestFixture::runTest(
 
     for (const auto &validation_function : terminating_validation_functions)
     {
-        terminating_function_validators.emplace_back(TerminatingFunctionValidator(validation_function, world));
+        terminating_function_validators.emplace_back(
+            TerminatingFunctionValidator(validation_function, world));
     }
 
     for (const auto &validation_function : non_terminating_validation_functions)
     {
         non_terminating_function_validators.emplace_back(
-                NonTerminatingFunctionValidator(validation_function, world));
+            NonTerminatingFunctionValidator(validation_function, world));
     }
 
     Timestamp timeout_time         = simulator->getTimestamp() + timeout;
@@ -202,8 +204,8 @@ void SimulatedTestFixture::runTest(
         {
             *world = world_opt.value();
 
-            validation_functions_done =
-                validateAndCheckCompletion(terminating_function_validators, non_terminating_function_validators);
+            validation_functions_done = validateAndCheckCompletion(
+                terminating_function_validators, non_terminating_function_validators);
             if (validation_functions_done)
             {
                 break;

@@ -22,9 +22,9 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
     if (!validation_sequence)
     {
         // Re-start the coroutine by re-creating it
-        validation_sequence = ValidationCoroutine::pull_type(
-            boost::bind(&NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper,
-                        this, _1, world_, validation_function_));
+        validation_sequence = ValidationCoroutine::pull_type(boost::bind(
+            &NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper, this, _1,
+            world_, validation_function_));
     }
 
     // Run the coroutine. This will call the bound executeAndCheckForFailuresWrapper

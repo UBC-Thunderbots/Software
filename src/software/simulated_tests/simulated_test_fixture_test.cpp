@@ -56,9 +56,10 @@ TEST_F(SimulatedTestFixtureTest, test_single_validation_function_fails_if_it_tim
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    EXPECT_NONFATAL_FAILURE(runTest(terminating_validation_functions, non_terminating_validation_functions,
-                                    Duration::fromSeconds(0.5)),
-                            "timeout duration");
+    EXPECT_NONFATAL_FAILURE(
+        runTest(terminating_validation_functions, non_terminating_validation_functions,
+                Duration::fromSeconds(0.5)),
+        "timeout duration");
 }
 
 TEST_F(SimulatedTestFixtureTest,
@@ -78,9 +79,10 @@ TEST_F(SimulatedTestFixtureTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    EXPECT_NONFATAL_FAILURE(runTest(terminating_validation_functions, non_terminating_validation_functions,
-                                    Duration::fromSeconds(1.0)),
-                            "Timestamp");
+    EXPECT_NONFATAL_FAILURE(
+        runTest(terminating_validation_functions, non_terminating_validation_functions,
+                Duration::fromSeconds(1.0)),
+        "Timestamp");
 }
 
 TEST_F(SimulatedTestFixtureTest, test_multiple_validation_function_pass_before_timeout)
@@ -127,9 +129,10 @@ TEST_F(SimulatedTestFixtureTest, test_should_fail_if_not_all_validation_function
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    EXPECT_NONFATAL_FAILURE(runTest(terminating_validation_functions, non_terminating_validation_functions,
-                                    Duration::fromSeconds(0.6)),
-                            "timeout duration");
+    EXPECT_NONFATAL_FAILURE(
+        runTest(terminating_validation_functions, non_terminating_validation_functions,
+                Duration::fromSeconds(0.6)),
+        "timeout duration");
 }
 
 TEST_F(SimulatedTestFixtureTest, test_single_non_terminating_validation_function_passes)
@@ -189,9 +192,10 @@ TEST_F(
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         passing_validation_function, failing_validation_function};
 
-    EXPECT_NONFATAL_FAILURE(runTest(terminating_validation_functions, non_terminating_validation_functions,
-                                    Duration::fromSeconds(0.5)),
-                            "Timestamp");
+    EXPECT_NONFATAL_FAILURE(
+        runTest(terminating_validation_functions, non_terminating_validation_functions,
+                Duration::fromSeconds(0.5)),
+        "Timestamp");
 }
 
 TEST_F(
@@ -226,9 +230,10 @@ TEST_F(
         passing_validation_function,
     };
 
-    EXPECT_NONFATAL_FAILURE(runTest(terminating_validation_functions, non_terminating_validation_functions,
-                                    Duration::fromSeconds(0.5)),
-                            "Timestamp");
+    EXPECT_NONFATAL_FAILURE(
+        runTest(terminating_validation_functions, non_terminating_validation_functions,
+                Duration::fromSeconds(0.5)),
+        "Timestamp");
 }
 
 TEST_F(SimulatedTestFixtureTest,

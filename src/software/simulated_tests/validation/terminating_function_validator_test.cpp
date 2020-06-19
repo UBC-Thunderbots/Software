@@ -7,7 +7,8 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-TEST(TerminatingFunctionValidatorTest, test_validation_function_that_does_nothing_reports_success)
+TEST(TerminatingFunctionValidatorTest,
+     test_validation_function_that_does_nothing_reports_success)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {};

@@ -68,7 +68,8 @@ class Simulator
      * and robot primitives.
      */
     explicit Simulator(const Field& field,
-                       const Duration& physics_time_step = Duration::fromSeconds(PHYSICS_TIME_STEP_SECONDS));
+                       const Duration& physics_time_step =
+                           Duration::fromSeconds(PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
 
     /**

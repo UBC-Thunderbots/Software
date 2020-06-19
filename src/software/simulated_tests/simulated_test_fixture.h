@@ -53,9 +53,10 @@ class SimulatedTestFixture : public ::testing::Test
      * If the test has not passed by the time this timeout is exceeded, the test
      * will fail.
      */
-    void runTest(const std::vector<ValidationFunction>& terminating_validation_functions,
-                 const std::vector<ValidationFunction>& non_terminating_validation_functions,
-                 const Duration& timeout);
+    void runTest(
+        const std::vector<ValidationFunction>& terminating_validation_functions,
+        const std::vector<ValidationFunction>& non_terminating_validation_functions,
+        const Duration& timeout);
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -116,14 +117,16 @@ class SimulatedTestFixture : public ::testing::Test
      * mean passed).
      *
      * @param terminating_function_validators The TerminatingFunctionValidators to check
-     * @param non_terminating_function_validators The NonTerminatingFunctionValidators to check
+     * @param non_terminating_function_validators The NonTerminatingFunctionValidators to
+     * check
      *
      * @return true if there is at least one TerminatingFunctionValidator and all
      * TerminatingFunctionValidators have completed, and false otherwise
      */
     static bool validateAndCheckCompletion(
         std::vector<TerminatingFunctionValidator>& terminating_function_validators,
-        std::vector<NonTerminatingFunctionValidator>& non_terminating_function_validators);
+        std::vector<NonTerminatingFunctionValidator>&
+            non_terminating_function_validators);
 
     /**
      * Puts the current thread to sleep until the difference between the current wall time

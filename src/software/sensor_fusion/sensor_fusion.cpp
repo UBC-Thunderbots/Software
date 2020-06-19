@@ -1,8 +1,8 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
 #include "software/constants.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/logger/logger.h"
+#include "software/parameter/dynamic_parameters.h"
 
 SensorFusion::SensorFusion()
     : ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,

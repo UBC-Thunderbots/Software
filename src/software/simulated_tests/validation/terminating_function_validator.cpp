@@ -2,15 +2,16 @@
 
 #include <boost/bind.hpp>
 
-TerminatingFunctionValidator::TerminatingFunctionValidator(ValidationFunction validation_function,
-                                                           std::shared_ptr<World> world)
+TerminatingFunctionValidator::TerminatingFunctionValidator(
+    ValidationFunction validation_function,
+    std::shared_ptr<World> world)
     :  // We need to provide the world and validation_function in the coroutine function
        // binding so that the wrapper function has access to the correct variable context,
        // otherwise the World inside the coroutine will not update properly when the
        // pointer is updated, and the wrong validation_function may be run.
       validation_sequence(
-          boost::bind(&TerminatingFunctionValidator::executeAndCheckForSuccessWrapper, this, _1,
-                      world, validation_function))
+          boost::bind(&TerminatingFunctionValidator::executeAndCheckForSuccessWrapper,
+                      this, _1, world, validation_function))
 {
 }
 
