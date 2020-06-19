@@ -14,7 +14,7 @@
 #include "software/gui/visualizer/ui/ui_main_widget.h"
 #include "software/gui/visualizer/widgets/ai_control.h"
 #include "software/gui/visualizer/widgets/parameters.h"
-#include "software/gui/visualizer/widgets/world_view.h"
+#include "software/gui/generic_widgets/world_view/world_view.h"
 #include "software/new_geom/rectangle.h"
 #include "software/proto/sensor_msg.pb.h"
 
