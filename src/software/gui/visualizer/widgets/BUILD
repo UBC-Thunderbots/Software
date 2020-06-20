@@ -1,6 +1,6 @@
 load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
 
-package(default_visibility = ["//software/gui/visualizer:__subpackages__"])
+package(default_visibility = ["//software/gui:__subpackages__"])
 
 qt_cc_library(
     name = "main_widget",
