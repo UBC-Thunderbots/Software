@@ -172,5 +172,6 @@ cc_binary(
         ":threaded_simulator",
         "//software/gui/standalone_simulator:standalone_simulator_gui_wrapper",
         "//software/logger",
+        "//software/world:field",
     ],
 )
