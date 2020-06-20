@@ -196,7 +196,7 @@ class BallFilterTest : public ::testing::Test
 
             // Create the detection that would have been seen by the vision system
             std::vector<BallDetection> ball_detections = {
-                BallDetection{ball_position_with_noise, current_timestamp}};
+                BallDetection{ball_position_with_noise, BALL_HEIGHT_METRES, current_timestamp}};
 
             // Get the filtered result given the new detection information
             auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);
@@ -242,6 +242,9 @@ class BallFilterTest : public ::testing::Test
     Duration time_step;
     std::mt19937 random_generator;
     Timestamp current_timestamp;
+    // For these tests, the ball is always on the ground. The filters
+    // are not designed for filtering balls in the air
+    static constexpr double BALL_HEIGHT_METRES = 0.0;
 };
 
 TEST_F(BallFilterTest, ball_sitting_still_with_low_noise)
@@ -512,8 +515,8 @@ TEST_F(BallFilterTest,
     boost::circular_buffer<BallDetection> ball_detections(2);
     Point p1(0, 0);
     Point p2(1, 0.5);
-    ball_detections.push_front({p1, Timestamp::fromSeconds(1)});
-    ball_detections.push_front({p2, Timestamp::fromSeconds(2)});
+    ball_detections.push_front({p1, BALL_HEIGHT_METRES, Timestamp::fromSeconds(1)});
+    ball_detections.push_front({p2, BALL_HEIGHT_METRES, Timestamp::fromSeconds(2)});
     auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
 
     double d1 = distance(x_vs_y_regression.regression_line, p1);
