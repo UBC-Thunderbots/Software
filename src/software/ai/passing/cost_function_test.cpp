@@ -534,18 +534,18 @@ TEST_F(PassingEvaluationTest, ratePass_attempting_to_pass_and_receive_no_shot)
     // highly if we are rating it as a pass which is intended to be received
 
     World world = ::TestUtil::createBlankTestingWorld();
-    world.mutableFriendlyTeam().updateRobots({
+    world.updateFriendlyTeamState(Team({
         Robot(0, {1, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
-    });
-    world.mutableEnemyTeam().updateRobots({
+    }));
+    world.updateEnemyTeamState(Team({
         Robot(0, world.field().enemyGoalCenter(), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
         Robot(1, world.field().enemyGoalCenter() - Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
         Robot(2, world.field().enemyGoalCenter() + Vector(0, 0.2), {0, 0}, Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-    });
+    }));
 
     // Since we're passing from the origin to a point directly in front of the goal,
     // the receiving robot would have to turn 180 degrees to take a shot after
