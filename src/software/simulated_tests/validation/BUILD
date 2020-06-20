@@ -10,9 +10,9 @@ cc_library(
 )
 
 cc_library(
-    name = "function_validator",
-    srcs = ["function_validator.cpp"],
-    hdrs = ["function_validator.h"],
+    name = "terminating_function_validator",
+    srcs = ["terminating_function_validator.cpp"],
+    hdrs = ["terminating_function_validator.h"],
     deps = [
         ":validation_function",
         "@boost//:coroutine2",
@@ -20,10 +20,10 @@ cc_library(
 )
 
 cc_test(
-    name = "function_validator_test",
-    srcs = ["function_validator_test.cpp"],
+    name = "terminating_function_validator_test",
+    srcs = ["terminating_function_validator_test.cpp"],
     deps = [
-        ":function_validator",
+        ":terminating_function_validator",
         ":validation_function",
         "//software/test_util",
         "//software/world",
@@ -32,9 +32,9 @@ cc_test(
 )
 
 cc_library(
-    name = "continuous_function_validator",
-    srcs = ["continuous_function_validator.cpp"],
-    hdrs = ["continuous_function_validator.h"],
+    name = "non_terminating_function_validator",
+    srcs = ["non_terminating_function_validator.cpp"],
+    hdrs = ["non_terminating_function_validator.h"],
     deps = [
         ":validation_function",
         "@boost//:coroutine2",
@@ -42,30 +42,13 @@ cc_library(
 )
 
 cc_test(
-    name = "continuous_function_validator_test",
-    srcs = ["continuous_function_validator_test.cpp"],
+    name = "non_terminating_function_validator_test",
+    srcs = ["non_terminating_function_validator_test.cpp"],
     deps = [
-        ":continuous_function_validator",
+        ":non_terminating_function_validator",
         ":validation_function",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "world_state_validator",
-    srcs = ["world_state_validator.cpp"],
-    hdrs = ["world_state_validator.h"],
-    deps = [
-        ":continuous_function_validator",
-        ":function_validator",
-        ":validation_function",
-        "//software/logger",
-        "//software/multithreading:subject",
-        "//software/multithreading:thread_safe_buffer",
-        "//software/multithreading:threaded_observer",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
