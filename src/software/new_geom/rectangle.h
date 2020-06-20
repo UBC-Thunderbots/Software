@@ -100,13 +100,6 @@ class Rectangle : public ConvexPolygon
     double yMin() const;
 
     /**
-     * Determines whether the given Point is contained within this Rectangle.
-     *
-     * @return whether the Point p is contained within this Rectangle.
-     */
-    bool contains(const Point &p) const override;
-
-    /**
      * Returns the corner point of the rectangle that is the furthest from the input
      * point.
      *

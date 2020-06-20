@@ -11,8 +11,6 @@ cc_library(
     hdrs = ["segment.h"],
     deps = [
         ":point",
-        "//software/new_geom/util:almost_equal",
-        "//software/new_geom/util:collinear",
     ],
 )
 
@@ -145,7 +143,6 @@ cc_library(
     hdrs = ["ray.h"],
     deps = [
         ":point",
-        "//software/new_geom/util:collinear",
     ],
 )
 

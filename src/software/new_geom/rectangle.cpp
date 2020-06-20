@@ -71,21 +71,16 @@ double Rectangle::yMin() const
     return negXNegYCorner().y();
 }
 
-bool Rectangle::contains(const Point &p) const
-{
-    return p.x() >= negXNegYCorner().x() && p.y() >= negXNegYCorner().y() &&
-           p.x() <= negXNegYCorner().x() + diagonal().x() &&
-           p.y() <= negXNegYCorner().y() + diagonal().y();
-}
-
 Point Rectangle::furthestCorner(const Point &p) const
 {
     std::vector<Point> corners = points_;
 
-    return *std::max_element(
-        corners.begin(), corners.end(), [&](const Point &corner1, const Point &corner2) {
-            return p.distanceFromPoint(corner1) < p.distanceFromPoint(corner2);
-        });
+    // TODO: fix this!
+    return *corners.begin();
+//    return *std::max_element(
+//        corners.begin(), corners.end(), [&](const Point &corner1, const Point &corner2) {
+//            return p.distanceFromPoint(corner1) < p.distanceFromPoint(corner2);
+//        });
 }
 
 bool Rectangle::inflate(double amount)
