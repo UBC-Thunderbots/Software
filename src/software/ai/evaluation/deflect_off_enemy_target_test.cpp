@@ -18,8 +18,8 @@ TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
     enemy_robots.emplace_back(enemy_robot);
 
     World test_world = TestUtil::createBlankTestingWorld();
-    test_world.mutableFriendlyTeam().updateRobots(friendly_robots);
-    test_world.mutableEnemyTeam().updateRobots(enemy_robots);
+    test_world.updateFriendlyTeamState(Team(friendly_robots));
+    test_world.updateEnemyTeamState(Team(enemy_robots));
     TestUtil::setBallPosition(test_world, Point(-1, 0), Timestamp::fromMilliseconds(0));
 
     Point p = deflect_off_enemy_target(test_world);
