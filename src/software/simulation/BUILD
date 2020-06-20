@@ -164,3 +164,13 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_binary(
+    name = "simulator_gui_main",
+    srcs = ["simulator_main.cpp"],
+    deps = [
+        ":threaded_simulator",
+        "//software/gui/simulator:simulator_gui_wrapper",
+        "//software/logger",
+    ],
+)

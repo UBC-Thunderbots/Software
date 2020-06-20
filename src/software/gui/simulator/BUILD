@@ -16,13 +16,3 @@ cc_library(
         "@qt//:qt_widgets",
     ],
 )
-
-cc_binary(
-    name = "simulator_gui_main",
-    srcs = ["simulator_main.cpp"],
-    deps = [
-        ":simulator_gui_wrapper",
-        "//software/logger",
-        "//software/simulation:threaded_simulator",
-    ],
-)
