@@ -37,6 +37,19 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "trajectory_planner_impl_test",
+    srcs = [
+        "trajectory_planner_impl.h",
+        "trajectory_planner_impl_test.cpp",
+    ],
+    deps = [
+        ":trajectory_planner",
+        "//software/new_geom:vector",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "control",
     srcs = ["control.c"],
