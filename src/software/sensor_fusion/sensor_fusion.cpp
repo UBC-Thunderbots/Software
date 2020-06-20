@@ -32,10 +32,6 @@ std::optional<World> SensorFusion::getWorld() const
     {
         return std::nullopt;
     }
-    else
-    {
-        return std::nullopt;
-    }
 }
 
 void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
