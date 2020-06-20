@@ -227,7 +227,7 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
 
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -246,7 +246,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -265,7 +265,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast_at_future_timestamp)
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -284,7 +284,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_slow)
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -303,7 +303,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_wrong_way)
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -322,7 +322,7 @@ TEST(RobotEvaluationTest, pass_with_ball_slightly_off)
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
@@ -341,7 +341,7 @@ TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
-    world.mutableFriendlyTeam().updateState(Team({robot}, Duration::fromSeconds(10)));
+    world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
     auto result = robotBeingPassedTo(world, robot, Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());

@@ -112,6 +112,7 @@ cc_library(
     srcs = ["ssl_referee.cpp"],
     hdrs = ["ssl_referee.h"],
     deps = [
+        "//software/new_geom:point",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion:refbox_data",
         "//software/world:team_colour",

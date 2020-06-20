@@ -205,7 +205,7 @@ void NetworkClient::filterAndPublishGameControllerData(Referee packet)
     {
         RefboxGameState game_state = network_filter.getRefboxGameState(packet);
         World world(*field, *ball, friendly_team, enemy_team);
-        world.updateRefboxGameState(game_state);
+        world.updateGameState(game_state);
         received_world_callback(world);
     }
 }

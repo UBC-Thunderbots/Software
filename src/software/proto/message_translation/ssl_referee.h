@@ -1,5 +1,6 @@
 #pragma once
 
+#include "software/new_geom/point.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/world/team_colour.h"
@@ -24,3 +25,12 @@ RefboxGameState createRefboxGameState(const Referee &packet, TeamColour team_col
  * @return RefboxStage from stage
  */
 RefboxStage createRefboxStage(const Referee &packet);
+
+/**
+ * Extracts the ball placement point from Referee packet
+ *
+ * @param packet Referee protobuf
+ *
+ * @return ball placement point if found
+ */
+std::optional<Point> getBallPlacementPoint(const Referee &packet);

@@ -16,7 +16,21 @@ std::optional<World> SensorFusion::getWorld() const
 {
     if (field && ball)
     {
-        return World(*field, *ball, friendly_team, enemy_team);
+        World new_world(*field, *ball, friendly_team, enemy_team);
+        new_world.updateRefboxStage(refbox_stage);
+        if (ball_placement_point)
+        {
+            new_world.updateGameState(refbox_game_state, *ball_placement_point);
+        }
+        else
+        {
+            new_world.updateGameState(refbox_game_state);
+        }
+        return new_world;
+    }
+    else
+    {
+        return std::nullopt;
     }
 }
 
@@ -68,12 +82,32 @@ void SensorFusion::updateWorld(const Referee &packet)
             ->FriendlyColorYellow()
             ->value())
     {
-        game_state = createRefboxGameState(packet, TeamColour::YELLOW);
+        refbox_game_state = createRefboxGameState(packet, TeamColour::YELLOW);
     }
     else
     {
-        game_state = createRefboxGameState(packet, TeamColour::BLUE);
+        refbox_game_state = createRefboxGameState(packet, TeamColour::BLUE);
     }
+
+    if (refbox_game_state == RefboxGameState::BALL_PLACEMENT_US)
+    {
+        auto pt = getBallPlacementPoint(packet);
+        if (pt)
+        {
+            ball_placement_point = pt;
+        }
+        else
+        {
+            LOG(WARNING)
+                << "In BALL_PLACEMENT_US game state, but no ball placement point found"
+                << std::endl;
+        }
+    }
+    else
+    {
+        ball_placement_point = std::nullopt;
+    }
+
     refbox_stage = createRefboxStage(packet);
 }
 
