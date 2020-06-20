@@ -30,8 +30,8 @@ void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
  * @param orientation The orientation of the robot
  * @param color The color to draw the robot's position
  */
-void drawRobotPosition(QGraphicsScene* scene, const Point& position,
-                       const Angle& orientation, const QColor& color);
+void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
+                         const Angle& orientation, const QColor& color);
 
 /**
  * Draws the robot's ID on the given scene.

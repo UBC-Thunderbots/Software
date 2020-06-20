@@ -20,8 +20,8 @@ void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
     drawSegment(scene, Segment(position, position + velocity), pen);
 }
 
-void drawRobotPosition(QGraphicsScene* scene, const Point& position,
-                       const Angle& orientation, const QColor& color)
+void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
+                         const Angle& orientation, const QColor& color)
 {
     QPen pen(Qt::black);
     pen.setWidth(1);
@@ -101,8 +101,8 @@ void drawRobotId(QGraphicsScene* scene, const Point& position, const RobotId id)
 
 void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColor& color)
 {
-    drawRobotPosition(scene, robot.robot_state.position(),
-                      robot.robot_state.orientation(), color);
+    drawRobotAtPosition(scene, robot.robot_state.position(),
+                        robot.robot_state.orientation(), color);
     drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(),
                       color);
     drawRobotId(scene, robot.robot_state.position(), robot.id);
@@ -113,6 +113,6 @@ void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColo
 
 void drawRobot(QGraphicsScene* scene, const RobotDetection& robot, const QColor& color)
 {
-    drawRobotPosition(scene, robot.position, robot.orientation, color);
+    drawRobotAtPosition(scene, robot.position, robot.orientation, color);
     drawRobotId(scene, robot.position, robot.id);
 }
