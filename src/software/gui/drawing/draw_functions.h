@@ -3,17 +3,22 @@
 #include <QtWidgets/QGraphicsScene>
 #include <functional>
 
-// This class is used to represent a "draw function", which is a function
-// provided to the visualizer that tells is how to draw things.
-// All functionality is implemented in this class so
-// subclasses only need to call the superconstructor.
-//
-// This class is made abstract by making the desctructor pure virtual,
-// but providing an implementation. The subclasses will have a default
-// destructor automatically generated which will implement the virtual
-// destructor. All together this lets the base class be pure virtual
-// without needing an extra pure-virtual "dummy" function
-// See https://stackoverflow.com/a/4641108
+/**
+ * This class is used to represent a "draw function", which is a function
+ * provided to various GUI components that tells them how to draw things.
+ *
+ * Draw functions exist because certain objects we would normally like to
+ * draw (like the AI) are non-copyable, so they can't be sent over
+ * the Observer system. We'd like to keep GUI / drawing-specific code
+ * out of our logic as much as possible, so DrawFunctions are the
+ * solution to that.
+ *
+ * DrawFunctions can capture any data that supports copying and
+ * "store" it for later. That way the entire DrawFunction can be copied
+ * and passed around the system, until some consumer calls it to
+ * draw its contents. This allows us to draw larger non-copyable objects
+ * by creating a DrawFunction from it's copyable components / members.
+ */
 class DrawFunction
 {
    public:
@@ -30,13 +35,14 @@ class DrawFunction
             draw_function_(scene);
         }
     }
-    virtual ~DrawFunction() = 0;
 
-   protected:
+   private:
     std::function<void(QGraphicsScene* scene)> draw_function_;
 };
 
-inline DrawFunction::~DrawFunction() = default;
+// Note: Generally the top-level DrawFunction class can be used, but if we need
+// separate concrete types (for example so an Observer can explicitly observe
+// two different DrawFunctions), they can be defined here.
 
 class AIDrawFunction : public DrawFunction
 {

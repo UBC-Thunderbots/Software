@@ -21,7 +21,7 @@
  * @param brush_opt The optional pointer to a brush to fill the Rectangle
  */
 void drawRectangle(QGraphicsScene* scene, const Rectangle& rectangle, const QPen& pen,
-                   std::optional<QBrush> brush_opt = std::nullopt);
+                   const std::optional<QBrush>& brush_opt = std::nullopt);
 
 /**
  * Draws the Polygon on the given scene.
@@ -32,7 +32,7 @@ void drawRectangle(QGraphicsScene* scene, const Rectangle& rectangle, const QPen
  * @param brush_opt The optional pointer to a brush to fill the Polygon
  */
 void drawPolygon(QGraphicsScene* scene, const Polygon& polygon, const QPen& pen,
-                 std::optional<QBrush> brush_opt = std::nullopt);
+                 const std::optional<QBrush>& brush_opt = std::nullopt);
 
 /**
  * Draws the Circle on the given scene.
@@ -43,7 +43,7 @@ void drawPolygon(QGraphicsScene* scene, const Polygon& polygon, const QPen& pen,
  * @param brush_opt The optional pointer to a brush to fill the Circle
  */
 void drawCircle(QGraphicsScene* scene, const Circle& circle, const QPen& pen,
-                std::optional<QBrush> brush_opt = std::nullopt);
+                const std::optional<QBrush>& brush_opt = std::nullopt);
 
 /**
  * Draws the Segment on the given scene.

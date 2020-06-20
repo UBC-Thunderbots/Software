@@ -7,7 +7,7 @@
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_ball.h"
-#include "software/test_util/test_util.h"
+#include "software/time/duration.h"
 #include "software/world/robot_state.h"
 
 class PhysicsRobotTest : public testing::Test

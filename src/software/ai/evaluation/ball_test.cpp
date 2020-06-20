@@ -6,7 +6,7 @@
 
 TEST(BallInFriendlyHalfTest, ball_barely_in_friendly_half)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(-0.01, 1), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_TRUE(ballInFriendlyHalf(field, ball));
@@ -14,7 +14,7 @@ TEST(BallInFriendlyHalfTest, ball_barely_in_friendly_half)
 
 TEST(BallInFriendlyHalfTest, ball_at_friendly_corner)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball =
         Ball(field.friendlyCornerNeg(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
@@ -23,7 +23,7 @@ TEST(BallInFriendlyHalfTest, ball_at_friendly_corner)
 
 TEST(BallInFriendlyHalfTest, ball_barely_in_enemy_half)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(0.03, -3), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_FALSE(ballInFriendlyHalf(field, ball));
@@ -31,7 +31,7 @@ TEST(BallInFriendlyHalfTest, ball_barely_in_enemy_half)
 
 TEST(BallInFriendlyHalfTest, ball_at_enemy_goal)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball =
         Ball(field.enemyGoalCenter(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
@@ -40,7 +40,7 @@ TEST(BallInFriendlyHalfTest, ball_at_enemy_goal)
 
 TEST(BallInEnemyHalfTest, ball_barely_in_enemy_half)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(0.01, 1), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_TRUE(ballInEnemyHalf(field, ball));
@@ -48,7 +48,7 @@ TEST(BallInEnemyHalfTest, ball_barely_in_enemy_half)
 
 TEST(BallInEnemyHalfTest, ball_at_enemy_corner)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball =
         Ball(field.enemyCornerNeg(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
@@ -57,7 +57,7 @@ TEST(BallInEnemyHalfTest, ball_at_enemy_corner)
 
 TEST(BallInEnemyHalfTest, ball_barely_in_friendly_half)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(-0.03, -3), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_FALSE(ballInEnemyHalf(field, ball));
@@ -65,7 +65,7 @@ TEST(BallInEnemyHalfTest, ball_barely_in_friendly_half)
 
 TEST(BallInEnemyHalfTest, ball_at_friendly_goal)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball =
         Ball(field.friendlyGoalCenter(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
@@ -90,7 +90,7 @@ class BallPositionsInEnemyCornerOffField : public ::testing::TestWithParam<Point
 
 TEST_P(BallPositionsInFriendlyCornerOnField, in_corner_inside_field)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(GetParam(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_FALSE(ballInEnemyCorner(field, ball, 2.0));
@@ -106,7 +106,7 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOnField,
 
 TEST_P(BallPositionsInFriendlyCornerOffField, in_corner_outside_field)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(GetParam(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_FALSE(ballInFriendlyCorner(field, ball, 1.0));
@@ -120,7 +120,7 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOffField,
 
 TEST_P(BallPositionsInEnemyCornerOnField, in_corner_inside_field)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(GetParam(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_TRUE(ballInEnemyCorner(field, ball, 2.0));
@@ -136,7 +136,7 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInEnemyCornerOnField,
 
 TEST_P(BallPositionsInEnemyCornerOffField, in_corner_outside_field)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(GetParam(), Vector(0, 0), Timestamp::fromMilliseconds(0));
 
     EXPECT_FALSE(ballInEnemyCorner(field, ball, 1.0));

@@ -3,10 +3,8 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/gui/drawing/colors.h"
-#include "software/gui/drawing/geom.h"
-#include "software/gui/geometry_conversion.h"
-#include "software/new_geom/segment.h"
-#include "software/world/ball.h"
+#include "software/sensor_fusion/filter/vision_detection.h"
+#include "software/world/ball_state.h"
 #include "software/world/field.h"
 
 /**
@@ -21,16 +19,19 @@
  * @param ball The ball to draw
  * @param color The color to draw the ball's velocity
  */
-void drawBallVelocity(QGraphicsScene *scene, const Ball &ball, const QColor &color);
+void drawBallVelocity(QGraphicsScene *scene, const Point &position,
+                      const Vector &velocity, const QColor &color);
 
 /**
  * Draws the ball's position on the given scene.
  *
  * @param scene The scene to draw on
- * @param ball The ball to draw
+ * @param position The position of the ball
+ * @param distance_from_ground the distance of the ball off the ground
  * @param color The color to draw the ball's position
  */
-void drawBallPosition(QGraphicsScene *scene, const Ball &ball, const QColor &color);
+void drawBallPosition(QGraphicsScene *scene, const Point &position,
+                      double distance_from_ground, const QColor &color);
 
 /**
  * Draws the ball on the given scene.
@@ -38,14 +39,22 @@ void drawBallPosition(QGraphicsScene *scene, const Ball &ball, const QColor &col
  * @param scene The scene to draw on
  * @param ball The ball to draw
  */
-void drawBall(QGraphicsScene *scene, const Ball &ball);
+void drawBall(QGraphicsScene *scene, const BallState &ball);
+
+/**
+ * Draws the ball on the given scene.
+ *
+ * @param scene The scene to draw on
+ * @param ball The ball to draw
+ */
+void drawBall(QGraphicsScene *scene, const BallDetection &ball);
 
 /**
  * Draws a cone between the ball and friendly goal posts
  *
  * @param scene The scene to draw on
- * @param ball The ball to draw the cone for
+ * @param position The position of the ball
  * @param field The field to draw the cone on
  */
-void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Ball &ball,
+void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Point &position,
                                const Field &field);

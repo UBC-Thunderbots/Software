@@ -33,7 +33,7 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
     RobotNavigationObstacleFactoryMotionConstraintTest()
         : current_time(
               Timestamp::fromSeconds(123)),  // arbitrary point in time for testing
-          field(::TestUtil::createSSLDivBField()),
+          field(Field::createSSLDivisionBField()),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
