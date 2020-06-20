@@ -22,13 +22,14 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
       refbox_config(refbox_config),
       camera_config(camera_config)
 {
-    ssl_vision_client = std::make_unique<ThreadedProtoMulticastListener<SSL_WrapperPacket>>(
+    ssl_vision_client =
+        std::make_unique<ThreadedProtoMulticastListener<SSL_WrapperPacket>>(
             vision_multicast_address, vision_multicast_port,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
 
     ssl_gamecontroller_client = std::make_unique<ThreadedProtoMulticastListener<Referee>>(
-            gamecontroller_multicast_address, gamecontroller_multicast_port,
-            boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
+        gamecontroller_multicast_address, gamecontroller_multicast_port,
+        boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
 }
 
 void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
