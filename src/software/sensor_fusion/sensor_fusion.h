@@ -3,8 +3,6 @@
 #include <google/protobuf/repeated_field.h>
 
 #include "software/backend/robot_status.h"
-#include "software/multithreading/subject.h"
-#include "software/multithreading/threaded_observer.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_referee.h"
@@ -19,35 +17,33 @@
 
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
- * need to perform. It produces Worlds that may be used, and consumes SensorMsgs
- *
- * This produce/consume pattern is performed by extending both "Observer" and
- * "Subject". Please see the implementation of those classes for details.
+ * need to perform. It produces Worlds that may be used, and consumes vision detections,
+ * refbox data, and robot statuses
  */
-class SensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
+class SensorFusion
 {
    public:
     SensorFusion();
 
     virtual ~SensorFusion() = default;
 
-    // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal
-    // multithreading this class potentially uses
-    SensorFusion &operator=(const SensorFusion &) = delete;
-    SensorFusion(const SensorFusion &)            = delete;
-
-   private:
-    void onValueReceived(SensorMsg sensor_msg) override;
-
     /**
-     * Updates components of world based on a new data and sends World to observers if
-     * complete
+     * Updates components of world based on a new data
      *
      * @param new data
      */
     void updateWorld(const SensorMsg &sensor_msg);
 
+    /**
+     * Returns the most up-to-date world if enough data has been received
+     * to create one.
+     *
+     * @return the most up-to-date world if enough data has been received
+     * to create one.
+     */
+    std::optional<World> getWorld() const;
+
+   private:
     /**
      * Updates relevant components of world based on a new data
      *

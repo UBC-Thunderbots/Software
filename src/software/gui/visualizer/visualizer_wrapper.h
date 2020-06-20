@@ -40,6 +40,12 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     ~VisualizerWrapper() override;
 
+    void onValueReceived(World world) override;
+    void onValueReceived(AIDrawFunction draw_function) override;
+    void onValueReceived(PlayInfo play_info) override;
+    void onValueReceived(SensorMsg sensor_msg) override;
+    void onValueReceived(RobotStatus robot_status) override;
+
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
      * be notified once the Visualizer has shut down
@@ -61,12 +67,6 @@ class VisualizerWrapper : public ThreadedObserver<World>,
      * @param argv Keyword arguments for the Visualizer QApplication
      */
     void createAndRunVisualizer(int argc, char** argv);
-
-    void onValueReceived(World world) override;
-    void onValueReceived(AIDrawFunction draw_function) override;
-    void onValueReceived(PlayInfo play_info) override;
-    void onValueReceived(SensorMsg sensor_msg) override;
-    void onValueReceived(RobotStatus robot_status) override;
 
     std::thread run_visualizer_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
