@@ -111,7 +111,9 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).length(), 0.3);
         EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
         EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).getSeconds()), 0.2);
+        UNUSED(score);
     }
+    UNUSED(converged_score);
 }
 
 TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
@@ -157,6 +159,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
     EXPECT_LE((converged_pass.receiverPoint() - robot_1.position()).length(), 0.6);
+    UNUSED(converged_score);
 }
 
 TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
@@ -211,6 +214,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
     EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).length(), 0.55);
+    UNUSED(converged_score);
 }
 
 TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
@@ -316,4 +320,5 @@ TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_regio
     // target region instead.
     auto [converged_pass, score] = pass_generator->getBestPassSoFar();
     EXPECT_TRUE(target_region.contains(converged_pass.receiverPoint()));
+    UNUSED(score);
 }

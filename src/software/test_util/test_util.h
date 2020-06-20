@@ -15,6 +15,8 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
+#define UNUSED(x) (void)(x)
+
 /**
  * Utility functions to our unit test suite, primarily for assisting with test setup (such
  * as creating World or Field objects)

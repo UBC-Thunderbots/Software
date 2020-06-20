@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 sh_binary(
     name = "debug_firmware_on_arm_board",
     srcs = ["debug_firmware_on_arm_board.sh"],

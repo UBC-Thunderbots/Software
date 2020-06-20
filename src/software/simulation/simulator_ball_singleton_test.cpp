@@ -6,7 +6,6 @@
 
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
-#include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 #include "software/world/world.h"
 

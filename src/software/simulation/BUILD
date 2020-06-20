@@ -106,7 +106,6 @@ cc_test(
         "//software/new_geom:point",
         "//software/new_geom:vector",
         "//software/simulation/physics:physics_world",
-        "//software/test_util",
         "//software/time:timestamp",
         "//software/world",
         "@gtest//:gtest_main",

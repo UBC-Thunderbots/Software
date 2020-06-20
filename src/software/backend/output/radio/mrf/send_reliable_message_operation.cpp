@@ -21,10 +21,11 @@ namespace
                 "Number of tries must be between 1 and 256 (inclusive)");
         }
 
-        uint8_t buffer[3 + length];
-        buffer[0] = static_cast<uint8_t>(robot | 0x10);
-        buffer[1] = message_id;
-        buffer[2] = static_cast<uint8_t>(tries & 0xFF);
+        std::vector<uint8_t> buffer_vec(3 + length);
+        buffer_vec[0]   = static_cast<uint8_t>(robot | 0x10);
+        buffer_vec[1]   = message_id;
+        buffer_vec[2]   = static_cast<uint8_t>(tries & 0xFF);
+        uint8_t *buffer = buffer_vec.data();
         std::memcpy(buffer + 3, data, length);
         std::unique_ptr<USB::BulkOutTransfer> ptr(
             new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));

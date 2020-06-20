@@ -456,7 +456,7 @@ TEST_F(RobotTest, get_position_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Point> previous_positions{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_positions.push_back(previous_states.at(i).robotState().position());
     }
@@ -479,7 +479,7 @@ TEST_F(RobotTest, get_velocity_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Vector> previous_velocities{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_velocities.push_back(previous_states.at(i).robotState().velocity());
     }
@@ -503,7 +503,7 @@ TEST_F(RobotTest, get_orientation_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Angle> previous_orientations{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_orientations.push_back(previous_states.at(i).robotState().orientation());
     }
@@ -530,7 +530,7 @@ TEST_F(RobotTest, get_angular_velocity_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<AngularVelocity> previous_angular_velocities{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_angular_velocities.push_back(
             previous_states.at(i).robotState().angularVelocity());
@@ -554,7 +554,7 @@ TEST_F(RobotTest, get_timestamp_history)
     boost::circular_buffer<TimestampedRobotState> previous_states =
         robot.getPreviousStates();
     std::vector<Timestamp> previous_timestamps{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_timestamps.push_back(previous_states.at(i).timestamp());
     }

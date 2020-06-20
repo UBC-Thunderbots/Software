@@ -121,7 +121,7 @@ class Controller : public Subject<ControllerInput>
     size_t getNumButtons(int fd) const;
 
     std::thread event_loop_thread;
-    std::atomic_bool in_destructor;
     std::shared_ptr<const HandheldControllerInputConfig> controller_input_config;
+    std::atomic_bool in_destructor;
     static constexpr double axis_deadzone = 0.05;
 };

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "software/new_geom/point.h"
 #include "software/new_geom/polynomial2d.h"
 
@@ -90,6 +92,20 @@ class Spline2d
     virtual size_t getNumKnots() const = 0;
 
     /**
+     * Get the parametrization values corresponding to the knots of this spline
+     *
+     * So for example, if we had a 3-knot spline that is linearly interpolated, this
+     * function would return {0, 0.5, 1}.
+     *
+     * NOTE: There is no guarantee that the knots will be at linearly interpolated
+     *       (equally spaced) intervals. This could return `{0, 0.25, 1.0}` and still be
+     *       well defined.
+     *
+     * @return The parametrization values corresponding to the knots of this spline
+     */
+    virtual std::vector<double> getKnotParametrizationValues() const = 0;
+
+    /**
      * Gets start point of spline
      *
      * @return start point of spline
@@ -127,6 +143,6 @@ class Spline2d
      *
      * @return A SplineSegment2d created from the given parameters
      */
-    SplineSegment2d createSplineSegment2d(double start_val, double end_val,
-                                          Polynomial2d polynomial);
+    static SplineSegment2d createSplineSegment2d(double start_val, double end_val,
+                                                 Polynomial2d polynomial);
 };

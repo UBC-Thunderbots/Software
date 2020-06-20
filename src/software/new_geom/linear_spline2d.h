@@ -38,6 +38,8 @@ class LinearSpline2d : Spline2d
 
     size_t getNumKnots(void) const override;
 
+    std::vector<double> getKnotParametrizationValues() const override;
+
     const std::vector<Point> getKnots(void) const override;
 
     const Point getStartPoint(void) const override;
