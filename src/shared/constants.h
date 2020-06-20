@@ -110,4 +110,4 @@ const uint16_t PRIMITIVE_PORT = 42070;
 const uint16_t ROBOT_STATUS_PORT = 42071;
 
 // maximum transfer unit size in bytes
-const uint16_t MAXIMUM_TRANSFER_UNIT_BYTES = 9000;
+const uint16_t MAXIMUM_TRANSFER_UNIT_BYTES = 1500;

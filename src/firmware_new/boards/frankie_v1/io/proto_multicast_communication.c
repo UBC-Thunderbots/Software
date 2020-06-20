@@ -87,7 +87,9 @@ void io_proto_multicast_sender_Task(void* arg)
     //
     // We use IP6_ADDR_ANY which will default to the ethernet interface on the STM32H7
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
-    netconn_join_leave_group(conn, comm_profile->multicast_address, NULL, NETCONN_JOIN);
+    /*netconn_bind(conn, IP6_ADDR_ANY, comm_profile->port);*/
+    netconn_join_leave_group(conn, comm_profile->multicast_address, IP6_ADDR_ANY,
+                             NETCONN_JOIN);
 
     // this buffer is used to hold serialized proto
     uint8_t buffer[comm_profile->message_max_size];
@@ -100,17 +102,23 @@ void io_proto_multicast_sender_Task(void* arg)
         /*osEventFlagsWait(comm_profile->communication_event, UPDATED_PROTO,
          * osFlagsWaitAny,*/
         /*osWaitForever);*/
+
         osDelay(100);
 
         tx_buf = netbuf_new();
         netbuf_alloc(tx_buf, comm_profile->message_max_size);
 
         // serialize proto
-        pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-        pb_encode(&stream, comm_profile->message_fields, comm_profile->protobuf_struct);
+        /*pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));*/
+        /*pb_encode(&stream, comm_profile->message_fields,
+         * comm_profile->protobuf_struct);*/
 
+        buffer[0] = 100;
+        buffer[1] = 200;
+        buffer[3] = 300;
         // package payload and send over udp
         tx_buf->p->payload = buffer;
+        ip6addr_aton("fe80::ff2:e723:3fb0:4f94", comm_profile->multicast_address);
         netconn_sendto(conn, tx_buf, comm_profile->multicast_address, comm_profile->port);
 
         netbuf_delete(tx_buf);
@@ -129,7 +137,8 @@ void io_proto_multicast_listener_Task(void* arg)
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
     netconn_set_ipv6only(conn, true);
     netconn_bind(conn, comm_profile->multicast_address, comm_profile->port);
-    netconn_join_leave_group(conn, comm_profile->multicast_address, NULL, NETCONN_JOIN);
+    netconn_join_leave_group(conn, comm_profile->multicast_address, IP6_ADDR_ANY,
+                             NETCONN_JOIN);
 
     // network buffer
     struct netbuf* rx_buf = NULL;

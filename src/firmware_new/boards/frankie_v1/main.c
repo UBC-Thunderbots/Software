@@ -61,10 +61,9 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* Definitions for NetStartTask */
 osThreadId_t NetStartTaskHandle;
-const osThreadAttr_t NetStartTask_attributes = {
-    .name       = "NetStartTask",
-    .priority   = (osPriority_t)osPriorityNormal,
-    .stack_size = 1024 * 4};
+const osThreadAttr_t NetStartTask_attributes = {.name     = "NetStartTask",
+                                                .priority = (osPriority_t)osPriorityHigh7,
+                                                .stack_size = 1024 * 4};
 /* Definitions for RobotStatusTask */
 osThreadId_t RobotStatusTaskHandle;
 const osThreadAttr_t RobotStatusTask_attributes = {
@@ -272,7 +271,7 @@ int main(void)
         osThreadNew(io_proto_multicast_listener_Task, (void *)vision_msg_listener_profile,
                     &VisionMsgTask_attributes);
 
-    /* creation of PrimMsgTask */
+    /*[> creation of PrimMsgTask <]*/
     PrimMsgTaskHandle =
         osThreadNew(io_proto_multicast_listener_Task,
                     (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
