@@ -27,10 +27,10 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position,
  *
  * @param scene The scene to draw on
  * @param position The position of the ball
- * @param height the height of the ball
+ * @param distance_from_ground the distance of the ball off the ground
  * @param color The color to draw the ball's position
  */
-void drawBallPosition(QGraphicsScene *scene, const Point &position, double height,
+void drawBallPosition(QGraphicsScene *scene, const Point &position, double distance_from_ground,
                       const QColor &color);
 
 /**

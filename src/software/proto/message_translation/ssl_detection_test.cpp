@@ -102,7 +102,7 @@ TEST(SSLDetectionTest, test_convert_ball_state_to_proto_and_back)
     BallDetection ball_detection = ball_detections.at(0);
     EXPECT_FLOAT_EQ(-1.2f, static_cast<float>(ball_detection.position.x()));
     EXPECT_FLOAT_EQ(-0.0f, static_cast<float>(ball_detection.position.y()));
-    EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.height));
+    EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.distance_from_ground));
 }
 
 TEST(SSLDetectionTest, test_convert_invalid_position_ball_state_to_proto_and_back)
@@ -138,7 +138,7 @@ TEST(SSLDetectionTest, test_convert_valid_position_ball_state_to_proto_and_back)
     BallDetection ball_detection = ball_detections.at(0);
     EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.position.x()));
     EXPECT_FLOAT_EQ(2.0f, static_cast<float>(ball_detection.position.y()));
-    EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.height));
+    EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.distance_from_ground));
 }
 
 TEST(SSLDetectionTest, test_convert_robot_states_to_proto_and_back)

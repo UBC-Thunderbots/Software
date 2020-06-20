@@ -18,7 +18,7 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position,
     drawSegment(scene, Segment(position, position + velocity), pen);
 }
 
-void drawBallPosition(QGraphicsScene *scene, const Point &position, const double height,
+void drawBallPosition(QGraphicsScene *scene, const Point &position, const double distance_from_ground,
                       const QColor &color)
 {
     QPen pen(color);
@@ -26,29 +26,29 @@ void drawBallPosition(QGraphicsScene *scene, const Point &position, const double
     pen.setCosmetic(true);
 
     QColor fill_colour = color;
-    // Decrease the alpha value as the ball's height increases
+    // Decrease the alpha value as the ball moves further from the ground
     double alpha =
-        1.0 - normalizeValueToRange<double>(height, 0, ROBOT_MAX_HEIGHT_METERS, 0.0, 0.5);
+        1.0 - normalizeValueToRange<double>(distance_from_ground, 0, ROBOT_MAX_HEIGHT_METERS, 0.0, 0.5);
     fill_colour.setAlphaF(alpha);
     QBrush brush(color);
     brush.setStyle(Qt::BrushStyle::SolidPattern);
 
-    // Increase the radius of the ball the higher it is.
+    // Increase the radius of the ball the further from the ground it is.
     // 2.0 is an estimate upper bound on how high the ball will go
     double ball_radius = normalizeValueToRange<double>(
-        height, 0, 2.0, BALL_MAX_RADIUS_METERS, 3 * BALL_MAX_RADIUS_METERS);
+            distance_from_ground, 0, 2.0, BALL_MAX_RADIUS_METERS, 3 * BALL_MAX_RADIUS_METERS);
     drawCircle(scene, Circle(position, ball_radius), pen, brush);
 }
 
 void drawBall(QGraphicsScene *scene, const BallState &ball)
 {
-    drawBallPosition(scene, ball.position(), ball.height(), ball_color);
+    drawBallPosition(scene, ball.position(), ball.distanceFromGround(), ball_color);
     drawBallVelocity(scene, ball.position(), ball.velocity(), ball_color);
 }
 
 void drawBall(QGraphicsScene *scene, const BallDetection &ball)
 {
-    drawBallPosition(scene, ball.position, ball.height, ball_color);
+    drawBallPosition(scene, ball.position, ball.distance_from_ground, ball_color);
 }
 
 void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Point &position,
