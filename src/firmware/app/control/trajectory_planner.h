@@ -16,6 +16,14 @@
 
 typedef struct FirmwareRobotPathParameters
 {
+    /*
+     * NOTE: Units must be consistent across the linear and angular domains. For example,
+     * if the linear 'path' is represented in inits of millimeters the linear velocity
+     * must be in mm/s and the accleleration in mm/s^2. The same goes for the angular
+     * domain. If the angular path is specified in radians the angular velocity must be in
+     * rad/s.
+     */
+
     // The 2D polynomial representation of the path to be followed
     Polynomial2dOrder3_t path;
     // The 1D polynomial representation of the orientation to be followed

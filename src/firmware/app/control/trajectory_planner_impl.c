@@ -7,10 +7,9 @@
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/physics.h"
 
-void app_trajectory_planner_getMaximumSpeedProfile_impl(
-    Polynomial2dOrder3_t path, const unsigned int num_elements, const float t_start,
-    const float t_end, const float max_allowable_acceleration, const float speed_cap,
-    float *max_allowable_speed_profile)
+void app_trajectory_planner_impl_getMaximumSpeedProfile(
+    Polynomial2dOrder3_t path, unsigned int num_elements, float t_start, float t_end,
+    float max_allowable_acceleration, float speed_cap, float *max_allowable_speed_profile)
 {
     const float t_increment = (t_end - t_start) / (num_elements - 1);
 
@@ -27,7 +26,7 @@ void app_trajectory_planner_getMaximumSpeedProfile_impl(
     }
 }
 
-void app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial1dOrder3_t path_1d, unsigned int num_elements,
     float *node_values, float *segment_lengths)
 {
@@ -54,7 +53,7 @@ void app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
     }
 }
 
-void app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
+void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial2dOrder3_t path_2d, unsigned int num_elements,
     float *x_values, float *y_values, float *segment_lengths)
 {
@@ -62,9 +61,9 @@ void app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
     float x_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float y_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
         t_start, t_end, path_2d.x, num_elements, x_values, x_lengths);
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
         t_start, t_end, path_2d.y, num_elements, y_values, y_lengths);
 
     // total length is the root sum-squared of the individual values
@@ -157,7 +156,7 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
 }
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
+app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
     unsigned int num_elements, float *segment_lengths, float *max_allowable_speed_profile,
     float max_allowable_acceleration, float initial_speed, float final_speed,
     float *speeds)
@@ -191,7 +190,7 @@ app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
 }
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
+app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
     unsigned int num_segments, float *segment_lengths, float max_allowable_acceleration,
     float initial_speed, float *speeds)
 {

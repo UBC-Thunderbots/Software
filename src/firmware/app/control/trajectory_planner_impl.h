@@ -43,7 +43,7 @@ typedef enum TrajectoryPlannerGenerationStatus
  * Node1  |--segment length---| Node2
  *   ->   *-------------------*  <-
  */
-void app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial1dOrder3_t path_1d, unsigned int num_elements,
     float *node_values, float *segment_lengths);
 
@@ -72,7 +72,7 @@ void app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
  * @param segment_lengths [out] The length of each trajectory segment (euclidean of the XY
  * 2d polynomial). This array is of length num_elements-1
  */
-void app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
+void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial2dOrder3_t path_2d, unsigned int num_elements,
     float *x_values, float *y_values, float *segment_lengths);
 
@@ -101,7 +101,7 @@ void app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
  * @return A status indicating whether or not modification was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
+app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
     unsigned int num_segments, float *segment_lengths, float max_allowable_acceleration,
     float initial_speed, float *speeds);
 
@@ -140,7 +140,7 @@ app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
+app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
     unsigned int num_elements, float *segment_lengths, float *max_allowable_speed_profile,
     float max_allowable_acceleration, float initial_speed, float final_speed,
     float *speeds);
@@ -174,7 +174,7 @@ app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
  * contain the absolute maximum allowable speed profile. The units here are consistent
  * with the input units. This array is of length num_elements.
  */
-void app_trajectory_planner_getMaximumSpeedProfile_impl(
+void app_trajectory_planner_impl_getMaximumSpeedProfile(
     Polynomial2dOrder3_t path, unsigned int num_elements, float t_start, float t_end,
     float max_allowable_acceleration, float speed_cap,
     float *max_allowable_speed_profile);
@@ -268,7 +268,7 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
  *
  * @param displacement [in] The distance between the initial and final velocity points.
  *
- * @return final_speed [out] The final speed at the end of the segment.
+ * @return final_speed The final speed at the end of the segment.
  */
 float app_trajectory_planner_modifySpeedToMatchDuration_impl(float initial_speed,
                                                              float duration,
