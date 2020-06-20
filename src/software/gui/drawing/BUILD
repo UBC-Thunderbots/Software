@@ -146,6 +146,7 @@ cc_library(
     deps = [
         ":ball",
         ":colors",
+        ":draw_functions",
         ":field",
         ":robot",
         "//software/proto:ssl_cc_proto",
