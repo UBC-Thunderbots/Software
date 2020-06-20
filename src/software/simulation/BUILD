@@ -166,8 +166,8 @@ cc_test(
 )
 
 cc_binary(
-    name = "simulator_gui_main",
-    srcs = ["simulator_main.cpp"],
+    name = "standalone_simulator_main",
+    srcs = ["standalone_simulator_main.cpp"],
     deps = [
         ":threaded_simulator",
         "//software/gui/simulator:simulator_gui_wrapper",
